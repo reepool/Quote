@@ -1,117 +1,764 @@
 {
-    "sys_config": {
-        "log_file": "log/sys.log",
-        "pid_file": "log/process.pid",
-        "log_level": "INFO"
-    },
-    "telegram_config": {
-        "enabled": false,
-        "api_id": "YOUR_TELEGRAM_API_ID",
-        "api_hash": "YOUR_TELEGRAM_API_HASH",
-        "bot_token": "YOUR_BOT_TOKEN",
-        "chat_id": ["YOUR_CHAT_ID"],
-        "session_name": "MsgBot"
-    },
-    "database_config": {
-        "db_path": "data/quotes.db",
-        "backup_enabled": true,
-        "backup_interval_days": 7
-    },
-    "data_config": {
-        "data_dir": "data",
-        "batch_size": 50,
-        "max_concurrent_downloads": 3,
-        "retry_times": 3,
-        "retry_interval_seconds": 5,
-        "default_start_years": {
-            "SSE": 2005,
-            "SZSE": 2005,
-            "HKEX": 2005,
-            "NASDAQ": 2005,
-            "NYSE": 2005
-        },
-        "market_presets": {
-            "a_shares": ["SSE", "SZSE"],
-            "hk_stocks": ["HKEX"],
-            "us_stocks": ["NASDAQ", "NYSE"],
-            "all_markets": ["SSE", "SZSE", "HKEX", "NASDAQ", "NYSE"],
-            "mainland": ["SSE", "SZSE"],
-            "overseas": ["HKEX", "NASDAQ", "NYSE"],
-            "chinese": ["SSE", "SZSE", "HKEX"],
-            "global": ["NASDAQ", "NYSE"]
-        }
-    },
-    "data_sources": {
-        "a_stock": {
-            "enabled": true
-        },
-        "hk_stock": {
-            "enabled": false
-        },
-        "us_stock": {
-            "enabled": false
-        }
-    },
-    "data_sources_config": {
-        "akshare": {
-            "enabled": true,
-            "exchanges_supported": ["a_stock", null],
-            "primary_source_of": ["a_stock"],
-            "max_requests_per_minute": 15,
-            "max_requests_per_hour": 600,
-            "max_requests_per_day": 8000,
-            "retry_times": 5,
-            "retry_interval": 2.0
-        },
-        "yfinance": {
-            "enabled": false,
-            "exchanges_supported": ["a_stock", "hk_stock", "us_stock", null],
-            "primary_source_of": ["us_stock", "hk_stock"],
-            "max_requests_per_minute": 30,
-            "max_requests_per_hour": 500,
-            "max_requests_per_day": 5000,
-            "retry_times": 3,
-            "retry_interval": 2.0
-        }
-    },
-    "exchange_rules":{
-        "exchange_mapping": {
-            "SSE": "a_stock",
-            "SZSE": "a_stock",
-            "BSE": "a_stock",
-            "HKEX": "hk_stock",
-            "NASDAQ": "us_stock",
-            "NYSE": "us_stock"
-        },
-        "symbol_rules": {
-            "SZSE": 6,
-            "SSE": 6,
-            "BSE": 6,
-            "HKEX": [4, 5],
-            "NASDAQ": null,
-            "NYSE": null
-        },
-        "symbol_start_with": {
-            "SSE": ["600", "601", "603", "688", "900"],
-            "SZSE": ["000", "001", "002", "300", "200"],
-            "BSE": ["43", "83", "87"],
-            "HKEX": ["0", "00", "000"]
-        }
-    },
-    "api_config": {
-        "host": "0.0.0.0",
-        "port": 8000,
-        "workers": 1,
-        "reload": false,
-        "cors_origins": ["*"]
-    },
-    "scheduler_config": {
-        "enabled": true,
-        "timezone": "Asia/Shanghai"
-    },
-    "cache_config": {
-        "enabled": true,
-        "max_memory_mb": 512,
-        "default_ttl_seconds": 3600
+  "sys_config": {
+    "pid_file": "log/process.pid",
+    "lock_file": "log/process.lock",
+    "single_instance": true,
+    "cleanup_on_startup": true,
+    "persistent_pids": {
+      "scheduler": "log/scheduler.pid",
+      "api_server": "log/api_server.pid"
     }
+  },
+  "logging_config": {
+    "level": "INFO",
+    "format": "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S",
+    "file_config": {
+      "enabled": true,
+      "directory": "log",
+      "filename": "sys.log",
+      "rotation": {
+        "enabled": true,
+        "type": "size",
+        "max_bytes_mb": 50,
+        "backup_count": 10
+      }
+    },
+    "console_config": {
+      "enabled": true,
+      "level": "INFO"
+    },
+    "modules": {
+      "DataManager": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "DataSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Database": {
+        "level": "WARNING",
+        "enabled": true
+      },
+      "API": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Scheduler": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "TaskManager": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "TelegramBot": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "AkShareSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "YFinanceSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Tushare": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Baostock": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "tg_task_manager": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "report": {
+        "level": "INFO",
+        "enabled": true
+      }
+    },
+    "performance_monitoring": {
+      "enabled": true,
+      "slow_operation_threshold_seconds": 2.0,
+      "log_memory_usage": true,
+      "collect_metrics": true
+    }
+  },
+  "telegram_config": {
+    "enabled": true,
+    "api_id": "",
+    "api_hash": "",
+    "bot_token": "6117627563:",
+    "chat_id": [
+      ""
+    ],
+    "session_name": "MsgBot",
+    "connection_retries": 3,
+    "retry_delay": 5,
+    "flood_sleep_threshold": 60,
+    "auto_reconnect": true,
+    "timeout": 30,
+    "intervals": {
+      "tg_msg_retry_interval": 3,
+      "tg_msg_retry_times": 5,
+      "tg_connect_timeout": 30,
+      "tg_auto_reconnect": true,
+      "tg_max_reconnect_attempts": 5,
+      "tg_reconnect_delay": 10
+    }
+  },
+  "database_config": {
+    "db_path": "data/quotes.db",
+    "backup_enabled": false,
+    "backup_interval_days": 7
+  },
+  "data_config": {
+    "data_dir": "data",
+    "batch_size": 50,
+    "download_chunk_days": 0,
+    "max_concurrent_downloads": 1,
+    "retry_times": 3,
+    "retry_interval_seconds": 5,
+    "default_start_years": {
+      "SSE": 1990,
+      "SZSE": 1990,
+      "BSE": 2014,
+      "HKEX": 1990,
+      "NASDAQ": 1990,
+      "NYSE": 1990
+    },
+    "market_presets": {
+      "a_shares": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "hk_stocks": [
+        "HKEX"
+      ],
+      "us_stocks": [
+        "NASDAQ",
+        "NYSE"
+      ],
+      "all_markets": [
+        "SSE",
+        "SZSE",
+        "BSE",
+        "HKEX",
+        "NASDAQ",
+        "NYSE"
+      ],
+      "mainland": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "overseas": [
+        "HKEX",
+        "NASDAQ",
+        "NYSE"
+      ],
+      "chinese": [
+        "SSE",
+        "SZSE",
+        "BSE",
+        "HKEX"
+      ],
+      "global": [
+        "NASDAQ",
+        "NYSE"
+      ]
+    }
+  },
+  "data_sources": {
+    "a_stock": {
+      "enabled": true
+    },
+    "hk_stock": {
+      "enabled": false
+    },
+    "us_stock": {
+      "enabled": false
+    }
+  },
+  "data_sources_config": {
+    "akshare": {
+      "enabled": false,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "primary_source_of": [],
+      "max_requests_per_minute": 8,
+      "max_requests_per_hour": 300,
+      "max_requests_per_day": 5000,
+      "retry_times": 5,
+      "retry_interval": 3.0
+    },
+    "yfinance": {
+      "enabled": false,
+      "exchanges_supported": [
+        "a_stock",
+        "hk_stock",
+        "us_stock"
+      ],
+      "primary_source_of": [],
+      "max_requests_per_minute": 8,
+      "max_requests_per_hour": 300,
+      "max_requests_per_day": 5000,
+      "retry_times": 3,
+      "retry_interval": 2.0
+    },
+    "tushare": {
+      "enabled": false,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "primary_source_of": [],
+      "max_requests_per_minute": 200,
+      "max_requests_per_hour": 1000,
+      "max_requests_per_day": 2000,
+      "retry_times": 3,
+      "retry_interval": 1.0,
+      "token": ""
+    },
+    "baostock": {
+      "enabled": true,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "primary_source_of": [
+        "a_stock"
+      ],
+      "max_requests_per_minute": 60,
+      "max_requests_per_hour": 3000,
+      "max_requests_per_day": 60000,
+      "retry_times": 5,
+      "retry_interval": 5.0,
+      "network_error_retry_interval": 10.0,
+      "connection_timeout": 30.0
+    }
+  },
+  "exchange_rules": {
+    "exchange_mapping": {
+      "SSE": "a_stock",
+      "SZSE": "a_stock",
+      "BSE": "a_stock",
+      "HKEX": "hk_stock",
+      "NASDAQ": "us_stock",
+      "NYSE": "us_stock"
+    },
+    "symbol_rules": {
+      "SZSE": 6,
+      "SSE": 6,
+      "BSE": 6,
+      "HKEX": [
+        4,
+        5
+      ],
+      "NASDAQ": null,
+      "NYSE": null
+    },
+    "symbol_start_with": {
+      "SSE": [
+        "600",
+        "601",
+        "603",
+        "688",
+        "900"
+      ],
+      "SZSE": [
+        "000",
+        "001",
+        "002",
+        "300",
+        "200"
+      ],
+      "BSE": [
+        "43",
+        "83",
+        "87"
+      ],
+      "HKEX": [
+        "0",
+        "00",
+        "000"
+      ]
+    }
+  },
+  "api_config": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "workers": 1,
+    "reload": false,
+    "cors_origins": [
+      "*"
+    ]
+  },
+  "scheduler_config": {
+    "enabled": true,
+    "timezone": "Asia/Shanghai",
+    "max_instances": 1,
+    "misfire_grace_time": 300,
+    "coalesce": true,
+    "monitor_startup_delay": 3,
+    "market_close_delay_minutes": 15,
+    "jobs": {
+      "daily_data_update": {
+        "enabled": true,
+        "description": "每日数据更新任务",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 20,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "wait_for_market_close": true,
+          "market_close_delay_minutes": 15,
+          "enable_trading_day_check": true
+        }
+      },
+      "system_health_check": {
+        "enabled": true,
+        "description": "系统健康检查",
+        "report": true,
+        "trigger": {
+          "type": "interval",
+          "hours": 1,
+          "minutes": 0,
+          "seconds": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "check_data_sources": true,
+          "check_database": true,
+          "check_disk_space": true,
+          "check_memory_usage": true,
+          "disk_space_threshold_mb": 1000,
+          "memory_threshold_percent": 85
+        }
+      },
+      "weekly_data_maintenance": {
+        "enabled": true,
+        "description": "每周数据维护",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 2,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "backup_database": true,
+          "cleanup_old_logs": true,
+          "log_retention_days": 30,
+          "optimize_database": true,
+          "validate_data_integrity": true
+        }
+      },
+      "monthly_data_integrity_check": {
+        "enabled": true,
+        "description": "月度数据完整性检查和缺口修复",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day": 1,
+          "hour": 3,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "severity_filter": [
+            "high",
+            "critical"
+          ],
+          "days_to_check": 45
+        }
+      },
+      "quarterly_cleanup": {
+        "enabled": true,
+        "description": "季度数据清理",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "month": "3,6,9,12",
+          "day": "last",
+          "hour": 4,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "cleanup_old_quotes": true,
+          "quote_retention_months": 36,
+          "cleanup_temp_files": true,
+          "cleanup_backup_files": false,
+          "backup_retention_months": 12
+        }
+      },
+      "cache_warm_up": {
+        "enabled": true,
+        "description": "缓存预热",
+        "report": false,
+        "trigger": {
+          "type": "cron",
+          "hour": 8,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "warm_popular_stocks": true,
+          "popular_stocks_count": 50,
+          "warm_market_indices": true,
+          "preload_recent_data": true,
+          "recent_data_days": 7
+        }
+      },
+      "trading_calendar_update": {
+        "enabled": true,
+        "description": "交易日历更新",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day": "1",
+          "hour": 1,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "update_future_months": 3,
+          "force_update": false,
+          "validate_holidays": true
+        }
+      },
+      "database_backup": {
+        "enabled": true,
+        "description": "数据库备份任务",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 6,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "use_backup_config": true
+        }
+      }
+    }
+  },
+  "backup_config": {
+    "enabled": true,
+    "source_db_path": "data/quotes.db",
+    "backup_directory": "data/PVE-Bak/QuoteBak",
+    "retention_days": 30,
+    "compression_enabled": false,
+    "notification_enabled": true,
+    "filename_pattern": "quotes_backup_{timestamp}.db",
+    "max_backup_files": 10
+  },
+  "cache_config": {
+    "enabled": true,
+    "max_memory_mb": 512,
+    "default_ttl_seconds": 3600
+  },
+  "report_config": {
+    "templates": {
+      "download_report": {
+        "name": "数据下载报告",
+        "emoji": "📊",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📊 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "total_instruments",
+              "success_count",
+              "failure_count",
+              "total_quotes",
+              "success_rate"
+            ]
+          },
+          {
+            "name": "exchange_stats",
+            "type": "table",
+            "data_source": "exchange_stats"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {time}"
+          }
+        ]
+      },
+      "daily_update_report": {
+        "name": "每日数据更新报告",
+        "emoji": "📈",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📈 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "updated_instruments",
+              "new_quotes",
+              "success_rate"
+            ]
+          },
+          {
+            "name": "exchange_details",
+            "type": "table",
+            "data_source": "exchange_stats"
+          }
+        ]
+      },
+      "gap_report": {
+        "name": "数据缺口报告",
+        "emoji": "🔍",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🔍 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "total_gaps",
+              "affected_stocks",
+              "severity_distribution"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "top_affected_stocks"
+          }
+        ]
+      },
+      "system_status": {
+        "name": "系统状态报告",
+        "emoji": "🏥",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🏥 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "system_status"
+          },
+          {
+            "name": "metrics",
+            "type": "metrics",
+            "fields": [
+              "database_stats",
+              "data_sources"
+            ]
+          }
+        ]
+      },
+      "backup_result": {
+        "name": "数据库备份报告",
+        "emoji": "💾",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "💾 *{name}*"
+          },
+          {
+            "name": "result",
+            "type": "status",
+            "data_source": "backup_result"
+          },
+          {
+            "name": "details",
+            "type": "metrics",
+            "fields": [
+              "backup_file",
+              "file_size",
+              "duration"
+            ]
+          }
+        ]
+      },
+      "health_check_report": {
+        "name": "系统健康检查报告",
+        "emoji": "🏥",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🏥 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "overall_status",
+              "checks_performed",
+              "issues_found"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "check_results"
+          }
+        ]
+      },
+      "maintenance_report": {
+        "name": "数据维护报告",
+        "emoji": "🔧",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🔧 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "tasks_completed",
+              "space_freed",
+              "duration"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "maintenance_tasks"
+          }
+        ]
+      },
+      "cache_warm_up_report": {
+        "name": "缓存预热报告",
+        "emoji": "⚡",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "⚡ *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "stocks_warmed",
+              "cache_hit_rate",
+              "duration"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "metrics",
+            "fields": [
+              "popular_stocks",
+              "market_indices",
+              "recent_data"
+            ]
+          }
+        ]
+      },
+      "trading_calendar_report": {
+        "name": "交易日历更新报告",
+        "emoji": "📅",
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📅 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "exchanges_updated",
+              "trading_days_added",
+              "holidays_added"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "table",
+            "data_source": "exchange_details"
+          }
+        ]
+      }
+    },
+    "formats": {
+      "telegram": {
+        "max_length": 4000,
+        "line_separator": "\n\n",
+        "bold_format": "*{text}*",
+        "code_format": "`{text}`"
+      },
+      "console": {
+        "max_width": 100,
+        "line_separator": "\n\n",
+        "table_style": "grid"
+      },
+      "api": {
+        "include_raw_data": true,
+        "response_format": "json"
+      }
+    }
+  }
 }

@@ -237,7 +237,12 @@ class TaskManagerBot:
     async def handle_reload_config_command(self, event) -> None:
         """处理配置重载命令"""
         chat_id = event.chat_id
-        self.logger.info(f"[TaskManagerBot] 收到配置重载请求，chat_id: {chat_id}")
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/reload_config'
+
+        # 详细日志记录
+        self.logger.info(f"[TaskManagerBot] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.logger.debug(f"[TaskManagerBot] 处理配置重载请求，chat_id: {chat_id}")
 
         try:
             # 发送开始重载的消息

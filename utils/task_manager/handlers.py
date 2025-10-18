@@ -23,7 +23,12 @@ class TaskManagerHandlers:
     async def handle_start_command(self, event) -> None:
         """处理 /start 命令"""
         chat_id = event.chat_id
-        self.task_manager.logger.debug(f"[TaskManagerHandlers] 收到/start命令，chat_id: {chat_id}")
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/start'
+
+        # 详细日志记录
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/start命令，chat_id: {chat_id}")
 
         user_state = self._get_user_state(chat_id)
         user_state.current_view = "main"
@@ -50,13 +55,24 @@ class TaskManagerHandlers:
     async def handle_status_command(self, event) -> None:
         """处理 /status 命令"""
         chat_id = event.chat_id
-        self.task_manager.logger.debug(f"[TaskManagerHandlers] 收到/status命令，chat_id: {chat_id}")
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/status'
+
+        # 详细日志记录
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/status命令，chat_id: {chat_id}")
+
         await self._show_task_status_simple(chat_id)
 
     async def handle_help_command(self, event) -> None:
         """处理 /help 命令"""
         chat_id = event.chat_id
-        self.task_manager.logger.debug(f"[TaskManagerHandlers] 收到/help命令，chat_id: {chat_id}")
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/help'
+
+        # 详细日志记录
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/help命令，chat_id: {chat_id}")
 
         help_message = (
             "🤖 *Quote 任务管理器帮助*\n\n"
@@ -91,8 +107,12 @@ class TaskManagerHandlers:
     async def handle_detail_command(self, event) -> None:
         """处理 /detail 命令"""
         chat_id = event.chat_id
-        command_text = event.text
-        self.task_manager.logger.debug(f"[TaskManagerHandlers] 收到/detail命令: {command_text}, chat_id: {chat_id}")
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        command_text = event.text if hasattr(event, 'text') else '/detail'
+
+        # 详细日志记录
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/detail命令: {command_text}, chat_id: {chat_id}")
 
         # 解析命令参数
         parts = command_text.split()

@@ -571,3 +571,27 @@ class TelegramBot:
                 else:
                     tgbot_logger.error(f"[tgbot] All {tg_msg_retry_times} send attempts failed for {chat_id}: {e}")
                     return False
+
+
+# 全局辅助函数，避免使用context manager清空单例连接
+async def send_report_without_context(report_type: str, report_data: dict, level: str = "info") -> bool:
+    """
+    发送报告但不使用context manager，避免清空单例的bot_thon连接
+
+    Args:
+        report_type: 报告类型
+        report_data: 报告数据
+        level: 消息级别
+
+    Returns:
+        bool: 发送是否成功
+    """
+    try:
+        bot = TelegramBot()
+        if not bot.bot_thon:
+            await bot.create_bot_instance()
+        result = await bot.send_report_notification(report_data, report_type, level)
+        return result
+    except Exception as e:
+        tgbot_logger.error(f"[tgbot] Failed to send report: {e}")
+        return False

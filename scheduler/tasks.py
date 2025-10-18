@@ -77,14 +77,14 @@ class ScheduledTasks:
             # 生成报告
             formatted_report = formatter(report_data, 'telegram')
 
-            # 发送报告
-            async with TelegramBot() as bot:
-                await bot.send_report_notification({
-                    'report_type': report_type,
-                    'task_name': task_name,
-                    'content': formatted_report,
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }, report_type)
+            # 发送报告 - 使用持久连接避免断开
+            from utils.tgbot import send_report_persistent
+            await send_report_persistent(report_type, {
+                'report_type': report_type,
+                'task_name': task_name,
+                'content': formatted_report,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
 
             scheduler_logger.info(f"[Scheduler] Task {task_name} report sent successfully")
             return True
@@ -93,16 +93,17 @@ class ScheduledTasks:
             scheduler_logger.error(f"[Scheduler] Failed to send task report for {task_name}: {e}")
             return False
 
-    async def initialize(self):
+    async def initialize(self, debug=False):
         """初始化定时任务"""
         scheduler_logger.info("[Scheduler] Initializing scheduled tasks...")
-        # 使用统一的通知接口
-        if self.telegram_enabled:
-            try:
-                async with TelegramBot() as bot:
-                    await bot.send_task_notification("定时任务系统已启动，开始加载任务...")
-            except Exception as e:
-                scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+        if debug:
+            # 使用统一的通知接口
+            if self.telegram_enabled:
+                try:
+                    from utils.tgbot import send_notification_persistent
+                    await send_notification_persistent("定时任务系统已启动，开始加载任务...", "[调度器启动]")
+                except Exception as e:
+                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
 
     async def daily_data_update(self,
                             exchanges: List[str] = None,
@@ -199,8 +200,8 @@ class ScheduledTasks:
             scheduler_logger.error(f"[Scheduler] Daily data update failed: {e}")
             if self.telegram_enabled:
                 try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(f"❌ 每日数据更新失败: {str(e)}")
+                    from utils.tgbot import send_notification_persistent
+                    await send_notification_persistent(f"❌ 每日数据更新失败: {str(e)}", "[每日数据更新]", "error")
                 except Exception as e:
                     scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
             return False

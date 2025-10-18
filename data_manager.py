@@ -228,8 +228,8 @@ class DataManager:
             # 使用统一的报告通知接口
             if self.telegram_enabled:
                 try:
-                    async with TelegramBot() as bot:
-                        await bot.send_report_notification(download_report, "download_report", "success")
+                    from utils.tgbot import send_report_without_context
+                    await send_report_without_context("download_report", download_report, "success")
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to send notification: {e}")
 
@@ -1538,8 +1538,8 @@ class DataManager:
             # 使用统一的报告通知接口
             if self.telegram_enabled:
                 try:
-                    async with TelegramBot() as bot:
-                        await bot.send_report_notification(update_report, "daily_update_report", "success")
+                    from utils.tgbot import send_report_without_context
+                    await send_report_without_context("daily_update_report", update_report, "success")
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to send notification: {e}")
 
