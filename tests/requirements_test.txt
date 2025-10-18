@@ -1,0 +1,51 @@
+# Quote System Test Dependencies
+
+# Core testing framework
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-mock==3.14.0
+pytest-cov==6.0.0
+pytest-xdist==3.6.1
+pytest-benchmark==4.0.0
+pytest-timeout==2.3.1
+
+# HTTP testing
+httpx==0.28.1
+aioresponses==0.7.7
+
+# Database testing
+factory-boy==3.3.1
+faker==30.8.1
+
+# Performance testing
+memory-profiler==0.61.0
+psutil==6.1.0
+
+# Code quality and coverage
+coverage==7.6.4
+pytest-html==4.1.1
+pytest-json-report==1.5.0
+
+# Async testing utilities
+asyncio-throttle==1.0.2
+
+# Data testing utilities
+pandas==2.2.3
+numpy==1.26.4
+
+# Mock and utilities
+responses==0.25.3
+freezegun==1.5.1
+
+# Configuration and environment
+python-dotenv==1.0.1
+
+# Development utilities
+pre-commit==4.0.1
+black==24.10.0
+isort==5.13.2
+flake8==7.1.1
+mypy==1.13.0
+
+# Documentation for tests
+sphinx==8.1.3

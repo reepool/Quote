@@ -1,0 +1,117 @@
+{
+    "sys_config": {
+        "log_file": "log/sys.log",
+        "pid_file": "log/process.pid",
+        "log_level": "INFO"
+    },
+    "telegram_config": {
+        "enabled": false,
+        "api_id": "YOUR_TELEGRAM_API_ID",
+        "api_hash": "YOUR_TELEGRAM_API_HASH",
+        "bot_token": "YOUR_BOT_TOKEN",
+        "chat_id": ["YOUR_CHAT_ID"],
+        "session_name": "MsgBot"
+    },
+    "database_config": {
+        "db_path": "data/quotes.db",
+        "backup_enabled": true,
+        "backup_interval_days": 7
+    },
+    "data_config": {
+        "data_dir": "data",
+        "batch_size": 50,
+        "max_concurrent_downloads": 3,
+        "retry_times": 3,
+        "retry_interval_seconds": 5,
+        "default_start_years": {
+            "SSE": 2005,
+            "SZSE": 2005,
+            "HKEX": 2005,
+            "NASDAQ": 2005,
+            "NYSE": 2005
+        },
+        "market_presets": {
+            "a_shares": ["SSE", "SZSE"],
+            "hk_stocks": ["HKEX"],
+            "us_stocks": ["NASDAQ", "NYSE"],
+            "all_markets": ["SSE", "SZSE", "HKEX", "NASDAQ", "NYSE"],
+            "mainland": ["SSE", "SZSE"],
+            "overseas": ["HKEX", "NASDAQ", "NYSE"],
+            "chinese": ["SSE", "SZSE", "HKEX"],
+            "global": ["NASDAQ", "NYSE"]
+        }
+    },
+    "data_sources": {
+        "a_stock": {
+            "enabled": true
+        },
+        "hk_stock": {
+            "enabled": false
+        },
+        "us_stock": {
+            "enabled": false
+        }
+    },
+    "data_sources_config": {
+        "akshare": {
+            "enabled": true,
+            "exchanges_supported": ["a_stock", null],
+            "primary_source_of": ["a_stock"],
+            "max_requests_per_minute": 15,
+            "max_requests_per_hour": 600,
+            "max_requests_per_day": 8000,
+            "retry_times": 5,
+            "retry_interval": 2.0
+        },
+        "yfinance": {
+            "enabled": false,
+            "exchanges_supported": ["a_stock", "hk_stock", "us_stock", null],
+            "primary_source_of": ["us_stock", "hk_stock"],
+            "max_requests_per_minute": 30,
+            "max_requests_per_hour": 500,
+            "max_requests_per_day": 5000,
+            "retry_times": 3,
+            "retry_interval": 2.0
+        }
+    },
+    "exchange_rules":{
+        "exchange_mapping": {
+            "SSE": "a_stock",
+            "SZSE": "a_stock",
+            "BSE": "a_stock",
+            "HKEX": "hk_stock",
+            "NASDAQ": "us_stock",
+            "NYSE": "us_stock"
+        },
+        "symbol_rules": {
+            "SZSE": 6,
+            "SSE": 6,
+            "BSE": 6,
+            "HKEX": [4, 5],
+            "NASDAQ": null,
+            "NYSE": null
+        },
+        "symbol_start_with": {
+            "SSE": ["600", "601", "603", "688", "900"],
+            "SZSE": ["000", "001", "002", "300", "200"],
+            "BSE": ["43", "83", "87"],
+            "HKEX": ["0", "00", "000"]
+        }
+    },
+    "api_config": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "workers": 1,
+        "reload": false,
+        "cors_origins": ["*"]
+    },
+    "scheduler_config": {
+        "enabled": true,
+        "timezone": "Asia/Shanghai"
+    },
+    "cache_config": {
+        "enabled": true,
+        "max_memory_mb": 512,
+        "default_ttl_seconds": 3600
+    }
+}

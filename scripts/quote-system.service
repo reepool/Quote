@@ -1,0 +1,43 @@
+[Unit]
+Description=Quote System - 股票行情数据管理系统
+Documentation=https://github.com/reepool/quote-system
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=python
+Group=python
+WorkingDirectory=/home/python/Quote
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/python/miniconda3/envs/Quote/bin
+Environment=PYTHONPATH=/home/python/Quote
+Environment=HOME=/home/python
+ExecStart=/home/python/Quote/scripts/start_simple_final.sh
+ExecStop=/home/python/miniconda3/envs/Quote/bin/python /home/python/Quote/scripts/graceful_shutdown.py
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=30
+SendSIGKILL=yes
+FinalKillSignal=SIGKILL
+PrivateTmp=true
+Restart=on-failure
+RestartSec=10
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=quote-system
+
+# 安全配置
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/python/Quote /home/python/miniconda3
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target
