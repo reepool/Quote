@@ -168,6 +168,61 @@ python3 main.py job --job-id monthly_data_integrity_check
 python3 main.py job --job-id database_backup
 ```
 
+#### 3. 启动服务
+
+```bash
+# 启动API服务器
+python3 main.py api --host 0.0.0.0 --port 8000
+
+# 启动调度器（仅定时任务）
+python3 main.py scheduler
+
+# 启动完整系统（调度器 + API服务）
+python3 main.py full --host 0.0.0.0 --port 8000
+```
+
+#### 4. Telegram任务管理
+
+系统提供完整的Telegram机器人管理界面：
+
+```bash
+# 启动包含任务管理器的完整系统
+python3 main.py full --host 0.0.0.0 --port 8000
+
+# 或分别启动调度器和API服务
+python3 main.py scheduler
+python3 main.py api --host 0.0.0.0 --port 8000
+```
+
+**Telegram机器人命令**：
+```
+/start           # 显示主菜单和帮助信息
+/status          # 查看所有任务状态和下次执行时间
+/detail <任务ID>  # 查看指定任务的详细信息
+/reload_config   # 热重载配置文件
+/help            # 显示帮助信息
+```
+
+**任务控制示例**：
+```bash
+# 在Telegram中直接发送命令
+/status                    # 显示任务状态（智能时间显示）
+/detail daily_data_update  # 查看每日数据更新任务详情
+/reload_config            # 重载任务配置
+```
+
+#### 5. 系统管理
+
+```bash
+# 显示系统状态
+python3 main.py status
+
+# 运行指定任务
+python3 main.py job --job-id daily_data_update
+python3 main.py job --job-id monthly_data_integrity_check
+python3 main.py job --job-id database_backup
+```
+
 ## 📖 详细功能说明
 
 ### 调度系统

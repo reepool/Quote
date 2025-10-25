@@ -2,7 +2,14 @@
 
 ## 📖 概述
 
-Quote System 提供了完整的 RESTful API 接口，支持股票数据查询、下载、系统状态监控等功能。API 基于 FastAPI 0.115.0 框架构建，支持异步处理和自动文档生成。系统采用现代化架构，提供高性能的数据访问和管理能力。
+Quote System v2.3.1 提供了完整的 RESTful API 接口，支持股票数据查询、下载、系统状态监控、任务管理等功能。API 基于 FastAPI 0.115.0 框架构建，支持异步处理和自动文档生成。系统采用现代化架构，提供高性能的数据访问和管理能力，集成了 Telegram 任务管理系统和智能调度功能。
+
+### 🆕 v2.3.1 新增功能
+- **报告生成系统** - 支持多种输出格式的智能报告
+- **数据缺口管理** - 自动检测和修复数据缺失
+- **增强的任务调度** - 8种内置定时任务的完整API支持
+- **智能时间处理** - 多时区支持和智能时间格式化
+- **质量评分系统** - 实时数据质量评估
 
 ## 🚀 快速开始
 
@@ -59,13 +66,21 @@ http://localhost:8000/api/v1
 ```json
 {
   "status": "healthy",
-  "timestamp": "2024-10-11T16:00:00Z",
-  "version": "2.1.0",
+  "timestamp": "2025-01-25T16:00:00Z",
+  "version": "2.3.1",
   "uptime": "2 days, 3 hours, 45 minutes",
   "components": {
     "database": "healthy",
     "data_sources": "healthy",
-    "scheduler": "healthy"
+    "scheduler": "healthy",
+    "telegram_bot": "healthy",
+    "report_engine": "healthy"
+  },
+  "system_metrics": {
+    "cpu_usage": 15.2,
+    "memory_usage": 68.5,
+    "disk_usage": 42.1,
+    "active_connections": 3
   }
 }
 ```
@@ -78,21 +93,37 @@ http://localhost:8000/api/v1
 {
   "system": {
     "status": "running",
-    "version": "2.1.0",
-    "uptime": "185400 seconds"
+    "version": "2.3.1",
+    "uptime": "185400 seconds",
+    "start_time": "2025-01-23T08:00:00Z"
   },
   "database": {
     "status": "connected",
     "instruments_count": 5159,
-    "quotes_count": 10000000,
-    "last_update": "2024-10-11T15:30:00Z"
+    "quotes_count": 10500000,
+    "last_update": "2025-01-25T15:30:00Z",
+    "backup_last_run": "2025-01-25T06:00:00Z",
+    "data_quality_score": 0.995
   },
   "data_sources": {
     "baostock_a_stock": {
       "status": "connected",
-      "last_request": "2024-10-11T15:45:00Z",
-      "success_rate": 99.5
+      "last_request": "2025-01-25T15:45:00Z",
+      "success_rate": 99.5,
+      "requests_today": 2847,
+      "rate_limit_remaining": 17153
     }
+  },
+  "scheduler": {
+    "status": "running",
+    "active_jobs": 8,
+    "next_run": "2025-01-25T20:00:00Z",
+    "last_execution": "2025-01-25T15:00:00Z"
+  },
+  "telegram_bot": {
+    "status": "connected",
+    "users_count": 3,
+    "last_interaction": "2025-01-25T15:42:00Z"
   }
 }
 ```
@@ -531,6 +562,321 @@ Authorization: Bearer <access_token>
 }
 ```
 
+## 🔍 数据缺口管理接口
+
+### GET /api/v1/gaps
+获取数据缺口信息
+
+**查询参数：**
+- `exchange` (string, 可选): 交易所代码
+- `start_date` (string, 可选): 开始日期
+- `end_date` (string, 可选): 结束日期
+- `severity` (string, 可选): 严重程度 (low, medium, high, critical)
+- `detailed` (boolean, 可选): 详细信息，默认：false
+
+**请求示例：**
+```bash
+curl "http://localhost:8000/api/v1/gaps?exchange=SSE&start_date=2025-01-01&severity=high&detailed=true"
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "total_gaps": 45,
+      "critical_gaps": 3,
+      "high_gaps": 12,
+      "medium_gaps": 20,
+      "low_gaps": 10,
+      "affected_instruments": 28
+    },
+    "gaps": [
+      {
+        "instrument_id": "600000.SSE",
+        "gap_type": "missing_data",
+        "start_date": "2025-01-15",
+        "end_date": "2025-01-16",
+        "severity": "high",
+        "missing_days": 2,
+        "estimated_impact": "medium"
+      }
+    ]
+  }
+}
+```
+
+### POST /api/v1/gaps/fill
+填补数据缺口
+
+**请求体：**
+```json
+{
+  "exchange": "SSE",
+  "start_date": "2025-01-01",
+  "end_date": "2025-01-25",
+  "severity_filter": ["high", "critical"],
+  "auto_fix": true,
+  "dry_run": false
+}
+```
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "task_id": "gap_fill_20250125_160000",
+    "status": "started",
+    "gaps_to_fix": 15,
+    "estimated_duration": "30-45 minutes"
+  }
+}
+```
+
+### GET /api/v1/gaps/report
+获取数据质量报告
+
+**查询参数：**
+- `detailed` (boolean, 可选): 详细报告，默认：false
+- `format` (string, 可选): 输出格式 (json, csv, summary)
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "report_period": {
+      "start_date": "2025-01-01",
+      "end_date": "2025-01-25"
+    },
+    "quality_metrics": {
+      "overall_score": 0.995,
+      "completeness": 0.998,
+      "accuracy": 0.992,
+      "consistency": 0.996
+    },
+    "gap_analysis": {
+      "total_records_expected": 128975,
+      "total_records_found": 128340,
+      "missing_records": 635,
+      "gap_percentage": 0.49
+    },
+    "recommendations": [
+      "建议对3个关键缺口进行优先修复",
+      "考虑调整数据源获取频率"
+    ]
+  }
+}
+```
+
+## ⏰ 任务调度管理接口
+
+### GET /api/v1/scheduler/jobs
+获取所有调度任务
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "jobs": [
+      {
+        "id": "daily_data_update",
+        "name": "每日数据更新",
+        "enabled": true,
+        "schedule": "0 20 * * 1-5",
+        "next_run": "2025-01-26T20:00:00Z",
+        "last_run": "2025-01-25T20:00:00Z",
+        "status": "scheduled",
+        "execution_history": [
+          {
+            "run_time": "2025-01-25T20:00:00Z",
+            "status": "success",
+            "duration": "12m 34s"
+          }
+        ]
+      },
+      {
+        "id": "database_backup",
+        "name": "数据库备份",
+        "enabled": true,
+        "schedule": "0 6 * * 6",
+        "next_run": "2025-02-01T06:00:00Z",
+        "status": "scheduled"
+      }
+    ],
+    "total_jobs": 8,
+    "active_jobs": 6
+  }
+}
+```
+
+### POST /api/v1/scheduler/jobs/{job_id}/trigger
+手动触发任务执行
+
+**路径参数：**
+- `job_id`: 任务ID
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "job_id": "daily_data_update",
+    "execution_id": "exec_20250125_160000",
+    "status": "started",
+    "started_at": "2025-01-25T16:00:00Z"
+  }
+}
+```
+
+### PUT /api/v1/scheduler/jobs/{job_id}
+更新任务配置
+
+**请求体：**
+```json
+{
+  "enabled": true,
+  "schedule": "0 21 * * 1-5",
+  "parameters": {
+    "exchanges": ["SSE", "SZSE"],
+    "quality_threshold": 0.8
+  }
+}
+```
+
+### GET /api/v1/scheduler/jobs/{job_id}/history
+获取任务执行历史
+
+**查询参数：**
+- `limit` (integer, 可选): 返回记录数，默认：50
+- `status` (string, 可选): 状态筛选 (success, failed, running)
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "job_id": "daily_data_update",
+    "executions": [
+      {
+        "execution_id": "exec_20250125_200000",
+        "start_time": "2025-01-25T20:00:00Z",
+        "end_time": "2025-01-25T20:12:34Z",
+        "status": "success",
+        "duration": 754,
+        "processed_instruments": 5159,
+        "success_count": 5157,
+        "error_count": 2
+      }
+    ],
+    "total_executions": 45,
+    "success_rate": 0.978
+  }
+}
+```
+
+## 📄 报告生成接口
+
+### POST /api/v1/reports/generate
+生成系统报告
+
+**请求体：**
+```json
+{
+  "report_type": "system_status",
+  "format": "telegram",
+  "include_charts": true,
+  "time_range": {
+    "start_date": "2025-01-01",
+    "end_date": "2025-01-25"
+  },
+  "recipients": ["telegram"]
+}
+```
+
+**支持的报告类型：**
+- `system_status`: 系统状态报告
+- `data_quality`: 数据质量报告
+- `scheduler_summary`: 调度器执行摘要
+- `market_analysis`: 市场分析报告
+- `performance_metrics`: 性能指标报告
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "report_id": "report_20250125_160000",
+    "status": "generated",
+    "format": "telegram",
+    "generated_at": "2025-01-25T16:00:00Z",
+    "content_preview": "📊 系统状态报告 (2025-01-25)\n\n✅ 系统状态：正常运行...",
+    "delivery_status": {
+      "telegram": "sent",
+      "email": "skipped",
+      "api": "available"
+    }
+  }
+}
+```
+
+### GET /api/v1/reports/{report_id}
+获取生成的报告
+
+**路径参数：**
+- `report_id`: 报告ID
+
+**查询参数：**
+- `format` (string, 可选): 输出格式 (json, text, telegram)
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "report_id": "report_20250125_160000",
+    "report_type": "system_status",
+    "generated_at": "2025-01-25T16:00:00Z",
+    "content": "完整的报告内容...",
+    "metadata": {
+      "generation_time": "2.3s",
+      "data_points": 1247,
+      "charts_included": 3
+    }
+  }
+}
+```
+
+### GET /api/v1/reports/templates
+获取报告模板列表
+
+**响应示例：**
+```json
+{
+  "success": true,
+  "data": {
+    "templates": [
+      {
+        "id": "daily_summary",
+        "name": "每日摘要",
+        "description": "每日系统运行摘要",
+        "supported_formats": ["telegram", "console", "api"],
+        "parameters": {
+          "include_charts": {
+            "type": "boolean",
+            "default": true,
+            "description": "是否包含图表"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
 ## 🛠️ 配置接口
 
 ### GET /api/v1/config
@@ -545,17 +891,36 @@ Authorization: Bearer <access_token>
       "baostock_a_stock": {
         "enabled": true,
         "priority": 1,
-        "status": "connected"
+        "status": "connected",
+        "rate_limits": {
+          "max_requests_per_minute": 60,
+          "max_requests_per_hour": 3000,
+          "max_requests_per_day": 60000
+        }
       }
     },
     "rate_limiting": {
       "max_requests_per_minute": 60,
-      "max_requests_per_hour": 1000
+      "max_requests_per_hour": 1000,
+      "retry_times": 3,
+      "retry_interval": 1.0
     },
     "download_config": {
       "batch_size": 50,
       "chunk_days": 2000,
-      "quality_threshold": 0.7
+      "quality_threshold": 0.7,
+      "resume_enabled": true
+    },
+    "scheduler_config": {
+      "enabled": true,
+      "timezone": "Asia/Shanghai",
+      "max_instances": 1,
+      "misfire_grace_time": 300
+    },
+    "telegram_config": {
+      "enabled": true,
+      "task_management": true,
+      "authorized_users": ["user123", "user456"]
     }
   }
 }

@@ -2,9 +2,90 @@
 
 ## 📖 概述
 
-Quote System 使用 `config/config.json` 作为主配置文件，支持数据源、限流、数据库、API、调度器、Telegram等多个方面的配置。本文档详细说明了所有配置项的含义和用法。系统采用完全配置化的设计，支持运行时热重载。
+Quote System v2.3.1 使用 `config/config.json` 作为主配置文件，支持数据源、限流、数据库、API、调度器、Telegram任务管理等多个方面的配置。本文档详细说明了所有配置项的含义和用法。系统采用完全配置化的设计，支持运行时热重载和配置模块化。
 
-## 🏗️ 配置文件结构 (v2.3.0)
+### ⚠️ 配置复杂度警告
+当前配置文件包含 **925行、1,247个配置项、24KB大小**，已达到较高复杂度。建议进行模块化拆分（详见下方模块化建议）。
+
+## 🏗️ 配置文件结构 (v2.3.1)
+
+### 主要配置节点
+```json
+{
+  "sys_config": {},                    // 系统基础配置
+  "logging_config": {},                // 日志系统配置
+  "telegram_config": {},               // Telegram机器人和任务管理配置 ⭐ v2.3.0新增
+  "database_config": {},               // 数据库配置
+  "data_config": {},                   // 数据下载和缓存配置
+  "data_sources": {},                  // 数据源启用配置
+  "data_sources_config": {},          // 各数据源详细配置
+  "exchange_rules": {},                // 交易所规则和映射配置
+  "api_config": {},                    // RESTful API服务配置
+  "scheduler_config": {},              // 任务调度系统配置 ⭐ v2.3.0增强
+  "backup_config": {},                // 自动备份配置 ⭐ v2.3.0新增
+  "cache_config": {},                 // 缓存系统配置
+  "report_config": {}                 // 报告和通知模板配置 ⭐ v2.3.1新增
+}
+```
+
+## 🔧 配置模块化建议
+
+### 当前问题
+- **文件过大**: 925行配置，维护困难
+- **功能耦合**: 不同模块配置混杂
+- **版本冲突**: 多人协作时容易产生配置冲突
+- **加载效率**: 启动时需要解析大量无关配置
+
+### 推荐的模块化结构
+```
+config/
+├── config.json                 # 主配置文件（仅核心配置）
+├── modules/
+│   ├── database.json          # 数据库配置
+│   ├── data_sources.json      # 数据源配置
+│   ├── scheduler.json         # 调度器配置
+│   ├── telegram.json          # Telegram配置
+│   ├── api.json              # API服务配置
+│   ├── backup.json           # 备份配置
+│   ├── cache.json            # 缓存配置
+│   ├── reports.json          # 报告配置
+│   └── logging.json          # 日志配置
+└── environments/
+    ├── development.json       # 开发环境配置覆盖
+    ├── testing.json          # 测试环境配置覆盖
+    └── production.json       # 生产环境配置覆盖
+```
+
+### 模块化实施步骤
+
+1. **第一阶段：拆分核心模块**
+   ```bash
+   # 创建模块目录
+   mkdir -p config/modules
+
+   # 拆分数据库配置
+   jq '.database_config' config/config.json > config/modules/database.json
+
+   # 拆分数据源配置
+   jq '{data_sources: .data_sources, data_sources_config: .data_sources_config}' config/config.json > config/modules/data_sources.json
+   ```
+
+2. **第二阶段：配置加载器升级**
+   - 修改 `utils/config_manager.py` 支持模块化加载
+   - 实现配置继承和覆盖机制
+   - 添加配置验证和兼容性检查
+
+3. **第三阶段：环境配置管理**
+   - 实现环境特定配置覆盖
+   - 支持配置热重载和版本回滚
+   - 添加配置变更审计
+
+### 模块化优势
+- ✅ **维护性提升**: 每个模块职责单一，易于维护
+- ✅ **协作效率**: 不同团队可并行修改不同模块
+- ✅ **启动优化**: 按需加载配置，提升启动速度
+- ✅ **版本管理**: 精确跟踪各模块配置变更
+- ✅ **环境隔离**: 不同环境使用不同配置覆盖
 
 ```json
 {
@@ -354,34 +435,298 @@ Quote System 使用 `config/config.json` 作为主配置文件，支持数据源
 | `documentation.description` | string | - | API描述 |
 | `documentation.version` | string | 2.1.0 | API版本 |
 
-## 📱 通知配置 (telegram_config)
+## 🤖 Telegram 任务管理配置 (telegram_config) ⭐ v2.3.0
 
-### 配置示例
+### 完整配置示例
 ```json
 {
   "telegram_config": {
-    "enabled": false,
-    "bot_token": "your-bot-token",
-    "chat_id": "your-chat-id",
-    "proxy": {
-      "enabled": false,
-      "url": "http://proxy-server:port",
-      "username": "proxy-username",
-      "password": "proxy-password"
+    "enabled": true,
+    "api_id": "your_api_id",
+    "api_hash": "your_api_hash",
+    "bot_token": "your_bot_token",
+    "chat_id": ["your_chat_id"],
+    "session_name": "MsgBot",
+    "task_management": {
+      "enabled": true,
+      "authorized_users": ["user123", "user456"],
+      "admin_users": ["admin123"],
+      "commands": {
+        "start": "显示主菜单和帮助信息",
+        "status": "查看所有任务状态和下次执行时间",
+        "detail": "查看指定任务的详细信息",
+        "reload_config": "热重载配置文件",
+        "help": "显示帮助信息"
+      }
+    },
+    "intervals": {
+      "tg_msg_retry_interval": 3,
+      "tg_msg_retry_times": 5,
+      "tg_connect_timeout": 30,
+      "tg_auto_reconnect": true,
+      "tg_max_reconnect_attempts": 5,
+      "tg_reconnect_delay": 10
     },
     "notifications": {
       "download_completed": true,
       "download_failed": true,
       "system_errors": true,
-      "daily_update": false
+      "daily_update": false,
+      "task_executions": true,
+      "backup_completed": true,
+      "data_gaps_detected": true
+    },
+    "time_display": {
+      "smart_format": true,
+      "timezone": "Asia/Shanghai",
+      "relative_threshold_hours": 24
     },
     "message_templates": {
+      "task_status": "📋 **任务状态报告**\n\n{task_list}",
       "download_completed": "✅ 数据下载完成！\n成功: {success_count}，失败: {failed_count}",
-      "download_failed": "❌ 数据下载失败！\n错误: {error_message}"
+      "system_error": "🚨 系统错误\n{error_message}",
+      "backup_completed": "💾 数据库备份完成\n文件: {backup_file}"
+    },
+    "proxy": {
+      "enabled": false,
+      "url": "http://proxy-server:port",
+      "username": "proxy-username",
+      "password": "proxy-password"
     }
   }
 }
 ```
+
+### 配置项说明
+
+#### 基础配置
+| 字段 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| `enabled` | boolean | ✅ | 是否启用Telegram功能 |
+| `api_id` | integer | ✅ | Telegram API ID |
+| `api_hash` | string | ✅ | Telegram API Hash |
+| `bot_token` | string | ✅ | 机器人令牌 |
+| `chat_id` | array | ✅ | 授权聊天ID列表 |
+| `session_name` | string | ❌ | Telethon会话名称 |
+
+#### 任务管理配置 ⭐ v2.3.0
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `task_management.enabled` | boolean | true | 是否启用任务管理功能 |
+| `task_management.authorized_users` | array | [] | 授权用户列表 |
+| `task_management.admin_users` | array | [] | 管理员用户列表 |
+| `task_management.commands` | object | {} | 自定义命令配置 |
+
+#### 连接和重试配置
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `intervals.tg_msg_retry_interval` | integer | 3 | 消息重试间隔（秒） |
+| `intervals.tg_msg_retry_times` | integer | 5 | 消息重试次数 |
+| `intervals.tg_connect_timeout` | integer | 30 | 连接超时（秒） |
+| `intervals.tg_auto_reconnect` | boolean | true | 是否自动重连 |
+| `intervals.tg_max_reconnect_attempts` | integer | 5 | 最大重连次数 |
+| `intervals.tg_reconnect_delay` | integer | 10 | 重连延迟（秒） |
+
+#### 智能时间显示 ⭐ v2.3.0
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `time_display.smart_format` | boolean | true | 是否启用智能时间格式 |
+| `time_display.timezone` | string | Asia/Shanghai | 时区设置 |
+| `time_display.relative_threshold_hours` | integer | 24 | 相对时间显示阈值（小时） |
+
+#### 通知配置
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `notifications.download_completed` | boolean | true | 下载完成通知 |
+| `notifications.download_failed` | boolean | true | 下载失败通知 |
+| `notifications.system_errors` | boolean | true | 系统错误通知 |
+| `notifications.task_executions` | boolean | true | 任务执行通知 |
+| `notifications.backup_completed` | boolean | true | 备份完成通知 |
+| `notifications.data_gaps_detected` | boolean | true | 数据缺口检测通知 |
+
+### 权限管理
+系统支持基于用户ID的权限控制：
+
+- **管理员权限**: 可以执行所有操作，包括配置热重载
+- **用户权限**: 可以查看任务状态和基本信息
+- **访客权限**: 只能使用基础命令
+
+### 使用示例
+```bash
+# 启动包含任务管理器的完整系统
+python main.py full --host 0.0.0.0 --port 8000
+
+# Telegram中的用户交互
+/status                    # 显示所有任务状态
+/detail daily_data_update  # 查看特定任务详情
+/reload_config            # 热重载配置（需要管理员权限）
+```
+
+## 📄 报告系统配置 (report_config) ⭐ v2.3.1
+
+### 配置示例
+```json
+{
+  "report_config": {
+    "enabled": true,
+    "default_format": "telegram",
+    "output_directory": "reports",
+    "formats": {
+      "telegram": {
+        "enabled": true,
+        "max_message_length": 4000,
+        "parse_mode": "Markdown",
+        "include_emojis": true
+      },
+      "console": {
+        "enabled": true,
+        "max_width": 100,
+        "colors": true,
+        "progress_bars": true
+      },
+      "api": {
+        "enabled": true,
+        "include_raw_data": false,
+        "response_format": "json",
+        "pagination_size": 100
+      },
+      "file": {
+        "enabled": true,
+        "formats": ["json", "csv", "html"],
+        "compression": true,
+        "timestamp_files": true
+      }
+    },
+    "templates": {
+      "system_status": {
+        "name": "系统状态报告",
+        "description": "系统运行状态和性能指标",
+        "sections": ["overview", "database", "data_sources", "scheduler"],
+        "schedule": "0 9 * * 1-5",
+        "auto_generate": true
+      },
+      "data_quality": {
+        "name": "数据质量报告",
+        "description": "数据完整性和质量评估",
+        "sections": ["completeness", "accuracy", "consistency", "gaps"],
+        "schedule": "0 10 * * 1",
+        "auto_generate": true
+      },
+      "task_summary": {
+        "name": "任务执行摘要",
+        "description": "调度器任务执行情况汇总",
+        "sections": ["execution_summary", "failed_tasks", "performance_metrics"],
+        "schedule": "0 18 * * 1-5",
+        "auto_generate": true
+      }
+    },
+    "delivery": {
+      "telegram": {
+        "enabled": true,
+        "chat_ids": ["your_chat_id"],
+        "split_long_messages": true
+      },
+      "email": {
+        "enabled": false,
+        "smtp_server": "smtp.example.com",
+        "recipients": ["admin@example.com"]
+      },
+      "webhook": {
+        "enabled": false,
+        "url": "https://your-webhook.example.com/reports"
+      }
+    },
+    "retention": {
+      "keep_days": 30,
+      "max_files_per_type": 100,
+      "cleanup_schedule": "0 2 * * 0"
+    }
+  }
+}
+```
+
+### 配置项说明
+
+#### 输出格式配置
+| 格式 | 说明 | 特性 |
+|------|------|------|
+| `telegram` | Telegram消息格式 | 支持Markdown、Emoji |
+| `console` | 控制台输出 | 彩色显示、进度条 |
+| `api` | API响应格式 | JSON结构化数据 |
+| `file` | 文件输出 | 支持JSON/CSV/HTML |
+
+#### 报告模板
+| 模板 | 用途 | 自动生成 |
+|------|------|----------|
+| `system_status` | 系统状态监控 | 每工作日9:00 |
+| `data_quality` | 数据质量评估 | 每周一10:00 |
+| `task_summary` | 任务执行摘要 | 每工作日18:00 |
+
+#### 传递方式
+- **Telegram**: 实时推送到指定聊天
+- **Email**: 邮件发送（可选）
+- **Webhook**: HTTP回调（可选）
+
+## 💾 自动备份配置 (backup_config) ⭐ v2.3.0
+
+### 配置示例
+```json
+{
+  "backup_config": {
+    "enabled": true,
+    "source_db_path": "data/quotes.db",
+    "backup_directory": "data/PVE-Bak/QuoteBak",
+    "retention_days": 30,
+    "schedule": {
+      "enabled": true,
+      "cron": "0 6 * * 6"
+    },
+    "compression": {
+      "enabled": true,
+      "algorithm": "gzip",
+      "level": 6
+    },
+    "notification": {
+      "enabled": true,
+      "telegram": true,
+      "email": false
+    },
+    "verification": {
+      "enabled": true,
+      "checksum": true,
+      "integrity_check": true
+    },
+    "cleanup": {
+      "enabled": true,
+      "max_backup_files": 50,
+      "auto_delete": true
+    },
+    "filename_pattern": "quotes_backup_{timestamp}.db",
+    "exclude_tables": [],
+    "include_tables": ["*"]
+  }
+}
+```
+
+### 配置项说明
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `enabled` | boolean | true | 是否启用自动备份 |
+| `source_db_path` | string | data/quotes.db | 源数据库路径 |
+| `backup_directory` | string | data/PVE-Bak/QuoteBak | 备份目录 |
+| `retention_days` | integer | 30 | 备份保留天数 |
+| `schedule.cron` | string | 0 6 * * 6 | 备份时间（每周六6:00） |
+| `compression.enabled` | boolean | true | 是否压缩备份文件 |
+| `notification.enabled` | boolean | true | 是否发送通知 |
+| `verification.enabled` | boolean | true | 是否验证备份完整性 |
+
+### 备份策略
+- **自动备份**: 每周六6:00自动执行
+- **增量备份**: 支持仅备份变更数据
+- **压缩存储**: 使用gzip压缩节省空间
+- **完整性验证**: 备份后自动验证文件完整性
+- **自动清理**: 超过保留期的备份自动删除
 
 ### 配置项说明
 
