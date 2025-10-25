@@ -3,10 +3,54 @@ API data models for the quote system.
 Pydantic models for request/response validation with comprehensive features.
 """
 
+from enum import Enum
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime, date
 from pydantic import BaseModel, Field, validator
 from database.models import Instrument, DailyQuote, TradingCalendar
+
+
+class ExchangeEnum(str, Enum):
+    """交易所枚举"""
+    SSE = "SSE"
+    SZSE = "SZSE"
+    BSE = "BSE"
+    HKEX = "HKEX"
+    NASDAQ = "NASDAQ"
+    NYSE = "NYSE"
+
+
+class InstrumentTypeEnum(str, Enum):
+    """交易品种类型枚举"""
+    STOCK = "STOCK"
+    BOND = "BOND"
+    ETF = "ETF"
+    INDEX = "INDEX"
+    FUND = "FUND"
+    REIT = "REIT"
+    WARRANT = "WARRANT"
+    FUTURES = "FUTURES"
+
+
+class InstrumentStatusEnum(str, Enum):
+    """交易品种状态枚举"""
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SUSPENDED = "suspended"
+
+
+class AdjustmentTypeEnum(str, Enum):
+    """复权类型枚举"""
+    NONE = "none"
+    FORWARD = "forward"
+    BACKWARD = "backward"
+
+
+class ReturnFormatEnum(str, Enum):
+    """返回格式枚举"""
+    PANDAS = "pandas"
+    JSON = "json"
+    CSV = "csv"
 
 
 class InstrumentResponse(BaseModel):
@@ -14,8 +58,8 @@ class InstrumentResponse(BaseModel):
     instrument_id: str = Field(..., description="交易品种ID")
     symbol: str = Field(..., description="交易代码")
     name: str = Field(..., description="品种名称")
-    exchange: str = Field(..., description="交易所")
-    type: str = Field(..., description="品种类型")
+    exchange: ExchangeEnum = Field(..., description="交易所")
+    type: InstrumentTypeEnum = Field(..., description="品种类型")
     currency: str = Field(..., description="交易货币")
 
     # 日期信息
@@ -29,7 +73,7 @@ class InstrumentResponse(BaseModel):
     market: Optional[str] = Field(None, description="市场")
 
     # 交易状态
-    status: str = Field('active', description="交易状态")
+    status: InstrumentStatusEnum = Field(InstrumentStatusEnum.ACTIVE, description="交易状态")
     is_active: bool = Field(True, description="是否活跃")
     is_st: bool = Field(False, description="是否ST股")
     trading_status: int = Field(1, description="交易状态码")
@@ -75,7 +119,7 @@ class DailyQuoteResponse(BaseModel):
 
     # 复权信息
     factor: float = Field(1.0, description="复权因子", ge=0)
-    adjustment_type: Optional[str] = Field(None, description="复权类型")
+    adjustment_type: Optional[AdjustmentTypeEnum] = Field(None, description="复权类型")
 
     # 数据质量
     is_complete: bool = Field(True, description="数据是否完整")
@@ -110,7 +154,7 @@ class DataGapResponse(BaseModel):
     """数据缺口响应模型"""
     instrument_id: str = Field(..., description="交易品种ID")
     symbol: str = Field(..., description="交易代码")
-    exchange: str = Field(..., description="交易所")
+    exchange: ExchangeEnum = Field(..., description="交易所")
     gap_start: date = Field(..., description="缺口开始日期")
     gap_end: date = Field(..., description="缺口结束日期")
     gap_days: int = Field(..., description="缺口天数")
@@ -143,7 +187,7 @@ class QuoteQueryRequest(BaseModel):
     """增强行情查询请求模型"""
     instrument_id: Optional[str] = Field(None, description="交易品种ID")
     symbol: Optional[str] = Field(None, description="交易代码")
-    exchange: Optional[str] = Field(None, description="交易所")
+    exchange: Optional[ExchangeEnum] = Field(None, description="交易所")
 
     # 日期范围
     start_date: datetime = Field(..., description="开始日期")
@@ -157,20 +201,13 @@ class QuoteQueryRequest(BaseModel):
     include_suspended: bool = Field(False, description="是否包含停牌数据")
 
     # 响应格式
-    return_format: str = Field("pandas", description="返回格式: pandas, json, csv")
+    return_format: ReturnFormatEnum = Field(ReturnFormatEnum.PANDAS, description="返回格式: pandas, json, csv")
     include_metadata: bool = Field(False, description="是否包含元数据")
     include_quality: bool = Field(True, description="是否包含质量信息")
 
     # 分页
     limit: Optional[int] = Field(None, description="限制返回记录数")
     offset: int = Field(0, description="偏移量")
-
-    @validator('return_format')
-    def validate_format(cls, v):
-        allowed_formats = ['pandas', 'json', 'csv']
-        if v not in allowed_formats:
-            raise ValueError(f"Format must be one of {allowed_formats}")
-        return v
 
     @validator('end_date')
     def validate_date_range(cls, v, values):
@@ -187,12 +224,12 @@ class QuoteQueryRequest(BaseModel):
 
 class InstrumentQueryRequest(BaseModel):
     """增强交易品种查询请求模型"""
-    exchange: Optional[str] = Field(None, description="交易所代码")
-    type: Optional[str] = Field(None, description="品种类型")
+    exchange: Optional[ExchangeEnum] = Field(None, description="交易所代码")
+    type: Optional[InstrumentTypeEnum] = Field(None, description="品种类型")
     industry: Optional[str] = Field(None, description="行业")
     sector: Optional[str] = Field(None, description="板块")
     market: Optional[str] = Field(None, description="市场")
-    status: Optional[str] = Field(None, description="状态")
+    status: Optional[InstrumentStatusEnum] = Field(None, description="状态")
 
     # 状态过滤
     is_active: Optional[bool] = Field(None, description="是否活跃")
@@ -294,7 +331,7 @@ class DownloadProgressResponse(BaseModel):
 
 class BatchDownloadRequest(BaseModel):
     """增强批量下载请求模型"""
-    exchanges: List[str] = Field(..., description="交易所列表")
+    exchanges: List[ExchangeEnum] = Field(..., description="交易所列表")
 
     # 日期范围选择
     start_date: Optional[date] = Field(None, description="开始日期")
@@ -314,14 +351,6 @@ class BatchDownloadRequest(BaseModel):
     include_suspended: bool = Field(False, description="包含停牌股票")
     include_delisted: bool = Field(False, description="包含退市股票")
 
-    @validator('exchanges')
-    def validate_exchanges(cls, v):
-        valid_exchanges = ['SSE', 'SZSE', 'HKEX', 'NASDAQ', 'NYSE']
-        invalid_exchanges = [ex for ex in v if ex not in valid_exchanges]
-        if invalid_exchanges:
-            raise ValueError(f"Invalid exchanges: {invalid_exchanges}. Valid: {valid_exchanges}")
-        return v
-
     @validator('years')
     def validate_years(cls, v):
         if v is not None:
@@ -340,7 +369,7 @@ class BatchDownloadRequest(BaseModel):
 
 class DataGapFillRequest(BaseModel):
     """数据缺口填补请求模型"""
-    exchange: Optional[str] = Field(None, description="交易所代码")
+    exchange: Optional[ExchangeEnum] = Field(None, description="交易所代码")
     instrument_ids: Optional[List[str]] = Field(None, description="指定股票ID列表")
     severity_filter: Optional[List[str]] = Field(None, description="严重程度过滤")
     gap_type_filter: Optional[List[str]] = Field(None, description="缺口类型过滤")
@@ -370,7 +399,7 @@ class DataGapFillResponse(BaseModel):
 
 class TradingCalendarQueryRequest(BaseModel):
     """交易日历查询请求模型"""
-    exchange: str = Field(..., description="交易所代码")
+    exchange: ExchangeEnum = Field(..., description="交易所代码")
     start_date: date = Field(..., description="开始日期")
     end_date: date = Field(..., description="结束日期")
     include_weekends: bool = Field(False, description="是否包含周末")
@@ -409,7 +438,7 @@ class DataStatsResponse(BaseModel):
 
 class DataValidationRequest(BaseModel):
     """数据验证请求模型"""
-    exchange: Optional[str] = Field(None, description="交易所代码")
+    exchange: Optional[ExchangeEnum] = Field(None, description="交易所代码")
     instrument_ids: Optional[List[str]] = Field(None, description="指定股票ID列表")
     start_date: date = Field(..., description="开始日期")
     end_date: date = Field(..., description="结束日期")

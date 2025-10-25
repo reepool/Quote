@@ -4,33 +4,44 @@
 """
 
 from typing import Dict, Any, Optional
-from utils import config_manager, report_logger
+from utils.logging_manager import report_logger, config_logger
+from utils.config_manager import config_manager
 from .templates import TemplateManager
 from .formatters import ReportFormatter
 from .adapters import OutputAdapter
+from utils.singleton import singleton
 
 
+@singleton
 class ReportEngine:
     """报告生成引擎核心类"""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self):
         # 使用标准项目日志器
         self.logger = report_logger
         """
         初始化报告引擎
-
-        Args:
-            config: 报告配置，如果为None则从config_manager获取
         """
-        if config is None:
-            from utils import config_manager
-            full_config = config_manager.to_dict()
-            config = full_config.get('report_config', {})
+        try:
+            # 直接从配置管理器获取类型安全的报告配置对象
+            report_config = config_manager.get_report_config()
+            self.config = report_config
 
-        self.config = config
-        self.template_manager = TemplateManager(config)
-        self.formatter = ReportFormatter(config)
-        self.adapter = OutputAdapter(config)
+            # 将配置对象传递给子管理器
+            self.template_manager = TemplateManager(report_config)
+            self.formatter = ReportFormatter(report_config)
+            self.adapter = OutputAdapter(report_config)
+
+            config_logger.debug(f"[ReportEngine] Report engine initialized with config: {report_config}")
+
+        except Exception as e:
+            config_logger.error(f"[ReportEngine] Failed to initialize with report config: {e}")
+            # 在配置失败时提供一个备用方案，以避免完全崩溃
+            from utils.config_manager import ReportConfig
+            self.config = ReportConfig()
+            self.template_manager = TemplateManager(self.config)
+            self.formatter = ReportFormatter(self.config)
+            self.adapter = OutputAdapter(self.config)
 
     def generate(self, report_type: str, data: Dict[str, Any],
                 output_format: str = 'telegram') -> str:
@@ -116,6 +127,8 @@ class ReportEngine:
             prepared_data = self._prepare_system_status_data(prepared_data)
         elif report_type == 'backup_result':
             prepared_data = self._prepare_backup_result_data(prepared_data)
+        elif report_type == 'health_check_report':
+            prepared_data = self._prepare_health_check_report_data(prepared_data)
 
         return prepared_data
 
@@ -155,16 +168,32 @@ class ReportEngine:
         Returns:
             Dict[str, Any]: 准备好的数据
         """
-        summary = data.get('summary', {})
+        # 如果是错误报告，直接返回错误信息
+        if data.get('status') == 'error':
+            return data
 
-        # 提取关键指标
-        data.update({
-            'updated_instruments': summary.get('updated_instruments', 0),
-            'new_quotes': summary.get('new_quotes_added', 0),
-            'success_rate': summary.get('success_rate', 0),
-            'target_date': summary.get('target_date', ''),
-            'exchange_stats': data.get('exchange_stats', {})
-        })
+        if data.get('non_trading_day'): # 非交易日报告
+            data['date'] = data.get('date', '')
+            # 格式化 calendar_updates 为字符串列表
+            formatted_calendar_updates = []
+            for ex, count in data.get('trading_calendar_updates', {}).items():
+                formatted_calendar_updates.append(f"• {ex}: 更新 {count} 天")
+            data['calendar_updates'] = '\n'.join(formatted_calendar_updates) if formatted_calendar_updates else '无更新'
+        else: # 正常交易日更新报告
+            summary = data.get('update_results', {})
+            total_checked = summary.get('success_count', 0) + summary.get('failure_count', 0)
+            success_rate = (summary.get('success_count', 0) / total_checked * 100) if total_checked > 0 else 0
+
+            data.update({
+                'date': data.get('date', ''),
+                'updated_instruments': summary.get('success_count', 0),
+                'new_quotes': summary.get('total_quotes_added', 0),
+                'success_rate': success_rate,
+                'exchange_stats': summary.get('exchange_stats', {})
+            })
+
+        # 确保所有报告都有一个明确的名称
+        data['name'] = data.get('name', '每日数据更新报告')
 
         return data
 
@@ -230,6 +259,21 @@ class ReportEngine:
 
         data.update(backup_info)
 
+        return data
+
+    def _prepare_health_check_report_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        准备健康检查报告数据
+
+        Args:
+            data: 原始数据
+
+        Returns:
+            Dict[str, Any]: 准备好的数据
+        """
+
+        # 这个方法保留为空，以备将来可能的扩展。
+        
         return data
 
     def _get_current_time(self) -> str:

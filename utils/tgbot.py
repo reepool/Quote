@@ -7,6 +7,7 @@ from telethon.tl.types import MessageMediaWebPage
 import asyncio
 import io
 from typing import List
+from functools import wraps
 from utils import tgbot_logger, config_manager
 from utils.singleton import singleton
 
@@ -14,7 +15,32 @@ from utils.singleton import singleton
 tgbot_logger.info("[tgbot] Reading system configuration...")
 config = config_manager
 telegram_config = config.get('telegram_config')
-intervals = telegram_config.get('intervals', {}) if telegram_config else {}
+intervals = telegram_config.get('intervals', {}) if hasattr(telegram_config, 'intervals') else {}
+
+
+def _retry_on_failure(func):
+    """一个装饰器，为异步的Telethon发送操作提供重试逻辑。"""
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        # 从 self 实例中获取重试配置
+        self_instance = args[0]
+        retry_interval = getattr(self_instance, 'tg_msg_retry_interval', 5)
+        retry_times = getattr(self_instance, 'tg_msg_retry_times', 10)
+
+        for attempt in range(retry_times):
+            try:
+                return await func(*args, **kwargs)
+            except FloodError as e:
+                retry_after = e.seconds
+                tgbot_logger.warning(f"[tgbot] Flood error on {func.__name__}! Waiting {retry_after}s. Attempt: {attempt+1}")
+                await asyncio.sleep(retry_after)
+            except Exception as e:
+                tgbot_logger.error(f"[tgbot] Error on {func.__name__}: {e}. Attempt: {attempt+1}")
+                if attempt < retry_times - 1:
+                    await asyncio.sleep(retry_interval * (attempt + 1))
+        tgbot_logger.error(f"[tgbot] Failed {func.__name__} after {retry_times} attempts.")
+        return None  # 或根据需要抛出异常
+    return wrapper
 
 
 @singleton
@@ -23,6 +49,9 @@ class TelegramBot:
 
     def __init__(self):
         self.bot_thon = None
+        # 将重试参数移至实例属性
+        self.tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
+        self.tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
 
 
     async def __aenter__(self):
@@ -132,8 +161,7 @@ class TelegramBot:
     def register_command_handler(self, command: str, handler_func):
         """注册命令处理器"""
         self._check_bot_thon()
-
-        @self.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith(command)))
+        @self.bot_thon.on(events.NewMessage(pattern=rf'^{command}(?:\s|$)'))
         async def command_handler(event):
             try:
                 tgbot_logger.debug(f"[tgbot] Received command '{command}' from chat_id: {event.chat_id}")
@@ -295,6 +323,7 @@ class TelegramBot:
         self._check_bot_thon()
         return await self.bot_thon.run_until_disconnected()
 
+    @_retry_on_failure
     async def send_message_async(self, chat_id, message):
         self._check_bot_thon()
         tgbot_logger.debug(f"[tgbot] Using send_message_async method to Send message to chat_id: {chat_id}")
@@ -317,10 +346,11 @@ class TelegramBot:
 
             await self.bot_thon.send_message(target_chat_id, message)
             tgbot_logger.info(f"[tgbot] Message sent successfully to {target_chat_id}: {message[:30]}...")
+        
         except Exception as e:
-            tgbot_logger.error(f"[tgbot] Error sending message to {chat_id}: {e}")
-            tgbot_logger.debug(f"[tgbot] Chat_id type: {type(chat_id)}, value: {chat_id}")
-
+            tgbot_logger.error(f"[tgbot] Error sending message: {e}")
+            raise
+        
     async def get_message_from_channel(self, channel_name, message_count):
         self._check_bot_thon()
         tgbot_logger.debug(f"[tgbot] Using get_message_from_channel method to Fetching message from channel: {channel_name}, the newest {message_count} messages")
@@ -337,85 +367,42 @@ class TelegramBot:
             tgbot_logger.error(f"[tgbot] Error fetching message from channel: {e}")
             return None
 
+    @_retry_on_failure
     async def respond_message_with_retry(self, event, text_to_send, username):
         self._check_bot_thon()
         tgbot_logger.debug(f"[tgbot] Using respond_message_with_retry method to Respond to {username} with message: {text_to_send}")
+        message = await event.respond(text_to_send)
+        if message:
+            tgbot_logger.info(f"[tgbot] Message sent successfully to {username}")
+        return message
 
-        tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
-        tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
-
-        for attempt in range(tg_msg_retry_times):
-            try:
-                tgbot_logger.info(f"[tgbot] Attempting to send message to {username}, attempt {attempt+1}")
-                message = await event.respond(text_to_send)
-                tgbot_logger.info(f"[tgbot] Message sent successfully on attempt {attempt+1}")
-                return message
-            except FloodError as e:
-                retry_after = e.seconds
-                tgbot_logger.warning(f"[tgbot] Flood error! Need to wait {retry_after} seconds. Attempt: {attempt+1}")
-                await asyncio.sleep(retry_after)
-            except Exception as e:
-                tgbot_logger.error(f"[tgbot] Error sending message to {username}: {e}, on attempt {attempt+1}")
-                await asyncio.sleep(tg_msg_retry_interval * (attempt+1))
-        tgbot_logger.error(f"[tgbot] Failed to send message to {username} after {tg_msg_retry_times} attempts.")
-        return None
-
+    @_retry_on_failure
     async def send_to_channel_with_retry(self, channel_dest_name, msg_media, message):
         self._check_bot_thon()
         tgbot_logger.debug(f"[tgbot] Using send_to_channel_with_retry method to Send message to channel {channel_dest_name}")
+        if isinstance(msg_media, MessageMediaWebPage):
+            web_page_message = f"{message}\nURL: {msg_media.webpage.url}"
+            await self.bot_thon.send_message(channel_dest_name, web_page_message, parse_mode='md')
+        else:
+            await self.bot_thon.send_file(channel_dest_name, file=msg_media, caption=message, parse_mode='md')
+        tgbot_logger.info(f"[tgbot] Message sent successfully to channel {channel_dest_name}")
+        return True
 
-        tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
-        tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
-
-        for attempt in range(tg_msg_retry_times):
-            try:
-                if isinstance(msg_media, MessageMediaWebPage):
-                    web_page_message = f"{message}\nURL: {msg_media.webpage.url}"
-                    await self.bot_thon.send_message(channel_dest_name, web_page_message, parse_mode='md')
-                else:
-                    await self.bot_thon.send_file(channel_dest_name, file=msg_media, caption=message, parse_mode='md')
-                tgbot_logger.info(f"[tgbot] Message sent successfully to channel {channel_dest_name} on attempt {attempt+1}")
-                return True
-            except FloodError as e:
-                retry_after = e.seconds
-                tgbot_logger.warning(f"[tgbot] Flood error! Need to wait {retry_after} seconds. Attempt: {attempt+1}")
-                await asyncio.sleep(retry_after)
-            except Exception as e:
-                tgbot_logger.error(f"[tgbot] Error sending message to channel {channel_dest_name}: {e}, on attempt {attempt+1}")
-                await asyncio.sleep(tg_msg_retry_interval * (attempt+1))
-        tgbot_logger.error(f"[tgbot] Failed to send message to channel {channel_dest_name} after {tg_msg_retry_times} attempts.")
-        return False
-
+    @_retry_on_failure
     async def send_voice_message_with_retry(self, event, response_voice, username):
         self._check_bot_thon()
         tgbot_logger.debug(f"[tgbot] Using send_voice_message_with_retry method to Send voice message to {username}")
-
-        tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
-        tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
-
-        for attempt in range(tg_msg_retry_times):
-            try:
-                with io.BytesIO(response_voice) as audio_file:
-                    audio_file.name = 'response.mp3'
-                    await self.bot_thon.send_file(event.chat_id, audio_file, voice_note=True)
-                tgbot_logger.info(f"[tgbot] Voice message sent successfully to {username} on attempt {attempt+1}")
-                return True
-            except FloodError as e:
-                retry_after = e.seconds
-                tgbot_logger.warning(f"[tgbot] Flood error! Need to wait {retry_after} seconds. Attempt: {attempt+1}")
-                await asyncio.sleep(retry_after)
-            except Exception as e:
-                tgbot_logger.error(f"[tgbot] Error sending voice message to {username}: {e}, on attempt {attempt+1}")
-                await asyncio.sleep(tg_msg_retry_interval * (attempt+1))
-        tgbot_logger.error(f"[tgbot] Failed to send voice message to {username} after {tg_msg_retry_times} attempts.")
-        return False
+        with io.BytesIO(response_voice) as audio_file:
+            audio_file.name = 'response.mp3'
+            await self.bot_thon.send_file(event.chat_id, audio_file, voice_note=True)
+        tgbot_logger.info(f"[tgbot] Voice message sent successfully to {username}")
+        return True
 
     # ==================== 统一通知方法 ====================
 
     async def send_notification(self, message: str, prefix: str = None, chat_ids: List[str] = None,
                               level: str = "info", enable_retry: bool = True) -> bool:
-        """
-        统一的通知发送方法
+        """统一的通知发送方法
 
         Args:
             message: 要发送的消息内容
@@ -464,16 +451,9 @@ class TelegramBot:
 
             for chat_id in chat_ids:
                 try:
-                    if enable_retry:
-                        # 使用重试机制发送
-                        if await self._send_with_retry(chat_id, formatted_message):
-                            success_count += 1
-                        else:
-                            failed_count += 1
-                    else:
-                        # 直接发送
-                        await self.send_message_async(chat_id, formatted_message)
+                    if await self.send_message_async(chat_id, formatted_message):
                         success_count += 1
+                    tgbot_logger.debug(f"[tgbot] Notification sent {formatted_message} successfully to {chat_id}")
 
                 except Exception as e:
                     failed_count += 1
@@ -490,14 +470,6 @@ class TelegramBot:
         except Exception as e:
             tgbot_logger.error(f"[tgbot] Error in send_notification: {e}")
             return False
-
-    async def send_system_notification(self, message: str, level: str = "info") -> bool:
-        """发送系统级通知"""
-        return await self.send_notification(
-            message=message,
-            prefix="[系统通知]",
-            level=level
-        )
 
     async def send_task_notification(self, message: str, task_name: str = None, level: str = "info") -> bool:
         """发送任务相关通知"""
@@ -537,13 +509,22 @@ class TelegramBot:
             level: 消息级别
         """
         try:
+            # 确保bot已连接（避免使用context manager时的连接清空问题）
+            if not self.bot_thon:
+                await self.create_bot_instance()
+
             tgbot_logger.debug(f"[tgbot] Sending report notification: type={report_type}, level={level}")
 
-            # 导入新的统一报告系统
-            from .report import generate_report
+            # 检查是否已经提供了格式化好的内容
+            if 'content' in report and isinstance(report.get('content'), str):
+                # 直接使用由上游（如 tasks.py）预先格式化好的报告内容
+                message = report['content']
+                tgbot_logger.debug("[tgbot] Using pre-formatted report content.")
+            else:
+                # 如果没有预格式化的内容，则调用报告引擎生成
+                from .report import generate_report
+                message = generate_report(report_type, report, 'telegram')
 
-            # 使用统一报告生成器
-            message = generate_report(report_type, report, 'telegram')
             tgbot_logger.debug(f"[tgbot] Report formatted successfully, length: {len(message)}")
 
             result = await self.send_data_notification(message, level)
@@ -554,44 +535,3 @@ class TelegramBot:
         except Exception as e:
             tgbot_logger.error(f"[tgbot] Error formatting report notification: {e}")
             return await self.send_data_notification(f"报告格式化失败: {str(e)}", "error")
-
-    async def _send_with_retry(self, chat_id: str, message: str) -> bool:
-        """带重试机制的发送方法"""
-        tg_msg_retry_interval = intervals.get('tg_msg_retry_interval', 5)
-        tg_msg_retry_times = intervals.get('tg_msg_retry_times', 10)
-
-        for attempt in range(tg_msg_retry_times):
-            try:
-                await self.send_message_async(chat_id, message)
-                return True
-            except Exception as e:
-                if attempt < tg_msg_retry_times - 1:  # 不是最后一次尝试
-                    tgbot_logger.warning(f"[tgbot] Send attempt {attempt+1} failed, retrying in {tg_msg_retry_interval}s: {e}")
-                    await asyncio.sleep(tg_msg_retry_interval)
-                else:
-                    tgbot_logger.error(f"[tgbot] All {tg_msg_retry_times} send attempts failed for {chat_id}: {e}")
-                    return False
-
-
-# 全局辅助函数，避免使用context manager清空单例连接
-async def send_report_without_context(report_type: str, report_data: dict, level: str = "info") -> bool:
-    """
-    发送报告但不使用context manager，避免清空单例的bot_thon连接
-
-    Args:
-        report_type: 报告类型
-        report_data: 报告数据
-        level: 消息级别
-
-    Returns:
-        bool: 发送是否成功
-    """
-    try:
-        bot = TelegramBot()
-        if not bot.bot_thon:
-            await bot.create_bot_instance()
-        result = await bot.send_report_notification(report_data, report_type, level)
-        return result
-    except Exception as e:
-        tgbot_logger.error(f"[tgbot] Failed to send report: {e}")
-        return False

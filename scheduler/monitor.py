@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 
-from utils import scheduler_logger, config_manager
+from utils import monitor_logger, TelegramBot
+from utils.config_manager import UnifiedConfigManager, config_manager
 
 from .scheduler import task_scheduler
 from .tasks import scheduled_tasks
@@ -30,23 +31,24 @@ class JobExecutionRecord:
 class SchedulerMonitor:
     """调度器监控器"""
 
-    def __init__(self):
+    def __init__(self, config_manager: UnifiedConfigManager):
         self.execution_history: List[JobExecutionRecord] = []
-        self.max_history_size = 100
         self.startup_time = None
-        self.alert_thresholds = {
-            'max_execution_time': 300,  # 5分钟
-            'max_failure_rate': 0.1,    # 10%失败率
-            'max_consecutive_failures': 3  # 连续失败次数
-        }
-        # 初始化延迟配置（从配置文件获取，默认2秒）
-        from utils import config_manager
-        self.startup_delay = config_manager.get_nested('scheduler_config.monitor_startup_delay', 2)
-        self.min_wait_time = 1  # 最小等待时间，确保基本初始化完成
+        self.config_manager = config_manager
+        self.bot_config = self.config_manager.get_telegram_config()
+        self.telegram_enabled = self.bot_config.enabled
+        self.bot = TelegramBot() if self.telegram_enabled else None
+
+        # 从配置管理器加载监控配置
+        monitor_config = self.config_manager.get_monitor_config()
+        self.max_history_size = monitor_config.max_history_size
+        self.alert_thresholds = monitor_config.alert_thresholds
+        self.startup_delay = monitor_config.startup_delay
+        self.min_wait_time = monitor_config.min_wait_time
 
     async def initialize(self):
         """初始化监控器"""
-        scheduler_logger.info("[SchedulerMonitor] Initializing scheduler monitor...")
+        monitor_logger.info("[SchedulerMonitor] Initializing scheduler monitor...")
 
         self.startup_time = get_shanghai_time()
 
@@ -60,7 +62,7 @@ class SchedulerMonitor:
 
     async def _wait_for_scheduler_ready(self):
         """智能等待调度器准备就绪"""
-        scheduler_logger.info(f"[SchedulerMonitor] Waiting at least {self.min_wait_time}s (max {self.startup_delay}s) for scheduler to be ready...")
+        monitor_logger.info(f"[SchedulerMonitor] Waiting at least {self.min_wait_time}s (max {self.startup_delay}s) for scheduler to be ready...")
 
         # 先确保最小等待时间
         await asyncio.sleep(self.min_wait_time)
@@ -73,7 +75,7 @@ class SchedulerMonitor:
         while waited_time < max_wait_time:
             # 检查调度器是否正在运行
             if task_scheduler.scheduler.running:
-                scheduler_logger.info(f"[SchedulerMonitor] Scheduler is ready after {waited_time:.1f} seconds")
+                monitor_logger.info(f"[SchedulerMonitor] Scheduler is ready after {waited_time:.1f} seconds")
                 return
 
             # 等待一小段时间再检查
@@ -81,7 +83,7 @@ class SchedulerMonitor:
             waited_time += check_interval
 
         # 如果超时了，记录警告但继续执行
-        scheduler_logger.warning(f"[SchedulerMonitor] Scheduler not ready after {max_wait_time} seconds, proceeding anyway")
+        monitor_logger.warning(f"[SchedulerMonitor] Scheduler not ready after {max_wait_time} seconds, proceeding anyway")
 
     async def _start_monitoring(self):
         """启动监控任务"""
@@ -118,31 +120,28 @@ class SchedulerMonitor:
             )
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to send initial status: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to send initial status: {e}")
 
     async def _send_success_notification(self, message: str):
         """发送成功通知"""
-        scheduler_logger.info(f"[SchedulerMonitor] Success: {message}")
+        monitor_logger.info(f"[SchedulerMonitor] Success: {message}")
 
-        # 通过Telegram发送通知
-        telegram_enabled = config_manager.get_nested('telegram_config.enabled', False)
-        if telegram_enabled:
+        if self.telegram_enabled:
             try:
-                from utils import TelegramBot
-                async with TelegramBot() as bot:
-                    await bot.send_scheduler_notification(message, "success")
+                await self.bot.send_scheduler_notification(message, "success")
             except Exception as e:
-                scheduler_logger.error(f"[SchedulerMonitor] Failed to send success notification via Telegram: {e}")
+                monitor_logger.error(f"[SchedulerMonitor] Failed to send success notification via Telegram: {e}")
 
     async def _monitor_loop(self):
         """监控循环"""
         while True:
             try:
                 await self._check_scheduler_health()
+                await self._check_long_running_jobs()
                 await self._cleanup_old_records()
                 await asyncio.sleep(60)  # 每分钟检查一次
             except Exception as e:
-                scheduler_logger.error(f"[SchedulerMonitor] Monitor loop error: {e}")
+                monitor_logger.error(f"[SchedulerMonitor] Monitor loop error: {e}")
                 await asyncio.sleep(300)  # 错误时等待5分钟
 
     async def record_job_start(self, job_id: str) -> JobExecutionRecord:
@@ -158,7 +157,7 @@ class SchedulerMonitor:
         if len(self.execution_history) > self.max_history_size:
             self.execution_history = self.execution_history[-self.max_history_size:]
 
-        scheduler_logger.debug(f"[SchedulerMonitor] Job {job_id} started at {record.start_time}")
+        monitor_logger.debug(f"[SchedulerMonitor] Job {job_id} started at {record.start_time}")
         return record
 
     async def record_job_completion(self, record: JobExecutionRecord, result: Dict[str, Any] = None):
@@ -168,7 +167,7 @@ class SchedulerMonitor:
         record.duration = (record.end_time - record.start_time).total_seconds()
         record.result = result
 
-        scheduler_logger.info(f"[SchedulerMonitor] Job {record.job_id} completed in {record.duration:.2f}s")
+        monitor_logger.info(f"[SchedulerMonitor] Job {record.job_id} completed in {record.duration:.2f}s")
 
         # 检查执行时间
         if record.duration > self.alert_thresholds['max_execution_time']:
@@ -181,7 +180,7 @@ class SchedulerMonitor:
         record.duration = (record.end_time - record.start_time).total_seconds()
         record.error_message = error_message
 
-        scheduler_logger.error(f"[SchedulerMonitor] Job {record.job_id} failed after {record.duration:.2f}s: {error_message}")
+        monitor_logger.error(f"[SchedulerMonitor] Job {record.job_id} failed after {record.duration:.2f}s: {error_message}")
 
         # 检查连续失败
         await self._check_consecutive_failures(record.job_id)
@@ -193,7 +192,7 @@ class SchedulerMonitor:
             if not task_scheduler.scheduler.running:
                 # 如果在启动后的5分钟内，只记录日志不发送警告
                 if self.startup_time and (get_shanghai_time() - self.startup_time).total_seconds() < 300:
-                    scheduler_logger.warning("[SchedulerMonitor] Scheduler not running (startup grace period)")
+                    monitor_logger.warning("[SchedulerMonitor] Scheduler not running (startup grace period)")
                     return
                 else:
                     await self._send_alert("调度器未运行！")
@@ -209,7 +208,7 @@ class SchedulerMonitor:
             await self._analyze_job_execution_stats()
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Health check failed: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Health check failed: {e}")
 
     async def _analyze_job_execution_stats(self):
         """分析任务执行统计"""
@@ -243,7 +242,27 @@ class SchedulerMonitor:
                 await self._send_alert(f"检测到长时间运行的任务: {', '.join(job_names)}")
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to analyze execution stats: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to analyze execution stats: {e}")
+
+    async def _check_long_running_jobs(self):
+        """检查并告警长时间运行的任务"""
+        try:
+            now = get_shanghai_time()
+            # 筛选出仍在运行中的任务记录
+            running_records = [
+                r for r in self.execution_history if r.status == "running"
+            ]
+
+            for record in running_records:
+                duration = (now - record.start_time).total_seconds()
+                # 使用配置中的超时阈值
+                if duration > self.alert_thresholds.get('max_execution_time', 300):
+                    # 为避免重复告警，可以添加一个标记，这里简化处理
+                    await self._send_alert(
+                        f"任务 {record.job_id} 已运行超过 {duration/60:.1f} 分钟，可能已卡住！"
+                    )
+        except Exception as e:
+            monitor_logger.error(f"[SchedulerMonitor] Failed to check long running jobs: {e}")
 
     async def _check_consecutive_failures(self, job_id: str):
         """检查连续失败"""
@@ -269,7 +288,7 @@ class SchedulerMonitor:
                 await self._send_alert(f"任务 {job_id} 连续失败 {consecutive_failures} 次！")
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to check consecutive failures: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to check consecutive failures: {e}")
 
     async def _cleanup_old_records(self):
         """清理旧记录"""
@@ -282,21 +301,17 @@ class SchedulerMonitor:
             ]
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to cleanup old records: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to cleanup old records: {e}")
 
     async def _send_alert(self, message: str):
         """发送警报"""
-        scheduler_logger.warning(f"[SchedulerMonitor] Alert: {message}")
+        monitor_logger.warning(f"[SchedulerMonitor] Alert: {message}")
 
-        # 通过Telegram发送警报
-        telegram_enabled = config_manager.get_nested('telegram_config.enabled', False)
-        if telegram_enabled:
+        if self.telegram_enabled:
             try:
-                from utils import TelegramBot
-                async with TelegramBot() as bot:
-                    await bot.send_scheduler_notification(message, "error")
+                await self.bot.send_scheduler_notification(message, "error")
             except Exception as e:
-                scheduler_logger.error(f"[SchedulerMonitor] Failed to send alert via Telegram: {e}")
+                monitor_logger.error(f"[SchedulerMonitor] Failed to send alert via Telegram: {e}")
 
     def get_execution_stats(self) -> Dict[str, Any]:
         """获取执行统计信息"""
@@ -351,7 +366,7 @@ class SchedulerMonitor:
             }
 
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to get execution stats: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to get execution stats: {e}")
             return {'error': str(e)}
 
     def get_recent_executions(self, limit: int = 50) -> List[Dict[str, Any]]:
@@ -370,7 +385,7 @@ class SchedulerMonitor:
                 for record in recent_records
             ]
         except Exception as e:
-            scheduler_logger.error(f"[SchedulerMonitor] Failed to get recent executions: {e}")
+            monitor_logger.error(f"[SchedulerMonitor] Failed to get recent executions: {e}")
             return []
 
     async def execute_job_with_monitoring(self, job_id: str, func, *args, **kwargs):
@@ -385,7 +400,3 @@ class SchedulerMonitor:
         except Exception as e:
             await self.record_job_failure(record, str(e))
             raise
-
-
-# 全局监控器实例
-scheduler_monitor = SchedulerMonitor()

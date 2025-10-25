@@ -46,6 +46,10 @@
         "enabled": true
       },
       "Scheduler": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "Monitor": {
         "level": "INFO",
         "enabled": true
       },
@@ -77,8 +81,8 @@
         "level": "INFO",
         "enabled": true
       },
-      "report": {
-        "level": "INFO",
+      "Report": {
+        "level": "DEBUG",
         "enabled": true
       }
     },
@@ -93,7 +97,7 @@
     "enabled": true,
     "api_id": "",
     "api_hash": "",
-    "bot_token": "6117627563:",
+    "bot_token": "",
     "chat_id": [
       ""
     ],
@@ -302,7 +306,7 @@
   "scheduler_config": {
     "enabled": true,
     "timezone": "Asia/Shanghai",
-    "max_instances": 1,
+    "max_instances": 10,
     "misfire_grace_time": 300,
     "coalesce": true,
     "monitor_startup_delay": 3,
@@ -350,6 +354,7 @@
           "check_database": true,
           "check_disk_space": true,
           "check_memory_usage": true,
+          "check_telegram": true,
           "disk_space_threshold_mb": 1000,
           "memory_threshold_percent": 85
         }
@@ -490,6 +495,17 @@
       }
     }
   },
+  "monitor_config": {
+    "enabled": true,
+    "max_history_size": 1000,
+    "startup_delay": 2,
+    "min_wait_time": 1,
+    "alert_thresholds": {
+      "max_execution_time": 300,
+      "max_failure_rate": 0.1,
+      "max_consecutive_failures": 3
+    }
+  },
   "backup_config": {
     "enabled": true,
     "source_db_path": "data/quotes.db",
@@ -510,11 +526,18 @@
       "download_report": {
         "name": "数据下载报告",
         "emoji": "📊",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
             "type": "static",
             "content": "📊 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "success_rate"
           },
           {
             "name": "summary",
@@ -528,7 +551,7 @@
             ]
           },
           {
-            "name": "exchange_stats",
+            "name": "details",
             "type": "table",
             "data_source": "exchange_stats"
           },
@@ -542,6 +565,8 @@
       "daily_update_report": {
         "name": "每日数据更新报告",
         "emoji": "📈",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -552,21 +577,55 @@
             "name": "summary",
             "type": "metrics",
             "fields": [
+              "date",
               "updated_instruments",
               "new_quotes",
               "success_rate"
-            ]
+            ],
+            "title": "更新摘要",
+            "condition": "not non_trading_day"
           },
           {
-            "name": "exchange_details",
+            "name": "non_trading_day_info",
+            "type": "static",
+            "content": "🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}",
+            "condition": "non_trading_day"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *更新失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "exchange_stats_title",
+            "type": "static",
+            "content": "*交易所统计*",
+            "condition": "not non_trading_day and status != 'error'"
+          },
+          {
+            "name": "exchange_stats",
             "type": "table",
             "data_source": "exchange_stats"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
           }
         ]
       },
       "gap_report": {
         "name": "数据缺口报告",
         "emoji": "🔍",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -580,18 +639,46 @@
               "total_gaps",
               "affected_stocks",
               "severity_distribution"
-            ]
+            ],
+            "title": "缺口摘要",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *缺口检测/填补失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "top_affected_stocks_title",
+            "type": "static",
+            "content": "*受影响最严重的股票*",
+            "condition": "status != 'error'"
           },
           {
             "name": "details",
             "type": "list",
-            "data_source": "top_affected_stocks"
+            "data_source": "top_affected_stocks",
+            "display_format": "{symbol} - 缺失天数: {total_missing_days}, 严重分数: {severity_score}"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
           }
         ]
       },
       "system_status": {
         "name": "系统状态报告",
         "emoji": "🏥",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -604,7 +691,15 @@
             "data_source": "system_status"
           },
           {
-            "name": "metrics",
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "database_stats",
+              "data_sources"
+            ]
+          },
+          {
+            "name": "details",
             "type": "metrics",
             "fields": [
               "database_stats",
@@ -616,6 +711,8 @@
       "backup_result": {
         "name": "数据库备份报告",
         "emoji": "💾",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -623,7 +720,7 @@
             "content": "💾 *{name}*"
           },
           {
-            "name": "result",
+            "name": "status",
             "type": "status",
             "data_source": "backup_result"
           },
@@ -641,6 +738,8 @@
       "health_check_report": {
         "name": "系统健康检查报告",
         "emoji": "🏥",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -654,23 +753,33 @@
               "overall_status",
               "checks_performed",
               "issues_found"
-            ]
+            ],
+            "title": "检查摘要"
           },
           {
             "name": "details",
             "type": "list",
-            "data_source": "check_results"
+            "data_source": "check_results",
+            "display_format": "{status_icon} {check_name}: {result}",
+            "title": "详细检查结果"
           }
         ]
       },
       "maintenance_report": {
         "name": "数据维护报告",
         "emoji": "🔧",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
             "type": "static",
             "content": "🔧 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "tasks_completed"
           },
           {
             "name": "summary",
@@ -684,18 +793,26 @@
           {
             "name": "details",
             "type": "list",
-            "data_source": "maintenance_tasks"
+            "data_source": "maintenance_tasks",
+            "display_format": "{task_name} - 状态: {status}"
           }
         ]
       },
       "cache_warm_up_report": {
         "name": "缓存预热报告",
         "emoji": "⚡",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
             "type": "static",
             "content": "⚡ *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "stocks_warmed"
           },
           {
             "name": "summary",
@@ -720,6 +837,8 @@
       "trading_calendar_report": {
         "name": "交易日历更新报告",
         "emoji": "📅",
+        "output_format": "telegram",
+        "enabled": true,
         "sections": [
           {
             "name": "header",
@@ -733,12 +852,37 @@
               "exchanges_updated",
               "trading_days_added",
               "holidays_added"
-            ]
+            ],
+            "title": "更新摘要",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *交易日历更新失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "exchange_details_title",
+            "type": "static",
+            "content": "*交易所详情*",
+            "condition": "status != 'error'"
           },
           {
             "name": "details",
             "type": "table",
             "data_source": "exchange_details"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
           }
         ]
       }
@@ -759,6 +903,24 @@
         "include_raw_data": true,
         "response_format": "json"
       }
+    },
+    "field_labels": {
+        "total_instruments": "处理股票",
+        "success_count": "成功数量",
+        "failure_count": "失败数量",
+        "quotes_added": "新增行情",
+        "total_quotes": "行情数据",
+        "success_rate": "成功率",
+        "updated_instruments": "更新股票",
+        "new_quotes": "新增行情",
+        "total_gaps": "总缺口数",
+        "affected_stocks": "受影响股票",
+        "backup_file": "备份文件",
+        "file_size": "文件大小",
+        "duration": "耗时",
+        "overall_status": "总体状态",
+        "checks_performed": "检查数量",
+        "issues_found": "问题数量"
     }
   }
 }

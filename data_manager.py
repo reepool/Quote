@@ -107,8 +107,8 @@ class DataManager:
         self.source_factory = None
 
     @log_execution("DataManager", "initialize")
-    async def initialize(self):
-        """初始化标准数据管理器"""
+    async def initialize(self) -> None:
+        """初始化数据管理器"""
         try:
             dm_logger.info("Initializing DataManager components...")
 
@@ -137,12 +137,12 @@ class DataManager:
             raise
 
     @log_execution("DataManager", "download_all_historical_data")
-    async def download_all_historical_data(self, exchanges: List[str] = None,
-                                         start_date: date = None, end_date: date = None,
+    async def download_all_historical_data(self, exchanges: Optional[List[str]] = None,
+                                         start_date: Optional[date] = None, end_date: Optional[date] = None,
                                          resume: bool = True,
                                          quality_threshold: float = 0.7,
-                                         force_update_calendar: bool = True):
-        """下载所有历史数据（标准版）
+                                         force_update_calendar: bool = True) -> None:
+        """下载所有历史数据
 
         Args:
             exchanges: 交易所列表
@@ -190,14 +190,6 @@ class DataManager:
             if end_date is None:
                 end_date = date.today() - timedelta(days=1)
 
-            # 使用统一的通知接口
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_data_notification(f"开始标准历史数据下载...批次ID: {self.progress.batch_id}")
-                except Exception as e:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {e}")
-
             # 预处理：更新交易日历（仅在需要时）
             if force_update_calendar:
                 dm_logger.info("Updating trading calendar from data source...")
@@ -225,14 +217,6 @@ class DataManager:
             dm_logger.info("[DataManager] Generating detailed download completion report...")
             download_report = await self._generate_download_report(exchanges)
 
-            # 使用统一的报告通知接口
-            if self.telegram_enabled:
-                try:
-                    from utils.tgbot import send_report_without_context
-                    await send_report_without_context("download_report", download_report, "success")
-                except Exception as e:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {e}")
-
             # 保存报告到文件（可选）
             try:
                 import os
@@ -258,15 +242,9 @@ class DataManager:
 
         except Exception as e:
             dm_logger.error(f"historical download failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_data_notification(f"标准历史数据下载失败: {str(e)}", "error")
-                except Exception as notify_error:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {notify_error}")
         finally:
             self.is_running = False
-            await self._save_progress()
+            await self._save_progress()  # 确保在任务结束时保存进度
 
     async def _update_trading_calendar(self, exchange: str, start_date: date, end_date: date):
         """更新交易日历"""
@@ -427,9 +405,9 @@ class DataManager:
 
     async def _download_instrument_by_trading_days(self, instrument: Dict, exchange: str,
                                                  trading_days: List[date],
-                                                 quality_threshold: float,
-                                                 start_date: date = None,
-                                                 end_date: date = None) -> List[Dict]:
+                                                 quality_threshold: float, # 质量阈值
+                                                 start_date: Optional[date] = None,
+                                                 end_date: Optional[date] = None) -> List[Dict]:
         """按交易日下载单个股票的数据"""
         all_data = []
 
@@ -576,7 +554,15 @@ class DataManager:
                     quote['quality_score'] = self._calculate_quality_score(quote, instrument)
 
                     # 检查是否为交易日（仅用于质量控制）
-                    quote_date = quote['time'].date() if isinstance(quote['time'], datetime) else quote['time']
+                    time_val = quote.get('time')
+                    if isinstance(time_val, datetime):
+                        quote_date = time_val.date()
+                    elif isinstance(time_val, date):
+                        quote_date = time_val
+                    else:
+                        dm_logger.warning(f"Invalid time type for {instrument.get('instrument_id')}: {type(time_val)}")
+                        continue # 跳过此条记录
+
                     is_trading_day = quote_date in trading_days
                     if not is_trading_day and quote.get('tradestatus', 1) == 1:
                         # 如果不是交易日但交易状态显示正常，标记为异常
@@ -949,21 +935,8 @@ class DataManager:
                 except Exception as e:
                     dm_logger.error(f"Failed to fill gap for {gap.instrument_id}: {e}")
 
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_data_notification(f"数据缺口填补完成！成功填补: {filled_count}/{len(gaps)}", "success")
-                except Exception as notify_error:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {notify_error}")
-
         except Exception as e:
             dm_logger.error(f"Data gap filling failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_data_notification(f"数据缺口填补失败: {str(e)}", "error")
-                except Exception as notify_error:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {notify_error}")
 
     async def _fill_single_gap(self, gap: DataGapInfo) -> bool:
         """填补单个数据缺口"""
@@ -998,11 +971,11 @@ class DataManager:
             dm_logger.error(f"Failed to fill gap for {gap.instrument_id}: {e}")
             return False
 
-    async def get_quotes(self, instrument_id: str = None, symbol: str = None,
-                               start_date: datetime = None, end_date: datetime = None,
+    async def get_quotes(self, instrument_id: Optional[str] = None, symbol: Optional[str] = None,
+                               start_date: Optional[datetime] = None, end_date: Optional[datetime] = None,
                                include_quality: bool = True,
-                               return_format: str = 'pandas') -> Any:
-        """获取标准行情数据"""
+                               return_format: str = 'pandas') -> Union[pd.DataFrame, List[Dict[str, Any]], str]:
+        """获取行情数据"""
         try:
             # 参数验证
             if instrument_id:
@@ -1257,7 +1230,7 @@ class DataManager:
                     'update_time': datetime.now().strftime('%H:%M:%S')
                 },
                 'exchange_stats': {},
-                'update_results': update_results,
+                'update_results': update_results.get('exchange_stats', {}),
                 'errors': []
             }
 
@@ -1305,8 +1278,8 @@ class DataManager:
             # 计算总体成功率
             total_checked = report['summary']['total_instruments_checked']
             total_updated = report['summary']['updated_instruments']
-            report['summary']['success_rate'] = (total_updated / total_checked * 100) if total_checked > 0 else 0
-
+            report['summary']['success_rate'] = (total_updated / total_checked * 100) if total_checked > 0 else 100.0
+ 
             return report
 
         except Exception as e:
@@ -1322,7 +1295,7 @@ class DataManager:
                     'update_time': datetime.now().strftime('%H:%M:%S')
                 },
                 'exchange_stats': {},
-                'update_results': update_results,
+                'update_results': update_results.get('exchange_stats', {}),
                 'errors': [str(e)]
             }
 
@@ -1379,7 +1352,7 @@ class DataManager:
         except Exception as e:
             dm_logger.error(f"[DataManager] Failed to load progress: {e}")
 
-    def _format_response(self, data: Any, format_type: str) -> Any:
+    def _format_response(self, data: pd.DataFrame, format_type: str) -> Union[pd.DataFrame, List[Dict[str, Any]], str]:
         """格式化响应数据"""
         if format_type == 'pandas':
             return data
@@ -1448,8 +1421,8 @@ class DataManager:
         except Exception as e:
             dm_logger.error(f"[DataManager] Failed to generate quote statistics: {e}")
             return {}
-
-    async def update_daily_data(self, exchanges: List[str] = None, target_date=None):
+ 
+    async def update_daily_data(self, exchanges: Optional[List[str]] = None, target_date: Optional[date] = None) -> Optional[dict]:
         """每日数据更新"""
         try:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
@@ -1458,14 +1431,14 @@ class DataManager:
                 exchanges = ['SSE', 'SZSE']
 
             if target_date is None:
-                target_date = date.today() - timedelta(days=1)
+                target_date = date.today()
 
             # 统计更新结果
             update_results = {
                 'success_count': 0,
                 'failure_count': 0,
                 'total_quotes_added': 0,
-                'exchange_results': {}
+                'exchange_stats': {}
             }
 
             for exchange in exchanges:
@@ -1522,7 +1495,7 @@ class DataManager:
                             update_results['failure_count'] += 1
                             continue
 
-                    update_results['exchange_results'][exchange] = exchange_result
+                    update_results['exchange_stats'][exchange] = exchange_result
                     dm_logger.info(f"[DataManager] {exchange} update completed: {exchange_result['success_count']} success, {exchange_result['failure_count']} failed, {exchange_result['quotes_added']} quotes added")
 
                 except Exception as e:
@@ -1534,14 +1507,6 @@ class DataManager:
             # 生成并发送详细的更新报告
             dm_logger.info("[DataManager] Generating daily update completion report...")
             update_report = await self._generate_daily_update_report(exchanges, target_date, update_results)
-
-            # 使用统一的报告通知接口
-            if self.telegram_enabled:
-                try:
-                    from utils.tgbot import send_report_without_context
-                    await send_report_without_context("daily_update_report", update_report, "success")
-                except Exception as e:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {e}")
 
             # 保存报告到文件（可选）
             try:
@@ -1560,15 +1525,9 @@ class DataManager:
 
             dm_logger.info("[DataManager] Daily data update completed")
             return update_results
-
+        
         except Exception as e:
             dm_logger.error(f"[DataManager] Daily data update failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_data_notification(f"每日数据更新失败: {str(e)}", "error")
-                except Exception as notify_error:
-                    dm_logger.error(f"[DataManager] Failed to send notification: {notify_error}")
             return {
                 'success_count': 0,
                 'failure_count': 0,
@@ -1577,7 +1536,7 @@ class DataManager:
                 'error': str(e)
             }
 
-    @log_execution("DataManager", "backup_data")
+    @log_execution("DataManager", "backup_data") 
     async def backup_data(self, backup_path: str = None, include_compression: bool = True) -> bool:
         """备份数据库数据
 
@@ -1628,7 +1587,37 @@ class DataManager:
             dm_logger.error(f"[DataManager] Backup failed: {e}")
             return False
 
-    
+    def get_top_affected_stocks(self, gaps: List[DataGapInfo], limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        从缺口列表中计算并返回受影响最严重的股票。
+
+        Args:
+            gaps: DataGapInfo 对象的列表。
+            limit: 返回的股票数量。
+
+        Returns:
+            一个包含受影响最严重股票信息的字典列表。
+        """
+        from collections import defaultdict
+
+        gaps_by_stock = defaultdict(list)
+        for gap in gaps:
+            gaps_by_stock[gap.instrument_id].append(gap)
+
+        stock_scores = []
+        for stock_id, stock_gaps in gaps_by_stock.items():
+            total_missing_days = sum(g.gap_days for g in stock_gaps)
+            critical_gaps = sum(1 for g in stock_gaps if g.severity == 'critical')
+            high_gaps = sum(1 for g in stock_gaps if g.severity == 'high')
+            score = total_missing_days + (critical_gaps * 10) + (high_gaps * 5)
+            stock_scores.append({
+                'symbol': stock_gaps[0].symbol,
+                'severity_score': score,
+                'total_missing_days': total_missing_days
+            })
+        stock_scores.sort(key=lambda x: x['severity_score'], reverse=True)
+        return stock_scores[:limit]
+
 
 # 全局标准数据管理器实例
 data_manager = DataManager()

@@ -41,6 +41,7 @@ from .logging_manager import (
     ds_logger,
     api_logger,
     scheduler_logger,
+    monitor_logger,
     config_logger,
     tgbot_logger,
     task_manager_logger,
@@ -91,8 +92,8 @@ except ImportError:
     QueryValidator = None
 # Telegram Bot
 from .tgbot import TelegramBot
-# 统一报告系统
-from .report import generate_report, format_download_report, format_daily_update_report, format_gap_report, format_system_status, format_backup_result
+# 统一报告系统 (只导入 generate_report)
+from .report import generate_report
 # 交易日历工具（延迟导入以避免循环依赖）
 
 # 版本信息
@@ -191,12 +192,7 @@ __all__ = [
     "get_process_manager",
 
     # 统一报告系统
-    "generate_report",
-    "format_download_report",
-    "format_daily_update_report",
-    "format_gap_report",
-    "format_system_status",
-    "format_backup_result",
+    "generate_report", # 仅导出 generate_report
 
     # 代码转换工具
     "code_converter",

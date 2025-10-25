@@ -23,42 +23,12 @@ router = APIRouter()
 async def health_check():
     """系统健康检查"""
     try:
-        status = await data_manager.get_system_status()
-
-        # 确定整体健康状态
-        healthy_components = sum(1 for v in status.get('data_sources', {}).values() if v)
-        total_components = len(status.get('data_sources', {}))
-
-        if healthy_components == total_components:
-            overall_status = "healthy"
-        elif healthy_components > 0:
-            overall_status = "degraded"
-        else:
-            overall_status = "unhealthy"
-
-        # 检查数据质量
-        quality_metrics = status.get('data_quality_metrics', {})
-        quality_score = quality_metrics.get('overall_score', 1.0)
-
-        if quality_score < 0.5:
-            overall_status = "degraded"
-
-        return SystemStatusResponse(
-            status=overall_status,
-            timestamp=get_shanghai_time(),
-            components={
-                'data_manager': {
-                    'status': 'running' if status.get('data_manager', {}).get('is_running') else 'idle',
-                    'quality_score': quality_score
-                },
-                'database': {'status': 'connected' if status.get('database') else 'disconnected'},
-                'data_sources': status.get('data_sources', {}),
-                'trading_calendar': {
-                    'status': 'active' if status.get('trading_calendar_status') else 'inactive'
-                }
-            },
-            uptime_seconds=status.get('timestamp', (get_shanghai_time() - get_shanghai_time()).total_seconds())
-        )
+        # 复用 /system/status 的逻辑，确保返回的数据结构与 SystemStatusResponse 模型匹配
+        status_data = await data_manager.get_system_status()
+        if not status_data:
+            raise HTTPException(status_code=503, detail="System status is unavailable.")
+        
+        return SystemStatusResponse(**status_data)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"health check failed: {str(e)}")

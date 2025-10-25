@@ -139,29 +139,34 @@ class LoggingManager:
                 ErrorCodes.CONFIG_INVALID_FORMAT
             ) from e
 
+    def _safe_get_config(self, config_obj: Any, key: str, default: Any) -> Any:
+        """安全地从配置对象（dataclass或dict）获取值"""
+        if hasattr(config_obj, key):
+            return getattr(config_obj, key, default)
+        elif isinstance(config_obj, dict) and key in config_obj:
+            return config_obj.get(key, default)
+        return default
+
     def _configure_module_loggers(self, modules_config: Dict[str, Any]):
         """配置模块特定的日志器"""
         for module_name, module_config in modules_config.items():
-            # 安全地访问 enabled 属性
-            enabled = getattr(module_config, 'enabled', True) if hasattr(module_config, 'enabled') else module_config.get('enabled', True) if isinstance(module_config, dict) else True
+            enabled = self._safe_get_config(module_config, 'enabled', True)
             if enabled:
                 logger = self.get_logger(module_name)
-                # 安全地访问 level 属性
-                level = getattr(module_config, 'level', 'INFO') if hasattr(module_config, 'level') else module_config.get('level', 'INFO') if isinstance(module_config, dict) else 'INFO'
+                level = self._safe_get_config(module_config, 'level', 'INFO')
                 logger.setLevel(getattr(logging, level.upper()))
 
     def _configure_performance_monitoring(self, perf_config: Any):
         """配置性能监控"""
-        # 安全地访问 enabled 属性
-        enabled = getattr(perf_config, 'enabled', True) if hasattr(perf_config, 'enabled') else perf_config.get('enabled', True) if isinstance(perf_config, dict) else True
+        enabled = self._safe_get_config(perf_config, 'enabled', True)
 
         # 可以在这里根据配置启用/禁用性能监控功能
         if not enabled:
             # 禁用性能监控的相关功能
             pass
 
-        # 设置慢操作阈值
-        threshold = getattr(perf_config, 'slow_operation_threshold_seconds', 1.0) if hasattr(perf_config, 'slow_operation_threshold_seconds') else perf_config.get('slow_operation_threshold_seconds', 1.0) if isinstance(perf_config, dict) else 1.0
+        # 设置慢操作阈值 - 字段名在dataclass中是 slow_operation_threshold
+        threshold = self._safe_get_config(perf_config, 'slow_operation_threshold', 1.0)
         # 可以将这个值存储起来供装饰器使用
         self._slow_operation_threshold = threshold
 
@@ -523,7 +528,10 @@ class ModuleLoggers:
     Config = logging_manager.get_logger("Config")
     TelegramBot = logging_manager.get_logger("TelegramBot")
     TaskManager = logging_manager.get_logger("TaskManager")
+    Monitor = logging_manager.get_logger("Monitor")
     Report = logging_manager.get_logger("Report")
+    tg_task_manager = logging_manager.get_logger("tg_task_manager")
+
 
     # 数据源专用日志器
     AkShareSource = logging_manager.get_logger("AkShareSource")
@@ -577,15 +585,17 @@ db_logger = ModuleLoggers.Database
 ds_logger = ModuleLoggers.DataSource
 api_logger = ModuleLoggers.API
 scheduler_logger = ModuleLoggers.Scheduler
+monitor_logger = ModuleLoggers.Monitor
 config_logger = ModuleLoggers.Config
 tgbot_logger = ModuleLoggers.TelegramBot
 task_manager_logger = ModuleLoggers.TaskManager
 report_logger = ModuleLoggers.Report
-akshare_logger = ModuleLoggers.AkShareSource
-yfinance_logger = ModuleLoggers.YFinanceSource
+tg_task_logger = ModuleLoggers.tg_task_manager
 cache_logger = ModuleLoggers.Cache
 validation_logger = ModuleLoggers.Validation
 date_utils_logger = ModuleLoggers.DateUtils
+akshare_logger = ModuleLoggers.AkShareSource
+yfinance_logger = ModuleLoggers.YFinanceSource
 tushare_logger = ModuleLoggers.Tushare
 baostock_logger = ModuleLoggers.Baostock
 

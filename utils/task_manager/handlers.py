@@ -79,6 +79,7 @@ class TaskManagerHandlers:
             "*可用命令：*\n"
             "• `/status` - 查看所有任务状态\n"
             "• `/detail <任务ID>` - 查看任务详情\n"
+            "• `/run <任务ID>` - 立即执行任务\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 显示此帮助信息\n\n"
             "*可用的任务ID：*\n"
@@ -91,10 +92,11 @@ class TaskManagerHandlers:
             "• `cache_warm_up` - 缓存预热\n\n"
             "*使用示例：*\n"
             "• `/detail trading_calendar_update`\n"
-            "• `/detail daily_data_update`\n"
+            "• `/run system_health_check`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
+            "• 使用 `/run` 可以立即执行任何任务\n"
             "• 使用 `/reload_config` 可以在修改配置文件后热重载，无需重启进程"
         )
 
@@ -403,12 +405,17 @@ class TaskManagerHandlers:
                 running_tasks, disabled_tasks, total_tasks
             )
 
+            # 如果有禁用的任务，也显示它们
+            if disabled_tasks:
+                message += "\n\n*🔴 已禁用的任务:*\n"
+                for task in disabled_tasks:
+                    message += f"• `{task.job_id}` - {task.description}\n"
+
             # 添加命令提示
-            message += "\n\n*可用的任务控制命令：*\n"
-            message += "• `/run <task_id>` - 立即运行任务\n"
-            message += "• `/enable <task_id>` - 启用任务\n"
-            message += "• `/disable <task_id>` - 禁用任务\n"
-            message += "• `/detail <task_id>` - 查看任务详情"
+            message += "\n\n*💡 可用命令:*\n"
+            message += "• `/run <任务ID>` - 立即执行\n"
+            message += "• `/detail <任务ID>` - 查看详情\n"
+            message += "• `/help` - 获取更多帮助"
 
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 发送状态消息到 {chat_id}")
 
@@ -542,6 +549,23 @@ class TaskManagerHandlers:
             for job_id, job_config in job_configs.items():
                 total_tasks += 1
                 self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理任务: {job_id}")
+
+                # 优先检查任务是否在配置中被禁用
+                if not job_config.enabled:
+                    task_info = TaskStatusInfo(
+                        job_id=job_id,
+                        description=job_config.description,
+                        status=TaskStatus.DISABLED,
+                        enabled=False,
+                        in_scheduler=False,
+                        next_run_time=None,
+                        trigger_info=None, # 触发器信息对于禁用任务不重要
+                        parameters=job_config.parameters
+                    )
+                    disabled_tasks.append(task_info)
+                    self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id} 已禁用，直接添加到禁用列表")
+                    continue # 处理下一个任务
+
                 # 处理JobConfig对象或字典数据
                 if hasattr(job_config, '__dict__'):
                     # 处理trigger对象，将其转换为字典格式
@@ -557,20 +581,23 @@ class TaskManagerHandlers:
                     self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id}: Trigger对象类型: {type(trigger_obj).__name__}")
 
                     if isinstance(trigger_obj, CronTrigger):
-                        # CronTrigger对象
+                        # CronTrigger对象，提取其参数
                         self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id}: 处理CronTrigger")
+                        # 安全地获取每个字段，如果不存在则使用默认值 '*'
                         trigger_dict = {
                             'type': 'cron',
-                            'second': getattr(trigger_obj, 'second', 0),
-                            'minute': getattr(trigger_obj, 'minute', '*'),
-                            'hour': getattr(trigger_obj, 'hour', '*'),
-                            'day': getattr(trigger_obj, 'day', '*'),
-                            'month': getattr(trigger_obj, 'month', '*'),
-                            'day_of_week': getattr(trigger_obj, 'day_of_week', '*'),
+                            'year': str(getattr(trigger_obj, 'year', '*')),
+                            'month': str(getattr(trigger_obj, 'month', '*')),
+                            'day': str(getattr(trigger_obj, 'day', '*')),
+                            'week': str(getattr(trigger_obj, 'week', '*')),
+                            'day_of_week': str(getattr(trigger_obj, 'day_of_week', '*')),
+                            'hour': str(getattr(trigger_obj, 'hour', '*')),
+                            'minute': str(getattr(trigger_obj, 'minute', '*')),
+                            'second': str(getattr(trigger_obj, 'second', '*')),
                             'timezone': str(getattr(trigger_obj, 'timezone', 'Asia/Shanghai'))
                         }
                     elif isinstance(trigger_obj, IntervalTrigger):
-                        # IntervalTrigger对象
+                        # IntervalTrigger对象，提取其参数
                         self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id}: 处理IntervalTrigger")
                         interval = trigger_obj.interval
                         hours = int(interval.total_seconds() // 3600)
@@ -585,7 +612,7 @@ class TaskManagerHandlers:
                             'timezone': str(getattr(trigger_obj, 'timezone', 'Asia/Shanghai'))
                         }
                     elif isinstance(trigger_obj, DateTrigger):
-                        # DateTrigger对象
+                        # DateTrigger对象，提取其参数
                         self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id}: 处理DateTrigger")
                         trigger_dict = {
                             'type': 'date',
@@ -753,7 +780,7 @@ class TaskManagerHandlers:
         """获取任务执行历史"""
         try:
             # 从监控器获取执行历史
-            recent_executions = self.task_manager.scheduler_monitor.get_recent_executions(limit * 2)  # 获取更多记录用于过滤
+            recent_executions = self.task_manager.task_scheduler.scheduler_monitor.get_recent_executions(limit * 2)  # 获取更多记录用于过滤
 
             # 过滤指定任务的执行记录
             task_executions = []
@@ -785,7 +812,7 @@ class TaskManagerHandlers:
                 success = await self._disable_task(job_id)
                 if success:
                     # 从调度器移除任务
-                    await self.task_manager.task_scheduler.remove_job(job_id)
+                    await self.task_manager.task_scheduler.remove_job(job_id)  # 确认异步调用
                 return success
             else:
                 return False
@@ -838,6 +865,94 @@ class TaskManagerHandlers:
         if chat_id not in self.user_states:
             self.user_states[chat_id] = TaskManagerState(chat_id=chat_id)
         return self.user_states[chat_id]
+
+    async def handle_run_command(self, event) -> None:
+        """处理 /run 命令"""
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        command_text = event.text if hasattr(event, 'text') else '/run'
+
+        # 详细日志记录
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/run命令: {command_text}, chat_id: {chat_id}")
+
+        # 解析命令参数
+        parts = command_text.strip().split()
+        if len(parts) < 2:
+            error_message = "❌ *缺少任务ID*\n\n请使用: `/run <task_id>`\n\n例如: `/run system_health_check`\n\n使用 `/help` 查看可用任务列表。"
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        job_id = parts[1]
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 尝试立即执行任务: {job_id}")
+
+        try:
+            # 验证任务是否存在
+            from utils import config_manager
+            job_cfg = config_manager.get_nested(f'scheduler_config.jobs.{job_id}', {})
+
+            if not job_cfg:
+                error_message = f"❌ *任务不存在*\n\n任务ID: `{job_id}`\n\n请使用 `/help` 查看可用任务。"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+                return
+
+            # 检查任务是否启用
+            if not job_cfg.get('enabled', True):
+                error_message = f"❌ *任务已禁用*\n\n任务ID: `{job_id}`\n\n请先启用任务后再执行。"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+                return
+
+            # 立即执行任务
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 开始执行任务: {job_id}")
+            success = await self._execute_task_direct(chat_id, job_id)
+
+            # 发送执行结果通知
+            if success:
+                success_message = f"✅ *任务执行成功*\n\n任务ID: `{job_id}`\n\n任务已成功提交执行。"
+                await self.task_manager.send_message(chat_id, success_message, parse_mode='markdown')
+                self.task_manager.logger.info(f"[TaskManagerHandlers] 任务执行成功: {job_id}")
+            else:
+                error_message = f"❌ *任务执行失败*\n\n任务ID: `{job_id}`\n\n任务执行失败，请检查日志。"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+                self.task_manager.logger.error(f"[TaskManagerHandlers] 任务执行失败: {job_id}")
+
+        except Exception as e:
+            error_message = (
+                f"❌ *执行任务时发生异常*\n\n"
+                f"任务ID: `{job_id}`\n"
+                f"错误: {str(e)}\n\n"
+                f"请检查日志或稍后重试。"
+            )
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 执行任务异常: {job_id}, 错误: {e}")
+
+    async def _execute_task_direct(self, chat_id: int, job_id: str) -> bool:
+        """直接执行任务，不通过UI交互"""
+        try:
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 直接执行任务: {job_id}")
+
+            # 调试：检查调度器中的任务状态
+            scheduler = self.task_manager.task_scheduler
+            available_jobs = list(scheduler.jobs.keys())
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 调度器中的可用任务: {available_jobs}")
+
+            if job_id not in scheduler.jobs:
+                self.task_manager.logger.error(f"[TaskManagerHandlers] 任务 {job_id} 不在调度器中！可用任务: {available_jobs}")
+                return False
+
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 任务 {job_id} 存在于调度器中，开始调度")
+
+            # 调用调度器的立即执行方法
+            success = await scheduler.run_job_now(job_id)
+
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 任务调度结果: {job_id}, 成功: {success}")
+            return success
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 直接执行任务失败: {job_id}, 错误: {e}")
+            import traceback
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 错误详情: {traceback.format_exc()}")
+            return False
 
     def cleanup_user_state(self, chat_id: int) -> None:
         """清理用户状态"""

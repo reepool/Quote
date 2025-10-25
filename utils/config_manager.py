@@ -5,7 +5,7 @@
 
 import json
 import logging
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, Dict, List, TypeVar
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -24,6 +24,9 @@ class ErrorCodes:
 
 # 获取配置专用日志器
 config_logger = logging.getLogger("Config")
+
+# 为泛型类型定义一个TypeVar
+T = TypeVar('T')
 
 # ============================================================================
 # 配置数据类型定义
@@ -114,7 +117,21 @@ class SchedulerConfig:
     """调度器配置"""
     enabled: bool = True
     timezone: str = "Asia/Shanghai"
+    max_instances: int = 10  # 提高默认并发任务数
+    misfire_grace_time: int = 300
+    coalesce: bool = True
     jobs: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+@dataclass
+class MonitorConfig:
+    """监控配置"""
+    enabled: bool = True
+    max_history_size: int = 1000
+    startup_delay: int = 2  # 调度器启动后的监控等待时间
+    min_wait_time: int = 1  # 监控器最小等待时间
+    alert_thresholds: Dict[str, Any] = field(default_factory=lambda: {
+        'max_execution_time': 300, 'max_failure_rate': 0.1, 'max_consecutive_failures': 3
+    })
 
 @dataclass
 class ApiConfig:
@@ -125,6 +142,14 @@ class ApiConfig:
     workers: int = 1
     reload: bool = False
     cors_origins: List[str] = field(default_factory=lambda: ["*"])
+
+@dataclass
+class ReportConfig:
+    """报告配置"""
+    templates: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    formats: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    field_labels: Dict[str, str] = field(default_factory=dict) # 字段标签
+    # 报告引擎的 prepare 方法映射
 
 
 # ============================================================================
@@ -147,33 +172,44 @@ class UnifiedConfigManager:
 
     def _load_config(self) -> None:
         """加载配置文件"""
+        merged_config = {}
         try:
-            config_logger.info("Loading configuration file...")
+            config_logger.info(f"Loading configuration from directory: {self._config_dir}")
 
-            if not self._config_path.exists():
-                # 尝试使用模板文件
-                template_path = self._config_dir / "config-template.json"
-                if template_path.exists():
-                    self._config_path = template_path
-                    config_logger.warning(f"Using template config: {template_path}")
-                else:
+            if not self._config_dir.is_dir():
+                raise ConfigurationError(
+                    f"Configuration path is not a directory: {self._config_dir}",
+                    ErrorCodes.CONFIG_FILE_NOT_FOUND
+                )
+
+            # 按文件名排序加载，确保加载顺序一致
+            config_files = sorted(self._config_dir.glob('*.json'))
+            if not config_files:
+                raise ConfigurationError(
+                    f"No configuration files (.json) found in: {self._config_dir}",
+                    ErrorCodes.CONFIG_FILE_NOT_FOUND
+                )
+
+            for config_file in config_files:
+                # 跳过旧的模板文件和合并后的文件，以防万一
+                if config_file.name in ["config-template.json", "config.merged.json"]:
+                    continue
+                try:
+                    with open(config_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        merged_config.update(data)
+                    config_logger.debug(f"Loaded and merged: {config_file.name}")
+                except json.JSONDecodeError as e:
                     raise ConfigurationError(
-                        f"Configuration file not found: {self._config_path}",
-                        ErrorCodes.CONFIG_FILE_NOT_FOUND
-                    )
+                        f"Invalid JSON in configuration file {config_file.name}: {e}",
+                        ErrorCodes.CONFIG_INVALID_FORMAT
+                    ) from e
 
-            with open(self._config_path, 'r', encoding='utf-8') as f:
-                self._config_data = json.load(f)
-
-            config_logger.info(f"Configuration loaded from: {self._config_path}")
+            self._config_data = merged_config
+            config_logger.info(f"Configuration loaded and merged from {len(config_files)} files.")
             # 清除类型化缓存
             self._typed_cache.clear()
 
-        except json.JSONDecodeError as e:
-            raise ConfigurationError(
-                f"Invalid JSON in configuration file: {e}",
-                ErrorCodes.CONFIG_INVALID_FORMAT
-            ) from e
         except Exception as e:
             raise ConfigurationError(
                 f"Failed to load configuration: {e}",
@@ -189,11 +225,11 @@ class UnifiedConfigManager:
     # 底层访问方法
     # ========================================================================
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Optional[T] = None) -> Optional[T]:
         """获取配置值"""
         return self._config_data.get(key, default)
 
-    def get_nested(self, path: str, default: Any = None) -> Any:
+    def get_nested(self, path: str, default: Optional[T] = None) -> Optional[T]:
         """获取嵌套配置值，支持点分隔路径"""
         keys = path.split('.')
         current = self._config_data
@@ -377,6 +413,9 @@ class UnifiedConfigManager:
                 self._typed_cache['scheduler_config'] = SchedulerConfig(
                     enabled=scheduler_data.get('enabled', True),
                     timezone=scheduler_data.get('timezone', 'Asia/Shanghai'),
+                    max_instances=scheduler_data.get('max_instances', 1),
+                    misfire_grace_time=scheduler_data.get('misfire_grace_time', 300),
+                    coalesce=scheduler_data.get('coalesce', True),
                     jobs=scheduler_data.get('jobs', {})
                 )
             except Exception as e:
@@ -411,6 +450,46 @@ class UnifiedConfigManager:
 
         return self._typed_cache[cache_key]
     
+    def get_monitor_config(self) -> MonitorConfig:
+        """获取监控配置（类型安全）"""
+        if 'monitor_config' not in self._typed_cache:
+            try:
+                monitor_data = self.get_nested('monitor_config', {})
+                thresholds_data = monitor_data.get('alert_thresholds', {})
+                self._typed_cache['monitor_config'] = MonitorConfig(
+                    enabled=monitor_data.get('enabled', True),
+                    max_history_size=monitor_data.get('max_history_size', 1000),
+                    startup_delay=monitor_data.get('startup_delay', 2),
+                    min_wait_time=monitor_data.get('min_wait_time', 1),
+                    alert_thresholds={
+                        'max_execution_time': thresholds_data.get('max_execution_time', 300),
+                        'max_failure_rate': thresholds_data.get('max_failure_rate', 0.1),
+                        'max_consecutive_failures': thresholds_data.get('max_consecutive_failures', 3)
+                    }
+                )
+            except Exception as e:
+                config_logger.error(f"Failed to parse monitor config: {e}")
+                self._typed_cache['monitor_config'] = MonitorConfig()
+
+        return self._typed_cache['monitor_config']
+    
+    def get_report_config(self) -> ReportConfig:
+        """获取报告配置（类型安全）"""
+        if 'report_config' not in self._typed_cache:
+            try:
+                report_data = self.get_nested('report_config', {})
+                self._typed_cache['report_config'] = ReportConfig(
+                    templates=report_data.get('templates', {}),
+                    formats=report_data.get('formats', {}),
+                    field_labels=report_data.get('field_labels', {})
+                )
+            except Exception as e:
+                config_logger.error(f"Failed to parse report config: {e}")
+                self._typed_cache['report_config'] = ReportConfig()
+
+        return self._typed_cache['report_config']
+
+
     def get_api_config(self) -> ApiConfig:
         """获取API配置（类型安全）"""
         if 'api_config' not in self._typed_cache:
@@ -446,15 +525,19 @@ class UnifiedConfigManager:
 
     def save_config(self, file_path: Optional[str] = None) -> None:
         """保存配置到文件"""
-        save_path = Path(file_path) if file_path else self._config_path
+        # 默认保存为一个合并后的文件，而不是覆盖拆分的文件
+        if file_path:
+            save_path = Path(file_path)
+        else:
+            save_path = self._config_dir / "config.merged.json"
 
         try:
             # 确保目录存在
             save_path.parent.mkdir(parents=True, exist_ok=True)
 
             with open(save_path, 'w', encoding='utf-8') as f:
-                json.dump(self._config_data, f, indent=2, ensure_ascii=False)
-            config_logger.info(f"Configuration saved to: {save_path}")
+                json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)
+            config_logger.info(f"Current merged configuration saved to: {save_path}")
         except Exception as e:
             raise ConfigurationError(
                 f"Failed to save configuration: {e}",

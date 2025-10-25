@@ -6,7 +6,7 @@ Provides in-memory caching with TTL support.
 import time
 import asyncio
 import json
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, Optional, Callable, TypeVar
 from functools import wraps
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from utils import cache_logger
 from utils.date_utils import get_shanghai_time
 
+# 为泛型缓存值定义一个TypeVar
+T = TypeVar('T')
 
 @dataclass
 class CacheEntry:
@@ -49,21 +51,21 @@ class SimpleCache:
         self._cache: Dict[str, CacheEntry] = {}
         self._lock = asyncio.Lock()
 
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str, default: Optional[T] = None) -> Optional[T]:
         """获取缓存值"""
         async with self._lock:
             entry = self._cache.get(key)
             if entry is None:
-                return None
+                return default
 
             if entry.is_expired():
                 del self._cache[key]
-                return None
+                return default
 
             cache_logger.debug(f"[Cache] Hit: {key}")
             return entry.value
 
-    async def set(self, key: str, value: Any, ttl: Optional[float] = None) -> bool:
+    async def set(self, key: str, value: T, ttl: Optional[float] = None) -> bool:
         """设置缓存值"""
         async with self._lock:
             # 检查是否需要清理空间

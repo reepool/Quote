@@ -3,7 +3,9 @@ Scheduler job configuration parser and manager.
 Handles parsing and validation of job configurations from config.json.
 """
 
-from typing import Dict, Any, Optional, List
+from __future__ import annotations
+
+from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from datetime import time
 
@@ -11,6 +13,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 from utils import scheduler_logger
+from utils.config_manager import UnifiedConfigManager
 
 
 @dataclass
@@ -30,21 +33,22 @@ class JobConfig:
 class JobConfigManager:
     """任务配置管理器"""
 
-    def __init__(self, config_manager):
+    def __init__(self, config_manager: UnifiedConfigManager):
         self.config_manager = config_manager
         self.job_configs: Dict[str, JobConfig] = {}
 
     def load_job_configs(self) -> Dict[str, JobConfig]:
         """从配置文件加载任务配置"""
         try:
-            scheduler_config = self.config_manager.get_nested('scheduler_config', {})
-            jobs_config = scheduler_config.get('jobs', {})
+            # 使用类型安全的配置访问方法
+            scheduler_config = self.config_manager.get_scheduler_config()
+            jobs_config = scheduler_config.jobs
 
             self.job_configs = {}
 
             for job_id, job_data in jobs_config.items():
                 try:
-                    job_config = self._parse_job_config(job_id, job_data)
+                    job_config = self._parse_job_config(job_id, job_data, scheduler_config)
                     if job_config:
                         self.job_configs[job_id] = job_config
                         scheduler_logger.info(f"[JobConfigManager] Loaded config for job: {job_id}")
@@ -62,13 +66,9 @@ class JobConfigManager:
             scheduler_logger.error(f"[JobConfigManager] Failed to load job configurations: {e}")
             return {}
 
-    def _parse_job_config(self, job_id: str, job_data: Dict[str, Any]) -> Optional[JobConfig]:
+    def _parse_job_config(self, job_id: str, job_data: Dict[str, Any], scheduler_config) -> Optional[JobConfig]:
         """解析单个任务配置"""
         try:
-            # 检查任务是否启用
-            if not job_data.get('enabled', True):
-                return None
-
             # 解析触发器
             trigger = self._parse_trigger(job_data.get('trigger', {}))
             if trigger is None:
@@ -81,9 +81,10 @@ class JobConfigManager:
                 enabled=job_data.get('enabled', True),
                 description=job_data.get('description', ''),
                 trigger=trigger,
-                max_instances=job_data.get('max_instances', 1),
-                misfire_grace_time=job_data.get('misfire_grace_time', 300),
-                coalesce=job_data.get('coalesce', True),
+                # 优先使用任务自身的配置，否则使用从SchedulerConfig对象中读取的全局默认值
+                max_instances=job_data.get('max_instances', scheduler_config.max_instances),
+                misfire_grace_time=job_data.get('misfire_grace_time', scheduler_config.misfire_grace_time),
+                coalesce=job_data.get('coalesce', scheduler_config.coalesce),
                 parameters=job_data.get('parameters', {}),
                 report=job_data.get('report', False)  # 默认不发送报告
             )
@@ -114,78 +115,86 @@ class JobConfigManager:
             scheduler_logger.error(f"[JobConfigManager] Error parsing trigger: {e}")
             return None
 
-    def _parse_cron_trigger(self, trigger_config: Dict[str, Any]) -> CronTrigger:
+    def _parse_cron_trigger(self, trigger_config: Dict[str, Any]) -> Optional[CronTrigger]:
         """解析 Cron 触发器"""
-        # 提取 cron 参数
-        cron_kwargs = {}
+        try:
+            # 提取 cron 参数
+            cron_kwargs = {}
 
-        # 基本时间字段
-        if 'second' in trigger_config:
-            cron_kwargs['second'] = trigger_config['second']
-        if 'minute' in trigger_config:
-            cron_kwargs['minute'] = trigger_config['minute']
-        if 'hour' in trigger_config:
-            cron_kwargs['hour'] = trigger_config['hour']
-        if 'month' in trigger_config:
-            cron_kwargs['month'] = trigger_config['month']
-        if 'day_of_week' in trigger_config:
-            cron_kwargs['day_of_week'] = trigger_config['day_of_week']
-        if 'week' in trigger_config:
-            cron_kwargs['week'] = trigger_config['week']
+            # 基本时间字段
+            if 'second' in trigger_config:
+                cron_kwargs['second'] = trigger_config['second']
+            if 'minute' in trigger_config:
+                cron_kwargs['minute'] = trigger_config['minute']
+            if 'hour' in trigger_config:
+                cron_kwargs['hour'] = trigger_config['hour']
+            if 'month' in trigger_config:
+                cron_kwargs['month'] = trigger_config['month']
+            if 'day_of_week' in trigger_config:
+                cron_kwargs['day_of_week'] = trigger_config['day_of_week']
+            if 'week' in trigger_config:
+                cron_kwargs['week'] = trigger_config['week']
 
-        # 处理day字段（支持特殊值'last'）
-        if 'day_of_month' in trigger_config:
-            cron_kwargs['day'] = trigger_config['day_of_month']
-        elif 'day' in trigger_config:
-            day_value = trigger_config['day']
-            if day_value == 'last':
-                cron_kwargs['day'] = 'last'  # 支持quarterly_cleanup的"day": "last"
-            else:
-                cron_kwargs['day'] = day_value
+            # 处理day字段（支持特殊值'last'）
+            if 'day_of_month' in trigger_config:
+                cron_kwargs['day'] = trigger_config['day_of_month']
+            elif 'day' in trigger_config:
+                day_value = trigger_config['day']
+                if day_value == 'last':
+                    cron_kwargs['day'] = 'last'  # 支持quarterly_cleanup的"day": "last"
+                else:
+                    cron_kwargs['day'] = day_value
 
-        # 其他 cron 参数
-        if 'start_date' in trigger_config:
-            cron_kwargs['start_date'] = trigger_config['start_date']
-        if 'end_date' in trigger_config:
-            cron_kwargs['end_date'] = trigger_config['end_date']
-        if 'timezone' in trigger_config:
-            cron_kwargs['timezone'] = trigger_config['timezone']
-        if 'jitter' in trigger_config:
-            cron_kwargs['jitter'] = trigger_config['jitter']
+            # 其他 cron 参数
+            if 'start_date' in trigger_config:
+                cron_kwargs['start_date'] = trigger_config['start_date']
+            if 'end_date' in trigger_config:
+                cron_kwargs['end_date'] = trigger_config['end_date']
+            if 'timezone' in trigger_config:
+                cron_kwargs['timezone'] = trigger_config['timezone']
+            if 'jitter' in trigger_config:
+                cron_kwargs['jitter'] = trigger_config['jitter']
 
-        return CronTrigger(**cron_kwargs)
+            return CronTrigger(**cron_kwargs)
+        except Exception as e:
+            scheduler_logger.error(f"[JobConfigManager] Error parsing cron trigger: {e}")
+            return None
 
-    def _parse_interval_trigger(self, trigger_config: Dict[str, Any]) -> IntervalTrigger:
+    def _parse_interval_trigger(self, trigger_config: Dict[str, Any]) -> Optional[IntervalTrigger]:
         """解析间隔触发器"""
-        interval_kwargs = {}
+        try:
+            interval_kwargs = {}
 
-        # 时间间隔字段
-        if 'weeks' in trigger_config:
-            interval_kwargs['weeks'] = trigger_config['weeks']
-        if 'days' in trigger_config:
-            interval_kwargs['days'] = trigger_config['days']
-        if 'hours' in trigger_config:
-            interval_kwargs['hours'] = trigger_config['hours']
-        if 'minutes' in trigger_config:
-            interval_kwargs['minutes'] = trigger_config['minutes']
-        if 'seconds' in trigger_config:
-            interval_kwargs['seconds'] = trigger_config['seconds']
+            # 时间间隔字段
+            if 'weeks' in trigger_config:
+                interval_kwargs['weeks'] = trigger_config['weeks']
+            if 'days' in trigger_config:
+                interval_kwargs['days'] = trigger_config['days']
+            if 'hours' in trigger_config:
+                interval_kwargs['hours'] = trigger_config['hours']
+            if 'minutes' in trigger_config:
+                interval_kwargs['minutes'] = trigger_config['minutes']
+            if 'seconds' in trigger_config:
+                interval_kwargs['seconds'] = trigger_config['seconds']
 
-        # 其他间隔参数
-        if 'start_date' in trigger_config:
-            interval_kwargs['start_date'] = trigger_config['start_date']
-        if 'end_date' in trigger_config:
-            interval_kwargs['end_date'] = trigger_config['end_date']
-        if 'timezone' in trigger_config:
-            interval_kwargs['timezone'] = trigger_config['timezone']
-        if 'jitter' in trigger_config:
-            interval_kwargs['jitter'] = trigger_config['jitter']
+            # 其他间隔参数
+            if 'start_date' in trigger_config:
+                interval_kwargs['start_date'] = trigger_config['start_date']
+            if 'end_date' in trigger_config:
+                interval_kwargs['end_date'] = trigger_config['end_date']
+            if 'timezone' in trigger_config:
+                interval_kwargs['timezone'] = trigger_config['timezone']
+            if 'jitter' in trigger_config:
+                interval_kwargs['jitter'] = trigger_config['jitter']
 
-        # 确保至少有一个时间间隔参数
-        if not any(k in interval_kwargs for k in ['weeks', 'days', 'hours', 'minutes', 'seconds']):
-            raise ValueError("Interval trigger must have at least one time interval parameter")
+            # 确保至少有一个时间间隔参数
+            if not any(k in interval_kwargs for k in ['weeks', 'days', 'hours', 'minutes', 'seconds']):
+                raise ValueError("Interval trigger must have at least one time interval parameter")
 
-        return IntervalTrigger(**interval_kwargs)
+            return IntervalTrigger(**interval_kwargs)
+        except Exception as e:
+            scheduler_logger.error(f"[JobConfigManager] Error parsing interval trigger: {e}")
+            return None
 
     def get_job_config(self, job_id: str) -> Optional[JobConfig]:
         """获取指定任务的配置"""
@@ -252,4 +261,4 @@ class JobConfigManager:
 
 
 # 全局任务配置管理器实例
-job_config_manager = None
+job_config_manager: Optional[JobConfigManager] = None

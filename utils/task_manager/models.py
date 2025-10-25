@@ -8,6 +8,8 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 from enum import Enum
 
+from utils import task_manager_logger
+
 
 class TaskStatus(Enum):
     """任务状态枚举"""
@@ -201,22 +203,21 @@ class TaskStatusInfo:
             # 优先使用新的字段名，如果不存在则尝试旧字段名
             next_run_time = job_data.get('next_run_time') or job_data.get('next_run')
 
-            # 导入时间格式化工具
-            try:
-                from utils.date_utils import DateUtils
-                # 这里先保持原始的datetime对象，格式化交给formatters处理
-                # 确保时间对象可以被正确传递给格式化函数
-                if next_run_time and hasattr(next_run_time, 'astimezone'):
-                    # 时间对象已经有时区信息，保持原样
-                    pass
-                elif next_run_time:
-                    # 为没有时区信息的时间对象添加默认时区
-                    from datetime import timezone
-                    if next_run_time.tzinfo is None:
-                        next_run_time = next_run_time.replace(tzinfo=timezone.utc)
-            except ImportError:
-                # 如果导入失败，保持原有逻辑
-                pass
+            # 增加对 next_run_time 类型的健壮性处理
+            if isinstance(next_run_time, str):
+                try:
+                    next_run_time = datetime.fromisoformat(next_run_time.replace('Z', '+00:00'))
+                except (ValueError, TypeError):
+                    task_manager_logger.warning(f"Invalid next_run_time format for job {job_id}: {next_run_time}")
+                    next_run_time = None
+            elif not isinstance(next_run_time, datetime):
+                next_run_time = None
+
+            # 确保 datetime 对象有时区信息
+            if next_run_time and next_run_time.tzinfo is None:
+                from datetime import timezone
+                # 假设无时区的时间是UTC时间
+                next_run_time = next_run_time.replace(tzinfo=timezone.utc)
 
         # 处理参数
         parameters = config_data.get('parameters', {}) if config_data else {}

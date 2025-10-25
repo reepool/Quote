@@ -1,0 +1,194 @@
+{
+  "scheduler_config": {
+    "enabled": true,
+    "timezone": "Asia/Shanghai",
+    "max_instances": 10,
+    "misfire_grace_time": 300,
+    "coalesce": true,
+    "monitor_startup_delay": 3,
+    "market_close_delay_minutes": 15,
+    "jobs": {
+      "daily_data_update": {
+        "enabled": true,
+        "description": "每日数据更新任务",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 20,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "wait_for_market_close": true,
+          "market_close_delay_minutes": 15,
+          "enable_trading_day_check": true
+        }
+      },
+      "system_health_check": {
+        "enabled": true,
+        "description": "系统健康检查",
+        "report": true,
+        "trigger": {
+          "type": "interval",
+          "hours": 1,
+          "minutes": 0,
+          "seconds": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 300,
+        "coalesce": true,
+        "parameters": {
+          "check_data_sources": true,
+          "check_database": true,
+          "check_disk_space": true,
+          "check_memory_usage": true,
+          "check_telegram": true,
+          "disk_space_threshold_mb": 1000,
+          "memory_threshold_percent": 85
+        }
+      },
+      "weekly_data_maintenance": {
+        "enabled": true,
+        "description": "每周数据维护",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 2,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "backup_database": true,
+          "cleanup_old_logs": true,
+          "log_retention_days": 30,
+          "optimize_database": true,
+          "validate_data_integrity": true
+        }
+      },
+      "monthly_data_integrity_check": {
+        "enabled": true,
+        "description": "月度数据完整性检查和缺口修复",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day": 1,
+          "hour": 3,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "severity_filter": [
+            "high",
+            "critical"
+          ],
+          "days_to_check": 45
+        }
+      },
+      "quarterly_cleanup": {
+        "enabled": true,
+        "description": "季度数据清理",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "month": "3,6,9,12",
+          "day": "last",
+          "hour": 4,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "cleanup_old_quotes": true,
+          "quote_retention_months": 36,
+          "cleanup_temp_files": true,
+          "cleanup_backup_files": false,
+          "backup_retention_months": 12
+        }
+      },
+      "cache_warm_up": {
+        "enabled": true,
+        "description": "缓存预热",
+        "report": false,
+        "trigger": {
+          "type": "cron",
+          "hour": 8,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "warm_popular_stocks": true,
+          "popular_stocks_count": 50,
+          "warm_market_indices": true,
+          "preload_recent_data": true,
+          "recent_data_days": 7
+        }
+      },
+      "trading_calendar_update": {
+        "enabled": true,
+        "description": "交易日历更新",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day": "1",
+          "hour": 1,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "update_future_months": 3,
+          "force_update": false,
+          "validate_holidays": true
+        }
+      },
+      "database_backup": {
+        "enabled": true,
+        "description": "数据库备份任务",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 6,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "use_backup_config": true
+        }
+      }
+    }
+  }
+}

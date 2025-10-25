@@ -4,19 +4,23 @@
 """
 
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from .templates import TemplateManager
+from utils.config_manager import ReportConfig
+from utils.logging_manager import report_logger
+
+
 
 
 class ReportFormatter:
     """统一报告格式化器"""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: ReportConfig):
         """
         初始化格式化器
 
         Args:
-            config: 报告配置
+            config: 报告配置对象
         """
         self.config = config
         self.template_manager = TemplateManager(config)
@@ -60,6 +64,17 @@ class ReportFormatter:
         Returns:
             str: 格式化后的段落内容
         """
+        # 检查条件是否满足
+        condition = section.get('condition')
+        if condition:
+            try:
+                # 将 data 字典解包到 eval 的局部命名空间中
+                if not eval(condition, {}, data):
+                    return ""  # 条件不满足，不渲染此段落
+            except Exception as e:
+                report_logger.warning(f"Error evaluating condition '{condition}': {e}")
+                return "" # 条件评估出错，不渲染
+
         section_type = section.get('type')
 
         if section_type == 'static':
@@ -72,6 +87,8 @@ class ReportFormatter:
             return self._format_list_section(section, data, output_format)
         elif section_type == 'status':
             return self._format_status_section(section, data, output_format)
+        else:
+            report_logger.error(f"Invalid section type: {section_type}")
 
         return ""
 
@@ -95,10 +112,15 @@ class ReportFormatter:
             **data
         }
 
-        try:
-            return content.format(**template_data)
-        except KeyError as e:
-            return content  # 如果模板变量不存在，返回原内容
+        # 使用 format_map 和一个带有默认值的字典，以避免KeyError
+        class SafeDict(dict):
+            def __missing__(self, key):
+                # 如果模板中的变量在数据中找不到，用占位符本身替换，并加上标记
+                return f"{{{key}}}"
+
+        safe_template_data = SafeDict(template_data)
+        report_logger.debug(f"Formatting static section with template data: {template_data}")
+        return content.format_map(safe_template_data)
 
     def _format_metrics_section(self, section: Dict[str, Any], data: Dict[str, Any],
                               output_format: str) -> str:
@@ -115,13 +137,19 @@ class ReportFormatter:
         """
         fields = section.get('fields', [])
         lines = []
+        title = section.get('title')
+
+        if title:
+            lines.append(f"*{title}*")
 
         for field in fields:
             value = self._get_nested_value(data, field)
             if value is not None:
                 formatted_value = self._format_value(value, field, output_format)
                 label = self._get_field_label(field)
-                lines.append(f"• {label}: {formatted_value}")
+                # 如果有标题，增加缩进
+                prefix = "  •" if title else "•"
+                lines.append(f"{prefix} {label}: {formatted_value}")
 
         return '\n'.join(lines)
 
@@ -144,18 +172,52 @@ class ReportFormatter:
         if not table_data or not isinstance(table_data, dict):
             return ""
 
-        lines = []
-        for key, value in table_data.items():
-            if isinstance(value, dict):
-                # 处理嵌套字典
-                for sub_key, sub_value in value.items():
-                    formatted_value = self._format_value(sub_value, sub_key, output_format)
-                    lines.append(f"• {key}.{sub_key}: {formatted_value}")
-            else:
-                formatted_value = self._format_value(value, key, output_format)
-                lines.append(f"• {key}: {formatted_value}")
+        # 尝试使用prettytable生成更美观的表格
+        try:
+            from prettytable import PrettyTable
+            
+            # 动态确定表头
+            headers = ["Exchange"]
+            first_item = next(iter(table_data.values()), {}) # 获取table_data字典的第一个值（exchange stats，不包含键"SSE"和"SZSE"）变成迭代器(iterator)，并取出第一个元素，目的是用这个元素来构造列头
+            if isinstance(first_item, dict):
+                for key in first_item.keys():
+                    headers.append(self._get_field_label(key))
+            
+            table = PrettyTable(headers)
+            table.align = "l"
 
-        return '\n'.join(lines)
+            for exchange, stats in table_data.items():
+                row = [exchange]
+                if isinstance(stats, dict):
+                    for key in first_item.keys():
+                        value = stats.get(key)
+                        row.append(self._format_value(value, key, output_format))
+                table.add_row(row)
+            
+            if output_format == 'console':
+                return str(table)
+            elif output_format == 'telegram':
+                # 对于Telegram，使用无边框表格并包裹在等宽字体块中以保证对齐
+                table_string = table.get_string(header=True, border=False)
+                return f"```{table_string}```"
+            else: # for other formats like api
+                return table.get_string(header=True, border=False)
+
+        except ImportError:
+            # 如果没有prettytable，使用简单的手动格式化
+            lines = []
+            for key, value in table_data.items():
+                if isinstance(value, dict):
+                    # 处理嵌套字典
+                    lines.append(f"*{key}*:")
+                    for sub_key, sub_value in value.items():
+                        formatted_value = self._format_value(sub_value, sub_key, output_format)
+                        label = self._get_field_label(sub_key)
+                        lines.append(f"  - {label}: {formatted_value}")
+                else:
+                    formatted_value = self._format_value(value, key, output_format)
+                    lines.append(f"• {key}: {formatted_value}")
+            return '\n'.join(lines)
 
     def _format_list_section(self, section: Dict[str, Any], data: Dict[str, Any],
                            output_format: str) -> str:
@@ -177,13 +239,20 @@ class ReportFormatter:
             return ""
 
         lines = []
+        title = section.get('title')
+        if title:
+            lines.append(f"*{title}*")
+
         if isinstance(list_data, list):
             for i, item in enumerate(list_data[:10]):  # 限制显示数量
                 if isinstance(item, dict):
-                    item_str = self._format_dict_item(item, output_format)
-                    lines.append(f"{i+1}. {item_str}")
+                    item_str = self._format_dict_item(item, section, output_format)
+                    # 如果有标题，增加缩进
+                    prefix = f"  {i+1}." if title else f"{i+1}."
+                    lines.append(f"{prefix} {item_str}")
                 else:
-                    lines.append(f"• {item}")
+                    prefix = "  •" if title else "•"
+                    lines.append(f"{prefix} {item}")
         elif isinstance(list_data, dict):
             for key, value in list_data.items():
                 formatted_value = self._format_value(value, key, output_format)
@@ -205,19 +274,26 @@ class ReportFormatter:
             str: 格式化后的段落内容
         """
         data_source = section.get('data_source')
-        status_data = self._get_nested_value(data, data_source)
+        status_value = self._get_nested_value(data, data_source)
 
-        if not status_data:
+        if status_value is None:
             return ""
 
-        if isinstance(status_data, dict):
-            lines = []
-            for key, value in status_data.items():
+        lines = []
+        if isinstance(status_value, dict): # 如果状态数据是字典，则遍历显示
+            for key, value in status_value.items():
                 status_icon = "✅" if value else "❌"
                 lines.append(f"{status_icon} {key}: {'正常' if value else '异常'}")
             return '\n'.join(lines)
         else:
-            return f"状态: {status_data}"
+            # 如果状态数据是字符串或数字，则直接显示
+            status_text = str(status_value)
+            if status_text.lower() in ('healthy', 'success'):
+                return f"任务执行状态: ✅ {status_text}"
+            elif status_text.lower() in ('warning', 'error'):
+                return f"任务执行状态: ❌ {status_text}"
+            else:
+                return f"任务执行状态: ℹ️ {status_text}"
 
     def _combine_sections(self, sections: List[str], template: Dict[str, Any],
                          output_format: str) -> str:
@@ -238,13 +314,7 @@ class ReportFormatter:
         separator = self._get_separator(output_format)
         report = separator.join(sections)
 
-        # 添加模板前缀
-        emoji = template.get('emoji', '')
-        name = template.get('name', '')
-
-        if emoji and name:
-            prefix = f"{emoji} *{name}*"
-            report = f"{prefix}\n\n{report}"
+        report_logger.debug(f"Formatted report: {report}")
 
         return report
 
@@ -259,15 +329,16 @@ class ReportFormatter:
         Returns:
             Any: 找到的值，如果不存在返回None
         """
+        if not key_path:
+            return None
+
         keys = key_path.split('.')
         value = data
 
         for key in keys:
-            if isinstance(value, dict) and key in value:
-                value = value[key]
-            else:
+            if not isinstance(value, dict) or key not in value:
                 return None
-
+            value = value[key]
         return value
 
     def _format_value(self, value: Any, field_name: str, output_format: str) -> str:
@@ -317,40 +388,50 @@ class ReportFormatter:
         Returns:
             str: 显示标签
         """
-        labels = {
-            'total_instruments': '处理股票',
-            'success_count': '成功数量',
-            'failure_count': '失败数量',
-            'total_quotes': '行情数据',
-            'success_rate': '成功率',
-            'updated_instruments': '更新股票',
-            'new_quotes': '新增行情',
-            'total_gaps': '总缺口数',
-            'affected_stocks': '受影响股票',
-            'backup_file': '备份文件',
-            'file_size': '文件大小',
-            'duration': '耗时'
-        }
+        labels = self.config.field_labels
 
         return labels.get(field_name, field_name.replace('_', ' ').title())
 
-    def _format_dict_item(self, item: Dict[str, Any], output_format: str) -> str:
+    def _format_dict_item(self, item: Dict[str, Any], section_config: Dict[str, Any], output_format: str) -> str:
         """
         格式化字典项
 
         Args:
             item: 字典项
+            section_config: 列表段落的配置
             output_format: 输出格式
 
         Returns:
             str: 格式化后的字符串
         """
-        if 'symbol' in item:
-            return f"{item.get('symbol', '')} ({item.get('exchange', '')})"
-        elif 'name' in item:
-            return item['name']
+        display_format = section_config.get('display_format')
+
+        if display_format:
+            # 使用配置的格式字符串
+            class SafeDict(dict):
+                def __missing__(self, key):
+                    return f"{{{key}}}"
+            
+            # 增加对Telegram交互式链接的支持
+            if output_format == 'telegram' and 'symbol' in item and 'exchange' in item:
+                # 创建一个副本以避免修改原始数据
+                interactive_item = item.copy()
+                symbol = interactive_item['symbol']
+                exchange = interactive_item['exchange']
+                instrument_id = f"{symbol}.{exchange}"
+                # 将 symbol 格式化为可点击的命令
+                interactive_item['symbol'] = f"[{symbol}](command:/detail_{instrument_id.replace('.', '_')})"
+                return display_format.format_map(SafeDict(interactive_item))
+            else:
+                return display_format.format_map(SafeDict(item))
         else:
-            return str(item)
+            # 回退到旧的硬编码逻辑
+            if 'symbol' in item:
+                return f"{item.get('symbol', '')} ({item.get('exchange', '')})"
+            elif 'name' in item:
+                return item['name']
+            else:
+                return str(item)
 
     def _get_separator(self, output_format: str) -> str:
         """

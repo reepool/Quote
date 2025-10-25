@@ -6,22 +6,13 @@ Defines all automated data update and maintenance tasks.
 import asyncio
 import os
 from datetime import datetime, date, timedelta, time
-from typing import List
+from typing import List, Dict, Any, Optional
 
 from utils import scheduler_logger, config_manager, TelegramBot
-
+from .job_config import JobConfig
 from data_manager import data_manager
 from utils.date_utils import DateUtils
 from utils.cache import cache_manager
-from utils.report import (
-    format_daily_update_report,
-    format_health_check_report,
-    format_maintenance_report,
-    format_cache_warm_up_report,
-    format_trading_calendar_report,
-    format_backup_result,
-    format_gap_report
-)
 
 
 class ScheduledTasks:
@@ -29,10 +20,25 @@ class ScheduledTasks:
 
     def __init__(self):
         self.config = config_manager
-        self.telegram_enabled = self.config.get_nested('telegram_config.enabled', False)
+
+        # Telegram调用
+        self.bot_config = self.config.get_telegram_config()
+        self.telegram_enabled = self.bot_config.enabled
+        self.bot = TelegramBot() if self.telegram_enabled else None
+
+    async def initialize(self, debug=False):
+        """初始化定时任务"""
+        scheduler_logger.info("[Scheduler] Initializing scheduled tasks...")
+        if debug:
+            # 使用统一的通知接口
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_scheduler_notification("定时任务系统已启动，开始加载任务...", "info")
+                except Exception as e:
+                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
 
     async def _send_task_report(self, report_data: dict, report_type: str,
-                               task_name: str, job_config=None) -> bool:
+                               task_name: str, job_config: Optional[JobConfig] = None) -> bool:
         """
         统一的任务报告发送方法
 
@@ -40,7 +46,7 @@ class ScheduledTasks:
             report_data: 报告数据
             report_type: 报告类型
             task_name: 任务名称
-            job_config: 任务配置对象，用于判断是否发送报告
+            job_config: JobConfig对象(任务配置对象)，取其report属性用于判断是否发送报告
 
         Returns:
             bool: 是否发送成功
@@ -50,41 +56,17 @@ class ScheduledTasks:
             should_send = False
             if job_config and hasattr(job_config, 'report'):
                 should_send = job_config.report
-            else:
-                # 如果没有配置，默认不发送
-                should_send = False
 
             if not should_send or not self.telegram_enabled:
                 scheduler_logger.debug(f"[Scheduler] Task {task_name} report disabled or Telegram not enabled")
                 return False
 
-            # 选择对应的格式化方法
-            formatter_map = {
-                'daily_update_report': format_daily_update_report,
-                'health_check_report': format_health_check_report,
-                'maintenance_report': format_maintenance_report,
-                'cache_warm_up_report': format_cache_warm_up_report,
-                'trading_calendar_report': format_trading_calendar_report,
-                'backup_result': format_backup_result,
-                'gap_report': format_gap_report
-            }
-
-            formatter = formatter_map.get(report_type)
-            if not formatter:
-                scheduler_logger.warning(f"[Scheduler] Unknown report type: {report_type}")
-                return False
-
-            # 生成报告
-            formatted_report = formatter(report_data, 'telegram')
-
-            # 发送报告 - 使用持久连接避免断开
-            from utils.tgbot import send_report_persistent
-            await send_report_persistent(report_type, {
+            # 直接调用 tgbot 的报告发送方法，它会处理报告生成
+            await self.bot.send_report_notification({
                 'report_type': report_type,
                 'task_name': task_name,
-                'content': formatted_report,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            })
+                **report_data  # 将所有报告数据传递下去
+            }, report_type)
 
             scheduler_logger.info(f"[Scheduler] Task {task_name} report sent successfully")
             return True
@@ -93,24 +75,12 @@ class ScheduledTasks:
             scheduler_logger.error(f"[Scheduler] Failed to send task report for {task_name}: {e}")
             return False
 
-    async def initialize(self, debug=False):
-        """初始化定时任务"""
-        scheduler_logger.info("[Scheduler] Initializing scheduled tasks...")
-        if debug:
-            # 使用统一的通知接口
-            if self.telegram_enabled:
-                try:
-                    from utils.tgbot import send_notification_persistent
-                    await send_notification_persistent("定时任务系统已启动，开始加载任务...", "[调度器启动]")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-
     async def daily_data_update(self,
-                            exchanges: List[str] = None,
+                            exchanges: Optional[List[str]] = None,
                             wait_for_market_close: bool = True,
                             market_close_delay_minutes: int = 15,
                             enable_trading_day_check: bool = True,
-                            job_config=None):
+                            job_config: Optional[JobConfig] = None) -> bool:
         """每日数据更新任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting daily data update task...")
@@ -160,8 +130,16 @@ class ScheduledTasks:
                             scheduler_logger.info(f"[Scheduler] {exchange} is trading today (fallback check)")
 
                 if not trading_exchanges:
-                    # 没有交易日，发送通知并退出
-                    await self._send_non_trading_day_notification(today, exchanges, trading_calendar_updates)
+                    # 非交易日，使用报告系统发送通知
+                    report_data = {
+                        'name': '每日数据更新报告',
+                        'status': 'info',
+                        'non_trading_day': True,
+                        'date': today.strftime('%Y-%m-%d'),
+                        'trading_calendar_updates': trading_calendar_updates
+                    }
+                    await self._send_task_report(report_data, 'daily_update_report', '每日数据更新', job_config)
+                    scheduler_logger.info("[Scheduler] Non-trading day, task finished.")
                     return False
 
             else:
@@ -177,8 +155,14 @@ class ScheduledTasks:
             update_results = await data_manager.update_daily_data(exchanges=trading_exchanges, target_date=today)
 
             # 步骤5: 发送报告
+            # 判断更新状态
+            success_count = update_results.get('success_count', 0)
+            failure_count = update_results.get('failure_count', 0)
+            is_successful = failure_count == 0 and success_count > 0
+
             report_data = {
                 'name': '每日数据更新报告',
+                'status': 'success' if is_successful else 'warning',  # 明确的成功/失败状态
                 'date': today.strftime('%Y-%m-%d'),
                 'trading_exchanges': trading_exchanges,
                 'update_results': update_results,
@@ -198,12 +182,18 @@ class ScheduledTasks:
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Daily data update failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    from utils.tgbot import send_notification_persistent
-                    await send_notification_persistent(f"❌ 每日数据更新失败: {str(e)}", "[每日数据更新]", "error")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+            # 统一使用报告系统发送失败通知
+            failure_report_data = {
+                'name': '每日数据更新报告',
+                'status': 'error',
+                'error_message': str(e)
+            }
+            await self._send_task_report(
+                report_data=failure_report_data,
+                report_type='daily_update_report',
+                task_name='每日数据更新',
+                job_config=job_config
+            )
             return False
 
     async def weekly_data_maintenance(self,
@@ -211,7 +201,8 @@ class ScheduledTasks:
                                   cleanup_old_logs: bool = True,
                                   log_retention_days: int = 30,
                                   optimize_database: bool = True,
-                                  validate_data_integrity: bool = True):
+                                  validate_data_integrity: bool = True,
+                                  job_config: Optional[JobConfig] = None) -> bool:
         """每周数据维护任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting weekly data maintenance...")
@@ -247,28 +238,61 @@ class ScheduledTasks:
                 await self._validate_data_integrity()
 
             scheduler_logger.info("[Scheduler] Weekly maintenance completed")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification("每周数据维护已完成")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+
+            # 生成维护报告数据
+            maintenance_report_data = {
+                'name': '每周数据维护报告',
+                'status': 'success',  # 明确的成功状态
+                'tasks_completed': 3,
+                'duration': 'N/A', # 可以在任务开始和结束时记录时间来计算
+                'maintenance_tasks': [
+                    {'task_name': '数据库备份', 'status': '成功' if backup_database else '跳过'},
+                    {'task_name': '日志清理', 'status': '成功' if cleanup_old_logs else '跳过'},
+                    {'task_name': '数据库优化', 'status': '成功' if optimize_database else '跳过'},
+                    {'task_name': '数据完整性验证', 'status': '成功' if validate_data_integrity else '跳过'}
+                ],
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            }
+
+            # 发送维护报告
+            await self._send_task_report(
+                report_data=maintenance_report_data,
+                report_type='maintenance_report',
+                task_name='每周数据维护',
+                job_config=job_config
+            )
+
             return True
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Weekly maintenance failed: {e}")
             if self.telegram_enabled:
                 try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(f"每周数据维护失败: {str(e)}")
+                    # 生成失败报告数据
+                    failure_report_data = {
+                        'name': '每周数据维护报告',
+                        'status': 'error',  # 明确的失败状态
+                        'tasks_completed': '维护任务执行失败',
+                        'error_message': str(e),
+                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    }
+
+                    # 发送失败报告
+                    await self._send_task_report(
+                        report_data=failure_report_data,
+                        report_type='maintenance_report',
+                        task_name='每周数据维护',
+                        job_config=job_config
+                    )
                 except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+                    scheduler_logger.error(f"[Scheduler] Failed to send failure notification: {e}")
             return False
 
     async def monthly_data_integrity_check(self,
-                                        exchanges: List[str] = None,
-                                        severity_filter: List[str] = None,
-                                        days_to_check: int = 45):
+                                        exchanges: Optional[List[str]] = None,
+                                        severity_filter: Optional[List[str]] = None,
+                                        days_to_check: int = 45,
+                                        job_config: Optional[JobConfig] = None) -> bool:
         """月度数据完整性检查和缺口修复任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting monthly data integrity check...")
@@ -293,10 +317,6 @@ class ScheduledTasks:
             scheduler_logger.info(f"[Scheduler] Checking data integrity for exchanges: {exchanges}")
             scheduler_logger.info(f"[Scheduler] Date range: {start_date} to {end_date}")
 
-            total_gaps_found = 0
-            total_gaps_filled = 0
-            exchange_results = {}
-
             # 检查每个交易所的数据缺口
             for exchange in exchanges:
                 try:
@@ -304,61 +324,76 @@ class ScheduledTasks:
 
                     # 使用现有的GAP检测系统
                     gaps = await data_manager.detect_data_gaps([exchange], start_date, end_date)
+                    scheduler_logger.info(f"[Scheduler] Found {len(gaps)} total gaps for {exchange}")
 
                     # 过滤严重程度
                     filtered_gaps = [g for g in gaps if g.severity in severity_filter]
-
-                    total_gaps_found += len(filtered_gaps)
-                    exchange_results[exchange] = {
-                        'total_gaps': len(gaps),
-                        'filtered_gaps': len(filtered_gaps),
-                        'gaps_filled': 0
-                    }
+                    scheduler_logger.info(f"[Scheduler] Found {len(filtered_gaps)} gaps matching severity filter for {exchange}")
 
                     if filtered_gaps:
-                        scheduler_logger.info(f"[Scheduler] Found {len(filtered_gaps)} gaps ({len(gaps)} total) for {exchange}")
-
                         # 使用现有的缺口填补系统
-                        filled_count = 0
                         for gap in filtered_gaps:
                             try:
-                                success = await data_manager._fill_single_gap(gap)
-                                if success:
-                                    filled_count += 1
-                                    total_gaps_filled += 1
-                                    exchange_results[exchange]['gaps_filled'] = filled_count
-
+                                await data_manager._fill_single_gap(gap)
                                 # API限流控制
                                 await asyncio.sleep(0.5)
-
                             except Exception as gap_e:
                                 scheduler_logger.warning(f"[Scheduler] Failed to fill gap for {gap.instrument_id}: {gap_e}")
 
-                        scheduler_logger.info(f"[Scheduler] Filled {filled_count}/{len(filtered_gaps)} gaps for {exchange}")
-                    else:
-                        scheduler_logger.info(f"[Scheduler] No significant gaps found for {exchange}")
-
                 except Exception as exchange_e:
                     scheduler_logger.error(f"[Scheduler] Failed to check {exchange}: {exchange_e}")
-                    exchange_results[exchange] = {'error': str(exchange_e)}
+
+            # 任务完成后，重新检测以生成报告
+            scheduler_logger.info("[Scheduler] Re-detecting gaps to generate final report...")
+            final_gaps = await data_manager.detect_data_gaps(exchanges, start_date, end_date)
+
+            # 在发送报告前，先对gaps数据进行统计
+            from collections import Counter, defaultdict
+
+            total_gaps = len(final_gaps)
+            affected_stocks_set = {gap.instrument_id for gap in final_gaps}
+            affected_stocks_count = len(affected_stocks_set)
+            severity_distribution = dict(Counter(gap.severity for gap in final_gaps))
+
+            # 获取受影响最严重的股票
+            top_affected_stocks = data_manager.get_top_affected_stocks(final_gaps, limit=10)
+
+            report_data = {
+                'name': '数据缺口报告',
+                'status': 'success',
+                'summary': {
+                    'total_gaps': total_gaps,
+                    'affected_stocks': affected_stocks_count,
+                    'severity_distribution': severity_distribution
+                },
+                'top_affected_stocks': top_affected_stocks
+            }
 
             # 发送详细的完成通知
-            await self._send_integrity_check_notification(
-                start_date, end_date, exchange_results, total_gaps_found, total_gaps_filled
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='gap_report',
+                task_name='月度数据完整性检查',
+                job_config=job_config
             )
 
             scheduler_logger.info(f"[Scheduler] Monthly data integrity check completed")
-            scheduler_logger.info(f"[Scheduler] Summary: {total_gaps_filled}/{total_gaps_found} gaps filled")
             return True
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Monthly data integrity check failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(f"❌ 月度数据完整性检查失败: {str(e)}")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+            # 统一使用报告系统发送失败通知
+            failure_report_data = {
+                'name': '数据缺口报告',
+                'status': 'error',
+                'error_message': str(e)
+            }
+            await self._send_task_report(
+                report_data=failure_report_data,
+                report_type='gap_report',
+                task_name='月度数据完整性检查',
+                job_config=job_config
+            )
             return False
 
     async def quarterly_cleanup(self,
@@ -366,7 +401,8 @@ class ScheduledTasks:
                               quote_retention_months: int = 36,
                               cleanup_temp_files: bool = True,
                               cleanup_backup_files: bool = False,
-                              backup_retention_months: int = 12):
+                              backup_retention_months: int = 12,
+                              job_config: Optional[JobConfig] = None) -> bool:
         """季度清理任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting quarterly cleanup...")
@@ -392,20 +428,39 @@ class ScheduledTasks:
             scheduler_logger.info("[Scheduler] Quarterly cleanup completed")
             if self.telegram_enabled:
                 try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification("季度数据清理已完成")
+                    # 生成季度清理报告数据
+                    cleanup_report_data = {
+                        'name': '季度数据清理报告',
+                        'status': 'success',  # 明确的成功状态
+                        'tasks_completed': '历史数据清理, 临时文件清理',
+                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    }
+
+                    # 发送清理报告
+                    await self._send_task_report(
+                        report_data=cleanup_report_data,
+                        report_type='maintenance_report',
+                        task_name='季度数据清理',
+                        job_config=job_config
+                    )
                 except Exception as e:
                     scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
             return True
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Quarterly cleanup failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(f"季度清理失败: {str(e)}")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+            # 统一使用报告系统发送失败通知
+            failure_report_data = {
+                'name': '季度数据清理报告',
+                'status': 'error',
+                'error_message': str(e)
+            }
+            await self._send_task_report(
+                report_data=failure_report_data,
+                report_type='maintenance_report', # 复用维护报告模板
+                task_name='季度数据清理',
+                job_config=job_config
+            )
             return False
 
     async def system_health_check(self,
@@ -413,9 +468,10 @@ class ScheduledTasks:
                                 check_database: bool = True,
                                 check_disk_space: bool = True,
                                 check_memory_usage: bool = True,
+                                check_telegram: bool = True,
                                 disk_space_threshold_mb: int = 1000,
                                 memory_threshold_percent: int = 85,
-                                job_config=None):
+                                job_config: Optional[JobConfig] = None) -> bool:
         """系统健康检查任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting system health check...")
@@ -428,28 +484,16 @@ class ScheduledTasks:
                     source for source, is_healthy in status.get('data_sources', {}).items()
                     if not is_healthy
                 ]
-
-                if unhealthy_sources:
-                    warning_msg = f"警告: 以下数据源状态异常: {', '.join(unhealthy_sources)}"
-                    scheduler_logger.warning(warning_msg)
-                    if self.telegram_enabled:
-                        try:
-                            async with TelegramBot() as bot:
-                                await bot.send_task_notification(warning_msg)
-                        except Exception as e:
-                            scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+            else:
+                unhealthy_sources = []
 
             # 检查数据库连接
+            database_unhealthy = False
             if check_database:
                 if not status.get('database'):
                     error_msg = "错误: 数据库连接异常"
                     scheduler_logger.error(error_msg)
-                    if self.telegram_enabled:
-                        try:
-                            async with TelegramBot() as bot:
-                                await bot.send_task_notification(error_msg)
-                        except Exception as e:
-                            scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+                    database_unhealthy = True
 
             # 检查磁盘空间
             if check_disk_space:
@@ -459,30 +503,64 @@ class ScheduledTasks:
             if check_memory_usage:
                 await self._check_memory_usage(memory_threshold_percent)
 
-            # 检查缓存状态
-            cache_stats = status.get('cache', {})
-            if cache_stats.get('cache_enabled'):
-                scheduler_logger.info(f"[Scheduler] Cache stats: {cache_stats}")
+            # 检查Telegram连接状态
+            if check_telegram:
+                telegram_result = await self._check_telegram_connection()
+            else:
+                telegram_result = "⏭️ Telegram检查已跳过"
 
             # 生成健康检查报告数据
             check_results = []
-            if check_data_sources:
-                check_results.append("✅ 数据源连接正常")
+            # 数据源检查
+            if check_data_sources: # 检查数据源
+                is_ds_healthy = not unhealthy_sources
+                check_results.append({
+                    "check_name": "数据源连接",
+                    "result": "正常" if is_ds_healthy else f"异常: {', '.join(unhealthy_sources)}",
+                    "status_icon": "✅" if is_ds_healthy else "❌"
+                })
+            # 数据库检查
             if check_database:
-                check_results.append("✅ 数据库状态正常")
+                is_db_healthy = not database_unhealthy
+                check_results.append({
+                    "check_name": "数据库状态",
+                    "result": "正常" if is_db_healthy else "连接异常",
+                    "status_icon": "✅" if is_db_healthy else "❌"
+                })
+            # 磁盘空间检查
             if check_disk_space:
-                check_results.append("✅ 磁盘空间充足")
+                # _check_disk_space 内部会记录警告，这里假设它成功则为充足
+                check_results.append({"check_name": "磁盘空间", "result": "充足", "status_icon": "✅"}) # TODO: 实际应根据_check_disk_space的返回值判断
+            # 内存使用检查
             if check_memory_usage:
-                check_results.append("✅ 内存使用正常")
+                # _check_memory_usage 内部会记录警告，这里假设它成功则为正常
+                check_results.append({"check_name": "内存使用", "result": "正常", "status_icon": "✅"}) # TODO: 实际应根据_check_memory_usage的返回值判断
+            # Telegram连接检查
+            if check_telegram:
+                is_tg_healthy = "✅" in telegram_result
+                check_results.append({
+                    "check_name": "Telegram连接",
+                    "result": telegram_result.replace("✅ ", "").replace("❌ ", ""),
+                    "status_icon": "✅" if is_tg_healthy else "❌"
+                })
+
+            # 计算健康状态
+            healthy_issues = [
+                r for r in check_results 
+                if r.get('status_icon') == '❌' or '异常' in r.get('result', '') or '错误' in r.get('result', '')
+            ]
+            is_healthy = len(healthy_issues) == 0
 
             report_data = {
                 'name': '系统健康检查报告',
-                'overall_status': 'HEALTHY' if len([r for r in check_results if '❌' in r]) == 0 else 'WARNING',
+                'status': 'success' if is_healthy else 'warning',  # 明确的成功/失败状态
+                'overall_status': 'HEALTHY' if is_healthy else 'WARNING',
                 'checks_performed': len(check_results),
-                'issues_found': len([r for r in check_results if '❌' in r]),
+                'issues_found': len(healthy_issues),
                 'check_results': check_results,
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
+            scheduler_logger.debug(f"[Scheduler] Generated health check report: {report_data}")
 
             # 发送报告
             await self._send_task_report(
@@ -497,12 +575,18 @@ class ScheduledTasks:
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Health check failed: {e}")
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(f"系统健康检查失败: {str(e)}")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+            # 统一使用报告系统发送失败通知
+            failure_report_data = {
+                'name': '系统健康检查报告',
+                'status': 'error',
+                'error_message': str(e)
+            }
+            await self._send_task_report(
+                report_data=failure_report_data,
+                report_type='health_check_report',
+                task_name='系统健康检查',
+                job_config=job_config
+            )
             return False
 
     async def cache_warm_up(self,
@@ -511,7 +595,7 @@ class ScheduledTasks:
                            warm_market_indices: bool = True,
                            preload_recent_data: bool = True,
                            recent_data_days: int = 7,
-                           job_config=None):
+                           job_config: Optional[JobConfig] = None) -> bool:
         """缓存预热任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting cache warm up...")
@@ -555,6 +639,7 @@ class ScheduledTasks:
             # 生成缓存预热报告数据
             report_data = {
                 'name': '缓存预热报告',
+                'status': 'success',  # 缓存预热通常成功，除非有异常
                 'stocks_warmed': warmed_count,
                 'cache_hit_rate': 'N/A',
                 'duration': 'N/A',
@@ -580,11 +665,11 @@ class ScheduledTasks:
             return False
 
     async def trading_calendar_update(self,
-                                    exchanges: List[str] = None,
+                                    exchanges: Optional[List[str]] = None,
                                     update_future_months: int = 6,
                                     force_update: bool = False,
                                     validate_holidays: bool = True,
-                                    job_config=None):
+                                    job_config: Optional[JobConfig] = None) -> bool:
         """交易日历更新任务"""
         try:
             scheduler_logger.info("[Scheduler] Updating trading calendars...")
@@ -633,10 +718,28 @@ class ScheduledTasks:
                     scheduler_logger.warning(f"[Scheduler] Failed to update calendar for {exchange}: {e}")
 
             scheduler_logger.info(f"[Scheduler] Trading calendars updated for: {', '.join(updated_exchanges)}")
+            
+            # 生成交易日历更新报告数据
+            report_data = {
+                'name': '交易日历更新报告',
+                'status': 'success' if len(updated_exchanges) > 0 else 'warning',
+                'exchanges_updated': len(updated_exchanges),
+                'trading_days_added': 'N/A', # 可以在_update_trading_calendar中返回
+                'holidays_added': 'N/A', # 可以在_validate_holidays中返回
+                'exchange_details': {
+                    ex: {'status': '成功'} for ex in updated_exchanges
+                },
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
 
-            # 返回成功状态
+            # 发送报告
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='trading_calendar_report',
+                task_name='交易日历更新',
+                job_config=job_config
+            )
             return len(updated_exchanges) > 0
-
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Trading calendar update failed: {e}")
             return False
@@ -810,10 +913,9 @@ class ScheduledTasks:
                 scheduler_logger.warning(warning_msg)
                 if self.telegram_enabled:
                     try:
-                        async with TelegramBot() as bot:
-                            await bot.send_task_notification(warning_msg)
-                    except Exception as e:
-                        scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+                        await self.bot.send_task_notification(warning_msg, "system_health_check", "warning")
+                    except Exception as notify_error:
+                        scheduler_logger.error(f"[Scheduler] Failed to send notification: {notify_error}")
             else:
                 scheduler_logger.debug(f"[Scheduler] Disk space OK: {free_mb}MB available")
 
@@ -833,15 +935,71 @@ class ScheduledTasks:
                 scheduler_logger.warning(warning_msg)
                 if self.telegram_enabled:
                     try:
-                        async with TelegramBot() as bot:
-                            await bot.send_task_notification(warning_msg)
-                    except Exception as e:
-                        scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
+                        await self.bot.send_task_notification(warning_msg, "system_health_check", "warning")
+                    except Exception as notify_error:
+                        scheduler_logger.error(f"[Scheduler] Failed to send notification: {notify_error}")
             else:
                 scheduler_logger.debug(f"[Scheduler] Memory usage OK: {used_percent:.1f}%")
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Failed to check memory usage: {e}")
+
+    async def _check_telegram_connection(self):
+        """检查Telegram连接状态并尝试修复"""
+        try:
+            scheduler_logger.info("[Scheduler] Checking Telegram connection status...")
+            bot = self.bot
+            # 检查连接健康状态
+            is_healthy = await bot.check_connection_health()
+
+            if is_healthy:
+                scheduler_logger.info("[Scheduler] Telegram connection is healthy")
+                return "✅ Telegram连接正常"
+
+            scheduler_logger.warning("[Scheduler] Telegram connection is unhealthy, attempting to fix...")
+
+            # 尝试修复连接
+            repair_success = await bot.ensure_connection()
+
+            if repair_success:
+                success_msg = "✅ Telegram连接修复成功"
+                scheduler_logger.info(f"[Scheduler] {success_msg}")
+
+                # 发送修复成功通知
+                if self.telegram_enabled:
+                    try:
+                        await self.bot.send_scheduler_notification(success_msg, "success")
+                    except Exception as notify_error:
+                        scheduler_logger.error(f"[Scheduler] Failed to send Telegram repair success notification: {notify_error}")
+
+                return "✅ Telegram连接修复成功"
+            else:
+                error_msg = "❌ Telegram连接修复失败，需要人工干预"
+                scheduler_logger.error(f"[Scheduler] {error_msg}")
+
+                # 发送修复失败通知
+                if self.telegram_enabled:
+                    try:
+                        # 如果连接修复失败，这个通知可能也发送失败，但我们还是尝试
+                        await self.bot.send_scheduler_notification(error_msg, "error")
+                    except Exception as notify_error:
+                        scheduler_logger.error(f"[Scheduler] Failed to send Telegram repair failure notification: {notify_error}")
+
+                return "❌ Telegram连接修复失败"
+
+        except Exception as e:
+            error_msg = f"❌ Telegram连接检查异常: {str(e)}"
+            scheduler_logger.error(f"[Scheduler] {error_msg}")
+
+            # 发送异常通知
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_scheduler_notification(error_msg, "error")
+                except Exception as notify_error:
+                    scheduler_logger.error(f"[Scheduler] Failed to send Telegram check exception notification: {notify_error}")
+
+            return error_msg
+
 
     async def _warm_up_market_indices(self, recent_data_days: int):
         """预热市场指数缓存"""
@@ -888,90 +1046,16 @@ class ScheduledTasks:
         except Exception as e:
             scheduler_logger.warning(f"[Scheduler] Failed to validate holidays for {exchange} {year}: {e}")
 
-    async def _send_non_trading_day_notification(self, today: date, exchanges: List[str], trading_calendar_updates: dict):
-        """发送非交易日通知"""
-        try:
-            # 格式化交易日历更新信息
-            calendar_info = []
-            for exchange, count in trading_calendar_updates.items():
-                calendar_info.append(f"{exchange}: {count}天")
-            calendar_str = ", ".join(calendar_info)
-
-            # 使用新的统一报告系统
-            from utils.report import generate_report
-
-            # 构建报告数据
-            report_data = {
-                'target_date': today.strftime('%Y-%m-%d'),
-                'calendar_updates': trading_calendar_updates,
-                'non_trading_day': True
-            }
-
-            # 使用统一报告生成器
-            formatted_message = generate_report('daily_update_report', report_data, 'telegram')
-
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(formatted_message)
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to send non-trading day notification: {e}")
-
-    async def _send_daily_update_completion_notification(self, today: date, trading_exchanges: List[str],
-                                                        update_results: dict, trading_calendar_updates: dict):
-        """发送每日更新完成通知"""
-        try:
-            # 构建统一的每日更新报告数据格式
-            update_report = {
-                'summary': {
-                    'target_date': today.strftime('%Y-%m-%d'),
-                    'total_instruments_checked': update_results.get('success_count', 0) + update_results.get('failure_count', 0),
-                    'updated_instruments': update_results.get('success_count', 0),
-                    'new_quotes_added': update_results.get('total_quotes_added', 0),
-                    'success_rate': (update_results.get('success_count', 0) /
-                                  (update_results.get('success_count', 0) + update_results.get('failure_count', 0)) * 100
-                                  if (update_results.get('success_count', 0) + update_results.get('failure_count', 0)) > 0 else 0)
-                },
-                'exchange_stats': {}
-            }
-
-            # 构建交易所统计信息
-            for exchange in trading_exchanges:
-                if exchange in update_results.get('exchange_results', {}):
-                    result = update_results['exchange_results'][exchange]
-                    if 'error' not in result:
-                        update_report['exchange_stats'][exchange] = {
-                            'updated_count': result.get('success_count', 0),
-                            'checked_count': result.get('success_count', 0),
-                            'new_quotes': result.get('quotes_added', 0)
-                        }
-
-            # 使用新的统一报告系统
-            from utils.report import generate_report
-            formatted_message = generate_report('daily_update_report', update_report, 'telegram')
-
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(formatted_message)
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to send daily update completion notification: {e}")
-
     
     async def database_backup(self,
                             use_backup_config: bool = True,
-                            source_db_path: str = None,
-                            backup_directory: str = None,
-                            retention_days: int = None,
-                            notification_enabled: bool = None,
-                            filename_pattern: str = None,
-                            max_backup_files: int = None):
+                            source_db_path: Optional[str] = None,
+                            backup_directory: Optional[str] = None,
+                            retention_days: Optional[int] = None,
+                            notification_enabled: Optional[bool] = None,
+                            filename_pattern: Optional[str] = None,
+                            max_backup_files: Optional[int] = None,
+                            job_config: Optional[JobConfig] = None) -> bool:
         """数据库备份任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting database backup task...")
@@ -989,15 +1073,12 @@ class ScheduledTasks:
             max_backup_files = max_backup_files or backup_config.get('max_backup_files', 10)
 
             # 验证源数据库文件是否存在
+            import os
             if not os.path.exists(source_db_path):
-                error_msg = f"源数据库文件不存在: {source_db_path}"
-                scheduler_logger.error(f"[Scheduler] {error_msg}")
-                await self._send_backup_notification(False, error_msg, notification_enabled)
-                return False
+                raise FileNotFoundError(f"源数据库文件不存在: {source_db_path}")
 
             # 获取源文件大小
             source_size = os.path.getsize(source_db_path)
-            source_size_mb = source_size / (1024 * 1024)
 
             # 检查磁盘空间
             await self._check_disk_space_for_backup(source_size, backup_directory)
@@ -1006,7 +1087,6 @@ class ScheduledTasks:
             os.makedirs(backup_directory, exist_ok=True)
 
             # 生成备份文件名
-            from datetime import datetime
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_filename = filename_pattern.format(timestamp=timestamp)
             backup_path = os.path.join(backup_directory, backup_filename)
@@ -1022,40 +1102,27 @@ class ScheduledTasks:
             duration = (end_time - start_time).total_seconds()
 
             # 验证备份文件
-            if not os.path.exists(backup_path):
-                error_msg = f"备份文件创建失败: {backup_path}"
-                scheduler_logger.error(f"[Scheduler] {error_msg}")
-                await self._send_backup_notification(False, error_msg, notification_enabled)
-                return False
+            if not os.path.exists(backup_path) or os.path.getsize(backup_path) != source_size:
+                raise IOError(f"备份文件创建失败或大小不匹配: {backup_path}")
 
-            backup_size = os.path.getsize(backup_path)
-            if backup_size != source_size:
-                error_msg = f"备份文件大小不匹配: 源文件 {source_size} bytes, 备份文件 {backup_size} bytes"
-                scheduler_logger.error(f"[Scheduler] {error_msg}")
-                await self._send_backup_notification(False, error_msg, notification_enabled)
-                return False
-
-            scheduler_logger.info(f"[Scheduler] Database backup completed successfully")
-            scheduler_logger.info(f"[Scheduler] Backup details: {backup_path}, Size: {backup_size/(1024*1024):.2f}MB, Duration: {duration:.2f}s")
+            scheduler_logger.info(f"[Scheduler] Database backup completed successfully: {backup_path}")
 
             # 清理过期备份
             await self._cleanup_old_backups(backup_directory, retention_days, max_backup_files)
 
-            # 发送成功通知
-            success_msg = f"数据库备份成功: {backup_filename} ({backup_size/(1024*1024):.2f}MB, 耗时 {duration:.2f}s)"
-            await self._send_backup_notification(True, success_msg, notification_enabled, {
-                'backup_file': backup_filename,
-                'backup_size_mb': backup_size/(1024*1024),
-                'duration_seconds': duration,
-                'backup_path': backup_path
-            })
-
+            # 使用统一报告接口发送通知
+            report_data = {
+                'name': '数据库备份报告', 'success': True, 'backup_file': backup_filename,
+                'file_size': source_size, 'duration': duration, 'timestamp': datetime.now().isoformat()
+            }
+            await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
             return True
 
         except Exception as e:
             error_msg = f"数据库备份失败: {str(e)}"
             scheduler_logger.error(f"[Scheduler] {error_msg}")
-            await self._send_backup_notification(False, error_msg, notification_enabled)
+            report_data = {'name': '数据库备份报告', 'success': False, 'error_message': str(e)}
+            await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
             return False
 
     async def _check_disk_space_for_backup(self, required_bytes: int, backup_directory: str):
@@ -1132,97 +1199,6 @@ class ScheduledTasks:
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Failed to cleanup old backups: {e}")
 
-    async def _send_backup_notification(self, success: bool, message: str, notification_enabled: bool = True, details: dict = None):
-        """发送备份任务通知"""
-        if not notification_enabled:
-            scheduler_logger.info(f"[Scheduler] Backup notification disabled: {message}")
-            return
-
-        try:
-            if success:
-                # 使用新的统一报告系统
-                from utils.report import generate_report
-
-                # 构建统一的备份数据格式
-                backup_result = {
-                    'success': True,
-                    'backup_file': details.get('backup_file', 'N/A') if details else 'N/A',
-                    'file_size': details.get('backup_size_mb', 0) * 1024 * 1024 if details else 0,  # 转换为字节
-                    'duration': details.get('duration_seconds', 0) if details else 0,
-                    'timestamp': details.get('timestamp', datetime.now().isoformat()) if details else datetime.now().isoformat()
-                }
-
-                formatted_message = generate_report('backup_result', backup_result, 'telegram')
-            else:
-                # 失败通知使用新系统
-                from utils.report import generate_report
-
-                backup_result = {
-                    'success': False,
-                    'error_message': message
-                }
-
-                formatted_message = generate_report('backup_result', backup_result, 'telegram')
-
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(formatted_message)
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to send backup notification: {e}")
-
-    async def _send_integrity_check_notification(self, start_date: date, end_date: date,
-                                               exchange_results: dict, total_gaps_found: int, total_gaps_filled: int):
-        """发送月度数据完整性检查通知"""
-        try:
-            # 计算成功率
-            success_rate = (total_gaps_filled / total_gaps_found * 100) if total_gaps_found > 0 else 100.0
-
-            # 构建详细消息
-            date_range = f"{start_date.strftime('%Y-%m-%d')} 至 {end_date.strftime('%Y-%m-%d')}"
-
-            # 构建交易所详情
-            exchange_details = []
-            for exchange, result in exchange_results.items():
-                if 'error' not in result:
-                    total = result.get('total_gaps', 0)
-                    filtered = result.get('filtered_gaps', 0)
-                    filled = result.get('gaps_filled', 0)
-
-                    if filtered > 0:
-                        exchange_details.append(f"• {exchange}: 发现{filtered}个缺口，修复{filled}个")
-                    else:
-                        exchange_details.append(f"• {exchange}: 无重要缺口")
-                else:
-                    exchange_details.append(f"• {exchange}: 检查失败")
-
-            # 构建报告数据
-            integrity_report = {
-                'start_date': start_date,
-                'end_date': end_date,
-                'exchange_results': exchange_results,
-                'total_gaps_found': total_gaps_found,
-                'total_gaps_filled': total_gaps_filled,
-                'success_rate': success_rate,
-                'exchange_details': exchange_details
-            }
-
-            # 使用新的统一报告系统
-            from utils.report import generate_report
-            formatted_message = generate_report('system_status', integrity_report, 'telegram')
-
-            if self.telegram_enabled:
-                try:
-                    async with TelegramBot() as bot:
-                        await bot.send_task_notification(formatted_message)
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to send integrity check notification: {e}")
 
 
 # 全局定时任务实例

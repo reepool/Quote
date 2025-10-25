@@ -1,0 +1,12 @@
+{
+  "sys_config": {
+    "pid_file": "log/process.pid",
+    "lock_file": "log/process.lock",
+    "single_instance": true,
+    "cleanup_on_startup": true,
+    "persistent_pids": {
+      "scheduler": "log/scheduler.pid",
+      "api_server": "log/api_server.pid"
+    }
+  }
+}

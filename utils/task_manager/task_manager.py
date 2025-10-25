@@ -56,33 +56,17 @@ class TaskManagerBot:
         """注册事件处理器"""
         try:
             from telethon import events
-            from telethon.tl import types
 
             # 注册命令处理器
-            @self.telegram_bot.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith('/start')))
-            async def start_handler(event):
-                await self.handlers.handle_start_command(event)
-
-            @self.telegram_bot.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith('/status')))
-            async def status_handler(event):
-                await self.handlers.handle_status_command(event)
-
-            @self.telegram_bot.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith('/help')))
-            async def help_handler(event):
-                await self.handlers.handle_help_command(event)
-
-            @self.telegram_bot.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith('/detail')))
-            async def detail_handler(event):
-                await self.handlers.handle_detail_command(event)
-
-            @self.telegram_bot.bot_thon.on(events.NewMessage(func=lambda e: e.text and e.text.startswith('/reload_config')))
-            async def reload_config_handler(event):
-                await self.handle_reload_config_command(event)
+            self.telegram_bot.register_command_handler('/start', self.handlers.handle_start_command)
+            self.telegram_bot.register_command_handler('/status', self.handlers.handle_status_command)
+            self.telegram_bot.register_command_handler('/help', self.handlers.handle_help_command)
+            self.telegram_bot.register_command_handler('/detail', self.handlers.handle_detail_command)
+            self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
+            self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)
 
             # 注册回调查询处理器
-            @self.telegram_bot.bot_thon.on(events.CallbackQuery)
-            async def callback_handler(event):
-                await self.handlers.handle_callback_query(event)
+            self.telegram_bot.register_callback_handler(self.handlers.handle_callback_query)
 
             self.logger.info("[TaskManagerBot] Event handlers registered successfully")
 

@@ -133,7 +133,8 @@ dmypy.json
 # 项目特定文件
 
 # 配置文件 (包含敏感信息)
-config/config.json
+config/config.json*
+config/02_tg.json
 .env
 .env.local
 .env.production

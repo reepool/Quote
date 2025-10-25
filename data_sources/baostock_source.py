@@ -183,18 +183,40 @@ class BaostockSource(BaseDataSource):
             end_str = end_date.strftime('%Y-%m-%d')
 
             baostock_logger.debug(f"[BaoStock] Querying {baostock_code} from {start_str} to {end_str}")
+            
+            # 为阻塞调用添加超时和重试逻辑
+            max_retries = self.rate_limiter.config.retry_times
+            base_delay = self.rate_limiter.config.retry_interval
+            rs = None
 
-            # 获取日线数据 - 使用统一的前复权配置
-            adjustment_config = AdjustmentConfig.get_adjustment_config('baostock')
-            rs = await asyncio.to_thread(
-                bs.query_history_k_data_plus,
-                baostock_code,
-                start_date=start_str,
-                end_date=end_str,
-                frequency="d",
-                adjustflag=adjustment_config['adjustflag'],  # 前复权数据
-                fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
-            )
+            for attempt in range(max_retries):
+                try:
+                    # 获取日线数据 - 使用统一的前复权配置
+                    adjustment_config = AdjustmentConfig.get_adjustment_config('baostock')
+                    
+                    rs = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            bs.query_history_k_data_plus,
+                            baostock_code,
+                            start_date=start_str,
+                            end_date=end_str,
+                            frequency="d",
+                            adjustflag=adjustment_config['adjustflag'],
+                            fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
+                        ),
+                        timeout=120.0  # 设置120秒（2分钟）超时
+                    )
+                    # 如果成功，跳出循环
+                    break
+                except asyncio.TimeoutError:
+                    baostock_logger.warning(f"Timeout fetching data for {baostock_code} (attempt {attempt + 1}/{max_retries})")
+                    if attempt < max_retries - 1:
+                        delay = base_delay * (2 ** attempt)  # 指数退避
+                        baostock_logger.info(f"Retrying in {delay:.1f} seconds...")
+                        await asyncio.sleep(delay)
+                    else:
+                        baostock_logger.error(f"All retry attempts failed for {baostock_code} due to timeout.")
+                        raise  # 最终抛出超时异常
 
             if rs.error_code != '0':
                 baostock_logger.error(f"Failed to query daily data: {rs.error_msg}")

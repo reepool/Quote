@@ -4,21 +4,25 @@
 """
 
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any
+from utils.config_manager import ReportConfig
+from utils.logging_manager import report_logger
+
+
 
 
 class OutputAdapter:
     """报告输出格式适配器"""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: ReportConfig):
         """
         初始化适配器
 
         Args:
-            config: 报告配置
+            config: 报告配置对象
         """
         self.config = config
-        self.format_configs = config.get('formats', {})
+        self.format_configs = config.formats
 
     def adapt(self, content: str, output_format: str) -> str:
         """
@@ -32,12 +36,17 @@ class OutputAdapter:
             str: 适配后的内容
         """
         if output_format == 'telegram':
+            report_logger.debug("[Report] Adapted for Telegram")
             return self._adapt_telegram(content)
         elif output_format == 'console':
+            report_logger.debug("[Report] Adapted for Console")
             return self._adapt_console(content)
         elif output_format == 'api':
+            report_logger.debug("[Report] Adapted for API")
             return self._adapt_api(content)
-
+        else:
+            report_logger.warning(f"[Report] Unsupported output format: {output_format}")
+        
         return content
 
     def _adapt_telegram(self, content: str) -> str:
@@ -50,26 +59,6 @@ class OutputAdapter:
         Returns:
             str: Telegram适配后的内容
         """
-        config = self.format_configs.get('telegram', {})
-        max_length = config.get('max_length', 4000)
-
-        # 长度限制
-        if len(content) > max_length:
-            # 尝试在合适的位置截断
-            truncated = content[:max_length-20]
-            last_complete_line = truncated.rfind('\n')
-            if last_complete_line > max_length - 100:
-                content = truncated[:last_complete_line] + "\n\n... (内容过长已截断)"
-            else:
-                content = truncated + "... (内容过长已截断)"
-
-        # 格式化处理
-        bold_format = config.get('bold_format', '*{text}*')
-        code_format = config.get('code_format', '`{text}`')
-
-        # 这里可以添加更多的Telegram格式化逻辑
-        # 比如处理特殊字符、链接等
-
         return content
 
     def _adapt_console(self, content: str) -> str:
@@ -109,6 +98,7 @@ class OutputAdapter:
             else:
                 adapted_lines.append(line)
 
+        report_logger.debug(f"[Report] Adapted for Console: {adapted_lines}")
         return '\n'.join(adapted_lines)
 
     def _adapt_api(self, content: str) -> str:
@@ -178,9 +168,11 @@ class OutputAdapter:
                 }
             }
 
+            report_logger.debug(f"[Report] Converted to API format: {data}")
             return json.dumps(data, ensure_ascii=False, indent=2)
         except Exception:
             # 如果解析失败，返回简单格式
+            report_logger.warning(f"[Report] Failed to convert to API format: {content}")
             return json.dumps({
                 'content': content,
                 'formatted_at': datetime.now().isoformat()

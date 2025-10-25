@@ -11,14 +11,13 @@ from datetime import date, datetime
 
 
 from utils import (
-    scheduler_logger, dm_logger, api_logger, config_manager, get_process_manager
+    scheduler_logger, dm_logger, tgbot_logger, api_logger, config_manager, get_process_manager
 )
 # 直接导入代码转换工具，避免依赖问题
 from utils.code_utils import convert_to_database_format, is_valid_standard_format
 
 from data_manager import data_manager
 from scheduler.scheduler import task_scheduler
-from scheduler.monitor import scheduler_monitor
 from scheduler.job_config import job_config_manager
 from api.app import app as api_app
 from utils.task_manager.task_manager import TaskManagerBot
@@ -40,15 +39,22 @@ class QuoteSystem:
         try:
             scheduler_logger.info("[Main] Initializing Quote System...")
 
+            # 提前初始化TelegramBot（确保所有组件都能使用）
+            await self._initialize_telegram_bot()
+
             # 初始化数据管理器
             await data_manager.initialize()
+
+            # 初始化调度器监控器 (需要 config_manager)
+            from scheduler.monitor import SchedulerMonitor
+            self.scheduler_monitor = SchedulerMonitor(self.config)
 
             if include_scheduler:
                 # 初始化任务调度器
                 await task_scheduler.initialize()
 
-                # 初始化调度器监控（在调度器启动后）
-                await scheduler_monitor.initialize()
+                # 初始化调度器监控
+                await self.scheduler_monitor.initialize()
 
                 # 初始化任务管理机器人
                 await self._initialize_task_manager()
@@ -546,34 +552,49 @@ class QuoteSystem:
             scheduler_logger.error(f"[Main] Failed to get system status: {e}")
             print(f"Error getting system status: {e}")
 
+    async def _initialize_telegram_bot(self):
+        """提前初始化TelegramBot"""
+        try:
+            tgbot_logger.info("[Main] Initialization of TelegramBot...")
+
+            # 检查Telegram配置
+            telegram_config = self.config.get_nested('telegram_config', {})
+            if not telegram_config.get('enabled', False):
+                tgbot_logger.info("[Main] Telegram disabled, skipping early bot initialization")
+                return
+
+            # 创建并初始化TelegramBot
+            from utils.tgbot import TelegramBot
+            telegram_bot = TelegramBot()
+            await telegram_bot.create_bot_instance()
+
+            # 保存引用以便清理
+            self._telegram_bot = telegram_bot
+            tgbot_logger.info("[Main] TelegramBot initialized successfully")
+
+        except Exception as e:
+            tgbot_logger.error(f"[Main] Failed to initialize TelegramBot early: {e}")
+            # 不抛出异常，允许系统继续运行
+
     async def _initialize_task_manager(self):
         """初始化任务管理机器人"""
         try:
             scheduler_logger.info("[Main] Initializing task manager bot...")
 
-            # 检查Telegram配置
-            telegram_config = self.config.get_nested('telegram_config', {})
-            if not telegram_config.get('enabled', False):
-                scheduler_logger.info("[Main] Telegram disabled, skipping task manager bot initialization")
+            # 使用已初始化的TelegramBot
+            if not hasattr(self, '_telegram_bot') or not self._telegram_bot:
+                scheduler_logger.warning("[Main] TelegramBot not initialized early, cannot create task manager")
                 return
 
-            # 检查是否有chat_id配置
-            chat_ids = telegram_config.get('chat_id', [])
-            if not chat_ids:
-                scheduler_logger.warning("[Main] No chat_id configured for Telegram, skipping task manager bot")
-                return
-
-            # 创建TelegramBot实例
-            from utils.tgbot import TelegramBot
-            telegram_bot = TelegramBot()
-            await telegram_bot.create_bot_instance()
+            telegram_bot = self._telegram_bot
+            scheduler_logger.debug("[Main] Using pre-initialized TelegramBot for task manager")
 
             # 创建任务管理机器人实例
             self.task_manager_bot = TaskManagerBot(
                 telegram_bot=telegram_bot,
                 task_scheduler=task_scheduler,
                 job_config_manager=job_config_manager,
-                scheduler_monitor=scheduler_monitor,
+                scheduler_monitor=self.scheduler_monitor,
                 config_manager=self.config,
                 logger=scheduler_logger
             )
@@ -934,33 +955,8 @@ class QuoteSystem:
                 'exchange_distribution': dict(exchange_counts)
             },
             'stock_details': stock_details if detailed else None,
-            'top_affected_stocks': self._get_top_affected_stocks(gaps_by_stock, 10)
+            'top_affected_stocks': data_manager.get_top_affected_stocks(gaps, 10)
         }
-
-    def _get_top_affected_stocks(self, gaps_by_stock: dict, limit: int) -> list:
-        """获取受影响最严重的股票"""
-        stock_scores = []
-        for stock_key, stock_gaps in gaps_by_stock.items():
-            total_missing_days = sum(gap.gap_days for gap in stock_gaps)
-            critical_gaps = sum(1 for gap in stock_gaps if gap.severity == 'critical')
-            high_gaps = sum(1 for gap in stock_gaps if gap.severity == 'high')
-
-            # 计算严重程度分数
-            score = total_missing_days + (critical_gaps * 10) + (high_gaps * 5)
-            stock_scores.append((stock_key, score, total_missing_days, len(stock_gaps)))
-
-        # 按分数排序
-        stock_scores.sort(key=lambda x: x[1], reverse=True)
-
-        return [
-            {
-                'symbol': score[0],
-                'severity_score': score[1],
-                'total_missing_days': score[2],
-                'gap_count': score[3]
-            }
-            for score in stock_scores[:limit]
-        ]
 
     def _display_gap_report(self, report: dict, detailed: bool):
         """显示GAP检测报告"""
@@ -994,10 +990,10 @@ class QuoteSystem:
         # 最受影响的股票
         if report['top_affected_stocks']:
             print(f"\n🔝 受影响最严重的股票 (前{len(report['top_affected_stocks'])}名):")
-            print(f"{'排名':<4} {'股票代码':<12} {'严重分数':<8} {'缺失天数':<8} {'缺口数':<6}")
-            print("-" * 50)
+            print(f"{'排名':<4} {'股票代码':<12} {'严重分数':<10} {'缺失天数':<8}")
+            print("-" * 45) # 调整分隔线长度以匹配新的列宽
             for i, stock in enumerate(report['top_affected_stocks'], 1):
-                print(f"{i:<4} {stock['symbol']:<12} {stock['severity_score']:<8} {stock['total_missing_days']:<8} {stock['gap_count']:<6}")
+                print(f"{i:<4} {stock['symbol']:<12} {stock['severity_score']:<10.2f} {stock['total_missing_days']:<8}") # 格式化分数和天数
 
         # 详细信息
         if detailed and report['stock_details']:

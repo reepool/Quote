@@ -26,10 +26,10 @@ class DataValidator:
     INSTRUMENT_TYPES = ['STOCK', 'BOND', 'ETF', 'INDEX', 'FUND', 'REIT', 'WARRANT', 'FUTURES']
 
     @staticmethod
-    def validate_exchange(exchange: str) -> Optional[str]:
+    def validate_exchange(exchange: str) -> str:
         """验证并标准化交易所代码"""
         if not exchange:
-            return None
+            raise ValueError("Exchange code cannot be empty.")
 
         exchange_upper = exchange.upper().strip()
 
@@ -42,28 +42,26 @@ class DataValidator:
             if exchange_upper in aliases or exchange in aliases:
                 return standard_code
 
-        validation_logger.warning(f"Unknown exchange: {exchange}")
-        return None
+        raise ValueError(f"Unknown or unsupported exchange: '{exchange}'")
 
     @staticmethod
-    def validate_instrument_type(instrument_type: str) -> Optional[str]:
+    def validate_instrument_type(instrument_type: str) -> str:
         """验证交易品种类型"""
         if not instrument_type:
-            return None
+            raise ValueError("Instrument type cannot be empty.")
 
         type_upper = instrument_type.upper().strip()
 
         if type_upper in DataValidator.INSTRUMENT_TYPES:
             return type_upper
 
-        validation_logger.warning(f"Unknown instrument type: {instrument_type}")
-        return None
+        raise ValueError(f"Unknown or unsupported instrument type: '{instrument_type}'")
 
     @staticmethod
-    def validate_symbol(symbol: str, exchange: str = None) -> Optional[str]:
+    def validate_symbol(symbol: str, exchange: str = None) -> str:
         """验证交易代码格式"""
         if not symbol:
-            return None
+            raise ValueError("Symbol cannot be empty.")
 
         symbol = symbol.strip()
 
@@ -91,14 +89,13 @@ class DataValidator:
         if re.match(r'^[A-Z0-9]{1,10}$', symbol.upper()):
             return symbol.upper()
 
-        validation_logger.warning(f"Invalid symbol format: {symbol} for exchange: {exchange}")
-        return None
+        raise ValueError(f"Invalid symbol format: '{symbol}' for exchange: {exchange}")
 
     @staticmethod
-    def validate_date(date_input: Union[str, date, datetime]) -> Optional[date]:
+    def validate_date(date_input: Union[str, date, datetime]) -> date:
         """验证日期格式"""
         if not date_input:
-            return None
+            raise ValueError("Date input cannot be empty.")
 
         if isinstance(date_input, date):
             return date_input
@@ -125,18 +122,17 @@ class DataValidator:
                 except ValueError:
                     continue
 
-        validation_logger.warning(f"Invalid date format: {date_input}")
-        return None
+        raise ValueError(f"Invalid date format: '{date_input}'")
 
     @staticmethod
     def validate_date_range(start_date: Union[str, date, datetime],
-                          end_date: Union[str, date, datetime]) -> Tuple[Optional[date], Optional[date]]:
+                          end_date: Union[str, date, datetime]) -> Tuple[date, date]:
         """验证日期范围"""
         start_valid = DataValidator.validate_date(start_date)
         end_valid = DataValidator.validate_date(end_date)
 
         if not start_valid or not end_valid:
-            return None, None
+            raise ValueError("Both start_date and end_date must be valid dates.")
 
         if start_valid > end_valid:
             validation_logger.warning(f"Start date {start_valid} is after end date {end_valid}")
@@ -145,65 +141,61 @@ class DataValidator:
         return start_valid, end_valid
 
     @staticmethod
-    def validate_price(price: Union[str, float, int]) -> Optional[float]:
+    def validate_price(price: Union[str, float, int]) -> float:
         """验证价格数据"""
         if price is None:
-            return None
+            raise ValueError("Price cannot be None.")
 
         try:
             price_float = float(price)
             if price_float >= 0:
                 return price_float
         except (ValueError, TypeError):
-            pass
+            raise ValueError(f"Invalid price value: '{price}'")
 
-        validation_logger.warning(f"Invalid price: {price}")
-        return None
+        raise ValueError(f"Price cannot be negative: {price}")
 
     @staticmethod
-    def validate_volume(volume: Union[str, float, int]) -> Optional[int]:
+    def validate_volume(volume: Union[str, float, int]) -> int:
         """验证成交量数据"""
         if volume is None:
-            return None
+            raise ValueError("Volume cannot be None.")
 
         try:
             volume_int = int(float(volume))
             if volume_int >= 0:
                 return volume_int
         except (ValueError, TypeError):
-            pass
+            raise ValueError(f"Invalid volume value: '{volume}'")
 
-        validation_logger.warning(f"Invalid volume: {volume}")
-        return None
+        raise ValueError(f"Volume cannot be negative: {volume}")
 
     @staticmethod
-    def validate_amount(amount: Union[str, float, int]) -> Optional[float]:
+    def validate_amount(amount: Union[str, float, int]) -> float:
         """验证成交额数据"""
         if amount is None:
-            return None
+            raise ValueError("Amount cannot be None.")
 
         try:
             amount_float = float(amount)
             if amount_float >= 0:
                 return amount_float
         except (ValueError, TypeError):
-            pass
+            raise ValueError(f"Invalid amount value: '{amount}'")
 
-        validation_logger.warning(f"Invalid amount: {amount}")
-        return None
+        raise ValueError(f"Amount cannot be negative: {amount}")
 
     @staticmethod
-    def validate_instrument_id(instrument_id: str) -> Optional[str]:
+    def validate_instrument_id(instrument_id: str) -> str:
         """验证交易品种ID格式"""
         if not instrument_id:
-            return None
+            raise ValueError("Instrument ID cannot be empty.")
 
         # 格式: symbol.exchange (e.g., 300708.SZSE)
         if re.match(r'^[A-Z0-9]{1,10}\.[A-Z]{2,6}$', instrument_id.upper()):
             return instrument_id.upper()
 
-        validation_logger.warning(f"Invalid instrument ID format: {instrument_id}")
-        return None
+        raise ValueError(f"Invalid instrument ID format: '{instrument_id}'")
 
     @staticmethod
     def validate_quote_data(quote_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:

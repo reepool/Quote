@@ -4,27 +4,28 @@
 """
 
 from typing import Dict, List, Any, Optional
-from utils import config_manager
+from utils.logging_manager import report_logger
+from utils.config_manager import config_manager, ReportConfig
 
 
 class TemplateManager:
     """报告模板管理器"""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional[ReportConfig] = None):
         """
         初始化模板管理器
 
         Args:
-            config: 报告配置字典，如果为None则从config_manager获取
+            config: 报告配置对象，如果为None则从config_manager获取
         """
         if config is None:
-            from utils import config_manager
-            full_config = config_manager.to_dict()
-            config = full_config.get('report_config', {})
-
+            # 如果没有传入配置，则从全局配置管理器获取
+            config = config_manager.get_report_config()
+        
         self.config = config
-        self.templates = config.get('templates', {})
-        self.formats = config.get('formats', {})
+        self.templates = self.config.templates
+        self.formats = self.config.formats
+        report_logger.debug(f"[Report] Template manager initialized with {len(self.templates)} templates and {len(self.formats)} formats.")
 
     def get_template(self, report_type: str) -> Optional[Dict[str, Any]]:
         """
@@ -107,21 +108,31 @@ class TemplateManager:
         """
         template = self.get_template(report_type)
         if not template:
+            report_logger.warning(f"[Report] Template {report_type} not found")
+            return False
+
+        # 检查模板是否 enabled
+        if not template.get("enabled", True):  # 默认应该是启用的
+            report_logger.warning(f"[Report] Template {report_type} is not enabled")
             return False
 
         # 检查必要字段
         required_fields = ['name', 'sections']
         for field in required_fields:
             if field not in template:
+                report_logger.warning(f"[Report] Template {report_type} is missing required field: {field}")
                 return False
 
         # 检查段落配置
         sections = template.get('sections', [])
         if not sections:
+            report_logger.warning(f"[Report] Template {report_type} has no sections")
             return False
 
         for section in sections:
             if 'name' not in section or 'type' not in section:
+                report_logger.warning(f"[Report] Template {report_type} has a section missing required fields: name, type")
                 return False
 
+        report_logger.debug(f"[Report] Template {report_type} is valid")
         return True

@@ -3,6 +3,7 @@ Yahoo Finance data source implementation with rate limiting.
 Supports A-shares, HK stocks, and US stocks.
 """
 
+import requests
 import asyncio
 import aiohttp
 from typing import List, Dict, Any, Optional
@@ -15,6 +16,14 @@ from .base_source import BaseDataSource, RateLimitConfig
 from .adjustment_config import AdjustmentConfig
 from utils import yfinance_logger
 
+class YFinanceConstants:
+    """Yahoo Finance 数据源的常量"""
+    # 测试连接和健康检查使用的股票代码
+    TEST_SYMBOL_US = "AAPL"
+    TEST_SYMBOL_HK = "00700.HK"
+    TEST_SYMBOL_CN = "000001.SS"
+    # 默认的用户代理
+    DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
 class YFinanceSource(BaseDataSource):
     """Yahoo Finance数据源"""
@@ -22,7 +31,7 @@ class YFinanceSource(BaseDataSource):
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
         self.aio_session = None
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
 
     async def _initialize_impl(self):
         """初始化Yahoo Finance数据源"""
@@ -42,8 +51,8 @@ class YFinanceSource(BaseDataSource):
             )
 
             # 测试连接 - 使用美股作为测试，因为更稳定
-            test_symbol = "AAPL"  # 使用美股测试，比A股更稳定
-            test_data = await self._fetch_yahoo_data(test_symbol, period="5d")
+            test_symbol = YFinanceConstants.TEST_SYMBOL_US
+            test_data = await self._fetch_yahoo_data(test_symbol, period="5d", max_retries=2)
             if test_data is not None and not test_data.empty:
                 yfinance_logger.info(f"[{self.name}] Successfully connected to Yahoo Finance")
             else:
@@ -67,9 +76,12 @@ class YFinanceSource(BaseDataSource):
         """获取历史日线数据"""
         try:
             await self.rate_limiter.acquire()
-
+            
+            # 从 instrument_id 中解析交易所信息
+            exchange = instrument_id.split('.')[-1] if '.' in instrument_id else None
+            
             # 构建Yahoo Finance代码
-            yf_symbol = self._build_yf_symbol(symbol)
+            yf_symbol = self._build_yf_symbol(symbol, exchange)
             if not yf_symbol:
                 yfinance_logger.error(f"[{self.name}] Cannot build Yahoo Finance symbol for: {symbol}")
                 return []
@@ -121,8 +133,11 @@ class YFinanceSource(BaseDataSource):
         """获取最新日线数据"""
         try:
             await self.rate_limiter.acquire()
+            
+            # 从 instrument_id 中解析交易所信息
+            exchange = instrument_id.split('.')[-1] if '.' in instrument_id else None
 
-            yf_symbol = self._build_yf_symbol(symbol)
+            yf_symbol = self._build_yf_symbol(symbol, exchange)
             if not yf_symbol:
                 return {}
 
@@ -166,35 +181,34 @@ class YFinanceSource(BaseDataSource):
             yfinance_logger.error(f"[{self.name}] Failed to get latest data for {symbol}: {e}")
             return {}
 
-    def _build_yf_symbol(self, symbol: str) -> Optional[str]:
+    def _build_yf_symbol(self, symbol: str, exchange: Optional[str]) -> Optional[str]:
         """构建Yahoo Finance代码"""
-        name_lower = self.name.lower()
+        if not isinstance(symbol, str) or not symbol:
+            yfinance_logger.warning(f"[{self.name}] Invalid symbol provided: {symbol}")
+            return None
 
-        # A股数据源判断 - 更精确的匹配
-        if any(keyword in name_lower for keyword in ['a_stock', 'cn_stock', 'china']):
+        exchange_upper = exchange.upper() if exchange else None
+
+        if exchange_upper in ['SSE', 'SZSE', 'BSE']:
             # A股
             if len(symbol) == 6:
-                if symbol.startswith(('6', '9')):
+                if exchange_upper == 'SSE' or symbol.startswith(('6', '9')): # 兼容没有交易所信息的情况
                     return f"{symbol}.SS"  # 上交所
                 else:
                     return f"{symbol}.SZ"  # 深交所
-            elif len(symbol) == 9 and '.' in symbol:
-                # 已经是Yahoo格式
-                return symbol
-        # 港股数据源判断
-        elif any(keyword in name_lower for keyword in ['hk_stock', 'hongkong']):
+        elif exchange_upper == 'HKEX':
             # 港股
             if len(symbol) == 5 and symbol.isdigit():
                 return f"{symbol}.HK"
-            elif len(symbol) == 9 and '.' in symbol:
-                # 已经是Yahoo格式
-                return symbol
-        # 美股数据源判断
-        elif any(keyword in name_lower for keyword in ['us_stock', 'nasdaq', 'nyse']):
+        elif exchange_upper in ['NASDAQ', 'NYSE']:
             # 美股
             return symbol
+        
+        # 如果已经符合Yahoo格式，直接返回
+        if '.' in symbol:
+            return symbol
 
-        yfinance_logger.warning(f"[{self.name}] Unknown symbol format: {symbol}")
+        yfinance_logger.warning(f"[{self.name}] Cannot determine Yahoo Finance suffix for symbol '{symbol}' with exchange '{exchange}'")
         return None
 
     async def _fetch_yahoo_data(self, symbol: str, start_date: datetime = None,
@@ -229,8 +243,6 @@ class YFinanceSource(BaseDataSource):
                                       end_date: datetime = None, period: str = None) -> Optional[pd.DataFrame]:
         """使用yfinance库获取数据"""
         try:
-            # 设置yfinance的用户代理和会话
-            import requests
             session = requests.Session()
             session.headers['User-Agent'] = self.user_agent
             session.headers.update({
@@ -338,20 +350,20 @@ class YFinanceSource(BaseDataSource):
 
         # 美股测试代码
         if any(keyword in name_lower for keyword in ['us_stock', 'nasdaq', 'nyse']):
-            return "AAPL"
+            return YFinanceConstants.TEST_SYMBOL_US
         # 港股测试代码
         elif any(keyword in name_lower for keyword in ['hk_stock', 'hongkong']):
-            return "00700.HK"
+            return YFinanceConstants.TEST_SYMBOL_HK
         # A股测试代码
         elif any(keyword in name_lower for keyword in ['a_stock', 'cn_stock', 'china']):
-            return "000001.SS"
+            return YFinanceConstants.TEST_SYMBOL_CN
         return None
 
     async def health_check(self) -> bool:
         """健康检查"""
         try:
             # 使用美股作为健康检查，更稳定
-            test_symbol = "AAPL"
+            test_symbol = YFinanceConstants.TEST_SYMBOL_US
 
             # 测试获取最近数据
             data = await self._fetch_yahoo_data(test_symbol, period="5d", max_retries=2)

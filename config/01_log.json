@@ -1,0 +1,86 @@
+{
+  "logging_config": {
+    "level": "INFO",
+    "format": "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S",
+    "file_config": {
+      "enabled": true,
+      "directory": "log",
+      "filename": "sys.log",
+      "rotation": {
+        "enabled": true,
+        "type": "size",
+        "max_bytes_mb": 50,
+        "backup_count": 10
+      }
+    },
+    "console_config": {
+      "enabled": true,
+      "level": "INFO"
+    },
+    "modules": {
+      "DataManager": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "DataSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Database": {
+        "level": "WARNING",
+        "enabled": true
+      },
+      "API": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Scheduler": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "Monitor": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "TaskManager": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "TelegramBot": {
+        "level": "DEBUG",
+        "enabled": true
+      },
+      "AkShareSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "YFinanceSource": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Tushare": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Baostock": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "tg_task_manager": {
+        "level": "INFO",
+        "enabled": true
+      },
+      "Report": {
+        "level": "DEBUG",
+        "enabled": true
+      }
+    },
+    "performance_monitoring": {
+      "enabled": true,
+      "slow_operation_threshold_seconds": 2.0,
+      "log_memory_usage": true,
+      "collect_metrics": true
+    }
+  }
+}

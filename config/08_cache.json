@@ -1,0 +1,7 @@
+{
+  "cache_config": {
+    "enabled": true,
+    "max_memory_mb": 512,
+    "default_ttl_seconds": 3600
+  }
+}

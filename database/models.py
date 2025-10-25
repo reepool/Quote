@@ -15,10 +15,16 @@ def safe_get_shanghai_time():
     try:
         from utils.date_utils import get_shanghai_time
         return get_shanghai_time()
-    except ImportError:
-        # 如果导入失败，使用标准时间
-        from datetime import datetime, timezone, timedelta
-        return datetime.now(timezone(timedelta(hours=8)))
+    except (ImportError, ModuleNotFoundError):
+        # 如果导入失败（例如循环导入），使用备用实现
+        try:
+            # 优先使用 zoneinfo (Python 3.9+)
+            from zoneinfo import ZoneInfo
+            return datetime.now(ZoneInfo("Asia/Shanghai"))
+        except ImportError:
+            # 兼容旧版本 Python
+            from datetime import timezone, timedelta
+            return datetime.now(timezone(timedelta(hours=8), 'Asia/Shanghai'))
 
 Base = declarative_base()
 

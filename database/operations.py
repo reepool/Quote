@@ -5,7 +5,7 @@ Supports comprehensive data management with new schema.
 
 import asyncio
 from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional, Tuple, Union
+from typing import List, Dict, Any, Optional, Union
 import pandas as pd
 from sqlalchemy import text, func, desc, asc
 from sqlalchemy.orm import sessionmaker
@@ -13,7 +13,8 @@ from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
 
 
-
+# 异步查询需要 select
+from sqlalchemy.future import select
 from .connection import db_manager
 from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
@@ -78,16 +79,18 @@ class DatabaseOperations:
     async def get_instruments_by_exchange(self, exchange: str, is_active: bool = True) -> List[Dict[str, Any]]:
         """根据交易所获取交易品种列表"""
         try:
-            with self.get_session() as session:
-                query = session.query(InstrumentDB).filter(InstrumentDB.exchange == exchange)
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB).filter(InstrumentDB.exchange == exchange)
 
                 if is_active is not None:
-                    query = query.filter(InstrumentDB.is_active == is_active)
+                    stmt = stmt.filter(InstrumentDB.is_active == is_active)
 
-                query = query.order_by(InstrumentDB.symbol)
+                stmt = stmt.order_by(InstrumentDB.symbol)
+                result = await session.execute(stmt)
+                instruments_db = result.scalars().all()
 
                 instruments = []
-                for instrument in query:
+                for instrument in instruments_db:
                     instruments.append({
                         'instrument_id': instrument.instrument_id,
                         'symbol': instrument.symbol,
@@ -120,16 +123,18 @@ class DatabaseOperations:
     async def get_active_instruments(self, exchange: str = None) -> List[Dict[str, Any]]:
         """获取活跃交易品种列表"""
         try:
-            with self.get_session() as session:
-                query = session.query(InstrumentDB).filter(InstrumentDB.is_active == True)
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB).filter(InstrumentDB.is_active == True)
 
                 if exchange:
-                    query = query.filter(InstrumentDB.exchange == exchange)
+                    stmt = stmt.filter(InstrumentDB.exchange == exchange)
 
-                query = query.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
+                stmt = stmt.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
+                result = await session.execute(stmt)
+                instruments_db = result.scalars().all()
 
                 instruments = []
-                for instrument in query:
+                for instrument in instruments_db:
                     instruments.append({
                         'instrument_id': instrument.instrument_id,
                         'symbol': instrument.symbol,
@@ -162,19 +167,20 @@ class DatabaseOperations:
     async def get_existing_data_dates(self, instrument_id: str, start_date: date, end_date: date) -> List[date]:
         """获取指定品种的已有数据日期"""
         try:
-            with self.get_session() as session:
-                query = session.query(DailyQuoteDB.time).filter(
+            async with self.get_async_session() as session:
+                stmt = select(DailyQuoteDB.time).filter(
                     DailyQuoteDB.instrument_id == instrument_id,
                     DailyQuoteDB.time >= start_date,
                     DailyQuoteDB.time <= end_date
                 ).order_by(DailyQuoteDB.time)
 
+                result = await session.execute(stmt)
                 dates = []
-                for result in query:
-                    if isinstance(result[0], datetime):
-                        dates.append(result[0].date())
+                for row in result.scalars().all():
+                    if isinstance(row, datetime):
+                        dates.append(row.date())
                     else:
-                        dates.append(result[0])
+                        dates.append(row)
 
                 return dates
 
@@ -202,46 +208,48 @@ class DatabaseOperations:
     ) -> List[Dict[str, Any]]:
         """根据过滤条件获取交易品种列表"""
         try:
-            with self.get_session() as session:
-                query = session.query(InstrumentDB)
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB)
 
                 # 应用过滤器
                 if exchange:
-                    query = query.filter(InstrumentDB.exchange == exchange)
+                    stmt = stmt.filter(InstrumentDB.exchange == exchange)
                 if instrument_type:
-                    query = query.filter(InstrumentDB.type == instrument_type)
+                    stmt = stmt.filter(InstrumentDB.type == instrument_type)
                 if industry:
-                    query = query.filter(InstrumentDB.industry == industry)
+                    stmt = stmt.filter(InstrumentDB.industry == industry)
                 if sector:
-                    query = query.filter(InstrumentDB.sector == sector)
+                    stmt = stmt.filter(InstrumentDB.sector == sector)
                 if market:
-                    query = query.filter(InstrumentDB.market == market)
+                    stmt = stmt.filter(InstrumentDB.market == market)
                 if status:
-                    query = query.filter(InstrumentDB.status == status)
+                    stmt = stmt.filter(InstrumentDB.status == status)
                 if is_active is not None:
-                    query = query.filter(InstrumentDB.is_active == is_active)
+                    stmt = stmt.filter(InstrumentDB.is_active == is_active)
                 if is_st is not None:
-                    query = query.filter(InstrumentDB.is_st == is_st)
+                    stmt = stmt.filter(InstrumentDB.is_st == is_st)
                 if trading_status is not None:
-                    query = query.filter(InstrumentDB.trading_status == trading_status)
+                    stmt = stmt.filter(InstrumentDB.trading_status == trading_status)
                 if listed_after:
-                    query = query.filter(InstrumentDB.listed_date >= listed_after)
+                    stmt = stmt.filter(InstrumentDB.listed_date >= listed_after)
                 if listed_before:
-                    query = query.filter(InstrumentDB.listed_date <= listed_before)
+                    stmt = stmt.filter(InstrumentDB.listed_date <= listed_before)
 
                 # 排序
                 if hasattr(InstrumentDB, sort_by):
                     sort_column = getattr(InstrumentDB, sort_by)
                     if sort_order.lower() == 'desc':
-                        query = query.order_by(desc(sort_column))
+                        stmt = stmt.order_by(desc(sort_column))
                     else:
-                        query = query.order_by(asc(sort_column))
+                        stmt = stmt.order_by(asc(sort_column))
 
                 # 分页
-                query = query.limit(limit).offset(offset)
+                stmt = stmt.limit(limit).offset(offset)
+                result = await session.execute(stmt)
+                instruments_db = result.scalars().all()
 
                 instruments = []
-                for instrument in query:
+                for instrument in instruments_db:
                     instruments.append({
                         'instrument_id': instrument.instrument_id,
                         'symbol': instrument.symbol,
@@ -272,25 +280,21 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get instruments with filters: {e}")
             return []
 
-    async def get_instrument_by_id(self, instrument_id: str) -> Optional[Dict[str, Any]]:
-        """根据ID获取交易品种信息"""
-        return await self.get_instrument_info(instrument_id=instrument_id)
-
     async def count_quotes_by_instrument(self, instrument_id: str, start_date: date = None,
                                          end_date: date = None) -> int:
         """统计指定股票的数据记录数"""
         try:
-            with self.get_session() as session:
-                query = session.query(DailyQuoteDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(func.count()).select_from(DailyQuoteDB).filter(
                     DailyQuoteDB.instrument_id == instrument_id
                 )
 
                 if start_date:
-                    query = query.filter(DailyQuoteDB.time >= start_date)
+                    stmt = stmt.filter(DailyQuoteDB.time >= start_date)
                 if end_date:
-                    query = query.filter(DailyQuoteDB.time <= end_date)
+                    stmt = stmt.filter(DailyQuoteDB.time <= end_date)
 
-                return query.count()
+                return await session.scalar(stmt)
 
         except Exception as e:
             self.db_logger.error(f"Failed to count quotes for {instrument_id}: {e}")
@@ -300,8 +304,8 @@ class DatabaseOperations:
                                         end_date: date = None) -> Dict[str, Any]:
         """获取指定股票的数据日期范围"""
         try:
-            with self.get_session() as session:
-                query = session.query(
+            async with self.get_async_session() as session:
+                stmt = select(
                     func.min(DailyQuoteDB.time).label('min_date'),
                     func.max(DailyQuoteDB.time).label('max_date')
                 ).filter(
@@ -309,13 +313,13 @@ class DatabaseOperations:
                 )
 
                 if start_date:
-                    query = query.filter(DailyQuoteDB.time >= start_date)
+                    stmt = stmt.filter(DailyQuoteDB.time >= start_date)
                 if end_date:
-                    query = query.filter(DailyQuoteDB.time <= end_date)
+                    stmt = stmt.filter(DailyQuoteDB.time <= end_date)
 
-                result = query.first()
+                result = (await session.execute(stmt)).first()
 
-                if result and result.min_date and result.max_date:
+                if result and result.min_date:
                     return {
                         'start_date': result.min_date.date() if isinstance(result.min_date, datetime) else result.min_date,
                         'end_date': result.max_date.date() if isinstance(result.max_date, datetime) else result.max_date
@@ -327,13 +331,6 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get date range for {instrument_id}: {e}")
             return {}
 
-    async def get_instrument_by_symbol(self, symbol: str) -> Optional[Dict[str, Any]]:
-        """根据交易代码获取交易品种信息"""
-        return await self.get_instrument_info(symbol=symbol)
-
-    async def save_daily_quotes(self, quotes: List[Dict[str, Any]]) -> bool:
-        """批量保存日线数据（别名方法）"""
-        return await self.save_daily_data(quotes)
 
     async def get_daily_quotes(
         self,
@@ -349,16 +346,6 @@ class DatabaseOperations:
         return_format: str = 'pandas'
     ) -> Any:
         """获取日线数据（别名方法）"""
-        return await self.get_daily_data(
-            instrument_id=instrument_id,
-            symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
-            tradestatus=tradestatus,
-            is_complete=is_complete,
-            min_volume=min_volume,
-            return_format=return_format
-        )
 
     async def save_instrument_list(self, instruments: List[Dict[str, Any]]) -> bool:
         """保存交易品种列表（别名方法）"""
@@ -367,11 +354,11 @@ class DatabaseOperations:
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""
         try:
-            with self.get_session() as session:
-                success_count = 0
+            async with self.get_async_session() as session:
+                upserted_count = 0
                 for instrument_data in instruments:
                     try:
-                        # 处理日期字段
+                        # 预处理日期字段，将字符串转换为datetime对象
                         processed_data = {}
                         for key, value in instrument_data.items():
                             if key in ['listed_date', 'delisted_date', 'issue_date', 'created_at', 'updated_at']:
@@ -397,14 +384,17 @@ class DatabaseOperations:
                                 processed_data[key] = value
 
                         # 检查是否已存在
-                        existing = session.query(InstrumentDB).filter(
+                        stmt = select(InstrumentDB).filter(
                             InstrumentDB.instrument_id == processed_data['instrument_id']
-                        ).first()
+                        )
+                        result = await session.execute(stmt)
+                        existing = result.scalar_one_or_none()
 
                         if existing:
                             # 更新现有记录
                             for key, value in processed_data.items():
-                                if hasattr(existing, key):
+                                # 确保只更新模型中存在的字段，防止动态添加属性
+                                if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
                             existing.updated_at = get_shanghai_time()
                         else:
@@ -416,7 +406,7 @@ class DatabaseOperations:
                                     if field not in processed_data:
                                         self.db_logger.warning(f"Missing required field '{field}' for instrument {instrument_data.get('instrument_id', 'unknown')}")
 
-                                # 过滤掉无效字段
+                                # 过滤掉模型中不存在的字段，避免创建错误
                                 valid_data = {k: v for k, v in processed_data.items() if hasattr(InstrumentDB, k)}
 
                                 # 调试：打印数据信息
@@ -428,13 +418,13 @@ class DatabaseOperations:
                                 self.db_logger.error(f"Error creating instrument: {create_error}")
                                 self.db_logger.error(f"Original data keys: {list(processed_data.keys())}")
                                 raise
-                        success_count += 1
+                        upserted_count += 1
                     except Exception as e:
                         self.db_logger.error(f"Error saving instrument {instrument_data.get('instrument_id', 'unknown')}: {e}")
 
-                session.commit()
-                self.db_logger.info(f"Successfully saved {success_count}/{len(instruments)} instruments")
-                return success_count > 0
+                await session.commit()
+                self.db_logger.info(f"Successfully upserted {upserted_count}/{len(instruments)} instruments")
+                return upserted_count > 0
 
         except Exception as e:
             import traceback
@@ -454,25 +444,27 @@ class DatabaseOperations:
     ) -> List[Dict[str, Any]]:
         """获取交易品种列表"""
         try:
-            with self.get_session() as session:
-                query = session.query(InstrumentDB)
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB)
 
                 # Apply filters
                 if exchange:
-                    query = query.filter(InstrumentDB.exchange == exchange)
+                    stmt = stmt.filter(InstrumentDB.exchange == exchange)
                 if type:
-                    query = query.filter(InstrumentDB.type == type)
+                    stmt = stmt.filter(InstrumentDB.type == type)
                 if is_active is not None:
-                    query = query.filter(InstrumentDB.is_active == is_active)
+                    stmt = stmt.filter(InstrumentDB.is_active == is_active)
                 if status:
-                    query = query.filter(InstrumentDB.status == status)
+                    stmt = stmt.filter(InstrumentDB.status == status)
                 if industry:
-                    query = query.filter(InstrumentDB.industry == industry)
+                    stmt = stmt.filter(InstrumentDB.industry == industry)
 
                 # Apply ordering and pagination
-                query = query.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
+                stmt = stmt.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
                 if limit:
-                    query = query.limit(limit).offset(offset)
+                    stmt = stmt.limit(limit).offset(offset)
+                result = await session.execute(stmt)
+                query = result.scalars().all()
 
                 instruments = []
                 for instrument in query:
@@ -512,18 +504,23 @@ class DatabaseOperations:
         instrument_id: str = None
     ) -> Optional[Dict[str, Any]]:
         """获取单个交易品种详细信息"""
+        if not symbol and not instrument_id:
+            self.db_logger.warning("get_instrument_info called without symbol or instrument_id")
+            return None
+
         try:
-            with self.get_session() as session:
-                query = session.query(InstrumentDB)
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB)
 
                 if instrument_id:
-                    query = query.filter(InstrumentDB.instrument_id == instrument_id)
+                    stmt = stmt.filter(InstrumentDB.instrument_id == instrument_id)
                 elif symbol:
-                    query = query.filter(InstrumentDB.symbol == symbol)
+                    stmt = stmt.filter(InstrumentDB.symbol == symbol)
                 else:
                     return None
 
-                instrument = query.first()
+                result = await session.execute(stmt)
+                instrument = result.scalar_one_or_none()
                 if not instrument:
                     return None
 
@@ -555,27 +552,37 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get instrument info: {e}")
             return None
 
+    async def get_instrument_by_id(self, instrument_id: str) -> Optional[Dict[str, Any]]:
+        """根据ID获取交易品种信息 (get_instrument_info的别名)"""
+        return await self.get_instrument_info(instrument_id=instrument_id)
+
+    async def get_instrument_by_symbol(self, symbol: str) -> Optional[Dict[str, Any]]:
+        """根据交易代码获取交易品种信息 (get_instrument_info的别名)"""
+        return await self.get_instrument_info(symbol=symbol)
+
     # === Daily Quote Operations ===
 
     async def save_daily_data(self, quotes: List[Dict[str, Any]]) -> bool:
         """批量保存日线数据"""
         try:
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 success_count = 0
                 update_count = 0
 
                 for quote_data in quotes:
                     try:
                         # Check if record exists
-                        existing = session.query(DailyQuoteDB).filter(
+                        stmt = select(DailyQuoteDB).filter(
                             DailyQuoteDB.time == quote_data['time'],
                             DailyQuoteDB.instrument_id == quote_data['instrument_id']
-                        ).first()
+                        )
+                        result = await session.execute(stmt)
+                        existing = result.scalar_one_or_none()
 
                         if existing:
                             # Update existing record
                             for key, value in quote_data.items():
-                                if hasattr(existing, key):
+                                if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
                             existing.updated_at = get_shanghai_time()
                             update_count += 1
@@ -588,13 +595,17 @@ class DatabaseOperations:
                     except Exception as e:
                         self.db_logger.error(f"Error saving quote {quote_data.get('instrument_id', 'unknown')} {quote_data.get('time', 'unknown')}: {e}")
 
-                session.commit()
+                await session.commit()
                 self.db_logger.info(f"Successfully saved daily data: {success_count} new, {update_count} updated")
                 return success_count > 0 or update_count > 0
 
         except Exception as e:
             self.db_logger.error(f"Failed to save daily data: {e}")
             return False
+
+    async def save_daily_quotes(self, quotes: List[Dict[str, Any]]) -> bool:
+        """批量保存日线数据 (save_daily_data的别名)"""
+        return await self.save_daily_data(quotes)
 
     async def get_daily_data(
         self,
@@ -610,34 +621,36 @@ class DatabaseOperations:
     ) -> Union[pd.DataFrame, List[Dict]]:
         """获取日线数据"""
         try:
-            with self.get_session() as session:
-                query = session.query(DailyQuoteDB)
+            async with self.get_async_session() as session:
+                stmt = select(DailyQuoteDB)
 
                 # Apply instrument filter
                 if instrument_id:
-                    query = query.filter(DailyQuoteDB.instrument_id == instrument_id)
+                    stmt = stmt.filter(DailyQuoteDB.instrument_id == instrument_id)
                 elif symbol:
                     # Join with instruments table to get instrument_id from symbol
-                    query = query.join(InstrumentDB).filter(InstrumentDB.symbol == symbol)
+                    stmt = stmt.join(InstrumentDB).filter(InstrumentDB.symbol == symbol)
 
                 # Apply date range filter
                 if start_date:
-                    query = query.filter(DailyQuoteDB.time >= start_date)
+                    stmt = stmt.filter(DailyQuoteDB.time >= start_date)
                 if end_date:
-                    query = query.filter(DailyQuoteDB.time <= end_date)
+                    stmt = stmt.filter(DailyQuoteDB.time <= end_date)
 
                 # Apply other filters
                 if tradestatus is not None:
-                    query = query.filter(DailyQuoteDB.tradestatus == tradestatus)
+                    stmt = stmt.filter(DailyQuoteDB.tradestatus == tradestatus)
                 if is_complete is not None:
-                    query = query.filter(DailyQuoteDB.is_complete == is_complete)
+                    stmt = stmt.filter(DailyQuoteDB.is_complete == is_complete)
                 if min_volume:
-                    query = query.filter(DailyQuoteDB.volume >= min_volume)
+                    stmt = stmt.filter(DailyQuoteDB.volume >= min_volume)
 
                 # Order and limit
-                query = query.order_by(DailyQuoteDB.time.desc())
+                stmt = stmt.order_by(DailyQuoteDB.time.desc())
                 if limit:
-                    query = query.limit(limit)
+                    stmt = stmt.limit(limit)
+                result = await session.execute(stmt)
+                query = result.scalars().all()
 
                 # Execute query
                 results = []
@@ -679,11 +692,12 @@ class DatabaseOperations:
     async def get_latest_quote_date(self, instrument_id: str) -> Optional[datetime]:
         """获取最新日期"""
         try:
-            with self.get_session() as session:
-                latest = session.query(DailyQuoteDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(DailyQuoteDB).filter(
                     DailyQuoteDB.instrument_id == instrument_id
-                ).order_by(DailyQuoteDB.time.desc()).first()
-
+                ).order_by(DailyQuoteDB.time.desc()).limit(1)
+                result = await session.execute(stmt)
+                latest = result.scalar_one_or_none()
                 if latest:
                     return latest.time
                 return None
@@ -697,20 +711,22 @@ class DatabaseOperations:
     async def save_trading_calendar(self, calendar_data: List[Dict[str, Any]]) -> bool:
         """保存交易日历数据"""
         try:
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 success_count = 0
                 for data in calendar_data:
                     try:
                         # Check if record exists
-                        existing = session.query(TradingCalendarDB).filter(
+                        stmt = select(TradingCalendarDB).filter(
                             TradingCalendarDB.exchange == data['exchange'],
                             TradingCalendarDB.date == data['date']
-                        ).first()
+                        )
+                        result = await session.execute(stmt)
+                        existing = result.scalar_one_or_none()
 
                         if existing:
                             # Update existing record
                             for key, value in data.items():
-                                if hasattr(existing, key):
+                                if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
                             existing.updated_at = get_shanghai_time()
                         else:
@@ -722,7 +738,7 @@ class DatabaseOperations:
                     except Exception as e:
                         self.db_logger.error(f"Error saving calendar record: {e}")
 
-                session.commit()
+                await session.commit()
                 self.db_logger.info(f"Successfully saved {success_count} calendar records")
                 return success_count
 
@@ -739,19 +755,19 @@ class DatabaseOperations:
     ) -> List[date]:
         """获取交易日列表"""
         try:
-            with self.get_session() as session:
-                query = session.query(TradingCalendarDB.date).distinct()
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB.date).distinct()
 
                 # Apply filters
                 if exchange:
-                    query = query.filter(TradingCalendarDB.exchange == exchange)
+                    stmt = stmt.filter(TradingCalendarDB.exchange == exchange)
                 if start_date:
                     # Convert string to date if needed
                     if isinstance(start_date, str):
                         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
                     # Convert date to datetime to match database storage format
                     start_datetime = datetime.combine(start_date, datetime.min.time())
-                    query = query.filter(TradingCalendarDB.date >= start_datetime)
+                    stmt = stmt.filter(TradingCalendarDB.date >= start_datetime)
                 if end_date:
                     # Convert string to date if needed
                     if isinstance(end_date, str):
@@ -759,18 +775,19 @@ class DatabaseOperations:
                     # Convert date to datetime to match database storage format
                     # Use end of day to ensure the end date is included
                     end_datetime = datetime.combine(end_date, datetime.max.time())
-                    query = query.filter(TradingCalendarDB.date <= end_datetime)
+                    stmt = stmt.filter(TradingCalendarDB.date <= end_datetime)
                 if is_trading_day is not None:
-                    query = query.filter(TradingCalendarDB.is_trading_day == is_trading_day)
+                    stmt = stmt.filter(TradingCalendarDB.is_trading_day == is_trading_day)
 
-                query = query.order_by(TradingCalendarDB.date)
+                stmt = stmt.order_by(TradingCalendarDB.date)
+                result = await session.execute(stmt)
 
                 trading_days = []
-                for result in query:
-                    if isinstance(result[0], datetime):
-                        trading_days.append(result[0].date())
+                for row in result.scalars().all():
+                    if isinstance(row, datetime):
+                        trading_days.append(row.date())
                     else:
-                        trading_days.append(result[0])
+                        trading_days.append(row)
 
                 return trading_days
 
@@ -788,13 +805,14 @@ class DatabaseOperations:
             # Convert date to datetime to match database storage format
             check_datetime = datetime.combine(check_date, datetime.max.time())
 
-            with self.get_session() as session:
-                result = session.query(TradingCalendarDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange,
                     TradingCalendarDB.date > check_datetime,
                     TradingCalendarDB.is_trading_day == True
-                ).order_by(TradingCalendarDB.date).first()
-
+                ).order_by(TradingCalendarDB.date).limit(1)
+                result_proxy = await session.execute(stmt)
+                result = result_proxy.scalar_one_or_none()
                 return result.date if result else None
 
         except Exception as e:
@@ -811,13 +829,14 @@ class DatabaseOperations:
             # Convert date to datetime to match database storage format
             check_datetime = datetime.combine(check_date, datetime.min.time())
 
-            with self.get_session() as session:
-                result = session.query(TradingCalendarDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange,
                     TradingCalendarDB.date < check_datetime,
                     TradingCalendarDB.is_trading_day == True
-                ).order_by(TradingCalendarDB.date.desc()).first()
-
+                ).order_by(TradingCalendarDB.date.desc()).limit(1)
+                result_proxy = await session.execute(stmt)
+                result = result_proxy.scalar_one_or_none()
                 return result.date if result else None
 
         except Exception as e:
@@ -835,12 +854,13 @@ class DatabaseOperations:
             start_datetime = datetime.combine(check_date, datetime.min.time())
             end_datetime = datetime.combine(check_date, datetime.max.time())
 
-            with self.get_session() as session:
-                result = session.query(TradingCalendarDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange,
                     TradingCalendarDB.date >= start_datetime,
                     TradingCalendarDB.date <= end_datetime
-                ).first()
+                ).limit(1)
+                result = (await session.execute(stmt)).scalar_one_or_none()
 
                 return result.is_trading_day if result else False
 
@@ -853,11 +873,11 @@ class DatabaseOperations:
     async def create_data_update(self, update_info: Dict[str, Any]) -> str:
         """创建数据更新记录"""
         try:
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 db_update = DataUpdateDB(**update_info)
                 session.add(db_update)
-                session.commit()
-                session.refresh(db_update)
+                await session.commit()
+                await session.refresh(db_update)
                 return db_update.batch_id
 
         except Exception as e:
@@ -867,11 +887,12 @@ class DatabaseOperations:
     async def update_data_update_progress(self, batch_id: str, progress: float, status: str = None) -> bool:
         """更新数据进度"""
         try:
-            with self.get_session() as session:
-                update = session.query(DataUpdateDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(DataUpdateDB).filter(
                     DataUpdateDB.batch_id == batch_id
-                ).first()
-
+                )
+                result = await session.execute(stmt)
+                update = result.scalar_one_or_none()
                 if update:
                     update.progress = progress
                     if status:
@@ -880,7 +901,7 @@ class DatabaseOperations:
                         update.completed_at = get_shanghai_time()
                         update.duration_seconds = int((get_shanghai_time() - update.started_at).total_seconds())
 
-                    session.commit()
+                    await session.commit()
                     return True
                 return False
 
@@ -896,18 +917,19 @@ class DatabaseOperations:
     ) -> List[Dict[str, Any]]:
         """获取数据更新记录"""
         try:
-            with self.get_session() as session:
-                query = session.query(DataUpdateDB).order_by(DataUpdateDB.created_at.desc())
+            async with self.get_async_session() as session:
+                stmt = select(DataUpdateDB).order_by(DataUpdateDB.created_at.desc())
 
                 if batch_id:
-                    query = query.filter(DataUpdateDB.batch_id == batch_id)
+                    stmt = stmt.filter(DataUpdateDB.batch_id == batch_id)
                 if status:
-                    query = query.filter(DataUpdateDB.status == status)
+                    stmt = stmt.filter(DataUpdateDB.status == status)
                 if limit:
-                    query = query.limit(limit)
+                    stmt = stmt.limit(limit)
 
+                result = await session.execute(stmt)
                 updates = []
-                for update in query:
+                for update in result.scalars().all():
                     updates.append({
                         'update_id': update.update_id,
                         'batch_id': update.batch_id,
@@ -944,36 +966,36 @@ class DatabaseOperations:
         try:
             stats = {}
 
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 # Instruments statistics
                 stats['instruments'] = {
-                    'total': session.query(InstrumentDB).count(),
-                    'active': session.query(InstrumentDB).filter(InstrumentDB.is_active == True).count(),
+                    'total': await session.scalar(select(func.count()).select_from(InstrumentDB)),
+                    'active': await session.scalar(select(func.count()).select_from(InstrumentDB).filter(InstrumentDB.is_active == True)),
                     'by_exchange': {},
                     'by_type': {},
                     'by_status': {}
                 }
 
                 # Exchange distribution
-                for exchange in ['SSE', 'SZSE', 'BSE']:
-                    count = session.query(InstrumentDB).filter(InstrumentDB.exchange == exchange).count()
+                exchange_counts_res = await session.execute(select(InstrumentDB.exchange, func.count(InstrumentDB.exchange)).group_by(InstrumentDB.exchange))
+                for exchange, count in exchange_counts_res.all():
                     stats['instruments']['by_exchange'][exchange] = count
 
                 # Type distribution
-                for type_name in ['stock', 'etf', 'index', 'bond']:
-                    count = session.query(InstrumentDB).filter(InstrumentDB.type == type_name).count()
+                type_counts_res = await session.execute(select(InstrumentDB.type, func.count(InstrumentDB.type)).group_by(InstrumentDB.type))
+                for type_name, count in type_counts_res.all():
                     stats['instruments']['by_type'][type_name] = count
 
                 # Status distribution
-                status_counts = session.query(
+                status_counts_res = await session.execute(select(
                     InstrumentDB.status, func.count(InstrumentDB.status)
-                ).group_by(InstrumentDB.status).all()
-                for status, count in status_counts:
+                ).group_by(InstrumentDB.status))
+                for status, count in status_counts_res.all():
                     stats['instruments']['by_status'][status] = count
 
                 # Daily quotes statistics
                 stats['daily_quotes'] = {
-                    'total': session.query(DailyQuoteDB).count(),
+                    'total': await session.scalar(select(func.count()).select_from(DailyQuoteDB)),
                     'by_trading_status': {},
                     'by_source': {},
                     'latest_date': None,
@@ -981,55 +1003,56 @@ class DatabaseOperations:
                 }
 
                 # Trading status distribution
-                status_counts = session.query(
+                trade_status_res = await session.execute(select(
                     DailyQuoteDB.tradestatus, func.count(DailyQuoteDB.tradestatus)
-                ).group_by(DailyQuoteDB.tradestatus).all()
-                for status, count in status_counts:
+                ).group_by(DailyQuoteDB.tradestatus))
+                for status, count in trade_status_res.all():
                     stats['daily_quotes']['by_trading_status'][status] = count
 
                 # Source distribution
-                source_counts = session.query(
+                source_counts_res = await session.execute(select(
                     DailyQuoteDB.source, func.count(DailyQuoteDB.source)
-                ).group_by(DailyQuoteDB.source).all()
-                for source, count in source_counts:
+                ).group_by(DailyQuoteDB.source))
+                for source, count in source_counts_res.all():
                     stats['daily_quotes']['by_source'][source or 'unknown'] = count
 
                 # Date range
-                latest = session.query(func.max(DailyQuoteDB.time)).scalar()
-                earliest = session.query(func.min(DailyQuoteDB.time)).scalar()
+                latest = await session.scalar(select(func.max(DailyQuoteDB.time)))
+                earliest = await session.scalar(select(func.min(DailyQuoteDB.time)))
                 stats['daily_quotes']['latest_date'] = latest
                 stats['daily_quotes']['earliest_date'] = earliest
 
                 # Trading calendar statistics
                 stats['trading_calendar'] = {
-                    'total_records': session.query(TradingCalendarDB).count(),
-                    'trading_days': session.query(TradingCalendarDB).filter(TradingCalendarDB.is_trading_day == True).count(),
+                    'total_records': await session.scalar(select(func.count()).select_from(TradingCalendarDB)),
+                    'trading_days': await session.scalar(select(func.count()).select_from(TradingCalendarDB).filter(TradingCalendarDB.is_trading_day == True)),
                     'by_exchange': {}
                 }
-
+ 
                 for exchange in ['SSE', 'SZSE', 'BSE']:
-                    trading_days = session.query(TradingCalendarDB).filter(
+                    trading_days = await session.scalar(select(func.count()).select_from(TradingCalendarDB).filter(
                         TradingCalendarDB.exchange == exchange,
                         TradingCalendarDB.is_trading_day == True
-                    ).count()
+                    ))
                     stats['trading_calendar']['by_exchange'][exchange] = trading_days
 
                 # Data updates statistics
                 stats['data_updates'] = {
-                    'total': session.query(DataUpdateDB).count(),
+                    'total': await session.scalar(select(func.count()).select_from(DataUpdateDB)),
                     'by_status': {},
                     'latest': None
                 }
 
                 # Status distribution
-                status_counts = session.query(
+                update_status_res = await session.execute(select(
                     DataUpdateDB.status, func.count(DataUpdateDB.status)
-                ).group_by(DataUpdateDB.status).all()
-                for status, count in status_counts:
+                ).group_by(DataUpdateDB.status))
+                for status, count in update_status_res.all():
                     stats['data_updates']['by_status'][status] = count
 
                 # Latest update
-                latest = session.query(DataUpdateDB).order_by(DataUpdateDB.created_at.desc()).first()
+                latest_res = await session.execute(select(DataUpdateDB).order_by(DataUpdateDB.created_at.desc()).limit(1))
+                latest = latest_res.scalar_one_or_none()
                 if latest:
                     stats['data_updates']['latest'] = {
                         'batch_id': latest.batch_id,
@@ -1052,23 +1075,24 @@ class DatabaseOperations:
         try:
             cutoff_date = get_shanghai_time() - timedelta(days=days_to_keep)
 
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 # Clean up old daily quotes
-                quotes_deleted = session.query(DailyQuoteDB).filter(
+                quotes_delete_stmt = DailyQuoteDB.__table__.delete().where(
                     DailyQuoteDB.time < cutoff_date
-                ).delete()
+                )
+                quotes_deleted_res = await session.execute(quotes_delete_stmt)
+                quotes_deleted = quotes_deleted_res.rowcount
 
                 # Clean up old trading calendar data
-                calendar_deleted = session.query(TradingCalendarDB).filter(
+                calendar_delete_stmt = TradingCalendarDB.__table__.delete().where(
                     TradingCalendarDB.date < cutoff_date
-                ).delete()
+                )
+                calendar_deleted_res = await session.execute(calendar_delete_stmt)
+                calendar_deleted = calendar_deleted_res.rowcount
 
                 # Clean up old data update records
-                updates_deleted = session.query(DataUpdateDB).filter(
-                    DataUpdateDB.created_at < cutoff_date
-                ).delete()
-
-                session.commit()
+                updates_deleted = 0 # This table is small, maybe not delete for now.
+                await session.commit()
                 self.db_logger.info(f"Cleaned up old data: {quotes_deleted} quotes, {calendar_deleted} calendar records, {updates_deleted} update records")
                 return True
 
@@ -1079,10 +1103,10 @@ class DatabaseOperations:
     async def optimize_database(self) -> bool:
         """优化数据库"""
         try:
-            with self.get_session() as session:
-                session.execute(text("VACUUM"))
-                session.execute(text("ANALYZE"))
-                session.commit()
+            async with self.get_async_session() as session:
+                await session.execute(text("VACUUM"))
+                await session.execute(text("ANALYZE"))
+                await session.commit()
                 self.db_logger.info("Database optimization completed")
                 return True
 
@@ -1093,16 +1117,17 @@ class DatabaseOperations:
     async def assess_data_quality(self, instrument_id: str, start_date: date, end_date: date) -> float:
         """评估指定品种在指定日期范围内的数据质量"""
         try:
-            with self.get_session() as session:
-                query = session.query(DailyQuoteDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(DailyQuoteDB).filter(
                     DailyQuoteDB.instrument_id == instrument_id,
                     DailyQuoteDB.time >= start_date,
                     DailyQuoteDB.time <= end_date
                 )
-
-                total_records = query.count()
+                count_stmt = select(func.count()).select_from(DailyQuoteDB).where(stmt.whereclause)
+                total_records = await session.scalar(count_stmt)
                 if total_records == 0:
                     return 0.0
+                query = (await session.execute(stmt)).scalars().all()
 
                 # 计算质量评分
                 quality_scores = []
@@ -1161,13 +1186,13 @@ class DatabaseOperations:
             if not any(query_upper.startswith(op) for op in allowed_operations):
                 self.db_logger.warning(f"Blocked potentially dangerous query: {query[:100]}...")
                 return False
-
-            with self.get_session() as session:
+            
+            async with self.get_async_session() as session:
                 if params:
-                    session.execute(text(query), params)
+                    await session.execute(text(query), params)
                 else:
-                    session.execute(text(query))
-                session.commit()
+                    await session.execute(text(query))
+                await session.commit()
 
                 self.db_logger.debug(f"Successfully executed query: {query[:100]}...")
                 return True
@@ -1193,9 +1218,9 @@ class DatabaseOperations:
                 'validation_timestamp': get_shanghai_time()
             }
 
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 # 1. 检查重复的行情记录
-                duplicate_quotes = session.query(
+                duplicate_stmt = select(
                     DailyQuoteDB.instrument_id,
                     DailyQuoteDB.time,
                     func.count(DailyQuoteDB.time).label('count')
@@ -1203,8 +1228,8 @@ class DatabaseOperations:
                     DailyQuoteDB.instrument_id,
                     DailyQuoteDB.time
                 ).having(
-                    func.count(DailyQuoteDB.time) > 1
-                ).count()
+                    func.count(DailyQuoteDB.time) > 1)
+                duplicate_quotes = len((await session.execute(duplicate_stmt)).all())
 
                 if duplicate_quotes > 0:
                     validation_results['issues'].append({
@@ -1216,7 +1241,7 @@ class DatabaseOperations:
                     validation_results['total_issues'] += duplicate_quotes
 
                 # 2. 检查无效的价格数据
-                invalid_prices = session.query(DailyQuoteDB).filter(
+                invalid_prices_stmt = select(func.count()).select_from(DailyQuoteDB).filter(
                     (DailyQuoteDB.high < DailyQuoteDB.low) |
                     (DailyQuoteDB.high < 0) |
                     (DailyQuoteDB.low < 0) |
@@ -1224,7 +1249,8 @@ class DatabaseOperations:
                     (DailyQuoteDB.close < 0) |
                     (DailyQuoteDB.volume < 0) |
                     (DailyQuoteDB.amount < 0)
-                ).count()
+                )
+                invalid_prices = await session.scalar(invalid_prices_stmt)
 
                 if invalid_prices > 0:
                     validation_results['issues'].append({
@@ -1236,9 +1262,10 @@ class DatabaseOperations:
                     validation_results['total_issues'] += invalid_prices
 
                 # 3. 检查缺失的交易品种信息
-                orphaned_quotes = session.query(DailyQuoteDB).outerjoin(
+                orphaned_stmt = select(func.count()).select_from(DailyQuoteDB).outerjoin(
                     InstrumentDB, DailyQuoteDB.instrument_id == InstrumentDB.instrument_id
-                ).filter(InstrumentDB.instrument_id.is_(None)).count()
+                ).filter(InstrumentDB.instrument_id.is_(None))
+                orphaned_quotes = await session.scalar(orphaned_stmt)
 
                 if orphaned_quotes > 0:
                     validation_results['issues'].append({
@@ -1250,10 +1277,11 @@ class DatabaseOperations:
                     validation_results['total_issues'] += orphaned_quotes
 
                 # 4. 检查数据质量评分低于阈值的记录
-                low_quality_quotes = session.query(DailyQuoteDB).filter(
+                low_quality_stmt = select(func.count()).select_from(DailyQuoteDB).filter(
                     (DailyQuoteDB.quality_score < 0.5) |
                     (DailyQuoteDB.quality_score.is_(None))
-                ).count()
+                )
+                low_quality_quotes = await session.scalar(low_quality_stmt)
 
                 if low_quality_quotes > 0:
                     validation_results['warnings'].append({
@@ -1265,13 +1293,13 @@ class DatabaseOperations:
 
                 # 5. 统计信息
                 validation_results['statistics'] = {
-                    'total_quotes': session.query(DailyQuoteDB).count(),
-                    'total_instruments': session.query(InstrumentDB).count(),
-                    'instruments_without_quotes': session.query(InstrumentDB).outerjoin(
+                    'total_quotes': await session.scalar(select(func.count()).select_from(DailyQuoteDB)),
+                    'total_instruments': await session.scalar(select(func.count()).select_from(InstrumentDB)),
+                    'instruments_without_quotes': await session.scalar(select(func.count()).select_from(InstrumentDB).outerjoin(
                         DailyQuoteDB, InstrumentDB.instrument_id == DailyQuoteDB.instrument_id
-                    ).filter(DailyQuoteDB.instrument_id.is_(None)).count(),
-                    'trading_calendar_records': session.query(TradingCalendarDB).count(),
-                    'data_update_records': session.query(DataUpdateDB).count()
+                    ).filter(DailyQuoteDB.instrument_id.is_(None))),
+                    'trading_calendar_records': await session.scalar(select(func.count()).select_from(TradingCalendarDB)),
+                    'data_update_records': await session.scalar(select(func.count()).select_from(DataUpdateDB))
                 }
 
             # 记录验证结果
@@ -1319,31 +1347,32 @@ class DatabaseOperations:
             set: 包含所有已有数据的日期集合
         """
         try:
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 # 获取交易所的所有活跃交易品种
-                instrument_ids = session.query(InstrumentDB.instrument_id).filter(
+                stmt = select(InstrumentDB.instrument_id).filter(
                     InstrumentDB.exchange == exchange,
                     InstrumentDB.is_active == True
-                ).all()
+                )
+                instrument_ids_res = await session.execute(stmt)
+                instrument_ids = instrument_ids_res.scalars().all()
 
                 if not instrument_ids:
                     return set()
 
-                instrument_ids = [item[0] for item in instrument_ids]
-
                 # 查询这些品种在指定日期范围内的数据
-                query = session.query(DailyQuoteDB.time).filter(
+                stmt = select(DailyQuoteDB.time).filter(
                     DailyQuoteDB.instrument_id.in_(instrument_ids),
                     DailyQuoteDB.time >= datetime.combine(start_date, datetime.min.time()),
                     DailyQuoteDB.time <= datetime.combine(end_date, datetime.max.time())
                 ).distinct()
 
+                result = await session.execute(stmt)
                 data_dates = set()
-                for result in query:
-                    if isinstance(result[0], datetime):
-                        data_dates.add(result[0].date())
+                for row in result.scalars().all():
+                    if isinstance(row, datetime):
+                        data_dates.add(row.date())
                     else:
-                        data_dates.add(result[0])
+                        data_dates.add(row)
 
                 return data_dates
 
@@ -1363,14 +1392,15 @@ class DatabaseOperations:
             List[Dict]: 交易日历记录列表
         """
         try:
-            with self.get_session() as session:
-                query = session.query(TradingCalendarDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange,
                     TradingCalendarDB.date >= datetime.combine(start_date, datetime.min.time()),
                     TradingCalendarDB.date <= datetime.combine(end_date, datetime.max.time())
                 ).order_by(TradingCalendarDB.date)
 
                 records = []
+                query = (await session.execute(stmt)).scalars().all()
                 for record in query:
                     records.append({
                         'exchange': record.exchange,
@@ -1399,11 +1429,12 @@ class DatabaseOperations:
             Optional[Dict]: 最新记录或None
         """
         try:
-            with self.get_session() as session:
-                record = session.query(TradingCalendarDB).filter(
+            async with self.get_async_session() as session:
+                stmt = select(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange
-                ).order_by(TradingCalendarDB.date.desc()).first()
-
+                ).order_by(TradingCalendarDB.date.desc()).limit(1)
+                result = await session.execute(stmt)
+                record = result.scalar_one_or_none()
                 if not record:
                     return None
 
@@ -1432,34 +1463,34 @@ class DatabaseOperations:
             Dict: 统计信息
         """
         try:
-            with self.get_session() as session:
+            async with self.get_async_session() as session:
                 # 总记录数
-                total_days = session.query(TradingCalendarDB).filter(
+                total_days = await session.scalar(select(func.count()).select_from(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange
-                ).count()
+                ))
 
                 # 交易日数
-                trading_days = session.query(TradingCalendarDB).filter(
+                trading_days = await session.scalar(select(func.count()).select_from(TradingCalendarDB).filter(
                     TradingCalendarDB.exchange == exchange,
                     TradingCalendarDB.is_trading_day == True
-                ).count()
+                ))
 
                 # 非交易日数
                 non_trading_days = total_days - trading_days
 
                 # 日期范围
-                earliest = session.query(func.min(TradingCalendarDB.date)).filter(
+                earliest = await session.scalar(select(func.min(TradingCalendarDB.date)).filter(
                     TradingCalendarDB.exchange == exchange
-                ).scalar()
+                ))
 
-                latest = session.query(func.max(TradingCalendarDB.date)).filter(
+                latest = await session.scalar(select(func.max(TradingCalendarDB.date)).filter(
                     TradingCalendarDB.exchange == exchange
-                ).scalar()
+                ))
 
                 # 最后更新时间
-                last_updated = session.query(func.max(TradingCalendarDB.updated_at)).filter(
+                last_updated = await session.scalar(select(func.max(TradingCalendarDB.updated_at)).filter(
                     TradingCalendarDB.exchange == exchange
-                ).scalar()
+                ))
 
                 return {
                     'total_days': total_days,

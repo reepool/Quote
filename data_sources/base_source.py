@@ -33,6 +33,7 @@ class DataQualityConfig:
     min_volume: int = 0  # 最小成交量
     max_volume: int = 10**12  # 最大成交量
     require_tradestatus: bool = True  # 是否要求交易状态
+    quality_threshold: float = 0.5  # 数据质量阈值
 
 
 class RateLimiter:
@@ -229,7 +230,7 @@ class BaseDataSource(ABC):
                 # 数据质量检查
                 if data:
                     quality_score = self._assess_data_quality(data, symbol)
-                    if quality_score > 0.5:  # 质量阈值
+                    if quality_score > self.quality_config.quality_threshold:  # 使用配置化的质量阈值
                         # 为每条数据添加质量评分
                         for quote in data:
                             quote['quality_score'] = quality_score
@@ -289,7 +290,7 @@ class BaseDataSource(ABC):
 
                 if data:
                     quality_score = self._assess_single_data_quality(data, symbol)
-                    if quality_score > 0.5:
+                    if quality_score > self.quality_config.quality_threshold:
                         data['quality_score'] = quality_score
                         return data
                     else:
@@ -317,7 +318,7 @@ class BaseDataSource(ABC):
 
         return sum(quality_scores) / len(quality_scores)
 
-    def _assess_single_data_quality(self, quote: Dict[str, Any], symbol: str) -> float:
+    def _assess_single_data_quality(self, quote: Dict[str, Any], symbol: str) -> Optional[float]:
         """评估单条数据质量"""
         score = 1.0
 
@@ -368,7 +369,7 @@ class BaseDataSource(ABC):
 
         except (ValueError, TypeError) as e:
             ds_logger.warning(f"[{self.name}] Data quality assessment error for {symbol}: {e}")
-            score = 0.0
+            return 0.0
 
         return max(0.0, score)
 

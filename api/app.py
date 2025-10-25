@@ -73,7 +73,12 @@ async def root():
 @app.get("/health")
 async def health_check():
     """健康检查端点"""
-    return {"status": "healthy", "timestamp": "2024-01-01T00:00:00Z"}
+    from datetime import datetime
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0"
+    }
 
 
 if __name__ == "__main__":

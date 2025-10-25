@@ -1,0 +1,17 @@
+{
+    "database_config": {
+        "db_path": "data/quotes.db",
+        "backup_enabled": false,
+        "backup_interval_days": 7
+    },
+        "backup_config": {
+        "enabled": true,
+        "source_db_path": "data/quotes.db",
+        "backup_directory": "data/PVE-Bak/QuoteBak",
+        "retention_days": 30,
+        "compression_enabled": false,
+        "notification_enabled": true,
+        "filename_pattern": "quotes_backup_{timestamp}.db",
+        "max_backup_files": 10
+    }
+}

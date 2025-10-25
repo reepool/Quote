@@ -1,0 +1,13 @@
+{
+  "monitor_config": {
+    "enabled": true,
+    "max_history_size": 1000,
+    "startup_delay": 2,
+    "min_wait_time": 1,
+    "alert_thresholds": {
+      "max_execution_time": 300,
+      "max_failure_rate": 0.1,
+      "max_consecutive_failures": 3
+    }
+  }
+}
