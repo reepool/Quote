@@ -200,6 +200,12 @@ Thumbs.db
 *.pid
 process.pid
 
+# Openspce辅助文件
+openspec/
+openspec/*/
+AGENTS.md
+CLAUDE.md
+
 # 性能分析文件
 *.prof
 *.profile

@@ -306,6 +306,30 @@ class DateUtils:
         return date_obj.strftime(format_str)
 
     @staticmethod
+    def format_datetime(dt_obj: Optional[datetime], format_str: str = '%Y-%m-%d %H:%M:%S', show_timezone: bool = False) -> str:
+        """
+        格式化datetime对象，并可选择性地显示时区
+
+        Args:
+            dt_obj: datetime对象
+            format_str: 格式化字符串
+            show_timezone: 是否显示时区
+
+        Returns:
+            格式化后的时间字符串
+        """
+        if not isinstance(dt_obj, datetime):
+            return "N/A"
+
+        formatted_str = dt_obj.strftime(format_str)
+
+        if show_timezone and dt_obj.tzinfo:
+            tz_name = dt_obj.tzname()
+            if tz_name:
+                formatted_str += f" ({tz_name})"
+        return formatted_str
+
+    @staticmethod
     def get_date_range(start_date: date, end_date: date) -> List[date]:
         """获取日期范围内的所有日期"""
         if start_date > end_date:

@@ -2,11 +2,12 @@
 Telegram任务管理机器人数据模型
 定义任务状态、配置和执行历史的数据结构
 """
-
+import warnings
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
 from enum import Enum
+from zoneinfo import ZoneInfo
 
 from utils import task_manager_logger
 
@@ -64,18 +65,14 @@ class TaskTriggerInfo:
     def from_apscheduler_trigger(cls, trigger) -> 'TaskTriggerInfo':
         """从APScheduler触发器创建触发器信息"""
         if hasattr(trigger, 'fields'):
-            # CronTrigger
+            # --- CronTrigger ---
             cron_parts = []
-            if hasattr(trigger, 'minute') and trigger.minute:
-                cron_parts.append(str(trigger.minute))
-            if hasattr(trigger, 'hour') and trigger.hour:
-                cron_parts.append(str(trigger.hour))
-            if hasattr(trigger, 'day') and trigger.day:
-                cron_parts.append(str(trigger.day))
-            if hasattr(trigger, 'day_of_week') and trigger.day_of_week:
-                cron_parts.append(str(trigger.day_of_week))
-            if hasattr(trigger, 'month') and trigger.month:
-                cron_parts.append(str(trigger.month))
+            # 遵循标准的 cron 格式: 分钟、小时、日、月、星期
+            cron_parts.append(str(getattr(trigger, 'minute', '*')))
+            cron_parts.append(str(getattr(trigger, 'hour', '*')))
+            cron_parts.append(str(getattr(trigger, 'day', '*')))
+            cron_parts.append(str(getattr(trigger, 'month', '*')))
+            cron_parts.append(str(getattr(trigger, 'day_of_week', '*')))
 
             cron_expr = ' '.join(cron_parts) if cron_parts else None
             return cls(
@@ -84,7 +81,7 @@ class TaskTriggerInfo:
                 cron_expression=cron_expr
             )
         elif hasattr(trigger, 'interval'):
-            # IntervalTrigger
+            # --- IntervalTrigger ---
             interval_seconds = trigger.interval.total_seconds()
             hours = int(interval_seconds // 3600)
             minutes = int((interval_seconds % 3600) // 60)
@@ -102,6 +99,28 @@ class TaskTriggerInfo:
                 trigger_type="interval",
                 description=desc,
                 interval_seconds=int(interval_seconds)
+            )
+        elif hasattr(trigger, 'run_date'):
+            # --- DateTrigger ---
+            run_date = getattr(trigger, 'run_date')
+            desc = "单次执行"
+            if isinstance(run_date, datetime):
+                # 确保datetime对象有时区信息
+                if run_date.tzinfo is None:
+                    warnings.warn("Received a naive datetime from APScheduler. Assuming scheduler's timezone.", UserWarning)
+                    from utils import config_manager
+                    scheduler_tz_str = config_manager.get_scheduler_config().timezone
+                    run_date = run_date.replace(tzinfo=ZoneInfo(scheduler_tz_str)) # run_date 是 datetime.datetime 对象，datetime 对象不可修改，,replace() 方法返回一个新的 datetime 对象，因此原始 APScheduler 触发器对象不会被修改。
+
+                # 使用工具类进行格式化，以获得更友好的显示
+                from utils.date_utils import DateUtils
+                formatted_date = DateUtils.format_datetime(run_date, show_timezone=True)
+                desc = f"单次执行: {formatted_date}"
+
+            return cls(
+                trigger_type="date",
+                description=desc,
+                next_run_time=run_date
             )
         else:
             return cls(
@@ -134,21 +153,26 @@ class TaskStatusInfo:
 
         # 确定任务状态
         enabled = config_data.get('enabled', False) if config_data else False
+        task_manager_logger.debug(f"[TaskManager] Determining task status for job {job_id}: {enabled}")
         in_scheduler = job_id in scheduler_data.get('jobs', {})
+        task_manager_logger.debug(f"[TaskManager] Determining task status for job {job_id}: {in_scheduler}")
 
         if not enabled:
             status = TaskStatus.DISABLED
         elif not in_scheduler:
             status = TaskStatus.ERROR
-        elif scheduler_data.get('jobs', {}).get(job_id, {}).get('status') == 'paused':
+        # 如果任务在调度器中，但没有下一次运行时间，则认为是暂停状态
+        elif in_scheduler and scheduler_data.get('jobs', {}).get(job_id, {}).get('next_run_time') is None:
             status = TaskStatus.PAUSED
         else:
             status = TaskStatus.RUNNING
+        task_manager_logger.debug(f"[TaskManager] Creating task status info for job {job_id}: {status}")
 
         # 处理触发器信息
         trigger_info = None
         if in_scheduler:
             job_data = scheduler_data['jobs'][job_id]
+            task_manager_logger.debug(f"[TaskManager] Getting trigger info for job {job_id}: {job_data}")
             # 这里需要实际的APScheduler Job对象来获取触发器信息
             # 暂时使用配置信息
             if config_data and 'trigger' in config_data:
@@ -169,6 +193,8 @@ class TaskStatusInfo:
                         description=f"定时执行: {' '.join(cron_parts)}",
                         cron_expression=' '.join(cron_parts)
                     )
+                    task_manager_logger.debug(f"Cron trigger for job {job_id}: {trigger_info}")
+                
                 elif trigger_type == 'interval':
                     hours = trigger_config.get('hours', 0)
                     minutes = trigger_config.get('minutes', 0)
@@ -189,6 +215,26 @@ class TaskStatusInfo:
                             description=f"间隔执行: 每{' '.join(desc_parts)}",
                             interval_seconds=total_seconds
                         )
+                    task_manager_logger.debug(f"Interval trigger for job {job_id}: {trigger_info}")
+
+                elif trigger_type == 'run_date':
+                    run_date_str = trigger_config.get('run_date')
+                    if run_date_str:
+                        try:
+                            run_date = datetime.fromisoformat(run_date_str)
+                            from utils.date_utils import DateUtils
+                            formatted_date = DateUtils.format_datetime(run_date, show_timezone=True)
+                            trigger_info = TaskTriggerInfo(
+                                trigger_type="date",
+                                description=f"单次执行: {formatted_date}",
+                                next_run_time=run_date
+                            )
+                        except (ValueError, TypeError):
+                            trigger_info = TaskTriggerInfo(
+                                trigger_type="run_date",
+                                description=f"单次执行: (无效日期 {run_date_str})"
+                            )
+                    task_manager_logger.debug(f"Run_date trigger for job {job_id}: {trigger_info}")
 
         if not trigger_info:
             trigger_info = TaskTriggerInfo(
