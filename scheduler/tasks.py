@@ -300,8 +300,6 @@ class ScheduledTasks:
             # 使用配置参数
             if exchanges is None:
                 exchanges = ['SSE', 'SZSE']
-            if severity_filter is None:
-                severity_filter = ['high', 'critical']
 
             # 计算检查范围：上个月
             today = date.today()
@@ -326,9 +324,13 @@ class ScheduledTasks:
                     gaps = await data_manager.detect_data_gaps([exchange], start_date, end_date)
                     scheduler_logger.info(f"[Scheduler] Found {len(gaps)} total gaps for {exchange}")
 
-                    # 过滤严重程度
-                    filtered_gaps = [g for g in gaps if g.severity in severity_filter]
-                    scheduler_logger.info(f"[Scheduler] Found {len(filtered_gaps)} gaps matching severity filter for {exchange}")
+                    # 过滤严重程度（如未配置则不过滤）
+                    if severity_filter:
+                        filtered_gaps = [g for g in gaps if g.severity in severity_filter]
+                        scheduler_logger.info(f"[Scheduler] Found {len(filtered_gaps)} gaps matching severity filter for {exchange}")
+                    else:
+                        filtered_gaps = gaps
+                        scheduler_logger.info(f"[Scheduler] No severity filter applied for {exchange}")
 
                     if filtered_gaps:
                         # 使用现有的缺口填补系统
@@ -392,6 +394,132 @@ class ScheduledTasks:
                 report_data=failure_report_data,
                 report_type='gap_report',
                 task_name='月度数据完整性检查',
+                job_config=job_config
+            )
+            return False
+
+    async def find_gap_and_repair(self,
+                                  exchanges: Optional[List[str]] = None,
+                                  start_date: Optional[date] = None,
+                                  end_date: Optional[date] = None,
+                                  severity_filter: Optional[List[str]] = None,
+                                  job_config: Optional[JobConfig] = None) -> bool:
+        """检测数据缺口并修复（复合任务）"""
+        try:
+            scheduler_logger.info("[Scheduler] Starting gap detect and repair task...")
+
+            if exchanges is None:
+                exchanges = ['SSE', 'SZSE', 'BSE']
+
+            if isinstance(start_date, str):
+                start_date = date.fromisoformat(start_date)
+            elif isinstance(start_date, datetime):
+                start_date = start_date.date()
+            if start_date is None:
+                start_date = date(2024, 1, 1)
+
+            if isinstance(end_date, str):
+                end_date = date.fromisoformat(end_date)
+            elif isinstance(end_date, datetime):
+                end_date = end_date.date()
+            if end_date is None:
+                end_date = date.today()
+
+            scheduler_logger.info(f"[Scheduler] Exchanges: {exchanges}")
+            scheduler_logger.info(f"[Scheduler] Date range: {start_date} to {end_date}")
+
+            all_gaps = await data_manager.detect_data_gaps(exchanges, start_date, end_date)
+            scheduler_logger.info(f"[Scheduler] Detected {len(all_gaps)} gaps")
+
+            if severity_filter:
+                gaps_to_repair = [gap for gap in all_gaps if gap.severity in severity_filter]
+                scheduler_logger.info(f"[Scheduler] Severity filter applied: {severity_filter} -> {len(gaps_to_repair)} gaps")
+            else:
+                gaps_to_repair = all_gaps
+
+            repaired = 0
+            failed = 0
+            failure_details = []
+            for gap in gaps_to_repair:
+                try:
+                    success = await data_manager._fill_single_gap(gap)
+                    if success:
+                        repaired += 1
+                    else:
+                        failure_details.append({
+                            'instrument_id': gap.instrument_id,
+                            'exchange': gap.exchange,
+                            'gap_start': gap.gap_start,
+                            'gap_end': gap.gap_end,
+                            'reason': 'fill_returned_false'
+                        })
+                        scheduler_logger.warning(
+                            "[Scheduler] Gap repair returned false for %s (%s) %s to %s",
+                            gap.instrument_id,
+                            gap.exchange,
+                            gap.gap_start,
+                            gap.gap_end
+                        )
+                        failed += 1
+                except Exception as gap_e:
+                    scheduler_logger.warning(f"[Scheduler] Failed to fill gap for {gap.instrument_id}: {gap_e}")
+                    failure_details.append({
+                        'instrument_id': gap.instrument_id,
+                        'exchange': gap.exchange,
+                        'gap_start': gap.gap_start,
+                        'gap_end': gap.gap_end,
+                        'reason': str(gap_e)
+                    })
+                    failed += 1
+                await asyncio.sleep(0.5)
+
+            from collections import Counter
+            severity_distribution = dict(Counter(gap.severity for gap in all_gaps))
+            affected_stocks = len({gap.instrument_id for gap in all_gaps})
+            top_affected_stocks = data_manager.get_top_affected_stocks(all_gaps, limit=10)
+
+            report_data = {
+                'name': '数据缺口检测与修复报告',
+                'status': 'success' if failed == 0 else 'warning',
+                'total_gaps': len(all_gaps),
+                'affected_stocks': affected_stocks,
+                'severity_distribution': severity_distribution,
+                'top_affected_stocks': top_affected_stocks,
+                'summary': {
+                    'detected_gaps': len(all_gaps),
+                    'repaired_gaps': repaired,
+                    'failed_repairs': failed
+                },
+                'failure_details': failure_details[:50],
+                'filters': {
+                    'exchanges': exchanges,
+                    'start_date': start_date.isoformat(),
+                    'end_date': end_date.isoformat(),
+                    'severity_filter': severity_filter
+                }
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='gap_report',
+                task_name='数据缺口检测与修复',
+                job_config=job_config
+            )
+
+            scheduler_logger.info("[Scheduler] Gap detect and repair task completed")
+            return failed == 0
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Gap detect and repair task failed: {e}")
+            failure_report_data = {
+                'name': '数据缺口检测与修复报告',
+                'status': 'error',
+                'error_message': str(e)
+            }
+            await self._send_task_report(
+                report_data=failure_report_data,
+                report_type='gap_report',
+                task_name='数据缺口检测与修复',
                 job_config=job_config
             )
             return False
@@ -486,6 +614,33 @@ class ScheduledTasks:
                 ]
             else:
                 unhealthy_sources = []
+            auto_repair_result = None
+            if check_data_sources and 'baostock_a_stock' in unhealthy_sources:
+                scheduler_logger.warning("[Scheduler] baostock_a_stock unhealthy, attempting auto-repair")
+                auto_repair_result = "失败"
+                try:
+                    source = data_manager.source_factory.sources.get('baostock_a_stock')
+                    if source:
+                        await source._relogin()
+                        is_healthy = await source.health_check()
+                        if is_healthy:
+                            auto_repair_result = "成功"
+                            unhealthy_sources = [
+                                src for src in unhealthy_sources if src != 'baostock_a_stock'
+                            ]
+                        else:
+                            auto_repair_result = "失败（健康检查未通过）"
+                    else:
+                        auto_repair_result = "失败（数据源未初始化）"
+                except Exception as e:
+                    auto_repair_result = f"失败（{e}）"
+                scheduler_logger.info(f"[Scheduler] baostock_a_stock auto-repair result: {auto_repair_result}")
+                if self.telegram_enabled and self.bot:
+                    level = "success" if auto_repair_result == "成功" else "warning"
+                    await self.bot.send_scheduler_notification(
+                        f"数据源自动修复结果: baostock_a_stock {auto_repair_result}",
+                        level=level
+                    )
 
             # 检查数据库连接
             database_unhealthy = False
@@ -519,6 +674,13 @@ class ScheduledTasks:
                     "result": "正常" if is_ds_healthy else f"异常: {', '.join(unhealthy_sources)}",
                     "status_icon": "✅" if is_ds_healthy else "❌"
                 })
+                if auto_repair_result is not None:
+                    repair_ok = auto_repair_result == "成功"
+                    check_results.append({
+                        "check_name": "数据源自动修复",
+                        "result": f"baostock_a_stock: {auto_repair_result}",
+                        "status_icon": "✅" if repair_ok else "❌"
+                    })
             # 数据库检查
             if check_database:
                 is_db_healthy = not database_unhealthy

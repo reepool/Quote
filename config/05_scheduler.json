@@ -96,11 +96,30 @@
             "SSE",
             "SZSE"
           ],
-          "severity_filter": [
-            "high",
-            "critical"
-          ],
           "days_to_check": 45
+        }
+      },
+      "find_gap_and_repair": {
+        "enabled": true,
+        "description": "数据缺口检测与修复",
+        "report": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 15,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "start_date": "2025-01-01"
         }
       },
       "quarterly_cleanup": {

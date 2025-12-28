@@ -88,6 +88,12 @@ class InstrumentResponse(BaseModel):
     updated_at: datetime = Field(..., description="更新时间")
     data_version: int = Field(1, description="数据版本")
 
+    @validator('type', pre=True)
+    def normalize_instrument_type(cls, v):
+        if isinstance(v, str):
+            return v.upper()
+        return v
+
     class Config:
         from_attributes = True
 

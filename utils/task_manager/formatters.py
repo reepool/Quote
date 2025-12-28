@@ -7,6 +7,7 @@ from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from utils import task_manager_logger
 from utils.date_utils import DateUtils
+from utils.task_manager.models import TaskStatusInfo
 
 
 class TaskManagerFormatters:
@@ -52,8 +53,8 @@ class TaskManagerFormatters:
         return base_message
 
     @staticmethod
-    def format_task_status_summary(running_tasks: List[Union['TaskStatusInfo', Dict]],
-                                 disabled_tasks: List[Union['TaskStatusInfo', Dict]],
+    def format_task_status_summary(running_tasks: List[Union[TaskStatusInfo, Dict]],
+                                 disabled_tasks: List[Union[TaskStatusInfo, Dict]],
                                  total_tasks: int) -> str:
         """格式化任务状态摘要"""
         task_manager_logger.debug(f"[TaskManagerFormatters] Formatting task status summary: "
@@ -79,7 +80,7 @@ class TaskManagerFormatters:
                     # 使用新的时间格式化函数
                     next_run = DateUtils.get_task_status_display(
                         task.next_run_time,
-                        task.status.value if hasattr(task.status, 'value') else str(task.status)
+                        str(task.status) if hasattr(task, 'status') and task.status else 'unknown'
                     )
                 else:  # 字典对象
                     job_id = task.get('job_id', 'N/A')

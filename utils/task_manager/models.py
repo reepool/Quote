@@ -57,7 +57,7 @@ class TaskTriggerInfo:
     """任务触发器信息"""
     trigger_type: str  # cron, interval, date
     description: str
-    next_run_time: Optional[datetime] = None
+    scheduled_run_time: Optional[datetime] = None # 触发器配置的运行时间
     cron_expression: Optional[str] = None
     interval_seconds: Optional[int] = None
 
@@ -120,7 +120,7 @@ class TaskTriggerInfo:
             return cls(
                 trigger_type="date",
                 description=desc,
-                next_run_time=run_date
+                scheduled_run_time=run_date
             )
         else:
             return cls(
@@ -138,7 +138,7 @@ class TaskStatusInfo:
     in_scheduler: bool  # 是否在调度器中
     status: TaskStatus
     trigger_info: TaskTriggerInfo
-    next_run_time: Optional[datetime] = None
+    next_run_time: Optional[datetime] = None # 调度器计算的实际下次运行时间
     last_execution: Optional[TaskExecutionRecord] = None
     recent_executions: List[TaskExecutionRecord] = field(default_factory=list)
     parameters: Dict[str, Any] = field(default_factory=dict)
@@ -227,7 +227,7 @@ class TaskStatusInfo:
                             trigger_info = TaskTriggerInfo(
                                 trigger_type="date",
                                 description=f"单次执行: {formatted_date}",
-                                next_run_time=run_date
+                                scheduled_run_time=run_date
                             )
                         except (ValueError, TypeError):
                             trigger_info = TaskTriggerInfo(
@@ -246,8 +246,10 @@ class TaskStatusInfo:
         next_run_time = None
         if in_scheduler:
             job_data = scheduler_data['jobs'][job_id]
-            # 优先使用新的字段名，如果不存在则尝试旧字段名
-            next_run_time = job_data.get('next_run_time') or job_data.get('next_run')
+            task_manager_logger.debug(f"[TaskManager] Job {job_id} data: {job_data}")
+            
+            next_run_time = job_data.get('next_run_time')
+            task_manager_logger.debug(f"[TaskManager] Next run time for job {job_id}: {next_run_time}")
 
             # 增加对 next_run_time 类型的健壮性处理
             if isinstance(next_run_time, str):
@@ -258,12 +260,14 @@ class TaskStatusInfo:
                     next_run_time = None
             elif not isinstance(next_run_time, datetime):
                 next_run_time = None
+                task_manager_logger.warning(f"Invalid next_run_time type for job {job_id}: {type(next_run_time)}")
 
             # 确保 datetime 对象有时区信息
             if next_run_time and next_run_time.tzinfo is None:
-                from datetime import timezone
-                # 假设无时区的时间是UTC时间
-                next_run_time = next_run_time.replace(tzinfo=timezone.utc)
+                # 如果是 naive datetime，则假定其为调度器的时区
+                from utils import config_manager
+                scheduler_tz_str = config_manager.get_scheduler_config().timezone
+                next_run_time = next_run_time.replace(tzinfo=ZoneInfo(scheduler_tz_str))
 
         # 处理参数
         parameters = config_data.get('parameters', {}) if config_data else {}

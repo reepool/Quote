@@ -149,8 +149,8 @@ class TaskScheduler:
                 'job': job,
                 'description': job_config.description,
                 'config': job_config,
-                # job.next_run_time might not be immediately available
-                'next_run': getattr(job, 'next_run_time', None)
+                # 使用与 get_job_status 一致的字段名
+                'next_run_time': getattr(job, 'next_run_time', None)
             }
 
             scheduler_logger.info(f"[Scheduler] Added job: {job_config.job_id} - {job_config.description}")

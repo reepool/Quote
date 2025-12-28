@@ -11,6 +11,7 @@ import pandas as pd
 import io
 
 from data_manager import data_manager
+from utils.code_utils import convert_to_database_format
 from utils.validation import QueryValidator, DataValidator
 from utils.date_utils import DateUtils, get_shanghai_time
 from .models import *
@@ -133,13 +134,17 @@ async def get_daily_quotes(
             raise HTTPException(status_code=400, detail="Either instrument_id or symbol must be provided")
 
         # 获取数据
+        data_return_format = request.return_format
+        if request.return_format == 'csv':
+            data_return_format = 'pandas'
+
         data = await data_manager.get_quotes(
             instrument_id=request.instrument_id,
             symbol=request.symbol,
             start_date=request.start_date,
             end_date=request.end_date,
             include_quality=request.include_quality,
-            return_format=request.return_format
+            return_format=data_return_format
         )
 
         if data is None or (hasattr(data, 'empty') and data.empty):
@@ -148,7 +153,8 @@ async def get_daily_quotes(
         # 获取品种信息
         instrument_info = None
         if request.instrument_id:
-            instrument_info = await data_manager.db_ops.get_instrument_by_id(request.instrument_id)
+            instrument_id = convert_to_database_format(request.instrument_id)
+            instrument_info = await data_manager.db_ops.get_instrument_by_id(instrument_id)
         elif request.symbol:
             instrument_info = await data_manager.db_ops.get_instrument_by_symbol(request.symbol)
 
@@ -165,8 +171,18 @@ async def get_daily_quotes(
 
         # 生成质量摘要
         quality_summary = None
-        if request.include_quality and hasattr(filtered_data, 'get'):
-            quality_scores = filtered_data.get('quality_score', [])
+        if request.include_quality:
+            quality_scores = []
+            if isinstance(filtered_data, pd.DataFrame):
+                if not filtered_data.empty and 'quality_score' in filtered_data.columns:
+                    quality_scores = filtered_data['quality_score'].dropna().tolist()
+            elif isinstance(filtered_data, list):
+                quality_scores = [
+                    q.get('quality_score')
+                    for q in filtered_data
+                    if isinstance(q, dict) and q.get('quality_score') is not None
+                ]
+
             if quality_scores:
                 quality_summary = {
                     'average_quality': sum(quality_scores) / len(quality_scores),
@@ -175,40 +191,78 @@ async def get_daily_quotes(
                     'records_below_threshold': len([q for q in quality_scores if q < 0.7])
                 }
 
+        def _serialize_value(value):
+            try:
+                import numpy as np
+            except Exception:
+                np = None
+
+            if isinstance(value, (datetime, date)):
+                return value.isoformat()
+            if np is not None:
+                if isinstance(value, (np.integer,)):
+                    return int(value)
+                if isinstance(value, (np.floating,)):
+                    return float(value)
+                if isinstance(value, (np.bool_,)):
+                    return bool(value)
+            if isinstance(value, dict):
+                return {k: _serialize_value(v) for k, v in value.items()}
+            if isinstance(value, list):
+                return [_serialize_value(v) for v in value]
+            return value
+
+        def _serialize_records(records):
+            return _serialize_value(records)
+
+        serialized_filters = _serialize_value(
+            {k: v for k, v in request.__dict__.items() if v is not None}
+        )
+        serialized_stats = _serialize_value(stats)
+
         # 根据格式返回数据
         if request.return_format == 'pandas':
-            return JSONResponse(content={
+            data_records = _serialize_records(filtered_data.to_dict('records'))
+            response_payload = {
                 "instrument_id": instrument_info['instrument_id'],
                 "symbol": instrument_info['symbol'],
                 "name": instrument_info['name'],
                 "exchange": instrument_info['exchange'],
-                "data": filtered_data.to_dict('records'),
+                "data": data_records,
                 "total_records": len(filtered_data),
-                "start_date": request.start_date,
-                "end_date": request.end_date,
+                "start_date": request.start_date.isoformat() if request.start_date else None,
+                "end_date": request.end_date.isoformat() if request.end_date else None,
                 "format": request.return_format,
-                "filters": {k: v for k, v in request.__dict__.items() if v is not None},
-                "stats": stats,
+                "filters": serialized_filters,
+                "stats": serialized_stats,
                 "quality_summary": quality_summary
-            })
+            }
+            return JSONResponse(content=_serialize_value(response_payload))
 
         elif request.return_format == 'json':
-            return JSONResponse(content={
+            if isinstance(filtered_data, list):
+                data_records = _serialize_records(filtered_data)
+            else:
+                data_records = _serialize_records(filtered_data.to_dict('records'))
+            response_payload = {
                 "instrument_id": instrument_info['instrument_id'],
                 "symbol": instrument_info['symbol'],
                 "name": instrument_info['name'],
                 "exchange": instrument_info['exchange'],
-                "data": filtered_data if isinstance(filtered_data, list) else filtered_data.to_dict('records'),
+                "data": data_records,
                 "total_records": len(filtered_data) if isinstance(filtered_data, list) else len(filtered_data),
-                "start_date": request.start_date,
-                "end_date": request.end_date,
+                "start_date": request.start_date.isoformat() if request.start_date else None,
+                "end_date": request.end_date.isoformat() if request.end_date else None,
                 "format": request.return_format,
-                "filters": {k: v for k, v in request.__dict__.items() if v is not None},
-                "stats": stats,
+                "filters": serialized_filters,
+                "stats": serialized_stats,
                 "quality_summary": quality_summary
-            })
+            }
+            return JSONResponse(content=_serialize_value(response_payload))
 
         elif request.return_format == 'csv':
+            if not isinstance(filtered_data, pd.DataFrame):
+                filtered_data = pd.DataFrame(filtered_data)
             output = io.StringIO()
             filtered_data.to_csv(output, index=False)
             output.seek(0)
@@ -251,8 +305,15 @@ async def get_latest_quotes(
             if not data.empty:
                 # 获取最新一条记录
                 latest_row = data.iloc[-1]
+                time_value = latest_row.get('time')
+                if isinstance(time_value, pd.Timestamp):
+                    time_value = time_value.to_pydatetime()
+                elif isinstance(time_value, datetime):
+                    pass
+                else:
+                    time_value = datetime.now()
                 latest_quote = DailyQuoteResponse(
-                    time=latest_row.name.to_pydatetime(),
+                    time=time_value,
                     instrument_id=instrument_id,
                     symbol=latest_row.get('symbol', ''),
                     open=float(latest_row['open']),

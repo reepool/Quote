@@ -346,6 +346,17 @@ class DatabaseOperations:
         return_format: str = 'pandas'
     ) -> Any:
         """获取日线数据（别名方法）"""
+        return await self.get_daily_data(
+            instrument_id=instrument_id,
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+            tradestatus=tradestatus,
+            is_complete=is_complete,
+            min_volume=min_volume,
+            limit=limit,
+            return_format=return_format
+        )
 
     async def save_instrument_list(self, instruments: List[Dict[str, Any]]) -> bool:
         """保存交易品种列表（别名方法）"""

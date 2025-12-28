@@ -908,26 +908,48 @@ class DataManager:
         except Exception as e:
             dm_logger.error(f"Failed to generate analysis report: {e}")
 
-    async def fill_data_gaps(self, exchange: str = None, severity_filter: List[str] = None):
+    async def fill_data_gaps(
+        self,
+        exchange: str = None,
+        severity_filter: List[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        instrument_ids: Optional[List[str]] = None,
+        gap_type_filter: Optional[List[str]] = None,
+        max_gap_days: Optional[int] = None,
+        dry_run: bool = False
+    ):
         """填补数据缺口"""
         try:
             dm_logger.info("Starting data gap filling process...")
 
+            if end_date is None:
+                end_date = date.today()
+
+            exchanges = [exchange] if exchange else ['SSE', 'SZSE', 'BSE']
+
             # 获取需要填补的缺口
-            gaps = await self.detect_data_gaps([exchange] if exchange else None)
+            gaps = await self.detect_data_gaps(exchanges, start_date, end_date)
 
             # 过滤严重程度
             if severity_filter:
                 gaps = [g for g in gaps if g.severity in severity_filter]
+            if instrument_ids:
+                gaps = [g for g in gaps if g.instrument_id in instrument_ids]
+            if gap_type_filter:
+                gaps = [g for g in gaps if g.gap_type in gap_type_filter]
+            if max_gap_days is not None:
+                gaps = [g for g in gaps if g.gap_days <= max_gap_days]
 
             dm_logger.info(f"Found {len(gaps)} gaps to fill")
 
             filled_count = 0
             for gap in gaps:
                 try:
-                    success = await self._fill_single_gap(gap)
-                    if success:
-                        filled_count += 1
+                    if not dry_run:
+                        success = await self._fill_single_gap(gap)
+                        if success:
+                            filled_count += 1
 
                     # API限流
                     await asyncio.sleep(1.0)
@@ -942,28 +964,63 @@ class DataManager:
         """填补单个数据缺口"""
         try:
             # 获取股票信息
-            instrument = await self.db_ops.get_instrument_info(gap.instrument_id)
+            instrument = await self.db_ops.get_instrument_info(instrument_id=gap.instrument_id)
+            converted_id = None
             if not instrument:
+                try:
+                    converted_id = convert_to_database_format(gap.instrument_id)
+                except Exception:
+                    converted_id = None
+
+                if converted_id and converted_id != gap.instrument_id:
+                    instrument = await self.db_ops.get_instrument_info(instrument_id=converted_id)
+
+            if not instrument and gap.symbol:
+                instrument = await self.db_ops.get_instrument_info(symbol=gap.symbol)
+            if not instrument:
+                dm_logger.warning(
+                    f"[DataManager] Gap fill skipped: instrument not found {gap.instrument_id}"
+                )
                 return False
 
             start_date = datetime.combine(gap.gap_start, datetime.min.time())
             end_date = datetime.combine(gap.gap_end, datetime.max.time())
 
             # 从数据源获取缺失数据
+            source_instrument_id = gap.instrument_id
+            if converted_id and converted_id != gap.instrument_id:
+                source_instrument_id = converted_id
+            source_symbol = gap.symbol or instrument.get('symbol')
+
             data = await self.source_factory.get_daily_data(
                 gap.exchange,
-                gap.instrument_id,
-                gap.symbol,
+                source_instrument_id,
+                source_symbol,
                 start_date,
                 end_date
             )
 
             if data:
+                dm_logger.info(
+                    f"[DataManager] Gap fill data fetched: {gap.instrument_id} "
+                    f"{gap.gap_start} to {gap.gap_end}, rows={len(data)}"
+                )
                 # 保存数据
+                for quote in data:
+                    quote['instrument_id'] = instrument.get('instrument_id')
                 success = await self.db_ops.save_daily_quotes(data)
                 if success:
                     dm_logger.info(f"Filled gap for {gap.symbol}: {gap.gap_start} to {gap.gap_end}")
                     return True
+                dm_logger.warning(
+                    f"[DataManager] Gap fill save failed: {gap.instrument_id} "
+                    f"{gap.gap_start} to {gap.gap_end}"
+                )
+            else:
+                dm_logger.warning(
+                    f"[DataManager] Gap fill returned no data: {gap.instrument_id} "
+                    f"{gap.gap_start} to {gap.gap_end}"
+                )
 
             return False
 
@@ -980,6 +1037,7 @@ class DataManager:
             # 参数验证
             if instrument_id:
                 instrument_id = DataValidator.validate_instrument_id(instrument_id)
+                instrument_id = convert_to_database_format(instrument_id)
             if symbol:
                 symbol = DataValidator.validate_symbol(symbol)
 
@@ -1354,6 +1412,8 @@ class DataManager:
 
     def _format_response(self, data: pd.DataFrame, format_type: str) -> Union[pd.DataFrame, List[Dict[str, Any]], str]:
         """格式化响应数据"""
+        if data is None:
+            return None
         if format_type == 'pandas':
             return data
         elif format_type == 'json':
