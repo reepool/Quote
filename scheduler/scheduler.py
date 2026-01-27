@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_MISSED
+from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES
 
 from utils import scheduler_logger, config_manager, TelegramBot
 from utils.singleton import singleton
@@ -27,6 +27,7 @@ class TaskScheduler:
         self.config = config_manager
         self.scheduler = AsyncIOScheduler()
         self.jobs: Dict[str, Any] = {}
+        self.running_tasks: Dict[str, Dict[str, datetime]] = {}
         self.enabled = self.config.get_nested('scheduler_config.enabled', True)
         # 创建 JobConfigManager 实例，由 TaskScheduler 统一管理
         self.job_config_manager = JobConfigManager(self.config)
@@ -53,6 +54,7 @@ class TaskScheduler:
             # 设置事件监听
             self.scheduler.add_listener(self._job_error_listener, EVENT_JOB_ERROR)
             self.scheduler.add_listener(self._job_missed_listener, EVENT_JOB_MISSED)
+            self.scheduler.add_listener(self._job_max_instances_listener, EVENT_JOB_MAX_INSTANCES)
 
             # 配置任务
             await self._setup_jobs_from_config()
@@ -111,20 +113,58 @@ class TaskScheduler:
             这个函数是一个函数工厂，生成并返回一个新的函数
         """
         async def parameterized_task():
+            job_id = job_config.job_id if job_config else getattr(func, '__name__', 'unknown')
+            run_id = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+            start_time = datetime.now()
+            if job_id not in self.running_tasks:
+                self.running_tasks[job_id] = {}
+            self.running_tasks[job_id][run_id] = start_time
+            scheduler_logger.info(
+                f"[Scheduler] Task {job_id} started (run_id={run_id})"
+            )
             try:
                 # 将 job_config 添加到参数中，如果它存在的话
                 all_parameters = {**parameters, 'job_config': job_config} if job_config else parameters.copy()
 
                 # 调用原函数并传入参数
                 # aiojobs scheduler 会自动处理协程函数的调用
-                return await func(**all_parameters)
+                max_runtime_seconds = all_parameters.pop('max_runtime_seconds', None)
+                if max_runtime_seconds:
+                    result = await asyncio.wait_for(
+                        func(**all_parameters),
+                        timeout=max_runtime_seconds
+                    )
+                else:
+                    result = await func(**all_parameters)
+                duration = (datetime.now() - start_time).total_seconds()
+                scheduler_logger.info(
+                    f"[Scheduler] Task {job_id} completed in {duration:.1f}s (run_id={run_id})"
+                )
+                return result
+            except asyncio.TimeoutError:
+                duration = (datetime.now() - start_time).total_seconds()
+                timeout_msg = (
+                    f"[Scheduler] Task {job_id} timed out after {duration:.1f}s "
+                    f"(run_id={run_id})"
+                )
+                scheduler_logger.error(timeout_msg)
+                raise
             except (asyncio.CancelledError, KeyboardInterrupt):
                 # 对于取消或手动中断，直接重新抛出，不记录为错误
                 raise
             except BaseException as e:
                 # 捕获所有其他异常，包括 Exception 和其他系统级错误
-                scheduler_logger.error(f"[Scheduler] Task execution failed: {e}")
+                duration = (datetime.now() - start_time).total_seconds()
+                scheduler_logger.error(
+                    f"[Scheduler] Task {job_id} failed after {duration:.1f}s "
+                    f"(run_id={run_id}): {e}"
+                )
                 raise  # 重新抛出，以便APScheduler的错误监听器可以捕获
+            finally:
+                if job_id in self.running_tasks:
+                    self.running_tasks[job_id].pop(run_id, None)
+                    if not self.running_tasks[job_id]:
+                        self.running_tasks.pop(job_id, None)
 
         return parameterized_task
 
@@ -196,6 +236,21 @@ class TaskScheduler:
             )
         except Exception:
             scheduler_logger.error("[Scheduler] Failed to send missed notification")
+
+    def _job_max_instances_listener(self, event):
+        """任务并发实例达到上限监听器"""
+        job_id = event.job_id if hasattr(event, 'job_id') else 'unknown'
+        scheduled_time = event.scheduled_run_time if hasattr(event, 'scheduled_run_time') else None
+        running_info = self.running_tasks.get(job_id, {})
+        durations = []
+        now = datetime.now()
+        for started_at in running_info.values():
+            durations.append((now - started_at).total_seconds())
+        longest = f"{max(durations):.1f}s" if durations else "unknown"
+        scheduler_logger.warning(
+            f"[Scheduler] Job {job_id} skipped due to max instances "
+            f"at {scheduled_time}, running_for={longest}"
+        )
 
 
     async def run_job_now(self, job_id: str):

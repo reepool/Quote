@@ -511,12 +511,23 @@ class DataSourceFactory:
     async def health_check_all(self) -> Dict[str, bool]:
         """检查所有数据源健康状态"""
         health_status = {}
+        timeout_seconds = self.config.get_nested(
+            'data_sources_config.health_check_timeout_sec', 10
+        )
 
         for name, source in self.sources.items():
             try:
-                is_healthy = await source.health_check()
+                is_healthy = await asyncio.wait_for(
+                    source.health_check(), timeout=timeout_seconds
+                )
                 health_status[name] = is_healthy
                 ds_logger.info(f"[DataSourceFactory] Health check {name}: {'OK' if is_healthy else 'FAILED'}")
+            except asyncio.TimeoutError:
+                health_status[name] = False
+                ds_logger.error(
+                    f"[DataSourceFactory] Health check timed out for {name} "
+                    f"after {timeout_seconds}s"
+                )
             except Exception as e:
                 health_status[name] = False
                 ds_logger.error(f"[DataSourceFactory] Health check failed for {name}: {e}")

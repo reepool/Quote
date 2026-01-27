@@ -221,6 +221,18 @@ class QuoteQueryRequest(BaseModel):
             raise ValueError("End date must be after start date")
         return v
 
+    @validator('start_date', pre=True)
+    def parse_start_date(cls, v):
+        if isinstance(v, str) and len(v) == 10:
+            return datetime.fromisoformat(v)
+        return v
+
+    @validator('end_date', pre=True)
+    def parse_end_date(cls, v):
+        if isinstance(v, str) and len(v) == 10:
+            return datetime.fromisoformat(v)
+        return v
+
     @validator('min_quality_score')
     def validate_quality_score(cls, v):
         if v is not None and (v < 0 or v > 1):

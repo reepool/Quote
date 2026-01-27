@@ -1482,7 +1482,11 @@ class DataManager:
             dm_logger.error(f"[DataManager] Failed to generate quote statistics: {e}")
             return {}
  
-    async def update_daily_data(self, exchanges: Optional[List[str]] = None, target_date: Optional[date] = None) -> Optional[dict]:
+    async def update_daily_data(self, exchanges: Optional[List[str]] = None,
+                               target_date: Optional[date] = None,
+                               per_instrument_timeout_sec: Optional[int] = None,
+                               progress_log_every: int = 200,
+                               progress_log_interval_sec: int = 300) -> Optional[dict]:
         """每日数据更新"""
         try:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
@@ -1507,14 +1511,16 @@ class DataManager:
 
                     # 获取该交易所的活跃股票
                     instruments = await self.db_ops.get_active_instruments(exchange)
+                    total_instruments = len(instruments)
                     exchange_result = {
                         'success_count': 0,
                         'failure_count': 0,
                         'quotes_added': 0,
-                        'total_instruments': len(instruments)
+                        'total_instruments': total_instruments
                     }
 
-                    for instrument in instruments:
+                    last_progress_log = datetime.now()
+                    for idx, instrument in enumerate(instruments, start=1):
                         try:
                             # 获取最新日期
                             latest_date = await self.db_ops.get_latest_quote_date(
@@ -1532,13 +1538,25 @@ class DataManager:
                                 start_date = target_date - timedelta(days=1)
                                 end_date = target_date
 
-                                data = await self.source_factory.get_daily_data(
-                                    exchange,
-                                    instrument['instrument_id'],
-                                    instrument['symbol'],
-                                    datetime.combine(start_date, datetime.min.time()),
-                                    datetime.combine(end_date, datetime.max.time())
-                                )
+                                if per_instrument_timeout_sec:
+                                    data = await asyncio.wait_for(
+                                        self.source_factory.get_daily_data(
+                                            exchange,
+                                            instrument['instrument_id'],
+                                            instrument['symbol'],
+                                            datetime.combine(start_date, datetime.min.time()),
+                                            datetime.combine(end_date, datetime.max.time())
+                                        ),
+                                        timeout=per_instrument_timeout_sec
+                                    )
+                                else:
+                                    data = await self.source_factory.get_daily_data(
+                                        exchange,
+                                        instrument['instrument_id'],
+                                        instrument['symbol'],
+                                        datetime.combine(start_date, datetime.min.time()),
+                                        datetime.combine(end_date, datetime.max.time())
+                                    )
 
                                 if data:
                                     await self.db_ops.save_daily_quotes(data)
@@ -1549,6 +1567,29 @@ class DataManager:
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1
 
+                            # 进度日志：按数量或时间间隔输出
+                            now = datetime.now()
+                            if (
+                                (progress_log_every and idx % progress_log_every == 0)
+                                or (progress_log_interval_sec and (now - last_progress_log).total_seconds() >= progress_log_interval_sec)
+                            ):
+                                dm_logger.info(
+                                    "[DataManager] Daily update progress %s: %s/%s (last=%s)",
+                                    exchange,
+                                    idx,
+                                    total_instruments,
+                                    instrument.get('symbol', instrument.get('instrument_id'))
+                                )
+                                last_progress_log = now
+
+                        except asyncio.TimeoutError:
+                            dm_logger.warning(
+                                "[DataManager] Daily update timed out for %s (%s)",
+                                instrument.get('symbol'),
+                                instrument.get('instrument_id')
+                            )
+                            exchange_result['failure_count'] += 1
+                            update_results['failure_count'] += 1
                         except Exception as e:
                             dm_logger.error(f"[DataManager] Failed to update {instrument['symbol']}: {e}")
                             exchange_result['failure_count'] += 1

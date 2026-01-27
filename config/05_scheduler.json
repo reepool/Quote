@@ -23,13 +23,14 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "exchanges": [
-            "SSE",
-            "SZSE"
-          ],
+          "exchanges": ["SSE", "SZSE"],
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
-          "enable_trading_day_check": true
+          "enable_trading_day_check": true,
+          "max_runtime_seconds": 10800,
+          "per_instrument_timeout_sec": 420,
+          "progress_log_every": 200,
+          "progress_log_interval_sec": 300
         }
       },
       "system_health_check": {
@@ -52,7 +53,9 @@
           "check_memory_usage": true,
           "check_telegram": true,
           "disk_space_threshold_mb": 1000,
-          "memory_threshold_percent": 85
+          "memory_threshold_percent": 85,
+          "health_check_timeout_sec": 30,
+          "max_runtime_seconds": 120
         }
       },
       "weekly_data_maintenance": {

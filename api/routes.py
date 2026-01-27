@@ -192,6 +192,7 @@ async def get_daily_quotes(
                 }
 
         def _serialize_value(value):
+            import math
             try:
                 import numpy as np
             except Exception:
@@ -199,11 +200,14 @@ async def get_daily_quotes(
 
             if isinstance(value, (datetime, date)):
                 return value.isoformat()
+            if isinstance(value, float):
+                return value if math.isfinite(value) else None
             if np is not None:
                 if isinstance(value, (np.integer,)):
                     return int(value)
                 if isinstance(value, (np.floating,)):
-                    return float(value)
+                    float_value = float(value)
+                    return float_value if math.isfinite(float_value) else None
                 if isinstance(value, (np.bool_,)):
                     return bool(value)
             if isinstance(value, dict):

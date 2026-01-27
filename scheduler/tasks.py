@@ -80,6 +80,9 @@ class ScheduledTasks:
                             wait_for_market_close: bool = True,
                             market_close_delay_minutes: int = 15,
                             enable_trading_day_check: bool = True,
+                            per_instrument_timeout_sec: Optional[int] = None,
+                            progress_log_every: int = 200,
+                            progress_log_interval_sec: int = 300,
                             job_config: Optional[JobConfig] = None) -> bool:
         """每日数据更新任务"""
         try:
@@ -152,7 +155,13 @@ class ScheduledTasks:
 
             # 步骤4: 执行数据更新
             scheduler_logger.info("[Scheduler] Step 4: Executing data update...")
-            update_results = await data_manager.update_daily_data(exchanges=trading_exchanges, target_date=today)
+            update_results = await data_manager.update_daily_data(
+                exchanges=trading_exchanges,
+                target_date=today,
+                per_instrument_timeout_sec=per_instrument_timeout_sec,
+                progress_log_every=progress_log_every,
+                progress_log_interval_sec=progress_log_interval_sec
+            )
 
             # 步骤5: 发送报告
             # 判断更新状态
@@ -599,12 +608,32 @@ class ScheduledTasks:
                                 check_telegram: bool = True,
                                 disk_space_threshold_mb: int = 1000,
                                 memory_threshold_percent: int = 85,
+                                health_check_timeout_sec: int = 30,
                                 job_config: Optional[JobConfig] = None) -> bool:
         """系统健康检查任务"""
         try:
             scheduler_logger.info("[Scheduler] Starting system health check...")
-
-            status = await data_manager.get_system_status()
+            start_time = datetime.now()
+            try:
+                status = await asyncio.wait_for(
+                    data_manager.get_system_status(),
+                    timeout=health_check_timeout_sec
+                )
+            except asyncio.TimeoutError:
+                error_msg = f"System status check timed out after {health_check_timeout_sec}s"
+                scheduler_logger.error(f"[Scheduler] {error_msg}")
+                failure_report_data = {
+                    'name': '系统健康检查报告',
+                    'status': 'error',
+                    'error_message': error_msg
+                }
+                await self._send_task_report(
+                    report_data=failure_report_data,
+                    report_type='health_check_report',
+                    task_name='系统健康检查',
+                    job_config=job_config
+                )
+                return False
 
             # 检查数据源健康状态
             if check_data_sources:
@@ -720,7 +749,8 @@ class ScheduledTasks:
                 'checks_performed': len(check_results),
                 'issues_found': len(healthy_issues),
                 'check_results': check_results,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'duration': f"{(datetime.now() - start_time).total_seconds():.1f}s"
             }
             scheduler_logger.debug(f"[Scheduler] Generated health check report: {report_data}")
 
@@ -1111,8 +1141,14 @@ class ScheduledTasks:
         try:
             scheduler_logger.info("[Scheduler] Checking Telegram connection status...")
             bot = self.bot
+            timeout_seconds = self.config.get_nested(
+                'telegram_config.health_check_timeout_sec', 10
+            )
             # 检查连接健康状态
-            is_healthy = await bot.check_connection_health()
+            is_healthy = await asyncio.wait_for(
+                bot.check_connection_health(),
+                timeout=timeout_seconds
+            )
 
             if is_healthy:
                 scheduler_logger.info("[Scheduler] Telegram connection is healthy")
@@ -1121,7 +1157,10 @@ class ScheduledTasks:
             scheduler_logger.warning("[Scheduler] Telegram connection is unhealthy, attempting to fix...")
 
             # 尝试修复连接
-            repair_success = await bot.ensure_connection()
+            repair_success = await asyncio.wait_for(
+                bot.ensure_connection(),
+                timeout=timeout_seconds
+            )
 
             if repair_success:
                 success_msg = "✅ Telegram连接修复成功"
@@ -1149,6 +1188,17 @@ class ScheduledTasks:
 
                 return "❌ Telegram连接修复失败"
 
+        except asyncio.TimeoutError:
+            error_msg = "❌ Telegram连接检查超时"
+            scheduler_logger.error(f"[Scheduler] {error_msg}")
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_scheduler_notification(error_msg, "error")
+                except Exception as notify_error:
+                    scheduler_logger.error(
+                        f"[Scheduler] Failed to send Telegram timeout notification: {notify_error}"
+                    )
+            return error_msg
         except Exception as e:
             error_msg = f"❌ Telegram连接检查异常: {str(e)}"
             scheduler_logger.error(f"[Scheduler] {error_msg}")

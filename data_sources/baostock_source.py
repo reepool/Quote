@@ -189,6 +189,7 @@ class BaostockSource(BaseDataSource):
             base_delay = self.rate_limiter.config.retry_interval
             rs = None
 
+            relogin_attempted = False
             for attempt in range(max_retries):
                 try:
                     # 获取日线数据 - 使用统一的前复权配置
@@ -210,6 +211,15 @@ class BaostockSource(BaseDataSource):
                     break
                 except asyncio.TimeoutError:
                     baostock_logger.warning(f"Timeout fetching data for {baostock_code} (attempt {attempt + 1}/{max_retries})")
+                    self.network_error_count += 1
+                    if not relogin_attempted:
+                        relogin_attempted = True
+                        try:
+                            baostock_logger.warning("Timeout detected, attempting BaoStock re-login")
+                            await self._relogin()
+                            self.network_error_count = 0
+                        except Exception as relogin_error:
+                            baostock_logger.error(f"BaoStock re-login after timeout failed: {relogin_error}")
                     if attempt < max_retries - 1:
                         delay = base_delay * (2 ** attempt)  # 指数退避
                         baostock_logger.info(f"Retrying in {delay:.1f} seconds...")
