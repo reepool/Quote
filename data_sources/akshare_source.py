@@ -9,6 +9,46 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta, date
 from collections import Counter
 import pandas as pd
+
+# AkShare 代理补丁 - 必须在 import akshare 之前调用
+# 此处不能使用 config_manager（会触发循环导入），直接读取 JSON 配置
+import json
+import logging
+from pathlib import Path
+
+_patch_logger = logging.getLogger("akshare_proxy_patch_init")
+
+def _install_akshare_proxy_patch() -> None:
+    """从配置文件读取 proxy_patch 参数并安装补丁"""
+    config_path = Path(__file__).resolve().parent.parent / "config" / "03_data.json"
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            data_config = json.load(f)
+        patch_cfg = data_config.get("data_sources_config", {}).get("akshare", {}).get("proxy_patch", {})
+        if not patch_cfg.get("enabled", False):
+            _patch_logger.info("akshare proxy patch 未启用，跳过")
+            return
+
+        import akshare_proxy_patch
+        akshare_proxy_patch.install_patch(
+            patch_cfg.get("gateway", "101.201.173.125"),
+            auth_token=patch_cfg.get("auth_token", ""),
+            retry=patch_cfg.get("retry", 30),
+            hook_domains=patch_cfg.get("hook_domains", [
+                "fund.eastmoney.com",
+                "push2.eastmoney.com",
+                "push2his.eastmoney.com",
+                "emweb.securities.eastmoney.com",
+            ]),
+        )
+        _patch_logger.info("akshare proxy patch 已安装 (token=%s***)", patch_cfg.get("auth_token", "")[:6])
+    except ImportError:
+        _patch_logger.warning("akshare-proxy-patch 未安装，跳过代理补丁")
+    except Exception as e:
+        _patch_logger.warning("安装 akshare proxy patch 失败: %s", e)
+
+_install_akshare_proxy_patch()
+
 import akshare as ak
 
 from .base_source import BaseDataSource, RateLimitConfig

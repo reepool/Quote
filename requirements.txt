@@ -25,6 +25,7 @@ redis==5.2.1  # Optional, for advanced caching
 # Data Sources
 yfinance==0.2.50
 akshare
+akshare-proxy-patch==0.2.13
 aiohttp>=3.11.13
 baostock
 telethon

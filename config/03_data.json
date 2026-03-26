@@ -79,7 +79,19 @@
       "max_requests_per_hour": 300,
       "max_requests_per_day": 5000,
       "retry_times": 5,
-      "retry_interval": 3.0
+      "retry_interval": 3.0,
+      "proxy_patch": {
+        "enabled": true,
+        "gateway": "101.201.173.125",
+        "auth_token": "20260228D7XF",
+        "retry": 30,
+        "hook_domains": [
+          "fund.eastmoney.com",
+          "push2.eastmoney.com",
+          "push2his.eastmoney.com",
+          "emweb.securities.eastmoney.com"
+        ]
+      }
     },
     "yfinance": {
       "enabled": false,
