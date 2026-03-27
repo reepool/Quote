@@ -218,9 +218,9 @@ uvicorn.error: [Errno 48] Address already in use
    python main.py status
    ```
 
-3. **检查数据源状态**：
+2. **检查数据源状态**：
    ```bash
-   curl "http://localhost:8000/api/v1/data-sources"
+   curl "http://localhost:8000/api/v1/system/status"
    ```
 
 ### Q10: API 请求被限流
@@ -248,8 +248,8 @@ uvicorn.error: [Errno 48] Address already in use
    ```
 3. **使用批量接口**：
    ```bash
-   # 使用批量查询替代单个查询
-   curl "http://localhost:8000/api/v1/quotes/batch?instruments=600000.SSE,000001.SZSE"
+   # 使用查询最新行情替代单个查询
+   curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=600000.SSE&instrument_ids=000001.SZSE"
    ```
 
 ## ⏰ 调度器问题
@@ -465,8 +465,8 @@ tail -n 200 log/api.log
 # 检查数据库状态
 python main.py status
 
-# 检查数据源状态
-curl "http://localhost:8000/api/v1/data-sources"
+# 检查系统状态摘要
+curl "http://localhost:8000/api/v1/system/status"
 
 # 检查任务状态
 python -c "

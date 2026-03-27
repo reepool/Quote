@@ -120,7 +120,7 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get instruments by exchange {exchange}: {e}")
             return []
 
-    async def get_active_instruments(self, exchange: str = None) -> List[Dict[str, Any]]:
+    async def get_active_instruments(self, exchange: str = None, instrument_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         """获取活跃交易品种列表"""
         try:
             async with self.get_async_session() as session:
@@ -128,6 +128,9 @@ class DatabaseOperations:
 
                 if exchange:
                     stmt = stmt.filter(InstrumentDB.exchange == exchange)
+                    
+                if instrument_types:
+                    stmt = stmt.filter(InstrumentDB.type.in_(instrument_types))
 
                 stmt = stmt.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
                 result = await session.execute(stmt)
@@ -575,41 +578,42 @@ class DatabaseOperations:
 
     async def save_daily_data(self, quotes: List[Dict[str, Any]]) -> bool:
         """批量保存日线数据"""
+        if not quotes:
+            return True
         try:
+            from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+            from utils.date_utils import get_shanghai_time
+            
             async with self.get_async_session() as session:
-                success_count = 0
-                update_count = 0
-
-                for quote_data in quotes:
-                    try:
-                        # Check if record exists
-                        stmt = select(DailyQuoteDB).filter(
-                            DailyQuoteDB.time == quote_data['time'],
-                            DailyQuoteDB.instrument_id == quote_data['instrument_id']
-                        )
-                        result = await session.execute(stmt)
-                        existing = result.scalar_one_or_none()
-
-                        if existing:
-                            # Update existing record
-                            for key, value in quote_data.items():
-                                if hasattr(existing, key) and getattr(existing, key) != value:
-                                    setattr(existing, key, value)
-                            existing.updated_at = get_shanghai_time()
-                            update_count += 1
-                        else:
-                            # Create new record
-                            db_quote = DailyQuoteDB(**quote_data)
-                            session.add(db_quote)
-                            success_count += 1
-
-                    except Exception as e:
-                        self.db_logger.error(f"Error saving quote {quote_data.get('instrument_id', 'unknown')} {quote_data.get('time', 'unknown')}: {e}")
-
+                chunk_size = 1000
+                total_saved = 0
+                for i in range(0, len(quotes), chunk_size):
+                    chunk = quotes[i:i + chunk_size]
+                    
+                    # 批量Upsert
+                    stmt = sqlite_insert(DailyQuoteDB).values(chunk)
+                    
+                    # 排除主键，其他的如果有冲突就更新
+                    update_dict = {
+                        c.name: c
+                        for c in stmt.excluded
+                        if c.name not in ('time', 'instrument_id')
+                    }
+                    update_dict['updated_at'] = get_shanghai_time()
+                    
+                    stmt = stmt.on_conflict_do_update(
+                        index_elements=['time', 'instrument_id'],
+                        set_=update_dict
+                    )
+                    
+                    await session.execute(stmt)
+                    total_saved += len(chunk)
+                    
                 await session.commit()
-                self.db_logger.info(f"Successfully saved daily data: {success_count} new, {update_count} updated")
-                return success_count > 0 or update_count > 0
-
+                
+                self.db_logger.info(f"Successfully saved {total_saved} daily quotes via bulk upsert")
+                return True
+                
         except Exception as e:
             self.db_logger.error(f"Failed to save daily data: {e}")
             return False
@@ -1173,6 +1177,36 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to assess data quality for {instrument_id}: {e}")
             return 0.0
+
+    async def execute_read_query(self, query: str, params: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """执行只读SQL查询并返回结果
+        
+        Args:
+            query: SQL查询语句
+            params: 查询参数
+            
+        Returns:
+            List[Dict[str, Any]]: 查询结果列表
+        """
+        try:
+            query_upper = query.strip().upper()
+            if not query_upper.startswith('SELECT'):
+                self.db_logger.warning(f"Blocked non-SELECT query in read operation: {query[:100]}...")
+                return []
+                
+            async with self.get_async_session() as session:
+                if params:
+                    result = await session.execute(text(query), params)
+                else:
+                    result = await session.execute(text(query))
+                
+                rows = result.mappings().all()
+                self.db_logger.debug(f"Successfully executed read query: {query[:100]}...")
+                return [dict(row) for row in rows]
+                
+        except Exception as e:
+            self.db_logger.error(f"Failed to execute read query '{query[:100]}...': {e}")
+            return []
 
     async def execute_query(self, query: str, params: Dict[str, Any] = None) -> bool:
         """执行SQL查询

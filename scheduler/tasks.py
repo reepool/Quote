@@ -83,6 +83,7 @@ class ScheduledTasks:
                             per_instrument_timeout_sec: Optional[int] = None,
                             progress_log_every: int = 200,
                             progress_log_interval_sec: int = 300,
+                            instrument_types: Optional[List[str]] = None,
                             job_config: Optional[JobConfig] = None) -> bool:
         """每日数据更新任务"""
         try:
@@ -160,7 +161,8 @@ class ScheduledTasks:
                 target_date=today,
                 per_instrument_timeout_sec=per_instrument_timeout_sec,
                 progress_log_every=progress_log_every,
-                progress_log_interval_sec=progress_log_interval_sec
+                progress_log_interval_sec=progress_log_interval_sec,
+                instrument_types=instrument_types
             )
 
             # 步骤5: 发送报告

@@ -1,60 +1,64 @@
 {
-    "data_config": {
-        "data_dir": "data",
-        "batch_size": 50,
-        "download_chunk_days": 0,
-        "max_concurrent_downloads": 1,
-        "retry_times": 3,
-        "retry_interval_seconds": 5,
-        "default_start_years": {
-        "SSE": 1990,
-        "SZSE": 1990,
-        "BSE": 2014,
-        "HKEX": 1990,
-        "NASDAQ": 1990,
-        "NYSE": 1990
-        },
-        "market_presets": {
-        "a_shares": [
-            "SSE",
-            "SZSE",
-            "BSE"
-        ],
-        "hk_stocks": [
-            "HKEX"
-        ],
-        "us_stocks": [
-            "NASDAQ",
-            "NYSE"
-        ],
-        "all_markets": [
-            "SSE",
-            "SZSE",
-            "BSE",
-            "HKEX",
-            "NASDAQ",
-            "NYSE"
-        ],
-        "mainland": [
-            "SSE",
-            "SZSE",
-            "BSE"
-        ],
-        "overseas": [
-            "HKEX",
-            "NASDAQ",
-            "NYSE"
-        ],
-        "chinese": [
-            "SSE",
-            "SZSE",
-            "BSE",
-            "HKEX"
-        ],
-        "global": [
-            "NASDAQ",
-            "NYSE"
-        ]
+  "data_config": {
+    "instrument_types": [
+      "stock",
+      "index"
+    ],
+    "data_dir": "data",
+    "batch_size": 50,
+    "download_chunk_days": 0,
+    "max_concurrent_downloads": 1,
+    "retry_times": 3,
+    "retry_interval_seconds": 5,
+    "default_start_years": {
+      "SSE": 1990,
+      "SZSE": 1990,
+      "BSE": 2014,
+      "HKEX": 1990,
+      "NASDAQ": 1990,
+      "NYSE": 1990
+    },
+    "market_presets": {
+      "a_shares": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "hk_stocks": [
+        "HKEX"
+      ],
+      "us_stocks": [
+        "NASDAQ",
+        "NYSE"
+      ],
+      "all_markets": [
+        "SSE",
+        "SZSE",
+        "BSE",
+        "HKEX",
+        "NASDAQ",
+        "NYSE"
+      ],
+      "mainland": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "overseas": [
+        "HKEX",
+        "NASDAQ",
+        "NYSE"
+      ],
+      "chinese": [
+        "SSE",
+        "SZSE",
+        "BSE",
+        "HKEX"
+      ],
+      "global": [
+        "NASDAQ",
+        "NYSE"
+      ]
     }
   },
   "data_sources": {
@@ -70,14 +74,14 @@
   },
   "data_sources_config": {
     "akshare": {
-      "enabled": false,
+      "enabled": true,
       "exchanges_supported": [
         "a_stock"
       ],
       "primary_source_of": [],
-      "max_requests_per_minute": 8,
-      "max_requests_per_hour": 300,
-      "max_requests_per_day": 5000,
+      "max_requests_per_minute": 60,
+      "max_requests_per_hour": 3600,
+      "max_requests_per_day": 50000,
       "retry_times": 5,
       "retry_interval": 3.0,
       "proxy_patch": {

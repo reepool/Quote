@@ -152,7 +152,8 @@ class TushareSource(BaseDataSource):
             return []
 
     async def get_daily_data(self, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         try:
             await self._respect_rate_limit()
@@ -188,7 +189,8 @@ class TushareSource(BaseDataSource):
                     'close': float(row['close']),
                     'volume': int(row['vol']) if pd.notna(row['vol']) else 0,
                     'amount': float(row['amount']) if pd.notna(row['amount']) else 0.0,
-                    'factor': adjustment_config['factor']  # Tushare前复权数据
+                    'factor': adjustment_config['factor'],  # Tushare前复权数据
+                    'adjustment_type': adjustment_config.get('type', 'forward'),
                 }
                 quotes.append(quote)
 
@@ -264,7 +266,8 @@ class TushareSource(BaseDataSource):
                 'close': float(latest['close']),
                 'volume': int(latest['vol']) if pd.notna(latest['vol']) else 0,
                 'amount': float(latest['amount']) if pd.notna(latest['amount']) else 0.0,
-                'factor': adjustment_config['factor']
+                'factor': adjustment_config['factor'],
+                'adjustment_type': adjustment_config.get('type', 'forward')
             }
 
         except Exception as e:

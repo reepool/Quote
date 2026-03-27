@@ -6,7 +6,7 @@ Pydantic models for request/response validation with comprehensive features.
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime, date
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from database.models import Instrument, DailyQuote, TradingCalendar
 
 
@@ -88,7 +88,8 @@ class InstrumentResponse(BaseModel):
     updated_at: datetime = Field(..., description="更新时间")
     data_version: int = Field(1, description="数据版本")
 
-    @validator('type', pre=True)
+    @field_validator('type', mode='before')
+    @classmethod
     def normalize_instrument_type(cls, v):
         if isinstance(v, str):
             return v.upper()
@@ -215,25 +216,28 @@ class QuoteQueryRequest(BaseModel):
     limit: Optional[int] = Field(None, description="限制返回记录数")
     offset: int = Field(0, description="偏移量")
 
-    @validator('end_date')
-    def validate_date_range(cls, v, values):
-        if 'start_date' in values and v < values['start_date']:
+    @model_validator(mode='after')
+    def validate_date_range(self) -> 'QuoteQueryRequest':
+        if self.start_date and self.end_date and self.end_date < self.start_date:
             raise ValueError("End date must be after start date")
-        return v
+        return self
 
-    @validator('start_date', pre=True)
+    @field_validator('start_date', mode='before')
+    @classmethod
     def parse_start_date(cls, v):
         if isinstance(v, str) and len(v) == 10:
             return datetime.fromisoformat(v)
         return v
 
-    @validator('end_date', pre=True)
+    @field_validator('end_date', mode='before')
+    @classmethod
     def parse_end_date(cls, v):
         if isinstance(v, str) and len(v) == 10:
             return datetime.fromisoformat(v)
         return v
 
-    @validator('min_quality_score')
+    @field_validator('min_quality_score')
+    @classmethod
     def validate_quality_score(cls, v):
         if v is not None and (v < 0 or v > 1):
             raise ValueError("Quality score must be between 0 and 1")
@@ -266,7 +270,8 @@ class InstrumentQueryRequest(BaseModel):
     sort_by: str = Field("symbol", description="排序字段")
     sort_order: str = Field("asc", description="排序方向")
 
-    @validator('sort_order')
+    @field_validator('sort_order')
+    @classmethod
     def validate_sort_order(cls, v):
         if v not in ['asc', 'desc']:
             raise ValueError("Sort order must be 'asc' or 'desc'")
@@ -369,7 +374,8 @@ class BatchDownloadRequest(BaseModel):
     include_suspended: bool = Field(False, description="包含停牌股票")
     include_delisted: bool = Field(False, description="包含退市股票")
 
-    @validator('years')
+    @field_validator('years')
+    @classmethod
     def validate_years(cls, v):
         if v is not None:
             current_year = datetime.now().year
@@ -378,11 +384,11 @@ class BatchDownloadRequest(BaseModel):
                     raise ValueError(f"Year {year} is out of valid range (1990-{current_year + 1})")
         return v
 
-    @validator('end_date')
-    def validate_date_range(cls, v, values):
-        if v and 'start_date' in values and values['start_date'] and v < values['start_date']:
+    @model_validator(mode='after')
+    def validate_date_range(self) -> 'BatchDownloadRequest':
+        if self.start_date and self.end_date and self.end_date < self.start_date:
             raise ValueError("End date must be after start date")
-        return v
+        return self
 
 
 class DataGapFillRequest(BaseModel):
@@ -394,7 +400,8 @@ class DataGapFillRequest(BaseModel):
     max_gap_days: Optional[int] = Field(None, description="最大缺口天数")
     dry_run: bool = Field(False, description="试运行模式")
 
-    @validator('severity_filter')
+    @field_validator('severity_filter')
+    @classmethod
     def validate_severity_filter(cls, v):
         if v is not None:
             valid_severities = ['low', 'medium', 'high', 'critical']
@@ -423,11 +430,11 @@ class TradingCalendarQueryRequest(BaseModel):
     include_weekends: bool = Field(False, description="是否包含周末")
     session_type: Optional[str] = Field(None, description="交易时段类型")
 
-    @validator('end_date')
-    def validate_date_range(cls, v, values):
-        if 'start_date' in values and v < values['start_date']:
+    @model_validator(mode='after')
+    def validate_date_range(self) -> 'TradingCalendarQueryRequest':
+        if self.start_date and self.end_date and self.end_date < self.start_date:
             raise ValueError("End date must be after start date")
-        return v
+        return self
 
 
 class DataStatsResponse(BaseModel):
@@ -463,7 +470,8 @@ class DataValidationRequest(BaseModel):
     validation_type: str = Field("completeness", description="验证类型")
     strict_mode: bool = Field(False, description="严格模式")
 
-    @validator('validation_type')
+    @field_validator('validation_type')
+    @classmethod
     def validate_validation_type(cls, v):
         valid_types = ['completeness', 'quality', 'consistency', 'all']
         if v not in valid_types:

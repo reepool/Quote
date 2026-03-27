@@ -20,27 +20,31 @@ class DataSourceAdjustment:
     BAOSTOCK = {
         'adjustflag': AdjustmentType.FRONT_ADJUSTED.value,
         'description': '前复权数据，适合历史数据分析',
-        'factor': 1.0
+        'factor': 1.0,
+        'type': 'forward'
     }
 
     # AkShare配置
     AKSHARE = {
         'adjust': 'qfq',  # 前复权
         'description': '前复权数据，适合历史数据分析',
-        'factor': 1.0
+        'factor': 1.0,
+        'type': 'forward'
     }
 
     # yFinance配置
     YFINANCE = {
         'auto_adjust': True,  # 默认前复权
         'description': '前复权数据，适合历史数据分析',
-        'factor': 1.0
+        'factor': 1.0,
+        'type': 'forward'
     }
 
     # Tushare配置
     TUSHARE = {
         'description': '前复权数据，适合历史数据分析',
-        'factor': 1.0
+        'factor': 1.0,
+        'type': 'forward'
     }
 
 @dataclass

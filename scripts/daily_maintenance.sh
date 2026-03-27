@@ -129,7 +129,7 @@ check_data() {
 
     # 获取数据统计
     log_info "数据统计信息:"
-    if curl -s "http://localhost:8000/api/v1/data/stats" 2>/dev/null; then
+    if curl -s "http://localhost:8000/api/v1/stats" 2>/dev/null; then
         log_success "API统计信息获取成功"
     else
         log_warning "API服务不可用，尝试命令行获取..."
@@ -153,11 +153,11 @@ asyncio.run(check_data())
 
     # 检查最新数据日期
     log_info "最新数据日期检查..."
-    latest_date=$(curl -s "http://localhost:8000/api/v1/data/latest?exchange=SSE" 2>/dev/null | python -c "
+    latest_date=$(curl -s "http://localhost:8000/api/v1/stats" 2>/dev/null | python -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
-    print(data.get('latest_date', 'Unknown'))
+    print(data.get('quotes_date_range', {}).get('SSE', {}).get('end_date', 'Unknown'))
 except:
     print('API Error')
 " 2>/dev/null) || echo "API不可用"
@@ -278,8 +278,8 @@ show_data_stats() {
     log_info "获取数据统计..."
     cd "$PROJECT_ROOT"
 
-    if curl -s "http://localhost:8000/api/v1/data/stats" > /dev/null; then
-        curl -s "http://localhost:8000/api/v1/data/stats" | python -c "
+    if curl -s "http://localhost:8000/api/v1/stats" > /dev/null; then
+        curl -s "http://localhost:8000/api/v1/stats" | python -c "
 import sys, json
 try:
     data = json.load(sys.stdin)

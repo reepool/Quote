@@ -2,7 +2,7 @@
 
 ## 📖 概述
 
-Quote System v2.3.1 是一个现代化的金融数据下载和管理系统，采用异步架构设计，支持多数据源、智能限流、断点续传、自动调度和实时监控。系统基于 Python 3.8+ 构建，使用 FastAPI、SQLAlchemy、APScheduler 等现代化技术栈。
+Quote System v2.4.0 是一个现代化的金融数据下载和管理系统，采用异步架构设计，支持多数据源、多品种类型（股票、指数、ETF）、智能限流、断点续传、自动调度和实时监控。系统基于 Python 3.10+ 构建，使用 FastAPI、SQLAlchemy、APScheduler 等现代化技术栈。
 
 ### 🚀 v2.3.1 架构更新亮点
 - **🤖 Telegram任务管理系统** - 完整的机器人界面和任务控制
@@ -77,8 +77,8 @@ TECH_STACK = {
         "pydantic": "2.11.0"              # 数据验证
     },
     "data_sources": {
-        "baostock": "A股历史数据",          # 主要数据源
-        "akshare": "综合数据接口",          # 开源数据
+        "baostock": "A股历史数据（股票+指数）",  # 主要数据源
+        "akshare": "综合数据接口（ETF数据源）",  # 开源数据
         "tushare": "专业数据服务",         # 商业数据
         "yfinance": "国际市场数据"          # 雅虎财经
     },
@@ -94,7 +94,7 @@ TECH_STACK = {
 ### 技术栈
 
 #### 核心框架
-- **Python 3.8+**: 主要编程语言
+- **Python 3.10+**: 主要编程语言
 - **FastAPI 0.115.0**: 现代 Web 框架，支持异步和自动文档
 - **SQLAlchemy 2.0.25**: 现代 ORM 框架，支持异步操作
 - **APScheduler 3.10.4**: 任务调度框架
@@ -106,8 +106,8 @@ TECH_STACK = {
 - **AIOSQLite 0.20.0**: 异步 SQLite 驱动
 
 #### 数据源
-- **BaoStock**: A股历史数据主要数据源
-- **AkShare**: 综合性金融数据接口
+- **BaoStock**: A股历史数据主要数据源（支持股票和指数，ETF 不支持）
+- **AkShare**: 综合性金融数据接口（ETF 数据源，开发中）
 - **Tushare**: 专业级金融数据服务
 - **YFinance**: 雅虎财经数据接口
 

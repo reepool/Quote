@@ -60,12 +60,27 @@ class BaostockSource(BaseDataSource):
                     ErrorCodes.DATASOURCE_CONNECTION_FAILED
                 ) from e
 
-    async def get_instrument_list(self, exchange: str = None) -> List[Dict[str, Any]]:
-        """获取交易品种列表"""
+    # BaoStock type 字段映射: 1=股票, 2=指数, 4=可转债, 5=ETF/基金
+    # 注意: BaoStock query_history_k_data_plus 不支持 ETF 日线数据查询
+    BAOSTOCK_TYPE_MAP: Dict[str, str] = {'1': 'stock', '2': 'index', '5': 'etf'}
+
+    async def get_instrument_list(self, exchange: str = None,
+                                  instrument_types: List[str] = None) -> List[Dict[str, Any]]:
+        """获取交易品种列表
+
+        Args:
+            exchange: 交易所代码 (SSE/SZSE)
+            instrument_types: 要获取的品种类型列表, 如 ['stock', 'index', 'etf']
+                              为 None 时仅获取 stock（保持向后兼容）
+        """
+        # 默认仅获取股票，保持向后兼容
+        if instrument_types is None:
+            instrument_types = ['stock']
+
         try:
             await self.rate_limiter.acquire()
 
-            # 获取股票列表（包含上市日期）
+            # 获取品种列表（包含上市日期）
             rs = await asyncio.to_thread(
                 bs.query_stock_basic
             )
@@ -87,8 +102,16 @@ class BaostockSource(BaseDataSource):
 
             instruments = []
             for _, row in df.iterrows():
-                # 只包含股票和活跃的品种
-                if row['type'] != '1' or row['status'] != '1':
+                # BaoStock type 映射
+                bs_type = row['type']
+                mapped_type = self.BAOSTOCK_TYPE_MAP.get(bs_type)
+
+                # 跳过不支持的类型或未启用的类型
+                if not mapped_type or mapped_type not in instrument_types:
+                    continue
+
+                # 股票需要检查活跃状态；指数和 ETF 不适用此过滤
+                if mapped_type == 'stock' and row['status'] != '1':
                     continue
 
                 # 根据交易所过滤数据
@@ -96,6 +119,8 @@ class BaostockSource(BaseDataSource):
                 if exchange == 'SSE' and not code.startswith('sh.'):
                     continue
                 elif exchange == 'SZSE' and not code.startswith('sz.'):
+                    continue
+                elif exchange == 'BSE' and not code.startswith('bj.'):
                     continue
 
                 # Baostock的代码格式转换
@@ -122,23 +147,23 @@ class BaostockSource(BaseDataSource):
                     except Exception as e:
                         baostock_logger.warning(f"Failed to parse outDate {row['outDate']} for {code}: {e}")
 
-                # 判断是否为 ST 股 (根据名称简单判断)
+                # 判断是否为 ST 股（仅对股票有意义）
                 name = row['code_name']
-                is_st = 'ST' in name.upper() or '*ST' in name.upper()
+                is_st = mapped_type == 'stock' and ('ST' in name.upper() or '*ST' in name.upper())
 
                 instrument = {
                     'instrument_id': ts_code,
                     'symbol': symbol,
                     'name': name,
                     'exchange': exchange,
-                    'type': 'stock',
+                    'type': mapped_type,
                     'currency': 'CNY',
                     'listed_date': listed_date,
                     'delisted_date': delisted_date,
                     'industry': row.get('industry', ''),
                     'sector': row.get('area', ''),  # BaoStock 的 area 映射为 sector
                     'market': row.get('market', ''),
-                    'status': 'active',  # 默认为活跃，因为已经过滤了 status='1'
+                    'status': 'active',
                     'is_active': True,
                     'is_st': is_st,
                     'trading_status': 1,  # 默认为正常交易状态
@@ -150,7 +175,12 @@ class BaostockSource(BaseDataSource):
                 }
                 instruments.append(instrument)
 
-            baostock_logger.info(f"Retrieved {len(instruments)} instruments from Baostock for {exchange}")
+            # 按类型统计日志
+            type_counts = {}
+            for inst in instruments:
+                t = inst['type']
+                type_counts[t] = type_counts.get(t, 0) + 1
+            baostock_logger.info(f"Retrieved {len(instruments)} instruments from Baostock for {exchange}: {type_counts}")
             return instruments
 
         except Exception as e:
@@ -158,7 +188,8 @@ class BaostockSource(BaseDataSource):
             return []
 
     async def get_daily_data(self, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         try:
             await self.rate_limiter.acquire()
@@ -227,13 +258,35 @@ class BaostockSource(BaseDataSource):
                     else:
                         baostock_logger.error(f"All retry attempts failed for {baostock_code} due to timeout.")
                         raise  # 最终抛出超时异常
+                except Exception as inner_e:
+                    # 捕获类似 Broken pipe 等 Socket 异常
+                    err_msg = str(inner_e).lower()
+                    if any(kw in err_msg for kw in ["broken pipe", "pipe", "reset", "abort", "网络", "connection", "timeout", "eof"]):
+                        baostock_logger.warning(f"Network error during fetch {baostock_code} (attempt {attempt + 1}/{max_retries}): {inner_e}")
+                        self.network_error_count += 1
+                        if not relogin_attempted:
+                            relogin_attempted = True
+                            try:
+                                baostock_logger.warning("Network drop detected, attempting BaoStock re-login")
+                                await self._relogin()
+                                self.network_error_count = 0
+                            except Exception as relogin_error:
+                                baostock_logger.error(f"BaoStock re-login failed: {relogin_error}")
+                        if attempt < max_retries - 1:
+                            delay = base_delay * (2 ** attempt)
+                            baostock_logger.info(f"Retrying inner exception in {delay:.1f} seconds...")
+                            await asyncio.sleep(delay)
+                            continue
+                    # 对于非网络异常直接向外抛
+                    raise
 
-            if rs.error_code != '0':
-                baostock_logger.error(f"Failed to query daily data: {rs.error_msg}")
+            if rs is None or rs.error_code != '0':
+                error_msg = rs.error_msg if rs else "rs is None"
+                baostock_logger.error(f"Failed to query daily data: {error_msg}")
 
-                # 特殊处理"用户未登录"错误
-                if "用户未登录" in rs.error_msg:
-                    baostock_logger.warning("BaoStock session expired, marking as logged out")
+                # 特殊处理"用户未登录"或"网络"错误
+                if rs and ("用户未登录" in rs.error_msg or "网络" in rs.error_msg):
+                    baostock_logger.warning("BaoStock session expired or network error returned, marking as logged out")
                     self.is_logged_in = False
 
                     # 尝试重新登录并重试一次
@@ -297,6 +350,7 @@ class BaostockSource(BaseDataSource):
 
                     # 复权信息
                     'factor': adjustment_config['factor'],
+                    'adjustment_type': adjustment_config.get('type', 'forward'),
                     'source': 'baostock'
                 }
                 quotes.append(quote)
@@ -306,7 +360,7 @@ class BaostockSource(BaseDataSource):
 
         except Exception as e:
             # 网络错误处理
-            if any(keyword in str(e).lower() for keyword in ["网络", "decode", "decompressing", "connection", "timeout", "urlopen"]):
+            if any(keyword in str(e).lower() for keyword in ["网络", "decode", "decompressing", "connection", "timeout", "urlopen", "broken pipe", "pipe", "reset", "abort", "eof"]):
                 self.network_error_count += 1
                 baostock_logger.warning(f"Network error #{self.network_error_count} for {instrument_id}: {e}")
 
@@ -450,7 +504,8 @@ class BaostockSource(BaseDataSource):
                 'close': float(latest_record[5]) if latest_record[5] else 0.0,
                 'volume': int(float(latest_record[7])) if latest_record[7] and float(latest_record[7]) > 0 else 0,
                 'amount': float(latest_record[8]) if latest_record[8] and float(latest_record[8]) > 0 else 0.0,
-                'factor': adjustment_config['factor']
+                'factor': adjustment_config['factor'],
+                'adjustment_type': adjustment_config.get('type', 'forward')
             }
 
         except Exception as e:

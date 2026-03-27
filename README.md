@@ -1,6 +1,6 @@
 # Quote System
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]())
 [![Code Size](https://img.shields.io/badge/Code-25K+-lines-yellow.svg)]())
@@ -11,8 +11,8 @@
 ## ✨ 核心特性
 
 ### 📊 多数据源支持
-- **BaoStock** - 中国A股市场历史数据（主要数据源）
-- **AkShare** - 综合性金融数据接口
+- **BaoStock** - 中国A股市场历史数据（主要数据源，支持股票与指数）
+- **AkShare** - 综合性金融数据接口（ETF 数据源，开发中）
 - **Tushare** - 专业级金融数据服务
 - **YFinance** - 雅虎财经数据接口
 
@@ -96,6 +96,11 @@ python3 main.py download --exchanges SSE SZSE --resume
 # 重置进度重新下载
 python3 main.py download --exchanges SZSE --no-resume
 
+# 按品种类型下载（stock=股票, index=指数, etf=ETF）
+python3 main.py download --types index              # 仅下载指数
+python3 main.py download --types stock index         # 股票+指数
+python3 main.py download --types index --no-resume   # 全量重新下载指数
+
 # 查看所有可用的市场预设
 python3 main.py download --list-presets
 ```
@@ -168,61 +173,6 @@ python3 main.py job --job-id monthly_data_integrity_check
 python3 main.py job --job-id database_backup
 ```
 
-#### 3. 启动服务
-
-```bash
-# 启动API服务器
-python3 main.py api --host 0.0.0.0 --port 8000
-
-# 启动调度器（仅定时任务）
-python3 main.py scheduler
-
-# 启动完整系统（调度器 + API服务）
-python3 main.py full --host 0.0.0.0 --port 8000
-```
-
-#### 4. Telegram任务管理
-
-系统提供完整的Telegram机器人管理界面：
-
-```bash
-# 启动包含任务管理器的完整系统
-python3 main.py full --host 0.0.0.0 --port 8000
-
-# 或分别启动调度器和API服务
-python3 main.py scheduler
-python3 main.py api --host 0.0.0.0 --port 8000
-```
-
-**Telegram机器人命令**：
-```
-/start           # 显示主菜单和帮助信息
-/status          # 查看所有任务状态和下次执行时间
-/detail <任务ID>  # 查看指定任务的详细信息
-/reload_config   # 热重载配置文件
-/help            # 显示帮助信息
-```
-
-**任务控制示例**：
-```bash
-# 在Telegram中直接发送命令
-/status                    # 显示任务状态（智能时间显示）
-/detail daily_data_update  # 查看每日数据更新任务详情
-/reload_config            # 重载任务配置
-```
-
-#### 5. 系统管理
-
-```bash
-# 显示系统状态
-python3 main.py status
-
-# 运行指定任务
-python3 main.py job --job-id daily_data_update
-python3 main.py job --job-id monthly_data_integrity_check
-python3 main.py job --job-id database_backup
-```
-
 ## 📖 详细功能说明
 
 ### 调度系统
@@ -233,8 +183,8 @@ python3 main.py job --job-id database_backup
 
 1. **每日数据更新** (`daily_data_update`)
    - **执行时间**: 每周一至周五 20:00
-   - **功能**: 自动更新当日股票数据
-   - **特点**: 支持交易日检查、市场收盘等待
+   - **功能**: 自动更新当日股票和指数数据
+   - **特点**: 支持交易日检查、市场收盘等待、品种类型过滤（通过 `instrument_types` 配置）
 
 2. **系统健康检查** (`system_health_check`)
    - **执行时间**: 每小时执行一次
@@ -333,38 +283,38 @@ python3 main.py job --job-id database_backup
 
 #### 系统管理
 ```bash
-# 健康检查
+# 健康检查（应用根路径）
 curl http://localhost:8000/health
 
 # 系统状态
-curl http://localhost:8000/system/status
+curl http://localhost:8000/api/v1/system/status
 
 # 系统统计
-curl http://localhost:8000/stats
+curl http://localhost:8000/api/v1/stats
 ```
 
 #### 交易品种管理
 ```bash
 # 获取交易品种列表（支持过滤）
-curl "http://localhost:8000/instruments?exchange=SSE&limit=100"
+curl "http://localhost:8000/api/v1/instruments?exchange=SSE&limit=100"
 
 # 根据ID获取品种信息
-curl http://localhost:8000/instruments/000001.SZSE
+curl http://localhost:8000/api/v1/instruments/000001.SZSE
 
 # 根据代码获取品种信息
-curl http://localhost:8000/instruments/symbol/000001
+curl http://localhost:8000/api/v1/instruments/symbol/000001
 ```
 
 #### 行情数据接口
 ```bash
 # 获取日线数据（支持多种格式）
-curl "http://localhost:8000/quotes/daily?symbol=000001.SZSE&start_date=2024-01-01&format=json"
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=000001.SZSE&start_date=2024-01-01&end_date=2024-01-31&return_format=json"
 
 # 获取最新行情数据
-curl "http://localhost:8000/quotes/latest?symbols=000001.SZSE,600000.SSE"
+curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&instrument_ids=600000.SSE"
 
-# 批量获取数据
-curl -X POST http://localhost:8000/data/download/historical \
+# 批量获取历史数据任务
+curl -X POST http://localhost:8000/api/v1/data/download/historical \
   -H "Content-Type: application/json" \
   -d '{"exchanges": ["SSE", "SZSE"], "years": [2024]}'
 ```
@@ -372,27 +322,27 @@ curl -X POST http://localhost:8000/data/download/historical \
 #### 数据缺口管理
 ```bash
 # 获取数据缺口
-curl "http://localhost:8000/gaps?exchange=SSE&start_date=2024-01-01"
+curl "http://localhost:8000/api/v1/gaps?exchange=SSE&start_date=2024-01-01&end_date=2024-12-31"
 
-# 填补数据缺口
-curl -X POST http://localhost:8000/gaps/fill \
+# 填补数据缺口任务
+curl -X POST http://localhost:8000/api/v1/gaps/fill \
   -H "Content-Type: application/json" \
-  -d '{"exchange": "SSE", "start_date": "2024-01-01", "auto_fix": true}'
+  -d '{"exchange": "SSE", "dry_run": false}'
 
 # 数据质量报告
-curl "http://localhost:8000/gaps/report?detailed=true"
+curl "http://localhost:8000/api/v1/gaps/report"
 ```
 
 #### 交易日历接口
 ```bash
 # 获取交易日历
-curl "http://localhost:8000/calendar/trading?exchange=SSE&year=2024"
+curl "http://localhost:8000/api/v1/calendar/trading?exchange=SSE&start_date=2024-01-01&end_date=2024-12-31"
 
 # 获取下一个交易日
-curl http://localhost:8000/calendar/trading/next?exchange=SSE
+curl "http://localhost:8000/api/v1/calendar/trading/next?exchange=SSE&date=2024-01-01"
 
 # 获取上一个交易日
-curl http://localhost:8000/calendar/trading/previous?exchange=SSE
+curl "http://localhost:8000/api/v1/calendar/trading/previous?exchange=SSE&date=2024-01-01"
 ```
 
 ### 数据缺口检测
@@ -590,6 +540,11 @@ Quote/
 - **复权数据** - 前复权/后复权
 - **基本面数据** - 股票基本信息
 - **交易日历** - 交易日/非交易日
+
+### 品种类型
+- **stock** - 个股（A股）
+- **index** - 指数（上证综指、深证成指等）
+- **etf** - ETF基金（品种已入库，历史数据需 AkShare 补齐）
 
 ### 数据质量
 - **实时评分** - 每条数据都有质量评分

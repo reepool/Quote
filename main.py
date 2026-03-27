@@ -194,7 +194,8 @@ class QuoteSystem:
 
     async def download_historical_data(self, exchanges: Optional[list] = None, years: Optional[list] = None,
                                       start_date: Optional[date] = None, end_date: Optional[date] = None,
-                                      preset: Optional[str] = None, resume: bool = True):
+                                      preset: Optional[str] = None, resume: bool = True,
+                                      instrument_types: Optional[list] = None):
         """下载历史数据"""
         try:
             dm_logger.info("[Main] Starting historical data download...")
@@ -208,7 +209,7 @@ class QuoteSystem:
 
             # 刷新股票列表以获取最新的上市日期信息
             dm_logger.info("[Main] Using precise download mode (based on listed dates)")
-            await self._refresh_instrument_list(exchanges)
+            await self._refresh_instrument_list(exchanges, instrument_types=instrument_types)
 
             # 处理日期范围参数
             from datetime import date
@@ -245,12 +246,12 @@ class QuoteSystem:
                 force_update_calendar = False
                 dm_logger.info("[Main] Using cached trading calendar for partial date range download")
             elif resume and data_manager.progress.processed_instruments > 0:
-                force_update_calendar = False
-                dm_logger.info("[Main] Resume mode, using cached trading calendar")
+                dm_logger.info("[Main] Resume mode, continuing with download progress")
 
             await data_manager.download_all_historical_data(
                 exchanges, start_date, end_date, resume=resume,
-                force_update_calendar=force_update_calendar
+                force_update_calendar=force_update_calendar,
+                instrument_types=instrument_types
             )
 
             dm_logger.info("[Main] Historical data download completed")
@@ -259,7 +260,8 @@ class QuoteSystem:
             dm_logger.error(f"[Main] Historical data download failed: {e}")
             raise
 
-    async def _refresh_instrument_list(self, exchanges: List[str]):
+    async def _refresh_instrument_list(self, exchanges: List[str],
+                                       instrument_types: Optional[list] = None):
         """刷新交易品种列表（获取最新的上市日期信息）"""
         try:
             dm_logger.info(f"[Main] Refreshing instrument list for exchanges: {exchanges}")
@@ -270,7 +272,9 @@ class QuoteSystem:
                 dm_logger.info(f"[Main] Refreshing instruments for {exchange}")
 
                 # 获取最新的交易品种信息（包含上市日期）- 强制刷新
-                instruments = await data_source_factory.get_instrument_list(exchange, force_refresh=True)
+                instruments = await data_source_factory.get_instrument_list(
+                    exchange, force_refresh=True, instrument_types=instrument_types
+                )
 
                 if instruments:
                     # 保存到数据库
@@ -473,7 +477,8 @@ class QuoteSystem:
                     exchanges=params.get('exchanges'),
                     wait_for_market_close=params.get('wait_for_market_close', True),
                     market_close_delay_minutes=params.get('market_close_delay_minutes', 15),
-                    enable_trading_day_check=params.get('enable_trading_day_check', True)
+                    enable_trading_day_check=params.get('enable_trading_day_check', True),
+                    instrument_types=params.get('instrument_types')
                 )
 
                 if success:
@@ -1120,6 +1125,8 @@ def create_parser():
     download_parser.add_argument('--list-presets', action='store_true', help='显示所有可用的市场预设')
     download_parser.add_argument('--resume', action='store_true', help='续传模式（默认开启，使用--no-resume禁用）')
     download_parser.add_argument('--no-resume', action='store_true', help='重置进度重新下载')
+    download_parser.add_argument('--types', nargs='+', choices=['stock', 'index', 'etf'],
+                               help='品种类型 (默认使用配置文件 instrument_types)')
     download_parser.set_defaults(resume=True)
 
     # 更新日线数据
@@ -1239,7 +1246,7 @@ async def main():
                 else:
                     # 下载历史数据（原有的逻辑）
                     await system.download_historical_data(args.exchanges, args.years, start_date, end_date, args.preset,
-                                                        resume=resume)
+                                                        resume=resume, instrument_types=getattr(args, 'types', None))
 
         elif args.command == 'update':
             await system.update_daily_data(args.exchanges)

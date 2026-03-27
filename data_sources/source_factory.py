@@ -171,8 +171,15 @@ class DataSourceFactory:
         backup_sources = self.region_to_sources['backup'].get(region, [])
         return backup_sources[0] if backup_sources else None
 
-    async def get_instrument_list(self, exchange: str, force_refresh: bool = False) -> List[Dict[str, Any]]:
-        """获取交易品种列表 - 智能降级策略"""
+    async def get_instrument_list(self, exchange: str, force_refresh: bool = False,
+                                  instrument_types: List[str] = None) -> List[Dict[str, Any]]:
+        """获取交易品种列表 - 智能降级策略
+
+        Args:
+            exchange: 交易所代码
+            force_refresh: 是否强制刷新
+            instrument_types: 要获取的品种类型列表, 如 ['stock', 'index', 'etf']
+        """
         exchange = exchange.upper()
 
         # 第一步：检查是否需要强制刷新
@@ -180,6 +187,12 @@ class DataSourceFactory:
             try:
                 with LogContext("DataSourceFactory", "get_cached_instruments", exchange=exchange):
                     cached_instruments = await self._get_cached_instruments(exchange)
+                    # 如果指定了 instrument_types，按类型过滤缓存
+                    if cached_instruments and instrument_types:
+                        cached_instruments = [
+                            inst for inst in cached_instruments
+                            if inst.get('type') in instrument_types
+                        ]
                     # 缓存检查：如果记录数过少（少于100条），强制刷新
                     if cached_instruments and len(cached_instruments) >= 100:
                         ds_logger.info(f"[DataSourceFactory] Using cached instruments for {exchange}: {len(cached_instruments)} items")
@@ -199,7 +212,45 @@ class DataSourceFactory:
 
         try:
             with LogContext("DataSourceFactory", "get_primary_instruments", exchange=exchange):
-                instruments = await primary_source.get_instrument_list(exchange)
+                # 透传 instrument_types（支持该参数的数据源会按类型过滤）
+                try:
+                    instruments = await primary_source.get_instrument_list(
+                        exchange, instrument_types=instrument_types
+                    )
+                except TypeError:
+                    # 数据源不支持 instrument_types 参数，回退到基本调用
+                    instruments = await primary_source.get_instrument_list(exchange)
+                    if instrument_types:
+                        instruments = [
+                            inst for inst in instruments
+                            if inst.get('type') in instrument_types
+                        ]
+
+                # 第三步：尝试从备用数据源进行并集合并（填补被主数据源遗漏的成分）
+                backup_source = self.get_backup_source(exchange)
+                if backup_source:
+                    try:
+                        ds_logger.info(f"[DataSourceFactory] Fetching instruments from backup_source {backup_source.name} for {exchange}...")
+                        try:
+                            backup_instruments = await backup_source.get_instrument_list(exchange, instrument_types=instrument_types)
+                        except TypeError:
+                            backup_instruments = await backup_source.get_instrument_list(exchange)
+                            if instrument_types:
+                                backup_instruments = [inst for inst in backup_instruments if inst.get('type') in instrument_types]
+                        
+                        if backup_instruments:
+                            # 按照 instrument_id 对仪器进行合并，保留 primary 的绝对优先级
+                            merged_dict = {inst['instrument_id']: inst for inst in instruments}
+                            added_count = 0
+                            for b_inst in backup_instruments:
+                                if b_inst['instrument_id'] not in merged_dict:
+                                    merged_dict[b_inst['instrument_id']] = b_inst
+                                    added_count += 1
+                            instruments = list(merged_dict.values())
+                            ds_logger.info(f"[DataSourceFactory] Successfully merged {added_count} instruments from {backup_source.name}. Total now: {len(instruments)}")
+                    except Exception as e:
+                        ds_logger.warning(f"[DataSourceFactory] Failed to get instruments from backup source {backup_source.name}: {e}")
+
                 if instruments and len(instruments) > 50:  # 认为是完整的列表
                     # 验证数据质量
                     if self._validate_instrument_list(instruments, exchange):
@@ -211,12 +262,6 @@ class DataSourceFactory:
                         ds_logger.warning(f"[DataSourceFactory] Invalid instrument list from {primary_source.name}")
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get instrument list from {primary_source.name}: {e}")
-
-        # 第三步：尝试从备用数据源获取（但只用于历史数据，不用于instruments列表）
-        backup_source = self.get_backup_source(exchange)
-        if backup_source:
-            ds_logger.warning(f"[DataSourceFactory] Primary source failed for {exchange}, checking backup...")
-            # 注意：yfinance等备用数据源不提供完整instruments列表，所以这里不获取
 
         # 第四步：如果所有方法都失败，返回空列表
         ds_logger.error(f"[DataSourceFactory] No valid instrument list available for {exchange}")
@@ -300,17 +345,18 @@ class DataSourceFactory:
                 close_price = float(quote.get('close', 0))
                 high_price = float(quote.get('high', 0))
                 low_price = float(quote.get('low', 0))
-
-                if open_price <= 0 or close_price <= 0 or high_price <= 0 or low_price <= 0:
-                    ds_logger.warning(f"[DataSourceFactory] Invalid price data: open={open_price}, close={close_price}, high={high_price}, low={low_price}")
+                if open_price < 0 or close_price < 0 or high_price < 0 or low_price < 0:
+                    ds_logger.warning(f"[DataSourceFactory] Negative price data: open={open_price}, close={close_price}, high={high_price}, low={low_price}")
                     return False
+                    
+                if open_price == 0 or close_price == 0:
+                    ds_logger.warning(f"[DataSourceFactory] Zero price data observed: open={open_price}, close={close_price}, high={high_price}, low={low_price}. Will be filtered by DataManager.")
 
                 if high_price < low_price:
-                    ds_logger.warning(f"[DataSourceFactory] Invalid price relationship: high < low for {symbol}")
-                    return False
+                    ds_logger.warning(f"[DataSourceFactory] Invalid price relationship: high < low for {symbol}. Will be filtered by DataManager.")
 
                 if close_price > high_price or close_price < low_price:
-                    # 这是正常的，股价可能跳空
+                    # 这是正常的，股价可能跳空 / 不调整
                     pass
 
             except (ValueError, TypeError):
@@ -321,7 +367,8 @@ class DataSourceFactory:
         return True
 
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取日线数据 - 智能降级策略"""
         exchange = exchange.upper()
 
@@ -335,7 +382,7 @@ class DataSourceFactory:
             with LogContext("DataSourceFactory", "get_primary_data",
                            exchange=exchange, source=primary_source.name,
                            instrument_id=instrument_id, symbol=symbol):
-                data = await primary_source.get_daily_data(instrument_id, symbol, start_date, end_date)
+                data = await primary_source.get_daily_data(instrument_id, symbol, start_date, end_date, instrument_type)
                 if data and self._validate_daily_data(data, instrument_id, symbol):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
@@ -352,7 +399,7 @@ class DataSourceFactory:
                 with LogContext("DataSourceFactory", "get_backup_data",
                                exchange=exchange, source=backup_source.name,
                                instrument_id=instrument_id, symbol=symbol):
-                    data = await backup_source.get_daily_data(instrument_id, symbol, start_date, end_date)
+                    data = await backup_source.get_daily_data(instrument_id, symbol, start_date, end_date, instrument_type)
                     if data and self._validate_daily_data(data, instrument_id, symbol):
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
                         return data

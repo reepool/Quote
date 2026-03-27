@@ -28,6 +28,9 @@ http://localhost:8000/api/v1
 
 ## 健康检查与系统状态
 
+### GET /
+应用根路径。
+
 ### GET /health
 应用根路径健康检查（不带 `/api/v1` 前缀）。
 
@@ -135,9 +138,7 @@ curl -X POST "http://localhost:8000/api/v1/data/download/historical" \
 ```
 
 ### GET /api/v1/data/download/progress
-获取历史下载任务进度。
-
----
+获取历史下载任务进度。返回当前的下载批次、处理品种数、成功率、预估剩余时间等进度详情（`DownloadProgressResponse`）。
 
 ## 数据缺口（Data Gaps）
 
@@ -243,12 +244,21 @@ curl "http://localhost:8000/api/v1/calendar/trading/previous?exchange=SSE&date=2
 ## 统计与验证
 
 ### GET /api/v1/stats
-返回数据库与数据质量统计摘要。
+返回数据库与数据质量统计摘要（与 `DataStatsResponse` 结构一致），包括品种数、行情数、高质量记录、缺口总数及各级分布等。
 
 ### POST /api/v1/data/validate
-数据质量验证（当前实现为简化占位返回）。
+启动数据质量验证并返回基本验证结果（`DataValidationResponse`）。
 
-请求体：`DataValidationRequest`
+**请求体**：
+```json
+{
+  "exchange": "SSE",
+  "start_date": "2024-01-01",
+  "end_date": "2024-12-31",
+  "validation_type": "completeness",
+  "strict_mode": false
+}
+```
 
 ---
 

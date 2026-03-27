@@ -141,7 +141,8 @@ class DataManager:
                                          start_date: Optional[date] = None, end_date: Optional[date] = None,
                                          resume: bool = True,
                                          quality_threshold: float = 0.7,
-                                         force_update_calendar: bool = True) -> None:
+                                         force_update_calendar: bool = True,
+                                         instrument_types: Optional[List[str]] = None) -> None:
         """下载所有历史数据
 
         Args:
@@ -150,12 +151,19 @@ class DataManager:
             end_date: 结束日期（如果为None，使用昨天）
             resume: 是否续传
             quality_threshold: 数据质量阈值
+            instrument_types: 品种类型列表, 如 ['stock', 'index', 'etf']
+                              为 None 时从配置 data_config.instrument_types 读取
         """
         if self.is_running:
             dm_logger.warning("download already in progress")
             return
 
         self.is_running = True
+
+        # 从配置读取默认品种类型
+        if instrument_types is None:
+            instrument_types = self.data_config.get('instrument_types', ['stock'])
+        dm_logger.info(f"Instrument types to download: {instrument_types}")
 
         # 处理续传逻辑
         has_existing_progress = (self.progress.processed_instruments > 0 and
@@ -182,6 +190,12 @@ class DataManager:
                 self.progress.total_instruments = 0
                 for exchange in exchanges:
                     instruments = await self.db_ops.get_instruments_by_exchange(exchange)
+                    # 按品种类型过滤
+                    if instrument_types:
+                        instruments = [
+                            inst for inst in instruments
+                            if inst.get('type') in instrument_types
+                        ]
                     all_instruments[exchange] = instruments
                     self.progress.total_instruments += len(instruments)
             await self._save_progress()
@@ -203,7 +217,13 @@ class DataManager:
                 with LogContext("DataManager", "download_exchange", exchange=exchange):
                     # 如果在续传模式，需要重新获取instruments
                     if exchange not in all_instruments:
-                        all_instruments[exchange] = await self.db_ops.get_instruments_by_exchange(exchange)
+                        instruments = await self.db_ops.get_instruments_by_exchange(exchange)
+                        if instrument_types:
+                            instruments = [
+                                inst for inst in instruments
+                                if inst.get('type') in instrument_types
+                            ]
+                        all_instruments[exchange] = instruments
 
                     # 统一使用精确下载模式
                     await self._download_exchange_precise(
@@ -301,24 +321,18 @@ class DataManager:
             batch_size = self.data_config.get('batch_size', 50)
             batches = [instruments[i:i + batch_size] for i in range(0, len(instruments), batch_size)]
 
-            # 修复的续传逻辑 - 按交易所独立跟踪进度
-            if resume:
-                # 检查当前交易所是否已经有处理记录
-                exchange_processed = await self._get_exchange_processed_count(exchange)
-                dm_logger.info(f"Resume mode: {exchange} - {exchange_processed} instruments already processed")
-            else:
-                exchange_processed = 0
-                dm_logger.info(f"Fresh download mode: {exchange}")
-
-            processed_batches = (exchange_processed // batch_size)
-            start_batch = processed_batches + 1
-
+            # 不再使用基于全市场总数的粗糙批次跳过，而是传入 resume 给批次处理，进行逐个品种的精确跳过
+            start_batch = 1
             self.progress.total_batches = len(batches)
-            dm_logger.info(f"Processing {len(batches)} batches for {exchange}, resuming from batch {start_batch}")
+            
+            if resume:
+                dm_logger.info(f"Resume mode: {exchange} - will check each instrument individually")
+            else:
+                dm_logger.info(f"Fresh download mode: {exchange} - downloading all from scratch")
+
+            dm_logger.info(f"Processing {len(batches)} batches for {exchange}")
 
             for batch_idx, batch in enumerate(batches, 1):
-                if batch_idx < start_batch:
-                    continue
 
                 with LogContext("DataManager", "process_precise_batch",
                                exchange=exchange, batch_idx=batch_idx):
@@ -327,7 +341,7 @@ class DataManager:
                     dm_logger.info(f"Processing precise batch {batch_idx}/{len(batches)}")
 
                     await self._download_batch_precise(
-                        batch, exchange, start_date, end_date, quality_threshold
+                        batch, exchange, start_date, end_date, quality_threshold, resume
                     )
 
                     # 批次间延迟
@@ -340,16 +354,42 @@ class DataManager:
 
     async def _download_batch_precise(self, instruments: List[Dict], exchange: str,
                                             start_date: date, end_date: date,
-                                            quality_threshold: float):
+                                            quality_threshold: float, resume: bool = False):
         """标准精确批次下载"""
         batch_data = []
         batch_quality_scores = []
 
         for instrument in instruments:
             try:
-                # 获取股票的上市日期
-                listed_date = instrument.get('listed_date')
-                instrument_start = listed_date if listed_date else start_date
+                instrument_start = None
+                
+                # ====== 精确断点续传检测 ======
+                if resume:
+                    last_update = await self.db_ops.get_latest_quote_date(
+                        instrument['instrument_id']
+                    )
+                    if last_update:
+                        if isinstance(last_update, datetime):
+                            last_update = last_update.date()
+                            
+                        if last_update >= end_date:
+                            dm_logger.debug(f"Skipping {instrument['instrument_id']}, already updated to {last_update}")
+                            self.progress.processed_instruments += 1
+                            continue
+                        else:
+                            # 从最后更新日期的下一天开始下载
+                            dm_logger.debug(f"Resuming {instrument['instrument_id']} from {last_update + timedelta(days=1)}")
+                            instrument_start = last_update + timedelta(days=1)
+                
+                if instrument_start is None:
+                    # 获取品种的上市日期（指数/ETF 可能无 listed_date）
+                    listed_date = instrument.get('listed_date')
+                    instrument_start = listed_date if listed_date else start_date
+                
+                # 兜底：如果仍然无起始日期，使用配置的默认起始年份
+                if instrument_start is None:
+                    default_year = self.data_config.get('default_start_years', {}).get(exchange, 1990)
+                    instrument_start = date(default_year, 1, 1)
 
                 instrument_start_date = instrument_start
                 if isinstance(instrument_start_date, datetime):
@@ -441,9 +481,10 @@ class DataManager:
                     start_date_for_download = datetime.combine(actual_start_date, datetime.min.time())
                     end_date_for_download = datetime.combine(actual_end_date, datetime.max.time())
 
+                    source_name = instrument.get('source', 'Unknown')
                     dm_logger.info(f"一次性下载 {instrument['instrument_id']} 数据 "
                                   f"从 {start_date_for_download.date()} 到 {end_date_for_download.date()} "
-                                  f"(共 {len(filtered_trading_days)} 个交易日)")
+                                  f"通过源 [{source_name}] (共 {len(filtered_trading_days)} 个交易日)")
 
                     # 更新trading_days为过滤后的列表，用于后续处理
                     trading_days = filtered_trading_days
@@ -458,7 +499,8 @@ class DataManager:
                     instrument['instrument_id'],
                     instrument['symbol'],
                     start_date_for_download,
-                    end_date_for_download
+                    end_date_for_download,
+                    instrument.get('type', 'stock')
                 )
 
                 if all_data_response:
@@ -1205,7 +1247,7 @@ class DataManager:
                     'data_gaps_detected': self.progress.data_gaps_detected,
                     'quality_score': self.progress.get_data_quality_score(),
                     'start_time': self.progress.start_time,
-                    'duration': datetime.now() - self.progress.start_time
+                    'duration': get_shanghai_time() - self.progress.start_time
                 },
                 'exchange_stats': {},
                 'database_stats': {},
@@ -1225,10 +1267,10 @@ class DataManager:
                         MAX(dq.time) as latest_date
                     FROM instruments i
                     LEFT JOIN daily_quotes dq ON i.instrument_id = dq.instrument_id
-                    WHERE i.exchange = ? AND i.is_active = 1
+                    WHERE i.exchange = :exchange AND i.is_active = 1
                     """
 
-                    result = await self.db_ops.execute_query(exchange_query, (exchange,))
+                    result = await self.db_ops.execute_read_query(exchange_query, {"exchange": exchange})
                     if result:
                         stats = result[0]
                         report['exchange_stats'][exchange] = {
@@ -1486,7 +1528,8 @@ class DataManager:
                                target_date: Optional[date] = None,
                                per_instrument_timeout_sec: Optional[int] = None,
                                progress_log_every: int = 200,
-                               progress_log_interval_sec: int = 300) -> Optional[dict]:
+                               progress_log_interval_sec: int = 300,
+                               instrument_types: Optional[List[str]] = None) -> Optional[dict]:
         """每日数据更新"""
         try:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
@@ -1496,6 +1539,9 @@ class DataManager:
 
             if target_date is None:
                 target_date = date.today()
+                
+            if instrument_types is None:
+                instrument_types = self.data_config.get('instrument_types', ['stock', 'index'])
 
             # 统计更新结果
             update_results = {
@@ -1507,10 +1553,10 @@ class DataManager:
 
             for exchange in exchanges:
                 try:
-                    dm_logger.info(f"[DataManager] Updating data for {exchange}")
+                    dm_logger.info(f"[DataManager] Updating data for {exchange}, types: {instrument_types}")
 
                     # 获取该交易所的活跃股票
-                    instruments = await self.db_ops.get_active_instruments(exchange)
+                    instruments = await self.db_ops.get_active_instruments(exchange, instrument_types=instrument_types)
                     total_instruments = len(instruments)
                     exchange_result = {
                         'success_count': 0,

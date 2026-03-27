@@ -47,7 +47,7 @@ SchedulerCore
 ### 1. 每日数据更新 (daily_data_update)
 
 #### 功能描述
-自动下载和更新当日股票数据，确保数据的及时性。
+自动下载和更新当日股票和指数数据，确保数据的及时性。通过 `instrument_types` 参数控制更新的品种范围（默认读取配置文件）。
 
 #### 配置示例
 ```json
@@ -87,8 +87,13 @@ async def daily_data_update(self,
                             exchanges: List[str] = None,
                             wait_for_market_close: bool = True,
                             market_close_delay_minutes: int = 15,
-                            enable_trading_day_check: bool = True):
-    """每日数据更新任务"""
+                            enable_trading_day_check: bool = True,
+                            instrument_types: List[str] = None):
+    """每日数据更新任务
+    
+    instrument_types: 要更新的品种类型列表，如 ['stock', 'index']。
+                     若不传则读取配置文件 instrument_types 项。
+    """
 ```
 
 ### 2. 交易日历更新 (trading_calendar_update)

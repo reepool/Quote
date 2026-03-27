@@ -153,7 +153,7 @@ class AkShareSource(BaseDataSource):
         return False
 
 
-    async def get_instrument_list(self, exchange: str = None) -> List[Dict[str, Any]]:
+    async def get_instrument_list(self, exchange: str = None, instrument_types: List[str] = None) -> List[Dict[str, Any]]:
         """获取沪深京A股交易所股票列表（根据配置规则解析）"""
         try:
             await self.rate_limiter.acquire()
@@ -180,7 +180,10 @@ class AkShareSource(BaseDataSource):
 
             stock_list = None
 
-            if exchange and exchange in ak_exchange_api_map:
+            # 判断是否需要拉取底层股票列表
+            needs_stock = not instrument_types or any(t in instrument_types for t in ["stock", "etf"])
+
+            if needs_stock and exchange and exchange in ak_exchange_api_map:
                 # 使用特定交易所的 API
                 try:
                     if exchange == "SSE":
@@ -227,7 +230,7 @@ class AkShareSource(BaseDataSource):
                     stock_list = None
 
             # 如果特定交易所API失败，或者没有指定交易所，尝试使用全市场API
-            if stock_list is None or stock_list.empty:
+            if needs_stock and (stock_list is None or stock_list.empty):
                 try:
                     akshare_logger.info(f"[{self.name}] Using stock_info_a_code_name as fallback")
                     all_stocks = await asyncio.to_thread(ak.stock_info_a_code_name)
@@ -251,10 +254,8 @@ class AkShareSource(BaseDataSource):
                 except Exception as e:
                     akshare_logger.error(f"[{self.name}] Failed to get stock list from stock_info_a_code_name: {e}")
                     return []
-
-            if stock_list.empty:
-                akshare_logger.warning(f"[{self.name}] Empty stock list returned from AkShare")
-                return []
+            if stock_list is None:
+                stock_list = pd.DataFrame()
 
             def _get_exchange(symbol: str) -> str:
                 """使用工具函数判断交易所（仅用于全市场）"""
@@ -262,66 +263,119 @@ class AkShareSource(BaseDataSource):
                 return exchange if exchange else "UNKNOWN"
 
             instruments = []
-            for row in stock_list.itertuples(index=False):
+            if not stock_list.empty:
+                for row in stock_list.itertuples(index=False):
+                    try:
+                        # 根据数据来源确定列名
+                        if exchange in ["SSE"]:  # stock_info_sh_name_code
+                            symbol = str(row.证券代码)
+                            name = str(row.证券简称)
+                            exchange_code = "SSE"
+                        elif exchange in ["SZSE"]:  # stock_info_sz_name_code
+                            symbol = str(row.A股代码)
+                            name = str(row.A股简称)
+                            exchange_code = "SZSE"
+                        elif exchange in ["BSE"]:  # stock_info_bj_name_code
+                            symbol = str(row.证券代码)
+                            name = str(row.证券简称)
+                            exchange_code = "BSE"
+                        else:  # stock_info_a_code_name (fallback)
+                            symbol = str(row.code)
+                            name = str(row.name)
+                            exchange_code = exchange or _get_exchange(symbol)
+                            if exchange_code == "UNKNOWN":
+                                continue
+
+                        # 所有API都没有价格信息，默认设为活跃状态
+                        is_active = True
+
+                        instrument_id = self._generate_instrument_id(symbol, exchange_code)
+
+                        # 判断是否为 ST 股
+                        is_st = 'ST' in name.upper() or '*ST' in name.upper()
+
+                        # 统一数据格式，与 Baostock 保持一致
+                        instrument_data = {
+                            "instrument_id": instrument_id,
+                            "symbol": symbol,
+                            "name": name,
+                            "exchange": exchange_code,
+                            "type": "stock",  # 统一为小写
+                            "currency": "CNY",
+                            "listed_date": None,  # AkShare API 暂时没有提供
+                            "delisted_date": None,  # AkShare API 暂时没有提供
+                            "industry": "",  # AkShare API 暂时没有提供
+                            "sector": "",   # AkShare API 暂时没有提供
+                            "market": "",   # AkShare API 暂时没有提供
+                            "status": "active",  # 默认为活跃
+                            "is_active": is_active,
+                            "is_st": is_st,
+                            "trading_status": 1,  # 默认为正常交易状态
+                            "source": "akshare",
+                            "source_symbol": symbol,  # AkShare 的原始代码
+                            "created_at": datetime.now(),
+                            "updated_at": datetime.now(),
+                            "data_version": 1
+                        }
+
+                        instruments.append(instrument_data)
+
+                    except Exception as e:
+                        akshare_logger.debug(f"[{self.name}] Error processing stock {row}: {e}")
+                        continue
+
+        # == 新增指数获取逻辑 ==
+            if instrument_types and "index" in instrument_types:
                 try:
-                    # 根据数据来源确定列名
-                    if exchange in ["SSE"]:  # stock_info_sh_name_code
-                        symbol = str(row.证券代码)
-                        name = str(row.证券简称)
-                        exchange_code = "SSE"
-                    elif exchange in ["SZSE"]:  # stock_info_sz_name_code
-                        symbol = str(row.A股代码)
-                        name = str(row.A股简称)
-                        exchange_code = "SZSE"
-                    elif exchange in ["BSE"]:  # stock_info_bj_name_code
-                        symbol = str(row.证券代码)
-                        name = str(row.证券简称)
-                        exchange_code = "BSE"
-                    else:  # stock_info_a_code_name (fallback)
-                        symbol = str(row.code)
-                        name = str(row.name)
-                        exchange_code = exchange or _get_exchange(symbol)
-                        if exchange_code == "UNKNOWN":
-                            continue
+                    index_dfs = []
+                    if not exchange or exchange == "SSE":
+                        df_sh = await asyncio.to_thread(ak.stock_zh_index_spot_em, symbol="上证系列指数")
+                        df_sh["exchange_code"] = "SSE"
+                        index_dfs.append(df_sh)
+                    if not exchange or exchange == "SZSE":
+                        df_sz = await asyncio.to_thread(ak.stock_zh_index_spot_em, symbol="深证系列指数")
+                        df_sz["exchange_code"] = "SZSE"
+                        index_dfs.append(df_sz)
 
-                    # 所有API都没有价格信息，默认设为活跃状态
-                    is_active = True
-
-                    instrument_id = self._generate_instrument_id(symbol, exchange_code)
-
-                    # 判断是否为 ST 股
-                    is_st = 'ST' in name.upper() or '*ST' in name.upper()
-
-                    # 统一数据格式，与 Baostock 保持一致
-                    instrument_data = {
-                        "instrument_id": instrument_id,
-                        "symbol": symbol,
-                        "name": name,
-                        "exchange": exchange_code,
-                        "type": "stock",  # 统一为小写
-                        "currency": "CNY",
-                        "listed_date": None,  # AkShare API 暂时没有提供
-                        "delisted_date": None,  # AkShare API 暂时没有提供
-                        "industry": "",  # AkShare API 暂时没有提供
-                        "sector": "",   # AkShare API 暂时没有提供
-                        "market": "",   # AkShare API 暂时没有提供
-                        "status": "active",  # 默认为活跃
-                        "is_active": is_active,
-                        "is_st": is_st,
-                        "trading_status": 1,  # 默认为正常交易状态
-                        "source": "akshare",
-                        "source_symbol": symbol,  # AkShare 的原始代码
-                        "created_at": datetime.now(),
-                        "updated_at": datetime.now(),
-                        "data_version": 1
-                    }
-
-                    instruments.append(instrument_data)
-
+                    if index_dfs:
+                        all_indices = pd.concat(index_dfs, ignore_index=True)
+                        for row in all_indices.itertuples(index=False):
+                            try:
+                                symbol = str(row.代码).zfill(6)
+                                name = str(row.名称)
+                                exchange_code = str(row.exchange_code)
+                                instrument_id = self._generate_instrument_id(symbol, exchange_code)
+                                
+                                instrument_data = {
+                                    "instrument_id": instrument_id,
+                                    "symbol": symbol,
+                                    "name": name,
+                                    "exchange": exchange_code,
+                                    "type": "index",
+                                    "currency": "CNY",
+                                    "listed_date": None,
+                                    "delisted_date": None,
+                                    "industry": "",
+                                    "sector": "",
+                                    "market": "",
+                                    "status": "active",
+                                    "is_active": True,
+                                    "is_st": False,
+                                    "trading_status": 1,
+                                    "source": "akshare",
+                                    "source_symbol": symbol,
+                                    "created_at": datetime.now(),
+                                    "updated_at": datetime.now(),
+                                    "data_version": 1
+                                }
+                                instruments.append(instrument_data)
+                            except Exception as parse_e:
+                                akshare_logger.warning(f"[{self.name}] Failed to parses index row: {parse_e}")
+                        akshare_logger.info(f"[{self.name}] Successfully appended {len(all_indices)} indices")
                 except Exception as e:
-                    akshare_logger.debug(f"[{self.name}] Error processing stock {row}: {e}")
-                    continue
+                    akshare_logger.error(f"[{self.name}] Failed to fetch indices from AkShare: {e}")
 
+            from collections import Counter
             exchange_counts = Counter(inst["exchange"] for inst in instruments)
 
             akshare_logger.info(f"[{self.name}] Retrieved {len(instruments)} instruments ({dict(exchange_counts)})")
@@ -333,19 +387,20 @@ class AkShareSource(BaseDataSource):
 
 
     async def get_daily_data(self, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取A股历史日线数据"""
         try:
             await self.rate_limiter.acquire()
 
             # 构建AkShare代码格式
             ak_symbol = self._build_akshare_symbol(symbol)
-            if not ak_symbol:
+            if not ak_symbol and instrument_type != 'index':
                 akshare_logger.error(f"[{self.name}] Cannot build AkShare symbol for: {symbol}")
                 return []
 
             # 获取历史数据
-            data = await self._fetch_akshare_data(ak_symbol, start_date, end_date)
+            data = await self._fetch_akshare_data(symbol if instrument_type == 'index' else ak_symbol, start_date, end_date, instrument_type)
             if data is None or data.empty:
                 akshare_logger.warning(f"[{self.name}] No data found for {ak_symbol}")
                 return []
@@ -505,11 +560,12 @@ class AkShareSource(BaseDataSource):
         # 添加复权信息
         adjustment_config = AdjustmentConfig.get_adjustment_config('akshare')
         enhanced['factor'] = adjustment_config['factor']
+        enhanced['adjustment_type'] = adjustment_config.get('type', 'forward')
 
         return enhanced
 
     async def _fetch_akshare_data(self, symbol: str, start_date: datetime,
-                                end_date: datetime) -> Optional[pd.DataFrame]:
+                                end_date: datetime, instrument_type: str = 'stock') -> Optional[pd.DataFrame]:
         """从AkShare获取历史数据"""
         max_retries = 3
         base_delay = 2.0
@@ -520,14 +576,23 @@ class AkShareSource(BaseDataSource):
         for attempt in range(max_retries):
             try:
                 # 调用AkShare API获取历史数据
-                data = await asyncio.to_thread(
-                    ak.stock_zh_a_hist,
-                    symbol=symbol,
-                    period="daily",
-                    start_date=start_date.strftime('%Y%m%d'),
-                    end_date=end_date.strftime('%Y%m%d'),
-                    adjust=adjustment_config['adjust']  # 使用统一的前复权配置
-                )
+                if instrument_type == 'index':
+                    data = await asyncio.to_thread(
+                        ak.index_zh_a_hist,
+                        symbol=symbol,
+                        period="daily",
+                        start_date=start_date.strftime('%Y%m%d'),
+                        end_date=end_date.strftime('%Y%m%d')
+                    )
+                else:
+                    data = await asyncio.to_thread(
+                        ak.stock_zh_a_hist,
+                        symbol=symbol,
+                        period="daily",
+                        start_date=start_date.strftime('%Y%m%d'),
+                        end_date=end_date.strftime('%Y%m%d'),
+                        adjust=adjustment_config['adjust']  # 使用统一的前复权配置
+                    )
 
                 if data.empty:
                     akshare_logger.warning(f"[{self.name}] No data returned from AkShare for {symbol}")
@@ -705,7 +770,7 @@ class AkShareSource(BaseDataSource):
                     instruments.append(instrument)
 
                 except Exception as e:
-                    akshare_logger.warning(f"[{self.name}] Error processing ETF {row}: {e}")
+                    akshare_logger.warning(f"[{self.name}] Failed to process row: {e}")
                     continue
 
             return instruments

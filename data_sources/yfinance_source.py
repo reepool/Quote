@@ -72,7 +72,8 @@ class YFinanceSource(BaseDataSource):
 
     
     async def get_daily_data(self, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         try:
             await self.rate_limiter.acquire()
@@ -118,7 +119,8 @@ class YFinanceSource(BaseDataSource):
                     'close': float(row['Close']) if pd.notna(row['Close']) else 0.0,
                     'volume': int(row['Volume']) if pd.notna(row['Volume']) and row['Volume'] > 0 else None,
                     'amount': amount,
-                    'factor': adjustment_config['factor']  # yfinance前复权数据
+                    'factor': adjustment_config['factor'],  # yfinance前复权数据
+                    'adjustment_type': adjustment_config.get('type', 'forward'),
                 }
                 quotes.append(quote)
 
@@ -174,7 +176,8 @@ class YFinanceSource(BaseDataSource):
                 'close': float(latest_row['Close']) if pd.notna(latest_row['Close']) else 0.0,
                 'volume': int(latest_row['Volume']) if pd.notna(latest_row['Volume']) and latest_row['Volume'] > 0 else None,
                 'amount': amount,
-                'factor': adjustment_config['factor']  # yfinance前复权数据
+                'factor': adjustment_config['factor'],  # yfinance前复权数据
+                'adjustment_type': adjustment_config.get('type', 'forward')
             }
 
         except Exception as e:

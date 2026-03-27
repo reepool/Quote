@@ -145,7 +145,8 @@ class BaseDataSource(ABC):
 
     @abstractmethod
     async def get_daily_data(self, instrument_id: str, symbol: str,
-                           start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+                           start_date: datetime, end_date: datetime,
+                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         pass
 
@@ -374,8 +375,14 @@ class BaseDataSource(ABC):
         return max(0.0, score)
 
     def _generate_instrument_id(self, symbol: str, exchange: str) -> str:
-        """生成交易品种ID"""
-        return f"{symbol}.{exchange}"
+        """生成交易品种ID，对齐现有数据库的标准后缀"""
+        suffix_map = {
+            "SSE": "SH",
+            "SZSE": "SZ",
+            "BSE": "BJ"
+        }
+        suffix = suffix_map.get(exchange.upper(), exchange)
+        return f"{symbol}.{suffix}"
 
     def _normalize_symbol(self, symbol: str, exchange: str) -> str:
         """标准化交易代码"""

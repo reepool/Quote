@@ -191,7 +191,8 @@ config/
     "enable_data_validation": true,
     "data_retention_days": 3650,
     "default_exchanges": ["SSE", "SZSE"],
-    "precise_download_mode": true
+    "precise_download_mode": true,
+    "instrument_types": ["stock", "index"]
   }
 }
 ```
@@ -207,6 +208,7 @@ config/
 | `data_retention_days` | integer | 3650 | 数据保留天数 |
 | `default_exchanges` | array | ["SSE","SZSE"] | 默认交易所 |
 | `precise_download_mode` | boolean | true | 精确下载模式 |
+| `instrument_types` | array | ["stock","index"] | 要下载/每日更新的品种类型（stock/index/etf） |
 
 ### 分块下载策略
 

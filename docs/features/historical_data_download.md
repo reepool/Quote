@@ -11,6 +11,7 @@
 - **指定日期范围下载**：精确控制下载的日期范围
 - **按年份下载**：支持指定一个或多个年份
 - **续传下载**：支持中断后的断点续传
+- **按品种类型下载**：支持 `--types stock index etf` 指定只下载股票、指数或 ETF
 
 ### 2. 智能下载策略
 - **精确下载模式**：基于股票上市日期计算下载范围
@@ -68,6 +69,14 @@ python main.py download [参数]
 ```bash
 --resume       # 启用续传（默认）
 --no-resume    # 禁用续传，重新开始
+```
+
+#### 品种类型指定
+```bash
+--types stock          # 仅下载股票
+--types index          # 仅下载指数
+--types stock index    # 同时下载股票和指数
+--types stock index etf  # 所有品种（ETF 需 AkShare 支持）
 ```
 
 ## 📊 下载场景和逻辑
@@ -275,10 +284,13 @@ start_batch = processed_batches + 1
     "download_chunk_days": 2000,  // 分块下载大小
     "batch_size": 50,              // 批处理大小
     "quality_threshold": 0.7,      // 质量阈值
-    "resume_enabled": true         // 是否启用续传
+    "resume_enabled": true,        // 是否启用续传
+    "instrument_types": ["stock", "index"]  // 控制下载和每日更新的品种类型
   }
 }
 ```
+
+> **注意**：`instrument_types` 同时控制历史下载和每日自动更新的品种范围。当前 BaoStock 不支持 ETF 日线数据，如需下载 ETF 需待接入 AkShare 数据源后再将 `etf` 加入此列表。
 
 ### 一次性下载模式
 设置 `download_chunk_days: 0` 可以启用一次性下载模式，一次性获取所有历史数据。
@@ -335,6 +347,12 @@ python main.py download --exchanges SSE SZSE --no-resume
 ```
 
 ## 🔄 版本更新日志
+
+### v2.4.0 (2026-03-26)
+- ✨ 新增指数和 ETF 品种支持（`--types` CLI 参数）
+- 🛡️ 每日更新任务自动包含指数，并通过 `instrument_types` 配置过滤 ETF
+- 🚀 数据库写入层重构为 Bulk Upsert，大幅提升写入性能
+- 🐛 修复 BSE 交易所代码过滤、resume 模式下日历截断、时区报错等多个 Bug
 
 ### v2.1.0 (2025-10-11)
 - ✨ 新增指定日期范围下载功能
