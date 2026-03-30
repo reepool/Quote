@@ -12,6 +12,7 @@
         "enabled": true,
         "description": "每日数据更新任务",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-fri",
@@ -37,6 +38,7 @@
         "enabled": true,
         "description": "系统健康检查",
         "report": true,
+        "pre_run_notify": false,
         "trigger": {
           "type": "interval",
           "hours": 1,
@@ -62,6 +64,7 @@
         "enabled": true,
         "description": "每周数据维护",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day_of_week": "sun",
@@ -84,6 +87,7 @@
         "enabled": true,
         "description": "月度数据完整性检查和缺口修复",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day": 1,
@@ -106,6 +110,7 @@
         "enabled": true,
         "description": "数据缺口检测与修复",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day_of_week": "sun",
@@ -129,6 +134,7 @@
         "enabled": true,
         "description": "季度数据清理",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "month": "3,6,9,12",
@@ -152,6 +158,7 @@
         "enabled": true,
         "description": "缓存预热",
         "report": false,
+        "pre_run_notify": false,
         "trigger": {
           "type": "cron",
           "hour": 8,
@@ -173,6 +180,7 @@
         "enabled": true,
         "description": "交易日历更新",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day": "1",
@@ -197,6 +205,7 @@
         "enabled": true,
         "description": "数据库备份任务",
         "report": true,
+        "pre_run_notify": true,
         "trigger": {
           "type": "cron",
           "day_of_week": "sat",

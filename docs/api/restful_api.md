@@ -75,18 +75,30 @@ http://localhost:8000/api/v1
 
 可选参数：
 - `return_format`: `pandas`（默认）、`json`、`csv`
+- `adjust`: `qfq`（前复权，默认）、`hfq`（后复权）、`none`（不复权）
 - `tradestatus`、`is_complete`、`min_volume`、`min_quality_score`
 - `include_quality`、`include_metadata`
 - `limit`、`offset`
 
-返回格式说明：
-- `pandas`: 仍返回 JSON（由 pandas DataFrame 序列化而来）
-- `json`: 返回 JSON
-- `csv`: 返回 `text/csv` 的内容（可直接 `pd.read_csv` 读取）
+复权说明：
+- 系统存储的是**非复权原始数据**，复权由 `AdjustmentEngine` 根据复权因子表实时计算
+- 仅**股票**类品种支持复权，指数/ETF 不存在除权概念，即使传入 `adjust=qfq` 也会返回原始数据
+- 前复权以查询范围内最新交易日为基准（价格=原始价格），历史价格向下调整使得价格序列连续
+- 后复权以上市首日为基准，价格按除权事件累乘放大，反映真实持股收益
 
 示例：
 ```bash
-curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SZSE&start_date=2024-01-01T00:00:00&end_date=2024-01-31T00:00:00&return_format=json"
+# 查询前复权数据（默认）
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=qfq"
+
+# 查询不复权原始数据
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=none"
+
+# 查询后复权数据
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=hfq"
+
+# 查询指数数据（指数无复权概念，adjust 参数被忽略）
+curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_date=2024-01-01&end_date=2024-01-31&return_format=json"
 ```
 
 ### GET /api/v1/quotes/latest

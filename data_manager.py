@@ -106,6 +106,60 @@ class DataManager:
         self.db_ops = db_ops
         self.source_factory = None
 
+        # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
+        # TTL = 1 小时, 适用于 API 高频查询场景
+        self._factor_cache: Dict[str, tuple] = {}
+        self._FACTOR_CACHE_TTL: float = 3600.0  # 秒
+
+    async def get_cached_adjustment_factors(
+        self, instrument_id: str
+    ) -> List[Dict[str, Any]]:
+        """获取复权因子（带内存缓存）
+
+        缓存策略:
+        - Key: instrument_id
+        - TTL: 1 小时 (因子数据变化频率极低, 仅在除权日更新)
+        - 失效时: 从 DB 重新加载并刷新缓存
+
+        用于 API 层的高频查询, 避免每次请求都 hit DB.
+        全量下载后若需立即生效, 可调用 invalidate_factor_cache() 清除缓存.
+
+        Args:
+            instrument_id: 品种 ID
+
+        Returns:
+            复权因子列表, 按 ex_date 升序
+        """
+        import time
+        now = time.monotonic()
+        cached = self._factor_cache.get(instrument_id)
+        if cached is not None:
+            ts, factors = cached
+            if (now - ts) < self._FACTOR_CACHE_TTL:
+                return factors
+
+        # 缓存未命中或已过期 → 从 DB 加载
+        factors = await self.db_ops.get_adjustment_factors(instrument_id)
+        self._factor_cache[instrument_id] = (now, factors)
+        return factors
+
+    def invalidate_factor_cache(self, instrument_id: Optional[str] = None) -> None:
+        """清除复权因子缓存
+
+        Args:
+            instrument_id: 若指定则清除单个品种缓存, 否则清除全部缓存
+        """
+        if instrument_id:
+            self._factor_cache.pop(instrument_id, None)
+        else:
+            self._factor_cache.clear()
+        dm_logger.debug(
+            "[DataManager] Factor cache cleared for %s",
+            instrument_id or "ALL"
+        )
+
+
+
     @log_execution("DataManager", "initialize")
     async def initialize(self) -> None:
         """初始化数据管理器"""
@@ -436,6 +490,38 @@ class DataManager:
                     self.progress.quality_issues += len(batch_data)
 
                 dm_logger.info(f"Saved precise batch: {len(batch_data)} quotes, quality: {batch_quality:.2f}")
+
+                # ===== 同步复权因子（全量下载时补充）=====
+                # 仅对股票类型品种获取因子，指数/ETF/期货无需复权
+                factor_start = datetime.combine(start_date or date(1990, 1, 1), datetime.min.time())
+                factor_end = datetime.combine(end_date, datetime.max.time())
+                saved_factors_total = 0
+
+                for inst in instruments:
+                    if inst.get('type', 'stock') != 'stock':
+                        continue
+                    try:
+                        factors = await self.source_factory.get_adjustment_factors(
+                            exchange,
+                            inst['instrument_id'],
+                            inst['symbol'],
+                            factor_start,
+                            factor_end,
+                        )
+                        if factors:
+                            saved = await self.db_ops.save_adjustment_factors(factors)
+                            saved_factors_total += saved
+                    except Exception as factor_e:
+                        dm_logger.debug(
+                            "[DataManager] Factor download skipped for %s: %s",
+                            inst.get('symbol'), factor_e
+                        )
+
+                if saved_factors_total > 0:
+                    dm_logger.info(
+                        "[DataManager] Synced %d adjustment factors for %s batch",
+                        saved_factors_total, exchange
+                    )
             else:
                 self.progress.failed_downloads += len(instruments)
                 self.progress.add_error(f"Failed to save precise batch for {exchange}")
@@ -643,14 +729,10 @@ class DataManager:
                 else:
                     quote['pct_change'] = 0.0
 
-            # 3. 判断复权类型
-            if 'factor' in quote:
-                if quote['factor'] == 1.0:
-                    quote['adjustment_type'] = 'none'
-                elif quote['factor'] > 1.0:
-                    quote['adjustment_type'] = 'forward'  # 前复权
-                else:
-                    quote['adjustment_type'] = 'backward'  # 后复权
+            # 3. 复权类型：改造后 DB 存储的是非复权原始数据
+            # 复权在 API 查询时由 AdjustmentEngine 动态计算
+            if 'adjustment_type' not in quote or quote.get('adjustment_type') is None:
+                quote['adjustment_type'] = 'none'
 
         except Exception as e:
             dm_logger.warning(f"Error calculating derived fields: {e}")
@@ -1039,7 +1121,8 @@ class DataManager:
                 source_instrument_id,
                 source_symbol,
                 start_date,
-                end_date
+                end_date,
+                instrument_type=instrument.get('type', 'stock')
             )
 
             if data:
@@ -1053,6 +1136,25 @@ class DataManager:
                 success = await self.db_ops.save_daily_quotes(data)
                 if success:
                     dm_logger.info(f"Filled gap for {gap.symbol}: {gap.gap_start} to {gap.gap_end}")
+
+                    # 同步复权因子（仅限股票, 与 update_daily_data 逻辑保持一致）
+                    if instrument.get('type', 'stock') == 'stock':
+                        try:
+                            factors = await self.source_factory.get_adjustment_factors(
+                                gap.exchange,
+                                instrument.get('instrument_id'),
+                                source_symbol,
+                                start_date,
+                                end_date,
+                            )
+                            if factors:
+                                await self.db_ops.save_adjustment_factors(factors)
+                        except Exception as factor_e:
+                            dm_logger.debug(
+                                "[DataManager] Factor sync skipped during gap fill for %s: %s",
+                                gap.instrument_id, factor_e
+                            )
+
                     return True
                 dm_logger.warning(
                     f"[DataManager] Gap fill save failed: {gap.instrument_id} "
@@ -1591,7 +1693,8 @@ class DataManager:
                                             instrument['instrument_id'],
                                             instrument['symbol'],
                                             datetime.combine(start_date, datetime.min.time()),
-                                            datetime.combine(end_date, datetime.max.time())
+                                            datetime.combine(end_date, datetime.max.time()),
+                                            instrument_type=instrument.get('type', 'stock')
                                         ),
                                         timeout=per_instrument_timeout_sec
                                     )
@@ -1601,7 +1704,8 @@ class DataManager:
                                         instrument['instrument_id'],
                                         instrument['symbol'],
                                         datetime.combine(start_date, datetime.min.time()),
-                                        datetime.combine(end_date, datetime.max.time())
+                                        datetime.combine(end_date, datetime.max.time()),
+                                        instrument_type=instrument.get('type', 'stock')
                                     )
 
                                 if data:
@@ -1609,6 +1713,24 @@ class DataManager:
                                     exchange_result['quotes_added'] += len(data)
                                     update_results['total_quotes_added'] += len(data)
                                     dm_logger.debug(f"[DataManager] Updated {len(data)} records for {instrument['symbol']}")
+
+                                    # 同步复权因子（仅限股票类型, 指数无需复权）
+                                    if instrument.get('type', 'stock') == 'stock':
+                                        try:
+                                            factors = await self.source_factory.get_adjustment_factors(
+                                                exchange,
+                                                instrument['instrument_id'],
+                                                instrument['symbol'],
+                                                datetime.combine(start_date, datetime.min.time()),
+                                                datetime.combine(end_date, datetime.max.time()),
+                                            )
+                                            if factors:
+                                                await self.db_ops.save_adjustment_factors(factors)
+                                        except Exception as factor_e:
+                                            dm_logger.debug(
+                                                "[DataManager] Factor sync skipped for %s: %s",
+                                                instrument['symbol'], factor_e
+                                            )
 
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1

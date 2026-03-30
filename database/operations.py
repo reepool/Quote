@@ -18,7 +18,7 @@ from sqlalchemy.future import select
 from .connection import db_manager
 from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
-    DataUpdateDB, DataSourceStatusDB
+    DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB
 )
 
 
@@ -1551,6 +1551,175 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to get calendar statistics for {exchange}: {e}")
             return {}
+
+
+    # ------------------------------------------------------------------
+    # 复权因子操作
+    # ------------------------------------------------------------------
+
+    async def save_adjustment_factors(
+        self, factors: List[Dict[str, Any]]
+    ) -> int:
+        """批量保存复权因子（upsert 语义）
+
+        Args:
+            factors: 复权因子列表, 每项含:
+                instrument_id, ex_date, factor, cumulative_factor,
+                dividend, bonus_shares, rights_shares, rights_price,
+                event_type, source
+
+        Returns:
+            成功保存/更新的记录数
+        """
+        if not factors:
+            return 0
+
+        saved_count = 0
+        try:
+            async with self.get_async_session() as session:
+                for f in factors:
+                    try:
+                        instrument_id = f.get('instrument_id')
+                        ex_date = f.get('ex_date')
+                        if not instrument_id or not ex_date:
+                            continue
+
+                        # 检查是否已存在
+                        from sqlalchemy import select
+                        stmt = select(AdjustmentFactorDB).where(
+                            AdjustmentFactorDB.instrument_id == instrument_id,
+                            AdjustmentFactorDB.ex_date == ex_date
+                        )
+                        result = await session.execute(stmt)
+                        existing = result.scalar_one_or_none()
+
+                        if existing:
+                            # 更新
+                            existing.factor = float(f.get('factor', 1.0))
+                            existing.cumulative_factor = float(f.get('cumulative_factor', 1.0))
+                            existing.dividend = float(f.get('dividend', 0.0))
+                            existing.bonus_shares = float(f.get('bonus_shares', 0.0))
+                            existing.rights_shares = float(f.get('rights_shares', 0.0))
+                            existing.rights_price = float(f.get('rights_price', 0.0))
+                            existing.event_type = f.get('event_type')
+                            existing.source = f.get('source')
+                        else:
+                            # 新增
+                            new_record = AdjustmentFactorDB(
+                                instrument_id=instrument_id,
+                                ex_date=ex_date,
+                                factor=float(f.get('factor', 1.0)),
+                                cumulative_factor=float(f.get('cumulative_factor', 1.0)),
+                                dividend=float(f.get('dividend', 0.0)),
+                                bonus_shares=float(f.get('bonus_shares', 0.0)),
+                                rights_shares=float(f.get('rights_shares', 0.0)),
+                                rights_price=float(f.get('rights_price', 0.0)),
+                                event_type=f.get('event_type'),
+                                source=f.get('source'),
+                            )
+                            session.add(new_record)
+
+                        saved_count += 1
+                    except Exception as row_e:
+                        self.db_logger.warning(
+                            "Failed to save adjustment factor for %s: %s",
+                            f.get('instrument_id'), row_e
+                        )
+                        continue
+
+                await session.commit()
+
+            self.db_logger.info(
+                "Saved %d adjustment factors", saved_count
+            )
+            return saved_count
+
+        except Exception as e:
+            self.db_logger.error("Failed to save adjustment factors: %s", e)
+            return 0
+
+    async def get_adjustment_factors(
+        self,
+        instrument_id: str,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+    ) -> List[Dict[str, Any]]:
+        """查询指定品种的复权因子
+
+        Args:
+            instrument_id: 品种ID
+            start_date: 开始日期（可选）
+            end_date: 结束日期（可选）
+
+        Returns:
+            复权因子列表, 按 ex_date 升序
+        """
+        try:
+            async with self.get_async_session() as session:
+                from sqlalchemy import select
+                stmt = select(AdjustmentFactorDB).where(
+                    AdjustmentFactorDB.instrument_id == instrument_id
+                )
+
+                if start_date:
+                    stmt = stmt.where(AdjustmentFactorDB.ex_date >= start_date)
+                if end_date:
+                    stmt = stmt.where(AdjustmentFactorDB.ex_date <= end_date)
+
+                stmt = stmt.order_by(AdjustmentFactorDB.ex_date.asc())
+                result = await session.execute(stmt)
+                rows = result.scalars().all()
+
+                return [
+                    {
+                        'instrument_id': r.instrument_id,
+                        'ex_date': r.ex_date,
+                        'factor': r.factor,
+                        'cumulative_factor': r.cumulative_factor,
+                        'dividend': r.dividend,
+                        'bonus_shares': r.bonus_shares,
+                        'rights_shares': r.rights_shares,
+                        'rights_price': r.rights_price,
+                        'event_type': r.event_type,
+                        'source': r.source,
+                    }
+                    for r in rows
+                ]
+
+        except Exception as e:
+            self.db_logger.error(
+                "Failed to get adjustment factors for %s: %s",
+                instrument_id, e
+            )
+            return []
+
+    async def get_latest_cumulative_factor(
+        self, instrument_id: str
+    ) -> float:
+        """获取指定品种最新的累积后复权因子
+
+        Returns:
+            最新的累积因子, 无记录时返回 1.0
+        """
+        try:
+            async with self.get_async_session() as session:
+                from sqlalchemy import select
+                stmt = (
+                    select(AdjustmentFactorDB.cumulative_factor)
+                    .where(AdjustmentFactorDB.instrument_id == instrument_id)
+                    .order_by(AdjustmentFactorDB.ex_date.desc())
+                    .limit(1)
+                )
+                result = await session.execute(stmt)
+                row = result.scalar_one_or_none()
+                return float(row) if row is not None else 1.0
+
+        except Exception as e:
+            self.db_logger.error(
+                "Failed to get latest cumulative factor for %s: %s",
+                instrument_id, e
+            )
+            return 1.0
 
 
 # Global instance

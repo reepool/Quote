@@ -249,6 +249,45 @@ class DataUpdateDB(Base):
     )
 
 
+class AdjustmentFactorDB(Base):
+    """复权因子表 - 记录除权除息事件
+
+    每条记录对应一个除权除息事件日.
+    cumulative_factor 为从上市日到该事件日的累积后复权因子.
+    前复权因子在查询时动态计算: forward_factor = cum(t) / cum(latest)
+    """
+    __tablename__ = 'adjustment_factors'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'),
+                           nullable=False, index=True)
+    ex_date = Column(DateTime, nullable=False, index=True)  # 除权除息日
+
+    # 核心因子
+    factor = Column(Float, nullable=False, default=1.0)             # 单日除权因子
+    cumulative_factor = Column(Float, nullable=False, default=1.0)  # 累积后复权因子
+
+    # 事件详情（可选, 用于验证和追溯）
+    dividend = Column(Float, default=0.0)       # 每股现金分红
+    bonus_shares = Column(Float, default=0.0)   # 每股送转股
+    rights_shares = Column(Float, default=0.0)  # 每股配股
+    rights_price = Column(Float, default=0.0)   # 配股价
+
+    # 元数据
+    event_type = Column(String(16), nullable=True)  # dividend, split, rights, mixed, roll
+    source = Column(String(32), nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time,
+                        onupdate=safe_get_shanghai_time)
+
+    __table_args__ = (
+        UniqueConstraint('instrument_id', 'ex_date',
+                         name='uq_adj_factor_inst_date'),
+        Index('idx_adj_factor_inst_date', 'instrument_id', 'ex_date'),
+        PrimaryKeyConstraint('id'),
+    )
+
+
 class DataSourceStatusDB(Base):
     """Data source status tracking model"""
     __tablename__ = 'data_source_status'
@@ -365,6 +404,32 @@ class DailyQuote(BaseModel):
     batch_id: Optional[str] = Field(None, description="批次ID")
 
     # Metadata
+    created_at: datetime = Field(default_factory=safe_get_shanghai_time)
+    updated_at: datetime = Field(default_factory=safe_get_shanghai_time)
+
+    class Config:
+        from_attributes = True
+
+
+class AdjustmentFactor(BaseModel):
+    """复权因子 API 模型"""
+    id: Optional[int] = Field(None, description="记录ID")
+    instrument_id: str = Field(..., description="交易品种ID")
+    ex_date: datetime = Field(..., description="除权除息日")
+
+    # 核心因子
+    factor: float = Field(1.0, description="单日除权因子")
+    cumulative_factor: float = Field(1.0, description="累积后复权因子")
+
+    # 事件详情
+    dividend: float = Field(0.0, description="每股现金分红")
+    bonus_shares: float = Field(0.0, description="每股送转股")
+    rights_shares: float = Field(0.0, description="每股配股")
+    rights_price: float = Field(0.0, description="配股价")
+
+    # 元数据
+    event_type: Optional[str] = Field(None, description="事件类型")
+    source: Optional[str] = Field(None, description="数据来源")
     created_at: datetime = Field(default_factory=safe_get_shanghai_time)
     updated_at: datetime = Field(default_factory=safe_get_shanghai_time)
 

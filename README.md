@@ -108,8 +108,12 @@ python3 main.py download --list-presets
 #### 2. 数据更新和维护
 
 ```bash
-# 更新日线数据
+# 更新当日日线数据
 python3 main.py update --exchanges SSE SZSE
+
+# 补充指定日期的缺失数据
+python3 main.py update --target-date 2026-03-27
+python3 main.py update --target-date 2026-03-27 --exchanges SSE
 
 # 数据缺口检测
 python3 main.py gap --exchanges SSE SZSE --start-date 2024-01-01 --end-date 2024-12-31
@@ -146,19 +150,23 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 **Telegram机器人命令**：
 ```
-/start           # 显示主菜单和帮助信息
-/status          # 查看所有任务状态和下次执行时间
-/detail <任务ID>  # 查看指定任务的详细信息
-/reload_config   # 热重载配置文件
-/help            # 显示帮助信息
+/start                                    # 显示主菜单和帮助信息
+/status                                   # 查看所有任务状态和下次执行时间
+/detail <任务ID>                           # 查看指定任务的详细信息
+/run <任务ID>                              # 立即执行指定任务
+/run daily_data_update 2026-03-27         # 补充指定日期的缺失数据
+/backfill 2026-03-27                      # 补充指定日期的缺失数据（支持指定交易所）
+/reload_config                            # 热重载配置文件
+/help                                     # 显示帮助信息
 ```
 
 **任务控制示例**：
 ```bash
 # 在Telegram中直接发送命令
-/status                    # 显示任务状态（智能时间显示）
-/detail daily_data_update  # 查看每日数据更新任务详情
-/reload_config            # 重载任务配置
+/status                                   # 显示任务状态（智能时间显示）
+/detail daily_data_update                 # 查看每日数据更新任务详情
+/backfill 2026-03-27 SSE                  # 仅补充上交所 3/27 数据
+/reload_config                            # 重载任务配置
 ```
 
 #### 5. 系统管理
@@ -171,6 +179,9 @@ python3 main.py status
 python3 main.py job --job-id daily_data_update
 python3 main.py job --job-id monthly_data_integrity_check
 python3 main.py job --job-id database_backup
+
+# 补充指定日期的缺失数据
+python3 main.py update --target-date 2026-03-27 --exchanges SSE SZSE
 ```
 
 ## 📖 详细功能说明
@@ -307,16 +318,20 @@ curl http://localhost:8000/api/v1/instruments/symbol/000001
 
 #### 行情数据接口
 ```bash
-# 获取日线数据（支持多种格式）
-curl "http://localhost:8000/api/v1/quotes/daily?symbol=000001.SZSE&start_date=2024-01-01&end_date=2024-01-31&return_format=json"
+# 获取日线数据（默认前复权）
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31"
+
+# 获取不复权原始数据
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=none"
+
+# 获取后复权数据
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=hfq"
+
+# 获取指数数据（指数无复权概念，adjust 参数被忽略）
+curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_date=2024-01-01&end_date=2024-01-31"
 
 # 获取最新行情数据
-curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&instrument_ids=600000.SSE"
-
-# 批量获取历史数据任务
-curl -X POST http://localhost:8000/api/v1/data/download/historical \
-  -H "Content-Type: application/json" \
-  -d '{"exchanges": ["SSE", "SZSE"], "years": [2024]}'
+curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZ&instrument_ids=600000.SH"
 ```
 
 #### 数据缺口管理
@@ -536,8 +551,9 @@ Quote/
 - **NYSE** - 纽约证券交易所
 
 ### 数据类型
-- **日线数据** - OHLCV数据
-- **复权数据** - 前复权/后复权
+- **日线数据** - OHLCV数据（存储非复权原始价格）
+- **复权数据** - 查询时动态计算（前复权 `adjust=qfq` / 后复权 `adjust=hfq`）
+- **复权因子** - 各品种除权除息事件和累积因子
 - **基本面数据** - 股票基本信息
 - **交易日历** - 交易日/非交易日
 

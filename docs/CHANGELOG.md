@@ -5,6 +5,58 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [2.4.0] - 2026-03-30 ⭐ 复权架构迁移
+
+### 新增
+- 🧮 **动态复权计算引擎** (`utils/adjustment.py`)
+  - `AdjustmentEngine` 纯静态引擎，支持前复权(qfq)和后复权(hfq)
+  - `adjust_quotes()` 统一入口，支持日线/周线/月线等多频率数据
+  - `AdjustmentFactorProvider` 协议，标准化各数据源因子接口
+  - 期货连续合约调整（预留扩展）
+
+- 📦 **复权因子数据表** (`adjustment_factors`)
+  - 存储所有品种的除权除息事件和累积因子
+  - 57,866 条因子记录覆盖 5,196 只股票（94.5%）
+  - 支持 BaoStock / AkShare 双数据源因子获取
+
+- 🔧 **复权因子补全工具** (`scripts/backfill_factors.py`)
+  - 断点可恢复的批量因子回填脚本
+  - 主源/辅源自动降级机制
+
+- 🛠️ **数据迁移工具** (`scripts/migrate_to_raw.py`)
+  - 全量历史数据重下载为非复权原始数据
+  - 断点续传支持
+
+### 变更
+- 🗄️ **存储模型变更**: 所有 K 线数据统一存储非复权原始价格 (`adjustment_type='none'`)
+- 🔀 **复权计算前移**: 从"下载时复权"改为"查询时动态计算"
+- 📡 **API 行为变更**: `/quotes/daily` 新增 `adjust` 参数（`qfq`/`hfq`/`none`），默认前复权
+- 🔧 **数据源配置**: `AdjustmentConfig` 强制所有数据源使用不复权模式
+- 🔄 **缺口修复增强**: `_fill_single_gap()` 补 K 线时同步复权因子
+
+### 修复
+- 🐛 **`save_adjustment_factors` Session 错误**: `self.db.get_session()` → `self.get_async_session()`
+- 🐛 **`get_adjustment_factors` Session 错误**: 同上，导致 API 复权因子加载静默失败
+- 🐛 **`get_latest_cumulative_factor` Session 错误**: 同上
+- 🐛 **累积因子查找缺陷**: 非除权日默认返回 1.0 导致复权计算无效，新增 `_lookup_cumulative_factor()` 修复
+
+## [2.3.2] - 2026-03-28
+
+### 新增
+- 📥 **指定日期数据补充功能**
+  - CLI: `python3 main.py update --target-date 2026-03-27`
+  - Telegram: `/backfill 2026-03-27 [交易所...]` 专用补数据命令
+  - Telegram: `/run daily_data_update 2026-03-27` 通过 /run 追加日期参数
+  - 补数据模式自动跳过等待收盘和交易日检查
+  - `/backfill` 支持指定交易所（如 `/backfill 2026-03-27 SSE`）
+
+### 修复
+- 🐛 **备用数据源回退失败**
+  - 修复 `close_all()` 后全局单例未重置，导致后续任务无法重新初始化数据源工厂
+  - 修复 `close_all()` 未清理 `region_to_sources`，导致残留失效的 backup 引用
+  - 修复 `data_manager.py` 中 `instrument_type` 未传递，导致指数被当作股票查询
+  - 增强 `get_daily_data` 的诊断日志，当 backup 不可用时记录详细原因
+
 ## [未发布]
 
 ### 新增

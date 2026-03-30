@@ -348,9 +348,9 @@ class BaostockSource(BaseDataSource):
                     'tradestatus': int(row['tradestatus']) if row['tradestatus'] else 1,
                     'pct_change': float(row['pctChg']) if row['pctChg'] else 0.0,
 
-                    # 复权信息
-                    'factor': adjustment_config['factor'],
-                    'adjustment_type': adjustment_config.get('type', 'forward'),
+                    # 复权信息 (非复权原始数据, 复权由本地引擎计算)
+                    'factor': 1.0,
+                    'adjustment_type': 'none',
                     'source': 'baostock'
                 }
                 quotes.append(quote)
@@ -504,8 +504,8 @@ class BaostockSource(BaseDataSource):
                 'close': float(latest_record[5]) if latest_record[5] else 0.0,
                 'volume': int(float(latest_record[7])) if latest_record[7] and float(latest_record[7]) > 0 else 0,
                 'amount': float(latest_record[8]) if latest_record[8] and float(latest_record[8]) > 0 else 0.0,
-                'factor': adjustment_config['factor'],
-                'adjustment_type': adjustment_config.get('type', 'forward')
+                'factor': 1.0,
+                'adjustment_type': 'none'
             }
 
         except Exception as e:
@@ -574,6 +574,86 @@ class BaostockSource(BaseDataSource):
 
         except Exception as e:
             baostock_logger.error(f"Failed to get trading calendar from Baostock for {exchange}: {e}")
+            return []
+
+    async def get_adjustment_factors(self, instrument_id: str, symbol: str,
+                                     start_date: datetime, end_date: datetime
+                                     ) -> List[Dict[str, Any]]:
+        """获取复权因子数据
+
+        调用 bs.query_adjust_factor 获取除权除息因子.
+        返回格式: [{instrument_id, ex_date, factor, cumulative_factor, source}, ...]
+        """
+        try:
+            await self.rate_limiter.acquire()
+            await self._ensure_login()
+
+            # 转换为 BaoStock 代码格式
+            if 'SH' in instrument_id or 'SSE' in instrument_id:
+                baostock_code = f"sh.{symbol}"
+            elif 'SZ' in instrument_id:
+                baostock_code = f"sz.{symbol}"
+            else:
+                baostock_logger.error(f"Cannot parse instrument_id for factors: {instrument_id}")
+                return []
+
+            start_str = start_date.strftime('%Y-%m-%d')
+            end_str = end_date.strftime('%Y-%m-%d')
+
+            rs = await asyncio.to_thread(
+                bs.query_adjust_factor,
+                code=baostock_code,
+                start_date=start_str,
+                end_date=end_str
+            )
+
+            if rs.error_code != '0':
+                baostock_logger.error(
+                    f"Failed to query adjust factors for {baostock_code}: {rs.error_msg}"
+                )
+                return []
+
+            data_list = []
+            while (rs.error_code == '0') & rs.next():
+                data_list.append(rs.get_row_data())
+
+            if not data_list:
+                baostock_logger.debug(
+                    f"No adjustment factors for {instrument_id} ({start_str} to {end_str})"
+                )
+                return []
+
+            df = pd.DataFrame(data_list, columns=rs.fields)
+
+            factors = []
+            for _, row in df.iterrows():
+                try:
+                    # BaoStock 返回字段: code, dividOperateDate,
+                    # foreAdjustFactor, backAdjustFactor, adjustFactor
+                    factor_record = {
+                        'instrument_id': instrument_id,
+                        'ex_date': pd.to_datetime(row['dividOperateDate']),
+                        'factor': float(row['adjustFactor']) if row['adjustFactor'] else 1.0,
+                        'cumulative_factor': float(row['backAdjustFactor']) if row['backAdjustFactor'] else 1.0,
+                        'fore_adjust_factor': float(row['foreAdjustFactor']) if row['foreAdjustFactor'] else 1.0,
+                        'source': 'baostock',
+                    }
+                    factors.append(factor_record)
+                except Exception as parse_e:
+                    baostock_logger.warning(
+                        f"Failed to parse factor row for {instrument_id}: {parse_e}"
+                    )
+                    continue
+
+            baostock_logger.info(
+                f"Retrieved {len(factors)} adjustment factors for {instrument_id} ({start_str} to {end_str})"
+            )
+            return factors
+
+        except Exception as e:
+            baostock_logger.error(
+                f"Failed to get adjustment factors from Baostock for {instrument_id}: {e}"
+            )
             return []
 
     async def close(self):

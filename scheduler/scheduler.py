@@ -123,6 +123,20 @@ class TaskScheduler:
                 f"[Scheduler] Task {job_id} started (run_id={run_id})"
             )
             try:
+                # ★ 任务启动前 Telegram 通知
+                if job_config and getattr(job_config, 'pre_run_notify', False):
+                    try:
+                        bot = TelegramBot()
+                        await bot.send_task_notification(
+                            f"开始执行...\n\n📋 任务: {job_config.description}",
+                            task_name=job_id,
+                            level="info"
+                        )
+                    except Exception as notify_err:
+                        scheduler_logger.warning(
+                            f"[Scheduler] 发送任务启动通知失败: {job_id}, {notify_err}"
+                        )
+
                 # 将 job_config 添加到参数中，如果它存在的话
                 all_parameters = {**parameters, 'job_config': job_config} if job_config else parameters.copy()
 

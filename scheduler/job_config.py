@@ -28,6 +28,7 @@ class JobConfig:
     coalesce: bool
     parameters: Dict[str, Any]
     report: bool = False  # 是否发送报告通知
+    pre_run_notify: bool = True  # 任务开始前是否发送 Telegram 通知
 
 
 class JobConfigManager:
@@ -86,7 +87,8 @@ class JobConfigManager:
                 misfire_grace_time=job_data.get('misfire_grace_time', scheduler_config.misfire_grace_time),
                 coalesce=job_data.get('coalesce', scheduler_config.coalesce),
                 parameters=job_data.get('parameters', {}),
-                report=job_data.get('report', False)  # 默认不发送报告
+                report=job_data.get('report', False),
+                pre_run_notify=job_data.get('pre_run_notify', True)
             )
 
             return job_config

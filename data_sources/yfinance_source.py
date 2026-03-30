@@ -119,8 +119,8 @@ class YFinanceSource(BaseDataSource):
                     'close': float(row['Close']) if pd.notna(row['Close']) else 0.0,
                     'volume': int(row['Volume']) if pd.notna(row['Volume']) and row['Volume'] > 0 else None,
                     'amount': amount,
-                    'factor': adjustment_config['factor'],  # yfinance前复权数据
-                    'adjustment_type': adjustment_config.get('type', 'forward'),
+                    'factor': 1.0,           # 非复权原始数据，复权由本地引擎计算
+                    'adjustment_type': 'none',
                 }
                 quotes.append(quote)
 
@@ -176,8 +176,8 @@ class YFinanceSource(BaseDataSource):
                 'close': float(latest_row['Close']) if pd.notna(latest_row['Close']) else 0.0,
                 'volume': int(latest_row['Volume']) if pd.notna(latest_row['Volume']) and latest_row['Volume'] > 0 else None,
                 'amount': amount,
-                'factor': adjustment_config['factor'],  # yfinance前复权数据
-                'adjustment_type': adjustment_config.get('type', 'forward')
+                'factor': 1.0,           # 非复权原始数据
+                'adjustment_type': 'none',
             }
 
         except Exception as e:
@@ -259,28 +259,22 @@ class YFinanceSource(BaseDataSource):
             ticker = yf.Ticker(symbol, session=session)
 
             if start_date and end_date:
-                # 获取复权配置
-                adjustment_config = AdjustmentConfig.get_adjustment_config('yfinance')
-
-                # 指定日期范围
+                # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
                 data = await asyncio.to_thread(
                     ticker.history,
                     start=start_date.strftime('%Y-%m-%d'),
                     end=end_date.strftime('%Y-%m-%d'),
                     interval='1d',
-                    auto_adjust=adjustment_config['auto_adjust'],
+                    auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
                     repair=True
                 )
             elif period:
-                # 获取复权配置
-                adjustment_config = AdjustmentConfig.get_adjustment_config('yfinance')
-
                 # 指定时间段
                 data = await asyncio.to_thread(
                     ticker.history,
                     period=period,
                     interval='1d',
-                    auto_adjust=adjustment_config['auto_adjust'],
+                    auto_adjust=False,
                     repair=True
                 )
             else:
@@ -361,6 +355,89 @@ class YFinanceSource(BaseDataSource):
         elif any(keyword in name_lower for keyword in ['a_stock', 'cn_stock', 'china']):
             return YFinanceConstants.TEST_SYMBOL_CN
         return None
+
+    async def get_adjustment_factors(
+        self,
+        instrument_id: str,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> List[Dict[str, Any]]:
+        """从 yfinance 的 Adj Close 反推复权因子
+
+        原理：yfinance 在 auto_adjust=False 时同时返回 Close（原始价）和 Adj Close（复权价）。
+        两者之比即当日累积复权因子。在发生突变的日期为除权除息事件。
+        仅返回因子发生显著变化的事件日（阈值 > 0.0001），避免冗余记录。
+        """
+        try:
+            await self.rate_limiter.acquire()
+            exchange = instrument_id.split('.')[-1] if '.' in instrument_id else None
+            yf_symbol = self._build_yf_symbol(symbol, exchange)
+            if not yf_symbol:
+                return []
+
+            data = await self._fetch_yahoo_data(yf_symbol, start_date, end_date)
+            if data is None or data.empty:
+                return []
+
+            # 必须含有 Adj Close 列（auto_adjust=False 时提供）
+            if 'Adj Close' not in data.columns:
+                yfinance_logger.warning(
+                    f"[{self.name}] 'Adj Close' column missing for {yf_symbol}, cannot compute factors"
+                )
+                return []
+
+            # 计算每日累积因子 = Adj Close / Close
+            close_col = 'Close'
+            adj_col = 'Adj Close'
+            data = data.copy()
+            data['_cum_factor'] = data[adj_col] / data[close_col]
+
+            # 识别因子发生突变的日期（前后比例差 > 0.0001 视为除权事件）
+            data['_factor_shift'] = data['_cum_factor'].diff().abs()
+
+            # 首行：若累积因子 != 1.0 也记录（上市起始就有历史除权）
+            first_row = data.iloc[0]
+            first_cum = float(first_row['_cum_factor'])
+
+            factors: List[Dict[str, Any]] = []
+
+            # 首行有历史除权事件
+            if abs(first_cum - 1.0) > 0.0001:
+                factors.append({
+                    'instrument_id': instrument_id,
+                    'ex_date': data.index[0].to_pydatetime(),
+                    'factor': round(first_cum, 6),
+                    'cumulative_factor': round(first_cum, 6),
+                    'source': 'yfinance',
+                })
+
+            prev_cum = first_cum
+            for dt, row in data.iloc[1:].iterrows():
+                cum = float(row['_cum_factor'])
+                shift = abs(row['_factor_shift']) if pd.notna(row['_factor_shift']) else 0.0
+                if shift > 0.0001:
+                    # 单日因子 = 当日累积 / 前日累积
+                    day_factor = cum / prev_cum if prev_cum != 0 else 1.0
+                    factors.append({
+                        'instrument_id': instrument_id,
+                        'ex_date': dt.to_pydatetime(),
+                        'factor': round(day_factor, 6),
+                        'cumulative_factor': round(cum, 6),
+                        'source': 'yfinance',
+                    })
+                prev_cum = cum
+
+            yfinance_logger.info(
+                f"[{self.name}] Found {len(factors)} adjustment factor events for {yf_symbol}"
+            )
+            return factors
+
+        except Exception as e:
+            yfinance_logger.warning(
+                f"[{self.name}] Failed to get adjustment factors for {symbol}: {e}"
+            )
+            return []
 
     async def health_check(self) -> bool:
         """健康检查"""

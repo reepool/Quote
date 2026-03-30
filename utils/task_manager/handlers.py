@@ -80,6 +80,7 @@ class TaskManagerHandlers:
             "• `/status` - 查看所有任务状态\n"
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
+            "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 显示此帮助信息\n\n"
             "*可用的任务ID：*\n"
@@ -93,6 +94,8 @@ class TaskManagerHandlers:
             "*使用示例：*\n"
             "• `/detail trading_calendar_update`\n"
             "• `/run system_health_check`\n"
+            "• `/run daily_data_update 2026-03-27`\n"
+            "• `/backfill 2026-03-27`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
@@ -867,24 +870,39 @@ class TaskManagerHandlers:
         return self.user_states[chat_id]
 
     async def handle_run_command(self, event) -> None:
-        """处理 /run 命令"""
+        """处理 /run 命令，支持 /run <task_id> [日期]"""
         chat_id = event.chat_id
         user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
         command_text = event.text if hasattr(event, 'text') else '/run'
 
-        # 详细日志记录
         self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
-        self.task_manager.logger.debug(f"[TaskManagerHandlers] 处理/run命令: {command_text}, chat_id: {chat_id}")
 
         # 解析命令参数
         parts = command_text.strip().split()
         if len(parts) < 2:
-            error_message = "❌ *缺少任务ID*\n\n请使用: `/run <task_id>`\n\n例如: `/run system_health_check`\n\n使用 `/help` 查看可用任务列表。"
+            error_message = (
+                "❌ *缺少任务ID*\n\n"
+                "请使用: `/run <task_id> [日期]`\n\n"
+                "例如:\n"
+                "• `/run system_health_check`\n"
+                "• `/run daily_data_update 2026-03-27`\n\n"
+                "使用 `/help` 查看可用任务列表。"
+            )
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             return
 
         job_id = parts[1]
-        self.task_manager.logger.info(f"[TaskManagerHandlers] 尝试立即执行任务: {job_id}")
+
+        # 解析可选的日期参数（第三个参数）
+        target_date = None
+        if len(parts) >= 3 and job_id == 'daily_data_update':
+            target_date = self._parse_date_arg(parts[2])
+            if target_date is None:
+                error_message = f"❌ *日期格式错误*\n\n`{parts[2]}` 不是有效日期。\n\n请使用 `YYYY-MM-DD` 格式，例如: `/run daily_data_update 2026-03-27`"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+                return
+
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 尝试立即执行任务: {job_id}, target_date={target_date}")
 
         try:
             # 验证任务是否存在
@@ -896,25 +914,26 @@ class TaskManagerHandlers:
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
                 return
 
-            # 检查任务是否启用
             if not job_cfg.get('enabled', True):
                 error_message = f"❌ *任务已禁用*\n\n任务ID: `{job_id}`\n\n请先启用任务后再执行。"
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
                 return
 
-            # 立即执行任务
-            self.task_manager.logger.info(f"[TaskManagerHandlers] 开始执行任务: {job_id}")
-            success = await self._execute_task_direct(chat_id, job_id)
+            # 发送开始执行通知
+            date_info = f" (补数据日期: {target_date})" if target_date else ""
+            start_message = f"⏳ *正在执行任务...*\n\n任务ID: `{job_id}`{date_info}\n\n请稍候，任务执行中..."
+            await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
 
-            # 发送执行结果通知
+            # 执行任务
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 开始执行任务: {job_id}")
+            success = await self._execute_task_direct(chat_id, job_id, target_date=target_date)
+
             if success:
-                success_message = f"✅ *任务执行成功*\n\n任务ID: `{job_id}`\n\n任务已成功提交执行。"
+                success_message = f"✅ *任务执行成功*\n\n任务ID: `{job_id}`{date_info}"
                 await self.task_manager.send_message(chat_id, success_message, parse_mode='markdown')
-                self.task_manager.logger.info(f"[TaskManagerHandlers] 任务执行成功: {job_id}")
             else:
-                error_message = f"❌ *任务执行失败*\n\n任务ID: `{job_id}`\n\n任务执行失败，请检查日志。"
+                error_message = f"❌ *任务执行失败*\n\n任务ID: `{job_id}`{date_info}\n\n请检查日志。"
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
-                self.task_manager.logger.error(f"[TaskManagerHandlers] 任务执行失败: {job_id}")
 
         except Exception as e:
             error_message = (
@@ -926,12 +945,111 @@ class TaskManagerHandlers:
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             self.task_manager.logger.error(f"[TaskManagerHandlers] 执行任务异常: {job_id}, 错误: {e}")
 
-    async def _execute_task_direct(self, chat_id: int, job_id: str) -> bool:
-        """直接执行任务，不通过UI交互"""
-        try:
-            self.task_manager.logger.info(f"[TaskManagerHandlers] 直接执行任务: {job_id}")
+    async def handle_backfill_command(self, event) -> None:
+        """处理 /backfill 命令，用于补充指定日期的缺失数据
 
-            # 调试：检查调度器中的任务状态
+        用法: /backfill <日期> [交易所...]
+        示例: /backfill 2026-03-27
+              /backfill 2026-03-27 SSE SZSE
+        """
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        command_text = event.text if hasattr(event, 'text') else '/backfill'
+
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+
+        parts = command_text.strip().split()
+        if len(parts) < 2:
+            error_message = (
+                "❌ *缺少日期参数*\n\n"
+                "用法: `/backfill <日期> [交易所...]`\n\n"
+                "示例:\n"
+                "• `/backfill 2026-03-27` - 补充 3/27 所有交易所数据\n"
+                "• `/backfill 2026-03-27 SSE` - 仅补充上交所数据"
+            )
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        # 解析日期
+        target_date = self._parse_date_arg(parts[1])
+        if target_date is None:
+            error_message = f"❌ *日期格式错误*\n\n`{parts[1]}` 不是有效日期。\n\n请使用 `YYYY-MM-DD` 格式。"
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        # 解析可选的交易所参数
+        exchanges = None
+        if len(parts) >= 3:
+            valid_exchanges = {'SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'}
+            exchanges = [ex.upper() for ex in parts[2:] if ex.upper() in valid_exchanges]
+            if not exchanges:
+                error_message = "❌ *无效的交易所代码*\n\n支持: SSE, SZSE, BSE"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+                return
+
+        exchanges_info = f" (交易所: {', '.join(exchanges)})" if exchanges else " (所有交易所)"
+        start_message = f"⏳ *正在补充数据...*\n\n目标日期: `{target_date}`{exchanges_info}\n\n请稍候，任务执行中..."
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+
+        try:
+            from scheduler.tasks import scheduled_tasks
+
+            result = await scheduled_tasks.daily_data_update(
+                exchanges=exchanges,
+                target_date=target_date,
+                wait_for_market_close=False,
+                enable_trading_day_check=False
+            )
+
+            if result:
+                success_message = f"✅ *数据补充完成*\n\n目标日期: `{target_date}`{exchanges_info}"
+                await self.task_manager.send_message(chat_id, success_message, parse_mode='markdown')
+            else:
+                error_message = f"⚠️ *数据补充未完全成功*\n\n目标日期: `{target_date}`{exchanges_info}\n\n可能是非交易日或部分数据源不可用，请检查日志。"
+                await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+
+        except Exception as e:
+            error_message = f"❌ *数据补充失败*\n\n错误: {str(e)}\n\n请检查日志。"
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 数据补充失败: {e}")
+
+    def _parse_date_arg(self, date_str: str):
+        """解析日期字符串，返回 date 对象或 None"""
+        from datetime import datetime as _dt
+        try:
+            return _dt.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return None
+
+    async def _execute_task_direct(self, chat_id: int, job_id: str, target_date=None) -> bool:
+        """直接执行任务，不通过UI交互
+
+        Args:
+            chat_id: 聊天ID
+            job_id: 任务ID
+            target_date: 可选，指定补数据日期（仅 daily_data_update 有效）
+        """
+        try:
+            self.task_manager.logger.info(f"[TaskManagerHandlers] 直接执行任务: {job_id}, target_date={target_date}")
+
+            # 如果有 target_date 且是 daily_data_update，直接调用 scheduled_tasks
+            if target_date and job_id == 'daily_data_update':
+                from scheduler.tasks import scheduled_tasks
+                from utils import config_manager
+                job_cfg = config_manager.get_nested(f'scheduler_config.jobs.{job_id}', {})
+                params = job_cfg.get('parameters', {})
+
+                success = await scheduled_tasks.daily_data_update(
+                    exchanges=params.get('exchanges'),
+                    target_date=target_date,
+                    wait_for_market_close=False,
+                    enable_trading_day_check=False,
+                    instrument_types=params.get('instrument_types')
+                )
+                self.task_manager.logger.info(f"[TaskManagerHandlers] 任务执行结果: {job_id}, 成功: {success}")
+                return success
+
+            # 常规执行路径：通过调度器
             scheduler = self.task_manager.task_scheduler
             available_jobs = list(scheduler.jobs.keys())
             self.task_manager.logger.info(f"[TaskManagerHandlers] 调度器中的可用任务: {available_jobs}")
@@ -940,11 +1058,7 @@ class TaskManagerHandlers:
                 self.task_manager.logger.error(f"[TaskManagerHandlers] 任务 {job_id} 不在调度器中！可用任务: {available_jobs}")
                 return False
 
-            self.task_manager.logger.info(f"[TaskManagerHandlers] 任务 {job_id} 存在于调度器中，开始调度")
-
-            # 调用调度器的立即执行方法
             success = await scheduler.run_job_now(job_id)
-
             self.task_manager.logger.info(f"[TaskManagerHandlers] 任务调度结果: {job_id}, 成功: {success}")
             return success
 

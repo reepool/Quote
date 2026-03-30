@@ -125,9 +125,16 @@ async def get_instrument_by_symbol(symbol: str):
 # Quote Data
 @router.get("/quotes/daily", tags=["Quotes"])
 async def get_daily_quotes(
-    request: QuoteQueryRequest = Depends()
+    request: QuoteQueryRequest = Depends(),
+    adjust: str = Query("qfq", description="复权类型: qfq=前复权, hfq=后复权, none=不复权")
 ):
-    """获取日线行情数据"""
+    """获取日线行情数据
+
+    支持动态复权计算:
+    - adjust=qfq: 前复权（默认）, 以最新日为基准向历史调整
+    - adjust=hfq: 后复权, 以上市日为基准向未来调整
+    - adjust=none: 不复权, 返回原始价格
+    """
     try:
         # 参数验证
         if not (request.instrument_id or request.symbol):
@@ -165,6 +172,61 @@ async def get_daily_quotes(
         filtered_data = await data_manager._apply_quote_filters(
             data, request.__dict__
         )
+
+        # ---- 动态复权计算 ----
+        adjust_type = (adjust or "qfq").lower().strip()
+        actual_instrument_id = instrument_info['instrument_id']
+        instrument_type = instrument_info.get('type', 'stock')
+
+        # 仅股票类型品种需要复权；指数/ETF/期货不存在除权概念，直接返回原始数据
+        needs_adjust = (
+            adjust_type in ("qfq", "hfq", "forward", "backward")
+            and instrument_type.lower() == 'stock'
+        )
+
+        if needs_adjust:
+            # 从缓存或 DB 加载复权因子
+            factors = await data_manager.get_cached_adjustment_factors(actual_instrument_id)
+
+            if factors:
+                from utils.adjustment import AdjustmentEngine
+
+                if isinstance(filtered_data, pd.DataFrame):
+                    records = filtered_data.to_dict('records')
+                else:
+                    records = list(filtered_data) if not isinstance(filtered_data, list) else filtered_data
+
+                adjusted_records = AdjustmentEngine.apply_adjustment(
+                    records, factors, adjust_type
+                )
+
+                if isinstance(filtered_data, pd.DataFrame):
+                    filtered_data = pd.DataFrame(adjusted_records)
+                else:
+                    filtered_data = adjusted_records
+            else:
+                # 无复权因子（如新股未收录除权事件）：返回原始数据并标记
+                adj_label = "forward" if adjust_type in ("qfq", "forward") else "backward"
+                if isinstance(filtered_data, pd.DataFrame):
+                    filtered_data = filtered_data.copy()
+                    filtered_data['adjustment_type'] = adj_label
+                    filtered_data['factor'] = 1.0
+                else:
+                    for record in (filtered_data if isinstance(filtered_data, list) else []):
+                        if isinstance(record, dict):
+                            record['adjustment_type'] = adj_label
+                            record['factor'] = 1.0
+        else:
+            # adjust=none 或 指数/ETF/期货：返回原始数据
+            if isinstance(filtered_data, pd.DataFrame):
+                filtered_data = filtered_data.copy()
+                filtered_data['adjustment_type'] = 'none'
+                filtered_data['factor'] = 1.0
+            elif isinstance(filtered_data, list):
+                for record in filtered_data:
+                    if isinstance(record, dict):
+                        record['adjustment_type'] = 'none'
+                        record['factor'] = 1.0
 
         # 生成统计信息
         stats = await data_manager._generate_quote_statistics(filtered_data)
@@ -237,6 +299,7 @@ async def get_daily_quotes(
                 "start_date": request.start_date.isoformat() if request.start_date else None,
                 "end_date": request.end_date.isoformat() if request.end_date else None,
                 "format": request.return_format,
+                "adjust": adjust_type,
                 "filters": serialized_filters,
                 "stats": serialized_stats,
                 "quality_summary": quality_summary
@@ -258,6 +321,7 @@ async def get_daily_quotes(
                 "start_date": request.start_date.isoformat() if request.start_date else None,
                 "end_date": request.end_date.isoformat() if request.end_date else None,
                 "format": request.return_format,
+                "adjust": adjust_type,
                 "filters": serialized_filters,
                 "stats": serialized_stats,
                 "quality_summary": quality_summary

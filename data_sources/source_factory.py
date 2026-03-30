@@ -394,7 +394,7 @@ class DataSourceFactory:
         # 第二步：尝试从备用数据源获取（yfinance等）
         backup_source = self.get_backup_source(exchange)
         if backup_source:
-            ds_logger.info(f"[DataSourceFactory] Trying backup source: {backup_source.name} for {symbol}")
+            ds_logger.info(f"[DataSourceFactory] Trying backup source: {backup_source.name} for {symbol} (instrument_type={instrument_type})")
             try:
                 with LogContext("DataSourceFactory", "get_backup_data",
                                exchange=exchange, source=backup_source.name,
@@ -407,8 +407,57 @@ class DataSourceFactory:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")
             except Exception as backup_e:
                 ds_logger.error(f"[DataSourceFactory] Backup source also failed: {backup_e}")
+        else:
+            region = self.exchange_mapper.get_region_from_exchange(exchange)
+            ds_logger.warning(
+                f"[DataSourceFactory] No backup source available for {exchange} "
+                f"(region={region}, registered_backups={list(self.region_to_sources['backup'].keys())}, "
+                f"total_sources={len(self.sources)})"
+            )
 
         ds_logger.warning(f"[DataSourceFactory] No data available for {exchange} {symbol}")
+        return []
+
+    async def get_adjustment_factors(self, exchange: str, instrument_id: str,
+                                     symbol: str, start_date: datetime,
+                                     end_date: datetime) -> List[Dict[str, Any]]:
+        """获取复权因子 - 与 get_daily_data 相同的降级策略"""
+        exchange = exchange.upper()
+
+        # 尝试主数据源
+        primary_source = self.get_primary_source(exchange)
+        if primary_source and hasattr(primary_source, 'get_adjustment_factors'):
+            try:
+                factors = await primary_source.get_adjustment_factors(
+                    instrument_id, symbol, start_date, end_date
+                )
+                if factors:
+                    ds_logger.debug(
+                        f"[DataSourceFactory] Got {len(factors)} factors from {primary_source.name}"
+                    )
+                    return factors
+            except Exception as e:
+                ds_logger.warning(
+                    f"[DataSourceFactory] Failed to get factors from {primary_source.name}: {e}"
+                )
+
+        # 尝试备用数据源
+        backup_source = self.get_backup_source(exchange)
+        if backup_source and hasattr(backup_source, 'get_adjustment_factors'):
+            try:
+                factors = await backup_source.get_adjustment_factors(
+                    instrument_id, symbol, start_date, end_date
+                )
+                if factors:
+                    ds_logger.info(
+                        f"[DataSourceFactory] Got {len(factors)} factors from backup {backup_source.name}"
+                    )
+                    return factors
+            except Exception as e:
+                ds_logger.warning(
+                    f"[DataSourceFactory] Backup factor fetch also failed: {e}"
+                )
+
         return []
 
     async def get_latest_daily_data(self, exchange: str, instrument_id: str, symbol: str) -> Dict[str, Any]:
@@ -592,7 +641,13 @@ class DataSourceFactory:
                 ds_logger.error(f"[DataSourceFactory] Error closing {name}: {e}")
 
         self.sources.clear()
+        self.region_to_sources = {'primary': {}, 'backup': {}}
         self.trading_calendar_cache.clear()
+
+        # 重置全局单例引用，允许下次使用时重新初始化
+        global data_source_factory
+        data_source_factory = None
+        ds_logger.info("[DataSourceFactory] All sources closed, factory reset for re-initialization")
 
 
 # 全局数据源工厂实例

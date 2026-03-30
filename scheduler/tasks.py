@@ -84,16 +84,29 @@ class ScheduledTasks:
                             progress_log_every: int = 200,
                             progress_log_interval_sec: int = 300,
                             instrument_types: Optional[List[str]] = None,
+                            target_date: Optional[date] = None,
                             job_config: Optional[JobConfig] = None) -> bool:
-        """每日数据更新任务"""
-        try:
-            scheduler_logger.info("[Scheduler] Starting daily data update task...")
+        """每日数据更新任务
 
+        Args:
+            target_date: 指定补数据的目标日期，为 None 时默认 date.today()
+        """
+        try:
             # 使用配置参数或默认值
             if exchanges is None:
                 exchanges = ['SSE', 'SZSE']
 
-            today = date.today()
+            today = target_date if target_date else date.today()
+            is_backfill = target_date is not None and target_date != date.today()
+
+            if is_backfill:
+                scheduler_logger.info(f"[Scheduler] Starting BACKFILL data update for {today}...")
+                # 补数据模式：跳过等待收盘和交易日检查
+                wait_for_market_close = False
+                enable_trading_day_check = False
+            else:
+                scheduler_logger.info("[Scheduler] Starting daily data update task...")
+
             trading_calendar_updates = {}
 
             # 步骤1: 更新每个交易所的交易日历

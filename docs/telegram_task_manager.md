@@ -10,6 +10,7 @@ Quote System 提供了功能完整的 Telegram 机器人任务管理界面，允
 - **实时任务监控** - 查看所有定时任务的状态和下次执行时间
 - **智能时间显示** - 根据时间差自动选择最佳显示格式
 - **任务控制** - 启用/禁用/暂停/恢复任务
+- **数据补充** - 指定日期补充缺失的历史数据
 - **配置热重载** - 运行时动态更新任务配置无需重启
 - **权限管理** - 基于用户ID的访问控制
 - **实时通知** - 任务执行状态和系统告警通知
@@ -81,20 +82,24 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/detail <task_id>` - 查看指定任务的详细信息
 - `/reload_config` - 热重载配置文件
 
-#### 任务控制命令（开发中）
-- `/enable <task_id>` - 启用指定任务
-- `/disable <task_id>` - 禁用指定任务
-- `/pause <task_id>` - 暂停指定任务
-- `/resume <task_id>` - 恢复指定任务
+#### 任务控制命令
 - `/run <task_id>` - 立即执行指定任务
+- `/run daily_data_update <日期>` - 以补数据模式执行每日更新（跳过交易日检查）
+- `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
+- `/enable <task_id>` - 启用指定任务（开发中）
+- `/disable <task_id>` - 禁用指定任务（开发中）
 
 ### 使用示例
 
 ```bash
 # 在Telegram中发送命令
-/status                    # 显示任务状态
-/detail daily_data_update  # 查看每日数据更新任务详情
-/reload_config            # 重载任务配置
+/status                                  # 显示任务状态
+/detail daily_data_update                # 查看每日数据更新任务详情
+/run daily_data_update                   # 立即执行每日更新
+/run daily_data_update 2026-03-27        # 补充 3/27 的缺失数据
+/backfill 2026-03-27                     # 补充 3/27 所有交易所数据
+/backfill 2026-03-27 SSE                 # 仅补充上交所 3/27 数据
+/reload_config                           # 重载任务配置
 ```
 
 ## 📋 内置任务列表
@@ -162,6 +167,39 @@ python3 main.py api --host 0.0.0.0 --port 8000
 • /disable <task_id> - 禁用任务
 • /detail <task_id> - 查看任务详情
 ```
+
+## \ud83d\udce5 \u6570\u636e\u8865\u5145\u529f\u80fd
+
+\u5f53\u5b9a\u65f6\u4efb\u52a1\u672a\u6b63\u5e38\u66f4\u65b0\u6570\u636e\u65f6\uff0c\u53ef\u4ee5\u901a\u8fc7\u4ee5\u4e0b\u4e24\u79cd\u65b9\u5f0f\u8865\u5145\u6307\u5b9a\u65e5\u671f\u7684\u7f3a\u5931\u6570\u636e\u3002
+
+### \u65b9\u5f0f\u4e00\uff1a`/backfill` \u547d\u4ee4\uff08\u63a8\u8350\uff09
+
+\u4e13\u7528\u7684\u6570\u636e\u8865\u5145\u547d\u4ee4\uff0c\u652f\u6301\u6307\u5b9a\u4ea4\u6613\u6240\u3002
+
+```
+/backfill 2026-03-27              # \u8865\u5145\u6240\u6709\u4ea4\u6613\u6240
+/backfill 2026-03-27 SSE          # \u4ec5\u8865\u5145\u4e0a\u4ea4\u6240
+/backfill 2026-03-27 SSE SZSE     # \u8865\u5145\u4e0a\u4ea4\u6240\u548c\u6df1\u4ea4\u6240
+```
+
+### \u65b9\u5f0f\u4e8c\uff1a`/run daily_data_update <\u65e5\u671f>`
+
+\u901a\u8fc7\u5728 `/run` \u547d\u4ee4\u540e\u8ffd\u52a0\u65e5\u671f\u53c2\u6570\u89e6\u53d1\u8865\u6570\u636e\u3002
+
+```
+/run daily_data_update 2026-03-27
+```
+
+### \u4e24\u79cd\u65b9\u5f0f\u7684\u5dee\u5f02
+
+| \u7ef4\u5ea6 | `/backfill` | `/run daily_data_update <\u65e5\u671f>` |
+|------|------------|-----------------------------------|
+| \u4ea4\u6613\u6240 | \u9ed8\u8ba4 SSE+SZSE\uff0c\u53ef\u8ffd\u52a0\u6307\u5b9a | \u4ece\u914d\u7f6e\u6587\u4ef6\u8bfb\u53d6 |
+| instrument\_types | \u4f7f\u7528\u65b9\u6cd5\u5185\u9ed8\u8ba4\u503c | \u4ece\u914d\u7f6e\u6587\u4ef6\u8bfb\u53d6 |
+| \u4f9d\u8d56\u8c03\u5ea6\u5668 | \u4e0d\u4f9d\u8d56\uff0c\u76f4\u63a5\u8c03\u7528 | \u4e0d\u4f9d\u8d56\uff0c\u76f4\u63a5\u8c03\u7528 |
+| \u7b49\u5f85\u6536\u76d8/\u4ea4\u6613\u65e5\u68c0\u67e5 | \u81ea\u52a8\u8df3\u8fc7 | \u81ea\u52a8\u8df3\u8fc7 |
+
+> **\u63d0\u793a**\uff1a\u5f53\u524d\u914d\u7f6e\u4e0b\u4e24\u8005\u884c\u4e3a\u57fa\u672c\u4e00\u81f4\u3002`/backfill` \u7684\u4f18\u52bf\u5728\u4e8e\u53ef\u4ee5\u7075\u6d3b\u6307\u5b9a\u4ea4\u6613\u6240\uff0c\u4e14\u4e0d\u4f9d\u8d56\u8c03\u5ea6\u5668\u72b6\u6001\u3002
 
 ## 🛠️ 技术实现
 

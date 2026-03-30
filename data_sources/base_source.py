@@ -106,7 +106,17 @@ class RateLimiter:
 
 
 class BaseDataSource(ABC):
-    """数据源基类"""
+    """数据源基类
+
+    所有数据源实现须继承此类并实现抽象方法。
+
+    复权因子设计:
+        若数据源支持提供复权因子, 实现 get_adjustment_factors() 方法即可自动
+        符合 AdjustmentFactorProvider 协议 (data_sources/adjustment_provider.py)。
+        DataSourceFactory 会自动探测并路由因子请求到正确的数据源。
+
+        不支持复权因子的数据源 (如仅提供指数数据的源) 保持默认实现返回 [] 即可。
+    """
 
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None,
                  quality_config: DataQualityConfig = None):
@@ -155,7 +165,30 @@ class BaseDataSource(ABC):
         """获取最新日线数据"""
         pass
 
-    # 可选的方法，子类可以选择性实现
+    async def get_adjustment_factors(
+        self,
+        instrument_id: str,
+        symbol: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> List[Dict[str, Any]]:
+        """获取复权因子事件列表（可选实现）
+
+        默认返回空列表。子类重写此方法以提供真实复权因子数据。
+
+        实现规范参见 data_sources/adjustment_provider.py (AdjustmentFactorProvider)。
+
+        Returns:
+            复权因子事件列表, 仅包含发生除权除息事件的日期记录 (非每日一条)。
+            每条记录必须包含以下字段:
+                instrument_id     str       品种 ID
+                ex_date           datetime  除权除息日
+                factor            float     单日除权因子 (> 1 表示除权)
+                cumulative_factor float     累积后复权因子
+                source            str       数据源名称
+        """
+        return []
+
     async def get_trading_calendar(self, exchange: str, start_date: date,
                                   end_date: date) -> List[Dict[str, Any]]:
         """获取交易日历（可选实现）"""

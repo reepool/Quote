@@ -66,6 +66,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/help', self.handlers.handle_help_command)
             self.telegram_bot.register_command_handler('/detail', self.handlers.handle_detail_command)
             self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
+            self.telegram_bot.register_command_handler('/backfill', self.handlers.handle_backfill_command)
             self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)
 
             # 注册回调查询处理器
@@ -138,12 +139,14 @@ class TaskManagerBot:
             "*可用命令:*\n"
             "• `/start` - 显示主菜单\n"
             "• `/status` - 查看任务状态\n"
+            "• `/backfill <日期>` - 补充指定日期的缺失数据\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 查看帮助信息\n\n"
             "*功能说明:*\n"
             "• 📋 查看任务状态 - 查看所有任务的运行状态\n"
             "• 📝 任务详情 - 查看任务的详细信息和执行历史\n"
             "• 🚀 立即执行 - 手动触发任务执行\n"
+            "• 📥 数据补充 - 补充指定日期的缺失数据\n"
             "• ✅ 启用任务 - 将任务加入调度器\n"
             "• 🔴 禁用任务 - 将任务从调度器移除\n"
             "• 🔄 重载配置 - 热重载配置文件无需重启\n\n"

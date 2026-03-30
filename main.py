@@ -295,7 +295,10 @@ class QuoteSystem:
     async def update_daily_data(self, exchanges: Optional[list] = None, target_date=None):
         """更新日线数据"""
         try:
-            dm_logger.info("[Main] Starting daily data update...")
+            if target_date:
+                dm_logger.info(f"[Main] Starting daily data BACKFILL for {target_date}...")
+            else:
+                dm_logger.info("[Main] Starting daily data update...")
 
             if exchanges is None:
                 exchanges = ['SSE', 'SZSE', 'BSE']
@@ -391,8 +394,9 @@ class QuoteSystem:
             # 确保关闭数据源，避免资源泄漏
             try:
                 from data_sources.source_factory import data_source_factory
-                await data_source_factory.close_all()
-                dm_logger.debug("[Main] DataSourceFactory closed successfully")
+                if data_source_factory:
+                    await data_source_factory.close_all()
+                    dm_logger.debug("[Main] DataSourceFactory closed successfully")
             except Exception as close_error:
                 dm_logger.warning(f"[Main] Failed to close DataSourceFactory: {close_error}")
 
@@ -436,8 +440,13 @@ class QuoteSystem:
             dm_logger.error(f"[Main] Failed to get download stats: {e}")
             return {}
 
-    async def run_job(self, job_id: str):
-        """运行指定任务"""
+    async def run_job(self, job_id: str, target_date=None):
+        """运行指定任务
+
+        Args:
+            job_id: 任务ID
+            target_date: 可选，指定补数据日期（仅 daily_data_update 有效）
+        """
         try:
             scheduler_logger.info(f"[Main] Running job: {job_id}")
 
@@ -478,7 +487,8 @@ class QuoteSystem:
                     wait_for_market_close=params.get('wait_for_market_close', True),
                     market_close_delay_minutes=params.get('market_close_delay_minutes', 15),
                     enable_trading_day_check=params.get('enable_trading_day_check', True),
-                    instrument_types=params.get('instrument_types')
+                    instrument_types=params.get('instrument_types'),
+                    target_date=target_date
                 )
 
                 if success:
@@ -637,7 +647,8 @@ class QuoteSystem:
 
             # 关闭数据源工厂
             from data_sources.source_factory import data_source_factory
-            await data_source_factory.close_all()
+            if data_source_factory:
+                await data_source_factory.close_all()
 
             # 清理进程管理器
             self.process_manager.cleanup(self.service_name)
@@ -1133,6 +1144,8 @@ def create_parser():
     update_parser = subparsers.add_parser('update', help='更新日线数据')
     update_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'HKEX', 'NASDAQ', 'NYSE'],
                              help='交易所列表 (默认: 全部)')
+    update_parser.add_argument('--target-date', type=str,
+                             help='目标日期 (YYYY-MM-DD)，用于补充历史缺失数据')
 
     # 显示系统状态
     status_parser = subparsers.add_parser('status', help='显示系统状态')
@@ -1249,7 +1262,15 @@ async def main():
                                                         resume=resume, instrument_types=getattr(args, 'types', None))
 
         elif args.command == 'update':
-            await system.update_daily_data(args.exchanges)
+            target_date = None
+            if hasattr(args, 'target_date') and args.target_date:
+                from datetime import datetime as _dt
+                try:
+                    target_date = _dt.strptime(args.target_date, '%Y-%m-%d').date()
+                except ValueError:
+                    print(f"错误: 目标日期格式无效 '{args.target_date}'，请使用 YYYY-MM-DD 格式")
+                    sys.exit(1)
+            await system.update_daily_data(args.exchanges, target_date=target_date)
 
         elif args.command == 'status':
             await system.show_system_status()

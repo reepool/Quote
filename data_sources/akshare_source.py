@@ -557,10 +557,9 @@ class AkShareSource(BaseDataSource):
             elif field in enhanced:
                 enhanced[field] = 0.0 if field != 'volume' else 0
 
-        # 添加复权信息
-        adjustment_config = AdjustmentConfig.get_adjustment_config('akshare')
-        enhanced['factor'] = adjustment_config['factor']
-        enhanced['adjustment_type'] = adjustment_config.get('type', 'forward')
+        # 复权信息 (非复权原始数据, 复权由本地引擎计算)
+        enhanced['factor'] = 1.0
+        enhanced['adjustment_type'] = 'none'
 
         return enhanced
 
@@ -570,7 +569,7 @@ class AkShareSource(BaseDataSource):
         max_retries = 3
         base_delay = 2.0
 
-        # 获取复权配置
+        # 复权配置: 统一使用非复权原始数据
         adjustment_config = AdjustmentConfig.get_adjustment_config('akshare')
 
         for attempt in range(max_retries):
@@ -591,7 +590,7 @@ class AkShareSource(BaseDataSource):
                         period="daily",
                         start_date=start_date.strftime('%Y%m%d'),
                         end_date=end_date.strftime('%Y%m%d'),
-                        adjust=adjustment_config['adjust']  # 使用统一的前复权配置
+                        adjust=adjustment_config['adjust']  # 空字符串 = 不复权
                     )
 
                 if data.empty:
@@ -832,6 +831,124 @@ class AkShareSource(BaseDataSource):
         except Exception as e:
             akshare_logger.error(f"[{self.name}] Health check failed: {e}")
             return False
+
+    async def get_adjustment_factors(self, instrument_id: str, symbol: str,
+                                     start_date: datetime, end_date: datetime
+                                     ) -> List[Dict[str, Any]]:
+        """获取复权因子数据
+
+        调用 ak.stock_zh_a_daily(adjust="hfq-factor") 获取后复权因子.
+        """
+        try:
+            await self.rate_limiter.acquire()
+
+            # AkShare 需要带市场前缀的代码
+            if 'SH' in instrument_id or 'SSE' in instrument_id:
+                ak_symbol = f"sh{symbol}"
+            elif 'SZ' in instrument_id:
+                ak_symbol = f"sz{symbol}"
+            else:
+                akshare_logger.debug(
+                    f"Unsupported instrument_id for AkShare factor: {instrument_id}"
+                )
+                return []
+
+            try:
+                factor_df = await asyncio.to_thread(
+                    ak.stock_zh_a_daily,
+                    symbol=ak_symbol,
+                    adjust="hfq-factor"
+                )
+            except Exception as fetch_e:
+                akshare_logger.warning(
+                    f"AkShare factor fetch failed for {ak_symbol}: {fetch_e}"
+                )
+                return []
+
+            if factor_df is None or factor_df.empty:
+                return []
+
+            # ---------- 解析: 仅保留因子发生显著变化的除权事件日 ----------
+            # ak.stock_zh_a_daily(adjust="hfq-factor") 返回每日一条累积因子记录,
+            # 非除权日前后值相同。只记录突变日, 与 BaoStock 保持稀疏存储一致。
+
+            # 识别日期列
+            if 'date' in factor_df.columns:
+                factor_df = factor_df.set_index('date')
+            factor_df.index = pd.to_datetime(factor_df.index)
+
+            # 识别因子列
+            factor_col = None
+            for col_name in ('hfq_factor', 'factor', factor_df.columns[0]):
+                if col_name in factor_df.columns:
+                    factor_col = col_name
+                    break
+
+            if factor_col is None:
+                akshare_logger.warning(
+                    f"AkShare factor DataFrame has no recognized factor column for {instrument_id}"
+                )
+                return []
+
+            # 仅保留日期范围内的记录
+            factor_df = factor_df[
+                (factor_df.index.date >= start_date.date()) &
+                (factor_df.index.date <= end_date.date())
+            ]
+
+            if factor_df.empty:
+                return []
+
+            # 计算相邻日期的因子变化量 (绝对值)
+            factor_df = factor_df.copy()
+            factor_df['_shift'] = factor_df[factor_col].diff().abs()
+
+            factors = []
+            prev_cum = None
+
+            for dt, row in factor_df.iterrows():
+                cum = float(row[factor_col])
+                shift = float(row['_shift']) if pd.notna(row['_shift']) else None
+
+                # 首行: 如果起始就有累积因子 (非1.0) 记录; 或因子突变
+                is_event_day = (
+                    (shift is None and abs(cum - 1.0) > 0.0001) or   # 首行非1.0
+                    (shift is not None and shift > 0.0001)              # 因子突变
+                )
+
+                if is_event_day:
+                    # 单日因子 = 当日累积 / 前日累积
+                    if prev_cum is not None and prev_cum != 0:
+                        day_factor = round(cum / prev_cum, 6)
+                    else:
+                        day_factor = round(cum, 6)
+
+                    try:
+                        factor_record = {
+                            'instrument_id': instrument_id,
+                            'ex_date': dt.to_pydatetime(),
+                            'factor': day_factor,
+                            'cumulative_factor': round(cum, 6),
+                            'source': 'akshare',
+                        }
+                        factors.append(factor_record)
+                    except Exception as parse_e:
+                        akshare_logger.warning(
+                            f"Failed to parse AkShare factor row for {instrument_id}: {parse_e}"
+                        )
+
+                prev_cum = cum
+
+            akshare_logger.info(
+                f"Retrieved {len(factors)} adjustment factors from AkShare for {instrument_id}"
+            )
+            return factors
+
+        except Exception as e:
+            akshare_logger.error(
+                f"Failed to get adjustment factors from AkShare for {instrument_id}: {e}"
+            )
+            return []
 
     async def close(self):
         """关闭AkShare数据源连接和资源"""
