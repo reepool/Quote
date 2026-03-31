@@ -225,6 +225,12 @@
             "content": "🏥 *{name}*"
           },
           {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *系统健康检查失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
             "name": "summary",
             "type": "metrics",
             "fields": [
@@ -232,14 +238,16 @@
               "checks_performed",
               "issues_found"
             ],
-            "title": "检查摘要"
+            "title": "检查摘要",
+            "condition": "status != 'error'"
           },
           {
             "name": "details",
             "type": "list",
             "data_source": "check_results",
             "display_format": "{status_icon} {check_name}: {result}",
-            "title": "详细检查结果"
+            "title": "详细检查结果",
+            "condition": "status != 'error'"
           }
         ]
       },

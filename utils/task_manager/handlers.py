@@ -40,6 +40,7 @@ class TaskManagerHandlers:
         message += "\n\n*可用命令：*\n"
         message += "• `/status` - 查看任务状态\n"
         message += "• `/detail <任务ID>` - 查看任务详情\n"
+        message += "• `/backfill_factors` - 回填复权因子\n"
         message += "• `/reload_config` - 重载配置文件\n"
         message += "• `/help` - 查看帮助信息\n\n"
         message += "*示例：* `/detail trading_calendar_update` 或 `/reload_config`"
@@ -81,6 +82,7 @@ class TaskManagerHandlers:
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
+            "• `/backfill_factors` - 扫描并回填缺失的复权因子\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 显示此帮助信息\n\n"
             "*可用的任务ID：*\n"
@@ -1012,6 +1014,70 @@ class TaskManagerHandlers:
             error_message = f"❌ *数据补充失败*\n\n错误: {str(e)}\n\n请检查日志。"
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             self.task_manager.logger.error(f"[TaskManagerHandlers] 数据补充失败: {e}")
+
+    async def handle_backfill_factors_command(self, event) -> None:
+        """处理 /backfill_factors 命令，调用单独的脚本回填复权因子"""
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        command_text = event.text if hasattr(event, 'text') else '/backfill_factors'
+
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+
+        start_message = "⏳ *开始扫描并回填复权因子...*\n\n脚本已在后台启动。由于涉及网络请求，此过程可能需要几分钟。执行完成后将在此发送报告。"
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+
+        # 在后台执行脚本，避免阻塞主循环
+        asyncio.create_task(self._run_backfill_factors_script(chat_id))
+
+    async def _run_backfill_factors_script(self, chat_id: int):
+        """后台运行 scripts/backfill_factors.py 并捕获输出报告"""
+        try:
+            import sys
+            import os
+            # 找到主目录
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            script_path = os.path.join(project_root, 'scripts', 'backfill_factors.py')
+
+            # 启动子进程执行该脚本
+            process = await asyncio.create_subprocess_exec(
+                sys.executable, script_path,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=project_root
+            )
+
+            stdout, stderr = await process.communicate()
+            
+            output = stdout.decode('utf-8', errors='replace')
+            error_output = stderr.decode('utf-8', errors='replace')
+
+            if process.returncode == 0:
+                # 提取报告部分
+                summary = ""
+                if "回填任务最终统计报告" in output:
+                    lines = output.split('\n')
+                    try:
+                        # 找到包含“回填任务最终统计报告”的那一行
+                        idx = next(i for i, line in enumerate(lines) if "回填任务最终统计报告" in line)
+                        # 向上回溯 1 行 (等号边界)，向下取 20 行包含结论的内容
+                        start_idx = max(0, idx - 1)
+                        end_idx = min(len(lines), idx + 20)
+                        summary = "\n".join(lines[start_idx:end_idx]).strip()
+                    except StopIteration:
+                        summary = output[-1000:]
+                else:
+                    # 没找到显式报告则截取最后部分
+                    summary = output[-1000:]
+
+                msg = f"✅ *复权因子回填完成*\n\n```text\n{summary}\n```"
+                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
+            else:
+                msg = f"❌ *复权因子回填失败(Exit Code: {process.returncode})*\n\n*错误输出:*\n```text\n{error_output[-800:]}\n```"
+                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 运行 backfill_factors.py 异常: {e}")
+            await self.task_manager.send_message(chat_id, f"❌ *复权因子回填异常*\n\n错误: {str(e)}", parse_mode='markdown')
 
     def _parse_date_arg(self, date_str: str):
         """解析日期字符串，返回 date 对象或 None"""

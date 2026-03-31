@@ -611,22 +611,31 @@ class DataSourceFactory:
             'data_sources_config.health_check_timeout_sec', 10
         )
 
-        for name, source in self.sources.items():
+        async def check_source(name: str, source: BaseDataSource) -> tuple[str, bool]:
             try:
                 is_healthy = await asyncio.wait_for(
                     source.health_check(), timeout=timeout_seconds
                 )
-                health_status[name] = is_healthy
                 ds_logger.info(f"[DataSourceFactory] Health check {name}: {'OK' if is_healthy else 'FAILED'}")
+                return name, is_healthy
             except asyncio.TimeoutError:
-                health_status[name] = False
                 ds_logger.error(
                     f"[DataSourceFactory] Health check timed out for {name} "
                     f"after {timeout_seconds}s"
                 )
+                return name, False
             except Exception as e:
-                health_status[name] = False
                 ds_logger.error(f"[DataSourceFactory] Health check failed for {name}: {e}")
+                return name, False
+
+        if not self.sources:
+            return {}
+
+        tasks = [check_source(name, source) for name, source in self.sources.items()]
+        results = await asyncio.gather(*tasks)
+        
+        for name, is_healthy in results:
+            health_status[name] = is_healthy
 
         return health_status
 

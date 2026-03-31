@@ -26,6 +26,9 @@ class ScheduledTasks:
         self.telegram_enabled = self.bot_config.enabled
         self.bot = TelegramBot() if self.telegram_enabled else None
 
+        # 由 TaskScheduler 在初始化时注入，用于获取当前正在运行的任务
+        self._get_running_tasks = None
+
     async def initialize(self, debug=False):
         """初始化定时任务"""
         scheduler_logger.info("[Scheduler] Initializing scheduled tasks...")
@@ -627,6 +630,22 @@ class ScheduledTasks:
                                 job_config: Optional[JobConfig] = None) -> bool:
         """系统健康检查任务"""
         try:
+            # ★ 运行管控：当有其他任务正在运行时，跳过本次健康检查
+            if self._get_running_tasks:
+                running = self._get_running_tasks()
+                # 排除 system_health_check 自身
+                other_tasks = {k: v for k, v in running.items() if k != 'system_health_check'}
+                if other_tasks:
+                    task_names = ', '.join(other_tasks.keys())
+                    skip_msg = f"当前 {task_names} 任务正在运行，健康检查延迟进行"
+                    scheduler_logger.info(f"[Scheduler] {skip_msg}")
+                    if self.telegram_enabled and self.bot:
+                        try:
+                            await self.bot.send_scheduler_notification(skip_msg, level='info')
+                        except Exception as notify_err:
+                            scheduler_logger.warning(f"[Scheduler] 发送跳过通知失败: {notify_err}")
+                    return True  # 返回 True 表示非异常跳过
+
             scheduler_logger.info("[Scheduler] Starting system health check...")
             start_time = datetime.now()
             try:
