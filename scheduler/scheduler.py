@@ -48,9 +48,6 @@ class TaskScheduler:
             # 初始化任务配置管理器
             self.job_configs = self.job_config_manager.load_job_configs()
 
-            # 注入 running_tasks 回调，供 health_check 检查是否有其他任务正在运行
-            scheduled_tasks._get_running_tasks = lambda: dict(self.running_tasks)
-
             # 初始化任务
             await scheduled_tasks.initialize()
 

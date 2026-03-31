@@ -26,8 +26,8 @@ class ScheduledTasks:
         self.telegram_enabled = self.bot_config.enabled
         self.bot = TelegramBot() if self.telegram_enabled else None
 
-        # 由 TaskScheduler 在初始化时注入，用于获取当前正在运行的任务
-        self._get_running_tasks = None
+        # 任务自追踪集合：无论通过调度器还是 Telegram /run 直接调用，都会被记录
+        self._active_tasks: set = set()
 
     async def initialize(self, debug=False):
         """初始化定时任务"""
@@ -94,6 +94,7 @@ class ScheduledTasks:
         Args:
             target_date: 指定补数据的目标日期，为 None 时默认 date.today()
         """
+        self._active_tasks.add('daily_data_update')
         try:
             # 使用配置参数或默认值
             if exchanges is None:
@@ -222,6 +223,8 @@ class ScheduledTasks:
                 job_config=job_config
             )
             return False
+        finally:
+            self._active_tasks.discard('daily_data_update')
 
     async def weekly_data_maintenance(self,
                                   backup_database: bool = True,
@@ -432,6 +435,7 @@ class ScheduledTasks:
                                   severity_filter: Optional[List[str]] = None,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """检测数据缺口并修复（复合任务）"""
+        self._active_tasks.add('find_gap_and_repair')
         try:
             scheduler_logger.info("[Scheduler] Starting gap detect and repair task...")
 
@@ -550,6 +554,8 @@ class ScheduledTasks:
                 job_config=job_config
             )
             return False
+        finally:
+            self._active_tasks.discard('find_gap_and_repair')
 
     async def quarterly_cleanup(self,
                               cleanup_old_quotes: bool = True,
@@ -631,20 +637,18 @@ class ScheduledTasks:
         """系统健康检查任务"""
         try:
             # ★ 运行管控：当有其他任务正在运行时，跳过本次健康检查
-            if self._get_running_tasks:
-                running = self._get_running_tasks()
-                # 排除 system_health_check 自身
-                other_tasks = {k: v for k, v in running.items() if k != 'system_health_check'}
-                if other_tasks:
-                    task_names = ', '.join(other_tasks.keys())
-                    skip_msg = f"当前 {task_names} 任务正在运行，健康检查延迟进行"
-                    scheduler_logger.info(f"[Scheduler] {skip_msg}")
-                    if self.telegram_enabled and self.bot:
-                        try:
-                            await self.bot.send_scheduler_notification(skip_msg, level='info')
-                        except Exception as notify_err:
-                            scheduler_logger.warning(f"[Scheduler] 发送跳过通知失败: {notify_err}")
-                    return True  # 返回 True 表示非异常跳过
+            # 检查 _active_tasks（覆盖调度器调用 + Telegram /run 直接调用）
+            other_tasks = {t for t in self._active_tasks if t != 'system_health_check'}
+            if other_tasks:
+                task_names = ', '.join(other_tasks)
+                skip_msg = f"当前 {task_names} 任务正在运行，健康检查延迟进行"
+                scheduler_logger.info(f"[Scheduler] {skip_msg}")
+                if self.telegram_enabled and self.bot:
+                    try:
+                        await self.bot.send_scheduler_notification(skip_msg, level='info')
+                    except Exception as notify_err:
+                        scheduler_logger.warning(f"[Scheduler] 发送跳过通知失败: {notify_err}")
+                return True  # 返回 True 表示非异常跳过
 
             scheduler_logger.info("[Scheduler] Starting system health check...")
             start_time = datetime.now()
