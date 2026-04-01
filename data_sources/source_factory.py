@@ -51,6 +51,10 @@ class DataSourceFactory:
 
             # 遍历所有数据源配置
             for source_name, source_config in sources_config.items():
+                # 跳过非数据源区块的全局配置选项（如 health_check_timeout_sec 等数字或布尔值）
+                if not isinstance(source_config, dict):
+                    continue
+                    
                 if not source_config.get('enabled', False):
                     ds_logger.info(f"[DataSourceFactory] Skipping disabled source: {source_name}")
                     continue
@@ -368,8 +372,19 @@ class DataSourceFactory:
 
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
-                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
-        """获取日线数据 - 智能降级策略"""
+                           instrument_type: str = 'stock',
+                           source_symbol: str = '') -> List[Dict[str, Any]]:
+        """获取日线数据 - 智能降级策略
+
+        Args:
+            exchange: 交易所代码
+            instrument_id: 品种 ID
+            symbol: 交易代码
+            start_date: 开始日期
+            end_date: 结束日期
+            instrument_type: 品种类型
+            source_symbol: 数据源原始代码（如东财 105.AAPL），可选
+        """
         exchange = exchange.upper()
 
         # 第一步：尝试从主数据源获取
@@ -382,7 +397,10 @@ class DataSourceFactory:
             with LogContext("DataSourceFactory", "get_primary_data",
                            exchange=exchange, source=primary_source.name,
                            instrument_id=instrument_id, symbol=symbol):
-                data = await primary_source.get_daily_data(instrument_id, symbol, start_date, end_date, instrument_type)
+                data = await primary_source.get_daily_data(
+                    instrument_id, symbol, start_date, end_date,
+                    instrument_type, source_symbol=source_symbol
+                )
                 if data and self._validate_daily_data(data, instrument_id, symbol):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
@@ -399,7 +417,10 @@ class DataSourceFactory:
                 with LogContext("DataSourceFactory", "get_backup_data",
                                exchange=exchange, source=backup_source.name,
                                instrument_id=instrument_id, symbol=symbol):
-                    data = await backup_source.get_daily_data(instrument_id, symbol, start_date, end_date, instrument_type)
+                    data = await backup_source.get_daily_data(
+                        instrument_id, symbol, start_date, end_date,
+                        instrument_type, source_symbol=source_symbol
+                    )
                     if data and self._validate_daily_data(data, instrument_id, symbol):
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
                         return data

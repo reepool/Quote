@@ -153,7 +153,8 @@ class TushareSource(BaseDataSource):
 
     async def get_daily_data(self, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
-                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
+                           instrument_type: str = 'stock',
+                           source_symbol: str = '') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         try:
             await self._respect_rate_limit()

@@ -570,7 +570,8 @@ class DataManager:
                     instrument['symbol'],
                     start_date_for_download,
                     end_date_for_download,
-                    instrument.get('type', 'stock')
+                    instrument.get('type', 'stock'),
+                    source_symbol=instrument.get('source_symbol', '')
                 )
 
                 if all_data_response:
@@ -621,7 +622,9 @@ class DataManager:
                     instrument['instrument_id'],
                     instrument['symbol'],
                     start_date,
-                    end_date
+                    end_date,
+                    instrument.get('type', 'stock'),
+                    source_symbol=instrument.get('source_symbol', '')
                 )
 
                 if trunk_data:
@@ -1740,7 +1743,8 @@ class DataManager:
                                             instrument['symbol'],
                                             datetime.combine(start_date, datetime.min.time()),
                                             datetime.combine(end_date, datetime.max.time()),
-                                            instrument_type=instrument.get('type', 'stock')
+                                            instrument_type=instrument.get('type', 'stock'),
+                                            source_symbol=instrument.get('source_symbol', '')
                                         ),
                                         timeout=per_instrument_timeout_sec
                                     )
@@ -1751,7 +1755,8 @@ class DataManager:
                                         instrument['symbol'],
                                         datetime.combine(start_date, datetime.min.time()),
                                         datetime.combine(end_date, datetime.max.time()),
-                                        instrument_type=instrument.get('type', 'stock')
+                                        instrument_type=instrument.get('type', 'stock'),
+                                        source_symbol=instrument.get('source_symbol', '')
                                     )
 
                                 if data:

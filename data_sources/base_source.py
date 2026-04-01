@@ -156,8 +156,18 @@ class BaseDataSource(ABC):
     @abstractmethod
     async def get_daily_data(self, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
-                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
-        """获取历史日线数据"""
+                           instrument_type: str = 'stock',
+                           source_symbol: str = '') -> List[Dict[str, Any]]:
+        """获取历史日线数据
+
+        Args:
+            instrument_id: 品种 ID (如 AAPL.US)
+            symbol: 交易代码 (如 AAPL)
+            start_date: 开始日期
+            end_date: 结束日期
+            instrument_type: 品种类型
+            source_symbol: 数据源原始代码 (如东财 105.AAPL)，可选
+        """
         pass
 
     @abstractmethod

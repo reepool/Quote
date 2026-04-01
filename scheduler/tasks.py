@@ -1021,13 +1021,28 @@ class ScheduledTasks:
         scheduler_logger.info(f"[Scheduler] Waiting for markets to close: {exchanges}")
 
         # 不同交易所的收盘时间（北京时间）
+        # 注意: 美股收盘时间随夏令时变化 (EDT=04:00 CST, EST=05:00 CST)
         market_close_times = {
             'SSE': time(15, 0),    # A股 15:00收盘
             'SZSE': time(15, 0),   # 深圳同样15:00
             'HKEX': time(16, 0),   # 港股 16:00收盘
-            'NASDAQ': time(5, 0),  # 美股 05:00收盘（北京时间）
-            'NYSE': time(5, 0)     # 纽交所 05:00收盘（北京时间）
         }
+
+        # 动态计算美股收盘的北京时间（自动处理夏令时）
+        if any(ex in ('NASDAQ', 'NYSE') for ex in exchanges):
+            try:
+                from zoneinfo import ZoneInfo
+                us_et = datetime.now(ZoneInfo("America/New_York"))
+                close_et = us_et.replace(hour=16, minute=0, second=0, microsecond=0)
+                close_cst = close_et.astimezone(ZoneInfo("Asia/Shanghai"))
+                us_close_time = close_cst.time()
+                scheduler_logger.debug(f"[Scheduler] US market close in CST: {us_close_time}")
+            except ImportError:
+                # zoneinfo 不可用时的降级处理
+                us_close_time = time(5, 0)  # 保守使用非夏令时 05:00 CST
+                scheduler_logger.warning("[Scheduler] zoneinfo unavailable, using default US close time 05:00 CST")
+            market_close_times['NASDAQ'] = us_close_time
+            market_close_times['NYSE'] = us_close_time
 
         # 找出最晚的收盘时间
         latest_close = max(market_close_times[ex] for ex in exchanges if ex in market_close_times)

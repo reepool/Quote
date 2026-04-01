@@ -396,7 +396,8 @@ class AkShareSource(BaseDataSource):
 
     async def get_daily_data(self, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
-                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
+                           instrument_type: str = 'stock',
+                           source_symbol: str = '') -> List[Dict[str, Any]]:
         """获取历史日线数据，支持 A 股 / 港股 / 美股"""
         try:
             await self.rate_limiter.acquire()
@@ -414,16 +415,22 @@ class AkShareSource(BaseDataSource):
                     akshare_logger.warning(f"[{self.name}] No data found for {symbol} (HK)")
                     return []
             elif suffix == 'US':
-                # 从 source_factory 传入的 symbol 是原始 ticker (如 AAPL)
-                # 需要重建东财前缀代码: 105.AAPL(NASDAQ) / 106.AAPL(NYSE)
-                # exchange 通过 instrument 的 exchange 字段而非 instrument_id 区分
-                # 此处保守处理: 先尝试 105(NASDAQ), 失败后尝试 106(NYSE)
-                us_code = f"105.{symbol}"  # 默认 NASDAQ
+                # 优先使用 source_symbol（已在 _get_us_instrument_list 中保存的东财前缀代码）
+                # 如 "105.AAPL"（NASDAQ）/ "106.BAC"（NYSE），避免盲猜浪费 API 调用
+                if source_symbol and '.' in source_symbol:
+                    us_code = source_symbol
+                    akshare_logger.debug(f"[{self.name}] Using source_symbol directly: {us_code}")
+                else:
+                    # 降级：盲猜前缀，先尝试 NASDAQ(105)，再尝试 NYSE(106)
+                    us_code = f"105.{symbol}"
+                    akshare_logger.debug(f"[{self.name}] source_symbol unavailable, guessing: {us_code}")
+
                 data = await self._fetch_akshare_data(
                     us_code, start_date, end_date, instrument_type,
                     instrument_id=instrument_id
                 )
-                if (data is None or data.empty):
+                if (data is None or data.empty) and not (source_symbol and '.' in source_symbol):
+                    # 仅在盲猜模式下才尝试第二个前缀
                     akshare_logger.debug(f"[{self.name}] 105.{symbol} empty, trying 106.{symbol} (NYSE)")
                     us_code = f"106.{symbol}"
                     data = await self._fetch_akshare_data(
@@ -479,7 +486,7 @@ class AkShareSource(BaseDataSource):
                 # 更新前收盘价为当前收盘价，供下一个交易日使用
                 previous_close = enhanced_quote['close']
 
-            akshare_logger.debug(f"[{self.name}] Retrieved {len(quotes)} daily quotes for {ak_symbol}")
+            akshare_logger.debug(f"[{self.name}] Retrieved {len(quotes)} daily quotes for {symbol}")
             return quotes
 
         except Exception as e:

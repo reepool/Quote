@@ -11,10 +11,12 @@ from datetime import datetime, timedelta
 import pandas as pd
 import yfinance as yf
 import io
+import os
+from contextlib import contextmanager
 
 from .base_source import BaseDataSource, RateLimitConfig
 from .adjustment_config import AdjustmentConfig
-from utils import yfinance_logger
+from utils import yfinance_logger, config_manager
 
 class YFinanceConstants:
     """Yahoo Finance 数据源的常量"""
@@ -32,6 +34,19 @@ class YFinanceSource(BaseDataSource):
         super().__init__(name, rate_limit_config)
         self.aio_session = None
         self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
+        
+        # 加载代理配置
+        proxy_config = config_manager.get_nested('data_sources_config.yfinance.proxy', {})
+        self.proxy_dict = {}
+        if isinstance(proxy_config, dict):
+            http_proxy = proxy_config.get('http', '')
+            https_proxy = proxy_config.get('https', '')
+            if http_proxy:
+                self.proxy_dict['http'] = http_proxy
+            if https_proxy:
+                self.proxy_dict['https'] = https_proxy
+        
+        self.aio_proxy = self.proxy_dict.get('http') or self.proxy_dict.get('https')
 
     async def _initialize_impl(self):
         """初始化Yahoo Finance数据源"""
@@ -50,13 +65,25 @@ class YFinanceSource(BaseDataSource):
                 headers={'User-Agent': self.user_agent}
             )
 
-            # 测试连接 - 使用美股作为测试，因为更稳定
+            # 尝试通过环境变量重定向缓存目录到非保护区，避免权限报错
+            try:
+                import yfinance as yf
+                yf.set_tz_cache_location("/tmp/py-yfinance")
+            except Exception:
+                pass
+
+            # 测试连接 - 使用异步原生请求代替脆弱的 yfinance 内库
             test_symbol = YFinanceConstants.TEST_SYMBOL_US
-            test_data = await self._fetch_yahoo_data(test_symbol, period="5d", max_retries=2)
-            if test_data is not None and not test_data.empty:
-                yfinance_logger.info(f"[{self.name}] Successfully connected to Yahoo Finance")
-            else:
-                yfinance_logger.warning(f"[{self.name}] Yahoo Finance connection test failed - will use as backup source")
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{test_symbol}"
+            
+            try:
+                async with self.aio_session.get(url, proxy=self.aio_proxy, timeout=5) as response:
+                    if response.status == 200:
+                        yfinance_logger.info(f"[{self.name}] Successfully connected to Yahoo Finance")
+                    else:
+                        yfinance_logger.warning(f"[{self.name}] Yahoo Finance connection test returned {response.status} - will use as backup source")
+            except Exception as e:
+                yfinance_logger.warning(f"[{self.name}] Yahoo Finance connection test failed: {e} - will use as backup source")
 
         except Exception as e:
             yfinance_logger.warning(f"[{self.name}] Yahoo Finance initialization failed: {e}")
@@ -73,7 +100,8 @@ class YFinanceSource(BaseDataSource):
     
     async def get_daily_data(self, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
-                           instrument_type: str = 'stock') -> List[Dict[str, Any]]:
+                           instrument_type: str = 'stock',
+                           source_symbol: str = '') -> List[Dict[str, Any]]:
         """获取历史日线数据"""
         try:
             await self.rate_limiter.acquire()
@@ -242,6 +270,31 @@ class YFinanceSource(BaseDataSource):
         yfinance_logger.warning(f"[{self.name}] All attempts failed for {symbol}")
         return None
 
+    @contextmanager
+    def _temporary_proxy_env(self):
+        """仅在执行时挂载代理，避免污染全局（针对 YF crumb 不听话的问题）"""
+        if not getattr(self, 'aio_proxy', None):
+            yield
+            return
+            
+        old_http = os.environ.get('HTTP_PROXY')
+        old_https = os.environ.get('HTTPS_PROXY')
+        
+        os.environ['HTTP_PROXY'] = self.aio_proxy
+        os.environ['HTTPS_PROXY'] = self.aio_proxy
+        try:
+            yield
+        finally:
+            if old_http is not None:
+                os.environ['HTTP_PROXY'] = old_http
+            else:
+                os.environ.pop('HTTP_PROXY', None)
+                
+            if old_https is not None:
+                os.environ['HTTPS_PROXY'] = old_https
+            else:
+                os.environ.pop('HTTPS_PROXY', None)
+
     async def _fetch_yahoo_data_library(self, symbol: str, start_date: datetime = None,
                                       end_date: datetime = None, period: str = None) -> Optional[pd.DataFrame]:
         """使用yfinance库获取数据"""
@@ -255,31 +308,38 @@ class YFinanceSource(BaseDataSource):
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1',
             })
+            
+            # 使用代理池
+            if self.proxy_dict:
+                session.proxies.update(self.proxy_dict)
 
             ticker = yf.Ticker(symbol, session=session)
 
-            if start_date and end_date:
-                # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
-                data = await asyncio.to_thread(
-                    ticker.history,
-                    start=start_date.strftime('%Y-%m-%d'),
-                    end=end_date.strftime('%Y-%m-%d'),
-                    interval='1d',
-                    auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
-                    repair=True
-                )
-            elif period:
-                # 指定时间段
-                data = await asyncio.to_thread(
-                    ticker.history,
-                    period=period,
-                    interval='1d',
-                    auto_adjust=False,
-                    repair=True
-                )
-            else:
-                yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
-                return None
+            with self._temporary_proxy_env():
+                if start_date and end_date:
+                    # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
+                    data = await asyncio.to_thread(
+                        ticker.history,
+                        start=start_date.strftime('%Y-%m-%d'),
+                        end=end_date.strftime('%Y-%m-%d'),
+                        interval='1d',
+                        auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
+                        repair=True,
+                        proxy=self.aio_proxy  # 必须显式传入，否则 crumb 获取会死锁
+                    )
+                elif period:
+                    # 指定时间段
+                    data = await asyncio.to_thread(
+                        ticker.history,
+                        period=period,
+                        interval='1d',
+                        auto_adjust=False,
+                        repair=True,
+                        proxy=self.aio_proxy  # 必须显式传入
+                    )
+                else:
+                    yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
+                    return None
 
             if data.empty:
                 yfinance_logger.debug(f"[{self.name}] No data returned for {symbol}")
@@ -298,47 +358,64 @@ class YFinanceSource(BaseDataSource):
 
     async def _fetch_yahoo_data_async(self, symbol: str, start_date: datetime = None,
                                     end_date: datetime = None) -> Optional[pd.DataFrame]:
-        """使用异步HTTP请求获取Yahoo Finance数据（备用方法）"""
+        """使用底层原生 requests 通过线程池异步化发起获取数据"""
+        if not start_date or not end_date:
+            yfinance_logger.error(f"[{self.name}] Must specify date range for async fetch")
+            return None
+
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+        params = {
+            'period1': int(start_date.timestamp()),
+            'period2': int(end_date.timestamp()),
+            'interval': '1d',
+            'events': 'history'
+        }
+
         try:
-            # 构建URL
-            if start_date and end_date:
-                period1 = int(start_date.timestamp())
-                period2 = int(end_date.timestamp())
-                url = f"https://query1.finance.yahoo.com/v7/finance/download/{symbol}"
-                params = {
-                    'period1': period1,
-                    'period2': period2,
-                    'interval': '1d',
-                    'events': 'history',
-                    'includeAdjustedClose': 'true'
-                }
+            def _do_fetch():
+                headers = {'User-Agent': self.user_agent, 'Accept': '*/*'}
+                proxies = {'http': self.aio_proxy, 'https': self.aio_proxy} if self.aio_proxy else None
+                return requests.get(url, params=params, headers=headers, proxies=proxies, timeout=15)
+
+            response = await asyncio.to_thread(_do_fetch)
+            
+            if response.status_code == 200:
+                data = response.json()
+                chart = data.get('chart', {})
+                result = chart.get('result', [])
+                if not result:
+                    yfinance_logger.warning(f"[{self.name}] No result found in chart API for {symbol}")
+                    return None
+                    
+                res_data = result[0]
+                timestamps = res_data.get('timestamp')
+                if not timestamps:
+                    yfinance_logger.debug(f"[{self.name}] No timestamps found for {symbol}")
+                    return pd.DataFrame()
+
+                quote = res_data.get('indicators', {}).get('quote', [{}])[0]
+                adjclose = res_data.get('indicators', {}).get('adjclose', [{}])[0]
+                
+                df = pd.DataFrame({
+                    'Date': pd.to_datetime(timestamps, unit='s'),
+                    'Open': quote.get('open', [None]*len(timestamps)),
+                    'High': quote.get('high', [None]*len(timestamps)),
+                    'Low': quote.get('low', [None]*len(timestamps)),
+                    'Close': quote.get('close', [None]*len(timestamps)),
+                    'Adj Close': adjclose.get('adjclose', [None]*len(timestamps)) if adjclose else quote.get('close', [None]*len(timestamps)),
+                    'Volume': quote.get('volume', [None]*len(timestamps)),
+                })
+                
+                df.set_index('Date', inplace=True)
+                df.index = df.index.tz_localize(None)
+                return df
             else:
-                yfinance_logger.error(f"[{self.name}] Must specify date range for async fetch")
+                text = response.text
+                yfinance_logger.warning(f"[{self.name}] V8 Chart API returned status {response.status_code} for {symbol}: {text[:100]}")
                 return None
 
-            async with self.aio_session.get(url, params=params) as response:
-                if response.status == 200:
-                    # 读取CSV数据
-                    csv_data = await response.text()
-                    df = pd.read_csv(io.StringIO(csv_data))
-
-                    if df.empty:
-                        return None
-
-                    # 设置日期索引
-                    df['Date'] = pd.to_datetime(df['Date'])
-                    df.set_index('Date', inplace=True)
-
-                    # 重命名列
-                    df.columns = ['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
-
-                    return df
-                else:
-                    yfinance_logger.error(f"[{self.name}] HTTP error {response.status} for {symbol}")
-                    return None
-
         except Exception as e:
-            yfinance_logger.error(f"[{self.name}] Async fetch failed for {symbol}: {e}")
+            yfinance_logger.error(f"[{self.name}] Requests fetch via V8 Chart failed for {symbol}: {e}")
             return None
 
     def _get_test_symbol(self) -> Optional[str]:
@@ -442,17 +519,18 @@ class YFinanceSource(BaseDataSource):
     async def health_check(self) -> bool:
         """健康检查"""
         try:
-            # 使用美股作为健康检查，更稳定
+            # 使用简单的底层 HTTP 请求去验证代理连通性，避开 yfinance.Ticker 内核脆弱的 crumb 生成器
             test_symbol = YFinanceConstants.TEST_SYMBOL_US
-
-            # 测试获取最近数据
-            data = await self._fetch_yahoo_data(test_symbol, period="5d", max_retries=2)
-            if data is not None and not data.empty:
-                yfinance_logger.debug(f"[{self.name}] Health check passed with {len(data)} records")
-                return True
-            else:
-                yfinance_logger.warning(f"[{self.name}] Health check failed - no data returned")
-                return False
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{test_symbol}"
+            
+            # 使用预设好的 AIO Session（携带了 User-Agent）和 代理
+            async with self.aio_session.get(url, proxy=self.aio_proxy, timeout=10) as response:
+                if response.status == 200:
+                    yfinance_logger.debug(f"[{self.name}] Health check passed directly to endpoints")
+                    return True
+                else:
+                    yfinance_logger.warning(f"[{self.name}] Health check HTTP failed with status {response.status}")
+                    return False
 
         except Exception as e:
             yfinance_logger.warning(f"[{self.name}] Health check failed: {e}")
