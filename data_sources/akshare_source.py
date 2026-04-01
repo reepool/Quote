@@ -59,7 +59,7 @@ from utils import akshare_logger
 
 
 class AkShareSource(BaseDataSource):
-    """AkShare数据源 - 专注A股数据"""
+    """AkShare数据源 - 支持 A 股 (SSE/SZSE/BSE) + 港股 (HKEX) + 美股 (NASDAQ/NYSE)"""
 
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
@@ -154,11 +154,19 @@ class AkShareSource(BaseDataSource):
 
 
     async def get_instrument_list(self, exchange: str = None, instrument_types: List[str] = None) -> List[Dict[str, Any]]:
-        """获取沪深京A股交易所股票列表（根据配置规则解析）"""
+        """获取交易所股票列表，支持 A 股 (SSE/SZSE/BSE)、港股 (HKEX)、美股 (NASDAQ/NYSE)"""
         try:
             await self.rate_limiter.acquire()
 
-            # 安全加载配置
+            # 港股分支
+            if exchange == 'HKEX':
+                return await self._get_hk_instrument_list()
+
+            # 美股分支
+            if exchange in ('NASDAQ', 'NYSE'):
+                return await self._get_us_instrument_list(exchange)
+
+            # 安全加载配置（A 股路径）
             try:
                 start_rules = config_manager.get_nested("exchange_rules.symbol_start_with")
                 supported_regions = config_manager.get_nested("data_sources_config.akshare.exchanges_supported")
@@ -389,20 +397,57 @@ class AkShareSource(BaseDataSource):
     async def get_daily_data(self, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
                            instrument_type: str = 'stock') -> List[Dict[str, Any]]:
-        """获取A股历史日线数据"""
+        """获取历史日线数据，支持 A 股 / 港股 / 美股"""
         try:
             await self.rate_limiter.acquire()
 
-            # 构建AkShare代码格式
-            ak_symbol = self._build_akshare_symbol(symbol)
-            if not ak_symbol and instrument_type != 'index':
-                akshare_logger.error(f"[{self.name}] Cannot build AkShare symbol for: {symbol}")
-                return []
+            # 从 instrument_id 后缀推断交易所
+            suffix = instrument_id.split('.')[-1].upper() if '.' in instrument_id else ''
 
-            # 获取历史数据
-            data = await self._fetch_akshare_data(symbol if instrument_type == 'index' else ak_symbol, start_date, end_date, instrument_type)
+            # 港股 / 美股路径
+            if suffix == 'HK':
+                data = await self._fetch_akshare_data(
+                    symbol, start_date, end_date, instrument_type,
+                    instrument_id=instrument_id
+                )
+                if data is None or data.empty:
+                    akshare_logger.warning(f"[{self.name}] No data found for {symbol} (HK)")
+                    return []
+            elif suffix == 'US':
+                # 从 source_factory 传入的 symbol 是原始 ticker (如 AAPL)
+                # 需要重建东财前缀代码: 105.AAPL(NASDAQ) / 106.AAPL(NYSE)
+                # exchange 通过 instrument 的 exchange 字段而非 instrument_id 区分
+                # 此处保守处理: 先尝试 105(NASDAQ), 失败后尝试 106(NYSE)
+                us_code = f"105.{symbol}"  # 默认 NASDAQ
+                data = await self._fetch_akshare_data(
+                    us_code, start_date, end_date, instrument_type,
+                    instrument_id=instrument_id
+                )
+                if (data is None or data.empty):
+                    akshare_logger.debug(f"[{self.name}] 105.{symbol} empty, trying 106.{symbol} (NYSE)")
+                    us_code = f"106.{symbol}"
+                    data = await self._fetch_akshare_data(
+                        us_code, start_date, end_date, instrument_type,
+                        instrument_id=instrument_id
+                    )
+                if data is None or data.empty:
+                    akshare_logger.warning(f"[{self.name}] No data found for {symbol} (US)")
+                    return []
+            else:
+                # A 股路径（原有逻辑）
+                ak_symbol = self._build_akshare_symbol(symbol)
+                if not ak_symbol and instrument_type != 'index':
+                    akshare_logger.error(f"[{self.name}] Cannot build AkShare symbol for: {symbol}")
+                    return []
+                data = await self._fetch_akshare_data(
+                    symbol if instrument_type == 'index' else ak_symbol,
+                    start_date, end_date, instrument_type,
+                    instrument_id=instrument_id
+                )
+
+            # 共用校验
             if data is None or data.empty:
-                akshare_logger.warning(f"[{self.name}] No data found for {ak_symbol}")
+                akshare_logger.warning(f"[{self.name}] No data found for {symbol}")
                 return []
 
             # 获取复权配置
@@ -564,32 +609,60 @@ class AkShareSource(BaseDataSource):
         return enhanced
 
     async def _fetch_akshare_data(self, symbol: str, start_date: datetime,
-                                end_date: datetime, instrument_type: str = 'stock') -> Optional[pd.DataFrame]:
-        """从AkShare获取历史数据"""
+                                end_date: datetime, instrument_type: str = 'stock',
+                                instrument_id: str = '') -> Optional[pd.DataFrame]:
+        """从 AkShare 获取历史数据，按市场分发不同 API"""
         max_retries = 3
         base_delay = 2.0
 
+        # 从 instrument_id 后缀判断市场
+        suffix = instrument_id.split('.')[-1].upper() if instrument_id and '.' in instrument_id else ''
+
         # 复权配置: 统一使用非复权原始数据
         adjustment_config = AdjustmentConfig.get_adjustment_config('akshare')
+        start_str = start_date.strftime('%Y%m%d')
+        end_str = end_date.strftime('%Y%m%d')
 
         for attempt in range(max_retries):
             try:
-                # 调用AkShare API获取历史数据
                 if instrument_type == 'index':
+                    # A 股指数
                     data = await asyncio.to_thread(
                         ak.index_zh_a_hist,
                         symbol=symbol,
                         period="daily",
-                        start_date=start_date.strftime('%Y%m%d'),
-                        end_date=end_date.strftime('%Y%m%d')
+                        start_date=start_str,
+                        end_date=end_str
+                    )
+                elif suffix == 'HK':
+                    # 港股: ak.stock_hk_hist — symbol 格式为 5 位数字，如 "00700"
+                    data = await asyncio.to_thread(
+                        ak.stock_hk_hist,
+                        symbol=symbol,
+                        period="daily",
+                        start_date=start_str,
+                        end_date=end_str,
+                        adjust=""  # 不复权
+                    )
+                elif suffix == 'US':
+                    # 美股: ak.stock_us_hist — symbol 格式为东财前缀代码，如 "105.AAPL"
+                    # source_symbol 已在 _get_us_instrument_list 阶段存为东财格式
+                    data = await asyncio.to_thread(
+                        ak.stock_us_hist,
+                        symbol=symbol,
+                        period="daily",
+                        start_date=start_str,
+                        end_date=end_str,
+                        adjust=""  # 不复权
                     )
                 else:
+                    # A 股（含北交所）
                     data = await asyncio.to_thread(
                         ak.stock_zh_a_hist,
                         symbol=symbol,
                         period="daily",
-                        start_date=start_date.strftime('%Y%m%d'),
-                        end_date=end_date.strftime('%Y%m%d'),
+                        start_date=start_str,
+                        end_date=end_str,
                         adjust=adjustment_config['adjust']  # 空字符串 = 不复权
                     )
 
@@ -605,7 +678,6 @@ class AkShareSource(BaseDataSource):
                 if "Connection aborted" in error_msg or "RemoteDisconnected" in error_msg:
                     akshare_logger.warning(f"[{self.name}] Connection error for {symbol} (attempt {attempt + 1}/{max_retries}): {e}")
                     if attempt < max_retries - 1:
-                        # 指数退避延迟
                         delay = base_delay * (2 ** attempt) + (attempt * 0.5)
                         akshare_logger.info(f"[{self.name}] Retrying {symbol} in {delay:.1f} seconds...")
                         await asyncio.sleep(delay)
@@ -615,11 +687,9 @@ class AkShareSource(BaseDataSource):
                     return None
 
         else:
-            # 所有重试都失败了
             akshare_logger.error(f"[{self.name}] All retries failed for {symbol}")
             return None
 
-        # 检查是否有有效数据
         if data.empty:
             akshare_logger.warning(f"[{self.name}] Data became empty after retries for {symbol}")
             return None
@@ -643,9 +713,8 @@ class AkShareSource(BaseDataSource):
         data[date_column] = pd.to_datetime(data[date_column])
         data.set_index(date_column, inplace=True)
 
-        # 重命名列以匹配标准格式（支持中英文列名）
+        # 重命名列（港股/美股列名与 A股完全一致，均为中文）
         column_mapping = {
-            # 中文列名
             '开盘': 'open',
             '最高': 'high',
             '最低': 'low',
@@ -656,26 +725,18 @@ class AkShareSource(BaseDataSource):
             '涨跌幅': 'change_pct',
             '涨跌额': 'change_amount',
             '换手率': 'turnover_rate',
-            # 英文列名
-            'open': 'open',
-            'high': 'high',
-            'low': 'low',
-            'close': 'close',
-            'volume': 'volume',
-            'amount': 'amount',
-            'amplitude': 'amplitude',
-            'change_pct': 'change_pct',
-            'change_amount': 'change_amount',
+            # 英文兜底
+            'open': 'open', 'high': 'high', 'low': 'low', 'close': 'close',
+            'volume': 'volume', 'amount': 'amount', 'amplitude': 'amplitude',
+            'change_pct': 'change_pct', 'change_amount': 'change_amount',
             'turnover_rate': 'turnover_rate'
         }
 
-        # 只映射实际存在的列
         available_mapping = {col: new_col for col, new_col in column_mapping.items() if col in data.columns}
         data = data.rename(columns=available_mapping)
 
         akshare_logger.debug(f"[{self.name}] Columns after mapping: {list(data.columns)}")
 
-        # 检查必要列是否存在
         required_columns = ['open', 'high', 'low', 'close']
         missing_columns = [col for col in required_columns if col not in data.columns]
 
@@ -684,9 +745,7 @@ class AkShareSource(BaseDataSource):
             akshare_logger.error(f"[{self.name}] Available columns: {list(data.columns)}")
             return None
 
-        # 清理数据 - 只删除关键列都为空的行
-        key_columns = ['open', 'high', 'low', 'close']
-        data = data.dropna(subset=key_columns, how='all')
+        data = data.dropna(subset=['open', 'high', 'low', 'close'], how='all')
 
         if data.empty:
             akshare_logger.warning(f"[{self.name}] Data became empty after cleaning for {symbol}")
@@ -694,6 +753,115 @@ class AkShareSource(BaseDataSource):
 
         akshare_logger.debug(f"[{self.name}] Successfully processed {len(data)} rows for {symbol}")
         return data
+
+    # ------------------------------------------------------------------ #
+    #  港股 / 美股品种列表                                                   #
+    # ------------------------------------------------------------------ #
+
+    def _build_instrument_record(self, symbol: str, name: str, exchange: str,
+                                  currency: str, source_symbol: str) -> Dict[str, Any]:
+        """生成统一格式的品种记录"""
+        instrument_id = self._generate_instrument_id(symbol, exchange)
+        return {
+            "instrument_id": instrument_id,
+            "symbol": symbol,
+            "name": name,
+            "exchange": exchange,
+            "type": "stock",
+            "currency": currency,
+            "listed_date": None,
+            "delisted_date": None,
+            "industry": "",
+            "sector": "",
+            "market": "",
+            "status": "active",
+            "is_active": True,
+            "is_st": False,
+            "trading_status": 1,
+            "source": "akshare",
+            "source_symbol": source_symbol,  # 东财原始代码，用于后续 API 调用
+            "created_at": datetime.now(),
+            "updated_at": datetime.now(),
+            "data_version": 1,
+        }
+
+    async def _get_hk_instrument_list(self) -> List[Dict[str, Any]]:
+        """获取港股全量品种列表（约 2800 只）"""
+        try:
+            akshare_logger.info(f"[{self.name}] Fetching HK stock list from AkShare...")
+            df = await asyncio.to_thread(ak.stock_hk_spot_em)
+            if df is None or df.empty:
+                akshare_logger.warning(f"[{self.name}] Empty HK stock list")
+                return []
+
+            akshare_logger.debug(f"[{self.name}] HK spot columns: {list(df.columns)}")
+
+            instruments = []
+            for row in df.itertuples(index=False):
+                try:
+                    # 东财港股代码格式: "00700" 或不足5位时补零
+                    raw_code = str(getattr(row, '代码', '')).strip()
+                    symbol = raw_code.zfill(5)  # 港股代码固定5位
+                    name = str(getattr(row, '名称', '')).strip()
+                    if not symbol or not name:
+                        continue
+                    instruments.append(
+                        self._build_instrument_record(symbol, name, 'HKEX', 'HKD', raw_code)
+                    )
+                except Exception as row_e:
+                    akshare_logger.debug(f"[{self.name}] HK row parse error: {row_e}")
+
+            akshare_logger.info(f"[{self.name}] Got {len(instruments)} HK instruments")
+            return instruments
+
+        except Exception as e:
+            akshare_logger.error(f"[{self.name}] Failed to get HK instrument list: {e}")
+            return []
+
+    async def _get_us_instrument_list(self, exchange: str) -> List[Dict[str, Any]]:
+        """获取美股品种列表，按东财前缀区分 NASDAQ(105) / NYSE(106)"""
+        # 东财美股前缀映射: 105 → NASDAQ, 106 → NYSE, 107 → AMEX
+        exchange_prefix_map = {'NASDAQ': '105', 'NYSE': '106'}
+        target_prefix = exchange_prefix_map.get(exchange)
+        if not target_prefix:
+            akshare_logger.warning(f"[{self.name}] Unknown US exchange: {exchange}")
+            return []
+
+        try:
+            akshare_logger.info(f"[{self.name}] Fetching US stock list ({exchange}) from AkShare...")
+            df = await asyncio.to_thread(ak.stock_us_spot_em)
+            if df is None or df.empty:
+                akshare_logger.warning(f"[{self.name}] Empty US stock list")
+                return []
+
+            akshare_logger.debug(f"[{self.name}] US spot columns: {list(df.columns)}")
+
+            instruments = []
+            for row in df.itertuples(index=False):
+                try:
+                    # 东财美股代码格式: "105.AAPL" / "106.BAC"
+                    raw_code = str(getattr(row, '代码', '')).strip()
+                    if not raw_code or '.' not in raw_code:
+                        continue
+                    prefix, ticker = raw_code.split('.', 1)
+                    if prefix != target_prefix:
+                        continue  # 跳过其他交易所
+                    name = str(getattr(row, '名称', '')).strip()
+                    if not ticker or not name:
+                        continue
+                    # instrument_id = "AAPL.US", source_symbol = "105.AAPL" (用于 API 调用)
+                    instruments.append(
+                        self._build_instrument_record(ticker, name, exchange, 'USD', raw_code)
+                    )
+                except Exception as row_e:
+                    akshare_logger.debug(f"[{self.name}] US row parse error: {row_e}")
+
+            akshare_logger.info(f"[{self.name}] Got {len(instruments)} {exchange} instruments")
+            return instruments
+
+        except Exception as e:
+            akshare_logger.error(f"[{self.name}] Failed to get US instrument list ({exchange}): {e}")
+            return []
 
     async def get_a_stock_indices(self) -> List[Dict[str, Any]]:
         """获取A股指数列表"""
@@ -779,20 +947,25 @@ class AkShareSource(BaseDataSource):
             return []
 
     async def get_trading_calendar(self, exchange: str, start_date: date, end_date: date) -> List[Dict[str, Any]]:
-        """获取指定交易所的交易日历"""
+        """获取指定交易所的交易日历
+        - A 股 (SSE/SZSE/BSE): 调用新浪交易日历接口
+        - 港股 (HKEX) / 美股 (NASDAQ/NYSE): 用 holidays 库本地生成
+        """
         try:
             await self.rate_limiter.acquire()
 
-            # 获取所有交易日数据
+            # ---- 港股 / 美股: 本地生成 ----
+            if exchange in ('HKEX', 'NASDAQ', 'NYSE'):
+                return self._generate_local_calendar(exchange, start_date, end_date)
+
+            # ---- A 股: 新浪接口 ----
             trade_days = await asyncio.to_thread(ak.tool_trade_date_hist_sina)
 
             if trade_days.empty:
                 return []
 
-            # 转换为日期格式
             trade_days['trade_date'] = pd.to_datetime(trade_days['trade_date'])
 
-            # 筛选日期范围
             start_datetime = datetime.combine(start_date, datetime.min.time())
             end_datetime = datetime.combine(end_date, datetime.max.time())
 
@@ -801,7 +974,6 @@ class AkShareSource(BaseDataSource):
                 (trade_days['trade_date'] <= end_datetime)
             ]
 
-            # 转换为统一格式
             calendar_data = []
             for _, row in filtered_days.iterrows():
                 trade_date = row['trade_date'].date()
@@ -817,6 +989,43 @@ class AkShareSource(BaseDataSource):
         except Exception as e:
             akshare_logger.error(f"[{self.name}] Failed to get trading calendar for {exchange}: {e}")
             return []
+
+    def _generate_local_calendar(self, exchange: str, start_date: date, end_date: date) -> List[Dict[str, Any]]:
+        """利用 holidays 库为港股/美股本地生成交易日历（排除周末与法定假日）"""
+        try:
+            import holidays as hol
+            from datetime import timedelta
+
+            if exchange == 'HKEX':
+                holiday_set = hol.HK(years=range(start_date.year, end_date.year + 1))
+            else:  # NASDAQ / NYSE
+                holiday_set = hol.US(years=range(start_date.year, end_date.year + 1))
+
+            calendar_data = []
+            current = start_date
+            while current <= end_date:
+                # 排除周末 (5=Saturday, 6=Sunday) 和法定假日
+                if current.weekday() < 5 and current not in holiday_set:
+                    calendar_data.append({
+                        'date': current,
+                        'exchange': exchange.upper(),
+                        'is_trading_day': True
+                    })
+                current += timedelta(days=1)
+
+            akshare_logger.debug(
+                f"[{self.name}] Generated {len(calendar_data)} trading days for {exchange} "
+                f"({start_date} ~ {end_date})"
+            )
+            return calendar_data
+
+        except ImportError:
+            akshare_logger.warning(f"[{self.name}] 'holidays' library not installed; returning empty calendar for {exchange}")
+            return []
+        except Exception as e:
+            akshare_logger.error(f"[{self.name}] Failed to generate local calendar for {exchange}: {e}")
+            return []
+
 
     def _get_test_symbol(self) -> Optional[str]:
         """获取测试用的交易代码"""

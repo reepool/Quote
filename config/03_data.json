@@ -76,9 +76,14 @@
     "akshare": {
       "enabled": true,
       "exchanges_supported": [
-        "a_stock"
+        "a_stock",
+        "hk_stock",
+        "us_stock"
       ],
-      "primary_source_of": [],
+      "primary_source_of": [
+        "hk_stock",
+        "us_stock"
+      ],
       "max_requests_per_minute": 60,
       "max_requests_per_hour": 3600,
       "max_requests_per_day": 50000,
@@ -98,7 +103,7 @@
       }
     },
     "yfinance": {
-      "enabled": false,
+      "enabled": true,
       "exchanges_supported": [
         "a_stock",
         "hk_stock",
@@ -133,7 +138,7 @@
         "a_stock"
       ],
       "max_requests_per_minute": 60,
-      "max_requests_per_hour": 3000,
+      "max_requests_per_hour": 6000,
       "max_requests_per_day": 60000,
       "retry_times": 5,
       "retry_interval": 5.0,
@@ -179,7 +184,8 @@
       "BSE": [
         "43",
         "83",
-        "87"
+        "87",
+        "92"
       ],
       "HKEX": [
         "0",

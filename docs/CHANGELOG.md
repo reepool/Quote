@@ -57,16 +57,24 @@
   - 修复 `data_manager.py` 中 `instrument_type` 未传递，导致指数被当作股票查询
   - 增强 `get_daily_data` 的诊断日志，当 backup 不可用时记录详细原因
 
-## [未发布]
+## [2.4.1] - 2026-04-01
 
 ### 新增
-- 无
+- 🔔 **定时任务启动前 Telegram 通知**
+  - 调度器自动触发的任务在执行前发送通知
+  - 每个任务可通过 `pre_run_notify` 配置开关（`system_health_check` 和 `cache_warm_up` 默认关闭）
+  - 通知失败不影响任务正常执行
 
 ### 变更
-- 无
+- ⚡ **复权因子同步性能优化**
+  - 每日更新 (`update_daily_data`) 和全量下载 (`_download_batch_precise`) 中，复权因子从逐品种串行获取改为日线完成后**批量阶段**同步
+  - 新增 `_batch_sync_adjustment_factors()` 统一批量方法，带进度日志
+  - 日线循环的 API 调用量从 ~12000 次降至 ~6500 次，避免与日线数据竞争限流窗口
+- 📈 **BaoStock 限流提升**: `max_requests_per_hour: 3000 → 6000`
+- ⏱️ **每日更新超时放宽**: `max_runtime_seconds: 10800 → 14400`（3h → 4h）
 
 ### 修复
-- 无
+- 🐛 **daily_data_update 超时失败**: 复权因子逐品种同步导致 API 调用量翻倍（6468→11666），撞上 3000/h 限流致超时
 
 ## [2.3.1] - 2025-01-25
 

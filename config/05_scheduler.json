@@ -10,7 +10,7 @@
     "jobs": {
       "daily_data_update": {
         "enabled": true,
-        "description": "每日数据更新任务",
+        "description": "每日数据更新任务（沪深A股）",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -28,9 +28,59 @@
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
           "enable_trading_day_check": true,
-          "max_runtime_seconds": 10800,
+          "max_runtime_seconds": 14400,
           "per_instrument_timeout_sec": 420,
           "progress_log_every": 200,
+          "progress_log_interval_sec": 300
+        }
+      },
+      "hk_daily_data_update": {
+        "enabled": false,
+        "description": "港股每日数据更新（16:00 HKT 收盘后）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 17,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": ["HKEX"],
+          "wait_for_market_close": false,
+          "enable_trading_day_check": true,
+          "max_runtime_seconds": 7200,
+          "per_instrument_timeout_sec": 420,
+          "progress_log_every": 200,
+          "progress_log_interval_sec": 300
+        }
+      },
+      "us_daily_data_update": {
+        "enabled": false,
+        "description": "美股每日数据更新（16:00 ET 收盘，次日 06:00 CST 更新）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "tue-sat",
+          "hour": 6,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": ["NASDAQ", "NYSE"],
+          "wait_for_market_close": false,
+          "enable_trading_day_check": true,
+          "max_runtime_seconds": 10800,
+          "per_instrument_timeout_sec": 420,
+          "progress_log_every": 500,
           "progress_log_interval_sec": 300
         }
       },

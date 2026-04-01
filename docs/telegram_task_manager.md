@@ -201,6 +201,41 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 > **\u63d0\u793a**\uff1a\u5f53\u524d\u914d\u7f6e\u4e0b\u4e24\u8005\u884c\u4e3a\u57fa\u672c\u4e00\u81f4\u3002`/backfill` \u7684\u4f18\u52bf\u5728\u4e8e\u53ef\u4ee5\u7075\u6d3b\u6307\u5b9a\u4ea4\u6613\u6240\uff0c\u4e14\u4e0d\u4f9d\u8d56\u8c03\u5ea6\u5668\u72b6\u6001\u3002
 
+## 🔔 任务启动通知
+
+调度器自动触发的定时任务在执行前，会向 Telegram 发送一条启动通知，便于用户感知系统运行状态。
+
+### 配置方式
+
+每个任务可通过 `pre_run_notify` 字段独立控制是否发送启动前通知：
+
+```json
+{
+  "daily_data_update": {
+    "pre_run_notify": true
+  },
+  "system_health_check": {
+    "pre_run_notify": false
+  }
+}
+```
+
+### 默认配置
+
+| 任务 | 通知 | 说明 |
+|------|:---:|------|
+| daily_data_update | ✅ | 每日数据更新 |
+| weekly_data_maintenance | ✅ | 每周数据维护 |
+| monthly_data_integrity_check | ✅ | 月度完整性检查 |
+| find_gap_and_repair | ✅ | 数据缺口修复 |
+| quarterly_cleanup | ✅ | 季度数据清理 |
+| trading_calendar_update | ✅ | 交易日历更新 |
+| database_backup | ✅ | 数据库备份 |
+| system_health_check | ❌ | 每小时执行，过于频繁 |
+| cache_warm_up | ❌ | 轻量级任务 |
+
+> **注意**：手动通过 `/run` 触发的任务已有即时回显，不会额外推送通知。通知发送失败不影响任务正常执行。
+
 ## 🛠️ 技术实现
 
 ### 架构组件

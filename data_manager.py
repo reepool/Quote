@@ -491,36 +491,20 @@ class DataManager:
 
                 dm_logger.info(f"Saved precise batch: {len(batch_data)} quotes, quality: {batch_quality:.2f}")
 
-                # ===== 同步复权因子（全量下载时补充）=====
-                # 仅对股票类型品种获取因子，指数/ETF/期货无需复权
-                factor_start = datetime.combine(start_date or date(1990, 1, 1), datetime.min.time())
-                factor_end = datetime.combine(end_date, datetime.max.time())
-                saved_factors_total = 0
-
-                for inst in instruments:
-                    if inst.get('type', 'stock') != 'stock':
-                        continue
-                    try:
-                        factors = await self.source_factory.get_adjustment_factors(
-                            exchange,
-                            inst['instrument_id'],
-                            inst['symbol'],
-                            factor_start,
-                            factor_end,
-                        )
-                        if factors:
-                            saved = await self.db_ops.save_adjustment_factors(factors)
-                            saved_factors_total += saved
-                    except Exception as factor_e:
-                        dm_logger.debug(
-                            "[DataManager] Factor download skipped for %s: %s",
-                            inst.get('symbol'), factor_e
-                        )
-
-                if saved_factors_total > 0:
-                    dm_logger.info(
-                        "[DataManager] Synced %d adjustment factors for %s batch",
-                        saved_factors_total, exchange
+                # 批量同步复权因子（仅对股票类型品种）
+                stocks_needing_factors = [
+                    {
+                        'instrument_id': inst['instrument_id'],
+                        'symbol': inst['symbol'],
+                        'start_date': start_date or date(1990, 1, 1),
+                        'end_date': end_date,
+                    }
+                    for inst in instruments
+                    if inst.get('type', 'stock') == 'stock'
+                ]
+                if stocks_needing_factors:
+                    await self._batch_sync_adjustment_factors(
+                        exchange, stocks_needing_factors
                     )
             else:
                 self.progress.failed_downloads += len(instruments)
@@ -1625,7 +1609,67 @@ class DataManager:
         except Exception as e:
             dm_logger.error(f"[DataManager] Failed to generate quote statistics: {e}")
             return {}
- 
+
+    async def _batch_sync_adjustment_factors(
+        self,
+        exchange: str,
+        stocks: List[Dict[str, Any]],
+        progress_log_every: int = 500,
+    ) -> Dict[str, int]:
+        """批量同步复权因子（Phase 2）
+
+        在日线更新全部完成后统一调用，避免与日线获取竞争限流窗口。
+        每只股票独立获取，单品种失败不影响其他品种。
+
+        Args:
+            exchange: 交易所代码
+            stocks: 需要同步的品种列表，每项包含 instrument_id, symbol, start_date, end_date
+            progress_log_every: 每处理多少只品种输出一次进度日志
+
+        Returns:
+            {'synced': int, 'skipped': int, 'failed': int}
+        """
+        total = len(stocks)
+        result = {'synced': 0, 'skipped': 0, 'failed': 0}
+
+        dm_logger.info(
+            "[DataManager] Phase 2: Batch syncing adjustment factors for %s (%d stocks)",
+            exchange, total
+        )
+
+        for idx, stock in enumerate(stocks, start=1):
+            try:
+                factors = await self.source_factory.get_adjustment_factors(
+                    exchange,
+                    stock['instrument_id'],
+                    stock['symbol'],
+                    datetime.combine(stock['start_date'], datetime.min.time()),
+                    datetime.combine(stock['end_date'], datetime.max.time()),
+                )
+                if factors:
+                    await self.db_ops.save_adjustment_factors(factors)
+                    result['synced'] += 1
+                else:
+                    result['skipped'] += 1
+            except Exception as e:
+                result['failed'] += 1
+                dm_logger.debug(
+                    "[DataManager] Factor sync failed for %s: %s",
+                    stock['symbol'], e
+                )
+
+            if progress_log_every and idx % progress_log_every == 0:
+                dm_logger.info(
+                    "[DataManager] Factor sync progress %s: %d/%d (synced=%d, failed=%d)",
+                    exchange, idx, total, result['synced'], result['failed']
+                )
+
+        dm_logger.info(
+            "[DataManager] %s factor sync completed: synced=%d, skipped=%d, failed=%d",
+            exchange, result['synced'], result['skipped'], result['failed']
+        )
+        return result
+
     async def update_daily_data(self, exchanges: Optional[List[str]] = None,
                                target_date: Optional[date] = None,
                                per_instrument_timeout_sec: Optional[int] = None,
@@ -1668,6 +1712,8 @@ class DataManager:
                     }
 
                     last_progress_log = datetime.now()
+                    stocks_needing_factors: list = []  # 收集需要同步复权因子的股票品种
+
                     for idx, instrument in enumerate(instruments, start=1):
                         try:
                             # 获取最新日期
@@ -1714,23 +1760,14 @@ class DataManager:
                                     update_results['total_quotes_added'] += len(data)
                                     dm_logger.debug(f"[DataManager] Updated {len(data)} records for {instrument['symbol']}")
 
-                                    # 同步复权因子（仅限股票类型, 指数无需复权）
+                                    # 收集需要同步复权因子的股票（指数无需复权）
                                     if instrument.get('type', 'stock') == 'stock':
-                                        try:
-                                            factors = await self.source_factory.get_adjustment_factors(
-                                                exchange,
-                                                instrument['instrument_id'],
-                                                instrument['symbol'],
-                                                datetime.combine(start_date, datetime.min.time()),
-                                                datetime.combine(end_date, datetime.max.time()),
-                                            )
-                                            if factors:
-                                                await self.db_ops.save_adjustment_factors(factors)
-                                        except Exception as factor_e:
-                                            dm_logger.debug(
-                                                "[DataManager] Factor sync skipped for %s: %s",
-                                                instrument['symbol'], factor_e
-                                            )
+                                        stocks_needing_factors.append({
+                                            'instrument_id': instrument['instrument_id'],
+                                            'symbol': instrument['symbol'],
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                        })
 
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1
@@ -1766,6 +1803,13 @@ class DataManager:
 
                     update_results['exchange_stats'][exchange] = exchange_result
                     dm_logger.info(f"[DataManager] {exchange} update completed: {exchange_result['success_count']} success, {exchange_result['failure_count']} failed, {exchange_result['quotes_added']} quotes added")
+
+                    # Phase 2: 批量同步复权因子（日线全部完成后）
+                    if stocks_needing_factors:
+                        factor_result = await self._batch_sync_adjustment_factors(
+                            exchange, stocks_needing_factors
+                        )
+                        update_results.setdefault('factor_stats', {})[exchange] = factor_result
 
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to update {exchange}: {e}")

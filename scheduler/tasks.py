@@ -78,6 +78,48 @@ class ScheduledTasks:
             scheduler_logger.error(f"[Scheduler] Failed to send task report for {task_name}: {e}")
             return False
 
+    async def hk_daily_data_update(self,
+                                   exchanges: Optional[List[str]] = None,
+                                   wait_for_market_close: bool = False,
+                                   enable_trading_day_check: bool = True,
+                                   per_instrument_timeout_sec: Optional[int] = None,
+                                   progress_log_every: int = 200,
+                                   progress_log_interval_sec: int = 300,
+                                   job_config: Optional[JobConfig] = None) -> bool:
+        """港股每日数据更新任务（委托至 daily_data_update）"""
+        if exchanges is None:
+            exchanges = ['HKEX']
+        return await self.daily_data_update(
+            exchanges=exchanges,
+            wait_for_market_close=wait_for_market_close,
+            enable_trading_day_check=enable_trading_day_check,
+            per_instrument_timeout_sec=per_instrument_timeout_sec,
+            progress_log_every=progress_log_every,
+            progress_log_interval_sec=progress_log_interval_sec,
+            job_config=job_config
+        )
+
+    async def us_daily_data_update(self,
+                                   exchanges: Optional[List[str]] = None,
+                                   wait_for_market_close: bool = False,
+                                   enable_trading_day_check: bool = True,
+                                   per_instrument_timeout_sec: Optional[int] = None,
+                                   progress_log_every: int = 500,
+                                   progress_log_interval_sec: int = 300,
+                                   job_config: Optional[JobConfig] = None) -> bool:
+        """美股每日数据更新任务（委托至 daily_data_update）"""
+        if exchanges is None:
+            exchanges = ['NASDAQ', 'NYSE']
+        return await self.daily_data_update(
+            exchanges=exchanges,
+            wait_for_market_close=wait_for_market_close,
+            enable_trading_day_check=enable_trading_day_check,
+            per_instrument_timeout_sec=per_instrument_timeout_sec,
+            progress_log_every=progress_log_every,
+            progress_log_interval_sec=progress_log_interval_sec,
+            job_config=job_config
+        )
+
     async def daily_data_update(self,
                             exchanges: Optional[List[str]] = None,
                             wait_for_market_close: bool = True,

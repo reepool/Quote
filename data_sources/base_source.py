@@ -412,7 +412,10 @@ class BaseDataSource(ABC):
         suffix_map = {
             "SSE": "SH",
             "SZSE": "SZ",
-            "BSE": "BJ"
+            "BSE": "BJ",
+            "HKEX": "HK",
+            "NASDAQ": "US",
+            "NYSE": "US"
         }
         suffix = suffix_map.get(exchange.upper(), exchange)
         return f"{symbol}.{suffix}"
