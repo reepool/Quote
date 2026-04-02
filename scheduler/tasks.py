@@ -309,19 +309,37 @@ class ScheduledTasks:
             if validate_data_integrity:
                 await self._validate_data_integrity()
 
+            # 全量复权因子同步（兜底校验，防止每日精准筛选遗漏）
+            factor_sync_status = '成功'
+            factor_sync_result = {}
+            try:
+                factor_sync_result = await data_manager.sync_all_adjustment_factors()
+                scheduler_logger.info(f"[Scheduler] Weekly factor sync result: {factor_sync_result}")
+            except Exception as e:
+                factor_sync_status = f'失败: {e}'
+                scheduler_logger.error(f"[Scheduler] Weekly factor sync failed: {e}")
+
             scheduler_logger.info("[Scheduler] Weekly maintenance completed")
 
             # 生成维护报告数据
+            factor_summary = ''
+            for ex, res in factor_sync_result.items():
+                if isinstance(res, dict) and 'synced' in res:
+                    factor_summary += f"{ex}: synced={res['synced']}, skipped={res['skipped']}, failed={res['failed']}; "
+            if not factor_summary:
+                factor_summary = factor_sync_status
+
             maintenance_report_data = {
                 'name': '每周数据维护报告',
                 'status': 'success',  # 明确的成功状态
-                'tasks_completed': 3,
+                'tasks_completed': 4,
                 'duration': 'N/A', # 可以在任务开始和结束时记录时间来计算
                 'maintenance_tasks': [
                     {'task_name': '数据库备份', 'status': '成功' if backup_database else '跳过'},
                     {'task_name': '日志清理', 'status': '成功' if cleanup_old_logs else '跳过'},
                     {'task_name': '数据库优化', 'status': '成功' if optimize_database else '跳过'},
-                    {'task_name': '数据完整性验证', 'status': '成功' if validate_data_integrity else '跳过'}
+                    {'task_name': '数据完整性验证', 'status': '成功' if validate_data_integrity else '跳过'},
+                    {'task_name': '复权因子全量同步', 'status': factor_summary},
                 ],
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             }

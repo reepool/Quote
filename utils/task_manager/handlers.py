@@ -41,6 +41,8 @@ class TaskManagerHandlers:
         message += "• `/status` - 查看任务状态\n"
         message += "• `/detail <任务ID>` - 查看任务详情\n"
         message += "• `/backfill_factors` - 回填复权因子\n"
+        message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
+        message += "• `/find_gap_and_repair` - 精确逐日修复缺口\n"
         message += "• `/reload_config` - 重载配置文件\n"
         message += "• `/help` - 查看帮助信息\n\n"
         message += "*示例：* `/detail trading_calendar_update` 或 `/reload_config`"
@@ -83,6 +85,8 @@ class TaskManagerHandlers:
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
             "• `/backfill_factors` - 扫描并回填缺失的复权因子\n"
+            "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
+            "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 显示此帮助信息\n\n"
             "*可用的任务ID：*\n"
@@ -1133,6 +1137,133 @@ class TaskManagerHandlers:
             import traceback
             self.task_manager.logger.error(f"[TaskManagerHandlers] 错误详情: {traceback.format_exc()}")
             return False
+
+    async def handle_smart_fill_gaps_command(self, event) -> None:
+        """处理 /smart_fill_gaps 命令，补足大段数据缺口"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/smart_fill_gaps'
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}")
+
+        # 解析可选参数
+        parts = command_text.strip().split()
+        extra_args = parts[1:]  # 透传给脚本的额外参数
+
+        start_message = "⏳ *智能缺口补足已启动 (Phase 1)...*\n\n后台正在扫描并补足大段数据缺口。执行完成后将发送报告。"
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(self._run_script(chat_id, 'smart_fill_gaps.py', extra_args))
+
+    async def handle_find_gap_and_repair_command(self, event) -> None:
+        """处理 /find_gap_and_repair 命令，精确逐日检测并修复缺口"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/find_gap_and_repair'
+        self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}")
+
+        parts = command_text.strip().split()
+        extra_args = parts[1:]
+
+        start_message = "⏳ *精确缺口修复已启动 (Phase 2)...*\n\n后台正在逐品种对比交易日历并修复缺口。此过程可能需要较长时间，完成后将发送报告。"
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(self._run_script(chat_id, 'find_gap_and_repair.py', extra_args))
+
+    async def _run_script(self, chat_id: int, script_name: str, extra_args: list = None):
+        """通用的后台脚本运行器，捕获输出并发送报告"""
+        try:
+            import sys
+            import os
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            script_path = os.path.join(project_root, 'scripts', script_name)
+
+            cmd = [sys.executable, script_path]
+            if extra_args:
+                cmd.extend(extra_args)
+
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=project_root
+            )
+            stdout, stderr = await process.communicate()
+            output = stdout.decode('utf-8', errors='replace')
+            error_output = stderr.decode('utf-8', errors='replace')
+
+            if process.returncode == 0:
+                report_text = self._extract_report(output)
+                msg = f"✅ *{script_name} 执行完成*\n\n```text\n{report_text}\n```"
+                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
+            else:
+                # 错误输出也过滤日志噪声
+                clean_err = self._filter_log_lines(error_output[-800:])
+                msg = f"❌ *{script_name} 执行失败 (Exit: {process.returncode})*\n\n```text\n{clean_err}\n```"
+                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 运行 {script_name} 异常: {e}")
+            await self.task_manager.send_message(
+                chat_id, f"❌ *{script_name} 执行异常*\n\n错误: {str(e)}", parse_mode='markdown'
+            )
+
+    @staticmethod
+    def _extract_report(output: str) -> str:
+        """从脚本输出中提取报告区块
+
+        策略：
+        1. 优先查找以 '====...' 开头的报告分隔符，提取整段报告
+        2. 回退：过滤掉日志行，仅保留纯报告内容
+        3. 最终截取不超过 2000 字符
+        """
+        lines = output.strip().split('\n')
+
+        # 策略1: 查找报告分隔符（连续的 '=' 行）
+        report_start = -1
+        for i, line in enumerate(lines):
+            stripped = line.strip()
+            if stripped.startswith('=' * 10) and ('报告' in stripped or '报告' in lines[i + 1].strip() if i + 1 < len(lines) else False):
+                report_start = i
+                break
+            # 也匹配 "📊" 等 emoji 开头的报告标题行
+            if '📊' in stripped and report_start == -1:
+                # 向前找分隔符行
+                if i > 0 and lines[i - 1].strip().startswith('=' * 10):
+                    report_start = i - 1
+                else:
+                    report_start = i
+                break
+
+        if report_start >= 0:
+            report_lines = lines[report_start:]
+            # 过滤掉混入报告末尾的日志行
+            report_lines = [l for l in report_lines if not TaskManagerHandlers._is_log_line(l)]
+            return '\n'.join(report_lines)[-2000:]
+
+        # 策略2: 回退——取最后 30 行并过滤日志
+        tail_lines = lines[-30:]
+        clean_lines = [l for l in tail_lines if not TaskManagerHandlers._is_log_line(l)]
+        return '\n'.join(clean_lines)[-2000:] if clean_lines else output[-1500:]
+
+    @staticmethod
+    def _is_log_line(line: str) -> bool:
+        """判断一行是否为日志行（应被过滤）"""
+        stripped = line.strip()
+        # 匹配 [INFO], [WARNING], [ERROR], [DEBUG] 等日志前缀
+        if any(stripped.startswith(f'[{level}]') for level in ('INFO', 'WARNING', 'ERROR', 'DEBUG')):
+            return True
+        # 匹配带时间戳的日志格式: [LEVEL][2026-...
+        if len(stripped) > 7 and stripped[0] == '[' and ']' in stripped[:10]:
+            for level in ('INFO', 'WARNING', 'ERROR', 'DEBUG'):
+                if f'[{level}]' in stripped[:30]:
+                    return True
+        # 匹配 Unclosed client session 等 asyncio 噪声
+        if 'Unclosed client session' in stripped or 'client_session:' in stripped:
+            return True
+        return False
+
+    @staticmethod
+    def _filter_log_lines(text: str) -> str:
+        """过滤文本中的日志行"""
+        lines = text.split('\n')
+        clean = [l for l in lines if not TaskManagerHandlers._is_log_line(l)]
+        return '\n'.join(clean)
 
     def cleanup_user_state(self, chat_id: int) -> None:
         """清理用户状态"""

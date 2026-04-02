@@ -68,6 +68,8 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
             self.telegram_bot.register_command_handler('/backfill', self.handlers.handle_backfill_command)
             self.telegram_bot.register_command_handler('/backfill_factors', self.handlers.handle_backfill_factors_command)
+            self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
+            self.telegram_bot.register_command_handler('/find_gap_and_repair', self.handlers.handle_find_gap_and_repair_command)
             self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)
 
             # 注册回调查询处理器
@@ -142,6 +144,8 @@ class TaskManagerBot:
             "• `/status` - 查看任务状态\n"
             "• `/backfill <日期>` - 补充指定日期的缺失数据\n"
             "• `/backfill_factors` - 回填缺失的复权因子\n"
+            "• `/smart_fill_gaps` - 智能补足大段数据缺口\n"
+            "• `/find_gap_and_repair` - 精确逐日检测并修复缺口\n"
             "• `/reload_config` - 重载配置文件\n"
             "• `/help` - 查看帮助信息\n\n"
             "*功能说明:*\n"

@@ -4,6 +4,8 @@ Specialized for Chinese stock market historical data.
 """
 
 import asyncio
+import concurrent.futures
+import socket
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta, date
 import pandas as pd
@@ -28,7 +30,53 @@ class BaostockSource(BaseDataSource):
         self.is_logged_in = False
         self.network_error_count = 0
         self.max_network_errors = 10  # 最大网络错误次数
+        self._bs_call_timeout = 30  # 单次 BaoStock API 调用超时（秒）
+        self._bs_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix='bs')
         self._last_success_time: float = 0.0  # 最近一次成功 API 调用的时间戳
+
+    async def _run_bs_call(self, func, *args, timeout: int = None, **kwargs):
+        """在线程池中执行 BaoStock 同步调用，带强制超时保护
+
+        与 asyncio.to_thread 不同，此方法在超时后会强制关闭 BaoStock 的底层 socket，
+        彻底终止卡死在 C 层 recv() 上的线程，防止永久死锁。
+        """
+        _timeout = timeout or self._bs_call_timeout
+        loop = asyncio.get_running_loop()
+        future = loop.run_in_executor(self._bs_executor, lambda: func(*args, **kwargs))
+        try:
+            return await asyncio.wait_for(future, timeout=_timeout)
+        except asyncio.TimeoutError:
+            baostock_logger.error(
+                f"BaoStock 调用 {func.__name__} 超时 ({_timeout}s)，强制关闭 socket"
+            )
+            self._kill_bs_socket()
+            self.is_logged_in = False
+            # 重建线程池（旧线程可能仍卡住，隔离它）
+            self._bs_executor.shutdown(wait=False)
+            self._bs_executor = concurrent.futures.ThreadPoolExecutor(
+                max_workers=1, thread_name_prefix='bs'
+            )
+            raise DataSourceError(
+                f"BaoStock {func.__name__} timed out after {_timeout}s",
+                ErrorCodes.DATASOURCE_CONNECTION_FAILED
+            )
+
+    @staticmethod
+    def _kill_bs_socket():
+        """强制关闭 BaoStock 底层 socket，解除 recv() 阻塞"""
+        try:
+            # baostock 把 socket 存在全局变量 bs.bao_stock._bs_socket 中
+            if hasattr(bs, 'bao_stock') and hasattr(bs.bao_stock, '_bs_socket'):
+                sock = bs.bao_stock._bs_socket
+                if sock and isinstance(sock, socket.socket):
+                    try:
+                        sock.shutdown(socket.SHUT_RDWR)
+                    except OSError:
+                        pass
+                    sock.close()
+                    baostock_logger.warning("已强制关闭 BaoStock 底层 socket")
+        except Exception as e:
+            baostock_logger.error(f"关闭 BaoStock socket 失败: {e}")
 
     @log_execution("Baostock", "initialize")
     async def _initialize_impl(self):
@@ -38,7 +86,7 @@ class BaostockSource(BaseDataSource):
 
             # 登录Baostock（加锁保护全局 socket）
             async with BaostockSource._bs_lock:
-                lg = await asyncio.to_thread(bs.login)
+                lg = await self._run_bs_call(bs.login, timeout=15)
             if lg.error_code != '0':
                 baostock_logger.error(f"Baostock login failed: {lg.error_msg}")
                 raise DataSourceError(
@@ -87,7 +135,7 @@ class BaostockSource(BaseDataSource):
 
             # 获取品种列表（加锁保护全局 socket）
             async with BaostockSource._bs_lock:
-                rs = await asyncio.to_thread(
+                rs = await self._run_bs_call(
                     bs.query_stock_basic
                 )
 
@@ -235,16 +283,14 @@ class BaostockSource(BaseDataSource):
                     adjustment_config = AdjustmentConfig.get_adjustment_config('baostock')
                     
                     async with BaostockSource._bs_lock:
-                        rs = await asyncio.wait_for(
-                            asyncio.to_thread(
-                                bs.query_history_k_data_plus,
-                                baostock_code,
-                                start_date=start_str,
-                                end_date=end_str,
-                                frequency="d",
-                                adjustflag=adjustment_config['adjustflag'],
-                                fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
-                            ),
+                        rs = await self._run_bs_call(
+                            bs.query_history_k_data_plus,
+                            baostock_code,
+                            start_date=start_str,
+                            end_date=end_str,
+                            frequency="d",
+                            adjustflag=adjustment_config['adjustflag'],
+                            fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
                             timeout=120.0  # 设置120秒（2分钟）超时
                         )
                     # 如果成功，跳出循环
@@ -305,14 +351,15 @@ class BaostockSource(BaseDataSource):
 
                         # 重新查询（加锁保护全局 socket）
                         async with BaostockSource._bs_lock:
-                            rs = await asyncio.to_thread(
+                            rs = await self._run_bs_call(
                                 bs.query_history_k_data_plus,
                                 baostock_code,
                                 start_date=start_str,
                                 end_date=end_str,
                                 frequency="d",
                                 adjustflag=adjustment_config['adjustflag'],
-                                fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
+                                fields="date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
+                                timeout=120.0
                             )
 
                         if rs.error_code != '0':
@@ -414,13 +461,13 @@ class BaostockSource(BaseDataSource):
                 # 先尝试登出（如果还有连接）
                 if self.is_logged_in:
                     try:
-                        await asyncio.to_thread(bs.logout)
+                        await self._run_bs_call(bs.logout, timeout=5)
                     except Exception:
                         pass  # 忽略登出错误
                     self.is_logged_in = False
 
                 # 重新登录
-                lg = await asyncio.to_thread(bs.login)
+                lg = await self._run_bs_call(bs.login, timeout=15)
                 if lg.error_code != '0':
                     baostock_logger.error(f"BaoStock re-login failed: {lg.error_msg}")
                     raise DataSourceError(
@@ -461,12 +508,10 @@ class BaostockSource(BaseDataSource):
 
             # 超过阈值，执行一次轻量探测（加锁保护全局 socket）
             async with BaostockSource._bs_lock:
-                rs = await asyncio.wait_for(
-                    asyncio.to_thread(
-                        bs.query_trade_dates,
-                        start_date='2024-01-02',
-                        end_date='2024-01-02'
-                    ),
+                rs = await self._run_bs_call(
+                    bs.query_trade_dates,
+                    start_date='2024-01-02',
+                    end_date='2024-01-02',
                     timeout=15.0
                 )
 
@@ -501,7 +546,7 @@ class BaostockSource(BaseDataSource):
             start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
 
             async with BaostockSource._bs_lock:
-                rs = await asyncio.to_thread(
+                rs = await self._run_bs_call(
                     bs.query_history_k_data_plus,
                     baostock_code,
                     start_date=start_date,
@@ -560,10 +605,11 @@ class BaostockSource(BaseDataSource):
 
             # 获取交易日历数据
             async with BaostockSource._bs_lock:
-                rs = await asyncio.to_thread(
+                rs = await self._run_bs_call(
                     bs.query_trade_dates,
                     start_date=start_str,
-                    end_date=end_str
+                    end_date=end_str,
+                    timeout=30.0
                 )
 
                 if rs.error_code != '0':
@@ -638,7 +684,7 @@ class BaostockSource(BaseDataSource):
 
             # 加锁保护全局 socket
             async with BaostockSource._bs_lock:
-                rs = await asyncio.to_thread(
+                rs = await self._run_bs_call(
                     bs.query_adjust_factor,
                     code=baostock_code,
                     start_date=start_str,
@@ -701,7 +747,7 @@ class BaostockSource(BaseDataSource):
         if self.is_logged_in:
             try:
                 async with BaostockSource._bs_lock:
-                    await asyncio.to_thread(bs.logout)
+                    await self._run_bs_call(bs.logout, timeout=5)
                     self.is_logged_in = False
                 baostock_logger.info("Baostock logged out successfully")
             except Exception as e:

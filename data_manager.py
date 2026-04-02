@@ -1618,6 +1618,7 @@ class DataManager:
         exchange: str,
         stocks: List[Dict[str, Any]],
         progress_log_every: int = 500,
+        skip_filter: bool = False,
     ) -> Dict[str, int]:
         """批量同步复权因子（Phase 2）
 
@@ -1630,14 +1631,51 @@ class DataManager:
             progress_log_every: 每处理多少只品种输出一次进度日志
 
         Returns:
-            {'synced': int, 'skipped': int, 'failed': int}
+            {'synced': int, 'skipped': int, 'failed': int, 'filtered_total': int}
         """
         total = len(stocks)
-        result = {'synced': 0, 'skipped': 0, 'failed': 0}
+        result = {'synced': 0, 'skipped': 0, 'failed': 0, 'filtered_total': total}
+
+        if not skip_filter:
+            # ★ 精准筛选：查询当天有除权除息的股票代码，仅对这些股票同步因子
+            target_dates = set()
+            for s in stocks[:1]:  # 取一个样本获取日期范围
+                target_dates.add(s.get('start_date'))
+                target_dates.add(s.get('end_date'))
+
+            ex_div_symbols = await self._query_ex_dividend_symbols(target_dates)
+
+            if ex_div_symbols is not None:
+                # 精准模式：仅同步有除权除息事件的品种
+                filtered_stocks = [
+                    s for s in stocks if s['symbol'] in ex_div_symbols
+                ]
+                dm_logger.info(
+                    "[DataManager] Phase 2: %s ex-dividend filter: %d/%d stocks have events on %s",
+                    exchange, len(filtered_stocks), total,
+                    ','.join(str(d) for d in sorted(target_dates))
+                )
+                if not filtered_stocks:
+                    dm_logger.info(
+                        "[DataManager] %s factor sync skipped: no ex-dividend events today",
+                        exchange
+                    )
+                    result['skipped'] = total
+                    return result
+                stocks = filtered_stocks
+                result['filtered_total'] = len(stocks)
+            else:
+                # AkShare 查询失败，跳过本次因子同步，由周维护补充
+                dm_logger.warning(
+                    "[DataManager] Phase 2: ex-dividend query failed, skipping factor sync for %s "
+                    "(will be handled by weekly maintenance)", exchange
+                )
+                result['skipped'] = total
+                return result
 
         dm_logger.info(
-            "[DataManager] Phase 2: Batch syncing adjustment factors for %s (%d stocks)",
-            exchange, total
+            "[DataManager] Phase 2: Syncing adjustment factors for %s (%d stocks)",
+            exchange, len(stocks)
         )
 
         for idx, stock in enumerate(stocks, start=1):
@@ -1664,7 +1702,7 @@ class DataManager:
             if progress_log_every and idx % progress_log_every == 0:
                 dm_logger.info(
                     "[DataManager] Factor sync progress %s: %d/%d (synced=%d, failed=%d)",
-                    exchange, idx, total, result['synced'], result['failed']
+                    exchange, idx, len(stocks), result['synced'], result['failed']
                 )
 
         dm_logger.info(
@@ -1672,6 +1710,144 @@ class DataManager:
             exchange, result['synced'], result['skipped'], result['failed']
         )
         return result
+
+    async def _query_ex_dividend_symbols(
+        self, target_dates: set
+    ) -> Optional[set]:
+        """通过 AkShare 批量查询指定日期有除权除息的股票代码
+
+        使用 stock_fhps_em 接口获取全市场分红方案，筛选除权除息日
+        匹配 target_dates 的股票。仅需 2~3 次 API 调用即可覆盖全年。
+
+        Args:
+            target_dates: 需要检查的日期集合
+
+        Returns:
+            匹配的股票代码集合(纯数字), 或 None 表示查询失败
+        """
+        try:
+            import akshare as ak
+            import pandas as pd
+
+            # 查询最近两个报告期的分红方案（覆盖年报和中报）
+            target_date_strs = {
+                d.strftime('%Y-%m-%d') if hasattr(d, 'strftime') else str(d)
+                for d in target_dates if d is not None
+            }
+            if not target_date_strs:
+                return set()
+
+            # 根据目标日期推算需查询的报告期
+            sample_date = next(iter(target_dates))
+            year = sample_date.year if hasattr(sample_date, 'year') else int(str(sample_date)[:4])
+            report_periods = [
+                f"{year - 1}1231",   # 上一年年报
+                f"{year}0630",       # 当年中报
+            ]
+
+            all_records = []
+            for period in report_periods:
+                try:
+                    df = await asyncio.to_thread(ak.stock_fhps_em, date=period)
+                    if df is not None and '除权除息日' in df.columns:
+                        valid = df[df['除权除息日'].notna()][['代码', '除权除息日']]
+                        all_records.append(valid)
+                        dm_logger.debug(
+                            "[DataManager] stock_fhps_em(%s): %d records with ex-dividend dates",
+                            period, len(valid)
+                        )
+                except Exception as e:
+                    dm_logger.debug(
+                        "[DataManager] stock_fhps_em(%s) failed: %s", period, e
+                    )
+
+            if not all_records:
+                dm_logger.warning("[DataManager] No ex-dividend data available from AkShare")
+                return None
+
+            merged = pd.concat(all_records, ignore_index=True)
+            merged['除权除息日'] = pd.to_datetime(merged['除权除息日']).dt.strftime('%Y-%m-%d')
+
+            # 筛选匹配目标日期的股票
+            matched = merged[merged['除权除息日'].isin(target_date_strs)]
+            symbols = set(matched['代码'].tolist())
+
+            dm_logger.info(
+                "[DataManager] Ex-dividend query: %d stocks matched for dates %s (from %d total records)",
+                len(symbols), target_date_strs, len(merged)
+            )
+            return symbols
+
+        except ImportError:
+            dm_logger.warning("[DataManager] AkShare not available for ex-dividend query")
+            return None
+        except Exception as e:
+            dm_logger.warning("[DataManager] Ex-dividend query failed: %s", e)
+            return None
+
+    async def sync_all_adjustment_factors(
+        self,
+        exchanges: Optional[List[str]] = None,
+        days_back: int = 7,
+    ) -> Dict[str, Any]:
+        """全量同步复权因子（周维护用）
+
+        遍历所有活跃股票品种，通过 BaoStock 逐品种获取近 N 天的复权因子。
+        作为每日精准筛选的兜底验证，确保不会因 AkShare 数据遗漏导致复权错误。
+
+        Args:
+            exchanges: 交易所列表，默认 ['SSE', 'SZSE']
+            days_back: 回查天数（默认 7 天，覆盖一周）
+
+        Returns:
+            各交易所的同步统计
+        """
+        if exchanges is None:
+            exchanges = ['SSE', 'SZSE']
+
+        end_date = date.today()
+        start_date = end_date - timedelta(days=days_back)
+        overall_result: Dict[str, Any] = {}
+
+        dm_logger.info(
+            "[DataManager] Weekly full adjustment factor sync: %s, range=%s~%s",
+            exchanges, start_date, end_date
+        )
+
+        for exchange in exchanges:
+            try:
+                instruments = await self.db_ops.get_instruments(
+                    exchange=exchange, is_active=True
+                )
+                # 仅筛选股票类型
+                stocks = [
+                    {
+                        'instrument_id': inst['instrument_id'],
+                        'symbol': inst['symbol'],
+                        'start_date': start_date,
+                        'end_date': end_date,
+                    }
+                    for inst in instruments
+                    if inst.get('type', 'stock') == 'stock'
+                ]
+
+                if not stocks:
+                    dm_logger.info("[DataManager] No stocks found for %s, skipping", exchange)
+                    continue
+
+                result = await self._batch_sync_adjustment_factors(
+                    exchange, stocks, skip_filter=True
+                )
+                overall_result[exchange] = result
+
+            except Exception as e:
+                dm_logger.error(
+                    "[DataManager] Weekly factor sync failed for %s: %s", exchange, e
+                )
+                overall_result[exchange] = {'error': str(e)}
+
+        dm_logger.info("[DataManager] Weekly full factor sync completed: %s", overall_result)
+        return overall_result
 
     async def update_daily_data(self, exchanges: Optional[List[str]] = None,
                                target_date: Optional[date] = None,
@@ -1730,11 +1906,11 @@ class DataManager:
                                 latest_date < datetime.combine(target_date, datetime.min.time())
                             )
 
+                            # 从数据源获取数据
+                            start_date = target_date - timedelta(days=1)
+                            end_date = target_date
+                            
                             if should_update:
-                                # 从数据源获取数据
-                                start_date = target_date - timedelta(days=1)
-                                end_date = target_date
-
                                 if per_instrument_timeout_sec:
                                     data = await asyncio.wait_for(
                                         self.source_factory.get_daily_data(
@@ -1765,17 +1941,17 @@ class DataManager:
                                     update_results['total_quotes_added'] += len(data)
                                     dm_logger.debug(f"[DataManager] Updated {len(data)} records for {instrument['symbol']}")
 
-                                    # 收集需要同步复权因子的股票（指数无需复权）
-                                    if instrument.get('type', 'stock') == 'stock':
-                                        stocks_needing_factors.append({
-                                            'instrument_id': instrument['instrument_id'],
-                                            'symbol': instrument['symbol'],
-                                            'start_date': start_date,
-                                            'end_date': end_date,
-                                        })
-
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1
+
+                            # 收集需要同步复权因子的股票（不管K线是否跳过更新，都必须收集，以防复权阶段断点接续被遗漏）
+                            if instrument.get('type', 'stock') == 'stock':
+                                stocks_needing_factors.append({
+                                    'instrument_id': instrument['instrument_id'],
+                                    'symbol': instrument['symbol'],
+                                    'start_date': start_date,
+                                    'end_date': end_date,
+                                })
 
                             # 进度日志：按数量或时间间隔输出
                             now = datetime.now()

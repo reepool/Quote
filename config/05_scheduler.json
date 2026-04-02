@@ -28,7 +28,7 @@
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
           "enable_trading_day_check": true,
-          "max_runtime_seconds": 14400,
+          "max_runtime_seconds": 21600,
           "per_instrument_timeout_sec": 420,
           "progress_log_every": 200,
           "progress_log_interval_sec": 300
@@ -130,7 +130,8 @@
           "cleanup_old_logs": true,
           "log_retention_days": 30,
           "optimize_database": true,
-          "validate_data_integrity": true
+          "validate_data_integrity": true,
+          "max_runtime_seconds": 10800
         }
       },
       "monthly_data_integrity_check": {

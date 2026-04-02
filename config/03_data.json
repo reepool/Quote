@@ -142,9 +142,9 @@
       "primary_source_of": [
         "a_stock"
       ],
-      "max_requests_per_minute": 60,
-      "max_requests_per_hour": 6000,
-      "max_requests_per_day": 60000,
+      "max_requests_per_minute": 600,
+      "max_requests_per_hour": 8000,
+      "max_requests_per_day": 80000,
       "retry_times": 5,
       "retry_interval": 5.0,
       "network_error_retry_interval": 10.0,
