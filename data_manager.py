@@ -190,6 +190,15 @@ class DataManager:
             dm_logger.error(f"Failed to initialize DataManager: {e}")
             raise
 
+    async def close(self) -> None:
+        """安全关闭所有数据源连接，防止协程退出时 ResourceWarning"""
+        if hasattr(self, 'source_factory') and self.source_factory:
+            try:
+                await self.source_factory.close_all()
+                dm_logger.info("[DataManager] All data sources closed safely.")
+            except Exception as e:
+                dm_logger.error(f"[DataManager] Error closing data sources: {e}")
+
     @log_execution("DataManager", "download_all_historical_data")
     async def download_all_historical_data(self, exchanges: Optional[List[str]] = None,
                                          start_date: Optional[date] = None, end_date: Optional[date] = None,
@@ -235,7 +244,7 @@ class DataManager:
 
             # 默认下载支持的交易所
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE']
+                exchanges = ['SSE', 'SZSE', 'BSE']
                 dm_logger.info(f"Using default exchanges: {exchanges}")
 
             # 获取所有交易品种并计算总数
@@ -504,7 +513,7 @@ class DataManager:
                 ]
                 if stocks_needing_factors:
                     await self._batch_sync_adjustment_factors(
-                        exchange, stocks_needing_factors
+                        exchange, stocks_needing_factors, skip_filter=True
                     )
             else:
                 self.progress.failed_downloads += len(instruments)
@@ -878,6 +887,24 @@ class DataManager:
 
             if start_date is None:
                 # Cannot determine start date, so skip
+                return []
+
+            # 获取股票的退市日期并限制 end_date
+            delisted_date = instrument.get('delisted_date')
+            if delisted_date:
+                delisted_date_val = delisted_date.date() if isinstance(delisted_date, datetime) else delisted_date
+                if isinstance(delisted_date_val, str):
+                    try:
+                        delisted_date_val = datetime.strptime(delisted_date_val[:10], "%Y-%m-%d").date()
+                    except ValueError:
+                        pass
+                
+                if isinstance(delisted_date_val, date) and end_date > delisted_date_val:
+                    dm_logger.debug(f"End date {end_date} is after delisted date {delisted_date_val}, capping end date.")
+                    end_date = delisted_date_val
+
+            if start_date > end_date:
+                # 如果上市日期比检测截止日还晚（或退市日比开始日还早），说明这段时间内该品种没有交易
                 return []
 
             # 获取交易日历 (统一转换为date类型)
@@ -1785,6 +1812,129 @@ class DataManager:
             dm_logger.warning("[DataManager] Ex-dividend query failed: %s", e)
             return None
 
+    async def _tdx_factor_audit(
+        self,
+        exchange: str,
+        stocks: list[dict],
+        phase2_result: dict,
+    ) -> None:
+        """Phase 2.5: tdx 自研因子旁路审计
+
+        计算 XDXR 自研因子, 与 Phase 2 获取的权威因子交叉验证, 结果写入审计表.
+        ★ 仅在因子路由配置了 tdx_xdxr validator 时执行.
+        ★ 失败不影响主流程.
+
+        Args:
+            exchange: 交易所代码
+            stocks: 品种列表 (含 instrument_id, symbol, start_date, end_date)
+            phase2_result: Phase 2 同步结果 (synced/skipped/failed)
+        """
+        # 检查因子路由中是否配置了 tdx_xdxr validator
+        factor_cfg = self.source_factory.factor_routes.get(exchange, {})
+        validator_engine = factor_cfg.get('validator_instance')
+        if validator_engine is None:
+            return
+
+        # 仅对 Phase 2 成功同步的品种进行审计 (有除权事件的)
+        if phase2_result.get('synced', 0) == 0:
+            return
+
+        dm_logger.info(
+            "[DataManager] Phase 2.5: Starting tdx audit for %s (%d synced stocks)",
+            exchange, phase2_result.get('synced', 0)
+        )
+
+        # 获取 pytdx 实例
+        pytdx_source = self.source_factory._find_source_by_base_name('pytdx')
+        if not pytdx_source or not pytdx_source.factor_engine:
+            dm_logger.warning(
+                "[DataManager] Phase 2.5: pytdx source not available, skipping audit"
+            )
+            return
+
+        from data_sources.tdx_factor_validator import TdxFactorValidator
+        validator = TdxFactorValidator(tolerance=0.001)
+
+        audit_factors: list[dict] = []
+        audit_count = 0
+        conflict_count = 0
+
+        for stock in stocks:
+            instrument_id = stock['instrument_id']
+            symbol = stock['symbol']
+            start_dt = datetime.combine(stock['start_date'], datetime.min.time())
+            end_dt = datetime.combine(stock['end_date'], datetime.max.time())
+
+            try:
+                # 1. 计算 tdx 自研因子
+                tdx_factors = await pytdx_source.get_adjustment_factors(
+                    instrument_id, symbol, start_dt, end_dt
+                )
+                if not tdx_factors:
+                    continue
+
+                # 2. 获取权威源因子 (从 DB 中读取 Phase 2 已写入的数据)
+                ref_factors_raw = await self.db_ops.get_adjustment_factors(
+                    instrument_id, start_dt, end_dt
+                )
+                # 转换为 validator 需要的格式
+                ref_factors = [
+                    {
+                        'instrument_id': r.get('instrument_id'),
+                        'ex_date': r.get('ex_date'),
+                        'factor': r.get('factor', 1.0),
+                        'cumulative_factor': r.get('cumulative_factor', 1.0),
+                    }
+                    for r in ref_factors_raw
+                ]
+
+                # 3. 交叉验证
+                report = validator.validate(instrument_id, tdx_factors, ref_factors)
+
+                # 4. 将验证结果附加到 tdx 因子中, 准备写入审计表
+                for f in tdx_factors:
+                    ex_date_key = f['ex_date'].strftime('%Y-%m-%d') if isinstance(f['ex_date'], datetime) else str(f['ex_date'])[:10]
+                    matching_detail = next(
+                        (d for d in report.details if d.ex_date.strftime('%Y-%m-%d') == ex_date_key),
+                        None
+                    )
+                    f['validation_result'] = report.result.value
+                    if matching_detail:
+                        f['ref_factor'] = matching_detail.ref_factor
+                        f['ref_source'] = factor_cfg.get('primary_instance', {})
+                        if hasattr(f['ref_source'], 'name'):
+                            f['ref_source'] = f['ref_source'].name
+                        else:
+                            f['ref_source'] = str(f['ref_source'])
+                        f['ratio_diff_pct'] = matching_detail.ratio_diff_pct
+                        f['conflict_reason'] = matching_detail.conflict_reason
+
+                    audit_factors.append(f)
+
+                if report.conflict_count > 0:
+                    conflict_count += 1
+                    dm_logger.warning(
+                        "[DataManager] Phase 2.5: %s has %d factor conflicts",
+                        instrument_id, report.conflict_count
+                    )
+
+                audit_count += 1
+
+            except Exception as e:
+                dm_logger.debug(
+                    "[DataManager] Phase 2.5: audit failed for %s: %s",
+                    instrument_id, e
+                )
+
+        # 5. 批量写入审计表
+        if audit_factors:
+            saved = await self.db_ops.save_tdx_audit_factors(audit_factors)
+            dm_logger.info(
+                "[DataManager] Phase 2.5: tdx audit for %s: %d stocks audited, "
+                "%d records saved, %d conflicts",
+                exchange, audit_count, saved, conflict_count
+            )
+
     async def sync_all_adjustment_factors(
         self,
         exchanges: Optional[List[str]] = None,
@@ -1803,7 +1953,7 @@ class DataManager:
             各交易所的同步统计
         """
         if exchanges is None:
-            exchanges = ['SSE', 'SZSE']
+            exchanges = ['SSE', 'SZSE', 'BSE']
 
         end_date = date.today()
         start_date = end_date - timedelta(days=days_back)
@@ -1860,7 +2010,7 @@ class DataManager:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
 
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE']
+                exchanges = ['SSE', 'SZSE', 'BSE']
 
             if target_date is None:
                 target_date = date.today()
@@ -1991,6 +2141,17 @@ class DataManager:
                             exchange, stocks_needing_factors
                         )
                         update_results.setdefault('factor_stats', {})[exchange] = factor_result
+
+                        # Phase 2.5: tdx 自研因子旁路审计（不阻塞主流程）
+                        try:
+                            await self._tdx_factor_audit(
+                                exchange, stocks_needing_factors, factor_result
+                            )
+                        except Exception as audit_e:
+                            dm_logger.warning(
+                                "[DataManager] Phase 2.5 tdx audit failed for %s (non-critical): %s",
+                                exchange, audit_e
+                            )
 
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to update {exchange}: {e}")

@@ -41,6 +41,7 @@ class TaskManagerHandlers:
         message += "• `/status` - 查看任务状态\n"
         message += "• `/detail <任务ID>` - 查看任务详情\n"
         message += "• `/backfill_factors` - 回填复权因子\n"
+        message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
         message += "• `/find_gap_and_repair` - 精确逐日修复缺口\n"
         message += "• `/reload_config` - 重载配置文件\n"
@@ -1151,6 +1152,30 @@ class TaskManagerHandlers:
         start_message = "⏳ *智能缺口补足已启动 (Phase 1)...*\n\n后台正在扫描并补足大段数据缺口。执行完成后将发送报告。"
         await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
         asyncio.create_task(self._run_script(chat_id, 'smart_fill_gaps.py', extra_args))
+
+    async def handle_audit_factors_command(self, event) -> None:
+        """处理 /audit_factors 命令，调用自研复权因子结构化审计"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/audit_factors'
+        
+        # 默认使用 resume 模式
+        extra_args = ["--exchange", "SSE", "--mode", "resume"]
+        
+        parts = command_text.split()
+        if len(parts) > 1:
+            exchange = parts[1].upper()
+            if exchange in ["SSE", "SZSE", "BSE"]:
+                extra_args[1] = exchange
+            
+            if len(parts) > 2:
+                mode = parts[2].lower()
+                if mode in ["full", "resume"]:
+                    extra_args[3] = mode
+
+        start_message = f"⏳ *开始执行自研复权因子审计*\n\n交易所: `{extra_args[1]}`\n模式: `{extra_args[3]}`\n\n后台处理中，因为需要密集比对，请耐心等待几分钟..."
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+
+        asyncio.create_task(self._run_script(chat_id, 'audit_tdx_factors.py', extra_args))
 
     async def handle_find_gap_and_repair_command(self, event) -> None:
         """处理 /find_gap_and_repair 命令，精确逐日检测并修复缺口"""

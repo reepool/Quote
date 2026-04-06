@@ -18,7 +18,7 @@ from sqlalchemy.future import select
 from .connection import db_manager
 from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
-    DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB
+    DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB
 )
 
 
@@ -365,6 +365,27 @@ class DatabaseOperations:
         """保存交易品种列表（别名方法）"""
         return await self.save_instruments_batch(instruments)
 
+    @staticmethod
+    def _apply_delisted_status(record) -> None:
+        """基于 delisted_date 自动校正 is_active 和 status（防线 B）
+
+        若 delisted_date 已过期，强制设置 is_active=False, status='delisted'。
+        确保无论数据源传入什么值，退市状态始终正确。
+        """
+        final_delisted = getattr(record, 'delisted_date', None)
+        if final_delisted is None:
+            return
+        from datetime import date as date_type
+        if isinstance(final_delisted, datetime):
+            delisted_val = final_delisted.date()
+        elif isinstance(final_delisted, date_type):
+            delisted_val = final_delisted
+        else:
+            return
+        if delisted_val <= date_type.today():
+            record.is_active = False
+            record.status = 'delisted'
+
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""
         try:
@@ -407,10 +428,15 @@ class DatabaseOperations:
                         if existing:
                             # 更新现有记录
                             for key, value in processed_data.items():
+                                # 防线 A: 保护已有的退市日期不被空值覆盖
+                                if key == 'delisted_date' and value is None and getattr(existing, key, None) is not None:
+                                    continue
                                 # 确保只更新模型中存在的字段，防止动态添加属性
                                 if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
                             existing.updated_at = get_shanghai_time()
+                            # 防线 B: 基于最终 delisted_date 强制校正 is_active/status
+                            self._apply_delisted_status(existing)
                         else:
                             # 创建新记录
                             try:
@@ -428,6 +454,8 @@ class DatabaseOperations:
 
                                 db_instrument = InstrumentDB(**valid_data)
                                 session.add(db_instrument)
+                                # 防线 B: 新记录同样校正
+                                self._apply_delisted_status(db_instrument)
                             except Exception as create_error:
                                 self.db_logger.error(f"Error creating instrument: {create_error}")
                                 self.db_logger.error(f"Original data keys: {list(processed_data.keys())}")
@@ -530,11 +558,13 @@ class DatabaseOperations:
                     stmt = stmt.filter(InstrumentDB.instrument_id == instrument_id)
                 elif symbol:
                     stmt = stmt.filter(InstrumentDB.symbol == symbol)
+                    # 优先返回股票，避免和同代码的指数冲突
+                    stmt = stmt.order_by(InstrumentDB.type.desc()) 
                 else:
                     return None
 
                 result = await session.execute(stmt)
-                instrument = result.scalar_one_or_none()
+                instrument = result.scalars().first()
                 if not instrument:
                     return None
 
@@ -1720,6 +1750,107 @@ class DatabaseOperations:
                 instrument_id, e
             )
             return 1.0
+
+    async def save_tdx_audit_factors(
+        self, factors: list[dict[str, Any]]
+    ) -> int:
+        """保存通达信自研复权因子到审计表 (upsert 语义)
+
+        ★ 写入 adjustment_factors_tdx, 不碰生产表 adjustment_factors!
+
+        Args:
+            factors: 因子列表, 每项含:
+                instrument_id, ex_date, factor, cumulative_factor,
+                pre_close, fenhong, songzhuangu, peigu, peigujia,
+                validation_result, ref_factor, ref_source, ratio_diff_pct, source
+
+        Returns:
+            成功保存/更新的记录数
+        """
+        if not factors:
+            return 0
+
+        saved_count = 0
+        try:
+            async with self.get_async_session() as session:
+                for f in factors:
+                    try:
+                        instrument_id = f.get('instrument_id')
+                        ex_date = f.get('ex_date')
+                        if not instrument_id or not ex_date:
+                            continue
+
+                        # 检查是否已存在
+                        from sqlalchemy import select
+                        stmt = select(AdjustmentFactorTdxDB).where(
+                            AdjustmentFactorTdxDB.instrument_id == instrument_id,
+                            AdjustmentFactorTdxDB.ex_date == ex_date
+                        )
+                        result = await session.execute(stmt)
+                        existing = result.scalar_one_or_none()
+
+                        if existing:
+                            existing.factor = float(f.get('factor', 1.0))
+                            existing.cumulative_factor = float(f.get('cumulative_factor', 1.0))
+                            existing.pre_close = float(f.get('pre_close', 0.0))
+                            existing.fenhong = float(f.get('fenhong', 0.0))
+                            existing.songzhuangu = float(f.get('songzhuangu', 0.0))
+                            existing.peigu = float(f.get('peigu', 0.0))
+                            existing.peigujia = float(f.get('peigujia', 0.0))
+                            existing.validation_result = f.get('validation_result')
+                            existing.ref_factor = (
+                                float(f['ref_factor']) if f.get('ref_factor') is not None else None
+                            )
+                            existing.ref_source = f.get('ref_source')
+                            existing.ratio_diff_pct = (
+                                float(f['ratio_diff_pct']) if f.get('ratio_diff_pct') is not None else None
+                            )
+                            existing.conflict_reason = f.get('conflict_reason')
+                            existing.source = f.get('source', 'tdx_xdxr')
+                        else:
+                            new_record = AdjustmentFactorTdxDB(
+                                instrument_id=instrument_id,
+                                ex_date=ex_date,
+                                factor=float(f.get('factor', 1.0)),
+                                cumulative_factor=float(f.get('cumulative_factor', 1.0)),
+                                pre_close=float(f.get('pre_close', 0.0)),
+                                fenhong=float(f.get('fenhong', 0.0)),
+                                songzhuangu=float(f.get('songzhuangu', 0.0)),
+                                peigu=float(f.get('peigu', 0.0)),
+                                peigujia=float(f.get('peigujia', 0.0)),
+                                validation_result=f.get('validation_result'),
+                                ref_factor=(
+                                    float(f['ref_factor'])
+                                    if f.get('ref_factor') is not None else None
+                                ),
+                                ref_source=f.get('ref_source'),
+                                ratio_diff_pct=(
+                                    float(f['ratio_diff_pct'])
+                                    if f.get('ratio_diff_pct') is not None else None
+                                ),
+                                conflict_reason=f.get('conflict_reason'),
+                                source=f.get('source', 'tdx_xdxr'),
+                            )
+                            session.add(new_record)
+
+                        saved_count += 1
+                    except Exception as row_e:
+                        self.db_logger.warning(
+                            "Failed to save tdx audit factor for %s: %s",
+                            f.get('instrument_id'), row_e
+                        )
+                        continue
+
+                await session.commit()
+
+            self.db_logger.info(
+                "Saved %d tdx audit factors to adjustment_factors_tdx", saved_count
+            )
+            return saved_count
+
+        except Exception as e:
+            self.db_logger.error("Failed to save tdx audit factors: %s", e)
+            return 0
 
 
 # Global instance

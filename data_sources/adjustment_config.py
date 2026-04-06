@@ -50,6 +50,12 @@ class DataSourceAdjustment:
         'type': 'none'
     }
 
+    # pytdx配置
+    PYTDX = {
+        'description': '非复权原始数据（由本地引擎动态复权, vol 单位已转换为股）',
+        'type': 'none'
+    }
+
 
 @dataclass
 class AdjustmentConfig:
@@ -62,7 +68,8 @@ class AdjustmentConfig:
             'baostock': DataSourceAdjustment.BAOSTOCK,
             'akshare': DataSourceAdjustment.AKSHARE,
             'yfinance': DataSourceAdjustment.YFINANCE,
-            'tushare': DataSourceAdjustment.TUSHARE
+            'tushare': DataSourceAdjustment.TUSHARE,
+            'pytdx': DataSourceAdjustment.PYTDX,
         }
         return configs.get(data_source.lower(), {})
 

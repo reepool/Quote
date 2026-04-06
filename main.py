@@ -1125,7 +1125,7 @@ def create_parser():
 
     # 下载历史数据
     download_parser = subparsers.add_parser('download', help='下载历史数据')
-    download_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'HKEX', 'NASDAQ', 'NYSE'],
+    download_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'],
                                help='交易所列表')
     download_parser.add_argument('--years', type=int, nargs='+', help='年份列表')
     download_parser.add_argument('--start-date', type=str, help='开始日期 (YYYY-MM-DD)')
@@ -1142,7 +1142,7 @@ def create_parser():
 
     # 更新日线数据
     update_parser = subparsers.add_parser('update', help='更新日线数据')
-    update_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'HKEX', 'NASDAQ', 'NYSE'],
+    update_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'],
                              help='交易所列表 (默认: 全部)')
     update_parser.add_argument('--target-date', type=str,
                              help='目标日期 (YYYY-MM-DD)，用于补充历史缺失数据')
@@ -1161,7 +1161,7 @@ def create_parser():
 
     # GAP检测
     gap_parser = subparsers.add_parser('gap', help='数据缺口检测')
-    gap_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'HKEX', 'NASDAQ', 'NYSE'],
+    gap_parser.add_argument('--exchanges', nargs='+', choices=['SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'],
                            help='交易所列表 (默认: 全部)')
     gap_parser.add_argument('--start-date', type=str, help='开始日期 (YYYY-MM-DD)')
     gap_parser.add_argument('--end-date', type=str, help='结束日期 (YYYY-MM-DD)')

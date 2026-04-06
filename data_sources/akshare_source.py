@@ -63,6 +63,7 @@ class AkShareSource(BaseDataSource):
 
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
+        self.supported_exchanges = ['SSE', 'SZSE', 'BSE']  # AkShare 支持全部 A 股交易所
         self.aio_session = None
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
@@ -689,9 +690,13 @@ class AkShareSource(BaseDataSource):
                         akshare_logger.info(f"[{self.name}] Retrying {symbol} in {delay:.1f} seconds...")
                         await asyncio.sleep(delay)
                         continue
-                else:
-                    akshare_logger.error(f"[{self.name}] Error fetching AkShare data for {symbol}: {e}")
-                    return None
+            except TypeError as e:
+                # 东财返回的数据结构缺失导致'NoneType' object is not subscriptable，说明该指数无此区间数据
+                akshare_logger.warning(f"[{self.name}] No data structure found for {symbol} (TypeError)")
+                return None
+            except Exception as e:
+                akshare_logger.error(f"[{self.name}] Error fetching AkShare data for {symbol}: {e}")
+                return None
 
         else:
             akshare_logger.error(f"[{self.name}] All retries failed for {symbol}")
@@ -1063,6 +1068,8 @@ class AkShareSource(BaseDataSource):
                 ak_symbol = f"sh{symbol}"
             elif 'SZ' in instrument_id:
                 ak_symbol = f"sz{symbol}"
+            elif 'BJ' in instrument_id or 'BSE' in instrument_id:
+                ak_symbol = f"bj{symbol}"
             else:
                 akshare_logger.debug(
                     f"Unsupported instrument_id for AkShare factor: {instrument_id}"
@@ -1093,6 +1100,11 @@ class AkShareSource(BaseDataSource):
                 factor_df = factor_df.set_index('date')
             factor_df.index = pd.to_datetime(factor_df.index)
 
+            # 过滤脏日期 (AkShare 部分 BSE 品种含 1900-01-01 等无效记录)
+            factor_df = factor_df[factor_df.index >= pd.Timestamp('1990-01-01')]
+
+            factor_df = factor_df.sort_index()  # ★ 必须按时间正序排列，否则累积复权算法错乱
+
             # 识别因子列
             factor_col = None
             for col_name in ('hfq_factor', 'factor', factor_df.columns[0]):
@@ -1115,8 +1127,15 @@ class AkShareSource(BaseDataSource):
             if factor_df.empty:
                 return []
 
-            # 计算相邻日期的因子变化量 (绝对值)
+            # ★ AkShare 返回的因子列可能是 object/str 类型，必须先转 float
             factor_df = factor_df.copy()
+            factor_df[factor_col] = pd.to_numeric(factor_df[factor_col], errors='coerce')
+            factor_df = factor_df.dropna(subset=[factor_col])
+
+            if factor_df.empty:
+                return []
+
+            # 计算相邻日期的因子变化量 (绝对值)
             factor_df['_shift'] = factor_df[factor_col].diff().abs()
 
             factors = []

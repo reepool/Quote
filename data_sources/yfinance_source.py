@@ -32,6 +32,7 @@ class YFinanceSource(BaseDataSource):
 
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
+        self.supported_exchanges = ['SSE', 'SZSE']  # Yahoo Finance 不支持北交所 (BSE)
         self.aio_session = None
         self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
         
@@ -220,10 +221,10 @@ class YFinanceSource(BaseDataSource):
 
         exchange_upper = exchange.upper() if exchange else None
 
-        if exchange_upper in ['SSE', 'SZSE', 'BSE']:
-            # A股
+        if exchange_upper in ['SSE', 'SZSE']:
+            # A股（不含北交所，Yahoo Finance 不支持 BSE）
             if len(symbol) == 6:
-                if exchange_upper == 'SSE' or symbol.startswith(('6', '9')): # 兼容没有交易所信息的情况
+                if exchange_upper == 'SSE' or symbol.startswith(('6', '9')):
                     return f"{symbol}.SS"  # 上交所
                 else:
                     return f"{symbol}.SZ"  # 深交所

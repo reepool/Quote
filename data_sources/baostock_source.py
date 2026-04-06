@@ -165,10 +165,6 @@ class BaostockSource(BaseDataSource):
                 if not mapped_type or mapped_type not in instrument_types:
                     continue
 
-                # 股票需要检查活跃状态；指数和 ETF 不适用此过滤
-                if mapped_type == 'stock' and row['status'] != '1':
-                    continue
-
                 # 根据交易所过滤数据
                 code = row['code']
                 if exchange == 'SSE' and not code.startswith('sh.'):
@@ -182,6 +178,9 @@ class BaostockSource(BaseDataSource):
                 if exchange == 'SSE':
                     symbol = code.replace('sh.', '')
                     ts_code = f"{symbol}.SH"
+                elif exchange == 'BSE':
+                    symbol = code.replace('bj.', '')
+                    ts_code = f"{symbol}.BJ"
                 else:
                     symbol = code.replace('sz.', '')
                     ts_code = f"{symbol}.SZ"
@@ -206,6 +205,9 @@ class BaostockSource(BaseDataSource):
                 name = row['code_name']
                 is_st = mapped_type == 'stock' and ('ST' in name.upper() or '*ST' in name.upper())
 
+                # 基于退市日期判断品种状态（不再硬编码 True/'active'）
+                is_delisted = delisted_date is not None and delisted_date <= datetime.now()
+
                 instrument = {
                     'instrument_id': ts_code,
                     'symbol': symbol,
@@ -218,8 +220,8 @@ class BaostockSource(BaseDataSource):
                     'industry': row.get('industry', ''),
                     'sector': row.get('area', ''),  # BaoStock 的 area 映射为 sector
                     'market': row.get('market', ''),
-                    'status': 'active',
-                    'is_active': True,
+                    'status': 'delisted' if is_delisted else 'active',
+                    'is_active': not is_delisted,
                     'is_st': is_st,
                     'trading_status': 1,  # 默认为正常交易状态
                     'source': 'baostock',
@@ -261,6 +263,8 @@ class BaostockSource(BaseDataSource):
                 baostock_code = f"sh.{symbol}"
             elif 'SZ' in instrument_id:
                 baostock_code = f"sz.{symbol}"
+            elif 'BJ' in instrument_id or 'BSE' in instrument_id:
+                baostock_code = f"bj.{symbol}"
             else:
                 baostock_logger.error(f"Cannot parse instrument_id: {instrument_id}")
                 return []
@@ -675,6 +679,8 @@ class BaostockSource(BaseDataSource):
                 baostock_code = f"sh.{symbol}"
             elif 'SZ' in instrument_id:
                 baostock_code = f"sz.{symbol}"
+            elif 'BJ' in instrument_id or 'BSE' in instrument_id:
+                baostock_code = f"bj.{symbol}"
             else:
                 baostock_logger.error(f"Cannot parse instrument_id for factors: {instrument_id}")
                 return []

@@ -17,6 +17,7 @@ from .yfinance_source import YFinanceSource
 from .akshare_source import AkShareSource
 from .tushare_source import TushareSource
 from .baostock_source import BaostockSource
+from .tdx_source import TdxSource
 from utils.exchange_utils import exchange_mapper
 
 
@@ -31,11 +32,20 @@ class DataSourceFactory:
         # 使用工具函数的映射器
         self.exchange_mapper = exchange_mapper
 
-        # 预构建地区到数据源实例的映射关系（用于快速查找）
+        # 日线数据主/备路由 (按 region)
         self.region_to_sources: Dict[str, Dict[str, List[BaseDataSource]]] = {
             'primary': {},
             'backup': {}
         }
+
+        # 品种列表路由 (按 region) — 独立于日线数据主源
+        self.instrument_sources: Dict[str, List[BaseDataSource]] = {}
+
+        # 交易日历路由 (按 region) — 独立于日线数据主源
+        self.calendar_sources: Dict[str, List[BaseDataSource]] = {}
+
+        # 复权因子路由 (按 exchange) — 不用 region, 因为 BSE 和 SSE/SZSE 共享 region=a_stock
+        self.factor_routes: Dict[str, Dict[str, Any]] = {}
 
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
@@ -62,9 +72,18 @@ class DataSourceFactory:
                 # 获取数据源限流配置
                 rate_limit_config = self._get_rate_limit_config_for_source(source_name)
 
-                # 获取数据源支持的地区和主力地区
+                # 获取数据源支持的地区和各种主力地区
                 supported_regions = source_config.get('exchanges_supported', [])
                 primary_regions = source_config.get('primary_source_of', [])
+                # 品种列表/日历路由: 未配置时 fallback 到 primary_source_of (向后兼容)
+                instrument_regions = source_config.get(
+                    'instrument_list_source_of',
+                    source_config.get('primary_source_of', [])
+                )
+                calendar_regions = source_config.get(
+                    'calendar_source_of',
+                    source_config.get('primary_source_of', [])
+                )
 
                 # 为每个启用的地区创建数据源实例
                 for region in supported_regions:
@@ -76,27 +95,22 @@ class DataSourceFactory:
                         ds_logger.info(f"[DataSourceFactory] Skipping {region} for {source_name} (region disabled)")
                         continue
 
-                    # 为数据源命名（直接使用地区名称）
+                    # 为数据源命名
                     source_instance_name = f"{source_name}_{region}"
 
                     # 创建数据源实例
                     try:
-                        if source_name == 'yfinance':
-                            source_instance = YFinanceSource(source_instance_name, rate_limit_config)
-                        elif source_name == 'akshare':
-                            source_instance = AkShareSource(source_instance_name, rate_limit_config)
-                        elif source_name == 'tushare':
-                            source_instance = TushareSource(source_instance_name, rate_limit_config)
-                        elif source_name == 'baostock':
-                            source_instance = BaostockSource(source_instance_name, rate_limit_config)
-                        else:
-                            ds_logger.warning(f"[DataSourceFactory] Unknown source type: {source_name}")
+                        source_instance = self._create_source_instance(
+                            source_name, source_instance_name, source_config,
+                            rate_limit_config
+                        )
+                        if source_instance is None:
                             continue
 
                         await source_instance.initialize()
                         self.sources[source_instance_name] = source_instance
 
-                        # 构建地区到数据源的映射关系
+                        # 1. 日线数据路由 (主/备)
                         if region in primary_regions:
                             source_type = 'primary'
                             ds_logger.info(f"[DataSourceFactory] Initialized {source_instance_name} as PRIMARY source for {region}")
@@ -108,15 +122,114 @@ class DataSourceFactory:
                             self.region_to_sources[source_type][region] = []
                         self.region_to_sources[source_type][region].append(source_instance)
 
+                        # 2. 品种列表路由 (独立于日线主源)
+                        if region in instrument_regions:
+                            if region not in self.instrument_sources:
+                                self.instrument_sources[region] = []
+                            self.instrument_sources[region].append(source_instance)
+                            ds_logger.info(f"[DataSourceFactory] {source_instance_name} → instrument_source for {region}")
+
+                        # 3. 交易日历路由 (独立于日线主源)
+                        if region in calendar_regions:
+                            if region not in self.calendar_sources:
+                                self.calendar_sources[region] = []
+                            self.calendar_sources[region].append(source_instance)
+                            ds_logger.info(f"[DataSourceFactory] {source_instance_name} → calendar_source for {region}")
+
                     except Exception as e:
                         ds_logger.error(f"[DataSourceFactory] Failed to initialize {source_instance_name}: {e}")
                         continue
 
+            # 4. 初始化因子路由 (按 exchange, 不按 region)
+            self._init_factor_routes()
+
             ds_logger.info(f"[DataSourceFactory] Initialized {len(self.sources)} data sources")
+            ds_logger.info(
+                f"[DataSourceFactory] 路由摘要: "
+                f"日线主源={list(self.region_to_sources['primary'].keys())}, "
+                f"品种源={list(self.instrument_sources.keys())}, "
+                f"日历源={list(self.calendar_sources.keys())}, "
+                f"因子路由={list(self.factor_routes.keys())}"
+            )
 
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to initialize data sources: {e}")
             raise
+
+    def _create_source_instance(
+        self, source_name: str, instance_name: str,
+        source_config: dict, rate_limit_config: RateLimitConfig
+    ) -> Optional[BaseDataSource]:
+        """根据数据源名称创建实例"""
+        if source_name == 'pytdx':
+            return TdxSource(
+                instance_name, rate_limit_config,
+                pool_size=source_config.get('connection_pool_size', 3),
+                connection_timeout=source_config.get('connection_timeout_sec', 10),
+                ip_refresh_hours=source_config.get('ip_refresh_interval_hours', 24),
+                batch_size=source_config.get('batch_size', 800),
+            )
+        elif source_name == 'baostock':
+            return BaostockSource(instance_name, rate_limit_config)
+        elif source_name == 'akshare':
+            return AkShareSource(instance_name, rate_limit_config)
+        elif source_name == 'yfinance':
+            return YFinanceSource(instance_name, rate_limit_config)
+        elif source_name == 'tushare':
+            return TushareSource(instance_name, rate_limit_config)
+        else:
+            ds_logger.warning(f"[DataSourceFactory] Unknown source type: {source_name}")
+            return None
+
+    def _init_factor_routes(self):
+        """初始化因子路由 — 按 exchange 而非 region"""
+        factor_config = self.config.get('factor_sources', {})
+        if not factor_config:
+            ds_logger.warning("[DataSourceFactory] No factor_sources config found")
+            return
+
+        for exchange, cfg in factor_config.items():
+            route: Dict[str, Any] = {
+                'primary_instance': None,
+                'validator_instance': None,
+                'fallback_instance': None,
+            }
+
+            # 查找 primary/fallback 实例 (按基名称匹配)
+            primary_name = cfg.get('primary')
+            fallback_name = cfg.get('fallback')
+            validator_name = cfg.get('validator')
+
+            if primary_name:
+                route['primary_instance'] = self._find_source_by_base_name(primary_name)
+            if fallback_name:
+                route['fallback_instance'] = self._find_source_by_base_name(fallback_name)
+
+            # validator: tdx_xdxr 是特殊的 — 从 pytdx source 内部获取 factor_engine
+            if validator_name == 'tdx_xdxr':
+                pytdx_source = self._find_source_by_base_name('pytdx')
+                if pytdx_source and hasattr(pytdx_source, 'factor_engine'):
+                    route['validator_instance'] = pytdx_source.factor_engine
+                else:
+                    ds_logger.warning(
+                        f"[DataSourceFactory] tdx_xdxr validator requested for {exchange} "
+                        f"but pytdx source not available"
+                    )
+            elif validator_name:
+                route['validator_instance'] = self._find_source_by_base_name(validator_name)
+
+            self.factor_routes[exchange] = route
+            ds_logger.info(
+                f"[DataSourceFactory] factor_route[{exchange}]: "
+                f"primary={primary_name}, validator={validator_name}, fallback={fallback_name}"
+            )
+
+    def _find_source_by_base_name(self, base_name: str) -> Optional[BaseDataSource]:
+        """按数据源基名称查找已注册的实例 (如 'baostock' 匹配 'baostock_a_stock')"""
+        for name, source in self.sources.items():
+            if name.startswith(base_name):
+                return source
+        return None
 
     def _get_rate_limit_config_for_source(self, source_name: str) -> RateLimitConfig:
         """获取数据源特定的限流配置"""
@@ -165,15 +278,17 @@ class DataSourceFactory:
         return primary_sources[0] if primary_sources else None
 
     def get_backup_source(self, exchange: str) -> Optional[BaseDataSource]:
-        """获取备用数据源"""
+        """获取第一个备用数据源"""
+        sources = self.get_backup_sources(exchange)
+        return sources[0] if sources else None
+
+    def get_backup_sources(self, exchange: str) -> List[BaseDataSource]:
+        """获取所有备用数据源 (用于降级链遍历)"""
         exchange = exchange.upper()
         region = self.exchange_mapper.get_region_from_exchange(exchange)
         if not region:
-            return None
-
-        # 使用预构建的映射关系快速查找
-        backup_sources = self.region_to_sources['backup'].get(region, [])
-        return backup_sources[0] if backup_sources else None
+            return []
+        return self.region_to_sources['backup'].get(region, [])
 
     async def get_instrument_list(self, exchange: str, force_refresh: bool = False,
                                   instrument_types: List[str] = None) -> List[Dict[str, Any]]:
@@ -208,11 +323,21 @@ class DataSourceFactory:
         else:
             ds_logger.info(f"[DataSourceFactory] Force refresh requested for {exchange}")
 
-        # 第二步：尝试从主数据源获取
-        primary_source = self.get_primary_source(exchange)
-        if not primary_source:
-            ds_logger.error(f"[DataSourceFactory] No data source configured for exchange: {exchange}")
+        # 第二步：尝试从品种列表专用源获取 (独立于日线主源)
+        region = self.exchange_mapper.get_region_from_exchange(exchange)
+        instrument_source_list = self.instrument_sources.get(region, []) if region else []
+        if not instrument_source_list:
+            # fallback: 日线主源
+            primary_source = self.get_primary_source(exchange)
+            if primary_source:
+                instrument_source_list = [primary_source]
+
+        if not instrument_source_list:
+            ds_logger.error(f"[DataSourceFactory] No instrument source configured for exchange: {exchange}")
             return []
+
+        primary_source = instrument_source_list[0]
+        backup_sources = instrument_source_list[1:]
 
         try:
             with LogContext("DataSourceFactory", "get_primary_instruments", exchange=exchange):
@@ -230,9 +355,8 @@ class DataSourceFactory:
                             if inst.get('type') in instrument_types
                         ]
 
-                # 第三步：尝试从备用数据源进行并集合并（填补被主数据源遗漏的成分）
-                backup_source = self.get_backup_source(exchange)
-                if backup_source:
+                # 第三步：尝试从其他品种源进行并集合并
+                for backup_source in backup_sources:
                     try:
                         ds_logger.info(f"[DataSourceFactory] Fetching instruments from backup_source {backup_source.name} for {exchange}...")
                         try:
@@ -409,9 +533,8 @@ class DataSourceFactory:
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get daily data from {primary_source.name}: {e}")
 
-        # 第二步：尝试从备用数据源获取（yfinance等）
-        backup_source = self.get_backup_source(exchange)
-        if backup_source:
+        # 第二步：遍历所有备用数据源（降级链）
+        for backup_source in self.get_backup_sources(exchange):
             ds_logger.info(f"[DataSourceFactory] Trying backup source: {backup_source.name} for {symbol} (instrument_type={instrument_type})")
             try:
                 with LogContext("DataSourceFactory", "get_backup_data",
@@ -427,14 +550,7 @@ class DataSourceFactory:
                     else:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")
             except Exception as backup_e:
-                ds_logger.error(f"[DataSourceFactory] Backup source also failed: {backup_e}")
-        else:
-            region = self.exchange_mapper.get_region_from_exchange(exchange)
-            ds_logger.warning(
-                f"[DataSourceFactory] No backup source available for {exchange} "
-                f"(region={region}, registered_backups={list(self.region_to_sources['backup'].keys())}, "
-                f"total_sources={len(self.sources)})"
-            )
+                ds_logger.error(f"[DataSourceFactory] Backup source {backup_source.name} failed: {backup_e}")
 
         ds_logger.warning(f"[DataSourceFactory] No data available for {exchange} {symbol}")
         return []
@@ -442,41 +558,71 @@ class DataSourceFactory:
     async def get_adjustment_factors(self, exchange: str, instrument_id: str,
                                      symbol: str, start_date: datetime,
                                      end_date: datetime) -> List[Dict[str, Any]]:
-        """获取复权因子 - 与 get_daily_data 相同的降级策略"""
+        """获取复权因子 - 使用因子独立路由 (按 exchange 而非 region)"""
         exchange = exchange.upper()
 
-        # 尝试主数据源
-        primary_source = self.get_primary_source(exchange)
-        if primary_source and hasattr(primary_source, 'get_adjustment_factors'):
+        # ★ 直接用 exchange 查因子路由, 不经过 region 映射
+        factor_cfg = self.factor_routes.get(exchange, {})
+
+        # 尝试因子主源
+        primary = factor_cfg.get('primary_instance')
+        if primary and hasattr(primary, 'get_adjustment_factors'):
             try:
-                factors = await primary_source.get_adjustment_factors(
+                factors = await primary.get_adjustment_factors(
                     instrument_id, symbol, start_date, end_date
                 )
                 if factors:
                     ds_logger.debug(
-                        f"[DataSourceFactory] Got {len(factors)} factors from {primary_source.name}"
+                        f"[DataSourceFactory] Got {len(factors)} factors from "
+                        f"{getattr(primary, 'name', type(primary).__name__)} for {exchange}"
                     )
                     return factors
             except Exception as e:
                 ds_logger.warning(
-                    f"[DataSourceFactory] Failed to get factors from {primary_source.name}: {e}"
+                    f"[DataSourceFactory] Factor primary failed for {exchange}: {e}"
                 )
 
-        # 尝试备用数据源
-        backup_source = self.get_backup_source(exchange)
-        if backup_source and hasattr(backup_source, 'get_adjustment_factors'):
+        # 尝试因子备用源
+        fallback = factor_cfg.get('fallback_instance')
+        if fallback and hasattr(fallback, 'get_adjustment_factors'):
+            try:
+                factors = await fallback.get_adjustment_factors(
+                    instrument_id, symbol, start_date, end_date
+                )
+                if factors:
+                    ds_logger.info(
+                        f"[DataSourceFactory] Got {len(factors)} factors from fallback "
+                        f"{getattr(fallback, 'name', type(fallback).__name__)} for {exchange}"
+                    )
+                    return factors
+            except Exception as e:
+                ds_logger.warning(
+                    f"[DataSourceFactory] Factor fallback also failed for {exchange}: {e}"
+                )
+
+        # 最后兜底: 遍历日线备用源（跳过已尝试的因子路由源和不支持该交易所的源）
+        tried_sources = {id(s) for s in [primary, fallback] if s is not None}
+        for backup_source in self.get_backup_sources(exchange):
+            if id(backup_source) in tried_sources:
+                continue
+            if not hasattr(backup_source, 'get_adjustment_factors'):
+                continue
+            supported = getattr(backup_source, 'supported_exchanges', None)
+            if supported and exchange not in supported:
+                continue
             try:
                 factors = await backup_source.get_adjustment_factors(
                     instrument_id, symbol, start_date, end_date
                 )
                 if factors:
                     ds_logger.info(
-                        f"[DataSourceFactory] Got {len(factors)} factors from backup {backup_source.name}"
+                        f"[DataSourceFactory] Got {len(factors)} factors from "
+                        f"daily-backup {backup_source.name}"
                     )
                     return factors
             except Exception as e:
                 ds_logger.warning(
-                    f"[DataSourceFactory] Backup factor fetch also failed: {e}"
+                    f"[DataSourceFactory] Daily-backup factor fetch failed: {e}"
                 )
 
         return []
@@ -604,19 +750,30 @@ class DataSourceFactory:
         return await self.db_ops.get_previous_trading_day(exchange, check_date)
 
     async def update_trading_calendar(self, exchange: str, start_date: date, end_date: date) -> int:
-        """更新交易日历"""
-        source = self.get_primary_source(exchange)
-        if not source or not hasattr(source, 'get_trading_calendar'):
-            ds_logger.warning(f"[DataSourceFactory] Source for {exchange} doesn't support trading calendar")
-            return 0
+        """更新交易日历 - 使用日历专用路由 (独立于日线主源)"""
+        region = self.exchange_mapper.get_region_from_exchange(exchange)
+        calendar_source_list = self.calendar_sources.get(region, []) if region else []
+        if not calendar_source_list:
+            # fallback: 日线主源
+            primary_source = self.get_primary_source(exchange)
+            if primary_source and hasattr(primary_source, 'get_trading_calendar'):
+                calendar_source_list = [primary_source]
 
-        try:
-            calendar_data = await source.get_trading_calendar(exchange, start_date, end_date)
-            if calendar_data:
-                return await self.db_ops.save_trading_calendar(calendar_data)
-        except Exception as e:
-            ds_logger.error(f"[DataSourceFactory] Failed to update trading calendar: {e}")
+        for source in calendar_source_list:
+            if not hasattr(source, 'get_trading_calendar'):
+                continue
+            try:
+                calendar_data = await source.get_trading_calendar(exchange, start_date, end_date)
+                if calendar_data:
+                    saved = await self.db_ops.save_trading_calendar(calendar_data)
+                    ds_logger.info(
+                        f"[DataSourceFactory] Calendar updated from {source.name}: {saved} records"
+                    )
+                    return saved
+            except Exception as e:
+                ds_logger.warning(f"[DataSourceFactory] Calendar source {source.name} failed: {e}")
 
+        ds_logger.warning(f"[DataSourceFactory] No calendar source available for {exchange}")
         return 0
 
     # 数据质量评估方法
@@ -672,6 +829,9 @@ class DataSourceFactory:
 
         self.sources.clear()
         self.region_to_sources = {'primary': {}, 'backup': {}}
+        self.instrument_sources.clear()
+        self.calendar_sources.clear()
+        self.factor_routes.clear()
         self.trading_calendar_cache.clear()
 
         # 重置全局单例引用，允许下次使用时重新初始化

@@ -44,26 +44,26 @@ async def get_instruments(
 ) -> List[Dict[str, Any]]:
     """获取活跃品种列表"""
     conditions = ["is_active = 1"]
-    params: list = []
+    params: dict = {}
 
     if exchange:
-        conditions.append("exchange = ?")
-        params.append(exchange)
+        conditions.append("exchange = :exchange")
+        params['exchange'] = exchange
     if instrument_type:
-        conditions.append("type = ?")
-        params.append(instrument_type)
+        conditions.append("type = :type")
+        params['type'] = instrument_type
 
     where_clause = " AND ".join(conditions)
     limit_clause = f" LIMIT {limit}" if limit else ""
 
     sql = f"SELECT instrument_id, symbol, name, exchange, type FROM instruments WHERE {where_clause} ORDER BY instrument_id{limit_clause}"
-    return await db_ops.execute_read_query(sql, tuple(params))
+    return await db_ops.execute_read_query(sql, params)
 
 
 async def get_existing_dates(instrument_id: str) -> Set[date]:
     """获取品种在数据库中已有的日期集合"""
-    sql = "SELECT DISTINCT date(time) AS d FROM daily_quotes WHERE instrument_id = ?"
-    rows = await db_ops.execute_read_query(sql, (instrument_id,))
+    sql = "SELECT DISTINCT date(time) AS d FROM daily_quotes WHERE instrument_id = :instrument_id"
+    rows = await db_ops.execute_read_query(sql, {'instrument_id': instrument_id})
     result: Set[date] = set()
     for row in rows:
         d = row['d']
@@ -94,6 +94,18 @@ async def find_missing_dates(
     # 数据覆盖的时间范围
     data_start = min(existing_dates)
     data_end = max(existing_dates)
+
+    # 退市品种：检测范围不超过退市日期（防御性冗余）
+    delisted = instrument.get('delisted_date')
+    if delisted:
+        if isinstance(delisted, datetime):
+            delisted_val = delisted.date()
+        elif isinstance(delisted, date):
+            delisted_val = delisted
+        else:
+            delisted_val = None
+        if delisted_val and data_end > delisted_val:
+            data_end = delisted_val
 
     # 获取交易日历（仅在已有数据的时间范围内比对）
     trading_days = await factory.get_trading_days(exchange, data_start, data_end)

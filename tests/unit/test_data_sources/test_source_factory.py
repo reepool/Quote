@@ -244,5 +244,8 @@ class TestDataSourceFactory:
             health_status = source_factory.get_all_sources_health_status()
 
         assert len(health_status) == 2
-        assert status['source'] == 'baostock' for status in health_status if 'baostock' in status.values()
-        assert status['healthy'] is True for status in health_status if 'baostock' in status.values()
+        baostock_status = next(s for s in health_status if s['source'] == 'baostock')
+        yfinance_status = next(s for s in health_status if s['source'] == 'yfinance')
+        
+        assert baostock_status['healthy'] is True
+        assert yfinance_status['healthy'] is False

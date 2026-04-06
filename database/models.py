@@ -288,6 +288,53 @@ class AdjustmentFactorDB(Base):
     )
 
 
+class AdjustmentFactorTdxDB(Base):
+    """通达信自研复权因子审计表
+
+    独立于生产因子表 adjustment_factors, 仅用于审计和交叉验证.
+    通过 pytdx XDXR 数据计算的因子存储在此处.
+    严禁与生产表交叉写入!
+    """
+    __tablename__ = 'adjustment_factors_tdx'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'),
+                           nullable=False, index=True)
+    ex_date = Column(DateTime, nullable=False, index=True)  # 除权除息日
+
+    # 核心因子
+    factor = Column(Float, nullable=False, default=1.0)             # 单日除权因子
+    cumulative_factor = Column(Float, nullable=False, default=1.0)  # 累积后复权因子
+
+    # XDXR 原始事件详情 (每 10 股为单位的原始值)
+    pre_close = Column(Float, default=0.0)      # 除权日前收盘价
+    fenhong = Column(Float, default=0.0)         # 每 10 股分红 (元)
+    songzhuangu = Column(Float, default=0.0)     # 每 10 股送转股
+    peigu = Column(Float, default=0.0)           # 每 10 股配股
+    peigujia = Column(Float, default=0.0)        # 配股价 (元)
+
+    # 验证结果
+    validation_result = Column(String(32), nullable=True)  # all_pass, conflict, no_overlap, etc.
+    ref_factor = Column(Float, nullable=True)               # 权威源对应因子 (用于对比)
+    ref_source = Column(String(32), nullable=True)          # 权威源名称
+    ratio_diff_pct = Column(Float, nullable=True)           # 因子比率差异百分比
+    conflict_reason = Column(String(128), nullable=True)    # 不可接受的具体原因
+
+    # 元数据
+    source = Column(String(32), default='tdx_xdxr')
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time,
+                        onupdate=safe_get_shanghai_time)
+
+    __table_args__ = (
+        UniqueConstraint('instrument_id', 'ex_date',
+                         name='uq_adj_factor_tdx_inst_date'),
+        Index('idx_adj_factor_tdx_inst_date', 'instrument_id', 'ex_date'),
+        Index('idx_adj_factor_tdx_validation', 'validation_result'),
+        PrimaryKeyConstraint('id'),
+    )
+
+
 class DataSourceStatusDB(Base):
     """Data source status tracking model"""
     __tablename__ = 'data_source_status'

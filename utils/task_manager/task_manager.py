@@ -68,6 +68,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
             self.telegram_bot.register_command_handler('/backfill', self.handlers.handle_backfill_command)
             self.telegram_bot.register_command_handler('/backfill_factors', self.handlers.handle_backfill_factors_command)
+            self.telegram_bot.register_command_handler('/audit_factors', self.handlers.handle_audit_factors_command)
             self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
             self.telegram_bot.register_command_handler('/find_gap_and_repair', self.handlers.handle_find_gap_and_repair_command)
             self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)

@@ -34,8 +34,8 @@ async def backfill_factors():
     
     stats = {
         "already_has": 0,           # 已经成功入库的（无需回填）
-        "primary_success": 0,       # 靠主源（BaoStock）成功回填的
-        "backup_success": 0,        # 靠辅源（AkShare）成功回填的
+        "primary_success": 0,       # 靠因子主源成功回填的
+        "backup_success": 0,        # 靠因子辅源成功回填的
         "no_factors": 0,            # 两个源都没有因子的（上市后从未分红的铁公鸡）
         "errors": 0                 # 获取/保存过程中发生报错的
     }
@@ -75,8 +75,10 @@ async def backfill_factors():
                     stats["primary_success"] += 1
                 elif 'akshare' in actual_source:
                     stats["backup_success"] += 1
+                elif 'pytdx' in actual_source or 'tdx' in actual_source:
+                    stats["primary_success"] += 1
                 else:
-                    stats["primary_success"] += 1 # 兜底逻辑
+                    stats["primary_success"] += 1  # 兜底逻辑
                     
             else:
                 logger.info(f"  -> 该股票无除权除息记录 (主辅源皆无)")
@@ -97,8 +99,8 @@ async def backfill_factors():
     print(f"此前已成功保存    : {stats['already_has']} 只 (不受断点影响的数据)")
     print("-" * 60)
     print("👇 本次回填情况明细 👇")
-    print(f"✅ 从 主源(BaoStock) 成功抢救的品种数 : {stats['primary_success']} 只")
-    print(f"🚀 从 辅源(AkShare) 成功抢救的品种数  : {stats['backup_success']} 只 (这些是主源漏掉的！)")
+    print(f"✅ 从 因子主源 成功抢救的品种数 : {stats['primary_success']} 只")
+    print(f"🚀 从 因子辅源 成功抢救的品种数  : {stats['backup_success']} 只 (这些是主源漏掉的！)")
     print(f"🪹 至今一毛不拔的铁公鸡 (两源皆无因子) : {stats['no_factors']} 只 (这是正常现象)")
     print(f"❌ 因网络/封禁等异常而依然失败的品种数 : {stats['errors']} 只")
     print("="*60)
@@ -107,6 +109,10 @@ async def backfill_factors():
         print("🎉 恭喜！数据补充非常完美，没有任何缺失遗漏！")
     else:
         print("⚠️ 仍存在个别网络异常导致错漏的股票，可稍后再单独执行一遍此脚本以缝补残缺。")
+
+    # 清理数据源连接，避免 Unclosed client session 警告
+    for source in factory.sources.values():
+        await source.close()
 
 if __name__ == "__main__":
     asyncio.run(backfill_factors())

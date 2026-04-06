@@ -371,6 +371,20 @@
             "content": "🔄 {source} - {generated_at}"
           }
         ]
+      },
+      "tdx_audit_report": {
+        "title": "自研复权因子审计通知",
+        "sections": [
+          {
+            "type": "static",
+            "content": "交易所: {exchange}\n执行模式: {mode}\n通过率: {pass_rate}%\n冲突/错位: {conflict_count}"
+          },
+          {
+            "type": "static",
+            "condition": "report_file_path",
+            "content": "📝 审计详情文件已生成:\n`{report_file_path}`"
+          }
+        ]
       }
     },
     "formats": {

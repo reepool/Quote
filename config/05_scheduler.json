@@ -24,7 +24,7 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "exchanges": ["SSE", "SZSE"],
+          "exchanges": ["SSE", "SZSE", "BSE"],
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
           "enable_trading_day_check": true,

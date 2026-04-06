@@ -140,7 +140,10 @@ class ScheduledTasks:
         try:
             # 使用配置参数或默认值
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE']
+                exchanges = self.config.get_nested(
+                    'data_config', 'market_presets', 'a_shares',
+                    default=['SSE', 'SZSE', 'BSE']
+                )
 
             today = target_date if target_date else date.today()
             is_backfill = target_date is not None and target_date != date.today()
@@ -389,7 +392,10 @@ class ScheduledTasks:
 
             # 使用配置参数
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE']
+                exchanges = self.config.get_nested(
+                    'data_config', 'market_presets', 'a_shares',
+                    default=['SSE', 'SZSE', 'BSE']
+                )
 
             # 计算检查范围：上个月
             today = date.today()
@@ -500,7 +506,10 @@ class ScheduledTasks:
             scheduler_logger.info("[Scheduler] Starting gap detect and repair task...")
 
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE', 'BSE']
+                exchanges = self.config.get_nested(
+                    'data_config', 'market_presets', 'a_shares',
+                    default=['SSE', 'SZSE', 'BSE']
+                )
 
             if isinstance(start_date, str):
                 start_date = date.fromisoformat(start_date)
@@ -741,33 +750,41 @@ class ScheduledTasks:
                 ]
             else:
                 unhealthy_sources = []
-            auto_repair_result = None
-            if check_data_sources and 'baostock_a_stock' in unhealthy_sources:
-                scheduler_logger.warning("[Scheduler] baostock_a_stock unhealthy, attempting auto-repair")
-                auto_repair_result = "失败"
-                try:
-                    source = data_manager.source_factory.sources.get('baostock_a_stock')
-                    if source:
-                        await source._relogin()
-                        is_healthy = await source.health_check()
-                        if is_healthy:
-                            auto_repair_result = "成功"
-                            unhealthy_sources = [
-                                src for src in unhealthy_sources if src != 'baostock_a_stock'
-                            ]
+            auto_repair_results = {}
+            if check_data_sources and unhealthy_sources:
+                scheduler_logger.warning(f"[Scheduler] 侦测到异常数据源 {unhealthy_sources}, 尝试自动修复")
+                new_unhealthy_sources = []
+                for src_name in unhealthy_sources:
+                    repair_res = "失败"
+                    try:
+                        source = data_manager.source_factory.sources.get(src_name)
+                        if source:
+                            if hasattr(source, '_relogin'):
+                                await source._relogin()
+                            elif hasattr(source, '_reconnect'):
+                                await source._reconnect()
+                            is_healthy = await source.health_check()
+                            if is_healthy:
+                                repair_res = "成功"
+                            else:
+                                repair_res = "失败（健康检查未通过）"
+                                new_unhealthy_sources.append(src_name)
                         else:
-                            auto_repair_result = "失败（健康检查未通过）"
-                    else:
-                        auto_repair_result = "失败（数据源未初始化）"
-                except Exception as e:
-                    auto_repair_result = f"失败（{e}）"
-                scheduler_logger.info(f"[Scheduler] baostock_a_stock auto-repair result: {auto_repair_result}")
+                            repair_res = "失败（数据源未初始化）"
+                            new_unhealthy_sources.append(src_name)
+                    except Exception as e:
+                        repair_res = f"失败（{e}）"
+                        new_unhealthy_sources.append(src_name)
+                    
+                    auto_repair_results[src_name] = repair_res
+                    scheduler_logger.info(f"[Scheduler] {src_name} 自动修复结果: {repair_res}")
+                
+                unhealthy_sources = new_unhealthy_sources
+
                 if self.telegram_enabled and self.bot:
-                    level = "success" if auto_repair_result == "成功" else "warning"
-                    await self.bot.send_scheduler_notification(
-                        f"数据源自动修复结果: baostock_a_stock {auto_repair_result}",
-                        level=level
-                    )
+                    msg = "数据源自动修复结果:\n" + "\n".join(f"- {k}: {v}" for k, v in auto_repair_results.items())
+                    level = "warning" if len(unhealthy_sources) > 0 else "success"
+                    await self.bot.send_scheduler_notification(msg, level=level)
 
             # 检查数据库连接
             database_unhealthy = False
@@ -801,11 +818,12 @@ class ScheduledTasks:
                     "result": "正常" if is_ds_healthy else f"异常: {', '.join(unhealthy_sources)}",
                     "status_icon": "✅" if is_ds_healthy else "❌"
                 })
-                if auto_repair_result is not None:
-                    repair_ok = auto_repair_result == "成功"
+                if auto_repair_results:
+                    repair_ok = all(v == "成功" for v in auto_repair_results.values())
+                    repair_details = ", ".join(f"{k}: {v}" for k, v in auto_repair_results.items())
                     check_results.append({
                         "check_name": "数据源自动修复",
-                        "result": f"baostock_a_stock: {auto_repair_result}",
+                        "result": repair_details,
                         "status_icon": "✅" if repair_ok else "❌"
                     })
             # 数据库检查
@@ -966,7 +984,10 @@ class ScheduledTasks:
 
             # 使用配置参数或默认值
             if exchanges is None:
-                exchanges = ['SSE', 'SZSE']
+                exchanges = self.config.get_nested(
+                    'data_config', 'market_presets', 'a_shares',
+                    default=['SSE', 'SZSE', 'BSE']
+                )
 
             current_year = datetime.now().year
             future_year = current_year + 1 if update_future_months >= 12 else current_year

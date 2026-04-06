@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 
 from scheduler.scheduler import TaskScheduler
-from scheduler.tasks import TaskManager
+from scheduler.tasks import ScheduledTasks
 from scheduler.job_config import JobConfig
 from utils.exceptions import SchedulerError
 
