@@ -1,967 +1,1714 @@
-# 配置文件详解
+# 系统配置参数详解
 
-## 📖 概述
+本文档自动整理自 `config/config.json` 或各模块的 `0*.json` 配置文件。以下是所有支持的配置节点及其参数说明。
 
-当前版本使用 `config/` 目录下的**分文件配置**，启动时会按文件名顺序合并加载（例如 `00_sys.json`、`01_log.json`、`05_scheduler.json`）。无需维护单一巨大 `config.json`。
-
-## 🏗️ 配置文件结构
-
-常用配置文件如下（示例）：
-```
-config/
-├── 00_sys.json          # 系统基础配置
-├── 01_log.json          # 日志配置
-├── 02_tg.json           # Telegram 配置
-├── 03_data.json         # 数据下载与缓存配置
-├── 04_database.json     # 数据库配置
-├── 05_scheduler.json    # 调度器配置
-├── 07_api.json          # API 配置
-├── 08_cache.json        # 缓存配置
-└── 09_report.json       # 报告模板配置
-```
-
-所有文件在启动时合并为统一配置树（`config_manager.get_*` 读取）。
-   - 添加配置变更审计
-
-### 模块化优势
-- ✅ **维护性提升**: 每个模块职责单一，易于维护
-- ✅ **协作效率**: 不同团队可并行修改不同模块
-- ✅ **启动优化**: 按需加载配置，提升启动速度
-- ✅ **版本管理**: 精确跟踪各模块配置变更
-- ✅ **环境隔离**: 不同环境使用不同配置覆盖
+## sys_config
 
 ```json
 {
   "sys_config": {
-    // 系统基础配置
-  },
-  "logging_config": {
-    // 日志系统配置
-  },
-  "telegram_config": {
-    // Telegram机器人和任务管理配置 ⭐
-  },
-  "database_config": {
-    // 数据库配置
-  },
-  "data_config": {
-    // 数据下载和缓存配置
-  },
-  "data_sources": {
-    // 数据源启用配置
-  },
-  "data_sources_config": {
-    // 各数据源详细配置
-  },
-  "exchange_rules": {
-    // 交易所规则和映射配置
-  },
-  "api_config": {
-    // RESTful API服务配置
-  },
-  "scheduler_config": {
-    // 任务调度系统配置 ⭐
-  },
-  "backup_config": {
-    // 自动备份配置 ⭐
-  },
-  "cache_config": {
-    // 缓存系统配置
-  },
-  "report_config": {
-    // 报告和通知模板配置
+    "pid_file": "log/process.pid",
+    "lock_file": "log/process.lock"
   }
-}
+}...
 ```
 
-## 📊 数据源配置 (data_sources)
+- **`pid_file`**: `str` (默认: `log/process.pid`)
+- **`lock_file`**: `str` (默认: `log/process.lock`)
+- **`single_instance`**: `bool` (默认: `True`)
+- **`cleanup_on_startup`**: `bool` (默认: `True`)
+### sys_config.persistent_pids
 
-### 配置示例
 ```json
 {
-  "data_sources": {
-    "baostock_a_stock": {
-      "enabled": true,
-      "priority": 1,
-      "exchanges": ["SSE", "SZSE"],
-      "config": {
-        "timeout": 30,
-        "retry_times": 3,
-        "retry_interval": 1.0
-      }
-    },
-    "akshare_a_stock": {
-      "enabled": false,
-      "priority": 2,
-      "exchanges": ["SSE", "SZSE"]
-    },
-    "tushare_a_stock": {
-      "enabled": false,
-      "priority": 3,
-      "exchanges": ["SSE", "SZSE"],
-      "config": {
-        "token": "your_tushare_token"
-      }
-    }
+  "persistent_pids": {
+    "scheduler": "log/scheduler.pid",
+    "api_server": "log/api_server.pid"
   }
 }
 ```
 
-### 配置项说明
+- **`scheduler`**: `str` (默认: `log/scheduler.pid`)
+- **`api_server`**: `str` (默认: `log/api_server.pid`)
+## logging_config
 
-| 字段 | 类型 | 必需 | 说明 |
-|------|------|------|------|
-| `enabled` | boolean | ✅ | 是否启用该数据源 |
-| `priority` | integer | ✅ | 优先级（数字越小优先级越高） |
-| `exchanges` | array | ✅ | 支持的交易所列表 |
-| `config` | object | ❌ | 数据源特定配置 |
-
-### 支持的数据源
-
-#### 1. BaoStock (baostock_a_stock)
-- **适用市场**: 中国A股（SSE、SZSE）
-- **特点**: 免费、稳定、数据质量高
-- **配置项**:
-  - `timeout`: 请求超时时间（秒）
-  - `retry_times`: 重试次数
-  - `retry_interval`: 重试间隔（秒）
-
-#### 2. AkShare (akshare_a_stock)
-- **适用市场**: 中国A股、港股、美股
-- **特点**: 开源、数据源丰富
-- **注意**: 需要安装 akshare 包
-
-#### 3. Tushare (tushare_a_stock)
-- **适用市场**: 中国A股、港股、美股
-- **特点**: 专业级、数据质量高
-- **注意**: 需要申请 token
-
-#### 4. YFinance (yfinance_us_stock)
-- **适用市场**: 美股
-- **特点**: 雅虎财经数据源
-
-## ⚡ 限流配置 (rate_limit_config)
-
-### 配置示例
-```json
-{
-  "rate_limit_config": {
-    "max_requests_per_minute": 60,
-    "max_requests_per_hour": 1000,
-    "max_requests_per_day": 10000,
-    "retry_times": 3,
-    "retry_interval": 1.0,
-    "backoff_factor": 2.0,
-    "circuit_breaker_threshold": 5,
-    "circuit_breaker_timeout": 300
-  }
-}
-```
-
-### 配置项说明
-
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `max_requests_per_minute` | integer | 60 | 每分钟最大请求数 |
-| `max_requests_per_hour` | integer | 1000 | 每小时最大请求数 |
-| `max_requests_per_day` | integer | 10000 | 每日最大请求数 |
-| `retry_times` | integer | 3 | 重试次数 |
-| `retry_interval` | float | 1.0 | 重试间隔（秒） |
-| `backoff_factor` | float | 2.0 | 退避因子 |
-| `circuit_breaker_threshold` | integer | 5 | 熔断器阈值 |
-| `circuit_breaker_timeout` | integer | 300 | 熔断器超时（秒） |
-
-### 限流策略
-
-系统使用多维度限流机制：
-1. **分钟级限流**: 防止短时间内过度请求
-2. **小时级限流**: 控制总体请求频率
-3. **日级限流**: 避免超出日配额
-4. **熔断器**: 连续失败时暂停请求
-
-## 📈 数据配置 (data_config)
-
-### 配置示例
-```json
-{
-  "data_config": {
-    "download_chunk_days": 2000,
-    "batch_size": 50,
-    "quality_threshold": 0.7,
-    "enable_data_validation": true,
-    "data_retention_days": 3650,
-    "default_exchanges": ["SSE", "SZSE"],
-    "precise_download_mode": true,
-    "instrument_types": ["stock", "index"]
-  }
-}
-```
-
-### 配置项说明
-
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `download_chunk_days` | integer | 2000 | 分块下载天数（0=一次性下载） |
-| `batch_size` | integer | 50 | 批处理大小 |
-| `quality_threshold` | float | 0.7 | 数据质量阈值 |
-| `enable_data_validation` | boolean | true | 是否启用数据验证 |
-| `data_retention_days` | integer | 3650 | 数据保留天数 |
-| `default_exchanges` | array | ["SSE","SZSE"] | 默认交易所 |
-| `precise_download_mode` | boolean | true | 精确下载模式 |
-| `instrument_types` | array | ["stock","index"] | 要下载/每日更新的品种类型（stock/index/etf） |
-
-### 分块下载策略
-
-- **download_chunk_days = 0**: 一次性下载所有数据
-- **download_chunk_days > 0**: 按指定天数分块下载
-- **推荐值**: 2000天（约5-6年）
-
-## 🗄️ 数据库配置 (database_config)
-
-### 配置示例
-```json
-{
-  "database_config": {
-    "url": "sqlite:///data/quotes.db",
-    "pool_size": 10,
-    "max_overflow": 20,
-    "pool_timeout": 30,
-    "pool_recycle": 3600,
-    "echo": false,
-    "backup_enabled": true,
-    "backup_path": "data/backups",
-    "backup_retention_days": 30
-  }
-}
-```
-
-### 配置项说明
-
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `url` | string | sqlite:///data/quotes.db | 数据库连接URL |
-| `pool_size` | integer | 10 | 连接池大小 |
-| `max_overflow` | integer | 20 | 最大溢出连接数 |
-| `pool_timeout` | integer | 30 | 连接池超时（秒） |
-| `pool_recycle` | integer | 3600 | 连接回收时间（秒） |
-| `echo` | boolean | false | 是否输出SQL语句 |
-| `backup_enabled` | boolean | true | 是否启用自动备份 |
-| `backup_path` | string | data/backups | 备份路径 |
-| `backup_retention_days` | integer | 30 | 备份保留天数 |
-
-### 支持的数据库
-
-- **SQLite**: 默认配置，适合小规模使用
-- **PostgreSQL**: 推荐用于生产环境
-- **MySQL**: 可选的数据库支持
-
-#### PostgreSQL 配置示例
-```json
-{
-  "database_config": {
-    "url": "postgresql://user:password@localhost:5432/quotedb",
-    "pool_size": 20,
-    "max_overflow": 30
-  }
-}
-```
-
-## 📝 日志配置 (logging_config)
-
-### 配置示例
 ```json
 {
   "logging_config": {
     "level": "INFO",
-    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    "date_format": "%Y-%m-%d %H:%M:%S",
-    "file_config": {
-      "enabled": true,
-      "path": "log",
-      "filename": "sys.log",
-      "rotation": {
-        "max_bytes_mb": 50,
-        "backup_count": 10
-      }
-    },
-    "console_config": {
-      "enabled": true,
-      "level": "INFO"
-    },
-    "performance_monitoring": {
-      "enabled": true,
-      "log_slow_queries": true,
-      "slow_query_threshold": 1.0
-    }
+    "format": "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s"
   }
-}
+}...
 ```
 
-### 配置项说明
+- **`level`**: `str` (默认: `INFO`)
+- **`format`**: `str` (默认: `[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s`)
+- **`date_format`**: `str` (默认: `%Y-%m-%d %H:%M:%S`)
+### logging_config.file_config
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `level` | string | INFO | 日志级别 |
-| `format` | string | - | 日志格式 |
-| `date_format` | string | %Y-%m-%d %H:%M:%S | 日期格式 |
-| `file_config.enabled` | boolean | true | 是否启用文件日志 |
-| `file_config.path` | string | log | 日志文件路径 |
-| `file_config.filename` | string | sys.log | 日志文件名 |
-| `file_config.rotation.max_bytes_mb` | integer | 50 | 单个文件最大大小（MB） |
-| `file_config.rotation.backup_count` | integer | 10 | 保留的备份文件数 |
-| `console_config.enabled` | boolean | true | 是否启用控制台日志 |
-| `console_config.level` | string | INFO | 控制台日志级别 |
-| `performance_monitoring.enabled` | boolean | true | 是否启用性能监控 |
-| `performance_monitoring.log_slow_queries` | boolean | true | 是否记录慢查询 |
-| `performance_monitoring.slow_query_threshold` | float | 1.0 | 慢查询阈值（秒） |
-
-### 日志级别
-
-- **DEBUG**: 详细的调试信息
-- **INFO**: 一般信息（推荐）
-- **WARNING**: 警告信息
-- **ERROR**: 错误信息
-- **CRITICAL**: 严重错误
-
-## 🌐 API配置 (api_config)
-
-### 配置示例
 ```json
 {
-  "api_config": {
-    "host": "0.0.0.0",
-    "port": 8000,
-    "workers": 1,
-    "reload": false,
-    "cors_enabled": true,
-    "cors_origins": ["*"],
-    "cors_methods": ["GET", "POST", "PUT", "DELETE"],
-    "cors_headers": ["*"],
-    "rate_limiting": {
-      "enabled": true,
-      "requests_per_minute": 100
-    },
-    "authentication": {
-      "enabled": false,
-      "secret_key": "your-secret-key",
-      "algorithm": "HS256",
-      "access_token_expire_minutes": 30
-    },
-    "documentation": {
-      "enabled": true,
-      "title": "Quote System API",
-      "description": "股票数据管理系统API",
-      "version": "2.1.0"
-    }
+  "file_config": {
+    "enabled": true,
+    "directory": "log"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`directory`**: `str` (默认: `log`)
+- **`filename`**: `str` (默认: `sys.log`)
+#### file_config.rotation
+
+```json
+{
+  "rotation": {
+    "enabled": true,
+    "type": "size"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`type`**: `str` (默认: `size`)
+- **`max_bytes_mb`**: `int` (默认: `50`)
+- **`backup_count`**: `int` (默认: `10`)
+### logging_config.console_config
+
+```json
+{
+  "console_config": {
+    "enabled": true,
+    "level": "INFO"
   }
 }
 ```
 
-### 配置项说明
+- **`enabled`**: `bool` (默认: `True`)
+- **`level`**: `str` (默认: `INFO`)
+### logging_config.modules
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `host` | string | 0.0.0.0 | 服务器地址 |
-| `port` | integer | 8000 | 服务器端口 |
-| `workers` | integer | 1 | 工作进程数 |
-| `reload` | boolean | false | 是否自动重载 |
-| `cors_enabled` | boolean | true | 是否启用CORS |
-| `cors_origins` | array | ["*"] | 允许的源 |
-| `cors_methods` | array | HTTP方法 | 允许的HTTP方法 |
-| `cors_headers` | array | ["*"] | 允许的请求头 |
-| `rate_limiting.enabled` | boolean | true | 是否启用API限流 |
-| `rate_limiting.requests_per_minute` | integer | 100 | API限流阈值 |
-| `authentication.enabled` | boolean | false | 是否启用认证 |
-| `authentication.secret_key` | string | - | JWT密钥 |
-| `authentication.algorithm` | string | HS256 | JWT算法 |
-| `authentication.access_token_expire_minutes` | integer | 30 | 访问令牌过期时间 |
-| `documentation.enabled` | boolean | true | 是否启用API文档 |
-| `documentation.title` | string | Quote System API | API标题 |
-| `documentation.description` | string | - | API描述 |
-| `documentation.version` | string | 2.1.0 | API版本 |
+```json
+{
+  "modules": {
+    "DataManager": {
+      "level": "INFO",
+      "enabled": true
+    },
+    "DataSource": {
+      "level": "INFO",
+      "enabled": true
+    }
+  }
+}...
+```
 
-## 🤖 Telegram 任务管理配置 (telegram_config) ⭐ v2.3.0
+#### modules.DataManager
 
-### 完整配置示例
+```json
+{
+  "DataManager": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.DataSource
+
+```json
+{
+  "DataSource": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Database
+
+```json
+{
+  "Database": {
+    "level": "WARNING",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `WARNING`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.API
+
+```json
+{
+  "API": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Scheduler
+
+```json
+{
+  "Scheduler": {
+    "level": "DEBUG",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `DEBUG`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Monitor
+
+```json
+{
+  "Monitor": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.TaskManager
+
+```json
+{
+  "TaskManager": {
+    "level": "DEBUG",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `DEBUG`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.TelegramBot
+
+```json
+{
+  "TelegramBot": {
+    "level": "DEBUG",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `DEBUG`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.AkShareSource
+
+```json
+{
+  "AkShareSource": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.YFinanceSource
+
+```json
+{
+  "YFinanceSource": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Tushare
+
+```json
+{
+  "Tushare": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Baostock
+
+```json
+{
+  "Baostock": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.tg_task_manager
+
+```json
+{
+  "tg_task_manager": {
+    "level": "INFO",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `INFO`)
+- **`enabled`**: `bool` (默认: `True`)
+#### modules.Report
+
+```json
+{
+  "Report": {
+    "level": "DEBUG",
+    "enabled": true
+  }
+}
+```
+
+- **`level`**: `str` (默认: `DEBUG`)
+- **`enabled`**: `bool` (默认: `True`)
+### logging_config.performance_monitoring
+
+```json
+{
+  "performance_monitoring": {
+    "enabled": true,
+    "slow_operation_threshold_seconds": 2.0
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`slow_operation_threshold_seconds`**: `float` (默认: `2.0`)
+- **`log_memory_usage`**: `bool` (默认: `True`)
+- **`collect_metrics`**: `bool` (默认: `True`)
+## telegram_config
+
 ```json
 {
   "telegram_config": {
     "enabled": true,
-    "api_id": "your_api_id",
-    "api_hash": "your_api_hash",
-    "bot_token": "your_bot_token",
-    "chat_id": ["your_chat_id"],
-    "session_name": "MsgBot",
-    "task_management": {
-      "enabled": true,
-      "authorized_users": ["user123", "user456"],
-      "admin_users": ["admin123"],
-      "commands": {
-        "start": "显示主菜单和帮助信息",
-        "status": "查看所有任务状态和下次执行时间",
-        "detail": "查看指定任务的详细信息",
-        "reload_config": "热重载配置文件",
-        "help": "显示帮助信息"
-      }
+    "api_id": ""
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`api_id`**: `str` (默认: ``)
+- **`api_hash`**: `str` (默认: ``)
+- **`bot_token`**: `str` (默认: ``)
+- **`chat_id`**: `List` (默认: `['']`)
+- **`session_name`**: `str` (默认: `MsgBot`)
+- **`connection_retries`**: `int` (默认: `3`)
+- **`retry_delay`**: `int` (默认: `5`)
+- **`flood_sleep_threshold`**: `int` (默认: `60`)
+- **`auto_reconnect`**: `bool` (默认: `True`)
+- **`timeout`**: `int` (默认: `30`)
+### telegram_config.intervals
+
+```json
+{
+  "intervals": {
+    "tg_msg_retry_interval": 3,
+    "tg_msg_retry_times": 5
+  }
+}...
+```
+
+- **`tg_msg_retry_interval`**: `int` (默认: `3`)
+- **`tg_msg_retry_times`**: `int` (默认: `5`)
+- **`tg_connect_timeout`**: `int` (默认: `30`)
+- **`tg_auto_reconnect`**: `bool` (默认: `True`)
+- **`tg_max_reconnect_attempts`**: `int` (默认: `5`)
+- **`tg_reconnect_delay`**: `int` (默认: `10`)
+## database_config
+
+```json
+{
+  "database_config": {
+    "db_path": "data/quotes.db",
+    "backup_enabled": false
+  }
+}...
+```
+
+- **`db_path`**: `str` (默认: `data/quotes.db`)
+- **`backup_enabled`**: `bool` (默认: `False`)
+- **`backup_interval_days`**: `int` (默认: `7`)
+## data_config
+
+```json
+{
+  "data_config": {
+    "data_dir": "data",
+    "batch_size": 50
+  }
+}...
+```
+
+- **`data_dir`**: `str` (默认: `data`)
+- **`batch_size`**: `int` (默认: `50`)
+- **`download_chunk_days`**: `int` (默认: `0`)
+- **`max_concurrent_downloads`**: `int` (默认: `1`)
+- **`retry_times`**: `int` (默认: `3`)
+- **`retry_interval_seconds`**: `int` (默认: `5`)
+### data_config.default_start_years
+
+```json
+{
+  "default_start_years": {
+    "SSE": 1990,
+    "SZSE": 1990
+  }
+}...
+```
+
+- **`SSE`**: `int` (默认: `1990`)
+- **`SZSE`**: `int` (默认: `1990`)
+- **`BSE`**: `int` (默认: `2014`)
+- **`HKEX`**: `int` (默认: `1990`)
+- **`NASDAQ`**: `int` (默认: `1990`)
+- **`NYSE`**: `int` (默认: `1990`)
+### data_config.market_presets
+
+```json
+{
+  "market_presets": {
+    "a_shares": [
+      "SSE",
+      "SZSE",
+      "BSE"
+    ],
+    "hk_stocks": [
+      "HKEX"
+    ]
+  }
+}...
+```
+
+- **`a_shares`**: `List` (默认: `['SSE', 'SZSE', 'BSE']`)
+- **`hk_stocks`**: `List` (默认: `['HKEX']`)
+- **`us_stocks`**: `List` (默认: `['NASDAQ', 'NYSE']`)
+- **`all_markets`**: `List` (默认: `['SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE']`)
+- **`mainland`**: `List` (默认: `['SSE', 'SZSE', 'BSE']`)
+- **`overseas`**: `List` (默认: `['HKEX', 'NASDAQ', 'NYSE']`)
+- **`chinese`**: `List` (默认: `['SSE', 'SZSE', 'BSE', 'HKEX']`)
+- **`global`**: `List` (默认: `['NASDAQ', 'NYSE']`)
+## data_sources
+
+```json
+{
+  "data_sources": {
+    "a_stock": {
+      "enabled": true
     },
-    "intervals": {
-      "tg_msg_retry_interval": 3,
-      "tg_msg_retry_times": 5,
-      "tg_connect_timeout": 30,
-      "tg_auto_reconnect": true,
-      "tg_max_reconnect_attempts": 5,
-      "tg_reconnect_delay": 10
-    },
-    "notifications": {
-      "download_completed": true,
-      "download_failed": true,
-      "system_errors": true,
-      "daily_update": false,
-      "task_executions": true,
-      "backup_completed": true,
-      "data_gaps_detected": true
-    },
-    "time_display": {
-      "smart_format": true,
-      "timezone": "Asia/Shanghai",
-      "relative_threshold_hours": 24
-    },
-    "message_templates": {
-      "task_status": "📋 **任务状态报告**\n\n{task_list}",
-      "download_completed": "✅ 数据下载完成！\n成功: {success_count}，失败: {failed_count}",
-      "system_error": "🚨 系统错误\n{error_message}",
-      "backup_completed": "💾 数据库备份完成\n文件: {backup_file}"
-    },
-    "proxy": {
+    "hk_stock": {
+      "enabled": false
+    }
+  }
+}...
+```
+
+### data_sources.a_stock
+
+```json
+{
+  "a_stock": {
+    "enabled": true
+  }
+}
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+### data_sources.hk_stock
+
+```json
+{
+  "hk_stock": {
+    "enabled": false
+  }
+}
+```
+
+- **`enabled`**: `bool` (默认: `False`)
+### data_sources.us_stock
+
+```json
+{
+  "us_stock": {
+    "enabled": false
+  }
+}
+```
+
+- **`enabled`**: `bool` (默认: `False`)
+## data_sources_config
+
+```json
+{
+  "data_sources_config": {
+    "akshare": {
       "enabled": false,
-      "url": "http://proxy-server:port",
-      "username": "proxy-username",
-      "password": "proxy-password"
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "primary_source_of": [],
+      "max_requests_per_minute": 8,
+      "max_requests_per_hour": 300,
+      "max_requests_per_day": 5000,
+      "retry_times": 5,
+      "retry_interval": 3.0
+    },
+    "yfinance": {
+      "enabled": false,
+      "exchanges_supported": [
+        "a_stock",
+        "hk_stock",
+        "us_stock"
+      ],
+      "primary_source_of": [],
+      "max_requests_per_minute": 8,
+      "max_requests_per_hour": 300,
+      "max_requests_per_day": 5000,
+      "retry_times": 3,
+      "retry_interval": 2.0
     }
   }
-}
+}...
 ```
 
-### 配置项说明
+### data_sources_config.akshare
 
-#### 基础配置
-| 字段 | 类型 | 必需 | 说明 |
-|------|------|------|------|
-| `enabled` | boolean | ✅ | 是否启用Telegram功能 |
-| `api_id` | integer | ✅ | Telegram API ID |
-| `api_hash` | string | ✅ | Telegram API Hash |
-| `bot_token` | string | ✅ | 机器人令牌 |
-| `chat_id` | array | ✅ | 授权聊天ID列表 |
-| `session_name` | string | ❌ | Telethon会话名称 |
-
-#### 任务管理配置 ⭐ v2.3.0
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `task_management.enabled` | boolean | true | 是否启用任务管理功能 |
-| `task_management.authorized_users` | array | [] | 授权用户列表 |
-| `task_management.admin_users` | array | [] | 管理员用户列表 |
-| `task_management.commands` | object | {} | 自定义命令配置 |
-
-#### 连接和重试配置
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `intervals.tg_msg_retry_interval` | integer | 3 | 消息重试间隔（秒） |
-| `intervals.tg_msg_retry_times` | integer | 5 | 消息重试次数 |
-| `intervals.tg_connect_timeout` | integer | 30 | 连接超时（秒） |
-| `intervals.tg_auto_reconnect` | boolean | true | 是否自动重连 |
-| `intervals.tg_max_reconnect_attempts` | integer | 5 | 最大重连次数 |
-| `intervals.tg_reconnect_delay` | integer | 10 | 重连延迟（秒） |
-
-#### 智能时间显示 ⭐ v2.3.0
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `time_display.smart_format` | boolean | true | 是否启用智能时间格式 |
-| `time_display.timezone` | string | Asia/Shanghai | 时区设置 |
-| `time_display.relative_threshold_hours` | integer | 24 | 相对时间显示阈值（小时） |
-
-#### 通知配置
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `notifications.download_completed` | boolean | true | 下载完成通知 |
-| `notifications.download_failed` | boolean | true | 下载失败通知 |
-| `notifications.system_errors` | boolean | true | 系统错误通知 |
-| `notifications.task_executions` | boolean | true | 任务执行通知 |
-| `notifications.backup_completed` | boolean | true | 备份完成通知 |
-| `notifications.data_gaps_detected` | boolean | true | 数据缺口检测通知 |
-
-### 权限管理
-系统支持基于用户ID的权限控制：
-
-- **管理员权限**: 可以执行所有操作，包括配置热重载
-- **用户权限**: 可以查看任务状态和基本信息
-- **访客权限**: 只能使用基础命令
-
-### 使用示例
-```bash
-# 启动包含任务管理器的完整系统
-python main.py full --host 0.0.0.0 --port 8000
-
-# Telegram中的用户交互
-/status                    # 显示所有任务状态
-/detail daily_data_update  # 查看特定任务详情
-/reload_config            # 热重载配置（需要管理员权限）
-```
-
-## 📄 报告系统配置 (report_config) ⭐ v2.3.1
-
-### 配置示例
 ```json
 {
-  "report_config": {
+  "akshare": {
+    "enabled": false,
+    "exchanges_supported": [
+      "a_stock"
+    ]
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `False`)
+- **`exchanges_supported`**: `List` (默认: `['a_stock']`)
+- **`primary_source_of`**: `List` (默认: `[]`)
+- **`max_requests_per_minute`**: `int` (默认: `8`)
+- **`max_requests_per_hour`**: `int` (默认: `300`)
+- **`max_requests_per_day`**: `int` (默认: `5000`)
+- **`retry_times`**: `int` (默认: `5`)
+- **`retry_interval`**: `float` (默认: `3.0`)
+### data_sources_config.yfinance
+
+```json
+{
+  "yfinance": {
+    "enabled": false,
+    "exchanges_supported": [
+      "a_stock",
+      "hk_stock",
+      "us_stock"
+    ]
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `False`)
+- **`exchanges_supported`**: `List` (默认: `['a_stock', 'hk_stock', 'us_stock']`)
+- **`primary_source_of`**: `List` (默认: `[]`)
+- **`max_requests_per_minute`**: `int` (默认: `8`)
+- **`max_requests_per_hour`**: `int` (默认: `300`)
+- **`max_requests_per_day`**: `int` (默认: `5000`)
+- **`retry_times`**: `int` (默认: `3`)
+- **`retry_interval`**: `float` (默认: `2.0`)
+### data_sources_config.tushare
+
+```json
+{
+  "tushare": {
+    "enabled": false,
+    "exchanges_supported": [
+      "a_stock"
+    ]
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `False`)
+- **`exchanges_supported`**: `List` (默认: `['a_stock']`)
+- **`primary_source_of`**: `List` (默认: `[]`)
+- **`max_requests_per_minute`**: `int` (默认: `200`)
+- **`max_requests_per_hour`**: `int` (默认: `1000`)
+- **`max_requests_per_day`**: `int` (默认: `2000`)
+- **`retry_times`**: `int` (默认: `3`)
+- **`retry_interval`**: `float` (默认: `1.0`)
+- **`token`**: `str` (默认: ``)
+### data_sources_config.baostock
+
+```json
+{
+  "baostock": {
     "enabled": true,
-    "default_format": "telegram",
-    "output_directory": "reports",
-    "formats": {
-      "telegram": {
-        "enabled": true,
-        "max_message_length": 4000,
-        "parse_mode": "Markdown",
-        "include_emojis": true
-      },
-      "console": {
-        "enabled": true,
-        "max_width": 100,
-        "colors": true,
-        "progress_bars": true
-      },
-      "api": {
-        "enabled": true,
-        "include_raw_data": false,
-        "response_format": "json",
-        "pagination_size": 100
-      },
-      "file": {
-        "enabled": true,
-        "formats": ["json", "csv", "html"],
-        "compression": true,
-        "timestamp_files": true
-      }
+    "exchanges_supported": [
+      "a_stock"
+    ]
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`exchanges_supported`**: `List` (默认: `['a_stock']`)
+- **`primary_source_of`**: `List` (默认: `['a_stock']`)
+- **`max_requests_per_minute`**: `int` (默认: `60`)
+- **`max_requests_per_hour`**: `int` (默认: `3000`)
+- **`max_requests_per_day`**: `int` (默认: `60000`)
+- **`retry_times`**: `int` (默认: `5`)
+- **`retry_interval`**: `float` (默认: `5.0`)
+- **`network_error_retry_interval`**: `float` (默认: `10.0`)
+- **`connection_timeout`**: `float` (默认: `30.0`)
+## exchange_rules
+
+```json
+{
+  "exchange_rules": {
+    "exchange_mapping": {
+      "SSE": "a_stock",
+      "SZSE": "a_stock",
+      "BSE": "a_stock",
+      "HKEX": "hk_stock",
+      "NASDAQ": "us_stock",
+      "NYSE": "us_stock"
     },
-    "templates": {
-      "system_status": {
-        "name": "系统状态报告",
-        "description": "系统运行状态和性能指标",
-        "sections": ["overview", "database", "data_sources", "scheduler"],
-        "schedule": "0 9 * * 1-5",
-        "auto_generate": true
-      },
-      "data_quality": {
-        "name": "数据质量报告",
-        "description": "数据完整性和质量评估",
-        "sections": ["completeness", "accuracy", "consistency", "gaps"],
-        "schedule": "0 10 * * 1",
-        "auto_generate": true
-      },
-      "task_summary": {
-        "name": "任务执行摘要",
-        "description": "调度器任务执行情况汇总",
-        "sections": ["execution_summary", "failed_tasks", "performance_metrics"],
-        "schedule": "0 18 * * 1-5",
-        "auto_generate": true
-      }
-    },
-    "delivery": {
-      "telegram": {
-        "enabled": true,
-        "chat_ids": ["your_chat_id"],
-        "split_long_messages": true
-      },
-      "email": {
-        "enabled": false,
-        "smtp_server": "smtp.example.com",
-        "recipients": ["admin@example.com"]
-      },
-      "webhook": {
-        "enabled": false,
-        "url": "https://your-webhook.example.com/reports"
-      }
-    },
-    "retention": {
-      "keep_days": 30,
-      "max_files_per_type": 100,
-      "cleanup_schedule": "0 2 * * 0"
+    "symbol_rules": {
+      "SZSE": 6,
+      "SSE": 6,
+      "BSE": 6,
+      "HKEX": [
+        4,
+        5
+      ],
+      "NASDAQ": null,
+      "NYSE": null
     }
   }
-}
+}...
 ```
 
-### 配置项说明
+### exchange_rules.exchange_mapping
 
-#### 输出格式配置
-| 格式 | 说明 | 特性 |
-|------|------|------|
-| `telegram` | Telegram消息格式 | 支持Markdown、Emoji |
-| `console` | 控制台输出 | 彩色显示、进度条 |
-| `api` | API响应格式 | JSON结构化数据 |
-| `file` | 文件输出 | 支持JSON/CSV/HTML |
-
-#### 报告模板
-| 模板 | 用途 | 自动生成 |
-|------|------|----------|
-| `system_status` | 系统状态监控 | 每工作日9:00 |
-| `data_quality` | 数据质量评估 | 每周一10:00 |
-| `task_summary` | 任务执行摘要 | 每工作日18:00 |
-
-#### 传递方式
-- **Telegram**: 实时推送到指定聊天
-- **Email**: 邮件发送（可选）
-- **Webhook**: HTTP回调（可选）
-
-## 💾 自动备份配置 (backup_config) ⭐ v2.3.0
-
-### 配置示例
 ```json
 {
-  "backup_config": {
-    "enabled": true,
-    "source_db_path": "data/quotes.db",
-    "backup_directory": "data/PVE-Bak/QuoteBak",
-    "retention_days": 30,
-    "schedule": {
-      "enabled": true,
-      "cron": "0 6 * * 6"
-    },
-    "compression": {
-      "enabled": true,
-      "algorithm": "gzip",
-      "level": 6
-    },
-    "notification": {
-      "enabled": true,
-      "telegram": true,
-      "email": false
-    },
-    "verification": {
-      "enabled": true,
-      "checksum": true,
-      "integrity_check": true
-    },
-    "cleanup": {
-      "enabled": true,
-      "max_backup_files": 50,
-      "auto_delete": true
-    },
-    "filename_pattern": "quotes_backup_{timestamp}.db",
-    "exclude_tables": [],
-    "include_tables": ["*"]
+  "exchange_mapping": {
+    "SSE": "a_stock",
+    "SZSE": "a_stock"
   }
-}
+}...
 ```
 
-### 配置项说明
+- **`SSE`**: `str` (默认: `a_stock`)
+- **`SZSE`**: `str` (默认: `a_stock`)
+- **`BSE`**: `str` (默认: `a_stock`)
+- **`HKEX`**: `str` (默认: `hk_stock`)
+- **`NASDAQ`**: `str` (默认: `us_stock`)
+- **`NYSE`**: `str` (默认: `us_stock`)
+### exchange_rules.symbol_rules
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `enabled` | boolean | true | 是否启用自动备份 |
-| `source_db_path` | string | data/quotes.db | 源数据库路径 |
-| `backup_directory` | string | data/PVE-Bak/QuoteBak | 备份目录 |
-| `retention_days` | integer | 30 | 备份保留天数 |
-| `schedule.cron` | string | 0 6 * * 6 | 备份时间（每周六6:00） |
-| `compression.enabled` | boolean | true | 是否压缩备份文件 |
-| `notification.enabled` | boolean | true | 是否发送通知 |
-| `verification.enabled` | boolean | true | 是否验证备份完整性 |
+```json
+{
+  "symbol_rules": {
+    "SZSE": 6,
+    "SSE": 6
+  }
+}...
+```
 
-### 备份策略
-- **自动备份**: 每周六6:00自动执行
-- **增量备份**: 支持仅备份变更数据
-- **压缩存储**: 使用gzip压缩节省空间
-- **完整性验证**: 备份后自动验证文件完整性
-- **自动清理**: 超过保留期的备份自动删除
+- **`SZSE`**: `int` (默认: `6`)
+- **`SSE`**: `int` (默认: `6`)
+- **`BSE`**: `int` (默认: `6`)
+- **`HKEX`**: `List` (默认: `[4, 5]`)
+- **`NASDAQ`**: `NoneType` (默认: `None`)
+- **`NYSE`**: `NoneType` (默认: `None`)
+### exchange_rules.symbol_start_with
 
-### 配置项说明
+```json
+{
+  "symbol_start_with": {
+    "SSE": [
+      "600",
+      "601",
+      "603",
+      "688",
+      "900"
+    ],
+    "SZSE": [
+      "000",
+      "001",
+      "002",
+      "300",
+      "200"
+    ]
+  }
+}...
+```
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `enabled` | boolean | false | 是否启用Telegram通知 |
-| `bot_token` | string | - | 机器人令牌 |
-| `chat_id` | string | - | 聊天ID |
-| `proxy.enabled` | boolean | false | 是否使用代理 |
-| `proxy.url` | string | - | 代理URL |
-| `proxy.username` | string | - | 代理用户名 |
-| `proxy.password` | string | - | 代理密码 |
-| `notifications.download_completed` | boolean | true | 下载完成通知 |
-| `notifications.download_failed` | boolean | true | 下载失败通知 |
-| `notifications.system_errors` | boolean | true | 系统错误通知 |
-| `notifications.daily_update` | boolean | false | 每日更新通知 |
+- **`SSE`**: `List` (默认: `['600', '601', '603', '688', '900']`)
+- **`SZSE`**: `List` (默认: `['000', '001', '002', '300', '200']`)
+- **`BSE`**: `List` (默认: `['43', '83', '87']`)
+- **`HKEX`**: `List` (默认: `['0', '00', '000']`)
+## api_config
 
-## ⏰ 调度器配置 (scheduler_config)
+```json
+{
+  "api_config": {
+    "host": "0.0.0.0",
+    "port": 8000
+  }
+}...
+```
 
-### 配置示例
+- **`host`**: `str` (默认: `0.0.0.0`)
+- **`port`**: `int` (默认: `8000`)
+- **`workers`**: `int` (默认: `1`)
+- **`reload`**: `bool` (默认: `False`)
+- **`cors_origins`**: `List` (默认: `['*']`)
+## scheduler_config
+
 ```json
 {
   "scheduler_config": {
     "enabled": true,
-    "timezone": "Asia/Shanghai",
-    "max_instances": 10,
-    "misfire_grace_time": 300,
-    "coalesce": true,
-    "jobs": {
-      "daily_data_update": {
-        "enabled": true,
-        "trigger": {
-          "type": "cron",
-          "hour": 20,
-          "minute": 30
-        },
-        "parameters": {
-          "exchanges": ["SSE", "SZSE"],
-          "wait_for_market_close": true,
-          "market_close_delay_minutes": 15
-        }
+    "timezone": "Asia/Shanghai"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`timezone`**: `str` (默认: `Asia/Shanghai`)
+- **`max_instances`**: `int` (默认: `10`)
+- **`misfire_grace_time`**: `int` (默认: `300`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`monitor_startup_delay`**: `int` (默认: `3`)
+- **`market_close_delay_minutes`**: `int` (默认: `15`)
+### scheduler_config.jobs
+
+```json
+{
+  "jobs": {
+    "daily_data_update": {
+      "enabled": true,
+      "description": "每日数据更新任务",
+      "report": true,
+      "trigger": {
+        "type": "cron",
+        "day_of_week": "mon-fri",
+        "hour": 20,
+        "minute": 0,
+        "second": 0
       },
-      "trading_calendar_update": {
-        "enabled": true,
-        "trigger": {
-          "type": "cron",
-          "day": 1,
-          "hour": 1,
-          "minute": 0
-        },
-        "parameters": {
-          "exchanges": ["SSE", "SZSE"],
-          "update_future_months": 6
-        }
+      "max_instances": 1,
+      "misfire_grace_time": 600,
+      "coalesce": true,
+      "parameters": {
+        "exchanges": [
+          "SSE",
+          "SZSE"
+        ],
+        "wait_for_market_close": true,
+        "market_close_delay_minutes": 15,
+        "enable_trading_day_check": true
+      }
+    },
+    "system_health_check": {
+      "enabled": true,
+      "description": "系统健康检查",
+      "report": true,
+      "trigger": {
+        "type": "interval",
+        "hours": 1,
+        "minutes": 0,
+        "seconds": 0
       },
-      "weekly_data_maintenance": {
-        "enabled": true,
-        "trigger": {
-          "type": "cron",
-          "day_of_week": "sun",
-          "hour": 2,
-          "minute": 0
-        }
-      },
-      "find_gap_and_repair": {
-        "enabled": true,
-        "trigger": {
-          "type": "cron",
-          "day_of_week": "sun",
-          "hour": 15,
-          "minute": 0
-        },
-        "parameters": {
-          "exchanges": ["SSE", "SZSE", "BSE"],
-          "start_date": "2024-01-01"
-        }
+      "max_instances": 1,
+      "misfire_grace_time": 300,
+      "coalesce": true,
+      "parameters": {
+        "check_data_sources": true,
+        "check_database": true,
+        "check_disk_space": true,
+        "check_memory_usage": true,
+        "check_telegram": true,
+        "disk_space_threshold_mb": 1000,
+        "memory_threshold_percent": 85
       }
     }
   }
-}
+}...
 ```
 
-### 配置项说明
+#### jobs.daily_data_update
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `enabled` | boolean | true | 是否启用调度器 |
-| `timezone` | string | Asia/Shanghai | 时区 |
-| `max_instances` | integer | 10 | 任务最大实例数 |
-| `misfire_grace_time` | integer | 300 | 错失任务的宽限时间 |
-| `coalesce` | boolean | true | 是否合并相同任务 |
-
-### 任务配置
-
-每个任务包含以下配置：
-- `enabled`: 是否启用
-- `trigger`: 触发器配置
-- `parameters`: 任务参数
-
-#### 触发器类型
-
-1. **cron**: Cron表达式
-   ```json
-   {
-     "type": "cron",
-     "day_of_week": "mon-fri",
-     "hour": 9,
-     "minute": 30
-   }
-   ```
-
-2. **interval**: 间隔触发
-   ```json
-   {
-     "type": "interval",
-     "hours": 1,
-     "minutes": 30
-   }
-   ```
-
-3. **date**: 一次性触发
-   ```json
-   {
-     "type": "date",
-     "run_date": "2024-12-31T23:59:59"
-   }
-   ```
-
-## 🔧 环境变量配置
-
-除了配置文件，系统还支持通过环境变量进行配置：
-
-### 数据库配置
-```bash
-export DATABASE_URL="postgresql://user:pass@localhost/db"
-export DB_POOL_SIZE="20"
-export DB_MAX_OVERFLOW="30"
-```
-
-### API配置
-```bash
-export API_HOST="0.0.0.0"
-export API_PORT="8000"
-export API_WORKERS="4"
-```
-
-### 日志配置
-```bash
-export LOG_LEVEL="INFO"
-export LOG_PATH="/var/log/quote"
-```
-
-### Telegram配置
-```bash
-export TELEGRAM_BOT_TOKEN="your-bot-token"
-export TELEGRAM_CHAT_ID="your-chat-id"
-```
-
-## 📊 配置验证
-
-系统启动时会验证配置文件的正确性：
-
-### 验证项
-1. **JSON格式**: 检查配置文件是否为有效JSON
-2. **必需字段**: 检查必需的配置项是否存在
-3. **数据类型**: 验证配置项的数据类型
-4. **值范围**: 检查配置值是否在合理范围内
-5. **依赖关系**: 验证配置项之间的依赖关系
-
-### 验证失败处理
-- 记录错误日志
-- 使用默认值
-- 提示修复建议
-
-## 🎯 配置最佳实践
-
-### 1. 生产环境配置
 ```json
 {
-  "logging_config": {
-    "level": "WARNING",
-    "file_config": {
-      "rotation": {
-        "max_bytes_mb": 100,
-        "backup_count": 30
+  "daily_data_update": {
+    "enabled": true,
+    "description": "每日数据更新任务"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `每日数据更新任务`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `600`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.system_health_check
+
+```json
+{
+  "system_health_check": {
+    "enabled": true,
+    "description": "系统健康检查"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `系统健康检查`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `300`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.weekly_data_maintenance
+
+```json
+{
+  "weekly_data_maintenance": {
+    "enabled": true,
+    "description": "每周数据维护"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `每周数据维护`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `1800`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.monthly_data_integrity_check
+
+```json
+{
+  "monthly_data_integrity_check": {
+    "enabled": true,
+    "description": "月度数据完整性检查和缺口修复"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `月度数据完整性检查和缺口修复`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `3600`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.quarterly_cleanup
+
+```json
+{
+  "quarterly_cleanup": {
+    "enabled": true,
+    "description": "季度数据清理"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `季度数据清理`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `1800`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.cache_warm_up
+
+```json
+{
+  "cache_warm_up": {
+    "enabled": true,
+    "description": "缓存预热"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `缓存预热`)
+- **`report`**: `bool` (默认: `False`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `600`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.trading_calendar_update
+
+```json
+{
+  "trading_calendar_update": {
+    "enabled": true,
+    "description": "交易日历更新"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `交易日历更新`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `1800`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+#### jobs.database_backup
+
+```json
+{
+  "database_backup": {
+    "enabled": true,
+    "description": "数据库备份任务"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`description`**: `str` (默认: `数据库备份任务`)
+- **`report`**: `bool` (默认: `True`)
+- **`trigger`**: `Object`
+- **`max_instances`**: `int` (默认: `1`)
+- **`misfire_grace_time`**: `int` (默认: `1800`)
+- **`coalesce`**: `bool` (默认: `True`)
+- **`parameters`**: `Object`
+## monitor_config
+
+```json
+{
+  "monitor_config": {
+    "enabled": true,
+    "max_history_size": 1000
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`max_history_size`**: `int` (默认: `1000`)
+- **`startup_delay`**: `int` (默认: `2`)
+- **`min_wait_time`**: `int` (默认: `1`)
+### monitor_config.alert_thresholds
+
+```json
+{
+  "alert_thresholds": {
+    "max_execution_time": 300,
+    "max_failure_rate": 0.1
+  }
+}...
+```
+
+- **`max_execution_time`**: `int` (默认: `300`)
+- **`max_failure_rate`**: `float` (默认: `0.1`)
+- **`max_consecutive_failures`**: `int` (默认: `3`)
+## backup_config
+
+```json
+{
+  "backup_config": {
+    "enabled": true,
+    "source_db_path": "data/quotes.db"
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`source_db_path`**: `str` (默认: `data/quotes.db`)
+- **`backup_directory`**: `str` (默认: `data/PVE-Bak/QuoteBak`)
+- **`retention_days`**: `int` (默认: `30`)
+- **`compression_enabled`**: `bool` (默认: `False`)
+- **`notification_enabled`**: `bool` (默认: `True`)
+- **`filename_pattern`**: `str` (默认: `quotes_backup_{timestamp}.db`)
+- **`max_backup_files`**: `int` (默认: `10`)
+## cache_config
+
+```json
+{
+  "cache_config": {
+    "enabled": true,
+    "max_memory_mb": 512
+  }
+}...
+```
+
+- **`enabled`**: `bool` (默认: `True`)
+- **`max_memory_mb`**: `int` (默认: `512`)
+- **`default_ttl_seconds`**: `int` (默认: `3600`)
+## report_config
+
+```json
+{
+  "report_config": {
+    "templates": {
+      "download_report": {
+        "name": "数据下载报告",
+        "emoji": "📊",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📊 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "success_rate"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "total_instruments",
+              "success_count",
+              "failure_count",
+              "total_quotes",
+              "success_rate"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "table",
+            "data_source": "exchange_stats"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {time}"
+          }
+        ]
+      },
+      "daily_update_report": {
+        "name": "每日数据更新报告",
+        "emoji": "📈",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📈 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "date",
+              "updated_instruments",
+              "new_quotes",
+              "success_rate"
+            ],
+            "title": "更新摘要",
+            "condition": "not non_trading_day"
+          },
+          {
+            "name": "non_trading_day_info",
+            "type": "static",
+            "content": "🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}",
+            "condition": "non_trading_day"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *更新失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "exchange_stats_title",
+            "type": "static",
+            "content": "*交易所统计*",
+            "condition": "not non_trading_day and status != 'error'"
+          },
+          {
+            "name": "exchange_stats",
+            "type": "table",
+            "data_source": "exchange_stats"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
+          }
+        ]
+      },
+      "gap_report": {
+        "name": "数据缺口报告",
+        "emoji": "🔍",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🔍 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "total_gaps",
+              "affected_stocks",
+              "severity_distribution"
+            ],
+            "title": "缺口摘要",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *缺口检测/填补失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "top_affected_stocks_title",
+            "type": "static",
+            "content": "*受影响最严重的股票*",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "top_affected_stocks",
+            "display_format": "{symbol} - 缺失天数: {total_missing_days}, 严重分数: {severity_score}"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
+          }
+        ]
+      },
+      "system_status": {
+        "name": "系统状态报告",
+        "emoji": "🏥",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🏥 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "system_status"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "database_stats",
+              "data_sources"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "metrics",
+            "fields": [
+              "database_stats",
+              "data_sources"
+            ]
+          }
+        ]
+      },
+      "backup_result": {
+        "name": "数据库备份报告",
+        "emoji": "💾",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "💾 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "backup_result"
+          },
+          {
+            "name": "details",
+            "type": "metrics",
+            "fields": [
+              "backup_file",
+              "file_size",
+              "duration"
+            ]
+          }
+        ]
+      },
+      "health_check_report": {
+        "name": "系统健康检查报告",
+        "emoji": "🏥",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🏥 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "overall_status",
+              "checks_performed",
+              "issues_found"
+            ],
+            "title": "检查摘要"
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "check_results",
+            "display_format": "{status_icon} {check_name}: {result}",
+            "title": "详细检查结果"
+          }
+        ]
+      },
+      "maintenance_report": {
+        "name": "数据维护报告",
+        "emoji": "🔧",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "🔧 *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "tasks_completed"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "tasks_completed",
+              "space_freed",
+              "duration"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "list",
+            "data_source": "maintenance_tasks",
+            "display_format": "{task_name} - 状态: {status}"
+          }
+        ]
+      },
+      "cache_warm_up_report": {
+        "name": "缓存预热报告",
+        "emoji": "⚡",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "⚡ *{name}*"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "stocks_warmed"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "stocks_warmed",
+              "cache_hit_rate",
+              "duration"
+            ]
+          },
+          {
+            "name": "details",
+            "type": "metrics",
+            "fields": [
+              "popular_stocks",
+              "market_indices",
+              "recent_data"
+            ]
+          }
+        ]
+      },
+      "trading_calendar_report": {
+        "name": "交易日历更新报告",
+        "emoji": "📅",
+        "output_format": "telegram",
+        "enabled": true,
+        "sections": [
+          {
+            "name": "header",
+            "type": "static",
+            "content": "📅 *{name}*"
+          },
+          {
+            "name": "summary",
+            "type": "metrics",
+            "fields": [
+              "exchanges_updated",
+              "trading_days_added",
+              "holidays_added"
+            ],
+            "title": "更新摘要",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "error_info",
+            "type": "static",
+            "content": "❌ *交易日历更新失败*\n\n错误信息: {error_message}",
+            "condition": "status == 'error'"
+          },
+          {
+            "name": "status",
+            "type": "status",
+            "data_source": "status",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "exchange_details_title",
+            "type": "static",
+            "content": "*交易所详情*",
+            "condition": "status != 'error'"
+          },
+          {
+            "name": "details",
+            "type": "table",
+            "data_source": "exchange_details"
+          },
+          {
+            "name": "footer",
+            "type": "static",
+            "content": "🔄 {source} - {generated_at}"
+          }
+        ]
+      }
+    },
+    "formats": {
+      "telegram": {
+        "max_length": 4000,
+        "line_separator": "\n\n",
+        "bold_format": "*{text}*",
+        "code_format": "`{text}`"
+      },
+      "console": {
+        "max_width": 100,
+        "line_separator": "\n\n",
+        "table_style": "grid"
+      },
+      "api": {
+        "include_raw_data": true,
+        "response_format": "json"
       }
     }
-  },
-  "api_config": {
-    "authentication": {
-      "enabled": true
-    }
-  },
-  "database_config": {
-    "url": "postgresql://user:pass@localhost/quotedb"
   }
-}
+}...
 ```
 
-### 2. 开发环境配置
+### report_config.templates
+
 ```json
 {
-  "logging_config": {
-    "level": "DEBUG",
-    "console_config": {
-      "enabled": true
-    }
-  },
-  "api_config": {
-    "reload": true,
-    "authentication": {
-      "enabled": false
+  "templates": {
+    "download_report": {
+      "name": "数据下载报告",
+      "emoji": "📊",
+      "output_format": "telegram",
+      "enabled": true,
+      "sections": [
+        {
+          "name": "header",
+          "type": "static",
+          "content": "📊 *{name}*"
+        },
+        {
+          "name": "status",
+          "type": "status",
+          "data_source": "success_rate"
+        },
+        {
+          "name": "summary",
+          "type": "metrics",
+          "fields": [
+            "total_instruments",
+            "success_count",
+            "failure_count",
+            "total_quotes",
+            "success_rate"
+          ]
+        },
+        {
+          "name": "details",
+          "type": "table",
+          "data_source": "exchange_stats"
+        },
+        {
+          "name": "footer",
+          "type": "static",
+          "content": "🔄 {source} - {time}"
+        }
+      ]
+    },
+    "daily_update_report": {
+      "name": "每日数据更新报告",
+      "emoji": "📈",
+      "output_format": "telegram",
+      "enabled": true,
+      "sections": [
+        {
+          "name": "header",
+          "type": "static",
+          "content": "📈 *{name}*"
+        },
+        {
+          "name": "summary",
+          "type": "metrics",
+          "fields": [
+            "date",
+            "updated_instruments",
+            "new_quotes",
+            "success_rate"
+          ],
+          "title": "更新摘要",
+          "condition": "not non_trading_day"
+        },
+        {
+          "name": "non_trading_day_info",
+          "type": "static",
+          "content": "🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}",
+          "condition": "non_trading_day"
+        },
+        {
+          "name": "error_info",
+          "type": "static",
+          "content": "❌ *更新失败*\n\n错误信息: {error_message}",
+          "condition": "status == 'error'"
+        },
+        {
+          "name": "status",
+          "type": "status",
+          "data_source": "status",
+          "condition": "status != 'error'"
+        },
+        {
+          "name": "exchange_stats_title",
+          "type": "static",
+          "content": "*交易所统计*",
+          "condition": "not non_trading_day and status != 'error'"
+        },
+        {
+          "name": "exchange_stats",
+          "type": "table",
+          "data_source": "exchange_stats"
+        },
+        {
+          "name": "footer",
+          "type": "static",
+          "content": "🔄 {source} - {generated_at}"
+        }
+      ]
     }
   }
-}
+}...
 ```
 
-### 3. 高性能配置
+#### templates.download_report
+
 ```json
 {
-  "data_config": {
-    "download_chunk_days": 0,
-    "batch_size": 100
-  },
-  "database_config": {
-    "pool_size": 50,
-    "max_overflow": 100
-  },
-  "rate_limit_config": {
-    "max_requests_per_minute": 120
+  "download_report": {
+    "name": "数据下载报告",
+    "emoji": "📊"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `数据下载报告`)
+- **`emoji`**: `str` (默认: `📊`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '📊 *{name}*'}, {'name': 'status', 'type': 'status', 'data_source': 'success_rate'}, {'name': 'summary', 'type': 'metrics', 'fields': ['total_instruments', 'success_count', 'failure_count', 'total_quotes', 'success_rate']}, {'name': 'details', 'type': 'table', 'data_source': 'exchange_stats'}, {'name': 'footer', 'type': 'static', 'content': '🔄 {source} - {time}'}]`)
+#### templates.daily_update_report
+
+```json
+{
+  "daily_update_report": {
+    "name": "每日数据更新报告",
+    "emoji": "📈"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `每日数据更新报告`)
+- **`emoji`**: `str` (默认: `📈`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '📈 *{name}*'}, {'name': 'summary', 'type': 'metrics', 'fields': ['date', 'updated_instruments', 'new_quotes', 'success_rate'], 'title': '更新摘要', 'condition': 'not non_trading_day'}, {'name': 'non_trading_day_info', 'type': 'static', 'content': '🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}', 'condition': 'non_trading_day'}, {'name': 'error_info', 'type': 'static', 'content': '❌ *更新失败*\n\n错误信息: {error_message}', 'condition': "status == 'error'"}, {'name': 'status', 'type': 'status', 'data_source': 'status', 'condition': "status != 'error'"}, {'name': 'exchange_stats_title', 'type': 'static', 'content': '*交易所统计*', 'condition': "not non_trading_day and status != 'error'"}, {'name': 'exchange_stats', 'type': 'table', 'data_source': 'exchange_stats'}, {'name': 'footer', 'type': 'static', 'content': '🔄 {source} - {generated_at}'}]`)
+#### templates.gap_report
+
+```json
+{
+  "gap_report": {
+    "name": "数据缺口报告",
+    "emoji": "🔍"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `数据缺口报告`)
+- **`emoji`**: `str` (默认: `🔍`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '🔍 *{name}*'}, {'name': 'summary', 'type': 'metrics', 'fields': ['total_gaps', 'affected_stocks', 'severity_distribution'], 'title': '缺口摘要', 'condition': "status != 'error'"}, {'name': 'error_info', 'type': 'static', 'content': '❌ *缺口检测/填补失败*\n\n错误信息: {error_message}', 'condition': "status == 'error'"}, {'name': 'status', 'type': 'status', 'data_source': 'status', 'condition': "status != 'error'"}, {'name': 'top_affected_stocks_title', 'type': 'static', 'content': '*受影响最严重的股票*', 'condition': "status != 'error'"}, {'name': 'details', 'type': 'list', 'data_source': 'top_affected_stocks', 'display_format': '{symbol} - 缺失天数: {total_missing_days}, 严重分数: {severity_score}'}, {'name': 'footer', 'type': 'static', 'content': '🔄 {source} - {generated_at}'}]`)
+#### templates.system_status
+
+```json
+{
+  "system_status": {
+    "name": "系统状态报告",
+    "emoji": "🏥"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `系统状态报告`)
+- **`emoji`**: `str` (默认: `🏥`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '🏥 *{name}*'}, {'name': 'status', 'type': 'status', 'data_source': 'system_status'}, {'name': 'summary', 'type': 'metrics', 'fields': ['database_stats', 'data_sources']}, {'name': 'details', 'type': 'metrics', 'fields': ['database_stats', 'data_sources']}]`)
+#### templates.backup_result
+
+```json
+{
+  "backup_result": {
+    "name": "数据库备份报告",
+    "emoji": "💾"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `数据库备份报告`)
+- **`emoji`**: `str` (默认: `💾`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '💾 *{name}*'}, {'name': 'status', 'type': 'status', 'data_source': 'backup_result'}, {'name': 'details', 'type': 'metrics', 'fields': ['backup_file', 'file_size', 'duration']}]`)
+#### templates.health_check_report
+
+```json
+{
+  "health_check_report": {
+    "name": "系统健康检查报告",
+    "emoji": "🏥"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `系统健康检查报告`)
+- **`emoji`**: `str` (默认: `🏥`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '🏥 *{name}*'}, {'name': 'summary', 'type': 'metrics', 'fields': ['overall_status', 'checks_performed', 'issues_found'], 'title': '检查摘要'}, {'name': 'details', 'type': 'list', 'data_source': 'check_results', 'display_format': '{status_icon} {check_name}: {result}', 'title': '详细检查结果'}]`)
+#### templates.maintenance_report
+
+```json
+{
+  "maintenance_report": {
+    "name": "数据维护报告",
+    "emoji": "🔧"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `数据维护报告`)
+- **`emoji`**: `str` (默认: `🔧`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '🔧 *{name}*'}, {'name': 'status', 'type': 'status', 'data_source': 'tasks_completed'}, {'name': 'summary', 'type': 'metrics', 'fields': ['tasks_completed', 'space_freed', 'duration']}, {'name': 'details', 'type': 'list', 'data_source': 'maintenance_tasks', 'display_format': '{task_name} - 状态: {status}'}]`)
+#### templates.cache_warm_up_report
+
+```json
+{
+  "cache_warm_up_report": {
+    "name": "缓存预热报告",
+    "emoji": "⚡"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `缓存预热报告`)
+- **`emoji`**: `str` (默认: `⚡`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '⚡ *{name}*'}, {'name': 'status', 'type': 'status', 'data_source': 'stocks_warmed'}, {'name': 'summary', 'type': 'metrics', 'fields': ['stocks_warmed', 'cache_hit_rate', 'duration']}, {'name': 'details', 'type': 'metrics', 'fields': ['popular_stocks', 'market_indices', 'recent_data']}]`)
+#### templates.trading_calendar_report
+
+```json
+{
+  "trading_calendar_report": {
+    "name": "交易日历更新报告",
+    "emoji": "📅"
+  }
+}...
+```
+
+- **`name`**: `str` (默认: `交易日历更新报告`)
+- **`emoji`**: `str` (默认: `📅`)
+- **`output_format`**: `str` (默认: `telegram`)
+- **`enabled`**: `bool` (默认: `True`)
+- **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '📅 *{name}*'}, {'name': 'summary', 'type': 'metrics', 'fields': ['exchanges_updated', 'trading_days_added', 'holidays_added'], 'title': '更新摘要', 'condition': "status != 'error'"}, {'name': 'error_info', 'type': 'static', 'content': '❌ *交易日历更新失败*\n\n错误信息: {error_message}', 'condition': "status == 'error'"}, {'name': 'status', 'type': 'status', 'data_source': 'status', 'condition': "status != 'error'"}, {'name': 'exchange_details_title', 'type': 'static', 'content': '*交易所详情*', 'condition': "status != 'error'"}, {'name': 'details', 'type': 'table', 'data_source': 'exchange_details'}, {'name': 'footer', 'type': 'static', 'content': '🔄 {source} - {generated_at}'}]`)
+### report_config.formats
+
+```json
+{
+  "formats": {
+    "telegram": {
+      "max_length": 4000,
+      "line_separator": "\n\n",
+      "bold_format": "*{text}*",
+      "code_format": "`{text}`"
+    },
+    "console": {
+      "max_width": 100,
+      "line_separator": "\n\n",
+      "table_style": "grid"
+    }
+  }
+}...
+```
+
+#### formats.telegram
+
+```json
+{
+  "telegram": {
+    "max_length": 4000,
+    "line_separator": "\n\n"
+  }
+}...
+```
+
+- **`max_length`**: `int` (默认: `4000`)
+- **`line_separator`**: `str` (默认: `
+
+`)
+- **`bold_format`**: `str` (默认: `*{text}*`)
+- **`code_format`**: `str` (默认: ``{text}``)
+#### formats.console
+
+```json
+{
+  "console": {
+    "max_width": 100,
+    "line_separator": "\n\n"
+  }
+}...
+```
+
+- **`max_width`**: `int` (默认: `100`)
+- **`line_separator`**: `str` (默认: `
+
+`)
+- **`table_style`**: `str` (默认: `grid`)
+#### formats.api
+
+```json
+{
+  "api": {
+    "include_raw_data": true,
+    "response_format": "json"
   }
 }
 ```
 
-## 🔄 配置热更新
+- **`include_raw_data`**: `bool` (默认: `True`)
+- **`response_format`**: `str` (默认: `json`)
+### report_config.field_labels
 
-系统支持部分配置的热更新：
-
-### 支持热更新的配置
-- 日志级别
-- 限流参数
-- 数据源优先级
-- 通知设置
-
-### 热更新方法
-```bash
-# 发送重载信号
-kill -HUP <pid>
-
-# 或使用API
-curl -X POST "http://localhost:8000/api/v1/config/reload"
+```json
+{
+  "field_labels": {
+    "total_instruments": "处理股票",
+    "success_count": "成功数量"
+  }
+}...
 ```
 
-## 📝 配置模板
-
-系统提供了多个配置模板：
-
-- `config/config.example.json`: 完整配置示例
-- `config/config.dev.json`: 开发环境配置
-- `config/config.prod.json`: 生产环境配置
-- `config/config.minimal.json`: 最小配置
-
-### 使用配置模板
-```bash
-# 复制模板
-cp config/config.example.json config/config.json
-
-# 根据环境选择模板
-cp config/config.prod.json config/config.json
-```
-
-## 🚨 配置安全
-
-### 敏感信息处理
-- 使用环境变量存储敏感信息
-- 配置文件权限控制
-- 加密存储密码和令牌
-
-### 权限设置
-```bash
-# 设置配置文件权限
-chmod 600 config/config.json
-chown app:app config/config.json
-```
-
-## 📞 技术支持
-
-如果配置遇到问题：
-1. 检查配置文件JSON格式
-2. 查看系统启动日志
-3. 验证必需配置项
-4. 参考配置模板
-5. 提交配置相关问题
+- **`total_instruments`**: `str` (默认: `处理股票`)
+- **`success_count`**: `str` (默认: `成功数量`)
+- **`failure_count`**: `str` (默认: `失败数量`)
+- **`quotes_added`**: `str` (默认: `新增行情`)
+- **`total_quotes`**: `str` (默认: `行情数据`)
+- **`success_rate`**: `str` (默认: `成功率`)
+- **`updated_instruments`**: `str` (默认: `更新股票`)
+- **`new_quotes`**: `str` (默认: `新增行情`)
+- **`total_gaps`**: `str` (默认: `总缺口数`)
+- **`affected_stocks`**: `str` (默认: `受影响股票`)
+- **`backup_file`**: `str` (默认: `备份文件`)
+- **`file_size`**: `str` (默认: `文件大小`)
+- **`duration`**: `str` (默认: `耗时`)
+- **`overall_status`**: `str` (默认: `总体状态`)
+- **`checks_performed`**: `str` (默认: `检查数量`)
+- **`issues_found`**: `str` (默认: `问题数量`)

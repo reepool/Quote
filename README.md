@@ -11,10 +11,11 @@
 ## ✨ 核心特性
 
 ### 📊 多数据源支持
-- **BaoStock** - 中国A股市场历史数据（主要数据源，支持股票与指数）
-- **AkShare** - 综合性金融数据接口（ETF 数据源，开发中）
-- **Tushare** - 专业级金融数据服务
-- **YFinance** - 雅虎财经数据接口
+- **PyTdx** - 高速本地通达信直连接口（极速 A 股日线数据获取，百万条/分钟）
+- **BaoStock** - 稳定 A 股市场历史数据（主行情及指数数据来源）
+- **AkShare** - 综合性接口（除权除息因子同步、ETF 补偿等）
+- **Tushare** - 专业级金融数据（需 Token 认证支持）
+- **YFinance** - 雅虎财经（提供美股、港股等海外市场支持）
 
 ### 🚀 智能下载功能
 - **精确下载模式** - 基于上市日期的智能数据范围计算
@@ -43,9 +44,10 @@
 - **实时监控** - 系统健康检查和性能监控
 - **智能调度** - 完全配置化的任务调度系统，支持8种内置任务
 - **数据分析** - 内置数据统计和分析功能
-- **数据缺口检测** - 自动识别和报告数据缺失，支持智能修复
+- **数据缺口检测与智能填补** - 自动识别和报告缺失数据点，支持单日、范围及多维度缺口修复与重试
 - **自动备份** - 定时数据库备份和清理，支持Telegram通知
 - **智能时间处理** - 多时区支持和交易日历集成
+- **多频率融合** - 支持 Daily(日线)、Weekly(周线)、Monthly(月线) 多级别数据采集融合
 
 ## 🚀 快速开始
 
@@ -460,87 +462,9 @@ Quote/
 - **data_sources/**: 多数据源统一接口和工厂模式
 - **database/**: 现代SQLAlchemy 2.0 ORM操作
 
-## 🔧 高级配置
-
-### 数据源配置
-
-#### BaoStock 配置（主要数据源）
-```json
-{
-  "data_sources_config": {
-    "baostock": {
-      "enabled": true,
-      "exchanges_supported": ["a_stock"],
-      "primary_source_of": ["a_stock"],
-      "max_requests_per_minute": 60,
-      "max_requests_per_hour": 3000,
-      "max_requests_per_day": 60000,
-      "retry_times": 5,
-      "retry_interval": 5.0
-    }
-  }
-}
-```
-
-#### 限流配置
-```json
-{
-  "rate_limit_config": {
-    "max_requests_per_minute": 60,
-    "max_requests_per_hour": 1000,
-    "max_requests_per_day": 10000,
-    "retry_times": 3,
-    "retry_interval": 1.0
-  }
-}
-```
-
-### 调度器配置
-
-```json
-{
-  "scheduler_config": {
-    "enabled": true,
-    "timezone": "Asia/Shanghai",
-    "max_instances": 1,
-    "misfire_grace_time": 300,
-    "coalesce": true
-  }
-}
-```
-
-### Telegram 通知和任务管理配置
-
-```json
-{
-  "telegram_config": {
-    "enabled": true,
-    "api_id": "your_api_id",
-    "api_hash": "your_api_hash",
-    "bot_token": "your_bot_token",
-    "chat_id": ["your_chat_id"],
-    "session_name": "MsgBot",
-    "connection_retries": 3,
-    "retry_delay": 5,
-    "auto_reconnect": true,
-    "timeout": 30,
-    "intervals": {
-      "tg_msg_retry_interval": 3,
-      "tg_msg_retry_times": 5,
-      "tg_connect_timeout": 30,
-      "tg_auto_reconnect": true,
-      "tg_max_reconnect_attempts": 5,
-      "tg_reconnect_delay": 10
-    }
-  }
-}
-```
-
-**功能说明**：
-- **任务管理**: 支持完整的任务控制功能
-- **权限控制**: 基于chat_id的访问控制
-- **会话管理**: 自动重连和错误恢复
-- **消息重试**: 智能消息发送重试机制
+> **💡 详细配置说明**: 
+> 上述配置仅为重要功能片段概述。随着系统升级，全部节点、详细参数说明、可用选项及其默认值，都已提炼至单独文档。
+> 请查阅：[【全系统配置参数说明文档】](docs/configuration/config_file.md)
 
 ## 📊 支持的交易所和数据类型
 
@@ -553,11 +477,11 @@ Quote/
 - **NYSE** - 纽约证券交易所
 
 ### 数据类型
-- **日线数据** - OHLCV数据（存储非复权原始价格）
-- **复权数据** - 查询时动态计算（前复权 `adjust=qfq` / 后复权 `adjust=hfq`）
-- **复权因子** - 各品种除权除息事件和累积因子
-- **基本面数据** - 股票基本信息
-- **交易日历** - 交易日/非交易日
+- **原始数据记录** - OHLCV 多周期数据支持（Day 日线 / Week 周线 / Month 月线）
+- **复权数据** - 查询时动态计算精度补偿（支持前复权 `adjust=qfq` / 后复权 `adjust=hfq`）
+- **复权因子** - 高精度除权除息记录表与拆股因子，与日线、周线、月线动态映射
+- **基本面数据** - 行情列表页所覆盖到的品种名称及基础元数据
+- **交易日历** - 中外市场交易日/休市日推算
 
 ### 品种类型
 - **stock** - 个股（A股）
@@ -743,7 +667,7 @@ isort .
 
 ## 🔗 相关文档
 
+- [全系统配置参数说明文档（核心）](docs/configuration/config_file.md) —— 所有配置项的查询地点
 - [数据库备份实施文档](DATABASE_BACKUP_IMPLEMENTATION.md)
 - [API 接口文档](docs/api/restful_api.md)
-- [配置文件详解](docs/configuration/config_file.md)
 - [故障排除指南](docs/troubleshooting/faq.md)
