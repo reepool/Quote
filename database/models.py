@@ -112,8 +112,8 @@ class DailyQuoteDB(Base):
     __tablename__ = 'daily_quotes'
 
     # Primary keys
-    time = Column(DateTime, nullable=False, index=True)
-    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True)
+    time = Column(DateTime, nullable=False)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'), nullable=False)
 
     # Basic price data
     open = Column(Float, nullable=False)
@@ -122,17 +122,17 @@ class DailyQuoteDB(Base):
     close = Column(Float, nullable=False)
 
     # Volume and value
-    volume = Column(Integer, nullable=False, index=True)
-    amount = Column(Float, nullable=False, index=True)
-    turnover = Column(Float, nullable=True, index=True)  # 换手率
+    volume = Column(Integer, nullable=False)
+    amount = Column(Float, nullable=False)
+    turnover = Column(Float, nullable=True)  # 换手率
 
     # Price changes
     pre_close = Column(Float, nullable=True)
     change = Column(Float, nullable=True)
-    pct_change = Column(Float, nullable=True, index=True)  # 涨跌幅
+    pct_change = Column(Float, nullable=True)  # 涨跌幅
 
     # Trading status
-    tradestatus = Column(Integer, nullable=False, default=1, index=True)  # 1=正常交易, 0=停牌
+    tradestatus = Column(Integer, nullable=False, default=1)  # 1=正常交易, 0=停牌
 
     
     # Adjustment information
@@ -144,12 +144,12 @@ class DailyQuoteDB(Base):
     quality_score = Column(Float, default=1.0, nullable=True)  # 数据质量评分
 
     # Source information
-    source = Column(String(32), nullable=True, index=True)  # 数据来源
+    source = Column(String(32), nullable=True)  # 数据来源
 
     # Metadata
     created_at = Column(DateTime, default=safe_get_shanghai_time)
     updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
-    batch_id = Column(String(32), nullable=True, index=True)  # 批次ID
+    batch_id = Column(String(32), nullable=True)  # 批次ID
 
     # Relationships
     instrument = relationship("InstrumentDB", back_populates="market_data")
@@ -157,15 +157,6 @@ class DailyQuoteDB(Base):
     __table_args__ = (
         PrimaryKeyConstraint('time', 'instrument_id'),
         Index('idx_daily_quotes_instrument_time', 'instrument_id', 'time'),
-        Index('idx_daily_quotes_tradestatus', 'tradestatus'),
-        Index('idx_daily_quotes_volume', 'volume'),
-        Index('idx_daily_quotes_amount', 'amount'),
-        Index('idx_daily_quotes_pct_change', 'pct_change'),
-        Index('idx_daily_quotes_source', 'source', 'time'),
-        Index('idx_daily_quotes_batch', 'batch_id'),
-        Index('idx_daily_quotes_date', 'time'),
-                Index('idx_daily_quotes_complete', 'is_complete'),
-        Index('idx_daily_quotes_quality', 'quality_score'),
     )
 
 

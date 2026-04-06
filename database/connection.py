@@ -9,10 +9,10 @@ from utils import db_logger, config_manager
 import aiosqlite
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.pool import StaticPool, QueuePool
 
 
 class DatabaseManager:
@@ -38,12 +38,26 @@ class DatabaseManager:
                 connect_args={"check_same_thread": False}
             )
 
-            # 异步连接引擎
+            # 异步连接引擎 (WAL 模式允许读写并行，因此放弃 StaticPool 改用微型 QueuePool)
             self.async_engine = create_async_engine(
                 f"sqlite+aiosqlite:///{self.db_path}",
-                poolclass=StaticPool,
+                poolclass=QueuePool,
+                pool_size=1,
+                max_overflow=4,
                 connect_args={"check_same_thread": False}
             )
+
+            # 注册连接层面 PRAGMA 保证每个协程获取到的连接都开启最优特性
+            def set_sqlite_pragma(dbapi_connection, connection_record):
+                cursor = dbapi_connection.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.execute("PRAGMA synchronous=NORMAL")
+                cursor.execute("PRAGMA cache_size=-64000")
+                cursor.execute("PRAGMA foreign_keys=ON")
+                cursor.close()
+
+            event.listen(self.sync_engine, 'connect', set_sqlite_pragma)
+            event.listen(self.async_engine.sync_engine, 'connect', set_sqlite_pragma)
 
             # 创建会话工厂
             self.SessionLocal = sessionmaker(
@@ -84,8 +98,6 @@ class DatabaseManager:
     def _create_indexes(self):
         """创建数据库索引"""
         indexes = [
-            "CREATE INDEX IF NOT EXISTS idx_daily_quotes_instrument_id ON daily_quotes(instrument_id)",
-            "CREATE INDEX IF NOT EXISTS idx_daily_quotes_time ON daily_quotes(time)",
             "CREATE INDEX IF NOT EXISTS idx_instruments_exchange_type ON instruments(exchange, type)",
             "CREATE INDEX IF NOT EXISTS idx_instruments_symbol ON instruments(symbol)",
         ]

@@ -668,6 +668,7 @@ isort .
 ## 🔗 相关文档
 
 - [全系统配置参数说明文档（核心）](docs/configuration/config_file.md) —— 所有配置项的查询地点
-- [数据库备份实施文档](DATABASE_BACKUP_IMPLEMENTATION.md)
+- [SQLite 底层架构与性能调优指南](docs/database_guide.md) —— 数据模型结构与并发解锁方案
+- [数据库备份实施文档](docs/DATABASE_BACKUP_IMPLEMENTATION.md)
 - [API 接口文档](docs/api/restful_api.md)
 - [故障排除指南](docs/troubleshooting/faq.md)
