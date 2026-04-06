@@ -134,7 +134,7 @@
         "http": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823",
         "https": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823"
       },
-      "exchanges_supported": ["a_stock", "hk_stock", "us_stock"],
+      "exchanges_supported": ["hk_stock", "us_stock"],
       "primary_source_of": [],
       "instrument_list_source_of": [],
       "calendar_source_of": [],

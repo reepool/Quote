@@ -283,12 +283,18 @@ class DataSourceFactory:
         return sources[0] if sources else None
 
     def get_backup_sources(self, exchange: str) -> List[BaseDataSource]:
-        """获取所有备用数据源 (用于降级链遍历)"""
+        """获取所有备用数据源 (用于降级链遍历)，自动过滤不支持该交易所的源"""
         exchange = exchange.upper()
         region = self.exchange_mapper.get_region_from_exchange(exchange)
         if not region:
             return []
-        return self.region_to_sources['backup'].get(region, [])
+        sources = self.region_to_sources['backup'].get(region, [])
+        # 过滤不支持该交易所的备用源（如 yfinance 不应用于 BSE/A股指数补数据）
+        return [
+            s for s in sources
+            if not getattr(s, 'supported_exchanges', None)
+            or exchange in s.supported_exchanges
+        ]
 
     async def get_instrument_list(self, exchange: str, force_refresh: bool = False,
                                   instrument_types: List[str] = None) -> List[Dict[str, Any]]:

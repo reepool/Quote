@@ -32,7 +32,7 @@ class YFinanceSource(BaseDataSource):
 
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
-        self.supported_exchanges = ['SSE', 'SZSE']  # Yahoo Finance 不支持北交所 (BSE)
+        self.supported_exchanges = ['HKEX', 'NASDAQ', 'NYSE']  # yfinance 仅用于港股和美股
         self.aio_session = None
         self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
         

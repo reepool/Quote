@@ -34,7 +34,9 @@ logger = logging.getLogger("gap_repair")
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.__init__ import db_ops
+from database.models import GapSkipDB
 from data_sources.source_factory import DataSourceFactory
+from sqlalchemy.future import select
 
 
 async def get_instruments(
@@ -136,24 +138,86 @@ async def find_missing_dates(
     return segments
 
 
+async def load_skip_set() -> Set[str]:
+    """加载跳表到内存集合，用于 O(1) 查找
+
+    跳过条件: fail_count >= 1 且 last_attempted 在 30 天内
+    超过 30 天的记录不在此集合中，会被自动重试。
+    """
+    cutoff = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
+    sql = """SELECT instrument_id, gap_start, gap_end FROM gap_skip_list
+             WHERE fail_count >= 1 AND last_attempted > :cutoff"""
+    rows = await db_ops.execute_read_query(sql, {'cutoff': cutoff})
+    skip_set: Set[str] = set()
+    for row in rows:
+        key = f"{row['instrument_id']}|{row['gap_start']}|{row['gap_end']}"
+        skip_set.add(key)
+    return skip_set
+
+
+def is_segment_skipped(skip_set: Set[str], instrument_id: str,
+                       seg_start: date, seg_end: date) -> bool:
+    """检查段是否在跳表中"""
+    key = f"{instrument_id}|{seg_start.strftime('%Y-%m-%d')}|{seg_end.strftime('%Y-%m-%d')}"
+    return key in skip_set
+
+
+async def record_skip(instrument_id: str, seg_start: date,
+                      seg_end: date, reason: str = 'no_data') -> None:
+    """将失败的缺口段记录到跳表（upsert：已存在则 fail_count+1）"""
+    start_str = seg_start.strftime('%Y-%m-%d')
+    end_str = seg_end.strftime('%Y-%m-%d')
+    try:
+        async with db_ops.get_async_session() as session:
+            stmt = select(GapSkipDB).filter(
+                GapSkipDB.instrument_id == instrument_id,
+                GapSkipDB.gap_start == start_str,
+                GapSkipDB.gap_end == end_str
+            )
+            result = await session.execute(stmt)
+            existing = result.scalar_one_or_none()
+            if existing:
+                existing.fail_count += 1
+                existing.last_attempted = datetime.now()
+            else:
+                session.add(GapSkipDB(
+                    instrument_id=instrument_id,
+                    gap_start=start_str,
+                    gap_end=end_str,
+                    fail_count=1,
+                    reason=reason,
+                    last_attempted=datetime.now(),
+                    created_at=datetime.now()
+                ))
+            await session.commit()
+    except Exception as e:
+        logger.warning(f"记录跳表失败 {instrument_id} {start_str}~{end_str}: {e}")
+
+
 async def repair_gaps(
     instrument: Dict[str, Any],
     segments: List[Tuple[date, date]],
     factory: DataSourceFactory,
+    skip_set: Set[str],
     dry_run: bool = False,
 ) -> Dict[str, int]:
     """修复单个品种的所有缺口段
 
     Returns:
-        {"filled_records": N, "segments_ok": N, "segments_fail": N}
+        {"filled_records": N, "segments_ok": N, "segments_fail": N, "segments_skipped": N}
     """
-    result = {"filled_records": 0, "segments_ok": 0, "segments_fail": 0}
+    result = {"filled_records": 0, "segments_ok": 0, "segments_fail": 0, "segments_skipped": 0}
     instrument_id = instrument['instrument_id']
     symbol = instrument['symbol']
     exchange = instrument['exchange']
     instrument_type = instrument.get('type', 'stock')
 
     for seg_start, seg_end in segments:
+        # 跳表检查：跳过已知不可填充段
+        if is_segment_skipped(skip_set, instrument_id, seg_start, seg_end):
+            result["segments_skipped"] += 1
+            continue
+
         if dry_run:
             result["segments_ok"] += 1
             continue
@@ -177,12 +241,15 @@ async def repair_gaps(
                     result["segments_ok"] += 1
                 else:
                     result["segments_fail"] += 1
+                    await record_skip(instrument_id, seg_start, seg_end, reason='save_failed')
             else:
-                # 数据源没有数据（停牌等），不算失败
-                result["segments_ok"] += 1
+                # 数据源没有数据 → 记入跳表
+                result["segments_fail"] += 1
+                await record_skip(instrument_id, seg_start, seg_end, reason='no_data')
 
         except Exception as e:
             result["segments_fail"] += 1
+            await record_skip(instrument_id, seg_start, seg_end, reason='source_error')
             logger.error(f"  修复失败 {instrument_id} {seg_start}~{seg_end}: {e}")
 
         await asyncio.sleep(0.3)
@@ -209,6 +276,10 @@ async def main(args: argparse.Namespace) -> Dict[str, Any]:
     )
     logger.info(f"待检查品种数: {len(instruments)}")
 
+    # 加载跳表
+    skip_set = await load_skip_set()
+    logger.info(f"跳表已加载: {len(skip_set)} 条已知不可填充段")
+
     # 全局统计
     global_stats = {
         "total_instruments": len(instruments),
@@ -218,6 +289,7 @@ async def main(args: argparse.Namespace) -> Dict[str, Any]:
         "filled_records": 0,
         "segments_ok": 0,
         "segments_fail": 0,
+        "segments_skipped": 0,
     }
 
     for i, inst in enumerate(instruments, 1):
@@ -250,10 +322,11 @@ async def main(args: argparse.Namespace) -> Dict[str, Any]:
         )
 
         # 修复
-        result = await repair_gaps(inst, segments, factory, dry_run=args.dry_run)
+        result = await repair_gaps(inst, segments, factory, skip_set, dry_run=args.dry_run)
         global_stats["filled_records"] += result["filled_records"]
         global_stats["segments_ok"] += result["segments_ok"]
         global_stats["segments_fail"] += result["segments_fail"]
+        global_stats["segments_skipped"] += result["segments_skipped"]
 
         # 进度日志
         if i % 100 == 0:
@@ -276,6 +349,7 @@ async def main(args: argparse.Namespace) -> Dict[str, Any]:
     if not args.dry_run:
         print(f"✅ 成功修复段数    : {global_stats['segments_ok']}")
         print(f"❌ 修复失败段数    : {global_stats['segments_fail']}")
+        print(f"⏭️ 跳表跳过段数    : {global_stats['segments_skipped']}")
         print(f"📝 写入记录总数    : {global_stats['filled_records']} 条")
     print("=" * 60)
 
@@ -287,6 +361,9 @@ async def main(args: argparse.Namespace) -> Dict[str, Any]:
         print("🎉 所有缺口已成功修复！")
     else:
         print("⚠️ 存在部分修复失败，可稍后重新运行。")
+
+    # 释放数据源连接，防止 aiohttp session 泄露
+    await factory.close_all()
 
     return global_stats
 

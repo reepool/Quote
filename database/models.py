@@ -373,6 +373,29 @@ class DataSourceStatusDB(Base):
     )
 
 
+class GapSkipDB(Base):
+    """缺口跳表：记录已知不可填充的缺口段，避免反复无效请求
+
+    fail_count >= 3 且 last_attempted < 30 天前的记录会被跳过。
+    超过 30 天后自动重试一次，失败则 fail_count + 1。
+    """
+    __tablename__ = 'gap_skip_list'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), nullable=False, index=True)
+    gap_start = Column(String(10), nullable=False)   # YYYY-MM-DD
+    gap_end = Column(String(10), nullable=False)      # YYYY-MM-DD
+    fail_count = Column(Integer, default=1, nullable=False)
+    reason = Column(String(128), nullable=True)       # 如 'no_data', 'source_error'
+    last_attempted = Column(DateTime, default=safe_get_shanghai_time, nullable=False)
+    created_at = Column(DateTime, default=safe_get_shanghai_time, nullable=False)
+
+    __table_args__ = (
+        Index('idx_gap_skip_instrument', 'instrument_id'),
+        Index('idx_gap_skip_lookup', 'instrument_id', 'gap_start', 'gap_end', unique=True),
+    )
+
+
 # Pydantic models for API
 class Instrument(BaseModel):
     """trading instrument API model"""
