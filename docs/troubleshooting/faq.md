@@ -75,13 +75,15 @@ Config file error: Expecting ',' delimiter: line 15 column 9
 
 **可能原因和解决方案：**
 
-1. **限流设置过严**：
+1. **特定数据源限流设置过严（针对 AkShare/BaoStock 分别配置）**：
    ```json
    // config/config.json
    {
-     "rate_limit_config": {
-       "max_requests_per_minute": 120,  // 增加到120
-       "max_requests_per_hour": 2000
+     "data_sources_config": {
+       "baostock": {
+         "max_requests_per_minute": 120,  // 原先太低可以调高
+         "max_requests_per_hour": 3000
+       }
      }
    }
    ```
@@ -136,12 +138,14 @@ Failed to download 000001.SZ: HTTP 503 Service Unavailable
 
 **解决方案：**
 1. **自动重试**：系统会自动重试3次
-2. **增加重试次数**：
+2. **增加数据源重试次数**：
    ```json
    {
-     "rate_limit_config": {
-       "retry_times": 5,
-       "retry_interval": 2.0
+     "data_sources_config": {
+       "baostock": {
+         "retry_times": 5,
+         "retry_interval": 3.0
+       }
      }
    }
    ```
@@ -236,16 +240,8 @@ uvicorn.error: [Errno 48] Address already in use
 
 **解决方案：**
 1. **降低请求频率**
-2. **增加限流阈值**：
-   ```json
-   {
-     "api_config": {
-       "rate_limiting": {
-         "requests_per_minute": 200
-       }
-     }
-   }
-   ```
+2. **增加内部限流防封挂起阈值，提高高并发容灾能力**：
+   （具体可以调高对应数据源中的 `max_requests_per_minute` 和 `max_requests_per_day`）
 3. **使用批量接口**：
    ```bash
    # 使用查询最新行情替代单个查询
@@ -383,14 +379,13 @@ TimeoutError: Failed to connect to data source
 ```
 
 **解决方案：**
-1. **增加超时时间**：
+1. **调整各接口的超时与冷却网络参数**：
    ```json
    {
-     "data_sources": {
-       "baostock_a_stock": {
-         "config": {
-           "timeout": 60  // 增加到60秒
-         }
+     "data_sources_config": {
+       "baostock": {
+         "connection_timeout": 60,  // 增加到60秒
+         "network_error_retry_interval": 20.0
        }
      }
    }
@@ -439,11 +434,8 @@ SSL: CERTIFICATE_VERIFY_FAILED
    pip install --upgrade certifi
    ```
 
-2. **禁用 SSL 验证（不推荐）**：
-   ```python
-   import ssl
-   ssl._create_default_https_context = ssl._create_unverified_context
-   ```
+2. **禁用特定 SSL 验证（不推荐或在代码层级统一捕获）**：
+   对于部分国外接口（如 Yahoo Finance）：可通过 `verify=False`，本项目网络层已在大部分源接入默认屏蔽安全套接层强制约束。
 
 ## 🔍 调试技巧
 
