@@ -68,8 +68,13 @@ class ReportFormatter:
         condition = section.get('condition')
         if condition:
             try:
-                # 将 data 字典解包到 eval 的局部命名空间中
-                if not eval(condition, {}, data):
+                # 使用 copy 并在没有配置时赋予默认 False 值，防止 NameError
+                eval_locals = data.copy()
+                if 'non_trading_day' not in eval_locals:
+                    eval_locals['non_trading_day'] = False
+                if 'status' not in eval_locals:
+                    eval_locals['status'] = 'success'
+                if not eval(condition, {}, eval_locals):
                     return ""  # 条件不满足，不渲染此段落
             except Exception as e:
                 report_logger.warning(f"Error evaluating condition '{condition}': {e}")

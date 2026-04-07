@@ -681,6 +681,10 @@ class AkShareSource(BaseDataSource):
                 # 成功获取数据，跳出重试循环
                 break
 
+            except TypeError as e:
+                # 东财返回的数据结构缺失导致'NoneType' object is not subscriptable，说明该指数无此区间数据
+                akshare_logger.warning(f"[{self.name}] No data structure found for {symbol} (TypeError)")
+                return None
             except Exception as e:
                 error_msg = str(e)
                 if "Connection aborted" in error_msg or "RemoteDisconnected" in error_msg:
@@ -690,11 +694,6 @@ class AkShareSource(BaseDataSource):
                         akshare_logger.info(f"[{self.name}] Retrying {symbol} in {delay:.1f} seconds...")
                         await asyncio.sleep(delay)
                         continue
-            except TypeError as e:
-                # 东财返回的数据结构缺失导致'NoneType' object is not subscriptable，说明该指数无此区间数据
-                akshare_logger.warning(f"[{self.name}] No data structure found for {symbol} (TypeError)")
-                return None
-            except Exception as e:
                 akshare_logger.error(f"[{self.name}] Error fetching AkShare data for {symbol}: {e}")
                 return None
 
