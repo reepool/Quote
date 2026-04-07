@@ -990,7 +990,7 @@ class TaskManagerHandlers:
             valid_exchanges = {'SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'}
             exchanges = [ex.upper() for ex in parts[2:] if ex.upper() in valid_exchanges]
             if not exchanges:
-                error_message = "❌ *无效的交易所代码*\n\n支持: SSE, SZSE, BSE"
+                error_message = "❌ *无效的交易所代码*\n\n支持: SSE, SZSE, BSE, HKEX"
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
                 return
 

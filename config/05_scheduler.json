@@ -152,7 +152,8 @@
         "parameters": {
           "exchanges": [
             "SSE",
-            "SZSE"
+            "SZSE",
+            "HKEX"
           ],
           "days_to_check": 45
         }
@@ -176,7 +177,8 @@
           "exchanges": [
             "SSE",
             "SZSE",
-            "BSE"
+            "BSE",
+            "HKEX"
           ],
           "start_date": "2025-01-01"
         }
@@ -245,7 +247,8 @@
         "parameters": {
           "exchanges": [
             "SSE",
-            "SZSE"
+            "SZSE",
+            "HKEX"
           ],
           "update_future_months": 3,
           "force_update": false,

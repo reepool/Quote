@@ -14,7 +14,7 @@
       "SSE": 1990,
       "SZSE": 1990,
       "BSE": 2014,
-      "HKEX": 1990,
+      "HKEX": 1995,
       "NASDAQ": 1990,
       "NYSE": 1990
     },
@@ -66,7 +66,7 @@
       "enabled": true
     },
     "hk_stock": {
-      "enabled": false
+      "enabled": true
     },
     "us_stock": {
       "enabled": false

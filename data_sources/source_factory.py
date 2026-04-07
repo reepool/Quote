@@ -534,8 +534,10 @@ class DataSourceFactory:
                 if data and self._validate_daily_data(data, instrument_id, symbol):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
+                elif not data:
+                    ds_logger.warning(f"[DataSourceFactory] Empty data from {primary_source.name} for {symbol}")
                 else:
-                    ds_logger.warning(f"[DataSourceFactory] Invalid data from {primary_source.name}")
+                    ds_logger.warning(f"[DataSourceFactory] Validation failed from {primary_source.name} for {symbol}")
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get daily data from {primary_source.name}: {e}")
 

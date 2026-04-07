@@ -1074,12 +1074,13 @@ class DatabaseOperations:
                     'by_exchange': {}
                 }
  
-                for exchange in ['SSE', 'SZSE', 'BSE']:
+                for exchange in ['SSE', 'SZSE', 'BSE', 'HKEX']:
                     trading_days = await session.scalar(select(func.count()).select_from(TradingCalendarDB).filter(
                         TradingCalendarDB.exchange == exchange,
                         TradingCalendarDB.is_trading_day == True
                     ))
-                    stats['trading_calendar']['by_exchange'][exchange] = trading_days
+                    if trading_days > 0:
+                        stats['trading_calendar']['by_exchange'][exchange] = trading_days
 
                 # Data updates statistics
                 stats['data_updates'] = {

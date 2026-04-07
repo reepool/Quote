@@ -270,8 +270,12 @@ class TdxConnectionPool:
                     f"pytdx 无法连接任何服务器: 首选 {ip}:{port}, 重试 {new_ip}:{new_port}"
                 ) from e2
 
-    def reconnect_current(self) -> TdxHq_API:
-        """断线重连当前线程的连接"""
+    def reconnect_current(self, mark_failure: bool = True) -> TdxHq_API:
+        """断线重连当前线程的连接
+        
+        Args:
+            mark_failure: 是否将当前 IP 标记为故障（拉黑）。因为有时只是为了怀疑断连而主动重刷连接，并不代表服务器一定宕机。
+        """
         old_api = getattr(self._local, 'api', None)
         old_ip = getattr(self._local, 'ip', None)
         old_port = getattr(self._local, 'port', None)
@@ -290,7 +294,7 @@ class TdxConnectionPool:
                 ]
 
         # 如果是因为当前 IP 故障, 切换到新 IP
-        if old_ip and old_port:
+        if old_ip and old_port and mark_failure:
             self._ip_manager.report_failure(old_ip, old_port)
 
         return self.get_connection()
@@ -527,6 +531,7 @@ class TdxSource(BaseDataSource):
         # 我们需要从 offset=0 开始往前取, 直到超出 start_date 或无数据
         offset = 0
         max_iterations = 100  # 安全阀: 最多取 100 × batch_size 条
+        _reconnected_this_call = False  # 防止同一次调用内无限重连
 
         for _ in range(max_iterations):
             try:
@@ -541,6 +546,7 @@ class TdxSource(BaseDataSource):
                 # 尝试重连
                 try:
                     api = self.pool.reconnect_current()
+                    _reconnected_this_call = True
                     bars = api.get_security_bars(
                         KLINE_TYPE_DAILY, market, code, offset, self._batch_size
                     )
@@ -551,7 +557,32 @@ class TdxSource(BaseDataSource):
                     break
 
             if not bars:
-                break
+                # ★ 静默断连检测: 首轮 offset=0 就返回空, 大概率是 TCP 连接已死
+                # pytdx 在连接断开时不抛异常, 而是返回 None/空列表
+                if offset == 0 and not _reconnected_this_call:
+                    tdx_logger.warning(
+                        f"[{self.name}] 首轮请求即返回空数据, 怀疑连接已断开, "
+                        f"尝试重连... ({instrument_id})"
+                    )
+                    try:
+                        api = self.pool.reconnect_current(mark_failure=False)
+                        _reconnected_this_call = True
+                        bars = api.get_security_bars(
+                            KLINE_TYPE_DAILY, market, code, offset, self._batch_size
+                        )
+                        if bars:
+                            tdx_logger.info(
+                                f"[{self.name}] 重连后成功获取数据 ({instrument_id})"
+                            )
+                        else:
+                            break  # 重连后仍然为空 → 确实没有数据
+                    except Exception as e:
+                        tdx_logger.error(
+                            f"[{self.name}] 静默断连重连失败 {instrument_id}: {e}"
+                        )
+                        break
+                else:
+                    break
 
             all_bars.extend(bars)
             offset += len(bars)

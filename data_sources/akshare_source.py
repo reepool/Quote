@@ -1063,6 +1063,13 @@ class AkShareSource(BaseDataSource):
         try:
             await self.rate_limiter.acquire()
 
+            # HKEX 分支: 通过不复权/后复权价格反推因子
+            suffix = instrument_id.split('.')[-1].upper() if '.' in instrument_id else ''
+            if suffix == 'HK':
+                return await self._get_hk_adjustment_factors(
+                    instrument_id, symbol, start_date, end_date
+                )
+
             # AkShare 需要带市场前缀的代码
             if 'SH' in instrument_id or 'SSE' in instrument_id:
                 ak_symbol = f"sh{symbol}"
@@ -1182,6 +1189,107 @@ class AkShareSource(BaseDataSource):
         except Exception as e:
             akshare_logger.error(
                 f"Failed to get adjustment factors from AkShare for {instrument_id}: {e}"
+            )
+            return []
+
+    async def _get_hk_adjustment_factors(
+        self, instrument_id: str, symbol: str,
+        start_date: datetime, end_date: datetime
+    ) -> List[Dict[str, Any]]:
+        """港股复权因子: 对比不复权/后复权收盘价反推累积因子
+
+        原理: cumulative_factor = hfq_close / raw_close
+        仅在因子发生显著变化时记录 (除权事件日)，与 A 股稀疏存储一致。
+        """
+        try:
+            start_str = start_date.strftime('%Y%m%d')
+            end_str = end_date.strftime('%Y%m%d')
+
+            # 1. 获取不复权数据
+            await self.rate_limiter.acquire()
+            raw_df = await asyncio.to_thread(
+                ak.stock_hk_hist, symbol=symbol, period="daily",
+                start_date=start_str, end_date=end_str, adjust=""
+            )
+
+            # 2. 获取后复权数据
+            await self.rate_limiter.acquire()
+            hfq_df = await asyncio.to_thread(
+                ak.stock_hk_hist, symbol=symbol, period="daily",
+                start_date=start_str, end_date=end_str, adjust="hfq"
+            )
+
+            if raw_df is None or hfq_df is None or raw_df.empty or hfq_df.empty:
+                akshare_logger.debug(
+                    f"[{self.name}] HK factor: no data for {symbol}"
+                )
+                return []
+
+            # 3. 标准化日期索引并对齐
+            raw_df['日期'] = pd.to_datetime(raw_df['日期'])
+            hfq_df['日期'] = pd.to_datetime(hfq_df['日期'])
+            raw_df = raw_df.set_index('日期').sort_index()
+            hfq_df = hfq_df.set_index('日期').sort_index()
+
+            # 取交集日期
+            common_dates = raw_df.index.intersection(hfq_df.index)
+            if common_dates.empty:
+                return []
+
+            raw_close = raw_df.loc[common_dates, '收盘'].astype(float)
+            hfq_close = hfq_df.loc[common_dates, '收盘'].astype(float)
+
+            # 4. 计算每日累积因子 = hfq_close / raw_close
+            cum_factor = (hfq_close / raw_close).round(6)
+
+            # 过滤掉无效值 (raw_close == 0 会产生 inf)
+            cum_factor = cum_factor.replace([float('inf'), float('-inf')], float('nan')).dropna()
+            if cum_factor.empty:
+                return []
+
+            # 5. 仅保留因子突变日
+            # ★ 港股阈值 0.03: 通过价格反推因子的浮点精度噪声远大于 A 股，
+            #   实测 00700 全量数据中 0.0001 产生 3642 个假阳性，
+            #   0.03 可精确识别拆股/特别股息等真正除权事件
+            _HK_FACTOR_THRESHOLD = 0.03
+            factor_shift = cum_factor.diff().abs()
+            factors: List[Dict[str, Any]] = []
+            prev_cum = None
+
+            for dt, cum in cum_factor.items():
+                cum_val = float(cum)
+                shift_val = float(factor_shift.get(dt, 0)) if pd.notna(factor_shift.get(dt)) else None
+
+                is_event_day = (
+                    (shift_val is None and abs(cum_val - 1.0) > _HK_FACTOR_THRESHOLD) or   # 首行非 1.0
+                    (shift_val is not None and shift_val > _HK_FACTOR_THRESHOLD)             # 因子突变
+                )
+
+                if is_event_day:
+                    if prev_cum is not None and prev_cum != 0:
+                        day_factor = round(cum_val / prev_cum, 6)
+                    else:
+                        day_factor = round(cum_val, 6)
+
+                    factors.append({
+                        'instrument_id': instrument_id,
+                        'ex_date': dt.to_pydatetime(),
+                        'factor': day_factor,
+                        'cumulative_factor': round(cum_val, 6),
+                        'source': 'akshare',
+                    })
+
+                prev_cum = cum_val
+
+            akshare_logger.info(
+                f"[{self.name}] HK factors: {len(factors)} events for {symbol} "
+                f"({start_str}-{end_str})"
+            )
+            return factors
+
+        except Exception as e:
+            akshare_logger.error(
+                f"[{self.name}] Failed to get HK adjustment factors for {symbol}: {e}"
             )
             return []
 

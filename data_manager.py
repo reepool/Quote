@@ -1664,6 +1664,17 @@ class DataManager:
         result = {'synced': 0, 'skipped': 0, 'failed': 0, 'filtered_total': total}
 
         if not skip_filter:
+            # 港股/美股暂不支持精准除权除息查询 (stock_fhps_em 仅限 A 股)
+            # 自动切换为全量同步模式
+            if exchange not in ('SSE', 'SZSE', 'BSE'):
+                dm_logger.info(
+                    "[DataManager] Phase 2: exchange=%s not A-stock, "
+                    "skipping ex-dividend filter, using full sync",
+                    exchange
+                )
+                skip_filter = True
+
+        if not skip_filter:
             # ★ 精准筛选：查询当天有除权除息的股票代码，仅对这些股票同步因子
             target_dates = set()
             for s in stocks[:1]:  # 取一个样本获取日期范围
@@ -1954,6 +1965,9 @@ class DataManager:
         """
         if exchanges is None:
             exchanges = ['SSE', 'SZSE', 'BSE']
+            # 港股已启用时纳入周度因子全量同步
+            if self.config.get_nested('data_sources.hk_stock.enabled', False):
+                exchanges.append('HKEX')
 
         end_date = date.today()
         start_date = end_date - timedelta(days=days_back)
