@@ -1841,9 +1841,16 @@ class DataManager:
             phase2_result: Phase 2 同步结果 (synced/skipped/failed)
         """
         # 检查因子路由中是否配置了 tdx_xdxr validator
+        # ★ 必须严格检查 validator 类型：HKEX 等非 A 股交易所配置的是
+        #   yfinance validator（非 None），若仅检查 is None 会导致误触发
         factor_cfg = self.source_factory.factor_routes.get(exchange, {})
         validator_engine = factor_cfg.get('validator_instance')
         if validator_engine is None:
+            return
+
+        # 仅当 validator 是 TdxFactorEngine 时才执行 TDX 审计
+        from data_sources.tdx_factor_engine import TdxFactorEngine
+        if not isinstance(validator_engine, TdxFactorEngine):
             return
 
         # 仅对 Phase 2 成功同步的品种进行审计 (有除权事件的)

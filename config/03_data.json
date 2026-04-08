@@ -76,8 +76,12 @@
     "health_check_timeout_sec": 30,
     "pytdx": {
       "enabled": true,
-      "exchanges_supported": ["a_stock"],
-      "primary_source_of": ["a_stock"],
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "primary_source_of": [
+        "a_stock"
+      ],
       "instrument_list_source_of": [],
       "calendar_source_of": [],
       "connection_pool_size": 3,
@@ -92,10 +96,16 @@
     },
     "baostock": {
       "enabled": true,
-      "exchanges_supported": ["a_stock"],
+      "exchanges_supported": [
+        "a_stock"
+      ],
       "primary_source_of": [],
-      "instrument_list_source_of": ["a_stock"],
-      "calendar_source_of": ["a_stock"],
+      "instrument_list_source_of": [
+        "a_stock"
+      ],
+      "calendar_source_of": [
+        "a_stock"
+      ],
       "max_requests_per_minute": 600,
       "max_requests_per_hour": 8000,
       "max_requests_per_day": 80000,
@@ -106,10 +116,23 @@
     },
     "akshare": {
       "enabled": true,
-      "exchanges_supported": ["a_stock", "hk_stock", "us_stock"],
-      "primary_source_of": ["hk_stock", "us_stock"],
-      "instrument_list_source_of": ["hk_stock", "us_stock"],
-      "calendar_source_of": ["hk_stock", "us_stock"],
+      "exchanges_supported": [
+        "a_stock",
+        "hk_stock",
+        "us_stock"
+      ],
+      "primary_source_of": [
+        "hk_stock",
+        "us_stock"
+      ],
+      "instrument_list_source_of": [
+        "hk_stock",
+        "us_stock"
+      ],
+      "calendar_source_of": [
+        "hk_stock",
+        "us_stock"
+      ],
       "max_requests_per_minute": 60,
       "max_requests_per_hour": 3600,
       "max_requests_per_day": 50000,
@@ -134,19 +157,24 @@
         "http": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823",
         "https": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823"
       },
-      "exchanges_supported": ["hk_stock", "us_stock"],
+      "exchanges_supported": [
+        "hk_stock",
+        "us_stock"
+      ],
       "primary_source_of": [],
       "instrument_list_source_of": [],
       "calendar_source_of": [],
-      "max_requests_per_minute": 8,
-      "max_requests_per_hour": 300,
-      "max_requests_per_day": 5000,
+      "max_requests_per_minute": 30,
+      "max_requests_per_hour": 1500,
+      "max_requests_per_day": 10000,
       "retry_times": 3,
       "retry_interval": 2.0
     },
     "tushare": {
       "enabled": false,
-      "exchanges_supported": ["a_stock"],
+      "exchanges_supported": [
+        "a_stock"
+      ],
       "primary_source_of": [],
       "instrument_list_source_of": [],
       "calendar_source_of": [],
@@ -159,12 +187,36 @@
     }
   },
   "factor_sources": {
-    "SSE":    { "primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare" },
-    "SZSE":   { "primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare" },
-    "BSE":    { "primary": "akshare",  "validator": "tdx_xdxr", "fallback": null },
-    "HKEX":   { "primary": "akshare",  "validator": "yfinance", "fallback": null },
-    "NASDAQ": { "primary": "akshare",  "validator": "yfinance", "fallback": null },
-    "NYSE":   { "primary": "akshare",  "validator": "yfinance", "fallback": null }
+    "SSE": {
+      "primary": "baostock",
+      "validator": "tdx_xdxr",
+      "fallback": "akshare"
+    },
+    "SZSE": {
+      "primary": "baostock",
+      "validator": "tdx_xdxr",
+      "fallback": "akshare"
+    },
+    "BSE": {
+      "primary": "akshare",
+      "validator": "tdx_xdxr",
+      "fallback": null
+    },
+    "HKEX": {
+      "primary": "akshare",
+      "validator": "yfinance",
+      "fallback": null
+    },
+    "NASDAQ": {
+      "primary": "akshare",
+      "validator": "yfinance",
+      "fallback": null
+    },
+    "NYSE": {
+      "primary": "akshare",
+      "validator": "yfinance",
+      "fallback": null
+    }
   },
   "exchange_rules": {
     "exchange_mapping": {
