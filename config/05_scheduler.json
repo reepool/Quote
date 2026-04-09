@@ -24,7 +24,11 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "exchanges": ["SSE", "SZSE", "BSE"],
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
           "enable_trading_day_check": true,
@@ -35,7 +39,7 @@
         }
       },
       "hk_daily_data_update": {
-        "enabled": false,
+        "enabled": true,
         "description": "港股每日数据更新（16:00 HKT 收盘后）",
         "report": true,
         "pre_run_notify": true,
@@ -50,7 +54,9 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "exchanges": ["HKEX"],
+          "exchanges": [
+            "HKEX"
+          ],
           "wait_for_market_close": false,
           "enable_trading_day_check": true,
           "max_runtime_seconds": 7200,
@@ -75,7 +81,10 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "exchanges": ["NASDAQ", "NYSE"],
+          "exchanges": [
+            "NASDAQ",
+            "NYSE"
+          ],
           "wait_for_market_close": false,
           "enable_trading_day_check": true,
           "max_runtime_seconds": 10800,
@@ -131,6 +140,8 @@
           "log_retention_days": 30,
           "optimize_database": true,
           "validate_data_integrity": true,
+          "cleanup_ghost_stocks": true,
+          "ghost_stock_grace_days": 14,
           "max_runtime_seconds": 10800
         }
       },

@@ -1009,6 +1009,21 @@ class AkShareSource(BaseDataSource):
 
             if exchange == 'HKEX':
                 holiday_set = hol.HK(years=range(start_date.year, end_date.year + 1))
+                # holidays 库 HK 定义缺少 Good Friday 和 Easter Saturday（港股法定休市日）
+                # 使用 dateutil.easter 手动补充
+                try:
+                    from dateutil.easter import easter
+                    for yr in range(start_date.year, end_date.year + 1):
+                        easter_sunday = easter(yr)
+                        good_friday = easter_sunday - timedelta(days=2)
+                        easter_saturday = easter_sunday - timedelta(days=1)
+                        holiday_set[good_friday] = "Good Friday"
+                        holiday_set[easter_saturday] = "The day following Good Friday"
+                except ImportError:
+                    akshare_logger.warning(
+                        f"[{self.name}] 'python-dateutil' not installed; "
+                        f"Good Friday / Easter Saturday may be missing from HKEX calendar"
+                    )
             else:  # NASDAQ / NYSE
                 holiday_set = hol.US(years=range(start_date.year, end_date.year + 1))
 
@@ -1031,7 +1046,10 @@ class AkShareSource(BaseDataSource):
             return calendar_data
 
         except ImportError:
-            akshare_logger.warning(f"[{self.name}] 'holidays' library not installed; returning empty calendar for {exchange}")
+            akshare_logger.error(
+                f"[{self.name}] 'holidays' library not installed; "
+                f"cannot generate calendar for {exchange}"
+            )
             return []
         except Exception as e:
             akshare_logger.error(f"[{self.name}] Failed to generate local calendar for {exchange}: {e}")

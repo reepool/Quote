@@ -431,6 +431,10 @@ class DatabaseOperations:
                                 # 防线 A: 保护已有的退市日期不被空值覆盖
                                 if key == 'delisted_date' and value is None and getattr(existing, key, None) is not None:
                                     continue
+                                # 防线 C: 拦截东方财富等脏数据对自动封禁幽灵股的强行唤醒
+                                if key in ('is_active', 'status') and getattr(existing, 'status', '') == 'auto_deactivated_no_data':
+                                    continue
+
                                 # 确保只更新模型中存在的字段，防止动态添加属性
                                 if hasattr(existing, key) and getattr(existing, key) != value:
                                     setattr(existing, key, value)
@@ -473,6 +477,54 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to save instruments batch: {e}")
             self.db_logger.error(f"Traceback: {traceback.format_exc()}")
             return False
+
+    async def cleanup_ghost_instruments(self, grace_days: int) -> int:
+        """
+        清理由于数据源脏数据引入的长期无交易记录的“幽灵股”。
+        
+        将 `is_active=1`、建库时间超过 `grace_days`、且在 `daily_quotes` 中没有任何一条历史数据的品种，
+        批量标记为 `is_active=0` 和 `status='auto_deactivated_no_data'`。
+        
+        Args:
+            grace_days: 宽限期天数（在这几天内刚被加入的不受影响，防止误杀即将上市的新股）。
+            
+        Returns:
+            int: 成功封禁的幽灵股数量。
+        """
+        try:
+            from utils.date_utils import get_shanghai_time
+            from datetime import timedelta
+            from sqlalchemy.future import select
+            cutoff_date = get_shanghai_time() - timedelta(days=grace_days)
+            
+            async with self.get_async_session() as session:
+                # 使用子查询：查找存在于 daily_quotes 中的所有独特股票ID
+                stmt_active_with_no_data = select(InstrumentDB).filter(
+                    InstrumentDB.is_active == True,
+                    InstrumentDB.created_at < cutoff_date,
+                    ~InstrumentDB.instrument_id.in_(
+                        select(DailyQuoteDB.instrument_id).distinct()
+                    )
+                )
+                result = await session.execute(stmt_active_with_no_data)
+                ghosts = result.scalars().all()
+                
+                count = len(ghosts)
+                if count > 0:
+                    for ghost in ghosts:
+                        ghost.is_active = False
+                        ghost.status = 'auto_deactivated_no_data'
+                        ghost.updated_at = get_shanghai_time()
+                    
+                    await session.commit()
+                    self.db_logger.info(f"Successfully auto-deactivated {count} ghost instruments (grace_days={grace_days}).")
+                else:
+                    self.db_logger.debug("No ghost instruments found to cleanup.")
+                    
+                return count
+        except Exception as e:
+            self.db_logger.error(f"Failed to run cleanup_ghost_instruments: {e}")
+            return 0
 
     async def get_instruments_list(
         self,
@@ -754,38 +806,34 @@ class DatabaseOperations:
     # === Trading Calendar Operations ===
 
     async def save_trading_calendar(self, calendar_data: List[Dict[str, Any]]) -> bool:
-        """保存交易日历数据"""
+        """保存交易日历数据（批量 upsert）"""
         try:
+            from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+
             async with self.get_async_session() as session:
-                success_count = 0
-                for data in calendar_data:
-                    try:
-                        # Check if record exists
-                        stmt = select(TradingCalendarDB).filter(
-                            TradingCalendarDB.exchange == data['exchange'],
-                            TradingCalendarDB.date == data['date']
-                        )
-                        result = await session.execute(stmt)
-                        existing = result.scalar_one_or_none()
+                chunk_size = 500
+                total_saved = 0
 
-                        if existing:
-                            # Update existing record
-                            for key, value in data.items():
-                                if hasattr(existing, key) and getattr(existing, key) != value:
-                                    setattr(existing, key, value)
-                            existing.updated_at = get_shanghai_time()
-                        else:
-                            # Create new record
-                            db_calendar = TradingCalendarDB(**data)
-                            session.add(db_calendar)
-                        success_count += 1
+                for i in range(0, len(calendar_data), chunk_size):
+                    chunk = calendar_data[i:i + chunk_size]
 
-                    except Exception as e:
-                        self.db_logger.error(f"Error saving calendar record: {e}")
+                    stmt = sqlite_insert(TradingCalendarDB).values(chunk)
+                    stmt = stmt.on_conflict_do_update(
+                        index_elements=['exchange', 'date'],
+                        set_={
+                            'is_trading_day': stmt.excluded.is_trading_day,
+                            'reason': stmt.excluded.reason,
+                            'session_type': stmt.excluded.session_type,
+                            'source': stmt.excluded.source,
+                            'updated_at': get_shanghai_time(),
+                        }
+                    )
+                    await session.execute(stmt)
+                    total_saved += len(chunk)
 
                 await session.commit()
-                self.db_logger.info(f"Successfully saved {success_count} calendar records")
-                return success_count
+                self.db_logger.info(f"Successfully upserted {total_saved} calendar records")
+                return total_saved
 
         except Exception as e:
             self.db_logger.error(f"Failed to save trading calendar: {e}")
@@ -1006,7 +1054,7 @@ class DatabaseOperations:
 
     # === Statistics and Analysis ===
 
-    async def get_database_statistics(self) -> Dict[str, Any]:
+    async def get_database_statistics(self, fast_mode: bool = False) -> Dict[str, Any]:
         """获取数据库统计信息"""
         try:
             stats = {}
@@ -1048,24 +1096,25 @@ class DatabaseOperations:
                 }
 
                 # Trading status distribution
-                trade_status_res = await session.execute(select(
-                    DailyQuoteDB.tradestatus, func.count(DailyQuoteDB.tradestatus)
-                ).group_by(DailyQuoteDB.tradestatus))
-                for status, count in trade_status_res.all():
-                    stats['daily_quotes']['by_trading_status'][status] = count
+                if not fast_mode:
+                    trade_status_res = await session.execute(select(
+                        DailyQuoteDB.tradestatus, func.count(DailyQuoteDB.tradestatus)
+                    ).group_by(DailyQuoteDB.tradestatus))
+                    for status, count in trade_status_res.all():
+                        stats['daily_quotes']['by_trading_status'][status] = count
 
-                # Source distribution
-                source_counts_res = await session.execute(select(
-                    DailyQuoteDB.source, func.count(DailyQuoteDB.source)
-                ).group_by(DailyQuoteDB.source))
-                for source, count in source_counts_res.all():
-                    stats['daily_quotes']['by_source'][source or 'unknown'] = count
+                    # Source distribution
+                    source_counts_res = await session.execute(select(
+                        DailyQuoteDB.source, func.count(DailyQuoteDB.source)
+                    ).group_by(DailyQuoteDB.source))
+                    for source, count in source_counts_res.all():
+                        stats['daily_quotes']['by_source'][source or 'unknown'] = count
 
-                # Date range
-                latest = await session.scalar(select(func.max(DailyQuoteDB.time)))
-                earliest = await session.scalar(select(func.min(DailyQuoteDB.time)))
-                stats['daily_quotes']['latest_date'] = latest
-                stats['daily_quotes']['earliest_date'] = earliest
+                    # Date range
+                    latest = await session.scalar(select(func.max(DailyQuoteDB.time)))
+                    earliest = await session.scalar(select(func.min(DailyQuoteDB.time)))
+                    stats['daily_quotes']['latest_date'] = latest
+                    stats['daily_quotes']['earliest_date'] = earliest
 
                 # Trading calendar statistics
                 stats['trading_calendar'] = {

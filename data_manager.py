@@ -421,6 +421,7 @@ class DataManager:
         """标准精确批次下载"""
         batch_data = []
         batch_quality_scores = []
+        skipped_in_loop = 0  # 在循环内已累加 processed_instruments 的数量
 
         for instrument in instruments:
             try:
@@ -438,6 +439,7 @@ class DataManager:
                         if last_update >= end_date:
                             dm_logger.debug(f"Skipping {instrument['instrument_id']}, already updated to {last_update}")
                             self.progress.processed_instruments += 1
+                            skipped_in_loop += 1
                             continue
                         else:
                             # 从最后更新日期的下一天开始下载
@@ -519,7 +521,8 @@ class DataManager:
                 self.progress.failed_downloads += len(instruments)
                 self.progress.add_error(f"Failed to save precise batch for {exchange}")
 
-        self.progress.processed_instruments += len(instruments)
+        # 只累加未在循环内已计数的品种（避免 resume 跳过的被重复计入）
+        self.progress.processed_instruments += len(instruments) - skipped_in_loop
         await self._save_progress()
 
     async def _download_instrument_by_trading_days(self, instrument: Dict, exchange: str,
@@ -1321,7 +1324,7 @@ class DataManager:
     async def get_system_status(self) -> Dict[str, Any]:
         """获取标准系统状态"""
         try:
-            db_stats = await self.db_ops.get_database_statistics()
+            db_stats = await self.db_ops.get_database_statistics(fast_mode=True)
             source_health = await self.source_factory.health_check_all()
 
             return {

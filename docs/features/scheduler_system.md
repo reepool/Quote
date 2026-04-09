@@ -170,7 +170,9 @@ async def trading_calendar_update(self,
       "cleanup_old_logs": true,
       "log_retention_days": 30,
       "optimize_database": true,
-      "validate_data_integrity": true
+      "validate_data_integrity": true,
+      "cleanup_ghost_stocks": true,
+      "ghost_stock_grace_days": 14
     }
   }
 }
@@ -180,8 +182,9 @@ async def trading_calendar_update(self,
 1. **数据库备份**：自动备份数据库
 2. **日志清理**：清理过期日志文件
 3. **数据库优化**：执行 VACUUM 和 ANALYZE
-4. **数据完整性检查**：验证数据一致性
-5. **性能优化**：优化数据库索引
+4. **清理幽灵股**：自动侦测并停用建库满 14 天且仍无任何行情的品种（如长期停牌/退市标的）
+5. **数据完整性检查**：验证数据一致性
+6. **性能优化**：优化数据库索引
 
 #### 核心方法
 ```python
@@ -190,7 +193,9 @@ async def weekly_data_maintenance(self,
                                 cleanup_old_logs: bool = True,
                                 log_retention_days: int = 30,
                                 optimize_database: bool = True,
-                                validate_data_integrity: bool = True):
+                                validate_data_integrity: bool = True,
+                                cleanup_ghost_stocks: bool = True,
+                                ghost_stock_grace_days: int = 14):
     """每周数据维护任务"""
 ```
 
@@ -647,6 +652,10 @@ python -c "from scheduler.scheduler import task_scheduler; import asyncio; async
 - 使用结构化日志格式
 
 ## 🔄 版本更新
+
+### v2.4.2 (2026-04-09)
+- ✨ 调度器 `weekly_data_maintenance` 任务新增死股/仙股智能封禁模块，优化庞大数据集运行效率
+- 🛡️ 安全化自动参数：添加 `cleanup_ghost_stocks` 和 `ghost_stock_grace_days`（宽限期）
 
 ### v2.1.0 (2025-10-11)
 - ✨ 新增交易日历智能选择策略

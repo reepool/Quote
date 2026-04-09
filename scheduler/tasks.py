@@ -277,6 +277,8 @@ class ScheduledTasks:
                                   log_retention_days: int = 30,
                                   optimize_database: bool = True,
                                   validate_data_integrity: bool = True,
+                                  cleanup_ghost_stocks: bool = True,
+                                  ghost_stock_grace_days: int = 14,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """每周数据维护任务"""
         try:
@@ -307,6 +309,15 @@ class ScheduledTasks:
             # 数据库优化
             if optimize_database:
                 await self._optimize_database()
+
+            # 清理幽灵股 (长期无数据死标的)
+            if cleanup_ghost_stocks:
+                try:
+                    scheduler_logger.info(f"[Scheduler] Starting ghost instruments cleanup (grace_days={ghost_stock_grace_days})...")
+                    ghost_count = await data_manager.db_ops.cleanup_ghost_instruments(grace_days=ghost_stock_grace_days)
+                    scheduler_logger.info(f"[Scheduler] Ghost instruments cleanup finished. Deactivated: {ghost_count}")
+                except Exception as e:
+                    scheduler_logger.error(f"[Scheduler] Ghost instruments cleanup failed: {e}")
 
             # 数据完整性验证
             if validate_data_integrity:

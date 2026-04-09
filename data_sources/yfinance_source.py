@@ -228,8 +228,8 @@ class YFinanceSource(BaseDataSource):
                     return f"{symbol}.SS"  # 上交所
                 else:
                     return f"{symbol}.SZ"  # 深交所
-        elif exchange_upper == 'HKEX':
-            # 港股
+        elif exchange_upper in ('HKEX', 'HK'):
+            # 港股（exchange 来自 instrument_id.split('.') 时为 'HK'，来自配置时为 'HKEX'）
             if len(symbol) == 5 and symbol.isdigit():
                 return f"{symbol}.HK"
         elif exchange_upper in ['NASDAQ', 'NYSE']:
