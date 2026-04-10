@@ -540,8 +540,18 @@ class DataSourceFactory:
                     ds_logger.warning(f"[DataSourceFactory] Validation failed from {primary_source.name} for {symbol}")
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get daily data from {primary_source.name}: {e}")
+            primary_exception = True
+        else:
+            primary_exception = False
 
         # 第二步：遍历所有备用数据源（降级链）
+        # 日更优化：当请求范围 ≤ 2 天且主源返回空（非异常）时，跳过 backup
+        # 因为"当日无数据"大概率是停牌/未交易，不值得花时间兜底
+        date_span = (end_date - start_date).days if start_date and end_date else 999
+        if date_span <= 2 and not primary_exception:
+            ds_logger.debug(f"[DataSourceFactory] Short-range query ({date_span}d), skip backup for {symbol}")
+            return []
+
         for backup_source in self.get_backup_sources(exchange):
             ds_logger.info(f"[DataSourceFactory] Trying backup source: {backup_source.name} for {symbol} (instrument_type={instrument_type})")
             try:
@@ -579,11 +589,14 @@ class DataSourceFactory:
                 factors = await primary.get_adjustment_factors(
                     instrument_id, symbol, start_date, end_date
                 )
-                if factors:
-                    ds_logger.debug(
-                        f"[DataSourceFactory] Got {len(factors)} factors from "
-                        f"{getattr(primary, 'name', type(primary).__name__)} for {exchange}"
-                    )
+                # 返回 list（包括空列表）视为主源成功，直接采信结果
+                # 空列表 = 该品种确认无除权除息事件，无需降级到备用源
+                if factors is not None:
+                    if factors:
+                        ds_logger.debug(
+                            f"[DataSourceFactory] Got {len(factors)} factors from "
+                            f"{getattr(primary, 'name', type(primary).__name__)} for {exchange}"
+                        )
                     return factors
             except Exception as e:
                 ds_logger.warning(

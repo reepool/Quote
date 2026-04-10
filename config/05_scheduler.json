@@ -142,6 +142,7 @@
           "validate_data_integrity": true,
           "cleanup_ghost_stocks": true,
           "ghost_stock_grace_days": 14,
+          "zombie_stock_grace_days": 30,
           "max_runtime_seconds": 10800
         }
       },

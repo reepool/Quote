@@ -279,6 +279,7 @@ class ScheduledTasks:
                                   validate_data_integrity: bool = True,
                                   cleanup_ghost_stocks: bool = True,
                                   ghost_stock_grace_days: int = 14,
+                                  zombie_stock_grace_days: int = 30,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """每周数据维护任务"""
         try:
@@ -310,14 +311,17 @@ class ScheduledTasks:
             if optimize_database:
                 await self._optimize_database()
 
-            # 清理幽灵股 (长期无数据死标的)
+            # 清理幽灵股 + 僵尸股 (长期无数据/无交易死标的)
             if cleanup_ghost_stocks:
                 try:
-                    scheduler_logger.info(f"[Scheduler] Starting ghost instruments cleanup (grace_days={ghost_stock_grace_days})...")
-                    ghost_count = await data_manager.db_ops.cleanup_ghost_instruments(grace_days=ghost_stock_grace_days)
-                    scheduler_logger.info(f"[Scheduler] Ghost instruments cleanup finished. Deactivated: {ghost_count}")
+                    scheduler_logger.info(f"[Scheduler] Starting ghost/zombie instruments cleanup (ghost_grace={ghost_stock_grace_days}, zombie_grace={zombie_stock_grace_days})...")
+                    cleaned_count = await data_manager.db_ops.cleanup_ghost_instruments(
+                        grace_days=ghost_stock_grace_days,
+                        zombie_grace_days=zombie_stock_grace_days
+                    )
+                    scheduler_logger.info(f"[Scheduler] Ghost/zombie instruments cleanup finished. Deactivated: {cleaned_count}")
                 except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Ghost instruments cleanup failed: {e}")
+                    scheduler_logger.error(f"[Scheduler] Ghost/zombie instruments cleanup failed: {e}")
 
             # 数据完整性验证
             if validate_data_integrity:

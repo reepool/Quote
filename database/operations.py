@@ -478,7 +478,7 @@ class DatabaseOperations:
             self.db_logger.error(f"Traceback: {traceback.format_exc()}")
             return False
 
-    async def cleanup_ghost_instruments(self, grace_days: int) -> int:
+    async def cleanup_ghost_instruments(self, grace_days: int, zombie_grace_days: int = 180) -> int:
         """
         清理由于数据源脏数据引入的长期无交易记录的“幽灵股”。
         
@@ -495,7 +495,9 @@ class DatabaseOperations:
             from utils.date_utils import get_shanghai_time
             from datetime import timedelta
             from sqlalchemy.future import select
+            from sqlalchemy import func
             cutoff_date = get_shanghai_time() - timedelta(days=grace_days)
+            zombie_cutoff = get_shanghai_time() - timedelta(days=zombie_grace_days)
             
             async with self.get_async_session() as session:
                 # 使用子查询：查找存在于 daily_quotes 中的所有独特股票ID
@@ -509,19 +511,41 @@ class DatabaseOperations:
                 result = await session.execute(stmt_active_with_no_data)
                 ghosts = result.scalars().all()
                 
-                count = len(ghosts)
-                if count > 0:
+                ghost_count = len(ghosts)
+                if ghost_count > 0:
                     for ghost in ghosts:
                         ghost.is_active = False
                         ghost.status = 'auto_deactivated_no_data'
                         ghost.updated_at = get_shanghai_time()
                     
                     await session.commit()
-                    self.db_logger.info(f"Successfully auto-deactivated {count} ghost instruments (grace_days={grace_days}).")
+                    self.db_logger.info(f"Successfully auto-deactivated {ghost_count} ghost instruments (grace_days={grace_days}).")
                 else:
                     self.db_logger.debug("No ghost instruments found to cleanup.")
+                
+                # 步骤二：清理僵尸股 (有历史数据，但最后交易日期超期)
+                stmt_zombies = select(InstrumentDB).filter(
+                    InstrumentDB.is_active == True,
+                    InstrumentDB.instrument_id.in_(
+                        select(DailyQuoteDB.instrument_id)
+                        .group_by(DailyQuoteDB.instrument_id)
+                        .having(func.max(DailyQuoteDB.time) < zombie_cutoff)
+                    )
+                )
+                zombie_result = await session.execute(stmt_zombies)
+                zombies = zombie_result.scalars().all()
+                
+                zombie_count = len(zombies)
+                if zombie_count > 0:
+                    for zombie in zombies:
+                        zombie.is_active = False
+                        zombie.status = 'auto_deactivated_zombie'
+                        zombie.updated_at = get_shanghai_time()
                     
-                return count
+                    await session.commit()
+                    self.db_logger.info(f"Successfully auto-deactivated {zombie_count} zombie instruments (zombie_grace_days={zombie_grace_days}).")
+                    
+                return ghost_count + zombie_count
         except Exception as e:
             self.db_logger.error(f"Failed to run cleanup_ghost_instruments: {e}")
             return 0

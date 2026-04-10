@@ -244,32 +244,30 @@ class YFinanceSource(BaseDataSource):
         return None
 
     async def _fetch_yahoo_data(self, symbol: str, start_date: datetime = None,
-                              end_date: datetime = None, period: str = None, max_retries: int = 3) -> Optional[pd.DataFrame]:
+                              end_date: datetime = None, period: str = None) -> Optional[pd.DataFrame]:
         """从Yahoo Finance获取数据"""
-        for attempt in range(max_retries):
-            try:
-                yfinance_logger.debug(f"[{self.name}] Fetching data for {symbol}, attempt {attempt + 1}/{max_retries}")
+        try:
+            yfinance_logger.debug(f"[{self.name}] Fetching data for {symbol}")
 
-                # 首先尝试使用yfinance库（更稳定）
-                data = await self._fetch_yahoo_data_library(symbol, start_date, end_date, period)
+            # 首先尝试使用yfinance库（更稳定）
+            data = await self._fetch_yahoo_data_library(symbol, start_date, end_date, period)
+            if data is not None and not data.empty:
+                yfinance_logger.debug(f"[{self.name}] Successfully fetched {len(data)} records for {symbol}")
+                return data
+
+            # 如果yfinance库失败，尝试使用异步HTTP方法
+            if start_date and end_date:
+                yfinance_logger.debug(f"[{self.name}] Trying async HTTP method for {symbol}")
+                data = await self._fetch_yahoo_data_async(symbol, start_date, end_date)
                 if data is not None and not data.empty:
-                    yfinance_logger.debug(f"[{self.name}] Successfully fetched {len(data)} records for {symbol}")
                     return data
 
-                # 如果yfinance库失败，尝试使用异步HTTP方法
-                if start_date and end_date and attempt < max_retries - 1:
-                    yfinance_logger.debug(f"[{self.name}] Trying async HTTP method for {symbol}")
-                    data = await self._fetch_yahoo_data_async(symbol, start_date, end_date)
-                    if data is not None and not data.empty:
-                        return data
+            yfinance_logger.warning(f"[{self.name}] All fetch attempts failed for {symbol}")
+            return None
 
-            except Exception as e:
-                yfinance_logger.warning(f"[{self.name}] Attempt {attempt + 1} failed for {symbol}: {e}")
-                if attempt < max_retries - 1:
-                    await asyncio.sleep(2 ** attempt)  # 指数退避
-
-        yfinance_logger.warning(f"[{self.name}] All attempts failed for {symbol}")
-        return None
+        except Exception as e:
+            yfinance_logger.warning(f"[{self.name}] Fetch operation failed for {symbol}: {e}")
+            return None
 
     @contextmanager
     def _temporary_proxy_env(self):
@@ -297,7 +295,8 @@ class YFinanceSource(BaseDataSource):
                 os.environ.pop('HTTPS_PROXY', None)
 
     async def _fetch_yahoo_data_library(self, symbol: str, start_date: datetime = None,
-                                      end_date: datetime = None, period: str = None) -> Optional[pd.DataFrame]:
+                                      end_date: datetime = None, period: str = None,
+                                      timeout_sec: int = 8) -> Optional[pd.DataFrame]:
         """使用yfinance库获取数据"""
         try:
             session = requests.Session()
@@ -319,24 +318,30 @@ class YFinanceSource(BaseDataSource):
             with self._temporary_proxy_env():
                 if start_date and end_date:
                     # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
-                    data = await asyncio.to_thread(
-                        ticker.history,
-                        start=start_date.strftime('%Y-%m-%d'),
-                        end=end_date.strftime('%Y-%m-%d'),
-                        interval='1d',
-                        auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
-                        repair=True,
-                        proxy=self.aio_proxy  # 必须显式传入，否则 crumb 获取会死锁
+                    data = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            ticker.history,
+                            start=start_date.strftime('%Y-%m-%d'),
+                            end=end_date.strftime('%Y-%m-%d'),
+                            interval='1d',
+                            auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
+                            repair=True,
+                            proxy=self.aio_proxy  # 必须显式传入，否则 crumb 获取会死锁
+                        ),
+                        timeout=timeout_sec
                     )
                 elif period:
                     # 指定时间段
-                    data = await asyncio.to_thread(
-                        ticker.history,
-                        period=period,
-                        interval='1d',
-                        auto_adjust=False,
-                        repair=True,
-                        proxy=self.aio_proxy  # 必须显式传入
+                    data = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            ticker.history,
+                            period=period,
+                            interval='1d',
+                            auto_adjust=False,
+                            repair=True,
+                            proxy=self.aio_proxy  # 必须显式传入
+                        ),
+                        timeout=timeout_sec
                     )
                 else:
                     yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
@@ -353,6 +358,9 @@ class YFinanceSource(BaseDataSource):
 
             return data
 
+        except asyncio.TimeoutError:
+            yfinance_logger.debug(f"[{self.name}] yfinance library timed out for {symbol} after {timeout_sec}s")
+            return None
         except Exception as e:
             yfinance_logger.debug(f"[{self.name}] yfinance library failed for {symbol}: {e}")
             return None

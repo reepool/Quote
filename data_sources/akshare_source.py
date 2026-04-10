@@ -1265,10 +1265,10 @@ class AkShareSource(BaseDataSource):
                 return []
 
             # 5. 仅保留因子突变日
-            # ★ 港股阈值 0.03: 通过价格反推因子的浮点精度噪声远大于 A 股，
-            #   实测 00700 全量数据中 0.0001 产生 3642 个假阳性，
-            #   0.03 可精确识别拆股/特别股息等真正除权事件
-            _HK_FACTOR_THRESHOLD = 0.03
+            # ★ 港股阈值 0.06: 东财后复权价格存在浮点精度误差（约±1-2%），
+            #   实测 02318/00001/00005 在 0.03 产生大量假阳性（61/75/41个），
+            #   0.06 可过滤绝大部分噪声，同时捕捉 ≥1% 股息率的真实除权事件
+            _HK_FACTOR_THRESHOLD = 0.06
             factor_shift = cum_factor.diff().abs()
             factors: List[Dict[str, Any]] = []
             prev_cum = None

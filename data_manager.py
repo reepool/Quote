@@ -2083,6 +2083,7 @@ class DataManager:
                             # 从数据源获取数据
                             start_date = target_date - timedelta(days=1)
                             end_date = target_date
+                            data = None  # 初始化，供后续复权因子收集判断
                             
                             if should_update:
                                 if per_instrument_timeout_sec:
@@ -2118,14 +2119,18 @@ class DataManager:
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1
 
-                            # 收集需要同步复权因子的股票（不管K线是否跳过更新，都必须收集，以防复权阶段断点接续被遗漏）
+                            # 收集需要同步复权因子的股票
+                            # A 股（有 ex-dividend 精准筛选）: 无条件收集，Phase 2 会再精准过滤
+                            # 港股/美股（无精准筛选）: 仅对今天有新数据写入的品种收集，避免全量空跑
                             if instrument.get('type', 'stock') == 'stock':
-                                stocks_needing_factors.append({
-                                    'instrument_id': instrument['instrument_id'],
-                                    'symbol': instrument['symbol'],
-                                    'start_date': start_date,
-                                    'end_date': end_date,
-                                })
+                                is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
+                                if is_a_stock or (data and len(data) > 0):
+                                    stocks_needing_factors.append({
+                                        'instrument_id': instrument['instrument_id'],
+                                        'symbol': instrument['symbol'],
+                                        'start_date': start_date,
+                                        'end_date': end_date,
+                                    })
 
                             # 进度日志：按数量或时间间隔输出
                             now = datetime.now()
