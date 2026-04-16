@@ -79,11 +79,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [
-        "a_stock"
-      ],
-      "instrument_list_source_of": [],
-      "calendar_source_of": [],
       "connection_pool_size": 3,
       "connection_timeout_sec": 10,
       "ip_refresh_interval_hours": 24,
@@ -97,13 +92,6 @@
     "baostock": {
       "enabled": true,
       "exchanges_supported": [
-        "a_stock"
-      ],
-      "primary_source_of": [],
-      "instrument_list_source_of": [
-        "a_stock"
-      ],
-      "calendar_source_of": [
         "a_stock"
       ],
       "max_requests_per_minute": 600,
@@ -121,20 +109,8 @@
         "hk_stock",
         "us_stock"
       ],
-      "primary_source_of": [
-        "hk_stock",
-        "us_stock"
-      ],
-      "instrument_list_source_of": [
-        "hk_stock",
-        "us_stock"
-      ],
-      "calendar_source_of": [
-        "hk_stock",
-        "us_stock"
-      ],
-      "max_requests_per_minute": 60,
-      "max_requests_per_hour": 3600,
+      "max_requests_per_minute": 120,
+      "max_requests_per_hour": 3800,
       "max_requests_per_day": 50000,
       "retry_times": 5,
       "retry_interval": 3.0,
@@ -161,9 +137,6 @@
         "hk_stock",
         "us_stock"
       ],
-      "primary_source_of": [],
-      "instrument_list_source_of": [],
-      "calendar_source_of": [],
       "max_requests_per_minute": 30,
       "max_requests_per_hour": 1500,
       "max_requests_per_day": 10000,
@@ -175,9 +148,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [],
-      "instrument_list_source_of": [],
-      "calendar_source_of": [],
       "max_requests_per_minute": 200,
       "max_requests_per_hour": 1000,
       "max_requests_per_day": 2000,
@@ -186,36 +156,121 @@
       "token": ""
     }
   },
-  "factor_sources": {
-    "SSE": {
-      "primary": "baostock",
-      "validator": "tdx_xdxr",
-      "fallback": "akshare"
+  "routing": {
+    "daily": {
+      "SSE": {
+        "stock": [
+          "pytdx",
+          "baostock",
+          "akshare"
+        ],
+        "index": [
+          "baostock",
+          "akshare"
+        ]
+      },
+      "SZSE": {
+        "stock": [
+          "pytdx",
+          "baostock",
+          "akshare"
+        ],
+        "index": [
+          "baostock",
+          "akshare"
+        ]
+      },
+      "BSE": {
+        "stock": [
+          "pytdx",
+          "akshare"
+        ],
+        "index": [
+          "akshare"
+        ]
+      },
+      "HKEX": {
+        "stock": [
+          "akshare",
+          "yfinance"
+        ]
+      }
     },
-    "SZSE": {
-      "primary": "baostock",
-      "validator": "tdx_xdxr",
-      "fallback": "akshare"
+    "daily_behavior": {
+      "default": {
+        "stock": {
+          "skip_backup_on_empty_short_range": true
+        },
+        "index": {
+          "skip_backup_on_empty_short_range": false
+        }
+      }
     },
-    "BSE": {
-      "primary": "akshare",
-      "validator": "tdx_xdxr",
-      "fallback": null
+    "instrument_list": {
+      "a_stock": [
+        "baostock"
+      ],
+      "hk_stock": [
+        "akshare"
+      ],
+      "us_stock": [
+        "akshare"
+      ]
     },
-    "HKEX": {
-      "primary": "akshare",
-      "validator": "yfinance",
-      "fallback": null
+    "calendar": {
+      "a_stock": [
+        "baostock"
+      ],
+      "hk_stock": [
+        "akshare"
+      ],
+      "us_stock": [
+        "akshare"
+      ]
     },
-    "NASDAQ": {
-      "primary": "akshare",
-      "validator": "yfinance",
-      "fallback": null
-    },
-    "NYSE": {
-      "primary": "akshare",
-      "validator": "yfinance",
-      "fallback": null
+    "factor": {
+      "SSE": {
+        "primary": "baostock",
+        "validator": "tdx_xdxr",
+        "fallback": "akshare",
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "SZSE": {
+        "primary": "baostock",
+        "validator": "tdx_xdxr",
+        "fallback": "akshare",
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "BSE": {
+        "primary": "akshare",
+        "validator": "tdx_xdxr",
+        "fallback": null,
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "HKEX": {
+        "primary": "akshare",
+        "validator": null,
+        "fallback": "yfinance",
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      },
+      "NASDAQ": {
+        "primary": "yfinance",
+        "validator": null,
+        "fallback": null,
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      },
+      "NYSE": {
+        "primary": "yfinance",
+        "validator": null,
+        "fallback": null,
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      }
     }
   },
   "exchange_rules": {

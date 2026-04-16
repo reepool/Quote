@@ -186,13 +186,18 @@
         "misfire_grace_time": 3600,
         "coalesce": true,
         "parameters": {
+          "max_runtime_seconds": 14400,
           "exchanges": [
             "SSE",
             "SZSE",
             "BSE",
             "HKEX"
           ],
-          "start_date": "2025-01-01"
+          "start_date": "2025-01-01",
+          "skip_failed_segments": true,
+          "skip_ttl_days": 30,
+          "hkex_max_gap_segments_per_instrument": 20,
+          "hkex_max_missing_days_per_instrument": 60
         }
       },
       "quarterly_cleanup": {

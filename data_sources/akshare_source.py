@@ -5,9 +5,10 @@ Specialized for Chinese A-shares market data.
 
 import asyncio
 import aiohttp
+import math
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta, date
-from collections import Counter
+from collections import Counter, OrderedDict
 import pandas as pd
 
 # AkShare 代理补丁 - 必须在 import akshare 之前调用
@@ -61,11 +62,23 @@ from utils import akshare_logger
 class AkShareSource(BaseDataSource):
     """AkShare数据源 - 支持 A 股 (SSE/SZSE/BSE) + 港股 (HKEX) + 美股 (NASDAQ/NYSE)"""
 
+    _HK_FACTOR_RATIO_REL_TOL = 0.0005
+    _HK_FACTOR_RATIO_ABS_TOL = 0.0005
+    _HK_FACTOR_PERSIST_WINDOW = 3
+    _HK_FACTOR_MIN_WINDOW = 2
+    _HK_FACTOR_MIN_SHIFT_REL = 0.0008
+    _HK_FACTOR_NOISE_MULTIPLIER = 4.0
+    _HK_FACTOR_MAX_EVENTS_PER_YEAR = 24
+    _HK_FACTOR_MAX_EVENTS_PER_30D = 3
+    _FACTOR_ANCHOR_LOOKBACK_DAYS = 10
+    _HK_RAW_CACHE_LIMIT = 4096
+
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['SSE', 'SZSE', 'BSE']  # AkShare 支持全部 A 股交易所
         self.aio_session = None
         self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        self._recent_hk_raw_cache: OrderedDict[str, pd.DataFrame] = OrderedDict()
 
     @log_execution("AkShare", "initialize")
     async def _initialize_impl(self):
@@ -415,6 +428,7 @@ class AkShareSource(BaseDataSource):
                 if data is None or data.empty:
                     akshare_logger.warning(f"[{self.name}] No data found for {symbol} (HK)")
                     return []
+                self._cache_hk_raw_history(symbol, data)
             elif suffix == 'US':
                 # 优先使用 source_symbol（已在 _get_us_instrument_list 中保存的东财前缀代码）
                 # 如 "105.AAPL"（NASDAQ）/ "106.BAC"（NYSE），避免盲猜浪费 API 调用
@@ -1060,6 +1074,350 @@ class AkShareSource(BaseDataSource):
         """获取测试用的交易代码"""
         return "300708"  # 聚灿光电
 
+    def _normalize_hk_hist_df(self, hist_df: Optional[pd.DataFrame]) -> Optional[pd.DataFrame]:
+        """标准化港股历史数据为按日期升序索引的 DataFrame。"""
+        if hist_df is None or hist_df.empty:
+            return None
+
+        normalized = hist_df.copy()
+        if '日期' in normalized.columns:
+            normalized['日期'] = pd.to_datetime(normalized['日期'])
+            normalized = normalized.set_index('日期')
+        else:
+            normalized.index = pd.to_datetime(normalized.index)
+
+        return normalized.sort_index()
+
+    def _cache_hk_raw_history(self, symbol: str, raw_df: Optional[pd.DataFrame]) -> None:
+        """缓存最近一次港股原始历史窗口，供因子阶段复用。"""
+        normalized = self._normalize_hk_hist_df(raw_df)
+        if normalized is None or normalized.empty:
+            return
+
+        self._recent_hk_raw_cache[symbol] = normalized
+        self._recent_hk_raw_cache.move_to_end(symbol)
+        while len(self._recent_hk_raw_cache) > self._HK_RAW_CACHE_LIMIT:
+            self._recent_hk_raw_cache.popitem(last=False)
+
+    def _get_cached_hk_raw_history(self, symbol: str) -> Optional[pd.DataFrame]:
+        """读取最近一次缓存的港股原始历史窗口。"""
+        cached = self._recent_hk_raw_cache.get(symbol)
+        if cached is None or cached.empty:
+            return None
+
+        self._recent_hk_raw_cache.move_to_end(symbol)
+        return cached.copy()
+
+    def _get_factor_anchor_start(self, start_date: datetime) -> datetime:
+        """为短窗口补一个锚点，避免把窗口首行误判成新事件。"""
+        return start_date - timedelta(days=self._FACTOR_ANCHOR_LOOKBACK_DAYS)
+
+    def _build_sparse_factor_events(
+        self,
+        instrument_id: str,
+        cum_factor: pd.Series,
+        requested_start: date,
+        requested_end: date,
+        threshold: float,
+        source: str,
+        event_mode: str = 'cum_shift',
+        rel_tol: float = 0.0,
+        abs_tol: float = 0.0,
+    ) -> List[Dict[str, Any]]:
+        """将累积因子序列压缩为稀疏事件列表。
+
+        有窗口前锚点时，只记录窗口内真正发生跳变的日期；
+        无锚点时，允许首点非 1.0 作为初始锚记录。
+        """
+        if cum_factor is None or len(cum_factor) == 0:
+            return []
+
+        normalized = pd.to_numeric(cum_factor.copy(), errors='coerce')
+        normalized.index = pd.to_datetime(normalized.index)
+        normalized = normalized.replace([float('inf'), float('-inf')], float('nan')).dropna()
+        normalized = normalized[normalized > 0]
+        normalized = normalized[normalized.index >= pd.Timestamp('1990-01-01')].sort_index()
+        if normalized.empty:
+            return []
+
+        has_anchor_before_range = any(ts.date() < requested_start for ts in normalized.index)
+        shifts = normalized.diff().abs()
+
+        factors: List[Dict[str, Any]] = []
+        prev_cum: Optional[float] = None
+
+        for ts, cum in normalized.items():
+            current_date = ts.date()
+            cum_val = float(cum)
+            shift_raw = shifts.get(ts)
+            shift_val = float(shift_raw) if pd.notna(shift_raw) else None
+
+            is_first_point = prev_cum is None
+            is_event_day = False
+            day_factor_raw = None
+            if is_first_point:
+                if event_mode == 'factor_ratio':
+                    is_event_day = (
+                        not has_anchor_before_range
+                        and not math.isclose(
+                            cum_val,
+                            1.0,
+                            rel_tol=rel_tol,
+                            abs_tol=abs_tol,
+                        )
+                    )
+                else:
+                    is_event_day = not has_anchor_before_range and abs(cum_val - 1.0) > threshold
+            elif event_mode == 'factor_ratio':
+                if prev_cum not in (None, 0):
+                    day_factor_raw = cum_val / prev_cum
+                    is_event_day = not math.isclose(
+                        day_factor_raw,
+                        1.0,
+                        rel_tol=rel_tol,
+                        abs_tol=abs_tol,
+                    )
+            elif shift_val is not None and shift_val > threshold:
+                is_event_day = True
+
+            if requested_start <= current_date <= requested_end and is_event_day:
+                day_factor = round(day_factor_raw, 6) if day_factor_raw is not None else (
+                    round(cum_val / prev_cum, 6) if prev_cum not in (None, 0) else round(cum_val, 6)
+                )
+                factors.append({
+                    'instrument_id': instrument_id,
+                    'ex_date': ts.to_pydatetime(),
+                    'factor': day_factor,
+                    'cumulative_factor': round(cum_val, 6),
+                    'source': source,
+                })
+
+            prev_cum = cum_val
+
+        return factors
+
+    def _median_relative_deviation(
+        self,
+        values: pd.Series,
+        center: float,
+    ) -> float:
+        """估计平台内相对噪声水平。"""
+        if values is None or len(values) == 0 or center in (None, 0):
+            return 0.0
+
+        normalized = pd.to_numeric(pd.Series(values), errors='coerce').dropna()
+        if normalized.empty or center == 0:
+            return 0.0
+
+        return float((normalized / float(center) - 1.0).abs().median())
+
+    def _build_hk_plateau_factor_events(
+        self,
+        instrument_id: str,
+        cum_factor: pd.Series,
+        requested_start: date,
+        requested_end: date,
+        source: str,
+    ) -> List[Dict[str, Any]]:
+        """港股因子事件识别：寻找持久平台跃迁，而非逐日微抖动。
+
+        真实复权事件会使 cumulative_factor 从一个平台永久切换到新平台；
+        四舍五入噪声只会在同一平台内上下波动。这里用左右窗口中位数
+        比较 + 局部噪声倍数阈值，识别持久跃迁。
+        """
+        if cum_factor is None or len(cum_factor) == 0:
+            return []
+
+        normalized = pd.to_numeric(cum_factor.copy(), errors='coerce')
+        normalized.index = pd.to_datetime(normalized.index)
+        normalized = normalized.replace([float('inf'), float('-inf')], float('nan')).dropna()
+        normalized = normalized[normalized > 0]
+        normalized = normalized[normalized.index >= pd.Timestamp('1990-01-01')].sort_index()
+        if normalized.empty:
+            return []
+
+        has_anchor_before_range = any(ts.date() < requested_start for ts in normalized.index)
+        n = len(normalized)
+        window = self._HK_FACTOR_PERSIST_WINDOW
+        min_window = self._HK_FACTOR_MIN_WINDOW
+
+        candidate_indices: List[int] = []
+        values = normalized.to_list()
+        index = list(normalized.index)
+
+        for i in range(1, n):
+            left = normalized.iloc[max(0, i - window):i]
+            right = normalized.iloc[i:min(n, i + window)]
+            if len(left) < min_window or len(right) < min_window:
+                continue
+
+            left_level = float(left.median())
+            right_level = float(right.median())
+            if left_level <= 0 or right_level <= 0:
+                continue
+
+            shift_rel = abs(right_level / left_level - 1.0)
+            left_noise = self._median_relative_deviation(left, left_level)
+            right_noise = self._median_relative_deviation(right, right_level)
+            local_tol = max(
+                self._HK_FACTOR_MIN_SHIFT_REL,
+                self._HK_FACTOR_NOISE_MULTIPLIER * max(left_noise, right_noise),
+            )
+
+            if shift_rel > local_tol:
+                candidate_indices.append(i)
+
+        clusters: List[List[int]] = []
+        for idx in candidate_indices:
+            if not clusters or idx - clusters[-1][-1] > 1:
+                clusters.append([idx])
+            else:
+                clusters[-1].append(idx)
+
+        factors: List[Dict[str, Any]] = []
+
+        if not has_anchor_before_range:
+            first_window = normalized.iloc[:window]
+            first_level = float(first_window.median()) if not first_window.empty else float(values[0])
+            first_noise = self._median_relative_deviation(first_window, first_level)
+            first_tol = max(
+                self._HK_FACTOR_MIN_SHIFT_REL,
+                self._HK_FACTOR_NOISE_MULTIPLIER * first_noise,
+            )
+            first_date = index[0].date()
+            if (
+                requested_start <= first_date <= requested_end
+                and not math.isclose(first_level, 1.0, rel_tol=first_tol, abs_tol=first_tol)
+            ):
+                factors.append({
+                    'instrument_id': instrument_id,
+                    'ex_date': index[0].to_pydatetime(),
+                    'factor': round(first_level, 6),
+                    'cumulative_factor': round(first_level, 6),
+                    'source': source,
+                })
+
+        for cluster in clusters:
+            event_idx = max(
+                cluster,
+                key=lambda idx: abs(values[idx] / values[idx - 1] - 1.0)
+                if idx > 0 and values[idx - 1] not in (None, 0)
+                else 0.0,
+            )
+            event_ts = index[event_idx]
+            event_date = event_ts.date()
+            if not (requested_start <= event_date <= requested_end):
+                continue
+
+            left = normalized.iloc[max(0, event_idx - window):event_idx]
+            right = normalized.iloc[event_idx:min(n, event_idx + window)]
+            if len(left) < min_window or len(right) < min_window:
+                continue
+
+            left_level = float(left.median())
+            right_level = float(right.median())
+            if left_level <= 0 or right_level <= 0:
+                continue
+
+            day_factor = right_level / left_level
+            left_noise = self._median_relative_deviation(left, left_level)
+            right_noise = self._median_relative_deviation(right, right_level)
+            local_tol = max(
+                self._HK_FACTOR_MIN_SHIFT_REL,
+                self._HK_FACTOR_NOISE_MULTIPLIER * max(left_noise, right_noise),
+            )
+
+            if math.isclose(day_factor, 1.0, rel_tol=local_tol, abs_tol=local_tol):
+                continue
+
+            factors.append({
+                'instrument_id': instrument_id,
+                'ex_date': event_ts.to_pydatetime(),
+                'factor': round(day_factor, 6),
+                'cumulative_factor': round(right_level, 6),
+                'source': source,
+            })
+
+        return factors
+
+    def _build_hk_cumulative_factor(
+        self,
+        raw_df: pd.DataFrame,
+        hfq_df: pd.DataFrame,
+    ) -> pd.Series:
+        """基于港股 OHLC 多列比值构造更稳健的日度累积因子。
+
+        单独使用收盘价时，容易把东财按分价格式四舍五入误差放大。
+        对开/高/低/收分别求 hfq/raw，再取横截面中位数，可显著抑制
+        单列价格取整噪声，同时保持真实复权跃迁。
+        """
+        common_dates = raw_df.index.intersection(hfq_df.index)
+        if common_dates.empty:
+            return pd.Series(dtype=float)
+
+        ratio_frames = []
+        for field in ('开盘', '最高', '最低', '收盘'):
+            if field not in raw_df.columns or field not in hfq_df.columns:
+                continue
+
+            raw_vals = pd.to_numeric(raw_df.loc[common_dates, field], errors='coerce')
+            hfq_vals = pd.to_numeric(hfq_df.loc[common_dates, field], errors='coerce')
+            valid = (raw_vals > 0) & (hfq_vals > 0)
+            ratio = (hfq_vals[valid] / raw_vals[valid]).rename(field)
+            if not ratio.empty:
+                ratio_frames.append(ratio)
+
+        if not ratio_frames:
+            return pd.Series(dtype=float)
+
+        ratio_df = pd.concat(ratio_frames, axis=1)
+        cum_factor = ratio_df.median(axis=1, skipna=True)
+        cum_factor = pd.to_numeric(cum_factor, errors='coerce')
+        cum_factor = cum_factor.replace([float('inf'), float('-inf')], float('nan')).dropna()
+        return cum_factor.sort_index()
+
+    def _hk_factor_result_is_reliable(
+        self,
+        factors: List[Dict[str, Any]],
+        requested_start: date,
+        requested_end: date,
+    ) -> bool:
+        """港股因子结果可靠性检查。
+
+        真实港股复权事件通常很稀疏；若在短时间内连续识别出大量事件，
+        更可能是价格取整噪声而不是公司行为。
+        """
+        if not factors:
+            return True
+
+        span_days = max((requested_end - requested_start).days + 1, 1)
+        max_events = max(
+            8,
+            math.ceil(span_days / 365.25 * self._HK_FACTOR_MAX_EVENTS_PER_YEAR),
+        )
+        if len(factors) > max_events:
+            return False
+
+        event_dates = sorted(
+            f['ex_date'].date() if isinstance(f.get('ex_date'), datetime) else pd.Timestamp(f.get('ex_date')).date()
+            for f in factors
+            if f.get('ex_date') is not None
+        )
+        if not event_dates:
+            return True
+
+        for idx, current_date in enumerate(event_dates):
+            window_count = 1
+            for future_date in event_dates[idx + 1:]:
+                if (future_date - current_date).days <= 30:
+                    window_count += 1
+                else:
+                    break
+            if window_count > self._HK_FACTOR_MAX_EVENTS_PER_30D:
+                return False
+
+        return True
+
     async def health_check(self) -> bool:
         """数据源健康检查，带重试机制"""
         try:
@@ -1078,14 +1436,14 @@ class AkShareSource(BaseDataSource):
         调用 ak.stock_zh_a_daily(adjust="hfq-factor") 获取后复权因子.
         """
         try:
-            await self.rate_limiter.acquire()
-
             # HKEX 分支: 通过不复权/后复权价格反推因子
             suffix = instrument_id.split('.')[-1].upper() if '.' in instrument_id else ''
             if suffix == 'HK':
                 return await self._get_hk_adjustment_factors(
                     instrument_id, symbol, start_date, end_date
                 )
+
+            await self.rate_limiter.acquire()
 
             # AkShare 需要带市场前缀的代码
             if 'SH' in instrument_id or 'SSE' in instrument_id:
@@ -1142,15 +1500,6 @@ class AkShareSource(BaseDataSource):
                 )
                 return []
 
-            # 仅保留日期范围内的记录
-            factor_df = factor_df[
-                (factor_df.index.date >= start_date.date()) &
-                (factor_df.index.date <= end_date.date())
-            ]
-
-            if factor_df.empty:
-                return []
-
             # ★ AkShare 返回的因子列可能是 object/str 类型，必须先转 float
             factor_df = factor_df.copy()
             factor_df[factor_col] = pd.to_numeric(factor_df[factor_col], errors='coerce')
@@ -1158,45 +1507,14 @@ class AkShareSource(BaseDataSource):
 
             if factor_df.empty:
                 return []
-
-            # 计算相邻日期的因子变化量 (绝对值)
-            factor_df['_shift'] = factor_df[factor_col].diff().abs()
-
-            factors = []
-            prev_cum = None
-
-            for dt, row in factor_df.iterrows():
-                cum = float(row[factor_col])
-                shift = float(row['_shift']) if pd.notna(row['_shift']) else None
-
-                # 首行: 如果起始就有累积因子 (非1.0) 记录; 或因子突变
-                is_event_day = (
-                    (shift is None and abs(cum - 1.0) > 0.0001) or   # 首行非1.0
-                    (shift is not None and shift > 0.0001)              # 因子突变
-                )
-
-                if is_event_day:
-                    # 单日因子 = 当日累积 / 前日累积
-                    if prev_cum is not None and prev_cum != 0:
-                        day_factor = round(cum / prev_cum, 6)
-                    else:
-                        day_factor = round(cum, 6)
-
-                    try:
-                        factor_record = {
-                            'instrument_id': instrument_id,
-                            'ex_date': dt.to_pydatetime(),
-                            'factor': day_factor,
-                            'cumulative_factor': round(cum, 6),
-                            'source': 'akshare',
-                        }
-                        factors.append(factor_record)
-                    except Exception as parse_e:
-                        akshare_logger.warning(
-                            f"Failed to parse AkShare factor row for {instrument_id}: {parse_e}"
-                        )
-
-                prev_cum = cum
+            factors = self._build_sparse_factor_events(
+                instrument_id=instrument_id,
+                cum_factor=factor_df[factor_col],
+                requested_start=start_date.date(),
+                requested_end=end_date.date(),
+                threshold=0.0001,
+                source='akshare',
+            )
 
             akshare_logger.info(
                 f"Retrieved {len(factors)} adjustment factors from AkShare for {instrument_id}"
@@ -1212,95 +1530,88 @@ class AkShareSource(BaseDataSource):
     async def _get_hk_adjustment_factors(
         self, instrument_id: str, symbol: str,
         start_date: datetime, end_date: datetime
-    ) -> List[Dict[str, Any]]:
+    ) -> Optional[List[Dict[str, Any]]]:
         """港股复权因子: 对比不复权/后复权收盘价反推累积因子
 
         原理: cumulative_factor = hfq_close / raw_close
         仅在因子发生显著变化时记录 (除权事件日)，与 A 股稀疏存储一致。
         """
         try:
-            start_str = start_date.strftime('%Y%m%d')
             end_str = end_date.strftime('%Y%m%d')
+            requested_start = start_date.date()
+            requested_end = end_date.date()
 
-            # 1. 获取不复权数据
-            await self.rate_limiter.acquire()
-            raw_df = await asyncio.to_thread(
-                ak.stock_hk_hist, symbol=symbol, period="daily",
-                start_date=start_str, end_date=end_str, adjust=""
-            )
+            raw_df = None
+            hfq_start_date = start_date
+            cached_raw_df = self._get_cached_hk_raw_history(symbol)
+            if (
+                cached_raw_df is not None
+                and not cached_raw_df.empty
+                and cached_raw_df.index.max().date() >= requested_end
+                and cached_raw_df.index.min().date() < requested_start
+            ):
+                raw_df = cached_raw_df
+                hfq_start_date = datetime.combine(
+                    raw_df.index.min().date(), datetime.min.time()
+                )
+            else:
+                anchor_start = self._get_factor_anchor_start(start_date)
+                await self.rate_limiter.acquire()
+                raw_df = await asyncio.to_thread(
+                    ak.stock_hk_hist, symbol=symbol, period="daily",
+                    start_date=anchor_start.strftime('%Y%m%d'),
+                    end_date=end_str, adjust=""
+                )
+                raw_df = self._normalize_hk_hist_df(raw_df)
+                if raw_df is None or raw_df.empty:
+                    akshare_logger.debug(
+                        f"[{self.name}] HK factor: no raw data for {symbol}"
+                    )
+                    return []
+                self._cache_hk_raw_history(symbol, raw_df)
+                hfq_start_date = anchor_start
 
-            # 2. 获取后复权数据
             await self.rate_limiter.acquire()
             hfq_df = await asyncio.to_thread(
                 ak.stock_hk_hist, symbol=symbol, period="daily",
-                start_date=start_str, end_date=end_str, adjust="hfq"
+                start_date=hfq_start_date.strftime('%Y%m%d'),
+                end_date=end_str, adjust="hfq"
             )
 
+            hfq_df = self._normalize_hk_hist_df(hfq_df)
             if raw_df is None or hfq_df is None or raw_df.empty or hfq_df.empty:
                 akshare_logger.debug(
                     f"[{self.name}] HK factor: no data for {symbol}"
                 )
                 return []
 
-            # 3. 标准化日期索引并对齐
-            raw_df['日期'] = pd.to_datetime(raw_df['日期'])
-            hfq_df['日期'] = pd.to_datetime(hfq_df['日期'])
-            raw_df = raw_df.set_index('日期').sort_index()
-            hfq_df = hfq_df.set_index('日期').sort_index()
-
-            # 取交集日期
-            common_dates = raw_df.index.intersection(hfq_df.index)
-            if common_dates.empty:
-                return []
-
-            raw_close = raw_df.loc[common_dates, '收盘'].astype(float)
-            hfq_close = hfq_df.loc[common_dates, '收盘'].astype(float)
-
-            # 4. 计算每日累积因子 = hfq_close / raw_close
-            cum_factor = (hfq_close / raw_close).round(6)
-
-            # 过滤掉无效值 (raw_close == 0 会产生 inf)
-            cum_factor = cum_factor.replace([float('inf'), float('-inf')], float('nan')).dropna()
+            cum_factor = self._build_hk_cumulative_factor(raw_df, hfq_df)
             if cum_factor.empty:
                 return []
 
-            # 5. 仅保留因子突变日
-            # ★ 港股阈值 0.06: 东财后复权价格存在浮点精度误差（约±1-2%），
-            #   实测 02318/00001/00005 在 0.03 产生大量假阳性（61/75/41个），
-            #   0.06 可过滤绝大部分噪声，同时捕捉 ≥1% 股息率的真实除权事件
-            _HK_FACTOR_THRESHOLD = 0.06
-            factor_shift = cum_factor.diff().abs()
-            factors: List[Dict[str, Any]] = []
-            prev_cum = None
+            factors = self._build_hk_plateau_factor_events(
+                instrument_id=instrument_id,
+                cum_factor=cum_factor,
+                requested_start=requested_start,
+                requested_end=requested_end,
+                source='akshare',
+            )
 
-            for dt, cum in cum_factor.items():
-                cum_val = float(cum)
-                shift_val = float(factor_shift.get(dt, 0)) if pd.notna(factor_shift.get(dt)) else None
-
-                is_event_day = (
-                    (shift_val is None and abs(cum_val - 1.0) > _HK_FACTOR_THRESHOLD) or   # 首行非 1.0
-                    (shift_val is not None and shift_val > _HK_FACTOR_THRESHOLD)             # 因子突变
+            if not self._hk_factor_result_is_reliable(
+                factors,
+                requested_start=requested_start,
+                requested_end=requested_end,
+            ):
+                akshare_logger.warning(
+                    f"[{self.name}] HK factors unreliable for {symbol}: "
+                    f"{len(factors)} events in {requested_start}~{requested_end}, "
+                    "delegating to fallback"
                 )
-
-                if is_event_day:
-                    if prev_cum is not None and prev_cum != 0:
-                        day_factor = round(cum_val / prev_cum, 6)
-                    else:
-                        day_factor = round(cum_val, 6)
-
-                    factors.append({
-                        'instrument_id': instrument_id,
-                        'ex_date': dt.to_pydatetime(),
-                        'factor': day_factor,
-                        'cumulative_factor': round(cum_val, 6),
-                        'source': 'akshare',
-                    })
-
-                prev_cum = cum_val
+                return None
 
             akshare_logger.info(
                 f"[{self.name}] HK factors: {len(factors)} events for {symbol} "
-                f"({start_str}-{end_str})"
+                f"({start_date.strftime('%Y%m%d')}-{end_str})"
             )
             return factors
 

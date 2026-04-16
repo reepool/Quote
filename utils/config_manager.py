@@ -88,7 +88,7 @@ class DataSourceConfig:
     """数据源配置"""
     enabled: bool = True
     exchanges_supported: List[str] = field(default_factory=list)
-    primary_source_of: List[str] = field(default_factory=list)
+    instrument_types_supported: List[str] = field(default_factory=list)
     max_requests_per_minute: int = 30
     max_requests_per_hour: int = 500
     max_requests_per_day: int = 5000
@@ -435,7 +435,7 @@ class UnifiedConfigManager:
                     self._typed_cache[cache_key] = DataSourceConfig(
                         enabled=source_data.get('enabled', True),
                         exchanges_supported=source_data.get('exchanges_supported', []),
-                        primary_source_of=source_data.get('primary_source_of', []),
+                        instrument_types_supported=source_data.get('instrument_types_supported', []),
                         max_requests_per_minute=source_data.get('max_requests_per_minute', 30),
                         max_requests_per_hour=source_data.get('max_requests_per_hour', 500),
                         max_requests_per_day=source_data.get('max_requests_per_day', 5000),

@@ -15,6 +15,55 @@ from utils.date_utils import DateUtils
 from utils.cache import cache_manager
 
 
+def _apply_hkex_gap_guard(
+    gaps: List[Any],
+    max_segments_per_instrument: Optional[int],
+    max_missing_days_per_instrument: Optional[int],
+) -> tuple[List[Any], List[Dict[str, Any]], int]:
+    """为 HKEX 自动修复添加保护，避免单个标的海量缺口拖垮整个任务。"""
+    if not gaps:
+        return gaps, [], 0
+
+    grouped: Dict[str, List[Any]] = {}
+    for gap in gaps:
+        grouped.setdefault(gap.instrument_id, []).append(gap)
+
+    filtered: List[Any] = []
+    skipped_details: List[Dict[str, Any]] = []
+    skipped_count = 0
+
+    for instrument_id, instrument_gaps in grouped.items():
+        first_gap = instrument_gaps[0]
+        if first_gap.exchange != 'HKEX':
+            filtered.extend(instrument_gaps)
+            continue
+
+        segments = len(instrument_gaps)
+        missing_days = sum(gap.gap_days for gap in instrument_gaps)
+
+        skip_reasons = []
+        if max_segments_per_instrument and segments > max_segments_per_instrument:
+            skip_reasons.append(f"segments>{max_segments_per_instrument}")
+        if max_missing_days_per_instrument and missing_days > max_missing_days_per_instrument:
+            skip_reasons.append(f"missing_days>{max_missing_days_per_instrument}")
+
+        if skip_reasons:
+            skipped_count += segments
+            skipped_details.append({
+                'instrument_id': instrument_id,
+                'symbol': first_gap.symbol,
+                'exchange': first_gap.exchange,
+                'gap_segments': segments,
+                'missing_days': missing_days,
+                'reason': ','.join(skip_reasons),
+            })
+            continue
+
+        filtered.extend(instrument_gaps)
+
+    return filtered, skipped_details, skipped_count
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -514,6 +563,10 @@ class ScheduledTasks:
                                   start_date: Optional[date] = None,
                                   end_date: Optional[date] = None,
                                   severity_filter: Optional[List[str]] = None,
+                                  skip_failed_segments: bool = True,
+                                  skip_ttl_days: int = 30,
+                                  hkex_max_gap_segments_per_instrument: Optional[int] = 20,
+                                  hkex_max_missing_days_per_instrument: Optional[int] = 60,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """检测数据缺口并修复（复合任务）"""
         self._active_tasks.add('find_gap_and_repair')
@@ -552,15 +605,49 @@ class ScheduledTasks:
             else:
                 gaps_to_repair = all_gaps
 
+            gaps_to_repair, hkex_guard_details, hkex_guard_skipped = _apply_hkex_gap_guard(
+                gaps_to_repair,
+                hkex_max_gap_segments_per_instrument,
+                hkex_max_missing_days_per_instrument,
+            )
+            if hkex_guard_skipped:
+                scheduler_logger.warning(
+                    "[Scheduler] HKEX guard skipped %s gap segments across %s instruments",
+                    hkex_guard_skipped,
+                    len(hkex_guard_details)
+                )
+
+            skip_set = set()
+            if skip_failed_segments:
+                skip_set = await data_manager.load_gap_skip_set(ttl_days=skip_ttl_days)
+                scheduler_logger.info(
+                    "[Scheduler] Loaded %s recent failed gap segments into skip set",
+                    len(skip_set)
+                )
+
             repaired = 0
             failed = 0
+            skipped_known_failures = 0
             failure_details = []
             for gap in gaps_to_repair:
+                if skip_failed_segments and data_manager.is_gap_skipped(
+                    skip_set, gap.instrument_id, gap.gap_start, gap.gap_end
+                ):
+                    skipped_known_failures += 1
+                    continue
+
                 try:
                     success = await data_manager._fill_single_gap(gap)
                     if success:
                         repaired += 1
                     else:
+                        if skip_failed_segments:
+                            await data_manager.record_gap_skip(
+                                gap.instrument_id, gap.gap_start, gap.gap_end, reason='no_data'
+                            )
+                            skip_set.add(data_manager.build_gap_skip_key(
+                                gap.instrument_id, gap.gap_start, gap.gap_end
+                            ))
                         failure_details.append({
                             'instrument_id': gap.instrument_id,
                             'exchange': gap.exchange,
@@ -577,6 +664,13 @@ class ScheduledTasks:
                         )
                         failed += 1
                 except Exception as gap_e:
+                    if skip_failed_segments:
+                        await data_manager.record_gap_skip(
+                            gap.instrument_id, gap.gap_start, gap.gap_end, reason='source_error'
+                        )
+                        skip_set.add(data_manager.build_gap_skip_key(
+                            gap.instrument_id, gap.gap_start, gap.gap_end
+                        ))
                     scheduler_logger.warning(f"[Scheduler] Failed to fill gap for {gap.instrument_id}: {gap_e}")
                     failure_details.append({
                         'instrument_id': gap.instrument_id,
@@ -602,15 +696,23 @@ class ScheduledTasks:
                 'top_affected_stocks': top_affected_stocks,
                 'summary': {
                     'detected_gaps': len(all_gaps),
+                    'candidate_gaps': len(gaps_to_repair),
                     'repaired_gaps': repaired,
-                    'failed_repairs': failed
+                    'failed_repairs': failed,
+                    'skipped_known_failures': skipped_known_failures,
+                    'skipped_by_hkex_guard': hkex_guard_skipped
                 },
                 'failure_details': failure_details[:50],
+                'skipped_instruments': hkex_guard_details[:50],
                 'filters': {
                     'exchanges': exchanges,
                     'start_date': start_date.isoformat(),
                     'end_date': end_date.isoformat(),
-                    'severity_filter': severity_filter
+                    'severity_filter': severity_filter,
+                    'skip_failed_segments': skip_failed_segments,
+                    'skip_ttl_days': skip_ttl_days,
+                    'hkex_max_gap_segments_per_instrument': hkex_max_gap_segments_per_instrument,
+                    'hkex_max_missing_days_per_instrument': hkex_max_missing_days_per_instrument
                 }
             }
 

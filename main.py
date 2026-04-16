@@ -512,6 +512,14 @@ class QuoteSystem:
             import traceback
             scheduler_logger.error(f"[Main] Exception details: {traceback.format_exc()}")
             return False
+        finally:
+            try:
+                from data_manager import data_manager
+                if hasattr(data_manager, 'close'):
+                    await data_manager.close()
+                    scheduler_logger.debug("[Main] DataManager closed after run_job")
+            except Exception as close_error:
+                scheduler_logger.warning(f"[Main] Failed to close DataManager after job {job_id}: {close_error}")
 
     async def show_system_status(self):
         """显示系统状态"""

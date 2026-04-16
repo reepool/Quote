@@ -196,7 +196,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [],
       "max_requests_per_minute": 8,
       "max_requests_per_hour": 300,
       "max_requests_per_day": 5000,
@@ -210,7 +209,6 @@
         "hk_stock",
         "us_stock"
       ],
-      "primary_source_of": [],
       "max_requests_per_minute": 8,
       "max_requests_per_hour": 300,
       "max_requests_per_day": 5000,
@@ -222,7 +220,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [],
       "max_requests_per_minute": 200,
       "max_requests_per_hour": 1000,
       "max_requests_per_day": 2000,
@@ -235,9 +232,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [
-        "a_stock"
-      ],
       "max_requests_per_minute": 60,
       "max_requests_per_hour": 3000,
       "max_requests_per_day": 60000,
@@ -245,6 +239,94 @@
       "retry_interval": 5.0,
       "network_error_retry_interval": 10.0,
       "connection_timeout": 30.0
+    }
+  },
+  "routing": {
+    "daily": {
+      "SSE": {
+        "stock": [
+          "baostock",
+          "akshare"
+        ],
+        "index": [
+          "baostock",
+          "akshare"
+        ]
+      },
+      "SZSE": {
+        "stock": [
+          "baostock",
+          "akshare"
+        ],
+        "index": [
+          "baostock",
+          "akshare"
+        ]
+      }
+    },
+    "daily_behavior": {
+      "default": {
+        "stock": {
+          "skip_backup_on_empty_short_range": true
+        },
+        "index": {
+          "skip_backup_on_empty_short_range": false
+        }
+      }
+    },
+    "instrument_list": {
+      "a_stock": [
+        "baostock"
+      ]
+    },
+    "calendar": {
+      "a_stock": [
+        "baostock"
+      ]
+    },
+    "factor": {
+      "SSE": {
+        "primary": "baostock",
+        "validator": "tdx_xdxr",
+        "fallback": "akshare",
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "SZSE": {
+        "primary": "baostock",
+        "validator": "tdx_xdxr",
+        "fallback": "akshare",
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "BSE": {
+        "primary": "akshare",
+        "validator": "tdx_xdxr",
+        "fallback": null,
+        "daily_sync_enabled": true,
+        "maintenance_sync_enabled": true
+      },
+      "HKEX": {
+        "primary": "akshare",
+        "validator": null,
+        "fallback": "yfinance",
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      },
+      "NASDAQ": {
+        "primary": "yfinance",
+        "validator": null,
+        "fallback": null,
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      },
+      "NYSE": {
+        "primary": "yfinance",
+        "validator": null,
+        "fallback": null,
+        "daily_sync_enabled": false,
+        "maintenance_sync_enabled": false
+      }
     }
   },
   "exchange_rules": {

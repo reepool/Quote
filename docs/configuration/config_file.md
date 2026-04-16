@@ -504,29 +504,57 @@
 ```json
 {
   "data_sources_config": {
-    "akshare": {
-      "enabled": false,
+    "pytdx": {
+      "enabled": true,
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [],
-      "max_requests_per_minute": 8,
-      "max_requests_per_hour": 300,
-      "max_requests_per_day": 5000,
-      "retry_times": 5,
-      "retry_interval": 3.0
+      "instrument_types_supported": [
+        "stock"
+      ],
+      "max_requests_per_minute": 6000,
+      "max_requests_per_hour": 300000,
+      "max_requests_per_day": 5000000,
+      "retry_times": 3,
+      "retry_interval": 1.0
     },
-    "yfinance": {
-      "enabled": false,
+    "baostock": {
+      "enabled": true,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "instrument_types_supported": [
+        "stock",
+        "index"
+      ],
+      "max_requests_per_minute": 600,
+      "max_requests_per_hour": 8000,
+      "max_requests_per_day": 80000,
+      "retry_times": 5,
+      "retry_interval": 5.0
+    },
+    "akshare": {
+      "enabled": true,
       "exchanges_supported": [
         "a_stock",
         "hk_stock",
         "us_stock"
       ],
-      "primary_source_of": [],
-      "max_requests_per_minute": 8,
-      "max_requests_per_hour": 300,
-      "max_requests_per_day": 5000,
+      "max_requests_per_minute": 120,
+      "max_requests_per_hour": 3800,
+      "max_requests_per_day": 50000,
+      "retry_times": 5,
+      "retry_interval": 3.0
+    },
+    "yfinance": {
+      "enabled": true,
+      "exchanges_supported": [
+        "hk_stock",
+        "us_stock"
+      ],
+      "max_requests_per_minute": 30,
+      "max_requests_per_hour": 1500,
+      "max_requests_per_day": 10000,
       "retry_times": 3,
       "retry_interval": 2.0
     },
@@ -535,7 +563,6 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "primary_source_of": [],
       "max_requests_per_minute": 200,
       "max_requests_per_hour": 1000,
       "max_requests_per_day": 2000,
@@ -548,78 +575,37 @@
   ...
 ```
 
-### data_sources_config.akshare
+`data_sources_config` 现在只描述单个 source 的能力边界和连接/限流参数，不再承担“谁是主源”的路由职责。  
+日线、品种列表、交易日历、复权因子等主备顺序统一由 `routing` 配置决定。
+
+通用字段说明：
+
+- **`enabled`**: `bool`，是否启用该 source
+- **`exchanges_supported`**: `List[str]`，该 source 会为哪些 region 实例化，例如 `a_stock`、`hk_stock`、`us_stock`
+- **`instrument_types_supported`**: `List[str]`，可选能力边界；声明后会参与启动期路由校验，例如 `stock`、`index`
+- **`max_requests_per_minute` / `max_requests_per_hour` / `max_requests_per_day`**: 速率限制
+- **`retry_times` / `retry_interval`**: 默认重试参数
+- 其余字段如 `token`、`proxy`、`connection_timeout`、`batch_size` 等，属于 source 自身连接参数
+
+### data_sources_config.pytdx
 
 ```json
 {
-  "akshare": {
-    "enabled": false,
+  "pytdx": {
+    "enabled": true,
     "exchanges_supported": [
       "a_stock"
     ],
-    "primary_source_of": []
+    "instrument_types_supported": [
+      "stock"
+    ]
   }
 }
   ...
 ```
 
-- **`enabled`**: `bool` (默认: `False`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`exchanges_supported`**: `List` (默认: `['a_stock']`) —— *指明目前本接口数据源能够安全承接哪些宏观维度的查询（例如 a_stock 意味着包揽整个 A 股）*
-- **`primary_source_of`**: `List` (默认: `[]`) —— *本接口在哪些市场拥有第一优先级霸主处理身份（不再走兜底查询链路）*
-- **`max_requests_per_minute`**: `int` (默认: `8`) —— *单一节点 1 分钟区间由于网络防刷保护限制的查询总额设定*
-- **`max_requests_per_hour`**: `int` (默认: `300`) —— *单一节点 1 小时区间防封拦截的查询最大总额设定*
-- **`max_requests_per_day`**: `int` (默认: `5000`) —— *单一节点 全日上限阈值设定（超过即熔断当日操作）*
-- **`retry_times`**: `int` (默认: `5`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
-- **`retry_interval`**: `float` (默认: `3.0`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-### data_sources_config.yfinance
+- **`instrument_types_supported`**: 当前建议为 `['stock']`，因为指数日线不走 `pytdx`
 
-```json
-{
-  "yfinance": {
-    "enabled": false,
-    "exchanges_supported": [
-      "a_stock",
-      "hk_stock",
-      "us_stock"
-    ],
-    "primary_source_of": []
-  }
-}
-  ...
-```
-
-- **`enabled`**: `bool` (默认: `False`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`exchanges_supported`**: `List` (默认: `['a_stock', 'hk_stock', 'us_stock']`) —— *指明目前本接口数据源能够安全承接哪些宏观维度的查询（例如 a_stock 意味着包揽整个 A 股）*
-- **`primary_source_of`**: `List` (默认: `[]`) —— *本接口在哪些市场拥有第一优先级霸主处理身份（不再走兜底查询链路）*
-- **`max_requests_per_minute`**: `int` (默认: `8`) —— *单一节点 1 分钟区间由于网络防刷保护限制的查询总额设定*
-- **`max_requests_per_hour`**: `int` (默认: `300`) —— *单一节点 1 小时区间防封拦截的查询最大总额设定*
-- **`max_requests_per_day`**: `int` (默认: `5000`) —— *单一节点 全日上限阈值设定（超过即熔断当日操作）*
-- **`retry_times`**: `int` (默认: `3`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
-- **`retry_interval`**: `float` (默认: `2.0`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-### data_sources_config.tushare
-
-```json
-{
-  "tushare": {
-    "enabled": false,
-    "exchanges_supported": [
-      "a_stock"
-    ],
-    "primary_source_of": []
-  }
-}
-  ...
-```
-
-- **`enabled`**: `bool` (默认: `False`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`exchanges_supported`**: `List` (默认: `['a_stock']`) —— *指明目前本接口数据源能够安全承接哪些宏观维度的查询（例如 a_stock 意味着包揽整个 A 股）*
-- **`primary_source_of`**: `List` (默认: `[]`) —— *本接口在哪些市场拥有第一优先级霸主处理身份（不再走兜底查询链路）*
-- **`max_requests_per_minute`**: `int` (默认: `200`) —— *单一节点 1 分钟区间由于网络防刷保护限制的查询总额设定*
-- **`max_requests_per_hour`**: `int` (默认: `1000`) —— *单一节点 1 小时区间防封拦截的查询最大总额设定*
-- **`max_requests_per_day`**: `int` (默认: `2000`) —— *单一节点 全日上限阈值设定（超过即熔断当日操作）*
-- **`retry_times`**: `int` (默认: `3`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
-- **`retry_interval`**: `float` (默认: `1.0`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`token`**: `str` (默认: ``) —— *专属金融接口商业鉴权调用 Token（例如 Tushare 会员密匙）*
 ### data_sources_config.baostock
 
 ```json
@@ -629,24 +615,132 @@
     "exchanges_supported": [
       "a_stock"
     ],
-    "primary_source_of": [
-      "a_stock"
+    "instrument_types_supported": [
+      "stock",
+      "index"
     ]
   }
 }
   ...
 ```
 
-- **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`exchanges_supported`**: `List` (默认: `['a_stock']`) —— *指明目前本接口数据源能够安全承接哪些宏观维度的查询（例如 a_stock 意味着包揽整个 A 股）*
-- **`primary_source_of`**: `List` (默认: `['a_stock']`) —— *本接口在哪些市场拥有第一优先级霸主处理身份（不再走兜底查询链路）*
-- **`max_requests_per_minute`**: `int` (默认: `60`) —— *单一节点 1 分钟区间由于网络防刷保护限制的查询总额设定*
-- **`max_requests_per_hour`**: `int` (默认: `3000`) —— *单一节点 1 小时区间防封拦截的查询最大总额设定*
-- **`max_requests_per_day`**: `int` (默认: `60000`) —— *单一节点 全日上限阈值设定（超过即熔断当日操作）*
-- **`retry_times`**: `int` (默认: `5`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
-- **`retry_interval`**: `float` (默认: `5.0`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`network_error_retry_interval`**: `float` (默认: `10.0`) —— *遭遇服务器主动挂断拒绝或 Timeout 时延缓的重新探测冷却期（防IP 关小黑屋）*
-- **`connection_timeout`**: `float` (默认: `30.0`) —— *往接口建连请求或 SSL 握手过程当中的限时放弃标准门槛*
+- **`instrument_types_supported`**: 当前建议包含 `stock` 和 `index`，以支持 A 股指数日线
+
+### data_sources_config.akshare
+
+```json
+{
+  "akshare": {
+    "enabled": true,
+    "exchanges_supported": [
+      "a_stock",
+      "hk_stock",
+      "us_stock"
+    ]
+  }
+}
+  ...
+```
+
+- **`instrument_types_supported`**: 未声明时默认表示“不额外限制”
+
+### data_sources_config.yfinance
+
+```json
+{
+  "yfinance": {
+    "enabled": true,
+    "exchanges_supported": [
+      "hk_stock",
+      "us_stock"
+    ]
+  }
+}
+  ...
+```
+
+- **`proxy`**: 仅对 `yfinance` 生效，用于海外行情代理访问
+
+## routing
+
+```json
+{
+  "routing": {
+    "daily": {
+      "SSE": {
+        "stock": ["pytdx", "baostock", "akshare"],
+        "index": ["baostock", "akshare"]
+      },
+      "SZSE": {
+        "stock": ["pytdx", "baostock", "akshare"],
+        "index": ["baostock", "akshare"]
+      },
+      "BSE": {
+        "stock": ["pytdx", "akshare"],
+        "index": ["akshare"]
+      },
+      "HKEX": {
+        "stock": ["akshare", "yfinance"]
+      }
+    },
+    "daily_behavior": {
+      "default": {
+        "stock": {
+          "skip_backup_on_empty_short_range": true
+        },
+        "index": {
+          "skip_backup_on_empty_short_range": false
+        }
+      }
+    },
+    "instrument_list": {
+      "a_stock": ["baostock"],
+      "hk_stock": ["akshare"],
+      "us_stock": ["akshare"]
+    },
+    "calendar": {
+      "a_stock": ["baostock"],
+      "hk_stock": ["akshare"],
+      "us_stock": ["akshare"]
+    },
+    "factor": {
+      "SSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
+      "SZSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
+      "BSE": {"primary": "akshare", "validator": "tdx_xdxr", "fallback": null, "daily_sync_enabled": true, "maintenance_sync_enabled": true},
+      "HKEX": {"primary": "akshare", "validator": null, "fallback": "yfinance", "daily_sync_enabled": false, "maintenance_sync_enabled": false},
+      "NASDAQ": {"primary": "yfinance", "validator": null, "fallback": null, "daily_sync_enabled": false, "maintenance_sync_enabled": false},
+      "NYSE": {"primary": "yfinance", "validator": null, "fallback": null, "daily_sync_enabled": false, "maintenance_sync_enabled": false}
+    }
+  }
+}
+  ...
+```
+
+`routing` 是当前数据源选择的单一真相来源。
+
+- **`routing.daily.<exchange>.<instrument_type>`**: `List[str]`
+  第一个元素是主源，后续元素按顺序作为 fallback。缺失配置时，`DataSourceFactory` 会在启动或调用时抛出明确配置错误，不再按 region 做隐式推断。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.skip_backup_on_empty_short_range`**: `bool`
+  控制短区间查询中“主源空结果是否跳过 fallback”。当前默认行为是 `stock=true`、`index=false`。
+- **`routing.instrument_list.<region>`**: `List[str]`
+  指定品种列表抓取链，按 region 配置。
+- **`routing.calendar.<region>`**: `List[str]`
+  指定交易日历抓取链，按 region 配置。
+- **`routing.factor.<exchange>`**: `Object`
+  指定复权因子路由，支持 `primary`、`validator`、`fallback`、`daily_sync_enabled`、`maintenance_sync_enabled`。其中 `primary` 是正式抓取与回补入口实际使用的主源；`validator=tdx_xdxr` 是特殊值，仅用于 A 股旁路审计，不参与主抓取结果选择。`daily_sync_enabled=false` 表示该交易所在日更任务中跳过 Phase 2 因子同步；`maintenance_sync_enabled=false` 表示该交易所在每周维护任务中也跳过自动因子同步，改由显式回补或专门任务承担。
+
+当前生产配置的关键路由示例：
+
+- A 股股票日线：`SSE/SZSE stock = pytdx -> baostock -> akshare`
+- A 股指数日线：`SSE/SZSE index = baostock -> akshare`
+- 北交所股票日线：`BSE stock = pytdx -> akshare`
+- 港股股票日线：`HKEX stock = akshare -> yfinance`
+- A 股品种列表与交易日历：`baostock`
+- 港股/美股品种列表与交易日历：`akshare`
+- A 股复权因子主源：`baostock`
+- 港股复权因子主源：`akshare`（`yfinance` 仅作为失败时的少量补位）
+- 美股复权因子主源：`yfinance`（当前尚未正式上线）
+
 ## exchange_rules
 
 ```json

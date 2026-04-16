@@ -100,8 +100,8 @@ def example_data_source_config():
         if config:
             print(f"\n{source_name.upper()} 配置:")
             print(f"  - 启用状态: {config.enabled}")
-            print(f"  - 支持交易所: {config.exchanges_supported}")
-            print(f"  - 主要数据源: {config.primary_source_of}")
+            print(f"  - 支持市场区域: {config.exchanges_supported}")
+            print(f"  - 支持品种类型: {config.instrument_types_supported or ['全部']}")
             print(f"  - 请求限制: {config.max_requests_per_minute} 次/分钟")
             print(f"  - 重试次数: {config.retry_times}")
             print(f"  - 重试间隔: {config.retry_interval} 秒")

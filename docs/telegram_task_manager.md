@@ -201,6 +201,28 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 > **\u63d0\u793a**\uff1a\u5f53\u524d\u914d\u7f6e\u4e0b\u4e24\u8005\u884c\u4e3a\u57fa\u672c\u4e00\u81f4\u3002`/backfill` \u7684\u4f18\u52bf\u5728\u4e8e\u53ef\u4ee5\u7075\u6d3b\u6307\u5b9a\u4ea4\u6613\u6240\uff0c\u4e14\u4e0d\u4f9d\u8d56\u8c03\u5ea6\u5668\u72b6\u6001\u3002
 
+## 📈 复权因子回补
+
+`/backfill_factors` 现在直接调用系统内置的正式回补逻辑，不再依赖独立脚本子进程。
+
+```text
+/backfill_factors
+/backfill_factors SSE SZSE
+/backfill_factors HKEX missing
+/backfill_factors HKEX full
+```
+
+参数说明：
+
+- 交易所参数可选，支持 `SSE`、`SZSE`、`BSE`、`HKEX`、`NASDAQ`、`NYSE`
+- `missing` 模式：仅处理当前完全没有因子记录的股票，适合常规补缺
+- `full` 模式：对目标交易所全部股票执行全量重抓并 upsert，适合清理错误因子后的重建
+
+港股修复建议：
+
+- 删除确认错误的 `HKEX + source='akshare'` 因子后，使用 `/backfill_factors HKEX full`
+- 当前正式路由会按 `routing.factor.HKEX.primary` 执行；生产配置应使用 `akshare` 港股因子倒算逻辑，`yfinance` 只作为失败时的少量补位，不承担主源角色
+
 ## 🔔 任务启动通知
 
 调度器自动触发的定时任务在执行前，会向 Telegram 发送一条启动通知，便于用户感知系统运行状态。

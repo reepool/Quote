@@ -40,7 +40,7 @@ class TaskManagerHandlers:
         message += "\n\n*可用命令：*\n"
         message += "• `/status` - 查看任务状态\n"
         message += "• `/detail <任务ID>` - 查看任务详情\n"
-        message += "• `/backfill_factors` - 回填复权因子\n"
+        message += "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
         message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
         message += "• `/find_gap_and_repair` - 精确逐日修复缺口\n"
@@ -85,7 +85,7 @@ class TaskManagerHandlers:
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
-            "• `/backfill_factors` - 扫描并回填缺失的复权因子\n"
+            "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
             "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
             "• `/reload_config` - 重载配置文件\n"
@@ -103,6 +103,7 @@ class TaskManagerHandlers:
             "• `/run system_health_check`\n"
             "• `/run daily_data_update 2026-03-27`\n"
             "• `/backfill 2026-03-27`\n"
+            "• `/backfill_factors HKEX full`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
@@ -1021,68 +1022,116 @@ class TaskManagerHandlers:
             self.task_manager.logger.error(f"[TaskManagerHandlers] 数据补充失败: {e}")
 
     async def handle_backfill_factors_command(self, event) -> None:
-        """处理 /backfill_factors 命令，调用单独的脚本回填复权因子"""
+        """处理 /backfill_factors 命令，走 DataManager 正式回补逻辑。"""
         chat_id = event.chat_id
         user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
         command_text = event.text if hasattr(event, 'text') else '/backfill_factors'
 
         self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
 
-        start_message = "⏳ *开始扫描并回填复权因子...*\n\n脚本已在后台启动。由于涉及网络请求，此过程可能需要几分钟。执行完成后将在此发送报告。"
+        parts = command_text.strip().split()
+        exchanges: List[str] = []
+        mode = 'missing'
+        valid_exchanges = {'SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'}
+        valid_modes = {'missing', 'full', 'resume'}
+
+        for token in parts[1:]:
+            normalized = token.upper()
+            if normalized in valid_exchanges:
+                exchanges.append(normalized)
+                continue
+
+            lowered = token.lower()
+            if lowered in valid_modes:
+                mode = 'missing' if lowered == 'resume' else lowered
+                continue
+
+            error_message = (
+                "❌ *参数错误*\n\n"
+                "用法: `/backfill_factors [交易所...] [missing|full]`\n\n"
+                "*示例：*\n"
+                "• `/backfill_factors`\n"
+                "• `/backfill_factors SSE SZSE`\n"
+                "• `/backfill_factors HKEX full`\n"
+                "• `/backfill_factors HKEX missing`\n"
+            )
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        exchanges = list(dict.fromkeys(exchanges))
+        exchange_info = ', '.join(exchanges) if exchanges else '当前启用市场'
+        start_message = (
+            "⏳ *开始回填复权因子...*\n\n"
+            f"交易所: `{exchange_info}`\n"
+            f"模式: `{mode}`\n\n"
+            "任务已在后台启动。执行完成后将在此发送报告。"
+        )
         await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
 
-        # 在后台执行脚本，避免阻塞主循环
-        asyncio.create_task(self._run_backfill_factors_script(chat_id))
-
-    async def _run_backfill_factors_script(self, chat_id: int):
-        """后台运行 scripts/backfill_factors.py 并捕获输出报告"""
-        try:
-            import sys
-            import os
-            # 找到主目录
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            script_path = os.path.join(project_root, 'scripts', 'backfill_factors.py')
-
-            # 启动子进程执行该脚本
-            process = await asyncio.create_subprocess_exec(
-                sys.executable, script_path,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=project_root
+        asyncio.create_task(
+            self._run_backfill_factors_task(
+                chat_id=chat_id,
+                exchanges=exchanges or None,
+                mode=mode,
             )
+        )
 
-            stdout, stderr = await process.communicate()
-            
-            output = stdout.decode('utf-8', errors='replace')
-            error_output = stderr.decode('utf-8', errors='replace')
+    async def _run_backfill_factors_task(
+        self,
+        chat_id: int,
+        exchanges: Optional[List[str]],
+        mode: str,
+    ) -> None:
+        """后台执行正式复权因子回补任务。"""
+        try:
+            from data_manager import data_manager
 
-            if process.returncode == 0:
-                # 提取报告部分
-                summary = ""
-                if "回填任务最终统计报告" in output:
-                    lines = output.split('\n')
-                    try:
-                        # 找到包含“回填任务最终统计报告”的那一行
-                        idx = next(i for i, line in enumerate(lines) if "回填任务最终统计报告" in line)
-                        # 向上回溯 1 行 (等号边界)，向下取 20 行包含结论的内容
-                        start_idx = max(0, idx - 1)
-                        end_idx = min(len(lines), idx + 20)
-                        summary = "\n".join(lines[start_idx:end_idx]).strip()
-                    except StopIteration:
-                        summary = output[-1000:]
-                else:
-                    # 没找到显式报告则截取最后部分
-                    summary = output[-1000:]
+            await data_manager.initialize()
+            result = await data_manager.backfill_adjustment_factors(
+                exchanges=exchanges,
+                mode=mode,
+            )
+            totals = result.get('totals', {})
+            by_exchange = result.get('by_exchange', {})
+            exchange_lines = []
+            for exchange, stats in by_exchange.items():
+                exchange_lines.append(
+                    f"{exchange}: scanned={stats.get('stocks_total', 0)}, "
+                    f"synced={stats.get('synced_instruments', 0)}, "
+                    f"skip_existing={stats.get('skipped_existing', 0)}, "
+                    f"no_factors={stats.get('no_factors', 0)}, "
+                    f"errors={stats.get('errors', 0)}"
+                )
 
-                msg = f"✅ *复权因子回填完成*\n\n```text\n{summary}\n```"
-                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
-            else:
-                msg = f"❌ *复权因子回填失败(Exit Code: {process.returncode})*\n\n*错误输出:*\n```text\n{error_output[-800:]}\n```"
-                await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
+            summary = "\n".join(exchange_lines) if exchange_lines else "无可报告结果"
+            msg = (
+                "✅ *复权因子回填完成*\n\n"
+                f"模式: `{result.get('mode', mode)}`\n"
+                f"范围: `{result.get('start_date')}` ~ `{result.get('end_date')}`\n"
+                f"交易所: `{', '.join(result.get('exchanges', exchanges or []))}`\n\n"
+                "```text\n"
+                f"total_stocks={totals.get('stocks_total', 0)}\n"
+                f"synced_instruments={totals.get('synced_instruments', 0)}\n"
+                f"saved_records={totals.get('saved_records', 0)}\n"
+                f"skipped_existing={totals.get('skipped_existing', 0)}\n"
+                f"no_factors={totals.get('no_factors', 0)}\n"
+                f"errors={totals.get('errors', 0)}\n"
+                f"{summary}\n"
+                "```"
+            )
+            await self.task_manager.send_message(chat_id, msg, parse_mode='markdown')
 
         except Exception as e:
-            self.task_manager.logger.error(f"[TaskManagerHandlers] 运行 backfill_factors.py 异常: {e}")
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 执行复权因子回填异常: {e}")
             await self.task_manager.send_message(chat_id, f"❌ *复权因子回填异常*\n\n错误: {str(e)}", parse_mode='markdown')
+        finally:
+            try:
+                from data_manager import data_manager
+                await data_manager.close()
+            except Exception as close_error:
+                self.task_manager.logger.warning(
+                    f"[TaskManagerHandlers] 关闭 DataManager 失败: {close_error}"
+                )
 
     def _parse_date_arg(self, date_str: str):
         """解析日期字符串，返回 date 对象或 None"""

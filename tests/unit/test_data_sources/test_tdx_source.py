@@ -449,31 +449,32 @@ class TestConfigRoutes:
         with open(config_path) as f:
             d = json.load(f)
         assert "data_sources_config" in d
-        assert "factor_sources" in d
+        assert "routing" in d
 
-    def test_pytdx_is_a_stock_primary(self):
-        """pytdx 是 a_stock 日线主源"""
+    def test_pytdx_is_primary_for_a_share_stock_daily_routes(self):
+        """pytdx 是 A 股 stock 日线路由首选"""
         import json
         config_path = os.path.join(
             os.path.dirname(__file__), '..', '..', '..', 'config', '03_data.json'
         )
         with open(config_path) as f:
             d = json.load(f)
-        pytdx_cfg = d["data_sources_config"]["pytdx"]
-        assert pytdx_cfg["enabled"] is True
-        assert "a_stock" in pytdx_cfg["primary_source_of"]
+        daily = d["routing"]["daily"]
+        assert daily["SSE"]["stock"][0] == "pytdx"
+        assert daily["SZSE"]["stock"][0] == "pytdx"
+        assert daily["BSE"]["stock"][0] == "pytdx"
 
-    def test_baostock_is_instrument_primary(self):
-        """baostock 是 a_stock 品种列表主源"""
+    def test_baostock_routes_instrument_list_and_calendar_for_a_stock(self):
+        """baostock 负责 a_stock 的品种列表和交易日历"""
         import json
         config_path = os.path.join(
             os.path.dirname(__file__), '..', '..', '..', 'config', '03_data.json'
         )
         with open(config_path) as f:
             d = json.load(f)
-        bao = d["data_sources_config"]["baostock"]
-        assert "a_stock" in bao["instrument_list_source_of"]
-        assert bao["primary_source_of"] == []  # 不再是日线主源
+        routing = d["routing"]
+        assert routing["instrument_list"]["a_stock"][0] == "baostock"
+        assert routing["calendar"]["a_stock"][0] == "baostock"
 
     def test_factor_routes_complete(self):
         """因子路由覆盖 SSE/SZSE/BSE"""
@@ -483,7 +484,7 @@ class TestConfigRoutes:
         )
         with open(config_path) as f:
             d = json.load(f)
-        fs = d["factor_sources"]
+        fs = d["routing"]["factor"]
         assert fs["SSE"]["primary"] == "baostock"
         assert fs["SSE"]["validator"] == "tdx_xdxr"
         assert fs["SZSE"]["primary"] == "baostock"
@@ -498,6 +499,6 @@ class TestConfigRoutes:
         )
         with open(config_path) as f:
             d = json.load(f)
-        pytdx_cfg = d["data_sources_config"]["pytdx"]
-        assert pytdx_cfg.get("instrument_list_source_of", []) == []
-        assert pytdx_cfg.get("calendar_source_of", []) == []
+        routing = d["routing"]
+        assert "pytdx" not in routing["instrument_list"]["a_stock"]
+        assert "pytdx" not in routing["calendar"]["a_stock"]

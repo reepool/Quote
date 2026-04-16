@@ -30,6 +30,9 @@ class YFinanceConstants:
 class YFinanceSource(BaseDataSource):
     """Yahoo Finance数据源"""
 
+    _FACTOR_ANCHOR_LOOKBACK_DAYS = 90
+    _FACTOR_THRESHOLD = 0.0001
+
     def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['HKEX', 'NASDAQ', 'NYSE']  # yfinance 仅用于港股和美股
@@ -442,6 +445,66 @@ class YFinanceSource(BaseDataSource):
             return YFinanceConstants.TEST_SYMBOL_CN
         return None
 
+    def _build_sparse_factor_events(
+        self,
+        instrument_id: str,
+        cum_factor: pd.Series,
+        requested_start: datetime,
+        requested_end: datetime,
+    ) -> List[Dict[str, Any]]:
+        """将累积因子序列压缩为稀疏事件列表。
+
+        关键点：
+        1. 带窗口前锚点时，只记录窗口内真正发生跳变的日期
+        2. 无锚点时，允许首点非 1.0 作为初始锚记录
+        """
+        if cum_factor is None or len(cum_factor) == 0:
+            return []
+
+        requested_start_date = requested_start.date()
+        requested_end_date = requested_end.date()
+
+        normalized = pd.to_numeric(cum_factor.copy(), errors='coerce')
+        normalized.index = pd.to_datetime(normalized.index)
+        normalized = normalized.replace([float('inf'), float('-inf')], float('nan')).dropna()
+        normalized = normalized[normalized > 0]
+        normalized = normalized[normalized.index >= pd.Timestamp('1990-01-01')].sort_index()
+        if normalized.empty:
+            return []
+
+        has_anchor_before_range = any(ts.date() < requested_start_date for ts in normalized.index)
+        shifts = normalized.diff().abs()
+
+        factors: List[Dict[str, Any]] = []
+        prev_cum: Optional[float] = None
+
+        for ts, cum in normalized.items():
+            current_date = ts.date()
+            cum_val = float(cum)
+            shift_raw = shifts.get(ts)
+            shift_val = float(shift_raw) if pd.notna(shift_raw) else None
+
+            is_first_point = prev_cum is None
+            is_event_day = False
+            if is_first_point:
+                is_event_day = not has_anchor_before_range and abs(cum_val - 1.0) > self._FACTOR_THRESHOLD
+            elif shift_val is not None and shift_val > self._FACTOR_THRESHOLD:
+                is_event_day = True
+
+            if requested_start_date <= current_date <= requested_end_date and is_event_day:
+                day_factor = round(cum_val / prev_cum, 6) if prev_cum not in (None, 0) else round(cum_val, 6)
+                factors.append({
+                    'instrument_id': instrument_id,
+                    'ex_date': ts.to_pydatetime(),
+                    'factor': day_factor,
+                    'cumulative_factor': round(cum_val, 6),
+                    'source': 'yfinance',
+                })
+
+            prev_cum = cum_val
+
+        return factors
+
     async def get_adjustment_factors(
         self,
         instrument_id: str,
@@ -462,7 +525,8 @@ class YFinanceSource(BaseDataSource):
             if not yf_symbol:
                 return []
 
-            data = await self._fetch_yahoo_data(yf_symbol, start_date, end_date)
+            anchor_start = start_date - timedelta(days=self._FACTOR_ANCHOR_LOOKBACK_DAYS)
+            data = await self._fetch_yahoo_data(yf_symbol, anchor_start, end_date)
             if data is None or data.empty:
                 return []
 
@@ -477,42 +541,20 @@ class YFinanceSource(BaseDataSource):
             close_col = 'Close'
             adj_col = 'Adj Close'
             data = data.copy()
+            data[close_col] = pd.to_numeric(data[close_col], errors='coerce')
+            data[adj_col] = pd.to_numeric(data[adj_col], errors='coerce')
+            data = data.dropna(subset=[close_col, adj_col])
+            data = data[(data[close_col] > 0) & (data[adj_col] > 0)].sort_index()
+            if data.empty:
+                return []
+
             data['_cum_factor'] = data[adj_col] / data[close_col]
-
-            # 识别因子发生突变的日期（前后比例差 > 0.0001 视为除权事件）
-            data['_factor_shift'] = data['_cum_factor'].diff().abs()
-
-            # 首行：若累积因子 != 1.0 也记录（上市起始就有历史除权）
-            first_row = data.iloc[0]
-            first_cum = float(first_row['_cum_factor'])
-
-            factors: List[Dict[str, Any]] = []
-
-            # 首行有历史除权事件
-            if abs(first_cum - 1.0) > 0.0001:
-                factors.append({
-                    'instrument_id': instrument_id,
-                    'ex_date': data.index[0].to_pydatetime(),
-                    'factor': round(first_cum, 6),
-                    'cumulative_factor': round(first_cum, 6),
-                    'source': 'yfinance',
-                })
-
-            prev_cum = first_cum
-            for dt, row in data.iloc[1:].iterrows():
-                cum = float(row['_cum_factor'])
-                shift = abs(row['_factor_shift']) if pd.notna(row['_factor_shift']) else 0.0
-                if shift > 0.0001:
-                    # 单日因子 = 当日累积 / 前日累积
-                    day_factor = cum / prev_cum if prev_cum != 0 else 1.0
-                    factors.append({
-                        'instrument_id': instrument_id,
-                        'ex_date': dt.to_pydatetime(),
-                        'factor': round(day_factor, 6),
-                        'cumulative_factor': round(cum, 6),
-                        'source': 'yfinance',
-                    })
-                prev_cum = cum
+            factors = self._build_sparse_factor_events(
+                instrument_id=instrument_id,
+                cum_factor=data['_cum_factor'],
+                requested_start=start_date,
+                requested_end=end_date,
+            )
 
             yfinance_logger.info(
                 f"[{self.name}] Found {len(factors)} adjustment factor events for {yf_symbol}"

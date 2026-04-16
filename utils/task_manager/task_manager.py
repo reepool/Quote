@@ -144,7 +144,7 @@ class TaskManagerBot:
             "• `/start` - 显示主菜单\n"
             "• `/status` - 查看任务状态\n"
             "• `/backfill <日期>` - 补充指定日期的缺失数据\n"
-            "• `/backfill_factors` - 回填缺失的复权因子\n"
+            "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口\n"
             "• `/find_gap_and_repair` - 精确逐日检测并修复缺口\n"
             "• `/reload_config` - 重载配置文件\n"

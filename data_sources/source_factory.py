@@ -11,6 +11,7 @@ from utils import ds_logger, config_manager
 from utils.logging_manager import LogContext
 from database.operations import DatabaseOperations
 from database.models import Instrument, DailyQuote, TradingCalendar
+from utils.exceptions import ConfigurationError, ErrorCodes
 
 from .base_source import BaseDataSource, RateLimitConfig
 from .yfinance_source import YFinanceSource
@@ -32,20 +33,15 @@ class DataSourceFactory:
         # 使用工具函数的映射器
         self.exchange_mapper = exchange_mapper
 
-        # 日线数据主/备路由 (按 region)
-        self.region_to_sources: Dict[str, Dict[str, List[BaseDataSource]]] = {
-            'primary': {},
-            'backup': {}
-        }
-
-        # 品种列表路由 (按 region) — 独立于日线数据主源
-        self.instrument_sources: Dict[str, List[BaseDataSource]] = {}
-
-        # 交易日历路由 (按 region) — 独立于日线数据主源
-        self.calendar_sources: Dict[str, List[BaseDataSource]] = {}
+        # 已初始化的数据源实例索引
+        self.region_sources: Dict[str, List[BaseDataSource]] = {}
+        self.source_instances_by_region: Dict[str, Dict[str, BaseDataSource]] = {}
 
         # 复权因子路由 (按 exchange) — 不用 region, 因为 BSE 和 SSE/SZSE 共享 region=a_stock
         self.factor_routes: Dict[str, Dict[str, Any]] = {}
+
+        # 统一 routing 配置
+        self.routing: Dict[str, Any] = {}
 
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
@@ -58,6 +54,8 @@ class DataSourceFactory:
             # 获取配置
             data_config = self.config.get('data_sources', {})
             sources_config = self.config.get('data_sources_config', {})
+            routing_config = self.config.get('routing', {})
+            self.routing = routing_config if isinstance(routing_config, dict) else {}
 
             # 遍历所有数据源配置
             for source_name, source_config in sources_config.items():
@@ -72,18 +70,9 @@ class DataSourceFactory:
                 # 获取数据源限流配置
                 rate_limit_config = self._get_rate_limit_config_for_source(source_name)
 
-                # 获取数据源支持的地区和各种主力地区
+                # 获取数据源支持的地区
                 supported_regions = source_config.get('exchanges_supported', [])
-                primary_regions = source_config.get('primary_source_of', [])
-                # 品种列表/日历路由: 未配置时 fallback 到 primary_source_of (向后兼容)
-                instrument_regions = source_config.get(
-                    'instrument_list_source_of',
-                    source_config.get('primary_source_of', [])
-                )
-                calendar_regions = source_config.get(
-                    'calendar_source_of',
-                    source_config.get('primary_source_of', [])
-                )
+                instrument_types_supported = source_config.get('instrument_types_supported', [])
 
                 # 为每个启用的地区创建数据源实例
                 for region in supported_regions:
@@ -108,48 +97,39 @@ class DataSourceFactory:
                             continue
 
                         await source_instance.initialize()
+                        source_instance.supported_exchanges = (
+                            self.exchange_mapper.get_exchanges_from_region(region)
+                            or getattr(source_instance, 'supported_exchanges', [])
+                        )
+                        source_instance.supported_regions = [region]
+                        source_instance.instrument_types_supported = [
+                            item.lower() for item in instrument_types_supported
+                            if isinstance(item, str) and item
+                        ]
                         self.sources[source_instance_name] = source_instance
 
-                        # 1. 日线数据路由 (主/备)
-                        if region in primary_regions:
-                            source_type = 'primary'
-                            ds_logger.info(f"[DataSourceFactory] Initialized {source_instance_name} as PRIMARY source for {region}")
-                        else:
-                            source_type = 'backup'
-                            ds_logger.info(f"[DataSourceFactory] Initialized {source_instance_name} as BACKUP source for {region}")
-
-                        if region not in self.region_to_sources[source_type]:
-                            self.region_to_sources[source_type][region] = []
-                        self.region_to_sources[source_type][region].append(source_instance)
-
-                        # 2. 品种列表路由 (独立于日线主源)
-                        if region in instrument_regions:
-                            if region not in self.instrument_sources:
-                                self.instrument_sources[region] = []
-                            self.instrument_sources[region].append(source_instance)
-                            ds_logger.info(f"[DataSourceFactory] {source_instance_name} → instrument_source for {region}")
-
-                        # 3. 交易日历路由 (独立于日线主源)
-                        if region in calendar_regions:
-                            if region not in self.calendar_sources:
-                                self.calendar_sources[region] = []
-                            self.calendar_sources[region].append(source_instance)
-                            ds_logger.info(f"[DataSourceFactory] {source_instance_name} → calendar_source for {region}")
+                        self.region_sources.setdefault(region, []).append(source_instance)
+                        self.source_instances_by_region.setdefault(region, {})[source_name] = source_instance
+                        ds_logger.info(
+                            f"[DataSourceFactory] Initialized {source_instance_name} for {region}: "
+                            f"exchanges={source_instance.supported_exchanges}"
+                        )
 
                     except Exception as e:
                         ds_logger.error(f"[DataSourceFactory] Failed to initialize {source_instance_name}: {e}")
                         continue
 
-            # 4. 初始化因子路由 (按 exchange, 不按 region)
+            # 4. 校验路由配置并初始化因子路由
+            self._validate_routing_config()
             self._init_factor_routes()
 
             ds_logger.info(f"[DataSourceFactory] Initialized {len(self.sources)} data sources")
             ds_logger.info(
                 f"[DataSourceFactory] 路由摘要: "
-                f"日线主源={list(self.region_to_sources['primary'].keys())}, "
-                f"品种源={list(self.instrument_sources.keys())}, "
-                f"日历源={list(self.calendar_sources.keys())}, "
-                f"因子路由={list(self.factor_routes.keys())}"
+                f"daily={list(self.routing.get('daily', {}).keys())}, "
+                f"instrument_list={list(self.routing.get('instrument_list', {}).keys())}, "
+                f"calendar={list(self.routing.get('calendar', {}).keys())}, "
+                f"factor={list(self.factor_routes.keys())}"
             )
 
         except Exception as e:
@@ -183,9 +163,9 @@ class DataSourceFactory:
 
     def _init_factor_routes(self):
         """初始化因子路由 — 按 exchange 而非 region"""
-        factor_config = self.config.get('factor_sources', {})
+        factor_config = self.routing.get('factor', {})
         if not factor_config:
-            ds_logger.warning("[DataSourceFactory] No factor_sources config found")
+            ds_logger.warning("[DataSourceFactory] No routing.factor config found")
             return
 
         for exchange, cfg in factor_config.items():
@@ -201,13 +181,13 @@ class DataSourceFactory:
             validator_name = cfg.get('validator')
 
             if primary_name:
-                route['primary_instance'] = self._find_source_by_base_name(primary_name)
+                route['primary_instance'] = self._get_source_instance(primary_name, exchange=exchange)
             if fallback_name:
-                route['fallback_instance'] = self._find_source_by_base_name(fallback_name)
+                route['fallback_instance'] = self._get_source_instance(fallback_name, exchange=exchange)
 
             # validator: tdx_xdxr 是特殊的 — 从 pytdx source 内部获取 factor_engine
             if validator_name == 'tdx_xdxr':
-                pytdx_source = self._find_source_by_base_name('pytdx')
+                pytdx_source = self._get_source_instance('pytdx', exchange=exchange)
                 if pytdx_source and hasattr(pytdx_source, 'factor_engine'):
                     route['validator_instance'] = pytdx_source.factor_engine
                 else:
@@ -216,7 +196,7 @@ class DataSourceFactory:
                         f"but pytdx source not available"
                     )
             elif validator_name:
-                route['validator_instance'] = self._find_source_by_base_name(validator_name)
+                route['validator_instance'] = self._get_source_instance(validator_name, exchange=exchange)
 
             self.factor_routes[exchange] = route
             ds_logger.info(
@@ -230,6 +210,81 @@ class DataSourceFactory:
             if name.startswith(base_name):
                 return source
         return None
+
+    def _get_source_instance(
+        self,
+        base_name: str,
+        *,
+        exchange: Optional[str] = None,
+        region: Optional[str] = None,
+    ) -> Optional[BaseDataSource]:
+        """按 source 基名和 region/exchange 精确获取实例。"""
+        if region is None and exchange:
+            region = self.exchange_mapper.get_region_from_exchange(exchange.upper())
+
+        if region:
+            return self.source_instances_by_region.get(region, {}).get(base_name)
+
+        return self._find_source_by_base_name(base_name)
+
+    def _source_supports_instrument_type(
+        self, source: Optional[BaseDataSource], instrument_type: str
+    ) -> bool:
+        """检查数据源是否支持指定品种类型。"""
+        if source is None:
+            return False
+        supported = getattr(source, 'instrument_types_supported', None)
+        if not supported:
+            return True
+        return (instrument_type or 'stock').lower() in supported
+
+    def _normalize_route_names(self, value: Any) -> List[str]:
+        """规范化路由配置中的 source 名称列表。"""
+        if isinstance(value, str):
+            return [value] if value else []
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, str) and item]
+        return []
+
+    def _is_region_enabled(self, region: Optional[str]) -> bool:
+        """判断指定 region 是否启用。未显式配置时默认视为启用。"""
+        if not region:
+            return False
+        data_sources_cfg = self.config.get('data_sources', {})
+        if not isinstance(data_sources_cfg, dict):
+            return True
+        region_cfg = data_sources_cfg.get(region, {})
+        if not isinstance(region_cfg, dict):
+            return True
+        return region_cfg.get('enabled', True)
+
+    def _is_exchange_enabled(self, exchange: Optional[str]) -> bool:
+        """判断指定 exchange 所属 region 是否启用。"""
+        if not exchange:
+            return False
+        region = self.exchange_mapper.get_region_from_exchange(exchange.upper())
+        if region is None:
+            return False
+        return self._is_region_enabled(region)
+
+    def _get_scene_route_names(self, scene: str, key: str) -> List[str]:
+        """获取指定场景下的路由 source 顺序。"""
+        route_map = self.routing.get(scene, {})
+        if not isinstance(route_map, dict):
+            return []
+        return self._normalize_route_names(route_map.get(key))
+
+    def _get_daily_route_names(self, exchange: str, instrument_type: str = 'stock') -> List[str]:
+        """获取 daily 场景的 source 顺序。"""
+        exchange = exchange.upper()
+        instrument_type = (instrument_type or 'stock').lower()
+        daily_cfg = self.routing.get('daily', {})
+        if not isinstance(daily_cfg, dict):
+            return []
+        exchange_cfg = daily_cfg.get(exchange, {})
+        if not isinstance(exchange_cfg, dict):
+            return []
+        return self._normalize_route_names(exchange_cfg.get(instrument_type))
 
     def _get_rate_limit_config_for_source(self, source_name: str) -> RateLimitConfig:
         """获取数据源特定的限流配置"""
@@ -250,51 +305,241 @@ class DataSourceFactory:
 
     def get_source(self, exchange: str) -> BaseDataSource:
         """根据交易所获取数据源"""
-        exchange = exchange.upper()
-        region = self.exchange_mapper.get_region_from_exchange(exchange)
-        if not region:
-            raise ValueError(f"Unsupported exchange: {exchange}")
-
-        # 优先返回主数据源，然后是备用数据源
-        primary_source = self.get_primary_source(exchange)
+        primary_source = self.get_primary_source(exchange, strict=True)
         if primary_source:
             return primary_source
-
-        backup_source = self.get_backup_source(exchange)
-        if backup_source:
-            return backup_source
-
         raise ValueError(f"No data source available for exchange: {exchange}")
 
-    def get_primary_source(self, exchange: str) -> Optional[BaseDataSource]:
+    def get_primary_source(
+        self, exchange: str, instrument_type: str = 'stock', strict: bool = False
+    ) -> Optional[BaseDataSource]:
         """获取主要数据源"""
-        exchange = exchange.upper()
-        region = self.exchange_mapper.get_region_from_exchange(exchange)
-        if not region:
+        try:
+            source_chain = self._get_daily_source_chain(exchange, instrument_type)
+        except ConfigurationError:
+            if strict:
+                raise
             return None
+        return source_chain[0] if source_chain else None
 
-        # 使用预构建的映射关系快速查找
-        primary_sources = self.region_to_sources['primary'].get(region, [])
-        return primary_sources[0] if primary_sources else None
-
-    def get_backup_source(self, exchange: str) -> Optional[BaseDataSource]:
+    def get_backup_source(self, exchange: str, instrument_type: str = 'stock') -> Optional[BaseDataSource]:
         """获取第一个备用数据源"""
-        sources = self.get_backup_sources(exchange)
+        sources = self.get_backup_sources(exchange, instrument_type=instrument_type)
         return sources[0] if sources else None
 
-    def get_backup_sources(self, exchange: str) -> List[BaseDataSource]:
+    def get_backup_sources(self, exchange: str, instrument_type: str = 'stock') -> List[BaseDataSource]:
         """获取所有备用数据源 (用于降级链遍历)，自动过滤不支持该交易所的源"""
-        exchange = exchange.upper()
-        region = self.exchange_mapper.get_region_from_exchange(exchange)
-        if not region:
+        try:
+            return self._get_daily_source_chain(exchange, instrument_type)[1:]
+        except ConfigurationError:
             return []
-        sources = self.region_to_sources['backup'].get(region, [])
-        # 过滤不支持该交易所的备用源（如 yfinance 不应用于 BSE/A股指数补数据）
-        return [
-            s for s in sources
-            if not getattr(s, 'supported_exchanges', None)
-            or exchange in s.supported_exchanges
-        ]
+
+    def _source_supports_exchange(self, source: Optional[BaseDataSource], exchange: str) -> bool:
+        """检查数据源是否支持指定交易所。"""
+        if source is None:
+            return False
+        supported = getattr(source, 'supported_exchanges', None)
+        return not supported or exchange in supported
+
+    def _get_daily_route_config(self, exchange: str, instrument_type: str = 'stock') -> Dict[str, Any]:
+        """获取指定交易所与品种类型的日线行为配置。"""
+        exchange = exchange.upper()
+        instrument_type = (instrument_type or 'stock').lower()
+
+        merged: Dict[str, Any] = {}
+
+        daily_behavior = self.routing.get('daily_behavior', {})
+        if not isinstance(daily_behavior, dict):
+            return merged
+
+        default_cfg = daily_behavior.get('default', {}).get(instrument_type, {})
+        if isinstance(default_cfg, dict):
+            merged.update(default_cfg)
+
+        exchange_cfg = daily_behavior.get(exchange, {}).get(instrument_type, {})
+        if isinstance(exchange_cfg, dict):
+            merged.update(exchange_cfg)
+
+        return merged
+
+    def _get_daily_source_chain(self, exchange: str, instrument_type: str = 'stock') -> List[BaseDataSource]:
+        """获取日线数据源链，仅使用 routing.daily 作为单一真相来源。"""
+        exchange = exchange.upper()
+        instrument_type = (instrument_type or 'stock').lower()
+        route_names = self._get_daily_route_names(exchange, instrument_type)
+        if not route_names:
+            raise ConfigurationError(
+                f"Missing daily route for {exchange}/{instrument_type}",
+                ErrorCodes.CONFIG_MISSING_KEY,
+            )
+
+        ordered_sources: List[BaseDataSource] = []
+        seen_ids = set()
+        for source_name in route_names:
+            source = self._get_source_instance(source_name, exchange=exchange)
+            if source is None:
+                raise ConfigurationError(
+                    f"Daily route {exchange}/{instrument_type} references unavailable source: {source_name}",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            if not self._source_supports_exchange(source, exchange):
+                raise ConfigurationError(
+                    f"Daily route {exchange}/{instrument_type} uses source {source_name} unsupported for {exchange}",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            if not self._source_supports_instrument_type(source, instrument_type):
+                raise ConfigurationError(
+                    f"Daily route {exchange}/{instrument_type} uses source {source_name} unsupported for {instrument_type}",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            source_id = id(source)
+            if source_id in seen_ids:
+                continue
+            ordered_sources.append(source)
+            seen_ids.add(source_id)
+
+        if not ordered_sources:
+            raise ConfigurationError(
+                f"Daily route for {exchange}/{instrument_type} resolved to no usable sources",
+                ErrorCodes.CONFIG_INVALID_FORMAT,
+            )
+        return ordered_sources
+
+    def _should_skip_backup_on_empty_short_range(
+        self,
+        exchange: str,
+        instrument_type: str,
+        date_span: int,
+        primary_exception: bool,
+    ) -> bool:
+        """判断短区间主源空结果时是否跳过 backup。"""
+        if primary_exception or date_span > 2:
+            return False
+
+        route_cfg = self._get_daily_route_config(exchange, instrument_type)
+        return bool(route_cfg.get('skip_backup_on_empty_short_range', False))
+
+    def _validate_routing_config(self) -> None:
+        """校验统一 routing 配置。"""
+        if not isinstance(self.routing, dict):
+            raise ConfigurationError(
+                "routing config must be a JSON object",
+                ErrorCodes.CONFIG_INVALID_FORMAT,
+            )
+
+        self._validate_daily_routes()
+        self._validate_region_routes('instrument_list')
+        self._validate_region_routes('calendar')
+        self._validate_factor_route_config()
+
+    def _validate_daily_routes(self) -> None:
+        """校验 daily 路由配置。"""
+        daily_cfg = self.routing.get('daily', {})
+        if not isinstance(daily_cfg, dict):
+            raise ConfigurationError(
+                "routing.daily must be an object",
+                ErrorCodes.CONFIG_INVALID_FORMAT,
+            )
+
+        for exchange, instrument_cfg in daily_cfg.items():
+            if not isinstance(instrument_cfg, dict):
+                raise ConfigurationError(
+                    f"routing.daily.{exchange} must be an object",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            if self.exchange_mapper.get_region_from_exchange(exchange.upper()) is None:
+                raise ConfigurationError(
+                    f"routing.daily contains unknown exchange: {exchange}",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            if not self._is_exchange_enabled(exchange):
+                continue
+
+            for instrument_type, route_names in instrument_cfg.items():
+                names = self._normalize_route_names(route_names)
+                if not names:
+                    raise ConfigurationError(
+                        f"routing.daily.{exchange}.{instrument_type} must contain at least one source",
+                        ErrorCodes.CONFIG_INVALID_FORMAT,
+                    )
+                for source_name in names:
+                    source = self._get_source_instance(source_name, exchange=exchange)
+                    if source is None:
+                        raise ConfigurationError(
+                            f"routing.daily.{exchange}.{instrument_type} references unavailable source: {source_name}",
+                            ErrorCodes.CONFIG_INVALID_FORMAT,
+                        )
+                    if not self._source_supports_exchange(source, exchange.upper()):
+                        raise ConfigurationError(
+                            f"routing.daily.{exchange}.{instrument_type} uses source unsupported for {exchange}: {source_name}",
+                            ErrorCodes.CONFIG_INVALID_FORMAT,
+                        )
+                    if not self._source_supports_instrument_type(source, instrument_type):
+                        raise ConfigurationError(
+                            f"routing.daily.{exchange}.{instrument_type} uses source unsupported for {instrument_type}: {source_name}",
+                            ErrorCodes.CONFIG_INVALID_FORMAT,
+                        )
+
+    def _validate_region_routes(self, scene: str) -> None:
+        """校验按 region 定义的 routing 场景。"""
+        scene_cfg = self.routing.get(scene, {})
+        if not isinstance(scene_cfg, dict):
+            raise ConfigurationError(
+                f"routing.{scene} must be an object",
+                ErrorCodes.CONFIG_INVALID_FORMAT,
+            )
+
+        for region, route_names in scene_cfg.items():
+            if not self._is_region_enabled(region):
+                continue
+            names = self._normalize_route_names(route_names)
+            if not names:
+                raise ConfigurationError(
+                    f"routing.{scene}.{region} must contain at least one source",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            for source_name in names:
+                source = self._get_source_instance(source_name, region=region)
+                if source is None:
+                    raise ConfigurationError(
+                        f"routing.{scene}.{region} references unavailable source: {source_name}",
+                        ErrorCodes.CONFIG_INVALID_FORMAT,
+                    )
+
+    def _validate_factor_route_config(self) -> None:
+        """校验因子路由配置。"""
+        factor_cfg = self.routing.get('factor', {})
+        if not isinstance(factor_cfg, dict):
+            raise ConfigurationError(
+                "routing.factor must be an object",
+                ErrorCodes.CONFIG_INVALID_FORMAT,
+            )
+
+        for exchange, cfg in factor_cfg.items():
+            if not isinstance(cfg, dict):
+                raise ConfigurationError(
+                    f"routing.factor.{exchange} must be an object",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
+            if not self._is_exchange_enabled(exchange):
+                continue
+            for field in ('primary', 'fallback'):
+                source_name = cfg.get(field)
+                if source_name:
+                    source = self._get_source_instance(source_name, exchange=exchange)
+                    if source is None:
+                        raise ConfigurationError(
+                            f"routing.factor.{exchange}.{field} references unavailable source: {source_name}",
+                            ErrorCodes.CONFIG_INVALID_FORMAT,
+                        )
+            validator_name = cfg.get('validator')
+            if validator_name and validator_name != 'tdx_xdxr':
+                source = self._get_source_instance(validator_name, exchange=exchange)
+                if source is None:
+                    raise ConfigurationError(
+                        f"routing.factor.{exchange}.validator references unavailable source: {validator_name}",
+                        ErrorCodes.CONFIG_INVALID_FORMAT,
+                    )
 
     async def get_instrument_list(self, exchange: str, force_refresh: bool = False,
                                   instrument_types: List[str] = None) -> List[Dict[str, Any]]:
@@ -329,18 +574,19 @@ class DataSourceFactory:
         else:
             ds_logger.info(f"[DataSourceFactory] Force refresh requested for {exchange}")
 
-        # 第二步：尝试从品种列表专用源获取 (独立于日线主源)
         region = self.exchange_mapper.get_region_from_exchange(exchange)
-        instrument_source_list = self.instrument_sources.get(region, []) if region else []
-        if not instrument_source_list:
-            # fallback: 日线主源
-            primary_source = self.get_primary_source(exchange)
-            if primary_source:
-                instrument_source_list = [primary_source]
+        route_names = self._get_scene_route_names('instrument_list', region) if region else []
+        instrument_source_list = [
+            self._get_source_instance(source_name, region=region)
+            for source_name in route_names
+        ]
+        instrument_source_list = [source for source in instrument_source_list if source is not None]
 
         if not instrument_source_list:
-            ds_logger.error(f"[DataSourceFactory] No instrument source configured for exchange: {exchange}")
-            return []
+            raise ConfigurationError(
+                f"No instrument_list route configured for region: {region or exchange}",
+                ErrorCodes.CONFIG_MISSING_KEY,
+            )
 
         primary_source = instrument_source_list[0]
         backup_sources = instrument_source_list[1:]
@@ -517,11 +763,11 @@ class DataSourceFactory:
         """
         exchange = exchange.upper()
 
-        # 第一步：尝试从主数据源获取
-        primary_source = self.get_primary_source(exchange)
-        if not primary_source:
+        source_chain = self._get_daily_source_chain(exchange, instrument_type)
+        if not source_chain:
             ds_logger.error(f"[DataSourceFactory] No data source configured for exchange: {exchange}")
             return []
+        primary_source = source_chain[0]
 
         try:
             with LogContext("DataSourceFactory", "get_primary_data",
@@ -548,11 +794,13 @@ class DataSourceFactory:
         # 日更优化：当请求范围 ≤ 2 天且主源返回空（非异常）时，跳过 backup
         # 因为"当日无数据"大概率是停牌/未交易，不值得花时间兜底
         date_span = (end_date - start_date).days if start_date and end_date else 999
-        if date_span <= 2 and not primary_exception:
+        if self._should_skip_backup_on_empty_short_range(
+            exchange, instrument_type, date_span, primary_exception
+        ):
             ds_logger.debug(f"[DataSourceFactory] Short-range query ({date_span}d), skip backup for {symbol}")
             return []
 
-        for backup_source in self.get_backup_sources(exchange):
+        for backup_source in source_chain[1:]:
             ds_logger.info(f"[DataSourceFactory] Trying backup source: {backup_source.name} for {symbol} (instrument_type={instrument_type})")
             try:
                 with LogContext("DataSourceFactory", "get_backup_data",
@@ -565,6 +813,8 @@ class DataSourceFactory:
                     if data and self._validate_daily_data(data, instrument_id, symbol):
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
                         return data
+                    elif not data:
+                        ds_logger.warning(f"[DataSourceFactory] Empty data from backup {backup_source.name} for {symbol}")
                     else:
                         ds_logger.warning(f"[DataSourceFactory] Invalid data from backup {backup_source.name}")
             except Exception as backup_e:
@@ -623,7 +873,8 @@ class DataSourceFactory:
 
         # 最后兜底: 遍历日线备用源（跳过已尝试的因子路由源和不支持该交易所的源）
         tried_sources = {id(s) for s in [primary, fallback] if s is not None}
-        for backup_source in self.get_backup_sources(exchange):
+        region = self.exchange_mapper.get_region_from_exchange(exchange)
+        for backup_source in self.region_sources.get(region, []):
             if id(backup_source) in tried_sources:
                 continue
             if not hasattr(backup_source, 'get_adjustment_factors'):
@@ -650,7 +901,7 @@ class DataSourceFactory:
 
     async def get_latest_daily_data(self, exchange: str, instrument_id: str, symbol: str) -> Dict[str, Any]:
         """获取最新日线数据"""
-        source = self.get_primary_source(exchange)
+        source = self.get_primary_source(exchange, strict=True)
         if not source:
             ds_logger.error(f"[DataSourceFactory] No data source for exchange: {exchange}")
             return {}
@@ -683,7 +934,7 @@ class DataSourceFactory:
                            "batch_size": batch_size
                        }):
 
-            source = self.get_primary_source(exchange)
+            source = self.get_primary_source(exchange, strict=True)
             if not source:
                 ds_logger.error(f"No data source for exchange: {exchange}")
                 return []
@@ -722,7 +973,7 @@ class DataSourceFactory:
     async def get_latest_data_batch(self, exchange: str, instruments: List[Dict[str, Any]],
                                  batch_size: int = 50) -> List[Dict[str, Any]]:
         """批量获取最新数据"""
-        source = self.get_primary_source(exchange)
+        source = self.get_primary_source(exchange, strict=True)
         if not source:
             ds_logger.error(f"[DataSourceFactory] No data source for exchange: {exchange}")
             return []
@@ -773,12 +1024,18 @@ class DataSourceFactory:
     async def update_trading_calendar(self, exchange: str, start_date: date, end_date: date) -> int:
         """更新交易日历 - 使用日历专用路由 (独立于日线主源)"""
         region = self.exchange_mapper.get_region_from_exchange(exchange)
-        calendar_source_list = self.calendar_sources.get(region, []) if region else []
+        route_names = self._get_scene_route_names('calendar', region) if region else []
+        calendar_source_list = [
+            self._get_source_instance(source_name, region=region)
+            for source_name in route_names
+        ]
+        calendar_source_list = [source for source in calendar_source_list if source is not None]
+
         if not calendar_source_list:
-            # fallback: 日线主源
-            primary_source = self.get_primary_source(exchange)
-            if primary_source and hasattr(primary_source, 'get_trading_calendar'):
-                calendar_source_list = [primary_source]
+            raise ConfigurationError(
+                f"No calendar route configured for region: {region or exchange}",
+                ErrorCodes.CONFIG_MISSING_KEY,
+            )
 
         for source in calendar_source_list:
             if not hasattr(source, 'get_trading_calendar'):
@@ -849,10 +1106,10 @@ class DataSourceFactory:
                 ds_logger.error(f"[DataSourceFactory] Error closing {name}: {e}")
 
         self.sources.clear()
-        self.region_to_sources = {'primary': {}, 'backup': {}}
-        self.instrument_sources.clear()
-        self.calendar_sources.clear()
+        self.region_sources.clear()
+        self.source_instances_by_region.clear()
         self.factor_routes.clear()
+        self.routing.clear()
         self.trading_calendar_cache.clear()
 
         # 重置全局单例引用，允许下次使用时重新初始化

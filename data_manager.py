@@ -8,7 +8,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from typing import List, Dict, Any, Optional, Tuple, Union
+from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass, field
 
@@ -18,7 +18,7 @@ from utils import dm_logger, config_manager, log_execution, LogContext, Telegram
 # 直接导入代码转换工具，避免依赖问题
 from utils.code_utils import convert_to_database_format
 from database.operations import DatabaseOperations
-from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateInfo
+from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateInfo, GapSkipDB
 # Note: get_data_source_factory will be imported dynamically to avoid circular import
 from utils.date_utils import DateUtils, get_shanghai_time
 from utils.validation import DataValidator
@@ -515,7 +515,10 @@ class DataManager:
                 ]
                 if stocks_needing_factors:
                     await self._batch_sync_adjustment_factors(
-                        exchange, stocks_needing_factors, skip_filter=True
+                        exchange,
+                        stocks_needing_factors,
+                        skip_filter=True,
+                        sync_reason='daily',
                     )
             else:
                 self.progress.failed_downloads += len(instruments)
@@ -995,6 +998,82 @@ class DataManager:
         else:
             return 'Investigate cause - possible delisting or suspension'
 
+    def build_gap_skip_key(self, instrument_id: str, gap_start: date, gap_end: date) -> str:
+        """构造缺口跳表 key。"""
+        return f"{instrument_id}|{gap_start.isoformat()}|{gap_end.isoformat()}"
+
+    def is_gap_skipped(self, skip_set: Set[str], instrument_id: str,
+                       gap_start: date, gap_end: date) -> bool:
+        """检查指定缺口段是否已在跳表中。"""
+        return self.build_gap_skip_key(instrument_id, gap_start, gap_end) in skip_set
+
+    async def load_gap_skip_set(self, min_fail_count: int = 1,
+                                ttl_days: int = 30) -> Set[str]:
+        """加载近期失败的缺口段，用于避免重复无效修复。"""
+        cutoff = (get_shanghai_time() - timedelta(days=ttl_days)).strftime('%Y-%m-%d %H:%M:%S')
+        sql = """
+        SELECT instrument_id, gap_start, gap_end
+        FROM gap_skip_list
+        WHERE fail_count >= :min_fail_count
+          AND last_attempted > :cutoff
+        """
+        rows = await self.db_ops.execute_read_query(
+            sql,
+            {'min_fail_count': min_fail_count, 'cutoff': cutoff}
+        )
+        return {
+            self.build_gap_skip_key(
+                row['instrument_id'],
+                datetime.strptime(row['gap_start'], '%Y-%m-%d').date(),
+                datetime.strptime(row['gap_end'], '%Y-%m-%d').date()
+            )
+            for row in rows
+        }
+
+    async def record_gap_skip(self, instrument_id: str, gap_start: date,
+                              gap_end: date, reason: str = 'no_data') -> None:
+        """记录失败缺口段，供后续任务短期跳过。"""
+        from sqlalchemy.future import select
+
+        start_str = gap_start.isoformat()
+        end_str = gap_end.isoformat()
+        now = get_shanghai_time()
+
+        try:
+            async with self.db_ops.get_async_session() as session:
+                stmt = select(GapSkipDB).filter(
+                    GapSkipDB.instrument_id == instrument_id,
+                    GapSkipDB.gap_start == start_str,
+                    GapSkipDB.gap_end == end_str
+                )
+                result = await session.execute(stmt)
+                existing = result.scalar_one_or_none()
+
+                if existing:
+                    existing.fail_count += 1
+                    existing.reason = reason
+                    existing.last_attempted = now
+                else:
+                    session.add(GapSkipDB(
+                        instrument_id=instrument_id,
+                        gap_start=start_str,
+                        gap_end=end_str,
+                        fail_count=1,
+                        reason=reason,
+                        last_attempted=now,
+                        created_at=now
+                    ))
+
+                await session.commit()
+        except Exception as e:
+            dm_logger.warning(
+                "[DataManager] Failed to record gap skip %s %s~%s: %s",
+                instrument_id,
+                start_str,
+                end_str,
+                e
+            )
+
     async def _generate_analysis_report(self, gaps: List[DataGapInfo]):
         """生成分析报告"""
         try:
@@ -1438,6 +1517,10 @@ class DataManager:
         try:
             dm_logger.info("[DataManager] Generating daily update report...")
 
+            exchange_stats = update_results.get('exchange_stats', {})
+            if not isinstance(exchange_stats, dict):
+                exchange_stats = {}
+
             report = {
                 'summary': {
                     'target_date': target_date.isoformat(),
@@ -1449,14 +1532,16 @@ class DataManager:
                     'update_time': datetime.now().strftime('%H:%M:%S')
                 },
                 'exchange_stats': {},
-                'update_results': update_results.get('exchange_stats', {}),
+                'update_results': exchange_stats,
                 'errors': []
             }
 
             # 统计更新结果
             for exchange in exchanges:
                 try:
-                    stats = update_results.get(exchange, {})
+                    # 当前 daily_data_update 将各市场结果放在 update_results['exchange_stats']；
+                    # 同时兼容旧调用直接将市场结果平铺在顶层的结构。
+                    stats = exchange_stats.get(exchange, update_results.get(exchange, {}))
                     if stats and 'error' not in stats:
                         # 检查是否是更新任务的结果还是每日数据更新的结果
                         if 'updated_count' in stats:  # 每日数据更新结果
@@ -1475,10 +1560,11 @@ class DataManager:
                             report['summary']['new_quotes_added'] += new_quotes
                         elif 'success_count' in stats:  # 标准下载任务结果
                             success_count = stats.get('success_count', 0)
-                            total_count = stats.get('total_count', 0)
-                            quotes_count = stats.get('quotes_count', 0)
+                            total_count = stats.get('total_instruments', stats.get('total_count', 0))
+                            quotes_count = stats.get('quotes_added', stats.get('quotes_count', 0))
                             report['exchange_stats'][exchange] = {
                                 'success_count': success_count,
+                                'failure_count': stats.get('failure_count', 0),
                                 'total_count': total_count,
                                 'quotes_count': quotes_count
                             }
@@ -1649,6 +1735,7 @@ class DataManager:
         stocks: List[Dict[str, Any]],
         progress_log_every: int = 500,
         skip_filter: bool = False,
+        sync_reason: str = 'daily',
     ) -> Dict[str, int]:
         """批量同步复权因子（Phase 2）
 
@@ -1665,6 +1752,19 @@ class DataManager:
         """
         total = len(stocks)
         result = {'synced': 0, 'skipped': 0, 'failed': 0, 'filtered_total': total}
+
+        daily_sync_enabled = self.config.get_nested(
+            f'routing.factor.{exchange}.daily_sync_enabled',
+            True,
+        )
+        if sync_reason == 'daily' and not daily_sync_enabled:
+            dm_logger.info(
+                "[DataManager] Phase 2: factor sync disabled for %s in daily mode; "
+                "skipping %d stocks",
+                exchange, total
+            )
+            result['skipped'] = total
+            return result
 
         if not skip_filter:
             # 港股/美股暂不支持精准除权除息查询 (stock_fhps_em 仅限 A 股)
@@ -1990,6 +2090,21 @@ class DataManager:
 
         for exchange in exchanges:
             try:
+                maintenance_sync_enabled = self.config.get_nested(
+                    f'routing.factor.{exchange}.maintenance_sync_enabled',
+                    True,
+                )
+                if not maintenance_sync_enabled:
+                    dm_logger.info(
+                        "[DataManager] Weekly factor sync disabled for %s by config",
+                        exchange
+                    )
+                    overall_result[exchange] = {
+                        'skipped': True,
+                        'reason': 'maintenance_sync_disabled',
+                    }
+                    continue
+
                 instruments = await self.db_ops.get_instruments(
                     exchange=exchange, is_active=True
                 )
@@ -2010,7 +2125,7 @@ class DataManager:
                     continue
 
                 result = await self._batch_sync_adjustment_factors(
-                    exchange, stocks, skip_filter=True
+                    exchange, stocks, skip_filter=True, sync_reason='maintenance'
                 )
                 overall_result[exchange] = result
 
@@ -2021,6 +2136,162 @@ class DataManager:
                 overall_result[exchange] = {'error': str(e)}
 
         dm_logger.info("[DataManager] Weekly full factor sync completed: %s", overall_result)
+        return overall_result
+
+    async def backfill_adjustment_factors(
+        self,
+        exchanges: Optional[List[str]] = None,
+        mode: str = 'missing',
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        progress_log_every: int = 200,
+    ) -> Dict[str, Any]:
+        """正式复权因子回补入口，供 TG 命令和运维任务调用。
+
+        Args:
+            exchanges: 交易所列表。为 None 时使用当前启用市场。
+            mode:
+                - missing: 仅处理当前完全没有因子记录的股票
+                - full: 对目标交易所全部股票执行全量重抓并 upsert
+            start_date: 回补开始日期，默认 1990-01-01
+            end_date: 回补结束日期，默认今天
+            progress_log_every: 每处理多少只股票打印一次进度
+
+        Returns:
+            结构化统计结果
+        """
+        mode = (mode or 'missing').lower()
+        if mode == 'resume':
+            mode = 'missing'
+        if mode not in ('missing', 'full'):
+            raise ValueError(f"Unsupported factor backfill mode: {mode}")
+
+        if exchanges is None:
+            exchanges = ['SSE', 'SZSE', 'BSE']
+            if self.config.get_nested('data_sources.hk_stock.enabled', False):
+                exchanges.append('HKEX')
+            if self.config.get_nested('data_sources.us_stock.enabled', False):
+                exchanges.extend(['NASDAQ', 'NYSE'])
+
+        exchanges = [exchange.upper() for exchange in exchanges]
+        exchanges = list(dict.fromkeys(exchanges))
+
+        start_date = start_date or date(1990, 1, 1)
+        end_date = end_date or date.today()
+        start_dt = datetime.combine(start_date, datetime.min.time())
+        end_dt = datetime.combine(end_date, datetime.max.time())
+
+        if not hasattr(self, 'source_factory') or not self.source_factory:
+            from data_sources.source_factory import get_data_source_factory
+            self.source_factory = await get_data_source_factory(self.db_ops)
+
+        overall_result: Dict[str, Any] = {
+            'mode': mode,
+            'exchanges': exchanges,
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'by_exchange': {},
+            'totals': {
+                'stocks_total': 0,
+                'skipped_existing': 0,
+                'synced_instruments': 0,
+                'saved_records': 0,
+                'no_factors': 0,
+                'errors': 0,
+            }
+        }
+
+        dm_logger.info(
+            "[DataManager] Starting factor backfill: exchanges=%s, mode=%s, range=%s~%s",
+            exchanges, mode, start_date, end_date
+        )
+
+        for exchange in exchanges:
+            instruments = await self.db_ops.get_instruments_list(
+                exchange=exchange, type='stock', is_active=True
+            )
+            exchange_stats: Dict[str, Any] = {
+                'stocks_total': len(instruments),
+                'skipped_existing': 0,
+                'synced_instruments': 0,
+                'saved_records': 0,
+                'no_factors': 0,
+                'errors': 0,
+                'sources': {},
+            }
+
+            existing_factor_ids = set()
+            if mode == 'missing':
+                existing_rows = await self.db_ops.execute_read_query(
+                    """
+                    SELECT DISTINCT af.instrument_id
+                    FROM adjustment_factors af
+                    JOIN instruments i ON i.instrument_id = af.instrument_id
+                    WHERE i.exchange = :exchange AND i.type = 'stock' AND i.is_active = 1
+                    """,
+                    {'exchange': exchange}
+                )
+                existing_factor_ids = {
+                    row['instrument_id']
+                    for row in existing_rows
+                    if row.get('instrument_id')
+                }
+
+            for idx, inst in enumerate(instruments, start=1):
+                instrument_id = inst['instrument_id']
+                symbol = inst['symbol']
+
+                if mode == 'missing' and instrument_id in existing_factor_ids:
+                    exchange_stats['skipped_existing'] += 1
+                    continue
+
+                try:
+                    factors = await self.source_factory.get_adjustment_factors(
+                        exchange, instrument_id, symbol, start_dt, end_dt
+                    )
+
+                    if factors:
+                        saved_count = await self.db_ops.save_adjustment_factors(factors)
+                        source_name = str(factors[0].get('source', 'unknown')).lower()
+                        exchange_stats['synced_instruments'] += 1
+                        exchange_stats['saved_records'] += saved_count
+                        exchange_stats['sources'][source_name] = (
+                            exchange_stats['sources'].get(source_name, 0) + 1
+                        )
+                    else:
+                        exchange_stats['no_factors'] += 1
+
+                except Exception as e:
+                    exchange_stats['errors'] += 1
+                    dm_logger.warning(
+                        "[DataManager] Factor backfill failed for %s (%s): %s",
+                        instrument_id, exchange, e
+                    )
+
+                if progress_log_every and idx % progress_log_every == 0:
+                    dm_logger.info(
+                        "[DataManager] Factor backfill progress %s: %d/%d "
+                        "(synced=%d, skipped_existing=%d, no_factors=%d, errors=%d)",
+                        exchange,
+                        idx,
+                        len(instruments),
+                        exchange_stats['synced_instruments'],
+                        exchange_stats['skipped_existing'],
+                        exchange_stats['no_factors'],
+                        exchange_stats['errors'],
+                    )
+
+            overall_result['by_exchange'][exchange] = exchange_stats
+            for key in ('stocks_total', 'skipped_existing', 'synced_instruments', 'saved_records', 'no_factors', 'errors'):
+                overall_result['totals'][key] += exchange_stats[key]
+
+            dm_logger.info(
+                "[DataManager] Factor backfill %s completed: %s",
+                exchange, exchange_stats
+            )
+
+        self.invalidate_factor_cache()
+        dm_logger.info("[DataManager] Factor backfill completed: %s", overall_result)
         return overall_result
 
     async def update_daily_data(self, exchanges: Optional[List[str]] = None,
@@ -2081,7 +2352,17 @@ class DataManager:
                             )
 
                             # 从数据源获取数据
-                            start_date = target_date - timedelta(days=1)
+                            # A 股沿用 calendar-day 锚点；
+                            # 港股/美股改为前一交易日锚点，仅将 target_date 作为因子业务窗口。
+                            is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
+                            fetch_start_date = target_date - timedelta(days=1)
+                            factor_start_date = fetch_start_date
+                            if not is_a_stock:
+                                fetch_start_date = DateUtils.get_previous_trading_day(
+                                    exchange, target_date
+                                )
+                                factor_start_date = target_date
+
                             end_date = target_date
                             data = None  # 初始化，供后续复权因子收集判断
                             
@@ -2092,7 +2373,7 @@ class DataManager:
                                             exchange,
                                             instrument['instrument_id'],
                                             instrument['symbol'],
-                                            datetime.combine(start_date, datetime.min.time()),
+                                            datetime.combine(fetch_start_date, datetime.min.time()),
                                             datetime.combine(end_date, datetime.max.time()),
                                             instrument_type=instrument.get('type', 'stock'),
                                             source_symbol=instrument.get('source_symbol', '')
@@ -2104,7 +2385,7 @@ class DataManager:
                                         exchange,
                                         instrument['instrument_id'],
                                         instrument['symbol'],
-                                        datetime.combine(start_date, datetime.min.time()),
+                                        datetime.combine(fetch_start_date, datetime.min.time()),
                                         datetime.combine(end_date, datetime.max.time()),
                                         instrument_type=instrument.get('type', 'stock'),
                                         source_symbol=instrument.get('source_symbol', '')
@@ -2123,12 +2404,11 @@ class DataManager:
                             # A 股（有 ex-dividend 精准筛选）: 无条件收集，Phase 2 会再精准过滤
                             # 港股/美股（无精准筛选）: 仅对今天有新数据写入的品种收集，避免全量空跑
                             if instrument.get('type', 'stock') == 'stock':
-                                is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
                                 if is_a_stock or (data and len(data) > 0):
                                     stocks_needing_factors.append({
                                         'instrument_id': instrument['instrument_id'],
                                         'symbol': instrument['symbol'],
-                                        'start_date': start_date,
+                                        'start_date': factor_start_date,
                                         'end_date': end_date,
                                     })
 
@@ -2167,7 +2447,7 @@ class DataManager:
                     # Phase 2: 批量同步复权因子（日线全部完成后）
                     if stocks_needing_factors:
                         factor_result = await self._batch_sync_adjustment_factors(
-                            exchange, stocks_needing_factors
+                            exchange, stocks_needing_factors, sync_reason='daily'
                         )
                         update_results.setdefault('factor_stats', {})[exchange] = factor_result
 

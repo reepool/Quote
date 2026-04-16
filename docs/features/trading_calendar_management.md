@@ -113,19 +113,31 @@ async def update_trading_calendar(
     end_date: date
 ) -> int:
     """更新交易日历"""
-    source = self.get_primary_source(exchange)
-    if not source or not hasattr(source, 'get_trading_calendar'):
-        return 0
+    region = self.exchange_mapper.get_region_from_exchange(exchange)
+    route_names = self._get_scene_route_names('calendar', region) if region else []
+    calendar_source_list = [
+        self._get_source_instance(source_name, region=region)
+        for source_name in route_names
+    ]
 
-    try:
-        calendar_data = await source.get_trading_calendar(exchange, start_date, end_date)
-        if calendar_data:
-            return await self.db_ops.save_trading_calendar(calendar_data)
-    except Exception as e:
-        ds_logger.error(f"Failed to update trading calendar: {e}")
+    for source in calendar_source_list:
+        if not hasattr(source, 'get_trading_calendar'):
+            continue
+        try:
+            calendar_data = await source.get_trading_calendar(exchange, start_date, end_date)
+            if calendar_data:
+                return await self.db_ops.save_trading_calendar(calendar_data)
+        except Exception as e:
+            ds_logger.warning(f"Calendar source {source.name} failed: {e}")
 
     return 0
 ```
+
+当前实现说明：
+
+- 交易日历不再复用 daily 主源，而是独立读取 `routing.calendar.<region>`
+- `calendar` 路由按顺序尝试，前一个 source 失败后才会继续下一个
+- 如果某个 region 未配置 `routing.calendar`，系统会抛出配置错误，而不是隐式退回 daily 路由
 
 #### get_trading_days()
 ```python
