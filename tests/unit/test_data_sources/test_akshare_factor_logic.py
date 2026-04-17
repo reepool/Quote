@@ -73,22 +73,16 @@ class TestAkshareFactorLogic:
         assert events[0]["cumulative_factor"] == 2.0
 
     @pytest.mark.asyncio
-    async def test_hk_factor_uses_cached_raw_window(self):
+    async def test_hk_factor_uses_single_qfq_factor_call_with_history_anchor(self):
         source = AkShareSource("akshare_test", RateLimitConfig())
         source.rate_limiter.acquire = AsyncMock()
 
-        raw_df = pd.DataFrame({
-            "日期": ["2026-04-10", "2026-04-13"],
-            "收盘": [100.0, 100.0],
-        })
-        hfq_df = pd.DataFrame({
-            "日期": ["2026-04-10", "2026-04-13"],
-            "收盘": [200.0, 220.0],
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["1900-01-01", "2026-04-10", "2026-04-13"]),
+            "qfq_factor": [1.0, 2.0, 2.2],
         })
 
-        source._cache_hk_raw_history("00001", raw_df)
-
-        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=hfq_df)) as mock_to_thread:
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)) as mock_to_thread:
             events = await source._get_hk_adjustment_factors(
                 instrument_id="00001.HK",
                 symbol="00001",
@@ -98,4 +92,6 @@ class TestAkshareFactorLogic:
 
         assert len(events) == 1
         assert events[0]["ex_date"].date() == datetime(2026, 4, 13).date()
+        assert events[0]["factor"] == 1.1
+        assert events[0]["cumulative_factor"] == 2.2
         assert mock_to_thread.await_count == 1

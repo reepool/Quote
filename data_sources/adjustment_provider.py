@@ -27,9 +27,13 @@
     前复权价  = 原始价 × cumulative_factor / max(cumulative_factor)
     后复权价  = 原始价 × cumulative_factor
     期货连续  = 原始价 ± 累积价差 (另见 AdjustmentEngine.futures_continuous_adjust)
+
+返回值约定:
+    List[Dict]  数据源成功返回结果；空列表 [] 表示确认无除权除息事件
+    None        数据源无法判定结果或响应不可靠，DataSourceFactory 可尝试 fallback
 """
 
-from typing import Any, Dict, List, Protocol, runtime_checkable
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 from datetime import datetime
 
 
@@ -39,6 +43,7 @@ class AdjustmentFactorProvider(Protocol):
 
     满足本协议的数据源可直接接入 DataSourceFactory.get_adjustment_factors()。
     不支持复权因子的数据源返回空列表 [] 即可 (如仅提供指数数据的源)。
+    临时失败或响应不可判定时可返回 None，以允许 DataSourceFactory 进入 fallback。
 
     Implementation Example:
         class MyDataSource(BaseDataSource):
@@ -48,7 +53,7 @@ class AdjustmentFactorProvider(Protocol):
                 symbol: str,
                 start_date: datetime,
                 end_date: datetime,
-            ) -> List[Dict[str, Any]]:
+            ) -> Optional[List[Dict[str, Any]]]:
                 # 返回因子列表
                 return [{
                     'instrument_id': instrument_id,
@@ -65,7 +70,7 @@ class AdjustmentFactorProvider(Protocol):
         symbol: str,
         start_date: datetime,
         end_date: datetime,
-    ) -> List[Dict[str, Any]]:
+    ) -> Optional[List[Dict[str, Any]]]:
         """获取指定品种在日期范围内的复权因子事件列表。
 
         Args:
@@ -78,6 +83,7 @@ class AdjustmentFactorProvider(Protocol):
             复权因子事件列表, 按 ex_date 升序排列。
             - 仅返回发生除权除息事件的日期记录 (非每日一条)
             - 无除权记录时返回 []
+            - 源不可判定或响应不可靠时返回 None，允许 fallback
         """
         ...
 

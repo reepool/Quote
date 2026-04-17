@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, datetime
+from unittest.mock import AsyncMock, patch
 
 import pandas as pd
 import pytest
 
 from data_sources.akshare_source import AkShareSource
 from data_sources.base_source import RateLimitConfig
+from utils.adjustment import AdjustmentEngine
 
 
 @pytest.mark.unit
@@ -155,3 +157,162 @@ class TestAkshareHkFactorLogic:
         )
 
         assert reliable is True
+
+
+@pytest.mark.unit
+class TestAkshareHkDirectQfqFactorFetch:
+    def _source(self):
+        source = AkShareSource("akshare_hk_stock", RateLimitConfig())
+        source.rate_limiter.acquire = AsyncMock()
+        return source
+
+    @pytest.mark.asyncio
+    async def test_qfq_factor_single_call_builds_multiplicative_events(self):
+        source = self._source()
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["1900-01-01", "2024-05-17", "2025-05-16"]),
+            "qfq_factor": [0.5, 0.75, 1.0],
+        })
+
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)) as mock_thread:
+            events = await source._get_hk_adjustment_factors(
+                instrument_id="00700.HK",
+                symbol="00700",
+                start_date=datetime(2024, 1, 1),
+                end_date=datetime(2025, 12, 31),
+            )
+
+        assert mock_thread.await_count == 1
+        assert source.rate_limiter.acquire.await_count == 1
+        assert [event["ex_date"].date() for event in events] == [
+            date(2024, 5, 17),
+            date(2025, 5, 16),
+        ]
+        assert events[0]["factor"] == 1.5
+        assert events[0]["cumulative_factor"] == 1.5
+        assert events[0]["event_type"] == "mixed"
+        assert events[1]["factor"] == round(2.0 / 1.5, 6)
+        assert events[1]["cumulative_factor"] == 2.0
+
+    @pytest.mark.asyncio
+    async def test_qfq_factor_uses_history_before_requested_start_as_anchor(self):
+        source = self._source()
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["1900-01-01", "2024-05-17", "2025-05-16"]),
+            "qfq_factor": [0.5, 0.75, 1.0],
+        })
+
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)):
+            events = await source._get_hk_adjustment_factors(
+                instrument_id="00700.HK",
+                symbol="00700",
+                start_date=datetime(2025, 1, 1),
+                end_date=datetime(2025, 12, 31),
+            )
+
+        assert len(events) == 1
+        assert events[0]["ex_date"].date() == date(2025, 5, 16)
+        assert events[0]["factor"] == round(2.0 / 1.5, 6)
+        assert events[0]["cumulative_factor"] == 2.0
+
+    @pytest.mark.asyncio
+    async def test_qfq_factor_sentinel_only_returns_empty_list(self):
+        source = self._source()
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["1900-01-01"]),
+            "qfq_factor": [1.0],
+        })
+
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)):
+            events = await source._get_hk_adjustment_factors(
+                instrument_id="01810.HK",
+                symbol="01810",
+                start_date=datetime(2024, 1, 1),
+                end_date=datetime(2025, 12, 31),
+            )
+
+        assert events == []
+
+    @pytest.mark.asyncio
+    async def test_qfq_factor_missing_base_row_returns_none_by_default(self):
+        source = self._source()
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["2024-05-17"]),
+            "qfq_factor": [1.0],
+        })
+
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)):
+            events = await source._get_hk_adjustment_factors(
+                instrument_id="00700.HK",
+                symbol="00700",
+                start_date=datetime(2024, 1, 1),
+                end_date=datetime(2025, 12, 31),
+            )
+
+        assert events is None
+
+    @pytest.mark.asyncio
+    async def test_invalid_response_can_be_configured_as_empty_result(self):
+        source = self._source()
+        cfg = {
+            "api": "stock_hk_daily",
+            "factor_adjust": "qfq-factor",
+            "base_date": "1900-01-01",
+            "require_base_date": True,
+            "fallback_on_invalid_response": False,
+            "rounding_tolerance": 0.0001,
+            "diagnostic_hfq_check_enabled": False,
+        }
+
+        with patch("data_sources.akshare_source.config_manager.get_nested", return_value=cfg):
+            with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(side_effect=Exception("network error"))):
+                events = await source._get_hk_adjustment_factors(
+                    instrument_id="00700.HK",
+                    symbol="00700",
+                    start_date=datetime(2024, 1, 1),
+                    end_date=datetime(2025, 12, 31),
+                )
+
+        assert events == []
+
+    @pytest.mark.asyncio
+    async def test_project_forward_adjust_matches_sina_qfq_factor_math(self):
+        source = self._source()
+        factor_df = pd.DataFrame({
+            "date": pd.to_datetime(["1900-01-01", "2024-05-17", "2025-05-16"]),
+            "qfq_factor": [0.5, 0.75, 1.0],
+        })
+
+        with patch("data_sources.akshare_source.asyncio.to_thread", new=AsyncMock(return_value=factor_df)):
+            factors = await source._get_hk_adjustment_factors(
+                instrument_id="00700.HK",
+                symbol="00700",
+                start_date=datetime(2024, 1, 1),
+                end_date=datetime(2025, 12, 31),
+            )
+
+        raw_quotes = [
+            {
+                "time": datetime(2024, 5, 17),
+                "open": 100.0,
+                "high": 110.0,
+                "low": 90.0,
+                "close": 100.0,
+                "volume": 1000,
+            },
+            {
+                "time": datetime(2025, 5, 16),
+                "open": 200.0,
+                "high": 210.0,
+                "low": 190.0,
+                "close": 200.0,
+                "volume": 1000,
+            },
+        ]
+
+        adjusted = AdjustmentEngine.forward_adjust(raw_quotes, factors)
+
+        assert adjusted[0]["close"] == 75.0
+        assert adjusted[0]["open"] == 75.0
+        assert adjusted[1]["close"] == 200.0
+        assert adjusted[1]["open"] == 200.0

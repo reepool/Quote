@@ -200,7 +200,16 @@
       "max_requests_per_hour": 300,
       "max_requests_per_day": 5000,
       "retry_times": 5,
-      "retry_interval": 3.0
+      "retry_interval": 3.0,
+      "hk_adjustment_factors": {
+        "api": "stock_hk_daily",
+        "factor_adjust": "qfq-factor",
+        "base_date": "1900-01-01",
+        "require_base_date": true,
+        "fallback_on_invalid_response": true,
+        "rounding_tolerance": 0.0001,
+        "diagnostic_hfq_check_enabled": false
+      }
     },
     "yfinance": {
       "enabled": false,
@@ -311,7 +320,7 @@
         "validator": null,
         "fallback": "yfinance",
         "daily_sync_enabled": false,
-        "maintenance_sync_enabled": false
+        "maintenance_sync_enabled": true
       },
       "NASDAQ": {
         "primary": "yfinance",
@@ -459,8 +468,20 @@
           "backup_database": true,
           "cleanup_old_logs": true,
           "log_retention_days": 30,
+          "cleanup_ghost_stocks": true,
+          "ghost_stock_grace_days": 14,
+          "zombie_stock_grace_days": 30,
+          "sync_adjustment_factors": true,
+          "factor_sync_exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE",
+            "HKEX"
+          ],
+          "factor_sync_days_back": 7,
+          "validate_data_integrity": true,
           "optimize_database": true,
-          "validate_data_integrity": true
+          "max_runtime_seconds": 18000
         }
       },
       "monthly_data_integrity_check": {

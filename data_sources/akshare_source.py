@@ -62,6 +62,15 @@ from utils import akshare_logger
 class AkShareSource(BaseDataSource):
     """AkShare数据源 - 支持 A 股 (SSE/SZSE/BSE) + 港股 (HKEX) + 美股 (NASDAQ/NYSE)"""
 
+    _HK_FACTOR_CONFIG_DEFAULTS = {
+        "api": "stock_hk_daily",
+        "factor_adjust": "qfq-factor",
+        "base_date": "1900-01-01",
+        "require_base_date": True,
+        "fallback_on_invalid_response": True,
+        "rounding_tolerance": 0.0001,
+        "diagnostic_hfq_check_enabled": False,
+    }
     _HK_FACTOR_RATIO_REL_TOL = 0.0005
     _HK_FACTOR_RATIO_ABS_TOL = 0.0005
     _HK_FACTOR_PERSIST_WINDOW = 3
@@ -1108,6 +1117,32 @@ class AkShareSource(BaseDataSource):
         self._recent_hk_raw_cache.move_to_end(symbol)
         return cached.copy()
 
+    def _get_hk_factor_config(self) -> Dict[str, Any]:
+        """读取港股因子算法配置，缺失项使用安全默认值。"""
+        configured = config_manager.get_nested(
+            "data_sources_config.akshare.hk_adjustment_factors",
+            {},
+        )
+        if not isinstance(configured, dict):
+            configured = {}
+
+        cfg = dict(self._HK_FACTOR_CONFIG_DEFAULTS)
+        cfg.update({
+            key: value
+            for key, value in configured.items()
+            if key in cfg
+        })
+        return cfg
+
+    def _hk_factor_invalid_result(
+        self,
+        message: str,
+        cfg: Dict[str, Any],
+    ) -> Optional[List[Dict[str, Any]]]:
+        """按配置把港股因子无效响应映射为 fallback 或成功空结果。"""
+        akshare_logger.warning(f"[{self.name}] HK factor invalid response: {message}")
+        return None if cfg.get("fallback_on_invalid_response", True) else []
+
     def _get_factor_anchor_start(self, start_date: datetime) -> datetime:
         """为短窗口补一个锚点，避免把窗口首行误判成新事件。"""
         return start_date - timedelta(days=self._FACTOR_ANCHOR_LOOKBACK_DAYS)
@@ -1219,7 +1254,10 @@ class AkShareSource(BaseDataSource):
         requested_end: date,
         source: str,
     ) -> List[Dict[str, Any]]:
-        """港股因子事件识别：寻找持久平台跃迁，而非逐日微抖动。
+        """[已废弃] 港股旧路径事件识别：寻找持久平台跃迁。
+
+        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        给旧测试和诊断使用。
 
         真实复权事件会使 cumulative_factor 从一个平台永久切换到新平台；
         四舍五入噪声只会在同一平台内上下波动。这里用左右窗口中位数
@@ -1345,7 +1383,10 @@ class AkShareSource(BaseDataSource):
         raw_df: pd.DataFrame,
         hfq_df: pd.DataFrame,
     ) -> pd.Series:
-        """基于港股 OHLC 多列比值构造更稳健的日度累积因子。
+        """[已废弃] 基于港股 OHLC 多列比值构造日度累积因子。
+
+        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        给旧测试和诊断使用。
 
         单独使用收盘价时，容易把东财按分价格式四舍五入误差放大。
         对开/高/低/收分别求 hfq/raw，再取横截面中位数，可显著抑制
@@ -1382,7 +1423,10 @@ class AkShareSource(BaseDataSource):
         requested_start: date,
         requested_end: date,
     ) -> bool:
-        """港股因子结果可靠性检查。
+        """[已废弃] 港股旧路径结果可靠性检查。
+
+        生产路径改用新浪 stock_hk_daily(adjust="qfq-factor")。此方法仅保留
+        给旧测试和诊断使用。
 
         真实港股复权事件通常很稀疏；若在短时间内连续识别出大量事件，
         更可能是价格取整噪声而不是公司行为。
@@ -1531,95 +1575,100 @@ class AkShareSource(BaseDataSource):
         self, instrument_id: str, symbol: str,
         start_date: datetime, end_date: datetime
     ) -> Optional[List[Dict[str, Any]]]:
-        """港股复权因子: 对比不复权/后复权收盘价反推累积因子
+        """港股复权因子: 使用新浪 qfq-factor 转换为项目乘法型累积因子。
 
-        原理: cumulative_factor = hfq_close / raw_close
-        仅在因子发生显著变化时记录 (除权事件日)，与 A 股稀疏存储一致。
+        新浪 qfq 价格公式为 raw_price * qfq_factor；项目统一前复权公式为
+        raw_price * cumulative_factor / latest_cumulative_factor。使用基准行
+        qfq_factor 归一化后即可得到项目后复权累积因子。
         """
+        cfg = self._get_hk_factor_config()
         try:
-            end_str = end_date.strftime('%Y%m%d')
             requested_start = start_date.date()
             requested_end = end_date.date()
-
-            raw_df = None
-            hfq_start_date = start_date
-            cached_raw_df = self._get_cached_hk_raw_history(symbol)
-            if (
-                cached_raw_df is not None
-                and not cached_raw_df.empty
-                and cached_raw_df.index.max().date() >= requested_end
-                and cached_raw_df.index.min().date() < requested_start
-            ):
-                raw_df = cached_raw_df
-                hfq_start_date = datetime.combine(
-                    raw_df.index.min().date(), datetime.min.time()
-                )
-            else:
-                anchor_start = self._get_factor_anchor_start(start_date)
-                await self.rate_limiter.acquire()
-                raw_df = await asyncio.to_thread(
-                    ak.stock_hk_hist, symbol=symbol, period="daily",
-                    start_date=anchor_start.strftime('%Y%m%d'),
-                    end_date=end_str, adjust=""
-                )
-                raw_df = self._normalize_hk_hist_df(raw_df)
-                if raw_df is None or raw_df.empty:
-                    akshare_logger.debug(
-                        f"[{self.name}] HK factor: no raw data for {symbol}"
-                    )
-                    return []
-                self._cache_hk_raw_history(symbol, raw_df)
-                hfq_start_date = anchor_start
+            factor_adjust = str(cfg.get("factor_adjust", "qfq-factor"))
+            base_date = pd.Timestamp(str(cfg.get("base_date", "1900-01-01")))
+            require_base_date = bool(cfg.get("require_base_date", True))
+            threshold = float(cfg.get("rounding_tolerance", 0.0001))
 
             await self.rate_limiter.acquire()
-            hfq_df = await asyncio.to_thread(
-                ak.stock_hk_hist, symbol=symbol, period="daily",
-                start_date=hfq_start_date.strftime('%Y%m%d'),
-                end_date=end_str, adjust="hfq"
+            factor_df = await asyncio.to_thread(
+                ak.stock_hk_daily, symbol=symbol, adjust=factor_adjust
             )
 
-            hfq_df = self._normalize_hk_hist_df(hfq_df)
-            if raw_df is None or hfq_df is None or raw_df.empty or hfq_df.empty:
+            if factor_df is None or factor_df.empty:
+                return self._hk_factor_invalid_result(
+                    f"empty {factor_adjust} table for {symbol}", cfg
+                )
+
+            required_columns = {"date", "qfq_factor"}
+            missing_columns = required_columns - set(factor_df.columns)
+            if missing_columns:
+                return self._hk_factor_invalid_result(
+                    f"missing columns {sorted(missing_columns)} for {symbol}", cfg
+                )
+
+            factor_df = factor_df.copy()
+            factor_df["date"] = pd.to_datetime(factor_df["date"], errors="coerce")
+            factor_df["qfq_factor"] = pd.to_numeric(
+                factor_df["qfq_factor"], errors="coerce"
+            )
+            factor_df = factor_df.dropna(subset=["date", "qfq_factor"])
+            factor_df = factor_df[factor_df["qfq_factor"] > 0]
+            if factor_df.empty:
+                return self._hk_factor_invalid_result(
+                    f"no positive qfq factors for {symbol}", cfg
+                )
+
+            factor_df = factor_df.set_index("date").sort_index()
+            base_rows = factor_df[factor_df.index == base_date]
+            if base_rows.empty:
+                if require_base_date:
+                    return self._hk_factor_invalid_result(
+                        f"missing base date {base_date.date()} for {symbol}", cfg
+                    )
+                base_factor = float(factor_df.iloc[0]["qfq_factor"])
+            else:
+                base_factor = float(base_rows.iloc[-1]["qfq_factor"])
+
+            if base_factor <= 0:
+                return self._hk_factor_invalid_result(
+                    f"non-positive base factor for {symbol}", cfg
+                )
+
+            event_df = factor_df[
+                (factor_df.index != base_date) &
+                (factor_df.index >= pd.Timestamp("1990-01-01")) &
+                (factor_df.index.date <= requested_end)
+            ]
+            if event_df.empty:
                 akshare_logger.debug(
-                    f"[{self.name}] HK factor: no data for {symbol}"
+                    f"[{self.name}] HK factor: no qfq-factor events for {symbol}"
                 )
                 return []
 
-            cum_factor = self._build_hk_cumulative_factor(raw_df, hfq_df)
-            if cum_factor.empty:
-                return []
-
-            factors = self._build_hk_plateau_factor_events(
+            cum_factor = event_df["qfq_factor"] / base_factor
+            factors = self._build_sparse_factor_events(
                 instrument_id=instrument_id,
                 cum_factor=cum_factor,
                 requested_start=requested_start,
                 requested_end=requested_end,
+                threshold=threshold,
                 source='akshare',
             )
-
-            if not self._hk_factor_result_is_reliable(
-                factors,
-                requested_start=requested_start,
-                requested_end=requested_end,
-            ):
-                akshare_logger.warning(
-                    f"[{self.name}] HK factors unreliable for {symbol}: "
-                    f"{len(factors)} events in {requested_start}~{requested_end}, "
-                    "delegating to fallback"
-                )
-                return None
+            for factor in factors:
+                factor.setdefault("event_type", "mixed")
 
             akshare_logger.info(
-                f"[{self.name}] HK factors: {len(factors)} events for {symbol} "
-                f"({start_date.strftime('%Y%m%d')}-{end_str})"
+                f"[{self.name}] HK factors (qfq-factor): {len(factors)} events for {symbol} "
+                f"({start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')})"
             )
             return factors
 
         except Exception as e:
-            akshare_logger.error(
+            akshare_logger.warning(
                 f"[{self.name}] Failed to get HK adjustment factors for {symbol}: {e}"
             )
-            return []
+            return None if cfg.get("fallback_on_invalid_response", True) else []
 
     async def close(self):
         """关闭AkShare数据源连接和资源"""

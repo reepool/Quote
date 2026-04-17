@@ -181,7 +181,7 @@ class BaseDataSource(ABC):
         symbol: str,
         start_date: datetime,
         end_date: datetime,
-    ) -> List[Dict[str, Any]]:
+    ) -> Optional[List[Dict[str, Any]]]:
         """获取复权因子事件列表（可选实现）
 
         默认返回空列表。子类重写此方法以提供真实复权因子数据。
@@ -190,6 +190,7 @@ class BaseDataSource(ABC):
 
         Returns:
             复权因子事件列表, 仅包含发生除权除息事件的日期记录 (非每日一条)。
+            返回 [] 表示成功确认无事件；返回 None 表示源不可判定，可由工厂尝试 fallback。
             每条记录必须包含以下字段:
                 instrument_id     str       品种 ID
                 ex_date           datetime  除权除息日

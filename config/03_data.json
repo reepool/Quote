@@ -114,6 +114,15 @@
       "max_requests_per_day": 50000,
       "retry_times": 5,
       "retry_interval": 3.0,
+      "hk_adjustment_factors": {
+        "api": "stock_hk_daily",
+        "factor_adjust": "qfq-factor",
+        "base_date": "1900-01-01",
+        "require_base_date": true,
+        "fallback_on_invalid_response": true,
+        "rounding_tolerance": 0.0001,
+        "diagnostic_hfq_check_enabled": false
+      },
       "proxy_patch": {
         "enabled": true,
         "gateway": "101.201.173.125",
@@ -255,7 +264,7 @@
         "validator": null,
         "fallback": "yfinance",
         "daily_sync_enabled": false,
-        "maintenance_sync_enabled": false
+        "maintenance_sync_enabled": true
       },
       "NASDAQ": {
         "primary": "yfinance",

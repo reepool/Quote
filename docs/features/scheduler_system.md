@@ -169,10 +169,15 @@ async def trading_calendar_update(self,
       "backup_database": true,
       "cleanup_old_logs": true,
       "log_retention_days": 30,
-      "optimize_database": true,
-      "validate_data_integrity": true,
       "cleanup_ghost_stocks": true,
-      "ghost_stock_grace_days": 14
+      "ghost_stock_grace_days": 14,
+      "zombie_stock_grace_days": 30,
+      "sync_adjustment_factors": true,
+      "factor_sync_exchanges": ["SSE", "SZSE", "BSE", "HKEX"],
+      "factor_sync_days_back": 7,
+      "validate_data_integrity": true,
+      "optimize_database": true,
+      "max_runtime_seconds": 18000
     }
   }
 }
@@ -181,10 +186,10 @@ async def trading_calendar_update(self,
 #### 维护任务
 1. **数据库备份**：自动备份数据库
 2. **日志清理**：清理过期日志文件
-3. **数据库优化**：执行 VACUUM 和 ANALYZE
-4. **清理幽灵股**：自动侦测并停用建库满 14 天且仍无任何行情的品种（如长期停牌/退市标的）
-5. **数据完整性检查**：验证数据一致性
-6. **性能优化**：优化数据库索引
+3. **清理幽灵股/僵尸股**：自动侦测并停用长期无行情或无交易的无效标的，减少后续同步扫描量
+4. **复权因子周度同步**：按 `factor_sync_exchanges` 和 `routing.factor.<exchange>.maintenance_sync_enabled` 执行周度因子同步；港股因子默认放在该阶段执行
+5. **数据完整性检查**：验证维护写入后的最终数据一致性
+6. **数据库优化**：在维护写入完成后执行 VACUUM 和 ANALYZE
 
 #### 核心方法
 ```python
@@ -195,7 +200,11 @@ async def weekly_data_maintenance(self,
                                 optimize_database: bool = True,
                                 validate_data_integrity: bool = True,
                                 cleanup_ghost_stocks: bool = True,
-                                ghost_stock_grace_days: int = 14):
+                                ghost_stock_grace_days: int = 14,
+                                zombie_stock_grace_days: int = 30,
+                                sync_adjustment_factors: bool = True,
+                                factor_sync_exchanges: Optional[List[str]] = None,
+                                factor_sync_days_back: int = 7):
     """每周数据维护任务"""
 ```
 

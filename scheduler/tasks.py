@@ -329,6 +329,9 @@ class ScheduledTasks:
                                   cleanup_ghost_stocks: bool = True,
                                   ghost_stock_grace_days: int = 14,
                                   zombie_stock_grace_days: int = 30,
+                                  sync_adjustment_factors: bool = True,
+                                  factor_sync_exchanges: Optional[List[str]] = None,
+                                  factor_sync_days_back: int = 7,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """每周数据维护任务"""
         try:
@@ -356,10 +359,6 @@ class ScheduledTasks:
             if cleanup_old_logs:
                 await self._cleanup_old_logs(log_retention_days)
 
-            # 数据库优化
-            if optimize_database:
-                await self._optimize_database()
-
             # 清理幽灵股 + 僵尸股 (长期无数据/无交易死标的)
             if cleanup_ghost_stocks:
                 try:
@@ -372,19 +371,30 @@ class ScheduledTasks:
                 except Exception as e:
                     scheduler_logger.error(f"[Scheduler] Ghost/zombie instruments cleanup failed: {e}")
 
-            # 数据完整性验证
+            # 周度复权因子同步（兜底校验，防止每日精准筛选遗漏）
+            factor_sync_status = '成功'
+            factor_sync_result = {}
+            if sync_adjustment_factors:
+                try:
+                    factor_sync_result = await data_manager.sync_all_adjustment_factors(
+                        exchanges=factor_sync_exchanges,
+                        days_back=factor_sync_days_back,
+                    )
+                    scheduler_logger.info(f"[Scheduler] Weekly factor sync result: {factor_sync_result}")
+                except Exception as e:
+                    factor_sync_status = f'失败: {e}'
+                    scheduler_logger.error(f"[Scheduler] Weekly factor sync failed: {e}")
+            else:
+                factor_sync_status = '跳过'
+                scheduler_logger.info("[Scheduler] Weekly factor sync skipped by config")
+
+            # 数据完整性验证应覆盖本轮清理与因子同步后的最终状态
             if validate_data_integrity:
                 await self._validate_data_integrity()
 
-            # 全量复权因子同步（兜底校验，防止每日精准筛选遗漏）
-            factor_sync_status = '成功'
-            factor_sync_result = {}
-            try:
-                factor_sync_result = await data_manager.sync_all_adjustment_factors()
-                scheduler_logger.info(f"[Scheduler] Weekly factor sync result: {factor_sync_result}")
-            except Exception as e:
-                factor_sync_status = f'失败: {e}'
-                scheduler_logger.error(f"[Scheduler] Weekly factor sync failed: {e}")
+            # 数据库优化放在维护写入之后，避免先优化再大量写入导致收益被抵消
+            if optimize_database:
+                await self._optimize_database()
 
             scheduler_logger.info("[Scheduler] Weekly maintenance completed")
 
@@ -399,14 +409,15 @@ class ScheduledTasks:
             maintenance_report_data = {
                 'name': '每周数据维护报告',
                 'status': 'success',  # 明确的成功状态
-                'tasks_completed': 4,
+                'tasks_completed': 6,
                 'duration': 'N/A', # 可以在任务开始和结束时记录时间来计算
                 'maintenance_tasks': [
                     {'task_name': '数据库备份', 'status': '成功' if backup_database else '跳过'},
                     {'task_name': '日志清理', 'status': '成功' if cleanup_old_logs else '跳过'},
-                    {'task_name': '数据库优化', 'status': '成功' if optimize_database else '跳过'},
+                    {'task_name': '幽灵/僵尸标的清理', 'status': '成功' if cleanup_ghost_stocks else '跳过'},
+                    {'task_name': '复权因子周度同步', 'status': factor_summary},
                     {'task_name': '数据完整性验证', 'status': '成功' if validate_data_integrity else '跳过'},
-                    {'task_name': '复权因子全量同步', 'status': factor_summary},
+                    {'task_name': '数据库优化', 'status': '成功' if optimize_database else '跳过'},
                 ],
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             }

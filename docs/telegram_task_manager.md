@@ -118,7 +118,8 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 ### 3. 每周数据维护 (weekly_data_maintenance)
 - **执行时间**: 每周日 02:00
-- **功能**: 数据库优化、日志清理、备份验证
+- **功能**: 维护前数据库备份、日志清理、幽灵/僵尸标的清理、周度复权因子同步、完整性验证、数据库优化
+- **港股因子**: `routing.factor.HKEX.maintenance_sync_enabled=true` 时由本任务周度同步，日更仍由 `routing.factor.HKEX.daily_sync_enabled=false` 控制为跳过
 
 ### 4. 月度数据完整性检查 (monthly_data_integrity_check)
 - **执行时间**: 每月1日 03:00
@@ -220,8 +221,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 港股修复建议：
 
-- 删除确认错误的 `HKEX + source='akshare'` 因子后，使用 `/backfill_factors HKEX full`
-- 当前正式路由会按 `routing.factor.HKEX.primary` 执行；生产配置应使用 `akshare` 港股因子倒算逻辑，`yfinance` 只作为失败时的少量补位，不承担主源角色
+- 替换旧口径或脏数据时，使用 `/backfill_factors HKEX full`；`missing` 模式会跳过已有任意因子记录的股票，不适合全量替换。
+- 当前正式路由会按 `routing.factor.HKEX.primary` 执行；生产配置应使用 `akshare` 港股 `qfq-factor` 乘法因子转换逻辑，`yfinance` 只作为失败时的少量补位，不承担主源角色。
+- `routing.factor.HKEX.daily_sync_enabled` 控制日更是否自动同步港股因子；`routing.factor.HKEX.maintenance_sync_enabled` 控制周维护是否自动同步港股因子；两者都不会阻止显式 `/backfill_factors`。
 
 ## 🔔 任务启动通知
 

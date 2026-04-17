@@ -636,13 +636,23 @@
       "a_stock",
       "hk_stock",
       "us_stock"
-    ]
+    ],
+    "hk_adjustment_factors": {
+      "api": "stock_hk_daily",
+      "factor_adjust": "qfq-factor",
+      "base_date": "1900-01-01",
+      "require_base_date": true,
+      "fallback_on_invalid_response": true,
+      "rounding_tolerance": 0.0001,
+      "diagnostic_hfq_check_enabled": false
+    }
   }
 }
   ...
 ```
 
 - **`instrument_types_supported`**: 未声明时默认表示“不额外限制”
+- **`hk_adjustment_factors`**: 港股复权因子算法配置，仅影响 `HKEX` 因子路径，不影响 A 股 AkShare 因子。默认使用新浪 `stock_hk_daily(adjust="qfq-factor")` 获取稀疏前复权乘法因子，再转换为项目统一的后复权累积因子。`fallback_on_invalid_response=true` 表示接口异常、缺少基准行或响应不可解析时返回 `None`，允许 `routing.factor.HKEX.fallback` 接管；有效空结果仍返回 `[]`，不触发 fallback。
 
 ### data_sources_config.yfinance
 
@@ -707,7 +717,7 @@
       "SSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
       "SZSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
       "BSE": {"primary": "akshare", "validator": "tdx_xdxr", "fallback": null, "daily_sync_enabled": true, "maintenance_sync_enabled": true},
-      "HKEX": {"primary": "akshare", "validator": null, "fallback": "yfinance", "daily_sync_enabled": false, "maintenance_sync_enabled": false},
+      "HKEX": {"primary": "akshare", "validator": null, "fallback": "yfinance", "daily_sync_enabled": false, "maintenance_sync_enabled": true},
       "NASDAQ": {"primary": "yfinance", "validator": null, "fallback": null, "daily_sync_enabled": false, "maintenance_sync_enabled": false},
       "NYSE": {"primary": "yfinance", "validator": null, "fallback": null, "daily_sync_enabled": false, "maintenance_sync_enabled": false}
     }
@@ -727,7 +737,7 @@
 - **`routing.calendar.<region>`**: `List[str]`
   指定交易日历抓取链，按 region 配置。
 - **`routing.factor.<exchange>`**: `Object`
-  指定复权因子路由，支持 `primary`、`validator`、`fallback`、`daily_sync_enabled`、`maintenance_sync_enabled`。其中 `primary` 是正式抓取与回补入口实际使用的主源；`validator=tdx_xdxr` 是特殊值，仅用于 A 股旁路审计，不参与主抓取结果选择。`daily_sync_enabled=false` 表示该交易所在日更任务中跳过 Phase 2 因子同步；`maintenance_sync_enabled=false` 表示该交易所在每周维护任务中也跳过自动因子同步，改由显式回补或专门任务承担。
+  指定复权因子路由，支持 `primary`、`validator`、`fallback`、`daily_sync_enabled`、`maintenance_sync_enabled`。其中 `primary` 是正式抓取与回补入口实际使用的主源；`validator=tdx_xdxr` 是特殊值，仅用于 A 股旁路审计，不参与主抓取结果选择。`daily_sync_enabled=false` 表示该交易所在日更任务中跳过 Phase 2 因子同步；`maintenance_sync_enabled=true` 表示该交易所会进入每周维护任务的周度因子同步。港股当前关闭日更因子、开启周维护因子，以避免交易日日更被 3000+ 标的扫描拖慢。
 
 当前生产配置的关键路由示例：
 
@@ -738,7 +748,7 @@
 - A 股品种列表与交易日历：`baostock`
 - 港股/美股品种列表与交易日历：`akshare`
 - A 股复权因子主源：`baostock`
-- 港股复权因子主源：`akshare`（`yfinance` 仅作为失败时的少量补位）
+- 港股复权因子主源：`akshare`（生产算法使用 `qfq-factor` 转换为乘法累积因子；`yfinance` 仅作为失败时的少量补位）
 - 美股复权因子主源：`yfinance`（当前尚未正式上线）
 
 ## exchange_rules
@@ -1040,7 +1050,21 @@
   "weekly_data_maintenance": {
     "enabled": true,
     "description": "每周数据维护",
-    "report": true
+    "report": true,
+    "parameters": {
+      "backup_database": true,
+      "cleanup_old_logs": true,
+      "log_retention_days": 30,
+      "cleanup_ghost_stocks": true,
+      "ghost_stock_grace_days": 14,
+      "zombie_stock_grace_days": 30,
+      "sync_adjustment_factors": true,
+      "factor_sync_exchanges": ["SSE", "SZSE", "BSE", "HKEX"],
+      "factor_sync_days_back": 7,
+      "validate_data_integrity": true,
+      "optimize_database": true,
+      "max_runtime_seconds": 18000
+    }
   }
 }
   ...
@@ -1054,6 +1078,10 @@
 - **`misfire_grace_time`**: `int` (默认: `1800`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
+- **`parameters.sync_adjustment_factors`**: `bool` (默认: `True`) —— *是否在周维护中执行复权因子周度同步*
+- **`parameters.factor_sync_exchanges`**: `List[str] | null` (默认: `null`) —— *周度因子同步的交易所范围；设为 `["SSE","SZSE","BSE","HKEX"]` 可显式纳入港股，设为 `null` 则使用系统默认启用市场*
+- **`parameters.factor_sync_days_back`**: `int` (默认: `7`) —— *周度因子同步的回看天数*
+- **`parameters.max_runtime_seconds`**: `int` (当前生产建议: `18000`) —— *周维护最大执行时间。港股周度因子扫描约需 2 小时以上，建议预留 5 小时窗口*
 #### jobs.monthly_data_integrity_check
 
 ```json

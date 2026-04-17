@@ -138,12 +138,20 @@
           "backup_database": true,
           "cleanup_old_logs": true,
           "log_retention_days": 30,
-          "optimize_database": true,
-          "validate_data_integrity": true,
           "cleanup_ghost_stocks": true,
           "ghost_stock_grace_days": 14,
           "zombie_stock_grace_days": 30,
-          "max_runtime_seconds": 10800
+          "sync_adjustment_factors": true,
+          "factor_sync_exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE",
+            "HKEX"
+          ],
+          "factor_sync_days_back": 7,
+          "validate_data_integrity": true,
+          "optimize_database": true,
+          "max_runtime_seconds": 18000
         }
       },
       "monthly_data_integrity_check": {
