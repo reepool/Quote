@@ -348,6 +348,11 @@ python main.py download --exchanges SSE SZSE --no-resume
 
 ## 🔄 版本更新日志
 
+### v2.4.3 (2026-04-17)
+- 🧮 **港股复权因子主算法更新**：AkShare 港股因子改为使用新浪 `stock_hk_daily(adjust="qfq-factor")` 稀疏接口构建乘法累积因子
+- 🗓️ **港股因子调度归位**：港股复权因子默认由周末 `weekly_data_maintenance` 同步，交易日日更保持关闭
+- 🧯 **主备源角色澄清**：港股日线与因子均以 `AkShare` 为主，`YFinance` 仅在主源失败时少量补位
+
 ### v2.4.2 (2026-04-09)
 - 🌐 **HKEX 全面支持**：完成港股数据源集成（AkShare + YFinance 作为备用兜底）
 - 🧹 **死标的智能化治理**：过滤港股市场1300+零交易“死股仙股”，彻底阻断冗余重试导致的性能崩溃

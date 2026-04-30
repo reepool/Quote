@@ -1,0 +1,2926 @@
+import asyncio
+from unittest.mock import AsyncMock, Mock, patch
+
+import pandas as pd
+import pytest
+
+from data_manager import DataManager
+from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
+
+
+def _build_mock_config(tmp_path, *, research_enabled: bool = True):
+    research_config = ResearchConfig(
+        enabled=research_enabled,
+        modules={
+            "industry": {"enabled": True},
+        },
+        storage=ResearchStorageConfig(
+            db_path=str(tmp_path / "research.db"),
+            shadow_mode=True,
+            attach_quotes_db=False,
+            quotes_db_path=str(tmp_path / "quotes.db"),
+            quotes_db_alias="quotes",
+        ),
+        budget=ResearchBudgetConfig(),
+    )
+
+    config = Mock()
+    config.get_research_config.return_value = research_config
+
+    def _get_nested(path, default=None):
+        mapping = {
+            "telegram_config.enabled": False,
+            "data_config": {"data_dir": str(tmp_path)},
+        }
+        return mapping.get(path, default)
+
+    config.get_nested.side_effect = _get_nested
+    return config
+
+
+def _run(coro):
+    loop = asyncio.new_event_loop()
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
+
+
+async def _sync_to_thread(func, /, *args, **kwargs):
+    return func(*args, **kwargs)
+
+
+def test_data_manager_refresh_runtime_config_rebinds_research_config(tmp_path):
+    initial_research_config = ResearchConfig(
+        enabled=True,
+        modules={"shareholders": {"delivery_mode": "free_best_effort"}},
+    )
+    updated_research_config = ResearchConfig(
+        enabled=True,
+        modules={"shareholders": {"delivery_mode": "paid_high_availability"}},
+    )
+    mock_config = Mock()
+    mock_config.get_research_config.side_effect = [
+        initial_research_config,
+        updated_research_config,
+    ]
+    mock_config.get_nested.side_effect = lambda path, default=None: {
+        "telegram_config.enabled": True,
+        "data_config": {"data_dir": str(tmp_path), "download_chunk_days": 13},
+    }.get(path, default)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    assert manager.research_config.modules["shareholders"]["delivery_mode"] == "free_best_effort"
+
+    manager.refresh_runtime_config()
+
+    assert manager.research_config.modules["shareholders"]["delivery_mode"] == "paid_high_availability"
+    assert manager.telegram_enabled is True
+    assert manager.download_chunk_days == 13
+    assert manager.progress_file == str(tmp_path / "download_progress.json")
+
+
+def test_data_manager_bootstraps_research_storage_when_enabled(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    with patch("research.ResearchStorageManager") as storage_cls:
+        storage_instance = Mock()
+        storage_cls.return_value = storage_instance
+
+        manager._initialize_research_storage()
+
+    storage_cls.assert_called_once_with(manager.research_config)
+    storage_instance.initialize.assert_called_once()
+    assert manager.research_storage is storage_instance
+
+
+def test_data_manager_research_storage_init_failure_does_not_raise(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    with patch("research.ResearchStorageManager") as storage_cls:
+        storage_instance = Mock()
+        storage_instance.initialize.side_effect = RuntimeError("boom")
+        storage_cls.return_value = storage_instance
+
+        manager._initialize_research_storage()
+
+    assert manager.research_storage is None
+
+
+def test_data_manager_run_company_profile_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_company_profile_shadow_sync(exchanges=["SSE"], limit_per_exchange=10)
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_list_industry_component_sets_resolves_sw_index_alias(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.list_industry_taxonomy_records.return_value = [
+        {
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "industry_code": "340301",
+            "industry_name": "白酒",
+            "industry_level": 3,
+            "sw_index_code": "850111",
+        }
+    ]
+    storage.list_industry_component_set_records.return_value = [
+        {
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "industry_code": "340301",
+            "component_count": 2,
+            "source": "swsresearch",
+            "source_mode": "direct",
+            "built_at": "2026-04-25T13:00:00",
+            "ingestion_run_id": None,
+            "created_at": "2026-04-25T13:00:00",
+            "updated_at": "2026-04-25T13:00:00",
+            "symbols": ["600519", "000568"],
+        }
+    ]
+    storage.count_industry_component_sets.return_value = 1
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(
+            manager.list_research_industry_component_sets(
+                sw_index_code="850111",
+                limit=10,
+                offset=0,
+            )
+        )
+
+    assert result["sw_index_code"] == "850111"
+    assert result["resolved_industry_code"] == "340301"
+    assert result["total"] == 1
+    storage.list_industry_component_set_records.assert_called_once_with(
+        taxonomy_system="sw",
+        taxonomy_version=None,
+        industry_code="340301",
+        max_age_days=None,
+        limit=10,
+        offset=0,
+        include_symbols=True,
+    )
+
+
+def test_data_manager_list_industry_component_sets_derives_from_memberships_when_cache_empty(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.list_industry_component_set_records.return_value = []
+    storage.count_industry_component_sets.return_value = 0
+    storage.list_industry_component_set_records_from_memberships.return_value = (
+        [
+            {
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "industry_code": "340301",
+                "component_count": 2,
+                "source": "swsresearch",
+                "source_mode": "direct",
+                "built_at": "2026-04-25T13:00:00",
+                "ingestion_run_id": 123,
+                "created_at": "2026-04-25T13:00:00",
+                "updated_at": "2026-04-25T13:00:00",
+                "symbols": ["000568", "600519"],
+            }
+        ],
+        1,
+    )
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(
+            manager.list_research_industry_component_sets(
+                industry_code="340301",
+                limit=10,
+                offset=0,
+            )
+        )
+
+    assert result["resolved_industry_code"] == "340301"
+    assert result["total"] == 1
+    assert result["items"][0]["symbols"] == ["000568", "600519"]
+    storage.list_industry_component_set_records_from_memberships.assert_called_once_with(
+        taxonomy_system="sw",
+        taxonomy_version=None,
+        industry_code="340301",
+        max_age_days=None,
+        limit=10,
+        offset=0,
+        include_symbols=True,
+    )
+
+
+def test_data_manager_list_industry_component_sets_returns_empty_for_missing_alias(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.list_industry_taxonomy_records.return_value = []
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(
+            manager.list_research_industry_component_sets(
+                sw_index_code="850111",
+                limit=10,
+                offset=0,
+            )
+        )
+
+    assert result["missing_reason"] == "taxonomy_alias_not_found"
+    assert result["total"] == 0
+    assert result["items"] == []
+    storage.list_industry_component_set_records.assert_not_called()
+
+
+def test_data_manager_run_company_profile_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.CompanyProfileShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_company_profile_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_financial_summary_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_financial_summary_shadow_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_financial_summary_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.FinancialSummaryShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_financial_summary_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_shareholder_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_shareholder_shadow_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_shareholder_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.ShareholderShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_shareholder_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_financial_statements_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_financial_statements_shadow_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_financial_statements_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.FinancialStatementsShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_financial_statements_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_industry_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_industry_shadow_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_industry_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.IndustryShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_industry_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_industry_standard_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_industry_standard_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_industry_standard_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {"enabled": True},
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.IndustryStandardSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_industry_standard_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+                instrument_ids_by_exchange={"SSE": ["600000.SH"]},
+                force_component_refresh=True,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+    service_instance.sync.assert_awaited_once_with(
+        exchanges=["SSE"],
+        limit_per_exchange=10,
+        instrument_ids_by_exchange={"SSE": ["600000.SH"]},
+        budget_mode=None,
+        allow_paid_proxy=None,
+        force_component_refresh=True,
+    )
+
+
+def test_data_manager_list_research_target_instrument_ids_prefers_db_ops_reader(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops.get_research_target_instrument_ids_by_exchange = AsyncMock(
+        return_value=["600000.SH", "600519.SH"]
+    )
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=AssertionError("fallback reader should not be used")
+    )
+
+    result = _run(
+        manager._list_research_target_instrument_ids_by_exchange("SSE")
+    )
+
+    assert result == ["600000.SH", "600519.SH"]
+    manager.db_ops.get_research_target_instrument_ids_by_exchange.assert_awaited_once_with(
+        "SSE",
+        is_active=True,
+    )
+
+
+def test_data_manager_get_research_industry_standard_coverage_gaps_reports_missing_ids(
+    tmp_path,
+):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+            },
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.list_industry_membership_instrument_ids.side_effect = [
+        ["600519.SH"],
+        ["000001.SZ"],
+    ]
+    manager.research_storage = storage
+
+    async def _get_target_ids(exchange: str, *, is_active: bool = True):
+        if exchange == "SSE":
+            return ["600000.SH", "600519.SH"]
+        if exchange == "SZSE":
+            return ["000001.SZ"]
+        return []
+
+    manager.db_ops.get_research_target_instrument_ids_by_exchange = AsyncMock(
+        side_effect=_get_target_ids
+    )
+
+    result = _run(
+        manager.get_research_industry_standard_coverage_gaps(
+            missing_limit_per_exchange=5,
+        )
+    )
+
+    assert result["taxonomy_system"] == "sw"
+    assert result["taxonomy_version"] == "sw_2021"
+    assert result["target_instrument_count"] == 3
+    assert result["authoritative_membership_total"] == 2
+    assert result["missing_authoritative_membership_count"] == 1
+    assert result["ready"] is False
+    assert result["targeted_missing_instrument_ids_by_exchange"] == {
+        "SSE": ["600000.SH"]
+    }
+    assert result["exchange_gaps"] == [
+        {
+            "exchange": "SSE",
+            "target_instruments": 2,
+            "authoritative_memberships": 1,
+            "missing_instrument_count": 1,
+            "coverage_ratio": 0.5,
+            "ready": False,
+            "optional_empty_exchange": False,
+            "missing_instrument_ids": ["600000.SH"],
+            "missing_ids_truncated": False,
+        },
+        {
+            "exchange": "SZSE",
+            "target_instruments": 1,
+            "authoritative_memberships": 1,
+            "missing_instrument_count": 0,
+            "coverage_ratio": 1.0,
+            "ready": True,
+            "optional_empty_exchange": False,
+            "missing_instrument_ids": [],
+            "missing_ids_truncated": False,
+        },
+    ]
+
+
+def test_data_manager_run_industry_standard_gap_fill_sync_targets_missing_ids(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+            },
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.list_industry_membership_instrument_ids.side_effect = [
+        ["600519.SH"],
+        ["000001.SZ"],
+        ["600519.SH", "600000.SH"],
+        ["000001.SZ"],
+    ]
+    manager.research_storage = storage
+
+    async def _get_target_ids(exchange: str, *, is_active: bool = True):
+        if exchange == "SSE":
+            return ["600000.SH", "600519.SH"]
+        if exchange == "SZSE":
+            return ["000001.SZ"]
+        return []
+
+    manager.db_ops.get_research_target_instrument_ids_by_exchange = AsyncMock(
+        side_effect=_get_target_ids
+    )
+    manager.run_industry_standard_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "successful_exchanges": 1,
+            "total_memberships_written": 1,
+        }
+    )
+
+    result = _run(
+        manager.run_industry_standard_gap_fill_sync(
+            exchanges=["SSE", "SZSE"],
+            missing_limit_per_exchange=5,
+            budget_mode="availability_first",
+            allow_paid_proxy=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["repaired_instrument_count"] == 1
+    assert result["remaining_missing_instrument_count"] == 0
+    assert result["targeted_exchanges"] == ["SSE"]
+    assert result["targeted_instrument_count"] == 1
+    assert result["targeted_missing_instrument_ids_by_exchange"] == {
+        "SSE": ["600000.SH"]
+    }
+    manager.run_industry_standard_sync.assert_awaited_once_with(
+        exchanges=["SSE"],
+        instrument_ids_by_exchange={"SSE": ["600000.SH"]},
+        budget_mode="availability_first",
+        allow_paid_proxy=True,
+    )
+
+
+def test_data_manager_run_industry_official_mapping_refresh_returns_unavailable_without_storage(
+    tmp_path,
+):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {"enabled": True},
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_industry_official_mapping_refresh(
+            exchanges=["SSE"],
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_industry_official_mapping_refresh_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {"enabled": True},
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.IndustryStandardSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.refresh_official_mapping_cache = AsyncMock(
+            return_value={"status": "success"}
+        )
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_industry_official_mapping_refresh(
+                exchanges=["SSE"],
+                budget_mode="balanced",
+                allow_paid_proxy=False,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_instance.refresh_official_mapping_cache.assert_awaited_once_with(
+        exchanges=["SSE"],
+        budget_mode="balanced",
+        allow_paid_proxy=False,
+    )
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_valuation_history_rebuild_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_valuation_history_rebuild(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_valuation_history_rebuild_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.ValuationHistoryRebuildService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_valuation_history_rebuild(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_analyst_forecast_shadow_sync_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "analyst_forecasts": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_analyst_forecast_shadow_sync(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_analyst_forecast_shadow_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "analyst_forecasts": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.AnalystForecastShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_analyst_forecast_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_risk_snapshot_rebuild_returns_unavailable_without_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "risk": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.run_risk_snapshot_rebuild(
+            exchanges=["SSE"],
+            limit_per_exchange=10,
+        )
+    )
+
+    assert result["status"] == "unavailable"
+
+
+def test_data_manager_run_risk_snapshot_rebuild_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "risk": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.RiskSnapshotRebuildService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_risk_snapshot_rebuild(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_get_research_company_profile_requires_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    with pytest.raises(RuntimeError, match="research storage is not initialized"):
+        _run(manager.get_research_company_profile("600000.SH"))
+
+
+def test_data_manager_get_research_company_profile_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_company_profile.return_value = {"instrument_id": "600000.SH"}
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_company_profile("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_company_profile.assert_called_once_with("600000.SH", include_snapshot=True)
+
+
+def test_data_manager_get_research_company_profile_returns_optional_empty_bse_placeholder(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "company_profile": {
+            "enabled": True,
+            "optional_empty_exchanges": ["BSE"],
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_company_profile.return_value = None
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    result = _run(manager.get_research_company_profile("430001.BJ"))
+
+    assert result["instrument_id"] == "430001.BJ"
+    assert result["source"] == "empty_placeholder"
+    assert result["profile"]["missing_reason"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_financial_summary_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_summary.return_value = {"instrument_id": "600000.SH"}
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_financial_summary("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_financial_summary.assert_called_once_with("600000.SH", include_snapshot=True)
+
+
+def test_data_manager_get_research_financial_summary_returns_optional_empty_bse_placeholder(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_summary": {
+            "enabled": True,
+            "optional_empty_exchanges": ["BSE"],
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_summary.return_value = None
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    result = _run(manager.get_research_financial_summary("430001.BJ"))
+
+    assert result["instrument_id"] == "430001.BJ"
+    assert result["source"] == "empty_placeholder"
+    assert result["summary"]["missing_reason"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_shareholders_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": False,
+            "delivery_mode": "free_best_effort",
+            "snapshot_api_requires_mode": "paid_high_availability",
+            "allowed_scope": [
+                "holder_count",
+                "top10_holders",
+                "reference_only_ownership_clues",
+            ],
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="research shareholders module is disabled"):
+        _run(manager.get_research_shareholders("600000.SH"))
+
+
+def test_data_manager_get_research_shareholders_requires_snapshot_gate(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": True,
+            "delivery_mode": "free_best_effort",
+            "snapshot_api_requires_mode": "paid_high_availability",
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="paid_high_availability"):
+        _run(manager.get_research_shareholders("600000.SH"))
+
+
+def test_data_manager_get_research_shareholders_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": True,
+            "delivery_mode": "paid_high_availability",
+            "snapshot_api_requires_mode": "paid_high_availability",
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_shareholder_snapshot.return_value = {"instrument_id": "600000.SH"}
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_shareholders("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_shareholder_snapshot.assert_called_once_with(
+        "600000.SH",
+        include_snapshot=True,
+    )
+
+
+def test_data_manager_get_research_shareholders_returns_optional_empty_bse_placeholder(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": True,
+            "delivery_mode": "paid_high_availability",
+            "snapshot_api_requires_mode": "paid_high_availability",
+            "optional_empty_exchanges": ["BSE"],
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_shareholder_snapshot.return_value = None
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    result = _run(manager.get_research_shareholders("430001.BJ"))
+
+    assert result["instrument_id"] == "430001.BJ"
+    assert result["coverage_status"] == "optional_empty_exchange"
+    assert result["snapshot"]["missing_reason"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_shareholder_readiness_reports_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": False,
+            "delivery_mode": "free_best_effort",
+            "snapshot_api_requires_mode": "paid_high_availability",
+            "allowed_scope": [
+                "holder_count",
+                "top10_holders",
+                "reference_only_ownership_clues",
+            ],
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_shareholder_snapshots.return_value = {
+        "total": 2,
+        "coverage_status_counts": {"reference_only": 2},
+        "source_counts": {"akshare": 1, "cninfo": 1},
+        "source_mode_counts": {"proxy_patch": 1, "direct": 1},
+        "scope_counts": {
+            "holder_count": 2,
+            "reference_only_ownership_clues": 2,
+            "top10_holders": 1,
+        },
+        "latest_updated_at": "2026-04-19T12:00:00+08:00",
+        "latest_data_as_of": "2026-04-19T12:00:00+08:00",
+    }
+    storage.count_shareholder_snapshots_by_exchange.return_value = {
+        "SSE": 1,
+        "SZSE": 1,
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [
+                {"instrument_id": "000001.SZ", "type": "stock"},
+            ],
+        ]
+    )
+
+    result = _run(manager.get_research_shareholder_readiness())
+
+    assert result["module_enabled"] is False
+    assert result["delivery_mode"] == "free_best_effort"
+    assert result["snapshot_api_enabled"] is False
+    assert result["target_instrument_count"] == 3
+    assert result["snapshot_total"] == 2
+    assert result["missing_snapshot_count"] == 1
+    assert result["required_scope"] == [
+        "holder_count",
+        "top10_holders",
+        "reference_only_ownership_clues",
+    ]
+    assert result["source_counts"] == {"akshare": 1, "cninfo": 1}
+    assert result["scope_counts"]["top10_holders"] == 1
+    assert result["exchange_coverage"][0]["exchange"] == "SSE"
+    assert result["exchange_coverage"][0]["coverage_ratio"] == 0.5
+    assert result["exchange_coverage"][1]["exchange"] == "SZSE"
+    assert result["exchange_coverage"][1]["coverage_ratio"] == 1.0
+    assert result["scope_coverage"][1]["scope"] == "top10_holders"
+    assert result["scope_coverage"][1]["coverage_ratio"] == pytest.approx(1 / 3)
+    assert result["ready_for_paid_high_availability_rollout"] is False
+    assert "shareholders_module_disabled" in result["blockers"]
+    assert "shareholder_snapshot_coverage_incomplete" in result["blockers"]
+    assert "required_scope_coverage_incomplete" in result["blockers"]
+    assert "delivery_mode_gate_not_satisfied" in result["blockers"]
+    storage.summarize_shareholder_snapshots.assert_called_once()
+    storage.count_shareholder_snapshots_by_exchange.assert_called_once()
+
+
+def test_data_manager_get_research_shareholder_readiness_excludes_optional_empty_bse(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "BSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": True,
+            "delivery_mode": "paid_high_availability",
+            "snapshot_api_requires_mode": "paid_high_availability",
+            "allowed_scope": [
+                "holder_count",
+                "top10_holders",
+            ],
+            "optional_empty_exchanges": ["BSE"],
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_shareholder_snapshots.return_value = {
+        "total": 2,
+        "coverage_status_counts": {"reference_only": 2},
+        "source_counts": {"akshare": 2},
+        "source_mode_counts": {"proxy_patch": 2},
+        "scope_counts": {"holder_count": 2, "top10_holders": 2},
+        "latest_updated_at": "2026-04-20T10:00:00+08:00",
+        "latest_data_as_of": "2026-04-20T10:00:00+08:00",
+    }
+    storage.summarize_shareholder_snapshots_by_exchanges.return_value = {
+        "total": 1,
+        "coverage_status_counts": {"reference_only": 1},
+        "source_counts": {"akshare": 1},
+        "source_mode_counts": {"proxy_patch": 1},
+        "scope_counts": {"holder_count": 1, "top10_holders": 1},
+        "latest_updated_at": "2026-04-20T10:00:00+08:00",
+        "latest_data_as_of": "2026-04-20T10:00:00+08:00",
+    }
+    storage.count_shareholder_snapshots_by_exchange.return_value = {
+        "SSE": 1,
+        "BSE": 0,
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [{"instrument_id": "600000.SH", "type": "stock", "exchange": "SSE"}],
+            [{"instrument_id": "430001.BJ", "type": "stock", "exchange": "BSE"}],
+        ]
+    )
+
+    result = _run(manager.get_research_shareholder_readiness())
+
+    assert result["target_instrument_count"] == 1
+    assert result["target_instruments_by_exchange"]["BSE"] == 0
+    assert result["snapshot_total"] == 1
+    assert result["ready_for_paid_high_availability_rollout"] is True
+    assert result["blockers"] == []
+    storage.summarize_shareholder_snapshots_by_exchanges.assert_called_once_with(["SSE"])
+
+
+def test_data_manager_get_research_shareholder_readiness_optional_bse_does_not_mask_target_scope_gap(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "BSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {
+            "enabled": True,
+            "delivery_mode": "paid_high_availability",
+            "snapshot_api_requires_mode": "paid_high_availability",
+            "allowed_scope": [
+                "holder_count",
+                "top10_holders",
+            ],
+            "optional_empty_exchanges": ["BSE"],
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_shareholder_snapshots.return_value = {
+        "total": 2,
+        "coverage_status_counts": {"reference_only": 2},
+        "source_counts": {"akshare": 2},
+        "source_mode_counts": {"proxy_patch": 2},
+        "scope_counts": {"holder_count": 2, "top10_holders": 2},
+        "latest_updated_at": "2026-04-20T10:00:00+08:00",
+        "latest_data_as_of": "2026-04-20T10:00:00+08:00",
+    }
+    storage.summarize_shareholder_snapshots_by_exchanges.return_value = {
+        "total": 1,
+        "coverage_status_counts": {"reference_only": 1},
+        "source_counts": {"akshare": 1},
+        "source_mode_counts": {"proxy_patch": 1},
+        "scope_counts": {"top10_holders": 1},
+        "latest_updated_at": "2026-04-20T10:00:00+08:00",
+        "latest_data_as_of": "2026-04-20T10:00:00+08:00",
+    }
+    storage.count_shareholder_snapshots_by_exchange.return_value = {
+        "SSE": 1,
+        "BSE": 1,
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [{"instrument_id": "600000.SH", "type": "stock", "exchange": "SSE"}],
+            [{"instrument_id": "430001.BJ", "type": "stock", "exchange": "BSE"}],
+        ]
+    )
+
+    result = _run(manager.get_research_shareholder_readiness())
+
+    assert result["target_instrument_count"] == 1
+    assert result["snapshot_total"] == 1
+    assert result["scope_counts"] == {"top10_holders": 1}
+    assert result["ready_for_paid_high_availability_rollout"] is False
+    assert "required_scope_coverage_incomplete" in result["blockers"]
+
+
+def test_data_manager_get_research_financial_statements_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="research financial_statements module is disabled"):
+        _run(manager.get_research_financial_statements("600000.SH"))
+
+
+def test_data_manager_get_research_financial_statements_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {"instrument_id": "600000.SH"}
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_financial_statements("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_financial_statement_bundle.assert_called_once_with(
+        "600000.SH",
+        include_statements=True,
+    )
+
+
+def test_data_manager_get_research_financial_statements_returns_optional_empty_bse_placeholder(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {
+            "enabled": True,
+            "optional_empty_exchanges": ["BSE"],
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = None
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    result = _run(manager.get_research_financial_statements("430001.BJ"))
+
+    assert result["instrument_id"] == "430001.BJ"
+    assert result["source"] == "empty_placeholder"
+    assert result["facts"]["missing_reason"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_valuation_history_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="research valuation module is disabled"):
+        _run(manager.get_research_valuation_history("600000.SH"))
+
+
+def test_data_manager_get_research_valuation_history_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_valuation_history_rows.return_value = [
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "as_of_date": "2026-04-18",
+            "calc_method": "valuation_history_builtin",
+            "calc_version": "valuation_history.v1",
+            "parameter_hash": "hash",
+            "details": {},
+        }
+    ]
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_valuation_history("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_valuation_history_rows.assert_called_once()
+
+
+def test_data_manager_get_research_relative_valuation_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="research valuation module is disabled"):
+        _run(manager.get_research_relative_valuation("600000.SH"))
+
+
+def test_data_manager_get_research_dcf_valuation_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with pytest.raises(RuntimeError, match="research valuation module is disabled"):
+        _run(manager.get_research_dcf_valuation("600000.SH"))
+
+
+def test_data_manager_relative_valuation_skips_peers_for_reference_only_membership(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_field": "sw_l2_code",
+                "min_peer_count": 1,
+                "max_peer_rows": 20,
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+        }
+    )
+    storage = Mock()
+    storage.get_latest_valuation_history_row.return_value = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+        "as_of_date": "2026-04-18",
+        "close_price": 10.0,
+        "market_cap": 2000.0,
+        "pe_ratio": 6.0,
+        "pb_ratio": 0.6,
+        "ps_ratio": 1.2,
+        "data_as_of": "2026-04-18T18:30:00",
+    }
+    storage.get_industry_membership.return_value = {
+        "taxonomy_system": "sw",
+        "taxonomy_version": "sw_2021",
+        "mapping_status": "reference_only",
+        "sw_l2_code": "801780.SI",
+        "sw_l2_name": "股份制银行",
+    }
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_relative_valuation("600000.SH"))
+
+    assert result["status"] == "benchmark_unavailable"
+    assert result["missing_reason"] == "authoritative_sw_l2_membership_required"
+    assert result["benchmark_field"] == "sw_l2_code"
+    assert result["benchmark_code"] == "801780.SI"
+    storage.get_latest_peer_valuation_rows.assert_not_called()
+
+
+def test_data_manager_relative_valuation_attaches_industry_index_benchmark(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_field": "sw_l2_code",
+                "min_peer_count": 1,
+                "max_peer_rows": 20,
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+        }
+    )
+    storage = Mock()
+    storage.get_latest_valuation_history_row.return_value = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+        "as_of_date": "2026-04-18",
+        "close_price": 10.0,
+        "market_cap": 2000.0,
+        "pe_ratio": 6.0,
+        "pb_ratio": 0.6,
+        "ps_ratio": 1.2,
+        "data_as_of": "2026-04-18T18:30:00",
+    }
+    storage.get_industry_membership.return_value = {
+        "taxonomy_system": "sw",
+        "taxonomy_version": "sw_2021",
+        "mapping_status": "authoritative",
+        "sw_l2_code": "340300",
+        "sw_l2_name": "饮料乳品",
+        "sw_l2_index_code": "801124",
+    }
+    storage.get_latest_peer_valuation_rows.return_value = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-04-18",
+            "pe_ratio": 8.0,
+            "pb_ratio": 0.8,
+            "ps_ratio": 1.8,
+        }
+    ]
+    storage.get_latest_industry_index_analysis.return_value = {
+        "sw_index_code": "801124",
+        "sw_index_name": "饮料乳品",
+        "trade_date": "2026-04-24",
+        "pe": 18.14,
+        "pb": 1.29,
+    }
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_relative_valuation("600000.SH"))
+
+    assert result["status"] == "success"
+    assert result["industry_index_benchmark"]["sw_index_code"] == "801124"
+    assert result["industry_index_benchmark"]["index_analysis"]["pe"] == 18.14
+    storage.get_latest_industry_index_analysis.assert_called_once_with(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        sw_index_code="801124",
+        include_payload=False,
+    )
+
+
+def test_data_manager_get_research_valuation_readiness_reports_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": False,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_level": 2,
+                "benchmark_field": "sw_l2_code",
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_valuation_history.return_value = {
+        "total": 2,
+        "source_counts": {"local_quotes_financial_facts": 2},
+        "source_mode_counts": {"derived": 2},
+        "calc_method_counts": {"valuation_history_builtin": 2},
+        "calc_version_counts": {"valuation_history.v1": 2},
+        "latest_as_of_date": "2026-04-18",
+        "latest_updated_at": "2026-04-18T18:30:00+08:00",
+        "latest_data_as_of": "2026-04-18T18:30:00+08:00",
+    }
+    storage.count_valuation_history_by_exchange.return_value = {
+        "SSE": 1,
+        "SZSE": 1,
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [
+                {"instrument_id": "000001.SZ", "type": "stock"},
+            ],
+        ]
+    )
+    manager.get_research_industry_standard_readiness = AsyncMock(
+        return_value={
+            "relative_valuation": {
+                "ready": False,
+                "blockers": ["authoritative_membership_coverage_incomplete"],
+            }
+        }
+    )
+
+    result = _run(manager.get_research_valuation_readiness())
+
+    assert result["module_enabled"] is False
+    assert result["target_instrument_count"] == 3
+    assert result["valuation_history_total"] == 2
+    assert result["missing_valuation_history_count"] == 1
+    assert result["source_counts"] == {"local_quotes_financial_facts": 2}
+    assert result["exchange_coverage"][0]["exchange"] == "SSE"
+    assert result["exchange_coverage"][0]["coverage_ratio"] == 0.5
+    assert result["relative_valuation"]["benchmark_field"] == "sw_l2_code"
+    assert result["relative_valuation"]["ready"] is False
+    assert result["ready_for_rollout"] is False
+    assert "valuation_module_disabled" in result["blockers"]
+    assert "valuation_history_coverage_incomplete" in result["blockers"]
+    assert "authoritative_membership_coverage_incomplete" in result["blockers"]
+    storage.summarize_valuation_history.assert_called_once()
+    storage.count_valuation_history_by_exchange.assert_called_once()
+    manager.get_research_industry_standard_readiness.assert_awaited_once_with()
+
+
+def test_data_manager_get_research_metadata_readiness_reports_domain_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "analyst_forecasts": {"enabled": False},
+        "research_reports": {"enabled": False},
+        "sentiment_events": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_analyst_forecasts.return_value = {
+        "row_total": 2,
+        "instrument_total": 2,
+        "source_counts": {"akshare": 2},
+        "source_mode_counts": {"proxy_patch": 2},
+        "latest_item_date": "2026-04-18",
+        "latest_updated_at": "2026-04-18T18:30:00+08:00",
+        "latest_data_as_of": "2026-04-18T18:30:00+08:00",
+    }
+    storage.count_analyst_forecasts_by_exchange.return_value = {
+        "SSE": 1,
+        "SZSE": 1,
+    }
+    storage.summarize_research_reports.return_value = {
+        "row_total": 1,
+        "instrument_total": 1,
+        "source_counts": {"akshare": 1},
+        "source_mode_counts": {"proxy_patch": 1},
+        "institution_name_counts": {"示例证券": 1},
+        "rating_counts": {"买入": 1},
+        "latest_item_date": "2026-04-18",
+        "latest_updated_at": "2026-04-18T18:30:00+08:00",
+        "latest_data_as_of": "2026-04-18T18:30:00+08:00",
+    }
+    storage.count_research_reports_by_exchange.return_value = {
+        "SSE": 1,
+        "SZSE": 0,
+    }
+    storage.summarize_sentiment_events.return_value = {
+        "row_total": 0,
+        "instrument_total": 0,
+        "source_counts": {},
+        "source_mode_counts": {},
+        "event_type_counts": {},
+        "severity_counts": {},
+        "latest_item_date": None,
+        "latest_updated_at": None,
+        "latest_data_as_of": None,
+    }
+    storage.count_sentiment_events_by_exchange.return_value = {}
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [{"instrument_id": "000001.SZ", "type": "stock"}],
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [{"instrument_id": "000001.SZ", "type": "stock"}],
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [{"instrument_id": "000001.SZ", "type": "stock"}],
+        ]
+    )
+
+    result = _run(manager.get_research_metadata_readiness())
+
+    assert result["domain_count"] == 3
+    assert result["ready_domain_count"] == 0
+    assert result["ready_for_rollout"] is False
+    analyst = result["domains"][0]
+    reports = result["domains"][1]
+    sentiment = result["domains"][2]
+    assert analyst["domain"] == "analyst_forecasts"
+    assert analyst["instrument_total"] == 2
+    assert "analyst_forecasts_module_disabled" in analyst["blockers"]
+    assert "analyst_forecast_coverage_incomplete" in analyst["blockers"]
+    assert reports["extra_counts"]["institution_name_counts"] == {"示例证券": 1}
+    assert "research_reports_module_disabled" in reports["blockers"]
+    assert "research_report_coverage_incomplete" in reports["blockers"]
+    assert sentiment["module_enabled"] is True
+    assert "no_sentiment_events" in sentiment["blockers"]
+    assert "sentiment_event_coverage_incomplete" in sentiment["blockers"]
+    assert "analyst_forecasts:analyst_forecasts_module_disabled" in result["blockers"]
+    storage.summarize_analyst_forecasts.assert_called_once()
+    storage.count_sentiment_events_by_exchange.assert_called_once()
+
+
+def test_data_manager_get_research_industry_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_industry_membership.return_value = {"instrument_id": "600000.SH"}
+    manager.research_storage = storage
+
+    result = _run(manager.get_research_industry("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    storage.get_industry_membership.assert_called_once_with(
+        "600000.SH",
+        include_snapshot=True,
+    )
+
+
+def test_data_manager_get_research_industry_returns_optional_empty_bse_placeholder(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_industry_membership.return_value = None
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    result = _run(manager.get_research_industry("430001.BJ"))
+
+    assert result["instrument_id"] == "430001.BJ"
+    assert result["mapping_status"] == "optional_empty_exchange"
+    assert result["membership"]["missing_reason"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_industry_standard_readiness_reports_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "official_mapping": {
+                    "cache_max_age_days": 7,
+                    "minimum_mapping_rows": 2,
+                    "minimum_mapped_rows": 1,
+                },
+            },
+        },
+        "valuation": {
+            "enabled": False,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_level": 2,
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_official_industry_code_mappings.return_value = {
+        "mapped": 2,
+        "unmapped": 1,
+    }
+    storage.get_latest_official_industry_code_mapping_cache_info.return_value = {
+        "source": "akshare",
+        "source_mode": "proxy_patch",
+        "built_at": "2026-04-19T12:00:00+08:00",
+        "updated_at": "2026-04-19T12:00:00+08:00",
+    }
+    storage.summarize_official_industry_classifications.return_value = {
+        "total": 2,
+        "counts": {"mapped": 2, "unmapped": 0},
+        "latest_updated_at": "2026-04-19T12:00:00+08:00",
+        "latest_official_update_time": "2026-04-19T11:59:00+08:00",
+    }
+    storage.summarize_industry_memberships.return_value = {
+        "total": 2,
+        "counts": {"authoritative": 2, "reference_only": 0},
+        "latest_updated_at": "2026-04-19T12:00:00+08:00",
+        "latest_data_as_of": "2026-04-19T12:00:00+08:00",
+    }
+    storage.count_industry_memberships_by_exchange.return_value = {
+        "SSE": 1,
+        "SZSE": 1,
+    }
+    storage.summarize_unmapped_official_industry_code_backlog.return_value = {
+        "official_code_total": 1,
+        "current_classification_total": 1,
+    }
+    storage.list_unmapped_official_industry_code_backlog.return_value = [
+        {
+            "official_industry_code": "480301",
+            "best_taxonomy_industry_code": "857831.SI",
+            "current_classification_count": 1,
+            "impacted_exchange_counts": {"SZSE": 1},
+            "sample_instruments": ["000001.SZ"],
+        }
+    ]
+    storage.summarize_industry_index_analysis_daily.return_value = {
+        "total": 2,
+        "distinct_index_codes": 2,
+        "latest_trade_date": "2026-04-24",
+        "latest_updated_at": "2026-04-25T12:00:00+08:00",
+        "index_type_counts": {"一级行业": {"rows": 2, "codes": 2}},
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {"instrument_id": "600519.SH", "type": "stock"},
+                {"instrument_id": "600000.SH", "type": "stock"},
+            ],
+            [
+                {"instrument_id": "000001.SZ", "type": "stock"},
+            ],
+        ]
+    )
+    manager.get_research_official_mapping_override_review = AsyncMock(
+        return_value={
+            "configured_override_total": 1,
+            "ready_candidate_total": 1,
+            "applied_override_total": 0,
+            "pending_manual_override_total": 1,
+            "status_counts": {"ready_candidate_pending_config": 1},
+            "items": [
+                {
+                    "official_industry_code": "480301",
+                    "review_status": "ready_candidate_pending_config",
+                    "status_reason": "ready_candidate_not_yet_configured",
+                }
+            ],
+        }
+    )
+
+    result = _run(manager.get_research_industry_standard_readiness())
+
+    assert result["taxonomy_system"] == "sw"
+    assert result["target_instrument_count"] == 3
+    assert result["official_mapping_cache"]["fresh"] is True
+    assert result["official_mapping_cache"]["meets_minimum_rows"] is True
+    assert result["official_mapping_cache"]["meets_minimum_mapped_rows"] is True
+    assert result["industry_standard_ready"] is False
+    assert "authoritative_membership_coverage_incomplete" in result["blockers"]
+    assert "official_classification_coverage_incomplete" not in result["blockers"]
+    assert (
+        "unmapped_official_code_backlog_impacts_current_classifications"
+        not in result["blockers"]
+    )
+    assert "official_override_review_requires_attention" not in result["blockers"]
+    assert result["unmapped_backlog"]["official_code_total"] == 1
+    assert result["unmapped_backlog"]["current_classification_total"] == 1
+    assert result["unmapped_backlog"]["top_items"][0]["official_industry_code"] == "480301"
+    assert result["override_review"]["requires_attention"] is True
+    assert result["override_review"]["pending_manual_override_total"] == 1
+    assert result["override_review"]["top_items"][0]["official_industry_code"] == "480301"
+    assert result["index_analysis"]["total"] == 2
+    assert result["index_analysis"]["latest_trade_date"] == "2026-04-24"
+
+
+def test_data_manager_get_research_industry_standard_readiness_excludes_optional_empty_bse(
+    tmp_path,
+):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "BSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "optional_empty_exchanges": ["BSE"],
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "official_mapping": {
+                    "cache_max_age_days": 7,
+                    "minimum_mapping_rows": 1,
+                    "minimum_mapped_rows": 1,
+                },
+            },
+        },
+        "valuation": {
+            "enabled": False,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_level": 2,
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_official_industry_code_mappings.return_value = {
+        "mapped": 1,
+        "unmapped": 0,
+    }
+    storage.get_latest_official_industry_code_mapping_cache_info.return_value = {
+        "source": "akshare",
+        "source_mode": "proxy_patch",
+        "built_at": "2026-04-20T12:00:00+08:00",
+        "updated_at": "2026-04-20T12:00:00+08:00",
+    }
+    storage.summarize_official_industry_classifications.return_value = {
+        "total": 1,
+        "counts": {"mapped": 1},
+        "latest_updated_at": "2026-04-20T12:00:00+08:00",
+        "latest_official_update_time": "2026-04-20",
+    }
+    storage.summarize_industry_memberships.return_value = {
+        "total": 1,
+        "counts": {"authoritative": 1},
+        "latest_updated_at": "2026-04-20T12:00:00+08:00",
+        "latest_data_as_of": "2026-04-20",
+    }
+    storage.count_industry_memberships_by_exchange.return_value = {
+        "SSE": 1,
+    }
+    storage.summarize_unmapped_official_industry_code_backlog.return_value = {
+        "official_code_total": 0,
+        "current_classification_total": 0,
+    }
+    storage.list_unmapped_official_industry_code_backlog.return_value = []
+    storage.summarize_industry_index_analysis_daily.return_value = {
+        "total": 0,
+        "distinct_index_codes": 0,
+        "latest_trade_date": None,
+        "latest_updated_at": None,
+        "index_type_counts": {},
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "symbol": "600000",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ],
+            [
+                {
+                    "instrument_id": "430001.BJ",
+                    "symbol": "430001",
+                    "exchange": "BSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ],
+        ]
+    )
+    manager.get_research_official_mapping_override_review = AsyncMock(
+        return_value={
+            "configured_override_total": 1,
+            "ready_candidate_total": 1,
+            "applied_override_total": 1,
+            "pending_manual_override_total": 0,
+            "status_counts": {"configured_and_applied": 1},
+            "items": [
+                {
+                    "official_industry_code": "480301",
+                    "review_status": "configured_and_applied",
+                    "status_reason": "configured_override_reflected_in_mapping_cache",
+                }
+            ],
+        }
+    )
+
+    result = _run(manager.get_research_industry_standard_readiness())
+
+    assert result["target_instrument_count"] == 1
+    assert result["target_instruments_by_exchange"]["SSE"] == 1
+    assert result["exchange_coverage"][1]["exchange"] == "BSE"
+    assert result["exchange_coverage"][1]["target_instruments"] == 0
+    assert result["industry_standard_ready"] is True
+    assert result["relative_valuation"]["ready"] is True
+    assert result["unmapped_backlog"]["official_code_total"] == 0
+    assert result["unmapped_backlog"]["top_items"] == []
+    assert result["override_review"]["requires_attention"] is False
+    assert result["override_review"]["status_counts"] == {"configured_and_applied": 1}
+    assert result["override_review"]["top_items"] == []
+    assert result["exchange_coverage"][0]["exchange"] == "SSE"
+    assert result["exchange_coverage"][0]["coverage_ratio"] == 1.0
+    storage.summarize_official_industry_code_mappings.assert_called_once()
+    storage.get_latest_official_industry_code_mapping_cache_info.assert_called_once()
+    storage.summarize_official_industry_classifications.assert_called_once()
+    storage.summarize_industry_memberships.assert_called_once()
+    storage.count_industry_memberships_by_exchange.assert_called_once_with(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        mapping_status="authoritative",
+    )
+
+
+def test_data_manager_list_research_unmapped_official_industry_code_backlog(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "industry": {
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "official_mapping": {
+                    "backlog_review": {
+                        "minimum_current_classification_count": 1,
+                        "minimum_overlap_count": 2,
+                        "minimum_precision": 0.2,
+                        "minimum_recall": 0.5,
+                        "minimum_top_candidate_overlap_gap": 1,
+                    }
+                },
+            },
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    class FakeStorage:
+        def __init__(self):
+            self.list_calls = []
+            self.summary_calls = []
+
+        def list_unmapped_official_industry_code_backlog(self, **kwargs):
+            self.list_calls.append(kwargs)
+            return [
+                {
+                    "taxonomy_system": "sw",
+                    "taxonomy_version": "sw_2021",
+                    "official_industry_code": "480301",
+                    "best_taxonomy_industry_code": "857831.SI",
+                    "mapped_industry_code": None,
+                    "mapping_status": "unmapped",
+                    "mapping_confidence": "unmapped",
+                    "overlap_count": 2,
+                    "official_symbol_count": 4,
+                    "taxonomy_symbol_count": 9,
+                    "precision": 0.22,
+                    "recall": 0.5,
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T12:00:00+08:00",
+                    "ingestion_run_id": 12,
+                    "created_at": "2026-04-20T12:00:01+08:00",
+                    "updated_at": "2026-04-20T12:00:02+08:00",
+                    "current_classification_count": 2,
+                    "impacted_exchange_counts": {"SSE": 1, "SZSE": 1},
+                    "sample_instruments": ["600000.SH", "000001.SZ"],
+                    "mapping": {
+                        "candidate_rankings": [
+                            {
+                                "taxonomy_industry_code": "857831.SI",
+                                "overlap_count": 2,
+                                "taxonomy_symbol_count": 9,
+                                "precision": 0.22,
+                                "recall": 0.5,
+                            }
+                        ]
+                    },
+                },
+                {
+                    "taxonomy_system": "sw",
+                    "taxonomy_version": "sw_2021",
+                    "official_industry_code": "999999",
+                    "best_taxonomy_industry_code": None,
+                    "mapped_industry_code": None,
+                    "mapping_status": "unmapped",
+                    "mapping_confidence": "unmapped",
+                    "overlap_count": 0,
+                    "official_symbol_count": 1,
+                    "taxonomy_symbol_count": 0,
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T12:00:00+08:00",
+                    "ingestion_run_id": 12,
+                    "created_at": "2026-04-20T12:00:01+08:00",
+                    "updated_at": "2026-04-20T12:00:02+08:00",
+                    "current_classification_count": 0,
+                    "impacted_exchange_counts": {},
+                    "sample_instruments": [],
+                    "mapping": {"candidate_rankings": []},
+                },
+            ]
+
+        def summarize_unmapped_official_industry_code_backlog(self, **kwargs):
+            self.summary_calls.append(kwargs)
+            return {
+                "official_code_total": 2,
+                "current_classification_total": 2,
+            }
+
+    storage = FakeStorage()
+    manager.research_storage = storage
+
+    async def _fake_to_thread(func, /, *args, **kwargs):
+        return func(*args, **kwargs)
+
+    with patch("data_manager.asyncio.to_thread", AsyncMock(side_effect=_fake_to_thread)):
+        result = _run(
+            manager.list_research_unmapped_official_industry_code_backlog(
+                source="akshare",
+                source_mode="proxy_patch",
+                max_age_days=7,
+                limit=50,
+                offset=0,
+                include_mapping=True,
+            )
+        )
+
+    assert result["taxonomy_system"] == "sw"
+    assert result["taxonomy_version"] == "sw_2021"
+    assert result["total"] == 2
+    assert result["current_classification_total"] == 2
+    assert result["items"][0]["official_industry_code"] == "480301"
+    assert result["items"][0]["review_priority"] == "high"
+    assert result["items"][0]["override_candidate_ready"] is True
+    assert (
+        result["items"][0]["override_candidate_reason"]
+        == "single_strong_candidate_with_current_impact"
+    )
+    assert result["items"][0]["candidate_count"] == 1
+    assert result["items"][0]["top_candidate_overlap_gap"] is None
+    assert result["items"][0]["manual_override_suggestion"]["official_industry_code"] == "480301"
+    assert result["items"][0]["manual_override_suggestion"]["taxonomy_industry_code"] == "857831.SI"
+    assert result["override_candidate_total"] == 1
+    assert result["review_priority_counts"] == {"high": 1, "low": 1}
+    assert result["items"][1]["official_industry_code"] == "999999"
+    assert result["items"][1]["override_candidate_ready"] is False
+    assert result["items"][1]["manual_override_suggestion"] is None
+    assert storage.list_calls == [
+        {
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "source": "akshare",
+            "source_mode": "proxy_patch",
+            "max_age_days": 7,
+            "limit": 50,
+            "offset": 0,
+            "include_mapping": True,
+        }
+    ]
+    assert storage.summary_calls == [
+        {
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "source": "akshare",
+            "source_mode": "proxy_patch",
+            "max_age_days": 7,
+        }
+    ]
+
+    with patch("data_manager.asyncio.to_thread", AsyncMock(side_effect=_fake_to_thread)):
+        ready_only_result = _run(
+            manager.list_research_unmapped_official_industry_code_backlog(
+                source="akshare",
+                source_mode="proxy_patch",
+                max_age_days=7,
+                limit=50,
+                offset=0,
+                include_mapping=True,
+                override_candidate_ready_only=True,
+            )
+        )
+
+    assert ready_only_result["total"] == 1
+    assert ready_only_result["current_classification_total"] == 2
+    assert ready_only_result["override_candidate_total"] == 1
+    assert ready_only_result["review_priority_counts"] == {"high": 1}
+    assert [item["official_industry_code"] for item in ready_only_result["items"]] == ["480301"]
+
+
+def test_data_manager_lists_research_official_mapping_override_candidates(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    class FakeStorage:
+        def list_unmapped_official_industry_code_backlog(self, **kwargs):
+            return [
+                {
+                    "taxonomy_system": "sw",
+                    "taxonomy_version": "sw_2021",
+                    "official_industry_code": "480301",
+                    "best_taxonomy_industry_code": "857831.SI",
+                    "mapped_industry_code": None,
+                    "mapping_status": "unmapped",
+                    "mapping_confidence": "unmapped",
+                    "overlap_count": 2,
+                    "official_symbol_count": 4,
+                    "taxonomy_symbol_count": 9,
+                    "precision": 0.22,
+                    "recall": 0.5,
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T11:00:00",
+                    "ingestion_run_id": 12,
+                    "created_at": "2026-04-20T11:00:01",
+                    "updated_at": "2026-04-20T11:00:02",
+                    "current_classification_count": 2,
+                    "impacted_exchange_counts": {"SSE": 1, "SZSE": 1},
+                    "sample_instruments": ["600000.SH", "000001.SZ"],
+                    "mapping": {
+                        "candidate_rankings": [
+                            {
+                                "taxonomy_industry_code": "857831.SI",
+                                "overlap_count": 2,
+                                "taxonomy_symbol_count": 9,
+                                "precision": 0.22,
+                                "recall": 0.5,
+                            }
+                        ]
+                    },
+                },
+                {
+                    "taxonomy_system": "sw",
+                    "taxonomy_version": "sw_2021",
+                    "official_industry_code": "999999",
+                    "best_taxonomy_industry_code": None,
+                    "mapped_industry_code": None,
+                    "mapping_status": "unmapped",
+                    "mapping_confidence": "unmapped",
+                    "overlap_count": 1,
+                    "official_symbol_count": 1,
+                    "taxonomy_symbol_count": 3,
+                    "precision": 0.1,
+                    "recall": 0.1,
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T11:00:00",
+                    "ingestion_run_id": 12,
+                    "created_at": "2026-04-20T11:00:01",
+                    "updated_at": "2026-04-20T11:00:02",
+                    "current_classification_count": 0,
+                    "impacted_exchange_counts": {},
+                    "sample_instruments": [],
+                    "mapping": {"candidate_rankings": []},
+                },
+            ]
+
+        def summarize_unmapped_official_industry_code_backlog(self, **kwargs):
+            return {
+                "official_code_total": 2,
+                "current_classification_total": 2,
+            }
+
+    manager.research_storage = FakeStorage()
+
+    async def _fake_to_thread(func, /, *args, **kwargs):
+        return func(*args, **kwargs)
+
+    with patch("data_manager.asyncio.to_thread", AsyncMock(side_effect=_fake_to_thread)):
+        result = _run(
+            manager.list_research_official_mapping_override_candidates(
+                source="akshare",
+                source_mode="proxy_patch",
+                max_age_days=7,
+                limit=50,
+                offset=0,
+                include_mapping=True,
+            )
+        )
+
+    assert result["total"] == 1
+    assert result["override_candidate_total"] == 1
+    assert result["review_priority_counts"] == {"high": 1}
+    assert list(result["manual_overrides"].keys()) == ["480301"]
+    assert result["manual_overrides"]["480301"] == {
+        "taxonomy_industry_code": "857831.SI",
+        "confidence": "review_candidate",
+        "reason": (
+            "Suggested from official mapping backlog: "
+            "single_strong_candidate_with_current_impact "
+            "(current_classification_count=2, overlap=2, precision=0.2200, recall=0.5000)"
+        ),
+    }
+    assert [item["official_industry_code"] for item in result["items"]] == ["480301"]
+
+
+def test_data_manager_reviews_research_official_mapping_overrides(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_config.modules["industry"]["standard"] = {
+        "enabled": True,
+        "taxonomy_system": "sw",
+        "taxonomy_version": "sw_2021",
+        "official_mapping": {
+            "manual_overrides": {
+                "480301": {
+                    "taxonomy_industry_code": "857831.SI",
+                    "confidence": "high",
+                    "reason": "Validated",
+                },
+                "111111": {
+                    "taxonomy_industry_code": "801001.SI",
+                    "confidence": "high",
+                    "reason": "Configured but not yet applied",
+                },
+            }
+        },
+    }
+
+    class FakeStorage:
+        def get_official_industry_code_mappings(self, **kwargs):
+            return [
+                {
+                    "official_industry_code": "480301",
+                    "mapped_industry_code": "857831.SI",
+                    "best_taxonomy_industry_code": "857831.SI",
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T11:00:00",
+                    "mapping": {
+                        "mapping_source": "manual_override",
+                        "override_reason": "Validated",
+                    },
+                },
+                {
+                    "official_industry_code": "222222",
+                    "mapped_industry_code": "801777.SI",
+                    "best_taxonomy_industry_code": "801777.SI",
+                    "source": "akshare",
+                    "source_mode": "proxy_patch",
+                    "built_at": "2026-04-20T11:00:00",
+                    "mapping": {
+                        "mapping_source": "manual_override",
+                        "override_reason": "Stale cache row",
+                    },
+                },
+            ]
+
+    manager.research_storage = FakeStorage()
+    manager.list_research_official_mapping_override_candidates = AsyncMock(
+        return_value={
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "source": "akshare",
+            "source_mode": "proxy_patch",
+            "max_age_days": 7,
+            "limit": 500,
+            "offset": 0,
+            "total": 3,
+            "current_classification_total": 5,
+            "override_candidate_total": 3,
+            "review_priority_counts": {"high": 3},
+            "manual_overrides": {
+                "480301": {
+                    "taxonomy_industry_code": "857831.SI",
+                    "confidence": "review_candidate",
+                    "reason": "same as configured",
+                },
+                "222222": {
+                    "taxonomy_industry_code": "801777.SI",
+                    "confidence": "review_candidate",
+                    "reason": "cache row still exists",
+                },
+                "333333": {
+                    "taxonomy_industry_code": "801888.SI",
+                    "confidence": "review_candidate",
+                    "reason": "new ready candidate",
+                },
+            },
+            "items": [],
+        }
+    )
+
+    async def _fake_to_thread(func, /, *args, **kwargs):
+        return func(*args, **kwargs)
+
+    with patch("data_manager.asyncio.to_thread", AsyncMock(side_effect=_fake_to_thread)):
+        result = _run(
+            manager.get_research_official_mapping_override_review(
+                source="akshare",
+                source_mode="proxy_patch",
+                max_age_days=7,
+                include_mapping=True,
+            )
+        )
+
+    assert result["attention_only"] is False
+    assert result["review_status"] == []
+    assert result["configured_override_total"] == 2
+    assert result["ready_candidate_total"] == 3
+    assert result["applied_override_total"] == 2
+    assert result["pending_manual_override_total"] == 1
+    assert result["status_counts"] == {
+        "applied_not_configured": 1,
+        "configured_and_applied": 1,
+        "configured_not_applied": 1,
+        "ready_candidate_pending_config": 1,
+    }
+    assert result["pending_manual_overrides"] == {
+        "333333": {
+            "taxonomy_industry_code": "801888.SI",
+            "confidence": "review_candidate",
+            "reason": "new ready candidate",
+        }
+    }
+    items = {item["official_industry_code"]: item for item in result["items"]}
+    assert items["480301"]["review_status"] == "configured_and_applied"
+    assert items["111111"]["review_status"] == "configured_not_applied"
+    assert items["222222"]["review_status"] == "applied_not_configured"
+    assert items["333333"]["review_status"] == "ready_candidate_pending_config"
+
+    with patch("data_manager.asyncio.to_thread", AsyncMock(side_effect=_fake_to_thread)):
+        attention_only_result = _run(
+            manager.get_research_official_mapping_override_review(
+                source="akshare",
+                source_mode="proxy_patch",
+                max_age_days=7,
+                include_mapping=True,
+                attention_only=True,
+                review_status=["configured_not_applied", "ready_candidate_pending_config"],
+            )
+        )
+
+    assert attention_only_result["attention_only"] is True
+    assert attention_only_result["review_status"] == [
+        "configured_not_applied",
+        "ready_candidate_pending_config",
+    ]
+    assert attention_only_result["status_counts"] == {
+        "configured_not_applied": 1,
+        "ready_candidate_pending_config": 1,
+    }
+    assert attention_only_result["pending_manual_override_total"] == 1
+    filtered_items = {
+        item["official_industry_code"]: item
+        for item in attention_only_result["items"]
+    }
+    assert set(filtered_items) == {"111111", "333333"}
+
+
+def test_data_manager_get_research_company_overview_requires_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    with pytest.raises(RuntimeError, match="research storage is not initialized"):
+        _run(manager.get_research_company_overview("600000.SH"))
+
+
+def test_data_manager_get_research_company_overview_delegates_to_query_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.ResearchQueryService") as service_cls:
+        service_instance = Mock()
+        service_instance.get_company_overview.return_value = {
+            "instrument_id": "600000.SH",
+            "data_as_of": "2026-04-17T19:00:00",
+            "source_summary": {
+                "company_profile": {"available": True},
+                "industry": {"available": True},
+                "financial_summary": {"available": False},
+            },
+            "missing_sections": ["financial_summary"],
+        }
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.get_research_company_overview(
+                "600000.SH",
+                include_profile_snapshot=True,
+                include_industry_snapshot=True,
+                include_financial_snapshot=False,
+            )
+        )
+
+    assert result["instrument_id"] == "600000.SH"
+    service_cls.assert_called_once_with(manager.research_storage)
+    service_instance.get_company_overview.assert_called_once_with(
+        "600000.SH",
+        include_profile_snapshot=True,
+        include_industry_snapshot=True,
+        include_financial_snapshot=False,
+    )
+
+
+def test_data_manager_returns_optional_empty_bse_collection_payloads_and_overview(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "company_profile": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+        "industry": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+        "financial_summary": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+        "analyst_forecasts": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+        "research_reports": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+        "sentiment_events": {"enabled": True, "optional_empty_exchanges": ["BSE"]},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={
+            "instrument_id": "430001.BJ",
+            "symbol": "430001",
+            "name": "北交样本",
+            "exchange": "BSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    )
+
+    with patch("research.ResearchQueryService") as service_cls:
+        service_instance = Mock()
+        service_instance.get_latest_analyst_forecast.return_value = None
+        service_instance.list_research_reports.return_value = []
+        service_instance.list_sentiment_events.return_value = []
+        service_instance.get_company_overview.return_value = None
+        service_cls.return_value = service_instance
+
+        analyst = _run(manager.get_research_analyst_coverage("430001.BJ"))
+        reports = _run(manager.get_research_reports("430001.BJ"))
+        events = _run(manager.get_research_sentiment_events("430001.BJ"))
+        overview = _run(
+            manager.get_research_company_overview(
+                "430001.BJ",
+                include_industry_snapshot=True,
+            )
+        )
+
+    assert analyst["status"] == "empty"
+    assert analyst["missing_reason"] == "optional_empty_exchange"
+    assert reports["data_points"] == 0
+    assert reports["exchange"] == "BSE"
+    assert events["data_points"] == 0
+    assert events["exchange"] == "BSE"
+    assert overview["instrument_id"] == "430001.BJ"
+    assert "company_profile" in overview["missing_sections"]
+    assert "industry" in overview["missing_sections"]
+    assert "financial_summary" in overview["missing_sections"]
+    assert overview["industry"]["mapping_status"] == "optional_empty_exchange"
+
+
+def test_data_manager_get_research_technical_summary_requires_enabled_module(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "technical": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    with pytest.raises(RuntimeError, match="research technical module is disabled"):
+        _run(manager.get_research_technical_summary("600000.SH"))
+
+
+def test_data_manager_get_research_technical_summary_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "technical": {
+            "enabled": True,
+            "default_adjustment": "qfq",
+            "summary": {"lookback_bars": 120},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    manager.db_ops.get_daily_data = AsyncMock(
+        return_value=pd.DataFrame(
+            [
+                {
+                    "time": "2026-04-16T00:00:00",
+                    "instrument_id": "600000.SH",
+                    "open": 10.0,
+                    "high": 10.5,
+                    "low": 9.9,
+                    "close": 10.2,
+                    "volume": 1000,
+                    "amount": 10200.0,
+                    "quality_score": 1.0,
+                }
+            ]
+        )
+    )
+    manager.get_cached_adjustment_factors = AsyncMock(return_value=[])
+
+    with patch("research.ResearchTechnicalAnalysisService") as service_cls:
+        service_instance = Mock()
+        service_instance.build_summary.return_value = {
+            "instrument_id": "600000.SH",
+            "status": "insufficient_data",
+            "data_as_of": "2026-04-16T00:00:00",
+            "calc_method": "ta_builtin",
+            "calc_version": "technical_summary.v1",
+            "parameter_hash": "hash",
+            "signal": "insufficient_data",
+            "quote_summary": {
+                "quote_source": "quotes_db",
+                "data_points": 1,
+                "window_start": "2026-04-16T00:00:00",
+                "window_end": "2026-04-16T00:00:00",
+                "requested_adjustment": "qfq",
+                "applied_adjustment": "none",
+                "latest_quality_score": 1.0,
+            },
+        }
+        service_cls.return_value = service_instance
+
+        result = _run(manager.get_research_technical_summary("600000.SH", adjust="qfq"))
+
+    assert result["instrument_id"] == "600000.SH"
+    manager.db_ops.get_instrument_by_id.assert_awaited_once_with("600000.SH")
+    manager.db_ops.get_daily_data.assert_awaited_once_with(
+        instrument_id="600000.SH",
+        limit=120,
+        return_format="pandas",
+    )
+    service_cls.assert_called_once_with({"lookback_bars": 120})
+    assert service_instance.build_summary.call_args.kwargs["requested_adjustment"] == "qfq"
+    assert service_instance.build_summary.call_args.kwargs["applied_adjustment"] == "none"
+
+
+def test_data_manager_get_research_technical_cache_readiness_reports_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    research_config = mock_config.get_research_config.return_value
+    research_config.markets = ["SSE", "SZSE"]
+    research_config.modules = {
+        "technical": {
+            "enabled": True,
+            "default_adjustment": "qfq",
+            "latest_cache": {"period": "1d", "adjustment": "qfq"},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_technical_indicator_latest.return_value = {
+        "instrument_total": 1,
+        "row_total": 1,
+        "source_counts": {"local_quotes": 1},
+        "source_mode_counts": {"derived": 1},
+        "calc_method_counts": {"ta_builtin": 1},
+        "calc_version_counts": {"technical_summary.v1": 1},
+        "status_counts": {"complete": 1},
+        "signal_counts": {"bullish": 1},
+        "latest_as_of_date": "2026-04-17",
+        "latest_updated_at": "2026-04-17T18:00:00+08:00",
+        "latest_data_as_of": "2026-04-17T15:00:00+08:00",
+    }
+    storage.count_technical_indicator_latest_by_exchange.return_value = {"SSE": 1}
+    manager.research_storage = storage
+    manager.db_ops.get_research_target_instrument_ids_by_exchange = AsyncMock(
+        side_effect=[
+            ["600000.SH"],
+            ["000001.SZ"],
+        ]
+    )
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        side_effect=[
+            [
+                {
+                    "instrument_id": "600000.SH",
+                    "symbol": "600000",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ],
+            [
+                {
+                    "instrument_id": "000001.SZ",
+                    "symbol": "000001",
+                    "exchange": "SZSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ],
+        ]
+    )
+
+    result = _run(manager.get_research_technical_cache_readiness())
+
+    assert result["period"] == "1d"
+    assert result["adjustment"] == "qfq"
+    assert result["cache_enabled"] is True
+    assert result["target_instrument_count"] == 2
+    assert result["snapshot_total"] == 1
+    assert result["missing_snapshot_count"] == 1
+    assert result["ready_for_rollout"] is False
+    assert "technical_indicator_latest_coverage_incomplete" in result["blockers"]
+    assert result["exchange_coverage"][0]["snapshot_count"] == 1
+    assert result["exchange_coverage"][1]["snapshot_count"] == 0
+    storage.summarize_technical_indicator_latest.assert_called_once_with(
+        period="1d",
+        adjustment="qfq",
+    )
+
+
+def test_data_manager_run_technical_snapshot_refresh_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "technical": {"enabled": True, "default_adjustment": "qfq"},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = Mock()
+
+    with patch("research.TechnicalIndicatorLatestRefreshService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(
+            return_value={"status": "success", "total_rows_written": 1}
+        )
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_technical_snapshot_refresh(
+                exchanges=["SSE"],
+                limit_per_exchange=1,
+                adjustment="qfq",
+                period="1d",
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+    assert service_cls.call_args.kwargs["db_ops"] is manager.db_ops
+    assert service_cls.call_args.kwargs["storage"] is manager.research_storage
+    assert service_cls.call_args.kwargs["adjust_quotes"] == manager._apply_research_adjustment
+    service_instance.sync.assert_awaited_once_with(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        adjustment="qfq",
+        period="1d",
+    )
+
+
+def test_data_manager_get_research_technical_indicators_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "technical": {
+            "enabled": True,
+            "default_adjustment": "qfq",
+            "summary": {"lookback_bars": 180},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    manager.db_ops.get_daily_data = AsyncMock(
+        return_value=pd.DataFrame(
+            [
+                {
+                    "time": "2026-04-15T00:00:00",
+                    "instrument_id": "600000.SH",
+                    "open": 10.0,
+                    "high": 10.5,
+                    "low": 9.8,
+                    "close": 10.1,
+                    "volume": 1000,
+                    "amount": 10100.0,
+                    "quality_score": 1.0,
+                },
+                {
+                    "time": "2026-04-16T00:00:00",
+                    "instrument_id": "600000.SH",
+                    "open": 10.1,
+                    "high": 10.6,
+                    "low": 9.9,
+                    "close": 10.3,
+                    "volume": 1200,
+                    "amount": 12360.0,
+                    "quality_score": 1.0,
+                },
+            ]
+        )
+    )
+    manager.get_cached_adjustment_factors = AsyncMock(return_value=[])
+
+    with patch("research.ResearchTechnicalAnalysisService") as service_cls:
+        service_instance = Mock()
+        service_instance.build_indicator_series.return_value = {
+            "instrument_id": "600000.SH",
+            "calc_method": "ta_builtin",
+            "calc_version": "technical_summary.v1",
+            "parameter_hash": "hash",
+            "requested_adjustment": "qfq",
+            "applied_adjustment": "none",
+            "data_points": 2,
+            "window_start": "2026-04-15T00:00:00",
+            "window_end": "2026-04-16T00:00:00",
+            "items": [],
+        }
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.get_research_technical_indicators(
+                "600000.SH",
+                adjust="qfq",
+                limit=2,
+            )
+        )
+
+    assert result["instrument_id"] == "600000.SH"
+    manager.db_ops.get_daily_data.assert_awaited_once_with(
+        instrument_id="600000.SH",
+        start_date=None,
+        end_date=None,
+        limit=180,
+        return_format="pandas",
+    )
+    service_instance.build_indicator_series.assert_called_once()
+    assert service_instance.build_indicator_series.call_args.kwargs["limit"] == 2

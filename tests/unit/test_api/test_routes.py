@@ -11,7 +11,7 @@ import pandas as pd
 
 from api.app import app
 from api.routes import router
-from utils.exceptions import ValidationError, NotFoundError
+from utils.exceptions import ValidationError
 
 
 @pytest.mark.unit

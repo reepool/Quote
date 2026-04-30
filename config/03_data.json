@@ -100,7 +100,8 @@
       "retry_times": 5,
       "retry_interval": 5.0,
       "network_error_retry_interval": 10.0,
-      "connection_timeout": 30.0
+      "connection_timeout": 30.0,
+      "login_timeout": 30.0
     },
     "akshare": {
       "enabled": true,
@@ -132,12 +133,20 @@
           "fund.eastmoney.com",
           "push2.eastmoney.com",
           "push2his.eastmoney.com",
-          "emweb.securities.eastmoney.com"
+          "emweb.securities.eastmoney.com",
+          "legulegu.com"
         ]
       }
     },
     "yfinance": {
       "enabled": true,
+      "proxy_patch": {
+        "enabled": true,
+        "gateway": "101.201.173.125",
+        "auth_token": "20260228D7XF",
+        "retry": 30,
+        "note": "Use akshare_proxy_patch.install_yfinance_patch before importing yfinance. The token is shared with the configured akshare proxy patch unless overridden here."
+      },
       "proxy": {
         "http": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823",
         "https": "http://9c5af8dc464a7dbcf203__cr.us:a6bc9a2608f4ebd2@74.81.81.81:823"
@@ -217,7 +226,8 @@
     },
     "instrument_list": {
       "a_stock": [
-        "baostock"
+        "baostock",
+        "akshare"
       ],
       "hk_stock": [
         "akshare"
@@ -228,7 +238,8 @@
     },
     "calendar": {
       "a_stock": [
-        "baostock"
+        "baostock",
+        "akshare"
       ],
       "hk_stock": [
         "akshare"

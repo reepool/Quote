@@ -331,11 +331,14 @@ curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01
 # 获取后复权数据
 curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01-01&end_date=2025-12-31&adjust=hfq"
 
+# symbol 会解析为一个首选品种；如需精确查询股票/指数/ETF，请使用 instrument_id
+curl "http://localhost:8000/api/v1/quotes/daily?symbol=000001&start_date=2026-04-22&end_date=2026-04-24"
+
 # 获取指数数据（指数无复权概念，adjust 参数被忽略）
 curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_date=2024-01-01&end_date=2024-01-31"
 
-# 获取最新行情数据
-curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZ&instrument_ids=600000.SH"
+# 获取最新行情数据（支持 SZSE/SSE 标准后缀，返回查询窗口内 time 最大的记录）
+curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&instrument_ids=600000.SSE"
 ```
 
 #### 数据缺口管理

@@ -213,6 +213,16 @@
     },
     "yfinance": {
       "enabled": false,
+      "proxy_patch": {
+        "enabled": false,
+        "gateway": "101.201.173.125",
+        "auth_token": "",
+        "retry": 30
+      },
+      "proxy": {
+        "http": "",
+        "https": ""
+      },
       "exchanges_supported": [
         "a_stock",
         "hk_stock",
@@ -247,7 +257,8 @@
       "retry_times": 5,
       "retry_interval": 5.0,
       "network_error_retry_interval": 10.0,
-      "connection_timeout": 30.0
+      "connection_timeout": 30.0,
+      "login_timeout": 30.0
     }
   },
   "routing": {
@@ -285,12 +296,14 @@
     },
     "instrument_list": {
       "a_stock": [
-        "baostock"
+        "baostock",
+        "akshare"
       ]
     },
     "calendar": {
       "a_stock": [
-        "baostock"
+        "baostock",
+        "akshare"
       ]
     },
     "factor": {
@@ -376,7 +389,8 @@
       "BSE": [
         "43",
         "83",
-        "87"
+        "87",
+        "92"
       ],
       "HKEX": [
         "0",

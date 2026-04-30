@@ -152,6 +152,36 @@ class ReportConfig:
     # 报告引擎的 prepare 方法映射
 
 
+@dataclass
+class ResearchStorageConfig:
+    """研究域存储配置"""
+    db_path: str = "data/research.db"
+    shadow_mode: bool = True
+    attach_quotes_db: bool = True
+    quotes_db_path: str = "data/quotes.db"
+    quotes_db_alias: str = "quotes"
+
+
+@dataclass
+class ResearchBudgetConfig:
+    """研究域预算与可用性配置"""
+    default_mode: str = "availability_first"
+    allow_paid_proxy: bool = True
+    max_paid_candidates_per_domain: int = 1
+
+
+@dataclass
+class ResearchConfig:
+    """研究域配置"""
+    enabled: bool = False
+    markets: List[str] = field(default_factory=list)
+    modules: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    storage: ResearchStorageConfig = field(default_factory=ResearchStorageConfig)
+    budget: ResearchBudgetConfig = field(default_factory=ResearchBudgetConfig)
+    sources: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    routing: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+
 # ============================================================================
 # 统一配置管理器
 # ============================================================================
@@ -508,6 +538,45 @@ class UnifiedConfigManager:
                 self._typed_cache['api_config'] = ApiConfig()
 
         return self._typed_cache['api_config']
+
+    def get_research_config(self) -> ResearchConfig:
+        """获取研究域配置（类型安全）"""
+        if 'research_config' not in self._typed_cache:
+            try:
+                research_data = self.get_nested('research_config', {})
+                storage_data = research_data.get('storage', {})
+                budget_data = research_data.get('budget', {})
+
+                storage = ResearchStorageConfig(
+                    db_path=storage_data.get('db_path', 'data/research.db'),
+                    shadow_mode=storage_data.get('shadow_mode', True),
+                    attach_quotes_db=storage_data.get('attach_quotes_db', True),
+                    quotes_db_path=storage_data.get('quotes_db_path', 'data/quotes.db'),
+                    quotes_db_alias=storage_data.get('quotes_db_alias', 'quotes')
+                )
+
+                budget = ResearchBudgetConfig(
+                    default_mode=budget_data.get('default_mode', 'balanced'),
+                    allow_paid_proxy=budget_data.get('allow_paid_proxy', False),
+                    max_paid_candidates_per_domain=budget_data.get(
+                        'max_paid_candidates_per_domain', 1
+                    )
+                )
+
+                self._typed_cache['research_config'] = ResearchConfig(
+                    enabled=research_data.get('enabled', False),
+                    markets=research_data.get('markets', []),
+                    modules=research_data.get('modules', {}),
+                    storage=storage,
+                    budget=budget,
+                    sources=research_data.get('sources', {}),
+                    routing=research_data.get('routing', {})
+                )
+            except Exception as e:
+                config_logger.error(f"Failed to parse research config: {e}")
+                self._typed_cache['research_config'] = ResearchConfig()
+
+        return self._typed_cache['research_config']
                 
 
 

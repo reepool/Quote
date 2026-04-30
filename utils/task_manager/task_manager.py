@@ -68,6 +68,10 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/run', self.handlers.handle_run_command)
             self.telegram_bot.register_command_handler('/backfill', self.handlers.handle_backfill_command)
             self.telegram_bot.register_command_handler('/backfill_factors', self.handlers.handle_backfill_factors_command)
+            self.telegram_bot.register_command_handler('/industry_standard_sync', self.handlers.handle_industry_standard_sync_command)
+            self.telegram_bot.register_command_handler('/industry_standard_rebuild', self.handlers.handle_industry_standard_rebuild_command)
+            self.telegram_bot.register_command_handler('/industry_index_analysis_sync', self.handlers.handle_industry_index_analysis_sync_command)
+            self.telegram_bot.register_command_handler('/industry_index_analysis_backfill', self.handlers.handle_industry_index_analysis_backfill_command)
             self.telegram_bot.register_command_handler('/audit_factors', self.handlers.handle_audit_factors_command)
             self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
             self.telegram_bot.register_command_handler('/find_gap_and_repair', self.handlers.handle_find_gap_and_repair_command)
@@ -143,8 +147,14 @@ class TaskManagerBot:
             "*可用命令:*\n"
             "• `/start` - 显示主菜单\n"
             "• `/status` - 查看任务状态\n"
+            "• `/run <任务ID>` - 立即执行任务\n"
+            "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
             "• `/backfill <日期>` - 补充指定日期的缺失数据\n"
             "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
+            "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
+            "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
+            "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
+            "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口\n"
             "• `/find_gap_and_repair` - 精确逐日检测并修复缺口\n"
             "• `/reload_config` - 重载配置文件\n"
@@ -292,16 +302,21 @@ class TaskManagerBot:
             self.logger.info("[TaskManagerBot] 步骤1: 重载配置文件...")
             self.config_manager.reload_config()
 
-            # 2. 重载任务配置管理器
-            self.logger.info("[TaskManagerBot] 步骤2: 重载任务配置...")
+            # 2. 刷新长生命周期服务中缓存的配置引用
+            self.logger.info("[TaskManagerBot] 步骤2: 刷新运行时配置引用...")
+            from data_manager import data_manager
+            data_manager.refresh_runtime_config()
+
+            # 3. 重载任务配置管理器
+            self.logger.info("[TaskManagerBot] 步骤3: 重载任务配置...")
             self.job_config_manager.load_job_configs()
 
-            # 3. 重新加载调度器中的任务
-            self.logger.info("[TaskManagerBot] 步骤3: 重新加载调度器任务...")
+            # 4. 重新加载调度器中的任务
+            self.logger.info("[TaskManagerBot] 步骤4: 重新加载调度器任务...")
             await self.task_scheduler.load_jobs_from_config()
 
-            # 4. 重载报告配置
-            self.logger.info("[TaskManagerBot] 步骤4: 重载报告配置...")
+            # 5. 重载报告配置
+            self.logger.info("[TaskManagerBot] 步骤5: 重载报告配置...")
             from utils import report
             report.reload_report_config()
 

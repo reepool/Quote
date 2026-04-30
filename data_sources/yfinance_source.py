@@ -9,10 +9,17 @@ import aiohttp
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import pandas as pd
-import yfinance as yf
 import io
 import os
 from contextlib import contextmanager
+from utils.proxy_patch_runtime import (
+    get_yfinance_proxy_patch_state,
+    install_yfinance_proxy_patch,
+)
+
+install_yfinance_proxy_patch(required=False)
+
+import yfinance as yf
 
 from .base_source import BaseDataSource, RateLimitConfig
 from .adjustment_config import AdjustmentConfig
@@ -40,6 +47,8 @@ class YFinanceSource(BaseDataSource):
         self.user_agent = YFinanceConstants.DEFAULT_USER_AGENT
         
         # 加载代理配置
+        self.proxy_patch_state = get_yfinance_proxy_patch_state()
+        self.proxy_patch_ready = bool(self.proxy_patch_state.get("ready"))
         proxy_config = config_manager.get_nested('data_sources_config.yfinance.proxy', {})
         self.proxy_dict = {}
         if isinstance(proxy_config, dict):
@@ -51,6 +60,8 @@ class YFinanceSource(BaseDataSource):
                 self.proxy_dict['https'] = https_proxy
         
         self.aio_proxy = self.proxy_dict.get('http') or self.proxy_dict.get('https')
+        # yfinance 库路径优先交给 akshare_proxy_patch；旧 HTTP proxy 只保留给底层 chart API fallback。
+        self.yf_proxy_arg = None if self.proxy_patch_ready else self.aio_proxy
 
     async def _initialize_impl(self):
         """初始化Yahoo Finance数据源"""
@@ -275,7 +286,7 @@ class YFinanceSource(BaseDataSource):
     @contextmanager
     def _temporary_proxy_env(self):
         """仅在执行时挂载代理，避免污染全局（针对 YF crumb 不听话的问题）"""
-        if not getattr(self, 'aio_proxy', None):
+        if self.proxy_patch_ready or not getattr(self, 'aio_proxy', None):
             yield
             return
             
@@ -302,53 +313,85 @@ class YFinanceSource(BaseDataSource):
                                       timeout_sec: int = 8) -> Optional[pd.DataFrame]:
         """使用yfinance库获取数据"""
         try:
-            session = requests.Session()
-            session.headers['User-Agent'] = self.user_agent
-            session.headers.update({
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-            })
-            
-            # 使用代理池
-            if self.proxy_dict:
-                session.proxies.update(self.proxy_dict)
-
-            ticker = yf.Ticker(symbol, session=session)
-
             with self._temporary_proxy_env():
-                if start_date and end_date:
-                    # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
-                    data = await asyncio.wait_for(
-                        asyncio.to_thread(
-                            ticker.history,
-                            start=start_date.strftime('%Y-%m-%d'),
-                            end=end_date.strftime('%Y-%m-%d'),
-                            interval='1d',
-                            auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
-                            repair=True,
-                            proxy=self.aio_proxy  # 必须显式传入，否则 crumb 获取会死锁
-                        ),
-                        timeout=timeout_sec
-                    )
-                elif period:
-                    # 指定时间段
-                    data = await asyncio.wait_for(
-                        asyncio.to_thread(
-                            ticker.history,
-                            period=period,
-                            interval='1d',
-                            auto_adjust=False,
-                            repair=True,
-                            proxy=self.aio_proxy  # 必须显式传入
-                        ),
-                        timeout=timeout_sec
-                    )
+                if self.proxy_patch_ready:
+                    # When proxy patch is active, keep the call path aligned with
+                    # the validated upstream usage pattern: install patch first,
+                    # then call yf.download() without injecting a custom session.
+                    if start_date and end_date:
+                        data = await asyncio.wait_for(
+                            asyncio.to_thread(
+                                yf.download,
+                                symbol,
+                                start=start_date.strftime('%Y-%m-%d'),
+                                end=end_date.strftime('%Y-%m-%d'),
+                                auto_adjust=False,
+                                progress=False,
+                                threads=False
+                            ),
+                            timeout=timeout_sec
+                        )
+                    elif period:
+                        data = await asyncio.wait_for(
+                            asyncio.to_thread(
+                                yf.download,
+                                symbol,
+                                period=period,
+                                auto_adjust=False,
+                                progress=False,
+                                threads=False
+                            ),
+                            timeout=timeout_sec
+                        )
+                    else:
+                        yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
+                        return None
                 else:
-                    yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
-                    return None
+                    session = requests.Session()
+                    session.headers['User-Agent'] = self.user_agent
+                    session.headers.update({
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Connection': 'keep-alive',
+                        'Upgrade-Insecure-Requests': '1',
+                    })
+
+                    # 使用旧 HTTP proxy 时才传入自定义 requests session。
+                    if self.proxy_dict:
+                        session.proxies.update(self.proxy_dict)
+                    ticker = yf.Ticker(symbol, session=session)
+
+                    if start_date and end_date:
+                        # 指定日期范围 — 关闭 auto_adjust，获取原始未复权价格
+                        data = await asyncio.wait_for(
+                            asyncio.to_thread(
+                                ticker.history,
+                                start=start_date.strftime('%Y-%m-%d'),
+                                end=end_date.strftime('%Y-%m-%d'),
+                                interval='1d',
+                                auto_adjust=False,   # 保留 Adj Close 列，用于因子计算
+                                repair=True,
+                                proxy=self.yf_proxy_arg
+                            ),
+                            timeout=timeout_sec
+                        )
+                    elif period:
+                        # 指定时间段
+                        data = await asyncio.wait_for(
+                            asyncio.to_thread(
+                                ticker.history,
+                                period=period,
+                                interval='1d',
+                                auto_adjust=False,
+                                repair=True,
+                                proxy=self.yf_proxy_arg
+                            ),
+                            timeout=timeout_sec
+                        )
+                    else:
+                        yfinance_logger.error(f"[{self.name}] Must specify either date range or period")
+                        return None
 
             if data.empty:
                 yfinance_logger.debug(f"[{self.name}] No data returned for {symbol}")

@@ -40,7 +40,13 @@ class TaskManagerHandlers:
         message += "\n\n*可用命令：*\n"
         message += "• `/status` - 查看任务状态\n"
         message += "• `/detail <任务ID>` - 查看任务详情\n"
+        message += "• `/run <任务ID>` - 立即执行任务\n"
+        message += "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
         message += "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
+        message += "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
+        message += "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
+        message += "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
+        message += "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
         message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
         message += "• `/find_gap_and_repair` - 精确逐日修复缺口\n"
@@ -84,8 +90,13 @@ class TaskManagerHandlers:
             "• `/status` - 查看所有任务状态\n"
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
+            "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
             "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
             "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
+            "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
+            "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
+            "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
+            "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
             "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
             "• `/reload_config` - 重载配置文件\n"
@@ -98,12 +109,31 @@ class TaskManagerHandlers:
             "• `monthly_sync` - 每月全量数据同步\n"
             "• `quarterly_cleanup` - 季度数据清理\n"
             "• `cache_warm_up` - 缓存预热\n\n"
+            "*研究域任务ID：*\n"
+            "• `shareholder_shadow_sync` - 股东摘要周更全量刷新\n"
+            "• `industry_standard_sync` - 申万官方分类日更同步\n"
+            "• `industry_standard_rebuild` - 申万官方分类全量重建\n"
+            "• `industry_index_analysis_sync` - 申万指数分析日频同步\n"
+            "• `industry_index_analysis_backfill` - 申万指数分析历史回补\n\n"
+            "*申万行业示例：*\n"
+            "• `/industry_standard_sync` - 使用 source manifest 做日更，未变化则短路\n"
+            "• `/industry_standard_sync force` - 强制重新拉取官方文件并同步\n"
+            "• `/industry_standard_rebuild force` - 清理 strict Shenwan slice 后全量重建\n\n"
+            "• `/industry_index_analysis_sync limit=20` - 小样本同步申万指数分析指标\n\n"
+            "• `/industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20` - 小样本回补历史申万指数分析指标\n"
+            "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day` - 按日补缺申万指数分析历史缺口\n\n"
             "*使用示例：*\n"
             "• `/detail trading_calendar_update`\n"
             "• `/run system_health_check`\n"
             "• `/run daily_data_update 2026-03-27`\n"
+            "• `/run shareholder_shadow_sync`\n"
             "• `/backfill 2026-03-27`\n"
             "• `/backfill_factors HKEX full`\n"
+            "• `/industry_standard_sync`\n"
+            "• `/industry_standard_rebuild force`\n"
+            "• `/industry_index_analysis_sync limit=20`\n"
+            "• `/industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20`\n"
+            "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
@@ -1130,8 +1160,484 @@ class TaskManagerHandlers:
                 await data_manager.close()
             except Exception as close_error:
                 self.task_manager.logger.warning(
-                    f"[TaskManagerHandlers] 关闭 DataManager 失败: {close_error}"
+                f"[TaskManagerHandlers] 关闭 DataManager 失败: {close_error}"
                 )
+
+    async def handle_industry_standard_sync_command(self, event) -> None:
+        """处理 /industry_standard_sync 命令，执行申万官方分类日更同步。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/industry_standard_sync'
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        parts = command_text.strip().split()
+        allowed = {'force'}
+        unknown = [token for token in parts[1:] if token.lower() not in allowed]
+        if unknown:
+            error_message = (
+                "❌ *参数错误*\n\n"
+                "用法: `/industry_standard_sync [force]`\n\n"
+                "`force` 表示绕过 source manifest 短路，强制重新拉取官方文件。"
+            )
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        force_refresh = any(token.lower() == 'force' for token in parts[1:])
+        start_message = (
+            "⏳ *申万官方分类日更同步已启动...*\n\n"
+            f"force_refresh: `{force_refresh}`\n"
+            "任务在后台执行，完成后会发送结果摘要。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(
+            self._run_industry_standard_sync_task(
+                chat_id=chat_id,
+                force_refresh=force_refresh,
+            )
+        )
+
+    async def handle_industry_standard_rebuild_command(self, event) -> None:
+        """处理 /industry_standard_rebuild 命令，执行申万官方分类全量重建。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/industry_standard_rebuild'
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        parts = command_text.strip().split()
+        allowed = {'force', 'drop_source_files'}
+        unknown = [token for token in parts[1:] if token.lower() not in allowed]
+        if unknown:
+            error_message = (
+                "❌ *参数错误*\n\n"
+                "用法: `/industry_standard_rebuild [force] [drop_source_files]`\n\n"
+                "说明：该命令会清理并重建 strict Shenwan 行业标准层，不影响行情库或其他研究域。"
+            )
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        lowered = {token.lower() for token in parts[1:]}
+        force_refresh = 'force' in lowered or not parts[1:]
+        drop_source_files = 'drop_source_files' in lowered
+        start_message = (
+            "⏳ *申万官方分类全量重建已启动...*\n\n"
+            "范围: `SSE,SZSE,BSE`\n"
+            "drop_existing: `true`\n"
+            f"drop_source_files: `{drop_source_files}`\n"
+            f"force_refresh: `{force_refresh}`\n\n"
+            "该任务会清理 strict Shenwan slice 后重建，完成后会发送结果摘要。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(
+            self._run_industry_standard_rebuild_task(
+                chat_id=chat_id,
+                force_refresh=force_refresh,
+                drop_source_files=drop_source_files,
+            )
+        )
+
+    async def handle_industry_index_analysis_sync_command(self, event) -> None:
+        """处理 /industry_index_analysis_sync 命令，执行申万行业指数分析同步。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/industry_index_analysis_sync'
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        parts = command_text.strip().split()
+        limit_per_type = None
+        for token in parts[1:]:
+            lowered = token.lower()
+            if not lowered.startswith('limit='):
+                await self.task_manager.send_message(
+                    chat_id,
+                    (
+                        "❌ *参数错误*\n\n"
+                        "用法: `/industry_index_analysis_sync [limit=N]`\n\n"
+                        "`limit=N` 用于每个指数维度的小样本验证；不传则同步完整配置维度。"
+                    ),
+                    parse_mode='markdown',
+                )
+                return
+            try:
+                limit_per_type = max(1, int(lowered.split('=', 1)[1]))
+            except ValueError:
+                await self.task_manager.send_message(
+                    chat_id,
+                    "❌ *参数错误*\n\n`limit=N` 中 N 必须是正整数。",
+                    parse_mode='markdown',
+                )
+                return
+
+        start_message = (
+            "⏳ *申万行业指数分析同步已启动...*\n\n"
+            f"limit_per_type: `{limit_per_type}`\n"
+            "该任务只写 `industry_index_analysis_daily`，不会改股票行业归属。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(
+            self._run_industry_index_analysis_sync_task(
+                chat_id=chat_id,
+                limit_per_type=limit_per_type,
+            )
+        )
+
+    async def handle_industry_index_analysis_backfill_command(self, event) -> None:
+        """处理 /industry_index_analysis_backfill 命令，执行申万行业指数分析历史回补。"""
+        chat_id = event.chat_id
+        command_text = (
+            event.text if hasattr(event, 'text') else '/industry_index_analysis_backfill'
+        )
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        args: Dict[str, str] = {}
+        for token in command_text.strip().split()[1:]:
+            if '=' not in token:
+                await self.task_manager.send_message(
+                    chat_id,
+                    (
+                        "❌ *参数错误*\n\n"
+                        "用法: `/industry_index_analysis_backfill start=YYYY-MM-DD "
+                        "end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]`"
+                    ),
+                    parse_mode='markdown',
+                )
+                return
+            key, value = token.split('=', 1)
+            args[key.strip().lower()] = value.strip()
+
+        start_date = args.get('start')
+        end_date = args.get('end')
+        if not start_date or not end_date:
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    "❌ *参数错误*\n\n"
+                    "必须提供 `start=YYYY-MM-DD` 和 `end=YYYY-MM-DD`。"
+                ),
+                parse_mode='markdown',
+            )
+            return
+
+        limit_per_type = None
+        if args.get('limit'):
+            try:
+                limit_per_type = max(1, int(args['limit']))
+            except ValueError:
+                await self.task_manager.send_message(
+                    chat_id,
+                    "❌ *参数错误*\n\n`limit=N` 中 N 必须是正整数。",
+                    parse_mode='markdown',
+                )
+                return
+
+        chunk_frequency = args.get('chunk', 'month').lower()
+        if chunk_frequency not in {'day', 'month', 'quarter', 'year', 'none'}:
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    "❌ *参数错误*\n\n"
+                    "`chunk` 必须是 `day|month|quarter|year|none` 之一。"
+                ),
+                parse_mode='markdown',
+            )
+            return
+
+        start_message = (
+            "⏳ *申万行业指数分析历史回补已启动...*\n\n"
+            f"start: `{start_date}`\n"
+            f"end: `{end_date}`\n"
+            f"limit_per_type: `{limit_per_type}`\n"
+            f"chunk_frequency: `{chunk_frequency}`\n"
+            "该任务只写 `industry_index_analysis_daily`，不会改股票行业归属。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(
+            self._run_industry_index_analysis_backfill_task(
+                chat_id=chat_id,
+                start_date=start_date,
+                end_date=end_date,
+                limit_per_type=limit_per_type,
+                chunk_frequency=chunk_frequency,
+            )
+        )
+
+    async def _run_industry_standard_sync_task(
+        self,
+        chat_id: int,
+        force_refresh: bool,
+    ) -> None:
+        """后台执行申万官方分类日更同步。"""
+        try:
+            from data_manager import data_manager
+
+            if data_manager.research_storage is None:
+                await data_manager.initialize(include_data_sources=False, load_progress=False)
+
+            result = await data_manager.run_industry_standard_sync(
+                exchanges=['SSE', 'SZSE', 'BSE'],
+                budget_mode='availability_first',
+                allow_paid_proxy=True,
+                force_component_refresh=force_refresh,
+            )
+            readiness = await data_manager.get_research_industry_standard_readiness()
+            sync_status = result.get('status')
+            msg = self._format_industry_standard_result(
+                title='申万官方分类日更同步完成',
+                result=result,
+                readiness=readiness,
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                msg,
+                parse_mode='markdown',
+            )
+            self.task_manager.logger.info(
+                f"[TaskManagerHandlers] 申万官方分类日更同步完成: {sync_status}"
+            )
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 申万官方分类日更同步异常: {e}")
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *申万官方分类日更同步异常*\n\n错误: `{str(e)}`",
+                parse_mode='markdown',
+            )
+
+    async def _run_industry_standard_rebuild_task(
+        self,
+        chat_id: int,
+        force_refresh: bool,
+        drop_source_files: bool,
+    ) -> None:
+        """后台执行申万官方分类全量重建。"""
+        try:
+            from data_manager import data_manager
+
+            if data_manager.research_storage is None:
+                await data_manager.initialize(include_data_sources=False, load_progress=False)
+
+            result = await data_manager.rebuild_official_industry_standard(
+                exchanges=['SSE', 'SZSE', 'BSE'],
+                budget_mode='availability_first',
+                allow_paid_proxy=True,
+                drop_existing=True,
+                drop_source_files=drop_source_files,
+                force_refresh=force_refresh,
+            )
+            msg = self._format_industry_standard_result(
+                title='申万官方分类全量重建完成',
+                result=result.get('sync') or result,
+                readiness=result.get('readiness') or {},
+                table_counts=(result.get('table_counts') or {}).get('after') or {},
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                msg,
+                parse_mode='markdown',
+            )
+            self.task_manager.logger.info(
+                f"[TaskManagerHandlers] 申万官方分类全量重建完成: {result.get('status')}"
+            )
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 申万官方分类全量重建异常: {e}")
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *申万官方分类全量重建异常*\n\n错误: `{str(e)}`",
+                parse_mode='markdown',
+            )
+
+    async def _run_industry_index_analysis_sync_task(
+        self,
+        chat_id: int,
+        limit_per_type: Optional[int],
+    ) -> None:
+        """后台执行申万行业指数分析日频指标同步。"""
+        try:
+            from data_manager import data_manager
+
+            if data_manager.research_storage is None:
+                await data_manager.initialize(include_data_sources=False, load_progress=False)
+
+            result = await data_manager.run_industry_index_analysis_sync(
+                limit_per_type=limit_per_type,
+            )
+            msg = self._format_industry_index_analysis_result(result)
+            await self.task_manager.send_message(
+                chat_id,
+                msg,
+                parse_mode='markdown',
+            )
+            self.task_manager.logger.info(
+                f"[TaskManagerHandlers] 申万行业指数分析同步完成: {result.get('status')}"
+            )
+
+        except Exception as e:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] 申万行业指数分析同步异常: {e}")
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *申万行业指数分析同步异常*\n\n错误: `{str(e)}`",
+                parse_mode='markdown',
+            )
+
+    async def _run_industry_index_analysis_backfill_task(
+        self,
+        chat_id: int,
+        start_date: str,
+        end_date: str,
+        limit_per_type: Optional[int],
+        chunk_frequency: str,
+    ) -> None:
+        """后台执行申万行业指数分析历史回补。"""
+        try:
+            from data_manager import data_manager
+
+            if data_manager.research_storage is None:
+                await data_manager.initialize(include_data_sources=False, load_progress=False)
+
+            result = await data_manager.run_industry_index_analysis_backfill(
+                start_date=start_date,
+                end_date=end_date,
+                limit_per_type=limit_per_type,
+                chunk_frequency=chunk_frequency,
+                split_index_types=True,
+            )
+            msg = self._format_industry_index_analysis_result(result)
+            await self.task_manager.send_message(
+                chat_id,
+                msg,
+                parse_mode='markdown',
+            )
+            self.task_manager.logger.info(
+                f"[TaskManagerHandlers] 申万行业指数分析历史回补完成: {result.get('status')}"
+            )
+
+        except Exception as e:
+            self.task_manager.logger.error(
+                f"[TaskManagerHandlers] 申万行业指数分析历史回补异常: {e}"
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *申万行业指数分析历史回补异常*\n\n错误: `{str(e)}`",
+                parse_mode='markdown',
+            )
+
+    @staticmethod
+    def _format_industry_index_analysis_result(result: Dict[str, Any]) -> str:
+        """格式化申万行业指数分析同步结果。"""
+        if result.get('operation') == 'history_backfill_chunked':
+            failures = result.get('failures') or []
+            failure_lines = [
+                (
+                    f"{item.get('start_date')}~{item.get('end_date')} "
+                    f"{','.join(item.get('index_types') or [])}: {item.get('status')}"
+                )
+                for item in failures[:10]
+            ]
+            failure_text = "\n".join(failure_lines) if failure_lines else "无失败分块"
+            icon = "✅" if result.get('status') == 'success' else "⚠️"
+            return (
+                f"{icon} *申万行业指数分析历史回补完成*\n\n"
+                f"status: `{result.get('status')}`\n"
+                f"operation: `{result.get('operation')}`\n"
+                f"date_range: `{result.get('start_date')}` ~ `{result.get('end_date')}`\n"
+                f"chunk_frequency: `{result.get('chunk_frequency')}`\n"
+                f"chunks_total: `{result.get('chunks_total', 0)}`\n"
+                f"chunks_failed: `{result.get('chunks_failed', 0)}`\n"
+                f"rows_written: `{result.get('rows_written', 0)}`\n\n"
+                "```text\n"
+                f"{failure_text}\n"
+                "```"
+            )
+
+        summary = result.get('summary') or {}
+        coverage = result.get('coverage') or {}
+        type_counts = summary.get('index_type_counts') or {}
+        lines = [
+            f"{index_type}: rows={counts.get('rows', 0)}, codes={counts.get('codes', 0)}"
+            for index_type, counts in type_counts.items()
+        ]
+        coverage_counts = coverage.get('index_type_counts') or {}
+        coverage_lines = [
+            (
+                f"{index_type}: fetched_rows={counts.get('rows', 0)}, "
+                f"dates={counts.get('trade_dates', 0)}, "
+                f"missing={counts.get('missing_metrics', {})}"
+            )
+            for index_type, counts in coverage_counts.items()
+        ]
+        details = "\n".join(lines) if lines else result.get('reason') or "无维度明细"
+        coverage_details = "\n".join(coverage_lines) if coverage_lines else "无本次覆盖率明细"
+        icon = "✅" if result.get('status') == 'success' else "⚠️"
+        return (
+            f"{icon} *申万行业指数分析同步完成*\n\n"
+            f"status: `{result.get('status')}`\n"
+            f"operation: `{result.get('operation')}`\n"
+            f"rows_written: `{result.get('rows_written', 0)}`\n"
+            f"latest_trade_date: `{summary.get('latest_trade_date')}`\n"
+            f"distinct_index_codes: `{summary.get('distinct_index_codes', 0)}`\n\n"
+            "```text\n"
+            f"{details}\n"
+            "\n本次覆盖:\n"
+            f"{coverage_details}\n"
+            "```"
+        )
+
+    @staticmethod
+    def _format_industry_standard_result(
+        *,
+        title: str,
+        result: Dict[str, Any],
+        readiness: Dict[str, Any],
+        table_counts: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """格式化申万官方分类同步/重建结果。"""
+        exchange_lines = []
+        for item in result.get('exchanges', []) or []:
+            exchange_lines.append(
+                f"{item.get('exchange')}: status={item.get('status')}, "
+                f"memberships={item.get('memberships_written', 0)}, "
+                f"official={item.get('official_classifications_written', 0)}"
+            )
+        exchanges_text = "\n".join(exchange_lines) if exchange_lines else "无交易所明细"
+        coverage_lines = []
+        for item in readiness.get('exchange_coverage', []) or []:
+            coverage_lines.append(
+                f"{item.get('exchange')}: "
+                f"{item.get('authoritative_memberships', 0)}/"
+                f"{item.get('target_instruments', 0)} "
+                f"({float(item.get('coverage_ratio', 0.0)):.2%})"
+            )
+        coverage_text = "\n".join(coverage_lines) if coverage_lines else "无 readiness 明细"
+        table_text = ""
+        if table_counts:
+            table_text = (
+                "\n\n表计数:\n"
+                f"taxonomy={table_counts.get('industry_taxonomy', 0)}\n"
+                f"history={table_counts.get('industry_classification_history', 0)}\n"
+                f"memberships={table_counts.get('industry_memberships', 0)}\n"
+                f"source_files={table_counts.get('industry_source_files', 0)}"
+            )
+
+        return (
+            f"✅ *{title}*\n\n"
+            f"status: `{result.get('status')}`\n"
+            f"source: `{result.get('source')}` / `{result.get('mode')}`\n"
+            f"taxonomy_nodes: `{result.get('taxonomy_nodes_written', 0)}`\n"
+            f"history_rows: `{result.get('classification_history_rows_written', 0)}`\n"
+            f"memberships: `{result.get('total_memberships_written', 0)}`\n"
+            f"official_classifications: `{result.get('total_official_classifications_written', 0)}`\n"
+            f"readiness: `{readiness.get('industry_standard_ready')}`\n\n"
+            "```text\n"
+            f"{exchanges_text}\n\n"
+            f"{coverage_text}"
+            f"{table_text}\n"
+            "```"
+        )
 
     def _parse_date_arg(self, date_str: str):
         """解析日期字符串，返回 date 对象或 None"""

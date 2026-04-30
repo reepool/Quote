@@ -298,6 +298,459 @@
         "parameters": {
           "use_backup_config": true
         }
+      },
+      "company_profile_shadow_sync": {
+        "enabled": false,
+        "description": "研究域公司档案影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 9,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 100,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 3600
+        }
+      },
+      "industry_official_mapping_refresh": {
+        "enabled": false,
+        "description": "研究域申万官方历史分类映射审计缓存刷新（非 current membership 前置）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 8,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "industry_standard_sync": {
+        "enabled": true,
+        "description": "研究域申万官方分类文件每日同步（source manifest + taxonomy + classification history + memberships）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "*",
+          "hour": 8,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "force_component_refresh": false,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "industry_standard_rebuild_official": {
+        "enabled": false,
+        "description": "研究域申万官方分类文件全量重建（清理 strict Shenwan slice 后重载）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 7,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "drop_existing": true,
+          "drop_source_files": false,
+          "force_refresh": true,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "industry_index_analysis_sync": {
+        "enabled": true,
+        "description": "研究域申万行业指数分析日频指标同步（独立于股票行业归属）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 8,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "index_types": [
+            "市场表征",
+            "一级行业",
+            "二级行业",
+            "三级行业",
+            "风格指数"
+          ],
+          "max_runtime_seconds": 3600
+        }
+      },
+      "industry_index_analysis_backfill": {
+        "enabled": false,
+        "description": "研究域申万行业指数分析历史回补（手动启用；独立于股票行业归属）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 7,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "source": "akshare",
+          "mode": "direct",
+          "index_types": [
+            "市场表征",
+            "一级行业",
+            "二级行业",
+            "三级行业",
+            "风格指数"
+          ],
+          "max_runtime_seconds": 7200,
+          "note": "Historical backfill can be large; keep disabled by default and run explicit date ranges via ops script or Telegram command."
+        }
+      },
+      "industry_standard_gap_fill": {
+        "enabled": false,
+        "description": "研究域申万标准行业缺口检测与定向修复",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 9,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "missing_limit_per_exchange": 200,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "industry_shadow_sync": {
+        "enabled": false,
+        "description": "研究域行业归属影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 9,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 100,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 3600
+        }
+      },
+      "financial_summary_shadow_sync": {
+        "enabled": false,
+        "description": "研究域财务摘要影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 10,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 100,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "shareholder_shadow_sync": {
+        "enabled": true,
+        "description": "研究域股东摘要影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 10,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "financial_statements_shadow_sync": {
+        "enabled": false,
+        "description": "研究域财务报表影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 10,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 50,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "max_runtime_seconds": 10800
+        }
+      },
+      "valuation_history_rebuild": {
+        "enabled": false,
+        "description": "研究域估值历史重建",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 18,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 50,
+          "max_runtime_seconds": 10800
+        }
+      },
+      "technical_snapshot_refresh": {
+        "enabled": false,
+        "description": "研究域技术指标最新快照刷新",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 18,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 200,
+          "adjustment": "qfq",
+          "period": "1d",
+          "max_runtime_seconds": 10800
+        }
+      },
+      "analyst_forecast_sync": {
+        "enabled": false,
+        "description": "研究域分析师预期影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 21,
+          "minute": 15,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 200,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true
+        }
+      },
+      "research_report_sync": {
+        "enabled": false,
+        "description": "研究域研报元数据影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 21,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 100,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true
+        }
+      },
+      "sentiment_event_sync": {
+        "enabled": false,
+        "description": "研究域事件舆情影子同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 21,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 100,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true
+        }
+      },
+      "risk_snapshot_rebuild": {
+        "enabled": false,
+        "description": "研究域风险快照重建",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 22,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 200
+        }
       }
     }
   }

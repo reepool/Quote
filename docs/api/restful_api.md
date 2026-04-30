@@ -73,6 +73,10 @@ http://localhost:8000/api/v1
 二选一参数：
 - `instrument_id` 或 `symbol`
 
+查询语义：
+- `symbol` 会先解析为一个首选品种，再只返回该品种的行情；当股票和指数共用代码时，默认优先股票。例如 `symbol=000001` 返回 `000001.SZ` 平安银行，不混入 `000001.SH` 上证综合指数。
+- 需要精确查询股票、指数、ETF 等指定品种时，请使用 `instrument_id`，例如 `000001.SH`。
+
 可选参数：
 - `return_format`: `pandas`（默认）、`json`、`csv`
 - `adjust`: `qfq`（前复权，默认）、`hfq`（后复权）、`none`（不复权）
@@ -103,6 +107,10 @@ curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_da
 
 ### GET /api/v1/quotes/latest
 获取指定品种的最新一条行情（从最近 5 天数据中取最新）。
+
+查询语义：
+- 返回每个请求品种在查询窗口内 `time` 最大的记录。
+- `instrument_ids` 支持数据库后缀和标准交易所后缀；例如 `000001.SZSE` 会归一化查询为 `000001.SZ`，`600000.SSE` 会归一化查询为 `600000.SH`。
 
 必填参数：
 - `instrument_ids`（可重复参数）
@@ -202,6 +210,61 @@ curl -X POST "http://localhost:8000/api/v1/gaps/fill" \
 
 ### GET /api/v1/gaps/report
 返回缺口质量报告（当前实现为简化占位返回，字段为空/默认值）。
+
+---
+
+## 研究域（Research）
+
+研究域接口统一使用 `/api/v1/research` 前缀。已落到本地 `research.db` 的标准化快照或物化结果原则上都应提供 API 读路径；未开放模块会返回明确的 gated/disabled 原因。
+
+### GET /api/v1/research/company/{instrument_id}/shareholders
+
+读取本地股东摘要快照。当前 `shareholders` 已按 `paid_high_availability` gate 开放，接口只读取本地 `shareholder_snapshots`，不会在请求时访问外部数据源。
+
+路径参数：
+- `instrument_id`：数据库格式代码，如 `600115.SH`、`000001.SZ`
+
+可选参数：
+- `include_snapshot`：是否返回完整 snapshot 明细，默认 `true`；设为 `false` 时只返回轻量摘要字段
+
+主要字段：
+- `holder_count`、`holder_count_report_date`
+- `top_holders_report_date`、`top_holders_count`、`top_holders_total_ratio`
+- `control_owner_name`、`control_owner_ratio`
+- `source`、`source_mode`、`data_as_of`
+- `snapshot`：可选明细，包含 `top_holders`、`ownership_clues`、`scope_sources` 等
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600115.SH/shareholders"
+curl "http://localhost:8000/api/v1/research/company/600115.SH/shareholders?include_snapshot=false"
+```
+
+### GET /api/v1/research/shareholders/readiness
+
+读取股东域 rollout readiness 与 API gate 状态。当前用于确认周更后本地快照是否仍满足正式读取要求。
+
+主要字段：
+- `module_enabled`
+- `delivery_mode`
+- `snapshot_api_enabled`
+- `target_instrument_count`
+- `snapshot_total`
+- `scope_counts`
+- `exchange_coverage`
+- `blockers`
+- `ready_for_paid_high_availability_rollout`
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/shareholders/readiness"
+```
+
+当前配置状态：
+- `shareholders.enabled = true`
+- `delivery_mode = paid_high_availability`
+- `snapshot_api_requires_mode = paid_high_availability`
+- `shareholder_shadow_sync` 周六 `10:00` 全量刷新 `SSE / SZSE / BSE`
 
 ---
 

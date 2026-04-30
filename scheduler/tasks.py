@@ -821,6 +821,1257 @@ class ScheduledTasks:
             )
             return False
 
+    async def company_profile_shadow_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 company profile 影子同步任务。"""
+        self._active_tasks.add('company_profile_shadow_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting company profile shadow sync...")
+
+            result = await data_manager.run_company_profile_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '公司档案影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='公司档案影子同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Company profile shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '公司档案影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'company_profile_shadow_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='公司档案影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('company_profile_shadow_sync')
+
+    async def industry_shadow_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 industry 影子同步任务。"""
+        self._active_tasks.add('industry_shadow_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting industry shadow sync...")
+
+            result = await data_manager.run_industry_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '行业归属影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='行业归属影子同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Industry shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '行业归属影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_shadow_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='行业归属影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_shadow_sync')
+
+    async def industry_standard_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        force_component_refresh: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 strict Shenwan 行业标准层日更同步任务。"""
+        self._active_tasks.add('industry_standard_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting industry standard sync...")
+
+            result = await data_manager.run_industry_standard_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                force_component_refresh=force_component_refresh,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '申万标准行业同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('memberships_written', 0)} memberships)"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万标准行业同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Industry standard sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '申万标准行业同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_standard_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万标准行业同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_standard_sync')
+
+    async def industry_standard_rebuild_official(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        drop_existing: bool = True,
+        drop_source_files: bool = False,
+        force_refresh: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 strict Shenwan 官方分类全量重建任务。"""
+        self._active_tasks.add('industry_standard_rebuild_official')
+        try:
+            scheduler_logger.info("[Scheduler] Starting official Shenwan industry rebuild...")
+
+            result = await data_manager.rebuild_official_industry_standard(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                drop_existing=drop_existing,
+                drop_source_files=drop_source_files,
+                force_refresh=force_refresh,
+            )
+
+            status = result.get('status', 'failed')
+            success = status == 'success'
+            sync_result = result.get('sync') or {}
+            readiness = result.get('readiness') or {}
+            table_counts = result.get('table_counts') or {}
+            after_counts = table_counts.get('after') or {}
+
+            maintenance_tasks = [
+                {
+                    'task_name': 'official_rebuild',
+                    'status': (
+                        f"{status} "
+                        f"(memberships={sync_result.get('total_memberships_written', 0)}, "
+                        f"history={sync_result.get('classification_history_rows_written', 0)})"
+                    ),
+                },
+                {
+                    'task_name': 'readiness',
+                    'status': (
+                        f"ready={readiness.get('industry_standard_ready')} "
+                        f"target={readiness.get('target_instrument_count', 0)}"
+                    ),
+                },
+                {
+                    'task_name': 'table_counts',
+                    'status': (
+                        f"taxonomy={after_counts.get('industry_taxonomy', 0)}, "
+                        f"memberships={after_counts.get('industry_memberships', 0)}, "
+                        f"source_files={after_counts.get('industry_source_files', 0)}"
+                    ),
+                },
+            ]
+
+            report_data = {
+                'name': '申万官方分类全量重建报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': sync_result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': maintenance_tasks,
+                'summary': {
+                    'status': status,
+                    'industry_standard_ready': readiness.get('industry_standard_ready'),
+                    'target_instrument_count': readiness.get('target_instrument_count', 0),
+                    'table_counts_after': after_counts,
+                },
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万官方分类全量重建',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Official Shenwan industry rebuild failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '申万官方分类全量重建报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_standard_rebuild_official', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万官方分类全量重建',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_standard_rebuild_official')
+
+    async def industry_index_analysis_sync(
+        self,
+        index_types: Optional[List[str]] = None,
+        limit_per_type: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域申万行业指数分析日频指标同步任务。"""
+        self._active_tasks.add('industry_index_analysis_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting industry index-analysis sync...")
+
+            result = await data_manager.run_industry_index_analysis_sync(
+                index_types=index_types,
+                limit_per_type=limit_per_type,
+            )
+
+            status = result.get('status', 'failed')
+            success = status == 'success'
+            summary = result.get('summary') or {}
+            type_counts = summary.get('index_type_counts') or {}
+            report_data = {
+                'name': '申万行业指数分析同步报告',
+                'status': 'success' if success else status,
+                'tasks_completed': len(type_counts),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': index_type,
+                        'status': (
+                            f"rows={counts.get('rows', 0)}, "
+                            f"codes={counts.get('codes', 0)}"
+                        ),
+                    }
+                    for index_type, counts in type_counts.items()
+                ],
+                'summary': {
+                    'rows_written': result.get('rows_written', 0),
+                    'latest_trade_date': summary.get('latest_trade_date'),
+                    'distinct_index_codes': summary.get('distinct_index_codes', 0),
+                },
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万行业指数分析同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Industry index-analysis sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '申万行业指数分析同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_index_analysis_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万行业指数分析同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_index_analysis_sync')
+
+    async def industry_index_analysis_backfill(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        index_types: Optional[List[str]] = None,
+        limit_per_type: Optional[int] = None,
+        source: str = "akshare",
+        mode: str = "direct",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域申万行业指数分析历史回补任务，默认禁用并要求显式日期。"""
+        self._active_tasks.add('industry_index_analysis_backfill')
+        try:
+            if not start_date or not end_date:
+                raise ValueError("industry_index_analysis_backfill requires start_date and end_date")
+
+            scheduler_logger.info(
+                "[Scheduler] Starting industry index-analysis backfill %s-%s...",
+                start_date,
+                end_date,
+            )
+            result = await data_manager.run_industry_index_analysis_backfill(
+                start_date=start_date,
+                end_date=end_date,
+                index_types=index_types,
+                limit_per_type=limit_per_type,
+                source=source,
+                mode=mode,
+            )
+            status = result.get('status', 'failed')
+            success = status == 'success'
+            coverage = result.get('coverage') or {}
+            type_counts = coverage.get('index_type_counts') or {}
+            report_data = {
+                'name': '申万行业指数分析历史回补报告',
+                'status': 'success' if success else status,
+                'tasks_completed': len(type_counts),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': index_type,
+                        'status': (
+                            f"fetched_rows={counts.get('rows', 0)}, "
+                            f"dates={counts.get('trade_dates', 0)}"
+                        ),
+                    }
+                    for index_type, counts in type_counts.items()
+                ],
+                'summary': {
+                    'rows_written': result.get('rows_written', 0),
+                    'start_date': coverage.get('start_date'),
+                    'end_date': coverage.get('end_date'),
+                    'trade_dates': coverage.get('trade_dates', 0),
+                },
+            }
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万行业指数分析历史回补',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Industry index-analysis backfill failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '申万行业指数分析历史回补报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_index_analysis_backfill', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万行业指数分析历史回补',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_index_analysis_backfill')
+
+    async def industry_standard_gap_fill(
+        self,
+        exchanges: Optional[List[str]] = None,
+        missing_limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 strict Shenwan authoritative membership 缺口检测与定向修复任务。"""
+        self._active_tasks.add('industry_standard_gap_fill')
+        try:
+            scheduler_logger.info("[Scheduler] Starting industry standard gap fill...")
+
+            result = await data_manager.run_industry_standard_gap_fill_sync(
+                exchanges=exchanges,
+                missing_limit_per_exchange=missing_limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded', 'skipped'}
+            coverage_before = result.get('coverage_before') or {}
+            coverage_after = result.get('coverage_after') or {}
+            missing_before = int(
+                coverage_before.get('missing_authoritative_membership_count', 0)
+            )
+            missing_after = int(
+                coverage_after.get('missing_authoritative_membership_count', 0)
+            )
+            repair_targets = int(result.get('targeted_instrument_count', 0))
+            repaired = int(result.get('repaired_instrument_count', 0))
+
+            scheduler_logger.info(
+                "[Scheduler] Industry standard gap fill summary: status=%s, targets=%s, repaired=%s, missing_before=%s, missing_after=%s",
+                status,
+                repair_targets,
+                repaired,
+                missing_before,
+                missing_after,
+            )
+
+            sync_result = result.get('sync') or {}
+            maintenance_tasks = [
+                {
+                    'task_name': 'coverage_before',
+                    'status': (
+                        f"missing={missing_before} "
+                        f"target={coverage_before.get('target_instrument_count', 0)}"
+                    ),
+                },
+                {
+                    'task_name': 'gap_fill',
+                    'status': (
+                        f"{status} "
+                        f"(targets={repair_targets}, repaired={repaired})"
+                    ),
+                },
+            ]
+            for exchange_result in sync_result.get('exchanges', []):
+                maintenance_tasks.append(
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('memberships_written', 0)} memberships)"
+                        ),
+                    }
+                )
+
+            report_data = {
+                'name': '申万标准行业缺口修复报告',
+                'status': (
+                    'success'
+                    if status in {'success', 'skipped'}
+                    else 'warning' if status == 'degraded' else 'error'
+                ),
+                'tasks_completed': repaired,
+                'duration': 'N/A',
+                'maintenance_tasks': maintenance_tasks,
+                'summary': {
+                    'missing_before': missing_before,
+                    'missing_after': missing_after,
+                    'repair_targets': repair_targets,
+                    'repaired_instrument_count': repaired,
+                },
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万标准行业缺口修复',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Industry standard gap fill failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '申万标准行业缺口修复报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'industry_standard_gap_fill', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万标准行业缺口修复',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_standard_gap_fill')
+
+    async def industry_official_mapping_refresh(
+        self,
+        exchanges: Optional[List[str]] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域申万官方行业码映射缓存刷新任务。"""
+        self._active_tasks.add('industry_official_mapping_refresh')
+        try:
+            scheduler_logger.info("[Scheduler] Starting industry official mapping refresh...")
+
+            result = await data_manager.run_industry_official_mapping_refresh(
+                exchanges=exchanges,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            source = result.get('source') or 'industry_official_mapping_refresh'
+            mode = result.get('mode')
+            task_name = source if mode is None else f"{source}:{mode}"
+            status_parts = [
+                status,
+                f"rows={result.get('mapping_cache_rows_written', 0)}",
+                f"mapped={result.get('mapped_code_count', 0)}/{result.get('total_code_count', 0)}",
+                f"components={result.get('component_taxonomy_count', 0)}",
+            ]
+
+            report_data = {
+                'name': '申万官方映射刷新报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': 1 if success else 0,
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': task_name,
+                        'status': " ".join(status_parts),
+                    }
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='申万官方映射刷新',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(
+                f"[Scheduler] Industry official mapping refresh failed: {e}"
+            )
+            await self._send_task_report(
+                report_data={
+                    'name': '申万官方映射刷新报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': 'industry_official_mapping_refresh',
+                            'status': str(e),
+                        }
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='申万官方映射刷新',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('industry_official_mapping_refresh')
+
+    async def financial_summary_shadow_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 financial summary 影子同步任务。"""
+        self._active_tasks.add('financial_summary_shadow_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial summary shadow sync...")
+
+            result = await data_manager.run_financial_summary_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '财务摘要影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='财务摘要影子同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial summary shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务摘要影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'financial_summary_shadow_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='财务摘要影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('financial_summary_shadow_sync')
+
+    async def shareholder_shadow_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 shareholders 影子同步任务。"""
+        self._active_tasks.add('shareholder_shadow_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting shareholder shadow sync...")
+
+            result = await data_manager.run_shareholder_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '股东摘要影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='股东摘要影子同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Shareholder shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '股东摘要影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'shareholder_shadow_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='股东摘要影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('shareholder_shadow_sync')
+
+    async def financial_statements_shadow_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 financial statements 影子同步任务。"""
+        self._active_tasks.add('financial_statements_shadow_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial statements shadow sync...")
+
+            result = await data_manager.run_financial_statements_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '财务报表影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='财务报表影子同步',
+                job_config=job_config,
+            )
+
+            return success
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial statements shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务报表影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'financial_statements_shadow_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='财务报表影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('financial_statements_shadow_sync')
+
+    async def valuation_history_rebuild(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 valuation history 重建任务。"""
+        self._active_tasks.add('valuation_history_rebuild')
+        try:
+            scheduler_logger.info("[Scheduler] Starting valuation history rebuild...")
+
+            result = await data_manager.run_valuation_history_rebuild(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '估值历史重建报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('rows_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='估值历史重建',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Valuation history rebuild failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '估值历史重建报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'valuation_history_rebuild', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='估值历史重建',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('valuation_history_rebuild')
+
+    async def technical_snapshot_refresh(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        adjustment: Optional[str] = None,
+        period: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 technical latest snapshot 刷新任务。"""
+        self._active_tasks.add('technical_snapshot_refresh')
+        try:
+            scheduler_logger.info("[Scheduler] Starting technical snapshot refresh...")
+
+            result = await data_manager.run_technical_snapshot_refresh(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                adjustment=adjustment,
+                period=period,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '技术指标最新快照刷新报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('rows_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='技术指标最新快照刷新',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Technical snapshot refresh failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '技术指标最新快照刷新报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'technical_snapshot_refresh', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='技术指标最新快照刷新',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('technical_snapshot_refresh')
+
+    async def analyst_forecast_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 analyst forecast 影子同步任务。"""
+        self._active_tasks.add('analyst_forecast_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting analyst forecast shadow sync...")
+
+            result = await data_manager.run_analyst_forecast_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '分析师预期影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('forecasts_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='分析师预期影子同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Analyst forecast shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '分析师预期影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'analyst_forecast_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='分析师预期影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('analyst_forecast_sync')
+
+    async def research_report_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 research report 影子同步任务。"""
+        self._active_tasks.add('research_report_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting research report shadow sync...")
+
+            result = await data_manager.run_research_report_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '研报元数据影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('reports_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='研报元数据影子同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Research report shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '研报元数据影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'research_report_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='研报元数据影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('research_report_sync')
+
+    async def sentiment_event_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 sentiment event 影子同步任务。"""
+        self._active_tasks.add('sentiment_event_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting sentiment event shadow sync...")
+
+            result = await data_manager.run_sentiment_event_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '事件舆情影子同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('events_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='事件舆情影子同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Sentiment event shadow sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '事件舆情影子同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'sentiment_event_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='事件舆情影子同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('sentiment_event_sync')
+
+    async def risk_snapshot_rebuild(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 risk snapshot 重建任务。"""
+        self._active_tasks.add('risk_snapshot_rebuild')
+        try:
+            scheduler_logger.info("[Scheduler] Starting risk snapshot rebuild...")
+
+            result = await data_manager.run_risk_snapshot_rebuild(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '风险快照重建报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('rows_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='风险快照重建',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Risk snapshot rebuild failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '风险快照重建报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'risk_snapshot_rebuild', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='风险快照重建',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('risk_snapshot_rebuild')
+
     async def system_health_check(self,
                                 check_data_sources: bool = True,
                                 check_database: bool = True,

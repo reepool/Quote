@@ -5,6 +5,7 @@ Provides CORS, logging, authentication, and other middleware components.
 
 import time
 import json
+import re
 from typing import Callable
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
@@ -12,6 +13,25 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from utils import api_logger, config_manager
+
+
+def normalize_repeated_slashes(path: str) -> str:
+    """Collapse repeated slashes while preserving a single leading slash."""
+    if "//" not in path:
+        return path
+    return re.sub(r"/{2,}", "/", path)
+
+
+class PathNormalizationMiddleware(BaseHTTPMiddleware):
+    """Normalize repeated slashes in request paths before routing."""
+
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        path = request.scope.get("path", "")
+        if "//" in path:
+            normalized_path = normalize_repeated_slashes(path)
+            request.scope["path"] = normalized_path
+            request.scope["raw_path"] = normalized_path.encode("ascii")
+        return await call_next(request)
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -207,5 +227,6 @@ def setup_middleware(app):
     app.add_middleware(RateLimitMiddleware, requests_per_minute=100)
     app.add_middleware(ErrorHandlingMiddleware)
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(PathNormalizationMiddleware)
 
     api_logger.info("[API] Middleware setup completed")

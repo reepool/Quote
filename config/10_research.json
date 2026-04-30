@@ -1,0 +1,638 @@
+{
+  "research_config": {
+    "enabled": true,
+    "markets": [
+      "SSE",
+      "SZSE",
+      "BSE"
+    ],
+    "modules": {
+      "company_profile": {
+        "enabled": true,
+        "optional_empty_exchanges": [
+          "BSE"
+        ]
+      },
+      "industry": {
+        "enabled": true,
+        "optional_empty_exchanges": [
+          "BSE"
+        ],
+        "standard": {
+          "enabled": true,
+          "taxonomy_system": "sw",
+          "taxonomy_version": "sw_2021",
+          "authoritative_source_required": true,
+          "default_refresh_frequency": "weekly",
+          "daily_refresh_supported": true,
+          "relative_valuation_level": 2,
+          "classification_primary_enabled": true,
+          "classification_primary_source": "swsresearch",
+          "source_file_manifest": {
+            "enabled": true,
+            "parser_version": "swsresearch_shenwan_classification.v1",
+            "daily_refresh_short_circuit": true,
+            "coverage_required_exchanges": [
+              "SSE",
+              "SZSE",
+              "BSE"
+            ]
+          },
+          "official_mapping": {
+            "min_overlap_count": 2,
+            "min_precision": 0.6,
+            "min_recall": 0.6,
+            "cache_max_age_days": 7,
+            "minimum_mapping_rows": 400,
+            "minimum_mapped_rows": 200,
+            "backlog_review": {
+              "minimum_current_classification_count": 1,
+              "minimum_overlap_count": 2,
+              "minimum_precision": 0.2,
+              "minimum_recall": 0.5,
+              "minimum_top_candidate_overlap_gap": 1
+            },
+            "readiness_override_review_limit": 5,
+            "allow_live_rebuild_on_cache_miss": true,
+            "manual_overrides": {}
+          },
+          "component_cache": {
+            "cache_max_age_days": 7,
+            "minimum_component_sets": 200
+          },
+          "name_supplement": {
+            "enabled": true,
+            "candidates": [
+              {
+                "source": "manual",
+                "mode": "configured"
+              },
+              {
+                "source": "sina",
+                "mode": "direct"
+              },
+              {
+                "source": "eastmoney",
+                "mode": "direct"
+              }
+            ],
+            "max_instruments_per_exchange": 200,
+            "allow_level2_leaf_matches": true,
+            "unmatched_sample_limit": 10,
+            "manual_entries": [
+              {
+                "instrument_id": "688781.SH",
+                "industry_name": "面板",
+                "industry_code": "850831.SI",
+                "reason": "Manual supplement approved after cross-checking Sina related-data page and other public market-data displays for 688781.SH.",
+                "evidence": [
+                  "https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpXiangGuan/stockid/688781.phtml",
+                  "https://quote.eastmoney.com/concept/sh688781.html?from=guba",
+                  "https://xueqiu.com/S/SH688781"
+                ],
+                "note": "Use as a bounded gap-fill override only when authoritative leaf component sets do not cover the stock. The taxonomy match is resolved locally by Shenwan name.",
+                "source_classification": "人工确认申万行业补源"
+              }
+            ],
+            "note": "Only runs for stocks missed by current Shenwan component sets. It maps provider industry names to local Shenwan taxonomy by normalized name; level-2 matches are accepted only when the local taxonomy has no level-3 children for that level-2 node."
+          },
+          "note": "Only authoritative Shenwan mappings can drive peer grouping or relative valuation. Unmapped raw industry fields remain reference_only."
+        }
+      },
+      "shareholders": {
+        "enabled": true,
+        "delivery_mode": "paid_high_availability",
+        "optional_empty_exchanges": [
+          "BSE"
+        ],
+        "allowed_scope": [
+          "holder_count",
+          "top10_holders",
+          "reference_only_ownership_clues"
+        ],
+        "same_source_recovery_candidates": [
+          "akshare:proxy_patch",
+          "akshare:direct"
+        ],
+        "force_merge_candidates": [
+          "cninfo:direct"
+        ],
+        "same_source_recovery_batch_size": 1,
+        "same_source_recovery_max_instruments": 20,
+        "snapshot_api_requires_mode": "paid_high_availability",
+        "note": "Shareholders are enabled for local standardized snapshot/API reads under paid_high_availability. Shareholder refresh uses weekly full sync; cninfo:direct is force-merged for actual-controller clues. BSE remains optional-empty in readiness targets even though current snapshots are populated."
+      },
+      "financial_summary": {
+        "enabled": true,
+        "optional_empty_exchanges": [
+          "BSE"
+        ]
+      },
+      "financial_statements": {
+        "enabled": true,
+        "optional_empty_exchanges": [
+          "BSE"
+        ]
+      },
+      "analyst_forecasts": {
+        "enabled": false,
+        "optional_empty_exchanges": [
+          "BSE"
+        ],
+        "note": "Implemented baseline storage/sync/API using AkShare earnings forecast coverage. Keep disabled by default until direct-source rollout and anti-crawl budget are explicitly accepted."
+      },
+      "research_reports": {
+        "enabled": false,
+        "max_reports_per_instrument": 20,
+        "optional_empty_exchanges": [
+          "BSE"
+        ],
+        "note": "Implemented as report-metadata coverage only; not a full-text research archive. Keep disabled by default until source stability is validated."
+      },
+      "sentiment_events": {
+        "enabled": false,
+        "optional_empty_exchanges": [
+          "BSE"
+        ],
+        "lookback_days": 7,
+        "event_families": [
+          "notice",
+          "executive_share_change",
+          "pledge_ratio"
+        ],
+        "note": "Implemented as event/sentiment metadata baseline. Default disabled until direct-source freshness and event coverage are validated."
+      },
+      "technical": {
+        "enabled": true,
+        "default_adjustment": "qfq",
+        "latest_cache": {
+          "enabled": true,
+          "period": "1d",
+          "adjustment": "qfq"
+        },
+        "summary": {
+          "lookback_bars": 180,
+          "min_bars": 60,
+          "sma_windows": {
+            "short": 20,
+            "long": 60
+          },
+          "ema_windows": {
+            "fast": 12,
+            "slow": 26,
+            "signal": 9
+          },
+          "rsi_window": 14,
+          "adx_window": 14,
+          "stoch_window": 14,
+          "stoch_smooth_k": 3,
+          "stoch_smooth_d": 3,
+          "cci_window": 20,
+          "williams_r_window": 14,
+          "boll_window": 20,
+          "boll_stddev": 2.0,
+          "atr_window": 14,
+          "volume_ratio_window": 20,
+          "signal_thresholds": {
+            "bullish": 0.25,
+            "bearish": -0.25
+          }
+        }
+      },
+      "valuation": {
+        "enabled": false,
+        "history": {
+          "lookback_days": 252
+        },
+        "relative": {
+          "taxonomy_system": "sw",
+          "benchmark_level": 2,
+          "benchmark_field": "sw_l2_code",
+          "require_authoritative": true,
+          "min_peer_count": 3,
+          "max_peer_rows": 20
+        },
+        "dcf": {
+          "projection_years": 5,
+          "risk_free_rate": 0.02,
+          "equity_risk_premium": 0.06,
+          "default_beta": 1.0,
+          "discount_rate": 0.1,
+          "terminal_growth": 0.03,
+          "base_growth_rate": 0.08,
+          "bear_growth_rate": 0.04,
+          "bull_growth_rate": 0.12,
+          "sensitivity_growth_rates": [
+            0.04,
+            0.06,
+            0.08
+          ],
+          "sensitivity_discount_rates": [
+            0.09,
+            0.1,
+            0.11
+          ]
+        }
+      },
+      "risk": {
+        "enabled": true,
+        "benchmark_instrument_id": "000300.SH",
+        "volatility_window_short": 20,
+        "volatility_window_long": 60,
+        "beta_window": 60,
+        "drawdown_window": 252,
+        "liquidity_window": 20,
+        "event_window_days": 30,
+        "risk_level_thresholds": {
+          "medium": 40.0,
+          "high": 70.0
+        }
+      }
+    },
+    "storage": {
+      "db_path": "data/research.db",
+      "shadow_mode": true,
+      "attach_quotes_db": true,
+      "quotes_db_path": "data/quotes.db",
+      "quotes_db_alias": "quotes"
+    },
+    "budget": {
+      "default_mode": "availability_first",
+      "allow_paid_proxy": true,
+      "max_paid_candidates_per_domain": 1
+    },
+    "sources": {
+      "baostock": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "low",
+        "supports_proxy_patch": false,
+        "role": "structured_a_share_facts",
+        "financial_summary": {
+          "lookback_quarters": 6
+        }
+      },
+      "pytdx": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "low",
+        "supports_proxy_patch": false,
+        "role": "market_data_and_raw_company_material",
+        "company_profile": {
+          "connection_timeout": 10.0,
+          "max_connect_attempts": 5,
+          "max_content_categories": 4,
+          "max_content_length": 4000
+        },
+        "financial_summary": {
+          "connection_timeout": 10.0,
+          "max_connect_attempts": 5
+        }
+      },
+      "efinance": {
+        "enabled": false,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "high",
+        "supports_proxy_patch": true,
+        "proxy_patch": {
+          "provider": "ak_proxy_patch",
+          "enabled": false,
+          "cost_tier": "paid",
+          "note": "efinance can use the same proxy patch approach as akshare, but the added availability is not free."
+        },
+        "role": "company_profile_shareholder_summary_financial_summary"
+      },
+      "akshare": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "high",
+        "supports_proxy_patch": true,
+        "proxy_patch": {
+          "provider": "ak_proxy_patch",
+          "enabled": true,
+          "cost_tier": "paid",
+          "note": "Use only when direct access is unstable or the data domain has no cheaper substitute."
+        },
+        "role": "fallback_for_full_financial_statements_and_sw_industry",
+        "shareholders": {
+          "top_holders_request_interval_seconds": 0.2,
+          "top_holders_retry_attempts": 2,
+          "top_holders_retry_backoff_seconds": 0.5
+        },
+        "industry_standard": {
+          "verified_interfaces": [
+            "sw_index_first_info",
+            "sw_index_second_info",
+            "sw_index_third_info",
+            "sw_index_third_cons",
+            "stock_industry_clf_hist_sw",
+            "index_component_sw"
+          ],
+          "membership_upstream_hosts": [
+            "legulegu.com"
+          ],
+          "constituent_base_url": "https://legulegu.com/stockdata/index-composition",
+          "constituent_request_timeout_seconds": 8.0,
+          "max_constituent_fetch_seconds": 20.0,
+          "max_failed_constituent_pages": 25,
+          "failed_code_sample_limit": 10,
+          "proxy_patch_note": "If proxy_patch is used for strict Shenwan memberships, config/03_data.json hook_domains must include legulegu.com."
+        },
+        "index_analysis": {
+          "enabled": true,
+          "mode": "direct",
+          "endpoint": "https://www.swsresearch.com/institute-sw/api/index_analysis/index_analysis_report/",
+          "request_timeout_seconds": 20.0,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "request_interval_seconds": 0.0,
+          "page_size": 50,
+          "max_pages_per_type": 200,
+          "supported_index_types": [
+            "市场表征",
+            "一级行业",
+            "二级行业",
+            "三级行业",
+            "风格指数"
+          ],
+          "historical_backfill_enabled": true,
+          "note": "Uses the same SWS index_analysis_report endpoint semantics as AkShare index_analysis_daily_sw, with project-controlled timeout/retry. This is the approved historical date-range source for industry_index_analysis_daily. Units match SWS display units: 成交量 is 100 million shares; percentage fields remain percent values."
+        }
+      },
+      "swsresearch": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "primary_strict_shenwan_official_classification_files",
+        "industry_standard": {
+          "stock_history_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/StockClassifyUse_stock.xls",
+          "code_table_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/SwClassCode_2021.xls",
+          "request_timeout_seconds": 30.0,
+          "parser_version": "swsresearch_shenwan_classification.v1",
+          "minimum_stock_history_rows": 5000,
+          "minimum_code_rows": 400,
+          "symbol_aliases": [
+            {
+              "instrument_id": "302132.SZ",
+              "current_symbol": "302132",
+              "official_symbol": "300114",
+              "exchange": "SZSE",
+              "reason": "中航成飞当前交易代码为 302132.SZ；申万官方分类文件仍以旧代码 300114 记录其最新官方分类。",
+              "evidence": [
+                "SWS StockClassifyUse_stock.xls has latest 300114 -> 650501 but no 302132 row as of 2026-04-24 source file.",
+                "Local instrument universe marks 302132.SZ 中航成飞 active."
+              ]
+            }
+          ],
+          "note": "Official Shenwan classification files are the primary strict industry taxonomy and membership source. AkShare stock_industry_clf_hist_sw is only a fallback for stock history when direct official download is unavailable."
+        },
+        "index_analysis": {
+          "enabled": true,
+          "endpoint": "https://www.swsresearch.com/institute-sw/api/index_analysis/day_week_month_report/",
+          "request_timeout_seconds": 20.0,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "page_size": 200,
+          "max_pages_per_type": 10,
+          "supported_index_types": [
+            "市场表征",
+            "一级行业",
+            "二级行业",
+            "三级行业",
+            "风格指数"
+          ],
+          "note": "Official latest daily industry index metrics keyed by Shenwan index code; does not create stock memberships. Enabled for daily latest full-dimension refresh. Current observed endpoint ignores historical date filters, so true historical backfill must be validated separately before enabling range rebuild."
+        }
+      },
+      "eastmoney": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "strict_shenwan_name_supplement_for_component_gaps",
+        "industry_standard_supplement": {
+          "endpoint": "https://push2.eastmoney.com/api/qt/stock/get",
+          "fields": "f57,f58,f127",
+          "request_timeout_seconds": 8.0,
+          "request_interval_seconds": 0.05,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "note": "f127 returns Eastmoney's stock industry name. For current observed Shenwan steel gaps it returns names such as 特钢Ⅱ, which are mapped by local Shenwan taxonomy name rather than remote code."
+        }
+      },
+      "sina": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "strict_shenwan_structured_leaf_supplement_for_component_gaps",
+        "industry_standard_supplement": {
+          "endpoint_template": "https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpXiangGuan/stockid/{stockid}.phtml",
+          "request_timeout_seconds": 8.0,
+          "request_interval_seconds": 0.1,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "note": "Parses Sina Finance related-data pages for current Shenwan index rows. Prefer current 85xxxx level-3 rows, then locally validate level-2 candidates as leaf-only before writing memberships."
+        }
+      },
+      "cninfo": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "official_a_share_disclosure_fallback"
+      },
+      "hkexnews": {
+        "enabled": true,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "official_hk_disclosure_fallback"
+      }
+    },
+    "routing": {
+      "company_profile": {
+        "free_chain": [
+          {
+            "source": "baostock",
+            "mode": "direct"
+          },
+          {
+            "source": "pytdx",
+            "mode": "direct"
+          }
+        ],
+        "paid_chain": [],
+        "fallback_chain": [
+          {
+            "source": "efinance",
+            "mode": "direct"
+          },
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "industry": {
+        "free_chain": [
+          {
+            "source": "baostock",
+            "mode": "direct"
+          },
+          {
+            "source": "pytdx",
+            "mode": "direct"
+          }
+        ],
+        "paid_chain": [],
+        "fallback_chain": [
+          {
+            "source": "efinance",
+            "mode": "direct"
+          }
+        ]
+      },
+      "industry_standard": {
+        "free_chain": [
+          {
+            "source": "swsresearch",
+            "mode": "direct"
+          }
+        ],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "shareholders": {
+        "free_chain": [],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          },
+          {
+            "source": "efinance",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "cninfo",
+            "mode": "direct"
+          },
+          {
+            "source": "akshare",
+            "mode": "direct"
+          },
+          {
+            "source": "efinance",
+            "mode": "direct"
+          }
+        ]
+      },
+      "financial_summary": {
+        "free_chain": [
+          {
+            "source": "baostock",
+            "mode": "direct"
+          },
+          {
+            "source": "pytdx",
+            "mode": "direct"
+          }
+        ],
+        "paid_chain": [],
+        "fallback_chain": [
+          {
+            "source": "efinance",
+            "mode": "direct"
+          },
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "financial_statements": {
+        "free_chain": [],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "analyst_forecasts": {
+        "free_chain": [],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "research_reports": {
+        "free_chain": [],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      },
+      "sentiment_events": {
+        "free_chain": [],
+        "paid_chain": [
+          {
+            "source": "akshare",
+            "mode": "proxy_patch"
+          }
+        ],
+        "fallback_chain": [
+          {
+            "source": "akshare",
+            "mode": "direct"
+          }
+        ]
+      }
+    }
+  }
+}

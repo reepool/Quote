@@ -6,8 +6,10 @@ trading calendar integration, data quality assessment, and gap detection.
 
 from __future__ import annotations
 import asyncio
+import inspect
 import json
 import os
+from calendar import monthrange
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass, field
@@ -23,6 +25,13 @@ from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateI
 from utils.date_utils import DateUtils, get_shanghai_time
 from utils.validation import DataValidator
 from utils.cache import cache_manager
+from research.empty_support import (
+    EMPTY_PLACEHOLDER_MODE,
+    EMPTY_PLACEHOLDER_REASON,
+    EMPTY_PLACEHOLDER_SOURCE,
+    allows_optional_empty_exchange,
+    get_optional_empty_exchanges,
+)
 
 
 @dataclass
@@ -94,6 +103,7 @@ class DataManager:
 
     def __init__(self):
         self.config = config_manager
+        self.research_config = self.config.get_research_config()
         self.telegram_enabled = self.config.get_nested('telegram_config.enabled', False)
         self.data_config = self.config.get_nested('data_config', {})
         self.download_chunk_days = self.data_config.get('download_chunk_days', 7)
@@ -105,11 +115,23 @@ class DataManager:
         from database import db_ops
         self.db_ops = db_ops
         self.source_factory = None
+        self.research_storage = None
 
         # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
         # TTL = 1 小时, 适用于 API 高频查询场景
         self._factor_cache: Dict[str, tuple] = {}
         self._FACTOR_CACHE_TTL: float = 3600.0  # 秒
+
+    def refresh_runtime_config(self) -> None:
+        """Refresh config references cached on the long-lived DataManager."""
+        self.research_config = self.config.get_research_config()
+        self.telegram_enabled = self.config.get_nested('telegram_config.enabled', False)
+        self.data_config = self.config.get_nested('data_config', {})
+        self.download_chunk_days = self.data_config.get('download_chunk_days', 7)
+        self.progress_file = os.path.join(
+            self.data_config.get('data_dir', 'data'),
+            'download_progress.json',
+        )
 
     async def get_cached_adjustment_factors(
         self, instrument_id: str
@@ -161,7 +183,12 @@ class DataManager:
 
 
     @log_execution("DataManager", "initialize")
-    async def initialize(self) -> None:
+    async def initialize(
+        self,
+        *,
+        include_data_sources: bool = True,
+        load_progress: bool = True,
+    ) -> None:
         """初始化数据管理器"""
         try:
             dm_logger.info("Initializing DataManager components...")
@@ -177,18 +204,4099 @@ class DataManager:
                 dm_logger.warning("db_ops not initialized, this should not happen!")
                 await self.db_ops.initialize()
 
-            # 初始化数据源工厂
-            from data_sources.source_factory import get_data_source_factory
-            self.source_factory = await get_data_source_factory(self.db_ops)
+            self._initialize_research_storage()
 
-            # 加载之前的进度
-            await self._load_progress()
+            if include_data_sources:
+                # 初始化数据源工厂
+                from data_sources.source_factory import get_data_source_factory
+
+                self.source_factory = await get_data_source_factory(self.db_ops)
+            else:
+                dm_logger.info(
+                    "[DataManager] Skipping data source factory initialization "
+                    "(include_data_sources=false)"
+                )
+
+            if load_progress:
+                # 加载之前的进度
+                await self._load_progress()
+            else:
+                dm_logger.info(
+                    "[DataManager] Skipping download progress load "
+                    "(load_progress=false)"
+                )
 
             dm_logger.info("DataManager initialized successfully")
 
         except Exception as e:
             dm_logger.error(f"Failed to initialize DataManager: {e}")
             raise
+
+    def _initialize_research_storage(self) -> None:
+        """初始化研究域独立存储。
+
+        该步骤是软依赖：
+        - 仅在 research_config.enabled 时执行
+        - 初始化失败只记录告警，不阻塞现有行情系统启动
+        """
+        if not self.research_config.enabled:
+            return
+
+        try:
+            from research.storage import ResearchStorageManager
+
+            self.research_storage = ResearchStorageManager(self.research_config)
+            self.research_storage.initialize()
+            dm_logger.info(
+                "[DataManager] Research storage initialized: %s",
+                self.research_config.storage.db_path,
+            )
+        except Exception as e:
+            dm_logger.warning(
+                "[DataManager] Research storage initialization failed, continuing "
+                "without research storage: %s",
+                e,
+            )
+            self.research_storage = None
+
+    def _require_research_storage(self):
+        """返回 research storage；若不可用则抛出运行时错误。"""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+
+        if self.research_storage is None:
+            raise RuntimeError("research storage is not initialized")
+
+        return self.research_storage
+
+    @staticmethod
+    def _load_research_storage_state(loader):
+        """Run a lightweight research SQLite aggregate read consistently.
+
+        Research storage methods open short-lived SQLite connections and are already
+        synchronous. Keep readiness aggregate reads on this path instead of mixing
+        ad-hoc thread offloading across domains.
+        """
+        return loader()
+
+    def _require_research_industry_standard_config(self) -> Dict[str, Any]:
+        """返回 research industry standard 配置。"""
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            raise RuntimeError("research industry module is disabled")
+
+        standard_cfg = industry_config.get("standard", {})
+        if not standard_cfg.get("enabled", True):
+            raise RuntimeError("research industry standard layer is disabled")
+
+        return standard_cfg
+
+    @staticmethod
+    def _industry_index_analysis_field_units() -> Dict[str, Any]:
+        """Return normalized field-unit metadata for Shenwan index-analysis rows."""
+        from research.providers.base import INDUSTRY_INDEX_ANALYSIS_FIELD_UNITS
+
+        return INDUSTRY_INDEX_ANALYSIS_FIELD_UNITS
+
+    @staticmethod
+    def _is_research_target_instrument(instrument: Dict[str, Any]) -> bool:
+        """Return whether one instrument belongs to the research stock universe."""
+        instrument_type = instrument.get("type")
+        if instrument_type is None:
+            return True
+        return str(instrument_type).upper() == "STOCK"
+
+    async def _list_research_target_instrument_ids_by_exchange(
+        self,
+        exchange: str,
+    ) -> List[str]:
+        """Return current research target instrument ids for one exchange."""
+        target_ids_reader = getattr(
+            self.db_ops,
+            "get_research_target_instrument_ids_by_exchange",
+            None,
+        )
+        if target_ids_reader is not None:
+            reader_result = target_ids_reader(
+                exchange,
+                is_active=True,
+            )
+            if inspect.isawaitable(reader_result):
+                return await reader_result
+            if isinstance(reader_result, (list, tuple, set)):
+                return sorted(
+                    {
+                        str(instrument_id).strip()
+                        for instrument_id in reader_result
+                        if str(instrument_id).strip()
+                    }
+                )
+
+        instruments = await self.db_ops.get_instruments_by_exchange(exchange)
+        return sorted(
+            {
+                str(instrument.get("instrument_id", "")).strip()
+                for instrument in instruments
+                if self._is_research_target_instrument(instrument)
+                and str(instrument.get("instrument_id", "")).strip()
+            }
+        )
+
+    async def _count_research_target_instruments_by_exchange(
+        self,
+        exchanges: List[str],
+        *,
+        excluded_exchanges: Optional[Set[str]] = None,
+    ) -> Tuple[Dict[str, int], int]:
+        """Count current target research instruments by exchange."""
+        excluded = {
+            str(exchange).strip().upper()
+            for exchange in (excluded_exchanges or set())
+            if str(exchange).strip()
+        }
+        counts: Dict[str, int] = {}
+        total = 0
+        for exchange in exchanges:
+            if str(exchange).strip().upper() in excluded:
+                counts[exchange] = 0
+                continue
+            target_ids = await self._list_research_target_instrument_ids_by_exchange(
+                exchange
+            )
+            count = len(target_ids)
+            counts[exchange] = count
+            total += count
+        return counts, total
+
+    def _require_research_shareholders_config(
+        self,
+        *,
+        require_snapshot_api: bool = False,
+    ) -> Dict[str, Any]:
+        """返回 research shareholders 配置，并按需检查 API 门禁。"""
+        module_cfg = self.research_config.modules.get("shareholders", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research shareholders module is disabled")
+
+        if require_snapshot_api:
+            required_mode = module_cfg.get("snapshot_api_requires_mode")
+            delivery_mode = module_cfg.get("delivery_mode")
+            if required_mode and delivery_mode != required_mode:
+                raise RuntimeError(
+                    "research shareholder snapshot API requires "
+                    f"{required_mode}, current delivery_mode is {delivery_mode}"
+                )
+
+        return module_cfg
+
+    async def _get_research_instrument_info(
+        self,
+        instrument_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        return await self.db_ops.get_instrument_info(instrument_id=instrument_id)
+
+    def _module_allows_optional_empty_exchange(
+        self,
+        module_name: str,
+        exchange: Optional[str],
+    ) -> bool:
+        if not exchange:
+            return False
+        return allows_optional_empty_exchange(
+            self.research_config,
+            module_name,
+            exchange,
+        )
+
+    @staticmethod
+    def _empty_placeholder_timestamps() -> tuple[str, str, str]:
+        now = get_shanghai_time().isoformat()
+        return now, now, now
+
+    def _build_empty_company_profile_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_snapshot: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        name = instrument.get("name") or instrument.get("symbol") or instrument.get("instrument_id")
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "company_name": name,
+            "short_name": name,
+            "exchange": instrument.get("exchange"),
+            "market": instrument.get("market"),
+            "listed_date": instrument.get("listed_date"),
+            "industry_raw": None,
+            "sector_raw": None,
+            "status": "active" if instrument.get("is_active", True) else "delisted",
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+        if include_snapshot:
+            payload["profile"] = {
+                "status": "empty",
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            }
+        return payload
+
+    def _build_empty_industry_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_snapshot: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        industry_cfg = self.research_config.modules.get("industry", {})
+        standard_cfg = industry_cfg.get("standard", {})
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "taxonomy_system": standard_cfg.get("taxonomy_system", "sw"),
+            "taxonomy_version": standard_cfg.get("taxonomy_version"),
+            "industry_code": "unsupported_exchange",
+            "industry_name": "未覆盖",
+            "industry_level": 0,
+            "parent_code": None,
+            "mapping_status": "optional_empty_exchange",
+            "effective_date": None,
+            "source_classification": None,
+            "source_industry_name": None,
+            "sw_l1_code": None,
+            "sw_l1_name": None,
+            "sw_l2_code": None,
+            "sw_l2_name": None,
+            "sw_l3_code": None,
+            "sw_l3_name": None,
+            "sw_l1_index_code": None,
+            "sw_l2_index_code": None,
+            "sw_l3_index_code": None,
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+        if include_snapshot:
+            payload["membership"] = {
+                "status": "empty",
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            }
+        return payload
+
+    def _build_empty_financial_summary_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_snapshot: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "report_date": None,
+            "pub_date": None,
+            "fiscal_year": None,
+            "fiscal_quarter": None,
+            "currency": "CNY",
+            "schema_version": "financial_summary.v1",
+            "roe": None,
+            "gross_margin": None,
+            "net_margin": None,
+            "current_ratio": None,
+            "quick_ratio": None,
+            "liability_to_asset": None,
+            "yoy_asset": None,
+            "yoy_equity": None,
+            "yoy_net_profit": None,
+            "cfo_to_revenue": None,
+            "cfo_to_net_profit": None,
+            "asset_turnover": None,
+            "eps": None,
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+        if include_snapshot:
+            payload["summary"] = {
+                "status": "empty",
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            }
+        return payload
+
+    def _build_empty_shareholder_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_snapshot: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "coverage_status": "optional_empty_exchange",
+            "holder_count": None,
+            "holder_count_report_date": None,
+            "top_holders_report_date": None,
+            "top_holders_count": None,
+            "top_holders_total_ratio": None,
+            "control_owner_name": None,
+            "control_owner_ratio": None,
+            "schema_version": "shareholders.v1",
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+        if include_snapshot:
+            payload["snapshot"] = {
+                "coverage_scope": [],
+                "scope_sources": {},
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            }
+        return payload
+
+    def _build_empty_financial_statements_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_statements: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "report_period": "unsupported_exchange",
+            "publish_date": None,
+            "fiscal_year": None,
+            "fiscal_quarter": None,
+            "currency": "CNY",
+            "schema_version": "financial_facts.v1",
+            "revenue": None,
+            "gross_profit": None,
+            "operating_profit": None,
+            "pre_tax_profit": None,
+            "net_income": None,
+            "operating_cf": None,
+            "total_cf": None,
+            "total_assets": None,
+            "total_liabilities": None,
+            "equity": None,
+            "current_assets": None,
+            "current_liabilities": None,
+            "inventory": None,
+            "receivables": None,
+            "fixed_assets": None,
+            "intangible_assets": None,
+            "shares_outstanding": None,
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "facts": {
+                "status": "empty",
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            },
+            "indicators": None,
+            "statements": [],
+        }
+        if not include_statements:
+            payload["statements"] = []
+        return payload
+
+    def _build_empty_analyst_coverage_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_details: bool = True,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "status": "empty",
+            "missing_reason": EMPTY_PLACEHOLDER_REASON,
+            "as_of_date": get_shanghai_time().date().isoformat(),
+            "rating_summary": None,
+            "report_count": None,
+            "institution_count": None,
+            "buy_count": None,
+            "overweight_count": None,
+            "neutral_count": None,
+            "underperform_count": None,
+            "sell_count": None,
+            "eps_fy1": None,
+            "eps_fy2": None,
+            "net_profit_fy1": None,
+            "net_profit_fy2": None,
+            "pe_fy1": None,
+            "pe_fy2": None,
+            "source": EMPTY_PLACEHOLDER_SOURCE,
+            "source_mode": EMPTY_PLACEHOLDER_MODE,
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+        }
+        if include_details:
+            payload["forecast"] = {
+                "status": "empty",
+                "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                "optional_empty_exchange": instrument.get("exchange"),
+            }
+        return payload
+
+    def _build_empty_reports_response(self, instrument: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "data_points": 0,
+            "window_start": None,
+            "window_end": None,
+            "items": [],
+        }
+
+    def _build_empty_sentiment_events_response(
+        self,
+        instrument: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        return {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "data_points": 0,
+            "window_start": None,
+            "window_end": None,
+            "items": [],
+        }
+
+    def _build_empty_company_overview_response(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        include_profile_snapshot: bool,
+        include_industry_snapshot: bool,
+        include_financial_snapshot: bool,
+    ) -> Dict[str, Any]:
+        now = get_shanghai_time().isoformat()
+        payload = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "market": instrument.get("market"),
+            "company_name": instrument.get("name"),
+            "short_name": instrument.get("name"),
+            "listed_date": instrument.get("listed_date"),
+            "industry_raw": None,
+            "sector_raw": None,
+            "industry_system": None,
+            "industry_taxonomy_version": None,
+            "industry_code": None,
+            "industry_name": None,
+            "industry_level": None,
+            "industry_mapping_status": None,
+            "sw_l1_code": None,
+            "sw_l1_name": None,
+            "sw_l2_code": None,
+            "sw_l2_name": None,
+            "sw_l3_code": None,
+            "sw_l3_name": None,
+            "status": "active" if instrument.get("is_active", True) else "delisted",
+            "report_date": None,
+            "pub_date": None,
+            "fiscal_year": None,
+            "fiscal_quarter": None,
+            "currency": None,
+            "schema_version": None,
+            "roe": None,
+            "gross_margin": None,
+            "net_margin": None,
+            "current_ratio": None,
+            "quick_ratio": None,
+            "liability_to_asset": None,
+            "yoy_asset": None,
+            "yoy_equity": None,
+            "yoy_net_profit": None,
+            "cfo_to_revenue": None,
+            "cfo_to_net_profit": None,
+            "asset_turnover": None,
+            "eps": None,
+            "data_as_of": now,
+            "source_summary": {
+                "company_profile": {
+                    "available": False,
+                    "source": None,
+                    "source_mode": None,
+                    "data_as_of": None,
+                    "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                },
+                "industry": {
+                    "available": False,
+                    "source": None,
+                    "source_mode": None,
+                    "data_as_of": None,
+                    "missing_reason": (
+                        EMPTY_PLACEHOLDER_REASON
+                        if self._module_allows_optional_empty_exchange(
+                            "industry",
+                            instrument.get("exchange"),
+                        )
+                        else "snapshot_not_available"
+                    ),
+                },
+                "financial_summary": {
+                    "available": False,
+                    "source": None,
+                    "source_mode": None,
+                    "data_as_of": None,
+                    "missing_reason": EMPTY_PLACEHOLDER_REASON,
+                },
+            },
+            "missing_sections": ["company_profile", "industry", "financial_summary"],
+        }
+        if include_profile_snapshot:
+            payload["company_profile"] = self._build_empty_company_profile_response(
+                instrument,
+                include_snapshot=True,
+            )
+        if include_industry_snapshot:
+            payload["industry"] = self._build_empty_industry_response(
+                instrument,
+                include_snapshot=True,
+            )
+        if include_financial_snapshot:
+            payload["financial_summary"] = self._build_empty_financial_summary_response(
+                instrument,
+                include_snapshot=True,
+            )
+        return payload
+
+    async def run_company_profile_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 company_profile 影子同步。
+
+        该方法只写入 research.db，不影响现有行情库。
+        """
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        from research.company_profile_sync import CompanyProfileShadowSyncService
+
+        service = CompanyProfileShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def get_research_company_profile(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 company profile。"""
+        storage = self._require_research_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+        profile = await asyncio.to_thread(
+            storage.get_company_profile,
+            normalized_id,
+            include_snapshot=include_snapshot,
+        )
+        if profile is not None:
+            return profile
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and self._module_allows_optional_empty_exchange(
+            "company_profile",
+            instrument.get("exchange"),
+        ):
+            return self._build_empty_company_profile_response(
+                instrument,
+                include_snapshot=include_snapshot,
+            )
+        return None
+
+    async def run_industry_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 industry 影子同步。
+
+        该方法只写入 research.db，不影响现有行情库。
+        """
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research industry module is disabled",
+            }
+
+        from research.industry_sync import IndustryShadowSyncService
+
+        service = IndustryShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_industry_standard_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        instrument_ids_by_exchange: Optional[Dict[str, List[str]]] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        force_component_refresh: bool = False,
+    ) -> Dict[str, Any]:
+        """运行 strict Shenwan 行业标准层同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research industry module is disabled",
+            }
+
+        standard_cfg = industry_config.get("standard", {})
+        if not standard_cfg.get("enabled", True):
+            return {
+                "status": "disabled",
+                "reason": "research industry standard layer is disabled",
+            }
+
+        from research.industry_standard_sync import IndustryStandardSyncService
+
+        service = IndustryStandardSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            instrument_ids_by_exchange=instrument_ids_by_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+            force_component_refresh=force_component_refresh,
+        )
+
+    async def rebuild_official_industry_standard(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        drop_existing: bool = True,
+        drop_source_files: bool = False,
+        force_refresh: bool = True,
+    ) -> Dict[str, Any]:
+        """Run a controlled full rebuild of strict Shenwan official rows."""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research industry module is disabled",
+            }
+
+        standard_cfg = industry_config.get("standard", {})
+        if not standard_cfg.get("enabled", True):
+            return {
+                "status": "disabled",
+                "reason": "research industry standard layer is disabled",
+            }
+
+        from research.industry_standard_operations import rebuild_official_industry_standard
+
+        return await rebuild_official_industry_standard(
+            self,
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+            drop_existing=drop_existing,
+            drop_source_files=drop_source_files,
+            force_refresh=force_refresh,
+        )
+
+    async def run_industry_index_analysis_sync(
+        self,
+        *,
+        index_types: Optional[List[str]] = None,
+        limit_per_type: Optional[int] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        latest_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """运行申万行业指数分析指标同步，不写股票行业归属。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        index_cfg = self.research_config.sources.get("swsresearch", {}).get(
+            "index_analysis",
+            {},
+        )
+        if not index_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "swsresearch.index_analysis.enabled is false",
+            }
+
+        from research.industry_index_analysis_sync import IndustryIndexAnalysisSyncService
+
+        service = IndustryIndexAnalysisSyncService(
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync_latest(
+            index_types=index_types,
+            limit_per_type=limit_per_type,
+            start_date=start_date,
+            end_date=end_date,
+            latest_date=latest_date,
+        )
+
+    async def run_industry_index_analysis_backfill(
+        self,
+        *,
+        start_date: str,
+        end_date: str,
+        index_types: Optional[List[str]] = None,
+        limit_per_type: Optional[int] = None,
+        source: str = "akshare",
+        mode: str = "direct",
+        chunk_frequency: Optional[str] = None,
+        split_index_types: bool = True,
+        stop_on_error: bool = False,
+    ) -> Dict[str, Any]:
+        """运行申万行业指数分析历史回补，不写股票行业归属。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        index_cfg = self.research_config.sources.get(source, {}).get(
+            "index_analysis",
+            {},
+        )
+        if not index_cfg and source == "akshare":
+            index_cfg = self.research_config.sources.get("swsresearch", {}).get(
+                "index_analysis",
+                {},
+            )
+        if not index_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": f"{source}.index_analysis.enabled is false",
+            }
+
+        if chunk_frequency and chunk_frequency != "none":
+            return await self._run_industry_index_analysis_backfill_chunked(
+                start_date=start_date,
+                end_date=end_date,
+                index_types=index_types,
+                limit_per_type=limit_per_type,
+                source=source,
+                mode=mode,
+                chunk_frequency=chunk_frequency,
+                split_index_types=split_index_types,
+                stop_on_error=stop_on_error,
+                index_cfg=index_cfg,
+            )
+
+        from research.industry_index_analysis_sync import IndustryIndexAnalysisSyncService
+
+        service = IndustryIndexAnalysisSyncService(
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync_history(
+            index_types=index_types,
+            limit_per_type=limit_per_type,
+            start_date=start_date,
+            end_date=end_date,
+            source=source,
+            mode=mode,
+        )
+
+    async def _run_industry_index_analysis_backfill_chunked(
+        self,
+        *,
+        start_date: str,
+        end_date: str,
+        index_types: Optional[List[str]],
+        limit_per_type: Optional[int],
+        source: str,
+        mode: str,
+        chunk_frequency: str,
+        split_index_types: bool,
+        stop_on_error: bool,
+        index_cfg: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Run Shenwan index-analysis backfill in bounded date/type chunks."""
+        start = self._parse_backfill_date(start_date)
+        end = self._parse_backfill_date(end_date)
+        if start > end:
+            raise ValueError("start_date must be earlier than or equal to end_date")
+
+        target_types = list(
+            index_types
+            or index_cfg.get("supported_index_types")
+            or ["市场表征", "一级行业", "二级行业", "三级行业", "风格指数"]
+        )
+        chunks: List[Dict[str, Any]] = []
+        failures: List[Dict[str, Any]] = []
+        rows_written = 0
+
+        for chunk_start, chunk_end in self._iter_backfill_date_chunks(
+            start,
+            end,
+            chunk_frequency,
+        ):
+            type_groups = (
+                [[index_type] for index_type in target_types]
+                if split_index_types
+                else [target_types]
+            )
+            for type_group in type_groups:
+                result = await self.run_industry_index_analysis_backfill(
+                    start_date=chunk_start.isoformat(),
+                    end_date=chunk_end.isoformat(),
+                    index_types=type_group,
+                    limit_per_type=limit_per_type,
+                    source=source,
+                    mode=mode,
+                    chunk_frequency=None,
+                )
+                chunk_result = {
+                    "start_date": chunk_start.isoformat(),
+                    "end_date": chunk_end.isoformat(),
+                    "index_types": type_group,
+                    "status": result.get("status"),
+                    "rows_written": int(result.get("rows_written") or 0),
+                    "reason": result.get("reason"),
+                    "coverage": result.get("coverage"),
+                }
+                chunks.append(chunk_result)
+                rows_written += chunk_result["rows_written"]
+                if result.get("status") != "success":
+                    failures.append(chunk_result)
+                    if stop_on_error:
+                        return self._build_index_analysis_chunked_result(
+                            start=start,
+                            end=end,
+                            chunk_frequency=chunk_frequency,
+                            split_index_types=split_index_types,
+                            source=source,
+                            mode=mode,
+                            rows_written=rows_written,
+                            chunks=chunks,
+                            failures=failures,
+                        )
+
+        return self._build_index_analysis_chunked_result(
+            start=start,
+            end=end,
+            chunk_frequency=chunk_frequency,
+            split_index_types=split_index_types,
+            source=source,
+            mode=mode,
+            rows_written=rows_written,
+            chunks=chunks,
+            failures=failures,
+        )
+
+    @staticmethod
+    def _parse_backfill_date(value: str) -> date:
+        normalized = str(value).strip()
+        if len(normalized) == 8 and normalized.isdigit():
+            normalized = f"{normalized[:4]}-{normalized[4:6]}-{normalized[6:]}"
+        return date.fromisoformat(normalized)
+
+    @staticmethod
+    def _iter_backfill_date_chunks(
+        start: date,
+        end: date,
+        frequency: str,
+    ):
+        current = start
+        while current <= end:
+            if frequency == "day":
+                chunk_end = current
+            elif frequency == "month":
+                chunk_end = date(
+                    current.year,
+                    current.month,
+                    monthrange(current.year, current.month)[1],
+                )
+            elif frequency == "quarter":
+                quarter_end_month = ((current.month - 1) // 3 + 1) * 3
+                chunk_end = date(
+                    current.year,
+                    quarter_end_month,
+                    monthrange(current.year, quarter_end_month)[1],
+                )
+            elif frequency == "year":
+                chunk_end = date(current.year, 12, 31)
+            else:
+                raise ValueError(
+                    "chunk_frequency must be one of day, month, quarter, year, none"
+                )
+
+            if chunk_end > end:
+                chunk_end = end
+            yield current, chunk_end
+            current = chunk_end + timedelta(days=1)
+
+    @staticmethod
+    def _build_index_analysis_chunked_result(
+        *,
+        start: date,
+        end: date,
+        chunk_frequency: str,
+        split_index_types: bool,
+        source: str,
+        mode: str,
+        rows_written: int,
+        chunks: List[Dict[str, Any]],
+        failures: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        return {
+            "status": "success" if not failures else "partial_success",
+            "operation": "history_backfill_chunked",
+            "source": source,
+            "mode": mode,
+            "start_date": start.isoformat(),
+            "end_date": end.isoformat(),
+            "chunk_frequency": chunk_frequency,
+            "split_index_types": split_index_types,
+            "chunks_total": len(chunks),
+            "chunks_failed": len(failures),
+            "rows_written": rows_written,
+            "failures": failures,
+            "chunks": chunks,
+        }
+
+    async def run_industry_official_mapping_refresh(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """刷新 strict Shenwan 官方行业码映射缓存。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research industry module is disabled",
+            }
+
+        standard_cfg = industry_config.get("standard", {})
+        if not standard_cfg.get("enabled", True):
+            return {
+                "status": "disabled",
+                "reason": "research industry standard layer is disabled",
+            }
+
+        from research.industry_standard_sync import IndustryStandardSyncService
+
+        service = IndustryStandardSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.refresh_official_mapping_cache(
+            exchanges=exchanges,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def get_research_industry_standard_coverage_gaps(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        missing_limit_per_exchange: Optional[int] = None,
+        include_missing_instrument_ids: bool = True,
+    ) -> Dict[str, Any]:
+        """Return authoritative-membership coverage gaps for strict Shenwan current membership."""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        markets = list(exchanges or self.research_config.markets)
+        optional_empty_exchanges = get_optional_empty_exchanges(
+            self.research_config,
+            "industry",
+        )
+        missing_limit = (
+            None
+            if missing_limit_per_exchange is None
+            else max(int(missing_limit_per_exchange), 0)
+        )
+
+        target_ids_by_exchange: Dict[str, List[str]] = {}
+        target_counts_by_exchange: Dict[str, int] = {}
+        target_total = 0
+        skipped_optional_empty_exchanges: List[str] = []
+
+        for exchange in markets:
+            normalized_exchange = str(exchange).strip().upper()
+            if normalized_exchange in optional_empty_exchanges:
+                target_ids_by_exchange[exchange] = []
+                target_counts_by_exchange[exchange] = 0
+                skipped_optional_empty_exchanges.append(exchange)
+                continue
+
+            target_ids = await self._list_research_target_instrument_ids_by_exchange(
+                exchange
+            )
+            target_ids_by_exchange[exchange] = target_ids
+            target_counts_by_exchange[exchange] = len(target_ids)
+            target_total += len(target_ids)
+
+        def _load_storage_state() -> Dict[str, List[str]]:
+            return {
+                exchange: storage.list_industry_membership_instrument_ids(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                    mapping_status="authoritative",
+                    exchange=exchange,
+                )
+                for exchange in markets
+                if str(exchange).strip().upper() not in optional_empty_exchanges
+            }
+
+        authoritative_ids_by_exchange = _load_storage_state()
+
+        authoritative_total = 0
+        missing_total = 0
+        exchange_gaps = []
+        targeted_missing_ids_by_exchange: Dict[str, List[str]] = {}
+
+        for exchange in markets:
+            target_ids = target_ids_by_exchange.get(exchange, [])
+            target_id_set = set(target_ids)
+            optional_empty_exchange = (
+                str(exchange).strip().upper() in optional_empty_exchanges
+            )
+            authoritative_ids = sorted(
+                target_id_set.intersection(
+                    authoritative_ids_by_exchange.get(exchange, [])
+                )
+            )
+            missing_ids = sorted(target_id_set.difference(authoritative_ids))
+            authoritative_count = len(authoritative_ids)
+            missing_count = len(missing_ids)
+            authoritative_total += authoritative_count
+            missing_total += missing_count
+
+            if missing_limit is None:
+                sampled_missing_ids = missing_ids
+            else:
+                sampled_missing_ids = missing_ids[:missing_limit]
+
+            if missing_ids:
+                targeted_missing_ids_by_exchange[exchange] = sampled_missing_ids
+
+            coverage_ratio = (
+                authoritative_count / len(target_ids)
+                if target_ids
+                else 1.0
+            )
+            row: Dict[str, Any] = {
+                "exchange": exchange,
+                "target_instruments": len(target_ids),
+                "authoritative_memberships": authoritative_count,
+                "missing_instrument_count": missing_count,
+                "coverage_ratio": coverage_ratio,
+                "ready": missing_count == 0,
+                "optional_empty_exchange": optional_empty_exchange,
+            }
+            if include_missing_instrument_ids:
+                row["missing_instrument_ids"] = sampled_missing_ids
+                row["missing_ids_truncated"] = (
+                    missing_limit is not None and len(sampled_missing_ids) < missing_count
+                )
+            exchange_gaps.append(row)
+
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "optional_empty_exchanges": skipped_optional_empty_exchanges,
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_counts_by_exchange,
+            "authoritative_membership_total": authoritative_total,
+            "missing_authoritative_membership_count": missing_total,
+            "ready": missing_total == 0,
+            "missing_limit_per_exchange": missing_limit_per_exchange,
+            "exchange_gaps": exchange_gaps,
+            "targeted_missing_instrument_ids_by_exchange": (
+                targeted_missing_ids_by_exchange
+                if include_missing_instrument_ids
+                else {}
+            ),
+        }
+
+    async def run_industry_standard_gap_fill_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        missing_limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """Detect authoritative-membership gaps and run a targeted strict Shenwan sync."""
+        coverage_before = await self.get_research_industry_standard_coverage_gaps(
+            exchanges=exchanges,
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            missing_limit_per_exchange=missing_limit_per_exchange,
+            include_missing_instrument_ids=True,
+        )
+        instrument_ids_by_exchange = {
+            exchange: instrument_ids
+            for exchange, instrument_ids in (
+                coverage_before.get("targeted_missing_instrument_ids_by_exchange") or {}
+            ).items()
+            if instrument_ids
+        }
+        targeted_exchanges = list(instrument_ids_by_exchange)
+        targeted_instrument_count = sum(
+            len(instrument_ids) for instrument_ids in instrument_ids_by_exchange.values()
+        )
+
+        if targeted_instrument_count == 0:
+            return {
+                "status": "skipped",
+                "reason": "no_missing_authoritative_memberships",
+                "requested": {
+                    "exchanges": exchanges,
+                    "taxonomy_system": taxonomy_system,
+                    "taxonomy_version": taxonomy_version,
+                    "missing_limit_per_exchange": missing_limit_per_exchange,
+                    "budget_mode": budget_mode,
+                    "allow_paid_proxy": allow_paid_proxy,
+                },
+                "coverage_before": coverage_before,
+                "coverage_after": coverage_before,
+                "targeted_exchanges": [],
+                "targeted_instrument_count": 0,
+                "targeted_missing_instrument_ids_by_exchange": {},
+                "sync": {"status": "skipped", "reason": "no_missing_authoritative_memberships"},
+            }
+
+        sync_result = await self.run_industry_standard_sync(
+            exchanges=targeted_exchanges,
+            instrument_ids_by_exchange=instrument_ids_by_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+        coverage_after = await self.get_research_industry_standard_coverage_gaps(
+            exchanges=exchanges,
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            missing_limit_per_exchange=missing_limit_per_exchange,
+            include_missing_instrument_ids=True,
+        )
+        missing_before = int(
+            coverage_before.get("missing_authoritative_membership_count", 0)
+        )
+        missing_after = int(
+            coverage_after.get("missing_authoritative_membership_count", 0)
+        )
+        repaired_instrument_count = max(missing_before - missing_after, 0)
+
+        sync_status = str(sync_result.get("status", "failed"))
+        if sync_status == "failed":
+            status = "failed"
+        elif missing_after == 0:
+            status = "success"
+        elif repaired_instrument_count > 0 or sync_status in {"success", "degraded"}:
+            status = "degraded"
+        else:
+            status = sync_status
+
+        return {
+            "status": status,
+            "requested": {
+                "exchanges": exchanges,
+                "taxonomy_system": taxonomy_system,
+                "taxonomy_version": taxonomy_version,
+                "missing_limit_per_exchange": missing_limit_per_exchange,
+                "budget_mode": budget_mode,
+                "allow_paid_proxy": allow_paid_proxy,
+            },
+            "targeted_exchanges": targeted_exchanges,
+            "targeted_instrument_count": targeted_instrument_count,
+            "targeted_missing_instrument_ids_by_exchange": instrument_ids_by_exchange,
+            "coverage_before": coverage_before,
+            "coverage_after": coverage_after,
+            "repaired_instrument_count": repaired_instrument_count,
+            "remaining_missing_instrument_count": missing_after,
+            "sync": sync_result,
+        }
+
+    async def get_research_industry(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 industry membership。"""
+        storage = self._require_research_storage()
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            raise RuntimeError("research industry module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        membership = await asyncio.to_thread(
+            storage.get_industry_membership,
+            normalized_id,
+            include_snapshot=include_snapshot,
+        )
+        if membership is not None:
+            return membership
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and self._module_allows_optional_empty_exchange(
+            "industry",
+            instrument.get("exchange"),
+        ):
+            return self._build_empty_industry_response(
+                instrument,
+                include_snapshot=include_snapshot,
+            )
+        return None
+
+    async def list_research_industry_taxonomy(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        industry_level: Optional[int] = None,
+        parent_code: Optional[str] = None,
+        industry_code: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        active_only: bool = True,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """读取研究域标准行业 taxonomy 节点。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+
+        items = await asyncio.to_thread(
+            storage.list_industry_taxonomy_records,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            industry_level=industry_level,
+            parent_code=parent_code,
+            industry_code=industry_code,
+            sw_index_code=sw_index_code,
+            active_only=active_only,
+            limit=limit,
+            offset=offset,
+        )
+        total = await asyncio.to_thread(
+            storage.count_industry_taxonomy_records,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            industry_level=industry_level,
+            parent_code=parent_code,
+            industry_code=industry_code,
+            sw_index_code=sw_index_code,
+            active_only=active_only,
+        )
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "industry_level": industry_level,
+            "parent_code": parent_code,
+            "industry_code": industry_code,
+            "sw_index_code": sw_index_code,
+            "active_only": active_only,
+            "limit": limit,
+            "offset": offset,
+            "total": total,
+            "items": items,
+        }
+
+    async def list_research_industry_component_sets(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        industry_code: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+        include_symbols: bool = True,
+    ) -> Dict[str, Any]:
+        """读取研究域标准行业成分缓存。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        resolved_industry_code = industry_code
+        missing_reason = None
+
+        if sw_index_code and not resolved_industry_code:
+            taxonomy_nodes = await asyncio.to_thread(
+                storage.list_industry_taxonomy_records,
+                taxonomy_system=resolved_taxonomy_system,
+                taxonomy_version=resolved_taxonomy_version,
+                sw_index_code=sw_index_code,
+                active_only=True,
+                limit=1,
+                offset=0,
+            )
+            if taxonomy_nodes:
+                resolved_industry_code = str(taxonomy_nodes[0]["industry_code"])
+            else:
+                missing_reason = "taxonomy_alias_not_found"
+
+        if missing_reason and not resolved_industry_code:
+            items = []
+            total = 0
+        else:
+            items = await asyncio.to_thread(
+                storage.list_industry_component_set_records,
+                taxonomy_system=resolved_taxonomy_system,
+                taxonomy_version=resolved_taxonomy_version,
+                industry_code=resolved_industry_code,
+                max_age_days=max_age_days,
+                limit=limit,
+                offset=offset,
+                include_symbols=include_symbols,
+            )
+            total = await asyncio.to_thread(
+                storage.count_industry_component_sets,
+                taxonomy_system=resolved_taxonomy_system,
+                taxonomy_version=resolved_taxonomy_version,
+                industry_code=resolved_industry_code,
+                max_age_days=max_age_days,
+            )
+            if total == 0:
+                items, total = await asyncio.to_thread(
+                    storage.list_industry_component_set_records_from_memberships,
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                    industry_code=resolved_industry_code,
+                    max_age_days=max_age_days,
+                    limit=limit,
+                    offset=offset,
+                    include_symbols=include_symbols,
+                )
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "industry_code": industry_code,
+            "sw_index_code": sw_index_code,
+            "resolved_industry_code": resolved_industry_code,
+            "missing_reason": missing_reason,
+            "max_age_days": max_age_days,
+            "include_symbols": include_symbols,
+            "limit": limit,
+            "offset": offset,
+            "total": total,
+            "items": items,
+        }
+
+    async def list_research_industry_index_analysis(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        index_type: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+        include_payload: bool = True,
+    ) -> Dict[str, Any]:
+        """读取申万行业指数分析日度数据。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+
+        items = await asyncio.to_thread(
+            storage.list_industry_index_analysis_daily,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            sw_index_code=sw_index_code,
+            index_type=index_type,
+            trade_date=trade_date,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+            offset=offset,
+            include_payload=include_payload,
+        )
+        total = await asyncio.to_thread(
+            storage.count_industry_index_analysis_daily,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            sw_index_code=sw_index_code,
+            index_type=index_type,
+            trade_date=trade_date,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        summary = await asyncio.to_thread(
+            storage.summarize_industry_index_analysis_daily,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+        )
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "sw_index_code": sw_index_code,
+            "index_type": index_type,
+            "trade_date": trade_date,
+            "start_date": start_date,
+            "end_date": end_date,
+            "include_payload": include_payload,
+            "limit": limit,
+            "offset": offset,
+            "total": total,
+            "summary": summary,
+            "field_units": self._industry_index_analysis_field_units(),
+            "items": items,
+        }
+
+    async def get_research_industry_index_analysis_latest(
+        self,
+        sw_index_code: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        include_payload: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取单个申万指数代码的最新行业指数分析数据。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        return await asyncio.to_thread(
+            storage.get_latest_industry_index_analysis,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            sw_index_code=sw_index_code,
+            include_payload=include_payload,
+        )
+
+    async def get_research_industry_index_analysis_latest_by_taxonomy(
+        self,
+        industry_code: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        include_payload: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """通过 taxonomy 显式 index alias 读取最新申万指数分析 benchmark。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        nodes = await asyncio.to_thread(
+            storage.list_industry_taxonomy_records,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            industry_code=industry_code,
+            active_only=True,
+            limit=1,
+            offset=0,
+        )
+        if not nodes:
+            return None
+
+        node = nodes[0]
+        sw_index_code = node.get("sw_index_code")
+        if not sw_index_code:
+            return {
+                "taxonomy_system": resolved_taxonomy_system,
+                "taxonomy_version": resolved_taxonomy_version,
+                "industry_code": industry_code,
+                "sw_index_code": None,
+                "missing_reason": "taxonomy_node_has_no_sw_index_code",
+                "taxonomy_node": node,
+                "index_analysis": None,
+            }
+
+        latest = await asyncio.to_thread(
+            storage.get_latest_industry_index_analysis,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            sw_index_code=str(sw_index_code),
+            include_payload=include_payload,
+        )
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "industry_code": industry_code,
+            "sw_index_code": str(sw_index_code),
+            "missing_reason": None if latest else "index_analysis_not_found",
+            "taxonomy_node": node,
+            "index_analysis": latest,
+        }
+
+    async def _get_research_industry_index_benchmark_for_membership(
+        self,
+        storage: Any,
+        industry_membership: Optional[Dict[str, Any]],
+        benchmark_field: Optional[str],
+        *,
+        include_payload: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """Resolve official SWS index-analysis benchmark from explicit membership aliases."""
+        if not industry_membership or not benchmark_field:
+            return None
+        alias_field_map = {
+            "sw_l1_code": "sw_l1_index_code",
+            "sw_l2_code": "sw_l2_index_code",
+            "sw_l3_code": "sw_l3_index_code",
+        }
+        alias_field = alias_field_map.get(str(benchmark_field))
+        if not alias_field:
+            return None
+
+        sw_index_code = str(industry_membership.get(alias_field) or "").strip()
+        payload = {
+            "benchmark_field": benchmark_field,
+            "alias_field": alias_field,
+            "sw_index_code": sw_index_code or None,
+            "missing_reason": None,
+            "index_analysis": None,
+        }
+        if not sw_index_code:
+            payload["missing_reason"] = "membership_has_no_sw_index_alias"
+            return payload
+
+        latest = await asyncio.to_thread(
+            storage.get_latest_industry_index_analysis,
+            taxonomy_system=industry_membership.get("taxonomy_system", "sw"),
+            taxonomy_version=industry_membership.get("taxonomy_version"),
+            sw_index_code=sw_index_code,
+            include_payload=include_payload,
+        )
+        payload["index_analysis"] = latest
+        if latest is None:
+            payload["missing_reason"] = "index_analysis_not_found"
+        return payload
+
+    async def list_research_official_industry_code_mappings(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        mapping_status: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+        include_mapping: bool = True,
+    ) -> Dict[str, Any]:
+        """读取 official Shenwan six-digit code 映射缓存列表。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+
+        items = await asyncio.to_thread(
+            storage.list_official_industry_code_mappings,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            mapping_status=mapping_status,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            limit=limit,
+            offset=offset,
+            include_mapping=include_mapping,
+        )
+        total = await asyncio.to_thread(
+            storage.count_official_industry_code_mappings,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            mapping_status=mapping_status,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        mapping_status_counts = await asyncio.to_thread(
+            storage.summarize_official_industry_code_mappings,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "mapping_status": mapping_status,
+            "source": source,
+            "source_mode": source_mode,
+            "max_age_days": max_age_days,
+            "limit": limit,
+            "offset": offset,
+            "total": total,
+            "mapping_status_counts": mapping_status_counts,
+            "items": items,
+        }
+
+    async def get_research_official_industry_code_mapping(
+        self,
+        official_industry_code: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        include_mapping: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取单条 official Shenwan six-digit code 映射缓存。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        return await asyncio.to_thread(
+            storage.get_official_industry_code_mapping,
+            official_industry_code,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            include_mapping=include_mapping,
+        )
+
+    async def list_research_unmapped_official_industry_code_backlog(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+        include_mapping: bool = True,
+        override_candidate_ready_only: bool = False,
+    ) -> Dict[str, Any]:
+        """读取 unmapped official-code backlog 视图。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        backlog_review_cfg = self._official_mapping_backlog_review_config(standard_cfg)
+
+        items = await asyncio.to_thread(
+            storage.list_unmapped_official_industry_code_backlog,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            limit=limit,
+            offset=offset,
+            include_mapping=include_mapping,
+        )
+        backlog_summary = await asyncio.to_thread(
+            storage.summarize_unmapped_official_industry_code_backlog,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        enriched_items = [
+            self._enrich_unmapped_backlog_item(item, backlog_review_cfg)
+            for item in items
+        ]
+        if override_candidate_ready_only:
+            enriched_items = [
+                item
+                for item in enriched_items
+                if bool(item.get("override_candidate_ready"))
+            ]
+
+        review_priority_counts: Dict[str, int] = {}
+        override_candidate_total = 0
+        filtered_current_classification_total = 0
+        for item in enriched_items:
+            priority = str(item.get("review_priority") or "unknown")
+            review_priority_counts[priority] = review_priority_counts.get(priority, 0) + 1
+            if bool(item.get("override_candidate_ready")):
+                override_candidate_total += 1
+            filtered_current_classification_total += int(
+                item.get("current_classification_count", 0) or 0
+            )
+
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "source": source,
+            "source_mode": source_mode,
+            "max_age_days": max_age_days,
+            "limit": limit,
+            "offset": offset,
+            "total": len(enriched_items)
+            if override_candidate_ready_only
+            else int(backlog_summary.get("official_code_total", 0)),
+            "current_classification_total": filtered_current_classification_total
+            if override_candidate_ready_only
+            else int(backlog_summary.get("current_classification_total", 0)),
+            "override_candidate_total": override_candidate_total,
+            "review_priority_counts": review_priority_counts,
+            "items": enriched_items,
+        }
+
+    async def list_research_official_mapping_override_candidates(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: int = 100,
+        offset: int = 0,
+        include_mapping: bool = True,
+    ) -> Dict[str, Any]:
+        """导出可进入 manual_overrides 审核的 official-code 候选集合。"""
+        backlog_payload = await self.list_research_unmapped_official_industry_code_backlog(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            limit=limit,
+            offset=offset,
+            include_mapping=include_mapping,
+            override_candidate_ready_only=True,
+        )
+        manual_overrides: Dict[str, Dict[str, Any]] = {}
+        for item in backlog_payload.get("items", []):
+            suggestion = item.get("manual_override_suggestion") or {}
+            official_industry_code = suggestion.get("official_industry_code")
+            taxonomy_industry_code = suggestion.get("taxonomy_industry_code")
+            if not official_industry_code or not taxonomy_industry_code:
+                continue
+            manual_overrides[str(official_industry_code)] = {
+                "taxonomy_industry_code": str(taxonomy_industry_code),
+                "confidence": suggestion.get("confidence"),
+                "reason": suggestion.get("reason"),
+            }
+
+        return {
+            "taxonomy_system": backlog_payload.get("taxonomy_system"),
+            "taxonomy_version": backlog_payload.get("taxonomy_version"),
+            "source": backlog_payload.get("source"),
+            "source_mode": backlog_payload.get("source_mode"),
+            "max_age_days": backlog_payload.get("max_age_days"),
+            "limit": backlog_payload.get("limit"),
+            "offset": backlog_payload.get("offset"),
+            "total": backlog_payload.get("total", 0),
+            "current_classification_total": backlog_payload.get(
+                "current_classification_total", 0
+            ),
+            "override_candidate_total": backlog_payload.get(
+                "override_candidate_total", 0
+            ),
+            "review_priority_counts": backlog_payload.get(
+                "review_priority_counts", {}
+            ),
+            "manual_overrides": manual_overrides,
+            "items": backlog_payload.get("items", []),
+        }
+
+    async def get_research_official_mapping_override_review(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        include_mapping: bool = True,
+        attention_only: bool = False,
+        review_status: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """聚合 configured/ready/applied official override 的审阅视图。"""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        configured_overrides = self._configured_official_mapping_overrides(standard_cfg)
+        ready_payload = await self.list_research_official_mapping_override_candidates(
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            limit=500,
+            offset=0,
+            include_mapping=include_mapping,
+        )
+        persisted_rows = await asyncio.to_thread(
+            storage.get_official_industry_code_mappings,
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            max_age_days=max_age_days,
+        )
+
+        applied_overrides: Dict[str, Dict[str, Any]] = {}
+        for row in persisted_rows:
+            mapping = row.get("mapping") or {}
+            if str(mapping.get("mapping_source") or "") != "manual_override":
+                continue
+            official_industry_code = str(row.get("official_industry_code") or "").strip()
+            if not official_industry_code:
+                continue
+            applied_overrides[official_industry_code] = {
+                "official_industry_code": official_industry_code,
+                "taxonomy_industry_code": row.get("mapped_industry_code")
+                or row.get("best_taxonomy_industry_code"),
+                "mapping_source": mapping.get("mapping_source"),
+                "override_reason": mapping.get("override_reason"),
+                "built_at": row.get("built_at"),
+                "source": row.get("source"),
+                "source_mode": row.get("source_mode"),
+            }
+
+        ready_candidates = {
+            str(code): dict(payload)
+            for code, payload in (ready_payload.get("manual_overrides") or {}).items()
+        }
+        union_codes = sorted(
+            set(configured_overrides)
+            | set(ready_candidates)
+            | set(applied_overrides)
+        )
+        requested_statuses = {
+            str(status).strip()
+            for status in (review_status or [])
+            if str(status).strip()
+        }
+
+        items: List[Dict[str, Any]] = []
+        for official_industry_code in union_codes:
+            configured_override = configured_overrides.get(official_industry_code)
+            ready_candidate = ready_candidates.get(official_industry_code)
+            applied_override = applied_overrides.get(official_industry_code)
+            review_status, status_reason = self._classify_official_override_review_status(
+                configured_override=configured_override,
+                ready_candidate=ready_candidate,
+                applied_override=applied_override,
+            )
+            items.append(
+                {
+                    "official_industry_code": official_industry_code,
+                    "review_status": review_status,
+                    "status_reason": status_reason,
+                    "configured_override": configured_override,
+                    "ready_candidate": ready_candidate,
+                    "applied_override": applied_override,
+                }
+            )
+
+        if attention_only:
+            items = [
+                item
+                for item in items
+                if str(item.get("review_status") or "") != "configured_and_applied"
+            ]
+        if requested_statuses:
+            items = [
+                item
+                for item in items
+                if str(item.get("review_status") or "") in requested_statuses
+            ]
+
+        status_counts: Dict[str, int] = {}
+        pending_manual_overrides: Dict[str, Dict[str, Any]] = {}
+        for item in items:
+            item_review_status = str(item.get("review_status") or "")
+            status_counts[item_review_status] = status_counts.get(item_review_status, 0) + 1
+            ready_candidate = item.get("ready_candidate")
+            if item_review_status == "ready_candidate_pending_config" and ready_candidate:
+                pending_manual_overrides[str(item.get("official_industry_code"))] = dict(
+                    ready_candidate
+                )
+
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "source": source,
+            "source_mode": source_mode,
+            "max_age_days": max_age_days,
+            "attention_only": attention_only,
+            "review_status": sorted(requested_statuses),
+            "configured_override_total": len(configured_overrides),
+            "ready_candidate_total": int(ready_payload.get("override_candidate_total", 0)),
+            "applied_override_total": len(applied_overrides),
+            "pending_manual_override_total": len(pending_manual_overrides),
+            "status_counts": status_counts,
+            "pending_manual_overrides": pending_manual_overrides,
+            "items": items,
+        }
+
+    async def get_research_industry_standard_readiness(
+        self,
+        *,
+        taxonomy_system: Optional[str] = None,
+        taxonomy_version: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return strict Shenwan readiness and relative-valuation rollout status."""
+        storage = self._require_research_storage()
+        standard_cfg = self._require_research_industry_standard_config()
+        resolved_taxonomy_system = taxonomy_system or standard_cfg.get(
+            "taxonomy_system", "sw"
+        )
+        resolved_taxonomy_version = taxonomy_version or standard_cfg.get(
+            "taxonomy_version"
+        )
+        mapping_cfg = standard_cfg.get("official_mapping", {})
+        readiness_backlog_limit = int(mapping_cfg.get("readiness_backlog_limit", 5))
+        readiness_override_review_limit = int(
+            mapping_cfg.get("readiness_override_review_limit", 5)
+        )
+        markets = list(self.research_config.markets)
+        optional_empty_exchanges = set()
+        if not bool(standard_cfg.get("classification_primary_enabled", False)):
+            optional_empty_exchanges = get_optional_empty_exchanges(
+                self.research_config,
+                "industry",
+            )
+
+        target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+            markets,
+            excluded_exchanges=optional_empty_exchanges,
+        )
+
+        def _load_storage_state() -> Dict[str, Any]:
+            return {
+                "mapping_counts": storage.summarize_official_industry_code_mappings(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+                "mapping_cache_info": storage.get_latest_official_industry_code_mapping_cache_info(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+                "official_classifications": storage.summarize_official_industry_classifications(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+                "memberships": storage.summarize_industry_memberships(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+                "authoritative_by_exchange": storage.count_industry_memberships_by_exchange(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                    mapping_status="authoritative",
+                ),
+                "unmapped_backlog_summary": storage.summarize_unmapped_official_industry_code_backlog(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+                "top_unmapped_backlog": storage.list_unmapped_official_industry_code_backlog(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                    limit=readiness_backlog_limit,
+                    offset=0,
+                    include_mapping=False,
+                ),
+                "index_analysis": storage.summarize_industry_index_analysis_daily(
+                    taxonomy_system=resolved_taxonomy_system,
+                    taxonomy_version=resolved_taxonomy_version,
+                ),
+            }
+
+        storage_state = self._load_research_storage_state(_load_storage_state)
+        override_review = await self.get_research_official_mapping_override_review(
+            taxonomy_system=resolved_taxonomy_system,
+            taxonomy_version=resolved_taxonomy_version,
+            include_mapping=True,
+        )
+        mapping_counts = storage_state["mapping_counts"]
+        mapping_cache_info = storage_state["mapping_cache_info"]
+        official_classifications = storage_state["official_classifications"]
+        memberships = storage_state["memberships"]
+        authoritative_by_exchange = storage_state["authoritative_by_exchange"]
+        unmapped_backlog_summary = storage_state["unmapped_backlog_summary"]
+        top_unmapped_backlog = storage_state["top_unmapped_backlog"]
+        index_analysis_summary = storage_state["index_analysis"]
+
+        latest_built_at = None if not mapping_cache_info else mapping_cache_info.get("built_at")
+        latest_updated_at = None if not mapping_cache_info else mapping_cache_info.get("updated_at")
+        cache_max_age_days = int(mapping_cfg.get("cache_max_age_days", 7))
+        minimum_mapping_rows = int(mapping_cfg.get("minimum_mapping_rows", 0))
+        minimum_mapped_rows = int(mapping_cfg.get("minimum_mapped_rows", 0))
+        mapping_total = int(mapping_counts.get("mapped", 0) + mapping_counts.get("unmapped", 0))
+        mapped_count = int(mapping_counts.get("mapped", 0))
+        unmapped_count = int(mapping_counts.get("unmapped", 0))
+
+        cache_fresh = False
+        if latest_built_at:
+            try:
+                built_at_dt = datetime.fromisoformat(str(latest_built_at))
+                cache_fresh = get_shanghai_time() - built_at_dt <= timedelta(days=cache_max_age_days)
+            except ValueError:
+                cache_fresh = False
+
+        meets_minimum_rows = mapping_total >= minimum_mapping_rows
+        meets_minimum_mapped_rows = mapped_count >= minimum_mapped_rows
+
+        classification_total = int(official_classifications.get("total", 0))
+        membership_total = int(memberships.get("total", 0))
+        authoritative_total = int(memberships.get("counts", {}).get("authoritative", 0))
+        unmapped_backlog_current_total = int(
+            unmapped_backlog_summary.get("current_classification_total", 0)
+        )
+        override_status_counts = dict(override_review.get("status_counts", {}) or {})
+        attention_status_counts = {
+            status: int(count)
+            for status, count in override_status_counts.items()
+            if status != "configured_and_applied" and int(count or 0) > 0
+        }
+        override_requires_attention = bool(attention_status_counts)
+        override_top_items = [
+            {
+                "official_industry_code": item.get("official_industry_code"),
+                "review_status": item.get("review_status"),
+                "status_reason": item.get("status_reason"),
+            }
+            for item in (override_review.get("items", []) or [])
+            if str(item.get("review_status") or "") != "configured_and_applied"
+        ][:readiness_override_review_limit]
+
+        exchange_coverage = []
+        for exchange in markets:
+            target_instruments = int(target_by_exchange.get(exchange, 0))
+            authoritative_memberships = int(authoritative_by_exchange.get(exchange, 0))
+            coverage_ratio = (
+                authoritative_memberships / target_instruments
+                if target_instruments > 0
+                else 1.0
+            )
+            exchange_coverage.append(
+                {
+                    "exchange": exchange,
+                    "target_instruments": target_instruments,
+                    "authoritative_memberships": authoritative_memberships,
+                    "coverage_ratio": coverage_ratio,
+                    "ready": authoritative_memberships >= target_instruments,
+                }
+            )
+
+        blockers: List[str] = []
+        if target_total <= 0:
+            blockers.append("no_target_instruments")
+        if target_total > 0 and authoritative_total < target_total:
+            blockers.append("authoritative_membership_coverage_incomplete")
+
+        industry_standard_ready = len(blockers) == 0
+        valuation_relative_cfg = self.research_config.modules.get("valuation", {}).get(
+            "relative", {}
+        )
+        require_authoritative = bool(
+            valuation_relative_cfg.get("require_authoritative", True)
+        )
+        if require_authoritative:
+            relative_valuation_ready = industry_standard_ready
+            relative_valuation_blockers = blockers.copy()
+        else:
+            membership_coverage_ready = target_total > 0 and membership_total >= target_total
+            relative_valuation_ready = membership_coverage_ready
+            relative_valuation_blockers = (
+                [] if membership_coverage_ready else ["membership_coverage_incomplete"]
+            )
+
+        return {
+            "taxonomy_system": resolved_taxonomy_system,
+            "taxonomy_version": resolved_taxonomy_version,
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_by_exchange,
+            "official_mapping_cache": {
+                "total": mapping_total,
+                "mapped": mapped_count,
+                "unmapped": unmapped_count,
+                "latest_built_at": latest_built_at,
+                "latest_updated_at": latest_updated_at,
+                "source": None if not mapping_cache_info else mapping_cache_info.get("source"),
+                "source_mode": None if not mapping_cache_info else mapping_cache_info.get("source_mode"),
+                "cache_max_age_days": cache_max_age_days,
+                "minimum_mapping_rows": minimum_mapping_rows,
+                "minimum_mapped_rows": minimum_mapped_rows,
+                "fresh": cache_fresh,
+                "meets_minimum_rows": meets_minimum_rows,
+                "meets_minimum_mapped_rows": meets_minimum_mapped_rows,
+            },
+            "official_classifications": {
+                "total": classification_total,
+                "counts": official_classifications.get("counts", {}),
+                "latest_updated_at": official_classifications.get("latest_updated_at"),
+                "latest_data_as_of": official_classifications.get("latest_official_update_time"),
+                "meets_target_universe": classification_total >= target_total if target_total > 0 else False,
+            },
+            "memberships": {
+                "total": membership_total,
+                "counts": memberships.get("counts", {}),
+                "latest_updated_at": memberships.get("latest_updated_at"),
+                "latest_data_as_of": memberships.get("latest_data_as_of"),
+                "meets_target_universe": authoritative_total >= target_total if target_total > 0 else False,
+            },
+            "unmapped_backlog": {
+                "official_code_total": int(
+                    unmapped_backlog_summary.get("official_code_total", 0)
+                ),
+                "current_classification_total": unmapped_backlog_current_total,
+                "top_items": [
+                    {
+                        "official_industry_code": item.get("official_industry_code"),
+                        "best_taxonomy_industry_code": item.get(
+                            "best_taxonomy_industry_code"
+                        ),
+                        "current_classification_count": int(
+                            item.get("current_classification_count", 0)
+                        ),
+                        "impacted_exchange_counts": item.get(
+                            "impacted_exchange_counts", {}
+                        ),
+                        "sample_instruments": item.get("sample_instruments", []),
+                    }
+                    for item in top_unmapped_backlog
+                ],
+            },
+            "override_review": {
+                "requires_attention": override_requires_attention,
+                "configured_override_total": int(
+                    override_review.get("configured_override_total", 0)
+                ),
+                "ready_candidate_total": int(
+                    override_review.get("ready_candidate_total", 0)
+                ),
+                "applied_override_total": int(
+                    override_review.get("applied_override_total", 0)
+                ),
+                "pending_manual_override_total": int(
+                    override_review.get("pending_manual_override_total", 0)
+                ),
+                "status_counts": override_status_counts,
+                "top_items": override_top_items,
+            },
+            "exchange_coverage": exchange_coverage,
+            "industry_standard_ready": industry_standard_ready,
+            "blockers": blockers,
+            "relative_valuation": {
+                "require_authoritative": require_authoritative,
+                "benchmark_level": int(valuation_relative_cfg.get("benchmark_level", 2)),
+                "ready": relative_valuation_ready,
+                "blockers": relative_valuation_blockers,
+            },
+            "index_analysis": {
+                "enabled": bool(
+                    self.research_config.sources.get("swsresearch", {})
+                    .get("index_analysis", {})
+                    .get("enabled", False)
+                ),
+                "total": int(index_analysis_summary.get("total", 0)),
+                "distinct_index_codes": int(
+                    index_analysis_summary.get("distinct_index_codes", 0)
+                ),
+                "latest_trade_date": index_analysis_summary.get("latest_trade_date"),
+                "latest_updated_at": index_analysis_summary.get("latest_updated_at"),
+                "index_type_counts": index_analysis_summary.get("index_type_counts", {}),
+            },
+        }
+
+    @staticmethod
+    def _official_mapping_backlog_review_config(
+        standard_cfg: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        mapping_cfg = standard_cfg.get("official_mapping", {})
+        review_cfg = mapping_cfg.get("backlog_review", {})
+        return {
+            "minimum_current_classification_count": max(
+                1, int(review_cfg.get("minimum_current_classification_count", 1))
+            ),
+            "minimum_overlap_count": max(
+                1, int(review_cfg.get("minimum_overlap_count", 1))
+            ),
+            "minimum_precision": float(review_cfg.get("minimum_precision", 0.0)),
+            "minimum_recall": float(review_cfg.get("minimum_recall", 0.0)),
+            "minimum_top_candidate_overlap_gap": max(
+                0, int(review_cfg.get("minimum_top_candidate_overlap_gap", 0))
+            ),
+        }
+
+    @staticmethod
+    def _configured_official_mapping_overrides(
+        standard_cfg: Dict[str, Any],
+    ) -> Dict[str, Dict[str, Any]]:
+        raw = (
+            standard_cfg.get("official_mapping", {}).get("manual_overrides", {}) or {}
+        )
+        if not isinstance(raw, dict):
+            return {}
+        normalized: Dict[str, Dict[str, Any]] = {}
+        for official_industry_code, payload in raw.items():
+            code = str(official_industry_code or "").strip()
+            if not code or not isinstance(payload, dict):
+                continue
+            taxonomy_industry_code = str(
+                payload.get("taxonomy_industry_code") or ""
+            ).strip()
+            if not taxonomy_industry_code:
+                continue
+            normalized[code] = {
+                "taxonomy_industry_code": taxonomy_industry_code,
+                "confidence": payload.get("confidence"),
+                "reason": payload.get("reason"),
+            }
+        return normalized
+
+    @staticmethod
+    def _classify_official_override_review_status(
+        *,
+        configured_override: Optional[Dict[str, Any]],
+        ready_candidate: Optional[Dict[str, Any]],
+        applied_override: Optional[Dict[str, Any]],
+    ) -> Tuple[str, str]:
+        configured_code = (
+            str(configured_override.get("taxonomy_industry_code") or "").strip()
+            if configured_override
+            else ""
+        )
+        ready_code = (
+            str(ready_candidate.get("taxonomy_industry_code") or "").strip()
+            if ready_candidate
+            else ""
+        )
+        applied_code = (
+            str(applied_override.get("taxonomy_industry_code") or "").strip()
+            if applied_override
+            else ""
+        )
+
+        if configured_override and applied_override:
+            if configured_code and configured_code == applied_code:
+                if ready_candidate and ready_code and ready_code != configured_code:
+                    return (
+                        "configured_ready_candidate_mismatch",
+                        "ready_candidate_differs_from_configured_override",
+                    )
+                return (
+                    "configured_and_applied",
+                    "configured_override_reflected_in_mapping_cache",
+                )
+            return (
+                "configured_applied_mismatch",
+                "applied_manual_override_differs_from_current_config",
+            )
+
+        if configured_override and not applied_override:
+            if ready_candidate and ready_code and ready_code != configured_code:
+                return (
+                    "configured_ready_candidate_mismatch",
+                    "configured_override_differs_from_ready_candidate",
+                )
+            return (
+                "configured_not_applied",
+                "configured_override_not_reflected_in_mapping_cache",
+            )
+
+        if applied_override and not configured_override:
+            return (
+                "applied_not_configured",
+                "mapping_cache_contains_manual_override_without_config_entry",
+            )
+
+        if ready_candidate and not configured_override:
+            return (
+                "ready_candidate_pending_config",
+                "ready_candidate_not_yet_configured",
+            )
+
+        return ("review_only", "review_state_could_not_be_classified")
+
+    @staticmethod
+    def _enrich_unmapped_backlog_item(
+        item: Dict[str, Any],
+        review_cfg: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        enriched = dict(item)
+        mapping_payload = enriched.get("mapping") or {}
+        candidate_rankings = list(mapping_payload.get("candidate_rankings") or [])
+        current_count = int(enriched.get("current_classification_count", 0) or 0)
+        best_candidate = candidate_rankings[0] if candidate_rankings else None
+        second_candidate = (
+            candidate_rankings[1] if len(candidate_rankings) > 1 else None
+        )
+        candidate_count = len(candidate_rankings)
+        top_gap = None
+        if best_candidate is not None and second_candidate is not None:
+            top_gap = int(best_candidate.get("overlap_count", 0) or 0) - int(
+                second_candidate.get("overlap_count", 0) or 0
+            )
+
+        has_current_impact = (
+            current_count >= review_cfg["minimum_current_classification_count"]
+        )
+        has_best_candidate = bool(
+            best_candidate
+            and str(best_candidate.get("taxonomy_industry_code") or "").strip()
+        )
+        candidate_strength_ready = (
+            has_best_candidate
+            and int(best_candidate.get("overlap_count", 0) or 0)
+            >= review_cfg["minimum_overlap_count"]
+            and float(best_candidate.get("precision", 0.0) or 0.0)
+            >= review_cfg["minimum_precision"]
+            and float(best_candidate.get("recall", 0.0) or 0.0)
+            >= review_cfg["minimum_recall"]
+        )
+        gap_ready = second_candidate is None or (
+            top_gap is not None
+            and top_gap >= review_cfg["minimum_top_candidate_overlap_gap"]
+        )
+        override_candidate_ready = (
+            has_current_impact and has_best_candidate and candidate_strength_ready and gap_ready
+        )
+
+        if override_candidate_ready:
+            reason = (
+                "single_strong_candidate_with_current_impact"
+                if second_candidate is None
+                else "top_candidate_clearly_leads_with_current_impact"
+            )
+            priority = "high"
+        elif not has_best_candidate:
+            reason = "no_candidate_rankings"
+            priority = "low" if current_count <= 0 else "medium"
+        elif not has_current_impact:
+            reason = "no_current_impact"
+            priority = "low"
+        elif not candidate_strength_ready:
+            reason = "candidate_strength_below_threshold"
+            priority = "medium"
+        else:
+            reason = "top_candidate_gap_too_small"
+            priority = "medium"
+
+        enriched["review_priority"] = priority
+        enriched["override_candidate_ready"] = override_candidate_ready
+        enriched["override_candidate_reason"] = reason
+        enriched["candidate_count"] = candidate_count
+        enriched["top_candidate_overlap_gap"] = top_gap
+        enriched["manual_override_suggestion"] = DataManager._build_manual_override_suggestion(
+            enriched,
+            best_candidate=best_candidate,
+            override_candidate_ready=override_candidate_ready,
+        )
+        return enriched
+
+    @staticmethod
+    def _build_manual_override_suggestion(
+        item: Dict[str, Any],
+        *,
+        best_candidate: Optional[Dict[str, Any]],
+        override_candidate_ready: bool,
+    ) -> Optional[Dict[str, Any]]:
+        if not override_candidate_ready or not best_candidate:
+            return None
+        taxonomy_code = str(best_candidate.get("taxonomy_industry_code") or "").strip()
+        if not taxonomy_code:
+            return None
+
+        official_code = str(item.get("official_industry_code") or "").strip()
+        reason = (
+            "Suggested from official mapping backlog: "
+            f"{item.get('override_candidate_reason')} "
+            f"(current_classification_count={int(item.get('current_classification_count', 0) or 0)}, "
+            f"overlap={int(best_candidate.get('overlap_count', 0) or 0)}, "
+            f"precision={float(best_candidate.get('precision', 0.0) or 0.0):.4f}, "
+            f"recall={float(best_candidate.get('recall', 0.0) or 0.0):.4f})"
+        )
+        return {
+            "official_industry_code": official_code,
+            "taxonomy_industry_code": taxonomy_code,
+            "confidence": "review_candidate",
+            "reason": reason,
+        }
+
+    async def run_financial_summary_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 financial_summary 影子同步。
+
+        该方法只写入 research.db，不影响现有行情库。
+        """
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        from research.financial_summary_sync import FinancialSummaryShadowSyncService
+
+        service = FinancialSummaryShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_shareholder_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 shareholders 影子同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("shareholders", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research shareholders module is disabled",
+            }
+
+        from research.shareholder_sync import ShareholderShadowSyncService
+
+        service = ShareholderShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def get_research_shareholder_readiness(self) -> Dict[str, Any]:
+        """Return shareholder-domain readiness and rollout blockers."""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("shareholders", {})
+        markets = list(self.research_config.markets)
+        optional_empty_exchanges = get_optional_empty_exchanges(
+            self.research_config,
+            "shareholders",
+        )
+
+        target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+            markets,
+            excluded_exchanges=optional_empty_exchanges,
+        )
+
+        def _load_storage_state() -> Dict[str, Any]:
+            summary = storage.summarize_shareholder_snapshots()
+            target_exchanges = [
+                exchange
+                for exchange in markets
+                if exchange not in optional_empty_exchanges
+            ]
+            if target_exchanges != markets and hasattr(
+                storage,
+                "summarize_shareholder_snapshots_by_exchanges",
+            ):
+                target_summary = storage.summarize_shareholder_snapshots_by_exchanges(
+                    target_exchanges
+                )
+            else:
+                target_summary = summary
+            return {
+                "summary": summary,
+                "target_summary": target_summary,
+                "by_exchange": storage.count_shareholder_snapshots_by_exchange(),
+            }
+
+        storage_state = self._load_research_storage_state(_load_storage_state)
+        summary = storage_state["summary"]
+        target_summary = storage_state["target_summary"]
+        snapshots_by_exchange = storage_state["by_exchange"]
+
+        enabled = bool(module_cfg.get("enabled", False))
+        delivery_mode = str(module_cfg.get("delivery_mode", "free_best_effort"))
+        required_mode = module_cfg.get("snapshot_api_requires_mode")
+        required_scope = [
+            str(scope).strip()
+            for scope in module_cfg.get("allowed_scope", [])
+            if str(scope).strip()
+        ]
+        snapshot_api_enabled = enabled and (
+            not required_mode or delivery_mode == required_mode
+        )
+
+        snapshot_total = int(target_summary.get("total", 0))
+        missing_snapshot_count = max(target_total - snapshot_total, 0)
+        scope_counts = {
+            str(scope): int(count or 0)
+            for scope, count in (target_summary.get("scope_counts") or {}).items()
+            if str(scope).strip()
+        }
+
+        exchange_coverage = []
+        for exchange in markets:
+            target_instruments = int(target_by_exchange.get(exchange, 0))
+            snapshot_count = int(snapshots_by_exchange.get(exchange, 0))
+            coverage_ratio = (
+                snapshot_count / target_instruments if target_instruments > 0 else 1.0
+            )
+            exchange_coverage.append(
+                {
+                    "exchange": exchange,
+                    "target_instruments": target_instruments,
+                    "snapshot_count": snapshot_count,
+                    "coverage_ratio": coverage_ratio,
+                    "ready": snapshot_count >= target_instruments,
+                }
+            )
+
+        scope_coverage = []
+        for scope in required_scope:
+            scope_snapshot_count = int(scope_counts.get(scope, 0))
+            coverage_ratio = (
+                scope_snapshot_count / target_total if target_total > 0 else 1.0
+            )
+            scope_coverage.append(
+                {
+                    "scope": scope,
+                    "target_instruments": target_total,
+                    "snapshot_count": scope_snapshot_count,
+                    "coverage_ratio": coverage_ratio,
+                    "ready": scope_snapshot_count >= target_total,
+                }
+            )
+
+        blockers: List[str] = []
+        if not enabled:
+            blockers.append("shareholders_module_disabled")
+        if target_total <= 0:
+            blockers.append("no_target_instruments")
+        if snapshot_total <= 0:
+            blockers.append("no_shareholder_snapshots")
+        if target_total > 0 and snapshot_total < target_total:
+            blockers.append("shareholder_snapshot_coverage_incomplete")
+        if target_total > 0 and any(item["snapshot_count"] < target_total for item in scope_coverage):
+            blockers.append("required_scope_coverage_incomplete")
+        if required_mode and delivery_mode != required_mode:
+            blockers.append("delivery_mode_gate_not_satisfied")
+
+        ready = len(blockers) == 0 and snapshot_api_enabled
+
+        return {
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "module_enabled": enabled,
+            "delivery_mode": delivery_mode,
+            "snapshot_api_requires_mode": required_mode,
+            "snapshot_api_enabled": snapshot_api_enabled,
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_by_exchange,
+            "snapshot_total": snapshot_total,
+            "missing_snapshot_count": missing_snapshot_count,
+            "required_scope": required_scope,
+            "coverage_status_counts": target_summary.get("coverage_status_counts", {}),
+            "source_counts": target_summary.get("source_counts", {}),
+            "source_mode_counts": target_summary.get("source_mode_counts", {}),
+            "scope_counts": scope_counts,
+            "latest_updated_at": target_summary.get("latest_updated_at"),
+            "latest_data_as_of": target_summary.get("latest_data_as_of"),
+            "exchange_coverage": exchange_coverage,
+            "scope_coverage": scope_coverage,
+            "ready_for_paid_high_availability_rollout": ready,
+            "blockers": blockers,
+        }
+
+    async def get_research_valuation_readiness(self) -> Dict[str, Any]:
+        """Return valuation-domain readiness and rollout blockers."""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        markets = list(self.research_config.markets)
+        optional_empty_exchanges = get_optional_empty_exchanges(
+            self.research_config,
+            "valuation",
+        )
+
+        target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+            markets,
+            excluded_exchanges=optional_empty_exchanges,
+        )
+
+        def _load_storage_state() -> Dict[str, Any]:
+            return {
+                "summary": storage.summarize_valuation_history(),
+                "by_exchange": storage.count_valuation_history_by_exchange(),
+            }
+
+        storage_state = self._load_research_storage_state(_load_storage_state)
+        summary = storage_state["summary"]
+        valuation_by_exchange = storage_state["by_exchange"]
+
+        enabled = bool(module_cfg.get("enabled", False))
+        relative_cfg = module_cfg.get("relative", {})
+        require_authoritative = bool(relative_cfg.get("require_authoritative", True))
+        benchmark_level = int(relative_cfg.get("benchmark_level", 2))
+        benchmark_field = str(relative_cfg.get("benchmark_field", "sw_l2_code"))
+
+        valuation_history_total = int(summary.get("total", 0))
+        missing_valuation_history_count = max(
+            target_total - valuation_history_total,
+            0,
+        )
+
+        exchange_coverage = []
+        for exchange in markets:
+            target_instruments = int(target_by_exchange.get(exchange, 0))
+            valuation_history_count = int(valuation_by_exchange.get(exchange, 0))
+            coverage_ratio = (
+                valuation_history_count / target_instruments
+                if target_instruments > 0
+                else 1.0
+            )
+            exchange_coverage.append(
+                {
+                    "exchange": exchange,
+                    "target_instruments": target_instruments,
+                    "valuation_history_count": valuation_history_count,
+                    "coverage_ratio": coverage_ratio,
+                    "ready": valuation_history_count >= target_instruments,
+                }
+            )
+
+        industry_readiness_error = None
+        industry_readiness: Optional[Dict[str, Any]] = None
+        try:
+            industry_readiness = await self.get_research_industry_standard_readiness()
+            industry_relative = industry_readiness.get("relative_valuation", {})
+            industry_relative_ready = bool(industry_relative.get("ready", False))
+            industry_relative_blockers = [
+                str(blocker)
+                for blocker in industry_relative.get("blockers", [])
+                if str(blocker)
+            ]
+        except Exception as exc:
+            industry_readiness_error = str(exc)
+            industry_relative_ready = False
+            industry_relative_blockers = ["industry_standard_readiness_unavailable"]
+
+        blockers: List[str] = []
+        if not enabled:
+            blockers.append("valuation_module_disabled")
+        if target_total <= 0:
+            blockers.append("no_target_instruments")
+        if valuation_history_total <= 0:
+            blockers.append("no_valuation_history")
+        if target_total > 0 and valuation_history_total < target_total:
+            blockers.append("valuation_history_coverage_incomplete")
+        blockers.extend(
+            blocker
+            for blocker in industry_relative_blockers
+            if blocker not in blockers
+        )
+
+        history_ready = (
+            target_total > 0
+            and valuation_history_total >= target_total
+            and valuation_history_total > 0
+        )
+        relative_valuation_ready = (
+            enabled
+            and history_ready
+            and industry_relative_ready
+        )
+        ready_for_rollout = len(blockers) == 0 and relative_valuation_ready
+
+        return {
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "module_enabled": enabled,
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_by_exchange,
+            "valuation_history_total": valuation_history_total,
+            "missing_valuation_history_count": missing_valuation_history_count,
+            "source_counts": summary.get("source_counts", {}),
+            "source_mode_counts": summary.get("source_mode_counts", {}),
+            "calc_method_counts": summary.get("calc_method_counts", {}),
+            "calc_version_counts": summary.get("calc_version_counts", {}),
+            "latest_as_of_date": summary.get("latest_as_of_date"),
+            "latest_updated_at": summary.get("latest_updated_at"),
+            "latest_data_as_of": summary.get("latest_data_as_of"),
+            "exchange_coverage": exchange_coverage,
+            "relative_valuation": {
+                "require_authoritative": require_authoritative,
+                "benchmark_level": benchmark_level,
+                "benchmark_field": benchmark_field,
+                "ready": relative_valuation_ready,
+                "blockers": (
+                    []
+                    if relative_valuation_ready
+                    else list(dict.fromkeys(industry_relative_blockers + [
+                        blocker
+                        for blocker in blockers
+                        if blocker
+                        in {
+                            "valuation_module_disabled",
+                            "no_target_instruments",
+                            "no_valuation_history",
+                            "valuation_history_coverage_incomplete",
+                        }
+                    ]))
+                ),
+                "industry_standard_ready": industry_relative_ready,
+                "industry_standard_error": industry_readiness_error,
+            },
+            "ready_for_rollout": ready_for_rollout,
+            "blockers": blockers,
+        }
+
+    async def get_research_metadata_readiness(self) -> Dict[str, Any]:
+        """Return readiness for external research metadata domains."""
+        storage = self._require_research_storage()
+        markets = list(self.research_config.markets)
+        domain_specs = [
+            {
+                "domain": "analyst_forecasts",
+                "summary_loader": storage.summarize_analyst_forecasts,
+                "exchange_loader": storage.count_analyst_forecasts_by_exchange,
+                "empty_blocker": "no_analyst_forecasts",
+                "coverage_blocker": "analyst_forecast_coverage_incomplete",
+            },
+            {
+                "domain": "research_reports",
+                "summary_loader": storage.summarize_research_reports,
+                "exchange_loader": storage.count_research_reports_by_exchange,
+                "empty_blocker": "no_research_reports",
+                "coverage_blocker": "research_report_coverage_incomplete",
+            },
+            {
+                "domain": "sentiment_events",
+                "summary_loader": storage.summarize_sentiment_events,
+                "exchange_loader": storage.count_sentiment_events_by_exchange,
+                "empty_blocker": "no_sentiment_events",
+                "coverage_blocker": "sentiment_event_coverage_incomplete",
+            },
+        ]
+
+        def _load_storage_state() -> Dict[str, Dict[str, Any]]:
+            state: Dict[str, Dict[str, Any]] = {}
+            for spec in domain_specs:
+                domain = spec["domain"]
+                state[domain] = {
+                    "summary": spec["summary_loader"](),
+                    "by_exchange": spec["exchange_loader"](),
+                }
+            return state
+
+        storage_state = self._load_research_storage_state(_load_storage_state)
+
+        domains = []
+        ready_domain_count = 0
+        grouped_blockers: List[str] = []
+        for spec in domain_specs:
+            domain = spec["domain"]
+            module_cfg = self.research_config.modules.get(domain, {})
+            enabled = bool(module_cfg.get("enabled", False))
+            optional_empty_exchanges = get_optional_empty_exchanges(
+                self.research_config,
+                domain,
+            )
+            target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+                markets,
+                excluded_exchanges=optional_empty_exchanges,
+            )
+            summary = storage_state[domain]["summary"]
+            by_exchange = storage_state[domain]["by_exchange"]
+
+            instrument_total = int(summary.get("instrument_total", 0))
+            missing_instrument_count = max(target_total - instrument_total, 0)
+
+            exchange_coverage = []
+            for exchange in markets:
+                target_instruments = int(target_by_exchange.get(exchange, 0))
+                instrument_count = int(by_exchange.get(exchange, 0))
+                coverage_ratio = (
+                    instrument_count / target_instruments
+                    if target_instruments > 0
+                    else 1.0
+                )
+                exchange_coverage.append(
+                    {
+                        "exchange": exchange,
+                        "target_instruments": target_instruments,
+                        "instrument_count": instrument_count,
+                        "coverage_ratio": coverage_ratio,
+                        "ready": instrument_count >= target_instruments,
+                    }
+                )
+
+            blockers: List[str] = []
+            if not enabled:
+                blockers.append(f"{domain}_module_disabled")
+            if target_total <= 0:
+                blockers.append("no_target_instruments")
+            if instrument_total <= 0:
+                blockers.append(spec["empty_blocker"])
+            if target_total > 0 and instrument_total < target_total:
+                blockers.append(spec["coverage_blocker"])
+
+            ready = len(blockers) == 0
+            if ready:
+                ready_domain_count += 1
+            grouped_blockers.extend(f"{domain}:{blocker}" for blocker in blockers)
+
+            domains.append(
+                {
+                    "domain": domain,
+                    "module_enabled": enabled,
+                    "target_instrument_count": target_total,
+                    "target_instruments_by_exchange": target_by_exchange,
+                    "instrument_total": instrument_total,
+                    "row_total": int(summary.get("row_total", 0)),
+                    "missing_instrument_count": missing_instrument_count,
+                    "source_counts": summary.get("source_counts", {}),
+                    "source_mode_counts": summary.get("source_mode_counts", {}),
+                    "extra_counts": {
+                        key: value
+                        for key, value in summary.items()
+                        if key.endswith("_counts")
+                        and key not in {"source_counts", "source_mode_counts"}
+                    },
+                    "latest_item_date": summary.get("latest_item_date"),
+                    "latest_updated_at": summary.get("latest_updated_at"),
+                    "latest_data_as_of": summary.get("latest_data_as_of"),
+                    "exchange_coverage": exchange_coverage,
+                    "ready_for_rollout": ready,
+                    "blockers": blockers,
+                }
+            )
+
+        return {
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "domain_count": len(domain_specs),
+            "ready_domain_count": ready_domain_count,
+            "ready_for_rollout": ready_domain_count == len(domain_specs),
+            "blockers": grouped_blockers,
+            "domains": domains,
+        }
+
+    async def get_research_technical_cache_readiness(self) -> Dict[str, Any]:
+        """Return readiness for persisted latest technical indicator snapshots."""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("technical", {})
+        markets = list(self.research_config.markets)
+        latest_cache_cfg = module_cfg.get("latest_cache", {})
+        cache_enabled = bool(latest_cache_cfg.get("enabled", True))
+        period = str(latest_cache_cfg.get("period", "1d"))
+        adjustment = self._normalize_research_adjustment(
+            str(
+                latest_cache_cfg.get("adjustment")
+                or module_cfg.get("default_adjustment", "qfq")
+            )
+        )
+        optional_empty_exchanges = get_optional_empty_exchanges(
+            self.research_config,
+            "technical",
+        )
+
+        target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+            markets,
+            excluded_exchanges=optional_empty_exchanges,
+        )
+
+        def _load_storage_state() -> Dict[str, Any]:
+            return {
+                "summary": storage.summarize_technical_indicator_latest(
+                    period=period,
+                    adjustment=adjustment,
+                ),
+                "by_exchange": storage.count_technical_indicator_latest_by_exchange(
+                    period=period,
+                    adjustment=adjustment,
+                ),
+            }
+
+        storage_state = self._load_research_storage_state(_load_storage_state)
+        summary = storage_state["summary"]
+        by_exchange = storage_state["by_exchange"]
+
+        enabled = bool(module_cfg.get("enabled", False))
+        snapshot_total = int(summary.get("instrument_total", 0))
+        missing_snapshot_count = max(target_total - snapshot_total, 0)
+
+        exchange_coverage = []
+        for exchange in markets:
+            target_instruments = int(target_by_exchange.get(exchange, 0))
+            snapshot_count = int(by_exchange.get(exchange, 0))
+            coverage_ratio = (
+                snapshot_count / target_instruments
+                if target_instruments > 0
+                else 1.0
+            )
+            exchange_coverage.append(
+                {
+                    "exchange": exchange,
+                    "target_instruments": target_instruments,
+                    "snapshot_count": snapshot_count,
+                    "coverage_ratio": coverage_ratio,
+                    "ready": snapshot_count >= target_instruments,
+                }
+            )
+
+        blockers: List[str] = []
+        if not enabled:
+            blockers.append("technical_module_disabled")
+        if not cache_enabled:
+            blockers.append("technical_latest_cache_disabled")
+        if target_total <= 0:
+            blockers.append("no_target_instruments")
+        if snapshot_total <= 0:
+            blockers.append("no_technical_indicator_latest")
+        if target_total > 0 and snapshot_total < target_total:
+            blockers.append("technical_indicator_latest_coverage_incomplete")
+
+        return {
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "module_enabled": enabled,
+            "cache_enabled": cache_enabled,
+            "period": period,
+            "adjustment": adjustment,
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_by_exchange,
+            "snapshot_total": snapshot_total,
+            "row_total": int(summary.get("row_total", 0)),
+            "missing_snapshot_count": missing_snapshot_count,
+            "source_counts": summary.get("source_counts", {}),
+            "source_mode_counts": summary.get("source_mode_counts", {}),
+            "calc_method_counts": summary.get("calc_method_counts", {}),
+            "calc_version_counts": summary.get("calc_version_counts", {}),
+            "status_counts": summary.get("status_counts", {}),
+            "signal_counts": summary.get("signal_counts", {}),
+            "latest_as_of_date": summary.get("latest_as_of_date"),
+            "latest_updated_at": summary.get("latest_updated_at"),
+            "latest_data_as_of": summary.get("latest_data_as_of"),
+            "exchange_coverage": exchange_coverage,
+            "ready_for_rollout": len(blockers) == 0,
+            "blockers": blockers,
+        }
+
+    async def run_financial_statements_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 financial_statements 影子同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research financial_statements module is disabled",
+            }
+
+        from research.financial_statements_sync import FinancialStatementsShadowSyncService
+
+        service = FinancialStatementsShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_analyst_forecast_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 analyst_forecasts 影子同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("analyst_forecasts", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research analyst_forecasts module is disabled",
+            }
+
+        from research.analyst_forecast_sync import AnalystForecastShadowSyncService
+
+        service = AnalystForecastShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_research_report_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 research_reports 影子同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("research_reports", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research research_reports module is disabled",
+            }
+
+        from research.research_report_sync import ResearchReportShadowSyncService
+
+        service = ResearchReportShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_sentiment_event_shadow_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """运行 sentiment_events 影子同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("sentiment_events", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research sentiment_events module is disabled",
+            }
+
+        from research.sentiment_event_sync import SentimentEventShadowSyncService
+
+        service = SentimentEventShadowSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+        )
+
+    async def run_valuation_history_rebuild(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """运行 valuation_history 重建。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research valuation module is disabled",
+            }
+
+        from research.valuation_history_sync import ValuationHistoryRebuildService
+
+        service = ValuationHistoryRebuildService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+        )
+
+    async def run_risk_snapshot_rebuild(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """运行 risk snapshot 重建。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("risk", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research risk module is disabled",
+            }
+
+        from research.risk_snapshot_sync import RiskSnapshotRebuildService
+
+        service = RiskSnapshotRebuildService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+        )
+
+    async def run_technical_snapshot_refresh(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        adjustment: Optional[str] = None,
+        period: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """运行 technical_indicator_latest 最新快照刷新。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("technical", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research technical module is disabled",
+            }
+        latest_cache_cfg = module_cfg.get("latest_cache", {})
+        if not latest_cache_cfg.get("enabled", True):
+            return {
+                "status": "disabled",
+                "reason": "research technical latest cache is disabled",
+            }
+
+        normalized_adjustment = (
+            self._normalize_research_adjustment(adjustment)
+            if adjustment is not None
+            else None
+        )
+
+        from research.technical_snapshot_sync import TechnicalIndicatorLatestRefreshService
+
+        service = TechnicalIndicatorLatestRefreshService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+            adjust_quotes=self._apply_research_adjustment,
+        )
+        return await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            adjustment=normalized_adjustment,
+            period=period,
+        )
+
+    async def get_research_financial_summary(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 financial summary。"""
+        storage = self._require_research_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+        summary = await asyncio.to_thread(
+            storage.get_financial_summary,
+            normalized_id,
+            include_snapshot=include_snapshot,
+        )
+        if summary is not None:
+            return summary
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and self._module_allows_optional_empty_exchange(
+            "financial_summary",
+            instrument.get("exchange"),
+        ):
+            return self._build_empty_financial_summary_response(
+                instrument,
+                include_snapshot=include_snapshot,
+            )
+        return None
+
+    async def get_research_shareholders(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 shareholder snapshot。"""
+        storage = self._require_research_storage()
+        self._require_research_shareholders_config(require_snapshot_api=True)
+        normalized_id = convert_to_database_format(instrument_id)
+        snapshot = await asyncio.to_thread(
+            storage.get_shareholder_snapshot,
+            normalized_id,
+            include_snapshot=include_snapshot,
+        )
+        if snapshot is not None:
+            return snapshot
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and self._module_allows_optional_empty_exchange(
+            "shareholders",
+            instrument.get("exchange"),
+        ):
+            return self._build_empty_shareholder_response(
+                instrument,
+                include_snapshot=include_snapshot,
+            )
+        return None
+
+    async def get_research_financial_statements(
+        self,
+        instrument_id: str,
+        *,
+        include_statements: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 financial statements bundle。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research financial_statements module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        bundle = await asyncio.to_thread(
+            storage.get_financial_statement_bundle,
+            normalized_id,
+            include_statements=include_statements,
+        )
+        if bundle is not None:
+            return bundle
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and self._module_allows_optional_empty_exchange(
+            "financial_statements",
+            instrument.get("exchange"),
+        ):
+            return self._build_empty_financial_statements_response(
+                instrument,
+                include_statements=include_statements,
+            )
+        return None
+
+    async def get_research_valuation_history(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        limit: int = 120,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 valuation history。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+        from research.valuation_service import ResearchValuationService
+
+        query_service = ResearchQueryService(storage)
+        valuation_service = ResearchValuationService(module_cfg)
+        rows = await asyncio.to_thread(
+            query_service.get_valuation_history_rows,
+            normalized_id,
+            start_date=None if start_date is None else start_date.isoformat(),
+            end_date=None if end_date is None else end_date.isoformat(),
+            limit=limit,
+            include_details=include_details,
+        )
+        return valuation_service.build_history_response(rows)
+
+    async def get_research_relative_valuation(
+        self,
+        instrument_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域相对估值。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        from research.query_service import ResearchQueryService
+        from research.valuation_service import ResearchValuationService
+
+        query_service = ResearchQueryService(storage)
+        valuation_service = ResearchValuationService(module_cfg)
+        subject_row = await asyncio.to_thread(
+            query_service.get_latest_valuation_history_row,
+            normalized_id,
+            include_details=True,
+        )
+        industry_membership = await asyncio.to_thread(
+            query_service.get_industry_membership,
+            normalized_id,
+            include_snapshot=True,
+        )
+
+        peer_rows: list[Dict[str, Any]] = []
+        relative_cfg = module_cfg.get("relative", {})
+        if industry_membership is not None:
+            benchmark_context = valuation_service.resolve_relative_benchmark_context(
+                industry_membership
+            )
+            require_authoritative = bool(relative_cfg.get("require_authoritative", True))
+            membership_eligible = (
+                not require_authoritative
+                or industry_membership.get("mapping_status") == "authoritative"
+            )
+        else:
+            benchmark_context = {}
+            membership_eligible = False
+
+        if (
+            membership_eligible
+            and benchmark_context.get("supported")
+            and benchmark_context.get("benchmark_code")
+        ):
+            peer_rows = await asyncio.to_thread(
+                storage.get_latest_peer_valuation_rows,
+                benchmark_context["benchmark_code"],
+                exclude_instrument_id=normalized_id,
+                taxonomy_system=industry_membership.get("taxonomy_system", "sw"),
+                taxonomy_version=industry_membership.get("taxonomy_version"),
+                benchmark_field=benchmark_context["benchmark_field"],
+                limit=int(relative_cfg.get("max_peer_rows", 20)),
+                include_details=False,
+            )
+
+        result = valuation_service.build_relative_valuation(
+            instrument=instrument,
+            subject_row=subject_row,
+            industry_membership=industry_membership,
+            peer_rows=peer_rows,
+        )
+        result["industry_index_benchmark"] = await (
+            self._get_research_industry_index_benchmark_for_membership(
+                storage,
+                industry_membership,
+                benchmark_context.get("benchmark_field"),
+                include_payload=False,
+            )
+        )
+        return result
+
+    async def get_research_dcf_valuation(
+        self,
+        instrument_id: str,
+        *,
+        growth_rate: Optional[float] = None,
+        discount_rate: Optional[float] = None,
+        terminal_growth: Optional[float] = None,
+        projection_years: Optional[int] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 DCF 估值。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        financial_bundle = await asyncio.to_thread(
+            storage.get_financial_statement_bundle,
+            normalized_id,
+            include_statements=False,
+        )
+        if financial_bundle is None:
+            return None
+
+        latest_quotes = await self.db_ops.get_daily_data(
+            instrument_id=normalized_id,
+            limit=1,
+            return_format="pandas",
+        )
+        latest_close = None
+        if latest_quotes is not None and not latest_quotes.empty:
+            latest_close = float(latest_quotes.iloc[0]["close"])
+
+        overrides = {
+            key: value
+            for key, value in {
+                "growth_rate": growth_rate,
+                "discount_rate": discount_rate,
+                "terminal_growth": terminal_growth,
+                "projection_years": projection_years,
+            }.items()
+            if value is not None
+        }
+
+        from research.valuation_service import ResearchValuationService
+
+        valuation_service = ResearchValuationService(module_cfg)
+        return valuation_service.run_dcf(
+            instrument=instrument,
+            financial_bundle=financial_bundle,
+            latest_close=latest_close,
+            overrides=overrides,
+        )
+
+    async def get_research_analyst_coverage(
+        self,
+        instrument_id: str,
+        *,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 analyst coverage。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("analyst_forecasts", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research analyst_forecasts module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+
+        query_service = ResearchQueryService(storage)
+        forecast = await asyncio.to_thread(
+            query_service.get_latest_analyst_forecast,
+            normalized_id,
+            include_details=include_details,
+        )
+        if forecast is None:
+            instrument = await self._get_research_instrument_info(normalized_id)
+            if instrument and self._module_allows_optional_empty_exchange(
+                "analyst_forecasts",
+                instrument.get("exchange"),
+            ):
+                return self._build_empty_analyst_coverage_response(
+                    instrument,
+                    include_details=include_details,
+                )
+            return None
+
+        forecast["status"] = "success"
+        forecast["missing_reason"] = None
+        return forecast
+
+    async def get_research_reports(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        limit: int = 20,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 research reports。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("research_reports", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research research_reports module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+
+        query_service = ResearchQueryService(storage)
+        rows = await asyncio.to_thread(
+            query_service.list_research_reports,
+            normalized_id,
+            start_date=None if start_date is None else start_date.isoformat(),
+            end_date=None if end_date is None else end_date.isoformat(),
+            limit=limit,
+            include_details=include_details,
+        )
+        if not rows:
+            instrument = await self._get_research_instrument_info(normalized_id)
+            if instrument and self._module_allows_optional_empty_exchange(
+                "research_reports",
+                instrument.get("exchange"),
+            ):
+                return self._build_empty_reports_response(instrument)
+            return None
+
+        return {
+            "instrument_id": normalized_id,
+            "symbol": rows[0].get("symbol"),
+            "exchange": rows[0].get("exchange"),
+            "data_points": len(rows),
+            "window_start": rows[-1].get("publish_date"),
+            "window_end": rows[0].get("publish_date"),
+            "items": rows,
+        }
+
+    async def get_research_sentiment_events(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        event_types: Optional[List[str]] = None,
+        limit: int = 50,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 sentiment events。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("sentiment_events", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research sentiment_events module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+
+        query_service = ResearchQueryService(storage)
+        rows = await asyncio.to_thread(
+            query_service.list_sentiment_events,
+            normalized_id,
+            start_date=None if start_date is None else start_date.isoformat(),
+            end_date=None if end_date is None else end_date.isoformat(),
+            event_types=event_types,
+            limit=limit,
+            include_details=include_details,
+        )
+        if not rows:
+            instrument = await self._get_research_instrument_info(normalized_id)
+            if instrument and self._module_allows_optional_empty_exchange(
+                "sentiment_events",
+                instrument.get("exchange"),
+            ):
+                return self._build_empty_sentiment_events_response(instrument)
+            return None
+
+        return {
+            "instrument_id": normalized_id,
+            "symbol": rows[0].get("symbol"),
+            "exchange": rows[0].get("exchange"),
+            "data_points": len(rows),
+            "window_start": rows[-1].get("event_date"),
+            "window_end": rows[0].get("event_date"),
+            "items": rows,
+        }
+
+    async def get_research_risk(
+        self,
+        instrument_id: str,
+        *,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 risk snapshot。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("risk", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research risk module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+        from research.risk_service import ResearchRiskService
+
+        query_service = ResearchQueryService(storage)
+        snapshot = await asyncio.to_thread(
+            query_service.get_latest_risk_snapshot,
+            normalized_id,
+            include_details=include_details,
+        )
+        if snapshot is None:
+            return None
+
+        risk_service = ResearchRiskService(module_cfg)
+        return risk_service.build_response(snapshot)
+
+    async def get_research_company_overview(
+        self,
+        instrument_id: str,
+        *,
+        include_profile_snapshot: bool = False,
+        include_industry_snapshot: bool = False,
+        include_financial_snapshot: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 company overview。"""
+        storage = self._require_research_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+
+        from research.query_service import ResearchQueryService
+
+        service = ResearchQueryService(storage)
+        overview = await asyncio.to_thread(
+            service.get_company_overview,
+            normalized_id,
+            include_profile_snapshot=include_profile_snapshot,
+            include_industry_snapshot=include_industry_snapshot,
+            include_financial_snapshot=include_financial_snapshot,
+        )
+        if overview is not None:
+            return overview
+
+        instrument = await self._get_research_instrument_info(normalized_id)
+        if instrument and (
+            self._module_allows_optional_empty_exchange(
+                "company_profile",
+                instrument.get("exchange"),
+            )
+            or self._module_allows_optional_empty_exchange(
+                "industry",
+                instrument.get("exchange"),
+            )
+            or self._module_allows_optional_empty_exchange(
+                "financial_summary",
+                instrument.get("exchange"),
+            )
+        ):
+            return self._build_empty_company_overview_response(
+                instrument,
+                include_profile_snapshot=include_profile_snapshot,
+                include_industry_snapshot=include_industry_snapshot,
+                include_financial_snapshot=include_financial_snapshot,
+            )
+        return None
+
+    async def get_research_technical_summary(
+        self,
+        instrument_id: str,
+        *,
+        adjust: str = "qfq",
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 technical summary。"""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+
+        technical_config = self.research_config.modules.get("technical", {})
+        if not technical_config.get("enabled", False):
+            raise RuntimeError("research technical module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        requested_adjustment = self._normalize_research_adjustment(
+            adjust or technical_config.get("default_adjustment", "qfq")
+        )
+        summary_config = technical_config.get("summary", {})
+        lookback_bars = int(summary_config.get("lookback_bars", 180))
+
+        quotes = await self.db_ops.get_daily_data(
+            instrument_id=normalized_id,
+            limit=lookback_bars,
+            return_format="pandas",
+        )
+        if quotes is None or quotes.empty:
+            return None
+
+        processed_quotes, applied_adjustment = await self._apply_research_adjustment(
+            quotes,
+            normalized_id,
+            instrument,
+            requested_adjustment,
+        )
+
+        from research.technical_service import ResearchTechnicalAnalysisService
+
+        service = ResearchTechnicalAnalysisService(summary_config)
+        return service.build_summary(
+            processed_quotes,
+            instrument,
+            requested_adjustment=requested_adjustment,
+            applied_adjustment=applied_adjustment,
+        )
+
+    async def get_research_technical_indicators(
+        self,
+        instrument_id: str,
+        *,
+        adjust: str = "qfq",
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 120,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域 technical indicators 时间序列。"""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+
+        technical_config = self.research_config.modules.get("technical", {})
+        if not technical_config.get("enabled", False):
+            raise RuntimeError("research technical module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        requested_adjustment = self._normalize_research_adjustment(
+            adjust or technical_config.get("default_adjustment", "qfq")
+        )
+        summary_config = technical_config.get("summary", {})
+        lookback_bars = int(summary_config.get("lookback_bars", 180))
+
+        query_limit = limit if start_date or end_date else max(limit, lookback_bars)
+        quotes = await self.db_ops.get_daily_data(
+            instrument_id=normalized_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=query_limit,
+            return_format="pandas",
+        )
+        if quotes is None or quotes.empty:
+            return None
+
+        processed_quotes, applied_adjustment = await self._apply_research_adjustment(
+            quotes,
+            normalized_id,
+            instrument,
+            requested_adjustment,
+        )
+
+        from research.technical_service import ResearchTechnicalAnalysisService
+
+        service = ResearchTechnicalAnalysisService(summary_config)
+        return service.build_indicator_series(
+            processed_quotes,
+            instrument,
+            requested_adjustment=requested_adjustment,
+            applied_adjustment=applied_adjustment,
+            limit=limit,
+        )
+
+    async def _apply_research_adjustment(
+        self,
+        quotes: pd.DataFrame,
+        instrument_id: str,
+        instrument: Dict[str, Any],
+        adjustment: str,
+    ) -> Tuple[pd.DataFrame, str]:
+        """Apply the requested adjustment for research technical calculations."""
+        from utils.adjustment import AdjustmentEngine
+
+        records = quotes.to_dict("records")
+        instrument_type = str(instrument.get("type", "")).lower()
+
+        if adjustment in {"qfq", "hfq"} and instrument_type == "stock":
+            factors = await self.get_cached_adjustment_factors(instrument_id)
+            if factors:
+                adjusted_records = AdjustmentEngine.apply_adjustment(
+                    records,
+                    factors,
+                    adjustment,
+                )
+                return pd.DataFrame(adjusted_records), adjustment
+
+        return pd.DataFrame(AdjustmentEngine.no_adjust(records)), "none"
+
+    @staticmethod
+    def _normalize_research_adjustment(adjustment: str) -> str:
+        normalized = (adjustment or "qfq").lower().strip()
+        if normalized in {"qfq", "forward"}:
+            return "qfq"
+        if normalized in {"hfq", "backward"}:
+            return "hfq"
+        if normalized == "none":
+            return "none"
+        raise ValueError("adjust must be one of qfq, hfq, none")
 
     async def close(self) -> None:
         """安全关闭所有数据源连接，防止协程退出时 ResourceWarning"""

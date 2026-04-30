@@ -1,0 +1,5885 @@
+"""
+Minimal storage manager for research shadow data.
+
+Phase 0 scope:
+- Initialize research.db independently from quotes.db
+- Create ingestion_runs and raw_payload_audit tables
+- Provide simple write helpers for shadow ingestion
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import sqlite3
+from contextlib import contextmanager
+from dataclasses import asdict, dataclass
+from datetime import timedelta
+from typing import Any, Dict, Generator, List, Optional
+
+from research.official_shenwan_mapping import OfficialShenwanCodeMapping
+from utils import db_logger
+from utils.config_manager import ResearchConfig, config_manager
+from utils.date_utils import get_shanghai_time
+from research.providers.base import (
+    AnalystForecastSnapshot,
+    CompanyProfileSnapshot,
+    FinancialFactsSnapshot,
+    FinancialIndicatorSnapshot,
+    FinancialStatementBundle,
+    FinancialStatementRawSnapshot,
+    FinancialSummarySnapshot,
+    IndustryClassificationHistorySnapshot,
+    IndustryIndexAnalysisSnapshot,
+    IndustrySnapshot,
+    IndustrySourceFileSnapshot,
+    IndustryTaxonomySnapshot,
+    OfficialIndustryClassificationSnapshot,
+    ResearchReportSnapshot,
+    RiskSnapshot,
+    ShareholderSnapshot,
+    SentimentEventSnapshot,
+    TechnicalIndicatorLatestSnapshot,
+    ValuationHistorySnapshot,
+)
+
+
+@dataclass(frozen=True)
+class IngestionRunRecord:
+    """Simple value object for ingestion run status."""
+
+    run_id: int
+    status: str
+
+
+class ResearchStorageManager:
+    """Manage the isolated research SQLite database."""
+
+    def __init__(self, research_config: Optional[ResearchConfig] = None):
+        self.research_config = research_config or config_manager.get_research_config()
+        self.db_path = self.research_config.storage.db_path
+        self.quotes_db_path = self.research_config.storage.quotes_db_path
+        self.quotes_db_alias = self.research_config.storage.quotes_db_alias
+
+    def initialize(self) -> None:
+        """Ensure database file, pragmas, and base tables exist."""
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            self._create_tables(conn)
+            self._migrate_tables(conn)
+
+            if self.research_config.storage.attach_quotes_db:
+                self._attach_quotes_db(conn)
+
+            conn.commit()
+        db_logger.info(f"[ResearchStorage] Initialized research database at {self.db_path}")
+
+    @contextmanager
+    def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
+        """Yield a sqlite3 connection for the research database."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+        finally:
+            conn.close()
+
+    def start_ingestion_run(
+        self,
+        *,
+        domain: str,
+        job_name: str,
+        market: Optional[str] = None,
+        source: Optional[str] = None,
+        mode: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> int:
+        """Create a new ingestion run row."""
+        now = get_shanghai_time().isoformat()
+        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                """
+                INSERT INTO ingestion_runs (
+                    domain,
+                    job_name,
+                    market,
+                    source,
+                    mode,
+                    status,
+                    shadow_mode,
+                    started_at,
+                    metadata_json,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    domain,
+                    job_name,
+                    market,
+                    source,
+                    mode,
+                    "running",
+                    1 if self.research_config.storage.shadow_mode else 0,
+                    now,
+                    metadata_json,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+            return int(cursor.lastrowid)
+
+    def finish_ingestion_run(
+        self,
+        run_id: int,
+        *,
+        status: str,
+        rows_written: int = 0,
+        error_message: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> IngestionRunRecord:
+        """Update an ingestion run on completion."""
+        now = get_shanghai_time().isoformat()
+        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                UPDATE ingestion_runs
+                SET status = ?,
+                    rows_written = ?,
+                    error_message = ?,
+                    metadata_json = ?,
+                    completed_at = ?,
+                    updated_at = ?
+                WHERE id = ?
+                """,
+                (
+                    status,
+                    rows_written,
+                    error_message,
+                    metadata_json,
+                    now,
+                    now,
+                    run_id,
+                ),
+            )
+            conn.commit()
+
+        return IngestionRunRecord(run_id=run_id, status=status)
+
+    def store_raw_payload(
+        self,
+        *,
+        domain: str,
+        instrument_id: Optional[str],
+        source: str,
+        source_mode: str,
+        payload: Dict[str, Any],
+        payload_hash: str,
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Store or replace a raw payload snapshot."""
+        now = get_shanghai_time().isoformat()
+        payload_json = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                """
+                INSERT INTO raw_payload_audit (
+                    domain,
+                    instrument_id,
+                    source,
+                    source_mode,
+                    payload_hash,
+                    payload_json,
+                    fetched_at,
+                    ingestion_run_id,
+                    created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(domain, instrument_id, source, payload_hash)
+                DO UPDATE SET
+                    payload_json = excluded.payload_json,
+                    fetched_at = excluded.fetched_at,
+                    ingestion_run_id = excluded.ingestion_run_id
+                """,
+                (
+                    domain,
+                    instrument_id,
+                    source,
+                    source_mode,
+                    payload_hash,
+                    payload_json,
+                    now,
+                    ingestion_run_id,
+                    now,
+                ),
+            )
+            conn.commit()
+            return int(cursor.lastrowid or 0)
+
+    def upsert_company_profile(
+        self,
+        snapshot: CompanyProfileSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one normalized company profile snapshot."""
+        now = get_shanghai_time().isoformat()
+        profile_json = json.dumps(asdict(snapshot), ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO company_profiles (
+                    instrument_id,
+                    symbol,
+                    company_name,
+                    short_name,
+                    exchange,
+                    market,
+                    listed_date,
+                    industry_raw,
+                    sector_raw,
+                    status,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    profile_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    company_name = excluded.company_name,
+                    short_name = excluded.short_name,
+                    exchange = excluded.exchange,
+                    market = excluded.market,
+                    listed_date = excluded.listed_date,
+                    industry_raw = excluded.industry_raw,
+                    sector_raw = excluded.sector_raw,
+                    status = excluded.status,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    profile_json = excluded.profile_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.company_name,
+                    snapshot.short_name,
+                    snapshot.exchange,
+                    snapshot.market,
+                    snapshot.listed_date,
+                    snapshot.industry_raw,
+                    snapshot.sector_raw,
+                    snapshot.status,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    profile_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_financial_summary(
+        self,
+        snapshot: FinancialSummarySnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one normalized financial summary snapshot."""
+        now = get_shanghai_time().isoformat()
+        summary_json = json.dumps(snapshot.summary_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_summaries (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_date,
+                    pub_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    roe,
+                    gross_margin,
+                    net_margin,
+                    current_ratio,
+                    quick_ratio,
+                    liability_to_asset,
+                    yoy_asset,
+                    yoy_equity,
+                    yoy_net_profit,
+                    cfo_to_revenue,
+                    cfo_to_net_profit,
+                    asset_turnover,
+                    eps,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    summary_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    report_date = excluded.report_date,
+                    pub_date = excluded.pub_date,
+                    fiscal_year = excluded.fiscal_year,
+                    fiscal_quarter = excluded.fiscal_quarter,
+                    currency = excluded.currency,
+                    schema_version = excluded.schema_version,
+                    roe = excluded.roe,
+                    gross_margin = excluded.gross_margin,
+                    net_margin = excluded.net_margin,
+                    current_ratio = excluded.current_ratio,
+                    quick_ratio = excluded.quick_ratio,
+                    liability_to_asset = excluded.liability_to_asset,
+                    yoy_asset = excluded.yoy_asset,
+                    yoy_equity = excluded.yoy_equity,
+                    yoy_net_profit = excluded.yoy_net_profit,
+                    cfo_to_revenue = excluded.cfo_to_revenue,
+                    cfo_to_net_profit = excluded.cfo_to_net_profit,
+                    asset_turnover = excluded.asset_turnover,
+                    eps = excluded.eps,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    summary_json = excluded.summary_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.report_date,
+                    snapshot.pub_date,
+                    snapshot.fiscal_year,
+                    snapshot.fiscal_quarter,
+                    snapshot.currency,
+                    snapshot.schema_version,
+                    snapshot.roe,
+                    snapshot.gross_margin,
+                    snapshot.net_margin,
+                    snapshot.current_ratio,
+                    snapshot.quick_ratio,
+                    snapshot.liability_to_asset,
+                    snapshot.yoy_asset,
+                    snapshot.yoy_equity,
+                    snapshot.yoy_net_profit,
+                    snapshot.cfo_to_revenue,
+                    snapshot.cfo_to_net_profit,
+                    snapshot.asset_turnover,
+                    snapshot.eps,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    summary_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_shareholder_snapshot(
+        self,
+        snapshot: ShareholderSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one normalized shareholder summary snapshot."""
+        now = get_shanghai_time().isoformat()
+        snapshot_json = json.dumps(
+            snapshot.snapshot_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO shareholder_snapshots (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    coverage_status,
+                    holder_count,
+                    holder_count_report_date,
+                    top_holders_report_date,
+                    top_holders_count,
+                    top_holders_total_ratio,
+                    control_owner_name,
+                    control_owner_ratio,
+                    schema_version,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    snapshot_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    coverage_status = excluded.coverage_status,
+                    holder_count = excluded.holder_count,
+                    holder_count_report_date = excluded.holder_count_report_date,
+                    top_holders_report_date = excluded.top_holders_report_date,
+                    top_holders_count = excluded.top_holders_count,
+                    top_holders_total_ratio = excluded.top_holders_total_ratio,
+                    control_owner_name = excluded.control_owner_name,
+                    control_owner_ratio = excluded.control_owner_ratio,
+                    schema_version = excluded.schema_version,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    snapshot_json = excluded.snapshot_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.coverage_status,
+                    snapshot.holder_count,
+                    snapshot.holder_count_report_date,
+                    snapshot.top_holders_report_date,
+                    snapshot.top_holders_count,
+                    snapshot.top_holders_total_ratio,
+                    snapshot.control_owner_name,
+                    snapshot.control_owner_ratio,
+                    snapshot.schema_version,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    snapshot_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_financial_statement_bundle(
+        self,
+        bundle: FinancialStatementBundle,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one latest financial statement bundle."""
+        for raw_statement in bundle.raw_statements:
+            self.upsert_financial_statement_raw(
+                raw_statement,
+                ingestion_run_id=ingestion_run_id,
+            )
+
+        if bundle.facts is not None:
+            self.upsert_financial_facts(
+                bundle.facts,
+                ingestion_run_id=ingestion_run_id,
+            )
+
+        if bundle.indicators is not None:
+            self.upsert_financial_indicator_snapshot(
+                bundle.indicators,
+                ingestion_run_id=ingestion_run_id,
+            )
+
+    def upsert_financial_statement_raw(
+        self,
+        snapshot: FinancialStatementRawSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one raw financial statement row."""
+        now = get_shanghai_time().isoformat()
+        statement_json = json.dumps(snapshot.statement_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_statements_raw (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    statement_type,
+                    report_period,
+                    publish_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    statement_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, statement_type, report_period)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    publish_date = excluded.publish_date,
+                    fiscal_year = excluded.fiscal_year,
+                    fiscal_quarter = excluded.fiscal_quarter,
+                    currency = excluded.currency,
+                    schema_version = excluded.schema_version,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    statement_json = excluded.statement_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.statement_type,
+                    snapshot.report_period,
+                    snapshot.publish_date,
+                    snapshot.fiscal_year,
+                    snapshot.fiscal_quarter,
+                    snapshot.currency,
+                    snapshot.schema_version,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    statement_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_financial_facts(
+        self,
+        snapshot: FinancialFactsSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one normalized financial facts row."""
+        now = get_shanghai_time().isoformat()
+        facts_json = json.dumps(snapshot.facts_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_facts (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_period,
+                    publish_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    revenue,
+                    gross_profit,
+                    operating_profit,
+                    pre_tax_profit,
+                    net_income,
+                    operating_cf,
+                    total_cf,
+                    total_assets,
+                    total_liabilities,
+                    equity,
+                    current_assets,
+                    current_liabilities,
+                    inventory,
+                    receivables,
+                    fixed_assets,
+                    intangible_assets,
+                    shares_outstanding,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    facts_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, report_period)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    publish_date = excluded.publish_date,
+                    fiscal_year = excluded.fiscal_year,
+                    fiscal_quarter = excluded.fiscal_quarter,
+                    currency = excluded.currency,
+                    schema_version = excluded.schema_version,
+                    revenue = excluded.revenue,
+                    gross_profit = excluded.gross_profit,
+                    operating_profit = excluded.operating_profit,
+                    pre_tax_profit = excluded.pre_tax_profit,
+                    net_income = excluded.net_income,
+                    operating_cf = excluded.operating_cf,
+                    total_cf = excluded.total_cf,
+                    total_assets = excluded.total_assets,
+                    total_liabilities = excluded.total_liabilities,
+                    equity = excluded.equity,
+                    current_assets = excluded.current_assets,
+                    current_liabilities = excluded.current_liabilities,
+                    inventory = excluded.inventory,
+                    receivables = excluded.receivables,
+                    fixed_assets = excluded.fixed_assets,
+                    intangible_assets = excluded.intangible_assets,
+                    shares_outstanding = excluded.shares_outstanding,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    facts_json = excluded.facts_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.report_period,
+                    snapshot.publish_date,
+                    snapshot.fiscal_year,
+                    snapshot.fiscal_quarter,
+                    snapshot.currency,
+                    snapshot.schema_version,
+                    snapshot.revenue,
+                    snapshot.gross_profit,
+                    snapshot.operating_profit,
+                    snapshot.pre_tax_profit,
+                    snapshot.net_income,
+                    snapshot.operating_cf,
+                    snapshot.total_cf,
+                    snapshot.total_assets,
+                    snapshot.total_liabilities,
+                    snapshot.equity,
+                    snapshot.current_assets,
+                    snapshot.current_liabilities,
+                    snapshot.inventory,
+                    snapshot.receivables,
+                    snapshot.fixed_assets,
+                    snapshot.intangible_assets,
+                    snapshot.shares_outstanding,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    facts_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_financial_indicator_snapshot(
+        self,
+        snapshot: FinancialIndicatorSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one derived financial indicator row."""
+        now = get_shanghai_time().isoformat()
+        indicators_json = json.dumps(
+            snapshot.indicators_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_indicator_snapshots (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_period,
+                    publish_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    gross_margin,
+                    operating_margin,
+                    net_margin,
+                    roe,
+                    roa,
+                    current_ratio,
+                    quick_ratio,
+                    asset_liability_ratio,
+                    revenue_per_share,
+                    operating_cf_to_revenue,
+                    operating_cf_to_net_income,
+                    book_value_per_share,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    indicators_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, report_period)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    publish_date = excluded.publish_date,
+                    fiscal_year = excluded.fiscal_year,
+                    fiscal_quarter = excluded.fiscal_quarter,
+                    currency = excluded.currency,
+                    schema_version = excluded.schema_version,
+                    gross_margin = excluded.gross_margin,
+                    operating_margin = excluded.operating_margin,
+                    net_margin = excluded.net_margin,
+                    roe = excluded.roe,
+                    roa = excluded.roa,
+                    current_ratio = excluded.current_ratio,
+                    quick_ratio = excluded.quick_ratio,
+                    asset_liability_ratio = excluded.asset_liability_ratio,
+                    revenue_per_share = excluded.revenue_per_share,
+                    operating_cf_to_revenue = excluded.operating_cf_to_revenue,
+                    operating_cf_to_net_income = excluded.operating_cf_to_net_income,
+                    book_value_per_share = excluded.book_value_per_share,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    indicators_json = excluded.indicators_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.report_period,
+                    snapshot.publish_date,
+                    snapshot.fiscal_year,
+                    snapshot.fiscal_quarter,
+                    snapshot.currency,
+                    snapshot.schema_version,
+                    snapshot.gross_margin,
+                    snapshot.operating_margin,
+                    snapshot.net_margin,
+                    snapshot.roe,
+                    snapshot.roa,
+                    snapshot.current_ratio,
+                    snapshot.quick_ratio,
+                    snapshot.asset_liability_ratio,
+                    snapshot.revenue_per_share,
+                    snapshot.operating_cf_to_revenue,
+                    snapshot.operating_cf_to_net_income,
+                    snapshot.book_value_per_share,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    indicators_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_valuation_history(
+        self,
+        snapshot: ValuationHistorySnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one derived valuation history row."""
+        now = get_shanghai_time().isoformat()
+        details_json = json.dumps(
+            snapshot.details_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO valuation_history (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    currency,
+                    close_price,
+                    market_cap,
+                    pe_ratio,
+                    pb_ratio,
+                    ps_ratio,
+                    calc_method,
+                    calc_version,
+                    parameter_hash,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    details_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    currency = excluded.currency,
+                    close_price = excluded.close_price,
+                    market_cap = excluded.market_cap,
+                    pe_ratio = excluded.pe_ratio,
+                    pb_ratio = excluded.pb_ratio,
+                    ps_ratio = excluded.ps_ratio,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    details_json = excluded.details_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.as_of_date,
+                    snapshot.currency,
+                    snapshot.close_price,
+                    snapshot.market_cap,
+                    snapshot.pe_ratio,
+                    snapshot.pb_ratio,
+                    snapshot.ps_ratio,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    details_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_analyst_forecast(
+        self,
+        snapshot: AnalystForecastSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one analyst forecast snapshot."""
+        now = get_shanghai_time().isoformat()
+        forecast_json = json.dumps(
+            snapshot.forecast_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO analyst_forecasts (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    rating_summary,
+                    report_count,
+                    institution_count,
+                    buy_count,
+                    overweight_count,
+                    neutral_count,
+                    underperform_count,
+                    sell_count,
+                    eps_fy1,
+                    eps_fy2,
+                    net_profit_fy1,
+                    net_profit_fy2,
+                    pe_fy1,
+                    pe_fy2,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    forecast_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, as_of_date, source, source_mode)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    rating_summary = excluded.rating_summary,
+                    report_count = excluded.report_count,
+                    institution_count = excluded.institution_count,
+                    buy_count = excluded.buy_count,
+                    overweight_count = excluded.overweight_count,
+                    neutral_count = excluded.neutral_count,
+                    underperform_count = excluded.underperform_count,
+                    sell_count = excluded.sell_count,
+                    eps_fy1 = excluded.eps_fy1,
+                    eps_fy2 = excluded.eps_fy2,
+                    net_profit_fy1 = excluded.net_profit_fy1,
+                    net_profit_fy2 = excluded.net_profit_fy2,
+                    pe_fy1 = excluded.pe_fy1,
+                    pe_fy2 = excluded.pe_fy2,
+                    data_as_of = excluded.data_as_of,
+                    forecast_json = excluded.forecast_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.as_of_date,
+                    snapshot.rating_summary,
+                    snapshot.report_count,
+                    snapshot.institution_count,
+                    snapshot.buy_count,
+                    snapshot.overweight_count,
+                    snapshot.neutral_count,
+                    snapshot.underperform_count,
+                    snapshot.sell_count,
+                    snapshot.eps_fy1,
+                    snapshot.eps_fy2,
+                    snapshot.net_profit_fy1,
+                    snapshot.net_profit_fy2,
+                    snapshot.pe_fy1,
+                    snapshot.pe_fy2,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    forecast_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_research_report(
+        self,
+        snapshot: ResearchReportSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one research report metadata row."""
+        now = get_shanghai_time().isoformat()
+        report_json = json.dumps(snapshot.report_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO research_reports (
+                    report_id,
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    publish_date,
+                    report_title,
+                    institution_name,
+                    analyst_name,
+                    rating,
+                    rating_change,
+                    target_price,
+                    report_url,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    report_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(report_id)
+                DO UPDATE SET
+                    instrument_id = excluded.instrument_id,
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    publish_date = excluded.publish_date,
+                    report_title = excluded.report_title,
+                    institution_name = excluded.institution_name,
+                    analyst_name = excluded.analyst_name,
+                    rating = excluded.rating,
+                    rating_change = excluded.rating_change,
+                    target_price = excluded.target_price,
+                    report_url = excluded.report_url,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    report_json = excluded.report_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.report_id,
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.publish_date,
+                    snapshot.report_title,
+                    snapshot.institution_name,
+                    snapshot.analyst_name,
+                    snapshot.rating,
+                    snapshot.rating_change,
+                    snapshot.target_price,
+                    snapshot.report_url,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    report_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_sentiment_event(
+        self,
+        snapshot: SentimentEventSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one sentiment event row."""
+        now = get_shanghai_time().isoformat()
+        details_json = json.dumps(snapshot.details_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO sentiment_events (
+                    event_id,
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    event_date,
+                    event_type,
+                    event_subtype,
+                    title,
+                    sentiment_score,
+                    severity,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    details_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(event_id)
+                DO UPDATE SET
+                    instrument_id = excluded.instrument_id,
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    event_date = excluded.event_date,
+                    event_type = excluded.event_type,
+                    event_subtype = excluded.event_subtype,
+                    title = excluded.title,
+                    sentiment_score = excluded.sentiment_score,
+                    severity = excluded.severity,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    details_json = excluded.details_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.event_id,
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.event_date,
+                    snapshot.event_type,
+                    snapshot.event_subtype,
+                    snapshot.title,
+                    snapshot.sentiment_score,
+                    snapshot.severity,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    details_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_risk_snapshot(
+        self,
+        snapshot: RiskSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one derived risk snapshot row."""
+        now = get_shanghai_time().isoformat()
+        details_json = json.dumps(snapshot.details_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO risk_snapshots (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    benchmark_instrument_id,
+                    volatility_20d,
+                    volatility_60d,
+                    beta_60d,
+                    max_drawdown_252d,
+                    average_turnover_20d,
+                    average_amount_20d,
+                    liability_to_asset,
+                    current_ratio,
+                    operating_cf_to_net_income,
+                    negative_event_count_30d,
+                    risk_score,
+                    risk_level,
+                    calc_method,
+                    calc_version,
+                    parameter_hash,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    details_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    benchmark_instrument_id = excluded.benchmark_instrument_id,
+                    volatility_20d = excluded.volatility_20d,
+                    volatility_60d = excluded.volatility_60d,
+                    beta_60d = excluded.beta_60d,
+                    max_drawdown_252d = excluded.max_drawdown_252d,
+                    average_turnover_20d = excluded.average_turnover_20d,
+                    average_amount_20d = excluded.average_amount_20d,
+                    liability_to_asset = excluded.liability_to_asset,
+                    current_ratio = excluded.current_ratio,
+                    operating_cf_to_net_income = excluded.operating_cf_to_net_income,
+                    negative_event_count_30d = excluded.negative_event_count_30d,
+                    risk_score = excluded.risk_score,
+                    risk_level = excluded.risk_level,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    details_json = excluded.details_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.as_of_date,
+                    snapshot.benchmark_instrument_id,
+                    snapshot.volatility_20d,
+                    snapshot.volatility_60d,
+                    snapshot.beta_60d,
+                    snapshot.max_drawdown_252d,
+                    snapshot.average_turnover_20d,
+                    snapshot.average_amount_20d,
+                    snapshot.liability_to_asset,
+                    snapshot.current_ratio,
+                    snapshot.operating_cf_to_net_income,
+                    snapshot.negative_event_count_30d,
+                    snapshot.risk_score,
+                    snapshot.risk_level,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    details_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_technical_indicator_latest(
+        self,
+        snapshot: TechnicalIndicatorLatestSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one latest technical indicator snapshot."""
+        now = get_shanghai_time().isoformat()
+        summary_json = json.dumps(
+            snapshot.summary_json,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO technical_indicator_latest (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    period,
+                    as_of_date,
+                    adjustment,
+                    applied_adjustment,
+                    calc_method,
+                    calc_version,
+                    parameter_hash,
+                    status,
+                    missing_reason,
+                    signal,
+                    trend_score,
+                    close_price,
+                    pct_change_1d,
+                    pct_change_20d,
+                    sma20,
+                    sma60,
+                    ema12,
+                    ema26,
+                    macd,
+                    macd_signal,
+                    macd_hist,
+                    rsi14,
+                    adx,
+                    plus_di,
+                    minus_di,
+                    stoch_k,
+                    stoch_d,
+                    cci,
+                    williams_r,
+                    boll_upper,
+                    boll_middle,
+                    boll_lower,
+                    atr14,
+                    volume_ratio,
+                    distance_to_sma20,
+                    distance_to_sma60,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    summary_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, period, adjustment, calc_method, calc_version, parameter_hash)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    as_of_date = excluded.as_of_date,
+                    applied_adjustment = excluded.applied_adjustment,
+                    status = excluded.status,
+                    missing_reason = excluded.missing_reason,
+                    signal = excluded.signal,
+                    trend_score = excluded.trend_score,
+                    close_price = excluded.close_price,
+                    pct_change_1d = excluded.pct_change_1d,
+                    pct_change_20d = excluded.pct_change_20d,
+                    sma20 = excluded.sma20,
+                    sma60 = excluded.sma60,
+                    ema12 = excluded.ema12,
+                    ema26 = excluded.ema26,
+                    macd = excluded.macd,
+                    macd_signal = excluded.macd_signal,
+                    macd_hist = excluded.macd_hist,
+                    rsi14 = excluded.rsi14,
+                    adx = excluded.adx,
+                    plus_di = excluded.plus_di,
+                    minus_di = excluded.minus_di,
+                    stoch_k = excluded.stoch_k,
+                    stoch_d = excluded.stoch_d,
+                    cci = excluded.cci,
+                    williams_r = excluded.williams_r,
+                    boll_upper = excluded.boll_upper,
+                    boll_middle = excluded.boll_middle,
+                    boll_lower = excluded.boll_lower,
+                    atr14 = excluded.atr14,
+                    volume_ratio = excluded.volume_ratio,
+                    distance_to_sma20 = excluded.distance_to_sma20,
+                    distance_to_sma60 = excluded.distance_to_sma60,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    summary_json = excluded.summary_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.period,
+                    snapshot.as_of_date,
+                    snapshot.adjustment,
+                    snapshot.applied_adjustment,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                    snapshot.status,
+                    snapshot.missing_reason,
+                    snapshot.signal,
+                    snapshot.trend_score,
+                    snapshot.close_price,
+                    snapshot.pct_change_1d,
+                    snapshot.pct_change_20d,
+                    snapshot.sma20,
+                    snapshot.sma60,
+                    snapshot.ema12,
+                    snapshot.ema26,
+                    snapshot.macd,
+                    snapshot.macd_signal,
+                    snapshot.macd_hist,
+                    snapshot.rsi14,
+                    snapshot.adx,
+                    snapshot.plus_di,
+                    snapshot.minus_di,
+                    snapshot.stoch_k,
+                    snapshot.stoch_d,
+                    snapshot.cci,
+                    snapshot.williams_r,
+                    snapshot.boll_upper,
+                    snapshot.boll_middle,
+                    snapshot.boll_lower,
+                    snapshot.atr14,
+                    snapshot.volume_ratio,
+                    snapshot.distance_to_sma20,
+                    snapshot.distance_to_sma60,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    summary_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_industry_membership(
+        self,
+        snapshot: IndustrySnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one normalized industry membership snapshot and taxonomy row."""
+        now = get_shanghai_time().isoformat()
+        membership_json = json.dumps(snapshot.membership_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            self._upsert_industry_taxonomy_row(
+                conn,
+                IndustryTaxonomySnapshot(
+                    taxonomy_system=snapshot.taxonomy_system,
+                    taxonomy_version=snapshot.taxonomy_version,
+                    industry_code=snapshot.industry_code,
+                    industry_name=snapshot.industry_name,
+                    industry_level=snapshot.industry_level,
+                    parent_code=snapshot.parent_code,
+                    source_classification=snapshot.source_classification,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                ),
+                now=now,
+            )
+            conn.execute(
+                """
+                INSERT INTO industry_memberships (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    taxonomy_system,
+                    taxonomy_version,
+                    industry_code,
+                    industry_name,
+                    industry_level,
+                    parent_code,
+                    mapping_status,
+                    effective_date,
+                    source_classification,
+                    source_industry_name,
+                    sw_l1_code,
+                    sw_l1_name,
+                    sw_l2_code,
+                    sw_l2_name,
+                    sw_l3_code,
+                    sw_l3_name,
+                    sw_l1_index_code,
+                    sw_l2_index_code,
+                    sw_l3_index_code,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    membership_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, taxonomy_system, taxonomy_version)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    industry_code = excluded.industry_code,
+                    industry_name = excluded.industry_name,
+                    industry_level = excluded.industry_level,
+                    parent_code = excluded.parent_code,
+                    mapping_status = excluded.mapping_status,
+                    effective_date = excluded.effective_date,
+                    source_classification = excluded.source_classification,
+                    source_industry_name = excluded.source_industry_name,
+                    sw_l1_code = excluded.sw_l1_code,
+                    sw_l1_name = excluded.sw_l1_name,
+                    sw_l2_code = excluded.sw_l2_code,
+                    sw_l2_name = excluded.sw_l2_name,
+                    sw_l3_code = excluded.sw_l3_code,
+                    sw_l3_name = excluded.sw_l3_name,
+                    sw_l1_index_code = excluded.sw_l1_index_code,
+                    sw_l2_index_code = excluded.sw_l2_index_code,
+                    sw_l3_index_code = excluded.sw_l3_index_code,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    membership_json = excluded.membership_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.taxonomy_system,
+                    snapshot.taxonomy_version or "",
+                    snapshot.industry_code,
+                    snapshot.industry_name,
+                    snapshot.industry_level,
+                    snapshot.parent_code,
+                    snapshot.mapping_status,
+                    snapshot.effective_date,
+                    snapshot.source_classification,
+                    snapshot.source_industry_name,
+                    snapshot.sw_l1_code,
+                    snapshot.sw_l1_name,
+                    snapshot.sw_l2_code,
+                    snapshot.sw_l2_name,
+                    snapshot.sw_l3_code,
+                    snapshot.sw_l3_name,
+                    snapshot.sw_l1_index_code,
+                    snapshot.sw_l2_index_code,
+                    snapshot.sw_l3_index_code,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    membership_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_industry_index_analysis(
+        self,
+        snapshot: IndustryIndexAnalysisSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one official Shenwan industry index-analysis daily row."""
+        now = get_shanghai_time().isoformat()
+        raw_payload_json = json.dumps(
+            snapshot.raw_payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            default=str,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO industry_index_analysis_daily (
+                    taxonomy_system,
+                    taxonomy_version,
+                    sw_index_code,
+                    trade_date,
+                    sw_index_name,
+                    index_type,
+                    close_index,
+                    bargain_volume,
+                    markup,
+                    turnover_rate,
+                    pe,
+                    pb,
+                    mean_price,
+                    bargain_sum_rate,
+                    negotiable_share_sum,
+                    average_negotiable_share_sum,
+                    dividend_yield,
+                    source,
+                    source_mode,
+                    raw_payload_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(taxonomy_system, taxonomy_version, sw_index_code, trade_date)
+                DO UPDATE SET
+                    sw_index_name = excluded.sw_index_name,
+                    index_type = excluded.index_type,
+                    close_index = excluded.close_index,
+                    bargain_volume = excluded.bargain_volume,
+                    markup = excluded.markup,
+                    turnover_rate = excluded.turnover_rate,
+                    pe = excluded.pe,
+                    pb = excluded.pb,
+                    mean_price = excluded.mean_price,
+                    bargain_sum_rate = excluded.bargain_sum_rate,
+                    negotiable_share_sum = excluded.negotiable_share_sum,
+                    average_negotiable_share_sum = excluded.average_negotiable_share_sum,
+                    dividend_yield = excluded.dividend_yield,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    raw_payload_json = excluded.raw_payload_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.taxonomy_system,
+                    snapshot.taxonomy_version or "",
+                    snapshot.sw_index_code,
+                    snapshot.trade_date,
+                    snapshot.sw_index_name,
+                    snapshot.index_type,
+                    snapshot.close_index,
+                    snapshot.bargain_volume,
+                    snapshot.markup,
+                    snapshot.turnover_rate,
+                    snapshot.pe,
+                    snapshot.pb,
+                    snapshot.mean_price,
+                    snapshot.bargain_sum_rate,
+                    snapshot.negotiable_share_sum,
+                    snapshot.average_negotiable_share_sum,
+                    snapshot.dividend_yield,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    raw_payload_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def summarize_industry_index_analysis_daily(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Dict[str, Any]:
+        """Return readiness summary for official index-analysis daily rows."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS total,
+                    COUNT(DISTINCT sw_index_code) AS distinct_index_codes,
+                    MAX(trade_date) AS latest_trade_date,
+                    MAX(updated_at) AS latest_updated_at
+                FROM industry_index_analysis_daily
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+            type_rows = conn.execute(
+                """
+                SELECT index_type, COUNT(*) AS row_count, COUNT(DISTINCT sw_index_code) AS code_count
+                FROM industry_index_analysis_daily
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                GROUP BY index_type
+                ORDER BY index_type ASC
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchall()
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "distinct_index_codes": int(
+                (summary_row["distinct_index_codes"] if summary_row is not None else 0)
+                or 0
+            ),
+            "latest_trade_date": None if summary_row is None else summary_row["latest_trade_date"],
+            "latest_updated_at": None if summary_row is None else summary_row["latest_updated_at"],
+            "index_type_counts": {
+                str(row["index_type"]): {
+                    "rows": int(row["row_count"] or 0),
+                    "codes": int(row["code_count"] or 0),
+                }
+                for row in type_rows
+                if row["index_type"] is not None
+            },
+        }
+
+    def get_latest_industry_index_analysis(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        sw_index_code: str,
+        include_payload: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch latest official index-analysis row for one Shenwan index code."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT *
+                FROM industry_index_analysis_daily
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                  AND sw_index_code = ?
+                ORDER BY trade_date DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (taxonomy_system, taxonomy_version or "", sw_index_code),
+            ).fetchone()
+
+        if row is None:
+            return None
+        item = dict(row)
+        payload_json = item.pop("raw_payload_json", None)
+        if include_payload:
+            item["raw_payload"] = self._deserialize_json(payload_json) or {}
+        return item
+
+    def list_industry_index_analysis_daily(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        sw_index_code: Optional[str] = None,
+        index_type: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+        include_payload: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """List official Shenwan industry index-analysis rows with filters."""
+        where_sql, params = self._industry_index_analysis_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            sw_index_code=sw_index_code,
+            index_type=index_type,
+            trade_date=trade_date,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        sql = f"""
+            SELECT *
+            FROM industry_index_analysis_daily
+            {where_sql}
+            ORDER BY trade_date DESC, index_type ASC, sw_index_code ASC
+        """
+        if limit is not None:
+            sql += " LIMIT ? OFFSET ?"
+            params.extend((int(limit), max(int(offset), 0)))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        records: list[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            payload_json = item.pop("raw_payload_json", None)
+            if include_payload:
+                item["raw_payload"] = self._deserialize_json(payload_json) or {}
+            records.append(item)
+        return records
+
+    def count_industry_index_analysis_daily(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        sw_index_code: Optional[str] = None,
+        index_type: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> int:
+        """Count official Shenwan industry index-analysis rows with filters."""
+        where_sql, params = self._industry_index_analysis_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            sw_index_code=sw_index_code,
+            index_type=index_type,
+            trade_date=trade_date,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        sql = f"""
+            SELECT COUNT(*)
+            FROM industry_index_analysis_daily
+            {where_sql}
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count = conn.execute(sql, params).fetchone()[0]
+        return int(count or 0)
+
+    def _industry_index_analysis_filter_sql(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        sw_index_code: Optional[str] = None,
+        index_type: Optional[str] = None,
+        trade_date: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> tuple[str, list[Any]]:
+        """Build a WHERE clause for official Shenwan index-analysis queries."""
+        conditions = ["taxonomy_system = ?", "taxonomy_version = ?"]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if sw_index_code:
+            conditions.append("sw_index_code = ?")
+            params.append(sw_index_code)
+        if index_type:
+            conditions.append("index_type = ?")
+            params.append(index_type)
+        if trade_date:
+            conditions.append("trade_date = ?")
+            params.append(trade_date)
+        else:
+            if start_date:
+                conditions.append("trade_date >= ?")
+                params.append(start_date)
+            if end_date:
+                conditions.append("trade_date <= ?")
+                params.append(end_date)
+        return "WHERE " + " AND ".join(conditions), params
+
+    def delete_industry_memberships(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        instrument_ids: List[str],
+    ) -> int:
+        """Delete normalized industry memberships for one taxonomy and instrument set."""
+        normalized_ids = [
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        ]
+        if not normalized_ids:
+            return 0
+
+        placeholders = ",".join("?" for _ in normalized_ids)
+        sql = f"""
+            DELETE FROM industry_memberships
+            WHERE taxonomy_system = ?
+              AND taxonomy_version = ?
+              AND instrument_id IN ({placeholders})
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                sql,
+                [taxonomy_system, taxonomy_version or "", *normalized_ids],
+            )
+            conn.commit()
+            return int(cursor.rowcount or 0)
+
+    def upsert_industry_source_file(
+        self,
+        snapshot: IndustrySourceFileSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Persist one industry source-file manifest row and return its id."""
+        now = get_shanghai_time().isoformat()
+        raw_headers_json = json.dumps(snapshot.raw_headers, ensure_ascii=False, sort_keys=True)
+        metadata_json = json.dumps(snapshot.metadata_json, ensure_ascii=False, sort_keys=True)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                """
+                INSERT INTO industry_source_files (
+                    source,
+                    source_mode,
+                    artifact_kind,
+                    url,
+                    parser_version,
+                    status,
+                    etag,
+                    last_modified,
+                    content_length,
+                    sha256,
+                    row_count,
+                    max_source_update_time,
+                    raw_headers_json,
+                    metadata_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(source, source_mode, artifact_kind, sha256)
+                DO UPDATE SET
+                    url = excluded.url,
+                    parser_version = excluded.parser_version,
+                    status = excluded.status,
+                    etag = excluded.etag,
+                    last_modified = excluded.last_modified,
+                    content_length = excluded.content_length,
+                    row_count = excluded.row_count,
+                    max_source_update_time = excluded.max_source_update_time,
+                    raw_headers_json = excluded.raw_headers_json,
+                    metadata_json = excluded.metadata_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.source,
+                    snapshot.source_mode,
+                    snapshot.artifact_kind,
+                    snapshot.url,
+                    snapshot.parser_version,
+                    snapshot.status,
+                    snapshot.etag,
+                    snapshot.last_modified,
+                    snapshot.content_length,
+                    snapshot.sha256 or "",
+                    snapshot.row_count,
+                    snapshot.max_source_update_time,
+                    raw_headers_json,
+                    metadata_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            row = conn.execute(
+                """
+                SELECT id
+                FROM industry_source_files
+                WHERE source = ?
+                  AND source_mode = ?
+                  AND artifact_kind = ?
+                  AND sha256 = ?
+                """,
+                (
+                    snapshot.source,
+                    snapshot.source_mode,
+                    snapshot.artifact_kind,
+                    snapshot.sha256 or "",
+                ),
+            ).fetchone()
+            source_file_id = 0 if row is None else int(row["id"])
+            conn.commit()
+        return source_file_id
+
+    def get_latest_industry_source_file(
+        self,
+        *,
+        source: str,
+        source_mode: str,
+        artifact_kind: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return latest source-file manifest metadata for one artifact."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    id,
+                    source,
+                    source_mode,
+                    artifact_kind,
+                    url,
+                    parser_version,
+                    status,
+                    etag,
+                    last_modified,
+                    content_length,
+                    sha256,
+                    row_count,
+                    max_source_update_time,
+                    raw_headers_json,
+                    metadata_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM industry_source_files
+                WHERE source = ?
+                  AND source_mode = ?
+                  AND artifact_kind = ?
+                  AND status IN ('downloaded', 'unchanged')
+                ORDER BY updated_at DESC, id DESC
+                LIMIT 1
+                """,
+                (source, source_mode, artifact_kind),
+            ).fetchone()
+
+        if row is None:
+            return None
+        item = dict(row)
+        item["raw_headers"] = self._deserialize_json(item.pop("raw_headers_json", None)) or {}
+        item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+        return item
+
+    def get_latest_industry_source_files(
+        self,
+        *,
+        source: str,
+        source_mode: str,
+        artifact_kinds: List[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Return latest source-file manifests keyed by artifact kind."""
+        result: Dict[str, Dict[str, Any]] = {}
+        for artifact_kind in artifact_kinds:
+            item = self.get_latest_industry_source_file(
+                source=source,
+                source_mode=source_mode,
+                artifact_kind=artifact_kind,
+            )
+            if item is not None:
+                result[artifact_kind] = item
+        return result
+
+    def replace_industry_classification_history(
+        self,
+        rows: List[IndustryClassificationHistorySnapshot],
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Replace full official classification history rows for one taxonomy version."""
+        now = get_shanghai_time().isoformat()
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                DELETE FROM industry_classification_history
+                WHERE taxonomy_system = ? AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            )
+            for row in rows:
+                classification_json = json.dumps(
+                    row.classification_json,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                )
+                conn.execute(
+                    """
+                    INSERT INTO industry_classification_history (
+                        row_hash,
+                        instrument_id,
+                        symbol,
+                        exchange,
+                        taxonomy_system,
+                        taxonomy_version,
+                        official_industry_code,
+                        official_start_date,
+                        official_update_time,
+                        source_file_id,
+                        source,
+                        source_mode,
+                        classification_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        row.row_hash,
+                        row.instrument_id,
+                        row.symbol,
+                        row.exchange,
+                        row.taxonomy_system,
+                        row.taxonomy_version or "",
+                        row.official_industry_code,
+                        row.official_start_date,
+                        row.official_update_time,
+                        row.source_file_id,
+                        row.source,
+                        row.source_mode,
+                        classification_json,
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
+            conn.commit()
+
+    def clear_industry_standard_slice(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        include_source_files: bool = False,
+    ) -> Dict[str, int]:
+        """Delete rebuildable strict-industry rows for one taxonomy version."""
+        tables = [
+            "industry_memberships",
+            "industry_official_classifications",
+            "industry_classification_history",
+            "industry_component_sets",
+            "industry_official_code_mappings",
+            "industry_taxonomy",
+        ]
+        deleted: Dict[str, int] = {}
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for table in tables:
+                cursor = conn.execute(
+                    f"""
+                    DELETE FROM {table}
+                    WHERE taxonomy_system = ? AND taxonomy_version = ?
+                    """,
+                    (taxonomy_system, taxonomy_version or ""),
+                )
+                deleted[table] = int(cursor.rowcount or 0)
+
+            if include_source_files:
+                cursor = conn.execute(
+                    """
+                    DELETE FROM industry_source_files
+                    WHERE source IN ('swsresearch', 'akshare')
+                      AND artifact_kind LIKE 'shenwan_%'
+                    """
+                )
+                deleted["industry_source_files"] = int(cursor.rowcount or 0)
+            conn.commit()
+        return deleted
+
+    def summarize_industry_classification_history(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Dict[str, Any]:
+        """Return summary metadata for official classification history rows."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS total,
+                    COUNT(DISTINCT symbol) AS distinct_symbols,
+                    MAX(official_update_time) AS latest_official_update_time,
+                    MAX(updated_at) AS latest_updated_at
+                FROM industry_classification_history
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+            exchange_rows = conn.execute(
+                """
+                SELECT exchange, COUNT(DISTINCT symbol) AS symbol_count
+                FROM industry_classification_history
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                GROUP BY exchange
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchall()
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "distinct_symbols": int(
+                (summary_row["distinct_symbols"] if summary_row is not None else 0) or 0
+            ),
+            "latest_official_update_time": None
+            if summary_row is None
+            else summary_row["latest_official_update_time"],
+            "latest_updated_at": None if summary_row is None else summary_row["latest_updated_at"],
+            "symbols_by_exchange": {
+                str(row["exchange"]): int(row["symbol_count"] or 0)
+                for row in exchange_rows
+                if row["exchange"] is not None
+            },
+        }
+
+    def upsert_official_industry_classification(
+        self,
+        snapshot: OfficialIndustryClassificationSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one latest official industry classification snapshot."""
+        now = get_shanghai_time().isoformat()
+        classification_json = json.dumps(
+            snapshot.classification_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO industry_official_classifications (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    taxonomy_system,
+                    taxonomy_version,
+                    official_industry_code,
+                    official_start_date,
+                    official_update_time,
+                    mapped_industry_code,
+                    mapped_industry_name,
+                    mapped_industry_level,
+                    mapped_parent_code,
+                    mapping_status,
+                    mapping_confidence,
+                    source,
+                    source_mode,
+                    classification_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, taxonomy_system, taxonomy_version)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    official_industry_code = excluded.official_industry_code,
+                    official_start_date = excluded.official_start_date,
+                    official_update_time = excluded.official_update_time,
+                    mapped_industry_code = excluded.mapped_industry_code,
+                    mapped_industry_name = excluded.mapped_industry_name,
+                    mapped_industry_level = excluded.mapped_industry_level,
+                    mapped_parent_code = excluded.mapped_parent_code,
+                    mapping_status = excluded.mapping_status,
+                    mapping_confidence = excluded.mapping_confidence,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    classification_json = excluded.classification_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.taxonomy_system,
+                    snapshot.taxonomy_version or "",
+                    snapshot.official_industry_code,
+                    snapshot.official_start_date,
+                    snapshot.official_update_time,
+                    snapshot.mapped_industry_code,
+                    snapshot.mapped_industry_name,
+                    snapshot.mapped_industry_level,
+                    snapshot.mapped_parent_code,
+                    snapshot.mapping_status,
+                    snapshot.mapping_confidence,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    classification_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def replace_official_industry_code_mappings(
+        self,
+        mappings: list[OfficialShenwanCodeMapping],
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        source: str,
+        source_mode: str,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Replace the persisted official-code mapping cache for one taxonomy version."""
+        now = get_shanghai_time().isoformat()
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                DELETE FROM industry_official_code_mappings
+                WHERE taxonomy_system = ? AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            )
+            for mapping in mappings:
+                mapping_json = json.dumps(asdict(mapping), ensure_ascii=False, sort_keys=True)
+                conn.execute(
+                    """
+                    INSERT INTO industry_official_code_mappings (
+                        taxonomy_system,
+                        taxonomy_version,
+                        official_industry_code,
+                        best_taxonomy_industry_code,
+                        mapped_industry_code,
+                        mapping_status,
+                        mapping_confidence,
+                        overlap_count,
+                        official_symbol_count,
+                        taxonomy_symbol_count,
+                        precision,
+                        recall,
+                        source,
+                        source_mode,
+                        built_at,
+                        mapping_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        taxonomy_system,
+                        taxonomy_version or "",
+                        mapping.official_industry_code,
+                        mapping.best_taxonomy_industry_code,
+                        mapping.taxonomy_industry_code,
+                        "mapped" if mapping.taxonomy_industry_code is not None else "unmapped",
+                        mapping.confidence,
+                        mapping.overlap_count,
+                        mapping.official_symbol_count,
+                        mapping.taxonomy_symbol_count,
+                        mapping.precision,
+                        mapping.recall,
+                        source,
+                        source_mode,
+                        now,
+                        mapping_json,
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+            )
+            conn.commit()
+
+    def replace_industry_component_sets(
+        self,
+        component_sets: Dict[str, set[str]],
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        source: str,
+        source_mode: str,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Replace persisted Shenwan component-set cache for one taxonomy version."""
+        now = get_shanghai_time().isoformat()
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                DELETE FROM industry_component_sets
+                WHERE taxonomy_system = ? AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            )
+            for industry_code, symbols in component_sets.items():
+                normalized_symbols = sorted(
+                    {
+                        str(symbol).strip()
+                        for symbol in (symbols or set())
+                        if str(symbol).strip()
+                    }
+                )
+                conn.execute(
+                    """
+                    INSERT INTO industry_component_sets (
+                        taxonomy_system,
+                        taxonomy_version,
+                        industry_code,
+                        component_count,
+                        source,
+                        source_mode,
+                        built_at,
+                        symbols_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        taxonomy_system,
+                        taxonomy_version or "",
+                        industry_code,
+                        len(normalized_symbols),
+                        source,
+                        source_mode,
+                        now,
+                        json.dumps(normalized_symbols, ensure_ascii=False, sort_keys=True),
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
+            conn.commit()
+
+    def get_industry_component_sets(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        max_age_days: Optional[int] = None,
+    ) -> Dict[str, set[str]]:
+        """Return cached Shenwan component sets for one taxonomy version."""
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        age_filter = ""
+        if max_age_days is not None:
+            cutoff = get_shanghai_time() - timedelta(days=int(max_age_days))
+            age_filter = " AND built_at >= ?"
+            params.append(cutoff.isoformat())
+
+        sql = f"""
+            SELECT industry_code, symbols_json
+            FROM industry_component_sets
+            WHERE taxonomy_system = ?
+              AND taxonomy_version = ?
+              {age_filter}
+            ORDER BY industry_code ASC
+        """
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        component_sets: Dict[str, set[str]] = {}
+        for row in rows:
+            symbols = self._deserialize_json(row["symbols_json"]) or []
+            component_sets[str(row["industry_code"])] = {
+                str(symbol).strip() for symbol in symbols if str(symbol).strip()
+            }
+        return component_sets
+
+    def list_industry_component_set_records(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        industry_code: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+        include_symbols: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """List cached Shenwan component-set rows with metadata."""
+        where_sql, params = self._industry_component_set_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            industry_code=industry_code,
+            max_age_days=max_age_days,
+        )
+        sql = f"""
+            SELECT
+                taxonomy_system,
+                taxonomy_version,
+                industry_code,
+                component_count,
+                source,
+                source_mode,
+                built_at,
+                symbols_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM industry_component_sets
+            {where_sql}
+            ORDER BY industry_code ASC
+        """
+        if limit is not None:
+            sql += " LIMIT ? OFFSET ?"
+            params.extend((int(limit), max(int(offset), 0)))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        records: list[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            symbols_json = item.pop("symbols_json", None)
+            if include_symbols:
+                item["symbols"] = self._deserialize_json(symbols_json) or []
+            records.append(item)
+        return records
+
+    def list_industry_component_set_records_from_memberships(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        industry_code: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+        include_symbols: bool = True,
+    ) -> tuple[list[Dict[str, Any]], int]:
+        """Derive Shenwan component sets from authoritative stock memberships."""
+        taxonomy_version = taxonomy_version or ""
+        conditions = [
+            "m.taxonomy_system = ?",
+            "m.taxonomy_version = ?",
+            "m.mapping_status = 'authoritative'",
+        ]
+        params: list[Any] = [taxonomy_system, taxonomy_version]
+
+        group_override: Optional[str] = None
+        if industry_code:
+            with self.get_connection() as conn:
+                self._apply_pragmas(conn)
+                node = conn.execute(
+                    """
+                    SELECT industry_level
+                    FROM industry_taxonomy
+                    WHERE taxonomy_system = ?
+                      AND taxonomy_version = ?
+                      AND industry_code = ?
+                      AND is_active = 1
+                    LIMIT 1
+                    """,
+                    (taxonomy_system, taxonomy_version, industry_code),
+                ).fetchone()
+
+            group_override = industry_code
+            if node and int(node["industry_level"] or 0) == 1:
+                conditions.append("m.sw_l1_code = ?")
+                params.append(industry_code)
+            elif node and int(node["industry_level"] or 0) == 2:
+                conditions.append("m.sw_l2_code = ?")
+                params.append(industry_code)
+            elif node and int(node["industry_level"] or 0) == 3:
+                conditions.append("(m.sw_l3_code = ? OR m.industry_code = ?)")
+                params.extend((industry_code, industry_code))
+            else:
+                conditions.append(
+                    """
+                    (
+                        m.industry_code = ?
+                        OR m.sw_l1_code = ?
+                        OR m.sw_l2_code = ?
+                        OR m.sw_l3_code = ?
+                    )
+                    """
+                )
+                params.extend((industry_code, industry_code, industry_code, industry_code))
+
+        if max_age_days is not None and max_age_days >= 0:
+            cutoff = get_shanghai_time() - timedelta(days=int(max_age_days))
+            conditions.append("m.updated_at >= ?")
+            params.append(cutoff.isoformat())
+
+        where_sql = " AND ".join(conditions)
+        sql = f"""
+            SELECT
+                m.instrument_id,
+                m.symbol,
+                m.industry_code,
+                m.source,
+                m.source_mode,
+                m.ingestion_run_id,
+                m.created_at,
+                m.updated_at
+            FROM industry_memberships m
+            WHERE {where_sql}
+            ORDER BY m.industry_code ASC, m.symbol ASC, m.instrument_id ASC
+        """
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        grouped: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            code = group_override or str(row["industry_code"])
+            item = grouped.setdefault(
+                code,
+                {
+                    "taxonomy_system": taxonomy_system,
+                    "taxonomy_version": taxonomy_version,
+                    "industry_code": code,
+                    "symbols": set(),
+                    "sources": set(),
+                    "source_modes": set(),
+                    "ingestion_run_ids": set(),
+                    "created_at": row["created_at"],
+                    "updated_at": row["updated_at"],
+                },
+            )
+            symbol = str(row["symbol"] or "").strip()
+            if symbol:
+                item["symbols"].add(symbol)
+            if row["source"]:
+                item["sources"].add(str(row["source"]))
+            if row["source_mode"]:
+                item["source_modes"].add(str(row["source_mode"]))
+            if row["ingestion_run_id"] is not None:
+                item["ingestion_run_ids"].add(int(row["ingestion_run_id"]))
+            if row["created_at"] and (
+                item["created_at"] is None or row["created_at"] < item["created_at"]
+            ):
+                item["created_at"] = row["created_at"]
+            if row["updated_at"] and (
+                item["updated_at"] is None or row["updated_at"] > item["updated_at"]
+            ):
+                item["updated_at"] = row["updated_at"]
+
+        records: list[Dict[str, Any]] = []
+        for code in sorted(grouped):
+            item = grouped[code]
+            symbols = sorted(item["symbols"])
+            sources = sorted(item["sources"])
+            source_modes = sorted(item["source_modes"])
+            run_ids = sorted(item["ingestion_run_ids"])
+            record = {
+                "taxonomy_system": item["taxonomy_system"],
+                "taxonomy_version": item["taxonomy_version"],
+                "industry_code": code,
+                "component_count": len(symbols),
+                "source": sources[0] if len(sources) == 1 else "industry_memberships",
+                "source_mode": source_modes[0] if len(source_modes) == 1 else "derived",
+                "built_at": item["updated_at"],
+                "ingestion_run_id": run_ids[-1] if len(run_ids) == 1 else None,
+                "created_at": item["created_at"],
+                "updated_at": item["updated_at"],
+            }
+            if include_symbols:
+                record["symbols"] = symbols
+            records.append(record)
+
+        total = len(records)
+        if limit is not None:
+            start = max(int(offset), 0)
+            end = start + int(limit)
+            records = records[start:end]
+        return records, total
+
+    def count_industry_component_sets(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        industry_code: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+    ) -> int:
+        """Count cached Shenwan component-set rows for one taxonomy version."""
+        where_sql, params = self._industry_component_set_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            industry_code=industry_code,
+            max_age_days=max_age_days,
+        )
+        sql = f"""
+            SELECT COUNT(*)
+            FROM industry_component_sets
+            {where_sql}
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count = conn.execute(sql, params).fetchone()[0]
+        return int(count or 0)
+
+    def _industry_component_set_filter_sql(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        industry_code: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+    ) -> tuple[str, list[Any]]:
+        """Build a WHERE clause for Shenwan component-set cache queries."""
+        conditions = ["taxonomy_system = ?", "taxonomy_version = ?"]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if industry_code:
+            conditions.append("industry_code = ?")
+            params.append(industry_code)
+        if max_age_days is not None and max_age_days >= 0:
+            cutoff = (get_shanghai_time() - timedelta(days=int(max_age_days))).isoformat()
+            conditions.append("built_at >= ?")
+            params.append(cutoff)
+        return "WHERE " + " AND ".join(conditions), params
+
+    def get_latest_industry_component_set_cache_info(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the latest persisted component-set cache build info."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    source,
+                    source_mode,
+                    built_at,
+                    updated_at
+                FROM industry_component_sets
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                ORDER BY COALESCE(built_at, updated_at) DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+        return None if row is None else dict(row)
+
+    def get_official_industry_code_mappings(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        max_age_days: Optional[int] = None,
+    ) -> list[Dict[str, Any]]:
+        """Return persisted official-code mapping rows for one taxonomy version."""
+        return self.list_official_industry_code_mappings(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            max_age_days=max_age_days,
+            limit=None,
+            offset=0,
+            include_mapping=True,
+        )
+
+    def list_official_industry_code_mappings(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        mapping_status: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+        include_mapping: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """List persisted official-code mapping rows with optional filters."""
+        where_sql, params = self._official_mapping_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            mapping_status=mapping_status,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        sql = f"""
+            SELECT
+                taxonomy_system,
+                taxonomy_version,
+                official_industry_code,
+                best_taxonomy_industry_code,
+                mapped_industry_code,
+                mapping_status,
+                mapping_confidence,
+                overlap_count,
+                official_symbol_count,
+                taxonomy_symbol_count,
+                precision,
+                recall,
+                source,
+                source_mode,
+                built_at,
+                mapping_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM industry_official_code_mappings
+            {where_sql}
+            ORDER BY
+                CASE
+                    WHEN mapping_status = 'unmapped' THEN 0
+                    ELSE 1
+                END,
+                official_industry_code ASC
+        """
+        if limit is not None:
+            sql += " LIMIT ? OFFSET ?"
+            params.extend((int(limit), max(int(offset), 0)))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        records: list[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            mapping_json = item.pop("mapping_json", None)
+            if include_mapping:
+                item["mapping"] = self._deserialize_json(mapping_json)
+            records.append(item)
+        return records
+
+    def count_official_industry_code_mappings(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        mapping_status: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+    ) -> int:
+        """Count persisted official-code mapping rows with optional filters."""
+        where_sql, params = self._official_mapping_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            mapping_status=mapping_status,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        sql = f"""
+            SELECT COUNT(*)
+            FROM industry_official_code_mappings
+            {where_sql}
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count = conn.execute(sql, params).fetchone()[0]
+        return int(count or 0)
+
+    def summarize_official_industry_code_mappings(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+    ) -> Dict[str, int]:
+        """Return mapping-status counts for one taxonomy version."""
+        where_sql, params = self._official_mapping_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+        )
+        sql = f"""
+            SELECT mapping_status, COUNT(*) AS row_count
+            FROM industry_official_code_mappings
+            {where_sql}
+            GROUP BY mapping_status
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+        summary = {"mapped": 0, "unmapped": 0}
+        for row in rows:
+            summary[str(row["mapping_status"])] = int(row["row_count"] or 0)
+        return summary
+
+    def get_latest_official_industry_code_mapping_cache_info(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the latest persisted mapping-cache build info."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    source,
+                    source_mode,
+                    built_at,
+                    updated_at
+                FROM industry_official_code_mappings
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                ORDER BY COALESCE(built_at, updated_at) DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+        return None if row is None else dict(row)
+
+    def summarize_official_industry_classifications(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Dict[str, Any]:
+        """Return mapping-status summary for latest official classifications."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count_rows = conn.execute(
+                """
+                SELECT mapping_status, COUNT(*) AS row_count
+                FROM industry_official_classifications
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                GROUP BY mapping_status
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchall()
+            summary_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS total,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(official_update_time) AS latest_official_update_time
+                FROM industry_official_classifications
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+
+        counts = {"mapped": 0, "unmapped": 0}
+        for row in count_rows:
+            counts[str(row["mapping_status"])] = int(row["row_count"] or 0)
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "counts": counts,
+            "latest_updated_at": None if summary_row is None else summary_row["latest_updated_at"],
+            "latest_official_update_time": None
+            if summary_row is None
+            else summary_row["latest_official_update_time"],
+        }
+
+    def summarize_industry_memberships(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> Dict[str, Any]:
+        """Return mapping-status summary for normalized industry memberships."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count_rows = conn.execute(
+                """
+                SELECT mapping_status, COUNT(*) AS row_count
+                FROM industry_memberships
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                GROUP BY mapping_status
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchall()
+            summary_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS total,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(data_as_of) AS latest_data_as_of
+                FROM industry_memberships
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                """,
+                (taxonomy_system, taxonomy_version or ""),
+            ).fetchone()
+
+        counts = {"authoritative": 0, "reference_only": 0}
+        for row in count_rows:
+            counts[str(row["mapping_status"])] = int(row["row_count"] or 0)
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "counts": counts,
+            "latest_updated_at": None if summary_row is None else summary_row["latest_updated_at"],
+            "latest_data_as_of": None if summary_row is None else summary_row["latest_data_as_of"],
+        }
+
+    def count_industry_memberships_by_exchange(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        mapping_status: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Count industry memberships per exchange with optional status filter."""
+        conditions = [
+            "taxonomy_system = ?",
+            "taxonomy_version = ?",
+        ]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if mapping_status:
+            conditions.append("mapping_status = ?")
+            params.append(mapping_status)
+
+        where_sql = " AND ".join(conditions)
+        sql = f"""
+            SELECT exchange, COUNT(*) AS row_count
+            FROM industry_memberships
+            WHERE {where_sql}
+            GROUP BY exchange
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        return {
+            str(row["exchange"]): int(row["row_count"] or 0)
+            for row in rows
+            if row["exchange"] is not None
+        }
+
+    def list_industry_membership_instrument_ids(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        mapping_status: Optional[str] = None,
+        exchange: Optional[str] = None,
+    ) -> List[str]:
+        """List distinct instrument ids covered by industry memberships."""
+        conditions = [
+            "taxonomy_system = ?",
+            "taxonomy_version = ?",
+        ]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if mapping_status:
+            conditions.append("mapping_status = ?")
+            params.append(mapping_status)
+        if exchange:
+            conditions.append("exchange = ?")
+            params.append(exchange)
+
+        where_sql = " AND ".join(conditions)
+        sql = f"""
+            SELECT DISTINCT instrument_id
+            FROM industry_memberships
+            WHERE {where_sql}
+              AND instrument_id IS NOT NULL
+              AND instrument_id != ''
+            ORDER BY instrument_id ASC
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        return [str(row["instrument_id"]) for row in rows if row["instrument_id"]]
+
+    def get_official_industry_code_mapping(
+        self,
+        official_industry_code: str,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        include_mapping: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one persisted official-code mapping row."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    taxonomy_system,
+                    taxonomy_version,
+                    official_industry_code,
+                    best_taxonomy_industry_code,
+                    mapped_industry_code,
+                    mapping_status,
+                    mapping_confidence,
+                    overlap_count,
+                    official_symbol_count,
+                    taxonomy_symbol_count,
+                    precision,
+                    recall,
+                    source,
+                    source_mode,
+                    built_at,
+                    mapping_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM industry_official_code_mappings
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                  AND official_industry_code = ?
+                LIMIT 1
+                """,
+                (taxonomy_system, taxonomy_version or "", official_industry_code),
+            ).fetchone()
+        if row is None:
+            return None
+        item = dict(row)
+        mapping_json = item.pop("mapping_json", None)
+        if include_mapping:
+            item["mapping"] = self._deserialize_json(mapping_json)
+        return item
+
+    def list_unmapped_official_industry_code_backlog(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+        include_mapping: bool = True,
+        sample_limit: int = 5,
+    ) -> list[Dict[str, Any]]:
+        """List prioritized unmapped official-code backlog rows."""
+        where_sql, params = self._official_mapping_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            mapping_status="unmapped",
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            table_alias="m",
+        )
+        sql = f"""
+            WITH classification_counts AS (
+                SELECT
+                    official_industry_code,
+                    COUNT(*) AS current_classification_count
+                FROM industry_official_classifications
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                GROUP BY official_industry_code
+            )
+            SELECT
+                m.taxonomy_system,
+                m.taxonomy_version,
+                m.official_industry_code,
+                m.best_taxonomy_industry_code,
+                m.mapped_industry_code,
+                m.mapping_status,
+                m.mapping_confidence,
+                m.overlap_count,
+                m.official_symbol_count,
+                m.taxonomy_symbol_count,
+                m.precision,
+                m.recall,
+                m.source,
+                m.source_mode,
+                m.built_at,
+                m.mapping_json,
+                m.ingestion_run_id,
+                m.created_at,
+                m.updated_at,
+                COALESCE(cc.current_classification_count, 0) AS current_classification_count
+            FROM industry_official_code_mappings AS m
+            LEFT JOIN classification_counts AS cc
+              ON cc.official_industry_code = m.official_industry_code
+            {where_sql}
+            ORDER BY
+                current_classification_count DESC,
+                m.official_symbol_count DESC,
+                m.overlap_count DESC,
+                m.official_industry_code ASC
+        """
+        query_params: list[Any] = [
+            taxonomy_system,
+            taxonomy_version or "",
+            *params,
+        ]
+        if limit is not None:
+            sql += " LIMIT ? OFFSET ?"
+            query_params.extend((int(limit), max(int(offset), 0)))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, query_params).fetchall()
+
+        records: list[Dict[str, Any]] = []
+        official_codes = [str(row["official_industry_code"]) for row in rows]
+        exchange_counts = self._get_official_classification_exchange_counts(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            official_codes=official_codes,
+        )
+        sample_instruments = self._get_official_classification_sample_instruments(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            official_codes=official_codes,
+            sample_limit=sample_limit,
+        )
+
+        for row in rows:
+            item = dict(row)
+            mapping_json = item.pop("mapping_json", None)
+            official_code = str(item["official_industry_code"])
+            item["impacted_exchange_counts"] = exchange_counts.get(official_code, {})
+            item["sample_instruments"] = sample_instruments.get(official_code, [])
+            if include_mapping:
+                item["mapping"] = self._deserialize_json(mapping_json)
+            records.append(item)
+        return records
+
+    def summarize_unmapped_official_industry_code_backlog(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+    ) -> Dict[str, int]:
+        """Summarize backlog size and current impact for unmapped official codes."""
+        where_sql, params = self._official_mapping_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            mapping_status="unmapped",
+            source=source,
+            source_mode=source_mode,
+            max_age_days=max_age_days,
+            table_alias="m",
+        )
+        sql = f"""
+            SELECT COALESCE(SUM(backlog.current_classification_count), 0) AS current_classification_total
+            FROM (
+                SELECT
+                    m.official_industry_code,
+                    COUNT(c.instrument_id) AS current_classification_count
+                FROM industry_official_code_mappings AS m
+                LEFT JOIN industry_official_classifications AS c
+                  ON c.taxonomy_system = m.taxonomy_system
+                 AND c.taxonomy_version = m.taxonomy_version
+                 AND c.official_industry_code = m.official_industry_code
+                {where_sql}
+                GROUP BY m.official_industry_code
+            ) AS backlog
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            current_classification_total = conn.execute(sql, params).fetchone()[0]
+
+        return {
+            "official_code_total": self.count_official_industry_code_mappings(
+                taxonomy_system=taxonomy_system,
+                taxonomy_version=taxonomy_version,
+                mapping_status="unmapped",
+                source=source,
+                source_mode=source_mode,
+                max_age_days=max_age_days,
+            ),
+            "current_classification_total": int(current_classification_total or 0),
+        }
+
+    def _official_mapping_filter_sql(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        mapping_status: Optional[str] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        max_age_days: Optional[int] = None,
+        table_alias: Optional[str] = None,
+    ) -> tuple[str, list[Any]]:
+        """Build a reusable WHERE clause for official mapping cache queries."""
+        prefix = f"{table_alias}." if table_alias else ""
+        conditions = [
+            f"{prefix}taxonomy_system = ?",
+            f"{prefix}taxonomy_version = ?",
+        ]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if mapping_status:
+            conditions.append(f"{prefix}mapping_status = ?")
+            params.append(mapping_status)
+        if source:
+            conditions.append(f"{prefix}source = ?")
+            params.append(source)
+        if source_mode:
+            conditions.append(f"{prefix}source_mode = ?")
+            params.append(source_mode)
+        if max_age_days is not None and max_age_days >= 0:
+            cutoff = (
+                get_shanghai_time() - timedelta(days=int(max_age_days))
+            ).isoformat()
+            conditions.append(f"{prefix}built_at >= ?")
+            params.append(cutoff)
+        return "WHERE " + " AND ".join(conditions), params
+
+    def _get_official_classification_exchange_counts(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        official_codes: list[str],
+    ) -> Dict[str, Dict[str, int]]:
+        """Return current impacted exchange counts for a set of official codes."""
+        if not official_codes:
+            return {}
+        placeholders = ", ".join("?" for _ in official_codes)
+        params: list[Any] = [taxonomy_system, taxonomy_version or "", *official_codes]
+        sql = f"""
+            SELECT official_industry_code, exchange, COUNT(*) AS row_count
+            FROM industry_official_classifications
+            WHERE taxonomy_system = ?
+              AND taxonomy_version = ?
+              AND official_industry_code IN ({placeholders})
+            GROUP BY official_industry_code, exchange
+            ORDER BY official_industry_code ASC, exchange ASC
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        result: Dict[str, Dict[str, int]] = {}
+        for row in rows:
+            official_code = str(row["official_industry_code"])
+            result.setdefault(official_code, {})[str(row["exchange"])] = int(
+                row["row_count"] or 0
+            )
+        return result
+
+    def _get_official_classification_sample_instruments(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        official_codes: list[str],
+        sample_limit: int,
+    ) -> Dict[str, list[str]]:
+        """Return sample instruments for a set of official codes."""
+        if not official_codes:
+            return {}
+        placeholders = ", ".join("?" for _ in official_codes)
+        params: list[Any] = [taxonomy_system, taxonomy_version or "", *official_codes]
+        sql = f"""
+            SELECT official_industry_code, instrument_id
+            FROM industry_official_classifications
+            WHERE taxonomy_system = ?
+              AND taxonomy_version = ?
+              AND official_industry_code IN ({placeholders})
+            ORDER BY official_industry_code ASC, exchange ASC, instrument_id ASC
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        result: Dict[str, list[str]] = {}
+        per_code_limit = max(1, int(sample_limit))
+        for row in rows:
+            official_code = str(row["official_industry_code"])
+            bucket = result.setdefault(official_code, [])
+            if len(bucket) >= per_code_limit:
+                continue
+            bucket.append(str(row["instrument_id"]))
+        return result
+
+    def upsert_industry_taxonomy(
+        self,
+        snapshot: IndustryTaxonomySnapshot,
+    ) -> None:
+        """Upsert one normalized industry taxonomy node."""
+        now = get_shanghai_time().isoformat()
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            self._upsert_industry_taxonomy_row(conn, snapshot, now=now)
+            conn.commit()
+
+    def list_industry_taxonomy(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[IndustryTaxonomySnapshot]:
+        """Return persisted taxonomy nodes for one taxonomy version."""
+        where = "taxonomy_system = ? AND taxonomy_version = ?"
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if active_only:
+            where += " AND is_active = 1"
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT
+                    taxonomy_system,
+                    taxonomy_version,
+                    industry_code,
+                    industry_name,
+                    industry_level,
+                    parent_code,
+                    sw_index_code,
+                    aliases_json,
+                    source_classification,
+                    source,
+                    source_mode
+                FROM industry_taxonomy
+                WHERE {where}
+                ORDER BY industry_level ASC, industry_code ASC
+                """,
+                params,
+            ).fetchall()
+
+        return [
+            IndustryTaxonomySnapshot(
+                taxonomy_system=str(row["taxonomy_system"]),
+                taxonomy_version=str(row["taxonomy_version"] or "") or None,
+                industry_code=str(row["industry_code"]),
+                industry_name=str(row["industry_name"]),
+                industry_level=int(row["industry_level"]),
+                parent_code=row["parent_code"],
+                sw_index_code=row["sw_index_code"],
+                aliases_json=self._deserialize_json(row["aliases_json"]) or {},
+                source_classification=row["source_classification"],
+                source=str(row["source"]),
+                source_mode=str(row["source_mode"]),
+                raw_payload={"cache_source": "industry_taxonomy"},
+            )
+            for row in rows
+        ]
+
+    def list_industry_taxonomy_records(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: Optional[str] = None,
+        industry_level: Optional[int] = None,
+        parent_code: Optional[str] = None,
+        industry_code: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        active_only: bool = True,
+        limit: Optional[int] = 100,
+        offset: int = 0,
+    ) -> list[Dict[str, Any]]:
+        """List persisted taxonomy nodes as API-ready dictionaries."""
+        where_sql, params = self._industry_taxonomy_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            industry_level=industry_level,
+            parent_code=parent_code,
+            industry_code=industry_code,
+            sw_index_code=sw_index_code,
+            active_only=active_only,
+        )
+        sql = f"""
+            SELECT
+                taxonomy_system,
+                taxonomy_version,
+                industry_code,
+                industry_name,
+                industry_level,
+                parent_code,
+                sw_index_code,
+                aliases_json,
+                source_classification,
+                source,
+                source_mode,
+                is_active,
+                created_at,
+                updated_at
+            FROM industry_taxonomy
+            {where_sql}
+            ORDER BY industry_level ASC, industry_code ASC
+        """
+        if limit is not None:
+            sql += " LIMIT ? OFFSET ?"
+            params.extend((int(limit), max(int(offset), 0)))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+
+        records: list[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["is_active"] = bool(item.get("is_active"))
+            aliases_json = item.pop("aliases_json", None)
+            item["aliases"] = self._deserialize_json(aliases_json) or {}
+            records.append(item)
+        return records
+
+    def count_industry_taxonomy_records(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: Optional[str] = None,
+        industry_level: Optional[int] = None,
+        parent_code: Optional[str] = None,
+        industry_code: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        active_only: bool = True,
+    ) -> int:
+        """Count persisted taxonomy nodes with optional filters."""
+        where_sql, params = self._industry_taxonomy_filter_sql(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            industry_level=industry_level,
+            parent_code=parent_code,
+            industry_code=industry_code,
+            sw_index_code=sw_index_code,
+            active_only=active_only,
+        )
+        sql = f"""
+            SELECT COUNT(*)
+            FROM industry_taxonomy
+            {where_sql}
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count = conn.execute(sql, params).fetchone()[0]
+        return int(count or 0)
+
+    def _industry_taxonomy_filter_sql(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: Optional[str] = None,
+        industry_level: Optional[int] = None,
+        parent_code: Optional[str] = None,
+        industry_code: Optional[str] = None,
+        sw_index_code: Optional[str] = None,
+        active_only: bool = True,
+    ) -> tuple[str, list[Any]]:
+        """Build a WHERE clause for industry taxonomy queries."""
+        conditions = ["taxonomy_system = ?", "taxonomy_version = ?"]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if industry_level is not None:
+            conditions.append("industry_level = ?")
+            params.append(int(industry_level))
+        if parent_code is not None:
+            conditions.append("parent_code = ?")
+            params.append(parent_code)
+        if industry_code:
+            conditions.append("industry_code = ?")
+            params.append(industry_code)
+        if sw_index_code:
+            conditions.append("sw_index_code = ?")
+            params.append(sw_index_code)
+        if active_only:
+            conditions.append("is_active = 1")
+        return "WHERE " + " AND ".join(conditions), params
+
+    def get_company_profile(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one normalized company profile row."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    company_name,
+                    short_name,
+                    exchange,
+                    market,
+                    listed_date,
+                    industry_raw,
+                    sector_raw,
+                    status,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    profile_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM company_profiles
+                WHERE instrument_id = ?
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        profile_json = data.pop("profile_json", None)
+        if include_snapshot:
+            data["profile"] = self._deserialize_json(profile_json)
+        return data
+
+    def get_financial_summary(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one normalized financial summary row."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_date,
+                    pub_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    roe,
+                    gross_margin,
+                    net_margin,
+                    current_ratio,
+                    quick_ratio,
+                    liability_to_asset,
+                    yoy_asset,
+                    yoy_equity,
+                    yoy_net_profit,
+                    cfo_to_revenue,
+                    cfo_to_net_profit,
+                    asset_turnover,
+                    eps,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    summary_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM financial_summaries
+                WHERE instrument_id = ?
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        summary_json = data.pop("summary_json", None)
+        if include_snapshot:
+            data["summary"] = self._deserialize_json(summary_json)
+        return data
+
+    def get_financial_statement_bundle(
+        self,
+        instrument_id: str,
+        *,
+        include_statements: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one latest financial statement bundle for an instrument."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            facts_row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_period,
+                    publish_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    revenue,
+                    gross_profit,
+                    operating_profit,
+                    pre_tax_profit,
+                    net_income,
+                    operating_cf,
+                    total_cf,
+                    total_assets,
+                    total_liabilities,
+                    equity,
+                    current_assets,
+                    current_liabilities,
+                    inventory,
+                    receivables,
+                    fixed_assets,
+                    intangible_assets,
+                    shares_outstanding,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    facts_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM financial_facts
+                WHERE instrument_id = ?
+                ORDER BY report_period DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+            if facts_row is None:
+                return None
+
+            report_period = facts_row["report_period"]
+            indicators_row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    report_period,
+                    gross_margin,
+                    operating_margin,
+                    net_margin,
+                    roe,
+                    roa,
+                    current_ratio,
+                    quick_ratio,
+                    asset_liability_ratio,
+                    revenue_per_share,
+                    operating_cf_to_revenue,
+                    operating_cf_to_net_income,
+                    book_value_per_share,
+                    indicators_json,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM financial_indicator_snapshots
+                WHERE instrument_id = ? AND report_period = ?
+                ORDER BY updated_at DESC
+                LIMIT 1
+                """,
+                (instrument_id, report_period),
+            ).fetchone()
+            statement_rows = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    statement_type,
+                    report_period,
+                    publish_date,
+                    fiscal_year,
+                    fiscal_quarter,
+                    currency,
+                    schema_version,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    statement_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM financial_statements_raw
+                WHERE instrument_id = ? AND report_period = ?
+                ORDER BY statement_type ASC
+                """,
+                (instrument_id, report_period),
+            ).fetchall()
+
+        facts = dict(facts_row)
+        facts_json = facts.pop("facts_json", None)
+        indicators = dict(indicators_row) if indicators_row is not None else None
+        if indicators is not None:
+            indicators_json = indicators.pop("indicators_json", None)
+            indicators["details"] = self._deserialize_json(indicators_json)
+
+        statements = []
+        for row in statement_rows:
+            item = dict(row)
+            statement_json = item.pop("statement_json", None)
+            item["statement"] = self._deserialize_json(statement_json)
+            statements.append(item)
+
+        facts["facts"] = self._deserialize_json(facts_json)
+        facts["indicators"] = indicators
+        if include_statements:
+            facts["statements"] = statements
+        return facts
+
+    def get_shareholder_snapshot(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one latest shareholder summary snapshot."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    coverage_status,
+                    holder_count,
+                    holder_count_report_date,
+                    top_holders_report_date,
+                    top_holders_count,
+                    top_holders_total_ratio,
+                    control_owner_name,
+                    control_owner_ratio,
+                    schema_version,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    snapshot_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM shareholder_snapshots
+                WHERE instrument_id = ?
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        snapshot_json = data.pop("snapshot_json", None)
+        if include_snapshot:
+            data["snapshot"] = self._deserialize_json(snapshot_json)
+        return data
+
+    def summarize_shareholder_snapshots(self) -> Dict[str, Any]:
+        """Return aggregate summary for latest shareholder snapshots."""
+        return self._summarize_shareholder_snapshots()
+
+    def summarize_shareholder_snapshots_by_exchanges(
+        self,
+        exchanges: List[str],
+    ) -> Dict[str, Any]:
+        """Return aggregate shareholder snapshot summary for selected exchanges."""
+        normalized_exchanges = [
+            str(exchange).strip()
+            for exchange in exchanges
+            if str(exchange).strip()
+        ]
+        if not normalized_exchanges:
+            return {
+                "total": 0,
+                "coverage_status_counts": {},
+                "source_counts": {},
+                "source_mode_counts": {},
+                "scope_counts": {},
+                "latest_updated_at": None,
+                "latest_data_as_of": None,
+            }
+        return self._summarize_shareholder_snapshots(
+            exchanges=normalized_exchanges,
+        )
+
+    def _summarize_shareholder_snapshots(
+        self,
+        exchanges: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Return aggregate summary for latest shareholder snapshots."""
+        where_clause = ""
+        params: List[str] = []
+        if exchanges:
+            placeholders = ",".join("?" for _ in exchanges)
+            where_clause = f"WHERE exchange IN ({placeholders})"
+            params = list(exchanges)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            coverage_rows = conn.execute(
+                f"""
+                SELECT coverage_status, COUNT(*) AS row_count
+                FROM shareholder_snapshots
+                {where_clause}
+                GROUP BY coverage_status
+                """,
+                params,
+            ).fetchall()
+            source_rows = conn.execute(
+                f"""
+                SELECT source, COUNT(*) AS row_count
+                FROM shareholder_snapshots
+                {where_clause}
+                GROUP BY source
+                """,
+                params,
+            ).fetchall()
+            mode_rows = conn.execute(
+                f"""
+                SELECT source_mode, COUNT(*) AS row_count
+                FROM shareholder_snapshots
+                {where_clause}
+                GROUP BY source_mode
+                """,
+                params,
+            ).fetchall()
+            snapshot_rows = conn.execute(
+                f"""
+                SELECT snapshot_json
+                FROM shareholder_snapshots
+                {where_clause}
+                """,
+                params,
+            ).fetchall()
+            summary_row = conn.execute(
+                f"""
+                SELECT
+                    COUNT(*) AS total,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(data_as_of) AS latest_data_as_of
+                FROM shareholder_snapshots
+                {where_clause}
+                """,
+                params,
+            ).fetchone()
+
+        scope_counts: Dict[str, int] = {}
+        for row in snapshot_rows:
+            snapshot = self._deserialize_json(row["snapshot_json"])
+            if not isinstance(snapshot, dict):
+                continue
+            for scope in snapshot.get("coverage_scope", []) or []:
+                scope_text = str(scope).strip()
+                if not scope_text:
+                    continue
+                scope_counts[scope_text] = scope_counts.get(scope_text, 0) + 1
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "coverage_status_counts": {
+                str(row["coverage_status"]): int(row["row_count"] or 0)
+                for row in coverage_rows
+                if row["coverage_status"] is not None
+            },
+            "source_counts": {
+                str(row["source"]): int(row["row_count"] or 0)
+                for row in source_rows
+                if row["source"] is not None
+            },
+            "source_mode_counts": {
+                str(row["source_mode"]): int(row["row_count"] or 0)
+                for row in mode_rows
+                if row["source_mode"] is not None
+            },
+            "scope_counts": scope_counts,
+            "latest_updated_at": None if summary_row is None else summary_row["latest_updated_at"],
+            "latest_data_as_of": None if summary_row is None else summary_row["latest_data_as_of"],
+        }
+
+    def count_shareholder_snapshots_by_exchange(self) -> Dict[str, int]:
+        """Count shareholder snapshots per exchange."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT exchange, COUNT(*) AS row_count
+                FROM shareholder_snapshots
+                GROUP BY exchange
+                """
+            ).fetchall()
+        return {
+            str(row["exchange"]): int(row["row_count"] or 0)
+            for row in rows
+            if row["exchange"] is not None
+        }
+
+    def get_industry_membership(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the preferred latest industry membership row for one instrument."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    taxonomy_system,
+                    taxonomy_version,
+                    industry_code,
+                    industry_name,
+                    industry_level,
+                    parent_code,
+                    mapping_status,
+                    effective_date,
+                    source_classification,
+                    source_industry_name,
+                    sw_l1_code,
+                    sw_l1_name,
+                    sw_l2_code,
+                    sw_l2_name,
+                    sw_l3_code,
+                    sw_l3_name,
+                    sw_l1_index_code,
+                    sw_l2_index_code,
+                    sw_l3_index_code,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    membership_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM industry_memberships
+                WHERE instrument_id = ?
+                ORDER BY
+                    CASE
+                        WHEN mapping_status = 'authoritative' THEN 0
+                        ELSE 1
+                    END,
+                    CASE
+                        WHEN taxonomy_system LIKE 'sw%' THEN 0
+                        ELSE 1
+                    END,
+                    updated_at DESC
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        membership_json = data.pop("membership_json", None)
+        if include_snapshot:
+            data["membership"] = self._deserialize_json(membership_json)
+        return data
+
+    def get_official_industry_classification(
+        self,
+        instrument_id: str,
+        *,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch one latest official industry classification row."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    taxonomy_system,
+                    taxonomy_version,
+                    official_industry_code,
+                    official_start_date,
+                    official_update_time,
+                    mapped_industry_code,
+                    mapped_industry_name,
+                    mapped_industry_level,
+                    mapped_parent_code,
+                    mapping_status,
+                    mapping_confidence,
+                    source,
+                    source_mode,
+                    classification_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM industry_official_classifications
+                WHERE instrument_id = ?
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        classification_json = data.pop("classification_json", None)
+        if include_snapshot:
+            data["classification"] = self._deserialize_json(classification_json)
+        return data
+
+    def get_latest_analyst_forecast(
+        self,
+        instrument_id: str,
+        *,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the latest analyst forecast snapshot for one instrument."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    rating_summary,
+                    report_count,
+                    institution_count,
+                    buy_count,
+                    overweight_count,
+                    neutral_count,
+                    underperform_count,
+                    sell_count,
+                    eps_fy1,
+                    eps_fy2,
+                    net_profit_fy1,
+                    net_profit_fy2,
+                    pe_fy1,
+                    pe_fy2,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    forecast_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM analyst_forecasts
+                WHERE instrument_id = ?
+                ORDER BY as_of_date DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        forecast_json = data.pop("forecast_json", None)
+        if include_details:
+            data["forecast"] = self._deserialize_json(forecast_json)
+        return data
+
+    def summarize_analyst_forecasts(self) -> Dict[str, Any]:
+        """Return aggregate summary for analyst forecast metadata coverage."""
+        return self._summarize_metadata_table(
+            table_name="analyst_forecasts",
+            date_column="as_of_date",
+            extra_group_columns=(),
+        )
+
+    def count_analyst_forecasts_by_exchange(self) -> Dict[str, int]:
+        """Count instruments with analyst forecast metadata per exchange."""
+        return self._count_metadata_instruments_by_exchange("analyst_forecasts")
+
+    def list_research_reports(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 20,
+        include_details: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """List research report metadata rows for one instrument."""
+        query = """
+            SELECT
+                report_id,
+                instrument_id,
+                symbol,
+                exchange,
+                publish_date,
+                report_title,
+                institution_name,
+                analyst_name,
+                rating,
+                rating_change,
+                target_price,
+                report_url,
+                source,
+                source_mode,
+                data_as_of,
+                report_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM research_reports
+            WHERE instrument_id = ?
+        """
+        parameters: list[Any] = [instrument_id]
+        if start_date:
+            query += " AND publish_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND publish_date <= ?"
+            parameters.append(end_date)
+        query += " ORDER BY publish_date DESC, updated_at DESC"
+        if limit > 0:
+            query += " LIMIT ?"
+            parameters.append(limit)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(query, tuple(parameters)).fetchall()
+
+        items = []
+        for row in rows:
+            item = dict(row)
+            report_json = item.pop("report_json", None)
+            if include_details:
+                item["report"] = self._deserialize_json(report_json)
+            items.append(item)
+        return items
+
+    def summarize_research_reports(self) -> Dict[str, Any]:
+        """Return aggregate summary for research report metadata coverage."""
+        return self._summarize_metadata_table(
+            table_name="research_reports",
+            date_column="publish_date",
+            extra_group_columns=("institution_name", "rating"),
+        )
+
+    def count_research_reports_by_exchange(self) -> Dict[str, int]:
+        """Count instruments with research report metadata per exchange."""
+        return self._count_metadata_instruments_by_exchange("research_reports")
+
+    def list_sentiment_events(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        event_types: Optional[list[str]] = None,
+        limit: int = 50,
+        include_details: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """List sentiment events for one instrument."""
+        query = """
+            SELECT
+                event_id,
+                instrument_id,
+                symbol,
+                exchange,
+                event_date,
+                event_type,
+                event_subtype,
+                title,
+                sentiment_score,
+                severity,
+                source,
+                source_mode,
+                data_as_of,
+                details_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM sentiment_events
+            WHERE instrument_id = ?
+        """
+        parameters: list[Any] = [instrument_id]
+        if start_date:
+            query += " AND event_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND event_date <= ?"
+            parameters.append(end_date)
+        if event_types:
+            placeholders = ", ".join("?" for _ in event_types)
+            query += f" AND event_type IN ({placeholders})"
+            parameters.extend(event_types)
+        query += " ORDER BY event_date DESC, updated_at DESC"
+        if limit > 0:
+            query += " LIMIT ?"
+            parameters.append(limit)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(query, tuple(parameters)).fetchall()
+
+        items = []
+        for row in rows:
+            item = dict(row)
+            details_json = item.pop("details_json", None)
+            if include_details:
+                item["details"] = self._deserialize_json(details_json)
+            items.append(item)
+        return items
+
+    def summarize_sentiment_events(self) -> Dict[str, Any]:
+        """Return aggregate summary for sentiment event metadata coverage."""
+        return self._summarize_metadata_table(
+            table_name="sentiment_events",
+            date_column="event_date",
+            extra_group_columns=("event_type", "severity"),
+        )
+
+    def count_sentiment_events_by_exchange(self) -> Dict[str, int]:
+        """Count instruments with sentiment event metadata per exchange."""
+        return self._count_metadata_instruments_by_exchange("sentiment_events")
+
+    def get_sentiment_event_count(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        negative_only: bool = False,
+    ) -> int:
+        """Count sentiment events for one instrument."""
+        query = """
+            SELECT COUNT(1)
+            FROM sentiment_events
+            WHERE instrument_id = ?
+        """
+        parameters: list[Any] = [instrument_id]
+        if start_date:
+            query += " AND event_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND event_date <= ?"
+            parameters.append(end_date)
+        if negative_only:
+            query += " AND sentiment_score < 0"
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            count = conn.execute(query, tuple(parameters)).fetchone()[0]
+
+        return int(count or 0)
+
+    def _summarize_metadata_table(
+        self,
+        *,
+        table_name: str,
+        date_column: str,
+        extra_group_columns: tuple[str, ...],
+    ) -> Dict[str, Any]:
+        allowed_tables = {
+            "analyst_forecasts",
+            "research_reports",
+            "sentiment_events",
+        }
+        allowed_columns = {
+            "as_of_date",
+            "publish_date",
+            "event_date",
+            "institution_name",
+            "rating",
+            "event_type",
+            "severity",
+        }
+        if table_name not in allowed_tables:
+            raise ValueError(f"unsupported metadata table: {table_name}")
+        if date_column not in allowed_columns:
+            raise ValueError(f"unsupported metadata date column: {date_column}")
+        for column in extra_group_columns:
+            if column not in allowed_columns:
+                raise ValueError(f"unsupported metadata group column: {column}")
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary_row = conn.execute(
+                f"""
+                SELECT
+                    COUNT(1) AS row_total,
+                    COUNT(DISTINCT instrument_id) AS instrument_total,
+                    MAX({date_column}) AS latest_item_date,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(data_as_of) AS latest_data_as_of
+                FROM {table_name}
+                """
+            ).fetchone()
+            source_rows = conn.execute(
+                f"""
+                SELECT source, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM {table_name}
+                GROUP BY source
+                """
+            ).fetchall()
+            mode_rows = conn.execute(
+                f"""
+                SELECT source_mode, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM {table_name}
+                GROUP BY source_mode
+                """
+            ).fetchall()
+            extra_counts: Dict[str, Dict[str, int]] = {}
+            for column in extra_group_columns:
+                rows = conn.execute(
+                    f"""
+                    SELECT {column} AS group_value, COUNT(1) AS row_count
+                    FROM {table_name}
+                    GROUP BY {column}
+                    """
+                ).fetchall()
+                extra_counts[f"{column}_counts"] = {
+                    str(row["group_value"]): int(row["row_count"] or 0)
+                    for row in rows
+                    if row["group_value"] is not None
+                }
+
+        return {
+            "row_total": int(
+                (summary_row["row_total"] if summary_row is not None else 0) or 0
+            ),
+            "instrument_total": int(
+                (summary_row["instrument_total"] if summary_row is not None else 0) or 0
+            ),
+            "source_counts": {
+                str(row["source"]): int(row["instrument_count"] or 0)
+                for row in source_rows
+                if row["source"] is not None
+            },
+            "source_mode_counts": {
+                str(row["source_mode"]): int(row["instrument_count"] or 0)
+                for row in mode_rows
+                if row["source_mode"] is not None
+            },
+            "latest_item_date": (
+                None if summary_row is None else summary_row["latest_item_date"]
+            ),
+            "latest_updated_at": (
+                None if summary_row is None else summary_row["latest_updated_at"]
+            ),
+            "latest_data_as_of": (
+                None if summary_row is None else summary_row["latest_data_as_of"]
+            ),
+            **extra_counts,
+        }
+
+    def _count_metadata_instruments_by_exchange(self, table_name: str) -> Dict[str, int]:
+        allowed_tables = {
+            "analyst_forecasts",
+            "research_reports",
+            "sentiment_events",
+        }
+        if table_name not in allowed_tables:
+            raise ValueError(f"unsupported metadata table: {table_name}")
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT exchange, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM {table_name}
+                GROUP BY exchange
+                """
+            ).fetchall()
+        return {
+            str(row["exchange"]): int(row["instrument_count"] or 0)
+            for row in rows
+            if row["exchange"] is not None
+        }
+
+    def get_latest_technical_indicator_snapshot(
+        self,
+        instrument_id: str,
+        *,
+        period: str = "1d",
+        adjustment: Optional[str] = None,
+        include_summary: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the latest persisted technical indicator snapshot."""
+        query = """
+            SELECT
+                instrument_id,
+                symbol,
+                exchange,
+                period,
+                as_of_date,
+                adjustment,
+                applied_adjustment,
+                calc_method,
+                calc_version,
+                parameter_hash,
+                status,
+                missing_reason,
+                signal,
+                trend_score,
+                close_price,
+                pct_change_1d,
+                pct_change_20d,
+                sma20,
+                sma60,
+                ema12,
+                ema26,
+                macd,
+                macd_signal,
+                macd_hist,
+                rsi14,
+                adx,
+                plus_di,
+                minus_di,
+                stoch_k,
+                stoch_d,
+                cci,
+                williams_r,
+                boll_upper,
+                boll_middle,
+                boll_lower,
+                atr14,
+                volume_ratio,
+                distance_to_sma20,
+                distance_to_sma60,
+                source,
+                source_mode,
+                data_as_of,
+                summary_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM technical_indicator_latest
+            WHERE instrument_id = ? AND period = ?
+        """
+        parameters: list[Any] = [instrument_id, period]
+        if adjustment:
+            query += " AND adjustment = ?"
+            parameters.append(adjustment)
+        query += " ORDER BY as_of_date DESC, updated_at DESC LIMIT 1"
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(query, tuple(parameters)).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        summary_json = data.pop("summary_json", None)
+        if include_summary:
+            data["summary"] = self._deserialize_json(summary_json) or {}
+        return data
+
+    def summarize_technical_indicator_latest(
+        self,
+        *,
+        period: Optional[str] = None,
+        adjustment: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return aggregate summary for persisted latest technical snapshots."""
+        filters = []
+        parameters: list[Any] = []
+        if period:
+            filters.append("period = ?")
+            parameters.append(period)
+        if adjustment:
+            filters.append("adjustment = ?")
+            parameters.append(adjustment)
+        where_clause = "WHERE " + " AND ".join(filters) if filters else ""
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary_row = conn.execute(
+                f"""
+                SELECT
+                    COUNT(1) AS row_total,
+                    COUNT(DISTINCT instrument_id) AS instrument_total,
+                    MAX(as_of_date) AS latest_as_of_date,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(data_as_of) AS latest_data_as_of
+                FROM technical_indicator_latest
+                {where_clause}
+                """,
+                tuple(parameters),
+            ).fetchone()
+            source_rows = conn.execute(
+                f"""
+                SELECT source, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY source
+                """,
+                tuple(parameters),
+            ).fetchall()
+            mode_rows = conn.execute(
+                f"""
+                SELECT source_mode, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY source_mode
+                """,
+                tuple(parameters),
+            ).fetchall()
+            method_rows = conn.execute(
+                f"""
+                SELECT calc_method, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY calc_method
+                """,
+                tuple(parameters),
+            ).fetchall()
+            version_rows = conn.execute(
+                f"""
+                SELECT calc_version, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY calc_version
+                """,
+                tuple(parameters),
+            ).fetchall()
+            status_rows = conn.execute(
+                f"""
+                SELECT status, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY status
+                """,
+                tuple(parameters),
+            ).fetchall()
+            signal_rows = conn.execute(
+                f"""
+                SELECT signal, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY signal
+                """,
+                tuple(parameters),
+            ).fetchall()
+
+        return {
+            "row_total": int(
+                (summary_row["row_total"] if summary_row is not None else 0) or 0
+            ),
+            "instrument_total": int(
+                (summary_row["instrument_total"] if summary_row is not None else 0) or 0
+            ),
+            "source_counts": {
+                str(row["source"]): int(row["instrument_count"] or 0)
+                for row in source_rows
+                if row["source"] is not None
+            },
+            "source_mode_counts": {
+                str(row["source_mode"]): int(row["instrument_count"] or 0)
+                for row in mode_rows
+                if row["source_mode"] is not None
+            },
+            "calc_method_counts": {
+                str(row["calc_method"]): int(row["instrument_count"] or 0)
+                for row in method_rows
+                if row["calc_method"] is not None
+            },
+            "calc_version_counts": {
+                str(row["calc_version"]): int(row["instrument_count"] or 0)
+                for row in version_rows
+                if row["calc_version"] is not None
+            },
+            "status_counts": {
+                str(row["status"]): int(row["instrument_count"] or 0)
+                for row in status_rows
+                if row["status"] is not None
+            },
+            "signal_counts": {
+                str(row["signal"]): int(row["instrument_count"] or 0)
+                for row in signal_rows
+                if row["signal"] is not None
+            },
+            "latest_as_of_date": (
+                None if summary_row is None else summary_row["latest_as_of_date"]
+            ),
+            "latest_updated_at": (
+                None if summary_row is None else summary_row["latest_updated_at"]
+            ),
+            "latest_data_as_of": (
+                None if summary_row is None else summary_row["latest_data_as_of"]
+            ),
+        }
+
+    def count_technical_indicator_latest_by_exchange(
+        self,
+        *,
+        period: Optional[str] = None,
+        adjustment: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Count instruments with latest technical snapshots by exchange."""
+        filters = []
+        parameters: list[Any] = []
+        if period:
+            filters.append("period = ?")
+            parameters.append(period)
+        if adjustment:
+            filters.append("adjustment = ?")
+            parameters.append(adjustment)
+        where_clause = "WHERE " + " AND ".join(filters) if filters else ""
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT exchange, COUNT(DISTINCT instrument_id) AS instrument_count
+                FROM technical_indicator_latest
+                {where_clause}
+                GROUP BY exchange
+                """,
+                tuple(parameters),
+            ).fetchall()
+        return {
+            str(row["exchange"]): int(row["instrument_count"] or 0)
+            for row in rows
+            if row["exchange"] is not None
+        }
+
+    def get_latest_risk_snapshot(
+        self,
+        instrument_id: str,
+        *,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the latest risk snapshot for one instrument."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    benchmark_instrument_id,
+                    volatility_20d,
+                    volatility_60d,
+                    beta_60d,
+                    max_drawdown_252d,
+                    average_turnover_20d,
+                    average_amount_20d,
+                    liability_to_asset,
+                    current_ratio,
+                    operating_cf_to_net_income,
+                    negative_event_count_30d,
+                    risk_score,
+                    risk_level,
+                    calc_method,
+                    calc_version,
+                    parameter_hash,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    details_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                FROM risk_snapshots
+                WHERE instrument_id = ?
+                ORDER BY as_of_date DESC, updated_at DESC
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+
+        if row is None:
+            return None
+
+        data = dict(row)
+        details_json = data.pop("details_json", None)
+        if include_details:
+            data["details"] = self._deserialize_json(details_json)
+        return data
+
+    def get_valuation_history_rows(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 120,
+        include_details: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """Fetch valuation history rows for one instrument."""
+        query = """
+            SELECT
+                instrument_id,
+                symbol,
+                exchange,
+                as_of_date,
+                currency,
+                close_price,
+                market_cap,
+                pe_ratio,
+                pb_ratio,
+                ps_ratio,
+                calc_method,
+                calc_version,
+                parameter_hash,
+                source,
+                source_mode,
+                data_as_of,
+                details_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM valuation_history
+            WHERE instrument_id = ?
+        """
+        parameters: list[Any] = [instrument_id]
+        if start_date:
+            query += " AND as_of_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND as_of_date <= ?"
+            parameters.append(end_date)
+        query += " ORDER BY as_of_date DESC"
+        if limit > 0:
+            query += " LIMIT ?"
+            parameters.append(limit)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(query, tuple(parameters)).fetchall()
+
+        items = []
+        for row in rows:
+            item = dict(row)
+            details_json = item.pop("details_json", None)
+            if include_details:
+                item["details"] = self._deserialize_json(details_json)
+            items.append(item)
+        return items
+
+    def get_latest_valuation_history_row(
+        self,
+        instrument_id: str,
+        *,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the latest valuation history row for one instrument."""
+        rows = self.get_valuation_history_rows(
+            instrument_id,
+            limit=1,
+            include_details=include_details,
+        )
+        if not rows:
+            return None
+        return rows[0]
+
+    def summarize_valuation_history(self) -> Dict[str, Any]:
+        """Return aggregate summary for instruments with valuation history."""
+        latest_rows_query = """
+            WITH latest AS (
+                SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
+                FROM valuation_history
+                GROUP BY instrument_id
+            )
+            SELECT vh.*
+            FROM valuation_history vh
+            JOIN latest
+              ON latest.instrument_id = vh.instrument_id
+             AND latest.latest_as_of_date = vh.as_of_date
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            summary_row = conn.execute(
+                """
+                SELECT
+                    COUNT(DISTINCT instrument_id) AS total,
+                    MAX(as_of_date) AS latest_as_of_date,
+                    MAX(updated_at) AS latest_updated_at,
+                    MAX(data_as_of) AS latest_data_as_of
+                FROM valuation_history
+                """
+            ).fetchone()
+            source_rows = conn.execute(
+                f"""
+                SELECT source, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY source
+                """
+            ).fetchall()
+            mode_rows = conn.execute(
+                f"""
+                SELECT source_mode, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY source_mode
+                """
+            ).fetchall()
+            method_rows = conn.execute(
+                f"""
+                SELECT calc_method, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY calc_method
+                """
+            ).fetchall()
+            version_rows = conn.execute(
+                f"""
+                SELECT calc_version, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY calc_version
+                """
+            ).fetchall()
+
+        return {
+            "total": int((summary_row["total"] if summary_row is not None else 0) or 0),
+            "source_counts": {
+                str(row["source"]): int(row["row_count"] or 0)
+                for row in source_rows
+                if row["source"] is not None
+            },
+            "source_mode_counts": {
+                str(row["source_mode"]): int(row["row_count"] or 0)
+                for row in mode_rows
+                if row["source_mode"] is not None
+            },
+            "calc_method_counts": {
+                str(row["calc_method"]): int(row["row_count"] or 0)
+                for row in method_rows
+                if row["calc_method"] is not None
+            },
+            "calc_version_counts": {
+                str(row["calc_version"]): int(row["row_count"] or 0)
+                for row in version_rows
+                if row["calc_version"] is not None
+            },
+            "latest_as_of_date": (
+                None if summary_row is None else summary_row["latest_as_of_date"]
+            ),
+            "latest_updated_at": (
+                None if summary_row is None else summary_row["latest_updated_at"]
+            ),
+            "latest_data_as_of": (
+                None if summary_row is None else summary_row["latest_data_as_of"]
+            ),
+        }
+
+    def count_valuation_history_by_exchange(self) -> Dict[str, int]:
+        """Count instruments with valuation history per exchange."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT exchange, COUNT(DISTINCT instrument_id) AS row_count
+                FROM valuation_history
+                GROUP BY exchange
+                """
+            ).fetchall()
+        return {
+            str(row["exchange"]): int(row["row_count"] or 0)
+            for row in rows
+            if row["exchange"] is not None
+        }
+
+    def get_latest_peer_valuation_rows(
+        self,
+        benchmark_code: str,
+        *,
+        exclude_instrument_id: Optional[str] = None,
+        taxonomy_system: str = "sw",
+        taxonomy_version: Optional[str] = None,
+        benchmark_field: str = "sw_l2_code",
+        limit: Optional[int] = None,
+        include_details: bool = False,
+    ) -> list[Dict[str, Any]]:
+        """Fetch latest valuation rows for peers in the configured Shenwan level."""
+        allowed_benchmark_fields = {"sw_l1_code", "sw_l2_code", "sw_l3_code"}
+        if benchmark_field not in allowed_benchmark_fields:
+            return []
+
+        membership_query = f"""
+            SELECT instrument_id
+            FROM industry_memberships
+            WHERE taxonomy_system = ?
+              AND mapping_status = 'authoritative'
+              AND {benchmark_field} = ?
+        """
+        membership_parameters: list[Any] = [taxonomy_system, benchmark_code]
+        if taxonomy_version is not None:
+            membership_query += " AND taxonomy_version = ?"
+            membership_parameters.append(taxonomy_version)
+        if exclude_instrument_id is not None:
+            membership_query += " AND instrument_id != ?"
+            membership_parameters.append(exclude_instrument_id)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            peer_ids = [
+                row["instrument_id"]
+                for row in conn.execute(
+                    membership_query,
+                    tuple(membership_parameters),
+                ).fetchall()
+            ]
+            if not peer_ids:
+                return []
+
+            placeholders = ", ".join("?" for _ in peer_ids)
+            latest_query = f"""
+                SELECT
+                    vh.instrument_id,
+                    vh.symbol,
+                    vh.exchange,
+                    vh.as_of_date,
+                    vh.currency,
+                    vh.close_price,
+                    vh.market_cap,
+                    vh.pe_ratio,
+                    vh.pb_ratio,
+                    vh.ps_ratio,
+                    vh.calc_method,
+                    vh.calc_version,
+                    vh.parameter_hash,
+                    vh.source,
+                    vh.source_mode,
+                    vh.data_as_of,
+                    vh.details_json,
+                    vh.ingestion_run_id,
+                    vh.created_at,
+                    vh.updated_at
+                FROM valuation_history vh
+                WHERE vh.instrument_id IN ({placeholders})
+                  AND vh.as_of_date = (
+                      SELECT MAX(vh2.as_of_date)
+                      FROM valuation_history vh2
+                      WHERE vh2.instrument_id = vh.instrument_id
+                  )
+                ORDER BY vh.pe_ratio ASC, vh.instrument_id ASC
+            """
+            if limit is not None and limit > 0:
+                latest_query += " LIMIT ?"
+                valuation_rows = conn.execute(
+                    latest_query,
+                    tuple(peer_ids) + (limit,),
+                ).fetchall()
+            else:
+                valuation_rows = conn.execute(latest_query, tuple(peer_ids)).fetchall()
+
+        items = []
+        for row in valuation_rows:
+            item = dict(row)
+            details_json = item.pop("details_json", None)
+            if include_details:
+                item["details"] = self._deserialize_json(details_json)
+            items.append(item)
+        return items
+
+    @staticmethod
+    def _apply_pragmas(conn: sqlite3.Connection) -> None:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+
+    @staticmethod
+    def _deserialize_json(value: Optional[str]) -> Optional[Dict[str, Any]]:
+        if not value:
+            return None
+        return json.loads(value)
+
+    @staticmethod
+    def _upsert_industry_taxonomy_row(
+        conn: sqlite3.Connection,
+        snapshot: IndustryTaxonomySnapshot,
+        *,
+        now: str,
+    ) -> None:
+        conn.execute(
+            """
+            INSERT INTO industry_taxonomy (
+                taxonomy_system,
+                taxonomy_version,
+                industry_code,
+                industry_name,
+                industry_level,
+                parent_code,
+                sw_index_code,
+                aliases_json,
+                source_classification,
+                source,
+                source_mode,
+                is_active,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(taxonomy_system, taxonomy_version, industry_code)
+            DO UPDATE SET
+                industry_name = excluded.industry_name,
+                industry_level = excluded.industry_level,
+                parent_code = excluded.parent_code,
+                sw_index_code = excluded.sw_index_code,
+                aliases_json = excluded.aliases_json,
+                source_classification = excluded.source_classification,
+                source = excluded.source,
+                source_mode = excluded.source_mode,
+                is_active = excluded.is_active,
+                updated_at = excluded.updated_at
+            """,
+            (
+                snapshot.taxonomy_system,
+                snapshot.taxonomy_version or "",
+                snapshot.industry_code,
+                snapshot.industry_name,
+                snapshot.industry_level,
+                snapshot.parent_code,
+                snapshot.sw_index_code,
+                json.dumps(snapshot.aliases_json, ensure_ascii=False, sort_keys=True),
+                snapshot.source_classification,
+                snapshot.source,
+                snapshot.source_mode,
+                1,
+                now,
+                now,
+            ),
+        )
+
+    def _attach_quotes_db(self, conn: sqlite3.Connection) -> None:
+        if not os.path.exists(self.quotes_db_path):
+            db_logger.warning(
+                "[ResearchStorage] Quotes database not found for attach: "
+                f"{self.quotes_db_path}"
+            )
+            return
+        conn.execute(
+            f"ATTACH DATABASE ? AS {self.quotes_db_alias}",
+            (self.quotes_db_path,),
+        )
+
+    @staticmethod
+    def _ensure_column(
+        conn: sqlite3.Connection,
+        table_name: str,
+        column_name: str,
+        column_sql: str,
+    ) -> None:
+        columns = {
+            row["name"]
+            for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+        }
+        if column_name not in columns:
+            conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_sql}")
+
+    @staticmethod
+    def _rename_column_if_needed(
+        conn: sqlite3.Connection,
+        table_name: str,
+        old_column_name: str,
+        new_column_name: str,
+    ) -> None:
+        columns = {
+            row["name"]
+            for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+        }
+        if old_column_name in columns and new_column_name not in columns:
+            conn.execute(
+                f"ALTER TABLE {table_name} RENAME COLUMN "
+                f"{old_column_name} TO {new_column_name}"
+            )
+
+    @classmethod
+    def _migrate_tables(cls, conn: sqlite3.Connection) -> None:
+        """Apply lightweight additive migrations for research shadow tables."""
+        cls._ensure_column(
+            conn,
+            "industry_taxonomy",
+            "taxonomy_version",
+            "taxonomy_version TEXT NOT NULL DEFAULT ''",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "taxonomy_version",
+            "taxonomy_version TEXT NOT NULL DEFAULT ''",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "mapping_status",
+            "mapping_status TEXT NOT NULL DEFAULT 'reference_only'",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "effective_date",
+            "effective_date TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l1_code",
+            "sw_l1_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l1_name",
+            "sw_l1_name TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l2_code",
+            "sw_l2_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l2_name",
+            "sw_l2_name TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l3_code",
+            "sw_l3_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l3_name",
+            "sw_l3_name TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l1_index_code",
+            "sw_l1_index_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l2_index_code",
+            "sw_l2_index_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "sw_l3_index_code",
+            "sw_l3_index_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_taxonomy",
+            "sw_index_code",
+            "sw_index_code TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "industry_taxonomy",
+            "aliases_json",
+            "aliases_json TEXT NOT NULL DEFAULT '{}'",
+        )
+        cls._rename_column_if_needed(
+            conn,
+            "industry_index_analysis_daily",
+            "bargain_amount",
+            "bargain_volume",
+        )
+
+    @staticmethod
+    def _create_tables(conn: sqlite3.Connection) -> None:
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS ingestion_runs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                domain TEXT NOT NULL,
+                job_name TEXT NOT NULL,
+                market TEXT,
+                source TEXT,
+                mode TEXT,
+                status TEXT NOT NULL,
+                shadow_mode INTEGER NOT NULL DEFAULT 1,
+                started_at TEXT,
+                completed_at TEXT,
+                rows_written INTEGER NOT NULL DEFAULT 0,
+                error_message TEXT,
+                metadata_json TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_ingestion_runs_domain_status
+            ON ingestion_runs(domain, status);
+
+            CREATE INDEX IF NOT EXISTS idx_ingestion_runs_job_name
+            ON ingestion_runs(job_name, started_at);
+
+            CREATE TABLE IF NOT EXISTS company_profiles (
+                instrument_id TEXT PRIMARY KEY,
+                symbol TEXT NOT NULL,
+                company_name TEXT NOT NULL,
+                short_name TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                market TEXT,
+                listed_date TEXT,
+                industry_raw TEXT,
+                sector_raw TEXT,
+                status TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                profile_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_profiles_exchange_source
+            ON company_profiles(exchange, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_summaries (
+                instrument_id TEXT PRIMARY KEY,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_date TEXT,
+                pub_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                roe REAL,
+                gross_margin REAL,
+                net_margin REAL,
+                current_ratio REAL,
+                quick_ratio REAL,
+                liability_to_asset REAL,
+                yoy_asset REAL,
+                yoy_equity REAL,
+                yoy_net_profit REAL,
+                cfo_to_revenue REAL,
+                cfo_to_net_profit REAL,
+                asset_turnover REAL,
+                eps REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                summary_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_summaries_exchange_source
+            ON financial_summaries(exchange, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS shareholder_snapshots (
+                instrument_id TEXT PRIMARY KEY,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                coverage_status TEXT NOT NULL,
+                holder_count INTEGER,
+                holder_count_report_date TEXT,
+                top_holders_report_date TEXT,
+                top_holders_count INTEGER,
+                top_holders_total_ratio REAL,
+                control_owner_name TEXT,
+                control_owner_ratio REAL,
+                schema_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                snapshot_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_shareholder_snapshots_exchange_source
+            ON shareholder_snapshots(exchange, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_statements_raw (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                statement_type TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                statement_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, statement_type, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_statements_raw_instrument
+            ON financial_statements_raw(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_facts (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                revenue REAL,
+                gross_profit REAL,
+                operating_profit REAL,
+                pre_tax_profit REAL,
+                net_income REAL,
+                operating_cf REAL,
+                total_cf REAL,
+                total_assets REAL,
+                total_liabilities REAL,
+                equity REAL,
+                current_assets REAL,
+                current_liabilities REAL,
+                inventory REAL,
+                receivables REAL,
+                fixed_assets REAL,
+                intangible_assets REAL,
+                shares_outstanding REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                facts_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_facts_instrument
+            ON financial_facts(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_indicator_snapshots (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                gross_margin REAL,
+                operating_margin REAL,
+                net_margin REAL,
+                roe REAL,
+                roa REAL,
+                current_ratio REAL,
+                quick_ratio REAL,
+                asset_liability_ratio REAL,
+                revenue_per_share REAL,
+                operating_cf_to_revenue REAL,
+                operating_cf_to_net_income REAL,
+                book_value_per_share REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                indicators_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_indicator_snapshots_instrument
+            ON financial_indicator_snapshots(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS valuation_history (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                close_price REAL,
+                market_cap REAL,
+                pe_ratio REAL,
+                pb_ratio REAL,
+                ps_ratio REAL,
+                calc_method TEXT NOT NULL,
+                calc_version TEXT NOT NULL,
+                parameter_hash TEXT NOT NULL DEFAULT '',
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                details_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, as_of_date, calc_method, calc_version, parameter_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_valuation_history_instrument
+            ON valuation_history(instrument_id, as_of_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS analyst_forecasts (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                rating_summary TEXT,
+                report_count INTEGER,
+                institution_count INTEGER,
+                buy_count INTEGER,
+                overweight_count INTEGER,
+                neutral_count INTEGER,
+                underperform_count INTEGER,
+                sell_count INTEGER,
+                eps_fy1 REAL,
+                eps_fy2 REAL,
+                net_profit_fy1 REAL,
+                net_profit_fy2 REAL,
+                pe_fy1 REAL,
+                pe_fy2 REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                forecast_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, as_of_date, source, source_mode),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_analyst_forecasts_instrument
+            ON analyst_forecasts(instrument_id, as_of_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS research_reports (
+                report_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                publish_date TEXT NOT NULL,
+                report_title TEXT NOT NULL,
+                institution_name TEXT,
+                analyst_name TEXT,
+                rating TEXT,
+                rating_change TEXT,
+                target_price REAL,
+                report_url TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                report_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_research_reports_instrument
+            ON research_reports(instrument_id, publish_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS sentiment_events (
+                event_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                event_date TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                event_subtype TEXT,
+                title TEXT,
+                sentiment_score REAL,
+                severity TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                details_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_sentiment_events_instrument
+            ON sentiment_events(instrument_id, event_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS risk_snapshots (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                benchmark_instrument_id TEXT,
+                volatility_20d REAL,
+                volatility_60d REAL,
+                beta_60d REAL,
+                max_drawdown_252d REAL,
+                average_turnover_20d REAL,
+                average_amount_20d REAL,
+                liability_to_asset REAL,
+                current_ratio REAL,
+                operating_cf_to_net_income REAL,
+                negative_event_count_30d INTEGER,
+                risk_score REAL,
+                risk_level TEXT,
+                calc_method TEXT NOT NULL,
+                calc_version TEXT NOT NULL,
+                parameter_hash TEXT NOT NULL DEFAULT '',
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                details_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, as_of_date, calc_method, calc_version, parameter_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_risk_snapshots_instrument
+            ON risk_snapshots(instrument_id, as_of_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS technical_indicator_latest (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                period TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                adjustment TEXT NOT NULL,
+                applied_adjustment TEXT NOT NULL,
+                calc_method TEXT NOT NULL,
+                calc_version TEXT NOT NULL,
+                parameter_hash TEXT NOT NULL DEFAULT '',
+                status TEXT NOT NULL,
+                missing_reason TEXT,
+                signal TEXT NOT NULL,
+                trend_score REAL,
+                close_price REAL,
+                pct_change_1d REAL,
+                pct_change_20d REAL,
+                sma20 REAL,
+                sma60 REAL,
+                ema12 REAL,
+                ema26 REAL,
+                macd REAL,
+                macd_signal REAL,
+                macd_hist REAL,
+                rsi14 REAL,
+                adx REAL,
+                plus_di REAL,
+                minus_di REAL,
+                stoch_k REAL,
+                stoch_d REAL,
+                cci REAL,
+                williams_r REAL,
+                boll_upper REAL,
+                boll_middle REAL,
+                boll_lower REAL,
+                atr14 REAL,
+                volume_ratio REAL,
+                distance_to_sma20 REAL,
+                distance_to_sma60 REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                summary_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, period, adjustment, calc_method, calc_version, parameter_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_technical_indicator_latest_exchange
+            ON technical_indicator_latest(exchange, period, adjustment, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_technical_indicator_latest_as_of
+            ON technical_indicator_latest(as_of_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_taxonomy (
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                industry_code TEXT NOT NULL,
+                industry_name TEXT NOT NULL,
+                industry_level INTEGER NOT NULL DEFAULT 1,
+                parent_code TEXT,
+                sw_index_code TEXT,
+                aliases_json TEXT NOT NULL DEFAULT '{}',
+                source_classification TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (taxonomy_system, taxonomy_version, industry_code)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_taxonomy_source
+            ON industry_taxonomy(source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_source_files (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                artifact_kind TEXT NOT NULL,
+                url TEXT NOT NULL,
+                parser_version TEXT NOT NULL,
+                status TEXT NOT NULL,
+                etag TEXT,
+                last_modified TEXT,
+                content_length INTEGER,
+                sha256 TEXT NOT NULL DEFAULT '',
+                row_count INTEGER NOT NULL DEFAULT 0,
+                max_source_update_time TEXT,
+                raw_headers_json TEXT NOT NULL DEFAULT '{}',
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(source, source_mode, artifact_kind, sha256),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_source_files_latest
+            ON industry_source_files(source, source_mode, artifact_kind, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_classification_history (
+                row_hash TEXT NOT NULL PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                official_industry_code TEXT NOT NULL,
+                official_start_date TEXT,
+                official_update_time TEXT,
+                source_file_id INTEGER,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                classification_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (source_file_id) REFERENCES industry_source_files(id),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_classification_history_symbol
+            ON industry_classification_history(symbol, official_update_time);
+
+            CREATE INDEX IF NOT EXISTS idx_industry_classification_history_exchange
+            ON industry_classification_history(exchange, official_industry_code);
+
+            CREATE TABLE IF NOT EXISTS industry_official_classifications (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                official_industry_code TEXT NOT NULL,
+                official_start_date TEXT,
+                official_update_time TEXT,
+                mapped_industry_code TEXT,
+                mapped_industry_name TEXT,
+                mapped_industry_level INTEGER,
+                mapped_parent_code TEXT,
+                mapping_status TEXT NOT NULL DEFAULT 'unmapped',
+                mapping_confidence TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                classification_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, taxonomy_system, taxonomy_version),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_official_code
+            ON industry_official_classifications(official_industry_code, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_industry_official_mapping_status
+            ON industry_official_classifications(mapping_status, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_official_code_mappings (
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                official_industry_code TEXT NOT NULL,
+                best_taxonomy_industry_code TEXT,
+                mapped_industry_code TEXT,
+                mapping_status TEXT NOT NULL DEFAULT 'unmapped',
+                mapping_confidence TEXT,
+                overlap_count INTEGER NOT NULL DEFAULT 0,
+                official_symbol_count INTEGER NOT NULL DEFAULT 0,
+                taxonomy_symbol_count INTEGER NOT NULL DEFAULT 0,
+                precision REAL NOT NULL DEFAULT 0,
+                recall REAL NOT NULL DEFAULT 0,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                built_at TEXT NOT NULL,
+                mapping_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (taxonomy_system, taxonomy_version, official_industry_code),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_official_code_mappings_status
+            ON industry_official_code_mappings(mapping_status, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_industry_official_code_mappings_built_at
+            ON industry_official_code_mappings(built_at, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_component_sets (
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                industry_code TEXT NOT NULL,
+                component_count INTEGER NOT NULL DEFAULT 0,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                built_at TEXT NOT NULL,
+                symbols_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (taxonomy_system, taxonomy_version, industry_code),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_component_sets_built_at
+            ON industry_component_sets(built_at, updated_at);
+
+            CREATE TABLE IF NOT EXISTS industry_memberships (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                industry_code TEXT NOT NULL,
+                industry_name TEXT NOT NULL,
+                industry_level INTEGER NOT NULL DEFAULT 1,
+                parent_code TEXT,
+                mapping_status TEXT NOT NULL DEFAULT 'reference_only',
+                effective_date TEXT,
+                source_classification TEXT,
+                source_industry_name TEXT,
+                sw_l1_code TEXT,
+                sw_l1_name TEXT,
+                sw_l2_code TEXT,
+                sw_l2_name TEXT,
+                sw_l3_code TEXT,
+                sw_l3_name TEXT,
+                sw_l1_index_code TEXT,
+                sw_l2_index_code TEXT,
+                sw_l3_index_code TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                membership_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, taxonomy_system, taxonomy_version),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id),
+                FOREIGN KEY (taxonomy_system, taxonomy_version, industry_code)
+                    REFERENCES industry_taxonomy(taxonomy_system, taxonomy_version, industry_code)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_memberships_exchange_source
+            ON industry_memberships(exchange, source, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_industry_memberships_instrument
+            ON industry_memberships(instrument_id, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_industry_memberships_gap_lookup
+            ON industry_memberships(
+                taxonomy_system,
+                taxonomy_version,
+                mapping_status,
+                exchange,
+                instrument_id
+            );
+
+            CREATE TABLE IF NOT EXISTS industry_index_analysis_daily (
+                taxonomy_system TEXT NOT NULL,
+                taxonomy_version TEXT NOT NULL DEFAULT '',
+                sw_index_code TEXT NOT NULL,
+                trade_date TEXT NOT NULL,
+                sw_index_name TEXT NOT NULL,
+                index_type TEXT,
+                close_index REAL,
+                bargain_volume REAL,
+                markup REAL,
+                turnover_rate REAL,
+                pe REAL,
+                pb REAL,
+                mean_price REAL,
+                bargain_sum_rate REAL,
+                negotiable_share_sum REAL,
+                average_negotiable_share_sum REAL,
+                dividend_yield REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                raw_payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (taxonomy_system, taxonomy_version, sw_index_code, trade_date),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_industry_index_analysis_latest
+            ON industry_index_analysis_daily(
+                taxonomy_system,
+                taxonomy_version,
+                trade_date,
+                index_type
+            );
+
+            CREATE TABLE IF NOT EXISTS raw_payload_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                domain TEXT NOT NULL,
+                instrument_id TEXT,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                payload_hash TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                fetched_at TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id),
+                UNIQUE(domain, instrument_id, source, payload_hash)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_raw_payload_domain_instrument
+            ON raw_payload_audit(domain, instrument_id, fetched_at);
+
+            CREATE INDEX IF NOT EXISTS idx_raw_payload_run_id
+            ON raw_payload_audit(ingestion_run_id);
+            """
+        )

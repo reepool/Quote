@@ -660,6 +660,16 @@
 {
   "yfinance": {
     "enabled": true,
+    "proxy_patch": {
+      "enabled": true,
+      "gateway": "101.201.173.125",
+      "auth_token": "从配置读取的 TOKEN",
+      "retry": 30
+    },
+    "proxy": {
+      "http": "",
+      "https": ""
+    },
     "exchanges_supported": [
       "hk_stock",
       "us_stock"
@@ -669,7 +679,11 @@
   ...
 ```
 
-- **`proxy`**: 仅对 `yfinance` 生效，用于海外行情代理访问
+- **`proxy_patch`**: 通过 `akshare_proxy_patch.install_yfinance_patch()` 为 `yfinance` 安装代理补丁；必须在 `import yfinance` 前执行。当前项目在 `data_sources/yfinance_source.py` 顶部调用统一 runtime 自动安装。一般不要为 yfinance 覆盖 `hook_domains`，保持上游默认值即可。
+- **`proxy`**: 旧 HTTP 代理配置，仅对底层 Yahoo chart API fallback 生效；当 `proxy_patch.enabled=true` 时，`yfinance` 库路径优先使用 `proxy_patch`，避免两套代理叠加。
+- 可用性验证：运行 `python scripts/validate_yfinance_proxy_patch.py --symbol AAPL --start 2017-01-01 --end 2017-04-30` 或兼容脚本 `python scripts/validate_yfinance_proxy_patch_1.py --symbol AAPL --start 2017-01-01 --end 2017-04-30`。
+- 生产链路验证：运行 `python scripts/validate_yfinance_source_live.py --source-name yfinance_us_stock --symbol AAPL --exchange NASDAQ --start 2017-01-01 --end 2017-04-30`，确认项目内 `YFinanceSource` 也能通过统一 runtime 正常抓取。
+- 统一运行时、影响边界与重启说明见 [proxy_patch_runtime.md](/home/python/Quote/docs/development/proxy_patch_runtime.md)。
 
 ## routing
 
@@ -871,7 +885,8 @@
     "BSE": [
       "43",
       "83",
-      "87"
+      "87",
+      "92"
     ]
   }
 }
@@ -880,7 +895,7 @@
 
 - **`SSE`**: `List` (默认: `['600', '601', '603', '688', '900']`) —— *上海证券交易所启动参数/预设映射标签*
 - **`SZSE`**: `List` (默认: `['000', '001', '002', '300', '200']`) —— *深圳证券交易所启动参数/预设映射标签*
-- **`BSE`**: `List` (默认: `['43', '83', '87']`) —— *北京证券交易所启动参数/预设映射标签*
+- **`BSE`**: `List` (默认: `['43', '83', '87', '92']`) —— *北京证券交易所启动参数/预设映射标签*
 - **`HKEX`**: `List` (默认: `['0', '00', '000']`) —— *香港交易所联交所*
 ## api_config
 

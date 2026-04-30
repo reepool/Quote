@@ -116,6 +116,33 @@ class TestSourceFactoryRouting:
 
         self.factory._validate_routing_config()
 
+    def test_validate_routing_allows_unavailable_source_when_backup_exists(self):
+        self.factory.source_instances_by_region['a_stock'].pop('baostock')
+        self.factory.routing['instrument_list']['a_stock'] = ['baostock', 'akshare']
+        self.factory.routing['calendar']['a_stock'] = ['baostock', 'akshare']
+
+        self.factory._validate_routing_config()
+
+        stock_chain = self.factory._get_daily_source_chain('SSE', 'stock')
+        index_chain = self.factory._get_daily_source_chain('SSE', 'index')
+
+        assert [source.name for source in stock_chain] == [
+            'pytdx_a_stock',
+            'akshare_a_stock',
+        ]
+        assert [source.name for source in index_chain] == [
+            'akshare_a_stock',
+        ]
+
+    def test_factor_route_promotes_fallback_when_primary_is_unavailable(self):
+        self.factory.source_instances_by_region['a_stock'].pop('baostock')
+
+        self.factory._init_factor_routes()
+
+        route = self.factory.factor_routes['SSE']
+        assert route['primary_instance'] is self.akshare
+        assert route['fallback_instance'] is None
+
     @pytest.mark.asyncio
     async def test_get_adjustment_factors_uses_hkex_primary_route(self):
         factors = await self.factory.get_adjustment_factors(

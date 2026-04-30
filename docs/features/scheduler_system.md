@@ -19,6 +19,7 @@
 - **数据维护**：每周数据备份和清理
 - **月度缺口检查**：按范围检测并修复缺口
 - **数据缺口检测与修复**：检测缺口并触发自动补齐
+- **研究域股东周更**：每周全量刷新本地股东摘要快照
 - **数据库备份**：定期备份数据库文件
 
 ### 3. 任务监控
@@ -302,6 +303,77 @@ async def weekly_data_maintenance(self,
 1. **缺口检测**：按交易所与日期范围检测缺口
 2. **自动修复**：逐个缺口触发补齐
 3. **执行记录**：记录检测数量与修复结果
+
+### 6.1 研究域申万标准行业缺口修复 (industry_standard_gap_fill)
+
+#### 功能描述
+对 strict Shenwan `authoritative membership` 覆盖率执行“先识别缺口，再定向补齐”的复合任务，用于收口 `industry_standard_ready` 前的剩余缺口，而不是每次都做全市场全量重跑。
+
+#### 配置示例
+```json
+{
+  "industry_standard_gap_fill": {
+    "enabled": false,
+    "description": "研究域申万标准行业缺口检测与定向修复",
+    "trigger": {
+      "type": "cron",
+      "day_of_week": "sat",
+      "hour": 9,
+      "minute": 0,
+      "second": 0
+    },
+    "max_instances": 1,
+    "misfire_grace_time": 1800,
+    "coalesce": true,
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "missing_limit_per_exchange": 200,
+      "budget_mode": "availability_first",
+      "allow_paid_proxy": true
+    }
+  }
+}
+```
+
+#### 业务逻辑
+1. **缺口枚举**：读取 strict Shenwan authoritative membership 覆盖率，按交易所列出缺失标的。
+2. **定向补齐**：仅对缺口标的调用 `industry_standard_sync`，通过 `instrument_ids_by_exchange` 缩小同步范围。
+3. **结果复核**：输出补齐前后 `missing_authoritative_membership_count` 与修复数量摘要。
+
+### 6.2 研究域股东摘要周更 (shareholder_shadow_sync)
+
+#### 功能描述
+每周刷新本地 `shareholder_snapshots`，覆盖股东户数、前十大股东和股权结构线索。当前股东域已完成全量导入并开放本地 API，调度任务用于维持后续更新。
+
+#### 当前配置
+```json
+{
+  "shareholder_shadow_sync": {
+    "enabled": true,
+    "description": "研究域股东摘要影子同步",
+    "trigger": {
+      "type": "cron",
+      "day_of_week": "sat",
+      "hour": 10,
+      "minute": 0,
+      "second": 0
+    },
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "limit_per_exchange": null,
+      "budget_mode": "availability_first",
+      "allow_paid_proxy": true,
+      "max_runtime_seconds": 7200
+    }
+  }
+}
+```
+
+#### 业务逻辑
+1. **全量扫描**：按 `SSE / SZSE / BSE` 股票池运行，不设置单交易所数量上限。
+2. **主链导入**：优先使用 `AkShare:proxy_patch`，并通过 `cninfo:direct` 合并实控人线索。
+3. **本地落库**：写入 `research.db` 的 `shareholder_snapshots`，API 读取不实时访问外部源。
+4. **健康复核**：运行后可通过 `/api/v1/research/shareholders/readiness` 或 `scripts/research_shareholder_rollout_validation.py --skip-sync` 复核 required scope 覆盖。
 
 ### 7. 系统健康检查 (system_health_check)
 
@@ -661,6 +733,12 @@ python -c "from scheduler.scheduler import task_scheduler; import asyncio; async
 - 使用结构化日志格式
 
 ## 🔄 版本更新
+
+### v2.4.3 (2026-04-17)
+- 🗓️ `weekly_data_maintenance` 新增 `sync_adjustment_factors`、`factor_sync_exchanges`、`factor_sync_days_back` 参数
+- 🌐 港股复权因子默认纳入周维护同步，日更继续保持关闭
+- 🧱 周维护顺序调整为“前置备份 -> 清理 -> 因子同步 -> 校验 -> 优化”，数据库优化移到所有写入动作之后
+- ⏱️ 周维护超时预算上调到 `18000` 秒，覆盖港股因子扫描窗口
 
 ### v2.4.2 (2026-04-09)
 - ✨ 调度器 `weekly_data_maintenance` 任务新增死股/仙股智能封禁模块，优化庞大数据集运行效率

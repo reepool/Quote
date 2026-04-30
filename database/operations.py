@@ -74,6 +74,32 @@ class DatabaseOperations:
         """Get synchronous database session"""
         return self.SessionLocal()
 
+    @staticmethod
+    def _serialize_instrument_row(instrument: InstrumentDB) -> Dict[str, Any]:
+        """Convert one instrument ORM row into the shared dict payload."""
+        return {
+            'instrument_id': instrument.instrument_id,
+            'symbol': instrument.symbol,
+            'name': instrument.name,
+            'exchange': instrument.exchange,
+            'type': instrument.type,
+            'currency': instrument.currency,
+            'listed_date': instrument.listed_date,
+            'delisted_date': instrument.delisted_date,
+            'industry': instrument.industry,
+            'sector': instrument.sector,
+            'market': instrument.market,
+            'status': instrument.status,
+            'is_active': instrument.is_active,
+            'is_st': instrument.is_st,
+            'trading_status': instrument.trading_status,
+            'source': instrument.source,
+            'source_symbol': instrument.source_symbol,
+            'created_at': instrument.created_at,
+            'updated_at': instrument.updated_at,
+            'data_version': instrument.data_version,
+        }
+
     # === Instrument Operations ===
 
     async def get_instruments_by_exchange(self, exchange: str, is_active: bool = True) -> List[Dict[str, Any]]:
@@ -89,36 +115,106 @@ class DatabaseOperations:
                 result = await session.execute(stmt)
                 instruments_db = result.scalars().all()
 
-                instruments = []
-                for instrument in instruments_db:
-                    instruments.append({
-                        'instrument_id': instrument.instrument_id,
-                        'symbol': instrument.symbol,
-                        'name': instrument.name,
-                        'exchange': instrument.exchange,
-                        'type': instrument.type,
-                        'currency': instrument.currency,
-                        'listed_date': instrument.listed_date,
-                        'delisted_date': instrument.delisted_date,
-                        'industry': instrument.industry,
-                        'sector': instrument.sector,
-                        'market': instrument.market,
-                        'status': instrument.status,
-                        'is_active': instrument.is_active,
-                        'is_st': instrument.is_st,
-                        'trading_status': instrument.trading_status,
-                                                'source': instrument.source,
-                        'source_symbol': instrument.source_symbol,
-                        'created_at': instrument.created_at,
-                        'updated_at': instrument.updated_at,
-                        'data_version': instrument.data_version
-                    })
-
-                return instruments
+                return [
+                    self._serialize_instrument_row(instrument)
+                    for instrument in instruments_db
+                ]
 
         except Exception as e:
             self.db_logger.error(f"Failed to get instruments by exchange {exchange}: {e}")
             return []
+
+    @staticmethod
+    def _is_research_target_instrument_type(instrument_type: Optional[str]) -> bool:
+        """Return whether one instrument type belongs to the research stock universe."""
+        if instrument_type is None:
+            return True
+        return str(instrument_type).upper() == "STOCK"
+
+    def get_research_target_instrument_ids_by_exchange_sync(
+        self,
+        exchange: str,
+        *,
+        is_active: bool = True,
+    ) -> List[str]:
+        """Return research target instrument ids for one exchange via a lightweight sync read."""
+        try:
+            with self.get_session() as session:
+                stmt = select(
+                    InstrumentDB.instrument_id,
+                    InstrumentDB.type,
+                ).filter(InstrumentDB.exchange == exchange)
+
+                if is_active is not None:
+                    stmt = stmt.filter(InstrumentDB.is_active == is_active)
+
+                rows = session.execute(stmt).all()
+
+            return sorted(
+                {
+                    str(instrument_id).strip()
+                    for instrument_id, instrument_type in rows
+                    if instrument_id
+                    and self._is_research_target_instrument_type(instrument_type)
+                }
+            )
+        except Exception as e:
+            self.db_logger.error(
+                f"Failed to get research target instrument ids for {exchange}: {e}"
+            )
+            return []
+
+    async def get_research_target_instrument_ids_by_exchange(
+        self,
+        exchange: str,
+        *,
+        is_active: bool = True,
+    ) -> List[str]:
+        """Return research target instrument ids for one exchange."""
+        return self.get_research_target_instrument_ids_by_exchange_sync(
+            exchange,
+            is_active=is_active,
+        )
+
+    def get_research_target_instruments_by_exchange_sync(
+        self,
+        exchange: str,
+        *,
+        is_active: bool = True,
+    ) -> List[Dict[str, Any]]:
+        """Return research target stock instruments via a lightweight sync read."""
+        try:
+            with self.get_session() as session:
+                stmt = select(InstrumentDB).filter(InstrumentDB.exchange == exchange)
+
+                if is_active is not None:
+                    stmt = stmt.filter(InstrumentDB.is_active == is_active)
+
+                stmt = stmt.order_by(InstrumentDB.symbol)
+                rows = session.execute(stmt).scalars().all()
+
+            return [
+                self._serialize_instrument_row(instrument)
+                for instrument in rows
+                if self._is_research_target_instrument_type(instrument.type)
+            ]
+        except Exception as e:
+            self.db_logger.error(
+                f"Failed to get research target instruments for {exchange}: {e}"
+            )
+            return []
+
+    async def get_research_target_instruments_by_exchange(
+        self,
+        exchange: str,
+        *,
+        is_active: bool = True,
+    ) -> List[Dict[str, Any]]:
+        """Return research target stock instruments for one exchange."""
+        return self.get_research_target_instruments_by_exchange_sync(
+            exchange,
+            is_active=is_active,
+        )
 
     async def get_active_instruments(self, exchange: str = None, instrument_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         """获取活跃交易品种列表"""

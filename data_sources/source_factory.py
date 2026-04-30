@@ -150,7 +150,17 @@ class DataSourceFactory:
                 batch_size=source_config.get('batch_size', 800),
             )
         elif source_name == 'baostock':
-            return BaostockSource(instance_name, rate_limit_config)
+            connection_timeout = source_config.get(
+                'connection_timeout',
+                source_config.get('connection_timeout_sec', 30.0),
+            )
+            login_timeout = source_config.get('login_timeout', connection_timeout)
+            return BaostockSource(
+                instance_name,
+                rate_limit_config,
+                connection_timeout_seconds=connection_timeout,
+                login_timeout_seconds=login_timeout,
+            )
         elif source_name == 'akshare':
             return AkShareSource(instance_name, rate_limit_config)
         elif source_name == 'yfinance':
@@ -184,6 +194,14 @@ class DataSourceFactory:
                 route['primary_instance'] = self._get_source_instance(primary_name, exchange=exchange)
             if fallback_name:
                 route['fallback_instance'] = self._get_source_instance(fallback_name, exchange=exchange)
+
+            if route['primary_instance'] is None and route['fallback_instance'] is not None:
+                ds_logger.warning(
+                    f"[DataSourceFactory] factor_route[{exchange}] primary {primary_name} unavailable; "
+                    f"promoting fallback {fallback_name} to primary"
+                )
+                route['primary_instance'] = route['fallback_instance']
+                route['fallback_instance'] = None
 
             # validator: tdx_xdxr 是特殊的 — 从 pytdx source 内部获取 factor_engine
             if validator_name == 'tdx_xdxr':
@@ -245,6 +263,47 @@ class DataSourceFactory:
         if isinstance(value, list):
             return [item for item in value if isinstance(item, str) and item]
         return []
+
+    def _resolve_route_sources(
+        self,
+        route_names: List[str],
+        *,
+        exchange: Optional[str] = None,
+        region: Optional[str] = None,
+        instrument_type: Optional[str] = None,
+        route_label: str,
+    ) -> List[BaseDataSource]:
+        """Resolve configured route names into currently available source instances."""
+
+        resolved_sources: List[BaseDataSource] = []
+        seen_ids = set()
+        skipped_sources: List[str] = []
+
+        for source_name in route_names:
+            source = self._get_source_instance(source_name, exchange=exchange, region=region)
+            if source is None:
+                skipped_sources.append(f"{source_name}(unavailable)")
+                continue
+            if exchange and not self._source_supports_exchange(source, exchange.upper()):
+                skipped_sources.append(f"{source_name}(unsupported_exchange)")
+                continue
+            if instrument_type and not self._source_supports_instrument_type(source, instrument_type):
+                skipped_sources.append(f"{source_name}(unsupported_instrument_type)")
+                continue
+            source_id = id(source)
+            if source_id in seen_ids:
+                continue
+            resolved_sources.append(source)
+            seen_ids.add(source_id)
+
+        if skipped_sources:
+            ds_logger.warning(
+                "[DataSourceFactory] Route %s skipped unavailable/unsupported sources: %s",
+                route_label,
+                ", ".join(skipped_sources),
+            )
+
+        return resolved_sources
 
     def _is_region_enabled(self, region: Optional[str]) -> bool:
         """判断指定 region 是否启用。未显式配置时默认视为启用。"""
@@ -373,30 +432,12 @@ class DataSourceFactory:
                 ErrorCodes.CONFIG_MISSING_KEY,
             )
 
-        ordered_sources: List[BaseDataSource] = []
-        seen_ids = set()
-        for source_name in route_names:
-            source = self._get_source_instance(source_name, exchange=exchange)
-            if source is None:
-                raise ConfigurationError(
-                    f"Daily route {exchange}/{instrument_type} references unavailable source: {source_name}",
-                    ErrorCodes.CONFIG_INVALID_FORMAT,
-                )
-            if not self._source_supports_exchange(source, exchange):
-                raise ConfigurationError(
-                    f"Daily route {exchange}/{instrument_type} uses source {source_name} unsupported for {exchange}",
-                    ErrorCodes.CONFIG_INVALID_FORMAT,
-                )
-            if not self._source_supports_instrument_type(source, instrument_type):
-                raise ConfigurationError(
-                    f"Daily route {exchange}/{instrument_type} uses source {source_name} unsupported for {instrument_type}",
-                    ErrorCodes.CONFIG_INVALID_FORMAT,
-                )
-            source_id = id(source)
-            if source_id in seen_ids:
-                continue
-            ordered_sources.append(source)
-            seen_ids.add(source_id)
+        ordered_sources = self._resolve_route_sources(
+            route_names,
+            exchange=exchange,
+            instrument_type=instrument_type,
+            route_label=f"routing.daily.{exchange}.{instrument_type}",
+        )
 
         if not ordered_sources:
             raise ConfigurationError(
@@ -462,23 +503,17 @@ class DataSourceFactory:
                         f"routing.daily.{exchange}.{instrument_type} must contain at least one source",
                         ErrorCodes.CONFIG_INVALID_FORMAT,
                     )
-                for source_name in names:
-                    source = self._get_source_instance(source_name, exchange=exchange)
-                    if source is None:
-                        raise ConfigurationError(
-                            f"routing.daily.{exchange}.{instrument_type} references unavailable source: {source_name}",
-                            ErrorCodes.CONFIG_INVALID_FORMAT,
-                        )
-                    if not self._source_supports_exchange(source, exchange.upper()):
-                        raise ConfigurationError(
-                            f"routing.daily.{exchange}.{instrument_type} uses source unsupported for {exchange}: {source_name}",
-                            ErrorCodes.CONFIG_INVALID_FORMAT,
-                        )
-                    if not self._source_supports_instrument_type(source, instrument_type):
-                        raise ConfigurationError(
-                            f"routing.daily.{exchange}.{instrument_type} uses source unsupported for {instrument_type}: {source_name}",
-                            ErrorCodes.CONFIG_INVALID_FORMAT,
-                        )
+                resolved_sources = self._resolve_route_sources(
+                    names,
+                    exchange=exchange,
+                    instrument_type=instrument_type,
+                    route_label=f"routing.daily.{exchange}.{instrument_type}",
+                )
+                if not resolved_sources:
+                    raise ConfigurationError(
+                        f"routing.daily.{exchange}.{instrument_type} resolved to no usable sources",
+                        ErrorCodes.CONFIG_INVALID_FORMAT,
+                    )
 
     def _validate_region_routes(self, scene: str) -> None:
         """校验按 region 定义的 routing 场景。"""
@@ -498,13 +533,16 @@ class DataSourceFactory:
                     f"routing.{scene}.{region} must contain at least one source",
                     ErrorCodes.CONFIG_INVALID_FORMAT,
                 )
-            for source_name in names:
-                source = self._get_source_instance(source_name, region=region)
-                if source is None:
-                    raise ConfigurationError(
-                        f"routing.{scene}.{region} references unavailable source: {source_name}",
-                        ErrorCodes.CONFIG_INVALID_FORMAT,
-                    )
+            resolved_sources = self._resolve_route_sources(
+                names,
+                region=region,
+                route_label=f"routing.{scene}.{region}",
+            )
+            if not resolved_sources:
+                raise ConfigurationError(
+                    f"routing.{scene}.{region} resolved to no usable sources",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
 
     def _validate_factor_route_config(self) -> None:
         """校验因子路由配置。"""
@@ -523,22 +561,39 @@ class DataSourceFactory:
                 )
             if not self._is_exchange_enabled(exchange):
                 continue
-            for field in ('primary', 'fallback'):
-                source_name = cfg.get(field)
-                if source_name:
-                    source = self._get_source_instance(source_name, exchange=exchange)
-                    if source is None:
-                        raise ConfigurationError(
-                            f"routing.factor.{exchange}.{field} references unavailable source: {source_name}",
-                            ErrorCodes.CONFIG_INVALID_FORMAT,
-                        )
+            primary_name = cfg.get('primary')
+            fallback_name = cfg.get('fallback')
+            primary_source = (
+                None if not primary_name else self._get_source_instance(primary_name, exchange=exchange)
+            )
+            fallback_source = (
+                None if not fallback_name else self._get_source_instance(fallback_name, exchange=exchange)
+            )
+            if primary_name and primary_source is None:
+                ds_logger.warning(
+                    "[DataSourceFactory] routing.factor.%s.primary unavailable: %s",
+                    exchange,
+                    primary_name,
+                )
+            if fallback_name and fallback_source is None:
+                ds_logger.warning(
+                    "[DataSourceFactory] routing.factor.%s.fallback unavailable: %s",
+                    exchange,
+                    fallback_name,
+                )
+            if primary_source is None and fallback_source is None:
+                raise ConfigurationError(
+                    f"routing.factor.{exchange} resolved to no usable primary/fallback source",
+                    ErrorCodes.CONFIG_INVALID_FORMAT,
+                )
             validator_name = cfg.get('validator')
             if validator_name and validator_name != 'tdx_xdxr':
                 source = self._get_source_instance(validator_name, exchange=exchange)
                 if source is None:
-                    raise ConfigurationError(
-                        f"routing.factor.{exchange}.validator references unavailable source: {validator_name}",
-                        ErrorCodes.CONFIG_INVALID_FORMAT,
+                    ds_logger.warning(
+                        "[DataSourceFactory] routing.factor.%s.validator unavailable: %s",
+                        exchange,
+                        validator_name,
                     )
 
     async def get_instrument_list(self, exchange: str, force_refresh: bool = False,

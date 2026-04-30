@@ -24,13 +24,24 @@ class BaostockSource(BaseDataSource):
     # 类级全局锁：BaoStock 使用全局单例 socket，不允许并发操作
     _bs_lock = asyncio.Lock()
 
-    def __init__(self, name: str, rate_limit_config: RateLimitConfig = None):
+    def __init__(
+        self,
+        name: str,
+        rate_limit_config: RateLimitConfig = None,
+        *,
+        connection_timeout_seconds: float = 30.0,
+        login_timeout_seconds: Optional[float] = None,
+    ):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['SSE', 'SZSE']  # 上海证券交易所、深圳证券交易所
         self.is_logged_in = False
         self.network_error_count = 0
         self.max_network_errors = 10  # 最大网络错误次数
-        self._bs_call_timeout = 30  # 单次 BaoStock API 调用超时（秒）
+        self._bs_call_timeout = max(1.0, float(connection_timeout_seconds))
+        self._login_timeout = max(
+            1.0,
+            float(login_timeout_seconds if login_timeout_seconds is not None else self._bs_call_timeout),
+        )
         self._bs_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix='bs')
         self._last_success_time: float = 0.0  # 最近一次成功 API 调用的时间戳
 
@@ -86,7 +97,7 @@ class BaostockSource(BaseDataSource):
 
             # 登录Baostock（加锁保护全局 socket）
             async with BaostockSource._bs_lock:
-                lg = await self._run_bs_call(bs.login, timeout=15)
+                lg = await self._run_bs_call(bs.login, timeout=self._login_timeout)
             if lg.error_code != '0':
                 baostock_logger.error(f"Baostock login failed: {lg.error_msg}")
                 raise DataSourceError(

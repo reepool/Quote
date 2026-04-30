@@ -5,6 +5,39 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased] - 2026-04-30
+
+### 新增
+- 研究域股东摘要已完成全量本地快照导入、`paid_high_availability` API gate 开放和周六 `10:00` 全量刷新调度。
+- REST API 文档新增股东快照读取与 readiness 接口说明。
+
+### 变更
+- 更新研究域执行文档、实现计划、scheduler 文档和 Telegram 文档，将 `shareholders` 从“默认禁用/待 rollout”调整为“已完成并进入周更维护”。
+- `/reload_config` 现在会刷新同进程内 `DataManager` 缓存的 research 配置引用；独立 API 进程仍需重启加载配置。
+
+## [2.4.3] - 2026-04-17 ⭐ 港股复权因子直连化与周维护收口
+
+### 新增
+- 🧮 **港股 AkShare 直连因子路径**
+  - `AkShareSource` 改用新浪 `stock_hk_daily(adjust="qfq-factor")` 稀疏因子接口构建 HKEX 累积复权因子
+  - 新增 `data_sources_config.akshare.hk_adjustment_factors` 配置段，统一管理 `factor_adjust`、`base_date`、`fallback_on_invalid_response` 等算法参数
+  - 明确 `None` / `[]` 的主源语义：`None` 允许 fallback，`[]` 表示主源确认无事件
+
+### 变更
+- 🔄 **港股因子调度策略**
+  - `routing.factor.HKEX.maintenance_sync_enabled` 默认开启，港股因子改由周末 `weekly_data_maintenance` 同步
+  - `routing.factor.HKEX.daily_sync_enabled` 继续保持关闭，避免交易日日更被 3000+ 港股扫描拖慢
+- 🗓️ **周维护任务配置化增强**
+  - `weekly_data_maintenance.parameters` 新增 `sync_adjustment_factors`、`factor_sync_exchanges`、`factor_sync_days_back`
+  - 周维护超时预算调整为 `18000` 秒，以覆盖港股因子扫描、数据校验和数据库优化
+- 🧹 **周维护执行顺序调整**
+  - 改为“前置备份 -> 日志清理 -> 幽灵/僵尸标的清理 -> 周度因子同步 -> 数据校验 -> 数据库优化”
+
+### 修复
+- 🐛 **港股伪因子生成路径移除**
+  - 删除生产路径对原始价/后复权价双下载、OHLC 中位数反推和平台跳跃检测的依赖
+  - 港股累积因子不再受东财价格四舍五入噪声影响
+
 ## [2.4.0] - 2026-03-30 ⭐ 复权架构迁移
 
 ### 新增
@@ -375,4 +408,4 @@
 
 ---
 
-*最后更新：2026-04-09*
+*最后更新：2026-04-30*

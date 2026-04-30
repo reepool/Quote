@@ -369,6 +369,7 @@ OSError: [Errno 28] No space left on device
    ```bash
    python main.py job --job-id weekly_data_maintenance
    ```
+   当前该任务除日志清理和无效标的治理外，还会按配置执行周度复权因子同步；港股因子默认在这里处理，而不是在交易日日更中处理。
 
 ## 🌐 网络问题
 
