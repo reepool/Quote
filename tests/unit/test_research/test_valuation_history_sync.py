@@ -72,7 +72,11 @@ def test_valuation_history_rebuild_writes_rows(tmp_path):
                 instrument_id="600519.SH",
                 symbol="600519",
                 exchange="SSE",
-                report_period="2025-12-31",
+                report_period="2025Q4",
+                publish_date="2026-04-15",
+                data_available_date="2026-04-15",
+                fiscal_year=2025,
+                fiscal_quarter=4,
                 revenue=80.0,
                 net_income=20.0,
                 equity=50.0,
@@ -109,3 +113,7 @@ def test_valuation_history_rebuild_writes_rows(tmp_path):
     rows = storage.get_valuation_history_rows("600519.SH")
     assert len(rows) == 2
     assert rows[0]["pe_ratio"] in {50.0, 55.0}
+    assert rows[0]["pe_static"] in {50.0, 55.0}
+    assert rows[0]["pe_ttm"] in {50.0, 55.0}
+    assert rows[0]["pb_mrq"] in {20.0, 22.0}
+    assert rows[0]["details"]["metrics"]["pe_forward"]["missing_reason"] == "analyst_forecast_disabled"

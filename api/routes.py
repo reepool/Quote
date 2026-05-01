@@ -833,6 +833,27 @@ async def get_research_valuation_history(
 
 
 @router.get(
+    "/research/financial-statements/readiness",
+    response_model=ResearchFinancialStatementsReadinessResponse,
+    tags=["Research"],
+)
+async def get_research_financial_statements_readiness():
+    """读取财务报表仓库 rollout readiness。"""
+    try:
+        payload = await data_manager.get_research_financial_statements_readiness()
+        return ResearchFinancialStatementsReadinessResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research financial statements readiness: {str(e)}",
+        )
+
+
+@router.get(
     "/research/valuation/readiness",
     response_model=ResearchValuationReadinessResponse,
     tags=["Research"],

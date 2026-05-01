@@ -375,6 +375,45 @@ async def weekly_data_maintenance(self,
 3. **本地落库**：写入 `research.db` 的 `shareholder_snapshots`，API 读取不实时访问外部源。
 4. **健康复核**：运行后可通过 `/api/v1/research/shareholders/readiness` 或 `scripts/research_shareholder_rollout_validation.py --skip-sync` 复核 required scope 覆盖。
 
+### 6.3 研究域财务报表日更与对账
+
+#### 功能描述
+财务报表不再依赖周六股东刷新窗口。当前新增两个默认禁用任务：
+
+- `financial_statements_catchup_sync`：周一至周五 `17:45` 运行日度 `catchup`，用于处理新披露或变化的报告期。
+- `financial_statements_reconciliation_sync`：周日 `08:30` 运行有界对账修复，默认 `force_full=true`，避开周六 `shareholder_shadow_sync`。
+
+#### 当前配置
+```json
+{
+  "financial_statements_catchup_sync": {
+    "enabled": false,
+    "trigger": {"type": "cron", "day_of_week": "mon-fri", "hour": 17, "minute": 45},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "sync_mode": "catchup",
+      "force_full": false,
+      "max_runtime_seconds": 7200
+    }
+  },
+  "financial_statements_reconciliation_sync": {
+    "enabled": false,
+    "trigger": {"type": "cron", "day_of_week": "sun", "hour": 8, "minute": 30},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "sync_mode": "catchup",
+      "force_full": true,
+      "max_runtime_seconds": 10800
+    }
+  }
+}
+```
+
+#### 业务逻辑
+1. **增量维护**：catch-up 依赖上次成功 `ingestion_runs` checkpoint、source hash 和 core facts 存在性跳过未变化文件。
+2. **对账修复**：reconciliation 复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比和 hot/cold tier consistency。
+3. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
+
 ### 7. 系统健康检查 (system_health_check)
 
 #### 功能描述
@@ -388,6 +427,14 @@ async def weekly_data_maintenance(self,
 
 #### 功能描述
 按计划自动备份数据库文件，支持保留策略与通知。
+
+#### 存储前提
+- `data/` 是 Quote 本地数据卷挂载点，生产环境应由 `/dev/sda3` 挂载到
+  `/home/python/Quote/data`。
+- `data/PVE-Bak` 和 `data/QuoteBak` 是 NAS 子挂载点。备份任务写入
+  `data/PVE-Bak/QuoteBak` 前，应确认该路径不是本地空目录。
+- 如果 NAS 不可用，`nofail` 配置应允许本地数据卷和核心服务继续启动；
+  备份任务需要失败告警，而不是把完整数据库备份落到本地数据卷。
 
 ### 9. 缓存预热 (cache_warm_up)
 

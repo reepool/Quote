@@ -132,7 +132,103 @@
         "enabled": true,
         "optional_empty_exchanges": [
           "BSE"
-        ]
+        ],
+        "history": {
+          "baseline_report_period": "2024Q1",
+          "optional_ttm_anchor_period": "2023Q4",
+          "rolling_min_quarters": 8
+        },
+        "storage": {
+          "target_db_path": "data/financials.db",
+          "archive_root": "data/filings/financial_statements",
+          "hot_quarter_window": 12,
+          "hot_anchor_policy": {
+            "include_ttm_anchor_period": true,
+            "include_yoy_anchor_periods": true,
+            "include_latest_annual_period": true
+          },
+          "tier_maintenance": {
+            "enabled": true,
+            "run_after_successful_sync": true,
+            "validate_duplicate_tier_conflicts": true,
+            "preserve_source_lineage": true
+          }
+        },
+        "official_structured_sources": {
+          "enabled": false,
+          "candidates": [
+            {
+              "source": "sse",
+              "exchanges": [
+                "SSE"
+              ],
+              "mode": "direct",
+              "enabled": false,
+              "manifest_url": "",
+              "endpoint_url": "",
+              "supports_xbrl": true,
+              "status": "needs_probe"
+            },
+            {
+              "source": "cninfo",
+              "exchanges": [
+                "SZSE"
+              ],
+              "mode": "direct",
+              "enabled": false,
+              "manifest_url": "",
+              "endpoint_url": "",
+              "supports_xbrl": true,
+              "status": "needs_probe"
+            },
+            {
+              "source": "bse",
+              "exchanges": [
+                "BSE"
+              ],
+              "mode": "direct",
+              "enabled": false,
+              "manifest_url": "",
+              "endpoint_url": "",
+              "supports_xbrl": true,
+              "status": "needs_probe"
+            }
+          ]
+        },
+        "runtime": {
+          "max_concurrency": 2,
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5
+        },
+        "parser": {
+          "parser_version": "financial_structured_filing.v1",
+          "alias_mapping_version": "core_financial_facts.v1",
+          "numeric_fact_parser": "xbrl_numeric_facts.v1"
+        },
+        "fallback_policy": {
+          "allow_third_party_fallback": true,
+          "fallback_only_missing_periods_or_facts": true,
+          "do_not_overwrite_higher_priority_facts": true,
+          "fallback_source_priority": [
+            "akshare"
+          ]
+        },
+        "readiness": {
+          "required_core_facts": [
+            "revenue",
+            "net_income",
+            "equity",
+            "total_assets",
+            "total_liabilities"
+          ],
+          "min_period_coverage_ratio": 0.95,
+          "min_core_fact_coverage_ratio": 0.95,
+          "max_fallback_share": 0.5,
+          "max_parser_failure_ratio": 0.05
+        },
+        "note": "Official structured sources stay disabled until the probe task records concrete endpoint evidence. AkShare remains the current fallback for existing sync behavior."
       },
       "analyst_forecasts": {
         "enabled": false,
@@ -202,7 +298,26 @@
       "valuation": {
         "enabled": false,
         "history": {
-          "lookback_days": 252
+          "lookback_days": 252,
+          "flow_input_mode": "cumulative_ytd",
+          "require_availability_date": true,
+          "forward_metrics_enabled": false
+        },
+        "metrics": {
+          "enabled_variants": [
+            "pe_static",
+            "pe_ttm",
+            "pe_forward",
+            "pb_mrq",
+            "ps_static",
+            "ps_ttm",
+            "ps_forward"
+          ],
+          "compatibility_fields": {
+            "pe_ratio": "pe_ttm_then_static",
+            "pb_ratio": "pb_mrq",
+            "ps_ratio": "ps_ttm_then_static"
+          }
         },
         "relative": {
           "taxonomy_system": "sw",
@@ -210,7 +325,13 @@
           "benchmark_field": "sw_l2_code",
           "require_authoritative": true,
           "min_peer_count": 3,
-          "max_peer_rows": 20
+          "max_peer_rows": 20,
+          "metric_variants": [
+            "pe_ttm",
+            "pb_mrq",
+            "ps_ttm"
+          ],
+          "include_compatibility_metrics": true
         },
         "dcf": {
           "projection_years": 5,
@@ -254,7 +375,9 @@
       "shadow_mode": true,
       "attach_quotes_db": true,
       "quotes_db_path": "data/quotes.db",
-      "quotes_db_alias": "quotes"
+      "quotes_db_alias": "quotes",
+      "financials_db_path": "data/financials.db",
+      "filings_archive_root": "data/filings/financial_statements"
     },
     "budget": {
       "default_mode": "availability_first",
@@ -323,6 +446,16 @@
           "top_holders_retry_attempts": 2,
           "top_holders_retry_backoff_seconds": 0.5
         },
+        "financial_statements": {
+          "enabled": true,
+          "role": "third_party_fallback_for_full_statement_rows",
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "parser_version": "akshare_financial_statements.v1",
+          "note": "Fallback only after official structured sources have missing periods or missing core facts. It must not overwrite higher-priority official facts."
+        },
         "industry_standard": {
           "verified_interfaces": [
             "sw_index_first_info",
@@ -361,6 +494,29 @@
           ],
           "historical_backfill_enabled": true,
           "note": "Uses the same SWS index_analysis_report endpoint semantics as AkShare index_analysis_daily_sw, with project-controlled timeout/retry. This is the approved historical date-range source for industry_index_analysis_daily. Units match SWS display units: 成交量 is 100 million shares; percentage fields remain percent values."
+        }
+      },
+      "sse": {
+        "enabled": false,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "official_sse_structured_financial_filings",
+        "financial_statements": {
+          "enabled": false,
+          "exchanges": [
+            "SSE"
+          ],
+          "manifest_url": "",
+          "endpoint_url": "",
+          "supports_xbrl": true,
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "status": "needs_probe",
+          "note": "Disabled until the official-source probe records concrete endpoint, artifact hash, and coverage evidence."
         }
       },
       "swsresearch": {
@@ -449,7 +605,45 @@
         "cost_tier": "free",
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
-        "role": "official_a_share_disclosure_fallback"
+        "role": "official_a_share_disclosure_fallback",
+        "financial_statements": {
+          "enabled": false,
+          "exchanges": [
+            "SZSE"
+          ],
+          "manifest_url": "",
+          "endpoint_url": "",
+          "supports_xbrl": true,
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "status": "needs_probe",
+          "note": "Disabled for financial statements until the CNInfo/SZSE structured filing probe confirms endpoints and parser compatibility."
+        }
+      },
+      "bse": {
+        "enabled": false,
+        "transport": "direct",
+        "cost_tier": "free",
+        "anti_crawl_risk": "medium",
+        "supports_proxy_patch": false,
+        "role": "official_bse_structured_financial_filings",
+        "financial_statements": {
+          "enabled": false,
+          "exchanges": [
+            "BSE"
+          ],
+          "manifest_url": "",
+          "endpoint_url": "",
+          "supports_xbrl": true,
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "status": "needs_probe",
+          "note": "BSE stays optional-empty for current readiness and disabled as an official source until live probe evidence is recorded."
+        }
       },
       "hkexnews": {
         "enabled": true,
@@ -574,7 +768,20 @@
         ]
       },
       "financial_statements": {
-        "free_chain": [],
+        "free_chain": [
+          {
+            "source": "sse",
+            "mode": "direct"
+          },
+          {
+            "source": "cninfo",
+            "mode": "direct"
+          },
+          {
+            "source": "bse",
+            "mode": "direct"
+          }
+        ],
         "paid_chain": [
           {
             "source": "akshare",

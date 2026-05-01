@@ -1,6 +1,6 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-04-27
+> 更新日期：2026-05-01
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
@@ -16,6 +16,7 @@
 > 配套 backlog manual-override 建议变更包：`openspec/changes/add-manual-override-suggestions-for-official-backlog/`
 > 配套申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
 > 配套申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
+> 配套财务/XBRL 与相对估值加固变更包：`openspec/changes/harden-financial-xbrl-and-relative-valuation/`
 
 ---
 
@@ -37,6 +38,12 @@
   - 原始报表快照
   - 规范化财务事实表
   - 派生财务指标表
+  - 官方结构化披露文件 manifest、原始文件 hash、解析诊断和数据可得日
+- **财务域必须区分当前已实现基线与下一阶段目标**：
+  - 当前代码已具备 `financial_summaries`、`financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`、`valuation_history` 的 schema / sync / read API 基线
+  - 当前财务主线已补齐 source manifest、全数值事实长表、hot/cold tier、多期回填/增量 catch-up checkpoint、覆盖缺口检测和仓库级 readiness 验证；官方结构化源仍因 URL 未验证而默认 disabled
+  - 当前估值历史已补齐 PE/PB/PS 静态、TTM、forward/MRQ 口径拆分，相对估值已支持显式 metric variants、干净同行统计和排除诊断，scheduler/API readiness gate 已接入；剩余生产化关键在官方结构化源 live probe、小样本 backfill 与全量 readiness 复核
+- **财务域不允许把上游 URL、报告期起点、限流、重试、并发、parser version、事实字段 alias、估值假设写死在业务逻辑里**；这些变量必须进入 `config/10_research.json`、scheduler 参数或后续独立 financial config，并在 `ingestion_runs` / source manifest 中留下运行时参数快照。
 - **研究域数据源优先级应固定为“稳定免费 -> 稳定付费 -> 免费不稳定补充”**：
   - `BaoStock` 适合作为 A 股基础主数据、交易日历、复权因子、部分财务指标等稳定免费主源
   - `pytdx / TDX` 适合作为 A 股行情、板块、公司信息文本、除权除息和底层财务补充源
@@ -67,6 +74,8 @@
   - 复用现有 Quote System 的代码仓、调度器、API、监控和 Telegram 运维能力
   - 研究域模块、表、路由和任务要独立命名与隔离
   - 为降低对现有生产库的影响，**推荐新增 `research.db` 或等价独立库文件**，而不是直接把全部研究表并入 `quotes.db`
+  - 后续财务仓可从 `research.db` 拆分到 `data/financials.db`，但业务层必须通过 repository/storage 抽象访问，不允许在 `DataManager`、provider 或 API 层散落 SQLite 方言和文件路径假设
+  - 若未来迁移到 DuckDB/PostgreSQL 等性能更优的数据库，应保持 `instrument_id + report_period + source lineage + availability metadata` 等逻辑模型不变，只替换存储适配层、迁移脚本和连接配置
 - **市场范围建议分两期**：
   - Phase 1：A 股完整研究能力 + 港股价格/技术/基础信息能力
   - Phase 2：港股财务、估值、事件、分析师数据按源验证逐步补齐
@@ -490,9 +499,11 @@ L4  Research API（新增）
   - 继续保持稳定免费主链，不默认迁移到 `AkShare`
   - 免费补充 fallback：`efinance:direct / akshare:direct`
 - `full financial statements`
-  - 主：`AkShare:proxy_patch` 或官方披露解析
-  - 免费补充 fallback：`AkShare:direct`
-  - 结论：**如果没有更可靠的稳定免费主源，就应把 `AkShare + proxy_patch` 视为完整三大报表的默认主链，而不是退回不稳定直连**
+  - 目标主链：交易所、巨潮或其他官方结构化披露/XBRL/等价结构化文件 provider，按交易所、报告期、公告文件 manifest 发现和下载
+  - 当前可运行基线：`AkShare:proxy_patch -> AkShare:direct`，只承诺最新报告期快照，不承诺完整历史仓和官方来源可审计性
+  - `BaoStock / PyTDX`：保留为财务摘要、关键字段交叉校验或缺口诊断源，不作为完整三大报表主源
+  - fallback 规则：官方源缺失、解析失败或字段不足时，允许配置化使用 AkShare fallback 补齐缺失期间或核心事实，但不得覆盖已确认的更高优先级官方事实；必须记录 fallback reason、source_mode 和 source-file lineage
+  - 结论：**下一阶段完整财报目标不是继续扩大 AkShare 最新期快照，而是先做官方结构化源探测、manifest 和 parser，再把 AkShare 作为补充链路接入多期财务仓**
 
 #### 5.3.5 对当前仓库的落地要求
 
@@ -1062,55 +1073,213 @@ Phase 1 就应落实：
 
 ### 9.3 财务表的推荐结构
 
-不建议只做一个 `financial_statements` JSON 表后直接给 API 用。
-推荐采用双层结构：
+不建议只做一个 `financial_statements` JSON 表后直接给 API 用。财务域应按“源文件 manifest -> 原始报表/原始 payload -> 全数值事实 -> 核心事实 -> 派生指标/估值”的层次设计。当前仓库已经在不破坏现有 API 的前提下补齐 `financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history` 和 `financial_indicator_snapshots_hot/history`，并保留 `financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots` 兼容表。
 
-#### 1. 原始表
+#### 1. 源文件 manifest / filing registry
 
-- `financial_statements_raw`
-- 字段：
-  - `instrument_id`
-  - `statement_type`
-  - `report_period`
-  - `publish_date`
-  - `source`
-  - `raw_json`
-  - `payload_hash`
+当前表为 `financial_source_files`，后续也可在拆库后放入 `data/financials.db`：
 
-#### 2. 规范化事实表
+- `id`
+- `instrument_id`
+- `symbol`
+- `exchange`
+- `report_period`
+- `report_type`
+- `filing_id`
+- `source`
+- `source_mode`
+- `source_url`
+- `archive_path`
+- `content_hash`
+- `content_type`
+- `file_size`
+- `disclosed_at`
+- `downloaded_at`
+- `parser_version`
+- `parse_status`
+- `diagnostics_json`
+- `ingestion_run_id`
 
-- `financial_facts`
-- 字段：
-  - `instrument_id`
-  - `report_period`
-  - `revenue`
-  - `gross_profit`
-  - `net_income`
-  - `operating_cf`
-  - `total_assets`
-  - `total_liabilities`
-  - `equity`
-  - `inventory`
-  - `receivables`
-  - `fixed_assets`
-  - `shares_outstanding`
-  - ...
+要求：
 
-#### 3. 指标表
+- 上游 URL、endpoint、timeout、retry、request interval、并发数、parser version 不得写死在 provider 内，必须来自配置或 provider 初始化参数
+- source file hash 是判断修订报表、重复下载、增量 catch-up 的主依据之一
+- 官方源不可用时，manifest 仍应记录缺失原因，避免 fallback 数据看起来像主源数据
+- 当前 `FinancialStatementsShadowSyncService` 已在 backfill/catchup 中写入 manifest，并把本次 `report_periods`、`sync_mode`、checkpoint、tier maintenance 和 coverage gaps 写入 `ingestion_runs.metadata_json`
 
-- `financial_indicator_snapshots`
-- 字段：
-  - `instrument_id`
-  - `report_period`
-  - `gross_margin`
-  - `net_margin`
-  - `roe`
-  - `roa`
-  - `asset_liability_ratio`
-  - `revenue_yoy`
-  - `net_income_yoy`
-  - `fcf`
-  - ...
+#### 2. 原始报表快照
+
+当前基线表为 `financial_statements_raw`：
+
+- `instrument_id`
+- `statement_type`
+- `report_period`
+- `publish_date`
+- `source`
+- `source_mode`
+- `statement_json`
+- `ingestion_run_id`
+
+后续增强：
+
+- 增加或关联 `source_file_id`
+- 增加 `report_type`、`data_available_date`、`parser_version`
+- 对官方结构化文件保留原始归档路径，JSON 只作为解析后的快照视图
+
+#### 3. 全数值事实长表
+
+当前表为 `financial_numeric_facts`，并同步维护 `financial_numeric_facts_hot/history`。它用于保存官方 XBRL 或等价结构化文件中的所有数值事实，不只保存估值常用字段：
+
+- `source_file_id`
+- `instrument_id`
+- `report_period`
+- `fact_name`
+- `namespace`
+- `statement_family`
+- `context_id`
+- `unit`
+- `decimals`
+- `precision`
+- `period_start`
+- `period_end`
+- `instant_date`
+- `dimensions_json`
+- `value`
+- `raw_value`
+- `parser_version`
+
+要求：
+
+- 不因当前 API 用不到而丢弃数值事实
+- 不用表结构硬编码某一个 XBRL taxonomy 的字段全集
+- 通过 `(instrument_id, report_period, fact_name, context_id, source_file_id)` 等组合唯一约束保证可重复写入
+
+#### 4. 核心规范化事实表
+
+当前基线表为 `financial_facts`，用于估值、筛选和公司概览的稳定字段：
+
+- `instrument_id`
+- `report_period`
+- `report_type`
+- `publish_date`
+- `data_available_date`
+- `revenue`
+- `gross_profit`
+- `net_income`
+- `operating_cf`
+- `total_assets`
+- `total_liabilities`
+- `equity`
+- `inventory`
+- `receivables`
+- `fixed_assets`
+- `shares_outstanding`
+- `source`
+- `source_mode`
+- `source_file_id`
+- `facts_json`
+
+要求：
+
+- 字段 alias 映射、单位换算、币种、报告口径必须版本化
+- 估值只能使用 `data_available_date <= trade_date` 的事实，缺失可得日时必须返回 unavailable 或使用配置化保守规则
+- fallback 数据只补缺，不覆盖高优先级事实
+
+#### 5. 派生指标与估值指标
+
+当前基线表为 `financial_indicator_snapshots`，后续继续承载：
+
+- `gross_margin`
+- `net_margin`
+- `roe`
+- `roa`
+- `asset_liability_ratio`
+- `revenue_yoy`
+- `net_income_yoy`
+- `fcf`
+- `book_value_per_share`
+- `operating_cf_to_net_income`
+
+估值域不应继续只暴露模糊的 `pe_ratio / pb_ratio / ps_ratio` 口径。当前 `valuation_history` 已在保留兼容字段的同时新增以下明确口径：
+
+- `pe_static`
+- `pe_ttm`
+- `pe_forward`
+- `pb_mrq`
+- `ps_static`
+- `ps_ttm`
+- `ps_forward`
+
+每个估值指标都要记录：
+
+- `numerator`
+- `denominator`
+- `denominator_fact_names`
+- `source_report_periods`
+- `data_available_dates`
+- `calc_method`
+- `calc_version`
+- `parameter_hash`
+
+#### 6. 财务事实热/冷分层
+
+你的判断是合理的：大多数公司研究、估值、筛选和 AI 概览只需要最近两年加当年已披露报告期，通常不超过 `12` 个季度。财务域可以采用 **hot/cold tier** 设计，降低常用查询表体量，同时保留长历史研究能力。
+
+建议语义：
+
+- hot tier：最近 `N` 个报告期，默认 `N = 12` 个季度，并可额外保留 TTM、YoY、年报锚点所需的配置化 anchor period
+- cold tier：超过 hot window 的历史报告期和全数值事实
+- source manifest / filing registry：不按 hot/cold 分裂，保持全量、唯一、可审计
+- API / service：默认查 hot tier；当请求显式指定更长 `start_period`、`lookback_quarters` 或 `include_history=true` 时，再 union cold tier
+
+推荐物理形态：
+
+```text
+financial_core_facts_hot
+financial_core_facts_history
+financial_numeric_facts_hot
+financial_numeric_facts_history
+financial_indicator_snapshots_hot
+financial_indicator_snapshots_history
+```
+
+也可以在未来数据库中映射为：
+
+- PostgreSQL：按 `report_period` 或 `data_available_date` 分区，并提供 `financial_core_facts_hot` view
+- DuckDB：hot 数据保留在常用 OLTP/SQLite 层，cold 数据放列式历史库
+- SQLite：先用两张物理表 + repository union 查询，避免大表持续膨胀
+
+关键规则：
+
+- `N=12` 只是默认值，必须配置化，例如 `financial_statements.storage.hot_quarter_window`
+- hot/cold 归档只改变物理位置，不改变逻辑主键、source lineage、API 语义和 readiness 口径
+- 每次 daily catch-up 或 backfill 成功后，运行 tier maintenance：把超出 hot window 的行移动到 history，并保证 hot 表至少覆盖配置窗口
+- 同一 `(instrument_id, report_period, report_type, source priority)` 不允许在 hot/history 中重复成为 active row；迁移过程应事务化或幂等
+- TTM、YoY、环比、静态 PE 和 PB MRQ 需要的额外报告期应通过配置保留在 hot tier，不能为了严格 12 季度而破坏计算
+- 长历史查询必须通过 repository 层合并 hot/history，业务代码不能直接拼两张表
+
+这个方案的收益：
+
+- 常用公司概览、最新财务、估值和筛选查询保持小表扫描或窄索引命中
+- 历史财务研究、长周期因子、财务质量回测仍可查全量
+- 为未来从 SQLite 迁移到 PostgreSQL/DuckDB 的冷热分区或列式历史仓预留一致语义
+
+风险与约束：
+
+- 需要维护 tier migration，不应在每次查询时动态搬迁
+- 如果索引设计正确，单纯拆表未必比单表快很多；真正收益来自控制 hot 表大小、简化常用索引和减少缓存污染
+- source manifest、raw archive 和 ingestion audit 不应被热/冷拆分打散，否则修订报表和追溯会变复杂
+
+#### 7. 数据库迁移兼容性
+
+财务域后续数据量和查询复杂度会高于普通快照表，因此要为 SQLite 之外的后端留迁移空间：
+
+- 业务代码只依赖 storage/repository 方法，不直接拼 SQLite 方言 SQL
+- upsert、分页、JSON 字段、时间字段和批量写入要集中在存储适配层处理
+- 表设计优先使用可迁移类型：`TEXT / INTEGER / REAL / NUMERIC / TIMESTAMP / JSON text`
+- 避免把 SQLite `rowid`、`PRAGMA`、`ATTACH` 语义作为业务逻辑前提
+- 若拆分到 `data/financials.db` 或迁移到 PostgreSQL/DuckDB，API 响应模型、source lineage 和 readiness 语义保持不变
+- hot/cold tier 在不同后端可以是两张表、分区表、物化视图或列式历史仓；业务层只感知 repository 的 `recent` / `history` 查询语义
 
 ### 9.4 技术指标表的推荐结构
 
@@ -1270,9 +1439,12 @@ GET /api/v1/research/company/{instrument_id}/events
 | `industry_official_mapping_refresh` | 手动/归档 | 旧 official code -> index taxonomy 映射审计缓存；官方分类代码成为主键后不再作为 membership 同步前置 |
 | `industry_index_analysis_sync` | 每日收盘后 | 同步申万行业指数最新日频估值、换手、涨跌幅、市值和股息率等指标，只写 `industry_index_analysis_daily` |
 | `industry_index_analysis_backfill` | 手动/禁用定时 | 按日期区间回补申万行业指数分析历史数据；默认按“月份 + index_type”分块，必要时可用按日分块补缺 |
-| `financial_statement_sync` | 每日轮询 + 季报季集中 | 同步新报表 |
-| `financial_indicator_rebuild` | 财报同步后 | 重建规范化指标 |
-| `valuation_history_rebuild` | 每日收盘后 | 重算核心估值历史 |
+| `financial_statement_official_probe` | 手动/开发验证 | 探测 SSE/SZSE/CNInfo/BSE 官方结构化财报源，记录覆盖率、延迟、下载证据和字段稳定性，不写生产表或仅写临时验证库 |
+| `financial_statement_backfill` | 手动/灰度批处理 | 按配置化 baseline、rolling quarters 和目标市场做多期财报回填，写 source manifest、全数值事实和核心事实，并按 hot/cold tier 维护最近报告期与历史报告期 |
+| `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
+| `financial_statement_reconciliation` | 每周，避开股东周更窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
+| `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
+| `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |
@@ -1293,6 +1465,8 @@ GET /api/v1/research/company/{instrument_id}/events
 - 支持按市场、按模块手动补数
 - 研究域任务与行情任务分开配置，避免耦合
 - 研究域任务默认支持 `shadow_mode`
+- 财务任务必须支持 `baseline_report_period`、`rolling_min_quarters`、`hot_quarter_window`、`hot_anchor_policy`、`max_concurrency`、`request_timeout_seconds`、`retry_attempts`、`request_interval_seconds`、`parser_version`、`fallback_policy` 等配置化参数
+- 财务 catch-up 和 reconciliation 必须有 checkpoint，不能靠全市场全量重跑作为唯一维护方式
 - 同步状态应区分：
   - `success`
   - `partial_success`
@@ -1338,6 +1512,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - `financial_statements_raw`
 - `financial_facts`
 - `financial_indicator_snapshots`
+- `financial_source_files / financial_numeric_facts` 或等价官方结构化财报 lineage 层
 - `technical_indicator_latest`
 - 技术指标实时计算 API
 - 基础研究路由 `/api/v1/research/company/*`
@@ -1346,7 +1521,7 @@ GET /api/v1/research/company/{instrument_id}/events
 
 - 公司概览
 - 行业参考层字段可读
-- 近 3~10 年财务数据
+- 近 3~10 年财务数据的目标不再靠最新期快照扩展，而是通过官方结构化披露优先的多期财务仓实现；第一批可从 `2024Q1` 起并满足至少 8 个季度 rolling floor
 - 财务指标
 - 技术指标摘要与时间序列
 - 研究域只读接口灰度可用
@@ -1366,6 +1541,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - 同行业对标
 - 相对估值
 - DCF + 参数覆盖 + 敏感性分析
+- PE/PB/PS 静态、TTM、forward 指标口径拆分；forward 指标在 forecast 输入未启用或未覆盖时必须显式 unavailable
 
 **交付结果**：
 
@@ -1374,7 +1550,9 @@ GET /api/v1/research/company/{instrument_id}/events
 - 估值时间轴
 - 支持以 **申万一级 / 二级 / 三级行业** 作为同行比较中枢的矩阵；未显式指定时默认使用 **申万二级行业**，工程实现通过 `valuation.relative.benchmark_field` 配置解析，默认 `sw_l2_code`
 - 当 `valuation.relative.require_authoritative=true` 时，相对估值只能使用 current authoritative 行业归属，不允许降级使用 reference-only 行业字段
+- 相对估值按 `valuation.relative.metric_variants` 显式选择指标口径，默认 `pe_ttm / pb_mrq / ps_ttm`，并返回 valid peer count、mean、median、p25、p75、percentile rank、相对中位数溢价/折价和逐指标排除诊断
 - valuation rollout readiness 应同时检查 `valuation_history` 覆盖、模块 gate 与 strict Shenwan current authoritative membership 前置条件
+- financial readiness 应检查目标报告期覆盖、核心事实覆盖、source/parser 分布、fallback 占比、缺失可得日和解析失败项；valuation readiness 必须依赖 financial readiness，而不是只看 `valuation_history` 是否有行
 - DCF 估值接口
 
 **预估工期**：`2 ~ 4 周`

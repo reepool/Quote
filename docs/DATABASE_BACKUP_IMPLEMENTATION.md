@@ -4,6 +4,11 @@
 
 成功实现了 `database_backup` 定时任务，将数据库文件从 `data/quotes.db` 自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。
 
+> 存储布局说明：生产环境中 `data/` 是 `/dev/sda3` 挂载到
+> `/home/python/Quote/data` 的本地数据卷；`data/PVE-Bak` 和
+> `data/QuoteBak` 是 NAS 子挂载。执行完整备份前必须确认
+> `data/PVE-Bak/QuoteBak` 已落在 NAS 上，避免把大文件写回本地数据卷。
+
 ## 📋 实施内容
 
 ### 1. 配置文件修改 ✅

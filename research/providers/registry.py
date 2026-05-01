@@ -21,6 +21,7 @@ from .cninfo_shareholders import CninfoShareholdersProvider
 from .efinance_shareholders import EfinanceShareholdersProvider
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
+from .official_financial_filings import ConfiguredOfficialFinancialFilingProvider
 from .sina_industry_supplement import SinaIndustryNameSupplementProvider
 from .swsresearch_index_analysis import SWSResearchIndexAnalysisProvider
 from .swsresearch_shenwan_classification import SWSResearchShenwanClassificationProvider
@@ -28,6 +29,7 @@ from .base import (
     BaseAnalystForecastProvider,
     BaseCompanyProfileProvider,
     BaseFinancialStatementsProvider,
+    BaseOfficialFinancialFilingProvider,
     BaseFinancialSummaryProvider,
     BaseIndustryProvider,
     BaseIndustryIndexAnalysisProvider,
@@ -97,6 +99,41 @@ class FinancialStatementsProviderRegistry:
         }
 
     def get(self, source_name: str) -> Optional[BaseFinancialStatementsProvider]:
+        return self._providers.get(source_name)
+
+
+class OfficialFinancialFilingProviderRegistry:
+    """Registry for official structured financial filing providers."""
+
+    def __init__(
+        self,
+        providers: Optional[Dict[str, BaseOfficialFinancialFilingProvider]] = None,
+        research_config: Optional[ResearchConfig] = None,
+    ):
+        research_config = research_config or config_manager.get_research_config()
+        if providers is not None:
+            self._providers = providers
+            return
+
+        module_cfg = research_config.modules.get("financial_statements", {})
+        official_cfg = module_cfg.get("official_structured_sources", {})
+        candidates = official_cfg.get("candidates", [])
+        self._providers = {}
+        for candidate in candidates:
+            source_name = str(candidate.get("source") or "").strip()
+            if not source_name:
+                continue
+            source_cfg = research_config.sources.get(source_name, {})
+            financial_cfg = {
+                **candidate,
+                **source_cfg.get("financial_statements", {}),
+            }
+            self._providers[source_name] = ConfiguredOfficialFinancialFilingProvider(
+                source_name=source_name,
+                source_config=financial_cfg,
+            )
+
+    def get(self, source_name: str) -> Optional[BaseOfficialFinancialFilingProvider]:
         return self._providers.get(source_name)
 
 

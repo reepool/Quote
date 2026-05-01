@@ -9,7 +9,7 @@ import json
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from statistics import fmean, median
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -19,6 +19,9 @@ from .providers.base import ValuationHistorySnapshot
 DEFAULT_VALUATION_PARAMETERS: Dict[str, Any] = {
     "history": {
         "lookback_days": 252,
+        "flow_input_mode": "cumulative_ytd",
+        "require_availability_date": True,
+        "forward_metrics_enabled": False,
     },
     "relative": {
         "taxonomy_system": "sw",
@@ -27,6 +30,8 @@ DEFAULT_VALUATION_PARAMETERS: Dict[str, Any] = {
         "require_authoritative": True,
         "min_peer_count": 3,
         "max_peer_rows": 20,
+        "metric_variants": ["pe_ttm", "pb_mrq", "ps_ttm"],
+        "include_compatibility_metrics": True,
     },
     "dcf": {
         "projection_years": 5,
@@ -42,6 +47,16 @@ DEFAULT_VALUATION_PARAMETERS: Dict[str, Any] = {
         "sensitivity_discount_rates": [0.09, 0.10, 0.11],
     },
 }
+
+VALUATION_METRIC_FIELDS: Tuple[str, ...] = (
+    "pe_static",
+    "pe_ttm",
+    "pe_forward",
+    "pb_mrq",
+    "ps_static",
+    "ps_ttm",
+    "ps_forward",
+)
 
 BENCHMARK_FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     "sw_l1_code": {
@@ -341,18 +356,13 @@ class ResearchValuationService:
         if quotes is None or quotes.empty:
             return []
 
-        shares_outstanding = self._safe_positive_float(financial_bundle.get("shares_outstanding"))
-        if shares_outstanding is None:
+        financial_facts = self._prepare_financial_fact_history(financial_bundle)
+        if not financial_facts:
             return []
 
         ordered = quotes.copy()
         ordered["time"] = pd.to_datetime(ordered["time"])
         ordered = ordered.sort_values("time").reset_index(drop=True)
-
-        report_period = financial_bundle.get("report_period")
-        revenue = self._safe_positive_float(financial_bundle.get("revenue"))
-        net_income = self._safe_positive_float(financial_bundle.get("net_income"))
-        equity = self._safe_positive_float(financial_bundle.get("equity"))
 
         parameter_hash = self._build_parameter_hash(self.parameters.get("history", {}))
         snapshots: List[ValuationHistorySnapshot] = []
@@ -361,30 +371,454 @@ class ResearchValuationService:
             if close_price is None:
                 continue
 
+            as_of_date = row["time"].date().isoformat()
+            eligible_facts = self._eligible_financial_facts(
+                financial_facts,
+                as_of_date=as_of_date,
+            )
+            if not eligible_facts:
+                continue
+
+            latest_fact = eligible_facts[0]
+            shares_outstanding = self._latest_positive_fact_value(
+                eligible_facts,
+                "shares_outstanding",
+            )
+            if shares_outstanding is None:
+                continue
+
             market_cap = close_price * shares_outstanding
+            metric_details = self._build_metric_details(
+                market_cap=market_cap,
+                eligible_facts=eligible_facts,
+            )
+            pe_ttm = self._metric_value(metric_details, "pe_ttm")
+            pe_static = self._metric_value(metric_details, "pe_static")
+            pb_mrq = self._metric_value(metric_details, "pb_mrq")
+            ps_ttm = self._metric_value(metric_details, "ps_ttm")
+            ps_static = self._metric_value(metric_details, "ps_static")
+            pe_forward = self._metric_value(metric_details, "pe_forward")
+            ps_forward = self._metric_value(metric_details, "ps_forward")
+
             snapshots.append(
                 ValuationHistorySnapshot(
                     instrument_id=instrument.get("instrument_id", ""),
                     symbol=instrument.get("symbol", ""),
                     exchange=instrument.get("exchange", ""),
-                    as_of_date=row["time"].date().isoformat(),
+                    as_of_date=as_of_date,
                     close_price=close_price,
                     market_cap=market_cap,
-                    pe_ratio=self._safe_ratio(market_cap, net_income),
-                    pb_ratio=self._safe_ratio(market_cap, equity),
-                    ps_ratio=self._safe_ratio(market_cap, revenue),
+                    pe_ratio=pe_ttm if pe_ttm is not None else pe_static,
+                    pb_ratio=pb_mrq,
+                    ps_ratio=ps_ttm if ps_ttm is not None else ps_static,
+                    pe_static=pe_static,
+                    pe_ttm=pe_ttm,
+                    pe_forward=pe_forward,
+                    pb_mrq=pb_mrq,
+                    ps_static=ps_static,
+                    ps_ttm=ps_ttm,
+                    ps_forward=ps_forward,
                     parameter_hash=parameter_hash,
                     details_json={
-                        "report_period": report_period,
+                        "report_period": latest_fact.get("report_period"),
+                        "latest_financial_report_period": latest_fact.get("report_period"),
+                        "latest_financial_available_date": latest_fact.get(
+                            "data_available_date"
+                        ),
                         "shares_outstanding": shares_outstanding,
-                        "revenue": revenue,
-                        "net_income": net_income,
-                        "equity": equity,
+                        "revenue": latest_fact.get("revenue"),
+                        "net_income": latest_fact.get("net_income"),
+                        "equity": latest_fact.get("equity"),
+                        "metrics": metric_details,
                     },
                 )
             )
 
         return snapshots
+
+    def _prepare_financial_fact_history(
+        self,
+        financial_bundle: Dict[str, Any],
+    ) -> List[Dict[str, Any]]:
+        raw_facts = (
+            financial_bundle.get("financial_history")
+            or financial_bundle.get("core_facts")
+            or financial_bundle.get("facts_history")
+            or [financial_bundle]
+        )
+        if not isinstance(raw_facts, list):
+            raw_facts = [raw_facts]
+
+        facts: List[Dict[str, Any]] = []
+        require_availability_date = bool(
+            self.parameters.get("history", {}).get("require_availability_date", True)
+        )
+        for raw_fact in raw_facts:
+            if not isinstance(raw_fact, dict):
+                continue
+            report_period = str(raw_fact.get("report_period") or "").strip()
+            period_key = self._report_period_key(
+                report_period,
+                raw_fact.get("fiscal_year"),
+                raw_fact.get("fiscal_quarter"),
+            )
+            if period_key is None:
+                continue
+            available_date = self._normalize_date(
+                raw_fact.get("data_available_date") or raw_fact.get("publish_date")
+            )
+            if require_availability_date and not available_date:
+                continue
+            if not available_date:
+                available_date = "0001-01-01"
+
+            item = dict(raw_fact)
+            item["report_period"] = report_period
+            item["fiscal_year"] = period_key[0]
+            item["fiscal_quarter"] = period_key[1]
+            item["period_key"] = period_key
+            item["data_available_date"] = available_date
+            for field_name in (
+                "revenue",
+                "net_income",
+                "equity",
+                "shares_outstanding",
+            ):
+                item[field_name] = self._safe_float(raw_fact.get(field_name))
+            facts.append(item)
+
+        facts.sort(key=lambda item: item["period_key"], reverse=True)
+        return facts
+
+    def _eligible_financial_facts(
+        self,
+        financial_facts: List[Dict[str, Any]],
+        *,
+        as_of_date: str,
+    ) -> List[Dict[str, Any]]:
+        return [
+            fact
+            for fact in financial_facts
+            if fact.get("data_available_date")
+            and str(fact["data_available_date"]) <= as_of_date
+        ]
+
+    def _build_metric_details(
+        self,
+        *,
+        market_cap: float,
+        eligible_facts: List[Dict[str, Any]],
+    ) -> Dict[str, Dict[str, Any]]:
+        by_period = {fact["period_key"]: fact for fact in eligible_facts}
+        latest_fact = eligible_facts[0]
+        metrics = {
+            "pe_static": self._build_static_metric(
+                metric_name="pe_static",
+                market_cap=market_cap,
+                eligible_facts=eligible_facts,
+                fact_field="net_income",
+            ),
+            "pe_ttm": self._build_ttm_metric(
+                metric_name="pe_ttm",
+                market_cap=market_cap,
+                latest_fact=latest_fact,
+                facts_by_period=by_period,
+                fact_field="net_income",
+            ),
+            "pb_mrq": self._build_latest_metric(
+                metric_name="pb_mrq",
+                market_cap=market_cap,
+                eligible_facts=eligible_facts,
+                fact_field="equity",
+            ),
+            "ps_static": self._build_static_metric(
+                metric_name="ps_static",
+                market_cap=market_cap,
+                eligible_facts=eligible_facts,
+                fact_field="revenue",
+            ),
+            "ps_ttm": self._build_ttm_metric(
+                metric_name="ps_ttm",
+                market_cap=market_cap,
+                latest_fact=latest_fact,
+                facts_by_period=by_period,
+                fact_field="revenue",
+            ),
+        }
+        metrics["pe_forward"] = self._build_forward_metric("pe_forward")
+        metrics["ps_forward"] = self._build_forward_metric("ps_forward")
+        return metrics
+
+    def _build_static_metric(
+        self,
+        *,
+        metric_name: str,
+        market_cap: float,
+        eligible_facts: List[Dict[str, Any]],
+        fact_field: str,
+    ) -> Dict[str, Any]:
+        annual_fact = next(
+            (
+                fact
+                for fact in eligible_facts
+                if int(fact.get("fiscal_quarter") or 0) == 4
+            ),
+            None,
+        )
+        if annual_fact is None:
+            return self._unavailable_metric(
+                metric_name,
+                "annual_report_period_not_available",
+                numerator=market_cap,
+            )
+        return self._ratio_metric(
+            metric_name=metric_name,
+            numerator=market_cap,
+            denominator=annual_fact.get(fact_field),
+            denominator_fact=fact_field,
+            report_periods=[annual_fact],
+            calc_method="latest_annual",
+        )
+
+    def _build_ttm_metric(
+        self,
+        *,
+        metric_name: str,
+        market_cap: float,
+        latest_fact: Dict[str, Any],
+        facts_by_period: Dict[Tuple[int, int], Dict[str, Any]],
+        fact_field: str,
+    ) -> Dict[str, Any]:
+        year, quarter = latest_fact["period_key"]
+        latest_value = latest_fact.get(fact_field)
+        if latest_value is None:
+            return self._unavailable_metric(
+                metric_name,
+                "latest_period_fact_missing",
+                numerator=market_cap,
+                report_periods=[latest_fact],
+            )
+
+        if quarter == 4:
+            return self._ratio_metric(
+                metric_name=metric_name,
+                numerator=market_cap,
+                denominator=latest_value,
+                denominator_fact=fact_field,
+                report_periods=[latest_fact],
+                calc_method="annual_ttm",
+            )
+
+        prior_annual = facts_by_period.get((year - 1, 4))
+        prior_same_quarter = facts_by_period.get((year - 1, quarter))
+        if prior_annual is None or prior_same_quarter is None:
+            return self._unavailable_metric(
+                metric_name,
+                "missing_ttm_comparison_period",
+                numerator=market_cap,
+                report_periods=[
+                    item
+                    for item in (latest_fact, prior_annual, prior_same_quarter)
+                    if item is not None
+                ],
+            )
+
+        prior_annual_value = prior_annual.get(fact_field)
+        prior_same_value = prior_same_quarter.get(fact_field)
+        if prior_annual_value is None or prior_same_value is None:
+            return self._unavailable_metric(
+                metric_name,
+                "missing_ttm_denominator_fact",
+                numerator=market_cap,
+                report_periods=[latest_fact, prior_annual, prior_same_quarter],
+            )
+
+        denominator = latest_value + prior_annual_value - prior_same_value
+        return self._ratio_metric(
+            metric_name=metric_name,
+            numerator=market_cap,
+            denominator=denominator,
+            denominator_fact=fact_field,
+            report_periods=[latest_fact, prior_annual, prior_same_quarter],
+            calc_method="cumulative_ytd_ttm",
+        )
+
+    def _build_latest_metric(
+        self,
+        *,
+        metric_name: str,
+        market_cap: float,
+        eligible_facts: List[Dict[str, Any]],
+        fact_field: str,
+    ) -> Dict[str, Any]:
+        latest_fact = next(
+            (fact for fact in eligible_facts if fact.get(fact_field) is not None),
+            None,
+        )
+        if latest_fact is None:
+            return self._unavailable_metric(
+                metric_name,
+                "latest_period_fact_missing",
+                numerator=market_cap,
+            )
+        return self._ratio_metric(
+            metric_name=metric_name,
+            numerator=market_cap,
+            denominator=latest_fact.get(fact_field),
+            denominator_fact=fact_field,
+            report_periods=[latest_fact],
+            calc_method="latest_mrq",
+        )
+
+    def _build_forward_metric(self, metric_name: str) -> Dict[str, Any]:
+        history_config = self.parameters.get("history", {})
+        forward_enabled = bool(
+            history_config.get("forward_metrics_enabled", False)
+            or self.parameters.get("forward", {}).get("enabled", False)
+        )
+        reason = (
+            "analyst_forecast_missing"
+            if forward_enabled
+            else "analyst_forecast_disabled"
+        )
+        return self._unavailable_metric(metric_name, reason)
+
+    def _ratio_metric(
+        self,
+        *,
+        metric_name: str,
+        numerator: float,
+        denominator: Optional[float],
+        denominator_fact: str,
+        report_periods: List[Dict[str, Any]],
+        calc_method: str,
+    ) -> Dict[str, Any]:
+        if denominator is None:
+            return self._unavailable_metric(
+                metric_name,
+                "denominator_fact_missing",
+                numerator=numerator,
+                denominator_fact=denominator_fact,
+                report_periods=report_periods,
+                calc_method=calc_method,
+            )
+        if denominator <= 0:
+            return self._unavailable_metric(
+                metric_name,
+                "invalid_denominator",
+                numerator=numerator,
+                denominator=denominator,
+                denominator_fact=denominator_fact,
+                report_periods=report_periods,
+                calc_method=calc_method,
+            )
+        return {
+            "metric": metric_name,
+            "status": "available",
+            "value": numerator / denominator,
+            "numerator": numerator,
+            "denominator": denominator,
+            "denominator_fact": denominator_fact,
+            "report_periods": [
+                str(item.get("report_period"))
+                for item in report_periods
+                if item.get("report_period")
+            ],
+            "availability_dates": [
+                item.get("data_available_date")
+                for item in report_periods
+                if item.get("data_available_date")
+            ],
+            "calc_method": calc_method,
+        }
+
+    def _unavailable_metric(
+        self,
+        metric_name: str,
+        missing_reason: str,
+        *,
+        numerator: Optional[float] = None,
+        denominator: Optional[float] = None,
+        denominator_fact: Optional[str] = None,
+        report_periods: Optional[List[Dict[str, Any]]] = None,
+        calc_method: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        return {
+            "metric": metric_name,
+            "status": "unavailable",
+            "value": None,
+            "numerator": numerator,
+            "denominator": denominator,
+            "denominator_fact": denominator_fact,
+            "report_periods": [
+                str(item.get("report_period"))
+                for item in report_periods or []
+                if item.get("report_period")
+            ],
+            "availability_dates": [
+                item.get("data_available_date")
+                for item in report_periods or []
+                if item.get("data_available_date")
+            ],
+            "calc_method": calc_method,
+            "missing_reason": missing_reason,
+        }
+
+    @staticmethod
+    def _metric_value(
+        metrics: Dict[str, Dict[str, Any]],
+        metric_name: str,
+    ) -> Optional[float]:
+        metric = metrics.get(metric_name) or {}
+        value = metric.get("value")
+        try:
+            return None if value is None else float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _latest_positive_fact_value(
+        eligible_facts: List[Dict[str, Any]],
+        fact_field: str,
+    ) -> Optional[float]:
+        for fact in eligible_facts:
+            value = ResearchValuationService._safe_positive_float(fact.get(fact_field))
+            if value is not None:
+                return value
+        return None
+
+    @staticmethod
+    def _report_period_key(
+        report_period: str,
+        fiscal_year: Any = None,
+        fiscal_quarter: Any = None,
+    ) -> Optional[Tuple[int, int]]:
+        try:
+            if fiscal_year is not None and fiscal_quarter is not None:
+                return int(fiscal_year), int(fiscal_quarter)
+        except (TypeError, ValueError):
+            pass
+
+        normalized = str(report_period or "").strip()
+        if len(normalized) == 6 and normalized[4].upper() == "Q":
+            try:
+                return int(normalized[:4]), int(normalized[5])
+            except ValueError:
+                return None
+
+        timestamp = pd.to_datetime(normalized, errors="coerce")
+        if pd.isna(timestamp):
+            return None
+        return int(timestamp.year), int((timestamp.month - 1) // 3 + 1)
+
+    @staticmethod
+    def _normalize_date(value: Any) -> Optional[str]:
+        if value in (None, ""):
+            return None
+        timestamp = pd.to_datetime(value, errors="coerce")
+        if pd.isna(timestamp):
+            return None
+        return timestamp.date().isoformat()
 
     def build_history_response(
         self,
@@ -420,6 +854,7 @@ class ResearchValuationService:
         require_authoritative = bool(relative_config.get("require_authoritative", True))
         min_peer_count = int(relative_config.get("min_peer_count", 3))
         max_peer_rows = int(relative_config.get("max_peer_rows", 20))
+        metric_fields = self._relative_metric_fields(relative_config)
 
         if subject_row is None:
             return self._relative_unavailable(
@@ -469,13 +904,15 @@ class ResearchValuationService:
         missing_reason = None if status == "success" else "minimum_peer_count_not_met"
 
         metrics = {}
-        for field_name in ("pe_ratio", "pb_ratio", "ps_ratio"):
-            benchmark = self._build_metric_benchmark(
-                subject_value=subject_row.get(field_name),
+        metric_exclusions: Dict[str, Any] = {}
+        for field_name in metric_fields:
+            benchmark, exclusions = self._build_metric_benchmark(
+                subject_row=subject_row,
                 peer_rows=peer_rows,
                 field_name=field_name,
             )
             metrics[field_name] = benchmark
+            metric_exclusions[field_name] = exclusions
 
         return {
             "instrument_id": instrument.get("instrument_id"),
@@ -505,6 +942,10 @@ class ResearchValuationService:
             "peer_count": peer_count,
             "subject_valuation": self._compact_valuation_row(subject_row),
             "benchmark_summary": metrics,
+            "metric_variants": metric_fields,
+            "diagnostics": {
+                "metric_exclusions": metric_exclusions,
+            },
             "peers": [self._compact_valuation_row(item) for item in peer_rows],
             "data_as_of": subject_row.get("data_as_of"),
         }
@@ -573,6 +1014,8 @@ class ResearchValuationService:
             "peer_count": 0,
             "subject_valuation": subject_valuation,
             "benchmark_summary": {},
+            "metric_variants": self._relative_metric_fields(self.parameters["relative"]),
+            "diagnostics": {"metric_exclusions": {}},
             "peers": [],
             "data_as_of": (
                 None
@@ -634,32 +1077,126 @@ class ResearchValuationService:
     def _build_metric_benchmark(
         self,
         *,
-        subject_value: Any,
+        subject_row: Dict[str, Any],
         peer_rows: List[Dict[str, Any]],
         field_name: str,
-    ) -> Optional[Dict[str, Any]]:
-        values = [
-            float(item[field_name])
-            for item in peer_rows
-            if item.get(field_name) is not None and float(item[field_name]) > 0
-        ]
-        if not values:
-            return None
+    ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+        values: List[float] = []
+        exclusions: List[Dict[str, Any]] = []
+        for row in peer_rows:
+            value, missing_reason = self._metric_value_from_row(row, field_name)
+            if value is None:
+                exclusions.append(
+                    {
+                        "instrument_id": row.get("instrument_id"),
+                        "symbol": row.get("symbol"),
+                        "reason": missing_reason,
+                    }
+                )
+                continue
+            values.append(value)
 
-        subject_numeric = self._safe_positive_float(subject_value)
+        subject_numeric, _ = self._metric_value_from_row(subject_row, field_name)
+        if not values:
+            return (
+                {
+                    "subject_value": subject_numeric,
+                    "peer_mean": None,
+                    "peer_median": None,
+                    "peer_min": None,
+                    "peer_max": None,
+                    "peer_p25": None,
+                    "peer_p75": None,
+                    "valid_peer_count": 0,
+                    "excluded_peer_count": len(exclusions),
+                    "percentile_rank": None,
+                    "premium_to_median": None,
+                },
+                exclusions,
+            )
+
         benchmark_median = median(values)
         premium_to_median = None
         if subject_numeric is not None and benchmark_median not in (None, 0):
             premium_to_median = subject_numeric / benchmark_median - 1
 
-        return {
-            "subject_value": subject_numeric,
-            "peer_mean": fmean(values),
-            "peer_median": benchmark_median,
-            "peer_min": min(values),
-            "peer_max": max(values),
-            "premium_to_median": premium_to_median,
+        return (
+            {
+                "subject_value": subject_numeric,
+                "peer_mean": fmean(values),
+                "peer_median": benchmark_median,
+                "peer_min": min(values),
+                "peer_max": max(values),
+                "peer_p25": self._quantile(values, 0.25),
+                "peer_p75": self._quantile(values, 0.75),
+                "valid_peer_count": len(values),
+                "excluded_peer_count": len(exclusions),
+                "percentile_rank": self._percentile_rank(subject_numeric, values),
+                "premium_to_median": premium_to_median,
+            },
+            exclusions,
+        )
+
+    @staticmethod
+    def _relative_metric_fields(relative_config: Dict[str, Any]) -> List[str]:
+        configured = relative_config.get("metric_variants") or [
+            "pe_ttm",
+            "pb_mrq",
+            "ps_ttm",
+        ]
+        fields = [str(item) for item in configured if str(item).strip()]
+        if bool(relative_config.get("include_compatibility_metrics", True)):
+            fields.extend(["pe_ratio", "pb_ratio", "ps_ratio"])
+        unique_fields: List[str] = []
+        for field_name in fields:
+            if field_name not in unique_fields:
+                unique_fields.append(field_name)
+        return unique_fields
+
+    @staticmethod
+    def _metric_value_from_row(
+        row: Dict[str, Any],
+        field_name: str,
+    ) -> Tuple[Optional[float], str]:
+        value = row.get(field_name)
+        fallback_fields = {
+            "pe_ttm": "pe_ratio",
+            "pb_mrq": "pb_ratio",
+            "ps_ttm": "ps_ratio",
         }
+        if value is None and field_name in fallback_fields:
+            value = row.get(fallback_fields[field_name])
+        if value is None:
+            return None, "missing_value"
+        try:
+            numeric = float(value)
+        except (TypeError, ValueError):
+            return None, "non_numeric_value"
+        if numeric <= 0:
+            return None, "invalid_value"
+        return numeric, ""
+
+    @staticmethod
+    def _quantile(values: List[float], q: float) -> Optional[float]:
+        if not values:
+            return None
+        ordered = sorted(values)
+        if len(ordered) == 1:
+            return ordered[0]
+        position = (len(ordered) - 1) * q
+        lower_index = int(position)
+        upper_index = min(lower_index + 1, len(ordered) - 1)
+        fraction = position - lower_index
+        return ordered[lower_index] * (1 - fraction) + ordered[upper_index] * fraction
+
+    @staticmethod
+    def _percentile_rank(
+        subject_value: Optional[float],
+        peer_values: List[float],
+    ) -> Optional[float]:
+        if subject_value is None or not peer_values:
+            return None
+        return sum(1 for value in peer_values if value <= subject_value) / len(peer_values)
 
     @staticmethod
     def _compact_valuation_row(row: Dict[str, Any]) -> Dict[str, Any]:
@@ -673,6 +1210,13 @@ class ResearchValuationService:
             "pe_ratio": row.get("pe_ratio"),
             "pb_ratio": row.get("pb_ratio"),
             "ps_ratio": row.get("ps_ratio"),
+            "pe_static": row.get("pe_static"),
+            "pe_ttm": row.get("pe_ttm"),
+            "pe_forward": row.get("pe_forward"),
+            "pb_mrq": row.get("pb_mrq"),
+            "ps_static": row.get("ps_static"),
+            "ps_ttm": row.get("ps_ttm"),
+            "ps_forward": row.get("ps_forward"),
             "data_as_of": row.get("data_as_of"),
         }
 
@@ -706,6 +1250,13 @@ class ResearchValuationService:
         if numeric <= 0:
             return None
         return numeric
+
+    @staticmethod
+    def _safe_float(value: Any) -> Optional[float]:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     @staticmethod
     def _deep_update(target: Dict[str, Any], overrides: Dict[str, Any]) -> None:

@@ -598,6 +598,64 @@
           "max_runtime_seconds": 10800
         }
       },
+      "financial_statements_catchup_sync": {
+        "enabled": false,
+        "description": "研究域财务报表日度增量 catch-up",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 17,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "sync_mode": "catchup",
+          "force_full": false,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "financial_statements_reconciliation_sync": {
+        "enabled": false,
+        "description": "研究域财务报表周度对账与修复",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 8,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 200,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "sync_mode": "catchup",
+          "force_full": true,
+          "max_runtime_seconds": 10800
+        }
+      },
       "valuation_history_rebuild": {
         "enabled": false,
         "description": "研究域估值历史重建",

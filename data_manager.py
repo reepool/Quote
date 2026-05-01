@@ -3014,6 +3014,78 @@ class DataManager:
             "blockers": blockers,
         }
 
+    async def get_research_financial_statements_readiness(self) -> Dict[str, Any]:
+        """Return financial-statement warehouse readiness and rollout blockers."""
+        from research.financial_statements_sync import build_financial_report_periods
+
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        markets = list(self.research_config.markets)
+        optional_empty_exchanges = get_optional_empty_exchanges(
+            self.research_config,
+            "financial_statements",
+        )
+        target_by_exchange, target_total = await self._count_research_target_instruments_by_exchange(
+            markets,
+            excluded_exchanges=optional_empty_exchanges,
+        )
+        target_instrument_ids: List[str] = []
+        for exchange in markets:
+            if str(exchange).strip().upper() in optional_empty_exchanges:
+                continue
+            target_instrument_ids.extend(
+                await self._list_research_target_instrument_ids_by_exchange(exchange)
+            )
+        target_instrument_ids = sorted(set(target_instrument_ids))
+        history_cfg = module_cfg.get("history", {})
+        storage_cfg = module_cfg.get("storage", {})
+        hot_anchor_policy = storage_cfg.get("hot_anchor_policy", {})
+        expected_periods = build_financial_report_periods(
+            baseline_report_period=str(
+                history_cfg.get("baseline_report_period", "2024Q1")
+            ),
+            rolling_min_quarters=int(history_cfg.get("rolling_min_quarters", 8)),
+            optional_anchor_period=history_cfg.get("optional_ttm_anchor_period"),
+            include_optional_anchor=bool(
+                hot_anchor_policy.get("include_ttm_anchor_period", True)
+            ),
+        )
+
+        def _load_readiness() -> Dict[str, Any]:
+            readiness_cfg = module_cfg.get("readiness", {})
+            readiness = storage.validate_financial_statement_readiness(
+                expected_periods=expected_periods,
+                instrument_ids=target_instrument_ids,
+                required_core_facts=list(readiness_cfg.get("required_core_facts", [])),
+                fallback_sources=list(
+                    module_cfg.get("fallback_policy", {}).get(
+                        "fallback_source_priority",
+                        ["akshare"],
+                    )
+                ),
+                readiness_config=readiness_cfg,
+            )
+            return readiness if isinstance(readiness, dict) else {}
+
+        readiness = self._load_research_storage_state(_load_readiness)
+        blockers = list(readiness.get("blockers", []))
+        if not bool(module_cfg.get("enabled", False)):
+            blockers.insert(0, "financial_statements_module_disabled")
+        blockers = list(dict.fromkeys(str(item) for item in blockers if str(item)))
+        ready = bool(readiness.get("ready_for_rollout", False)) and not blockers
+
+        return {
+            "generated_at": get_shanghai_time().isoformat(),
+            "markets": markets,
+            "module_enabled": bool(module_cfg.get("enabled", False)),
+            "target_instrument_count": target_total,
+            "target_instruments_by_exchange": target_by_exchange,
+            "expected_report_periods": expected_periods,
+            "readiness": readiness,
+            "ready_for_rollout": ready,
+            "blockers": blockers,
+        }
+
     async def get_research_valuation_readiness(self) -> Dict[str, Any]:
         """Return valuation-domain readiness and rollout blockers."""
         storage = self._require_research_storage()
@@ -3029,18 +3101,35 @@ class DataManager:
             excluded_exchanges=optional_empty_exchanges,
         )
 
+        relative_cfg = module_cfg.get("relative", {})
+        metric_fields = [
+            str(item)
+            for item in relative_cfg.get("metric_variants", ["pe_ttm", "pb_mrq", "ps_ttm"])
+            if str(item).strip()
+        ]
+
         def _load_storage_state() -> Dict[str, Any]:
+            metric_coverage: Dict[str, Any] = {}
+            try:
+                candidate = storage.summarize_valuation_metric_coverage(
+                    metric_fields=metric_fields,
+                )
+                if isinstance(candidate, dict):
+                    metric_coverage = candidate
+            except Exception:
+                metric_coverage = {}
             return {
                 "summary": storage.summarize_valuation_history(),
                 "by_exchange": storage.count_valuation_history_by_exchange(),
+                "metric_coverage": metric_coverage,
             }
 
         storage_state = self._load_research_storage_state(_load_storage_state)
         summary = storage_state["summary"]
         valuation_by_exchange = storage_state["by_exchange"]
+        metric_coverage = storage_state.get("metric_coverage", {})
 
         enabled = bool(module_cfg.get("enabled", False))
-        relative_cfg = module_cfg.get("relative", {})
         require_authoritative = bool(relative_cfg.get("require_authoritative", True))
         benchmark_level = int(relative_cfg.get("benchmark_level", 2))
         benchmark_field = str(relative_cfg.get("benchmark_field", "sw_l2_code"))
@@ -3086,6 +3175,23 @@ class DataManager:
             industry_relative_ready = False
             industry_relative_blockers = ["industry_standard_readiness_unavailable"]
 
+        financial_readiness_payload: Optional[Dict[str, Any]] = None
+        financial_ready = True
+        financial_cfg = self.research_config.modules.get("financial_statements", {})
+        if bool(financial_cfg.get("enabled", False)):
+            try:
+                financial_readiness_payload = await self.get_research_financial_statements_readiness()
+                financial_ready = bool(
+                    financial_readiness_payload.get("ready_for_rollout", False)
+                )
+            except Exception as exc:
+                financial_ready = False
+                financial_readiness_payload = {
+                    "ready_for_rollout": False,
+                    "blockers": ["financial_statement_readiness_unavailable"],
+                    "error": str(exc),
+                }
+
         blockers: List[str] = []
         if not enabled:
             blockers.append("valuation_module_disabled")
@@ -3100,6 +3206,8 @@ class DataManager:
             for blocker in industry_relative_blockers
             if blocker not in blockers
         )
+        if not financial_ready and "financial_statement_readiness_incomplete" not in blockers:
+            blockers.append("financial_statement_readiness_incomplete")
 
         history_ready = (
             target_total > 0
@@ -3110,6 +3218,7 @@ class DataManager:
             enabled
             and history_ready
             and industry_relative_ready
+            and financial_ready
         )
         ready_for_rollout = len(blockers) == 0 and relative_valuation_ready
 
@@ -3125,6 +3234,7 @@ class DataManager:
             "source_mode_counts": summary.get("source_mode_counts", {}),
             "calc_method_counts": summary.get("calc_method_counts", {}),
             "calc_version_counts": summary.get("calc_version_counts", {}),
+            "metric_coverage": metric_coverage,
             "latest_as_of_date": summary.get("latest_as_of_date"),
             "latest_updated_at": summary.get("latest_updated_at"),
             "latest_data_as_of": summary.get("latest_data_as_of"),
@@ -3152,6 +3262,7 @@ class DataManager:
                 "industry_standard_ready": industry_relative_ready,
                 "industry_standard_error": industry_readiness_error,
             },
+            "financial_statements": financial_readiness_payload,
             "ready_for_rollout": ready_for_rollout,
             "blockers": blockers,
         }
@@ -3395,6 +3506,9 @@ class DataManager:
         limit_per_exchange: Optional[int] = None,
         budget_mode: Optional[str] = None,
         allow_paid_proxy: Optional[bool] = None,
+        report_periods: Optional[List[str]] = None,
+        sync_mode: str = "backfill",
+        force_full: bool = False,
     ) -> Dict[str, Any]:
         """运行 financial_statements 影子同步。"""
         if not self.research_config.enabled:
@@ -3416,7 +3530,7 @@ class DataManager:
                 "reason": "research financial_statements module is disabled",
             }
 
-        from research.financial_statements_sync import FinancialStatementsShadowSyncService
+        from research import FinancialStatementsShadowSyncService
 
         service = FinancialStatementsShadowSyncService(
             db_ops=self.db_ops,
@@ -3428,6 +3542,9 @@ class DataManager:
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
+            report_periods=report_periods,
+            sync_mode=sync_mode,
+            force_full=force_full,
         )
 
     async def run_analyst_forecast_shadow_sync(

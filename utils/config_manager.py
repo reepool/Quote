@@ -5,6 +5,7 @@
 
 import json
 import logging
+from copy import deepcopy
 from typing import Any, Optional, Dict, List, TypeVar
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -160,6 +161,8 @@ class ResearchStorageConfig:
     attach_quotes_db: bool = True
     quotes_db_path: str = "data/quotes.db"
     quotes_db_alias: str = "quotes"
+    financials_db_path: str = "data/financials.db"
+    filings_archive_root: str = "data/filings/financial_statements"
 
 
 @dataclass
@@ -180,6 +183,97 @@ class ResearchConfig:
     budget: ResearchBudgetConfig = field(default_factory=ResearchBudgetConfig)
     sources: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     routing: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+
+DEFAULT_FINANCIAL_STATEMENTS_MODULE_CONFIG: Dict[str, Any] = {
+    "history": {
+        "baseline_report_period": "2024Q1",
+        "optional_ttm_anchor_period": "2023Q4",
+        "rolling_min_quarters": 8,
+    },
+    "storage": {
+        "target_db_path": "data/financials.db",
+        "archive_root": "data/filings/financial_statements",
+        "hot_quarter_window": 12,
+        "hot_anchor_policy": {
+            "include_ttm_anchor_period": True,
+            "include_yoy_anchor_periods": True,
+            "include_latest_annual_period": True,
+        },
+        "tier_maintenance": {
+            "enabled": True,
+            "run_after_successful_sync": True,
+            "validate_duplicate_tier_conflicts": True,
+            "preserve_source_lineage": True,
+        },
+    },
+    "official_structured_sources": {
+        "enabled": False,
+        "candidates": [
+            {
+                "source": "sse",
+                "exchanges": ["SSE"],
+                "mode": "direct",
+                "enabled": False,
+                "manifest_url": "",
+                "endpoint_url": "",
+                "supports_xbrl": True,
+                "status": "needs_probe",
+            },
+            {
+                "source": "cninfo",
+                "exchanges": ["SZSE"],
+                "mode": "direct",
+                "enabled": False,
+                "manifest_url": "",
+                "endpoint_url": "",
+                "supports_xbrl": True,
+                "status": "needs_probe",
+            },
+            {
+                "source": "bse",
+                "exchanges": ["BSE"],
+                "mode": "direct",
+                "enabled": False,
+                "manifest_url": "",
+                "endpoint_url": "",
+                "supports_xbrl": True,
+                "status": "needs_probe",
+            },
+        ],
+    },
+    "runtime": {
+        "max_concurrency": 2,
+        "request_timeout_seconds": 20.0,
+        "request_interval_seconds": 0.2,
+        "retry_attempts": 2,
+        "retry_backoff_seconds": 0.5,
+    },
+    "parser": {
+        "parser_version": "financial_structured_filing.v1",
+        "alias_mapping_version": "core_financial_facts.v1",
+        "numeric_fact_parser": "xbrl_numeric_facts.v1",
+    },
+    "fallback_policy": {
+        "allow_third_party_fallback": True,
+        "fallback_only_missing_periods_or_facts": True,
+        "do_not_overwrite_higher_priority_facts": True,
+        "fallback_source_priority": ["akshare"],
+    },
+    "readiness": {
+        "required_core_facts": [
+            "revenue",
+            "net_income",
+            "equity",
+            "total_assets",
+            "total_liabilities",
+        ],
+        "min_period_coverage_ratio": 0.95,
+        "min_core_fact_coverage_ratio": 0.95,
+        "max_fallback_share": 0.5,
+        "max_parser_failure_ratio": 0.05,
+    },
+}
 
 
 # ============================================================================
@@ -546,13 +640,24 @@ class UnifiedConfigManager:
                 research_data = self.get_nested('research_config', {})
                 storage_data = research_data.get('storage', {})
                 budget_data = research_data.get('budget', {})
+                modules_data = self._build_research_modules_config(
+                    research_data.get('modules', {})
+                )
 
                 storage = ResearchStorageConfig(
                     db_path=storage_data.get('db_path', 'data/research.db'),
                     shadow_mode=storage_data.get('shadow_mode', True),
                     attach_quotes_db=storage_data.get('attach_quotes_db', True),
                     quotes_db_path=storage_data.get('quotes_db_path', 'data/quotes.db'),
-                    quotes_db_alias=storage_data.get('quotes_db_alias', 'quotes')
+                    quotes_db_alias=storage_data.get('quotes_db_alias', 'quotes'),
+                    financials_db_path=storage_data.get(
+                        'financials_db_path',
+                        'data/financials.db',
+                    ),
+                    filings_archive_root=storage_data.get(
+                        'filings_archive_root',
+                        'data/filings/financial_statements',
+                    )
                 )
 
                 budget = ResearchBudgetConfig(
@@ -566,7 +671,7 @@ class UnifiedConfigManager:
                 self._typed_cache['research_config'] = ResearchConfig(
                     enabled=research_data.get('enabled', False),
                     markets=research_data.get('markets', []),
-                    modules=research_data.get('modules', {}),
+                    modules=modules_data,
                     storage=storage,
                     budget=budget,
                     sources=research_data.get('sources', {}),
@@ -577,6 +682,38 @@ class UnifiedConfigManager:
                 self._typed_cache['research_config'] = ResearchConfig()
 
         return self._typed_cache['research_config']
+
+    @classmethod
+    def _build_research_modules_config(
+        cls,
+        modules_data: Dict[str, Dict[str, Any]],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Apply typed defaults to selected research modules without changing the public dict API."""
+        modules = deepcopy(modules_data)
+        financial_cfg = modules.get('financial_statements')
+        if isinstance(financial_cfg, dict):
+            modules['financial_statements'] = cls._deep_merge_dict(
+                DEFAULT_FINANCIAL_STATEMENTS_MODULE_CONFIG,
+                financial_cfg,
+            )
+        return modules
+
+    @classmethod
+    def _deep_merge_dict(
+        cls,
+        defaults: Dict[str, Any],
+        overrides: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        merged = deepcopy(defaults)
+        for key, value in overrides.items():
+            if (
+                isinstance(value, dict)
+                and isinstance(merged.get(key), dict)
+            ):
+                merged[key] = cls._deep_merge_dict(merged[key], value)
+            else:
+                merged[key] = deepcopy(value)
+        return merged
                 
 
 

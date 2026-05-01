@@ -758,6 +758,13 @@ class ResearchValuationHistoryItemResponse(BaseModel):
     pe_ratio: Optional[float] = Field(None, description="市盈率")
     pb_ratio: Optional[float] = Field(None, description="市净率")
     ps_ratio: Optional[float] = Field(None, description="市销率")
+    pe_static: Optional[float] = Field(None, description="静态市盈率")
+    pe_ttm: Optional[float] = Field(None, description="TTM 市盈率")
+    pe_forward: Optional[float] = Field(None, description="前瞻市盈率")
+    pb_mrq: Optional[float] = Field(None, description="最近报告期市净率")
+    ps_static: Optional[float] = Field(None, description="静态市销率")
+    ps_ttm: Optional[float] = Field(None, description="TTM 市销率")
+    ps_forward: Optional[float] = Field(None, description="前瞻市销率")
     calc_method: str = Field(..., description="计算方法")
     calc_version: str = Field(..., description="计算版本")
     parameter_hash: str = Field(..., description="参数哈希")
@@ -800,6 +807,13 @@ class ResearchRelativeValuationPeerResponse(BaseModel):
     pe_ratio: Optional[float] = Field(None, description="市盈率")
     pb_ratio: Optional[float] = Field(None, description="市净率")
     ps_ratio: Optional[float] = Field(None, description="市销率")
+    pe_static: Optional[float] = Field(None, description="静态市盈率")
+    pe_ttm: Optional[float] = Field(None, description="TTM 市盈率")
+    pe_forward: Optional[float] = Field(None, description="前瞻市盈率")
+    pb_mrq: Optional[float] = Field(None, description="最近报告期市净率")
+    ps_static: Optional[float] = Field(None, description="静态市销率")
+    ps_ttm: Optional[float] = Field(None, description="TTM 市销率")
+    ps_forward: Optional[float] = Field(None, description="前瞻市销率")
     data_as_of: Optional[datetime] = Field(None, description="数据快照时间")
 
 
@@ -811,6 +825,11 @@ class ResearchRelativeValuationMetricResponse(BaseModel):
     peer_median: Optional[float] = Field(None, description="同行中位数")
     peer_min: Optional[float] = Field(None, description="同行最小值")
     peer_max: Optional[float] = Field(None, description="同行最大值")
+    peer_p25: Optional[float] = Field(None, description="同行 25 分位")
+    peer_p75: Optional[float] = Field(None, description="同行 75 分位")
+    valid_peer_count: Optional[int] = Field(None, description="有效同行样本数")
+    excluded_peer_count: Optional[int] = Field(None, description="被排除同行样本数")
+    percentile_rank: Optional[float] = Field(None, description="标的在同行中的分位排名")
     premium_to_median: Optional[float] = Field(None, description="相对中位数溢价率")
 
 
@@ -841,6 +860,14 @@ class ResearchRelativeValuationResponse(BaseModel):
     benchmark_summary: Dict[str, Optional[ResearchRelativeValuationMetricResponse]] = Field(
         default_factory=dict,
         description="同行基准摘要",
+    )
+    metric_variants: List[str] = Field(
+        default_factory=list,
+        description="本次计算使用的估值指标口径",
+    )
+    diagnostics: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="相对估值诊断信息",
     )
     industry_index_benchmark: Optional[Dict[str, Any]] = Field(
         None,
@@ -907,6 +934,10 @@ class ResearchValuationReadinessResponse(BaseModel):
         default_factory=dict,
         description="按计算版本统计",
     )
+    metric_coverage: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="估值指标口径覆盖情况",
+    )
     latest_as_of_date: Optional[str] = Field(None, description="最近估值日期")
     latest_updated_at: Optional[datetime] = Field(None, description="最近更新时间")
     latest_data_as_of: Optional[datetime] = Field(None, description="最近数据时间")
@@ -918,7 +949,34 @@ class ResearchValuationReadinessResponse(BaseModel):
         ...,
         description="相对估值 rollout readiness",
     )
+    financial_statements: Optional[Dict[str, Any]] = Field(
+        None,
+        description="财务报表 readiness 摘要",
+    )
     ready_for_rollout: bool = Field(..., description="估值模块是否满足 rollout 条件")
+    blockers: List[str] = Field(default_factory=list, description="阻塞原因")
+
+
+class ResearchFinancialStatementsReadinessResponse(BaseModel):
+    """研究域财务报表 rollout readiness 响应模型。"""
+
+    generated_at: datetime = Field(..., description="状态生成时间")
+    markets: List[str] = Field(default_factory=list, description="目标市场列表")
+    module_enabled: bool = Field(..., description="财务报表模块是否启用")
+    target_instrument_count: int = Field(..., description="目标股票池总量")
+    target_instruments_by_exchange: Dict[str, int] = Field(
+        default_factory=dict,
+        description="按交易所统计的目标股票池数量",
+    )
+    expected_report_periods: List[str] = Field(
+        default_factory=list,
+        description="应覆盖的报告期",
+    )
+    readiness: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="存储层 readiness 明细",
+    )
+    ready_for_rollout: bool = Field(..., description="是否满足 rollout 条件")
     blockers: List[str] = Field(default_factory=list, description="阻塞原因")
 
 

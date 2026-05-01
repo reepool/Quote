@@ -138,6 +138,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         exchange: str,
         mode: str = "direct",
         limit: Optional[int] = None,
+        report_periods: Optional[List[str]] = None,
     ) -> List[FinancialStatementBundle]:
         if not self.supports_mode(mode):
             return []
@@ -157,15 +158,18 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             self._fetch_financial_statement_bundles_sync,
             target_instruments,
             mode,
+            report_periods,
         )
 
     def _fetch_financial_statement_bundles_sync(
         self,
         target_instruments: List[Dict[str, Any]],
         mode: str,
+        report_periods: Optional[List[str]] = None,
     ) -> List[FinancialStatementBundle]:
         akshare_module = self._akshare(mode)
         bundles: List[FinancialStatementBundle] = []
+        target_periods = set(report_periods or [])
 
         for instrument in target_instruments:
             symbol = self._to_akshare_symbol(instrument.get("instrument_id", ""))
@@ -176,19 +180,19 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             profit_df = akshare_module.stock_profit_sheet_by_report_em(symbol=symbol)
             cashflow_df = akshare_module.stock_cash_flow_sheet_by_report_em(symbol=symbol)
 
-            bundle = self._build_bundle(
+            instrument_bundles = self._build_bundles(
                 instrument=instrument,
                 mode=mode,
                 balance_df=balance_df,
                 profit_df=profit_df,
                 cashflow_df=cashflow_df,
+                report_periods=target_periods or None,
             )
-            if bundle is not None:
-                bundles.append(bundle)
+            bundles.extend(instrument_bundles)
 
         return bundles
 
-    def _build_bundle(
+    def _build_bundles(
         self,
         *,
         instrument: Dict[str, Any],
@@ -196,7 +200,8 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         balance_df: Optional[pd.DataFrame],
         profit_df: Optional[pd.DataFrame],
         cashflow_df: Optional[pd.DataFrame],
-    ) -> Optional[FinancialStatementBundle]:
+        report_periods: Optional[set[str]] = None,
+    ) -> List[FinancialStatementBundle]:
         rows_by_type = {
             "balance_sheet": self._index_statement_rows(balance_df),
             "profit_sheet": self._index_statement_rows(profit_df),
@@ -208,11 +213,37 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             for report_period in rows.keys()
         }
         if not candidate_periods:
-            return None
+            return []
 
-        report_period = max(candidate_periods)
+        if report_periods is not None:
+            candidate_periods = {
+                period for period in candidate_periods if period in report_periods
+            }
+            if not candidate_periods:
+                return []
+
+        bundles: List[FinancialStatementBundle] = []
+        for report_period in sorted(candidate_periods, reverse=True):
+            bundle = self._build_bundle_for_period(
+                instrument=instrument,
+                mode=mode,
+                rows_by_type=rows_by_type,
+                report_period=report_period,
+            )
+            if bundle is not None:
+                bundles.append(bundle)
+        return bundles
+
+    def _build_bundle_for_period(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        mode: str,
+        rows_by_type: Dict[str, Dict[str, Dict[str, Any]]],
+        report_period: str,
+    ) -> Optional[FinancialStatementBundle]:
         aligned_rows = {
-            statement_type: rows.get(report_period) or self._latest_row(rows)
+            statement_type: rows.get(report_period)
             for statement_type, rows in rows_by_type.items()
         }
 

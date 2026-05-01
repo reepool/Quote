@@ -1,6 +1,6 @@
 # 投研数据引擎实施主线与工程化推进文档
 
-> 更新日期：2026-04-27
+> 更新日期：2026-05-01
 > 配套需求文档：[implementation_plan.md](/home/python/Quote/implementation_plan.md)
 > 配套配置：[config/10_research.json](/home/python/Quote/config/10_research.json)
 > 当前推进焦点：strict Shenwan 主线从 `AkShare/Legulegu index component` 切换为 `swsresearch_classification_direct` 官方分类文件主源，即 `official XLS manifest -> official taxonomy -> classification history -> latest memberships -> readiness`
@@ -11,6 +11,7 @@
 > 当前申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
 > 当前申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
 > 当前申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
+> 当前财务/XBRL 与相对估值加固变更包：`openspec/changes/harden-financial-xbrl-and-relative-valuation/`
 > official-code backlog 相关变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`（仅作为历史分类审计链路）
 > 当前 readiness backlog 可视化变更包：`openspec/changes/surface-unmapped-backlog-in-industry-readiness/`
 > 当前 backlog override-review 信号变更包：`openspec/changes/add-override-readiness-signals-for-official-backlog/`
@@ -129,7 +130,7 @@
 | `industry_standard` current membership + rollout readiness | 官方分类主源已落地，API 读路径已补齐 | 已以申万官方 `StockClassifyUse_stock.xls + SwClassCode_2021.xls` 作为 strict Shenwan 主源重建 taxonomy、classification history 和 latest membership；官方六位分类代码作为 taxonomy/membership 主标识；已补齐 taxonomy、stock membership、component-set API 读路径。若 `industry_component_sets` 物理缓存为空，component-set API 会从 authoritative `industry_memberships` 派生股票组合 |
 | `industry_index_analysis` provider + sync + read | 已完成存储/同步/API、日更、历史回补与补缺入口 | 已接入申万 `day_week_month_report` 最新日频指数分析指标，并接入与 AkShare `index_analysis_daily_sw` 同上游语义的历史日期区间回补源；两条链路均独立写入 `industry_index_analysis_daily`，并提供按 `sw_index_code`、日期区间、latest、taxonomy alias benchmark 的 API 读取；`2026-04-27` 完成 `2010-01-01` 至 `2026-04-24` 全量回补复核，主表 `1,104,548` 行；该表不反推股票分类 |
 | `shareholders` rollout readiness + validation runner | 已完成 | 已新增股东域 readiness 聚合读链路，可汇总 snapshot coverage、source/source_mode 分布、按交易所覆盖率、模块 gate 与 `paid_high_availability` rollout blockers；已新增仓库级 `scripts/research_shareholder_rollout_validation.py`，用于串联 shadow sync 与 readiness 复核 |
-| `financial_statements` provider + sync + read | 已完成 | 已落地 `AkShare proxy_patch -> direct` 主链、完整财务报表写入、读取 API 与 scheduler 任务；`BSE` 在无稳定上游时允许空占位结果 |
+| `financial_statements` provider + sync + read | 多期财务仓主线进行中 | 已保留 `AkShare proxy_patch -> direct` fallback 主链，并新增官方结构化 filing provider 接口、XBRL numeric parser、source manifest、全数值事实长表、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与仓库级 rollout validation runner；官方 `SSE/CNInfo/BSE` URL 仍默认 disabled，真实放量前需先完成 live probe |
 | `analyst_forecasts` provider + sync + read | 已完成基线实现 | 已落地 `AkShare stock_profit_forecast_em` 标准化、影子同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
 | `research_reports` provider + sync + read | 已完成基线实现 | 已落地 `AkShare stock_research_report_em` 元数据同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
 | `sentiment_events` provider + sync + read | 已完成基线实现 | 已落地 `notice / executive_share_change / pledge_ratio` 事件标准化、影子同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
@@ -242,13 +243,19 @@ API 补齐原则：
 | `industry` 严格申万标准层 | 官方分类主源与 API 已完成 | 已以申万官方 XLS 文件直接维护 taxonomy、classification history 和 latest membership，官方六位分类代码成为主键；已补齐 taxonomy、stock membership、component-set API 读取，其中 component-set 可从 authoritative membership 派生。后续只保留 gap/readiness 细分定位和 alias 查询体验优化 |
 | `industry_index_analysis` | 已完成 provider/storage/sync/API、日更、历史回补与按日补缺入口 | 已确认官方最新日频字段并落 `industry_index_analysis_daily`；已提供 index-code/latest/date/taxonomy-alias benchmark API；直连 provider 继续负责最新横截面日更；AkShare-compatible 历史 provider 复用 `index_analysis_daily_sw` 的 SWS `index_analysis_report` 上游语义并自行控制 timeout/retry，负责历史日期区间回补并写同一张表；历史回补会返回按 index_type 的覆盖率与缺失指标统计，默认通过 ops/Telegram 手动触发，scheduler 配置项保持 disabled；CLI 支持按日分块补缺 |
 | `shareholders` | 已完成并开放本地 API | 已落地 `shareholder_snapshots`、shadow sync、scheduler、gated snapshot API 与 readiness API；当前语义覆盖 `holder_count / top10_holders / reference_only_ownership_clues`，配置已切到 `enabled=true / paid_high_availability`；仓库默认路由为 `AkShare proxy_patch` 主链，`cninfo:direct` 强制合并实控人线索，`akshare:direct / efinance:direct` 为补充 fallback；全量导入后 readiness 已无 blockers，后续进入周更维护和异常补缺阶段 |
-| `financial_statements` | 已完成并通过代表样本校验 | 已落地原始报表表、事实表、指标快照表、shadow sync、读取 API；`2026-04-18` 已在 `600519.SH / 000001.SZ` 上完成真实环境校验，当前语义为“最新报告期快照”，不是完整历史仓 |
-| `valuation` | 已完成基线实现，默认禁用 | 已落地 `valuation_history`、相对估值、DCF 抽象、scheduler 与 API；relative valuation 默认使用 authoritative `sw_l2`，benchmark 字段已由配置解析而非业务硬编码驱动；production rollout 仍取决于全市场 current authoritative membership 覆盖率 |
+| `financial_statements` | 多期财务仓主线进行中 | 已落地原始报表表、事实表、指标快照表、shadow sync、读取 API、官方 source manifest、全数值事实长表、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与 `scripts/research_financial_statements_rollout_validation.py`；`2026-05-01` 检查当前生产 `research.db` 中财务摘要、完整报表、事实、指标表均为 `0` 行，说明工程链路已升级但尚未完成真实全市场财务数据维护 |
+| `valuation` | 已完成基线并完成指标口径加固，默认禁用 | 已落地 `valuation_history`、相对估值、DCF 抽象、scheduler 与 API；估值历史已拆分 static/TTM/forward/MRQ 指标，相对估值可按 metric variants 明确计算 valid peer count、分位数、percentile rank 和排除诊断；production rollout 后续不仅取决于全市场 current authoritative membership 覆盖率，还必须依赖真实多期财务事实、可得日和 readiness gate |
 | `analyst_forecasts` | 已完成基线实现，默认禁用 | 已落地标准化存储、shadow sync、scheduler 与 API；当前以 `AkShare stock_profit_forecast_em` 为主，默认保持 disabled 等待 source stability 与预算确认 |
 | `research_reports` | 已完成基线实现，默认禁用 | 已落地研报元数据表、shadow sync、scheduler 与 API；仅承诺元数据覆盖，不承诺全文与长期稳定可用性 |
 | `sentiment_events` | 已完成基线实现，默认禁用 | 已落地 `notice / executive_share_change / pledge_ratio` 事件基线、shadow sync、scheduler 与 API；后续可扩展龙虎榜和资金流事件 |
 | `risk` | 已完成 | 已落地 `risk_snapshots`、重建任务与 API；当前为本地派生风险快照，读取时不访问外部源 |
 | `technical_indicator_latest` 持久化 | 已完成基线实现 | 当前只落“最新快照/缓存”，不落全历史技术指标宽表；快照由本地行情与本地复权因子派生，读取 API 仍默认实时计算 |
+
+财务域当前必须明确三个层次，避免后续开发误判：
+
+- 已有代码层：`financial_summary`、`financial_statements`、`valuation_history` 均有 provider/sync/storage/API 基线；`financial_statements` 已升级为支持多报告期、source manifest、all numeric facts、hot/cold tier 和 repository readiness 的同步/存储链路。
+- 当前数据层：截至 `2026-05-01` 本地 `research.db` 财务与估值核心表尚未落入全市场数据，不能把 API 存在等同于数据已可用。
+- 下一阶段目标层：`harden-financial-xbrl-and-relative-valuation` 已补齐 PE/PB/PS 指标语义、relative valuation 统计、scheduler 任务和 readiness API gate；官方结构化源生产化仍取决于 URL 探测和小样本 live backfill 证据。
 
 ### 4.6 当前状态与需求文档的差异
 
@@ -269,13 +276,14 @@ API 补齐原则：
   - `technical` 读取能力
   - `technical_indicator_latest` 最新快照缓存基线
 - 当前尚未完成的是：
+  - 官方结构化源 live probe / 小样本 backfill 证据，以及生产打开 valuation rollout 前的全量 readiness 复核
   - `research metadata / valuation` 等默认 disabled 或受 gate 控制模块的 production rollout 决策与更大范围运行复核
-- 因此，工程配置当前可以将 `financial_statements` 置为 enabled；`valuation` 虽已实现，但正式开放仍应以 `/api/v1/research/valuation/readiness` 的覆盖率、模块 gate 和业务确认结果为准
+- 因此，`financial_statements.enabled=true` 只代表本地同步/读取链路可用，不代表官方结构化源已经生产可用或全市场历史财务仓已完成；`valuation` 虽已实现，但正式开放仍应以财务 readiness、`/api/v1/research/valuation/readiness`、模块 gate 和业务确认结果为准
 
 补充说明：
 
-- 截至 `2026-04-21`，仓库内所有 research 主线相关的活跃 OpenSpec 变更均已进入 `complete` 状态
-- 当前剩余工作更多属于 `rollout / archive / 下一轮需求切分`，而不是前述已完成 change 的缺失实现
+- 截至 `2026-04-21`，当时仓库内 research 主线相关活跃 OpenSpec 变更均已进入 `complete` 状态；`2026-05-01` 之后新的财务主线以 `harden-financial-xbrl-and-relative-valuation` 为准，当前已开始实现配置、探测和路由加固任务
+- 当前剩余工作分为两类：已完成模块的 `rollout / archive / 维护复核`，以及财务域下一轮正式需求切分与实现
 - `yfinance` 的 `akshare_proxy_patch` 接入也已完成收口：
   - `validate_yfinance_proxy_patch.py`
   - `validate_yfinance_proxy_patch_1.py`
@@ -300,7 +308,8 @@ API 补齐原则：
 
 - 有稳定免费源时，仍优先走稳定免费源
 - 没有可靠免费源时，允许稳定付费链路先于不稳定直连链路
-- 对 `industry_standard / shareholders / financial_statements / analyst_forecasts / research_reports / sentiment_events` 这类 AkShare-heavy 域，仓库默认应优先 `proxy_patch`，再退回 `direct`
+- 对 `shareholders / analyst_forecasts / research_reports / sentiment_events` 这类 AkShare-heavy 域，仓库默认应优先 `proxy_patch`，再退回 `direct`
+- 对 `financial_statements`，当前基线仍是 `AkShare proxy_patch -> direct`，但下一阶段目标 source policy 必须调整为“官方结构化披露源优先 -> AkShare fallback”；官方源 endpoint、报告期 baseline、限流、重试、并发和 parser version 必须配置化
 - 对已按 `optional_empty_exchanges=["BSE"]` 配置的模块，`BSE` 无稳定上游时允许以空占位完成 sync/read，不把缺口升级成全模块失败
 
 同时要明确一个工程边界：
@@ -461,8 +470,18 @@ technical readiness 接口会聚合：
 当前边界：
 
 - 当前落地的是“最新报告期快照”模型，而不是全历史财务仓
-- 当前完整三大报表 authoritative 免费链路仍以 `AkShare` 为主
+- 当前完整三大报表可运行基线仍以 `AkShare proxy_patch -> direct` 为主，但下一阶段 authoritative 目标应切到官方结构化披露源优先
 - `BaoStock / PyTDX` 在完整报表域仍不具备同等级覆盖，因此暂不作为主源
+- 截至 `2026-05-01` 当前生产 `research.db` 的财务核心表尚未完成实际数据落库，下一步必须先做小样本同步验证和 readiness，再决定是否放量
+
+下一阶段目标：
+
+- 官方结构化披露源优先，AkShare 作为 fallback/supplement
+- 多期 backfill 默认覆盖 `2024Q1` 至最新披露期，并满足至少 8 个季度 rolling floor
+- source manifest、归档路径、hash、parser diagnostics 和 `data_available_date` 必须进入存储模型
+- 全数值事实长表与核心事实表分层；字段 alias、单位换算、parser version 全部配置化或版本化
+- 财务事实和派生指标按 hot/cold tier 维护：默认 hot window 为最近 `12` 个季度，历史数据进入 history tier；`12` 是配置默认值，不得写死在查询逻辑中
+- 读取 API 继续本地优先，不在请求时访问官方披露或第三方财务接口
 
 #### Stage G：估值基线
 
@@ -513,7 +532,59 @@ technical readiness 接口会聚合：
 
 ### 5.2 当前下一主线
 
-当前活跃主线已完成 `valuation` readiness 与 `technical_indicator_latest` 最新快照缓存基线，后续进入 Phase 1 收口与 rollout 复核。申万行业自身后续只保留两类工作：
+当前活跃主线已完成 `valuation` readiness 与 `technical_indicator_latest` 最新快照缓存基线，行业和股东进入维护复核；下一条真正需要开发的主线是 **财务数据获取、存储和更新能力加固**，对应 `openspec/changes/harden-financial-xbrl-and-relative-valuation/`。这条主线的目标不是简单打开现有定时任务，而是把财务域从“最新期快照基线”升级为“官方结构化披露优先、多期、可审计、可支撑估值”的本地财务仓。
+
+财务主线执行顺序：
+
+1. 官方结构化源探测
+   - 对 `SSE / SZSE-CNInfo / BSE` 分别做小样本 live probe，记录可下载 artifact、字段稳定性、延迟、失败模式和覆盖率
+   - probe 脚本只做受控样本验证，不做全市场抓取
+   - 当前已新增 `scripts/dev_validation/probe_official_financial_filings.py`，从 `config/10_research.json` 读取官方候选源，输出本地样本覆盖、URL 配置状态、请求延迟、响应大小和样本 hash；官方 URL 仍为空时会明确返回 `missing_config`
+2. 配置与路由加固
+   - 在 `config/10_research.json` 或后续独立 financial config 中配置 `baseline_report_period`、`rolling_min_quarters`、`hot_quarter_window`、`hot_anchor_policy`、`official_source_candidates`、`max_concurrency`、`request_timeout_seconds`、`retry_attempts`、`request_interval_seconds`、`parser_version`、`fallback_policy`
+   - `financial_statements` 路由改为官方结构化源优先，`AkShare proxy_patch/direct` 只作为缺失期间或缺失核心事实的 fallback
+   - 当前实现中 `sse / cninfo / bse` 已进入 `financial_statements.free_chain`，但官方财务子域默认 `enabled=false`；`ResearchSourcePolicyResolver` 会尊重 `sources.<source>.financial_statements.enabled=false`，因此在官方源未通过探测前，实际解析结果仍保持 `AkShare proxy_patch -> AkShare direct`
+3. 存储层扩展
+   - 增加 source-file manifest，保存 official filing id / URL / archive path / hash / parser diagnostics / ingestion run
+   - 增加全数值事实长表，保留 XBRL 或等价结构化文件中的所有 numeric facts
+   - 扩展核心事实表，补齐 `report_type`、`data_available_date`、`source_file_id` 和 fallback provenance
+   - 增加财务事实 hot/cold tier：hot tier 默认保留最近 `12` 个季度和必要 anchor periods，history tier 保存更早报告期；source manifest 和 raw archive 保持全量唯一，不按 hot/cold 拆散
+   - 当前已落地 `financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`，并保留现有 `financial_facts` 与 `financial_indicator_snapshots` 兼容表
+   - 当前 storage facade 为 `FinancialStatementStorageRepository`，调用方通过 manifest/numeric facts/core facts/tier maintenance helper 访问，不直接依赖物理表名；后续拆到 `data/financials.db`、DuckDB 或 PostgreSQL 时应替换 storage adapter，不改变 API 语义
+4. 官方 provider 与解析层
+   - 当前已新增 `ConfiguredOfficialFinancialFilingProvider`，按配置化 URL template 获取官方结构化 filing payload，并返回 source manifest + payload；官方 URL 未验证前不接入生产同步
+   - 当前已新增 `FinancialXbrlNumericFactParser`，使用标准库 XML 解析 XBRL numeric facts，保留 namespace、context、unit、decimals/precision、period、dimensions 和 parser diagnostics
+   - 当前 core fact aliases 通过 `core_financial_facts.v1` 版本化映射提供；fallback merge 只填补主源缺失字段，不覆盖官方主源已给出的事实
+5. 多期回填与增量维护
+   - 默认从 `2024Q1` 到最新披露期，并满足至少 `8` 个季度 rolling floor；是否补 `2023A` 作为 TTM anchor 由配置决定
+   - 当前 `FinancialStatementsShadowSyncService` 已支持 `report_periods` runtime override、`backfill/catchup` 模式、基于 source hash + core fact 存在性的 unchanged skip，并在 `ingestion_runs.metadata_json` 记录 checkpoint、resolved periods、运行配置、写入计数、tier maintenance 和 coverage gaps
+   - 当前 `AkshareFinancialStatementsProvider` 已从单最新期扩展为按目标报告期返回多期 bundle；官方 provider 启用后会走 source manifest -> XBRL numeric facts -> core facts 的路径
+   - 成功 backfill/catchup 后会执行 tier maintenance，将超出 hot window 的事实和指标幂等迁入 history
+   - weekly reconciliation 仍待后续 scheduler 阶段接入，职责是覆盖率、hash、缺失核心事实、解析失败补缺和 hot/history 一致性校验
+6. 估值语义升级
+   - 当前 `valuation_history` 已拆成 `pe_static / pe_ttm / pe_forward / pb_mrq / ps_static / ps_ttm / ps_forward`，并保留 `pe_ratio / pb_ratio / ps_ratio` 兼容字段
+   - TTM 使用已披露的累计 YTD 财务事实构造，估值日只能使用 `data_available_date <= as_of_date` 的报告期，避免未来函数
+   - 每个指标在 details 中记录 numerator、denominator、报告期和可得日；forward PE/PS 在 analyst forecast 未启用或覆盖不足时返回 explicit unavailable，不能复用 static/TTM denominator
+7. readiness 与 rollout
+   - 当前 storage/repository 已新增 `detect_financial_coverage_gaps` 与 `validate_financial_statement_readiness`，覆盖报告期、source file、核心事实、source/parser 分布、fallback 占比、parser failure、hot/cold tier coverage、stale hot rows 和 duplicate-tier conflicts
+   - 当前已新增 `scripts/research_financial_statements_rollout_validation.py`，可串联小样本 sync 与仓库级 readiness；用 `--skip-sync` 可只读当前库状态
+   - 当前已新增 `/api/v1/research/financial-statements/readiness`，并扩展 `/api/v1/research/valuation/readiness` 返回 metric coverage、financial readiness 摘要和 rollout blockers
+   - valuation rollout 必须依赖 financial readiness 和 industry readiness，不再只看估值历史表是否有行
+
+工程约束：
+
+- 不在 provider、sync service、API 中硬编码官方 URL、报告期、字段 alias、限流、重试或估值常数
+- 不让 API 请求时访问外部财务源；读取链路只查本地存储
+- 存储访问必须收口到 storage/repository 层，避免未来从 SQLite 拆分到 `data/financials.db`、DuckDB 或 PostgreSQL 时修改业务逻辑
+- hot/cold tier 是存储优化，不是业务语义；常用 API 默认查 hot tier，长历史查询通过 repository union hot/history，调用方不直接拼表
+- 现有 `financial_statements_raw / financial_facts / financial_indicator_snapshots` API 响应尽量保持兼容，新表和新字段先通过 optional fields / readiness 暴露
+
+当前 blocker：
+
+- `SSE / CNInfo-SZSE / BSE` 官方结构化财报的 `manifest_url` 与 `endpoint_url` 仍为空，必须通过 live probe 记录可下载 artifact、样本 hash、延迟和字段稳定性后才能启用
+- 当前 probe 烟雾验证只确认配置链路完整并返回 `missing_config`，没有实际联网下载官方披露文件，也没有写入生产表
+
+申万行业自身后续只保留两类工作：
 
 - 主线维护：以全量本地化为核心，固定执行 `taxonomy 全量刷新 -> 三级成分股集合全量刷新 -> 当前 membership 全量重建/重映射 -> targeted gap fill -> readiness`
 - 审计旁路：继续保留 `stock_industry_clf_hist_sw()`、official-code mapping cache、backlog/override review，但它们只服务历史分类审计，不再参与当前归属和相对估值同行分组
@@ -1159,6 +1230,7 @@ technical readiness 接口会聚合：
 - 所有新模块先进入 `research.db`，不直接改写现有行情表
 - 所有读取接口统一挂到 `/api/v1/research/*`
 - 所有数据源策略必须通过配置表达，不在业务代码里硬编码
+- 财务域所有上游 URL、报告期 baseline、rolling window、hot window、anchor policy、限流、重试、并发、parser version、字段 alias、估值指标定义和 fallback policy 必须配置化或版本化
 - 行业域必须明确区分：
   - `reference_only`
   - `authoritative`
@@ -1171,6 +1243,14 @@ technical readiness 接口会聚合：
   - `source`
   - `source_mode`
   - `data_as_of`
+- 所有用于历史估值的财务事实必须保留：
+  - `report_period`
+  - `report_type`
+  - `publish_date`
+  - `data_available_date`
+  - `source_file_id` 或等价 source lineage
+- `DataManager`、API 路由和 provider 不应直接依赖 SQLite 方言；如果必须使用 SQLite 特性，应封装在 storage 层，便于后续拆分 `financials.db` 或迁移到 DuckDB/PostgreSQL
+- hot/cold 财务表、分区表或历史列式仓都必须由 storage/repository 层屏蔽；业务层只能表达“查最近窗口”或“查长历史”
 - 新模块必须先补单元测试，再考虑开放接口
 - 文档、配置、代码状态不一致时，以“代码实际能力 + 本文档状态定义”为准，并及时回写文档
 
@@ -1183,8 +1263,10 @@ technical readiness 接口会聚合：
 接下来的工作重点不再是继续扩张需求范围，而是把已有成果按工程主线串起来，并按以下顺序持续推进：
 
 1. `industry` 严格申万标准层与 `shareholders` 本阶段均已完成，后续只保留 readiness 复核、异常补缺和调度维护
-2. 按模块 gate 继续推进 `valuation / research metadata` 的 production rollout 决策与质量加固
-3. 对 `risk / technical cache` 做参数调优、覆盖率复核和 API 使用体验优化
-4. 持续把已交付模块回写到执行文档与 OpenSpec 状态
+2. 进入财务主线：官方结构化披露源探测、source manifest、全数值事实长表、多期 backfill、daily catch-up、weekly reconciliation 和 financial readiness
+3. 在财务 readiness 通过前，`valuation` 继续保持 gate，不把当前空 `valuation_history` 或单期财务快照视作 production-ready
+4. 按模块 gate 继续推进 `research metadata` 的 production rollout 决策与质量加固
+5. 对 `risk / technical cache` 做参数调优、覆盖率复核和 API 使用体验优化
+6. 持续把已交付模块回写到执行文档与 OpenSpec 状态
 
 本文件更新后，后续每次推进都应先更新这里的状态，再继续编码。

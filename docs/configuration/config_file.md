@@ -1248,8 +1248,8 @@
 ```
 
 - **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`source_db_path`**: `str` (默认: `data/quotes.db`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`backup_directory`**: `str` (默认: `data/PVE-Bak/QuoteBak`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
+- **`source_db_path`**: `str` (默认: `data/quotes.db`) —— *Quote 本地数据卷中的源数据库路径；生产环境中 `data/` 应由 `/dev/sda3` 挂载到 `/home/python/Quote/data`*
+- **`backup_directory`**: `str` (默认: `data/PVE-Bak/QuoteBak`) —— *NAS 备份输出路径；`data/PVE-Bak` 必须是 NAS 子挂载，不能退化为本地空目录*
 - **`retention_days`**: `int` (默认: `30`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`compression_enabled`**: `bool` (默认: `False`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`notification_enabled`**: `bool` (默认: `True`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*

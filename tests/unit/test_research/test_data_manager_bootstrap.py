@@ -1659,6 +1659,104 @@ def test_data_manager_get_research_valuation_readiness_reports_blockers(tmp_path
     manager.get_research_industry_standard_readiness.assert_awaited_once_with()
 
 
+def test_data_manager_get_research_financial_statements_readiness_reports_blockers(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {
+            "enabled": True,
+            "history": {"baseline_report_period": "2026Q1", "rolling_min_quarters": 1},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.validate_financial_statement_readiness.return_value = {
+        "status": "not_ready",
+        "ready_for_rollout": False,
+        "blockers": ["missing_core_facts"],
+        "gaps": {
+            "period_coverage": {"coverage_ratio": 0.0},
+            "core_facts": {"coverage_ratio": 0.0},
+            "source_files": {"parser_version_distribution": {}},
+            "tier_coverage": {},
+        },
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        return_value=[{"instrument_id": "600519.SH", "type": "stock"}]
+    )
+
+    result = _run(manager.get_research_financial_statements_readiness())
+
+    assert result["module_enabled"] is True
+    assert result["target_instrument_count"] == 1
+    assert result["ready_for_rollout"] is False
+    assert result["blockers"] == ["missing_core_facts"]
+    storage.validate_financial_statement_readiness.assert_called_once()
+
+
+def test_data_manager_valuation_readiness_requires_financial_readiness(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "relative": {
+                "require_authoritative": True,
+                "benchmark_level": 2,
+                "benchmark_field": "sw_l2_code",
+                "metric_variants": ["pe_ttm", "pb_mrq", "ps_ttm"],
+            },
+        },
+        "financial_statements": {
+            "enabled": True,
+            "history": {"baseline_report_period": "2026Q1", "rolling_min_quarters": 1},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.summarize_valuation_history.return_value = {
+        "total": 1,
+        "source_counts": {"local_quotes_financial_facts": 1},
+        "source_mode_counts": {"derived": 1},
+        "calc_method_counts": {"valuation_history_builtin": 1},
+        "calc_version_counts": {"valuation.v1": 1},
+        "latest_as_of_date": "2026-04-18",
+    }
+    storage.count_valuation_history_by_exchange.return_value = {"SSE": 1}
+    storage.summarize_valuation_metric_coverage.return_value = {
+        "instrument_count": 1,
+        "metrics": {"pe_ttm": {"covered_instruments": 1, "coverage_ratio": 1.0}},
+    }
+    storage.validate_financial_statement_readiness.return_value = {
+        "status": "not_ready",
+        "ready_for_rollout": False,
+        "blockers": ["missing_core_facts"],
+    }
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instruments_by_exchange = AsyncMock(
+        return_value=[{"instrument_id": "600519.SH", "type": "stock"}]
+    )
+    manager.get_research_industry_standard_readiness = AsyncMock(
+        return_value={"relative_valuation": {"ready": True, "blockers": []}}
+    )
+
+    result = _run(manager.get_research_valuation_readiness())
+
+    assert result["ready_for_rollout"] is False
+    assert "financial_statement_readiness_incomplete" in result["blockers"]
+    assert result["financial_statements"]["ready_for_rollout"] is False
+    assert result["metric_coverage"]["metrics"]["pe_ttm"]["coverage_ratio"] == 1.0
+
+
 def test_data_manager_get_research_metadata_readiness_reports_domain_blockers(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.markets = ["SSE", "SZSE"]

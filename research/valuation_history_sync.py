@@ -113,10 +113,20 @@ class ValuationHistoryRebuildService:
                     instrument["instrument_id"],
                     include_statements=False,
                 )
-                if bundle is None or bundle.get("shares_outstanding") in (None, 0):
+                core_facts = self.storage.get_financial_core_facts(
+                    instrument["instrument_id"],
+                    include_history=True,
+                    limit=12,
+                )
+                if bundle is None and not core_facts:
                     skipped_instruments += 1
                     missing_financials.append(instrument["instrument_id"])
                     continue
+                if bundle is None:
+                    bundle = dict(core_facts[0])
+                else:
+                    bundle = dict(bundle)
+                bundle["financial_history"] = core_facts or [bundle]
 
                 quotes = await self.db_ops.get_daily_data(
                     instrument_id=instrument["instrument_id"],

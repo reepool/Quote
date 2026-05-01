@@ -9,6 +9,8 @@ from research.providers.base import (
     CompanyProfileSnapshot,
     FinancialFactsSnapshot,
     FinancialIndicatorSnapshot,
+    FinancialNumericFactSnapshot,
+    FinancialSourceFileManifest,
     FinancialStatementBundle,
     FinancialStatementRawSnapshot,
     FinancialSummarySnapshot,
@@ -70,8 +72,16 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "financial_summaries" in tables
     assert "shareholder_snapshots" in tables
     assert "financial_statements_raw" in tables
+    assert "financial_source_files" in tables
+    assert "financial_numeric_facts" in tables
+    assert "financial_numeric_facts_hot" in tables
+    assert "financial_numeric_facts_history" in tables
     assert "financial_facts" in tables
+    assert "financial_core_facts_hot" in tables
+    assert "financial_core_facts_history" in tables
     assert "financial_indicator_snapshots" in tables
+    assert "financial_indicator_snapshots_hot" in tables
+    assert "financial_indicator_snapshots_history" in tables
     assert "valuation_history" in tables
     assert "analyst_forecasts" in tables
     assert "research_reports" in tables
@@ -1338,6 +1348,327 @@ def test_upsert_financial_statement_bundle_writes_raw_facts_and_indicators(tmp_p
     assert len(loaded["statements"]) == 2
 
 
+def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_statement_official_probe",
+        market="SSE",
+    )
+
+    source_file_id = storage.financial_statements.upsert_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="sse",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2024-03-31",
+            report_type="quarterly",
+            filing_id="sse-filing-1",
+            source_url="https://example.test/600000/2024q1.xbrl",
+            archive_path="data/filings/financial_statements/sse/600000.xml",
+            content_hash="hash-600000-q1",
+            content_length=128,
+            parser_version="financial_structured_filing.v1",
+            parser_diagnostics={"numeric_fact_count": 1},
+            metadata_json={"probe": True},
+        ),
+        ingestion_run_id=run_id,
+    )
+    written = storage.financial_statements.upsert_numeric_facts(
+        [
+            FinancialNumericFactSnapshot(
+                source_file_id=source_file_id,
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period="2024-03-31",
+                report_type="quarterly",
+                statement_family="income_statement",
+                fact_name="Revenue",
+                taxonomy_namespace="cn-gaap",
+                context_id="current_q1",
+                unit="CNY",
+                period_start="2024-01-01",
+                period_end="2024-03-31",
+                fact_value=1000.0,
+                source="sse",
+                source_mode="direct",
+                parser_version="financial_structured_filing.v1",
+                dimensions_json={"consolidated": True},
+                raw_fact_json={"name": "Revenue"},
+            )
+        ],
+        ingestion_run_id=run_id,
+    )
+
+    assert written == 1
+    manifests = storage.get_financial_source_file_manifests(
+        instrument_id="600000.SH",
+        report_period="2024-03-31",
+    )
+    facts = storage.get_financial_numeric_facts("600000.SH")
+    derived = storage.derive_financial_core_facts_from_numeric_facts(
+        "600000.SH",
+        "2024-03-31",
+        alias_mapping={"revenue": ["Revenue"]},
+    )
+
+    assert manifests[0]["source_file_id"] == source_file_id
+    assert manifests[0]["parser_diagnostics"] == {"numeric_fact_count": 1}
+    assert manifests[0]["metadata"] == {"probe": True}
+    assert facts[0]["fact_name"] == "Revenue"
+    assert facts[0]["fact_value"] == 1000.0
+    assert facts[0]["dimensions"] == {"consolidated": True}
+    assert derived is not None
+    assert derived.revenue == 1000.0
+    assert derived.source_file_id == source_file_id
+    assert derived.lineage_json["numeric_fact_count"] == 1
+    storage.upsert_financial_source_file_manifest(
+        FinancialSourceFileManifest(
+            source_file_id=source_file_id,
+            source="sse",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2024-03-31",
+            report_type="quarterly",
+            filing_id="sse-filing-1",
+            source_url="https://example.test/600000/2024q1-revised.xbrl",
+            content_hash="hash-600000-q1-revised",
+            parser_version="financial_structured_filing.v1",
+            status="downloaded",
+        ),
+        ingestion_run_id=run_id,
+    )
+    revised_manifest = storage.get_financial_source_file_manifests(
+        instrument_id="600000.SH",
+        report_period="2024-03-31",
+    )[0]
+    assert revised_manifest["content_hash"] == "hash-600000-q1-revised"
+
+    with sqlite3.connect(research_db_path) as conn:
+        canonical_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_numeric_facts"
+        ).fetchone()[0]
+        hot_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_numeric_facts_hot"
+        ).fetchone()[0]
+
+    assert canonical_count == 1
+    assert hot_count == 1
+
+
+def test_financial_hot_cold_tier_maintenance_is_idempotent(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_statement_backfill",
+        market="SSE",
+    )
+    periods = [
+        "2025-12-31",
+        "2025-09-30",
+        "2025-06-30",
+        "2025-03-31",
+    ]
+    for index, period in enumerate(periods):
+        source_file_id = storage.upsert_financial_source_file_manifest(
+            FinancialSourceFileManifest(
+                source="sse",
+                source_mode="direct",
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period=period,
+                report_type="quarterly",
+                content_hash=f"hash-{period}",
+                parser_version="financial_structured_filing.v1",
+            ),
+            ingestion_run_id=run_id,
+        )
+        storage.upsert_financial_facts(
+            FinancialFactsSnapshot(
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period=period,
+                report_type="quarterly",
+                statement_family="core",
+                data_available_date=period,
+                publish_date=period,
+                fiscal_year=2025,
+                fiscal_quarter=4 - index,
+                revenue=1000.0 + index,
+                net_income=100.0 + index,
+                equity=500.0 + index,
+                source="sse",
+                source_mode="direct",
+                source_file_id=source_file_id,
+                filing_id=f"filing-{period}",
+                facts_json={"period": period},
+                lineage_json={"source_file_id": source_file_id},
+            ),
+            ingestion_run_id=run_id,
+        )
+        storage.upsert_financial_indicator_snapshot(
+            FinancialIndicatorSnapshot(
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period=period,
+                publish_date=period,
+                fiscal_year=2025,
+                fiscal_quarter=4 - index,
+                roe=0.2,
+                source="sse",
+                source_mode="direct",
+                indicators_json={"period": period},
+            ),
+            ingestion_run_id=run_id,
+        )
+        storage.upsert_financial_numeric_facts(
+            [
+                FinancialNumericFactSnapshot(
+                    source_file_id=source_file_id,
+                    instrument_id="600000.SH",
+                    symbol="600000",
+                    exchange="SSE",
+                    report_period=period,
+                    report_type="quarterly",
+                    fact_name="Revenue",
+                    fact_value=1000.0 + index,
+                    source="sse",
+                    source_mode="direct",
+                    parser_version="financial_structured_filing.v1",
+                )
+            ],
+            ingestion_run_id=run_id,
+        )
+
+    result = storage.financial_statements.maintain_tiers(
+        instrument_id="600000.SH",
+        hot_quarter_window=2,
+    )
+    second_result = storage.maintain_financial_hot_cold_tiers(
+        instrument_id="600000.SH",
+        hot_quarter_window=2,
+    )
+
+    recent = storage.get_financial_core_facts("600000.SH")
+    history = storage.get_financial_core_facts(
+        "600000.SH",
+        include_history=True,
+    )
+    coverage = storage.summarize_financial_period_coverage(
+        expected_periods=periods,
+        instrument_ids=["600000.SH"],
+    )
+
+    assert result["moved_rows"] == {
+        "core_facts": 2,
+        "numeric_facts": 2,
+        "indicators": 2,
+    }
+    assert result["duplicate_tier_conflicts"] == {
+        "core_facts": 0,
+        "numeric_facts": 0,
+        "indicators": 0,
+    }
+    assert second_result["moved_rows"] == {
+        "core_facts": 0,
+        "numeric_facts": 0,
+        "indicators": 0,
+    }
+    assert [row["report_period"] for row in recent] == periods[:2]
+    assert [row["report_period"] for row in history] == periods
+    assert history[0]["lineage"]["source_file_id"]
+    assert coverage["coverage_ratio"] == 1.0
+
+    with sqlite3.connect(research_db_path) as conn:
+        hot_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_core_facts_hot"
+        ).fetchone()[0]
+        history_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_core_facts_history"
+        ).fetchone()[0]
+
+    assert hot_count == 2
+    assert history_count == 2
+
+
+def test_financial_coverage_gap_detection_and_readiness(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_statement_backfill",
+        market="SSE",
+    )
+    storage.financial_statements.upsert_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="sse",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2024-03-31",
+            report_type="quarterly",
+            content_hash="hash-q1",
+            parser_version="financial_structured_filing.v1",
+            status="parsed",
+        ),
+        ingestion_run_id=run_id,
+    )
+    storage.upsert_financial_facts(
+        FinancialFactsSnapshot(
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2024-03-31",
+            report_type="quarterly",
+            statement_family="core",
+            data_available_date="2024-04-30",
+            publish_date="2024-04-30",
+            fiscal_year=2024,
+            fiscal_quarter=1,
+            revenue=1000.0,
+            net_income=None,
+            equity=600.0,
+            source="sse",
+            source_mode="direct",
+        ),
+        ingestion_run_id=run_id,
+    )
+
+    gaps = storage.financial_statements.detect_coverage_gaps(
+        expected_periods=["2024-03-31", "2024-06-30"],
+        instrument_ids=["600000.SH"],
+        required_core_facts=["revenue", "net_income", "equity"],
+        fallback_sources=["akshare"],
+    )
+    readiness = storage.financial_statements.validate_readiness(
+        expected_periods=["2024-03-31", "2024-06-30"],
+        instrument_ids=["600000.SH"],
+        required_core_facts=["revenue", "net_income", "equity"],
+        fallback_sources=["akshare"],
+    )
+
+    assert gaps["period_coverage"]["coverage_ratio"] == 0.5
+    assert gaps["period_coverage"]["missing_periods"] == {
+        "600000.SH": ["2024-06-30"]
+    }
+    assert gaps["source_files"]["missing_source_file_count"] == 1
+    assert gaps["core_facts"]["missing_core_fact_count"] == 4
+    assert readiness["ready_for_rollout"] is False
+    assert "missing_required_report_periods" in readiness["blockers"]
+    assert "missing_core_facts" in readiness["blockers"]
+
+
 def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
     storage, research_db_path = _build_storage_manager(tmp_path)
     storage.initialize()
@@ -1404,6 +1735,11 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
             pe_ratio=25.0,
             pb_ratio=8.0,
             ps_ratio=10.0,
+            pe_static=24.0,
+            pe_ttm=25.0,
+            pb_mrq=8.0,
+            ps_static=9.5,
+            ps_ttm=10.0,
             parameter_hash="hash",
             details_json={"report_period": "2025-12-31"},
         ),
@@ -1420,6 +1756,11 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
             pe_ratio=20.0,
             pb_ratio=6.0,
             ps_ratio=8.0,
+            pe_static=19.0,
+            pe_ttm=20.0,
+            pb_mrq=6.0,
+            ps_static=7.5,
+            ps_ttm=8.0,
             parameter_hash="hash",
             details_json={"report_period": "2025-12-31"},
         ),
@@ -1436,6 +1777,9 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
     history_rows = storage.get_valuation_history_rows("600519.SH")
     assert len(history_rows) == 1
     assert history_rows[0]["pe_ratio"] == 25.0
+    assert history_rows[0]["pe_static"] == 24.0
+    assert history_rows[0]["pe_ttm"] == 25.0
+    assert history_rows[0]["pb_mrq"] == 8.0
     assert history_rows[0]["details"]["report_period"] == "2025-12-31"
 
     latest_row = storage.get_latest_valuation_history_row("600519.SH")
@@ -1451,6 +1795,7 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
     assert len(peer_rows) == 1
     assert peer_rows[0]["instrument_id"] == "000858.SZ"
     assert peer_rows[0]["pe_ratio"] == 20.0
+    assert peer_rows[0]["pe_ttm"] == 20.0
 
     peer_rows_by_l3 = storage.get_latest_peer_valuation_rows(
         "850111.SI",

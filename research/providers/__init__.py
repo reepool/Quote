@@ -12,6 +12,7 @@ from .akshare_shenwan_industry import AkshareShenwanIndustryProvider
 from .akshare_swsresearch_index_analysis import AkshareSWSResearchIndexAnalysisProvider
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
+from .official_financial_filings import ConfiguredOfficialFinancialFilingProvider
 from .sina_industry_supplement import SinaIndustryNameSupplementProvider
 from .swsresearch_shenwan_classification import (
     SWSResearchClassificationBundle,
@@ -47,8 +48,12 @@ from .baostock_industry import BaostockIndustryProvider
 from .base import (
     BaseFinancialStatementsProvider,
     BaseFinancialSummaryProvider,
+    BaseOfficialFinancialFilingProvider,
+    FinancialFilingPayload,
     FinancialFactsSnapshot,
     FinancialIndicatorSnapshot,
+    FinancialNumericFactSnapshot,
+    FinancialSourceFileManifest,
     FinancialStatementBundle,
     FinancialStatementRawSnapshot,
     ValuationHistorySnapshot,
@@ -72,6 +77,7 @@ from .registry import (
     IndustryNameSupplementProviderRegistry,
     IndustryStandardProviderRegistry,
     OfficialIndustryHistoryProviderRegistry,
+    OfficialFinancialFilingProviderRegistry,
     ResearchReportProviderRegistry,
     ShareholderProviderRegistry,
     SentimentEventProviderRegistry,
@@ -99,6 +105,10 @@ __all__ = [
     "RiskSnapshot",
     "SentimentEventSnapshot",
     "BaseFinancialStatementsProvider",
+    "BaseOfficialFinancialFilingProvider",
+    "FinancialFilingPayload",
+    "FinancialSourceFileManifest",
+    "FinancialNumericFactSnapshot",
     "FinancialStatementRawSnapshot",
     "FinancialFactsSnapshot",
     "FinancialIndicatorSnapshot",
@@ -121,6 +131,7 @@ __all__ = [
     "AkshareShareholdersProvider",
     "EastmoneyIndustryNameSupplementProvider",
     "ManualIndustryNameSupplementProvider",
+    "ConfiguredOfficialFinancialFilingProvider",
     "SinaIndustryNameSupplementProvider",
     "SWSResearchClassificationBundle",
     "SWSResearchShenwanClassificationProvider",
@@ -141,6 +152,7 @@ __all__ = [
     "IndustryNameSupplementProviderRegistry",
     "IndustryStandardProviderRegistry",
     "OfficialIndustryHistoryProviderRegistry",
+    "OfficialFinancialFilingProviderRegistry",
     "ResearchReportProviderRegistry",
     "ShareholderProviderRegistry",
     "SentimentEventProviderRegistry",

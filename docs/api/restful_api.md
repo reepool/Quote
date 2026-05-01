@@ -217,6 +217,133 @@ curl -X POST "http://localhost:8000/api/v1/gaps/fill" \
 
 研究域接口统一使用 `/api/v1/research` 前缀。已落到本地 `research.db` 的标准化快照或物化结果原则上都应提供 API 读路径；未开放模块会返回明确的 gated/disabled 原因。
 
+### GET /api/v1/research/company/{instrument_id}/financial-indicators
+
+读取本地财务摘要/关键指标快照。当前接口对应 `financial_summaries`，只读本地库，不在请求时访问外部财务源。
+
+路径参数：
+- `instrument_id`：数据库格式代码，如 `600000.SH`、`000001.SZ`
+
+可选参数：
+- `include_snapshot`：是否返回完整摘要 JSON，默认 `true`
+
+当前边界：
+- 该接口是财务摘要基线，不等价于完整三大报表。
+- 如果目标交易所配置为 optional-empty，可能返回结构化空占位。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-indicators"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-indicators?include_snapshot=false"
+```
+
+### GET /api/v1/research/company/{instrument_id}/financial-statements
+
+读取本地完整财务报表组合快照。当前接口仍保持兼容读模型，对应 `financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`；底层同步/存储已新增 source manifest、全数值事实长表、hot/cold tier 和多期 readiness，但该单公司接口默认仍返回当前 bundle 形态。
+
+路径参数：
+- `instrument_id`：数据库格式代码，如 `600000.SH`、`000001.SZ`
+
+可选参数：
+- `include_statements`：是否返回原始报表分项，默认 `true`
+
+主要字段：
+- `report_period`、`publish_date`、`fiscal_year`、`fiscal_quarter`
+- `revenue`、`net_income`、`operating_cf`
+- `total_assets`、`total_liabilities`、`equity`
+- `source`、`source_mode`、`data_as_of`
+- `facts`、`indicators`、`statements`
+
+当前边界：
+- API 响应暂未暴露长历史 period range 查询；长历史读取由 storage/repository 层先行支持，后续再扩展 API 参数。
+- 官方结构化 `SSE/CNInfo/BSE` 源默认仍 disabled；在 live probe 和小样本 backfill 通过前，实际生产链路仍以 AkShare fallback 为主。
+- 仓库级财务 readiness 当前通过 `scripts/research_financial_statements_rollout_validation.py` 验证，正式 REST readiness endpoint 会在后续 scheduler/API gate 阶段补上。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?include_statements=false"
+```
+
+### GET /api/v1/research/company/{instrument_id}/valuation/history
+
+读取本地估值历史。当前接口对应 `valuation_history`，只读本地库。
+
+可选参数：
+- `start_date`：开始日期
+- `end_date`：结束日期
+- `limit`：最大返回点数，默认 `120`
+- `include_details`：是否返回估值细节，默认 `true`
+
+当前边界：
+- `pe_ratio / pb_ratio / ps_ratio` 仍作为兼容字段保留，其中 `pe_ratio` 优先映射 `pe_ttm`、缺失时回退 `pe_static`，`pb_ratio` 映射 `pb_mrq`，`ps_ratio` 优先映射 `ps_ttm`、缺失时回退 `ps_static`。
+- 当前估值历史已拆分 `pe_static / pe_ttm / pe_forward / pb_mrq / ps_static / ps_ttm / ps_forward`；`include_details=true` 时返回每个指标的 numerator、denominator、报告期和可得日。
+- `pe_forward / ps_forward` 在 analyst forecast 输入未启用或缺失时返回空值，并在 details 中给出 explicit unavailable 状态和原因。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/history?limit=120"
+```
+
+### GET /api/v1/research/company/{instrument_id}/valuation/relative
+
+读取本地相对估值。当前默认使用 authoritative 申万二级同行分组，分组字段由 `valuation.relative.benchmark_field` 配置解析，默认 `sw_l2_code`。
+
+当前字段包括：
+- `metric_variants`：本次参与 benchmark 的估值口径，默认 `pe_ttm / pb_mrq / ps_ttm`，并保留兼容字段统计。
+- `benchmark_summary`：逐指标返回 valid peer count、mean、median、p25、p75、percentile rank、相对中位数溢价/折价。
+- `diagnostics.metric_exclusions`：逐指标列出因缺失、非数值、负值或零值被排除的同行样本。
+- `subject_valuation`、`peers`：保留静态、TTM、forward/MRQ 指标字段，便于调用方明确选择口径。
+
+当前边界：
+- `pe_forward / ps_forward` 无 forecast 输入时不会参与有效同行统计，只通过空值和 diagnostics 暴露缺失原因。
+- 当 `valuation.relative.require_authoritative=true` 时，不使用 reference-only 行业归属降级生成同行分组。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/relative"
+```
+
+### GET /api/v1/research/valuation/readiness
+
+读取估值域 readiness 与 rollout blockers。
+
+当前字段包括：
+- `module_enabled`
+- `target_instrument_count`
+- `valuation_history_total`
+- `metric_coverage`
+- `exchange_coverage`
+- `relative_valuation`
+- `financial_statements`
+- `blockers`
+
+下一阶段会补充：
+- source/parser distribution
+- 更细粒度 valuation rollout 操作建议
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/valuation/readiness"
+```
+
+### GET /api/v1/research/financial-statements/readiness
+
+读取财务报表仓库 readiness 与 rollout blockers。
+
+当前字段包括：
+- `expected_report_periods`
+- `readiness.gaps.period_coverage`
+- `readiness.gaps.core_facts`
+- `readiness.gaps.source_files`
+- `readiness.gaps.tier_coverage`
+- `readiness.blockers`
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/financial-statements/readiness"
+```
+
 ### GET /api/v1/research/company/{instrument_id}/shareholders
 
 读取本地股东摘要快照。当前 `shareholders` 已按 `paid_high_availability` gate 开放，接口只读取本地 `shareholder_snapshots`，不会在请求时访问外部数据源。

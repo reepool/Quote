@@ -88,7 +88,7 @@ class ResearchSourcePolicyResolver:
                 continue
 
             for item in route.get(stage, []):
-                candidate = self._build_candidate(item, stage)
+                candidate = self._build_candidate(item, stage, domain)
                 if not candidate.enabled:
                     continue
 
@@ -125,12 +125,16 @@ class ResearchSourcePolicyResolver:
         self,
         item: Dict[str, Any],
         stage: str,
+        domain: str,
     ) -> ResearchSourceCandidate:
         source_name = item["source"]
         mode = item.get("mode", "direct")
 
         source_cfg = self.research_config.sources.get(source_name, {})
         enabled = source_cfg.get("enabled", False)
+        domain_cfg = source_cfg.get(domain, {})
+        if isinstance(domain_cfg, dict) and domain_cfg.get("enabled") is False:
+            enabled = False
 
         paid = False
         cost_tier = source_cfg.get("cost_tier", "unknown")

@@ -22,6 +22,7 @@ from api.models import (
     ResearchCompanyOverviewResponse,
     ResearchDcfValuationResponse,
     ResearchFinancialStatementsResponse,
+    ResearchFinancialStatementsReadinessResponse,
     ResearchFinancialSummaryResponse,
     ResearchMetadataReadinessResponse,
     ResearchOfficialIndustryCodeBacklogResponse,
@@ -51,6 +52,7 @@ from api.routes import (
     get_research_company_profile,
     get_research_dcf_valuation,
     get_research_financial_statements,
+    get_research_financial_statements_readiness,
     get_research_financial_summary,
     get_research_metadata_readiness,
     get_research_official_industry_mapping,
@@ -1968,6 +1970,12 @@ class TestResearchRoutes:
                 "source_mode_counts": {"derived": 2},
                 "calc_method_counts": {"valuation_history_builtin": 2},
                 "calc_version_counts": {"valuation_history.v1": 2},
+                "metric_coverage": {
+                    "instrument_count": 2,
+                    "metrics": {
+                        "pe_ttm": {"covered_instruments": 2, "coverage_ratio": 1.0}
+                    },
+                },
                 "latest_as_of_date": "2026-04-18",
                 "latest_updated_at": "2026-04-18T18:30:00+08:00",
                 "latest_data_as_of": "2026-04-18T18:30:00+08:00",
@@ -2000,6 +2008,10 @@ class TestResearchRoutes:
                     "industry_standard_ready": False,
                     "industry_standard_error": None,
                 },
+                "financial_statements": {
+                    "ready_for_rollout": False,
+                    "blockers": ["missing_core_facts"],
+                },
                 "ready_for_rollout": False,
                 "blockers": [
                     "valuation_module_disabled",
@@ -2014,10 +2026,39 @@ class TestResearchRoutes:
         assert isinstance(response, ResearchValuationReadinessResponse)
         assert response.module_enabled is False
         assert response.valuation_history_total == 2
+        assert response.metric_coverage["metrics"]["pe_ttm"]["coverage_ratio"] == 1.0
+        assert response.financial_statements["ready_for_rollout"] is False
         assert response.exchange_coverage[0].coverage_ratio == 0.5
         assert response.relative_valuation.benchmark_field == "sw_l2_code"
         assert response.ready_for_rollout is False
         mock_dm.get_research_valuation_readiness.assert_awaited_once_with()
+
+    @patch("api.routes.data_manager")
+    def test_get_research_financial_statements_readiness_success(self, mock_dm):
+        mock_dm.get_research_financial_statements_readiness = AsyncMock(
+            return_value={
+                "generated_at": "2026-05-01T18:30:00+08:00",
+                "markets": ["SSE"],
+                "module_enabled": True,
+                "target_instrument_count": 1,
+                "target_instruments_by_exchange": {"SSE": 1},
+                "expected_report_periods": ["2026Q1"],
+                "readiness": {
+                    "status": "not_ready",
+                    "ready_for_rollout": False,
+                    "blockers": ["missing_core_facts"],
+                },
+                "ready_for_rollout": False,
+                "blockers": ["missing_core_facts"],
+            }
+        )
+
+        response = _run(get_research_financial_statements_readiness())
+
+        assert isinstance(response, ResearchFinancialStatementsReadinessResponse)
+        assert response.module_enabled is True
+        assert response.expected_report_periods == ["2026Q1"]
+        assert response.blockers == ["missing_core_facts"]
 
     @patch("api.routes.data_manager")
     def test_get_research_relative_valuation_success(self, mock_dm):
@@ -2046,18 +2087,28 @@ class TestResearchRoutes:
                     "pe_ratio": 22.0,
                     "pb_ratio": 2.2,
                     "ps_ratio": 3.2,
+                    "pe_ttm": 22.0,
+                    "pb_mrq": 2.2,
+                    "ps_ttm": 3.2,
                     "data_as_of": "2026-04-17T18:30:00",
                 },
                 "benchmark_summary": {
-                    "pe_ratio": {
+                    "pe_ttm": {
                         "subject_value": 22.0,
                         "peer_mean": 21.0,
                         "peer_median": 21.0,
                         "peer_min": 20.0,
                         "peer_max": 22.0,
+                        "peer_p25": 20.5,
+                        "peer_p75": 21.5,
+                        "valid_peer_count": 2,
+                        "excluded_peer_count": 0,
+                        "percentile_rank": 1.0,
                         "premium_to_median": 0.0476,
                     }
                 },
+                "metric_variants": ["pe_ttm", "pb_mrq", "ps_ttm"],
+                "diagnostics": {"metric_exclusions": {"pe_ttm": []}},
                 "peers": [],
                 "data_as_of": "2026-04-17T18:30:00",
             }
@@ -2068,7 +2119,9 @@ class TestResearchRoutes:
         assert isinstance(response, ResearchRelativeValuationResponse)
         assert response.status == "success"
         assert response.benchmark_sw_l2_code == "801124.SI"
-        assert response.benchmark_summary["pe_ratio"].peer_median == 21.0
+        assert response.benchmark_summary["pe_ttm"].peer_median == 21.0
+        assert response.benchmark_summary["pe_ttm"].valid_peer_count == 2
+        assert response.metric_variants == ["pe_ttm", "pb_mrq", "ps_ttm"]
 
     @patch("api.routes.data_manager")
     def test_get_research_dcf_valuation_success(self, mock_dm):

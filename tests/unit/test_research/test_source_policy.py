@@ -181,3 +181,42 @@ def test_financial_statements_plan_prefers_proxy_patch_before_direct():
         ("akshare", "proxy_patch"),
         ("akshare", "direct"),
     ]
+
+
+def test_financial_statements_plan_skips_domain_disabled_source():
+    config = _build_research_config()
+    config.routing["financial_statements"]["free_chain"] = [
+        {"source": "cninfo", "mode": "direct"},
+    ]
+    config.sources["cninfo"]["financial_statements"] = {"enabled": False}
+    resolver = ResearchSourcePolicyResolver(config)
+
+    plan = resolver.resolve("financial_statements")
+
+    assert ("cninfo", "direct") not in plan.source_keys
+    assert plan.source_keys == [
+        ("akshare", "proxy_patch"),
+        ("akshare", "direct"),
+    ]
+
+
+def test_financial_statements_plan_prefers_enabled_official_source_before_akshare():
+    config = _build_research_config()
+    config.sources["sse"] = {
+        "enabled": True,
+        "cost_tier": "free",
+        "supports_proxy_patch": False,
+        "financial_statements": {"enabled": True},
+    }
+    config.routing["financial_statements"]["free_chain"] = [
+        {"source": "sse", "mode": "direct"},
+    ]
+    resolver = ResearchSourcePolicyResolver(config)
+
+    plan = resolver.resolve("financial_statements")
+
+    assert plan.source_keys == [
+        ("sse", "direct"),
+        ("akshare", "proxy_patch"),
+        ("akshare", "direct"),
+    ]

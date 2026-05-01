@@ -1684,6 +1684,138 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('financial_statements_shadow_sync')
 
+    async def financial_statements_catchup_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        sync_mode: str = "catchup",
+        force_full: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 financial statements 日度增量 catch-up 任务。"""
+        task_name = 'financial_statements_catchup_sync'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial statements catch-up sync...")
+            result = await data_manager.run_financial_statements_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                sync_mode=sync_mode,
+                force_full=force_full,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            await self._send_task_report(
+                report_data={
+                    'name': '财务报表日度增量同步报告',
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': result.get('successful_exchanges', 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': exchange_result.get('exchange', 'unknown'),
+                            'status': (
+                                f"{exchange_result.get('status')} "
+                                f"(rows={exchange_result.get('rows_written', 0)})"
+                            ),
+                        }
+                        for exchange_result in result.get('exchanges', [])
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='财务报表日度增量同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial statements catch-up failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务报表日度增量同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='财务报表日度增量同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
+    async def financial_statements_reconciliation_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        sync_mode: str = "catchup",
+        force_full: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 financial statements 周度对账与修复任务。"""
+        task_name = 'financial_statements_reconciliation_sync'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial statements reconciliation sync...")
+            result = await data_manager.run_financial_statements_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                sync_mode=sync_mode,
+                force_full=force_full,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            await self._send_task_report(
+                report_data={
+                    'name': '财务报表周度对账修复报告',
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': result.get('successful_exchanges', 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': exchange_result.get('exchange', 'unknown'),
+                            'status': (
+                                f"{exchange_result.get('status')} "
+                                f"(rows={exchange_result.get('rows_written', 0)})"
+                            ),
+                        }
+                        for exchange_result in result.get('exchanges', [])
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='财务报表周度对账修复',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(
+                f"[Scheduler] Financial statements reconciliation failed: {e}"
+            )
+            await self._send_task_report(
+                report_data={
+                    'name': '财务报表周度对账修复报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='财务报表周度对账修复',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
     async def valuation_history_rebuild(
         self,
         exchanges: Optional[List[str]] = None,

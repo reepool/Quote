@@ -165,6 +165,72 @@ class FinancialStatementRawSnapshot:
 
 
 @dataclass(frozen=True)
+class FinancialSourceFileManifest:
+    """Manifest metadata for one official or fallback financial source file."""
+
+    source: str
+    exchange: str
+    report_period: str
+    parser_version: str
+    source_mode: str = "direct"
+    instrument_id: Optional[str] = None
+    symbol: Optional[str] = None
+    report_type: Optional[str] = None
+    filing_id: Optional[str] = None
+    source_url: Optional[str] = None
+    archive_path: Optional[str] = None
+    content_hash: Optional[str] = None
+    content_length: Optional[int] = None
+    published_at: Optional[str] = None
+    downloaded_at: Optional[str] = None
+    source_file_id: Optional[str] = None
+    status: str = "discovered"
+    schema_version: str = "financial_source_file_manifest.v1"
+    parser_diagnostics: Dict[str, Any] = field(default_factory=dict)
+    metadata_json: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FinancialFilingPayload:
+    """Downloaded structured financial filing payload with manifest metadata."""
+
+    manifest: FinancialSourceFileManifest
+    content: bytes
+    text: Optional[str] = None
+    content_type: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class FinancialNumericFactSnapshot:
+    """One long-form numeric fact parsed from a structured financial filing."""
+
+    source_file_id: str
+    instrument_id: str
+    symbol: str
+    exchange: str
+    report_period: str
+    fact_name: str
+    fact_value: Optional[float]
+    source: str
+    parser_version: str
+    source_mode: str = "direct"
+    report_type: Optional[str] = None
+    statement_family: Optional[str] = None
+    taxonomy_namespace: Optional[str] = None
+    context_id: Optional[str] = None
+    unit: Optional[str] = None
+    decimals: Optional[str] = None
+    precision: Optional[str] = None
+    period_start: Optional[str] = None
+    period_end: Optional[str] = None
+    instant: Optional[str] = None
+    currency: str = "CNY"
+    value_text: Optional[str] = None
+    dimensions_json: Dict[str, Any] = field(default_factory=dict)
+    raw_fact_json: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class FinancialFactsSnapshot:
     """Normalized financial facts for one latest report period."""
 
@@ -197,6 +263,12 @@ class FinancialFactsSnapshot:
     source: str = ""
     source_mode: str = "direct"
     facts_json: Dict[str, Any] = field(default_factory=dict)
+    report_type: Optional[str] = None
+    statement_family: Optional[str] = None
+    data_available_date: Optional[str] = None
+    source_file_id: Optional[str] = None
+    filing_id: Optional[str] = None
+    lineage_json: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -263,6 +335,13 @@ class ValuationHistorySnapshot:
     pe_ratio: Optional[float] = None
     pb_ratio: Optional[float] = None
     ps_ratio: Optional[float] = None
+    pe_static: Optional[float] = None
+    pe_ttm: Optional[float] = None
+    pe_forward: Optional[float] = None
+    pb_mrq: Optional[float] = None
+    ps_static: Optional[float] = None
+    ps_ttm: Optional[float] = None
+    ps_forward: Optional[float] = None
     calc_method: str = "valuation_history_builtin"
     calc_version: str = "valuation_history.v1"
     parameter_hash: str = ""
@@ -435,8 +514,31 @@ class BaseFinancialStatementsProvider(ABC):
         exchange: str,
         mode: str = "direct",
         limit: Optional[int] = None,
+        report_periods: Optional[List[str]] = None,
     ) -> List[FinancialStatementBundle]:
-        """Fetch latest financial statement bundles for a set of instruments."""
+        """Fetch financial statement bundles for configured report periods."""
+
+
+class BaseOfficialFinancialFilingProvider(ABC):
+    """Base contract for official structured financial filing providers."""
+
+    source_name: str = ""
+    supported_modes: set[str] = {"direct"}
+
+    def supports_mode(self, mode: str) -> bool:
+        return mode in self.supported_modes
+
+    @abstractmethod
+    async def fetch_financial_filings(
+        self,
+        *,
+        instruments: List[Dict[str, Any]],
+        exchange: str,
+        report_periods: List[str],
+        mode: str = "direct",
+        limit: Optional[int] = None,
+    ) -> List[FinancialFilingPayload]:
+        """Fetch structured filing payloads by instrument and report period."""
 
 
 @dataclass(frozen=True)

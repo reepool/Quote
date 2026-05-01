@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+import hashlib
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
@@ -26,6 +27,8 @@ from research.providers.base import (
     CompanyProfileSnapshot,
     FinancialFactsSnapshot,
     FinancialIndicatorSnapshot,
+    FinancialNumericFactSnapshot,
+    FinancialSourceFileManifest,
     FinancialStatementBundle,
     FinancialStatementRawSnapshot,
     FinancialSummarySnapshot,
@@ -52,6 +55,93 @@ class IngestionRunRecord:
     status: str
 
 
+class FinancialStatementStorageRepository:
+    """Backend-portable facade for financial statement storage operations."""
+
+    def __init__(self, storage: "ResearchStorageManager"):
+        self._storage = storage
+
+    def upsert_source_file_manifest(
+        self,
+        manifest: FinancialSourceFileManifest,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> str:
+        return self._storage.upsert_financial_source_file_manifest(
+            manifest,
+            ingestion_run_id=ingestion_run_id,
+        )
+
+    def upsert_numeric_facts(
+        self,
+        facts: List[FinancialNumericFactSnapshot],
+        *,
+        ingestion_run_id: Optional[int] = None,
+        tier: str = "hot",
+    ) -> int:
+        return self._storage.upsert_financial_numeric_facts(
+            facts,
+            ingestion_run_id=ingestion_run_id,
+            tier=tier,
+        )
+
+    def get_core_facts(
+        self,
+        instrument_id: str,
+        *,
+        include_history: bool = False,
+        report_period: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        return self._storage.get_financial_core_facts(
+            instrument_id,
+            include_history=include_history,
+            report_period=report_period,
+            limit=limit,
+        )
+
+    def detect_coverage_gaps(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+        required_core_facts: List[str],
+        fallback_sources: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        return self._storage.detect_financial_coverage_gaps(
+            expected_periods=expected_periods,
+            instrument_ids=instrument_ids,
+            required_core_facts=required_core_facts,
+            fallback_sources=fallback_sources,
+        )
+
+    def validate_readiness(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+        required_core_facts: List[str],
+        fallback_sources: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        return self._storage.validate_financial_statement_readiness(
+            expected_periods=expected_periods,
+            instrument_ids=instrument_ids,
+            required_core_facts=required_core_facts,
+            fallback_sources=fallback_sources,
+        )
+
+    def maintain_tiers(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        hot_quarter_window: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        return self._storage.maintain_financial_hot_cold_tiers(
+            instrument_id=instrument_id,
+            hot_quarter_window=hot_quarter_window,
+        )
+
+
 class ResearchStorageManager:
     """Manage the isolated research SQLite database."""
 
@@ -60,6 +150,7 @@ class ResearchStorageManager:
         self.db_path = self.research_config.storage.db_path
         self.quotes_db_path = self.research_config.storage.quotes_db_path
         self.quotes_db_alias = self.research_config.storage.quotes_db_alias
+        self.financial_statements = FinancialStatementStorageRepository(self)
 
     def initialize(self) -> None:
         """Ensure database file, pragmas, and base tables exist."""
@@ -173,6 +264,39 @@ class ResearchStorageManager:
             conn.commit()
 
         return IngestionRunRecord(run_id=run_id, status=status)
+
+    def get_latest_successful_ingestion_run(
+        self,
+        *,
+        domain: str,
+        job_name: str,
+        market: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the latest successful ingestion run for checkpointing."""
+        filters = ["domain = ?", "job_name = ?", "status = ?"]
+        params: List[Any] = [domain, job_name, "success"]
+        if market is not None:
+            filters.append("market = ?")
+            params.append(market)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                f"""
+                SELECT *
+                FROM ingestion_runs
+                WHERE {' AND '.join(filters)}
+                ORDER BY completed_at DESC, id DESC
+                LIMIT 1
+                """,
+                params,
+            ).fetchone()
+
+        if row is None:
+            return None
+        item = dict(row)
+        item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+        return item
 
     def store_raw_payload(
         self,
@@ -591,6 +715,242 @@ class ResearchStorageManager:
             )
             conn.commit()
 
+    def upsert_financial_source_file_manifest(
+        self,
+        manifest: FinancialSourceFileManifest,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> str:
+        """Upsert one financial source-file manifest and return its stable id."""
+        now = get_shanghai_time().isoformat()
+        source_file_id = manifest.source_file_id or self._build_financial_source_file_id(
+            manifest
+        )
+        parser_diagnostics_json = json.dumps(
+            manifest.parser_diagnostics,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        metadata_json = json.dumps(
+            manifest.metadata_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_source_files (
+                    source_file_id,
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    report_period,
+                    report_type,
+                    filing_id,
+                    source_url,
+                    archive_path,
+                    content_hash,
+                    content_length,
+                    published_at,
+                    downloaded_at,
+                    parser_version,
+                    parser_diagnostics_json,
+                    schema_version,
+                    source,
+                    source_mode,
+                    status,
+                    metadata_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(source_file_id)
+                DO UPDATE SET
+                    instrument_id = excluded.instrument_id,
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    report_period = excluded.report_period,
+                    report_type = excluded.report_type,
+                    filing_id = excluded.filing_id,
+                    source_url = excluded.source_url,
+                    archive_path = excluded.archive_path,
+                    content_hash = excluded.content_hash,
+                    content_length = excluded.content_length,
+                    published_at = excluded.published_at,
+                    downloaded_at = excluded.downloaded_at,
+                    parser_version = excluded.parser_version,
+                    parser_diagnostics_json = excluded.parser_diagnostics_json,
+                    schema_version = excluded.schema_version,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    status = excluded.status,
+                    metadata_json = excluded.metadata_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    source_file_id,
+                    manifest.instrument_id,
+                    manifest.symbol,
+                    manifest.exchange,
+                    manifest.report_period,
+                    manifest.report_type,
+                    manifest.filing_id,
+                    manifest.source_url,
+                    manifest.archive_path,
+                    manifest.content_hash,
+                    manifest.content_length,
+                    manifest.published_at,
+                    manifest.downloaded_at,
+                    manifest.parser_version,
+                    parser_diagnostics_json,
+                    manifest.schema_version,
+                    manifest.source,
+                    manifest.source_mode,
+                    manifest.status,
+                    metadata_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+        return source_file_id
+
+    def get_financial_source_file_manifests(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        exchange: Optional[str] = None,
+        report_period: Optional[str] = None,
+        source: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Fetch financial source-file manifests with optional filters."""
+        filters = []
+        params: List[Any] = []
+        if instrument_id:
+            filters.append("instrument_id = ?")
+            params.append(instrument_id)
+        if exchange:
+            filters.append("exchange = ?")
+            params.append(exchange)
+        if report_period:
+            filters.append("report_period = ?")
+            params.append(report_period)
+        if source:
+            filters.append("source = ?")
+            params.append(source)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM financial_source_files
+                {where_clause}
+                ORDER BY report_period DESC, updated_at DESC
+                """,
+                params,
+            ).fetchall()
+
+        manifests: List[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["parser_diagnostics"] = self._deserialize_json(
+                item.pop("parser_diagnostics_json", None)
+            ) or {}
+            item["metadata"] = self._deserialize_json(
+                item.pop("metadata_json", None)
+            ) or {}
+            manifests.append(item)
+        return manifests
+
+    def upsert_financial_numeric_facts(
+        self,
+        facts: List[FinancialNumericFactSnapshot],
+        *,
+        ingestion_run_id: Optional[int] = None,
+        tier: str = "hot",
+    ) -> int:
+        """Upsert long-form numeric facts into the canonical and tier tables."""
+        if not facts:
+            return 0
+        if tier not in {"hot", "history"}:
+            raise ValueError("financial numeric fact tier must be 'hot' or 'history'")
+
+        now = get_shanghai_time().isoformat()
+        tier_table = (
+            "financial_numeric_facts_hot"
+            if tier == "hot"
+            else "financial_numeric_facts_history"
+        )
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for fact in facts:
+                self._upsert_financial_numeric_fact_row(
+                    conn,
+                    fact,
+                    table_name="financial_numeric_facts",
+                    ingestion_run_id=ingestion_run_id,
+                    now=now,
+                )
+                self._upsert_financial_numeric_fact_row(
+                    conn,
+                    fact,
+                    table_name=tier_table,
+                    ingestion_run_id=ingestion_run_id,
+                    now=now,
+                )
+            conn.commit()
+        return len(facts)
+
+    def get_financial_numeric_facts(
+        self,
+        instrument_id: str,
+        *,
+        include_history: bool = False,
+        report_period: Optional[str] = None,
+        fact_name: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Fetch long-form financial numeric facts through logical tier semantics."""
+        tables = ["financial_numeric_facts_hot"]
+        if include_history:
+            tables.append("financial_numeric_facts_history")
+        select_sql = " UNION ALL ".join(
+            f"SELECT *, '{table_name}' AS physical_table FROM {table_name}"
+            for table_name in tables
+        )
+        filters = ["instrument_id = ?"]
+        params: List[Any] = [instrument_id]
+        if report_period:
+            filters.append("report_period = ?")
+            params.append(report_period)
+        if fact_name:
+            filters.append("fact_name = ?")
+            params.append(fact_name)
+        limit_clause = "" if limit is None else "LIMIT ?"
+        if limit is not None:
+            params.append(int(limit))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM ({select_sql})
+                WHERE {' AND '.join(filters)}
+                ORDER BY report_period DESC, fact_name ASC, updated_at DESC
+                {limit_clause}
+                """,
+                params,
+            ).fetchall()
+
+        return [self._decode_financial_numeric_fact_row(row) for row in rows]
+
     def upsert_financial_facts(
         self,
         snapshot: FinancialFactsSnapshot,
@@ -603,111 +963,21 @@ class ResearchStorageManager:
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
-            conn.execute(
-                """
-                INSERT INTO financial_facts (
-                    instrument_id,
-                    symbol,
-                    exchange,
-                    report_period,
-                    publish_date,
-                    fiscal_year,
-                    fiscal_quarter,
-                    currency,
-                    schema_version,
-                    revenue,
-                    gross_profit,
-                    operating_profit,
-                    pre_tax_profit,
-                    net_income,
-                    operating_cf,
-                    total_cf,
-                    total_assets,
-                    total_liabilities,
-                    equity,
-                    current_assets,
-                    current_liabilities,
-                    inventory,
-                    receivables,
-                    fixed_assets,
-                    intangible_assets,
-                    shares_outstanding,
-                    source,
-                    source_mode,
-                    data_as_of,
-                    facts_json,
-                    ingestion_run_id,
-                    created_at,
-                    updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(instrument_id, report_period)
-                DO UPDATE SET
-                    symbol = excluded.symbol,
-                    exchange = excluded.exchange,
-                    publish_date = excluded.publish_date,
-                    fiscal_year = excluded.fiscal_year,
-                    fiscal_quarter = excluded.fiscal_quarter,
-                    currency = excluded.currency,
-                    schema_version = excluded.schema_version,
-                    revenue = excluded.revenue,
-                    gross_profit = excluded.gross_profit,
-                    operating_profit = excluded.operating_profit,
-                    pre_tax_profit = excluded.pre_tax_profit,
-                    net_income = excluded.net_income,
-                    operating_cf = excluded.operating_cf,
-                    total_cf = excluded.total_cf,
-                    total_assets = excluded.total_assets,
-                    total_liabilities = excluded.total_liabilities,
-                    equity = excluded.equity,
-                    current_assets = excluded.current_assets,
-                    current_liabilities = excluded.current_liabilities,
-                    inventory = excluded.inventory,
-                    receivables = excluded.receivables,
-                    fixed_assets = excluded.fixed_assets,
-                    intangible_assets = excluded.intangible_assets,
-                    shares_outstanding = excluded.shares_outstanding,
-                    source = excluded.source,
-                    source_mode = excluded.source_mode,
-                    data_as_of = excluded.data_as_of,
-                    facts_json = excluded.facts_json,
-                    ingestion_run_id = excluded.ingestion_run_id,
-                    updated_at = excluded.updated_at
-                """,
-                (
-                    snapshot.instrument_id,
-                    snapshot.symbol,
-                    snapshot.exchange,
-                    snapshot.report_period,
-                    snapshot.publish_date,
-                    snapshot.fiscal_year,
-                    snapshot.fiscal_quarter,
-                    snapshot.currency,
-                    snapshot.schema_version,
-                    snapshot.revenue,
-                    snapshot.gross_profit,
-                    snapshot.operating_profit,
-                    snapshot.pre_tax_profit,
-                    snapshot.net_income,
-                    snapshot.operating_cf,
-                    snapshot.total_cf,
-                    snapshot.total_assets,
-                    snapshot.total_liabilities,
-                    snapshot.equity,
-                    snapshot.current_assets,
-                    snapshot.current_liabilities,
-                    snapshot.inventory,
-                    snapshot.receivables,
-                    snapshot.fixed_assets,
-                    snapshot.intangible_assets,
-                    snapshot.shares_outstanding,
-                    snapshot.source,
-                    snapshot.source_mode,
-                    now,
-                    facts_json,
-                    ingestion_run_id,
-                    now,
-                    now,
-                ),
+            self._upsert_financial_core_fact_row(
+                conn,
+                snapshot,
+                table_name="financial_facts",
+                facts_json=facts_json,
+                ingestion_run_id=ingestion_run_id,
+                now=now,
+            )
+            self._upsert_financial_core_fact_row(
+                conn,
+                snapshot,
+                table_name="financial_core_facts_hot",
+                facts_json=facts_json,
+                ingestion_run_id=ingestion_run_id,
+                now=now,
             )
             conn.commit()
 
@@ -818,6 +1088,14 @@ class ResearchStorageManager:
                     now,
                 ),
             )
+            self._upsert_financial_indicator_row(
+                conn,
+                snapshot,
+                table_name="financial_indicator_snapshots_hot",
+                indicators_json=indicators_json,
+                ingestion_run_id=ingestion_run_id,
+                now=now,
+            )
             conn.commit()
 
     def upsert_valuation_history(
@@ -849,6 +1127,13 @@ class ResearchStorageManager:
                     pe_ratio,
                     pb_ratio,
                     ps_ratio,
+                    pe_static,
+                    pe_ttm,
+                    pe_forward,
+                    pb_mrq,
+                    ps_static,
+                    ps_ttm,
+                    ps_forward,
                     calc_method,
                     calc_version,
                     parameter_hash,
@@ -859,7 +1144,7 @@ class ResearchStorageManager:
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -870,6 +1155,13 @@ class ResearchStorageManager:
                     pe_ratio = excluded.pe_ratio,
                     pb_ratio = excluded.pb_ratio,
                     ps_ratio = excluded.ps_ratio,
+                    pe_static = excluded.pe_static,
+                    pe_ttm = excluded.pe_ttm,
+                    pe_forward = excluded.pe_forward,
+                    pb_mrq = excluded.pb_mrq,
+                    ps_static = excluded.ps_static,
+                    ps_ttm = excluded.ps_ttm,
+                    ps_forward = excluded.ps_forward,
                     source = excluded.source,
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
@@ -888,6 +1180,13 @@ class ResearchStorageManager:
                     snapshot.pe_ratio,
                     snapshot.pb_ratio,
                     snapshot.ps_ratio,
+                    snapshot.pe_static,
+                    snapshot.pe_ttm,
+                    snapshot.pe_forward,
+                    snapshot.pb_mrq,
+                    snapshot.ps_static,
+                    snapshot.ps_ttm,
+                    snapshot.ps_forward,
                     snapshot.calc_method,
                     snapshot.calc_version,
                     snapshot.parameter_hash,
@@ -3631,6 +3930,11 @@ class ResearchStorageManager:
                     symbol,
                     exchange,
                     report_period,
+                    report_type,
+                    statement_family,
+                    data_available_date,
+                    source_file_id,
+                    filing_id,
                     publish_date,
                     fiscal_year,
                     fiscal_quarter,
@@ -3657,6 +3961,7 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     facts_json,
+                    lineage_json,
                     ingestion_run_id,
                     created_at,
                     updated_at
@@ -3731,6 +4036,7 @@ class ResearchStorageManager:
 
         facts = dict(facts_row)
         facts_json = facts.pop("facts_json", None)
+        lineage_json = facts.pop("lineage_json", None)
         indicators = dict(indicators_row) if indicators_row is not None else None
         if indicators is not None:
             indicators_json = indicators.pop("indicators_json", None)
@@ -3744,10 +4050,594 @@ class ResearchStorageManager:
             statements.append(item)
 
         facts["facts"] = self._deserialize_json(facts_json)
+        facts["lineage"] = self._deserialize_json(lineage_json) or {}
         facts["indicators"] = indicators
         if include_statements:
             facts["statements"] = statements
         return facts
+
+    def get_financial_core_facts(
+        self,
+        instrument_id: str,
+        *,
+        include_history: bool = False,
+        report_period: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Read normalized financial facts through hot/history logical tiers."""
+        tables = ["financial_core_facts_hot"]
+        if include_history:
+            tables.append("financial_core_facts_history")
+        select_sql = " UNION ALL ".join(
+            f"SELECT *, '{table_name}' AS physical_table FROM {table_name}"
+            for table_name in tables
+        )
+        filters = ["instrument_id = ?"]
+        params: List[Any] = [instrument_id]
+        if report_period:
+            filters.append("report_period = ?")
+            params.append(report_period)
+        limit_clause = "" if limit is None else "LIMIT ?"
+        if limit is not None:
+            params.append(int(limit))
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM ({select_sql})
+                WHERE {' AND '.join(filters)}
+                ORDER BY report_period DESC, updated_at DESC
+                {limit_clause}
+                """,
+                params,
+            ).fetchall()
+
+        return [self._decode_financial_core_fact_row(row) for row in rows]
+
+    def summarize_financial_period_coverage(
+        self,
+        *,
+        expected_periods: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        include_history: bool = True,
+    ) -> Dict[str, Any]:
+        """Summarize core-fact period coverage for readiness and rollout checks."""
+        tables = ["financial_core_facts_hot"]
+        if include_history:
+            tables.append("financial_core_facts_history")
+        select_sql = " UNION ALL ".join(
+            f"SELECT instrument_id, report_period FROM {table_name}"
+            for table_name in tables
+        )
+
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids:
+            placeholders = ",".join("?" for _ in instrument_ids)
+            filters.append(f"instrument_id IN ({placeholders})")
+            params.extend(instrument_ids)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT instrument_id, report_period
+                FROM ({select_sql})
+                {where_clause}
+                GROUP BY instrument_id, report_period
+                """,
+                params,
+            ).fetchall()
+
+        periods_by_instrument: Dict[str, set[str]] = {}
+        for row in rows:
+            periods_by_instrument.setdefault(row["instrument_id"], set()).add(
+                row["report_period"]
+            )
+
+        missing: Dict[str, List[str]] = {}
+        expected = expected_periods or []
+        if expected:
+            target_instruments = instrument_ids or sorted(periods_by_instrument)
+            for target in target_instruments:
+                present = periods_by_instrument.get(target, set())
+                missing_periods = [period for period in expected if period not in present]
+                if missing_periods:
+                    missing[target] = missing_periods
+
+        covered_period_rows = sum(len(periods) for periods in periods_by_instrument.values())
+        expected_rows = len(expected) * len(instrument_ids or periods_by_instrument)
+        return {
+            "instrument_count": len(periods_by_instrument),
+            "covered_period_rows": covered_period_rows,
+            "expected_period_rows": expected_rows,
+            "coverage_ratio": None
+            if expected_rows == 0
+            else covered_period_rows / expected_rows,
+            "missing_periods": missing,
+        }
+
+    def detect_financial_coverage_gaps(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+        required_core_facts: List[str],
+        include_history: bool = True,
+        fallback_sources: Optional[List[str]] = None,
+        detail_limit: int = 50,
+    ) -> Dict[str, Any]:
+        """Detect financial statement coverage gaps through storage semantics."""
+        expected = sorted(set(expected_periods or []))
+        instruments = sorted(set(instrument_ids or []))
+        required_fields = [
+            field
+            for field in required_core_facts
+            if field in self._financial_core_fact_fields()
+        ]
+        fallback_source_set = set(fallback_sources or ["akshare"])
+        core_rows = self._fetch_financial_core_rows_for_gap_detection(
+            expected_periods=expected,
+            instrument_ids=instruments,
+            include_history=include_history,
+        )
+        manifest_rows = self._fetch_financial_manifest_rows_for_gap_detection(
+            expected_periods=expected,
+            instrument_ids=instruments,
+        )
+
+        core_by_key: Dict[tuple[str, str], Dict[str, Any]] = {}
+        source_distribution: Dict[str, int] = {}
+        source_mode_distribution: Dict[str, int] = {}
+        fallback_core_rows = 0
+        for row in core_rows:
+            item = dict(row)
+            key = (item["instrument_id"], item["report_period"])
+            core_by_key[key] = item
+            source = str(item.get("source") or "unknown")
+            mode = str(item.get("source_mode") or "unknown")
+            source_distribution[source] = source_distribution.get(source, 0) + 1
+            source_mode_distribution[mode] = source_mode_distribution.get(mode, 0) + 1
+            if source in fallback_source_set:
+                fallback_core_rows += 1
+
+        source_file_keys: set[tuple[str, str]] = set()
+        parser_version_distribution: Dict[str, int] = {}
+        manifest_status_counts: Dict[str, int] = {}
+        for row in manifest_rows:
+            instrument_id = row["instrument_id"]
+            report_period = row["report_period"]
+            if instrument_id and report_period:
+                source_file_keys.add((instrument_id, report_period))
+            parser_version = str(row["parser_version"] or "unknown")
+            status = str(row["status"] or "unknown")
+            parser_version_distribution[parser_version] = (
+                parser_version_distribution.get(parser_version, 0) + 1
+            )
+            manifest_status_counts[status] = manifest_status_counts.get(status, 0) + 1
+
+        missing_periods: Dict[str, List[str]] = {}
+        missing_instruments: List[str] = []
+        missing_source_files: List[Dict[str, str]] = []
+        missing_core_facts: List[Dict[str, Any]] = []
+        field_present_counts = {field: 0 for field in required_fields}
+        present_core_cells = 0
+        expected_keys = [(instrument_id, period) for instrument_id in instruments for period in expected]
+
+        for instrument_id in instruments:
+            has_any_core = any((instrument_id, period) in core_by_key for period in expected)
+            if expected and not has_any_core:
+                missing_instruments.append(instrument_id)
+            for period in expected:
+                key = (instrument_id, period)
+                row = core_by_key.get(key)
+                if row is None:
+                    missing_periods.setdefault(instrument_id, []).append(period)
+                    self._append_limited(
+                        missing_core_facts,
+                        {
+                            "instrument_id": instrument_id,
+                            "report_period": period,
+                            "missing_fields": list(required_fields),
+                        },
+                        detail_limit,
+                    )
+                else:
+                    missing_fields = []
+                    for field in required_fields:
+                        if row.get(field) is None:
+                            missing_fields.append(field)
+                        else:
+                            field_present_counts[field] += 1
+                            present_core_cells += 1
+                    if missing_fields:
+                        self._append_limited(
+                            missing_core_facts,
+                            {
+                                "instrument_id": instrument_id,
+                                "report_period": period,
+                                "missing_fields": missing_fields,
+                            },
+                            detail_limit,
+                        )
+                if key not in source_file_keys:
+                    self._append_limited(
+                        missing_source_files,
+                        {"instrument_id": instrument_id, "report_period": period},
+                        detail_limit,
+                    )
+
+        covered_period_rows = sum(1 for key in expected_keys if key in core_by_key)
+        expected_period_rows = len(expected_keys)
+        expected_core_cells = expected_period_rows * len(required_fields)
+        missing_period_row_count = expected_period_rows - covered_period_rows
+        missing_source_file_count = sum(
+            1 for key in expected_keys if key not in source_file_keys
+        )
+        missing_core_fact_count = expected_core_cells - present_core_cells
+        parser_failure_count = sum(
+            count
+            for status, count in manifest_status_counts.items()
+            if status in {"failed", "parse_failed"}
+        )
+        manifest_count = len(manifest_rows)
+        core_row_count = len(core_rows)
+
+        return {
+            "target_instrument_count": len(instruments),
+            "expected_periods": expected,
+            "expected_period_rows": expected_period_rows,
+            "required_core_facts": required_fields,
+            "period_coverage": {
+                "covered_period_rows": covered_period_rows,
+                "missing_period_row_count": missing_period_row_count,
+                "coverage_ratio": None
+                if expected_period_rows == 0
+                else covered_period_rows / expected_period_rows,
+                "missing_periods": {
+                    key: value[:detail_limit]
+                    for key, value in list(missing_periods.items())[:detail_limit]
+                },
+            },
+            "missing_instruments": missing_instruments[:detail_limit],
+            "source_files": {
+                "manifest_count": manifest_count,
+                "missing_source_file_count": missing_source_file_count,
+                "missing_source_files": missing_source_files,
+                "status_counts": manifest_status_counts,
+                "parser_version_distribution": parser_version_distribution,
+                "parser_failure_count": parser_failure_count,
+                "parser_failure_ratio": None
+                if manifest_count == 0
+                else parser_failure_count / manifest_count,
+            },
+            "core_facts": {
+                "core_row_count": core_row_count,
+                "expected_core_fact_cells": expected_core_cells,
+                "present_core_fact_cells": present_core_cells,
+                "missing_core_fact_count": missing_core_fact_count,
+                "coverage_ratio": None
+                if expected_core_cells == 0
+                else present_core_cells / expected_core_cells,
+                "missing_core_facts": missing_core_facts,
+                "field_present_counts": field_present_counts,
+            },
+            "source_distribution": source_distribution,
+            "source_mode_distribution": source_mode_distribution,
+            "fallback_sources": sorted(fallback_source_set),
+            "fallback_core_rows": fallback_core_rows,
+            "fallback_share": None
+            if core_row_count == 0
+            else fallback_core_rows / core_row_count,
+            "tier_coverage": self.summarize_financial_tier_coverage(
+                instrument_ids=instruments or None,
+            ),
+        }
+
+    def validate_financial_statement_readiness(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+        required_core_facts: List[str],
+        include_history: bool = True,
+        fallback_sources: Optional[List[str]] = None,
+        readiness_config: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Validate financial statement rollout readiness at repository level."""
+        readiness_cfg = readiness_config or self.research_config.modules.get(
+            "financial_statements",
+            {},
+        ).get("readiness", {})
+        gaps = self.detect_financial_coverage_gaps(
+            expected_periods=expected_periods,
+            instrument_ids=instrument_ids,
+            required_core_facts=required_core_facts,
+            include_history=include_history,
+            fallback_sources=fallback_sources,
+        )
+        blockers: List[str] = []
+        if not instrument_ids:
+            blockers.append("no_target_instruments")
+        if not expected_periods:
+            blockers.append("no_expected_report_periods")
+        if gaps["period_coverage"]["missing_period_row_count"]:
+            blockers.append("missing_required_report_periods")
+        if gaps["source_files"]["missing_source_file_count"]:
+            blockers.append("missing_source_files")
+        if gaps["core_facts"]["missing_core_fact_count"]:
+            blockers.append("missing_core_facts")
+
+        min_period_coverage = float(
+            readiness_cfg.get("min_period_coverage_ratio", 0.95)
+        )
+        period_coverage = gaps["period_coverage"]["coverage_ratio"]
+        if period_coverage is not None and period_coverage < min_period_coverage:
+            blockers.append("period_coverage_below_threshold")
+
+        min_core_coverage = float(
+            readiness_cfg.get("min_core_fact_coverage_ratio", 0.95)
+        )
+        core_coverage = gaps["core_facts"]["coverage_ratio"]
+        if core_coverage is not None and core_coverage < min_core_coverage:
+            blockers.append("core_fact_coverage_below_threshold")
+
+        max_fallback_share = float(readiness_cfg.get("max_fallback_share", 0.5))
+        fallback_share = gaps["fallback_share"]
+        if fallback_share is not None and fallback_share > max_fallback_share:
+            blockers.append("fallback_share_above_threshold")
+
+        max_parser_failure_ratio = float(
+            readiness_cfg.get("max_parser_failure_ratio", 0.05)
+        )
+        parser_failure_ratio = gaps["source_files"]["parser_failure_ratio"]
+        if (
+            parser_failure_ratio is not None
+            and parser_failure_ratio > max_parser_failure_ratio
+        ):
+            blockers.append("parser_failure_ratio_above_threshold")
+
+        tier_coverage = gaps["tier_coverage"]
+        duplicate_conflicts = tier_coverage.get("duplicate_tier_conflicts", {})
+        if any(int(value) > 0 for value in duplicate_conflicts.values()):
+            blockers.append("duplicate_tier_conflicts")
+        if int(tier_coverage.get("stale_hot_rows", 0)) > 0:
+            blockers.append("stale_hot_rows")
+
+        return {
+            "status": "ready" if not blockers else "not_ready",
+            "ready_for_rollout": not blockers,
+            "blockers": blockers,
+            "thresholds": {
+                "min_period_coverage_ratio": min_period_coverage,
+                "min_core_fact_coverage_ratio": min_core_coverage,
+                "max_fallback_share": max_fallback_share,
+                "max_parser_failure_ratio": max_parser_failure_ratio,
+            },
+            "gaps": gaps,
+        }
+
+    def summarize_financial_tier_coverage(
+        self,
+        *,
+        instrument_ids: Optional[List[str]] = None,
+        hot_quarter_window: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Summarize hot/history tier coverage without moving data."""
+        window = hot_quarter_window or self._financial_hot_quarter_window()
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            coverage = {
+                table_name: self._count_financial_tier_table(
+                    conn,
+                    table_name,
+                    instrument_ids=instrument_ids,
+                )
+                for table_name in (
+                    "financial_core_facts_hot",
+                    "financial_core_facts_history",
+                    "financial_numeric_facts_hot",
+                    "financial_numeric_facts_history",
+                    "financial_indicator_snapshots_hot",
+                    "financial_indicator_snapshots_history",
+                )
+            }
+            duplicate_conflicts = self._count_duplicate_tier_conflicts(conn)
+            instruments = self._financial_tier_instruments(conn, instrument_id=None)
+            if instrument_ids:
+                instruments = [
+                    instrument_id
+                    for instrument_id in instruments
+                    if instrument_id in set(instrument_ids)
+                ]
+            stale_hot_rows = 0
+            for instrument_id in instruments:
+                periods = [
+                    row["report_period"]
+                    for row in conn.execute(
+                        """
+                        SELECT DISTINCT report_period
+                        FROM financial_core_facts_hot
+                        WHERE instrument_id = ?
+                        ORDER BY report_period DESC
+                        """,
+                        (instrument_id,),
+                    ).fetchall()
+                ]
+                stale_hot_rows += self._count_stale_hot_rows(
+                    conn,
+                    instrument_id,
+                    set(periods[:window]),
+                )
+
+        return {
+            "hot_quarter_window": window,
+            "tables": coverage,
+            "duplicate_tier_conflicts": duplicate_conflicts,
+            "stale_hot_rows": stale_hot_rows,
+        }
+
+    def derive_financial_core_facts_from_numeric_facts(
+        self,
+        instrument_id: str,
+        report_period: str,
+        *,
+        alias_mapping: Dict[str, List[str]],
+        include_history: bool = True,
+    ) -> Optional[FinancialFactsSnapshot]:
+        """Build a normalized core-fact snapshot from long-form numeric facts."""
+        numeric_facts = self.get_financial_numeric_facts(
+            instrument_id,
+            include_history=include_history,
+            report_period=report_period,
+        )
+        if not numeric_facts:
+            return None
+
+        facts_by_name = {
+            str(row.get("fact_name")): row
+            for row in numeric_facts
+            if row.get("fact_name")
+        }
+        core_values: Dict[str, Optional[float]] = {}
+        supported_fields = {
+            "revenue",
+            "gross_profit",
+            "operating_profit",
+            "pre_tax_profit",
+            "net_income",
+            "operating_cf",
+            "total_cf",
+            "total_assets",
+            "total_liabilities",
+            "equity",
+            "current_assets",
+            "current_liabilities",
+            "inventory",
+            "receivables",
+            "fixed_assets",
+            "intangible_assets",
+            "shares_outstanding",
+        }
+        for core_field, aliases in alias_mapping.items():
+            if core_field not in supported_fields:
+                continue
+            for alias in aliases:
+                row = facts_by_name.get(alias)
+                if row is None:
+                    continue
+                core_values[core_field] = row.get("fact_value")
+                break
+
+        first = numeric_facts[0]
+        source_file_id = first.get("source_file_id")
+        return FinancialFactsSnapshot(
+            instrument_id=instrument_id,
+            symbol=str(first.get("symbol") or ""),
+            exchange=str(first.get("exchange") or ""),
+            report_period=report_period,
+            report_type=first.get("report_type"),
+            statement_family="core",
+            source_file_id=source_file_id,
+            currency=str(first.get("currency") or "CNY"),
+            schema_version="financial_facts.derived.v1",
+            source=str(first.get("source") or ""),
+            source_mode=str(first.get("source_mode") or "direct"),
+            facts_json={
+                "derived_from_numeric_facts": True,
+                "alias_mapping": alias_mapping,
+                "source_file_id": source_file_id,
+            },
+            lineage_json={
+                "source_file_id": source_file_id,
+                "numeric_fact_count": len(numeric_facts),
+            },
+            **core_values,
+        )
+
+    def maintain_financial_hot_cold_tiers(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        hot_quarter_window: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Move financial rows outside the configured hot window into history."""
+        window = hot_quarter_window or self._financial_hot_quarter_window()
+        if window < 1:
+            raise ValueError("hot_quarter_window must be positive")
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            instruments = self._financial_tier_instruments(
+                conn,
+                instrument_id=instrument_id,
+            )
+            moved_core = 0
+            moved_numeric = 0
+            moved_indicators = 0
+            stale_hot_rows = 0
+
+            for target in instruments:
+                periods = [
+                    row["report_period"]
+                    for row in conn.execute(
+                        """
+                        SELECT DISTINCT report_period
+                        FROM financial_core_facts_hot
+                        WHERE instrument_id = ?
+                        ORDER BY report_period DESC
+                        """,
+                        (target,),
+                    ).fetchall()
+                ]
+                keep_periods = set(periods[:window])
+                stale_periods = [period for period in periods if period not in keep_periods]
+                for period in stale_periods:
+                    moved_core += self._move_tier_rows(
+                        conn,
+                        "financial_core_facts_hot",
+                        "financial_core_facts_history",
+                        "instrument_id = ? AND report_period = ?",
+                        (target, period),
+                    )
+                    moved_numeric += self._move_tier_rows(
+                        conn,
+                        "financial_numeric_facts_hot",
+                        "financial_numeric_facts_history",
+                        "instrument_id = ? AND report_period = ?",
+                        (target, period),
+                    )
+                    moved_indicators += self._move_tier_rows(
+                        conn,
+                        "financial_indicator_snapshots_hot",
+                        "financial_indicator_snapshots_history",
+                        "instrument_id = ? AND report_period = ?",
+                        (target, period),
+                    )
+
+                stale_hot_rows += self._count_stale_hot_rows(
+                    conn,
+                    target,
+                    keep_periods,
+                )
+
+            duplicate_conflicts = self._count_duplicate_tier_conflicts(conn)
+            conn.commit()
+
+        return {
+            "hot_quarter_window": window,
+            "instrument_count": len(instruments),
+            "moved_rows": {
+                "core_facts": moved_core,
+                "numeric_facts": moved_numeric,
+                "indicators": moved_indicators,
+            },
+            "stale_hot_rows": stale_hot_rows,
+            "duplicate_tier_conflicts": duplicate_conflicts,
+        }
 
     def get_shareholder_snapshot(
         self,
@@ -4738,6 +5628,13 @@ class ResearchStorageManager:
                 pe_ratio,
                 pb_ratio,
                 ps_ratio,
+                pe_static,
+                pe_ttm,
+                pe_forward,
+                pb_mrq,
+                ps_static,
+                ps_ttm,
+                ps_forward,
                 calc_method,
                 calc_version,
                 parameter_hash,
@@ -4897,6 +5794,88 @@ class ResearchStorageManager:
             if row["exchange"] is not None
         }
 
+    def summarize_valuation_metric_coverage(
+        self,
+        *,
+        metric_fields: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Summarize latest valuation metric coverage by metric variant."""
+        allowed_fields = {
+            "pe_ratio",
+            "pb_ratio",
+            "ps_ratio",
+            "pe_static",
+            "pe_ttm",
+            "pe_forward",
+            "pb_mrq",
+            "ps_static",
+            "ps_ttm",
+            "ps_forward",
+        }
+        fields = [
+            field
+            for field in (metric_fields or sorted(allowed_fields))
+            if field in allowed_fields
+        ]
+        if not fields:
+            return {"metrics": {}, "instrument_count": 0}
+
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids is not None:
+            normalized_ids = [
+                str(instrument_id).strip()
+                for instrument_id in instrument_ids
+                if str(instrument_id).strip()
+            ]
+            if not normalized_ids:
+                return {"metrics": {}, "instrument_count": 0}
+            placeholders = ", ".join("?" for _ in normalized_ids)
+            filters.append(f"vh.instrument_id IN ({placeholders})")
+            params.extend(normalized_ids)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+
+        metric_selects = ",\n                    ".join(
+            f"SUM(CASE WHEN vh.{field} IS NOT NULL AND vh.{field} > 0 THEN 1 ELSE 0 END) AS {field}_count"
+            for field in fields
+        )
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                f"""
+                WITH latest AS (
+                    SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
+                    FROM valuation_history
+                    GROUP BY instrument_id
+                )
+                SELECT
+                    COUNT(DISTINCT vh.instrument_id) AS instrument_count,
+                    {metric_selects}
+                FROM valuation_history vh
+                JOIN latest
+                  ON latest.instrument_id = vh.instrument_id
+                 AND latest.latest_as_of_date = vh.as_of_date
+                {where_clause}
+                """,
+                tuple(params),
+            ).fetchone()
+
+        instrument_count = int((row["instrument_count"] if row is not None else 0) or 0)
+        metrics = {}
+        for field in fields:
+            covered = int((row[f"{field}_count"] if row is not None else 0) or 0)
+            metrics[field] = {
+                "covered_instruments": covered,
+                "coverage_ratio": (
+                    covered / instrument_count if instrument_count > 0 else None
+                ),
+            }
+        return {
+            "instrument_count": instrument_count,
+            "metrics": metrics,
+        }
+
     def get_latest_peer_valuation_rows(
         self,
         benchmark_code: str,
@@ -4953,6 +5932,13 @@ class ResearchStorageManager:
                     vh.pe_ratio,
                     vh.pb_ratio,
                     vh.ps_ratio,
+                    vh.pe_static,
+                    vh.pe_ttm,
+                    vh.pe_forward,
+                    vh.pb_mrq,
+                    vh.ps_static,
+                    vh.ps_ttm,
+                    vh.ps_forward,
                     vh.calc_method,
                     vh.calc_version,
                     vh.parameter_hash,
@@ -5001,6 +5987,697 @@ class ResearchStorageManager:
         if not value:
             return None
         return json.loads(value)
+
+    @staticmethod
+    def _json_text(value: Dict[str, Any]) -> str:
+        return json.dumps(value or {}, ensure_ascii=False, sort_keys=True)
+
+    @staticmethod
+    def _build_financial_source_file_id(
+        manifest: FinancialSourceFileManifest,
+    ) -> str:
+        identity = {
+            "source": manifest.source,
+            "source_mode": manifest.source_mode,
+            "instrument_id": manifest.instrument_id,
+            "exchange": manifest.exchange,
+            "report_period": manifest.report_period,
+            "report_type": manifest.report_type,
+            "filing_id": manifest.filing_id,
+            "source_url": manifest.source_url,
+            "content_hash": manifest.content_hash,
+        }
+        raw = json.dumps(identity, ensure_ascii=False, sort_keys=True)
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _financial_dimensions_hash(dimensions_json: Dict[str, Any]) -> str:
+        if not dimensions_json:
+            return ""
+        raw = json.dumps(dimensions_json, ensure_ascii=False, sort_keys=True)
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    @classmethod
+    def _upsert_financial_numeric_fact_row(
+        cls,
+        conn: sqlite3.Connection,
+        fact: FinancialNumericFactSnapshot,
+        *,
+        table_name: str,
+        ingestion_run_id: Optional[int],
+        now: str,
+    ) -> None:
+        cls._assert_financial_table_name(
+            table_name,
+            {
+                "financial_numeric_facts",
+                "financial_numeric_facts_hot",
+                "financial_numeric_facts_history",
+            },
+        )
+        dimensions_json = cls._json_text(fact.dimensions_json)
+        raw_fact_json = cls._json_text(fact.raw_fact_json)
+        dimensions_hash = cls._financial_dimensions_hash(fact.dimensions_json)
+        value_text = fact.value_text
+        if value_text is None and fact.fact_value is not None:
+            value_text = str(fact.fact_value)
+
+        conn.execute(
+            f"""
+            INSERT INTO {table_name} (
+                source_file_id,
+                instrument_id,
+                symbol,
+                exchange,
+                report_period,
+                report_type,
+                statement_family,
+                fact_name,
+                taxonomy_namespace,
+                context_id,
+                unit,
+                decimals,
+                precision,
+                period_start,
+                period_end,
+                instant,
+                currency,
+                fact_value,
+                value_text,
+                dimensions_hash,
+                dimensions_json,
+                parser_version,
+                source,
+                source_mode,
+                raw_fact_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(source_file_id, fact_name, context_id, unit, dimensions_hash)
+            DO UPDATE SET
+                instrument_id = excluded.instrument_id,
+                symbol = excluded.symbol,
+                exchange = excluded.exchange,
+                report_period = excluded.report_period,
+                report_type = excluded.report_type,
+                statement_family = excluded.statement_family,
+                taxonomy_namespace = excluded.taxonomy_namespace,
+                decimals = excluded.decimals,
+                precision = excluded.precision,
+                period_start = excluded.period_start,
+                period_end = excluded.period_end,
+                instant = excluded.instant,
+                currency = excluded.currency,
+                fact_value = excluded.fact_value,
+                value_text = excluded.value_text,
+                dimensions_json = excluded.dimensions_json,
+                parser_version = excluded.parser_version,
+                source = excluded.source,
+                source_mode = excluded.source_mode,
+                raw_fact_json = excluded.raw_fact_json,
+                ingestion_run_id = excluded.ingestion_run_id,
+                updated_at = excluded.updated_at
+            """,
+            (
+                fact.source_file_id,
+                fact.instrument_id,
+                fact.symbol,
+                fact.exchange,
+                fact.report_period,
+                fact.report_type,
+                fact.statement_family,
+                fact.fact_name,
+                fact.taxonomy_namespace,
+                fact.context_id or "",
+                fact.unit or "",
+                fact.decimals,
+                fact.precision,
+                fact.period_start,
+                fact.period_end,
+                fact.instant,
+                fact.currency,
+                fact.fact_value,
+                value_text,
+                dimensions_hash,
+                dimensions_json,
+                fact.parser_version,
+                fact.source,
+                fact.source_mode,
+                raw_fact_json,
+                ingestion_run_id,
+                now,
+                now,
+            ),
+        )
+
+    @classmethod
+    def _decode_financial_numeric_fact_row(
+        cls,
+        row: sqlite3.Row,
+    ) -> Dict[str, Any]:
+        item = dict(row)
+        item["dimensions"] = cls._deserialize_json(item.pop("dimensions_json", None)) or {}
+        item["raw_fact"] = cls._deserialize_json(item.pop("raw_fact_json", None)) or {}
+        return item
+
+    @classmethod
+    def _upsert_financial_core_fact_row(
+        cls,
+        conn: sqlite3.Connection,
+        snapshot: FinancialFactsSnapshot,
+        *,
+        table_name: str,
+        facts_json: str,
+        ingestion_run_id: Optional[int],
+        now: str,
+    ) -> None:
+        cls._assert_financial_table_name(
+            table_name,
+            {
+                "financial_facts",
+                "financial_core_facts_hot",
+                "financial_core_facts_history",
+            },
+        )
+        lineage_json = cls._json_text(snapshot.lineage_json)
+        data_available_date = snapshot.data_available_date or snapshot.publish_date
+        conn.execute(
+            f"""
+            INSERT INTO {table_name} (
+                instrument_id,
+                symbol,
+                exchange,
+                report_period,
+                report_type,
+                statement_family,
+                data_available_date,
+                source_file_id,
+                filing_id,
+                publish_date,
+                fiscal_year,
+                fiscal_quarter,
+                currency,
+                schema_version,
+                revenue,
+                gross_profit,
+                operating_profit,
+                pre_tax_profit,
+                net_income,
+                operating_cf,
+                total_cf,
+                total_assets,
+                total_liabilities,
+                equity,
+                current_assets,
+                current_liabilities,
+                inventory,
+                receivables,
+                fixed_assets,
+                intangible_assets,
+                shares_outstanding,
+                source,
+                source_mode,
+                data_as_of,
+                facts_json,
+                lineage_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(instrument_id, report_period)
+            DO UPDATE SET
+                symbol = excluded.symbol,
+                exchange = excluded.exchange,
+                report_type = excluded.report_type,
+                statement_family = excluded.statement_family,
+                data_available_date = excluded.data_available_date,
+                source_file_id = excluded.source_file_id,
+                filing_id = excluded.filing_id,
+                publish_date = excluded.publish_date,
+                fiscal_year = excluded.fiscal_year,
+                fiscal_quarter = excluded.fiscal_quarter,
+                currency = excluded.currency,
+                schema_version = excluded.schema_version,
+                revenue = excluded.revenue,
+                gross_profit = excluded.gross_profit,
+                operating_profit = excluded.operating_profit,
+                pre_tax_profit = excluded.pre_tax_profit,
+                net_income = excluded.net_income,
+                operating_cf = excluded.operating_cf,
+                total_cf = excluded.total_cf,
+                total_assets = excluded.total_assets,
+                total_liabilities = excluded.total_liabilities,
+                equity = excluded.equity,
+                current_assets = excluded.current_assets,
+                current_liabilities = excluded.current_liabilities,
+                inventory = excluded.inventory,
+                receivables = excluded.receivables,
+                fixed_assets = excluded.fixed_assets,
+                intangible_assets = excluded.intangible_assets,
+                shares_outstanding = excluded.shares_outstanding,
+                source = excluded.source,
+                source_mode = excluded.source_mode,
+                data_as_of = excluded.data_as_of,
+                facts_json = excluded.facts_json,
+                lineage_json = excluded.lineage_json,
+                ingestion_run_id = excluded.ingestion_run_id,
+                updated_at = excluded.updated_at
+            """,
+            (
+                snapshot.instrument_id,
+                snapshot.symbol,
+                snapshot.exchange,
+                snapshot.report_period,
+                snapshot.report_type,
+                snapshot.statement_family,
+                data_available_date,
+                snapshot.source_file_id,
+                snapshot.filing_id,
+                snapshot.publish_date,
+                snapshot.fiscal_year,
+                snapshot.fiscal_quarter,
+                snapshot.currency,
+                snapshot.schema_version,
+                snapshot.revenue,
+                snapshot.gross_profit,
+                snapshot.operating_profit,
+                snapshot.pre_tax_profit,
+                snapshot.net_income,
+                snapshot.operating_cf,
+                snapshot.total_cf,
+                snapshot.total_assets,
+                snapshot.total_liabilities,
+                snapshot.equity,
+                snapshot.current_assets,
+                snapshot.current_liabilities,
+                snapshot.inventory,
+                snapshot.receivables,
+                snapshot.fixed_assets,
+                snapshot.intangible_assets,
+                snapshot.shares_outstanding,
+                snapshot.source,
+                snapshot.source_mode,
+                now,
+                facts_json,
+                lineage_json,
+                ingestion_run_id,
+                now,
+                now,
+            ),
+        )
+
+    @classmethod
+    def _decode_financial_core_fact_row(
+        cls,
+        row: sqlite3.Row,
+    ) -> Dict[str, Any]:
+        item = dict(row)
+        item["facts"] = cls._deserialize_json(item.pop("facts_json", None)) or {}
+        item["lineage"] = cls._deserialize_json(item.pop("lineage_json", None)) or {}
+        return item
+
+    @classmethod
+    def _upsert_financial_indicator_row(
+        cls,
+        conn: sqlite3.Connection,
+        snapshot: FinancialIndicatorSnapshot,
+        *,
+        table_name: str,
+        indicators_json: str,
+        ingestion_run_id: Optional[int],
+        now: str,
+    ) -> None:
+        cls._assert_financial_table_name(
+            table_name,
+            {
+                "financial_indicator_snapshots",
+                "financial_indicator_snapshots_hot",
+                "financial_indicator_snapshots_history",
+            },
+        )
+        conn.execute(
+            f"""
+            INSERT INTO {table_name} (
+                instrument_id,
+                symbol,
+                exchange,
+                report_period,
+                publish_date,
+                fiscal_year,
+                fiscal_quarter,
+                currency,
+                schema_version,
+                gross_margin,
+                operating_margin,
+                net_margin,
+                roe,
+                roa,
+                current_ratio,
+                quick_ratio,
+                asset_liability_ratio,
+                revenue_per_share,
+                operating_cf_to_revenue,
+                operating_cf_to_net_income,
+                book_value_per_share,
+                source,
+                source_mode,
+                data_as_of,
+                indicators_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(instrument_id, report_period)
+            DO UPDATE SET
+                symbol = excluded.symbol,
+                exchange = excluded.exchange,
+                publish_date = excluded.publish_date,
+                fiscal_year = excluded.fiscal_year,
+                fiscal_quarter = excluded.fiscal_quarter,
+                currency = excluded.currency,
+                schema_version = excluded.schema_version,
+                gross_margin = excluded.gross_margin,
+                operating_margin = excluded.operating_margin,
+                net_margin = excluded.net_margin,
+                roe = excluded.roe,
+                roa = excluded.roa,
+                current_ratio = excluded.current_ratio,
+                quick_ratio = excluded.quick_ratio,
+                asset_liability_ratio = excluded.asset_liability_ratio,
+                revenue_per_share = excluded.revenue_per_share,
+                operating_cf_to_revenue = excluded.operating_cf_to_revenue,
+                operating_cf_to_net_income = excluded.operating_cf_to_net_income,
+                book_value_per_share = excluded.book_value_per_share,
+                source = excluded.source,
+                source_mode = excluded.source_mode,
+                data_as_of = excluded.data_as_of,
+                indicators_json = excluded.indicators_json,
+                ingestion_run_id = excluded.ingestion_run_id,
+                updated_at = excluded.updated_at
+            """,
+            (
+                snapshot.instrument_id,
+                snapshot.symbol,
+                snapshot.exchange,
+                snapshot.report_period,
+                snapshot.publish_date,
+                snapshot.fiscal_year,
+                snapshot.fiscal_quarter,
+                snapshot.currency,
+                snapshot.schema_version,
+                snapshot.gross_margin,
+                snapshot.operating_margin,
+                snapshot.net_margin,
+                snapshot.roe,
+                snapshot.roa,
+                snapshot.current_ratio,
+                snapshot.quick_ratio,
+                snapshot.asset_liability_ratio,
+                snapshot.revenue_per_share,
+                snapshot.operating_cf_to_revenue,
+                snapshot.operating_cf_to_net_income,
+                snapshot.book_value_per_share,
+                snapshot.source,
+                snapshot.source_mode,
+                now,
+                indicators_json,
+                ingestion_run_id,
+                now,
+                now,
+            ),
+        )
+
+    @staticmethod
+    def _financial_core_fact_fields() -> set[str]:
+        return {
+            "revenue",
+            "gross_profit",
+            "operating_profit",
+            "pre_tax_profit",
+            "net_income",
+            "operating_cf",
+            "total_cf",
+            "total_assets",
+            "total_liabilities",
+            "equity",
+            "current_assets",
+            "current_liabilities",
+            "inventory",
+            "receivables",
+            "fixed_assets",
+            "intangible_assets",
+            "shares_outstanding",
+        }
+
+    @staticmethod
+    def _append_limited(items: List[Any], item: Any, limit: int) -> None:
+        if len(items) < limit:
+            items.append(item)
+
+    def _fetch_financial_core_rows_for_gap_detection(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+        include_history: bool,
+    ) -> List[sqlite3.Row]:
+        tables = ["financial_core_facts_hot"]
+        if include_history:
+            tables.append("financial_core_facts_history")
+        select_sql = " UNION ALL ".join(f"SELECT * FROM {table}" for table in tables)
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids:
+            placeholders = ",".join("?" for _ in instrument_ids)
+            filters.append(f"instrument_id IN ({placeholders})")
+            params.extend(instrument_ids)
+        if expected_periods:
+            placeholders = ",".join("?" for _ in expected_periods)
+            filters.append(f"report_period IN ({placeholders})")
+            params.extend(expected_periods)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            return conn.execute(
+                f"""
+                SELECT *
+                FROM ({select_sql})
+                {where_clause}
+                ORDER BY report_period DESC, updated_at DESC
+                """,
+                params,
+            ).fetchall()
+
+    def _fetch_financial_manifest_rows_for_gap_detection(
+        self,
+        *,
+        expected_periods: List[str],
+        instrument_ids: List[str],
+    ) -> List[sqlite3.Row]:
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids:
+            placeholders = ",".join("?" for _ in instrument_ids)
+            filters.append(f"instrument_id IN ({placeholders})")
+            params.extend(instrument_ids)
+        if expected_periods:
+            placeholders = ",".join("?" for _ in expected_periods)
+            filters.append(f"report_period IN ({placeholders})")
+            params.extend(expected_periods)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            return conn.execute(
+                f"""
+                SELECT instrument_id, report_period, source, source_mode,
+                       parser_version, status
+                FROM financial_source_files
+                {where_clause}
+                ORDER BY report_period DESC, updated_at DESC
+                """,
+                params,
+            ).fetchall()
+
+    @classmethod
+    def _count_financial_tier_table(
+        cls,
+        conn: sqlite3.Connection,
+        table_name: str,
+        *,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> Dict[str, int]:
+        cls._assert_financial_table_name(
+            table_name,
+            {
+                "financial_core_facts_hot",
+                "financial_core_facts_history",
+                "financial_numeric_facts_hot",
+                "financial_numeric_facts_history",
+                "financial_indicator_snapshots_hot",
+                "financial_indicator_snapshots_history",
+            },
+        )
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids:
+            placeholders = ",".join("?" for _ in instrument_ids)
+            filters.append(f"instrument_id IN ({placeholders})")
+            params.extend(instrument_ids)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+        row = conn.execute(
+            f"""
+            SELECT COUNT(*) AS row_count,
+                   COUNT(DISTINCT instrument_id) AS instrument_count,
+                   COUNT(DISTINCT report_period) AS report_period_count
+            FROM {table_name}
+            {where_clause}
+            """,
+            params,
+        ).fetchone()
+        return {
+            "row_count": int(row["row_count"]),
+            "instrument_count": int(row["instrument_count"]),
+            "report_period_count": int(row["report_period_count"]),
+        }
+
+    @staticmethod
+    def _assert_financial_table_name(table_name: str, allowed: set[str]) -> None:
+        if table_name not in allowed:
+            raise ValueError(f"unsupported financial storage table: {table_name}")
+
+    def _financial_hot_quarter_window(self) -> int:
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        storage_cfg = module_cfg.get("storage", {}) if isinstance(module_cfg, dict) else {}
+        return int(storage_cfg.get("hot_quarter_window", 12))
+
+    @staticmethod
+    def _financial_tier_instruments(
+        conn: sqlite3.Connection,
+        *,
+        instrument_id: Optional[str],
+    ) -> List[str]:
+        if instrument_id:
+            return [instrument_id]
+        rows = conn.execute(
+            """
+            SELECT instrument_id FROM financial_core_facts_hot
+            UNION
+            SELECT instrument_id FROM financial_core_facts_history
+            UNION
+            SELECT instrument_id FROM financial_facts
+            ORDER BY instrument_id
+            """
+        ).fetchall()
+        return [row["instrument_id"] for row in rows]
+
+    @classmethod
+    def _move_tier_rows(
+        cls,
+        conn: sqlite3.Connection,
+        source_table: str,
+        target_table: str,
+        where_clause: str,
+        params: tuple[Any, ...],
+    ) -> int:
+        allowed = {
+            "financial_core_facts_hot",
+            "financial_core_facts_history",
+            "financial_numeric_facts_hot",
+            "financial_numeric_facts_history",
+            "financial_indicator_snapshots_hot",
+            "financial_indicator_snapshots_history",
+        }
+        cls._assert_financial_table_name(source_table, allowed)
+        cls._assert_financial_table_name(target_table, allowed)
+        rows_to_move = conn.execute(
+            f"SELECT COUNT(*) AS count FROM {source_table} WHERE {where_clause}",
+            params,
+        ).fetchone()["count"]
+        if rows_to_move == 0:
+            return 0
+        conn.execute(
+            f"""
+            INSERT OR REPLACE INTO {target_table}
+            SELECT *
+            FROM {source_table}
+            WHERE {where_clause}
+            """,
+            params,
+        )
+        conn.execute(f"DELETE FROM {source_table} WHERE {where_clause}", params)
+        return int(rows_to_move)
+
+    @staticmethod
+    def _count_stale_hot_rows(
+        conn: sqlite3.Connection,
+        instrument_id: str,
+        keep_periods: set[str],
+    ) -> int:
+        if not keep_periods:
+            return int(
+                conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM financial_core_facts_hot
+                    WHERE instrument_id = ?
+                    """,
+                    (instrument_id,),
+                ).fetchone()["count"]
+            )
+        placeholders = ",".join("?" for _ in keep_periods)
+        params: List[Any] = [instrument_id]
+        params.extend(sorted(keep_periods))
+        return int(
+            conn.execute(
+                f"""
+                SELECT COUNT(*) AS count
+                FROM financial_core_facts_hot
+                WHERE instrument_id = ? AND report_period NOT IN ({placeholders})
+                """,
+                params,
+            ).fetchone()["count"]
+        )
+
+    @staticmethod
+    def _count_duplicate_tier_conflicts(conn: sqlite3.Connection) -> Dict[str, int]:
+        core = conn.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM financial_core_facts_hot h
+            INNER JOIN financial_core_facts_history c
+                ON h.instrument_id = c.instrument_id
+               AND h.report_period = c.report_period
+            """
+        ).fetchone()["count"]
+        numeric = conn.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM financial_numeric_facts_hot h
+            INNER JOIN financial_numeric_facts_history c
+                ON h.source_file_id = c.source_file_id
+               AND h.fact_name = c.fact_name
+               AND h.context_id = c.context_id
+               AND h.unit = c.unit
+               AND h.dimensions_hash = c.dimensions_hash
+            """
+        ).fetchone()["count"]
+        indicators = conn.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM financial_indicator_snapshots_hot h
+            INNER JOIN financial_indicator_snapshots_history c
+                ON h.instrument_id = c.instrument_id
+               AND h.report_period = c.report_period
+            """
+        ).fetchone()["count"]
+        return {
+            "core_facts": int(core),
+            "numeric_facts": int(numeric),
+            "indicators": int(indicators),
+        }
 
     @staticmethod
     def _upsert_industry_taxonomy_row(
@@ -5200,6 +6877,42 @@ class ResearchStorageManager:
             "bargain_amount",
             "bargain_volume",
         )
+        cls._ensure_column(conn, "financial_facts", "report_type", "report_type TEXT")
+        cls._ensure_column(
+            conn,
+            "financial_facts",
+            "statement_family",
+            "statement_family TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "financial_facts",
+            "data_available_date",
+            "data_available_date TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "financial_facts",
+            "source_file_id",
+            "source_file_id TEXT",
+        )
+        cls._ensure_column(conn, "financial_facts", "filing_id", "filing_id TEXT")
+        cls._ensure_column(
+            conn,
+            "financial_facts",
+            "lineage_json",
+            "lineage_json TEXT NOT NULL DEFAULT '{}'",
+        )
+        for column_name in (
+            "pe_static",
+            "pe_ttm",
+            "pe_forward",
+            "pb_mrq",
+            "ps_static",
+            "ps_ttm",
+            "ps_forward",
+        ):
+            cls._ensure_column(conn, "valuation_history", column_name, f"{column_name} REAL")
 
     @staticmethod
     def _create_tables(conn: sqlite3.Connection) -> None:
@@ -5340,11 +7053,154 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_financial_statements_raw_instrument
             ON financial_statements_raw(instrument_id, report_period, updated_at);
 
+            CREATE TABLE IF NOT EXISTS financial_source_files (
+                source_file_id TEXT PRIMARY KEY,
+                instrument_id TEXT,
+                symbol TEXT,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                filing_id TEXT,
+                source_url TEXT,
+                archive_path TEXT,
+                content_hash TEXT,
+                content_length INTEGER,
+                published_at TEXT,
+                downloaded_at TEXT,
+                parser_version TEXT NOT NULL,
+                parser_diagnostics_json TEXT NOT NULL DEFAULT '{}',
+                schema_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                status TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_source_files_period
+            ON financial_source_files(exchange, report_period, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_numeric_facts (
+                source_file_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                fact_name TEXT NOT NULL,
+                taxonomy_namespace TEXT,
+                context_id TEXT NOT NULL DEFAULT '',
+                unit TEXT NOT NULL DEFAULT '',
+                decimals TEXT,
+                precision TEXT,
+                period_start TEXT,
+                period_end TEXT,
+                instant TEXT,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                fact_value REAL,
+                value_text TEXT,
+                dimensions_hash TEXT NOT NULL DEFAULT '',
+                dimensions_json TEXT NOT NULL DEFAULT '{}',
+                parser_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                raw_fact_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (source_file_id, fact_name, context_id, unit, dimensions_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_instrument
+            ON financial_numeric_facts(instrument_id, report_period, fact_name);
+
+            CREATE TABLE IF NOT EXISTS financial_numeric_facts_hot (
+                source_file_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                fact_name TEXT NOT NULL,
+                taxonomy_namespace TEXT,
+                context_id TEXT NOT NULL DEFAULT '',
+                unit TEXT NOT NULL DEFAULT '',
+                decimals TEXT,
+                precision TEXT,
+                period_start TEXT,
+                period_end TEXT,
+                instant TEXT,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                fact_value REAL,
+                value_text TEXT,
+                dimensions_hash TEXT NOT NULL DEFAULT '',
+                dimensions_json TEXT NOT NULL DEFAULT '{}',
+                parser_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                raw_fact_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (source_file_id, fact_name, context_id, unit, dimensions_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_hot_instrument
+            ON financial_numeric_facts_hot(instrument_id, report_period, fact_name);
+
+            CREATE TABLE IF NOT EXISTS financial_numeric_facts_history (
+                source_file_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                fact_name TEXT NOT NULL,
+                taxonomy_namespace TEXT,
+                context_id TEXT NOT NULL DEFAULT '',
+                unit TEXT NOT NULL DEFAULT '',
+                decimals TEXT,
+                precision TEXT,
+                period_start TEXT,
+                period_end TEXT,
+                instant TEXT,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                fact_value REAL,
+                value_text TEXT,
+                dimensions_hash TEXT NOT NULL DEFAULT '',
+                dimensions_json TEXT NOT NULL DEFAULT '{}',
+                parser_version TEXT NOT NULL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                raw_fact_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (source_file_id, fact_name, context_id, unit, dimensions_hash),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_history_instrument
+            ON financial_numeric_facts_history(instrument_id, report_period, fact_name);
+
             CREATE TABLE IF NOT EXISTS financial_facts (
                 instrument_id TEXT NOT NULL,
                 symbol TEXT NOT NULL,
                 exchange TEXT NOT NULL,
                 report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                data_available_date TEXT,
+                source_file_id TEXT,
+                filing_id TEXT,
                 publish_date TEXT,
                 fiscal_year INTEGER,
                 fiscal_quarter INTEGER,
@@ -5371,6 +7227,7 @@ class ResearchStorageManager:
                 source_mode TEXT NOT NULL,
                 data_as_of TEXT NOT NULL,
                 facts_json TEXT NOT NULL,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
@@ -5380,6 +7237,100 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_financial_facts_instrument
             ON financial_facts(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_core_facts_hot (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                data_available_date TEXT,
+                source_file_id TEXT,
+                filing_id TEXT,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                revenue REAL,
+                gross_profit REAL,
+                operating_profit REAL,
+                pre_tax_profit REAL,
+                net_income REAL,
+                operating_cf REAL,
+                total_cf REAL,
+                total_assets REAL,
+                total_liabilities REAL,
+                equity REAL,
+                current_assets REAL,
+                current_liabilities REAL,
+                inventory REAL,
+                receivables REAL,
+                fixed_assets REAL,
+                intangible_assets REAL,
+                shares_outstanding REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                facts_json TEXT NOT NULL,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_core_facts_hot_instrument
+            ON financial_core_facts_hot(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_core_facts_history (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                report_type TEXT,
+                statement_family TEXT,
+                data_available_date TEXT,
+                source_file_id TEXT,
+                filing_id TEXT,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                revenue REAL,
+                gross_profit REAL,
+                operating_profit REAL,
+                pre_tax_profit REAL,
+                net_income REAL,
+                operating_cf REAL,
+                total_cf REAL,
+                total_assets REAL,
+                total_liabilities REAL,
+                equity REAL,
+                current_assets REAL,
+                current_liabilities REAL,
+                inventory REAL,
+                receivables REAL,
+                fixed_assets REAL,
+                intangible_assets REAL,
+                shares_outstanding REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                facts_json TEXT NOT NULL,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_core_facts_history_instrument
+            ON financial_core_facts_history(instrument_id, report_period, updated_at);
 
             CREATE TABLE IF NOT EXISTS financial_indicator_snapshots (
                 instrument_id TEXT NOT NULL,
@@ -5417,6 +7368,78 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_financial_indicator_snapshots_instrument
             ON financial_indicator_snapshots(instrument_id, report_period, updated_at);
 
+            CREATE TABLE IF NOT EXISTS financial_indicator_snapshots_hot (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                gross_margin REAL,
+                operating_margin REAL,
+                net_margin REAL,
+                roe REAL,
+                roa REAL,
+                current_ratio REAL,
+                quick_ratio REAL,
+                asset_liability_ratio REAL,
+                revenue_per_share REAL,
+                operating_cf_to_revenue REAL,
+                operating_cf_to_net_income REAL,
+                book_value_per_share REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                indicators_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_indicator_snapshots_hot_instrument
+            ON financial_indicator_snapshots_hot(instrument_id, report_period, updated_at);
+
+            CREATE TABLE IF NOT EXISTS financial_indicator_snapshots_history (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                publish_date TEXT,
+                fiscal_year INTEGER,
+                fiscal_quarter INTEGER,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                schema_version TEXT NOT NULL,
+                gross_margin REAL,
+                operating_margin REAL,
+                net_margin REAL,
+                roe REAL,
+                roa REAL,
+                current_ratio REAL,
+                quick_ratio REAL,
+                asset_liability_ratio REAL,
+                revenue_per_share REAL,
+                operating_cf_to_revenue REAL,
+                operating_cf_to_net_income REAL,
+                book_value_per_share REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                data_as_of TEXT NOT NULL,
+                indicators_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_indicator_snapshots_history_instrument
+            ON financial_indicator_snapshots_history(instrument_id, report_period, updated_at);
+
             CREATE TABLE IF NOT EXISTS valuation_history (
                 instrument_id TEXT NOT NULL,
                 symbol TEXT NOT NULL,
@@ -5428,6 +7451,13 @@ class ResearchStorageManager:
                 pe_ratio REAL,
                 pb_ratio REAL,
                 ps_ratio REAL,
+                pe_static REAL,
+                pe_ttm REAL,
+                pe_forward REAL,
+                pb_mrq REAL,
+                ps_static REAL,
+                ps_ttm REAL,
+                ps_forward REAL,
                 calc_method TEXT NOT NULL,
                 calc_version TEXT NOT NULL,
                 parameter_hash TEXT NOT NULL DEFAULT '',
