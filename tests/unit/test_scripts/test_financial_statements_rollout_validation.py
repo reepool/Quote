@@ -1,7 +1,10 @@
 import asyncio
 
 from scripts.research_financial_statements_rollout_validation import (
+    enable_official_source_config,
     exit_code_for_result,
+    normalize_report_periods,
+    parse_official_sources,
     parse_report_periods,
     run_rollout_validation,
 )
@@ -73,6 +76,18 @@ def test_parse_report_periods():
     assert parse_report_periods(None) is None
 
 
+def test_parse_official_sources():
+    assert parse_official_sources(["sse, cninfo", "SSE"]) == ["sse", "cninfo"]
+    assert parse_official_sources(None) == []
+
+
+def test_normalize_report_periods():
+    assert normalize_report_periods(["2024Q1", "2024-06-30"]) == [
+        "2024-03-31",
+        "2024-06-30",
+    ]
+
+
 def test_financial_statements_rollout_validation_skip_sync():
     manager = _FakeManager()
 
@@ -89,6 +104,94 @@ def test_financial_statements_rollout_validation_skip_sync():
     assert result["sync"]["status"] == "skipped"
     assert result["summary"]["target_instrument_count"] == 1
     assert manager.sync_called is False
+
+
+def test_enable_official_source_config_enables_source_candidates():
+    research_config = ResearchConfig(
+        modules={
+            "financial_statements": {
+                "official_structured_sources": {
+                    "enabled": False,
+                    "candidates": [
+                        {"source": "sse", "enabled": False},
+                        {"source": "cninfo", "enabled": False},
+                    ],
+                }
+            }
+        },
+        sources={
+            "sse": {
+                "enabled": False,
+                "financial_statements": {
+                    "enabled": False,
+                    "endpoint_candidates": [
+                        {"key": "income", "kind": "structured_json", "enabled": False},
+                        {"key": "balance", "kind": "structured_json"},
+                    ],
+                },
+            },
+            "cninfo": {"enabled": False, "financial_statements": {}},
+        },
+    )
+
+    overrides = enable_official_source_config(research_config, "sse")
+
+    assert research_config.sources["sse"]["enabled"] is True
+    assert research_config.sources["sse"]["financial_statements"]["enabled"] is True
+    assert (
+        research_config.modules["financial_statements"]["official_structured_sources"][
+            "enabled"
+        ]
+        is True
+    )
+    official_candidates = research_config.modules["financial_statements"][
+        "official_structured_sources"
+    ]["candidates"]
+    assert official_candidates[0]["enabled"] is True
+    assert official_candidates[1]["enabled"] is False
+    assert all(
+        candidate["enabled"] is True
+        for candidate in research_config.sources["sse"]["financial_statements"][
+            "endpoint_candidates"
+        ]
+    )
+    assert overrides["source_enabled_before"] is False
+    assert len(overrides["endpoint_candidate_states"]) == 2
+
+
+def test_financial_statements_rollout_validation_records_official_overrides():
+    manager = _FakeManager()
+    manager.research_config.modules["financial_statements"][
+        "official_structured_sources"
+    ] = {
+        "enabled": False,
+        "candidates": [{"source": "sse", "enabled": False}],
+    }
+    manager.research_config.sources["sse"] = {
+        "enabled": False,
+        "financial_statements": {
+            "enabled": False,
+            "endpoint_candidates": [{"key": "income", "enabled": False}],
+        },
+    }
+
+    result = asyncio.run(
+        run_rollout_validation(
+            manager,
+            exchanges=["SSE"],
+            report_periods=["2024-03-31"],
+            skip_sync=True,
+            enable_official_sources=["sse"],
+        )
+    )
+
+    overrides = result["runtime_overrides"]["official_source_overrides"]["sse"]
+    assert result["requested"]["enable_official_sources"] == ["sse"]
+    assert overrides["source_enabled_before"] is False
+    assert overrides["source_enabled_after"] is True
+    assert manager.research_config.sources["sse"]["financial_statements"][
+        "endpoint_candidates"
+    ][0]["enabled"] is True
 
 
 def test_financial_statements_rollout_validation_exit_code():

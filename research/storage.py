@@ -4210,10 +4210,10 @@ class ResearchStorageManager:
         for row in manifest_rows:
             instrument_id = row["instrument_id"]
             report_period = row["report_period"]
-            if instrument_id and report_period:
+            status = str(row["status"] or "unknown")
+            if instrument_id and report_period and status == "parsed":
                 source_file_keys.add((instrument_id, report_period))
             parser_version = str(row["parser_version"] or "unknown")
-            status = str(row["status"] or "unknown")
             parser_version_distribution[parser_version] = (
                 parser_version_distribution.get(parser_version, 0) + 1
             )

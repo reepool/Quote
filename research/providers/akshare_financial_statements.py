@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import asyncio
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from utils import dm_logger
 from .akshare_support import load_akshare
 from .base import (
     BaseFinancialStatementsProvider,
@@ -25,6 +26,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
 
     source_name = "akshare"
     supported_modes = {"direct", "proxy_patch"}
+    _supported_statement_interfaces = {"sina_report", "eastmoney_report"}
 
     _report_period_aliases = (
         "REPORT_DATE",
@@ -32,6 +34,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         "REPORT_PERIOD",
         "报告日期",
         "报告期",
+        "报告日",
     )
     _publish_date_aliases = (
         "NOTICE_DATE",
@@ -71,6 +74,8 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         "PARENT_NETPROFIT",
         "NETPROFIT",
         "归属于母公司股东的净利润",
+        "归属于母公司的净利润",
+        "归属于母公司所有者的净利润",
         "净利润",
     )
     _operating_cf_aliases = (
@@ -95,6 +100,9 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
     _equity_aliases = (
         "TOTAL_EQUITY",
         "归属于母公司股东权益合计",
+        "归属于母公司股东的权益",
+        "归属于母公司所有者权益合计",
+        "归属于母公司所有者权益",
         "股东权益合计",
         "所有者权益合计",
         "净资产",
@@ -129,7 +137,14 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         "TOTAL_SHARE",
         "SHARE_CAPITAL",
         "总股本",
+        "股本",
     )
+
+    def __init__(self, provider_config: Optional[Dict[str, Any]] = None):
+        self.provider_config = provider_config or {}
+        self.statement_interface_order = self._resolve_statement_interface_order(
+            self.provider_config.get("statement_interface_order")
+        )
 
     async def fetch_financial_statement_bundles(
         self,
@@ -172,25 +187,76 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         target_periods = set(report_periods or [])
 
         for instrument in target_instruments:
-            symbol = self._to_akshare_symbol(instrument.get("instrument_id", ""))
-            if symbol is None:
-                continue
+            for statement_interface in self.statement_interface_order:
+                try:
+                    balance_df, profit_df, cashflow_df = self._fetch_statement_frames(
+                        akshare_module,
+                        instrument=instrument,
+                        statement_interface=statement_interface,
+                    )
+                except Exception as exc:
+                    dm_logger.warning(
+                        "[AkshareFinancialStatementsProvider] %s failed for %s: %s",
+                        statement_interface,
+                        instrument.get("instrument_id"),
+                        exc,
+                    )
+                    continue
 
-            balance_df = akshare_module.stock_balance_sheet_by_report_em(symbol=symbol)
-            profit_df = akshare_module.stock_profit_sheet_by_report_em(symbol=symbol)
-            cashflow_df = akshare_module.stock_cash_flow_sheet_by_report_em(symbol=symbol)
-
-            instrument_bundles = self._build_bundles(
-                instrument=instrument,
-                mode=mode,
-                balance_df=balance_df,
-                profit_df=profit_df,
-                cashflow_df=cashflow_df,
-                report_periods=target_periods or None,
-            )
-            bundles.extend(instrument_bundles)
+                instrument_bundles = self._build_bundles(
+                    instrument=instrument,
+                    mode=mode,
+                    balance_df=balance_df,
+                    profit_df=profit_df,
+                    cashflow_df=cashflow_df,
+                    report_periods=target_periods or None,
+                    statement_interface=statement_interface,
+                )
+                if instrument_bundles:
+                    bundles.extend(instrument_bundles)
+                    break
 
         return bundles
+
+    def _fetch_statement_frames(
+        self,
+        akshare_module: Any,
+        *,
+        instrument: Dict[str, Any],
+        statement_interface: str,
+    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        if statement_interface == "sina_report":
+            symbol = self._to_sina_stock_symbol(str(instrument.get("instrument_id", "")))
+            if symbol is None:
+                return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+            return (
+                akshare_module.stock_financial_report_sina(
+                    stock=symbol,
+                    symbol="资产负债表",
+                ),
+                akshare_module.stock_financial_report_sina(
+                    stock=symbol,
+                    symbol="利润表",
+                ),
+                akshare_module.stock_financial_report_sina(
+                    stock=symbol,
+                    symbol="现金流量表",
+                ),
+            )
+
+        if statement_interface == "eastmoney_report":
+            symbol = self._to_eastmoney_stock_symbol(
+                str(instrument.get("instrument_id", ""))
+            )
+            if symbol is None:
+                return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+            return (
+                akshare_module.stock_balance_sheet_by_report_em(symbol=symbol),
+                akshare_module.stock_profit_sheet_by_report_em(symbol=symbol),
+                akshare_module.stock_cash_flow_sheet_by_report_em(symbol=symbol),
+            )
+
+        raise ValueError(f"unsupported AkShare statement interface: {statement_interface}")
 
     def _build_bundles(
         self,
@@ -201,6 +267,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         profit_df: Optional[pd.DataFrame],
         cashflow_df: Optional[pd.DataFrame],
         report_periods: Optional[set[str]] = None,
+        statement_interface: Optional[str] = None,
     ) -> List[FinancialStatementBundle]:
         rows_by_type = {
             "balance_sheet": self._index_statement_rows(balance_df),
@@ -229,6 +296,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
                 mode=mode,
                 rows_by_type=rows_by_type,
                 report_period=report_period,
+                statement_interface=statement_interface,
             )
             if bundle is not None:
                 bundles.append(bundle)
@@ -241,6 +309,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         mode: str,
         rows_by_type: Dict[str, Dict[str, Dict[str, Any]]],
         report_period: str,
+        statement_interface: Optional[str] = None,
     ) -> Optional[FinancialStatementBundle]:
         aligned_rows = {
             statement_type: rows.get(report_period)
@@ -257,6 +326,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             aligned_rows["cash_flow_sheet"],
             self._publish_date_aliases,
         )
+        publish_date = self._normalize_date_text(publish_date)
 
         fiscal_year, fiscal_quarter = self._derive_fiscal_period(report_period)
         symbol = instrument.get("symbol", "")
@@ -322,6 +392,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             facts=facts,
             indicators=indicators,
             raw_payload={
+                "akshare_statement_interface": statement_interface,
                 "balance_sheet": aligned_rows["balance_sheet"] or {},
                 "profit_sheet": aligned_rows["profit_sheet"] or {},
                 "cash_flow_sheet": aligned_rows["cash_flow_sheet"] or {},
@@ -494,6 +565,9 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             report_period = self._pick_first_text(row, self._report_period_aliases)
             if report_period is None:
                 continue
+            report_period = self._normalize_date_text(report_period)
+            if report_period is None:
+                continue
             rows[report_period] = row
         return rows
 
@@ -571,7 +645,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         return value.year, quarter
 
     @staticmethod
-    def _to_akshare_symbol(instrument_id: str) -> Optional[str]:
+    def _to_eastmoney_stock_symbol(instrument_id: str) -> Optional[str]:
         parts = instrument_id.rsplit(".", 1)
         if len(parts) != 2:
             return None
@@ -585,6 +659,50 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         if suffix in {"BJ", "BSE"}:
             return f"BJ{code}"
         return None
+
+    @staticmethod
+    def _to_sina_stock_symbol(instrument_id: str) -> Optional[str]:
+        parts = instrument_id.rsplit(".", 1)
+        if len(parts) != 2:
+            return None
+
+        code, suffix = parts
+        suffix = suffix.upper()
+        if suffix == "SH":
+            return f"sh{code}"
+        if suffix == "SZ":
+            return f"sz{code}"
+        if suffix in {"BJ", "BSE"}:
+            return f"bj{code}"
+        return None
+
+    @classmethod
+    def _resolve_statement_interface_order(cls, raw_value: Any) -> List[str]:
+        if raw_value is None:
+            return ["sina_report", "eastmoney_report"]
+        if isinstance(raw_value, str):
+            values = [item.strip() for item in raw_value.split(",")]
+        else:
+            values = [str(item).strip() for item in raw_value]
+        resolved = [
+            item
+            for item in values
+            if item and item in cls._supported_statement_interfaces
+        ]
+        return resolved or ["sina_report", "eastmoney_report"]
+
+    @staticmethod
+    def _normalize_date_text(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text or text in {"--", "nan", "NaT"}:
+            return None
+        if len(text) == 8 and text.isdigit():
+            return f"{text[:4]}-{text[4:6]}-{text[6:8]}"
+        if len(text) >= 10 and text[4] == "-" and text[7] == "-":
+            return text[:10]
+        return text
 
     @staticmethod
     def _akshare(mode: str = "direct"):

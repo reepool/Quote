@@ -3,6 +3,12 @@ data source factory for the quote system.
 Manages different data sources and provides unified interface with support for comprehensive features.
 """
 
+# Ensure the AkShare proxy patch is installed before importing concrete data
+# sources. Some of them import requests/yfinance at module import time.
+from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshare_proxy_patch
+
+_install_akshare_proxy_patch(required=False)
+
 import asyncio
 from typing import Dict, List, Optional, Any
 from datetime import datetime, date

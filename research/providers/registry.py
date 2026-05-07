@@ -94,8 +94,12 @@ class FinancialStatementsProviderRegistry:
         research_config: Optional[ResearchConfig] = None,
     ):
         research_config = research_config or config_manager.get_research_config()
+        akshare_cfg = research_config.sources.get("akshare", {}).get(
+            "financial_statements",
+            {},
+        )
         self._providers = providers if providers is not None else {
-            "akshare": AkshareFinancialStatementsProvider(),
+            "akshare": AkshareFinancialStatementsProvider(provider_config=akshare_cfg),
         }
 
     def get(self, source_name: str) -> Optional[BaseFinancialStatementsProvider]:

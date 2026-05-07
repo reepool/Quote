@@ -3,6 +3,12 @@ Main entry point for the Quote System.
 Provides command-line interface and system initialization.
 """
 
+# akshare_proxy_patch 0.4.x must be installed before modules that import
+# requests/akshare/yfinance. Keep this before project imports.
+from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshare_proxy_patch
+
+_install_akshare_proxy_patch(required=False)
+
 import asyncio
 import argparse
 import sys

@@ -144,7 +144,7 @@ reload_config - 热重载配置
 
 ## 📋 内置任务列表
 
-系统预置了8个定时任务，每个任务都有详细的配置和执行计划：
+系统预置了多个定时任务，每个任务都有详细的配置和执行计划：
 
 ### 1. 每日数据更新 (daily_data_update)
 - **执行时间**: 每周一至周五 20:00
@@ -161,24 +161,29 @@ reload_config - 热重载配置
 - **功能**: 维护前数据库备份、日志清理、幽灵/僵尸标的清理、周度复权因子同步、完整性验证、数据库优化
 - **港股因子**: `routing.factor.HKEX.maintenance_sync_enabled=true` 时由本任务周度同步，日更仍由 `routing.factor.HKEX.daily_sync_enabled=false` 控制为跳过
 
-### 4. 月度数据完整性检查 (monthly_data_integrity_check)
+### 4. 行情依赖版本检查 (market_dependency_version_check)
+- **执行时间**: 每日 12:00
+- **功能**: 检查 `pytdx`、`baostock`、`akshare`、`akshare_proxy_patch`、`yfinance`、`curl_cffi` 是否有 PyPI 新版本
+- **特点**: 只发送 Telegram 升级提醒，不自动安装或升级依赖
+
+### 5. 月度数据完整性检查 (monthly_data_integrity_check)
 - **执行时间**: 每月1日 03:00
 - **功能**: 检查上月数据缺口并自动修复
 
-### 5. 季度数据清理 (quarterly_cleanup)
+### 6. 季度数据清理 (quarterly_cleanup)
 - **执行时间**: 每季度最后一天 04:00
 - **功能**: 清理过期数据和文件
 
-### 6. 数据库备份 (database_backup)
+### 7. 数据库备份 (database_backup)
 - **执行时间**: 每周六 06:00
 - **功能**: 自动备份数据库文件
 - **特点**: 支持Telegram通知、自动清理过期备份
 
-### 7. 缓存预热 (cache_warm_up)
+### 8. 缓存预热 (cache_warm_up)
 - **执行时间**: 每日 08:00
 - **功能**: 预加载热门数据到缓存
 
-### 8. 交易日历更新 (trading_calendar_update)
+### 9. 交易日历更新 (trading_calendar_update)
 - **执行时间**: 每月1日 01:00
 - **功能**: 更新各交易所交易日历
 

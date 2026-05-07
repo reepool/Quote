@@ -3,6 +3,11 @@ AkShare data source implementation with rate limiting.
 Specialized for Chinese A-shares market data.
 """
 
+# Must run before importing akshare or adjacent HTTP-heavy modules.
+from proxy_patch_bootstrap import install_akshare_proxy_patch
+
+install_akshare_proxy_patch(required=False)
+
 import asyncio
 import aiohttp
 import math
@@ -10,11 +15,6 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta, date
 from collections import Counter, OrderedDict
 import pandas as pd
-
-# AkShare 代理补丁 - 必须在 import akshare 之前调用
-from utils.proxy_patch_runtime import install_akshare_proxy_patch
-
-install_akshare_proxy_patch(required=False)
 
 import akshare as ak
 

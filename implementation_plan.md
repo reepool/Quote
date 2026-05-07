@@ -1,6 +1,6 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-05-01
+> 更新日期：2026-05-06
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
@@ -16,7 +16,9 @@
 > 配套 backlog manual-override 建议变更包：`openspec/changes/add-manual-override-suggestions-for-official-backlog/`
 > 配套申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
 > 配套申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
-> 配套财务/XBRL 与相对估值加固变更包：`openspec/changes/harden-financial-xbrl-and-relative-valuation/`
+> 已归档财务/XBRL 与相对估值加固变更包：`openspec/changes/archive/2026-05-06-harden-financial-xbrl-and-relative-valuation/`
+> 已归档官方财务 endpoint/parser 变更包：`openspec/changes/archive/2026-05-06-discover-official-financial-xbrl-endpoints/`
+> 当前官方财务 SSE structured JSON 实现变更包：`openspec/changes/implement-sse-official-financial-json-source/`
 
 ---
 
@@ -41,8 +43,8 @@
   - 官方结构化披露文件 manifest、原始文件 hash、解析诊断和数据可得日
 - **财务域必须区分当前已实现基线与下一阶段目标**：
   - 当前代码已具备 `financial_summaries`、`financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`、`valuation_history` 的 schema / sync / read API 基线
-  - 当前财务主线已补齐 source manifest、全数值事实长表、hot/cold tier、多期回填/增量 catch-up checkpoint、覆盖缺口检测和仓库级 readiness 验证；官方结构化源仍因 URL 未验证而默认 disabled
-  - 当前估值历史已补齐 PE/PB/PS 静态、TTM、forward/MRQ 口径拆分，相对估值已支持显式 metric variants、干净同行统计和排除诊断，scheduler/API readiness gate 已接入；剩余生产化关键在官方结构化源 live probe、小样本 backfill 与全量 readiness 复核
+  - 当前财务主线已补齐 source manifest、全数值事实长表、hot/cold tier、多期回填/增量 catch-up checkpoint、覆盖缺口检测和仓库级 readiness 验证；`2026-05-06` 已进一步补齐官方响应分类、manifest-to-artifact 候选抽取、XBRL/XML/ZIP parser dispatch、SSE structured JSON parser、parse-failed fallback、parsed-only readiness 语义和 disabled-by-default artifact endpoint 候选配置
+  - 当前估值历史已补齐 PE/PB/PS 静态、TTM、forward/MRQ 口径拆分，相对估值已支持显式 metric variants、干净同行统计和排除诊断，scheduler/API readiness gate 已接入；剩余生产化关键在 SSE official isolated live sync、小样本 backfill、CNInfo/BSE 结构化 artifact 证据与全量 readiness 复核
 - **财务域不允许把上游 URL、报告期起点、限流、重试、并发、parser version、事实字段 alias、估值假设写死在业务逻辑里**；这些变量必须进入 `config/10_research.json`、scheduler 参数或后续独立 financial config，并在 `ingestion_runs` / source manifest 中留下运行时参数快照。
 - **研究域数据源优先级应固定为“稳定免费 -> 稳定付费 -> 免费不稳定补充”**：
   - `BaoStock` 适合作为 A 股基础主数据、交易日历、复权因子、部分财务指标等稳定免费主源
@@ -500,10 +502,10 @@ L4  Research API（新增）
   - 免费补充 fallback：`efinance:direct / akshare:direct`
 - `full financial statements`
   - 目标主链：交易所、巨潮或其他官方结构化披露/XBRL/等价结构化文件 provider，按交易所、报告期、公告文件 manifest 发现和下载
-  - 当前可运行基线：`AkShare:proxy_patch -> AkShare:direct`，只承诺最新报告期快照，不承诺完整历史仓和官方来源可审计性
+  - 当前可运行基线：`AkShare:proxy_patch -> AkShare:direct` 作为 fallback；官方链路已支持 manifest/endpoint 探测、结构化附件候选抽取、XBRL/XML/ZIP parser dispatch、SSE structured JSON parser、structured JSON 分类诊断和 source-file lineage；`2026-05-06` live probe 已确认 SSE 官方 XBRL `commonQuery.do` 收入表、资产负债表、现金流量表候选可返回结构化 JSON，当前代码已能把 `S2020_xxxx / S2010_xxxx / S2030_xxxx` 解析为 numeric facts 并通过配置化 alias 派生核心事实；SSE 生产源仍 disabled，待 isolated live sync、小样本 backfill 和 readiness 复核，CNInfo/BSE 仍只有 metadata/manifest 证据
   - `BaoStock / PyTDX`：保留为财务摘要、关键字段交叉校验或缺口诊断源，不作为完整三大报表主源
-  - fallback 规则：官方源缺失、解析失败或字段不足时，允许配置化使用 AkShare fallback 补齐缺失期间或核心事实，但不得覆盖已确认的更高优先级官方事实；必须记录 fallback reason、source_mode 和 source-file lineage
-  - 结论：**下一阶段完整财报目标不是继续扩大 AkShare 最新期快照，而是先做官方结构化源探测、manifest 和 parser，再把 AkShare 作为补充链路接入多期财务仓**
+  - fallback 规则：官方源缺失、manifest-only、PDF-only、blocked、解析失败或字段不足时，允许配置化使用 AkShare fallback 补齐缺失期间或核心事实，但不得覆盖已确认的更高优先级官方事实；必须记录 fallback reason、source_mode 和 source-file lineage
+  - 结论：**下一阶段完整财报目标不是继续扩大 AkShare 最新期快照，而是在生产默认关闭的前提下完成 SSE 官方 structured JSON 下载/parser/isolated sync 验证，同时继续发现 CNInfo/BSE 真实官方结构化 artifact，并用当前 parser/lineage/readiness 框架验证后再启用官方源**
 
 #### 5.3.5 对当前仓库的落地要求
 
@@ -1153,6 +1155,7 @@ Phase 1 就应落实：
 - 不因当前 API 用不到而丢弃数值事实
 - 不用表结构硬编码某一个 XBRL taxonomy 的字段全集
 - 通过 `(instrument_id, report_period, fact_name, context_id, source_file_id)` 等组合唯一约束保证可重复写入
+- SSE `commonQuery.do` structured JSON 使用 `FinancialSseStructuredJsonFactParser` 进入同一张全数值事实长表，`COMMON_MAP_INCOMESTATEMENT_C / COMMON_MAP_BALANCESHEET_C / COMMON_MAP_CASHFLOW_C` 只作为配置化 endpoint/payload 元数据和 `statement_family` 诊断；由于三张表来自三个 endpoint candidate，`fetch_all_endpoint_candidates=true` 也必须是配置项，不改变下游事实表语义
 
 #### 4. 核心规范化事实表
 
@@ -1182,6 +1185,7 @@ Phase 1 就应落实：
 要求：
 
 - 字段 alias 映射、单位换算、币种、报告口径必须版本化
+- SSE `S2020_xxxx / S2010_xxxx / S2030_xxxx` 到 `revenue / net_income / total_assets / total_liabilities / equity / operating_cf` 等核心字段的映射通过 `config/10_research.json` 的 `parser.core_fact_alias_overrides` 配置，不允许写死在估值、API 或同步调用方中
 - 估值只能使用 `data_available_date <= trade_date` 的事实，缺失可得日时必须返回 unavailable 或使用配置化保守规则
 - fallback 数据只补缺，不覆盖高优先级事实
 
@@ -1439,7 +1443,7 @@ GET /api/v1/research/company/{instrument_id}/events
 | `industry_official_mapping_refresh` | 手动/归档 | 旧 official code -> index taxonomy 映射审计缓存；官方分类代码成为主键后不再作为 membership 同步前置 |
 | `industry_index_analysis_sync` | 每日收盘后 | 同步申万行业指数最新日频估值、换手、涨跌幅、市值和股息率等指标，只写 `industry_index_analysis_daily` |
 | `industry_index_analysis_backfill` | 手动/禁用定时 | 按日期区间回补申万行业指数分析历史数据；默认按“月份 + index_type”分块，必要时可用按日分块补缺 |
-| `financial_statement_official_probe` | 手动/开发验证 | 探测 SSE/SZSE/CNInfo/BSE 官方结构化财报源，记录覆盖率、延迟、下载证据和字段稳定性，不写生产表或仅写临时验证库 |
+| `financial_statement_official_probe` | 手动/开发验证 | 探测 SSE/SZSE/CNInfo/BSE 官方结构化财报源，记录覆盖率、延迟、下载证据和字段稳定性；SSE parser 接入后使用 `scripts/dev_validation/validate_sse_official_financial_json_live.py` 在临时 SQLite 库中验证官方下载、解析、numeric facts 和 core facts，不写生产表 |
 | `financial_statement_backfill` | 手动/灰度批处理 | 按配置化 baseline、rolling quarters 和目标市场做多期财报回填，写 source manifest、全数值事实和核心事实，并按 hot/cold tier 维护最近报告期与历史报告期 |
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周更窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |

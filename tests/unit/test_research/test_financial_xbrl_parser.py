@@ -1,9 +1,16 @@
+import asyncio
+import io
+import zipfile
+
 import pytest
 import xml.etree.ElementTree as ET
 
 from research.financial_fact_aliases import get_core_financial_fact_aliases
 from research.financial_fallback import merge_financial_core_facts_with_fallback
-from research.financial_xbrl_parser import FinancialXbrlNumericFactParser
+from research.financial_xbrl_parser import (
+    FinancialStructuredFilingParserDispatcher,
+    FinancialXbrlNumericFactParser,
+)
 from research.providers.base import FinancialFactsSnapshot
 from research.providers.official_financial_filings import (
     ConfiguredOfficialFinancialFilingProvider,
@@ -100,6 +107,95 @@ def test_xbrl_parser_rejects_malformed_filings():
         )
 
 
+def test_structured_dispatcher_routes_xbrl_xml_and_preserves_lineage():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        SAMPLE_XBRL,
+        artifact_kind="xbrl_xml",
+        source_file_id="file-xml",
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        source="sse",
+    )
+
+    assert result.diagnostics["artifact_kind"] == "xbrl_xml"
+    assert result.diagnostics["parse_status"] == "parsed"
+    assert result.numeric_facts[0].source_file_id == "file-xml"
+    assert result.numeric_facts[0].parser_version == "xbrl_numeric_facts.v1"
+
+
+def test_structured_dispatcher_extracts_xbrl_from_zip_archive():
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("README.txt", "not a filing")
+        archive.writestr("reports/instance.xbrl", SAMPLE_XBRL)
+
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        buffer.getvalue(),
+        artifact_kind="xbrl_zip",
+        source_file_id="file-zip",
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        source="sse",
+    )
+
+    assert result.diagnostics["artifact_kind"] == "xbrl_zip"
+    assert result.diagnostics["archive_entry"] == "reports/instance.xbrl"
+    assert result.numeric_facts[0].source_file_id == "file-zip"
+
+
+def test_structured_dispatcher_reports_unsupported_json_without_facts():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        b'{"financialStatements":{"incomeStatement":{"Revenue":123}}}',
+        artifact_kind="structured_json",
+        source_file_id="file-json",
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        source="sse",
+    )
+
+    assert result.numeric_facts == []
+    assert result.diagnostics["artifact_kind"] == "structured_json"
+    assert result.diagnostics["parse_status"] == "unsupported_structured_json_payload"
+
+
+def test_structured_dispatcher_parses_sse_commonquery_json_numeric_facts():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            b'{"sqlId":"COMMON_MAP_INCOMESTATEMENT_C",'
+            b'"result":[{"REPORT_YEAR":"2023","STOCK_ID":"600000.SS",'
+            b'"S2020_0010":"173434000000","S2020_0310":"36702000000",'
+            b'"S2020_0110":"-"}]}'
+        ),
+        artifact_kind="structured_json",
+        source_file_id="file-sse-json",
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2023-12-31",
+        source="sse",
+    )
+
+    assert result.diagnostics["artifact_kind"] == "structured_json"
+    assert result.diagnostics["sql_id"] == "COMMON_MAP_INCOMESTATEMENT_C"
+    assert result.diagnostics["statement_family"] == "income_statement"
+    assert result.diagnostics["numeric_fact_count"] == 2
+    assert [fact.fact_name for fact in result.numeric_facts] == [
+        "S2020_0010",
+        "S2020_0310",
+    ]
+    assert result.numeric_facts[0].fact_value == 173434000000.0
+    assert result.numeric_facts[0].statement_family == "income_statement"
+    assert result.numeric_facts[0].taxonomy_namespace == (
+        "sse:common_map_incomestatement_c"
+    )
+
+
 def test_core_fact_alias_mapping_returns_versioned_copy():
     aliases = get_core_financial_fact_aliases()
     aliases["revenue"].append("MUTATION")
@@ -140,9 +236,17 @@ def test_fallback_merge_fills_missing_core_facts_without_overwriting_primary():
 
 
 class _FakeResponse:
-    headers = {"Content-Type": "application/xml"}
-    content = b"<xbrl/>"
-    text = "<xbrl/>"
+    def __init__(
+        self,
+        content=b"<xbrl/>",
+        content_type="application/xml",
+        url="https://example.test/response",
+    ):
+        self.status_code = 200
+        self.headers = {"Content-Type": content_type}
+        self.content = content
+        self.text = content.decode("utf-8", errors="replace")
+        self.url = url
 
     def raise_for_status(self):
         return None
@@ -157,8 +261,17 @@ class _FakeSession:
         return _FakeResponse()
 
 
-@pytest.mark.asyncio
-async def test_configured_official_provider_fetches_payload_from_url_template():
+class _QueuedFakeSession:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.urls = []
+
+    def get(self, url, **kwargs):
+        self.urls.append(url)
+        return self.responses.pop(0)
+
+
+def test_configured_official_provider_fetches_payload_from_url_template():
     session = _FakeSession()
     provider = ConfiguredOfficialFinancialFilingProvider(
         source_name="sse",
@@ -171,8 +284,8 @@ async def test_configured_official_provider_fetches_payload_from_url_template():
         session=session,
     )
 
-    payloads = await provider.fetch_financial_filings(
-        instruments=[
+    payloads = provider._fetch_sync(
+        [
             {
                 "instrument_id": "600000.SH",
                 "symbol": "600000",
@@ -180,8 +293,9 @@ async def test_configured_official_provider_fetches_payload_from_url_template():
                 "type": "stock",
             }
         ],
-        exchange="SSE",
-        report_periods=["2024Q1"],
+        "SSE",
+        ["2024Q1"],
+        "direct",
     )
 
     assert session.urls == ["https://example.test/600000/2024Q1.xbrl"]
@@ -190,4 +304,179 @@ async def test_configured_official_provider_fetches_payload_from_url_template():
     assert len(payloads) == 1
     assert payloads[0].manifest.source == "sse"
     assert payloads[0].manifest.content_hash
+    assert payloads[0].manifest.metadata_json["artifact_kind"] == "xbrl_xml"
+    assert payloads[0].manifest.metadata_json["parser_candidate"] == "xbrl_numeric_facts.v1"
     assert payloads[0].content == b"<xbrl/>"
+
+
+def test_configured_official_provider_discovers_structured_candidate_from_manifest():
+    manifest = (
+        b'{"announcements":[{"announcementId":"abc",'
+        b'"announcementTitle":"2024 annual report",'
+        b'"xbrlUrl":"/reports/600000_2024.xbrl"}]}'
+    )
+    session = _QueuedFakeSession(
+        [
+            _FakeResponse(manifest, "application/json"),
+            _FakeResponse(SAMPLE_XBRL, "application/xml"),
+        ]
+    )
+    provider = ConfiguredOfficialFinancialFilingProvider(
+        source_name="sse",
+        source_config={
+            "manifest_url": "https://example.test/list/{symbol}",
+            "request_timeout_seconds": 3.0,
+            "request_interval_seconds": 0.0,
+            "parser_version": "financial_structured_filing.v1",
+        },
+        session=session,
+    )
+
+    payloads = provider._fetch_sync(
+        [
+            {
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "type": "stock",
+            }
+        ],
+        "SSE",
+        ["2024Q4"],
+        "direct",
+    )
+
+    assert session.urls == [
+        "https://example.test/list/600000",
+        "https://example.test/reports/600000_2024.xbrl",
+    ]
+    assert len(payloads) == 1
+    assert payloads[0].manifest.filing_id == "abc"
+    assert payloads[0].manifest.source_url == (
+        "https://example.test/reports/600000_2024.xbrl"
+    )
+    assert payloads[0].manifest.metadata_json["artifact_kind"] == "xbrl_xml"
+    assert payloads[0].content == SAMPLE_XBRL
+
+
+def test_configured_official_provider_fetches_enabled_endpoint_candidate():
+    session = _QueuedFakeSession(
+        [
+            _FakeResponse(
+                (
+                    b'{"sqlId":"COMMON_MAP_INCOMESTATEMENT_C",'
+                    b'"result":[{"S2020_0010":"12345","REPORT_YEAR":"2023"}]}'
+                ),
+                "application/json",
+                url="https://query.sse.com.cn/commonQuery.do",
+            ),
+        ]
+    )
+    provider = ConfiguredOfficialFinancialFilingProvider(
+        source_name="sse",
+        source_config={
+            "endpoint_candidates": [
+                {
+                    "key": "sse_xbrl_income_statement_common_query",
+                    "enabled": True,
+                    "url": "https://query.sse.com.cn/commonQuery.do",
+                    "request": {
+                        "method": "GET",
+                        "query_params": {
+                            "sqlId": "COMMON_MAP_INCOMESTATEMENT_C",
+                            "STOCK_ID": "{symbol}",
+                            "REPORT_YEAR": "{report_year}",
+                            "REPORT_PERIOD_ID": "{report_type_id}",
+                        },
+                    },
+                    "promotion_gate": "structured_json_with_core_fact_mapping",
+                }
+            ],
+            "request_timeout_seconds": 3.0,
+            "request_interval_seconds": 0.0,
+        },
+        session=session,
+    )
+
+    payloads = provider._fetch_sync(
+        [
+            {
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "type": "stock",
+            }
+        ],
+        "SSE",
+        ["2023Q4"],
+        "direct",
+    )
+
+    assert session.urls == ["https://query.sse.com.cn/commonQuery.do"]
+    assert len(payloads) == 1
+    assert payloads[0].manifest.metadata_json["endpoint_candidate_key"] == (
+        "sse_xbrl_income_statement_common_query"
+    )
+    assert payloads[0].manifest.metadata_json["artifact_kind"] == "structured_json"
+    assert payloads[0].manifest.metadata_json["structured_payload"] is True
+    assert payloads[0].content_type == "application/json"
+
+
+def test_configured_official_provider_public_fetch_accepts_candidate_only_config(monkeypatch):
+    async def _run_inline(func, *args, **kwargs):
+        return func(*args, **kwargs)
+
+    monkeypatch.setattr(asyncio, "to_thread", _run_inline)
+    session = _QueuedFakeSession(
+        [
+            _FakeResponse(
+                (
+                    b'{"sqlId":"COMMON_MAP_BALANCESHEET_C",'
+                    b'"result":[{"S2020_0010":"12345","REPORT_YEAR":"2023"}]}'
+                ),
+                "application/json",
+                url="https://query.sse.com.cn/commonQuery.do",
+            ),
+        ]
+    )
+    provider = ConfiguredOfficialFinancialFilingProvider(
+        source_name="sse",
+        source_config={
+            "endpoint_candidates": [
+                {
+                    "key": "sse_xbrl_balance_sheet_common_query",
+                    "enabled": True,
+                    "url": "https://query.sse.com.cn/commonQuery.do",
+                    "request": {
+                        "method": "GET",
+                        "query_params": {
+                            "sqlId": "COMMON_MAP_BALANCESHEET_C",
+                            "STOCK_ID": "{symbol}",
+                        },
+                    },
+                }
+            ],
+            "request_interval_seconds": 0.0,
+        },
+        session=session,
+    )
+
+    payloads = asyncio.run(
+        provider.fetch_financial_filings(
+            instruments=[
+                {
+                    "instrument_id": "600000.SH",
+                    "symbol": "600000",
+                    "exchange": "SSE",
+                    "type": "stock",
+                }
+            ],
+            exchange="SSE",
+            report_periods=["2023Q4"],
+        )
+    )
+
+    assert len(payloads) == 1
+    assert payloads[0].manifest.metadata_json["endpoint_candidate_key"] == (
+        "sse_xbrl_balance_sheet_common_query"
+    )

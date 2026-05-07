@@ -119,6 +119,53 @@
           "max_runtime_seconds": 120
         }
       },
+      "market_dependency_version_check": {
+        "enabled": true,
+        "description": "行情数据依赖版本检查",
+        "report": false,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "*",
+          "hour": 12,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "packages": [
+            {
+              "name": "pytdx",
+              "distribution": "pytdx"
+            },
+            {
+              "name": "baostock",
+              "distribution": "baostock"
+            },
+            {
+              "name": "akshare",
+              "distribution": "akshare"
+            },
+            {
+              "name": "akshare_proxy_patch",
+              "distribution": "akshare-proxy-patch"
+            },
+            {
+              "name": "yfinance",
+              "distribution": "yfinance"
+            },
+            {
+              "name": "curl_cffi",
+              "distribution": "curl_cffi"
+            }
+          ],
+          "timeout_sec": 10.0,
+          "notify_when_latest": false,
+          "max_runtime_seconds": 120
+        }
+      },
       "weekly_data_maintenance": {
         "enabled": true,
         "description": "每周数据维护",

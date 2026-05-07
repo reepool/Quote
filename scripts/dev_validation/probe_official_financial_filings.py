@@ -12,9 +12,10 @@ import argparse
 import asyncio
 import hashlib
 import json
+import sqlite3
 import sys
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -31,10 +32,31 @@ from scripts.research_cli_support import (  # noqa: E402
     json_ready,
     parse_exchanges,
 )
+from research.providers.official_financial_filings import (  # noqa: E402
+    classify_official_filing_response,
+    extract_official_filing_artifact_candidates,
+)
 from utils.config_manager import ResearchConfig, UnifiedConfigManager  # noqa: E402
 
 
 DEFAULT_USER_AGENT = "QuoteResearch/official-financial-probe"
+
+
+@dataclass(frozen=True)
+class OfficialFinancialEndpointCandidate:
+    """One official metadata or structured artifact endpoint candidate."""
+
+    key: str
+    kind: str = "endpoint"
+    enabled: bool = False
+    url: str = ""
+    evidence: Dict[str, Any] = field(default_factory=dict)
+    request_config: Dict[str, Any] = field(default_factory=dict)
+    artifact_base_url: str = ""
+    max_artifact_downloads: int = 0
+    promotion_gate: str = "structured_payload_required"
+    status: str = "needs_probe"
+    note: str = ""
 
 
 @dataclass(frozen=True)
@@ -53,6 +75,10 @@ class OfficialFinancialProbeTarget:
     retry_attempts: int = 2
     retry_backoff_seconds: float = 0.5
     status: str = "needs_probe"
+    manifest_request: Dict[str, Any] = field(default_factory=dict)
+    endpoint_request: Dict[str, Any] = field(default_factory=dict)
+    endpoint_candidates: List[OfficialFinancialEndpointCandidate] = field(default_factory=list)
+    sample_symbols_by_exchange: Dict[str, List[str]] = field(default_factory=dict)
 
 
 class _SafeFormatDict(dict):
@@ -122,6 +148,17 @@ def build_probe_targets(
                     merged.get("retry_backoff_seconds", 0.5)
                 ),
                 status=str(merged.get("status", "needs_probe")),
+                manifest_request=_normalize_request_config(
+                    merged.get("manifest_request") or {}
+                ),
+                endpoint_request=_normalize_request_config(
+                    merged.get("endpoint_request") or {}
+                ),
+                endpoint_candidates=_normalize_endpoint_candidates(merged),
+                sample_symbols_by_exchange=_normalize_sample_symbols_by_exchange(
+                    merged,
+                    target_exchanges,
+                ),
             )
         )
     return targets
@@ -133,56 +170,106 @@ def probe_targets(
     sample_instruments_by_exchange: Optional[Dict[str, List[Dict[str, Any]]]] = None,
     report_period: str = "2024Q1",
     timeout_override: Optional[float] = None,
+    max_candidates_per_target: Optional[int] = None,
+    max_artifact_downloads: Optional[int] = None,
+    max_elapsed_seconds: Optional[float] = None,
+    max_concurrency: int = 1,
     session: Optional[requests.Session] = None,
 ) -> Dict[str, Any]:
     """Probe target URLs and return structured evidence."""
     http_session = session or requests.Session()
     samples_by_exchange = sample_instruments_by_exchange or {}
     target_results: List[Dict[str, Any]] = []
+    started_at = time.perf_counter()
+    max_concurrency = max(1, int(max_concurrency or 1))
 
     for target in targets:
+        if _elapsed_limit_reached(started_at, max_elapsed_seconds):
+            break
         sample_instruments = _sample_instruments_for_target(
             target,
             samples_by_exchange,
         )
         timeout = timeout_override or target.request_timeout_seconds
         artifacts: List[Dict[str, Any]] = []
-        artifacts.append(
-            _probe_url(
-                http_session,
-                kind="manifest",
-                url=target.manifest_url,
-                timeout=timeout,
-                context={},
-                retry_attempts=target.retry_attempts,
-                retry_backoff_seconds=target.retry_backoff_seconds,
-            )
-        )
         endpoint_contexts = _build_endpoint_contexts(
             sample_instruments,
             report_period=report_period,
         )
-        if endpoint_contexts:
-            for context in endpoint_contexts:
-                artifacts.append(
-                    _probe_url(
-                        http_session,
-                        kind="endpoint",
-                        url=target.endpoint_url,
-                        timeout=timeout,
-                        context=context,
-                        retry_attempts=target.retry_attempts,
-                        retry_backoff_seconds=target.retry_backoff_seconds,
-                    )
+        manifest_contexts = endpoint_contexts or [{}]
+        for context in manifest_contexts:
+            if _elapsed_limit_reached(started_at, max_elapsed_seconds):
+                break
+            artifacts.append(
+                _probe_url(
+                    http_session,
+                    kind="manifest",
+                    url=target.manifest_url,
+                    source_config_key=f"{target.source}.financial_statements.manifest_url",
+                    request_config=target.manifest_request,
+                    timeout=timeout,
+                    context=context,
+                    retry_attempts=target.retry_attempts,
+                    retry_backoff_seconds=target.retry_backoff_seconds,
                 )
+            )
+        endpoint_candidates = target.endpoint_candidates
+        if not endpoint_candidates and target.endpoint_url:
+            endpoint_candidates = [
+                OfficialFinancialEndpointCandidate(
+                    key="endpoint_url",
+                    kind="endpoint",
+                    enabled=target.enabled,
+                    url=target.endpoint_url,
+                    request_config=target.endpoint_request,
+                    status=target.status,
+                )
+            ]
+        endpoint_candidates = _limit_endpoint_candidates(
+            endpoint_candidates,
+            max_candidates_per_target=max_candidates_per_target,
+            max_artifact_downloads=max_artifact_downloads,
+        )
+
+        if endpoint_contexts and endpoint_candidates:
+            for context in endpoint_contexts:
+                if _elapsed_limit_reached(started_at, max_elapsed_seconds):
+                    break
+                for candidate in endpoint_candidates:
+                    if _elapsed_limit_reached(started_at, max_elapsed_seconds):
+                        break
+                    artifacts.append(
+                        _probe_endpoint_candidate(
+                            http_session,
+                            target=target,
+                            candidate=candidate,
+                            timeout=timeout,
+                            context=context,
+                        )
+                    )
                 if target.request_interval_seconds > 0:
                     time.sleep(target.request_interval_seconds)
+        elif endpoint_candidates:
+            for candidate in endpoint_candidates:
+                if _elapsed_limit_reached(started_at, max_elapsed_seconds):
+                    break
+                artifacts.append(
+                    _probe_endpoint_candidate(
+                        http_session,
+                        target=target,
+                        candidate=candidate,
+                        timeout=timeout,
+                        context={"report_period": report_period},
+                    )
+                )
         else:
             artifacts.append(
                 _probe_url(
                     http_session,
                     kind="endpoint",
                     url=target.endpoint_url,
+                    source_config_key=f"{target.source}.financial_statements.endpoint_url",
+                    request_config=target.endpoint_request,
                     timeout=timeout,
                     context={"report_period": report_period},
                     retry_attempts=target.retry_attempts,
@@ -200,6 +287,10 @@ def probe_targets(
                 ),
                 "artifacts": artifacts,
                 "probe_status": _target_probe_status(artifacts),
+                "elapsed_limit_reached": _elapsed_limit_reached(
+                    started_at,
+                    max_elapsed_seconds,
+                ),
             }
         )
 
@@ -207,7 +298,45 @@ def probe_targets(
         "status": _overall_probe_status(target_results),
         "targets": target_results,
         "target_count": len(target_results),
+        "elapsed_ms": int((time.perf_counter() - started_at) * 1000),
+        "bounds": {
+            "max_candidates_per_target": max_candidates_per_target,
+            "max_artifact_downloads": max_artifact_downloads,
+            "max_elapsed_seconds": max_elapsed_seconds,
+            "max_concurrency": max_concurrency,
+        },
     }
+
+
+def _limit_endpoint_candidates(
+    candidates: List[OfficialFinancialEndpointCandidate],
+    *,
+    max_candidates_per_target: Optional[int],
+    max_artifact_downloads: Optional[int],
+) -> List[OfficialFinancialEndpointCandidate]:
+    bounded = list(candidates)
+    if max_candidates_per_target is not None:
+        bounded = bounded[: max(0, int(max_candidates_per_target))]
+    if max_artifact_downloads is not None:
+        bounded = [
+            replace(
+                candidate,
+                max_artifact_downloads=max(0, int(max_artifact_downloads)),
+            )
+            for candidate in bounded
+        ]
+    return bounded
+
+
+def _elapsed_limit_reached(
+    started_at: float,
+    max_elapsed_seconds: Optional[float],
+) -> bool:
+    return (
+        max_elapsed_seconds is not None
+        and max_elapsed_seconds >= 0
+        and (time.perf_counter() - started_at) >= max_elapsed_seconds
+    )
 
 
 async def collect_sample_instruments(
@@ -220,6 +349,15 @@ async def collect_sample_instruments(
     await initialize_manager_for_research_cli(manager)
     samples: Dict[str, List[Dict[str, Any]]] = {}
     for exchange in exchanges:
+        sqlite_samples = _collect_samples_from_quotes_db(
+            manager,
+            exchange=exchange,
+            limit_per_exchange=limit_per_exchange,
+        )
+        if sqlite_samples is not None:
+            samples[exchange] = sqlite_samples
+            continue
+
         instruments = await manager.db_ops.get_instruments_by_exchange(exchange)
         active_stocks = [
             item
@@ -228,6 +366,38 @@ async def collect_sample_instruments(
         ]
         samples[exchange] = active_stocks[:limit_per_exchange]
     return samples
+
+
+def _collect_samples_from_quotes_db(
+    manager: Any,
+    *,
+    exchange: str,
+    limit_per_exchange: int,
+) -> Optional[List[Dict[str, Any]]]:
+    storage_cfg = getattr(getattr(manager, "research_config", None), "storage", None)
+    quotes_db_path = getattr(storage_cfg, "quotes_db_path", None)
+    if not quotes_db_path:
+        return None
+
+    db_path = Path(str(quotes_db_path))
+    if not db_path.is_absolute():
+        db_path = ROOT_DIR / db_path
+    if not db_path.exists():
+        return None
+
+    sql = (
+        "SELECT instrument_id, symbol, exchange, type, is_active "
+        "FROM instruments "
+        "WHERE exchange = ? AND type = 'stock' AND COALESCE(is_active, 1) = 1 "
+        "ORDER BY symbol LIMIT ?"
+    )
+    try:
+        with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(sql, (exchange, int(limit_per_exchange))).fetchall()
+    except sqlite3.Error:
+        return None
+    return [dict(row) for row in rows]
 
 
 def _merge_dicts(
@@ -239,14 +409,128 @@ def _merge_dicts(
     return merged
 
 
+def _normalize_request_config(raw: Dict[str, Any]) -> Dict[str, Any]:
+    if not isinstance(raw, dict):
+        return {}
+    normalized = dict(raw)
+    if "params" in normalized and "query_params" not in normalized:
+        normalized["query_params"] = normalized["params"]
+    if "body" in normalized and "body_params" not in normalized:
+        normalized["body_params"] = normalized["body"]
+    return normalized
+
+
+def _normalize_endpoint_candidates(
+    merged: Dict[str, Any],
+) -> List[OfficialFinancialEndpointCandidate]:
+    raw_candidates = merged.get("endpoint_candidates")
+    if not isinstance(raw_candidates, list):
+        return []
+
+    candidates: List[OfficialFinancialEndpointCandidate] = []
+    for index, raw in enumerate(raw_candidates):
+        if not isinstance(raw, dict):
+            continue
+        key = str(raw.get("key") or raw.get("name") or f"candidate_{index + 1}").strip()
+        if not key:
+            continue
+        request_config = _normalize_request_config(
+            raw.get("request") or raw.get("request_config") or {}
+        )
+        candidates.append(
+            OfficialFinancialEndpointCandidate(
+                key=key,
+                kind=str(raw.get("kind") or "endpoint"),
+                enabled=bool(raw.get("enabled", False)),
+                url=str(raw.get("url") or raw.get("endpoint_url") or ""),
+                evidence=dict(raw.get("evidence") or {}),
+                request_config=request_config,
+                artifact_base_url=str(raw.get("artifact_base_url") or ""),
+                max_artifact_downloads=max(0, int(raw.get("max_artifact_downloads", 0))),
+                promotion_gate=str(
+                    raw.get("promotion_gate") or "structured_payload_required"
+                ),
+                status=str(raw.get("status") or "needs_probe"),
+                note=str(raw.get("note") or ""),
+            )
+        )
+    return candidates
+
+
+def _normalize_sample_symbols_by_exchange(
+    merged: Dict[str, Any],
+    target_exchanges: List[str],
+) -> Dict[str, List[str]]:
+    configured = merged.get("sample_symbols_by_exchange")
+    if isinstance(configured, dict):
+        return {
+            str(exchange).upper(): [
+                str(symbol).strip()
+                for symbol in symbols
+                if str(symbol).strip()
+            ]
+            for exchange, symbols in configured.items()
+            if isinstance(symbols, list)
+        }
+
+    symbols = merged.get("sample_symbols")
+    if isinstance(symbols, list) and len(target_exchanges) == 1:
+        return {
+            target_exchanges[0]: [
+                str(symbol).strip()
+                for symbol in symbols
+                if str(symbol).strip()
+            ]
+        }
+    return {}
+
+
 def _sample_instruments_for_target(
     target: OfficialFinancialProbeTarget,
     samples_by_exchange: Dict[str, List[Dict[str, Any]]],
 ) -> List[Dict[str, Any]]:
     instruments: List[Dict[str, Any]] = []
     for exchange in target.exchanges:
-        instruments.extend(samples_by_exchange.get(exchange, []))
+        exchange_samples = samples_by_exchange.get(exchange, [])
+        instruments.extend(exchange_samples)
+        if not exchange_samples:
+            instruments.extend(
+                _configured_sample_instruments(
+                    target.sample_symbols_by_exchange.get(exchange, []),
+                    exchange=exchange,
+                )
+            )
     return instruments
+
+
+def _configured_sample_instruments(
+    symbols: List[str],
+    *,
+    exchange: str,
+) -> List[Dict[str, Any]]:
+    suffix_by_exchange = {"SSE": "SH", "SZSE": "SZ", "BSE": "BJ"}
+    suffix = suffix_by_exchange.get(exchange, exchange)
+    samples: List[Dict[str, Any]] = []
+    for symbol in symbols:
+        normalized_symbol = str(symbol).strip()
+        if not normalized_symbol:
+            continue
+        instrument_id = (
+            normalized_symbol
+            if "." in normalized_symbol
+            else f"{normalized_symbol}.{suffix}"
+        )
+        samples.append(
+            {
+                "instrument_id": instrument_id,
+                "symbol": instrument_id.split(".", 1)[0],
+                "exchange": exchange,
+                "type": "stock",
+                "is_active": True,
+                "coverage_basis": "configured_sample_symbols",
+            }
+        )
+    return samples
 
 
 def _build_endpoint_contexts(
@@ -265,9 +549,29 @@ def _build_endpoint_contexts(
                 "stockid": symbol,
                 "exchange": str(instrument.get("exchange") or ""),
                 "report_period": report_period,
+                "report_year": _report_year(report_period),
+                "report_type_id": _sse_report_type_id(report_period),
             }
         )
     return contexts
+
+
+def _report_year(report_period: str) -> str:
+    value = str(report_period or "")
+    return value[:4] if len(value) >= 4 and value[:4].isdigit() else value
+
+
+def _sse_report_type_id(report_period: str) -> str:
+    value = str(report_period or "").upper()
+    if value.endswith("Q1"):
+        return "4000"
+    if value.endswith("Q2"):
+        return "1000"
+    if value.endswith("Q3"):
+        return "4400"
+    if value.endswith("Q4") or value.endswith("FY"):
+        return "5000"
+    return "5000"
 
 
 def _build_coverage_summary(
@@ -292,15 +596,55 @@ def _build_coverage_summary(
     }
 
 
+def _probe_endpoint_candidate(
+    session: requests.Session,
+    *,
+    target: OfficialFinancialProbeTarget,
+    candidate: OfficialFinancialEndpointCandidate,
+    timeout: float,
+    context: Dict[str, str],
+) -> Dict[str, Any]:
+    if candidate.key == "endpoint_url":
+        source_config_key = f"{target.source}.financial_statements.endpoint_url"
+    else:
+        source_config_key = (
+            f"{target.source}.financial_statements.endpoint_candidates."
+            f"{candidate.key}.url"
+        )
+    return _probe_url(
+        session,
+        kind=candidate.kind,
+        url=candidate.url,
+        source_config_key=source_config_key,
+        request_config=candidate.request_config,
+        timeout=timeout,
+        context=context,
+        retry_attempts=target.retry_attempts,
+        retry_backoff_seconds=target.retry_backoff_seconds,
+        endpoint_candidate_key=candidate.key,
+        evidence=candidate.evidence,
+        promotion_gate=candidate.promotion_gate,
+        artifact_base_url=candidate.artifact_base_url,
+        max_artifact_downloads=candidate.max_artifact_downloads,
+    )
+
+
 def _probe_url(
     session: requests.Session,
     *,
     kind: str,
     url: str,
+    source_config_key: str,
+    request_config: Dict[str, Any],
     timeout: float,
     context: Dict[str, str],
     retry_attempts: int,
     retry_backoff_seconds: float,
+    endpoint_candidate_key: Optional[str] = None,
+    evidence: Optional[Dict[str, Any]] = None,
+    promotion_gate: str = "structured_payload_required",
+    artifact_base_url: str = "",
+    max_artifact_downloads: int = 0,
     max_sample_bytes: int = 8192,
 ) -> Dict[str, Any]:
     if not url:
@@ -308,7 +652,22 @@ def _probe_url(
             "kind": kind,
             "status": "missing_config",
             "url": "",
+            "source_config_key": source_config_key,
+            "endpoint_candidate_key": endpoint_candidate_key,
+            "evidence": evidence or {},
+            "promotion_gate": promotion_gate,
             "downloadable": False,
+            "structured_downloadable": False,
+            "readiness_status": "missing_config",
+            "response_class": "missing_config",
+            "artifact_kind": None,
+            "parser_candidate": None,
+            "structured_payload": False,
+            "readiness_blocker": "missing_endpoint_config",
+            "classification_diagnostics": {},
+            "artifact_candidate_count": 0,
+            "artifact_candidates": [],
+            "artifact_downloads": [],
             "context": context,
             "error": "missing URL in configuration",
         }
@@ -319,35 +678,77 @@ def _probe_url(
     for attempt in range(1, attempts + 1):
         started = time.perf_counter()
         response = None
+        method = str(request_config.get("method") or "GET").upper()
         try:
-            response = session.get(
-                formatted_url,
-                headers={
-                    "Accept": "*/*",
-                    "User-Agent": DEFAULT_USER_AGENT,
-                },
+            response = _send_request(
+                session,
+                method=method,
+                url=formatted_url,
+                context=context,
+                request_config=request_config,
                 timeout=timeout,
-                stream=True,
             )
             sample = _read_response_sample(response, max_sample_bytes=max_sample_bytes)
             elapsed_ms = int((time.perf_counter() - started) * 1000)
             status_code = int(getattr(response, "status_code", 0))
             headers = dict(getattr(response, "headers", {}) or {})
+            content_type = headers.get("Content-Type") or headers.get("content-type")
+            classification = classify_official_filing_response(
+                sample,
+                content_type=content_type,
+                http_status=status_code,
+                url=formatted_url,
+            )
+            artifact_candidates = extract_official_filing_artifact_candidates(
+                sample,
+                content_type=content_type,
+                base_url=artifact_base_url or formatted_url,
+            )
+            artifact_downloads = _probe_artifact_downloads(
+                session,
+                artifact_candidates=artifact_candidates,
+                request_config=request_config,
+                timeout=timeout,
+                context=context,
+                max_artifact_downloads=max_artifact_downloads,
+                max_sample_bytes=max_sample_bytes,
+            )
             status = "ok" if 200 <= status_code < 400 and sample else "http_error"
+            structured_downloadable = status == "ok" and classification.is_structured
+            readiness_status = _readiness_status(
+                status=status,
+                classification_structured=classification.is_structured,
+                artifact_downloads=artifact_downloads,
+                artifact_candidate_count=len(artifact_candidates),
+            )
             return {
                 "kind": kind,
                 "status": status,
                 "url": formatted_url,
+                "source_config_key": source_config_key,
+                "endpoint_candidate_key": endpoint_candidate_key,
+                "evidence": evidence or {},
+                "promotion_gate": promotion_gate,
                 "downloadable": status == "ok",
+                "structured_downloadable": structured_downloadable,
+                "readiness_status": readiness_status,
                 "http_status": status_code,
+                "request_method": method,
                 "elapsed_ms": elapsed_ms,
-                "content_type": headers.get("Content-Type") or headers.get("content-type"),
+                "content_type": content_type,
                 "content_length": headers.get("Content-Length")
                 or headers.get("content-length"),
                 "sha256_sample": hashlib.sha256(sample).hexdigest() if sample else None,
                 "sample_bytes": len(sample),
+                "artifact_candidate_count": len(artifact_candidates),
+                "artifact_candidates": [
+                    candidate.as_probe_fields()
+                    for candidate in artifact_candidates
+                ],
+                "artifact_downloads": artifact_downloads,
                 "attempts": attempt,
                 "context": context,
+                **classification.as_probe_fields(),
                 "error": None if status == "ok" else "non-success HTTP status or empty body",
             }
         except Exception as exc:  # pragma: no cover - concrete exception classes vary by transport
@@ -363,11 +764,189 @@ def _probe_url(
         "kind": kind,
         "status": "error",
         "url": formatted_url,
+        "source_config_key": source_config_key,
+        "endpoint_candidate_key": endpoint_candidate_key,
+        "evidence": evidence or {},
+        "promotion_gate": promotion_gate,
         "downloadable": False,
+        "structured_downloadable": False,
+        "readiness_status": "request_error",
+        "response_class": "request_error",
+        "artifact_kind": None,
+        "parser_candidate": None,
+        "structured_payload": False,
+        "readiness_blocker": "request_error",
+        "classification_diagnostics": {},
+        "artifact_candidate_count": 0,
+        "artifact_candidates": [],
+        "artifact_downloads": [],
         "attempts": attempts,
         "context": context,
         "error": last_error or "request failed",
     }
+
+
+def _probe_artifact_downloads(
+    session: requests.Session,
+    *,
+    artifact_candidates: List[Any],
+    request_config: Dict[str, Any],
+    timeout: float,
+    context: Dict[str, str],
+    max_artifact_downloads: int,
+    max_sample_bytes: int,
+) -> List[Dict[str, Any]]:
+    if max_artifact_downloads <= 0 or not artifact_candidates:
+        return []
+
+    downloads: List[Dict[str, Any]] = []
+    artifact_headers = request_config.get("artifact_headers")
+    headers = {
+        "Accept": "*/*",
+        "User-Agent": DEFAULT_USER_AGENT,
+        **_format_mapping(artifact_headers or {}, context),
+    }
+    for candidate in artifact_candidates[:max_artifact_downloads]:
+        started = time.perf_counter()
+        response = None
+        try:
+            response = session.get(
+                candidate.url,
+                headers=headers,
+                timeout=timeout,
+                stream=True,
+            )
+            sample = _read_response_sample(response, max_sample_bytes=max_sample_bytes)
+            status_code = int(getattr(response, "status_code", 0))
+            response_headers = dict(getattr(response, "headers", {}) or {})
+            content_type = response_headers.get("Content-Type") or response_headers.get(
+                "content-type"
+            )
+            classification = classify_official_filing_response(
+                sample,
+                content_type=content_type,
+                http_status=status_code,
+                url=candidate.url,
+            )
+            status = "ok" if 200 <= status_code < 400 and sample else "http_error"
+            downloads.append(
+                {
+                    **candidate.as_probe_fields(),
+                    "status": status,
+                    "http_status": status_code,
+                    "content_type": content_type,
+                    "sample_bytes": len(sample),
+                    "sha256_sample": hashlib.sha256(sample).hexdigest()
+                    if sample
+                    else None,
+                    "elapsed_ms": int((time.perf_counter() - started) * 1000),
+                    "structured_downloadable": status == "ok"
+                    and classification.is_structured,
+                    **classification.as_probe_fields(),
+                    "error": None
+                    if status == "ok"
+                    else "non-success HTTP status or empty body",
+                }
+            )
+        except Exception as exc:  # pragma: no cover - transport-specific
+            downloads.append(
+                {
+                    **candidate.as_probe_fields(),
+                    "status": "error",
+                    "structured_downloadable": False,
+                    "response_class": "request_error",
+                    "artifact_kind": candidate.artifact_kind,
+                    "parser_candidate": candidate.parser_candidate,
+                    "structured_payload": False,
+                    "readiness_blocker": "request_error",
+                    "classification_diagnostics": {},
+                    "elapsed_ms": int((time.perf_counter() - started) * 1000),
+                    "error": str(exc),
+                }
+            )
+        finally:
+            close = getattr(response, "close", None)
+            if close is not None:
+                close()
+    return downloads
+
+
+def _readiness_status(
+    *,
+    status: str,
+    classification_structured: bool,
+    artifact_downloads: List[Dict[str, Any]],
+    artifact_candidate_count: int,
+) -> str:
+    if status != "ok":
+        return status
+    if classification_structured:
+        return "structured_artifact_ready"
+    if any(download.get("structured_downloadable") for download in artifact_downloads):
+        return "structured_artifact_ready"
+    if artifact_downloads:
+        return "artifact_download_not_structured"
+    if artifact_candidate_count:
+        return "artifact_candidates_unverified"
+    return "manifest_or_metadata_only"
+
+
+def _send_request(
+    session: requests.Session,
+    *,
+    method: str,
+    url: str,
+    context: Dict[str, str],
+    request_config: Dict[str, Any],
+    timeout: float,
+) -> Any:
+    headers = {
+        "Accept": "*/*",
+        "User-Agent": DEFAULT_USER_AGENT,
+        **_format_mapping(request_config.get("headers") or {}, context),
+    }
+    query_params = _format_mapping(
+        request_config.get("query_params") or {},
+        context,
+    )
+    body_params = _format_mapping(
+        request_config.get("body_params") or {},
+        context,
+    )
+    json_body = _format_mapping(request_config.get("json") or {}, context)
+
+    kwargs = {
+        "headers": headers,
+        "timeout": timeout,
+        "stream": True,
+    }
+    if query_params:
+        kwargs["params"] = query_params
+    if body_params:
+        kwargs["data"] = body_params
+    if json_body:
+        kwargs["json"] = json_body
+
+    if method == "GET":
+        return session.get(url, **kwargs)
+    return session.request(method, url, **kwargs)
+
+
+def _format_mapping(raw: Dict[str, Any], context: Dict[str, str]) -> Dict[str, Any]:
+    formatted: Dict[str, Any] = {}
+    for key, value in raw.items():
+        formatted[str(key)] = _format_config_value(value, context)
+    return formatted
+
+
+def _format_config_value(value: Any, context: Dict[str, str]) -> Any:
+    if isinstance(value, str):
+        return _format_url(value, context)
+    if isinstance(value, list):
+        return [_format_config_value(item, context) for item in value]
+    if isinstance(value, dict):
+        return _format_mapping(value, context)
+    return value
 
 
 def _format_url(url: str, context: Dict[str, str]) -> str:
@@ -448,6 +1027,27 @@ def build_parser() -> argparse.ArgumentParser:
         help="Override configured request timeout in seconds.",
     )
     parser.add_argument(
+        "--max-candidates-per-target",
+        type=int,
+        help="Maximum endpoint candidates to probe per source target.",
+    )
+    parser.add_argument(
+        "--max-artifact-downloads",
+        type=int,
+        help="Override maximum artifact downloads per endpoint candidate.",
+    )
+    parser.add_argument(
+        "--max-elapsed-seconds",
+        type=float,
+        help="Stop scheduling additional probes after this elapsed-time budget.",
+    )
+    parser.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=1,
+        help="Probe concurrency upper bound. Current implementation is sequential, so 1 is the effective default.",
+    )
+    parser.add_argument(
         "--enabled-only",
         action="store_true",
         help="Only probe candidates whose source and financial config are enabled.",
@@ -510,6 +1110,10 @@ async def _async_main(args: argparse.Namespace) -> int:
         sample_instruments_by_exchange=sample_instruments,
         report_period=args.report_period or str(baseline),
         timeout_override=args.timeout,
+        max_candidates_per_target=args.max_candidates_per_target,
+        max_artifact_downloads=args.max_artifact_downloads,
+        max_elapsed_seconds=args.max_elapsed_seconds,
+        max_concurrency=args.max_concurrency,
     )
     result["requested"] = {
         "sources": _split_csv(args.sources),
@@ -518,6 +1122,10 @@ async def _async_main(args: argparse.Namespace) -> int:
         "report_period": args.report_period or str(baseline),
         "enabled_only": bool(args.enabled_only),
         "skip_db_coverage": bool(args.skip_db_coverage),
+        "max_candidates_per_target": args.max_candidates_per_target,
+        "max_artifact_downloads": args.max_artifact_downloads,
+        "max_elapsed_seconds": args.max_elapsed_seconds,
+        "max_concurrency": args.max_concurrency,
     }
     print(json.dumps(json_ready(result), ensure_ascii=False, indent=2, sort_keys=True))
 

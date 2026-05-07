@@ -2408,6 +2408,73 @@ class ScheduledTasks:
             )
             return False
 
+    async def market_dependency_version_check(
+        self,
+        packages: Optional[List[Dict[str, str]]] = None,
+        timeout_sec: float = 10.0,
+        notify_when_latest: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """检查行情数据相关 Python 包是否有可升级版本，并通过 Telegram 通知。"""
+        self._active_tasks.add('market_dependency_version_check')
+        try:
+            from utils.market_dependency_versions import (
+                check_market_dependency_versions,
+                format_market_dependency_version_message,
+            )
+
+            scheduler_logger.info("[Scheduler] Starting market dependency version check...")
+            result = await asyncio.to_thread(
+                check_market_dependency_versions,
+                packages,
+                timeout_sec=timeout_sec,
+            )
+
+            updates = result.get('updates') or []
+            errors = result.get('errors') or []
+            scheduler_logger.info(
+                "[Scheduler] Market dependency version check completed: updates=%d, errors=%d",
+                len(updates),
+                len(errors),
+            )
+            for item in result.get('statuses') or []:
+                scheduler_logger.info(
+                    "[Scheduler] dependency_version %s installed=%s latest=%s update=%s error=%s",
+                    item.get('name'),
+                    item.get('installed_version'),
+                    item.get('latest_version'),
+                    item.get('update_available'),
+                    item.get('error'),
+                )
+
+            if (updates or errors or notify_when_latest) and self.telegram_enabled and self.bot:
+                message = format_market_dependency_version_message(result)
+                level = 'warning' if updates or errors else 'success'
+                await self.bot.send_task_notification(
+                    message,
+                    task_name='market_dependency_version_check',
+                    level=level,
+                )
+
+            return True
+
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Market dependency version check failed: {e}")
+            if self.telegram_enabled and self.bot:
+                try:
+                    await self.bot.send_task_notification(
+                        f"行情依赖版本检查失败: {e}",
+                        task_name='market_dependency_version_check',
+                        level='error',
+                    )
+                except Exception as notify_err:
+                    scheduler_logger.warning(
+                        f"[Scheduler] 发送行情依赖版本检查失败通知失败: {notify_err}"
+                    )
+            return False
+        finally:
+            self._active_tasks.discard('market_dependency_version_check')
+
     async def cache_warm_up(self,
                            warm_popular_stocks: bool = True,
                            popular_stocks_count: int = 50,

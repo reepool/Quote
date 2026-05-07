@@ -12,7 +12,11 @@ from typing import Any, Dict, List, Optional
 
 from research.empty_support import allows_optional_empty_exchange
 from research.financial_fact_aliases import get_core_financial_fact_aliases
-from research.financial_xbrl_parser import FinancialXbrlNumericFactParser
+from research.financial_xbrl_parser import (
+    FinancialSseStructuredJsonFactParser,
+    FinancialStructuredFilingParserDispatcher,
+    FinancialXbrlNumericFactParser,
+)
 from research.providers import (
     FinancialStatementsProviderRegistry,
     OfficialFinancialFilingProviderRegistry,
@@ -56,6 +60,7 @@ class FinancialStatementsExchangeSyncResult:
     unchanged_files_skipped: int = 0
     tier_maintenance: Optional[Dict[str, Any]] = None
     coverage_gaps: Optional[Dict[str, Any]] = None
+    official_fallback_reasons: List[str] = field(default_factory=list)
     error_message: Optional[str] = None
 
 
@@ -110,7 +115,7 @@ class FinancialStatementsShadowSyncService:
         resolver: Optional[ResearchSourcePolicyResolver] = None,
         registry: Optional[FinancialStatementsProviderRegistry] = None,
         official_registry: Optional[OfficialFinancialFilingProviderRegistry] = None,
-        numeric_fact_parser: Optional[FinancialXbrlNumericFactParser] = None,
+        numeric_fact_parser: Optional[Any] = None,
     ):
         self.db_ops = db_ops
         self.storage = storage
@@ -123,9 +128,26 @@ class FinancialStatementsShadowSyncService:
             research_config=self.research_config,
         )
         parser_cfg = self._module_config().get("parser", {})
-        parser_version = str(parser_cfg.get("numeric_fact_parser", "xbrl_numeric_facts.v1"))
-        self.numeric_fact_parser = numeric_fact_parser or FinancialXbrlNumericFactParser(
+        parser_version = str(
+            parser_cfg.get("parser_version", "financial_structured_filing.v1")
+        )
+        numeric_parser_version = str(
+            parser_cfg.get("numeric_fact_parser", "xbrl_numeric_facts.v1")
+        )
+        structured_json_parser_version = str(
+            parser_cfg.get(
+                "structured_json_fact_parser",
+                "sse_commonquery_structured_json_facts.v1",
+            )
+        )
+        self.numeric_fact_parser = numeric_fact_parser or FinancialStructuredFilingParserDispatcher(
             parser_version=parser_version,
+            xbrl_parser=FinancialXbrlNumericFactParser(
+                parser_version=numeric_parser_version,
+            ),
+            structured_json_parser=FinancialSseStructuredJsonFactParser(
+                parser_version=structured_json_parser_version,
+            ),
         )
 
     async def sync(
@@ -248,6 +270,7 @@ class FinancialStatementsShadowSyncService:
                 budget_mode=budget_mode,
                 allow_paid_proxy=allow_paid_proxy,
             )
+            official_fallback_reasons: List[str] = []
 
             for candidate in plan.candidates:
                 attempted_sources.append(f"{candidate.source}:{candidate.mode}")
@@ -271,7 +294,6 @@ class FinancialStatementsShadowSyncService:
                     if official_result is not None and (
                         official_result.numeric_facts_written
                         or official_result.core_facts_written
-                        or official_result.official_payloads_processed
                         or official_result.unchanged_files_skipped
                     ):
                         result = self._finalize_successful_exchange(
@@ -288,8 +310,17 @@ class FinancialStatementsShadowSyncService:
                             numeric_facts_written=official_result.numeric_facts_written,
                             core_facts_written=official_result.core_facts_written,
                             unchanged_files_skipped=official_result.unchanged_files_skipped,
+                            official_fallback_reasons=official_fallback_reasons,
                         )
                         return result
+                    reason = (
+                        official_result.error_message
+                        if official_result is not None
+                        else "no_official_payloads_or_provider_error"
+                    )
+                    official_fallback_reasons.append(
+                        f"{candidate.source}:{candidate.mode}:{reason}"
+                    )
                     continue
 
                 provider = self.registry.get(candidate.source)
@@ -355,6 +386,7 @@ class FinancialStatementsShadowSyncService:
                     unchanged_files_skipped=fallback_result[
                         "unchanged_files_skipped"
                     ],
+                    official_fallback_reasons=official_fallback_reasons,
                 )
                 return result
 
@@ -469,6 +501,9 @@ class FinancialStatementsShadowSyncService:
             numeric_facts_written=numeric_written,
             core_facts_written=core_written,
             unchanged_files_skipped=unchanged_skipped,
+            error_message=None
+            if numeric_written or core_written or unchanged_skipped
+            else "official_payloads_unparseable_or_no_core_facts",
         )
 
     def _write_official_payload(
@@ -484,17 +519,36 @@ class FinancialStatementsShadowSyncService:
         )
         manifests_written = 1
         try:
-            parse_result = self.numeric_fact_parser.parse(
-                payload.text if payload.text is not None else payload.content,
-                source_file_id=source_file_id,
-                instrument_id=str(manifest.instrument_id or ""),
-                symbol=str(manifest.symbol or ""),
-                exchange=manifest.exchange,
-                report_period=manifest.report_period,
-                source=manifest.source,
-                source_mode=manifest.source_mode,
-                report_type=manifest.report_type,
-            )
+            parse_payload = payload.text if payload.text is not None else payload.content
+            parse_kwargs = {
+                "source_file_id": source_file_id,
+                "instrument_id": str(manifest.instrument_id or ""),
+                "symbol": str(manifest.symbol or ""),
+                "exchange": manifest.exchange,
+                "report_period": manifest.report_period,
+                "source": manifest.source,
+                "source_mode": manifest.source_mode,
+                "report_type": manifest.report_type,
+            }
+            artifact_kind = (manifest.metadata_json or {}).get("artifact_kind")
+            if artifact_kind:
+                parse_kwargs["artifact_kind"] = artifact_kind
+            if payload.content_type:
+                parse_kwargs["content_type"] = payload.content_type
+            try:
+                parse_result = self.numeric_fact_parser.parse(
+                    parse_payload,
+                    **parse_kwargs,
+                )
+            except TypeError as type_error:
+                if "unexpected keyword argument" not in str(type_error):
+                    raise
+                parse_kwargs.pop("artifact_kind", None)
+                parse_kwargs.pop("content_type", None)
+                parse_result = self.numeric_fact_parser.parse(
+                    parse_payload,
+                    **parse_kwargs,
+                )
         except Exception as e:
             failed_manifest = replace(
                 manifest,
@@ -521,7 +575,7 @@ class FinancialStatementsShadowSyncService:
         core = self.storage.derive_financial_core_facts_from_numeric_facts(
             str(manifest.instrument_id or ""),
             manifest.report_period,
-            alias_mapping=get_core_financial_fact_aliases(self._alias_mapping_version()),
+            alias_mapping=self._core_fact_alias_mapping(),
         )
         if core is not None:
             core = replace(
@@ -652,7 +706,9 @@ class FinancialStatementsShadowSyncService:
         numeric_facts_written: int = 0,
         core_facts_written: int = 0,
         unchanged_files_skipped: int = 0,
+        official_fallback_reasons: Optional[List[str]] = None,
     ) -> FinancialStatementsExchangeSyncResult:
+        official_fallback_reasons = official_fallback_reasons or []
         tier_result = self._run_tier_maintenance_if_enabled()
         coverage_gaps = self._build_coverage_gaps(
             instruments=stock_instruments,
@@ -694,6 +750,7 @@ class FinancialStatementsShadowSyncService:
                 },
                 "tier_maintenance": tier_result,
                 "coverage_gaps": coverage_gaps,
+                "official_fallback_reasons": official_fallback_reasons,
             },
         )
         return FinancialStatementsExchangeSyncResult(
@@ -712,6 +769,7 @@ class FinancialStatementsShadowSyncService:
             unchanged_files_skipped=unchanged_files_skipped,
             tier_maintenance=tier_result,
             coverage_gaps=coverage_gaps,
+            official_fallback_reasons=official_fallback_reasons,
         )
 
     def _build_coverage_gaps(
@@ -832,6 +890,22 @@ class FinancialStatementsShadowSyncService:
             .get("parser", {})
             .get("alias_mapping_version", "core_financial_facts.v1")
         )
+
+    def _core_fact_alias_mapping(self) -> Dict[str, List[str]]:
+        parser_cfg = self._module_config().get("parser", {})
+        mapping = get_core_financial_fact_aliases(self._alias_mapping_version())
+        overrides = parser_cfg.get("core_fact_alias_overrides") or {}
+        if not isinstance(overrides, dict):
+            return mapping
+        for core_field, aliases in overrides.items():
+            if not isinstance(aliases, list):
+                continue
+            existing = mapping.setdefault(str(core_field), [])
+            for alias in aliases:
+                alias_text = str(alias).strip()
+                if alias_text and alias_text not in existing:
+                    existing.append(alias_text)
+        return mapping
 
     def _fallback_parser_version(self, source: str) -> str:
         source_cfg = self.research_config.sources.get(source, {})

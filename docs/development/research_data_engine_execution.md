@@ -1,9 +1,9 @@
 # 投研数据引擎实施主线与工程化推进文档
 
-> 更新日期：2026-05-01
+> 更新日期：2026-05-06
 > 配套需求文档：[implementation_plan.md](/home/python/Quote/implementation_plan.md)
 > 配套配置：[config/10_research.json](/home/python/Quote/config/10_research.json)
-> 当前推进焦点：strict Shenwan 主线从 `AkShare/Legulegu index component` 切换为 `swsresearch_classification_direct` 官方分类文件主源，即 `official XLS manifest -> official taxonomy -> classification history -> latest memberships -> readiness`
+> 当前推进焦点：SSE 官方结构化财报 JSON 主源下载、parser 接入与生产前验证；已归档 `harden-financial-xbrl-and-relative-valuation` 与 `discover-official-financial-xbrl-endpoints`，上一轮 endpoint 发现变更包为 `openspec/changes/discover-official-financial-artifact-endpoints/`，当前实现变更包为 `openspec/changes/implement-sse-official-financial-json-source/`
 > 当前 source policy 变更包：`openspec/changes/harden-research-source-priority-policy/`
 > 当前行业 rollout readiness 变更包：`openspec/changes/add-industry-standard-readiness-api/`
 > 当前股东 rollout readiness 变更包：`openspec/changes/add-shareholder-readiness-api/`
@@ -11,7 +11,9 @@
 > 当前申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
 > 当前申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
 > 当前申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
-> 当前财务/XBRL 与相对估值加固变更包：`openspec/changes/harden-financial-xbrl-and-relative-valuation/`
+> 已归档财务/XBRL 与相对估值加固变更包：`openspec/changes/archive/2026-05-06-harden-financial-xbrl-and-relative-valuation/`
+> 已归档官方财务 endpoint/parser 变更包：`openspec/changes/archive/2026-05-06-discover-official-financial-xbrl-endpoints/`
+> 当前官方财务 SSE structured JSON 实现变更包：`openspec/changes/implement-sse-official-financial-json-source/`
 > official-code backlog 相关变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`（仅作为历史分类审计链路）
 > 当前 readiness backlog 可视化变更包：`openspec/changes/surface-unmapped-backlog-in-industry-readiness/`
 > 当前 backlog override-review 信号变更包：`openspec/changes/add-override-readiness-signals-for-official-backlog/`
@@ -130,7 +132,7 @@
 | `industry_standard` current membership + rollout readiness | 官方分类主源已落地，API 读路径已补齐 | 已以申万官方 `StockClassifyUse_stock.xls + SwClassCode_2021.xls` 作为 strict Shenwan 主源重建 taxonomy、classification history 和 latest membership；官方六位分类代码作为 taxonomy/membership 主标识；已补齐 taxonomy、stock membership、component-set API 读路径。若 `industry_component_sets` 物理缓存为空，component-set API 会从 authoritative `industry_memberships` 派生股票组合 |
 | `industry_index_analysis` provider + sync + read | 已完成存储/同步/API、日更、历史回补与补缺入口 | 已接入申万 `day_week_month_report` 最新日频指数分析指标，并接入与 AkShare `index_analysis_daily_sw` 同上游语义的历史日期区间回补源；两条链路均独立写入 `industry_index_analysis_daily`，并提供按 `sw_index_code`、日期区间、latest、taxonomy alias benchmark 的 API 读取；`2026-04-27` 完成 `2010-01-01` 至 `2026-04-24` 全量回补复核，主表 `1,104,548` 行；该表不反推股票分类 |
 | `shareholders` rollout readiness + validation runner | 已完成 | 已新增股东域 readiness 聚合读链路，可汇总 snapshot coverage、source/source_mode 分布、按交易所覆盖率、模块 gate 与 `paid_high_availability` rollout blockers；已新增仓库级 `scripts/research_shareholder_rollout_validation.py`，用于串联 shadow sync 与 readiness 复核 |
-| `financial_statements` provider + sync + read | 多期财务仓主线进行中 | 已保留 `AkShare proxy_patch -> direct` fallback 主链，并新增官方结构化 filing provider 接口、XBRL numeric parser、source manifest、全数值事实长表、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与仓库级 rollout validation runner；官方 `SSE/CNInfo/BSE` URL 仍默认 disabled，真实放量前需先完成 live probe |
+| `financial_statements` provider + sync + read | SSE 官方 structured JSON 主源接入验证中 | 已保留 `AkShare proxy_patch -> direct` fallback 主链，并新增官方结构化 filing provider、manifest-to-artifact 候选抽取、响应分类、XBRL/XML/ZIP/structured JSON parser dispatch、SSE commonQuery structured JSON parser、source manifest、全数值事实长表、core fact alias override、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与仓库级 rollout validation runner；`2026-05-06` live probe 已确认 SSE 官方 XBRL `commonQuery.do` 收入表、资产负债表、现金流量表候选可返回结构化 JSON，当前代码已能解析 numeric facts 并派生核心事实；生产源仍 disabled，下一步是 isolated live sync、小样本 backfill 和 readiness 复核；CNInfo/SZSE 与 BSE 当前仍为公告 metadata/manifest-only，继续由 AkShare fallback 承接生产同步 |
 | `analyst_forecasts` provider + sync + read | 已完成基线实现 | 已落地 `AkShare stock_profit_forecast_em` 标准化、影子同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
 | `research_reports` provider + sync + read | 已完成基线实现 | 已落地 `AkShare stock_research_report_em` 元数据同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
 | `sentiment_events` provider + sync + read | 已完成基线实现 | 已落地 `notice / executive_share_change / pledge_ratio` 事件标准化、影子同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
@@ -255,7 +257,7 @@ API 补齐原则：
 
 - 已有代码层：`financial_summary`、`financial_statements`、`valuation_history` 均有 provider/sync/storage/API 基线；`financial_statements` 已升级为支持多报告期、source manifest、all numeric facts、hot/cold tier 和 repository readiness 的同步/存储链路。
 - 当前数据层：截至 `2026-05-01` 本地 `research.db` 财务与估值核心表尚未落入全市场数据，不能把 API 存在等同于数据已可用。
-- 下一阶段目标层：`harden-financial-xbrl-and-relative-valuation` 已补齐 PE/PB/PS 指标语义、relative valuation 统计、scheduler 任务和 readiness API gate；官方结构化源生产化仍取决于 URL 探测和小样本 live backfill 证据。
+- 下一阶段目标层：`harden-financial-xbrl-and-relative-valuation` 已补齐 PE/PB/PS 指标语义、relative valuation 统计、scheduler 任务和 readiness API gate；当前 `implement-sse-official-financial-json-source` 已推进到 SSE 官方 XBRL structured JSON parser 接入，官方结构化源生产化仍取决于 isolated live sync、小样本 backfill、字段稳定性和全量 readiness 证据。
 
 ### 4.6 当前状态与需求文档的差异
 
@@ -276,7 +278,7 @@ API 补齐原则：
   - `technical` 读取能力
   - `technical_indicator_latest` 最新快照缓存基线
 - 当前尚未完成的是：
-  - 官方结构化源 live probe / 小样本 backfill 证据，以及生产打开 valuation rollout 前的全量 readiness 复核
+  - SSE `structured_json` isolated live sync、小样本 backfill 与 readiness 复核；CNInfo/SZSE、BSE 仍需找到可下载且可解析的结构化 artifact；生产打开 valuation rollout 前还需要全量 readiness 复核
   - `research metadata / valuation` 等默认 disabled 或受 gate 控制模块的 production rollout 决策与更大范围运行复核
 - 因此，`financial_statements.enabled=true` 只代表本地同步/读取链路可用，不代表官方结构化源已经生产可用或全市场历史财务仓已完成；`valuation` 虽已实现，但正式开放仍应以财务 readiness、`/api/v1/research/valuation/readiness`、模块 gate 和业务确认结果为准
 
@@ -532,18 +534,23 @@ technical readiness 接口会聚合：
 
 ### 5.2 当前下一主线
 
-当前活跃主线已完成 `valuation` readiness 与 `technical_indicator_latest` 最新快照缓存基线，行业和股东进入维护复核；下一条真正需要开发的主线是 **财务数据获取、存储和更新能力加固**，对应 `openspec/changes/harden-financial-xbrl-and-relative-valuation/`。这条主线的目标不是简单打开现有定时任务，而是把财务域从“最新期快照基线”升级为“官方结构化披露优先、多期、可审计、可支撑估值”的本地财务仓。
+当前活跃主线已完成 `valuation` readiness 与 `technical_indicator_latest` 最新快照缓存基线，行业和股东进入维护复核；财务数据获取、存储和更新能力加固 change 已于 `2026-05-06` 归档，上一轮官方 endpoint 探测 change `discover-official-financial-xbrl-endpoints` 也已归档。当前继续推进 **SSE 官方 structured JSON 主源下载、parser 接入与生产前验证**，对应 `openspec/changes/implement-sse-official-financial-json-source/`。这条主线的目标不是简单打开现有定时任务，而是把官方披露页或官方脚本进一步解析为“有证据、可请求、可分类、可解析、可审计”的结构化 filing artifact 或等价结构化 payload，并在生产配置默认关闭的前提下完成 isolated live validation 和小样本 readiness。
 
 财务主线执行顺序：
 
 1. 官方结构化源探测
    - 对 `SSE / SZSE-CNInfo / BSE` 分别做小样本 live probe，记录可下载 artifact、字段稳定性、延迟、失败模式和覆盖率
    - probe 脚本只做受控样本验证，不做全市场抓取
-   - 当前已新增 `scripts/dev_validation/probe_official_financial_filings.py`，从 `config/10_research.json` 读取官方候选源，输出本地样本覆盖、URL 配置状态、请求延迟、响应大小和样本 hash；官方 URL 仍为空时会明确返回 `missing_config`
+   - 当前 `scripts/dev_validation/probe_official_financial_filings.py` 已从 `config/10_research.json` 读取官方候选源和 `endpoint_candidates`，输出本地样本覆盖、URL 配置状态、请求 method、候选 key、证据来源、响应分类、artifact kind、parser candidate、readiness status/blocker、artifact 下载样本、响应大小和样本 hash；官方 endpoint URL 仍为空时会明确返回 `missing_endpoint_config`
+   - `2026-05-06` 有界 live probe 结果已收紧：
+     - `SSE 600000 / 2023Q4`：官方英文 XBRL 页面脚本暴露的 `https://query.sse.com.cn/commonQuery.do` 可通过 `COMMON_MAP_INCOMESTATEMENT_C / COMMON_MAP_BALANCESHEET_C / COMMON_MAP_CASHFLOW_C` 返回结构化 JSON，三个候选均被分类为 `structured_payload / structured_json / structured_financial_json.v1`，`readiness_status=structured_artifact_ready`
+     - `CNInfo/SZSE 000001 / 2025Q4`：`hisAnnouncement/query` metadata endpoint 可达，但当前配置化 `stock={symbol}` 样本只证明 metadata/manifest 可访问；历史手工样本显示带 orgId 的 stock 参数可返回年报 PDF `adjunctUrl`，但尚未证明结构化 artifact，需补 orgId resolver 和结构化下载证据
+     - `BSE 430047 / 2025Q4`：`companyAnnouncement.do` metadata endpoint 可达并支持 JSONP-like 响应分类，但代表样本未返回可解析年报 artifact，继续保持 optional-empty 与官方源 disabled
+   - 因此官方结构化源仍不得视为 production-ready；SSE 已从 endpoint 发现推进到 parser 接入和 isolated sync 验证阶段，CNInfo/BSE 仍停留在 metadata/manifest 发现阶段
 2. 配置与路由加固
    - 在 `config/10_research.json` 或后续独立 financial config 中配置 `baseline_report_period`、`rolling_min_quarters`、`hot_quarter_window`、`hot_anchor_policy`、`official_source_candidates`、`max_concurrency`、`request_timeout_seconds`、`retry_attempts`、`request_interval_seconds`、`parser_version`、`fallback_policy`
    - `financial_statements` 路由改为官方结构化源优先，`AkShare proxy_patch/direct` 只作为缺失期间或缺失核心事实的 fallback
-   - 当前实现中 `sse / cninfo / bse` 已进入 `financial_statements.free_chain`，但官方财务子域默认 `enabled=false`；`ResearchSourcePolicyResolver` 会尊重 `sources.<source>.financial_statements.enabled=false`，因此在官方源未通过探测前，实际解析结果仍保持 `AkShare proxy_patch -> AkShare direct`
+   - 当前实现中 `sse / cninfo / bse` 已进入 `financial_statements.free_chain`，但官方财务子域默认 `enabled=false`；`ResearchSourcePolicyResolver` 会尊重 `sources.<source>.financial_statements.enabled=false`，因此在官方源未通过 isolated live sync、小样本 backfill 和 readiness 前，实际解析结果仍保持 `AkShare proxy_patch -> AkShare direct`
 3. 存储层扩展
    - 增加 source-file manifest，保存 official filing id / URL / archive path / hash / parser diagnostics / ingestion run
    - 增加全数值事实长表，保留 XBRL 或等价结构化文件中的所有 numeric facts
@@ -552,9 +559,11 @@ technical readiness 接口会聚合：
    - 当前已落地 `financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`，并保留现有 `financial_facts` 与 `financial_indicator_snapshots` 兼容表
    - 当前 storage facade 为 `FinancialStatementStorageRepository`，调用方通过 manifest/numeric facts/core facts/tier maintenance helper 访问，不直接依赖物理表名；后续拆到 `data/financials.db`、DuckDB 或 PostgreSQL 时应替换 storage adapter，不改变 API 语义
 4. 官方 provider 与解析层
-   - 当前已新增 `ConfiguredOfficialFinancialFilingProvider`，按配置化 URL template 获取官方结构化 filing payload，并返回 source manifest + payload；官方 URL 未验证前不接入生产同步
-   - 当前已新增 `FinancialXbrlNumericFactParser`，使用标准库 XML 解析 XBRL numeric facts，保留 namespace、context、unit、decimals/precision、period、dimensions 和 parser diagnostics
-   - 当前 core fact aliases 通过 `core_financial_facts.v1` 版本化映射提供；fallback merge 只填补主源缺失字段，不覆盖官方主源已给出的事实
+   - 当前 `ConfiguredOfficialFinancialFilingProvider` 已支持 direct endpoint 下载，也支持在无 `endpoint_url` 时先请求 `manifest_url`、抽取 XML/XBRL/ZIP/JSON/PDF 附件候选，再只下载结构化候选；本轮已扩展为可读取 `endpoint_candidates` 并按配置构造 method、headers、query/body、artifact base URL、promotion gate 和样本下载限制
+   - 当前已新增 `FinancialXbrlNumericFactParser` 与 `FinancialStructuredFilingParserDispatcher`，支持 `xbrl_xml`、`xbrl_zip` 与 `structured_json` 路由，保留 namespace、context、unit、decimals/precision、period、dimensions、archive entry 和 parser diagnostics；`structured_html` 暂只记录 unsupported diagnostics，不假装解析成功
+   - `FinancialSseStructuredJsonFactParser` 已接入 SSE `COMMON_MAP_INCOMESTATEMENT_C / COMMON_MAP_BALANCESHEET_C / COMMON_MAP_CASHFLOW_C`，把 `S2020_xxxx / S2010_xxxx / S2030_xxxx` 数值字段落为全数值 facts；`config/10_research.json` 通过 `fetch_all_endpoint_candidates=true` 表达“三张表来自三个 commonQuery candidate”，并通过 `structured_json_fact_parser` 与 `core_fact_alias_overrides` 配置 parser version 和核心事实 alias，避免把字段代码写死到同步服务
+   - 当前 core fact aliases 通过 `core_financial_facts.v1` 版本化映射提供，并在运行时合并配置化 override；fallback merge 只填补主源缺失字段，不覆盖官方主源已给出的事实
+   - 官方 payload 只在写入 `parsed` source manifest 后才被 readiness 计为可用来源；manifest-only、PDF-only、blocked、parse-failed 或无核心事实的官方结果不会阻断 fallback，并会在 sync result 中记录 `official_fallback_reasons`
 5. 多期回填与增量维护
    - 默认从 `2024Q1` 到最新披露期，并满足至少 `8` 个季度 rolling floor；是否补 `2023A` 作为 TTM anchor 由配置决定
    - 当前 `FinancialStatementsShadowSyncService` 已支持 `report_periods` runtime override、`backfill/catchup` 模式、基于 source hash + core fact 存在性的 unchanged skip，并在 `ingestion_runs.metadata_json` 记录 checkpoint、resolved periods、运行配置、写入计数、tier maintenance 和 coverage gaps
@@ -567,7 +576,8 @@ technical readiness 接口会聚合：
    - 每个指标在 details 中记录 numerator、denominator、报告期和可得日；forward PE/PS 在 analyst forecast 未启用或覆盖不足时返回 explicit unavailable，不能复用 static/TTM denominator
 7. readiness 与 rollout
    - 当前 storage/repository 已新增 `detect_financial_coverage_gaps` 与 `validate_financial_statement_readiness`，覆盖报告期、source file、核心事实、source/parser 分布、fallback 占比、parser failure、hot/cold tier coverage、stale hot rows 和 duplicate-tier conflicts
-   - 当前已新增 `scripts/research_financial_statements_rollout_validation.py`，可串联小样本 sync 与仓库级 readiness；用 `--skip-sync` 可只读当前库状态
+   - 当前已新增 `scripts/research_financial_statements_rollout_validation.py`，可串联小样本 sync 与仓库级 readiness；用 `--skip-sync` 可只读当前库状态，用 `--enable-official-source sse` 可仅在当前进程内临时启用 SSE 官方源和 endpoint candidates
+   - 当前新增 isolated live validator：`python scripts/dev_validation/validate_sse_official_financial_json_live.py --instrument-id 600000.SH --exchange SSE --report-period 2023Q4`；该命令使用 `/tmp` 临时 SQLite 库验证官方下载、parser、numeric facts 和 core facts，不写生产库
    - 当前已新增 `/api/v1/research/financial-statements/readiness`，并扩展 `/api/v1/research/valuation/readiness` 返回 metric coverage、financial readiness 摘要和 rollout blockers
    - valuation rollout 必须依赖 financial readiness 和 industry readiness，不再只看估值历史表是否有行
 
@@ -581,8 +591,10 @@ technical readiness 接口会聚合：
 
 当前 blocker：
 
-- `SSE / CNInfo-SZSE / BSE` 官方结构化财报的 `manifest_url` 与 `endpoint_url` 仍为空，必须通过 live probe 记录可下载 artifact、样本 hash、延迟和字段稳定性后才能启用
-- 当前 probe 烟雾验证只确认配置链路完整并返回 `missing_config`，没有实际联网下载官方披露文件，也没有写入生产表
+- `SSE` 已找到官方 XBRL `commonQuery.do` structured JSON 路线，并已补上 `S2020_xxxx / S2010_xxxx / S2030_xxxx` 到 numeric facts 与核心事实的配置化 alias/parser；在 isolated live sync、小样本 backfill、字段稳定性和 readiness 通过前，仍不启用生产官方源
+- `CNInfo/SZSE` metadata endpoint 需要补 orgId-aware stock 参数解析，并验证是否存在 XML/XBRL/ZIP/structured JSON artifact；PDF-only 年报附件不能满足结构化源 readiness
+- `BSE` metadata endpoint 已确认但代表样本为空，仍需更换样本或补参数规则验证真实年报 artifact；当前继续保留 optional-empty
+- 当前 probe 只做有界只读验证，不写入生产表；官方源启用前必须记录 artifact/payload hash、parser diagnostics、字段稳定性、失败模式和覆盖率
 
 申万行业自身后续只保留两类工作：
 

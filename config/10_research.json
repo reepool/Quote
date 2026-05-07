@@ -164,10 +164,11 @@
               ],
               "mode": "direct",
               "enabled": false,
-              "manifest_url": "",
+              "manifest_url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/index.shtml?productId={symbol}",
               "endpoint_url": "",
               "supports_xbrl": true,
-              "status": "needs_probe"
+              "status": "sse_structured_json_parser_ready_disabled",
+              "note": "Source-level endpoint_candidates include SSE official XBRL commonQuery structured JSON probes. The structured_json parser and configurable core fact aliases are implemented; production stays disabled until bounded live validation and broader backfill readiness pass."
             },
             {
               "source": "cninfo",
@@ -176,10 +177,11 @@
               ],
               "mode": "direct",
               "enabled": false,
-              "manifest_url": "",
+              "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
               "endpoint_url": "",
               "supports_xbrl": true,
-              "status": "needs_probe"
+              "status": "metadata_candidate_configured_disabled",
+              "note": "Source-level endpoint_candidates include CNInfo announcement metadata probe; structured artifact evidence is not yet available."
             },
             {
               "source": "bse",
@@ -188,10 +190,11 @@
               ],
               "mode": "direct",
               "enabled": false,
-              "manifest_url": "",
+              "manifest_url": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
               "endpoint_url": "",
               "supports_xbrl": true,
-              "status": "needs_probe"
+              "status": "metadata_candidate_configured_disabled",
+              "note": "Source-level endpoint_candidates include BSE company announcement metadata probe; representative sample is not structured-artifact ready."
             }
           ]
         },
@@ -205,7 +208,43 @@
         "parser": {
           "parser_version": "financial_structured_filing.v1",
           "alias_mapping_version": "core_financial_facts.v1",
-          "numeric_fact_parser": "xbrl_numeric_facts.v1"
+          "numeric_fact_parser": "xbrl_numeric_facts.v1",
+          "structured_json_fact_parser": "sse_commonquery_structured_json_facts.v1",
+          "core_fact_alias_overrides": {
+            "revenue": [
+              "S2020_0010",
+              "S2020_0020"
+            ],
+            "operating_profit": [
+              "S2020_0240"
+            ],
+            "pre_tax_profit": [
+              "S2020_0280"
+            ],
+            "net_income": [
+              "S2020_0310",
+              "S2020_0300"
+            ],
+            "total_assets": [
+              "S2010_0380"
+            ],
+            "total_liabilities": [
+              "S2010_0690"
+            ],
+            "equity": [
+              "S2010_0770",
+              "S2010_0790"
+            ],
+            "operating_cf": [
+              "S2030_0250"
+            ],
+            "total_cf": [
+              "S2030_0520"
+            ],
+            "shares_outstanding": [
+              "S2010_0700"
+            ]
+          }
         },
         "fallback_policy": {
           "allow_third_party_fallback": true,
@@ -228,7 +267,7 @@
           "max_fallback_share": 0.5,
           "max_parser_failure_ratio": 0.05
         },
-        "note": "Official structured sources stay disabled until the probe task records concrete endpoint evidence. AkShare remains the current fallback for existing sync behavior."
+        "note": "Official SSE structured_json parsing is implemented but remains disabled for production rollout until bounded live validation and backfill readiness pass. AkShare remains the default fallback for existing sync behavior."
       },
       "analyst_forecasts": {
         "enabled": false,
@@ -453,6 +492,10 @@
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
+          "statement_interface_order": [
+            "sina_report",
+            "eastmoney_report"
+          ],
           "parser_version": "akshare_financial_statements.v1",
           "note": "Fallback only after official structured sources have missing periods or missing core facts. It must not overwrite higher-priority official facts."
         },
@@ -508,15 +551,108 @@
           "exchanges": [
             "SSE"
           ],
-          "manifest_url": "",
+          "manifest_url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/index.shtml?productId={symbol}",
           "endpoint_url": "",
+          "fetch_all_endpoint_candidates": true,
+          "sample_symbols_by_exchange": {
+            "SSE": [
+              "600000"
+            ]
+          },
+          "endpoint_candidates": [
+            {
+              "key": "sse_xbrl_income_statement_common_query",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://query.sse.com.cn/commonQuery.do",
+              "evidence": {
+                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                "observed_on": "2026-05-06",
+                "sql_id": "COMMON_MAP_INCOMESTATEMENT_C"
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                },
+                "query_params": {
+                  "isPagination": "false",
+                  "sqlId": "COMMON_MAP_INCOMESTATEMENT_C",
+                  "type": "inParams",
+                  "REPORT_YEAR": "{report_year}",
+                  "STOCK_ID": "{symbol}",
+                  "REPORT_PERIOD_ID": "{report_type_id}"
+                }
+              },
+              "promotion_gate": "structured_json_with_core_fact_mapping",
+              "status": "live_sample_structured_json_parser_ready",
+              "note": "Observed from SSE official XBRL data page script; sample 600000 annual data returned numeric S2020 fields. Parser maps these field codes to numeric facts and configurable core aliases, while production endpoint use remains disabled."
+            },
+            {
+              "key": "sse_xbrl_balance_sheet_common_query",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://query.sse.com.cn/commonQuery.do",
+              "evidence": {
+                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                "observed_on": "2026-05-06",
+                "sql_id": "COMMON_MAP_BALANCESHEET_C"
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                },
+                "query_params": {
+                  "isPagination": "false",
+                  "sqlId": "COMMON_MAP_BALANCESHEET_C",
+                  "type": "inParams",
+                  "REPORT_YEAR": "{report_year}",
+                  "STOCK_ID": "{symbol}",
+                  "REPORT_PERIOD_ID": "{report_type_id}"
+                }
+              },
+              "promotion_gate": "structured_json_with_core_fact_mapping",
+              "status": "live_sample_structured_json_parser_ready"
+            },
+            {
+              "key": "sse_xbrl_cash_flow_common_query",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://query.sse.com.cn/commonQuery.do",
+              "evidence": {
+                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                "observed_on": "2026-05-06",
+                "sql_id": "COMMON_MAP_CASHFLOW_C"
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                },
+                "query_params": {
+                  "isPagination": "false",
+                  "sqlId": "COMMON_MAP_CASHFLOW_C",
+                  "type": "inParams",
+                  "REPORT_YEAR": "{report_year}",
+                  "STOCK_ID": "{symbol}",
+                  "REPORT_PERIOD_ID": "{report_type_id}"
+                }
+              },
+              "promotion_gate": "structured_json_with_core_fact_mapping",
+              "status": "live_sample_structured_json_parser_ready"
+            }
+          ],
           "supports_xbrl": true,
           "request_timeout_seconds": 20.0,
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
-          "status": "needs_probe",
-          "note": "Disabled until the official-source probe records concrete endpoint, artifact hash, and coverage evidence."
+          "status": "sse_structured_json_parser_ready_disabled",
+          "note": "SSE official XBRL commonQuery endpoint candidates are configured and disabled. Live sample 600000 2023Q4 returned structured JSON for income, balance sheet, and cash flow; fetch_all_endpoint_candidates=true is required because each statement family is a separate commonQuery candidate. structured_json parser and core aliases are implemented. Production remains disabled until bounded live sync validation and coverage checks pass."
         }
       },
       "swsresearch": {
@@ -611,15 +747,67 @@
           "exchanges": [
             "SZSE"
           ],
-          "manifest_url": "",
+          "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
           "endpoint_url": "",
+          "sample_symbols_by_exchange": {
+            "SZSE": [
+              "000001"
+            ]
+          },
+          "endpoint_candidates": [
+            {
+              "key": "cninfo_his_announcement_query",
+              "kind": "metadata_json",
+              "enabled": false,
+              "url": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+              "evidence": {
+                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
+                "official_script": "https://static.cninfo.com.cn/new/assets/js/common.js?v=20260124055940",
+                "observed_on": "2026-05-06",
+                "metadata_fields": [
+                  "announcementId",
+                  "announcementTitle",
+                  "announcementTime",
+                  "adjunctUrl",
+                  "adjunctType"
+                ]
+              },
+              "request": {
+                "method": "POST",
+                "headers": {
+                  "Origin": "https://www.cninfo.com.cn",
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                },
+                "body_params": {
+                  "pageNum": "1",
+                  "pageSize": "5",
+                  "column": "szse",
+                  "tabName": "fulltext",
+                  "plate": "sz",
+                  "stock": "{symbol}",
+                  "searchkey": "年度报告",
+                  "category": "category_ndbg_szsh",
+                  "seDate": "2024-01-01~2026-05-06",
+                  "isHLtitle": "true"
+                },
+                "artifact_headers": {
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                }
+              },
+              "artifact_base_url": "https://static.cninfo.com.cn/",
+              "max_artifact_downloads": 1,
+              "promotion_gate": "structured_artifact_download_required",
+              "status": "metadata_ok_pdf_only_sample",
+              "note": "Observed metadata API returns annual-report records with adjunctUrl, but current sample attachments are PDF-only; orgId-aware stock parameter resolution may be required before promotion."
+            }
+          ],
           "supports_xbrl": true,
           "request_timeout_seconds": 20.0,
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
-          "status": "needs_probe",
-          "note": "Disabled for financial statements until the CNInfo/SZSE structured filing probe confirms endpoints and parser compatibility."
+          "status": "metadata_candidate_configured_disabled",
+          "note": "CNInfo announcement metadata endpoint is configured and disabled. Current no-orgId stock parameter sample is metadata/manifest-only; orgId-aware symbol resolution and structured artifact evidence are required before promotion."
         }
       },
       "bse": {
@@ -634,15 +822,62 @@
           "exchanges": [
             "BSE"
           ],
-          "manifest_url": "",
+          "manifest_url": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
           "endpoint_url": "",
+          "sample_symbols_by_exchange": {
+            "BSE": [
+              "430047"
+            ]
+          },
+          "endpoint_candidates": [
+            {
+              "key": "bse_company_announcement_query",
+              "kind": "metadata_jsonp",
+              "enabled": false,
+              "url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
+              "evidence": {
+                "official_page": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
+                "official_script": "https://www.bse.cn/template/6/bluewise/_files/js/disclosure/list_company_2.min.js",
+                "observed_on": "2026-05-06",
+                "metadata_fields": [
+                  "listInfo",
+                  "content",
+                  "disclosureTitle",
+                  "destFilePath"
+                ]
+              },
+              "request": {
+                "method": "POST",
+                "headers": {
+                  "Referer": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1"
+                },
+                "body_params": {
+                  "page": "0",
+                  "companyCd": "{symbol}",
+                  "isNewThree": "1",
+                  "xxfcbj": "2",
+                  "keyword": "年度报告",
+                  "startTime": "2024-01-01",
+                  "endTime": "2026-05-06"
+                },
+                "artifact_headers": {
+                  "Referer": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1"
+                }
+              },
+              "artifact_base_url": "https://www.bse.cn/",
+              "max_artifact_downloads": 1,
+              "promotion_gate": "structured_artifact_download_required",
+              "status": "metadata_endpoint_confirmed_empty_sample",
+              "note": "Official page script exposes companyAnnouncement.do. Current sample query returned no annual-report artifacts; BSE remains optional-empty and disabled."
+            }
+          ],
           "supports_xbrl": true,
           "request_timeout_seconds": 20.0,
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
-          "status": "needs_probe",
-          "note": "BSE stays optional-empty for current readiness and disabled as an official source until live probe evidence is recorded."
+          "status": "metadata_candidate_configured_disabled",
+          "note": "BSE company announcement metadata endpoint is configured and disabled. Current representative sample remains metadata/manifest-only; BSE stays optional-empty until structured artifact evidence and parser compatibility are confirmed."
         }
       },
       "hkexnews": {

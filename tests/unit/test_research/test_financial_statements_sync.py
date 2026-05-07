@@ -188,6 +188,124 @@ class _MockOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvider):
         return payloads
 
 
+class _MalformedOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvider):
+    source_name = "sse"
+
+    async def fetch_financial_filings(
+        self,
+        *,
+        instruments,
+        exchange,
+        report_periods,
+        mode="direct",
+        limit=None,
+    ):
+        selected = instruments[:limit] if limit is not None else instruments
+        payloads = []
+        for instrument in selected:
+            for report_period in report_periods:
+                content = b"<xbrli:xbrl>"
+                payloads.append(
+                    FinancialFilingPayload(
+                        manifest=FinancialSourceFileManifest(
+                            source="sse",
+                            source_mode=mode,
+                            instrument_id=instrument["instrument_id"],
+                            symbol=instrument["symbol"],
+                            exchange=exchange,
+                            report_period=report_period,
+                            report_type="quarterly",
+                            filing_id=f"sse-bad-{instrument['symbol']}-{report_period}",
+                            source_url=f"https://example.test/{instrument['symbol']}/bad.xml",
+                            content_hash=f"bad-hash-{instrument['symbol']}-{report_period}",
+                            content_length=len(content),
+                            published_at=report_period,
+                            parser_version="financial_structured_filing.v1",
+                            status="downloaded",
+                            metadata_json={"artifact_kind": "xbrl_xml"},
+                        ),
+                        content=content,
+                        text=content.decode("utf-8"),
+                        content_type="application/xml",
+                    )
+                )
+        return payloads
+
+
+class _SseStructuredJsonOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvider):
+    source_name = "sse"
+
+    async def fetch_financial_filings(
+        self,
+        *,
+        instruments,
+        exchange,
+        report_periods,
+        mode="direct",
+        limit=None,
+    ):
+        selected = instruments[:limit] if limit is not None else instruments
+        payloads = []
+        statement_payloads = [
+            (
+                "income",
+                b'{"sqlId":"COMMON_MAP_INCOMESTATEMENT_C",'
+                b'"result":[{"REPORT_YEAR":"2023","STOCK_ID":"600000.SS",'
+                b'"S2020_0010":"173434000000","S2020_0310":"36702000000"}]}',
+            ),
+            (
+                "balance",
+                b'{"sqlId":"COMMON_MAP_BALANCESHEET_C",'
+                b'"result":[{"REPORT_YEAR":"2023","STOCK_ID":"600000.SS",'
+                b'"S2010_0380":"9007247000000","S2010_0690":"8274363000000",'
+                b'"S2010_0770":"724749000000","S2010_0700":"29352000000"}]}',
+            ),
+            (
+                "cashflow",
+                b'{"sqlId":"COMMON_MAP_CASHFLOW_C",'
+                b'"result":[{"REPORT_YEAR":"2023","STOCK_ID":"600000.SS",'
+                b'"S2030_0250":"388397000000"}]}',
+            ),
+        ]
+        for instrument in selected:
+            for report_period in report_periods:
+                for statement_name, content in statement_payloads:
+                    payloads.append(
+                        FinancialFilingPayload(
+                            manifest=FinancialSourceFileManifest(
+                                source="sse",
+                                source_mode=mode,
+                                instrument_id=instrument["instrument_id"],
+                                symbol=instrument["symbol"],
+                                exchange=exchange,
+                                report_period=report_period,
+                                report_type="annual",
+                                filing_id=(
+                                    f"sse-json-{statement_name}-"
+                                    f"{instrument['symbol']}-{report_period}"
+                                ),
+                                source_url=(
+                                    "https://query.sse.com.cn/commonQuery.do"
+                                    f"?statement={statement_name}"
+                                ),
+                                content_hash=(
+                                    f"json-hash-{statement_name}-"
+                                    f"{instrument['symbol']}-{report_period}"
+                                ),
+                                content_length=len(content),
+                                published_at=report_period,
+                                parser_version="financial_structured_filing.v1",
+                                status="downloaded",
+                                metadata_json={"artifact_kind": "structured_json"},
+                            ),
+                            content=content,
+                            text=content.decode("utf-8"),
+                            content_type="application/json",
+                        )
+                    )
+        return payloads
+
+
 def _xbrl_payload(report_period: str) -> str:
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <xbrli:xbrl xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:cn="http://example.test/cn">
@@ -401,3 +519,137 @@ async def test_financial_statements_sync_processes_official_multi_period_payload
     assert catchup["status"] == "success"
     assert catchup["total_unchanged_files_skipped"] == 2
     assert catchup["total_numeric_facts_written"] == 0
+
+
+@pytest.mark.asyncio
+async def test_financial_statements_sync_processes_sse_structured_json_payloads(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    research_config.modules["financial_statements"]["parser"] = {
+        "parser_version": "financial_structured_filing.v1",
+        "numeric_fact_parser": "xbrl_numeric_facts.v1",
+        "structured_json_fact_parser": "sse_commonquery_structured_json_facts.v1",
+        "alias_mapping_version": "core_financial_facts.v1",
+        "core_fact_alias_overrides": {
+            "revenue": ["S2020_0010"],
+            "net_income": ["S2020_0310"],
+            "total_assets": ["S2010_0380"],
+            "total_liabilities": ["S2010_0690"],
+            "equity": ["S2010_0770"],
+            "operating_cf": ["S2030_0250"],
+            "shares_outstanding": ["S2010_0700"],
+        },
+    }
+    research_config.sources["sse"] = {
+        "enabled": True,
+        "financial_statements": {"enabled": True},
+    }
+    research_config.routing["financial_statements"]["free_chain"] = [
+        {"source": "sse", "mode": "direct"},
+        {"source": "akshare", "mode": "direct"},
+    ]
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    service = FinancialStatementsShadowSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600000.SH",
+                    "symbol": "600000",
+                    "name": "浦发银行",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=FinancialStatementsProviderRegistry(
+            {"akshare": _EmptyFinancialStatementsProvider()}
+        ),
+        official_registry=OfficialFinancialFilingProviderRegistry(
+            {"sse": _SseStructuredJsonOfficialFinancialFilingProvider()}
+        ),
+    )
+
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        report_periods=["2023Q4"],
+    )
+
+    assert result["status"] == "success"
+    assert result["exchanges"][0]["source"] == "sse"
+    assert result["exchanges"][0]["official_payloads_processed"] == 3
+    assert result["total_numeric_facts_written"] == 7
+    assert result["total_core_facts_written"] == 3
+
+    facts = storage.get_financial_core_facts("600000.SH", include_history=True)
+    latest = facts[0]
+    assert latest["source"] == "sse"
+    assert latest["report_period"] == "2023-12-31"
+    assert latest["revenue"] == 173434000000.0
+    assert latest["net_income"] == 36702000000.0
+    assert latest["total_assets"] == 9007247000000.0
+    assert latest["total_liabilities"] == 8274363000000.0
+    assert latest["equity"] == 724749000000.0
+    assert latest["operating_cf"] == 388397000000.0
+
+
+@pytest.mark.asyncio
+async def test_financial_statements_sync_falls_back_after_official_parse_failure(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    research_config.sources["sse"] = {
+        "enabled": True,
+        "financial_statements": {"enabled": True},
+    }
+    research_config.routing["financial_statements"]["free_chain"] = [
+        {"source": "sse", "mode": "direct"},
+        {"source": "akshare", "mode": "direct"},
+    ]
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    service = FinancialStatementsShadowSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "name": "贵州茅台",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=FinancialStatementsProviderRegistry(
+            {"akshare": _MockFinancialStatementsProvider()}
+        ),
+        official_registry=OfficialFinancialFilingProviderRegistry(
+            {"sse": _MalformedOfficialFinancialFilingProvider()}
+        ),
+    )
+
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        report_periods=["2025-12-31"],
+    )
+
+    assert result["status"] == "success"
+    assert result["exchanges"][0]["source"] == "akshare"
+    assert result["exchanges"][0]["attempted_sources"] == [
+        "sse:direct",
+        "akshare:direct",
+    ]
+    assert result["exchanges"][0]["official_fallback_reasons"] == [
+        "sse:direct:official_payloads_unparseable_or_no_core_facts"
+    ]
+    facts = storage.get_financial_core_facts("600519.SH", include_history=True)
+    assert facts[0]["source"] == "akshare"
