@@ -1074,23 +1074,42 @@ class TaskManagerHandlers:
 
             succeeded = []
             failed = []
-            for target_date in backfill_dates:
+            if start_date != end_date:
                 try:
-                    result = await scheduled_tasks.daily_data_update(
+                    result = await scheduled_tasks.daily_data_backfill_range(
+                        start_date=start_date,
+                        end_date=end_date,
                         exchanges=exchanges,
-                        target_date=target_date,
-                        wait_for_market_close=False,
-                        enable_trading_day_check=False
+                        run_factor_audit=False,
                     )
-                    if result:
-                        succeeded.append(target_date)
+                    if result and result.get('failure_count', 0) == 0:
+                        succeeded = backfill_dates
                     else:
-                        failed.append((target_date, '任务返回未成功'))
-                except Exception as single_e:
-                    failed.append((target_date, str(single_e)))
+                        failed.append((f"{start_date}~{end_date}", result.get('error', '任务返回未成功') if isinstance(result, dict) else '任务返回未成功'))
+                except Exception as range_e:
+                    failed.append((f"{start_date}~{end_date}", str(range_e)))
                     self.task_manager.logger.error(
-                        f"[TaskManagerHandlers] 单日数据补充失败: {target_date}, 错误: {single_e}"
+                        f"[TaskManagerHandlers] 区间数据补充失败: {start_date}~{end_date}, 错误: {range_e}"
                     )
+            else:
+                for target_date in backfill_dates:
+                    try:
+                        result = await scheduled_tasks.daily_data_update(
+                            exchanges=exchanges,
+                            target_date=target_date,
+                            wait_for_market_close=False,
+                            enable_trading_day_check=False,
+                            run_factor_audit=False,
+                        )
+                        if result:
+                            succeeded.append(target_date)
+                        else:
+                            failed.append((target_date, '任务返回未成功'))
+                    except Exception as single_e:
+                        failed.append((target_date, str(single_e)))
+                        self.task_manager.logger.error(
+                            f"[TaskManagerHandlers] 单日数据补充失败: {target_date}, 错误: {single_e}"
+                        )
 
             if not failed:
                 success_message = (

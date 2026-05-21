@@ -27,12 +27,13 @@ async def test_backfill_single_day_keeps_legacy_syntax():
         target_date=date(2026, 4, 9),
         wait_for_market_close=False,
         enable_trading_day_check=False,
+        run_factor_audit=False,
     )
     assert task_manager.send_message.await_count == 2
 
 
 @pytest.mark.asyncio
-async def test_backfill_range_runs_each_trading_day_in_range():
+async def test_backfill_range_runs_single_range_backfill():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(
         chat_id=1,
@@ -40,16 +41,18 @@ async def test_backfill_range_runs_each_trading_day_in_range():
         text='/backfill 2026-04-09 2026-04-10 SSE SZSE BSE',
     )
 
-    with patch('scheduler.tasks.scheduled_tasks.daily_data_update', new=AsyncMock(return_value=True)) as run_update:
+    with patch(
+        'scheduler.tasks.scheduled_tasks.daily_data_backfill_range',
+        new=AsyncMock(return_value={'failure_count': 0, 'total_quotes_added': 10}),
+    ) as run_update:
         await handler.handle_backfill_command(event)
 
-    assert run_update.await_count == 2
-    target_dates = [call.kwargs['target_date'] for call in run_update.await_args_list]
-    assert target_dates == [date(2026, 4, 9), date(2026, 4, 10)]
-    for call in run_update.await_args_list:
-        assert call.kwargs['exchanges'] == ['SSE', 'SZSE', 'BSE']
-        assert call.kwargs['wait_for_market_close'] is False
-        assert call.kwargs['enable_trading_day_check'] is False
+    run_update.assert_awaited_once_with(
+        start_date=date(2026, 4, 9),
+        end_date=date(2026, 4, 10),
+        exchanges=['SSE', 'SZSE', 'BSE'],
+        run_factor_audit=False,
+    )
     assert task_manager.send_message.await_count == 2
 
 

@@ -8,6 +8,25 @@ from data_manager import DataManager
 
 @pytest.mark.unit
 class TestDailyFactorSyncPolicy:
+    def test_factor_target_dates_expand_range(self):
+        manager = DataManager()
+
+        target_dates = manager._build_factor_target_dates([
+            {
+                'instrument_id': '000001.SZ',
+                'symbol': '000001',
+                'start_date': date(2026, 4, 9),
+                'end_date': date(2026, 4, 12),
+            }
+        ])
+
+        assert target_dates == {
+            date(2026, 4, 9),
+            date(2026, 4, 10),
+            date(2026, 4, 11),
+            date(2026, 4, 12),
+        }
+
     @pytest.mark.asyncio
     async def test_daily_factor_sync_respects_disabled_exchange_policy(self):
         manager = DataManager()

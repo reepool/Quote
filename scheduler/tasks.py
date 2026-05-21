@@ -179,6 +179,7 @@ class ScheduledTasks:
                             progress_log_interval_sec: int = 300,
                             instrument_types: Optional[List[str]] = None,
                             target_date: Optional[date] = None,
+                            run_factor_audit: bool = True,
                             job_config: Optional[JobConfig] = None) -> bool:
         """每日数据更新任务
 
@@ -273,7 +274,8 @@ class ScheduledTasks:
                 per_instrument_timeout_sec=per_instrument_timeout_sec,
                 progress_log_every=progress_log_every,
                 progress_log_interval_sec=progress_log_interval_sec,
-                instrument_types=instrument_types
+                instrument_types=instrument_types,
+                run_factor_audit=run_factor_audit,
             )
 
             # 步骤5: 发送报告
@@ -319,6 +321,83 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('daily_data_update')
+
+    async def daily_data_backfill_range(
+        self,
+        start_date: date,
+        end_date: date,
+        exchanges: Optional[List[str]] = None,
+        per_instrument_timeout_sec: Optional[int] = None,
+        progress_log_every: int = 200,
+        progress_log_interval_sec: int = 300,
+        instrument_types: Optional[List[str]] = None,
+        run_factor_audit: bool = False,
+    ) -> Dict[str, Any]:
+        """区间补充日线数据，避免按交易日重复执行完整日更。"""
+        self._active_tasks.add('daily_data_backfill_range')
+        try:
+            if exchanges is None:
+                exchanges = self.config.get_nested(
+                    'data_config', 'market_presets', 'a_shares',
+                    default=['SSE', 'SZSE', 'BSE']
+                )
+
+            scheduler_logger.info(
+                "[Scheduler] Starting RANGE BACKFILL data update for %s~%s exchanges=%s",
+                start_date, end_date, exchanges
+            )
+
+            trading_calendar_updates = {}
+            scheduler_logger.info("[Scheduler] Range backfill: updating trading calendars once...")
+            for exchange in exchanges:
+                try:
+                    updated_count = await data_manager._update_trading_calendar(
+                        exchange,
+                        start_date,
+                        end_date + timedelta(days=7),
+                    )
+                    trading_calendar_updates[exchange] = updated_count
+                    scheduler_logger.info(
+                        "[Scheduler] Range backfill updated %d trading days for %s",
+                        updated_count,
+                        exchange,
+                    )
+                except Exception as e:
+                    scheduler_logger.error(
+                        "[Scheduler] Range backfill failed to update calendar for %s: %s",
+                        exchange,
+                        e,
+                    )
+                    trading_calendar_updates[exchange] = 0
+
+            update_results = await data_manager.update_daily_data_range(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                per_instrument_timeout_sec=per_instrument_timeout_sec,
+                progress_log_every=progress_log_every,
+                progress_log_interval_sec=progress_log_interval_sec,
+                instrument_types=instrument_types,
+                run_factor_audit=run_factor_audit,
+            )
+            update_results['trading_calendar_updates'] = trading_calendar_updates
+            scheduler_logger.info("[Scheduler] Range backfill completed successfully")
+            return update_results
+
+        except Exception as e:
+            scheduler_logger.error("[Scheduler] Range backfill failed: %s", e)
+            return {
+                'operation': 'range_backfill',
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+                'success_count': 0,
+                'failure_count': 1,
+                'total_quotes_added': 0,
+                'exchange_stats': {},
+                'error': str(e),
+            }
+        finally:
+            self._active_tasks.discard('daily_data_backfill_range')
 
     async def weekly_data_maintenance(self,
                                   backup_database: bool = True,

@@ -128,6 +128,56 @@ class TdxFactorValidator:
         self.tolerance = tolerance
         self.warning_threshold = warning_threshold
 
+    @staticmethod
+    def _date_key(factor: dict) -> str:
+        ex_date = factor.get("ex_date")
+        if isinstance(ex_date, datetime):
+            return ex_date.strftime("%Y-%m-%d")
+        return str(ex_date)[:10]
+
+    @staticmethod
+    def _factor_date(factor: dict) -> datetime:
+        ex_date = factor.get("ex_date", datetime.min)
+        if isinstance(ex_date, datetime):
+            return ex_date
+        try:
+            return datetime.strptime(str(ex_date)[:10], "%Y-%m-%d")
+        except ValueError:
+            return datetime.min
+
+    @staticmethod
+    def _build_day_factor_map(factors: list[dict]) -> dict[str, float]:
+        """Return same-semantics single-event factors keyed by ex-date.
+
+        Production providers are not perfectly aligned: TDX emits a single-event
+        factor, while BaoStock's ``adjustFactor`` can behave like an absolute
+        cumulative level. When cumulative levels are available, the comparable
+        single-event factor is the ratio against the previous cumulative level.
+        """
+        sorted_factors = sorted(factors, key=TdxFactorValidator._factor_date)
+        day_factors: dict[str, float] = {}
+        previous_cumulative: float | None = None
+
+        for factor in sorted_factors:
+            key = TdxFactorValidator._date_key(factor)
+            raw_factor = float(factor.get("factor", 1.0) or 1.0)
+            cumulative = factor.get("cumulative_factor")
+
+            day_factor = raw_factor
+            if cumulative is not None:
+                cumulative_value = float(cumulative or 1.0)
+                if previous_cumulative and previous_cumulative > 0:
+                    day_factor = cumulative_value / previous_cumulative
+                elif abs(raw_factor - cumulative_value) < 1e-9:
+                    day_factor = cumulative_value
+
+                if cumulative_value > 0:
+                    previous_cumulative = cumulative_value
+
+            day_factors[key] = round(day_factor, 6)
+
+        return day_factors
+
     def validate(
         self,
         instrument_id: str,
@@ -159,30 +209,32 @@ class TdxFactorValidator:
                 return report
 
             # 构建日期索引
-            tdx_by_date: dict[str, dict] = {}
-            for f in tdx_factors:
-                ex_date = f.get("ex_date")
-                if isinstance(ex_date, datetime):
-                    key = ex_date.strftime("%Y-%m-%d")
-                else:
-                    key = str(ex_date)[:10]
-                tdx_by_date[key] = f
-
-            ref_by_date: dict[str, dict] = {}
-            for f in ref_factors:
-                ex_date = f.get("ex_date")
-                if isinstance(ex_date, datetime):
-                    key = ex_date.strftime("%Y-%m-%d")
-                else:
-                    key = str(ex_date)[:10]
-                ref_by_date[key] = f
+            tdx_by_date: dict[str, dict] = {
+                self._date_key(f): f for f in tdx_factors
+            }
+            ref_by_date: dict[str, dict] = {
+                self._date_key(f): f for f in ref_factors
+            }
+            tdx_day_factors = self._build_day_factor_map(tdx_factors)
+            ref_day_factors = self._build_day_factor_map(ref_factors)
 
             # 统计
-            all_dates = set(tdx_by_date.keys()) | set(ref_by_date.keys())
             overlap_dates = set(tdx_by_date.keys()) & set(ref_by_date.keys())
             report.overlap_count = len(overlap_dates)
             report.tdx_only_count = len(set(tdx_by_date.keys()) - overlap_dates)
-            report.ref_only_count = len(set(ref_by_date.keys()) - overlap_dates)
+
+            # DataManager may pass one historical reference event before the
+            # audit window so cumulative factors can be converted to day
+            # factors. Do not count those baseline rows as missing TDX events.
+            tdx_dates = sorted(tdx_by_date.keys())
+            min_tdx_date = tdx_dates[0] if tdx_dates else None
+            max_tdx_date = tdx_dates[-1] if tdx_dates else None
+            only_ref_dates = set(ref_by_date.keys()) - overlap_dates
+            if min_tdx_date and max_tdx_date:
+                only_ref_dates = {
+                    d for d in only_ref_dates if min_tdx_date <= d <= max_tdx_date
+                }
+            report.ref_only_count = len(only_ref_dates)
 
             if not overlap_dates:
                 report.result = FactorValidationResult.NO_OVERLAP
@@ -193,8 +245,8 @@ class TdxFactorValidator:
                 tdx_f = tdx_by_date[date_key]
                 ref_f = ref_by_date[date_key]
 
-                tdx_day_factor = float(tdx_f.get("factor", 1.0))
-                ref_day_factor = float(ref_f.get("factor", 1.0))
+                tdx_day_factor = float(tdx_day_factors.get(date_key, 1.0))
+                ref_day_factor = float(ref_day_factors.get(date_key, 1.0))
 
                 # 计算比率差异
                 if ref_day_factor > 0:
@@ -216,12 +268,7 @@ class TdxFactorValidator:
                     else:
                         conflict_reason = "Drift (严重漂移)"
 
-                ex_date = tdx_f.get("ex_date", datetime.min)
-                if isinstance(ex_date, str):
-                    try:
-                        ex_date = datetime.strptime(ex_date[:10], "%Y-%m-%d")
-                    except ValueError:
-                        ex_date = datetime.min
+                ex_date = self._factor_date(tdx_f)
 
                 detail = ValidationDetail(
                     ex_date=ex_date,
@@ -240,15 +287,11 @@ class TdxFactorValidator:
             only_tdx_dates = set(tdx_by_date.keys()) - overlap_dates
             for date_key in sorted(only_tdx_dates):
                 tdx_f = tdx_by_date[date_key]
-                ex_date = tdx_f.get("ex_date", datetime.min)
-                if isinstance(ex_date, str):
-                    try:
-                        ex_date = datetime.strptime(ex_date[:10], "%Y-%m-%d")
-                    except ValueError: pass
+                ex_date = self._factor_date(tdx_f)
                 detail = ValidationDetail(
                     ex_date=ex_date,
                     instrument_id=instrument_id,
-                    tdx_factor=float(tdx_f.get("factor", 1.0)),
+                    tdx_factor=float(tdx_day_factors.get(date_key, 1.0)),
                     ref_factor=1.0,
                     tdx_cumulative=float(tdx_f.get("cumulative_factor", 0)),
                     ref_cumulative=0.0,
@@ -258,19 +301,14 @@ class TdxFactorValidator:
                 )
                 report.details.append(detail)
                 
-            only_ref_dates = set(ref_by_date.keys()) - overlap_dates
             for date_key in sorted(only_ref_dates):
                 ref_f = ref_by_date[date_key]
-                ex_date = ref_f.get("ex_date", datetime.min)
-                if isinstance(ex_date, str):
-                    try:
-                        ex_date = datetime.strptime(ex_date[:10], "%Y-%m-%d")
-                    except ValueError: pass
+                ex_date = self._factor_date(ref_f)
                 detail = ValidationDetail(
                     ex_date=ex_date,
                     instrument_id=instrument_id,
                     tdx_factor=1.0,
-                    ref_factor=float(ref_f.get("factor", 1.0)),
+                    ref_factor=float(ref_day_factors.get(date_key, 1.0)),
                     tdx_cumulative=0.0,
                     ref_cumulative=float(ref_f.get("cumulative_factor", 0)),
                     ratio_diff_pct=100.0,

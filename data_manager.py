@@ -6665,10 +6665,7 @@ class DataManager:
 
         if not skip_filter:
             # ★ 精准筛选：查询当天有除权除息的股票代码，仅对这些股票同步因子
-            target_dates = set()
-            for s in stocks[:1]:  # 取一个样本获取日期范围
-                target_dates.add(s.get('start_date'))
-                target_dates.add(s.get('end_date'))
+            target_dates = self._build_factor_target_dates(stocks)
 
             ex_div_symbols = await self._query_ex_dividend_symbols(target_dates)
 
@@ -6738,6 +6735,39 @@ class DataManager:
         )
         return result
 
+    @staticmethod
+    def _build_factor_target_dates(stocks: List[Dict[str, Any]]) -> set:
+        """Build the ex-dividend dates covered by a factor sync request."""
+        target_dates = set()
+        min_start: Optional[date] = None
+        max_end: Optional[date] = None
+
+        for stock in stocks:
+            start = stock.get('start_date')
+            end = stock.get('end_date')
+            if isinstance(start, datetime):
+                start = start.date()
+            if isinstance(end, datetime):
+                end = end.date()
+            if start is not None:
+                min_start = start if min_start is None else min(min_start, start)
+            if end is not None:
+                max_end = end if max_end is None else max(max_end, end)
+
+        if min_start is None or max_end is None or max_end < min_start:
+            return target_dates
+
+        span_days = (max_end - min_start).days
+        if span_days <= 366:
+            return {min_start + timedelta(days=offset) for offset in range(span_days + 1)}
+
+        dm_logger.warning(
+            "[DataManager] Phase 2: factor date range %s~%s is too wide for "
+            "precise ex-dividend filtering; using boundary dates only",
+            min_start, max_end
+        )
+        return {min_start, max_end}
+
     async def _query_ex_dividend_symbols(
         self, target_dates: set
     ) -> Optional[set]:
@@ -6764,13 +6794,17 @@ class DataManager:
             if not target_date_strs:
                 return set()
 
-            # 根据目标日期推算需查询的报告期
-            sample_date = next(iter(target_dates))
-            year = sample_date.year if hasattr(sample_date, 'year') else int(str(sample_date)[:4])
-            report_periods = [
-                f"{year - 1}1231",   # 上一年年报
-                f"{year}0630",       # 当年中报
-            ]
+            # 根据目标日期推算需查询的报告期。区间补数可能跨年，不能只取
+            # 一个 sample date，否则会漏掉另一年的分红方案。
+            years = sorted({
+                d.year if hasattr(d, 'year') else int(str(d)[:4])
+                for d in target_dates if d is not None
+            })
+            report_periods = sorted({
+                period
+                for year in years
+                for period in (f"{year - 1}1231", f"{year}0630")
+            })
 
             all_records = []
             for period in report_periods:
@@ -6882,7 +6916,7 @@ class DataManager:
 
                 # 2. 获取权威源因子 (从 DB 中读取 Phase 2 已写入的数据)
                 ref_factors_raw = await self.db_ops.get_adjustment_factors(
-                    instrument_id, start_dt, end_dt
+                    instrument_id, None, end_dt
                 )
                 # 转换为 validator 需要的格式
                 ref_factors = [
@@ -7185,7 +7219,8 @@ class DataManager:
                                per_instrument_timeout_sec: Optional[int] = None,
                                progress_log_every: int = 200,
                                progress_log_interval_sec: int = 300,
-                               instrument_types: Optional[List[str]] = None) -> Optional[dict]:
+                               instrument_types: Optional[List[str]] = None,
+                               run_factor_audit: bool = True) -> Optional[dict]:
         """每日数据更新"""
         try:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
@@ -7343,15 +7378,16 @@ class DataManager:
                         update_results.setdefault('factor_stats', {})[exchange] = factor_result
 
                         # Phase 2.5: tdx 自研因子旁路审计（不阻塞主流程）
-                        try:
-                            await self._tdx_factor_audit(
-                                exchange, stocks_needing_factors, factor_result
-                            )
-                        except Exception as audit_e:
-                            dm_logger.warning(
-                                "[DataManager] Phase 2.5 tdx audit failed for %s (non-critical): %s",
-                                exchange, audit_e
-                            )
+                        if run_factor_audit:
+                            try:
+                                await self._tdx_factor_audit(
+                                    exchange, stocks_needing_factors, factor_result
+                                )
+                            except Exception as audit_e:
+                                dm_logger.warning(
+                                    "[DataManager] Phase 2.5 tdx audit failed for %s (non-critical): %s",
+                                    exchange, audit_e
+                                )
 
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to update {exchange}: {e}")
@@ -7390,6 +7426,217 @@ class DataManager:
                 'exchange_results': {},
                 'error': str(e)
             }
+
+    async def update_daily_data_range(
+        self,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        per_instrument_timeout_sec: Optional[int] = None,
+        progress_log_every: int = 200,
+        progress_log_interval_sec: int = 300,
+        instrument_types: Optional[List[str]] = None,
+        run_factor_audit: bool = False,
+    ) -> dict:
+        """补充一个日期区间的日线数据。
+
+        每个交易所只获取一次活跃品种列表，每个品种只请求一次连续日期
+        范围，并在区间结束后集中同步复权因子。历史补数默认不执行
+        Phase 2.5 TDX 审计，避免重复审计拖慢任务。
+        """
+        if start_date is None or end_date is None:
+            raise ValueError("start_date and end_date are required")
+        if end_date < start_date:
+            raise ValueError(f"end_date {end_date} is earlier than start_date {start_date}")
+
+        if exchanges is None:
+            exchanges = ['SSE', 'SZSE', 'BSE']
+        if instrument_types is None:
+            instrument_types = self.data_config.get('instrument_types', ['stock', 'index'])
+
+        def _to_date(value: Any) -> Optional[date]:
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value.date()
+            if isinstance(value, date):
+                return value
+            try:
+                return pd.to_datetime(value).date()
+            except Exception:
+                return None
+
+        dm_logger.info(
+            "[DataManager] Starting range daily data backfill for exchanges=%s range=%s~%s",
+            exchanges, start_date, end_date
+        )
+
+        update_results: dict = {
+            'operation': 'range_backfill',
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'success_count': 0,
+            'failure_count': 0,
+            'total_quotes_added': 0,
+            'exchange_stats': {},
+            'instrument_master_sync': {
+                'status': 'skipped',
+                'reason': 'range_backfill_uses_existing_master',
+                'target_date': end_date.isoformat(),
+                'exchanges': {},
+                'warnings': [],
+                'errors': [],
+            },
+        }
+
+        for exchange in exchanges:
+            try:
+                dm_logger.info(
+                    "[DataManager] Range backfill updating %s, types=%s, range=%s~%s",
+                    exchange, instrument_types, start_date, end_date
+                )
+                instruments = await self.db_ops.get_active_instruments(
+                    exchange,
+                    instrument_types=instrument_types,
+                )
+                total_instruments = len(instruments)
+                exchange_result = {
+                    'success_count': 0,
+                    'failure_count': 0,
+                    'quotes_added': 0,
+                    'total_instruments': total_instruments,
+                    'skipped_not_listed': 0,
+                }
+
+                is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
+                range_fetch_start = start_date - timedelta(days=1)
+                if not is_a_stock:
+                    range_fetch_start = DateUtils.get_previous_trading_day(
+                        exchange, start_date
+                    )
+
+                last_progress_log = datetime.now()
+                stocks_needing_factors: list[dict] = []
+
+                for idx, instrument in enumerate(instruments, start=1):
+                    try:
+                        listed_date = _to_date(instrument.get('listed_date'))
+                        if listed_date and listed_date > end_date:
+                            exchange_result['skipped_not_listed'] += 1
+                            continue
+
+                        query_start = range_fetch_start
+                        if listed_date and listed_date > query_start:
+                            query_start = listed_date
+                        if query_start > end_date:
+                            exchange_result['skipped_not_listed'] += 1
+                            continue
+
+                        async def _fetch_range() -> list:
+                            return await self.source_factory.get_daily_data(
+                                exchange,
+                                instrument['instrument_id'],
+                                instrument['symbol'],
+                                datetime.combine(query_start, datetime.min.time()),
+                                datetime.combine(end_date, datetime.max.time()),
+                                instrument_type=instrument.get('type', 'stock'),
+                                source_symbol=instrument.get('source_symbol', ''),
+                            )
+
+                        if per_instrument_timeout_sec:
+                            data = await asyncio.wait_for(
+                                _fetch_range(),
+                                timeout=per_instrument_timeout_sec,
+                            )
+                        else:
+                            data = await _fetch_range()
+
+                        if data:
+                            await self.db_ops.save_daily_quotes(data)
+                            exchange_result['quotes_added'] += len(data)
+                            update_results['total_quotes_added'] += len(data)
+
+                        exchange_result['success_count'] += 1
+                        update_results['success_count'] += 1
+
+                        if instrument.get('type', 'stock') == 'stock':
+                            if is_a_stock or (data and len(data) > 0):
+                                stocks_needing_factors.append({
+                                    'instrument_id': instrument['instrument_id'],
+                                    'symbol': instrument['symbol'],
+                                    'start_date': start_date,
+                                    'end_date': end_date,
+                                })
+
+                        now = datetime.now()
+                        if (
+                            (progress_log_every and idx % progress_log_every == 0)
+                            or (
+                                progress_log_interval_sec
+                                and (now - last_progress_log).total_seconds() >= progress_log_interval_sec
+                            )
+                        ):
+                            dm_logger.info(
+                                "[DataManager] Range backfill progress %s: %s/%s (last=%s)",
+                                exchange,
+                                idx,
+                                total_instruments,
+                                instrument.get('symbol', instrument.get('instrument_id')),
+                            )
+                            last_progress_log = now
+
+                    except asyncio.TimeoutError:
+                        dm_logger.warning(
+                            "[DataManager] Range backfill timed out for %s (%s)",
+                            instrument.get('symbol'),
+                            instrument.get('instrument_id'),
+                        )
+                        exchange_result['failure_count'] += 1
+                        update_results['failure_count'] += 1
+                    except Exception as e:
+                        dm_logger.error(
+                            "[DataManager] Range backfill failed for %s: %s",
+                            instrument.get('symbol'),
+                            e,
+                        )
+                        exchange_result['failure_count'] += 1
+                        update_results['failure_count'] += 1
+
+                update_results['exchange_stats'][exchange] = exchange_result
+                dm_logger.info(
+                    "[DataManager] Range backfill %s completed: %d success, %d failed, %d quotes added",
+                    exchange,
+                    exchange_result['success_count'],
+                    exchange_result['failure_count'],
+                    exchange_result['quotes_added'],
+                )
+
+                if stocks_needing_factors:
+                    factor_result = await self._batch_sync_adjustment_factors(
+                        exchange,
+                        stocks_needing_factors,
+                        sync_reason='daily',
+                    )
+                    update_results.setdefault('factor_stats', {})[exchange] = factor_result
+
+                    if run_factor_audit:
+                        try:
+                            await self._tdx_factor_audit(
+                                exchange, stocks_needing_factors, factor_result
+                            )
+                        except Exception as audit_e:
+                            dm_logger.warning(
+                                "[DataManager] Phase 2.5 tdx audit failed for %s (non-critical): %s",
+                                exchange, audit_e
+                            )
+
+            except Exception as e:
+                dm_logger.error("[DataManager] Range backfill failed for %s: %s", exchange, e)
+                update_results['failure_count'] += 1
+                update_results['exchange_stats'][exchange] = {'error': str(e)}
+
+        dm_logger.info("[DataManager] Range daily data backfill completed: %s", update_results)
+        return update_results
 
     @log_execution("DataManager", "backup_data") 
     async def backup_data(self, backup_path: str = None, include_compression: bool = True) -> bool:

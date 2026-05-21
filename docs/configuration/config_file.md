@@ -751,7 +751,7 @@
 - **`routing.calendar.<region>`**: `List[str]`
   指定交易日历抓取链，按 region 配置。
 - **`routing.factor.<exchange>`**: `Object`
-  指定复权因子路由，支持 `primary`、`validator`、`fallback`、`daily_sync_enabled`、`maintenance_sync_enabled`。其中 `primary` 是正式抓取与回补入口实际使用的主源；`validator=tdx_xdxr` 是特殊值，仅用于 A 股旁路审计，不参与主抓取结果选择。`daily_sync_enabled=false` 表示该交易所在日更任务中跳过 Phase 2 因子同步；`maintenance_sync_enabled=true` 表示该交易所会进入每周维护任务的周度因子同步。港股当前关闭日更因子、开启周维护因子，以避免交易日日更被 3000+ 标的扫描拖慢。
+  指定复权因子路由，支持 `primary`、`validator`、`fallback`、`daily_sync_enabled`、`maintenance_sync_enabled`。其中 `primary` 是正式抓取与回补入口实际使用的主源；`validator=tdx_xdxr` 是特殊值，仅用于 A 股旁路审计，不参与主抓取结果选择。TDX 审计会把权威源累计因子先推导为单日因子，再与 TDX XDXR 单日因子比较；审计结果只写 `adjustment_factors_tdx`，不会覆盖生产 `adjustment_factors`。`daily_sync_enabled=false` 表示该交易所在日更任务中跳过 Phase 2 因子同步；`maintenance_sync_enabled=true` 表示该交易所会进入每周维护任务的周度因子同步。港股当前关闭日更因子、开启周维护因子，以避免交易日日更被 3000+ 标的扫描拖慢。
 
 当前生产配置的关键路由示例：
 

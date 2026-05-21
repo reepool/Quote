@@ -87,7 +87,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/run daily_data_update <日期>` - 以补数据模式执行每日更新（跳过交易日检查）
 - `/run shareholder_shadow_sync` - 立即执行股东摘要周更任务，刷新本地 `shareholder_snapshots`
 - `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
-- `/backfill <开始日期> <结束日期> [交易所...]` - 按交易日逐日补充日期范围内缺失数据
+- `/backfill <开始日期> <结束日期> [交易所...]` - 以区间模式补充日期范围内缺失数据
 - `/industry_standard_sync [force]` - 申万官方分类日更同步；默认使用 source manifest，官方文件未变化时短路
 - `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建；清理 strict Shenwan 行业标准层后重载
 - `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频指标同步；只写 `industry_index_analysis_daily`
@@ -106,6 +106,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 /run shareholder_shadow_sync             # 手工触发股东摘要全量刷新
 /backfill 2026-03-27                     # 补充 3/27 所有交易所数据
 /backfill 2026-03-27 SSE                 # 仅补充上交所 3/27 数据
+/backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # 一次性补充 A 股日期区间
 /industry_standard_sync                  # 申万官方分类日更同步
 /industry_standard_sync force            # 强制重新拉取官方文件并同步
 /industry_standard_rebuild force         # 清理 strict Shenwan slice 后全量重建
@@ -229,10 +230,10 @@ reload_config - 热重载配置
 /backfill 2026-03-27 SSE          # \u4ec5\u8865\u5145\u4e0a\u4ea4\u6240
 /backfill 2026-03-27 SSE SZSE     # \u8865\u5145\u4e0a\u4ea4\u6240\u548c\u6df1\u4ea4\u6240
 /backfill 2026-05-20 BSE          # \u8865\u5145\u5317\u4ea4\u6240\u67d0\u4e2a\u4ea4\u6613\u65e5
-/backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # \u6309\u4ea4\u6613\u65e5\u9010\u65e5\u8865\u533a\u95f4
+/backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # \u4ee5\u533a\u95f4\u6a21\u5f0f\u8865\u5145 A \u80a1\u7f3a\u53e3
 ```
 
-> A 股普通日更已经会先刷新股票主数据。若新股因为历史股票池滞后漏掉了近几天日 K，先确认主数据同步完成，再执行 `/backfill <开始日期> <结束日期> SSE SZSE BSE` 即可。`/backfill` 会走 `daily_data_update(target_date=...)` 的补数模式，跳过当前主数据同步，但会使用当前数据库中的 active 股票池。时间段模式只对范围内交易日逐日执行。
+> A 股普通日更已经会先刷新股票主数据。若新股因为历史股票池滞后漏掉了近几天日 K，先确认主数据同步完成，再执行 `/backfill <开始日期> <结束日期> SSE SZSE BSE` 即可。单日 `/backfill` 仍走 `daily_data_update(target_date=...)` 的补数模式；时间段 `/backfill` 走区间补数路径，每个交易所只读取一次 active 股票池、每个品种只请求一次连续日期范围，并默认跳过 TDX Phase 2.5 审计。
 
 ### \u65b9\u5f0f\u4e8c\uff1a`/run daily_data_update <\u65e5\u671f>`
 
@@ -248,10 +249,10 @@ reload_config - 热重载配置
 |------|------------|-----------------------------------|
 | \u4ea4\u6613\u6240 | \u9ed8\u8ba4 SSE+SZSE\uff0c\u53ef\u8ffd\u52a0\u6307\u5b9a | \u4ece\u914d\u7f6e\u6587\u4ef6\u8bfb\u53d6 |
 | instrument\_types | \u4f7f\u7528\u65b9\u6cd5\u5185\u9ed8\u8ba4\u503c | \u4ece\u914d\u7f6e\u6587\u4ef6\u8bfb\u53d6 |
-| \u4f9d\u8d56\u8c03\u5ea6\u5668 | \u4e0d\u4f9d\u8d56\uff0c\u76f4\u63a5\u8c03\u7528 | \u4e0d\u4f9d\u8d56\uff0c\u76f4\u63a5\u8c03\u7528 |
+| \u4f9d\u8d56\u8c03\u5ea6\u5668 | \u4e0d\u4f9d\u8d56\uff0c\u5355\u65e5\u8d70 daily update\uff0c\u533a\u95f4\u8d70 range backfill | \u4e0d\u4f9d\u8d56\uff0c\u76f4\u63a5\u8c03\u7528 |
 | \u7b49\u5f85\u6536\u76d8/\u4ea4\u6613\u65e5\u68c0\u67e5 | \u81ea\u52a8\u8df3\u8fc7 | \u81ea\u52a8\u8df3\u8fc7 |
 
-> **\u63d0\u793a**\uff1a\u5f53\u524d\u914d\u7f6e\u4e0b\u4e24\u8005\u884c\u4e3a\u57fa\u672c\u4e00\u81f4\u3002`/backfill` \u7684\u4f18\u52bf\u5728\u4e8e\u53ef\u4ee5\u7075\u6d3b\u6307\u5b9a\u4ea4\u6613\u6240\uff0c\u4e14\u4e0d\u4f9d\u8d56\u8c03\u5ea6\u5668\u72b6\u6001\u3002
+> **\u63d0\u793a**\uff1a\u5355\u65e5 `/backfill` \u4e0e `/run daily_data_update <\u65e5\u671f>` \u57fa\u672c\u4e00\u81f4\uff1b\u65f6\u95f4\u6bb5 `/backfill` \u4f1a\u4f7f\u7528\u533a\u95f4\u8865\u6570\u5165\u53e3\uff0c\u907f\u514d\u5bf9\u6bcf\u4e2a\u4ea4\u6613\u65e5\u91cd\u590d\u8dd1\u4e09\u5e02\u5168\u91cf\u626b\u63cf\u548c TDX \u5ba1\u8ba1\u3002
 
 ## 📈 复权因子回补
 

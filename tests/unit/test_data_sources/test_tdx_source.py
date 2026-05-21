@@ -392,6 +392,23 @@ class TestFactorValidator:
         report = val.validate("000001.SZ", tdx, ref)
         assert report.result == FactorValidationResult.ALL_PASS
 
+    def test_ref_cumulative_factor_is_normalized_to_day_factor(self):
+        """权威源为累计因子时，先推导单日因子再比较。"""
+        from data_sources.tdx_factor_validator import FactorValidationResult
+        val = self._validator()
+        tdx = [
+            {"ex_date": datetime(2026, 4, 8), "factor": 1.036244, "cumulative_factor": 1.036244},
+        ]
+        ref = [
+            {"ex_date": datetime(2025, 9, 26), "factor": 1.283950, "cumulative_factor": 1.283950},
+            {"ex_date": datetime(2026, 4, 8), "factor": 1.330485, "cumulative_factor": 1.330485},
+        ]
+        report = val.validate("603682.SH", tdx, ref)
+        assert report.result == FactorValidationResult.ALL_PASS
+        assert report.conflict_count == 0
+        assert report.ref_only_count == 0
+        assert report.details[0].ref_factor == pytest.approx(1.036244, rel=1e-6)
+
     def test_report_to_dict(self):
         """验证报告序列化"""
         val = self._validator()
