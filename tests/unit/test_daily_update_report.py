@@ -133,5 +133,5 @@ def test_report_engine_formats_instrument_master_sync_warnings():
 
     assert '状态: warning' in summary
     assert '新增: 14，停用: 1' in summary
-    assert 'BSE warning active=314 +14/-0' in summary
+    assert 'BSE 状态=warning 活跃=314 +14/-0' in summary
     assert 'master data freshness exceeds 48h' in summary

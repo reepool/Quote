@@ -50,6 +50,14 @@ SchedulerCore
 #### 功能描述
 自动下载和更新当日股票和指数数据，确保数据的及时性。通过 `instrument_types` 参数控制更新的品种范围（默认读取配置文件）。
 
+普通 A 股日更会先执行证券主数据同步：
+
+- 范围为 `SSE`、`SZSE`、`BSE` 的 `stock` 主数据。
+- 主源为 BaoStock，AkShare 作为备用和补充；BSE 当前以 AkShare 当前列表补齐新增股票。
+- 同步完成后重新读取 active instruments，再开始行情抓取。
+- 历史补数模式 `target_date < today` 默认跳过当前主数据同步，并在报告数据中记录 skip reason。
+- 日更报告会包含 `instrument_master_sync`，用于暴露新增、停用、主数据新鲜度和 warnings/errors。
+
 #### 配置示例
 ```json
 {

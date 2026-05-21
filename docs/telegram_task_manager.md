@@ -87,6 +87,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/run daily_data_update <日期>` - 以补数据模式执行每日更新（跳过交易日检查）
 - `/run shareholder_shadow_sync` - 立即执行股东摘要周更任务，刷新本地 `shareholder_snapshots`
 - `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
+- `/backfill <开始日期> <结束日期> [交易所...]` - 按交易日逐日补充日期范围内缺失数据
 - `/industry_standard_sync [force]` - 申万官方分类日更同步；默认使用 source manifest，官方文件未变化时短路
 - `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建；清理 strict Shenwan 行业标准层后重载
 - `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频指标同步；只写 `industry_index_analysis_daily`
@@ -149,7 +150,8 @@ reload_config - 热重载配置
 ### 1. 每日数据更新 (daily_data_update)
 - **执行时间**: 每周一至周五 20:00
 - **功能**: 自动更新当日股票数据
-- **特点**: 支持交易日检查、市场收盘等待
+- **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更会先刷新 `SSE/SZSE/BSE` 股票主数据，再重新读取 active 股票池抓取行情
+- **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
 
 ### 2. 系统健康检查 (system_health_check)
 - **执行时间**: 每小时执行一次
@@ -226,7 +228,11 @@ reload_config - 热重载配置
 /backfill 2026-03-27              # \u8865\u5145\u6240\u6709\u4ea4\u6613\u6240
 /backfill 2026-03-27 SSE          # \u4ec5\u8865\u5145\u4e0a\u4ea4\u6240
 /backfill 2026-03-27 SSE SZSE     # \u8865\u5145\u4e0a\u4ea4\u6240\u548c\u6df1\u4ea4\u6240
+/backfill 2026-05-20 BSE          # \u8865\u5145\u5317\u4ea4\u6240\u67d0\u4e2a\u4ea4\u6613\u65e5
+/backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # \u6309\u4ea4\u6613\u65e5\u9010\u65e5\u8865\u533a\u95f4
 ```
+
+> A 股普通日更已经会先刷新股票主数据。若新股因为历史股票池滞后漏掉了近几天日 K，先确认主数据同步完成，再执行 `/backfill <开始日期> <结束日期> SSE SZSE BSE` 即可。`/backfill` 会走 `daily_data_update(target_date=...)` 的补数模式，跳过当前主数据同步，但会使用当前数据库中的 active 股票池。时间段模式只对范围内交易日逐日执行。
 
 ### \u65b9\u5f0f\u4e8c\uff1a`/run daily_data_update <\u65e5\u671f>`
 

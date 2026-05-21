@@ -17,7 +17,7 @@
       "continue_on_failure": true,
       "timeout_sec": 180,
       "freshness_threshold_hours": 48,
-      "pytdx_validation_enabled": true,
+      "pytdx_validation_enabled": false,
       "exchanges": [
         "SSE",
         "SZSE",

@@ -224,8 +224,8 @@ class ReportEngine:
                 continue
             after = item.get('after') if isinstance(item.get('after'), dict) else {}
             exchange_parts.append(
-                f"{exchange} {item.get('status', 'unknown')} "
-                f"active={after.get('active_count', 0)} "
+                f"{exchange} 状态={item.get('status', 'unknown')} "
+                f"活跃={after.get('active_count', 0)} "
                 f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)}"
             )
         if exchange_parts:

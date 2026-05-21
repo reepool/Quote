@@ -38,7 +38,7 @@ class DateUtils:
             target_date = date.today()
 
         # 中国交易日历
-        if exchange.upper() in ['SSE', 'SZSE']:
+        if exchange.upper() in ['SSE', 'SZSE', 'BSE']:
             return DateUtils._get_cn_trading_day(target_date)
         # 香港交易日历
         elif exchange.upper() == 'HKEX':

@@ -11,6 +11,7 @@ from .models import TaskStatusInfo, TaskStatus, TaskManagerState
 from .formatters import TaskManagerFormatters
 from .keyboards import TaskManagerKeyboards
 from utils import task_manager_logger
+from utils.date_utils import DateUtils
 
 
 class TaskManagerHandlers:
@@ -91,7 +92,7 @@ class TaskManagerHandlers:
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
-            "• `/backfill <日期>` - 补齐指定日期的缺失数据\n"
+            "• `/backfill <日期|开始日期 结束日期> [交易所...]` - 补齐指定日期或日期范围的缺失数据\n"
             "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
             "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
             "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
@@ -128,6 +129,7 @@ class TaskManagerHandlers:
             "• `/run daily_data_update 2026-03-27`\n"
             "• `/run shareholder_shadow_sync`\n"
             "• `/backfill 2026-03-27`\n"
+            "• `/backfill 2026-04-09 2026-05-21 SSE SZSE BSE`\n"
             "• `/backfill_factors HKEX full`\n"
             "• `/industry_standard_sync`\n"
             "• `/industry_standard_rebuild force`\n"
@@ -984,11 +986,13 @@ class TaskManagerHandlers:
             self.task_manager.logger.error(f"[TaskManagerHandlers] 执行任务异常: {job_id}, 错误: {e}")
 
     async def handle_backfill_command(self, event) -> None:
-        """处理 /backfill 命令，用于补充指定日期的缺失数据
+        """处理 /backfill 命令，用于补充指定日期或日期范围的缺失数据
 
         用法: /backfill <日期> [交易所...]
+              /backfill <开始日期> <结束日期> [交易所...]
         示例: /backfill 2026-03-27
               /backfill 2026-03-27 SSE SZSE
+              /backfill 2026-04-09 2026-05-21 SSE SZSE BSE
         """
         chat_id = event.chat_id
         user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
@@ -1000,56 +1004,146 @@ class TaskManagerHandlers:
         if len(parts) < 2:
             error_message = (
                 "❌ *缺少日期参数*\n\n"
-                "用法: `/backfill <日期> [交易所...]`\n\n"
+                "用法:\n"
+                "• `/backfill <日期> [交易所...]`\n"
+                "• `/backfill <开始日期> <结束日期> [交易所...]`\n\n"
                 "示例:\n"
                 "• `/backfill 2026-03-27` - 补充 3/27 所有交易所数据\n"
-                "• `/backfill 2026-03-27 SSE` - 仅补充上交所数据"
+                "• `/backfill 2026-03-27 SSE` - 仅补充上交所数据\n"
+                "• `/backfill 2026-04-09 2026-05-21 SSE SZSE BSE` - 补充日期范围内交易日"
             )
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             return
 
-        # 解析日期
-        target_date = self._parse_date_arg(parts[1])
-        if target_date is None:
+        # 解析日期：第二个日期参数存在时进入时间段模式。
+        start_date = self._parse_date_arg(parts[1])
+        if start_date is None:
             error_message = f"❌ *日期格式错误*\n\n`{parts[1]}` 不是有效日期。\n\n请使用 `YYYY-MM-DD` 格式。"
+            await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
+            return
+
+        end_date = start_date
+        exchange_arg_start = 2
+        if len(parts) >= 3:
+            parsed_end_date = self._parse_date_arg(parts[2])
+            if parsed_end_date is not None:
+                end_date = parsed_end_date
+                exchange_arg_start = 3
+
+        if end_date < start_date:
+            error_message = f"❌ *日期范围错误*\n\n结束日期 `{end_date}` 早于开始日期 `{start_date}`。"
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             return
 
         # 解析可选的交易所参数
         exchanges = None
-        if len(parts) >= 3:
+        if len(parts) > exchange_arg_start:
             valid_exchanges = {'SSE', 'SZSE', 'BSE', 'HKEX', 'NASDAQ', 'NYSE'}
-            exchanges = [ex.upper() for ex in parts[2:] if ex.upper() in valid_exchanges]
-            if not exchanges:
-                error_message = "❌ *无效的交易所代码*\n\n支持: SSE, SZSE, BSE, HKEX"
+            requested_exchanges = [ex.upper() for ex in parts[exchange_arg_start:]]
+            invalid_exchanges = [ex for ex in requested_exchanges if ex not in valid_exchanges]
+            if invalid_exchanges:
+                error_message = f"❌ *无效的交易所代码*\n\n无效参数: `{', '.join(invalid_exchanges)}`\n支持: SSE, SZSE, BSE, HKEX, NASDAQ, NYSE"
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
                 return
+            exchanges = requested_exchanges
 
         exchanges_info = f" (交易所: {', '.join(exchanges)})" if exchanges else " (所有交易所)"
-        start_message = f"⏳ *正在补充数据...*\n\n目标日期: `{target_date}`{exchanges_info}\n\n请稍候，任务执行中..."
+        effective_exchanges = exchanges or self._get_default_backfill_exchanges()
+        backfill_dates = self._build_backfill_dates(start_date, end_date, effective_exchanges)
+
+        if not backfill_dates:
+            empty_message = (
+                "⚠️ *没有可补充的交易日*\n\n"
+                f"日期范围: `{start_date}` 至 `{end_date}`{exchanges_info}"
+            )
+            await self.task_manager.send_message(chat_id, empty_message, parse_mode='markdown')
+            return
+
+        if start_date == end_date:
+            date_info = f"目标日期: `{start_date}`"
+        else:
+            date_info = (
+                f"日期范围: `{start_date}` 至 `{end_date}`\n"
+                f"交易日数量: `{len(backfill_dates)}`"
+            )
+        start_message = f"⏳ *正在补充数据...*\n\n{date_info}{exchanges_info}\n\n请稍候，任务执行中..."
         await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
 
         try:
             from scheduler.tasks import scheduled_tasks
 
-            result = await scheduled_tasks.daily_data_update(
-                exchanges=exchanges,
-                target_date=target_date,
-                wait_for_market_close=False,
-                enable_trading_day_check=False
-            )
+            succeeded = []
+            failed = []
+            for target_date in backfill_dates:
+                try:
+                    result = await scheduled_tasks.daily_data_update(
+                        exchanges=exchanges,
+                        target_date=target_date,
+                        wait_for_market_close=False,
+                        enable_trading_day_check=False
+                    )
+                    if result:
+                        succeeded.append(target_date)
+                    else:
+                        failed.append((target_date, '任务返回未成功'))
+                except Exception as single_e:
+                    failed.append((target_date, str(single_e)))
+                    self.task_manager.logger.error(
+                        f"[TaskManagerHandlers] 单日数据补充失败: {target_date}, 错误: {single_e}"
+                    )
 
-            if result:
-                success_message = f"✅ *数据补充完成*\n\n目标日期: `{target_date}`{exchanges_info}"
+            if not failed:
+                success_message = (
+                    "✅ *数据补充完成*\n\n"
+                    f"{date_info}{exchanges_info}\n"
+                    f"成功交易日: `{len(succeeded)}`"
+                )
                 await self.task_manager.send_message(chat_id, success_message, parse_mode='markdown')
             else:
-                error_message = f"⚠️ *数据补充未完全成功*\n\n目标日期: `{target_date}`{exchanges_info}\n\n可能是非交易日或部分数据源不可用，请检查日志。"
+                failed_preview = "\n".join(
+                    f"• `{day}`: {reason}" for day, reason in failed[:10]
+                )
+                more = f"\n... 另有 {len(failed) - 10} 个失败日期" if len(failed) > 10 else ""
+                error_message = (
+                    "⚠️ *数据补充未完全成功*\n\n"
+                    f"{date_info}{exchanges_info}\n"
+                    f"成功交易日: `{len(succeeded)}`\n"
+                    f"失败交易日: `{len(failed)}`\n\n"
+                    f"{failed_preview}{more}\n\n"
+                    "请检查日志。"
+                )
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
 
         except Exception as e:
             error_message = f"❌ *数据补充失败*\n\n错误: {str(e)}\n\n请检查日志。"
             await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
             self.task_manager.logger.error(f"[TaskManagerHandlers] 数据补充失败: {e}")
+
+    def _get_default_backfill_exchanges(self) -> List[str]:
+        """Return exchanges used by scheduler daily_data_update when /backfill omits exchanges."""
+        try:
+            from utils import config_manager
+            exchanges = config_manager.get_nested(
+                'data_config',
+                'market_presets',
+                'a_shares',
+                default=['SSE', 'SZSE', 'BSE'],
+            )
+            if isinstance(exchanges, list) and exchanges:
+                return [str(exchange).upper() for exchange in exchanges]
+        except Exception:
+            pass
+        return ['SSE', 'SZSE', 'BSE']
+
+    def _build_backfill_dates(self, start_date, end_date, exchanges: List[str]) -> List:
+        """Build target dates for /backfill; ranges run only on trading days."""
+        if start_date == end_date:
+            return [start_date]
+
+        dates = set()
+        for exchange in exchanges:
+            dates.update(DateUtils.get_trading_days_in_range(exchange, start_date, end_date))
+        return sorted(day for day in dates if start_date <= day <= end_date)
 
     async def handle_backfill_factors_command(self, event) -> None:
         """处理 /backfill_factors 命令，走 DataManager 正式回补逻辑。"""

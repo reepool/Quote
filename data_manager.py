@@ -6150,7 +6150,7 @@ class DataManager:
             'continue_on_failure': True,
             'timeout_sec': 180,
             'freshness_threshold_hours': 48,
-            'pytdx_validation_enabled': True,
+            'pytdx_validation_enabled': False,
             'exchanges': ['SSE', 'SZSE', 'BSE'],
         }
 
@@ -6241,7 +6241,7 @@ class DataManager:
 
         if self.source_factory is None:
             from data_sources.source_factory import get_data_source_factory
-            self.source_factory = get_data_source_factory()
+            self.source_factory = await get_data_source_factory(self.db_ops)
 
         pytdx_source = None
         if hasattr(self.source_factory, '_get_source_instance'):
@@ -6320,7 +6320,7 @@ class DataManager:
 
         if self.source_factory is None:
             from data_sources.source_factory import get_data_source_factory
-            self.source_factory = get_data_source_factory()
+            self.source_factory = await get_data_source_factory(self.db_ops)
 
         for exchange in sync_exchanges:
             exchange_result: Dict[str, Any] = {

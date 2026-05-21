@@ -292,6 +292,10 @@ start_batch = processed_batches + 1
 
 > **注意**：`instrument_types` 同时控制历史下载和每日自动更新的品种范围。当前 BaoStock 不支持 ETF 日线数据，如需下载 ETF 需待接入 AkShare 数据源后再将 `etf` 加入此列表。
 
+> **A 股主数据同步**：普通 `daily_data_update` 会在抓取行情前刷新 `SSE/SZSE/BSE` 股票主数据；显式历史回补默认跳过当前主数据同步，但会使用当前数据库中的 active 股票池。因此新股因股票字典滞后漏掉的日 K，应先完成一次主数据同步，再执行 `/backfill <开始日期> <结束日期> <交易所...>`；Telegram 会按范围内交易日逐日补数。
+
+> **港股注意**：当前 HKEX 品种列表来自 AkShare `stock_hk_spot_em`，该接口覆盖范围较宽，可能包含旧代码、债券/RMB 柜台等非普通股票。港股不应直接复用 A 股退市状态规则；需要先做 HKEX 专用主数据清洗和类型过滤，再决定是否接入日更前同步。
+
 ### 一次性下载模式
 设置 `download_chunk_days: 0` 可以启用一次性下载模式，一次性获取所有历史数据。
 

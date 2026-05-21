@@ -416,6 +416,7 @@
         "failure_count": "失败数量",
         "quotes_added": "新增行情",
         "total_quotes": "行情数据",
+        "date": "日期",
         "success_rate": "成功率",
         "updated_instruments": "更新股票",
         "new_quotes": "新增行情",

@@ -295,7 +295,9 @@ class ReportFormatter:
             status_text = str(status_value)
             if status_text.lower() in ('healthy', 'success'):
                 return f"任务执行状态: ✅ {status_text}"
-            elif status_text.lower() in ('warning', 'error'):
+            elif status_text.lower() == 'warning':
+                return f"任务执行状态: ⚠️ {status_text}"
+            elif status_text.lower() == 'error':
                 return f"任务执行状态: ❌ {status_text}"
             else:
                 return f"任务执行状态: ℹ️ {status_text}"
