@@ -64,6 +64,148 @@ def _apply_hkex_gap_guard(
     return filtered, skipped_details, skipped_count
 
 
+def _format_scheduler_status(status: Any) -> tuple[str, str]:
+    """Return a Telegram icon and concise Chinese label for task status."""
+    status_text = str(status or "unknown")
+    normalized = status_text.lower()
+    if normalized == "success":
+        return "✅", "成功"
+    if normalized in {"degraded", "warning"}:
+        return "⚠️", "部分完成"
+    if normalized in {"skipped", "disabled", "unavailable"}:
+        return "ℹ️", "未执行"
+    if normalized in {"failed", "error"}:
+        return "❌", "失败"
+    return "ℹ️", status_text
+
+
+def _format_source_mode(result: Dict[str, Any]) -> str:
+    source = result.get("source") or "N/A"
+    mode = result.get("mode") or "N/A"
+    return f"`{source}` / `{mode}`"
+
+
+def _format_industry_standard_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build an operator-facing report for the scheduled Shenwan standard sync."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    memberships_written = int(result.get("total_memberships_written", 0) or 0)
+    history_rows = int(result.get("classification_history_rows_written", 0) or 0)
+    taxonomy_nodes = int(result.get("taxonomy_nodes_written", 0) or 0)
+    official_rows = int(result.get("total_official_classifications_written", 0) or 0)
+    successful_exchanges = int(result.get("successful_exchanges", 0) or 0)
+    attempted_exchanges = int(result.get("attempted_exchanges", 0) or 0)
+    source_files_unchanged = bool(result.get("source_files_unchanged"))
+    reason = result.get("reason")
+
+    if status == "success" and source_files_unchanged:
+        conclusion = "官方分类文件未变化，本地 authoritative coverage 已满足，本次无需重写。"
+    elif status == "success":
+        conclusion = (
+            f"同步成功，本次写入 {memberships_written} 条股票行业归属、"
+            f"{history_rows} 条分类历史。"
+        )
+    elif status == "degraded":
+        conclusion = "同步部分完成，至少存在交易所覆盖不足或上游/本地校验异常。"
+    elif status in {"skipped", "disabled", "unavailable"}:
+        conclusion = reason or "任务未执行，请查看原因和交易所明细。"
+    else:
+        conclusion = reason or "任务失败，请查看日志和交易所明细。"
+
+    exchange_lines = []
+    for item in result.get("exchanges", []) or []:
+        diagnostics = item.get("diagnostics") or {}
+        existing = diagnostics.get("existing_authoritative_memberships")
+        target = diagnostics.get("target_instruments")
+        coverage = f", existing={existing}/{target}" if existing is not None and target is not None else ""
+        unchanged = ", source_files=unchanged" if diagnostics.get("source_files_unchanged") else ""
+        error = f", reason={item.get('error_message')}" if item.get("error_message") else ""
+        exchange_lines.append(
+            f"{item.get('exchange', 'UNKNOWN')}: {item.get('status', 'unknown')}, "
+            f"memberships={item.get('memberships_written', 0)}, "
+            f"official={item.get('official_classifications_written', 0)}"
+            f"{coverage}{unchanged}{error}"
+        )
+    if not exchange_lines:
+        exchange_lines.append(reason or "无交易所明细")
+
+    return (
+        f"{icon} *研究域申万官方分类文件每日同步*\n\n"
+        f"任务: `industry_standard_sync`\n"
+        f"结论: *{label}* - {conclusion}\n\n"
+        f"状态: `{status}`\n"
+        f"数据源: {_format_source_mode(result)}\n"
+        f"source_files: `{'unchanged' if source_files_unchanged else 'updated/checked'}`\n"
+        f"交易所: `{successful_exchanges}/{attempted_exchanges}` 成功\n"
+        f"taxonomy_nodes: `{taxonomy_nodes}`\n"
+        f"history_rows: `{history_rows}`\n"
+        f"memberships_written: `{memberships_written}`\n"
+        f"official_classifications: `{official_rows}`\n\n"
+        "交易所明细:\n"
+        "```text\n"
+        + "\n".join(exchange_lines[:10])
+        + "\n```"
+    )
+
+
+def _format_industry_index_analysis_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build an operator-facing report for the scheduled Shenwan index-analysis sync."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    rows_written = int(result.get("rows_written", 0) or 0)
+    summary = result.get("summary") or {}
+    coverage = result.get("coverage") or {}
+    type_counts = summary.get("index_type_counts") or {}
+    coverage_counts = coverage.get("index_type_counts") or {}
+    latest_trade_date = summary.get("latest_trade_date") or coverage.get("end_date") or "N/A"
+    distinct_codes = int(summary.get("distinct_index_codes", 0) or 0)
+    reason = result.get("reason")
+
+    if status == "success" and rows_written > 0:
+        conclusion = (
+            f"同步成功，本次写入 {rows_written} 行指数分析指标，"
+            f"最新交易日 {latest_trade_date}。"
+        )
+    elif status == "success":
+        conclusion = "任务成功结束，但本次没有写入指数分析指标；需结合上游返回和日志判断是否为合法空跑。"
+    elif status in {"disabled", "unavailable", "skipped"}:
+        conclusion = reason or "任务未执行，请查看配置或研究存储初始化状态。"
+    else:
+        conclusion = reason or "任务失败，请查看日志。"
+
+    detail_lines = []
+    detail_source = type_counts or coverage_counts
+    for index_type, counts in detail_source.items():
+        missing_metrics = counts.get("missing_metrics") or {}
+        missing_text = f", missing={missing_metrics}" if missing_metrics else ""
+        detail_lines.append(
+            f"{index_type}: rows={counts.get('rows', 0)}, "
+            f"codes={counts.get('codes', 0)}, "
+            f"dates={counts.get('trade_dates', 0)}"
+            f"{missing_text}"
+        )
+    if not detail_lines:
+        detail_lines.append(reason or "无指数类型明细")
+
+    return (
+        f"{icon} *研究域申万行业指数分析日频指标同步*\n\n"
+        f"任务: `industry_index_analysis_sync`\n"
+        f"结论: *{label}* - {conclusion}\n\n"
+        f"状态: `{status}`\n"
+        f"operation: `{result.get('operation', 'latest')}`\n"
+        f"数据源: {_format_source_mode(result)}\n"
+        f"rows_written: `{rows_written}`\n"
+        f"latest_trade_date: `{latest_trade_date}`\n"
+        f"distinct_index_codes: `{distinct_codes}`\n"
+        f"index_types: `{len(detail_source)}`\n"
+        f"说明: 该任务只写 `industry_index_analysis_daily`，不改股票行业归属。\n\n"
+        "指数类型明细:\n"
+        "```text\n"
+        + "\n".join(detail_lines[:10])
+        + "\n```"
+    )
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -1065,6 +1207,7 @@ class ScheduledTasks:
 
             report_data = {
                 'name': '申万标准行业同步报告',
+                'content': _format_industry_standard_scheduler_report(result),
                 'status': 'success' if success else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
                 'duration': 'N/A',
@@ -1094,6 +1237,15 @@ class ScheduledTasks:
             await self._send_task_report(
                 report_data={
                     'name': '申万标准行业同步报告',
+                    'content': _format_industry_standard_scheduler_report({
+                        'status': 'error',
+                        'reason': str(e),
+                        'attempted_exchanges': 0,
+                        'successful_exchanges': 0,
+                        'exchanges': [
+                            {'exchange': 'ALL', 'status': 'error', 'error_message': str(e)}
+                        ],
+                    }),
                     'status': 'error',
                     'tasks_completed': 0,
                     'duration': 'N/A',
@@ -1233,6 +1385,7 @@ class ScheduledTasks:
             type_counts = summary.get('index_type_counts') or {}
             report_data = {
                 'name': '申万行业指数分析同步报告',
+                'content': _format_industry_index_analysis_scheduler_report(result),
                 'status': 'success' if success else status,
                 'tasks_completed': len(type_counts),
                 'duration': 'N/A',
@@ -1267,6 +1420,11 @@ class ScheduledTasks:
             await self._send_task_report(
                 report_data={
                     'name': '申万行业指数分析同步报告',
+                    'content': _format_industry_index_analysis_scheduler_report({
+                        'status': 'error',
+                        'reason': str(e),
+                        'rows_written': 0,
+                    }),
                     'status': 'error',
                     'tasks_completed': 0,
                     'duration': 'N/A',
