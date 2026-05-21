@@ -9,7 +9,7 @@ from unittest.mock import Mock, AsyncMock, patch, MagicMock
 import pandas as pd
 
 from data_sources.baostock_source import BaostockSource
-from data_sources.base_source import BaseDataSource
+from data_sources.base_source import BaseDataSource, RateLimitConfig
 from utils.exceptions import DataSourceError, ValidationError
 
 
@@ -85,6 +85,42 @@ class TestBaoStockSource:
 
         assert isinstance(result, pd.DataFrame)
         assert all(code.endswith('.SH') for code in result['code'])
+
+    @pytest.mark.asyncio
+    async def test_get_instrument_list_marks_past_outdate_delisted(self):
+        """BaoStock outDate is authoritative for inactive/delisted A-share status."""
+        class FakeResult:
+            error_code = '0'
+            error_msg = ''
+            fields = ['code', 'code_name', 'industry', 'area', 'type', 'status', 'ipoDate', 'outDate']
+
+            def __init__(self):
+                self._rows = [
+                    ['sh.600355', '精伦电子', '电子', '湖北', '1', '0', '2002-06-13', '2026-04-15'],
+                    ['sh.600000', '浦发银行', '银行', '上海', '1', '1', '1999-11-10', ''],
+                ]
+                self._idx = -1
+
+            def next(self):
+                self._idx += 1
+                return self._idx < len(self._rows)
+
+            def get_row_data(self):
+                return self._rows[self._idx]
+
+        source = BaostockSource(
+            'baostock',
+            RateLimitConfig(max_requests_per_minute=10000, max_requests_per_hour=10000, max_requests_per_day=10000),
+        )
+        source._run_bs_call = AsyncMock(return_value=FakeResult())
+
+        instruments = await source.get_instrument_list('SSE', instrument_types=['stock'])
+
+        by_id = {item['instrument_id']: item for item in instruments}
+        assert by_id['600355.SH']['is_active'] is False
+        assert by_id['600355.SH']['status'] == 'delisted'
+        assert by_id['600355.SH']['delisted_date'] == datetime(2026, 4, 15)
+        assert by_id['600000.SH']['is_active'] is True
 
     @pytest.mark.asyncio
     async def test_get_daily_data(self, baostock_source):

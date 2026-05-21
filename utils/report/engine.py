@@ -189,13 +189,55 @@ class ReportEngine:
                 'updated_instruments': summary.get('success_count', 0),
                 'new_quotes': summary.get('total_quotes_added', 0),
                 'success_rate': success_rate,
-                'exchange_stats': summary.get('exchange_stats', {})
+                'exchange_stats': summary.get('exchange_stats', {}),
+                'instrument_master_sync': summary.get('instrument_master_sync', data.get('instrument_master_sync')),
             })
+
+        data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
+            data.get('instrument_master_sync')
+        )
 
         # 确保所有报告都有一个明确的名称
         data['name'] = data.get('name', '每日数据更新报告')
 
         return data
+
+    def _format_instrument_master_sync_summary(self, sync_result: Dict[str, Any]) -> str:
+        """Format master-sync diagnostics for operator reports."""
+        if not isinstance(sync_result, dict) or not sync_result:
+            return ''
+
+        status = sync_result.get('status', 'unknown')
+        reason = sync_result.get('reason')
+        if status == 'skipped':
+            return f"状态: skipped\n原因: {reason or 'not provided'}"
+
+        summary = sync_result.get('summary', {}) if isinstance(sync_result.get('summary'), dict) else {}
+        lines = [
+            f"状态: {status}",
+            f"新增: {summary.get('added_instruments', 0)}，停用: {summary.get('deactivated_instruments', 0)}，活跃合计: {summary.get('active_count', 0)}",
+        ]
+
+        exchange_parts = []
+        for exchange, item in (sync_result.get('exchanges') or {}).items():
+            if not isinstance(item, dict):
+                continue
+            after = item.get('after') if isinstance(item.get('after'), dict) else {}
+            exchange_parts.append(
+                f"{exchange} {item.get('status', 'unknown')} "
+                f"active={after.get('active_count', 0)} "
+                f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)}"
+            )
+        if exchange_parts:
+            lines.append('市场: ' + '；'.join(exchange_parts))
+
+        warnings = sync_result.get('warnings') or []
+        errors = sync_result.get('errors') or []
+        if warnings:
+            lines.append('警告: ' + '；'.join(str(w) for w in warnings[:3]))
+        if errors:
+            lines.append('错误: ' + '；'.join(str(e) for e in errors[:3]))
+        return '\n'.join(lines)
 
     def _prepare_gap_report_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """

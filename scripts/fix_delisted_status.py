@@ -245,6 +245,7 @@ async def step2_akshare_supplement(db_ops, dry_run: bool = False) -> Dict[str, i
 async def step3_diff_report(db_ops) -> Dict[str, Any]:
     """Step 3: AkShare 独有品种差集报告（仅报告）"""
     import akshare as ak
+    import pandas as pd
 
     logger.info("=" * 60)
     logger.info("Step 3: AkShare 独有品种差集报告")
@@ -255,12 +256,26 @@ async def step3_diff_report(db_ops) -> Dict[str, Any]:
     # 获取 AkShare 各交易所当前在册列表
     current_lists: Dict[str, set] = {}
 
-    try:
-        sh_df = ak.stock_info_sh_name_code(symbol="主板A股")
-        current_lists['SSE_stock'] = {f"{str(row['证券代码']).zfill(6)}.SH" for _, row in sh_df.iterrows()}
-        logger.info(f"  上交所主板 A 股当前在册: {len(current_lists['SSE_stock'])}")
-    except Exception as e:
-        logger.warning(f"  获取上交所列表失败: {e}")
+    sse_frames: List[Any] = []
+    for board_name in ("主板A股", "科创板"):
+        try:
+            board_df = ak.stock_info_sh_name_code(symbol=board_name)
+            if board_df is not None and not board_df.empty:
+                sse_frames.append(board_df)
+            logger.info(f"  上交所{board_name}当前在册: {len(board_df)} 条")
+        except Exception as e:
+            logger.warning(f"  获取上交所{board_name}列表失败: {e}")
+
+    if sse_frames:
+        sh_df = pd.concat(sse_frames, ignore_index=True)
+        current_lists['SSE_stock'] = {
+            f"{str(row['证券代码']).zfill(6)}.SH"
+            for _, row in sh_df.iterrows()
+        }
+        logger.info(
+            f"  上交所 A 股当前在册合计（主板A股+科创板）: "
+            f"{len(current_lists['SSE_stock'])}"
+        )
 
     try:
         sz_df = ak.stock_info_sz_name_code(symbol="A股列表")

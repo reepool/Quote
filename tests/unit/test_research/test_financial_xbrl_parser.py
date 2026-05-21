@@ -14,6 +14,7 @@ from research.financial_xbrl_parser import (
 from research.providers.base import FinancialFactsSnapshot
 from research.providers.official_financial_filings import (
     ConfiguredOfficialFinancialFilingProvider,
+    classify_official_filing_response,
 )
 
 
@@ -191,9 +192,140 @@ def test_structured_dispatcher_parses_sse_commonquery_json_numeric_facts():
     ]
     assert result.numeric_facts[0].fact_value == 173434000000.0
     assert result.numeric_facts[0].statement_family == "income_statement"
+    assert result.numeric_facts[0].canonical_fact_name == "revenue"
+    assert result.numeric_facts[0].canonical_semantic == "operating_revenue"
+    assert result.numeric_facts[1].canonical_fact_name == "net_income_parent"
+    assert result.numeric_facts[1].canonical_semantic == (
+        "parent_attributable_net_profit"
+    )
     assert result.numeric_facts[0].taxonomy_namespace == (
         "sse:common_map_incomestatement_c"
     )
+
+
+def test_structured_dispatcher_maps_statement_share_capital_as_amount():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            b'{"sqlId":"COMMON_MAP_BALANCESHEET_C",'
+            b'"result":[{"REPORT_YEAR":"2023","STOCK_ID":"600000.SS",'
+            b'"S2010_0700":"29352000000"}]}'
+        ),
+        artifact_kind="structured_json",
+        source_file_id="file-sse-balance-json",
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2023-12-31",
+        source="sse",
+    )
+
+    fact = result.numeric_facts[0]
+
+    assert fact.fact_name == "S2010_0700"
+    assert fact.statement_family == "balance_sheet"
+    assert fact.canonical_fact_name == "share_capital_amount"
+    assert fact.canonical_semantic == "paid_in_capital_amount"
+    assert fact.canonical_unit == "CNY"
+    assert fact.canonical_fact_name != "shares_outstanding"
+
+
+def test_structured_dispatcher_parses_cninfo_data20_json_for_target_period():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            '{"path":"/financialData/getIncomeStatement","code":200,'
+            '"data":{"resultMsg":"success","records":[{"year":['
+            '{"index":"营业总收入","2025":43774.88,"2024":42421.88},'
+            '{"index":"归属母公司净利润","2025":2891.78,"2024":2479.55}],'
+            '"one":[{"index":"营业总收入","2026":10094.0,"2025":12010.02}]}]}}'
+        ).encode("utf-8"),
+        artifact_kind="structured_json",
+        source_file_id="file-cninfo-json",
+        instrument_id="920833.BJ",
+        symbol="920833",
+        exchange="BSE",
+        report_period="2025-12-31",
+        source="cninfo",
+    )
+
+    facts = {fact.fact_name: fact for fact in result.numeric_facts}
+
+    assert result.diagnostics["artifact_kind"] == "structured_json"
+    assert result.diagnostics["path"] == "/financialData/getIncomeStatement"
+    assert result.diagnostics["statement_family"] == "income_statement"
+    assert result.diagnostics["period_bucket"] == "year"
+    assert result.diagnostics["numeric_fact_count"] == 2
+    assert facts["营业总收入"].fact_value == 437748800.0
+    assert facts["营业总收入"].unit == "CNY"
+    assert facts["营业总收入"].canonical_fact_name == "revenue"
+    assert facts["营业总收入"].canonical_statement_family == "income_statement"
+    assert facts["归属母公司净利润"].canonical_fact_name == "net_income_parent"
+    assert facts["营业总收入"].raw_fact_json["source_unit"] == "CNY_10K"
+    assert facts["营业总收入"].raw_fact_json["standardized_fact"][
+        "canonical_fact_name"
+    ] == "revenue"
+    assert facts["营业总收入"].statement_family == "income_statement"
+    assert facts["营业总收入"].taxonomy_namespace == "cninfo:data20:getIncomeStatement"
+    assert "2024" in facts["营业总收入"].raw_fact_json["raw_row"]
+
+
+def test_structured_dispatcher_maps_cninfo_share_capital_as_amount():
+    result = FinancialStructuredFilingParserDispatcher().parse(
+        (
+            '{"path":"/financialData/getBalanceSheets","code":200,'
+            '"data":{"records":[{"year":[{"index":"实收资本（或股本）",'
+            '"2025":293.52}]}]}}'
+        ).encode("utf-8"),
+        artifact_kind="structured_json",
+        source_file_id="file-cninfo-balance-json",
+        instrument_id="920833.BJ",
+        symbol="920833",
+        exchange="BSE",
+        report_period="2025-12-31",
+        source="cninfo",
+    )
+
+    fact = result.numeric_facts[0]
+
+    assert fact.fact_name == "实收资本（或股本）"
+    assert fact.fact_value == 2935200.0
+    assert fact.canonical_fact_name == "share_capital_amount"
+    assert fact.canonical_unit == "CNY"
+    assert fact.canonical_fact_name != "shares_outstanding"
+
+
+def test_cninfo_data20_json_classifies_as_structured_payload():
+    classification = classify_official_filing_response(
+        (
+            '{"path":"/financialData/getBalanceSheets","code":200,'
+            '"data":{"records":[{"year":[{"index":"总资产","2025":77111.02}]}]}}'
+        ).encode("utf-8"),
+        content_type="application/json",
+        http_status=200,
+        url="https://www.cninfo.com.cn/data20/financialData/getBalanceSheets",
+    )
+
+    assert classification.response_class == "structured_payload"
+    assert classification.artifact_kind == "structured_json"
+    assert classification.parser_candidate == "structured_financial_json.v1"
+
+
+def test_cninfo_data20_json_classification_uses_full_payload_not_prefix_only():
+    payload = (
+        '{"path":"/financialData/getBalanceSheets","code":200,'
+        '"data":{"records":[{"year":[{"index":"总资产","2025":77111.02}]}]},'
+        f'"padding":"{"x" * 9000}"'
+        '}'
+    ).encode("utf-8")
+
+    assert len(payload) > 8192
+    classification = classify_official_filing_response(
+        payload,
+        content_type="application/json",
+        http_status=200,
+    )
+
+    assert classification.response_class == "structured_payload"
+    assert classification.artifact_kind == "structured_json"
 
 
 def test_core_fact_alias_mapping_returns_versioned_copy():
@@ -201,6 +333,14 @@ def test_core_fact_alias_mapping_returns_versioned_copy():
     aliases["revenue"].append("MUTATION")
 
     assert "Revenue" in get_core_financial_fact_aliases()["revenue"]
+    assert "归属母公司净利润" in get_core_financial_fact_aliases()["net_income"]
+    assert "总资产" in get_core_financial_fact_aliases()["total_assets"]
+    assert get_core_financial_fact_aliases()["net_income"].index(
+        "NetProfitAttributableToOwnersOfParent"
+    ) < get_core_financial_fact_aliases()["net_income"].index("NetProfit")
+    assert get_core_financial_fact_aliases()["equity"].index(
+        "EquityAttributableToOwnersOfParent"
+    ) < get_core_financial_fact_aliases()["equity"].index("TotalEquity")
     assert "MUTATION" not in get_core_financial_fact_aliases()["revenue"]
     with pytest.raises(ValueError):
         get_core_financial_fact_aliases("unknown")
@@ -233,6 +373,42 @@ def test_fallback_merge_fills_missing_core_facts_without_overwriting_primary():
     assert merged.equity == 50.0
     assert merged.lineage_json["fallback_source"] == "akshare"
     assert merged.lineage_json["fallback_filled_fields"] == ["equity"]
+
+
+def test_fallback_merge_skips_semantically_ambiguous_fields():
+    primary = FinancialFactsSnapshot(
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        source="sse",
+        source_mode="direct",
+    )
+    fallback = FinancialFactsSnapshot(
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        equity=50.0,
+        source="akshare",
+        source_mode="direct",
+        lineage_json={
+            "core_fact_warnings": [
+                {
+                    "core_field": "equity",
+                    "warning": "equity_total_vs_parent_ambiguous",
+                }
+            ]
+        },
+    )
+
+    merged = merge_financial_core_facts_with_fallback(primary, fallback)
+
+    assert merged.equity is None
+    assert merged.lineage_json["fallback_filled_fields"] == []
+    assert merged.lineage_json["fallback_skipped_semantic_warning_fields"] == [
+        "equity"
+    ]
 
 
 class _FakeResponse:

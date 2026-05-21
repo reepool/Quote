@@ -18,6 +18,11 @@ from dataclasses import asdict, dataclass
 from datetime import timedelta
 from typing import Any, Dict, Generator, List, Optional
 
+from research.financial_fact_aliases import (
+    describe_core_financial_fact_alias,
+    get_core_financial_fact_derivation_rules,
+)
+from research.financial_source_field_mapping import FinancialSourceFieldMapping
 from research.official_shenwan_mapping import OfficialShenwanCodeMapping
 from utils import db_logger
 from utils.config_manager import ResearchConfig, config_manager
@@ -67,10 +72,11 @@ class FinancialStatementStorageRepository:
         *,
         ingestion_run_id: Optional[int] = None,
     ) -> str:
-        return self._storage.upsert_financial_source_file_manifest(
-            manifest,
-            ingestion_run_id=ingestion_run_id,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.upsert_financial_source_file_manifest(
+                manifest,
+                ingestion_run_id=ingestion_run_id,
+            )
 
     def upsert_numeric_facts(
         self,
@@ -79,11 +85,84 @@ class FinancialStatementStorageRepository:
         ingestion_run_id: Optional[int] = None,
         tier: str = "hot",
     ) -> int:
-        return self._storage.upsert_financial_numeric_facts(
-            facts,
-            ingestion_run_id=ingestion_run_id,
-            tier=tier,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.upsert_financial_numeric_facts(
+                facts,
+                ingestion_run_id=ingestion_run_id,
+                tier=tier,
+            )
+
+    def upsert_source_field_mappings(
+        self,
+        mappings: List[FinancialSourceFieldMapping],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        with self._storage.financial_database_scope():
+            return self._storage.upsert_financial_source_field_mappings(
+                mappings,
+                ingestion_run_id=ingestion_run_id,
+            )
+
+    def get_source_field_mappings(
+        self,
+        *,
+        profile: Optional[str] = None,
+        approved_for_core: Optional[bool] = None,
+        mapping_version: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_source_field_mappings(
+                profile=profile,
+                approved_for_core=approved_for_core,
+                mapping_version=mapping_version,
+            )
+
+    def upsert_mapping_audit_result(
+        self,
+        audit_result: Dict[str, Any],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> str:
+        with self._storage.financial_database_scope():
+            return self._storage.upsert_financial_mapping_audit_result(
+                audit_result,
+                ingestion_run_id=ingestion_run_id,
+            )
+
+    def get_mapping_audit_results(
+        self,
+        *,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        limit: int = 20,
+    ) -> List[Dict[str, Any]]:
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_mapping_audit_results(
+                profile=profile,
+                mapping_version=mapping_version,
+                limit=limit,
+            )
+
+    def get_local_core_facts(
+        self,
+        instrument_id: str,
+        *,
+        report_period: Optional[str] = None,
+        requested_canonical_facts: Optional[List[str]] = None,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        include_history: bool = False,
+    ) -> Dict[str, Any]:
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_local_core_facts(
+                instrument_id,
+                report_period=report_period,
+                requested_canonical_facts=requested_canonical_facts,
+                profile=profile,
+                mapping_version=mapping_version,
+                include_history=include_history,
+            )
 
     def get_core_facts(
         self,
@@ -93,12 +172,13 @@ class FinancialStatementStorageRepository:
         report_period: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
-        return self._storage.get_financial_core_facts(
-            instrument_id,
-            include_history=include_history,
-            report_period=report_period,
-            limit=limit,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_core_facts(
+                instrument_id,
+                include_history=include_history,
+                report_period=report_period,
+                limit=limit,
+            )
 
     def detect_coverage_gaps(
         self,
@@ -108,12 +188,13 @@ class FinancialStatementStorageRepository:
         required_core_facts: List[str],
         fallback_sources: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
-        return self._storage.detect_financial_coverage_gaps(
-            expected_periods=expected_periods,
-            instrument_ids=instrument_ids,
-            required_core_facts=required_core_facts,
-            fallback_sources=fallback_sources,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.detect_financial_coverage_gaps(
+                expected_periods=expected_periods,
+                instrument_ids=instrument_ids,
+                required_core_facts=required_core_facts,
+                fallback_sources=fallback_sources,
+            )
 
     def validate_readiness(
         self,
@@ -123,12 +204,13 @@ class FinancialStatementStorageRepository:
         required_core_facts: List[str],
         fallback_sources: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
-        return self._storage.validate_financial_statement_readiness(
-            expected_periods=expected_periods,
-            instrument_ids=instrument_ids,
-            required_core_facts=required_core_facts,
-            fallback_sources=fallback_sources,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.validate_financial_statement_readiness(
+                expected_periods=expected_periods,
+                instrument_ids=instrument_ids,
+                required_core_facts=required_core_facts,
+                fallback_sources=fallback_sources,
+            )
 
     def maintain_tiers(
         self,
@@ -136,10 +218,11 @@ class FinancialStatementStorageRepository:
         instrument_id: Optional[str] = None,
         hot_quarter_window: Optional[int] = None,
     ) -> Dict[str, Any]:
-        return self._storage.maintain_financial_hot_cold_tiers(
-            instrument_id=instrument_id,
-            hot_quarter_window=hot_quarter_window,
-        )
+        with self._storage.financial_database_scope():
+            return self._storage.maintain_financial_hot_cold_tiers(
+                instrument_id=instrument_id,
+                hot_quarter_window=hot_quarter_window,
+            )
 
 
 class ResearchStorageManager:
@@ -148,8 +231,21 @@ class ResearchStorageManager:
     def __init__(self, research_config: Optional[ResearchConfig] = None):
         self.research_config = research_config or config_manager.get_research_config()
         self.db_path = self.research_config.storage.db_path
+        self.financials_db_path = self.research_config.storage.financials_db_path
+        if (
+            os.path.normpath(self.financials_db_path)
+            == os.path.normpath("data/financials.db")
+            and os.path.normpath(self.db_path) != os.path.normpath("data/research.db")
+        ):
+            self.financials_db_path = os.path.join(
+                os.path.dirname(self.db_path),
+                "financials.db",
+            )
+            self.research_config.storage.financials_db_path = self.financials_db_path
         self.quotes_db_path = self.research_config.storage.quotes_db_path
         self.quotes_db_alias = self.research_config.storage.quotes_db_alias
+        self._active_db_path: Optional[str] = None
+        self._financial_ingestion_run_ids: set[int] = set()
         self.financial_statements = FinancialStatementStorageRepository(self)
 
     def initialize(self) -> None:
@@ -159,22 +255,83 @@ class ResearchStorageManager:
             self._apply_pragmas(conn)
             self._create_tables(conn)
             self._migrate_tables(conn)
+            if self._uses_separate_financial_database():
+                self._drop_financial_tables_from_research_database(conn)
 
             if self.research_config.storage.attach_quotes_db:
                 self._attach_quotes_db(conn)
 
             conn.commit()
         db_logger.info(f"[ResearchStorage] Initialized research database at {self.db_path}")
+        if self.financials_db_path and self.financials_db_path != self.db_path:
+            os.makedirs(os.path.dirname(self.financials_db_path), exist_ok=True)
+            with self.financial_database_scope():
+                with self.get_connection() as conn:
+                    self._apply_pragmas(conn)
+                    self._create_tables(conn)
+                    self._migrate_tables(conn)
+                    conn.commit()
+            db_logger.info(
+                "[ResearchStorage] Initialized financial database at %s",
+                self.financials_db_path,
+            )
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
         """Yield a sqlite3 connection for the research database."""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self._active_db_path or self.db_path)
         conn.row_factory = sqlite3.Row
         try:
             yield conn
         finally:
             conn.close()
+
+    @contextmanager
+    def financial_database_scope(self) -> Generator[None, None, None]:
+        """Route storage operations inside this block to the financial database."""
+        previous_db_path = self._active_db_path
+        self._active_db_path = self.financials_db_path or self.db_path
+        try:
+            yield
+        finally:
+            self._active_db_path = previous_db_path
+
+    def active_storage_db_path(self) -> str:
+        """Return the SQLite path currently used by storage operations."""
+        return self._active_db_path or self.db_path
+
+    def _uses_separate_financial_database(self) -> bool:
+        return bool(self.financials_db_path) and (
+            os.path.abspath(self.financials_db_path) != os.path.abspath(self.db_path)
+        )
+
+    @classmethod
+    def _drop_financial_tables_from_research_database(
+        cls,
+        conn: sqlite3.Connection,
+    ) -> None:
+        """Remove financial-domain physical tables from the non-financial research DB."""
+        for table_name in cls._financial_table_names():
+            conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+    @staticmethod
+    def _financial_table_names() -> tuple[str, ...]:
+        return (
+            "financial_core_facts_history",
+            "financial_core_facts_hot",
+            "financial_facts",
+            "financial_indicator_snapshots",
+            "financial_indicator_snapshots_history",
+            "financial_indicator_snapshots_hot",
+            "financial_numeric_facts",
+            "financial_numeric_facts_history",
+            "financial_numeric_facts_hot",
+            "financial_source_field_mappings",
+            "financial_source_files",
+            "financial_source_mapping_audits",
+            "financial_statements_raw",
+            "financial_summaries",
+        )
 
     def start_ingestion_run(
         self,
@@ -187,6 +344,16 @@ class ResearchStorageManager:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> int:
         """Create a new ingestion run row."""
+        if self._is_financial_domain(domain) and self._active_db_path is None:
+            with self.financial_database_scope():
+                return self.start_ingestion_run(
+                    domain=domain,
+                    job_name=job_name,
+                    market=market,
+                    source=source,
+                    mode=mode,
+                    metadata=metadata,
+                )
         now = get_shanghai_time().isoformat()
         metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
 
@@ -223,7 +390,10 @@ class ResearchStorageManager:
                 ),
             )
             conn.commit()
-            return int(cursor.lastrowid)
+            run_id = int(cursor.lastrowid)
+            if self._is_financial_domain(domain):
+                self._financial_ingestion_run_ids.add(run_id)
+            return run_id
 
     def finish_ingestion_run(
         self,
@@ -235,6 +405,15 @@ class ResearchStorageManager:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> IngestionRunRecord:
         """Update an ingestion run on completion."""
+        if run_id in self._financial_ingestion_run_ids and self._active_db_path is None:
+            with self.financial_database_scope():
+                return self.finish_ingestion_run(
+                    run_id,
+                    status=status,
+                    rows_written=rows_written,
+                    error_message=error_message,
+                    metadata=metadata,
+                )
         now = get_shanghai_time().isoformat()
         metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
 
@@ -273,6 +452,13 @@ class ResearchStorageManager:
         market: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """Return the latest successful ingestion run for checkpointing."""
+        if self._is_financial_domain(domain) and self._active_db_path is None:
+            with self.financial_database_scope():
+                return self.get_latest_successful_ingestion_run(
+                    domain=domain,
+                    job_name=job_name,
+                    market=market,
+                )
         filters = ["domain = ?", "job_name = ?", "status = ?"]
         params: List[Any] = [domain, job_name, "success"]
         if market is not None:
@@ -310,6 +496,17 @@ class ResearchStorageManager:
         ingestion_run_id: Optional[int] = None,
     ) -> int:
         """Store or replace a raw payload snapshot."""
+        if self._is_financial_domain(domain) and self._active_db_path is None:
+            with self.financial_database_scope():
+                return self.store_raw_payload(
+                    domain=domain,
+                    instrument_id=instrument_id,
+                    source=source,
+                    source_mode=source_mode,
+                    payload=payload,
+                    payload_hash=payload_hash,
+                    ingestion_run_id=ingestion_run_id,
+                )
         now = get_shanghai_time().isoformat()
         payload_json = json.dumps(
             payload,
@@ -353,6 +550,10 @@ class ResearchStorageManager:
             )
             conn.commit()
             return int(cursor.lastrowid or 0)
+
+    @staticmethod
+    def _is_financial_domain(domain: Optional[str]) -> bool:
+        return str(domain or "").startswith("financial")
 
     def upsert_company_profile(
         self,
@@ -819,6 +1020,244 @@ class ResearchStorageManager:
             conn.commit()
         return source_file_id
 
+    def upsert_financial_source_field_mappings(
+        self,
+        mappings: List[FinancialSourceFieldMapping],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Persist versioned source-field mapping decisions as long-form rows."""
+        if not mappings:
+            return 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for mapping in mappings:
+                mapping_json = json.dumps(
+                    mapping.to_dict(),
+                    ensure_ascii=False,
+                    sort_keys=True,
+                )
+                conn.execute(
+                    """
+                    INSERT INTO financial_source_field_mappings (
+                        mapping_version,
+                        profile,
+                        canonical_fact,
+                        statement_family,
+                        sina_field,
+                        ths_metric,
+                        relationship,
+                        source_unit,
+                        canonical_unit,
+                        unit_multiplier,
+                        value_type,
+                        approved_for_core,
+                        semantic,
+                        rejection_reason,
+                        mapping_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(mapping_version, profile, canonical_fact, sina_field, ths_metric)
+                    DO UPDATE SET
+                        statement_family = excluded.statement_family,
+                        relationship = excluded.relationship,
+                        source_unit = excluded.source_unit,
+                        canonical_unit = excluded.canonical_unit,
+                        unit_multiplier = excluded.unit_multiplier,
+                        value_type = excluded.value_type,
+                        approved_for_core = excluded.approved_for_core,
+                        semantic = excluded.semantic,
+                        rejection_reason = excluded.rejection_reason,
+                        mapping_json = excluded.mapping_json,
+                        ingestion_run_id = excluded.ingestion_run_id,
+                        updated_at = excluded.updated_at
+                    """,
+                    (
+                        mapping.mapping_version,
+                        mapping.profile,
+                        mapping.canonical_fact,
+                        mapping.statement_family,
+                        mapping.sina_field,
+                        mapping.ths_metric,
+                        mapping.relationship,
+                        mapping.source_unit,
+                        mapping.canonical_unit,
+                        mapping.unit_multiplier,
+                        mapping.value_type,
+                        1 if mapping.approved_for_core else 0,
+                        mapping.semantic,
+                        mapping.rejection_reason,
+                        mapping_json,
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
+            conn.commit()
+        return len(mappings)
+
+    def get_financial_source_field_mappings(
+        self,
+        *,
+        profile: Optional[str] = None,
+        approved_for_core: Optional[bool] = None,
+        mapping_version: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Read persisted source-field mapping decisions."""
+        clauses: List[str] = []
+        params: List[Any] = []
+        if profile is not None:
+            clauses.append("profile = ?")
+            params.append(profile)
+        if approved_for_core is not None:
+            clauses.append("approved_for_core = ?")
+            params.append(1 if approved_for_core else 0)
+        if mapping_version is not None:
+            clauses.append("mapping_version = ?")
+            params.append(mapping_version)
+        where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM financial_source_field_mappings
+                {where_sql}
+                ORDER BY mapping_version, profile, statement_family, canonical_fact, sina_field
+                """,
+                params,
+            ).fetchall()
+        return [self._row_to_financial_source_field_mapping(row) for row in rows]
+
+    def upsert_financial_mapping_audit_result(
+        self,
+        audit_result: Dict[str, Any],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> str:
+        """Persist one bounded mapping audit result as JSON plus queryable summary."""
+        now = get_shanghai_time().isoformat()
+        mapping_version = str(audit_result.get("mapping_version") or "")
+        profile = str(audit_result.get("profile") or "")
+        instrument_id = audit_result.get("instrument_id")
+        report_period = audit_result.get("report_period")
+        status = str(audit_result.get("status") or "unknown")
+        summary = audit_result.get("summary") or {}
+        audit_json = json.dumps(audit_result, ensure_ascii=False, sort_keys=True)
+        summary_json = json.dumps(summary, ensure_ascii=False, sort_keys=True)
+        audit_hash = hashlib.sha256(audit_json.encode("utf-8")).hexdigest()
+        audit_id = str(audit_result.get("audit_id") or f"{mapping_version}:{profile}:{audit_hash}")
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_source_mapping_audits (
+                    audit_id,
+                    mapping_version,
+                    profile,
+                    instrument_id,
+                    report_period,
+                    status,
+                    summary_json,
+                    audit_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(audit_id)
+                DO UPDATE SET
+                    mapping_version = excluded.mapping_version,
+                    profile = excluded.profile,
+                    instrument_id = excluded.instrument_id,
+                    report_period = excluded.report_period,
+                    status = excluded.status,
+                    summary_json = excluded.summary_json,
+                    audit_json = excluded.audit_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    audit_id,
+                    mapping_version,
+                    profile,
+                    instrument_id,
+                    report_period,
+                    status,
+                    summary_json,
+                    audit_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+        return audit_id
+
+    def get_financial_mapping_audit_results(
+        self,
+        *,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        limit: int = 20,
+    ) -> List[Dict[str, Any]]:
+        """Read bounded source-field mapping audit results."""
+        clauses: List[str] = []
+        params: List[Any] = []
+        if profile is not None:
+            clauses.append("profile = ?")
+            params.append(profile)
+        if mapping_version is not None:
+            clauses.append("mapping_version = ?")
+            params.append(mapping_version)
+        where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        params.append(max(int(limit), 1))
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM financial_source_mapping_audits
+                {where_sql}
+                ORDER BY updated_at DESC
+                LIMIT ?
+                """,
+                params,
+            ).fetchall()
+        return [self._row_to_financial_mapping_audit(row) for row in rows]
+
+    def _row_to_financial_source_field_mapping(self, row: sqlite3.Row) -> Dict[str, Any]:
+        item = dict(row)
+        item["approved_for_core"] = bool(item.get("approved_for_core"))
+        item["mapping"] = self._deserialize_json(item.pop("mapping_json", None)) or {}
+        return item
+
+    def _row_to_financial_mapping_audit(self, row: sqlite3.Row) -> Dict[str, Any]:
+        item = dict(row)
+        item["summary"] = self._deserialize_json(item.pop("summary_json", None)) or {}
+        item["audit"] = self._deserialize_json(item.pop("audit_json", None)) or {}
+        return item
+
+    @staticmethod
+    def _numeric_fact_has_local_core_lineage(
+        row: Dict[str, Any],
+        *,
+        profile: Optional[str],
+        mapping_version: Optional[str],
+    ) -> bool:
+        raw_fact = row.get("raw_fact") or {}
+        lineage = raw_fact.get("local_core_mapping") or {}
+        if not bool(lineage.get("approved_for_core")):
+            return False
+        if mapping_version is not None and lineage.get("mapping_version") != mapping_version:
+            return False
+        if profile is not None and profile not in set(lineage.get("profiles") or []):
+            return False
+        return True
+
     def get_financial_source_file_manifests(
         self,
         *,
@@ -914,6 +1353,7 @@ class ResearchStorageManager:
         include_history: bool = False,
         report_period: Optional[str] = None,
         fact_name: Optional[str] = None,
+        canonical_fact_name: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """Fetch long-form financial numeric facts through logical tier semantics."""
@@ -932,6 +1372,9 @@ class ResearchStorageManager:
         if fact_name:
             filters.append("fact_name = ?")
             params.append(fact_name)
+        if canonical_fact_name:
+            filters.append("canonical_fact_name = ?")
+            params.append(canonical_fact_name)
         limit_clause = "" if limit is None else "LIMIT ?"
         if limit is not None:
             params.append(int(limit))
@@ -950,6 +1393,107 @@ class ResearchStorageManager:
             ).fetchall()
 
         return [self._decode_financial_numeric_fact_row(row) for row in rows]
+
+    def get_financial_local_core_facts(
+        self,
+        instrument_id: str,
+        *,
+        report_period: Optional[str] = None,
+        requested_canonical_facts: Optional[List[str]] = None,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        include_history: bool = False,
+    ) -> Dict[str, Any]:
+        """Read approved local-core facts with structured missing-field diagnostics."""
+        approved_mappings = self.get_financial_source_field_mappings(
+            profile=profile,
+            approved_for_core=True,
+            mapping_version=mapping_version,
+        )
+        approved_core_facts = sorted(
+            {
+                str(mapping.get("canonical_fact") or "")
+                for mapping in approved_mappings
+                if str(mapping.get("canonical_fact") or "")
+            }
+        )
+        requested = (
+            [str(item) for item in requested_canonical_facts if str(item)]
+            if requested_canonical_facts is not None
+            else list(approved_core_facts)
+        )
+        rows = self.get_financial_numeric_facts(
+            instrument_id,
+            include_history=include_history,
+            report_period=report_period,
+        )
+        local_rows = [
+            row
+            for row in rows
+            if self._numeric_fact_has_local_core_lineage(
+                row,
+                profile=profile,
+                mapping_version=mapping_version,
+            )
+        ]
+        if report_period is None and local_rows:
+            selected_period = max(str(row["report_period"]) for row in local_rows)
+            local_rows = [
+                row for row in local_rows if str(row["report_period"]) == selected_period
+            ]
+        else:
+            selected_period = report_period
+
+        facts_by_canonical: Dict[str, Dict[str, Any]] = {}
+        for row in local_rows:
+            canonical_fact = str(row.get("canonical_fact_name") or "")
+            if not canonical_fact or canonical_fact not in requested:
+                continue
+            facts_by_canonical.setdefault(canonical_fact, row)
+
+        missing_fields = []
+        if not approved_core_facts:
+            missing_fields.append(
+                {
+                    "canonical_fact": None,
+                    "reason": "mapping_catalog_empty",
+                    "mapping_version": mapping_version,
+                    "profile": profile,
+                }
+            )
+        for canonical_fact in requested:
+            if canonical_fact not in approved_core_facts:
+                missing_fields.append(
+                    {
+                        "canonical_fact": canonical_fact,
+                        "reason": "outside_approved_local_core",
+                        "mapping_version": mapping_version,
+                        "profile": profile,
+                    }
+                )
+                continue
+            if canonical_fact not in facts_by_canonical:
+                missing_fields.append(
+                    {
+                        "canonical_fact": canonical_fact,
+                        "reason": "missing_local_core_fact",
+                        "mapping_version": mapping_version,
+                        "profile": profile,
+                        "report_period": selected_period,
+                    }
+                )
+
+        return {
+            "instrument_id": instrument_id,
+            "report_period": selected_period,
+            "profile": profile,
+            "mapping_version": mapping_version,
+            "requested_canonical_facts": requested,
+            "approved_canonical_facts": approved_core_facts,
+            "facts": facts_by_canonical,
+            "missing_fields": missing_fields,
+            "ready": not missing_fields,
+        }
 
     def upsert_financial_facts(
         self,
@@ -3919,12 +4463,19 @@ class ResearchStorageManager:
         instrument_id: str,
         *,
         include_statements: bool = True,
+        report_period: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """Fetch one latest financial statement bundle for an instrument."""
+        filters = ["instrument_id = ?"]
+        params: List[Any] = [instrument_id]
+        if report_period:
+            filters.append("report_period = ?")
+            params.append(report_period)
+
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             facts_row = conn.execute(
-                """
+                f"""
                 SELECT
                     instrument_id,
                     symbol,
@@ -3966,11 +4517,11 @@ class ResearchStorageManager:
                     created_at,
                     updated_at
                 FROM financial_facts
-                WHERE instrument_id = ?
+                WHERE {' AND '.join(filters)}
                 ORDER BY report_period DESC, updated_at DESC
                 LIMIT 1
                 """,
-                (instrument_id,),
+                params,
             ).fetchone()
             if facts_row is None:
                 return None
@@ -4193,6 +4744,8 @@ class ResearchStorageManager:
         source_distribution: Dict[str, int] = {}
         source_mode_distribution: Dict[str, int] = {}
         fallback_core_rows = 0
+        semantic_warning_count = 0
+        semantic_warnings: List[Dict[str, Any]] = []
         for row in core_rows:
             item = dict(row)
             key = (item["instrument_id"], item["report_period"])
@@ -4203,6 +4756,19 @@ class ResearchStorageManager:
             source_mode_distribution[mode] = source_mode_distribution.get(mode, 0) + 1
             if source in fallback_source_set:
                 fallback_core_rows += 1
+            lineage = self._deserialize_json(item.get("lineage_json")) or {}
+            for warning in lineage.get("core_fact_warnings") or []:
+                semantic_warning_count += 1
+                if len(semantic_warnings) < detail_limit:
+                    semantic_warnings.append(
+                        {
+                            "instrument_id": item.get("instrument_id"),
+                            "report_period": item.get("report_period"),
+                            "source": source,
+                            "source_mode": mode,
+                            **warning,
+                        }
+                    )
 
         source_file_keys: set[tuple[str, str]] = set()
         parser_version_distribution: Dict[str, int] = {}
@@ -4319,6 +4885,8 @@ class ResearchStorageManager:
                 "expected_core_fact_cells": expected_core_cells,
                 "present_core_fact_cells": present_core_cells,
                 "missing_core_fact_count": missing_core_fact_count,
+                "semantic_warning_count": semantic_warning_count,
+                "semantic_warnings": semantic_warnings,
                 "coverage_ratio": None
                 if expected_core_cells == 0
                 else present_core_cells / expected_core_cells,
@@ -4370,6 +4938,11 @@ class ResearchStorageManager:
             blockers.append("missing_source_files")
         if gaps["core_facts"]["missing_core_fact_count"]:
             blockers.append("missing_core_facts")
+        if (
+            bool(readiness_cfg.get("block_on_core_fact_semantic_warnings", True))
+            and gaps["core_facts"].get("semantic_warning_count")
+        ):
+            blockers.append("core_fact_semantic_warnings")
 
         min_period_coverage = float(
             readiness_cfg.get("min_period_coverage_ratio", 0.95)
@@ -4416,6 +4989,9 @@ class ResearchStorageManager:
                 "min_core_fact_coverage_ratio": min_core_coverage,
                 "max_fallback_share": max_fallback_share,
                 "max_parser_failure_ratio": max_parser_failure_ratio,
+                "block_on_core_fact_semantic_warnings": bool(
+                    readiness_cfg.get("block_on_core_fact_semantic_warnings", True)
+                ),
             },
             "gaps": gaps,
         }
@@ -4522,15 +5098,64 @@ class ResearchStorageManager:
             "intangible_assets",
             "shares_outstanding",
         }
+        alias_matches: Dict[str, Dict[str, Any]] = {}
+        alias_warnings: List[Dict[str, Any]] = []
+        derivation_rules = get_core_financial_fact_derivation_rules()
         for core_field, aliases in alias_mapping.items():
             if core_field not in supported_fields:
                 continue
+            skipped_candidates: List[Dict[str, Any]] = []
             for alias in aliases:
                 row = facts_by_name.get(alias)
                 if row is None:
                     continue
-                core_values[core_field] = row.get("fact_value")
-                break
+                alias_info = describe_core_financial_fact_alias(core_field, alias)
+                match_info = {
+                    **alias_info,
+                    "fact_name": row.get("fact_name"),
+                    "fact_value": row.get("fact_value"),
+                    "statement_family": row.get("statement_family"),
+                    "source_file_id": row.get("source_file_id"),
+                    "parser_version": row.get("parser_version"),
+                    "unit": row.get("unit"),
+                    "currency": row.get("currency"),
+                }
+                if alias_info["canonical_compatible"]:
+                    core_values[core_field] = row.get("fact_value")
+                    alias_matches[core_field] = match_info
+                    break
+                skipped_candidates.append({**match_info, "skipped": True})
+                for warning in alias_info.get("warnings", []):
+                    alias_warnings.append(
+                        {
+                            "core_field": core_field,
+                            "fact_name": row.get("fact_name"),
+                            "fact_value": row.get("fact_value"),
+                            "warning": warning,
+                            "canonical_semantic": alias_info.get("canonical_semantic"),
+                            "alias_semantic": alias_info.get("alias_semantic"),
+                        }
+                    )
+            else:
+                if skipped_candidates:
+                    alias_matches[core_field] = {
+                        "selected": None,
+                        "skipped_candidates": skipped_candidates,
+                    }
+            if core_field not in core_values:
+                derived_match = self._derive_core_fact_from_components(
+                    core_field,
+                    facts_by_name,
+                    derivation_rules.get(core_field, []),
+                )
+                if derived_match is not None:
+                    core_values[core_field] = derived_match["fact_value"]
+                    alias_matches[core_field] = derived_match
+                    alias_warnings = [
+                        warning
+                        for warning in alias_warnings
+                        if warning.get("core_field") != core_field
+                    ]
 
         first = numeric_facts[0]
         source_file_id = first.get("source_file_id")
@@ -4549,14 +5174,71 @@ class ResearchStorageManager:
             facts_json={
                 "derived_from_numeric_facts": True,
                 "alias_mapping": alias_mapping,
+                "core_fact_alias_matches": alias_matches,
+                "core_fact_warnings": alias_warnings,
                 "source_file_id": source_file_id,
             },
             lineage_json={
                 "source_file_id": source_file_id,
                 "numeric_fact_count": len(numeric_facts),
+                "core_fact_alias_matches": alias_matches,
+                "core_fact_warnings": alias_warnings,
             },
             **core_values,
         )
+
+    @staticmethod
+    def _derive_core_fact_from_components(
+        core_field: str,
+        facts_by_name: Dict[str, Dict[str, Any]],
+        rules: List[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        for rule in rules:
+            components = rule.get("components") or {}
+            total = ResearchStorageManager._first_numeric_component(
+                facts_by_name,
+                components.get("total") or [],
+            )
+            minority = ResearchStorageManager._first_numeric_component(
+                facts_by_name,
+                components.get("minority") or [],
+            )
+            if total is None or minority is None:
+                continue
+            value = total["fact_value"] - minority["fact_value"]
+            return {
+                "core_field": core_field,
+                "fact_name": f"{total['fact_name']}-{minority['fact_name']}",
+                "fact_value": value,
+                "method": rule.get("method"),
+                "canonical_compatible": True,
+                "derived": True,
+                "components": {
+                    "total": total,
+                    "minority": minority,
+                },
+            }
+        return None
+
+    @staticmethod
+    def _first_numeric_component(
+        facts_by_name: Dict[str, Dict[str, Any]],
+        aliases: List[str],
+    ) -> Optional[Dict[str, Any]]:
+        for alias in aliases:
+            row = facts_by_name.get(alias)
+            if row is None or row.get("fact_value") is None:
+                continue
+            return {
+                "fact_name": row.get("fact_name"),
+                "fact_value": row.get("fact_value"),
+                "statement_family": row.get("statement_family"),
+                "source_file_id": row.get("source_file_id"),
+                "parser_version": row.get("parser_version"),
+                "unit": row.get("unit"),
+                "currency": row.get("currency"),
+            }
+        return None
 
     def maintain_financial_hot_cold_tiers(
         self,
@@ -6053,6 +6735,11 @@ class ResearchStorageManager:
                 report_type,
                 statement_family,
                 fact_name,
+                canonical_fact_name,
+                canonical_statement_family,
+                canonical_semantic,
+                canonical_unit,
+                canonical_version,
                 taxonomy_namespace,
                 context_id,
                 unit,
@@ -6073,7 +6760,7 @@ class ResearchStorageManager:
                 ingestion_run_id,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(source_file_id, fact_name, context_id, unit, dimensions_hash)
             DO UPDATE SET
                 instrument_id = excluded.instrument_id,
@@ -6082,6 +6769,11 @@ class ResearchStorageManager:
                 report_period = excluded.report_period,
                 report_type = excluded.report_type,
                 statement_family = excluded.statement_family,
+                canonical_fact_name = excluded.canonical_fact_name,
+                canonical_statement_family = excluded.canonical_statement_family,
+                canonical_semantic = excluded.canonical_semantic,
+                canonical_unit = excluded.canonical_unit,
+                canonical_version = excluded.canonical_version,
                 taxonomy_namespace = excluded.taxonomy_namespace,
                 decimals = excluded.decimals,
                 precision = excluded.precision,
@@ -6108,6 +6800,11 @@ class ResearchStorageManager:
                 fact.report_type,
                 fact.statement_family,
                 fact.fact_name,
+                fact.canonical_fact_name,
+                fact.canonical_statement_family,
+                fact.canonical_semantic,
+                fact.canonical_unit,
+                fact.canonical_version,
                 fact.taxonomy_namespace,
                 fact.context_id or "",
                 fact.unit or "",
@@ -6903,6 +7600,54 @@ class ResearchStorageManager:
             "lineage_json",
             "lineage_json TEXT NOT NULL DEFAULT '{}'",
         )
+        for table_name in (
+            "financial_numeric_facts",
+            "financial_numeric_facts_hot",
+            "financial_numeric_facts_history",
+        ):
+            cls._ensure_column(
+                conn,
+                table_name,
+                "canonical_fact_name",
+                "canonical_fact_name TEXT",
+            )
+            cls._ensure_column(
+                conn,
+                table_name,
+                "canonical_statement_family",
+                "canonical_statement_family TEXT",
+            )
+            cls._ensure_column(
+                conn,
+                table_name,
+                "canonical_semantic",
+                "canonical_semantic TEXT",
+            )
+            cls._ensure_column(conn, table_name, "canonical_unit", "canonical_unit TEXT")
+            cls._ensure_column(
+                conn,
+                table_name,
+                "canonical_version",
+                "canonical_version TEXT",
+            )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_canonical
+            ON financial_numeric_facts(instrument_id, report_period, canonical_fact_name)
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_hot_canonical
+            ON financial_numeric_facts_hot(instrument_id, report_period, canonical_fact_name)
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_history_canonical
+            ON financial_numeric_facts_history(instrument_id, report_period, canonical_fact_name)
+            """
+        )
         for column_name in (
             "pe_static",
             "pe_ttm",
@@ -7083,6 +7828,50 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_financial_source_files_period
             ON financial_source_files(exchange, report_period, source, updated_at);
 
+            CREATE TABLE IF NOT EXISTS financial_source_field_mappings (
+                mapping_version TEXT NOT NULL,
+                profile TEXT NOT NULL,
+                canonical_fact TEXT NOT NULL,
+                statement_family TEXT NOT NULL,
+                sina_field TEXT NOT NULL,
+                ths_metric TEXT NOT NULL,
+                relationship TEXT NOT NULL,
+                source_unit TEXT NOT NULL,
+                canonical_unit TEXT NOT NULL,
+                unit_multiplier REAL NOT NULL DEFAULT 1.0,
+                value_type TEXT NOT NULL,
+                approved_for_core INTEGER NOT NULL DEFAULT 0,
+                semantic TEXT NOT NULL DEFAULT '',
+                rejection_reason TEXT,
+                mapping_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (mapping_version, profile, canonical_fact, sina_field, ths_metric),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_source_field_mappings_profile
+            ON financial_source_field_mappings(mapping_version, profile, approved_for_core);
+
+            CREATE TABLE IF NOT EXISTS financial_source_mapping_audits (
+                audit_id TEXT PRIMARY KEY,
+                mapping_version TEXT NOT NULL,
+                profile TEXT NOT NULL,
+                instrument_id TEXT,
+                report_period TEXT,
+                status TEXT NOT NULL,
+                summary_json TEXT NOT NULL DEFAULT '{}',
+                audit_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_source_mapping_audits_lookup
+            ON financial_source_mapping_audits(mapping_version, profile, instrument_id, report_period, updated_at);
+
             CREATE TABLE IF NOT EXISTS financial_numeric_facts (
                 source_file_id TEXT NOT NULL,
                 instrument_id TEXT NOT NULL,
@@ -7092,6 +7881,11 @@ class ResearchStorageManager:
                 report_type TEXT,
                 statement_family TEXT,
                 fact_name TEXT NOT NULL,
+                canonical_fact_name TEXT,
+                canonical_statement_family TEXT,
+                canonical_semantic TEXT,
+                canonical_unit TEXT,
+                canonical_version TEXT,
                 taxonomy_namespace TEXT,
                 context_id TEXT NOT NULL DEFAULT '',
                 unit TEXT NOT NULL DEFAULT '',
@@ -7128,6 +7922,11 @@ class ResearchStorageManager:
                 report_type TEXT,
                 statement_family TEXT,
                 fact_name TEXT NOT NULL,
+                canonical_fact_name TEXT,
+                canonical_statement_family TEXT,
+                canonical_semantic TEXT,
+                canonical_unit TEXT,
+                canonical_version TEXT,
                 taxonomy_namespace TEXT,
                 context_id TEXT NOT NULL DEFAULT '',
                 unit TEXT NOT NULL DEFAULT '',
@@ -7164,6 +7963,11 @@ class ResearchStorageManager:
                 report_type TEXT,
                 statement_family TEXT,
                 fact_name TEXT NOT NULL,
+                canonical_fact_name TEXT,
+                canonical_statement_family TEXT,
+                canonical_semantic TEXT,
+                canonical_unit TEXT,
+                canonical_version TEXT,
                 taxonomy_namespace TEXT,
                 context_id TEXT NOT NULL DEFAULT '',
                 unit TEXT NOT NULL DEFAULT '',
@@ -7913,3 +8717,45 @@ class ResearchStorageManager:
             ON raw_payload_audit(ingestion_run_id);
             """
         )
+
+
+def _route_financial_method_to_financial_db(method_name: str) -> None:
+    original = getattr(ResearchStorageManager, method_name)
+
+    def wrapped(self: ResearchStorageManager, *args: Any, **kwargs: Any) -> Any:
+        if self._active_db_path is not None:
+            return original(self, *args, **kwargs)
+        with self.financial_database_scope():
+            return original(self, *args, **kwargs)
+
+    wrapped.__name__ = original.__name__
+    wrapped.__doc__ = original.__doc__
+    setattr(ResearchStorageManager, method_name, wrapped)
+
+
+for _financial_method_name in (
+    "upsert_financial_summary",
+    "get_financial_summary",
+    "upsert_financial_statement_bundle",
+    "upsert_financial_statement_raw",
+    "upsert_financial_source_file_manifest",
+    "get_financial_source_file_manifests",
+    "upsert_financial_source_field_mappings",
+    "get_financial_source_field_mappings",
+    "upsert_financial_mapping_audit_result",
+    "get_financial_mapping_audit_results",
+    "upsert_financial_numeric_facts",
+    "get_financial_numeric_facts",
+    "get_financial_local_core_facts",
+    "upsert_financial_facts",
+    "upsert_financial_indicator_snapshot",
+    "get_financial_statement_bundle",
+    "get_financial_core_facts",
+    "summarize_financial_period_coverage",
+    "detect_financial_coverage_gaps",
+    "validate_financial_statement_readiness",
+    "summarize_financial_tier_coverage",
+    "derive_financial_core_facts_from_numeric_facts",
+    "maintain_financial_hot_cold_tiers",
+):
+    _route_financial_method_to_financial_db(_financial_method_name)

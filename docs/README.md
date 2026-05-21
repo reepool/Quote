@@ -10,6 +10,7 @@
 - `docs/telegram_task_manager.md`：Telegram 任务管理器
 
 ## 功能与使用
+- `docs/financial_data_system.md`：财务数据系统专项文档，包含 L1/L2/L3 分层、字段映射、`financials.db` 存储边界和全量导入脚本使用方法
 - `docs/features/historical_data_download.md`：历史数据下载
 - `docs/features/trading_calendar_management.md`：交易日历管理
 - `docs/gap_detection_usage.md`：缺口检测与报告

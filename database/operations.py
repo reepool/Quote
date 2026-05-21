@@ -482,6 +482,17 @@ class DatabaseOperations:
             record.is_active = False
             record.status = 'delisted'
 
+    @staticmethod
+    def _should_preserve_protected_inactive_status(
+        existing_status: str,
+        incoming_source: str,
+        incoming_delisted_date,
+    ) -> bool:
+        """Return True when a non-authoritative current-list source must not reactivate a row."""
+        status = existing_status or ''
+        protected_status = status == 'delisted' or status.startswith('auto_deactivated')
+        return protected_status and incoming_delisted_date is None and incoming_source != 'baostock'
+
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""
         try:
@@ -527,8 +538,20 @@ class DatabaseOperations:
                                 # 防线 A: 保护已有的退市日期不被空值覆盖
                                 if key == 'delisted_date' and value is None and getattr(existing, key, None) is not None:
                                     continue
-                                # 防线 C: 拦截东方财富等脏数据对自动封禁幽灵股的强行唤醒
-                                if key in ('is_active', 'status') and getattr(existing, 'status', '') == 'auto_deactivated_no_data':
+                                # 防线 C: 拦截缺少退市字段的数据源对已封禁/退市品种的强行唤醒。
+                                # BaoStock 的 outDate/status 才能作为 A 股退市状态的主判据；AkShare/pytdx
+                                # 等当前名单源不得用空 delisted_date 覆盖既有退市或自动封禁状态。
+                                existing_status = getattr(existing, 'status', '') or ''
+                                incoming_source = processed_data.get('source')
+                                incoming_delisted_date = processed_data.get('delisted_date')
+                                if (
+                                    key in ('is_active', 'status')
+                                    and self._should_preserve_protected_inactive_status(
+                                        existing_status,
+                                        incoming_source,
+                                        incoming_delisted_date,
+                                    )
+                                ):
                                     continue
 
                                 # 确保只更新模型中存在的字段，防止动态添加属性

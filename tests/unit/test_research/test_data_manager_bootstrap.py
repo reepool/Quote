@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from data_manager import DataManager
+from research.financial_source_field_mapping import MAPPING_VERSION
 from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchStorageConfig
 
 
@@ -1336,7 +1337,192 @@ def test_data_manager_get_research_financial_statements_delegates_to_storage(tmp
     storage.get_financial_statement_bundle.assert_called_once_with(
         "600000.SH",
         include_statements=True,
+        report_period=None,
     )
+
+
+def test_data_manager_get_research_financial_statements_includes_local_core_layer(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "local_core": {
+                        "enabled": True,
+                        "mapping_version": "sina_ths_core_financial_facts.v1",
+                    }
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+        "report_period": "2025-12-31",
+    }
+    storage.get_financial_local_core_facts.return_value = {
+        "instrument_id": "600000.SH",
+        "report_period": "2025-12-31",
+        "profile": "nonbank",
+        "mapping_version": "sina_ths_core_financial_facts.v1",
+        "requested_canonical_facts": ["revenue"],
+        "approved_canonical_facts": ["revenue"],
+        "facts": {"revenue": {"fact_value": 100.0}},
+        "missing_fields": [],
+        "ready": True,
+    }
+    manager.research_storage = storage
+
+    result = _run(
+        manager.get_research_financial_statements(
+            "600000.SH",
+            report_period="2025-12-31",
+            requested_canonical_facts=["revenue"],
+            profile="nonbank",
+            include_local_core=True,
+        )
+    )
+
+    assert result["service_layers"]["local_core"]["status"] == "passed"
+    assert result["service_layers"]["local_core"]["facts"]["revenue"]["fact_value"] == 100.0
+    storage.get_financial_statement_bundle.assert_called_once_with(
+        "600000.SH",
+        include_statements=True,
+        report_period="2025-12-31",
+    )
+    storage.get_financial_local_core_facts.assert_called_once_with(
+        "600000.SH",
+        report_period="2025-12-31",
+        requested_canonical_facts=["revenue"],
+        profile="nonbank",
+        mapping_version="sina_ths_core_financial_facts.v1",
+    )
+
+
+def test_data_manager_get_research_financial_statements_auto_resolves_local_core_profile(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "local_core": {
+                        "enabled": True,
+                        "mapping_version": MAPPING_VERSION,
+                    }
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600030.SH",
+        "symbol": "600030",
+        "exchange": "SSE",
+        "report_period": "2025-12-31",
+    }
+    storage.get_industry_membership.return_value = {
+        "taxonomy_system": "sw",
+        "taxonomy_version": "sw_2021",
+        "industry_code": "490101",
+        "industry_name": "证券Ⅲ",
+        "sw_l1_name": "非银金融",
+        "sw_l2_name": "证券Ⅱ",
+        "sw_l3_name": "证券Ⅲ",
+    }
+    storage.get_company_profile.return_value = None
+    storage.get_financial_local_core_facts.return_value = {
+        "instrument_id": "600030.SH",
+        "report_period": "2025-12-31",
+        "profile": "securities",
+        "mapping_version": MAPPING_VERSION,
+        "requested_canonical_facts": ["equity_parent"],
+        "approved_canonical_facts": ["equity_parent"],
+        "facts": {"equity_parent": {"fact_value": 293108725612.16}},
+        "missing_fields": [],
+        "ready": True,
+    }
+    manager.research_storage = storage
+
+    result = _run(
+        manager.get_research_financial_statements(
+            "600030.SH",
+            report_period="2025-12-31",
+            requested_canonical_facts=["equity_parent"],
+            include_local_core=True,
+        )
+    )
+
+    local_core = result["service_layers"]["local_core"]
+    assert local_core["status"] == "passed"
+    assert local_core["profile_resolution"]["profile"] == "securities"
+    assert local_core["profile_resolution"]["source"] == "industry_membership"
+    storage.get_financial_local_core_facts.assert_called_once_with(
+        "600030.SH",
+        report_period="2025-12-31",
+        requested_canonical_facts=["equity_parent"],
+        profile="securities",
+        mapping_version=MAPPING_VERSION,
+    )
+
+
+def test_data_manager_get_research_financial_statements_remote_extension_disabled_by_config(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "remote_extension": {
+                        "enabled": False,
+                        "source": "akshare",
+                        "statement_interface": "eastmoney_report",
+                    }
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+        "report_period": "2025-12-31",
+    }
+    manager.research_storage = storage
+
+    result = _run(
+        manager.get_research_financial_statements(
+            "600000.SH",
+            requested_canonical_facts=["eastmoney_only_metric"],
+            allow_remote_extension=True,
+        )
+    )
+
+    remote = result["service_layers"]["remote_extension"]
+    assert remote["status"] == "disabled_by_config"
+    assert remote["missing_fields"][0]["reason"] == "remote_extension_disabled_by_config"
 
 
 def test_data_manager_get_research_financial_statements_returns_optional_empty_bse_placeholder(tmp_path):

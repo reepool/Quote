@@ -35,6 +35,7 @@ from scripts.research_cli_support import (  # noqa: E402
 from research.providers.official_financial_filings import (  # noqa: E402
     classify_official_filing_response,
     extract_official_filing_artifact_candidates,
+    resolve_official_filing_context,
 )
 from utils.config_manager import ResearchConfig, UnifiedConfigManager  # noqa: E402
 
@@ -79,6 +80,7 @@ class OfficialFinancialProbeTarget:
     endpoint_request: Dict[str, Any] = field(default_factory=dict)
     endpoint_candidates: List[OfficialFinancialEndpointCandidate] = field(default_factory=list)
     sample_symbols_by_exchange: Dict[str, List[str]] = field(default_factory=dict)
+    context_resolvers: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class _SafeFormatDict(dict):
@@ -159,6 +161,11 @@ def build_probe_targets(
                     merged,
                     target_exchanges,
                 ),
+                context_resolvers=[
+                    resolver
+                    for resolver in merged.get("context_resolvers", [])
+                    if isinstance(resolver, dict)
+                ],
             )
         )
     return targets
@@ -196,6 +203,14 @@ def probe_targets(
             sample_instruments,
             report_period=report_period,
         )
+        context_resolution_diagnostics: List[Dict[str, Any]] = []
+        if target.context_resolvers and endpoint_contexts:
+            endpoint_contexts, context_resolution_diagnostics = _resolve_endpoint_contexts(
+                http_session,
+                target=target,
+                contexts=endpoint_contexts,
+                timeout=timeout,
+            )
         manifest_contexts = endpoint_contexts or [{}]
         for context in manifest_contexts:
             if _elapsed_limit_reached(started_at, max_elapsed_seconds):
@@ -285,6 +300,7 @@ def probe_targets(
                     samples_by_exchange,
                     sample_instruments,
                 ),
+                "context_resolution_diagnostics": context_resolution_diagnostics,
                 "artifacts": artifacts,
                 "probe_status": _target_probe_status(artifacts),
                 "elapsed_limit_reached": _elapsed_limit_reached(
@@ -326,6 +342,35 @@ def _limit_endpoint_candidates(
             for candidate in bounded
         ]
     return bounded
+
+
+def _resolve_endpoint_contexts(
+    session: requests.Session,
+    *,
+    target: OfficialFinancialProbeTarget,
+    contexts: List[Dict[str, str]],
+    timeout: float,
+) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
+    resolved_contexts: List[Dict[str, str]] = []
+    diagnostics: List[Dict[str, Any]] = []
+    for context in contexts:
+        resolution = resolve_official_filing_context(
+            session,
+            context,
+            resolvers=target.context_resolvers,
+            timeout=timeout,
+            user_agent=DEFAULT_USER_AGENT,
+        )
+        resolved_contexts.append(resolution.context)
+        if resolution.diagnostics:
+            diagnostics.append(
+                {
+                    "instrument_id": context.get("instrument_id"),
+                    "symbol": context.get("symbol"),
+                    "diagnostics": resolution.diagnostics,
+                }
+            )
+    return resolved_contexts, diagnostics
 
 
 def _elapsed_limit_reached(
@@ -645,7 +690,7 @@ def _probe_url(
     promotion_gate: str = "structured_payload_required",
     artifact_base_url: str = "",
     max_artifact_downloads: int = 0,
-    max_sample_bytes: int = 8192,
+    max_sample_bytes: int = 262144,
 ) -> Dict[str, Any]:
     if not url:
         return {

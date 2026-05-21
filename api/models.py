@@ -743,6 +743,10 @@ class ResearchFinancialStatementsResponse(BaseModel):
         default_factory=list,
         description="原始报表分项",
     )
+    service_layers: Optional[Dict[str, Any]] = Field(
+        None,
+        description="可选财务服务分层结果，包括 L1 本地核心和显式 L3 远程扩展诊断",
+    )
 
 
 class ResearchValuationHistoryItemResponse(BaseModel):

@@ -92,3 +92,32 @@ class TestDataSourceFactory:
         assert self.factory.source_instances_by_region == {}
         assert self.factory.factor_routes == {}
         assert self.factory.routing == {}
+
+    @pytest.mark.asyncio
+    async def test_get_instrument_list_uses_akshare_when_baostock_raises(self):
+        self.factory.routing['instrument_list']['a_stock'] = ['baostock', 'akshare']
+        self.baostock.get_instrument_list = AsyncMock(side_effect=RuntimeError('baostock down'))
+        backup_rows = [
+            {
+                'instrument_id': f'920{i:03d}.BJ',
+                'symbol': f'920{i:03d}',
+                'name': f'BSE{i}',
+                'exchange': 'BSE',
+                'type': 'stock',
+                'source': 'akshare',
+            }
+            for i in range(51)
+        ]
+        self.akshare.get_instrument_list = AsyncMock(return_value=backup_rows)
+        self.factory._save_instruments_cache = AsyncMock()
+
+        instruments = await self.factory.get_instrument_list(
+            'BSE',
+            force_refresh=True,
+            instrument_types=['stock'],
+        )
+
+        assert instruments == backup_rows
+        self.baostock.get_instrument_list.assert_awaited_once()
+        self.akshare.get_instrument_list.assert_awaited_once()
+        self.factory._save_instruments_cache.assert_awaited_once_with('BSE', backup_rows)

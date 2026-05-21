@@ -16,6 +16,8 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 
+from research.official_financial_source_profiles import source_profile_metadata
+
 from .base import (
     BaseOfficialFinancialFilingProvider,
     FinancialFilingPayload,
@@ -76,6 +78,14 @@ class OfficialFilingArtifactCandidate:
         }
 
 
+@dataclass(frozen=True)
+class OfficialFilingContextResolution:
+    """Resolved request context plus diagnostics for endpoint templating."""
+
+    context: Dict[str, str]
+    diagnostics: List[Dict[str, Any]] = field(default_factory=list)
+
+
 def classify_official_filing_response(
     sample: bytes | str,
     *,
@@ -87,7 +97,8 @@ def classify_official_filing_response(
     raw = sample.encode("utf-8", errors="replace") if isinstance(sample, str) else bytes(sample or b"")
     stripped = raw.lstrip(b"\xef\xbb\xbf\r\n\t ")
     content_type_lower = (content_type or "").lower()
-    text_sample = stripped[:8192].decode("utf-8", errors="ignore")
+    text_full = stripped.decode("utf-8", errors="ignore")
+    text_sample = text_full[:8192]
     text_lower = text_sample.lower()
 
     if http_status is not None and http_status in {401, 403, 407, 408, 409, 429, 451}:
@@ -125,7 +136,7 @@ def classify_official_filing_response(
         )
     if _looks_like_json(stripped, content_type_lower):
         return _classify_json_response(
-            text_sample,
+            text_full,
             content_type=content_type,
             http_status=http_status,
         )
@@ -199,6 +210,75 @@ def extract_official_filing_artifact_candidates(
     return list(deduped.values())
 
 
+def resolve_official_filing_context(
+    session: requests.Session,
+    context: Dict[str, str],
+    *,
+    resolvers: List[Dict[str, Any]],
+    timeout: float,
+    user_agent: str = "QuoteResearch/official-financial-filing",
+) -> OfficialFilingContextResolution:
+    """Resolve optional endpoint template variables from configured metadata calls."""
+    resolved = dict(context)
+    diagnostics: List[Dict[str, Any]] = []
+    for resolver in resolvers:
+        if not isinstance(resolver, dict) or not bool(resolver.get("enabled", True)):
+            continue
+        kind = str(resolver.get("kind") or "").strip()
+        key = str(resolver.get("key") or kind or "context_resolver")
+        if kind != "json_row_template":
+            diagnostics.append(
+                {
+                    "key": key,
+                    "status": "unsupported",
+                    "kind": kind,
+                    "error": "unsupported_context_resolver_kind",
+                }
+            )
+            continue
+        try:
+            before_keys = set(resolved)
+            row = _fetch_context_resolver_row(
+                session,
+                resolver=resolver,
+                context=resolved,
+                timeout=timeout,
+                user_agent=user_agent,
+            )
+            if row is None:
+                diagnostics.append(
+                    {
+                        "key": key,
+                        "status": "not_found",
+                        "kind": kind,
+                        "added_keys": [],
+                    }
+                )
+                continue
+            for output_key, template in (resolver.get("outputs") or {}).items():
+                value = _format_context_template(str(template), resolved, row)
+                if value:
+                    resolved[str(output_key)] = value
+            diagnostics.append(
+                {
+                    "key": key,
+                    "status": "ok",
+                    "kind": kind,
+                    "added_keys": sorted(set(resolved) - before_keys),
+                }
+            )
+        except Exception as exc:  # pragma: no cover - transport-specific
+            diagnostics.append(
+                {
+                    "key": key,
+                    "status": "error",
+                    "kind": kind,
+                    "error": str(exc),
+                }
+            )
+    return OfficialFilingContextResolution(context=resolved, diagnostics=diagnostics)
+
+
 def _classify_json_response(
     text_sample: str,
     *,
@@ -262,6 +342,128 @@ def _parse_json_or_jsonp(text_sample: str) -> Optional[Any]:
         return json.loads(match.group(1))
     except json.JSONDecodeError:
         return None
+
+
+def _fetch_context_resolver_row(
+    session: requests.Session,
+    *,
+    resolver: Dict[str, Any],
+    context: Dict[str, str],
+    timeout: float,
+    user_agent: str,
+) -> Optional[Dict[str, Any]]:
+    request_config = resolver.get("request") or resolver.get("request_config") or {}
+    url = str(resolver.get("url") or resolver.get("endpoint_url") or "")
+    if not url:
+        return None
+    method = str(request_config.get("method") or "GET").upper()
+    headers = {
+        "User-Agent": user_agent,
+        **_format_mapping(request_config.get("headers") or {}, context),
+    }
+    kwargs: Dict[str, Any] = {
+        "headers": headers,
+        "timeout": timeout,
+    }
+    query_params = _format_mapping(
+        request_config.get("query_params") or request_config.get("params") or {},
+        context,
+    )
+    body_params = _format_mapping(
+        request_config.get("body_params") or request_config.get("body") or {},
+        context,
+    )
+    json_body = _format_mapping(request_config.get("json") or {}, context)
+    if query_params:
+        kwargs["params"] = query_params
+    if body_params:
+        kwargs["data"] = body_params
+    if json_body:
+        kwargs["json"] = json_body
+
+    formatted_url = url.format_map(_SafeFormatDict(context))
+    response = (
+        session.get(formatted_url, **kwargs)
+        if method == "GET"
+        else session.request(method, formatted_url, **kwargs)
+    )
+    raise_for_status = getattr(response, "raise_for_status", None)
+    if raise_for_status is not None:
+        raise_for_status()
+    payload = _parse_json_or_jsonp(str(getattr(response, "text", "") or ""))
+    if payload is None:
+        payload = _parse_json_or_jsonp(
+            _response_body_bytes(response).decode(
+                "utf-8",
+                errors="ignore",
+            )
+        )
+    rows = _extract_rows_by_path(payload, str(resolver.get("row_list_path") or ""))
+    return _select_context_resolver_row(
+        rows,
+        row_match=resolver.get("row_match") or {},
+        context=context,
+    )
+
+
+def _response_body_bytes(response: Any) -> bytes:
+    content = getattr(response, "content", None)
+    if content is not None:
+        return bytes(content or b"")
+    iter_content = getattr(response, "iter_content", None)
+    if iter_content is None:
+        return b""
+    body = bytearray()
+    for chunk in iter_content(chunk_size=4096):
+        if chunk:
+            body.extend(chunk)
+    return bytes(body)
+
+
+def _extract_rows_by_path(payload: Any, path: str) -> List[Dict[str, Any]]:
+    current = payload
+    for part in [item for item in path.split(".") if item]:
+        if isinstance(current, dict):
+            current = current.get(part)
+        else:
+            current = None
+        if current is None:
+            break
+    if isinstance(current, list):
+        return [item for item in current if isinstance(item, dict)]
+    if isinstance(current, dict):
+        return [current]
+    return []
+
+
+def _select_context_resolver_row(
+    rows: List[Dict[str, Any]],
+    *,
+    row_match: Dict[str, Any],
+    context: Dict[str, str],
+) -> Optional[Dict[str, Any]]:
+    if not rows:
+        return None
+    match_items = [
+        (str(key), _format_config_value(value, context))
+        for key, value in row_match.items()
+    ]
+    if not match_items:
+        return rows[0]
+    for row in rows:
+        if all(str(row.get(key) or "") == str(expected) for key, expected in match_items):
+            return row
+    return None
+
+
+def _format_context_template(
+    template: str,
+    context: Dict[str, str],
+    row: Dict[str, Any],
+) -> str:
+    values = {key: str(value) for key, value in context.items()}
+    values.update({str(key): str(value) for key, value in row.items() if value is not None})
+    return template.format_map(_SafeFormatDict(values)).strip()
 
 
 def _looks_like_html(text_lower: str, content_type_lower: str) -> bool:
@@ -331,6 +533,10 @@ def _json_has_structured_financial_facts(
         return True
 
     if isinstance(payload, dict):
+        path = str(payload.get("path") or "")
+        if path.startswith("/financialData/") and _json_has_cninfo_data20_records(payload):
+            return True
+
         sql_id = str(payload.get("sqlId") or "").upper()
         if sql_id in {
             "COMMON_MAP_BASIC_COMPANYINFO_C",
@@ -351,6 +557,25 @@ def _json_has_structured_financial_facts(
                     re.match(r"^S\d{4}_\d{4}$", str(key)) for key in row
                 ):
                     return True
+    return False
+
+
+def _json_has_cninfo_data20_records(payload: Dict[str, Any]) -> bool:
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        return False
+    records = data.get("records")
+    if not isinstance(records, list):
+        return False
+    for record in records[:3]:
+        if not isinstance(record, dict):
+            continue
+        for bucket in ("year", "middle", "one", "three"):
+            rows = record.get(bucket)
+            if isinstance(rows, list) and any(
+                isinstance(row, dict) and row.get("index") for row in rows[:5]
+            ):
+                return True
     return False
 
 
@@ -562,6 +787,11 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
             for candidate in source_config.get("endpoint_candidates", [])
             if isinstance(candidate, dict)
         ]
+        self.context_resolvers = [
+            resolver
+            for resolver in source_config.get("context_resolvers", [])
+            if isinstance(resolver, dict)
+        ]
         self.timeout = float(source_config.get("request_timeout_seconds", 20.0))
         self.request_interval = float(source_config.get("request_interval_seconds", 0.0))
         self.session = session or requests.Session()
@@ -609,6 +839,13 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
         for instrument in instruments:
             for report_period in report_periods:
                 context = self._context(instrument, exchange, report_period)
+                if self.context_resolvers:
+                    context = resolve_official_filing_context(
+                        self.session,
+                        context,
+                        resolvers=self.context_resolvers,
+                        timeout=self.timeout,
+                    ).context
                 if self.endpoint_url:
                     payloads.append(
                         self._download_payload(
@@ -704,7 +941,7 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
             content = bytes(response.content or b"")
             content_type = response.headers.get("Content-Type")
             classification = classify_official_filing_response(
-                content[:8192],
+                content,
                 content_type=content_type,
                 http_status=getattr(response, "status_code", None),
                 url=getattr(response, "url", None),
@@ -821,6 +1058,11 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
             "endpoint_candidate_key": candidate_config.get("key"),
             "promotion_gate": candidate_config.get("promotion_gate"),
             "evidence": candidate_config.get("evidence") or {},
+            "source_profile": source_profile_metadata(
+                exchange,
+                self.source_name,
+                strict=False,
+            ),
             **classification.as_probe_fields(),
         }
         manifest = FinancialSourceFileManifest(
@@ -871,7 +1113,7 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
         content_hash = hashlib.sha256(content).hexdigest()
         content_type = response.headers.get("Content-Type")
         classification = classify_official_filing_response(
-            content[:8192],
+            content,
             content_type=content_type,
             http_status=getattr(response, "status_code", None),
             url=url,
@@ -879,6 +1121,11 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
         symbol = str(instrument.get("symbol") or str(instrument.get("instrument_id") or "").split(".")[0])
         metadata_json = {
             "content_type": content_type,
+            "source_profile": source_profile_metadata(
+                exchange,
+                self.source_name,
+                strict=False,
+            ),
             **classification.as_probe_fields(),
         }
         if candidate is not None:

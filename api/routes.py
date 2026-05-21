@@ -774,12 +774,60 @@ async def get_research_technical_cache_readiness():
 async def get_research_financial_statements(
     instrument_id: str,
     include_statements: bool = Query(True, description="是否包含原始报表详情"),
+    report_period: Optional[str] = Query(None, description="可选报告期过滤"),
+    requested_canonical_facts: Optional[str] = Query(
+        None,
+        description="逗号分隔的 canonical 财务字段，仅用于 L1/L3 分层读取",
+    ),
+    profile: Optional[str] = Query(None, description="字段映射 profile，例如 nonbank/bank"),
+    mapping_version: Optional[str] = Query(None, description="字段映射版本"),
+    include_local_core: bool = Query(False, description="是否附加 L1 本地核心字段诊断"),
+    allow_remote_extension: bool = Query(
+        False,
+        description="是否显式允许 L3 东财远程扩展",
+    ),
 ):
     """获取研究域完整财务报表组合快照。"""
     try:
+        report_period = report_period if isinstance(report_period, str) else None
+        requested_canonical_facts = (
+            requested_canonical_facts
+            if isinstance(requested_canonical_facts, str)
+            else None
+        )
+        profile = profile if isinstance(profile, str) else None
+        mapping_version = mapping_version if isinstance(mapping_version, str) else None
+        include_local_core = include_local_core if isinstance(include_local_core, bool) else False
+        allow_remote_extension = (
+            allow_remote_extension
+            if isinstance(allow_remote_extension, bool)
+            else False
+        )
+        requested = (
+            [
+                item.strip()
+                for item in requested_canonical_facts.split(",")
+                if item.strip()
+            ]
+            if requested_canonical_facts
+            else None
+        )
+        manager_kwargs = {"include_statements": include_statements}
+        if report_period:
+            manager_kwargs["report_period"] = report_period
+        if requested is not None:
+            manager_kwargs["requested_canonical_facts"] = requested
+        if profile:
+            manager_kwargs["profile"] = profile
+        if mapping_version:
+            manager_kwargs["mapping_version"] = mapping_version
+        if include_local_core:
+            manager_kwargs["include_local_core"] = include_local_core
+        if allow_remote_extension:
+            manager_kwargs["allow_remote_extension"] = allow_remote_extension
         bundle = await data_manager.get_research_financial_statements(
             instrument_id,
-            include_statements=include_statements,
+            **manager_kwargs,
         )
         if not bundle:
             raise HTTPException(status_code=404, detail="Research financial statements not found")

@@ -10,6 +10,20 @@
     "max_concurrent_downloads": 1,
     "retry_times": 3,
     "retry_interval_seconds": 5,
+    "instrument_master_sync": {
+      "enabled": true,
+      "run_before_daily_update": true,
+      "skip_for_backfill": true,
+      "continue_on_failure": true,
+      "timeout_sec": 180,
+      "freshness_threshold_hours": 48,
+      "pytdx_validation_enabled": true,
+      "exchanges": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ]
+    },
     "default_start_years": {
       "SSE": 1990,
       "SZSE": 1990,

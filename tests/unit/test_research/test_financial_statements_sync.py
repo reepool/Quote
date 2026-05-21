@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+import sqlite3
 
 import pytest
 
@@ -7,6 +8,7 @@ from research.financial_statements_sync import (
     FinancialStatementsShadowSyncService,
     build_financial_report_periods,
 )
+from research.financial_source_field_mapping import MAPPING_VERSION
 from research.providers.base import (
     BaseOfficialFinancialFilingProvider,
     BaseFinancialStatementsProvider,
@@ -69,7 +71,11 @@ class _MockFinancialStatementsProvider(BaseFinancialStatementsProvider):
                         fiscal_quarter=4,
                         source="akshare",
                         source_mode=mode,
-                        statement_json={"TOTAL_ASSETS": 1200.0},
+                        statement_json={
+                            "TOTAL_ASSETS": 1200.0,
+                            "TOTAL_SHARE": 100.0,
+                            "CUSTOM_RATIO": 7.5,
+                        },
                     ),
                     FinancialStatementRawSnapshot(
                         instrument_id=selected[0]["instrument_id"],
@@ -318,8 +324,8 @@ def _xbrl_payload(report_period: str) -> str:
     <xbrli:measure>CNY</xbrli:measure>
   </xbrli:unit>
   <cn:Revenue contextRef="current" unitRef="CNY">1000</cn:Revenue>
-  <cn:NetProfit contextRef="current" unitRef="CNY">120</cn:NetProfit>
-  <cn:TotalEquity contextRef="current" unitRef="CNY">600</cn:TotalEquity>
+  <cn:NetProfitAttributableToOwnersOfParent contextRef="current" unitRef="CNY">120</cn:NetProfitAttributableToOwnersOfParent>
+  <cn:EquityAttributableToOwnersOfParent contextRef="current" unitRef="CNY">600</cn:EquityAttributableToOwnersOfParent>
   <cn:TotalAssets contextRef="current" unitRef="CNY">1500</cn:TotalAssets>
   <cn:TotalLiabilities contextRef="current" unitRef="CNY">900</cn:TotalLiabilities>
 </xbrli:xbrl>
@@ -384,6 +390,12 @@ async def test_financial_statements_sync_writes_bundle_rows(tmp_path):
     assert result["status"] == "success"
     assert result["total_bundles_written"] == 1
     assert result["total_raw_rows_written"] == 3
+    assert result["total_numeric_facts_written"] == 5
+    exchange_result = result["exchanges"][0]
+    assert exchange_result["local_core_mapping_catalog"]["mapping_version"] == (
+        MAPPING_VERSION
+    )
+    assert exchange_result["local_core_mapping_catalog"]["rows_synced"] > 0
 
     bundle = storage.get_financial_statement_bundle("600519.SH")
     assert bundle is not None
@@ -391,6 +403,265 @@ async def test_financial_statements_sync_writes_bundle_rows(tmp_path):
     assert bundle["revenue"] == 1000.0
     assert bundle["indicators"]["net_margin"] == 0.18
     assert len(bundle["statements"]) == 3
+
+    numeric_facts = storage.get_financial_numeric_facts(
+        "600519.SH",
+        include_history=True,
+        report_period="2025-12-31",
+    )
+    facts_by_name = {row["fact_name"]: row for row in numeric_facts}
+    assert len(numeric_facts) == 5
+    assert facts_by_name["TOTAL_OPERATE_INCOME"]["canonical_fact_name"] == "revenue"
+    assert facts_by_name["TOTAL_ASSETS"]["canonical_fact_name"] == "total_assets"
+    assert facts_by_name["NETCASH_OPERATE"]["canonical_fact_name"] == "operating_cf"
+    assert facts_by_name["TOTAL_SHARE"]["canonical_fact_name"] == (
+        "share_capital_amount"
+    )
+    assert facts_by_name["TOTAL_SHARE"]["canonical_unit"] == "CNY"
+    assert facts_by_name["CUSTOM_RATIO"]["canonical_fact_name"] is None
+
+    with sqlite3.connect(research_config.storage.db_path) as conn:
+        research_financial_tables = {
+            row[0]
+            for row in conn.execute(
+                """
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table' AND name LIKE 'financial_%'
+                """
+            ).fetchall()
+        }
+    with sqlite3.connect(research_config.storage.financials_db_path) as conn:
+        financials_raw_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_statements_raw WHERE instrument_id = ?",
+            ("600519.SH",),
+        ).fetchone()[0]
+    assert research_financial_tables == set()
+    assert financials_raw_count == 3
+    assert facts_by_name["CUSTOM_RATIO"]["unit"] == ""
+    assert facts_by_name["TOTAL_ASSETS"]["source"] == "akshare"
+    assert facts_by_name["TOTAL_ASSETS"]["source_mode"] == "direct"
+    assert facts_by_name["TOTAL_ASSETS"]["parser_version"] == (
+        "financial_structured_filing.v1"
+    )
+    assert facts_by_name["TOTAL_ASSETS"]["raw_fact"]["source_payload_schema"] == (
+        "financial_statement_bundle"
+    )
+    persisted_mappings = storage.get_financial_source_field_mappings(
+        profile="nonbank",
+        approved_for_core=True,
+        mapping_version=MAPPING_VERSION,
+    )
+    assert persisted_mappings
+
+
+def test_financial_statements_sync_adds_local_core_mapping_lineage_for_ths_facts():
+    bundle = FinancialStatementBundle(
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        report_period="2025-12-31",
+        publish_date="2026-03-30",
+        fiscal_year=2025,
+        fiscal_quarter=4,
+        source="akshare",
+        source_mode="direct",
+        raw_statements=[
+            FinancialStatementRawSnapshot(
+                instrument_id="600519.SH",
+                symbol="600519",
+                exchange="SSE",
+                statement_type="profit_sheet",
+                report_period="2025-12-31",
+                publish_date="2026-03-30",
+                fiscal_year=2025,
+                fiscal_quarter=4,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "operating_income": 1000.0,
+                    "custom_metric": 7.5,
+                },
+            )
+        ],
+        facts=FinancialFactsSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            report_period="2025-12-31",
+            report_type="annual",
+            revenue=1000.0,
+            source="akshare",
+            source_mode="direct",
+        ),
+        raw_payload={"akshare_statement_interface": "ths_report"},
+    )
+
+    numeric_facts = FinancialStatementsShadowSyncService._numeric_facts_from_fallback_bundle(
+        bundle,
+        source_file_id="source-file-1",
+        payload_hash="payload-hash",
+        parser_version="akshare_financial_statements.v1",
+        statement_profile="nonbank",
+    )
+    facts_by_name = {fact.fact_name: fact for fact in numeric_facts}
+
+    lineage = facts_by_name["operating_income"].raw_fact_json["local_core_mapping"]
+    assert lineage["mapping_version"] == MAPPING_VERSION
+    assert lineage["approved_for_core"] is True
+    assert lineage["source_field_role"] == "ths_metric"
+    assert lineage["profiles"] == ["nonbank"]
+    assert lineage["canonical_fact"] == "revenue"
+    assert "revenue" in lineage["canonical_facts"]
+    assert "local_core_mapping" not in facts_by_name["custom_metric"].raw_fact_json
+
+
+def test_financial_statements_sync_uses_profile_specific_local_core_mapping_metadata():
+    bundle = FinancialStatementBundle(
+        instrument_id="600030.SH",
+        symbol="600030",
+        exchange="SSE",
+        report_period="2025-12-31",
+        publish_date="2026-03-30",
+        fiscal_year=2025,
+        fiscal_quarter=4,
+        source="akshare",
+        source_mode="direct",
+        raw_statements=[
+            FinancialStatementRawSnapshot(
+                instrument_id="600030.SH",
+                symbol="600030",
+                exchange="SSE",
+                statement_type="balance_sheet",
+                report_period="2025-12-31",
+                publish_date="2026-03-30",
+                fiscal_year=2025,
+                fiscal_quarter=4,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "归属于母公司的股东权益合计": 293108725612.16,
+                },
+            )
+        ],
+        facts=FinancialFactsSnapshot(
+            instrument_id="600030.SH",
+            symbol="600030",
+            exchange="SSE",
+            report_period="2025-12-31",
+            report_type="annual",
+            source="akshare",
+            source_mode="direct",
+        ),
+        raw_payload={"akshare_statement_interface": "sina_report"},
+    )
+
+    numeric_facts = FinancialStatementsShadowSyncService._numeric_facts_from_fallback_bundle(
+        bundle,
+        source_file_id="source-file-2",
+        payload_hash="payload-hash-2",
+        parser_version="akshare_financial_statements.v1",
+        statement_profile="securities",
+    )
+
+    fact = numeric_facts[0]
+    lineage = fact.raw_fact_json["local_core_mapping"]
+    assert lineage["profiles"] == ["securities"]
+    assert lineage["canonical_fact"] == "equity_parent"
+    assert fact.canonical_fact_name == "equity_parent"
+    assert fact.canonical_statement_family == "balance_sheet"
+    assert fact.canonical_unit == "CNY"
+
+
+def test_financial_statements_sync_uses_statement_level_mapping_source_for_mixed_bundle():
+    bundle = FinancialStatementBundle(
+        instrument_id="920005.BJ",
+        symbol="920005",
+        exchange="BSE",
+        report_period="2024-09-30",
+        publish_date="2024-10-30",
+        fiscal_year=2024,
+        fiscal_quarter=3,
+        source="akshare",
+        source_mode="direct",
+        raw_statements=[
+            FinancialStatementRawSnapshot(
+                instrument_id="920005.BJ",
+                symbol="920005",
+                exchange="BSE",
+                statement_type="balance_sheet",
+                report_period="2024-09-30",
+                publish_date="2024-10-30",
+                fiscal_year=2024,
+                fiscal_quarter=3,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "资产总计": 1200.0,
+                    "负债合计": 420.0,
+                    "归属于母公司股东权益合计": 780.0,
+                },
+            ),
+            FinancialStatementRawSnapshot(
+                instrument_id="920005.BJ",
+                symbol="920005",
+                exchange="BSE",
+                statement_type="profit_sheet",
+                report_period="2024-09-30",
+                publish_date="2024-10-30",
+                fiscal_year=2024,
+                fiscal_quarter=3,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "operating_income": 1000.0,
+                    "parent_holder_net_profit": 180.0,
+                },
+            ),
+        ],
+        facts=FinancialFactsSnapshot(
+            instrument_id="920005.BJ",
+            symbol="920005",
+            exchange="BSE",
+            report_period="2024-09-30",
+            report_type="quarterly",
+            source="akshare",
+            source_mode="direct",
+        ),
+        raw_payload={
+            "akshare_statement_interface": "mixed",
+            "akshare_statement_interfaces": {
+                "balance_sheet": "sina_report",
+                "profit_sheet": "ths_report",
+            },
+        },
+    )
+
+    numeric_facts = FinancialStatementsShadowSyncService._numeric_facts_from_fallback_bundle(
+        bundle,
+        source_file_id="source-file-3",
+        payload_hash="payload-hash-3",
+        parser_version="akshare_financial_statements.v1",
+        statement_profile="nonbank",
+    )
+    facts_by_canonical = {
+        fact.canonical_fact_name: fact
+        for fact in numeric_facts
+        if fact.raw_fact_json.get("local_core_mapping")
+    }
+
+    assert facts_by_canonical["total_assets"].raw_fact_json[
+        "akshare_statement_interface"
+    ] == "sina_report"
+    assert facts_by_canonical["total_assets"].raw_fact_json["local_core_mapping"][
+        "source_field_role"
+    ] == "sina_field"
+    assert facts_by_canonical["revenue"].raw_fact_json[
+        "akshare_statement_interface"
+    ] == "ths_report"
+    assert facts_by_canonical["revenue"].raw_fact_json["local_core_mapping"][
+        "source_field_role"
+    ] == "ths_metric"
 
 
 @pytest.mark.asyncio
@@ -536,7 +807,6 @@ async def test_financial_statements_sync_processes_sse_structured_json_payloads(
             "total_liabilities": ["S2010_0690"],
             "equity": ["S2010_0770"],
             "operating_cf": ["S2030_0250"],
-            "shares_outstanding": ["S2010_0700"],
         },
     }
     research_config.sources["sse"] = {
@@ -644,6 +914,7 @@ async def test_financial_statements_sync_falls_back_after_official_parse_failure
 
     assert result["status"] == "success"
     assert result["exchanges"][0]["source"] == "akshare"
+    assert result["total_numeric_facts_written"] == 5
     assert result["exchanges"][0]["attempted_sources"] == [
         "sse:direct",
         "akshare:direct",

@@ -11,7 +11,23 @@ from datetime import date
 from typing import Any, Dict, List, Optional
 
 from research.empty_support import allows_optional_empty_exchange
-from research.financial_fact_aliases import get_core_financial_fact_aliases
+from research.financial_fact_aliases import (
+    describe_financial_numeric_fact_name,
+    get_core_financial_fact_aliases,
+)
+from research.financial_source_field_mapping import (
+    FINANCIAL_STATEMENT_PROFILES,
+    MAPPING_VERSION,
+    get_financial_source_field_mappings,
+)
+from research.financial_statement_profile import (
+    resolve_financial_statement_profiles_for_instruments,
+    summarize_financial_statement_profile_resolutions,
+)
+from research.official_financial_source_profiles import (
+    parser_profile_for,
+    source_profile_for,
+)
 from research.financial_xbrl_parser import (
     FinancialSseStructuredJsonFactParser,
     FinancialStructuredFilingParserDispatcher,
@@ -23,6 +39,7 @@ from research.providers import (
 )
 from research.providers.base import (
     FinancialFilingPayload,
+    FinancialNumericFactSnapshot,
     FinancialSourceFileManifest,
     FinancialStatementBundle,
 )
@@ -41,6 +58,43 @@ _QUARTER_ENDS = {
 }
 
 
+_FALLBACK_STATEMENT_FAMILY_BY_TYPE = {
+    "balance_sheet": "balance_sheet",
+    "profit_sheet": "income_statement",
+    "income_statement": "income_statement",
+    "cash_flow_sheet": "cash_flow",
+    "cash_flow": "cash_flow",
+}
+
+
+_FALLBACK_NUMERIC_METADATA_FIELDS = {
+    "REPORT_DATE",
+    "REPORTDATE",
+    "REPORT_PERIOD",
+    "REPORT_TYPE",
+    "NOTICE_DATE",
+    "ANNOUNCE_DATE",
+    "PUBLISH_DATE",
+    "UPDATE_DATE",
+    "SECURITY_CODE",
+    "SECURITY_NAME_ABBR",
+    "SECURITY_NAME",
+    "ORG_CODE",
+    "ORGCODE",
+    "股票代码",
+    "股票简称",
+    "证券代码",
+    "证券简称",
+    "报告日期",
+    "报告期",
+    "报告日",
+    "公告日期",
+    "披露日期",
+    "更新时间",
+    "币种",
+}
+
+
 @dataclass(frozen=True)
 class FinancialStatementsExchangeSyncResult:
     """Per-exchange result for financial statements shadow sync."""
@@ -49,6 +103,11 @@ class FinancialStatementsExchangeSyncResult:
     status: str
     source: Optional[str] = None
     mode: Optional[str] = None
+    source_profile: Optional[str] = None
+    parser_profile: Optional[str] = None
+    local_core_mapping_catalog: Optional[Dict[str, Any]] = None
+    financial_statement_profile_summary: Optional[Dict[str, Any]] = None
+    financial_statement_profile_resolutions: List[Dict[str, Any]] = field(default_factory=list)
     attempted_sources: List[str] = field(default_factory=list)
     report_periods_attempted: List[str] = field(default_factory=list)
     bundles_written: int = 0
@@ -160,6 +219,7 @@ class FinancialStatementsShadowSyncService:
         report_periods: Optional[List[str]] = None,
         sync_mode: str = "backfill",
         force_full: bool = False,
+        runtime_metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         target_exchanges = exchanges or self.research_config.markets
         target_periods = (
@@ -179,6 +239,7 @@ class FinancialStatementsShadowSyncService:
                     report_periods=target_periods,
                     sync_mode=sync_mode,
                     force_full=force_full,
+                    runtime_metadata=runtime_metadata,
                 )
             )
 
@@ -221,6 +282,7 @@ class FinancialStatementsShadowSyncService:
         report_periods: List[str],
         sync_mode: str,
         force_full: bool,
+        runtime_metadata: Optional[Dict[str, Any]],
     ) -> FinancialStatementsExchangeSyncResult:
         instruments = await self.db_ops.get_instruments_by_exchange(exchange)
         stock_instruments = [
@@ -240,6 +302,18 @@ class FinancialStatementsShadowSyncService:
                 error_message="No active stock instruments found for exchange",
             )
 
+        profile_resolutions = resolve_financial_statement_profiles_for_instruments(
+            storage=self.storage,
+            instrument_ids=[
+                str(instrument.get("instrument_id"))
+                for instrument in stock_instruments
+                if instrument.get("instrument_id")
+            ],
+            exchange=exchange,
+        )
+        profile_summary = summarize_financial_statement_profile_resolutions(
+            profile_resolutions
+        )
         checkpoint = self.storage.get_latest_successful_ingestion_run(
             domain="financial_statements",
             job_name="financial_statements_shadow_sync",
@@ -254,10 +328,12 @@ class FinancialStatementsShadowSyncService:
                 "report_periods": report_periods,
                 "sync_mode": sync_mode,
                 "force_full": force_full,
+                "financial_statement_profile_summary": profile_summary,
                 "previous_checkpoint": checkpoint,
+                "runtime_metadata": runtime_metadata or {},
             },
         )
-
+        local_core_mapping_catalog = None
         attempted_sources: List[str] = []
         optional_empty_exchange = allows_optional_empty_exchange(
             self.research_config,
@@ -265,6 +341,9 @@ class FinancialStatementsShadowSyncService:
             exchange,
         )
         try:
+            local_core_mapping_catalog = self._ensure_local_core_mapping_catalog(
+                run_id=run_id
+            )
             plan = self.resolver.resolve(
                 "financial_statements",
                 budget_mode=budget_mode,
@@ -311,6 +390,10 @@ class FinancialStatementsShadowSyncService:
                             core_facts_written=official_result.core_facts_written,
                             unchanged_files_skipped=official_result.unchanged_files_skipped,
                             official_fallback_reasons=official_fallback_reasons,
+                            financial_statement_profile_resolutions=profile_resolutions,
+                            financial_statement_profile_summary=profile_summary,
+                            local_core_mapping_catalog=local_core_mapping_catalog,
+                            runtime_metadata=runtime_metadata,
                         )
                         return result
                     reason = (
@@ -367,6 +450,7 @@ class FinancialStatementsShadowSyncService:
                     run_id=run_id,
                     sync_mode=sync_mode,
                     force_full=force_full,
+                    financial_statement_profile_resolutions=profile_resolutions,
                 )
                 result = self._finalize_successful_exchange(
                     run_id=run_id,
@@ -382,11 +466,16 @@ class FinancialStatementsShadowSyncService:
                     source_manifests_written=fallback_result[
                         "source_manifests_written"
                     ],
+                    numeric_facts_written=fallback_result["numeric_facts_written"],
                     core_facts_written=fallback_result["core_facts_written"],
                     unchanged_files_skipped=fallback_result[
                         "unchanged_files_skipped"
                     ],
                     official_fallback_reasons=official_fallback_reasons,
+                    financial_statement_profile_resolutions=profile_resolutions,
+                    financial_statement_profile_summary=profile_summary,
+                    local_core_mapping_catalog=local_core_mapping_catalog,
+                    runtime_metadata=runtime_metadata,
                 )
                 return result
 
@@ -403,7 +492,10 @@ class FinancialStatementsShadowSyncService:
                     "optional_empty_exchange": optional_empty_exchange,
                     "report_periods": report_periods,
                     "sync_mode": sync_mode,
+                    "financial_statement_profile_summary": profile_summary,
                     "previous_checkpoint": checkpoint,
+                    "local_core_mapping_catalog": local_core_mapping_catalog,
+                    "runtime_metadata": runtime_metadata or {},
                 },
             )
             return FinancialStatementsExchangeSyncResult(
@@ -411,6 +503,9 @@ class FinancialStatementsShadowSyncService:
                 status="success" if optional_empty_exchange else "degraded",
                 attempted_sources=attempted_sources,
                 report_periods_attempted=report_periods,
+                local_core_mapping_catalog=local_core_mapping_catalog,
+                financial_statement_profile_summary=profile_summary,
+                financial_statement_profile_resolutions=profile_resolutions,
                 error_message=None
                 if optional_empty_exchange
                 else "No provider returned financial statement bundles",
@@ -426,6 +521,9 @@ class FinancialStatementsShadowSyncService:
                     "attempted_sources": attempted_sources,
                     "report_periods": report_periods,
                     "sync_mode": sync_mode,
+                    "financial_statement_profile_summary": profile_summary,
+                    "local_core_mapping_catalog": local_core_mapping_catalog,
+                    "runtime_metadata": runtime_metadata or {},
                 },
             )
             return FinancialStatementsExchangeSyncResult(
@@ -433,6 +531,9 @@ class FinancialStatementsShadowSyncService:
                 status="failed",
                 attempted_sources=attempted_sources,
                 report_periods_attempted=report_periods,
+                local_core_mapping_catalog=local_core_mapping_catalog,
+                financial_statement_profile_summary=profile_summary,
+                financial_statement_profile_resolutions=profile_resolutions,
                 error_message=str(e),
             )
 
@@ -621,15 +722,24 @@ class FinancialStatementsShadowSyncService:
         run_id: int,
         sync_mode: str,
         force_full: bool,
+        financial_statement_profile_resolutions: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, int]:
         bundles_written = 0
         raw_rows_written = 0
         manifests_written = 0
+        numeric_facts_written = 0
         core_facts_written = 0
         unchanged_skipped = 0
+        profile_by_instrument = {
+            str(item.get("instrument_id")): str(item.get("profile") or "")
+            for item in financial_statement_profile_resolutions or []
+            if item.get("instrument_id") and item.get("profile")
+        }
+        mapping_version = self._local_core_mapping_version()
 
         for bundle in bundles:
             payload_hash = self._hash_payload(bundle.raw_payload)
+            parser_version = self._fallback_parser_version(source)
             manifest = FinancialSourceFileManifest(
                 source=source,
                 source_mode=mode,
@@ -639,7 +749,7 @@ class FinancialStatementsShadowSyncService:
                 report_period=bundle.report_period,
                 report_type=self._report_type_for_period(bundle.report_period),
                 content_hash=payload_hash,
-                parser_version=self._fallback_parser_version(source),
+                parser_version=parser_version,
                 status="parsed",
                 parser_diagnostics={"fallback_bundle": True},
                 metadata_json={"source_payload_schema": "financial_statement_bundle"},
@@ -674,6 +784,18 @@ class FinancialStatementsShadowSyncService:
                 payload_hash=payload_hash,
                 ingestion_run_id=run_id,
             )
+            numeric_facts = self._numeric_facts_from_fallback_bundle(
+                bundle_to_write,
+                source_file_id=source_file_id,
+                payload_hash=payload_hash,
+                parser_version=parser_version,
+                statement_profile=profile_by_instrument.get(bundle.instrument_id),
+                local_core_mapping_version=mapping_version,
+            )
+            numeric_facts_written += self.storage.financial_statements.upsert_numeric_facts(
+                numeric_facts,
+                ingestion_run_id=run_id,
+            )
             manifests_written += 1
             bundles_written += 1
             raw_rows_written += len(bundle.raw_statements)
@@ -684,9 +806,117 @@ class FinancialStatementsShadowSyncService:
             "bundles_written": bundles_written,
             "raw_rows_written": raw_rows_written,
             "source_manifests_written": manifests_written,
+            "numeric_facts_written": numeric_facts_written,
             "core_facts_written": core_facts_written,
             "unchanged_files_skipped": unchanged_skipped,
         }
+
+    @staticmethod
+    def _numeric_facts_from_fallback_bundle(
+        bundle: FinancialStatementBundle,
+        *,
+        source_file_id: str,
+        payload_hash: str,
+        parser_version: str,
+        statement_profile: Optional[str] = None,
+        local_core_mapping_version: str = MAPPING_VERSION,
+    ) -> List[FinancialNumericFactSnapshot]:
+        """Convert fallback raw statement rows into the unified long-form fact model."""
+        facts: List[FinancialNumericFactSnapshot] = []
+        statement_interface = str(
+            (bundle.raw_payload or {}).get("akshare_statement_interface") or ""
+        )
+        statement_interfaces = (bundle.raw_payload or {}).get(
+            "akshare_statement_interfaces"
+        ) or {}
+        for statement in bundle.raw_statements:
+            statement_type = str(statement.statement_type or "")
+            statement_interface_for_mapping = str(
+                statement_interfaces.get(statement_type) or statement_interface
+            )
+            statement_family = _FALLBACK_STATEMENT_FAMILY_BY_TYPE.get(
+                statement_type,
+                statement_type or None,
+            )
+            for index, (raw_name, raw_value) in enumerate(statement.statement_json.items()):
+                fact_name = str(raw_name or "").strip()
+                if not fact_name or _is_fallback_numeric_metadata_field(fact_name):
+                    continue
+                fact_value = _to_fallback_numeric_fact_value(raw_value)
+                if fact_value is None:
+                    continue
+                standard_metadata = describe_financial_numeric_fact_name(fact_name)
+                unit = str(standard_metadata.get("canonical_unit") or "")
+                local_core_mapping = _local_core_mapping_lineage(
+                    statement_interface=statement_interface_for_mapping,
+                    fact_name=fact_name,
+                    profile=statement_profile,
+                    mapping_version=local_core_mapping_version,
+                )
+                canonical_fact_name = standard_metadata.get("canonical_fact_name")
+                canonical_statement_family = standard_metadata.get(
+                    "canonical_statement_family"
+                )
+                canonical_semantic = standard_metadata.get("canonical_semantic")
+                canonical_unit = standard_metadata.get("canonical_unit")
+                canonical_version = standard_metadata.get("canonical_version")
+                if local_core_mapping is not None:
+                    canonical_fact_name = (
+                        local_core_mapping.get("canonical_fact") or canonical_fact_name
+                    )
+                    canonical_statement_family = (
+                        local_core_mapping.get("canonical_statement_family")
+                        or canonical_statement_family
+                    )
+                    canonical_semantic = (
+                        local_core_mapping.get("canonical_semantic")
+                        or canonical_semantic
+                    )
+                    canonical_unit = local_core_mapping.get("canonical_unit") or canonical_unit
+                    unit = str(canonical_unit or unit or "")
+                raw_fact_json = {
+                    "source_payload_schema": "financial_statement_bundle",
+                    "statement_type": statement.statement_type,
+                    "akshare_statement_interface": statement_interface_for_mapping,
+                    "payload_hash": payload_hash,
+                    "raw_value": raw_value,
+                    "standardized_fact": standard_metadata,
+                }
+                if local_core_mapping is not None:
+                    raw_fact_json["local_core_mapping"] = local_core_mapping
+                facts.append(
+                    FinancialNumericFactSnapshot(
+                        source_file_id=source_file_id,
+                        instrument_id=bundle.instrument_id,
+                        symbol=bundle.symbol,
+                        exchange=bundle.exchange,
+                        report_period=bundle.report_period,
+                        report_type=bundle.facts.report_type
+                        if bundle.facts is not None
+                        else _report_type_for_period(bundle.report_period),
+                        statement_family=statement_family,
+                        fact_name=fact_name,
+                        canonical_fact_name=canonical_fact_name,
+                        canonical_statement_family=canonical_statement_family,
+                        canonical_semantic=canonical_semantic,
+                        canonical_unit=canonical_unit,
+                        canonical_version=canonical_version,
+                        taxonomy_namespace=f"{bundle.source}:fallback:{statement.statement_type}",
+                        context_id=(
+                            f"{bundle.source}:{statement.statement_type}:"
+                            f"{bundle.report_period}:{index}"
+                        ),
+                        unit=unit,
+                        period_end=bundle.report_period,
+                        fact_value=fact_value,
+                        value_text=str(raw_value),
+                        raw_fact_json=raw_fact_json,
+                        source=bundle.source,
+                        source_mode=bundle.source_mode,
+                        parser_version=parser_version,
+                    )
+                )
+        return facts
 
     def _finalize_successful_exchange(
         self,
@@ -707,8 +937,23 @@ class FinancialStatementsShadowSyncService:
         core_facts_written: int = 0,
         unchanged_files_skipped: int = 0,
         official_fallback_reasons: Optional[List[str]] = None,
+        financial_statement_profile_resolutions: Optional[List[Dict[str, Any]]] = None,
+        financial_statement_profile_summary: Optional[Dict[str, Any]] = None,
+        local_core_mapping_catalog: Optional[Dict[str, Any]] = None,
+        runtime_metadata: Optional[Dict[str, Any]] = None,
     ) -> FinancialStatementsExchangeSyncResult:
         official_fallback_reasons = official_fallback_reasons or []
+        financial_statement_profile_resolutions = (
+            financial_statement_profile_resolutions or []
+        )
+        financial_statement_profile_summary = (
+            financial_statement_profile_summary
+            or summarize_financial_statement_profile_resolutions(
+                financial_statement_profile_resolutions
+            )
+        )
+        source_profile = source_profile_for(exchange, source, strict=False)
+        parser_profile = parser_profile_for(exchange, source)
         tier_result = self._run_tier_maintenance_if_enabled()
         coverage_gaps = self._build_coverage_gaps(
             instruments=stock_instruments,
@@ -721,6 +966,7 @@ class FinancialStatementsShadowSyncService:
             + official_payloads_processed
             + numeric_facts_written
             + core_facts_written
+            + int((local_core_mapping_catalog or {}).get("rows_synced") or 0)
         )
         self.storage.finish_ingestion_run(
             run_id,
@@ -730,13 +976,20 @@ class FinancialStatementsShadowSyncService:
                 "exchange": exchange,
                 "source": source,
                 "mode": mode,
+                "source_profile": source_profile,
+                "parser_profile": parser_profile,
                 "attempted_sources": attempted_sources,
                 "report_periods": report_periods,
                 "sync_mode": sync_mode,
+                "financial_statement_profile_summary": financial_statement_profile_summary,
+                "financial_statement_profile_resolutions": financial_statement_profile_resolutions,
+                "local_core_mapping_catalog": local_core_mapping_catalog,
                 "checkpoint": {
                     "completed_at": get_shanghai_time().isoformat(),
                     "source": source,
                     "mode": mode,
+                    "source_profile": source_profile,
+                    "parser_profile": parser_profile,
                     "report_periods": report_periods,
                 },
                 "counts": {
@@ -751,6 +1004,7 @@ class FinancialStatementsShadowSyncService:
                 "tier_maintenance": tier_result,
                 "coverage_gaps": coverage_gaps,
                 "official_fallback_reasons": official_fallback_reasons,
+                "runtime_metadata": runtime_metadata or {},
             },
         )
         return FinancialStatementsExchangeSyncResult(
@@ -758,6 +1012,11 @@ class FinancialStatementsShadowSyncService:
             status="success",
             source=source,
             mode=mode,
+            source_profile=source_profile,
+            parser_profile=parser_profile,
+            local_core_mapping_catalog=local_core_mapping_catalog,
+            financial_statement_profile_summary=financial_statement_profile_summary,
+            financial_statement_profile_resolutions=financial_statement_profile_resolutions,
             attempted_sources=attempted_sources,
             report_periods_attempted=report_periods,
             bundles_written=bundles_written,
@@ -919,6 +1178,65 @@ class FinancialStatementsShadowSyncService:
             )
         )
 
+    def _local_core_mapping_version(self) -> str:
+        return str(
+            self.research_config.sources.get("akshare", {})
+            .get("financial_statements", {})
+            .get("service_layers", {})
+            .get("local_core", {})
+            .get("mapping_version", MAPPING_VERSION)
+        )
+
+    def _ensure_local_core_mapping_catalog(self, *, run_id: int) -> Dict[str, Any]:
+        """Persist the configured local-core mapping catalog for read-side gates."""
+        mapping_version = self._local_core_mapping_version()
+        profiles = self._local_core_profiles()
+        mappings = []
+        seen = set()
+        for profile in profiles:
+            for mapping in get_financial_source_field_mappings(
+                profile=profile,
+                mapping_version=mapping_version,
+            ):
+                key = (
+                    mapping.mapping_version,
+                    mapping.profile,
+                    mapping.canonical_fact,
+                    mapping.sina_field,
+                    mapping.ths_metric,
+                )
+                if key in seen:
+                    continue
+                seen.add(key)
+                mappings.append(mapping)
+        rows_synced = self.storage.financial_statements.upsert_source_field_mappings(
+            mappings,
+            ingestion_run_id=run_id,
+        )
+        return {
+            "mapping_version": mapping_version,
+            "profiles": profiles,
+            "rows_synced": rows_synced,
+        }
+
+    def _local_core_profiles(self) -> List[str]:
+        configured_profiles = (
+            self.research_config.sources.get("akshare", {})
+            .get("financial_statements", {})
+            .get("service_layers", {})
+            .get("local_core", {})
+            .get("profiles")
+        )
+        if configured_profiles:
+            return sorted(
+                {
+                    str(profile).strip().lower()
+                    for profile in configured_profiles
+                    if str(profile).strip()
+                }
+            )
+        return list(FINANCIAL_STATEMENT_PROFILES)
+
     def _module_config(self) -> Dict[str, Any]:
         return self.research_config.modules.get("financial_statements", {})
 
@@ -986,3 +1304,79 @@ def _report_type_for_period(report_period: str) -> str:
     if quarter == 4:
         return "annual"
     return "quarterly"
+
+
+def _is_fallback_numeric_metadata_field(fact_name: str) -> bool:
+    text = str(fact_name or "").strip()
+    if not text:
+        return True
+    upper = text.upper()
+    return upper in _FALLBACK_NUMERIC_METADATA_FIELDS or text in _FALLBACK_NUMERIC_METADATA_FIELDS
+
+
+def _local_core_mapping_lineage(
+    *,
+    statement_interface: str,
+    fact_name: str,
+    profile: Optional[str] = None,
+    mapping_version: str = MAPPING_VERSION,
+) -> Optional[Dict[str, Any]]:
+    """Return mapping lineage for approved Sina/THS local-core fallback facts."""
+    if statement_interface == "sina_report":
+        source_field_attr = "sina_field"
+    elif statement_interface == "ths_report":
+        source_field_attr = "ths_metric"
+    else:
+        return None
+
+    matches = [
+        mapping
+        for mapping in get_financial_source_field_mappings(
+            profile=profile,
+            approved_for_core=True,
+            mapping_version=mapping_version,
+        )
+        if getattr(mapping, source_field_attr) == fact_name
+    ]
+    if not matches:
+        return None
+    canonical_facts = sorted({mapping.canonical_fact for mapping in matches})
+    statement_families = sorted({mapping.statement_family for mapping in matches})
+    semantics = sorted({mapping.semantic for mapping in matches if mapping.semantic})
+    canonical_units = sorted({mapping.canonical_unit for mapping in matches if mapping.canonical_unit})
+    return {
+        "mapping_version": matches[0].mapping_version,
+        "approved_for_core": True,
+        "source_field_role": source_field_attr,
+        "profiles": sorted({mapping.profile for mapping in matches}),
+        "canonical_facts": canonical_facts,
+        "canonical_fact": canonical_facts[0] if len(canonical_facts) == 1 else None,
+        "canonical_statement_family": (
+            statement_families[0] if len(statement_families) == 1 else None
+        ),
+        "canonical_semantic": semantics[0] if len(semantics) == 1 else None,
+        "canonical_unit": canonical_units[0] if len(canonical_units) == 1 else None,
+        "relationships": sorted({mapping.relationship for mapping in matches}),
+        "value_types": sorted({mapping.value_type for mapping in matches}),
+    }
+
+
+def _to_fallback_numeric_fact_value(value: Any) -> Optional[float]:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, str):
+        text = value.strip().replace(",", "")
+        if not text or text in {"--", "-", "nan", "NaT", "None", "null"}:
+            return None
+        if text.endswith("%"):
+            text = text[:-1]
+        value = text
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if numeric != numeric:
+        return None
+    return numeric

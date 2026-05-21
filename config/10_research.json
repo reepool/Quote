@@ -173,15 +173,17 @@
             {
               "source": "cninfo",
               "exchanges": [
-                "SZSE"
+                "SSE",
+                "SZSE",
+                "BSE"
               ],
               "mode": "direct",
               "enabled": false,
               "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
               "endpoint_url": "",
               "supports_xbrl": true,
-              "status": "metadata_candidate_configured_disabled",
-              "note": "Source-level endpoint_candidates include CNInfo announcement metadata probe; structured artifact evidence is not yet available."
+              "status": "official_structured_json_candidate_ready_disabled",
+              "note": "Source-level endpoint_candidates include CNInfo data20 official structured financial JSON for SSE, SZSE, and BSE 920-code instruments. SSE still defaults to the exchange commonQuery profile; CNInfo data20 is available as explicit alternate official evidence, cross-check, or fallback profile. Announcement metadata remains PDF-only evidence and is not a readiness gate."
             },
             {
               "source": "bse",
@@ -194,7 +196,26 @@
               "endpoint_url": "",
               "supports_xbrl": true,
               "status": "metadata_candidate_configured_disabled",
-              "note": "Source-level endpoint_candidates include BSE company announcement metadata probe; representative sample is not structured-artifact ready."
+              "note": "BSE exchange announcement metadata remains configured for evidence only; representative samples expose PDF files. BSE structured statement ingestion is currently routed through CNInfo data20 920-code official structured JSON until a BSE-hosted XBRL/XML/ZIP artifact is validated."
+            }
+          ]
+        },
+        "official_source_selection": {
+          "enabled": true,
+          "period_unavailable_alternates": [
+            {
+              "exchange": "SSE",
+              "source": "sse",
+              "source_profile": "sse_commonquery",
+              "alternate_source": "cninfo",
+              "alternate_source_profile": "cninfo_data20",
+              "switch_when": "all_periods_beyond_report_type_max_year",
+              "report_type_max_year_by_id": {
+                "5000": "2023"
+              },
+              "observed_on": "2026-05-15",
+              "reason": "sse_commonquery_annual_report_max_year_2023",
+              "note": "Live probe for 600000.SH on 2026-05-15 showed 2023Q4 annual SSE commonQuery rows were structured, while 2024Q4 and 2025Q4 returned HTTP 200 empty payloads and COMMON_MAP_MAXYEAR_L reported annual max year 2023. For latest annual SSE periods, default backfill may select CNInfo data20 unless the operator explicitly requests sse_commonquery."
             }
           ]
         },
@@ -240,9 +261,6 @@
             ],
             "total_cf": [
               "S2030_0520"
-            ],
-            "shares_outstanding": [
-              "S2010_0700"
             ]
           }
         },
@@ -265,9 +283,10 @@
           "min_period_coverage_ratio": 0.95,
           "min_core_fact_coverage_ratio": 0.95,
           "max_fallback_share": 0.5,
-          "max_parser_failure_ratio": 0.05
+          "max_parser_failure_ratio": 0.05,
+          "block_on_core_fact_semantic_warnings": true
         },
-        "note": "Official SSE structured_json parsing is implemented but remains disabled for production rollout until bounded live validation and backfill readiness pass. AkShare remains the default fallback for existing sync behavior."
+        "note": "Official structured_json parsing is implemented for SSE commonQuery and CNInfo data20 SZSE/BSE profiles, but production rollout remains disabled until each profile passes bounded dry-run evidence, production backfill gates, and readiness checks. AkShare remains the configured fallback for missing official periods or facts."
       },
       "analyst_forecasts": {
         "enabled": false,
@@ -496,6 +515,77 @@
             "sina_report",
             "eastmoney_report"
           ],
+          "service_layers": {
+            "local_core": {
+              "enabled": false,
+              "source_order": [
+                "ths_report",
+                "sina_report"
+              ],
+              "primary_source": "ths_report",
+              "validation_source": "sina_report",
+              "strict_intersection_only": true,
+              "mapping_version": "sina_ths_core_financial_facts.v5",
+              "promotion_required_canonical_facts": [
+                "revenue",
+                "net_income_parent",
+                "total_assets",
+                "total_liabilities",
+                "equity_parent",
+                "operating_cf"
+              ],
+              "profiles": [
+                "nonbank",
+                "bank",
+                "securities",
+                "insurance"
+              ],
+              "request_timeout_seconds": 20.0,
+              "request_interval_seconds": 0.2,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 0.5,
+              "cache_policy": {
+                "enabled": true,
+                "scope": "source_statement_rows",
+                "ttl_seconds": 86400
+              }
+            },
+            "official_summary_check": {
+              "enabled": true,
+              "source": "cninfo",
+              "source_profile": "cninfo_data20",
+              "unit_conversion": {
+                "source_unit": "CNY_10K",
+                "canonical_unit": "CNY",
+                "multiplier": 10000.0
+              },
+              "request_timeout_seconds": 20.0,
+              "request_interval_seconds": 0.2,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 0.5,
+              "cache_policy": {
+                "enabled": true,
+                "scope": "official_summary_check",
+                "ttl_seconds": 86400
+              }
+            },
+            "remote_extension": {
+              "enabled": false,
+              "source": "akshare",
+              "statement_interface": "eastmoney_report",
+              "requires_explicit_opt_in": true,
+              "persist_to_local_core": false,
+              "request_timeout_seconds": 30.0,
+              "request_interval_seconds": 0.5,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 1.0,
+              "cache_policy": {
+                "enabled": true,
+                "scope": "remote_extension_response",
+                "ttl_seconds": 3600
+              }
+            }
+          },
           "parser_version": "akshare_financial_statements.v1",
           "note": "Fallback only after official structured sources have missing periods or missing core facts. It must not overwrite higher-priority official facts."
         },
@@ -745,16 +835,193 @@
         "financial_statements": {
           "enabled": false,
           "exchanges": [
-            "SZSE"
+            "SSE",
+            "SZSE",
+            "BSE"
           ],
-          "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
+          "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
           "endpoint_url": "",
           "sample_symbols_by_exchange": {
+            "SSE": [
+              "600000"
+            ],
             "SZSE": [
               "000001"
+            ],
+            "BSE": [
+              "920833"
             ]
           },
+          "fetch_all_endpoint_candidates": true,
+          "context_resolvers": [
+            {
+              "key": "cninfo_top_search_org_id",
+              "kind": "json_row_template",
+              "enabled": true,
+              "url": "https://www.cninfo.com.cn/new/information/topSearch/query",
+              "request": {
+                "method": "POST",
+                "headers": {
+                  "Origin": "https://www.cninfo.com.cn",
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                },
+                "body_params": {
+                  "keyWord": "{symbol}",
+                  "maxNum": "10"
+                }
+              },
+              "row_list_path": "",
+              "row_match": {
+                "code": "{symbol}"
+              },
+              "outputs": {
+                "cninfo_org_id": "{orgId}",
+                "cninfo_stock_param": "{code},{orgId}"
+              },
+              "note": "Resolves CNInfo orgId for announcement metadata discovery. It is not a financial data source by itself; only XBRL/XML/ZIP/structured JSON artifacts can satisfy promotion gates."
+            },
+            {
+              "key": "cninfo_data20_company_info_sign",
+              "kind": "json_row_template",
+              "enabled": true,
+              "url": "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                },
+                "query_params": {
+                  "scode": "{symbol}"
+                }
+              },
+              "row_list_path": "data.records",
+              "row_match": {
+                "SECCODE": "{symbol}"
+              },
+              "outputs": {
+                "cninfo_data20_sign": "{F002N}"
+              },
+              "note": "Resolves the CNInfo data20 financial statement schema sign used by getIncomeStatement/getBalanceSheets/getCashFlowStatement. The returned financial endpoints are official structured JSON; statement amounts are parsed as CNY after applying the documented 10k-yuan page unit scale."
+            }
+          ],
           "endpoint_candidates": [
+            {
+              "key": "cninfo_data20_income_statement",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://www.cninfo.com.cn/data20/financialData/getIncomeStatement",
+              "evidence": {
+                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                "observed_on": "2026-05-09",
+                "metadata_fields": [
+                  "path",
+                  "data.records.year",
+                  "data.records.middle",
+                  "data.records.one",
+                  "data.records.three",
+                  "index"
+                ],
+                "sample_symbols": [
+                  "600000",
+                  "000001",
+                  "000002",
+                  "300750",
+                  "920833"
+                ]
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                },
+                "query_params": {
+                  "scode": "{symbol}",
+                  "sign": "{cninfo_data20_sign}"
+                }
+              },
+              "promotion_gate": "structured_payload_required",
+              "status": "structured_json_live_evidence_ready_disabled",
+              "note": "Official CNInfo data20 income statement JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+            },
+            {
+              "key": "cninfo_data20_balance_sheet",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://www.cninfo.com.cn/data20/financialData/getBalanceSheets",
+              "evidence": {
+                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                "observed_on": "2026-05-09",
+                "metadata_fields": [
+                  "path",
+                  "data.records.year",
+                  "data.records.middle",
+                  "data.records.one",
+                  "data.records.three",
+                  "index"
+                ],
+                "sample_symbols": [
+                  "600000",
+                  "000001",
+                  "000002",
+                  "300750",
+                  "920833"
+                ]
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                },
+                "query_params": {
+                  "scode": "{symbol}",
+                  "sign": "{cninfo_data20_sign}"
+                }
+              },
+              "promotion_gate": "structured_payload_required",
+              "status": "structured_json_live_evidence_ready_disabled",
+              "note": "Official CNInfo data20 balance sheet JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+            },
+            {
+              "key": "cninfo_data20_cash_flow_statement",
+              "kind": "structured_json",
+              "enabled": false,
+              "url": "https://www.cninfo.com.cn/data20/financialData/getCashFlowStatement",
+              "evidence": {
+                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                "observed_on": "2026-05-09",
+                "metadata_fields": [
+                  "path",
+                  "data.records.year",
+                  "data.records.middle",
+                  "data.records.one",
+                  "data.records.three",
+                  "index"
+                ],
+                "sample_symbols": [
+                  "600000",
+                  "000001",
+                  "000002",
+                  "300750",
+                  "920833"
+                ]
+              },
+              "request": {
+                "method": "GET",
+                "headers": {
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                },
+                "query_params": {
+                  "scode": "{symbol}",
+                  "sign": "{cninfo_data20_sign}"
+                }
+              },
+              "promotion_gate": "structured_payload_required",
+              "status": "structured_json_live_evidence_ready_disabled",
+              "note": "Official CNInfo data20 cash-flow statement JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+            },
             {
               "key": "cninfo_his_announcement_query",
               "kind": "metadata_json",
@@ -776,7 +1043,7 @@
                 "method": "POST",
                 "headers": {
                   "Origin": "https://www.cninfo.com.cn",
-                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
                 },
                 "body_params": {
                   "pageNum": "1",
@@ -784,21 +1051,21 @@
                   "column": "szse",
                   "tabName": "fulltext",
                   "plate": "sz",
-                  "stock": "{symbol}",
+                  "stock": "{cninfo_stock_param}",
                   "searchkey": "年度报告",
                   "category": "category_ndbg_szsh",
                   "seDate": "2024-01-01~2026-05-06",
                   "isHLtitle": "true"
                 },
                 "artifact_headers": {
-                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                  "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
                 }
               },
               "artifact_base_url": "https://static.cninfo.com.cn/",
               "max_artifact_downloads": 1,
               "promotion_gate": "structured_artifact_download_required",
-              "status": "metadata_ok_pdf_only_sample",
-              "note": "Observed metadata API returns annual-report records with adjunctUrl, but current sample attachments are PDF-only; orgId-aware stock parameter resolution may be required before promotion."
+              "status": "metadata_ok_pdf_only_after_orgid_resolution",
+              "note": "OrgId-aware metadata returns annual-report records for representative SZSE symbols, but observed attachments are PDF-only. PDF files are discovery evidence only and cannot satisfy official structured source readiness."
             }
           ],
           "supports_xbrl": true,
@@ -806,8 +1073,8 @@
           "request_interval_seconds": 0.2,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,
-          "status": "metadata_candidate_configured_disabled",
-          "note": "CNInfo announcement metadata endpoint is configured and disabled. Current no-orgId stock parameter sample is metadata/manifest-only; orgId-aware symbol resolution and structured artifact evidence are required before promotion."
+          "status": "official_structured_json_candidate_ready_disabled",
+          "note": "CNInfo data20 official structured financial JSON is configured for SZSE and BSE 920-code instruments and remains disabled until bounded parser/backfill validation passes. Announcement metadata is still retained as PDF-only evidence and does not satisfy readiness by itself."
         }
       },
       "bse": {

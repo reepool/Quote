@@ -382,6 +382,62 @@ def test_probe_targets_uses_configured_sample_symbols_and_request_options():
     assert session.calls[1]["headers"]["X-Exchange"] == "SSE"
 
 
+def test_probe_targets_resolves_context_before_endpoint_candidates():
+    target = OfficialFinancialProbeTarget(
+        source="cninfo",
+        exchanges=["SZSE"],
+        request_interval_seconds=0.0,
+        sample_symbols_by_exchange={"SZSE": ["000001"]},
+        context_resolvers=[
+            {
+                "key": "cninfo_top_search_org_id",
+                "kind": "json_row_template",
+                "enabled": True,
+                "url": "https://www.cninfo.com.cn/new/information/topSearch/query",
+                "request": {
+                    "method": "POST",
+                    "body_params": {"keyWord": "{symbol}", "maxNum": "10"},
+                },
+                "row_match": {"code": "{symbol}"},
+                "outputs": {
+                    "cninfo_org_id": "{orgId}",
+                    "cninfo_stock_param": "{code},{orgId}",
+                },
+            }
+        ],
+        endpoint_candidates=[
+            OfficialFinancialEndpointCandidate(
+                key="cninfo_his_announcement_query",
+                kind="metadata_json",
+                url="https://example.test/announcements",
+                request_config={
+                    "method": "POST",
+                    "body_params": {"stock": "{cninfo_stock_param}"},
+                },
+            )
+        ],
+    )
+    session = _QueuedFakeSession(
+        [
+            _FakeResponse(
+                content=b'[{"code":"000001","orgId":"gssz0000001"}]',
+                content_type="application/json",
+            ),
+            _FakeResponse(
+                content=b'{"announcements":[]}',
+                content_type="application/json",
+            ),
+        ]
+    )
+
+    result = probe_targets([target], report_period="2025Q4", session=session)
+
+    assert session.calls[0]["data"]["keyWord"] == "000001"
+    assert session.calls[1]["data"]["stock"] == "000001,gssz0000001"
+    diagnostics = result["targets"][0]["context_resolution_diagnostics"]
+    assert diagnostics[0]["diagnostics"][0]["status"] == "ok"
+
+
 def test_probe_targets_reports_artifact_candidates_from_manifest():
     target = OfficialFinancialProbeTarget(
         source="cninfo",

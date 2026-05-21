@@ -1887,6 +1887,62 @@ class TestResearchRoutes:
         )
 
     @patch("api.routes.data_manager")
+    def test_get_research_financial_statements_passes_service_layer_options(self, mock_dm):
+        mock_dm.get_research_financial_statements = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "report_period": "2025-12-31",
+                "publish_date": None,
+                "fiscal_year": 2025,
+                "fiscal_quarter": 4,
+                "currency": "CNY",
+                "schema_version": "financial_service_layers.v1",
+                "source": "service_layers",
+                "source_mode": "local_or_explicit_remote",
+                "data_as_of": "2026-05-19T10:00:00",
+                "ingestion_run_id": None,
+                "created_at": "2026-05-19T10:00:00",
+                "updated_at": "2026-05-19T10:00:00",
+                "facts": {"revenue": 100.0},
+                "indicators": None,
+                "statements": [],
+                "service_layers": {
+                    "local_core": {
+                        "status": "passed",
+                        "facts": {"revenue": {"fact_value": 100.0}},
+                        "missing_fields": [],
+                    }
+                },
+            }
+        )
+
+        response = _run(
+            get_research_financial_statements(
+                "600000.SH",
+                include_statements=False,
+                report_period="2025-12-31",
+                requested_canonical_facts="revenue,equity_parent",
+                profile="nonbank",
+                mapping_version="sina_ths_core_financial_facts.v1",
+                include_local_core=True,
+                allow_remote_extension=False,
+            )
+        )
+
+        assert response.service_layers["local_core"]["status"] == "passed"
+        mock_dm.get_research_financial_statements.assert_awaited_once_with(
+            "600000.SH",
+            include_statements=False,
+            report_period="2025-12-31",
+            requested_canonical_facts=["revenue", "equity_parent"],
+            profile="nonbank",
+            mapping_version="sina_ths_core_financial_facts.v1",
+            include_local_core=True,
+        )
+
+    @patch("api.routes.data_manager")
     def test_get_research_valuation_history_success(self, mock_dm):
         mock_dm.get_research_valuation_history = AsyncMock(
             return_value={

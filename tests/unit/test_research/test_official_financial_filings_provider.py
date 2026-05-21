@@ -104,6 +104,152 @@ def test_endpoint_candidates_can_collect_all_structured_payloads():
     ]
 
 
+def test_context_resolver_adds_cninfo_org_id_before_endpoint_request():
+    provider = ConfiguredOfficialFinancialFilingProvider(
+        source_name="cninfo",
+        source_config={
+            "context_resolvers": [
+                {
+                    "key": "cninfo_top_search_org_id",
+                    "kind": "json_row_template",
+                    "enabled": True,
+                    "url": "https://www.cninfo.com.cn/new/information/topSearch/query",
+                    "request": {
+                        "method": "POST",
+                        "body_params": {
+                            "keyWord": "{symbol}",
+                            "maxNum": "10",
+                        },
+                    },
+                    "row_match": {"code": "{symbol}"},
+                    "outputs": {
+                        "cninfo_org_id": "{orgId}",
+                        "cninfo_stock_param": "{code},{orgId}",
+                    },
+                }
+            ],
+            "endpoint_candidates": [
+                {
+                    "key": "cninfo_his_announcement_query",
+                    "enabled": True,
+                    "url": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+                    "request": {
+                        "method": "POST",
+                        "body_params": {"stock": "{cninfo_stock_param}"},
+                    },
+                }
+            ],
+        },
+        session=_QueuedSession(
+            [
+                _FakeResponse(
+                    '[{"code":"000001","orgId":"gssz0000001","zwjc":"PAB"}]'
+                ),
+                _FakeResponse('{"announcements":[]}'),
+            ]
+        ),
+    )
+
+    payloads = provider._fetch_sync(
+        [
+            {
+                "instrument_id": "000001.SZ",
+                "symbol": "000001",
+                "exchange": "SZSE",
+                "type": "stock",
+            }
+        ],
+        "SZSE",
+        ["2025-12-31"],
+        "direct",
+    )
+
+    assert payloads == []
+    assert provider.session.calls[0]["data"]["keyWord"] == "000001"
+    assert provider.session.calls[1]["data"]["stock"] == "000001,gssz0000001"
+
+
+def test_cninfo_data20_context_resolver_fetches_all_statement_candidates():
+    provider = ConfiguredOfficialFinancialFilingProvider(
+        source_name="cninfo",
+        source_config={
+            "fetch_all_endpoint_candidates": True,
+            "context_resolvers": [
+                {
+                    "key": "cninfo_data20_company_info_sign",
+                    "kind": "json_row_template",
+                    "enabled": True,
+                    "url": "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
+                    "request": {
+                        "method": "GET",
+                        "query_params": {"scode": "{symbol}"},
+                    },
+                    "row_list_path": "data.records",
+                    "row_match": {"SECCODE": "{symbol}"},
+                    "outputs": {"cninfo_data20_sign": "{F002N}"},
+                }
+            ],
+            "endpoint_candidates": [
+                _cninfo_data20_candidate(
+                    "income",
+                    "https://www.cninfo.com.cn/data20/financialData/getIncomeStatement",
+                ),
+                _cninfo_data20_candidate(
+                    "balance",
+                    "https://www.cninfo.com.cn/data20/financialData/getBalanceSheets",
+                ),
+                _cninfo_data20_candidate(
+                    "cash",
+                    "https://www.cninfo.com.cn/data20/financialData/getCashFlowStatement",
+                ),
+            ],
+        },
+        session=_QueuedSession(
+            [
+                _FakeResponse(
+                    '{"data":{"records":[{"SECCODE":"920833","F002N":1}]}}'
+                ),
+                _cninfo_data20_response("/financialData/getIncomeStatement", "营业总收入"),
+                _cninfo_data20_response("/financialData/getBalanceSheets", "总资产"),
+                _cninfo_data20_response(
+                    "/financialData/getCashFlowStatement",
+                    "经营活动产生的现金流量净额",
+                ),
+            ]
+        ),
+    )
+
+    payloads = provider._fetch_sync(
+        [
+            {
+                "instrument_id": "920833.BJ",
+                "symbol": "920833",
+                "exchange": "BSE",
+                "type": "stock",
+            }
+        ],
+        "BSE",
+        ["2025-12-31"],
+        "direct",
+    )
+
+    assert len(payloads) == 3
+    assert provider.session.calls[0]["params"]["scode"] == "920833"
+    assert [call["params"]["sign"] for call in provider.session.calls[1:]] == [
+        "1",
+        "1",
+        "1",
+    ]
+    assert [payload.manifest.metadata_json["endpoint_candidate_key"] for payload in payloads] == [
+        "income",
+        "balance",
+        "cash",
+    ]
+    assert all(
+        payload.manifest.metadata_json["structured_payload"] for payload in payloads
+    )
+
+
 def _instrument():
     return {
         "instrument_id": "600000.SH",
@@ -134,4 +280,25 @@ def _structured_json_response(sql_id: str):
     return _FakeResponse(
         '{"sqlId":"%s","result":[{"STOCK_ID":"600000","REPORT_YEAR":"2023","S2020_0010":"1"}]}'
         % sql_id
+    )
+
+
+def _cninfo_data20_candidate(key: str, url: str):
+    return {
+        "key": key,
+        "enabled": True,
+        "url": url,
+        "request": {
+            "query_params": {
+                "scode": "{symbol}",
+                "sign": "{cninfo_data20_sign}",
+            }
+        },
+    }
+
+
+def _cninfo_data20_response(path: str, fact_name: str):
+    return _FakeResponse(
+        '{"path":"%s","code":200,"data":{"records":[{"year":[{"index":"%s","2025":1.0}]}]}}'
+        % (path, fact_name)
     )

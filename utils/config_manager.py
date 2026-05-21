@@ -242,6 +242,10 @@ DEFAULT_FINANCIAL_STATEMENTS_MODULE_CONFIG: Dict[str, Any] = {
             },
         ],
     },
+    "official_source_selection": {
+        "enabled": False,
+        "period_unavailable_alternates": [],
+    },
     "runtime": {
         "max_concurrency": 2,
         "request_timeout_seconds": 20.0,

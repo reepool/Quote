@@ -216,6 +216,11 @@ class FinancialNumericFactSnapshot:
     source_mode: str = "direct"
     report_type: Optional[str] = None
     statement_family: Optional[str] = None
+    canonical_fact_name: Optional[str] = None
+    canonical_statement_family: Optional[str] = None
+    canonical_semantic: Optional[str] = None
+    canonical_unit: Optional[str] = None
+    canonical_version: Optional[str] = None
     taxonomy_namespace: Optional[str] = None
     context_id: Optional[str] = None
     unit: Optional[str] = None

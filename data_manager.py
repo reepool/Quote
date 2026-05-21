@@ -32,6 +32,7 @@ from research.empty_support import (
     allows_optional_empty_exchange,
     get_optional_empty_exchanges,
 )
+from research.financial_statement_profile import resolve_financial_statement_profile
 
 
 @dataclass
@@ -3866,6 +3867,12 @@ class DataManager:
         instrument_id: str,
         *,
         include_statements: bool = True,
+        report_period: Optional[str] = None,
+        requested_canonical_facts: Optional[List[str]] = None,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        include_local_core: bool = False,
+        allow_remote_extension: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域 financial statements bundle。"""
         storage = self._require_research_storage()
@@ -3878,19 +3885,321 @@ class DataManager:
             storage.get_financial_statement_bundle,
             normalized_id,
             include_statements=include_statements,
+            report_period=report_period,
         )
         if bundle is not None:
+            service_layers = await self._get_research_financial_statement_service_layers(
+                storage,
+                normalized_id,
+                bundle=bundle,
+                report_period=report_period,
+                requested_canonical_facts=requested_canonical_facts,
+                profile=profile,
+                mapping_version=mapping_version,
+                include_local_core=include_local_core,
+                allow_remote_extension=allow_remote_extension,
+            )
+            if service_layers:
+                bundle["service_layers"] = service_layers
             return bundle
 
         instrument = await self._get_research_instrument_info(normalized_id)
+        service_layers = await self._get_research_financial_statement_service_layers(
+            storage,
+            normalized_id,
+            instrument=instrument,
+            report_period=report_period,
+            requested_canonical_facts=requested_canonical_facts,
+            profile=profile,
+            mapping_version=mapping_version,
+            include_local_core=include_local_core,
+            allow_remote_extension=allow_remote_extension,
+        )
+        if service_layers and self._financial_statement_service_layers_have_data(service_layers):
+            return self._build_financial_statements_service_layer_response(
+                normalized_id,
+                instrument,
+                service_layers,
+                report_period=report_period,
+            )
         if instrument and self._module_allows_optional_empty_exchange(
             "financial_statements",
             instrument.get("exchange"),
         ):
-            return self._build_empty_financial_statements_response(
+            placeholder = self._build_empty_financial_statements_response(
                 instrument,
                 include_statements=include_statements,
             )
+            if service_layers:
+                placeholder["service_layers"] = service_layers
+            return placeholder
+        return None
+
+    def _financial_statement_service_layer_config(self) -> Dict[str, Any]:
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        module_layers = module_cfg.get("service_layers")
+        if isinstance(module_layers, dict):
+            return module_layers
+        akshare_cfg = self.research_config.sources.get("akshare", {}).get(
+            "financial_statements",
+            {},
+        )
+        layers = akshare_cfg.get("service_layers", {})
+        return layers if isinstance(layers, dict) else {}
+
+    async def _get_research_financial_statement_service_layers(
+        self,
+        storage: Any,
+        instrument_id: str,
+        *,
+        bundle: Optional[Dict[str, Any]] = None,
+        instrument: Optional[Dict[str, Any]] = None,
+        report_period: Optional[str] = None,
+        requested_canonical_facts: Optional[List[str]] = None,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        include_local_core: bool = False,
+        allow_remote_extension: bool = False,
+    ) -> Dict[str, Any]:
+        requested = [str(item) for item in (requested_canonical_facts or []) if str(item)]
+        if not include_local_core and not allow_remote_extension and not requested:
+            return {}
+
+        layers_cfg = self._financial_statement_service_layer_config()
+        result: Dict[str, Any] = {}
+        local_core_payload: Optional[Dict[str, Any]] = None
+        local_cfg = layers_cfg.get("local_core", {})
+        resolved_mapping_version = mapping_version or local_cfg.get("mapping_version")
+        profile_resolution = None
+        resolved_profile = profile
+        if (include_local_core or requested) and resolved_profile is None:
+            profile_resolution = await self._resolve_research_financial_statement_profile(
+                storage,
+                instrument_id,
+                instrument=instrument,
+            )
+            resolved_profile = profile_resolution.get("profile") if profile_resolution else None
+        if include_local_core or requested:
+            if not local_cfg.get("enabled", False):
+                local_core_payload = {
+                    "status": "disabled_by_config",
+                    "ready": False,
+                    "instrument_id": instrument_id,
+                    "report_period": report_period,
+                    "profile": resolved_profile,
+                    "profile_resolution": profile_resolution,
+                    "mapping_version": resolved_mapping_version,
+                    "requested_canonical_facts": requested,
+                    "facts": {},
+                    "missing_fields": [
+                        {
+                            "canonical_fact": item,
+                            "reason": "local_core_disabled_by_config",
+                            "mapping_version": resolved_mapping_version,
+                            "profile": resolved_profile,
+                        }
+                        for item in requested
+                    ],
+                }
+            else:
+                local_core_payload = await asyncio.to_thread(
+                    storage.get_financial_local_core_facts,
+                    instrument_id,
+                    report_period=report_period,
+                    requested_canonical_facts=requested or None,
+                    profile=resolved_profile,
+                    mapping_version=resolved_mapping_version,
+                )
+                local_core_payload["profile_resolution"] = profile_resolution
+                local_core_payload["status"] = (
+                    "passed" if local_core_payload.get("ready") else "partial"
+                )
+            result["local_core"] = local_core_payload
+
+        if allow_remote_extension:
+            remote_cfg = layers_cfg.get("remote_extension", {})
+            if not remote_cfg.get("enabled", False):
+                result["remote_extension"] = {
+                    "status": "disabled_by_config",
+                    "is_remote": True,
+                    "source": remote_cfg.get("source", "akshare"),
+                    "statement_interface": remote_cfg.get(
+                        "statement_interface",
+                        "eastmoney_report",
+                    ),
+                    "instrument_id": instrument_id,
+                    "requested_canonical_facts": requested,
+                    "facts": [],
+                    "missing_fields": [
+                        {
+                            "canonical_fact": item,
+                            "reason": "remote_extension_disabled_by_config",
+                        }
+                        for item in requested
+                    ],
+                }
+            elif requested:
+                remote_instrument = instrument or {
+                    "instrument_id": instrument_id,
+                    "symbol": (bundle or {}).get("symbol"),
+                    "exchange": (bundle or {}).get("exchange"),
+                }
+                exchange = (
+                    remote_instrument.get("exchange")
+                    or (bundle or {}).get("exchange")
+                    or ""
+                )
+                from research.financial_remote_extension import (
+                    FinancialRemoteExtensionService,
+                )
+
+                service = FinancialRemoteExtensionService(
+                    provider_config={
+                        "statement_interface_order": [
+                            remote_cfg.get("statement_interface", "eastmoney_report")
+                        ],
+                        "request_timeout_seconds": remote_cfg.get(
+                            "request_timeout_seconds",
+                            30.0,
+                        ),
+                        "request_interval_seconds": remote_cfg.get(
+                            "request_interval_seconds",
+                            0.5,
+                        ),
+                        "retry_attempts": remote_cfg.get("retry_attempts", 2),
+                        "retry_backoff_seconds": remote_cfg.get(
+                            "retry_backoff_seconds",
+                            1.0,
+                        ),
+                    }
+                )
+                result["remote_extension"] = await service.fetch_facts(
+                    instrument=remote_instrument,
+                    exchange=exchange,
+                    requested_canonical_facts=requested,
+                    report_periods=[report_period] if report_period else None,
+                    allow_remote_extension=True,
+                )
+        return result
+
+    async def _resolve_research_financial_statement_profile(
+        self,
+        storage: Any,
+        instrument_id: str,
+        *,
+        instrument: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        industry_membership = await asyncio.to_thread(
+            storage.get_industry_membership,
+            instrument_id,
+            include_snapshot=False,
+        )
+        company_profile = await asyncio.to_thread(
+            storage.get_company_profile,
+            instrument_id,
+            include_snapshot=False,
+        )
+        return resolve_financial_statement_profile(
+            industry_membership=industry_membership,
+            company_profile=company_profile,
+            instrument=instrument,
+        ).to_dict()
+
+    @staticmethod
+    def _financial_statement_service_layers_have_data(
+        service_layers: Dict[str, Any],
+    ) -> bool:
+        local_core = service_layers.get("local_core") or {}
+        if local_core.get("facts"):
+            return True
+        remote_extension = service_layers.get("remote_extension") or {}
+        return bool(remote_extension.get("facts"))
+
+    def _build_financial_statements_service_layer_response(
+        self,
+        instrument_id: str,
+        instrument: Optional[Dict[str, Any]],
+        service_layers: Dict[str, Any],
+        *,
+        report_period: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        data_as_of, created_at, updated_at = self._empty_placeholder_timestamps()
+        local_core = service_layers.get("local_core") or {}
+        selected_period = (
+            report_period
+            or local_core.get("report_period")
+            or self._latest_remote_extension_report_period(service_layers)
+            or ""
+        )
+        return {
+            "instrument_id": instrument_id,
+            "symbol": (instrument or {}).get("symbol") or instrument_id.split(".")[0],
+            "exchange": (instrument or {}).get("exchange") or instrument_id.split(".")[-1],
+            "report_period": selected_period,
+            "publish_date": None,
+            "fiscal_year": self._fiscal_year_from_report_period(selected_period),
+            "fiscal_quarter": self._fiscal_quarter_from_report_period(selected_period),
+            "currency": "CNY",
+            "schema_version": "financial_service_layers.v1",
+            "source": "service_layers",
+            "source_mode": "local_or_explicit_remote",
+            "data_as_of": data_as_of,
+            "ingestion_run_id": None,
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "facts": self._flatten_financial_service_layer_facts(service_layers),
+            "indicators": None,
+            "statements": [],
+            "service_layers": service_layers,
+        }
+
+    @staticmethod
+    def _flatten_financial_service_layer_facts(
+        service_layers: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        facts: Dict[str, Any] = {}
+        for canonical_fact, row in (service_layers.get("local_core") or {}).get(
+            "facts",
+            {},
+        ).items():
+            facts[canonical_fact] = row.get("fact_value")
+        for row in (service_layers.get("remote_extension") or {}).get("facts", []):
+            canonical_fact = row.get("canonical_fact_name")
+            if canonical_fact and canonical_fact not in facts:
+                facts[canonical_fact] = row.get("fact_value")
+        return facts
+
+    @staticmethod
+    def _latest_remote_extension_report_period(service_layers: Dict[str, Any]) -> Optional[str]:
+        periods = [
+            str(row.get("report_period"))
+            for row in (service_layers.get("remote_extension") or {}).get("facts", [])
+            if row.get("report_period")
+        ]
+        return max(periods) if periods else None
+
+    @staticmethod
+    def _fiscal_year_from_report_period(report_period: Optional[str]) -> Optional[int]:
+        if not report_period:
+            return None
+        try:
+            return int(str(report_period)[:4])
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _fiscal_quarter_from_report_period(report_period: Optional[str]) -> Optional[int]:
+        if not report_period:
+            return None
+        text = str(report_period)
+        if text.endswith("Q1") or text.endswith("-03-31"):
+            return 1
+        if text.endswith("Q2") or text.endswith("-06-30"):
+            return 2
+        if text.endswith("Q3") or text.endswith("-09-30"):
+            return 3
+        if text.endswith("Q4") or text.endswith("-12-31"):
+            return 4
         return None
 
     async def get_research_valuation_history(
@@ -5745,6 +6054,7 @@ class DataManager:
             exchange_stats = update_results.get('exchange_stats', {})
             if not isinstance(exchange_stats, dict):
                 exchange_stats = {}
+            instrument_master_sync = update_results.get('instrument_master_sync')
 
             report = {
                 'summary': {
@@ -5758,6 +6068,7 @@ class DataManager:
                 },
                 'exchange_stats': {},
                 'update_results': exchange_stats,
+                'instrument_master_sync': instrument_master_sync,
                 'errors': []
             }
 
@@ -5809,7 +6120,7 @@ class DataManager:
             total_checked = report['summary']['total_instruments_checked']
             total_updated = report['summary']['updated_instruments']
             report['summary']['success_rate'] = (total_updated / total_checked * 100) if total_checked > 0 else 100.0
- 
+
             return report
 
         except Exception as e:
@@ -5826,8 +6137,358 @@ class DataManager:
                 },
                 'exchange_stats': {},
                 'update_results': update_results.get('exchange_stats', {}),
+                'instrument_master_sync': update_results.get('instrument_master_sync'),
                 'errors': [str(e)]
             }
+
+    def _get_instrument_master_sync_config(self) -> Dict[str, Any]:
+        """Return current A-share instrument master sync config with conservative defaults."""
+        defaults = {
+            'enabled': True,
+            'run_before_daily_update': True,
+            'skip_for_backfill': True,
+            'continue_on_failure': True,
+            'timeout_sec': 180,
+            'freshness_threshold_hours': 48,
+            'pytdx_validation_enabled': True,
+            'exchanges': ['SSE', 'SZSE', 'BSE'],
+        }
+
+        raw_config = self.data_config.get('instrument_master_sync')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.instrument_master_sync', {})
+        if isinstance(raw_config, dict):
+            defaults.update(raw_config)
+        return defaults
+
+    async def _get_instrument_master_snapshot(self, exchange: str) -> Dict[str, Any]:
+        """Read a compact stock master snapshot for one exchange."""
+        rows = await self.db_ops.execute_read_query(
+            """
+            SELECT instrument_id, symbol, name, exchange, type, status, is_active,
+                   listed_date, delisted_date, source, updated_at
+            FROM instruments
+            WHERE exchange = :exchange AND type = 'stock'
+            """,
+            {'exchange': exchange},
+        )
+
+        all_ids: Set[str] = set()
+        active_ids: Set[str] = set()
+        updated_values: List[str] = []
+        status_counts: Dict[str, int] = {}
+        source_counts: Dict[str, int] = {}
+
+        for row in rows:
+            instrument_id = row.get('instrument_id')
+            if not instrument_id:
+                continue
+            all_ids.add(instrument_id)
+
+            is_active = row.get('is_active')
+            if is_active in (True, 1, '1', 'true', 'True'):
+                active_ids.add(instrument_id)
+
+            status = str(row.get('status') or 'unknown')
+            source = str(row.get('source') or 'unknown')
+            status_counts[status] = status_counts.get(status, 0) + 1
+            source_counts[source] = source_counts.get(source, 0) + 1
+
+            updated_at = row.get('updated_at')
+            if updated_at:
+                updated_values.append(str(updated_at))
+
+        updated_values.sort()
+        return {
+            'exchange': exchange,
+            'total_count': len(all_ids),
+            'active_count': len(active_ids),
+            'inactive_count': max(0, len(all_ids) - len(active_ids)),
+            'all_ids': all_ids,
+            'active_ids': active_ids,
+            'status_counts': status_counts,
+            'source_counts': source_counts,
+            'freshness': {
+                'oldest_updated_at': updated_values[0] if updated_values else None,
+                'latest_updated_at': updated_values[-1] if updated_values else None,
+            },
+        }
+
+    def _summarize_instrument_source_usage(self, instruments: List[Dict[str, Any]]) -> Dict[str, int]:
+        usage: Dict[str, int] = {}
+        for instrument in instruments or []:
+            source = str(instrument.get('source') or 'unknown')
+            usage[source] = usage.get(source, 0) + 1
+        return usage
+
+    async def _validate_instrument_master_with_pytdx(
+        self,
+        exchange: str,
+        active_ids: Set[str],
+    ) -> Dict[str, Any]:
+        """Compare pytdx current-list coverage without mutating authoritative fields."""
+        result = {
+            'status': 'skipped',
+            'source': 'pytdx',
+            'count': 0,
+            'missing_in_db_count': 0,
+            'missing_in_pytdx_count': 0,
+            'missing_in_db_samples': [],
+            'missing_in_pytdx_samples': [],
+            'warnings': [],
+            'errors': [],
+        }
+
+        if self.source_factory is None:
+            from data_sources.source_factory import get_data_source_factory
+            self.source_factory = get_data_source_factory()
+
+        pytdx_source = None
+        if hasattr(self.source_factory, '_get_source_instance'):
+            pytdx_source = self.source_factory._get_source_instance('pytdx', region='a_stock')
+        if pytdx_source is None:
+            result['warnings'].append('pytdx source unavailable')
+            return result
+
+        try:
+            instruments = await pytdx_source.get_instrument_list(exchange)
+            pytdx_ids = {
+                inst.get('instrument_id')
+                for inst in (instruments or [])
+                if inst.get('instrument_id')
+            }
+            missing_in_db = sorted(pytdx_ids - active_ids)
+            missing_in_pytdx = sorted(active_ids - pytdx_ids)
+            result.update({
+                'status': 'success',
+                'count': len(pytdx_ids),
+                'missing_in_db_count': len(missing_in_db),
+                'missing_in_pytdx_count': len(missing_in_pytdx),
+                'missing_in_db_samples': missing_in_db[:20],
+                'missing_in_pytdx_samples': missing_in_pytdx[:20],
+            })
+            if missing_in_db or missing_in_pytdx:
+                result['status'] = 'warning'
+                result['warnings'].append('pytdx current-list differs from authoritative master data')
+        except Exception as exc:
+            result['status'] = 'error'
+            result['errors'].append(str(exc))
+
+        return result
+
+    async def sync_instrument_master(
+        self,
+        exchanges: Optional[List[str]] = None,
+        *,
+        include_pytdx_validation: Optional[bool] = None,
+        timeout_sec: Optional[int] = None,
+        freshness_threshold_hours: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Refresh A-share stock master data and return structured diagnostics."""
+        config = self._get_instrument_master_sync_config()
+        sync_exchanges = exchanges or config.get('exchanges') or ['SSE', 'SZSE', 'BSE']
+        sync_exchanges = [ex for ex in sync_exchanges if ex in ('SSE', 'SZSE', 'BSE')]
+        include_pytdx = (
+            config.get('pytdx_validation_enabled', True)
+            if include_pytdx_validation is None
+            else include_pytdx_validation
+        )
+        effective_timeout = timeout_sec if timeout_sec is not None else config.get('timeout_sec')
+        freshness_hours = (
+            freshness_threshold_hours
+            if freshness_threshold_hours is not None
+            else config.get('freshness_threshold_hours')
+        )
+
+        started_at = get_shanghai_time()
+        result: Dict[str, Any] = {
+            'status': 'success',
+            'started_at': started_at.isoformat(),
+            'finished_at': None,
+            'elapsed_sec': 0.0,
+            'source_priority': ['baostock', 'akshare', 'pytdx_validation_only'],
+            'exchanges': {},
+            'summary': {
+                'exchanges': sync_exchanges,
+                'added_instruments': 0,
+                'deactivated_instruments': 0,
+                'active_count': 0,
+            },
+            'warnings': [],
+            'errors': [],
+        }
+
+        if self.source_factory is None:
+            from data_sources.source_factory import get_data_source_factory
+            self.source_factory = get_data_source_factory()
+
+        for exchange in sync_exchanges:
+            exchange_result: Dict[str, Any] = {
+                'status': 'success',
+                'before': {},
+                'after': {},
+                'fetched_count': 0,
+                'source_usage': {},
+                'added_count': 0,
+                'deactivated_count': 0,
+                'added_samples': [],
+                'deactivated_samples': [],
+                'freshness': {},
+                'pytdx_validation': None,
+                'warnings': [],
+                'errors': [],
+            }
+            try:
+                before = await self._get_instrument_master_snapshot(exchange)
+                fetch_coro = self.source_factory.get_instrument_list(
+                    exchange,
+                    force_refresh=True,
+                    instrument_types=['stock'],
+                )
+                if effective_timeout:
+                    instruments = await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
+                else:
+                    instruments = await fetch_coro
+                after = await self._get_instrument_master_snapshot(exchange)
+
+                added_ids = sorted(after['all_ids'] - before['all_ids'])
+                deactivated_ids = sorted(before['active_ids'] - after['active_ids'])
+                source_usage = self._summarize_instrument_source_usage(instruments)
+
+                exchange_result.update({
+                    'before': {
+                        'total_count': before['total_count'],
+                        'active_count': before['active_count'],
+                        'inactive_count': before['inactive_count'],
+                        'status_counts': before['status_counts'],
+                    },
+                    'after': {
+                        'total_count': after['total_count'],
+                        'active_count': after['active_count'],
+                        'inactive_count': after['inactive_count'],
+                        'status_counts': after['status_counts'],
+                        'source_counts': after['source_counts'],
+                    },
+                    'fetched_count': len(instruments or []),
+                    'source_usage': source_usage,
+                    'added_count': len(added_ids),
+                    'deactivated_count': len(deactivated_ids),
+                    'added_samples': added_ids[:20],
+                    'deactivated_samples': deactivated_ids[:20],
+                    'freshness': after['freshness'],
+                })
+
+                if not instruments:
+                    exchange_result['status'] = 'warning'
+                    exchange_result['warnings'].append('empty instrument list from primary route')
+                if source_usage and 'baostock' not in source_usage:
+                    exchange_result['warnings'].append('BaoStock primary did not contribute rows; fallback data is non-authoritative for delisting dates')
+                    exchange_result['status'] = 'warning'
+
+                if include_pytdx:
+                    pytdx_result = await self._validate_instrument_master_with_pytdx(
+                        exchange,
+                        after['active_ids'],
+                    )
+                    exchange_result['pytdx_validation'] = pytdx_result
+                    if pytdx_result.get('status') in ('warning', 'error'):
+                        exchange_result['warnings'].extend(pytdx_result.get('warnings', []))
+                        exchange_result['errors'].extend(pytdx_result.get('errors', []))
+                        if exchange_result['status'] == 'success':
+                            exchange_result['status'] = pytdx_result['status']
+
+                if freshness_hours and after['freshness'].get('latest_updated_at'):
+                    try:
+                        latest = datetime.fromisoformat(str(after['freshness']['latest_updated_at']).replace('Z', '+00:00'))
+                        if latest.tzinfo is not None:
+                            latest = latest.replace(tzinfo=None)
+                        age_hours = (datetime.now() - latest).total_seconds() / 3600
+                        exchange_result['freshness']['age_hours'] = round(age_hours, 2)
+                        if age_hours > float(freshness_hours):
+                            exchange_result['warnings'].append(
+                                f"master data freshness exceeds {freshness_hours}h"
+                            )
+                            if exchange_result['status'] == 'success':
+                                exchange_result['status'] = 'warning'
+                    except Exception:
+                        exchange_result['warnings'].append('unable to parse master data freshness timestamp')
+                        if exchange_result['status'] == 'success':
+                            exchange_result['status'] = 'warning'
+
+                result['summary']['added_instruments'] += exchange_result['added_count']
+                result['summary']['deactivated_instruments'] += exchange_result['deactivated_count']
+                result['summary']['active_count'] += exchange_result['after'].get('active_count', 0)
+
+            except asyncio.TimeoutError:
+                exchange_result['status'] = 'error'
+                exchange_result['errors'].append(f'instrument master sync timed out after {effective_timeout}s')
+            except Exception as exc:
+                exchange_result['status'] = 'error'
+                exchange_result['errors'].append(str(exc))
+
+            if exchange_result['warnings']:
+                result['warnings'].extend([f"{exchange}: {w}" for w in exchange_result['warnings']])
+            if exchange_result['errors']:
+                result['errors'].extend([f"{exchange}: {e}" for e in exchange_result['errors']])
+            result['exchanges'][exchange] = exchange_result
+
+        if result['errors']:
+            result['status'] = 'error'
+        elif result['warnings']:
+            result['status'] = 'warning'
+
+        finished_at = get_shanghai_time()
+        result['finished_at'] = finished_at.isoformat()
+        result['elapsed_sec'] = round((finished_at - started_at).total_seconds(), 3)
+        return result
+
+    async def _maybe_sync_instrument_master_before_daily_update(
+        self,
+        exchanges: List[str],
+        target_date: date,
+    ) -> Dict[str, Any]:
+        """Run current master-data sync before normal daily update unless config says to skip."""
+        config = self._get_instrument_master_sync_config()
+        today = date.today()
+
+        if not config.get('enabled', True) or not config.get('run_before_daily_update', True):
+            return {
+                'status': 'skipped',
+                'reason': 'disabled_by_config',
+                'exchanges': {},
+                'warnings': [],
+                'errors': [],
+            }
+
+        if config.get('skip_for_backfill', True) and target_date < today:
+            return {
+                'status': 'skipped',
+                'reason': 'historical_backfill_current_master_sync_skipped',
+                'target_date': target_date.isoformat(),
+                'exchanges': {},
+                'warnings': [],
+                'errors': [],
+            }
+
+        a_share_exchanges = [ex for ex in exchanges if ex in ('SSE', 'SZSE', 'BSE')]
+        if not a_share_exchanges:
+            return {
+                'status': 'skipped',
+                'reason': 'no_a_share_exchange_in_update_scope',
+                'exchanges': {},
+                'warnings': [],
+                'errors': [],
+            }
+
+        result = await self.sync_instrument_master(
+            a_share_exchanges,
+            include_pytdx_validation=config.get('pytdx_validation_enabled', True),
+            timeout_sec=config.get('timeout_sec'),
+            freshness_threshold_hours=config.get('freshness_threshold_hours'),
+        )
+        if result.get('status') == 'error' and not config.get('continue_on_failure', True):
+            raise RuntimeError(f"instrument master sync failed before daily update: {result.get('errors', [])}")
+        return result
 
     async def _save_progress(self):
         """保存标准进度到文件"""
@@ -6545,6 +7206,11 @@ class DataManager:
                 'total_quotes_added': 0,
                 'exchange_stats': {}
             }
+            instrument_master_sync = await self._maybe_sync_instrument_master_before_daily_update(
+                exchanges,
+                target_date,
+            )
+            update_results['instrument_master_sync'] = instrument_master_sync
 
             for exchange in exchanges:
                 try:

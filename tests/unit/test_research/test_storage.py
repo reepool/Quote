@@ -1,5 +1,9 @@
 import sqlite3
 
+from research.financial_source_field_mapping import (
+    MAPPING_VERSION,
+    get_financial_source_field_mappings,
+)
 from research.official_shenwan_mapping import (
     OfficialShenwanCandidateMatch,
     OfficialShenwanCodeMapping,
@@ -47,6 +51,7 @@ def _build_storage_manager(tmp_path, *, attach_quotes_db: bool = False):
             attach_quotes_db=attach_quotes_db,
             quotes_db_path=str(quotes_db_path),
             quotes_db_alias="quotes",
+            financials_db_path=str(research_db_path),
         ),
         budget=ResearchBudgetConfig(),
     )
@@ -95,6 +100,76 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "industry_source_files" in tables
     assert "industry_classification_history" in tables
     assert "industry_memberships" in tables
+
+
+def test_financial_writes_use_financials_db_when_configured(tmp_path):
+    research_db_path = tmp_path / "research.db"
+    financials_db_path = tmp_path / "financials.db"
+    quotes_db_path = tmp_path / "quotes.db"
+    quotes_db_path.write_bytes(b"")
+    config = ResearchConfig(
+        enabled=True,
+        storage=ResearchStorageConfig(
+            db_path=str(research_db_path),
+            shadow_mode=True,
+            attach_quotes_db=False,
+            quotes_db_path=str(quotes_db_path),
+            quotes_db_alias="quotes",
+            financials_db_path=str(financials_db_path),
+        ),
+        budget=ResearchBudgetConfig(),
+    )
+    storage = ResearchStorageManager(config)
+    storage.initialize()
+
+    run_id = storage.start_ingestion_run(
+        domain="financial_summary",
+        job_name="financial_summary_shadow_sync",
+        market="SSE",
+    )
+    storage.upsert_financial_summary(
+        FinancialSummarySnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            report_date="2025-12-31",
+            source="unit",
+            source_mode="direct",
+        ),
+        ingestion_run_id=run_id,
+    )
+
+    with sqlite3.connect(financials_db_path) as conn:
+        financial_count = conn.execute(
+            "SELECT COUNT(*) FROM financial_summaries WHERE instrument_id = ?",
+            ("600519.SH",),
+        ).fetchone()[0]
+        financial_run_count = conn.execute(
+            "SELECT COUNT(*) FROM ingestion_runs WHERE domain = ?",
+            ("financial_summary",),
+        ).fetchone()[0]
+
+    with sqlite3.connect(research_db_path) as conn:
+        research_run_count = conn.execute(
+            "SELECT COUNT(*) FROM ingestion_runs WHERE domain = ?",
+            ("financial_summary",),
+        ).fetchone()[0]
+        research_financial_tables = {
+            row[0]
+            for row in conn.execute(
+                """
+                SELECT name
+                FROM sqlite_master
+                WHERE type = 'table' AND name LIKE 'financial_%'
+                """
+            ).fetchall()
+        }
+
+    assert financial_count == 1
+    assert financial_run_count == 1
+    assert research_financial_tables == set()
+    assert research_run_count == 0
+    assert storage.get_financial_summary("600519.SH")["report_date"] == "2025-12-31"
 
 
 def test_ingestion_run_and_payload_audit_round_trip(tmp_path):
@@ -1388,6 +1463,11 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
                 report_type="quarterly",
                 statement_family="income_statement",
                 fact_name="Revenue",
+                canonical_fact_name="revenue",
+                canonical_statement_family="income_statement",
+                canonical_semantic="operating_revenue",
+                canonical_unit="CNY",
+                canonical_version="standard_financial_numeric_facts.v1",
                 taxonomy_namespace="cn-gaap",
                 context_id="current_q1",
                 unit="CNY",
@@ -1410,6 +1490,10 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
         report_period="2024-03-31",
     )
     facts = storage.get_financial_numeric_facts("600000.SH")
+    canonical_facts = storage.get_financial_numeric_facts(
+        "600000.SH",
+        canonical_fact_name="revenue",
+    )
     derived = storage.derive_financial_core_facts_from_numeric_facts(
         "600000.SH",
         "2024-03-31",
@@ -1420,6 +1504,12 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
     assert manifests[0]["parser_diagnostics"] == {"numeric_fact_count": 1}
     assert manifests[0]["metadata"] == {"probe": True}
     assert facts[0]["fact_name"] == "Revenue"
+    assert facts[0]["canonical_fact_name"] == "revenue"
+    assert facts[0]["canonical_statement_family"] == "income_statement"
+    assert facts[0]["canonical_semantic"] == "operating_revenue"
+    assert facts[0]["canonical_unit"] == "CNY"
+    assert facts[0]["canonical_version"] == "standard_financial_numeric_facts.v1"
+    assert canonical_facts[0]["fact_name"] == "Revenue"
     assert facts[0]["fact_value"] == 1000.0
     assert facts[0]["dimensions"] == {"consolidated": True}
     assert derived is not None
@@ -1460,6 +1550,345 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
 
     assert canonical_count == 1
     assert hot_count == 1
+
+
+def test_financial_source_field_mappings_and_audit_results_round_trip(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_source_field_mapping_test",
+        market="SSE",
+    )
+    mappings = get_financial_source_field_mappings(
+        profile="nonbank",
+        mapping_version="sina_ths_core_financial_facts.v1",
+    )[:2]
+
+    written = storage.financial_statements.upsert_source_field_mappings(
+        mappings,
+        ingestion_run_id=run_id,
+    )
+    stored_mappings = storage.financial_statements.get_source_field_mappings(
+        profile="nonbank",
+        approved_for_core=True,
+    )
+
+    assert research_db_path.exists()
+    assert written == 2
+    assert len(stored_mappings) == 2
+    assert stored_mappings[0]["approved_for_core"] is True
+    assert stored_mappings[0]["mapping"]["mapping_version"] == (
+        "sina_ths_core_financial_facts.v1"
+    )
+
+    audit_id = storage.financial_statements.upsert_mapping_audit_result(
+        {
+            "mapping_version": "sina_ths_core_financial_facts.v1",
+            "profile": "nonbank",
+            "instrument_id": "600000.SH",
+            "report_period": "2025-12-31",
+            "status": "passed",
+            "summary": {
+                "approved_mapping_count": 2,
+                "approved_mapping_passed_count": 2,
+            },
+            "mapping_audit": [
+                {
+                    "canonical_fact": "revenue",
+                    "approved_for_core": True,
+                }
+            ],
+        },
+        ingestion_run_id=run_id,
+    )
+    audits = storage.financial_statements.get_mapping_audit_results(
+        profile="nonbank",
+        mapping_version="sina_ths_core_financial_facts.v1",
+    )
+
+    assert audit_id.startswith("sina_ths_core_financial_facts.v1:nonbank:")
+    assert len(audits) == 1
+    assert audits[0]["status"] == "passed"
+    assert audits[0]["summary"]["approved_mapping_passed_count"] == 2
+    assert audits[0]["audit"]["mapping_audit"][0]["canonical_fact"] == "revenue"
+
+
+def test_financial_local_core_facts_returns_missing_field_diagnostics(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_local_core_read_test",
+        market="SSE",
+    )
+    storage.financial_statements.upsert_source_field_mappings(
+        get_financial_source_field_mappings(
+            mapping_version="sina_ths_core_financial_facts.v1"
+        ),
+        ingestion_run_id=run_id,
+    )
+    source_file_id = storage.financial_statements.upsert_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="akshare",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2025-12-31",
+            report_type="annual",
+            content_hash="hash-local-core-600000-2025",
+            parser_version="akshare_financial_statements.v1",
+            status="parsed",
+        ),
+        ingestion_run_id=run_id,
+    )
+    lineage = {
+        "mapping_version": "sina_ths_core_financial_facts.v1",
+        "approved_for_core": True,
+        "source_field_role": "ths_metric",
+        "profiles": ["nonbank"],
+        "canonical_facts": ["revenue"],
+        "relationships": ["exact_equivalent"],
+        "value_types": ["period_reported_value"],
+    }
+    storage.financial_statements.upsert_numeric_facts(
+        [
+            FinancialNumericFactSnapshot(
+                source_file_id=source_file_id,
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period="2025-12-31",
+                report_type="annual",
+                statement_family="income_statement",
+                fact_name="operating_income",
+                canonical_fact_name="revenue",
+                canonical_statement_family="income_statement",
+                canonical_semantic="operating_revenue",
+                canonical_unit="CNY",
+                canonical_version="standard_financial_numeric_facts.v1",
+                unit="CNY",
+                fact_value=1000.0,
+                source="akshare",
+                source_mode="direct",
+                parser_version="akshare_financial_statements.v1",
+                raw_fact_json={"local_core_mapping": lineage},
+            ),
+            FinancialNumericFactSnapshot(
+                source_file_id=source_file_id,
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period="2025-12-31",
+                report_type="annual",
+                statement_family="balance_sheet",
+                fact_name="custom_metric",
+                canonical_fact_name=None,
+                unit="",
+                fact_value=7.5,
+                source="akshare",
+                source_mode="direct",
+                parser_version="akshare_financial_statements.v1",
+            ),
+        ],
+        ingestion_run_id=run_id,
+    )
+
+    result = storage.financial_statements.get_local_core_facts(
+        "600000.SH",
+        report_period="2025-12-31",
+        requested_canonical_facts=["revenue", "equity_parent", "eastmoney_only_metric"],
+        profile="nonbank",
+        mapping_version="sina_ths_core_financial_facts.v1",
+    )
+
+    assert result["ready"] is False
+    assert result["facts"]["revenue"]["fact_value"] == 1000.0
+    assert result["facts"]["revenue"]["raw_fact"]["local_core_mapping"] == lineage
+    assert result["missing_fields"] == [
+        {
+            "canonical_fact": "equity_parent",
+            "reason": "missing_local_core_fact",
+            "mapping_version": "sina_ths_core_financial_facts.v1",
+            "profile": "nonbank",
+            "report_period": "2025-12-31",
+        },
+        {
+            "canonical_fact": "eastmoney_only_metric",
+            "reason": "outside_approved_local_core",
+            "mapping_version": "sina_ths_core_financial_facts.v1",
+            "profile": "nonbank",
+        },
+    ]
+
+    bank_result = storage.financial_statements.get_local_core_facts(
+        "600000.SH",
+        report_period="2025-12-31",
+        requested_canonical_facts=["revenue"],
+        profile="bank",
+        mapping_version="sina_ths_core_financial_facts.v1",
+    )
+    assert bank_result["facts"] == {}
+    assert bank_result["missing_fields"] == [
+        {
+            "canonical_fact": "revenue",
+            "reason": "missing_local_core_fact",
+            "mapping_version": "sina_ths_core_financial_facts.v1",
+            "profile": "bank",
+            "report_period": "2025-12-31",
+        }
+    ]
+
+
+def test_financial_local_core_facts_reads_profile_specific_persisted_catalog(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_local_core_profile_catalog_test",
+        market="SSE",
+    )
+    storage.financial_statements.upsert_source_field_mappings(
+        get_financial_source_field_mappings(
+            profile="securities",
+            mapping_version=MAPPING_VERSION,
+        ),
+        ingestion_run_id=run_id,
+    )
+    source_file_id = storage.financial_statements.upsert_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="akshare",
+            source_mode="direct",
+            instrument_id="600030.SH",
+            symbol="600030",
+            exchange="SSE",
+            report_period="2024-12-31",
+            report_type="annual",
+            content_hash="hash-local-core-600030-2024",
+            parser_version="akshare_financial_statements.v1",
+            status="parsed",
+        ),
+        ingestion_run_id=run_id,
+    )
+    lineage = {
+        "mapping_version": MAPPING_VERSION,
+        "approved_for_core": True,
+        "source_field_role": "sina_field",
+        "profiles": ["securities"],
+        "canonical_facts": ["equity_parent"],
+        "canonical_fact": "equity_parent",
+        "canonical_statement_family": "balance_sheet",
+        "canonical_semantic": "equity_parent",
+        "canonical_unit": "CNY",
+        "relationships": ["exact_equivalent"],
+        "value_types": ["point_in_time"],
+    }
+    storage.financial_statements.upsert_numeric_facts(
+        [
+            FinancialNumericFactSnapshot(
+                source_file_id=source_file_id,
+                instrument_id="600030.SH",
+                symbol="600030",
+                exchange="SSE",
+                report_period="2024-12-31",
+                report_type="annual",
+                statement_family="balance_sheet",
+                fact_name="归属于母公司的股东权益合计",
+                canonical_fact_name="equity_parent",
+                canonical_statement_family="balance_sheet",
+                canonical_semantic="equity_parent",
+                canonical_unit="CNY",
+                canonical_version="standard_financial_numeric_facts.v1",
+                unit="CNY",
+                fact_value=2500.0,
+                source="akshare",
+                source_mode="direct",
+                parser_version="akshare_financial_statements.v1",
+                raw_fact_json={"local_core_mapping": lineage},
+            )
+        ],
+        ingestion_run_id=run_id,
+    )
+
+    result = storage.financial_statements.get_local_core_facts(
+        "600030.SH",
+        report_period="2024-12-31",
+        requested_canonical_facts=["equity_parent"],
+        profile="securities",
+        mapping_version=MAPPING_VERSION,
+    )
+
+    assert result["ready"] is True
+    assert result["profile"] == "securities"
+    assert result["mapping_version"] == MAPPING_VERSION
+    assert result["facts"]["equity_parent"]["fact_value"] == 2500.0
+    assert result["missing_fields"] == []
+
+
+def test_derive_financial_core_facts_skips_ambiguous_total_equity(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_statement_official_probe",
+        market="SSE",
+    )
+    source_file_id = storage.financial_statements.upsert_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="cninfo",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2023-12-31",
+            report_type="annual",
+            filing_id="cninfo-600000-2023",
+            content_hash="hash-cninfo-600000-2023",
+            parser_version="cninfo_data20_structured_json_facts.v1",
+            status="parsed",
+        ),
+        ingestion_run_id=run_id,
+    )
+    storage.financial_statements.upsert_numeric_facts(
+        [
+            FinancialNumericFactSnapshot(
+                source_file_id=source_file_id,
+                instrument_id="600000.SH",
+                symbol="600000",
+                exchange="SSE",
+                report_period="2023-12-31",
+                report_type="annual",
+                statement_family="balance_sheet",
+                fact_name="所有者权益",
+                fact_value=732884000000.0,
+                source="cninfo",
+                source_mode="direct",
+                parser_version="cninfo_data20_structured_json_facts.v1",
+            )
+        ],
+        ingestion_run_id=run_id,
+    )
+
+    derived = storage.derive_financial_core_facts_from_numeric_facts(
+        "600000.SH",
+        "2023-12-31",
+        alias_mapping={"equity": ["所有者权益"]},
+    )
+
+    assert derived is not None
+    assert derived.equity is None
+    assert derived.lineage_json["core_fact_warnings"][0]["warning"] == (
+        "equity_total_vs_parent_ambiguous"
+    )
+    storage.upsert_financial_facts(derived, ingestion_run_id=run_id)
+    readiness = storage.validate_financial_statement_readiness(
+        expected_periods=["2023-12-31"],
+        instrument_ids=["600000.SH"],
+        required_core_facts=["equity"],
+    )
+    assert "missing_core_facts" in readiness["blockers"]
+    assert "core_fact_semantic_warnings" in readiness["blockers"]
 
 
 def test_financial_hot_cold_tier_maintenance_is_idempotent(tmp_path):

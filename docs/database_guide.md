@@ -30,12 +30,14 @@
 
 ## 财务域与未来数据库迁移原则
 
+专项说明见 [财务数据系统专项文档](financial_data_system.md)，其中记录了当前 L1/L2/L3 财务服务分层、`data/financials.db` 写入边界、字段映射原则和全量导入脚本 `scripts/research_financial_l1_full_import.py` 的使用方法。
+
 当前 Quote Core 和 research 域仍以 SQLite 为现实底座，但财务域已经开始引入官方结构化披露文件、全数值事实长表、hot/cold tier、多期 backfill/catchup 和更复杂的 coverage/readiness 查询。为避免未来迁移到更高性能数据库时重写业务逻辑，财务相关实现必须遵守以下边界：
 
 1. **存储隔离**
-   - 当前兼容读写继续使用 `data/research.db` 中的 `financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`。
-   - 新增财务仓表包括 `financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`。
-   - 下一阶段可将财务专用表拆到 `data/financials.db`；官方 XBRL 或等价结构化文件归档放在 `data/filings/`。
+   - `2026-05-20` 起，财务域生产读写必须通过 `financials_db_path` 路由到 `data/financials.db`；`data/research.db` 中已有的 `financial_*` 表只作为历史兼容/迁移来源，不再作为新增财务事实的目标库。
+   - 财务仓表包括 `financial_summaries`、`financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`、`financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`、`financial_source_field_mappings` 和 `financial_source_mapping_audits`。
+   - 官方 XBRL 或等价结构化文件归档放在 `data/filings/`，归档路径写入 `financial_source_files.archive_path`。
    - `quotes.db` 不承载财务事实表，避免行情主库被低频大字段写入放大。
 
 2. **访问抽象**

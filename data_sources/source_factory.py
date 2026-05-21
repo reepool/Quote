@@ -703,6 +703,41 @@ class DataSourceFactory:
                         ds_logger.warning(f"[DataSourceFactory] Invalid instrument list from {primary_source.name}")
         except Exception as e:
             ds_logger.error(f"[DataSourceFactory] Failed to get instrument list from {primary_source.name}: {e}")
+            for backup_source in backup_sources:
+                try:
+                    ds_logger.warning(
+                        "[DataSourceFactory] Trying backup instrument source %s after primary failure for %s",
+                        backup_source.name,
+                        exchange,
+                    )
+                    try:
+                        instruments = await backup_source.get_instrument_list(
+                            exchange,
+                            instrument_types=instrument_types,
+                        )
+                    except TypeError:
+                        instruments = await backup_source.get_instrument_list(exchange)
+                        if instrument_types:
+                            instruments = [
+                                inst for inst in instruments
+                                if inst.get('type') in instrument_types
+                            ]
+
+                    if instruments and len(instruments) > 50 and self._validate_instrument_list(instruments, exchange):
+                        await self._save_instruments_cache(exchange, instruments)
+                        ds_logger.info(
+                            "[DataSourceFactory] Got fresh instruments from backup %s: %s items",
+                            backup_source.name,
+                            len(instruments),
+                        )
+                        return instruments
+                except Exception as backup_error:
+                    ds_logger.warning(
+                        "[DataSourceFactory] Backup instrument source %s failed for %s: %s",
+                        backup_source.name,
+                        exchange,
+                        backup_error,
+                    )
 
         # 第四步：如果所有方法都失败，返回空列表
         ds_logger.error(f"[DataSourceFactory] No valid instrument list available for {exchange}")
