@@ -748,6 +748,15 @@ class IndustryStandardSyncService:
                 getattr(provider, "CODE_TABLE_ARTIFACT", "shenwan_classification_code_table"),
             ],
         )
+        dm_logger.info(
+            "[IndustryStandardSync] Official SWS bundle sync starting "
+            "(source=%s, mode=%s, exchanges=%s, previous_files=%s, force_refresh=%s)",
+            candidate_source,
+            candidate_mode,
+            target_exchanges,
+            sorted(previous_source_files.keys()),
+            force_refresh,
+        )
         try:
             bundle = await bundle_fetcher(
                 mode=candidate_mode,
@@ -786,6 +795,9 @@ class IndustryStandardSyncService:
             }
 
         if not bundle.changed:
+            dm_logger.info(
+                "[IndustryStandardSync] Official SWS bundle unchanged; checking existing coverage"
+            )
             return self._build_unchanged_official_classification_result(
                 candidate_source=candidate_source,
                 candidate_mode=candidate_mode,
@@ -798,19 +810,34 @@ class IndustryStandardSyncService:
         taxonomy_nodes = list(bundle.taxonomy_nodes)
         taxonomy_system, taxonomy_version = self._resolve_taxonomy_identity(taxonomy_nodes)
         taxonomy_by_code = {node.industry_code: node for node in taxonomy_nodes}
+        dm_logger.info(
+            "[IndustryStandardSync] Official SWS bundle parsed "
+            "(taxonomy_nodes=%s, history_rows=%s, latest_classifications=%s, taxonomy=%s/%s)",
+            len(taxonomy_nodes),
+            len(bundle.history_rows),
+            len(bundle.latest_classifications),
+            taxonomy_system,
+            taxonomy_version,
+        )
         source_file_ids: Dict[str, int] = {}
         for source_file in bundle.source_files:
             source_file_ids[source_file.artifact_kind] = self.storage.upsert_industry_source_file(
                 source_file,
                 ingestion_run_id=run_id,
             )
+        dm_logger.info(
+            "[IndustryStandardSync] Source file manifests upserted: %s",
+            source_file_ids,
+        )
 
         cleared_counts = self.storage.clear_industry_standard_slice(
             taxonomy_system=taxonomy_system,
             taxonomy_version=taxonomy_version,
         )
+        dm_logger.info("[IndustryStandardSync] Cleared strict Shenwan slice: %s", cleared_counts)
         for node in taxonomy_nodes:
             self.storage.upsert_industry_taxonomy(node)
+        dm_logger.info("[IndustryStandardSync] Taxonomy upserted: %s nodes", len(taxonomy_nodes))
 
         stock_history_artifact = getattr(
             provider,
@@ -828,6 +855,10 @@ class IndustryStandardSyncService:
             taxonomy_version=taxonomy_version,
             ingestion_run_id=run_id,
         )
+        dm_logger.info(
+            "[IndustryStandardSync] Classification history replaced: %s rows",
+            len(history_rows),
+        )
 
         latest_by_symbol = {
             str(snapshot.symbol).strip(): snapshot for snapshot in bundle.latest_classifications
@@ -838,6 +869,7 @@ class IndustryStandardSyncService:
         for exchange in target_exchanges:
             stock_instruments = instruments_by_exchange.get(exchange, [])
             if not stock_instruments:
+                dm_logger.info("[IndustryStandardSync] Exchange %s skipped: no active stocks", exchange)
                 exchange_results.append(
                     IndustryStandardExchangeSyncResult(
                         exchange=exchange,
@@ -849,6 +881,12 @@ class IndustryStandardSyncService:
                 )
                 continue
 
+            dm_logger.info(
+                "[IndustryStandardSync] Writing official memberships for %s "
+                "(target_instruments=%s)",
+                exchange,
+                len(stock_instruments),
+            )
             exchange_result = self._write_official_memberships_for_exchange(
                 taxonomy_nodes=taxonomy_nodes,
                 taxonomy_by_code=taxonomy_by_code,
@@ -870,6 +908,15 @@ class IndustryStandardSyncService:
             total_official_classifications_written += (
                 exchange_result.official_classifications_written
             )
+            dm_logger.info(
+                "[IndustryStandardSync] Exchange %s finished "
+                "(status=%s, memberships=%s, official_classifications=%s, error=%s)",
+                exchange,
+                exchange_result.status,
+                exchange_result.memberships_written,
+                exchange_result.official_classifications_written,
+                exchange_result.error_message,
+            )
 
         successful_exchanges = sum(
             1 for result in exchange_results if result.status == "success"
@@ -878,6 +925,15 @@ class IndustryStandardSyncService:
             1
             for result in exchange_results
             if instruments_by_exchange.get(result.exchange) and result.status != "success"
+        )
+        dm_logger.info(
+            "[IndustryStandardSync] Official SWS bundle sync finished "
+            "(status=%s, successful_exchanges=%s/%s, memberships=%s, official_classifications=%s)",
+            "success" if required_failures == 0 and successful_exchanges > 0 else "degraded",
+            successful_exchanges,
+            len(exchange_results),
+            total_memberships_written,
+            total_official_classifications_written,
         )
         return {
             "status": "success" if required_failures == 0 and successful_exchanges > 0 else "degraded",

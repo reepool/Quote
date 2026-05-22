@@ -123,6 +123,19 @@ class IndustryIndexAnalysisSyncService:
             },
         )
         try:
+            dm_logger.info(
+                "[IndustryIndexAnalysisSync] Sync starting "
+                "(operation=%s, source=%s, mode=%s, index_types=%s, limit_per_type=%s, "
+                "start_date=%s, end_date=%s, latest_date=%s)",
+                operation,
+                source,
+                mode,
+                target_types,
+                limit_per_type,
+                start_date,
+                end_date,
+                latest_date,
+            )
             snapshots = await provider.fetch_latest_index_analysis(
                 mode=mode,
                 index_types=target_types or None,
@@ -131,16 +144,32 @@ class IndustryIndexAnalysisSyncService:
                 end_date=end_date,
                 latest_date=latest_date,
             )
+            coverage = summarize_index_analysis_snapshots(snapshots)
+            dm_logger.info(
+                "[IndustryIndexAnalysisSync] Provider fetch finished "
+                "(rows=%s, trade_dates=%s, start=%s, end=%s, index_types=%s)",
+                len(snapshots),
+                coverage.get("trade_dates", 0),
+                coverage.get("start_date"),
+                coverage.get("end_date"),
+                sorted((coverage.get("index_type_counts") or {}).keys()),
+            )
             for snapshot in snapshots:
                 self.storage.upsert_industry_index_analysis(
                     snapshot,
                     ingestion_run_id=run_id,
                 )
 
-            coverage = summarize_index_analysis_snapshots(snapshots)
             summary = self.storage.summarize_industry_index_analysis_daily(
                 taxonomy_system=taxonomy_system,
                 taxonomy_version=taxonomy_version,
+            )
+            dm_logger.info(
+                "[IndustryIndexAnalysisSync] Rows upserted and storage summarized "
+                "(rows_written=%s, latest_trade_date=%s, distinct_index_codes=%s)",
+                len(snapshots),
+                summary.get("latest_trade_date"),
+                summary.get("distinct_index_codes", 0),
             )
             self.storage.finish_ingestion_run(
                 run_id,

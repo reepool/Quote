@@ -13,6 +13,7 @@ import requests
 
 from .base import BaseIndustryIndexAnalysisProvider, IndustryIndexAnalysisSnapshot
 from .tls_support import build_ca_bundle_with_extra_certificate
+from utils import dm_logger
 
 
 class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
@@ -108,6 +109,16 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
         requested_end = _normalize_optional_date(end_date)
         requested_latest = _normalize_optional_date(latest_date)
         for index_type in index_types:
+            dm_logger.info(
+                "[SWSResearchIndexAnalysis] Fetching index_type=%s "
+                "(limit=%s, start_date=%s, end_date=%s, latest_date=%s)",
+                index_type,
+                limit_per_type,
+                requested_start,
+                requested_end,
+                requested_latest,
+            )
+            before_count = len(rows)
             rows.extend(
                 self._fetch_index_type(
                     session,
@@ -117,6 +128,11 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
                     end_date=requested_end,
                     latest_date=requested_latest,
                 )
+            )
+            dm_logger.info(
+                "[SWSResearchIndexAnalysis] Finished index_type=%s (rows=%s)",
+                index_type,
+                len(rows) - before_count,
             )
         return rows
 
@@ -162,6 +178,14 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
                 )
             data = payload.get("data") or {}
             result_rows = data.get("results") or []
+            dm_logger.info(
+                "[SWSResearchIndexAnalysis] Page fetched "
+                "(index_type=%s, page=%s, result_rows=%s, has_next=%s)",
+                index_type,
+                page,
+                len(result_rows),
+                bool(data.get("next")),
+            )
             for row in result_rows:
                 snapshot = self._parse_row(row, index_type=index_type)
                 if not _date_in_requested_range(

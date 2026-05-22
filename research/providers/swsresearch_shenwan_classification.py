@@ -185,9 +185,17 @@ class SWSResearchShenwanClassificationProvider(
         force_refresh: bool,
     ) -> SWSResearchClassificationBundle:
         if self._bundle_cache is not None and not force_refresh and not previous_source_files:
+            dm_logger.info("[SWSResearchClassification] Reusing in-memory official bundle cache")
             return self._bundle_cache
 
         session = requests.Session()
+        dm_logger.info(
+            "[SWSResearchClassification] Fetching official Shenwan classification artifacts "
+            "(mode=%s, force_refresh=%s, previous_files=%s)",
+            mode,
+            force_refresh,
+            sorted(previous_source_files.keys()),
+        )
         stock_artifact = self._fetch_artifact(
             session,
             artifact_kind=self.STOCK_HISTORY_ARTIFACT,
@@ -212,6 +220,11 @@ class SWSResearchShenwanClassificationProvider(
         changed = any(item["status"] != "unchanged" for item in (stock_artifact, code_artifact))
 
         if not changed:
+            dm_logger.info(
+                "[SWSResearchClassification] Official artifacts unchanged; short-circuiting parse "
+                "(unchanged=%s)",
+                unchanged_artifacts,
+            )
             bundle = SWSResearchClassificationBundle(
                 taxonomy_nodes=[],
                 history_rows=[],
@@ -244,6 +257,13 @@ class SWSResearchShenwanClassificationProvider(
         history_rows = self._parse_history_rows(stock_frame)
         latest_classifications = self._latest_classifications_from_history(history_rows)
         latest_classifications = self._apply_symbol_aliases(latest_classifications)
+        dm_logger.info(
+            "[SWSResearchClassification] Parsed official artifacts "
+            "(taxonomy_rows=%s, history_rows=%s, latest_classifications=%s)",
+            len(code_frame),
+            len(stock_frame),
+            len(latest_classifications),
+        )
         source_files = [
             self._with_file_row_metadata(
                 stock_artifact["snapshot"],
@@ -305,6 +325,7 @@ class SWSResearchShenwanClassificationProvider(
             if last_modified:
                 headers["If-Modified-Since"] = last_modified
 
+        dm_logger.info("[SWSResearchClassification] Requesting artifact %s from %s", artifact_kind, url)
         response = session.get(
             url,
             headers=headers,
@@ -313,6 +334,9 @@ class SWSResearchShenwanClassificationProvider(
         )
         raw_headers = {key: value for key, value in response.headers.items()}
         if response.status_code == 304 and previous:
+            dm_logger.info(
+                "[SWSResearchClassification] Artifact %s unchanged by HTTP 304", artifact_kind
+            )
             snapshot = IndustrySourceFileSnapshot(
                 source=self.source_name,
                 source_mode="direct",
@@ -335,6 +359,13 @@ class SWSResearchShenwanClassificationProvider(
         content = response.content
         digest = hashlib.sha256(content).hexdigest()
         if previous and not force_refresh and digest == str(previous.get("sha256") or ""):
+            dm_logger.info(
+                "[SWSResearchClassification] Artifact %s unchanged by sha256 "
+                "(bytes=%s, sha256=%s)",
+                artifact_kind,
+                len(content),
+                digest,
+            )
             snapshot = IndustrySourceFileSnapshot(
                 source=self.source_name,
                 source_mode="direct",
@@ -354,6 +385,14 @@ class SWSResearchShenwanClassificationProvider(
             )
             return {"status": "unchanged", "snapshot": snapshot, "content": None}
 
+        dm_logger.info(
+            "[SWSResearchClassification] Artifact %s fetched "
+            "(bytes=%s, sha256=%s, status_code=%s)",
+            artifact_kind,
+            len(content),
+            digest,
+            response.status_code,
+        )
         snapshot = IndustrySourceFileSnapshot(
             source=self.source_name,
             source_mode="direct",
