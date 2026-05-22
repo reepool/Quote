@@ -3,6 +3,7 @@ import pytest
 from scripts.dev_validation.prepare_sina_ths_local_core_import_manifest import (
     build_batches,
     build_local_core_import_manifest,
+    classify_report_period_lifecycle,
     collect_target_instruments,
     manifest_console_summary,
     write_batch_target_files,
@@ -103,6 +104,62 @@ def test_build_local_core_import_manifest_profiles_and_mapping_readiness():
     assert "000001.SZ:SZSE:bank" in manifest["target_lines"]
     assert manifest["mapping_readiness_by_profile"]["bank"]["ready"] is True
     assert manifest["batch_count"] == 2
+
+
+def test_build_local_core_import_manifest_marks_lifecycle_excluded_periods():
+    manifest = build_local_core_import_manifest(
+        instruments_by_exchange={
+            "SSE": [
+                {
+                    "instrument_id": "600355.SH",
+                    "symbol": "600355",
+                    "exchange": "SSE",
+                    "listed_date": "2002-06-13",
+                    "delisted_date": "2026-04-27",
+                },
+                {
+                    "instrument_id": "688999.SH",
+                    "symbol": "688999",
+                    "exchange": "SSE",
+                    "listed_date": "2021-07-27",
+                },
+            ]
+        },
+        storage=_FakeStorage(),
+        report_periods=["2021-06-30", "2025-12-31", "2026-03-31"],
+        batch_size=20,
+    )
+
+    by_id = {target["instrument_id"]: target for target in manifest["targets"]}
+    assert by_id["600355.SH"]["excluded_report_periods"] == [
+        {
+            "report_period": "2026-03-31",
+            "classification": "post_delisting_or_no_disclosure",
+            "reason": "退市日在该报告期法定披露截止日前，未披露结构化财报视为正常待记录事项。",
+            "listed_date": "2002-06-13",
+            "delisted_date": "2026-04-27",
+            "disclosure_deadline": "2026-04-30",
+        }
+    ]
+    assert by_id["688999.SH"]["excluded_report_periods"][0]["classification"] == (
+        "pre_listing_period"
+    )
+    assert manifest["report_period_lifecycle_summary"]["by_classification"] == {
+        "post_delisting_or_no_disclosure": 1,
+        "pre_listing_period": 1,
+    }
+
+
+def test_classify_report_period_lifecycle_supports_quarter_aliases():
+    lifecycle = classify_report_period_lifecycle(
+        instrument={"listed_date": "2021-07-27", "delisted_date": "2026-04-27"},
+        report_periods=["2021Q2", "2026Q1"],
+    )
+
+    assert [item["classification"] for item in lifecycle["excluded_report_periods"]] == [
+        "pre_listing_period",
+        "post_delisting_or_no_disclosure",
+    ]
 
 
 def test_build_local_core_import_manifest_flags_default_profile_for_review():

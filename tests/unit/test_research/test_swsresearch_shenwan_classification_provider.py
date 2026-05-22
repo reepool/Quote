@@ -1,7 +1,9 @@
 import io
+from pathlib import Path
 
 import pandas as pd
 
+from research.providers.tls_support import build_ca_bundle_with_extra_certificate
 from research.providers.swsresearch_shenwan_classification import (
     SWSResearchShenwanClassificationProvider,
 )
@@ -52,6 +54,17 @@ def test_swsresearch_provider_reads_official_excel_artifacts():
     assert list(stock_frame.columns) == list(provider.REQUIRED_STOCK_COLUMNS)
     assert code_frame.iloc[0]["行业代码"] == "340000"
     assert stock_frame.iloc[0]["股票代码"] == "600519"
+
+
+def test_swsresearch_extra_ca_bundle_keeps_tls_verification_enabled():
+    cert_path = "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt"
+    bundle = build_ca_bundle_with_extra_certificate(cert_path)
+    provider = SWSResearchShenwanClassificationProvider(extra_ca_cert_path=cert_path)
+
+    assert bundle is not True
+    assert Path(str(bundle)).exists()
+    assert provider.request_verify == bundle
+    assert Path(cert_path).read_text().strip() in Path(str(bundle)).read_text()
 
 
 def test_swsresearch_provider_parses_official_taxonomy_levels():

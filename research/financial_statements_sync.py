@@ -8,7 +8,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass, field, replace
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 from research.empty_support import allows_optional_empty_exchange
 from research.financial_fact_aliases import (
@@ -829,11 +829,18 @@ class FinancialStatementsShadowSyncService:
         statement_interfaces = (bundle.raw_payload or {}).get(
             "akshare_statement_interfaces"
         ) or {}
+        statement_field_interfaces = (bundle.raw_payload or {}).get(
+            "akshare_statement_field_interfaces"
+        ) or {}
+        existing_canonical_facts: set[str] = set()
         for statement in bundle.raw_statements:
             statement_type = str(statement.statement_type or "")
             statement_interface_for_mapping = str(
                 statement_interfaces.get(statement_type) or statement_interface
             )
+            field_interfaces_for_statement = statement_field_interfaces.get(
+                statement_type
+            ) or {}
             statement_family = _FALLBACK_STATEMENT_FAMILY_BY_TYPE.get(
                 statement_type,
                 statement_type or None,
@@ -847,8 +854,12 @@ class FinancialStatementsShadowSyncService:
                     continue
                 standard_metadata = describe_financial_numeric_fact_name(fact_name)
                 unit = str(standard_metadata.get("canonical_unit") or "")
+                fact_statement_interface = str(
+                    field_interfaces_for_statement.get(fact_name)
+                    or statement_interface_for_mapping
+                )
                 local_core_mapping = _local_core_mapping_lineage(
-                    statement_interface=statement_interface_for_mapping,
+                    statement_interface=fact_statement_interface,
                     fact_name=fact_name,
                     profile=statement_profile,
                     mapping_version=local_core_mapping_version,
@@ -874,10 +885,15 @@ class FinancialStatementsShadowSyncService:
                     )
                     canonical_unit = local_core_mapping.get("canonical_unit") or canonical_unit
                     unit = str(canonical_unit or unit or "")
+                if canonical_fact_name:
+                    existing_canonical_facts.add(str(canonical_fact_name))
                 raw_fact_json = {
                     "source_payload_schema": "financial_statement_bundle",
                     "statement_type": statement.statement_type,
-                    "akshare_statement_interface": statement_interface_for_mapping,
+                    "akshare_statement_interface": fact_statement_interface,
+                    "akshare_statement_interface_for_statement": (
+                        statement_interface_for_mapping
+                    ),
                     "payload_hash": payload_hash,
                     "raw_value": raw_value,
                     "standardized_fact": standard_metadata,
@@ -916,6 +932,18 @@ class FinancialStatementsShadowSyncService:
                         parser_version=parser_version,
                     )
                 )
+        facts.extend(
+            _derived_local_core_numeric_facts_from_bundle(
+                bundle,
+                source_file_id=source_file_id,
+                payload_hash=payload_hash,
+                parser_version=parser_version,
+                statement_profile=statement_profile,
+                mapping_version=local_core_mapping_version,
+                existing_canonical_facts=existing_canonical_facts,
+                existing_numeric_facts=facts,
+            )
+        )
         return facts
 
     def _finalize_successful_exchange(
@@ -1312,6 +1340,170 @@ def _is_fallback_numeric_metadata_field(fact_name: str) -> bool:
         return True
     upper = text.upper()
     return upper in _FALLBACK_NUMERIC_METADATA_FIELDS or text in _FALLBACK_NUMERIC_METADATA_FIELDS
+
+
+def _derived_local_core_numeric_facts_from_bundle(
+    bundle: FinancialStatementBundle,
+    *,
+    source_file_id: str,
+    payload_hash: str,
+    parser_version: str,
+    statement_profile: Optional[str],
+    mapping_version: str,
+    existing_canonical_facts: set[str],
+    existing_numeric_facts: Sequence[FinancialNumericFactSnapshot],
+) -> List[FinancialNumericFactSnapshot]:
+    """Emit approved derived facts when a canonical field is computable but absent raw."""
+    if "net_income_parent" in existing_canonical_facts:
+        return []
+    profile = str(statement_profile or "").strip().lower()
+    if not profile:
+        return []
+    if bundle.facts is None:
+        return _derive_parent_net_income_from_total_without_minority(
+            bundle,
+            source_file_id=source_file_id,
+            payload_hash=payload_hash,
+            parser_version=parser_version,
+            profile=profile,
+            mapping_version=mapping_version,
+            existing_numeric_facts=existing_numeric_facts,
+        )
+    lineage = (bundle.facts.lineage_json or {}).get("core_fact_alias_matches") or {}
+    net_income_lineage = lineage.get("net_income") or {}
+    if (
+        net_income_lineage.get("method") == "total_net_profit_minus_minority_interest_income"
+        and bundle.facts.net_income is not None
+    ):
+        return [
+            _build_derived_parent_net_income_fact(
+                bundle,
+                source_file_id=source_file_id,
+                payload_hash=payload_hash,
+                parser_version=parser_version,
+                profile=profile,
+                mapping_version=mapping_version,
+                fact_value=float(bundle.facts.net_income),
+                derivation=net_income_lineage,
+                relationship="derived_from_total_net_profit_and_minority_interest",
+            )
+        ]
+    return _derive_parent_net_income_from_total_without_minority(
+        bundle,
+        source_file_id=source_file_id,
+        payload_hash=payload_hash,
+        parser_version=parser_version,
+        profile=profile,
+        mapping_version=mapping_version,
+        existing_numeric_facts=existing_numeric_facts,
+    )
+
+
+def _derive_parent_net_income_from_total_without_minority(
+    bundle: FinancialStatementBundle,
+    *,
+    source_file_id: str,
+    payload_hash: str,
+    parser_version: str,
+    profile: str,
+    mapping_version: str,
+    existing_numeric_facts: Sequence[FinancialNumericFactSnapshot],
+) -> List[FinancialNumericFactSnapshot]:
+    if any(
+        fact.canonical_fact_name
+        in {"profit_sheet.minority_interest_income", "minority_equity"}
+        for fact in existing_numeric_facts
+    ):
+        return []
+    total_candidates = [
+        fact
+        for fact in existing_numeric_facts
+        if fact.canonical_fact_name == "net_income_total" and fact.fact_value is not None
+    ]
+    if not total_candidates:
+        return []
+    source_fact = total_candidates[0]
+    return [
+        _build_derived_parent_net_income_fact(
+            bundle,
+            source_file_id=source_file_id,
+            payload_hash=payload_hash,
+            parser_version=parser_version,
+            profile=profile,
+            mapping_version=mapping_version,
+            fact_value=float(source_fact.fact_value),
+            derivation={
+                "method": "net_income_total_when_no_minority_interest_disclosed",
+                "source_fact_name": source_fact.fact_name,
+                "source_fact_value": source_fact.fact_value,
+            },
+            relationship="derived_from_total_net_profit_without_minority_interest_disclosed",
+        )
+    ]
+
+
+def _build_derived_parent_net_income_fact(
+    bundle: FinancialStatementBundle,
+    *,
+    source_file_id: str,
+    payload_hash: str,
+    parser_version: str,
+    profile: str,
+    mapping_version: str,
+    fact_value: float,
+    derivation: Dict[str, Any],
+    relationship: str,
+) -> FinancialNumericFactSnapshot:
+    return FinancialNumericFactSnapshot(
+        source_file_id=source_file_id,
+        instrument_id=bundle.instrument_id,
+        symbol=bundle.symbol,
+        exchange=bundle.exchange,
+        report_period=bundle.report_period,
+        report_type=(
+            bundle.facts.report_type
+            if bundle.facts is not None and bundle.facts.report_type
+            else _report_type_for_period(bundle.report_period)
+        ),
+        statement_family="income_statement",
+        fact_name="derived.net_income_parent",
+        canonical_fact_name="net_income_parent",
+        canonical_statement_family="income_statement",
+        canonical_semantic="parent_attributable_net_profit",
+        canonical_unit="CNY",
+        canonical_version=None,
+        taxonomy_namespace=f"{bundle.source}:fallback:derived",
+        context_id=f"{bundle.source}:derived:net_income_parent:{bundle.report_period}",
+        unit="CNY",
+        period_end=bundle.report_period,
+        fact_value=fact_value,
+        value_text=str(fact_value),
+        raw_fact_json={
+            "source_payload_schema": "financial_statement_bundle",
+            "statement_type": "profit_sheet",
+            "akshare_statement_interface": "derived_formula",
+            "payload_hash": payload_hash,
+            "raw_value": fact_value,
+            "derived": True,
+            "derivation": derivation,
+            "local_core_mapping": {
+                "mapping_version": mapping_version,
+                "approved_for_core": True,
+                "source_field_role": "derived_formula",
+                "profiles": [profile],
+                "canonical_facts": ["net_income_parent"],
+                "canonical_fact": "net_income_parent",
+                "canonical_statement_family": "income_statement",
+                "canonical_semantic": "parent_attributable_net_profit",
+                "canonical_unit": "CNY",
+                "relationships": [relationship],
+                "value_types": ["period_reported_value"],
+            },
+        },
+        source=bundle.source,
+        source_mode=bundle.source_mode,
+        parser_version=parser_version,
+    )
 
 
 def _local_core_mapping_lineage(

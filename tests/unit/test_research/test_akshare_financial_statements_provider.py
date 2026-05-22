@@ -339,6 +339,120 @@ def test_akshare_financial_statements_provider_merges_target_period_statement_ga
     assert bundle.facts.operating_cf == 210.0
 
 
+def test_akshare_financial_statements_provider_merges_missing_fields_from_sina(
+    monkeypatch,
+):
+    provider = AkshareFinancialStatementsProvider(
+        provider_config={
+            "statement_interface_order": ["ths_report", "sina_report"],
+        }
+    )
+    calls = []
+
+    def _ths_balance(symbol="603019", indicator="按报告期"):
+        calls.append(("ths_balance", symbol, indicator))
+        return pd.DataFrame(
+            [
+                {
+                    "report_date": "2024-06-30",
+                    "metric_name": "assets_total",
+                    "value": 1200.0,
+                },
+                {
+                    "report_date": "2024-06-30",
+                    "metric_name": "total_debt",
+                    "value": 420.0,
+                },
+                {
+                    "report_date": "2024-06-30",
+                    "metric_name": "parent_holder_equity_total",
+                    "value": 780.0,
+                },
+            ]
+        )
+
+    def _ths_profit(symbol="603019", indicator="按报告期"):
+        calls.append(("ths_profit", symbol, indicator))
+        return pd.DataFrame(
+            [
+                {
+                    "report_date": "2024-06-30",
+                    "metric_name": "index_deduct_holder_net_profit",
+                    "value": 150.0,
+                }
+            ]
+        )
+
+    def _ths_cash(symbol="603019", indicator="按报告期"):
+        calls.append(("ths_cash", symbol, indicator))
+        return pd.DataFrame(
+            [
+                {
+                    "report_date": "2024-06-30",
+                    "metric_name": "act_cash_flow_net",
+                    "value": 210.0,
+                }
+            ]
+        )
+
+    def _sina_report(stock="sh603019", symbol="资产负债表"):
+        calls.append(("sina", stock, symbol))
+        if symbol == "利润表":
+            return pd.DataFrame(
+                [
+                    {
+                        "报告日": "20240630",
+                        "公告日期": "20240830",
+                        "营业收入": 1000.0,
+                        "归属于母公司股东的净利润": 180.0,
+                    }
+                ]
+            )
+        return pd.DataFrame()
+
+    monkeypatch.setattr(
+        provider,
+        "_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_financial_debt_new_ths=_ths_balance,
+            stock_financial_benefit_new_ths=_ths_profit,
+            stock_financial_cash_new_ths=_ths_cash,
+            stock_financial_report_sina=_sina_report,
+        ),
+    )
+
+    bundles = provider._fetch_financial_statement_bundles_sync(
+        [
+            {
+                "instrument_id": "603019.SH",
+                "symbol": "603019",
+                "exchange": "SSE",
+                "type": "stock",
+                "is_active": True,
+            }
+        ],
+        "direct",
+        report_periods=["2024-06-30"],
+    )
+
+    assert ("sina", "sh603019", "利润表") in calls
+    assert len(bundles) == 1
+    bundle = bundles[0]
+    assert bundle.raw_payload["akshare_statement_interface"] == "mixed"
+    assert bundle.raw_payload["akshare_statement_interfaces"]["profit_sheet"] == "mixed"
+    assert bundle.raw_payload["akshare_statement_field_interfaces"]["profit_sheet"][
+        "营业收入"
+    ] == "sina_report"
+    assert bundle.raw_payload["akshare_statement_field_interfaces"]["profit_sheet"][
+        "归属于母公司股东的净利润"
+    ] == "sina_report"
+    assert bundle.facts is not None
+    assert bundle.facts.revenue == 1000.0
+    assert bundle.facts.net_income == 180.0
+    assert bundle.facts.total_assets == 1200.0
+    assert bundle.facts.operating_cf == 210.0
+
+
 def test_akshare_financial_statements_provider_builds_bundle_from_ths_report(monkeypatch):
     provider = AkshareFinancialStatementsProvider(
         provider_config={"statement_interface_order": ["ths_report"]}

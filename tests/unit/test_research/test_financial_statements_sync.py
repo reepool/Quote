@@ -664,6 +664,150 @@ def test_financial_statements_sync_uses_statement_level_mapping_source_for_mixed
     ] == "ths_metric"
 
 
+def test_financial_statements_sync_uses_field_level_mapping_source_for_mixed_statement():
+    bundle = FinancialStatementBundle(
+        instrument_id="603019.SH",
+        symbol="603019",
+        exchange="SSE",
+        report_period="2024-06-30",
+        publish_date="2024-08-30",
+        fiscal_year=2024,
+        fiscal_quarter=2,
+        source="akshare",
+        source_mode="direct",
+        raw_statements=[
+            FinancialStatementRawSnapshot(
+                instrument_id="603019.SH",
+                symbol="603019",
+                exchange="SSE",
+                statement_type="profit_sheet",
+                report_period="2024-06-30",
+                publish_date="2024-08-30",
+                fiscal_year=2024,
+                fiscal_quarter=2,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "index_deduct_holder_net_profit": 150.0,
+                    "营业收入": 1000.0,
+                    "归属于母公司股东的净利润": 180.0,
+                },
+            )
+        ],
+        facts=FinancialFactsSnapshot(
+            instrument_id="603019.SH",
+            symbol="603019",
+            exchange="SSE",
+            report_period="2024-06-30",
+            report_type="semiannual",
+            source="akshare",
+            source_mode="direct",
+        ),
+        raw_payload={
+            "akshare_statement_interface": "mixed",
+            "akshare_statement_interfaces": {"profit_sheet": "ths_report"},
+            "akshare_statement_field_interfaces": {
+                "profit_sheet": {
+                    "营业收入": "sina_report",
+                    "归属于母公司股东的净利润": "sina_report",
+                }
+            },
+        },
+    )
+
+    numeric_facts = FinancialStatementsShadowSyncService._numeric_facts_from_fallback_bundle(
+        bundle,
+        source_file_id="source-file-4",
+        payload_hash="payload-hash-4",
+        parser_version="akshare_financial_statements.v1",
+        statement_profile="nonbank",
+    )
+    facts_by_name = {fact.fact_name: fact for fact in numeric_facts}
+
+    revenue = facts_by_name["营业收入"]
+    assert revenue.canonical_fact_name == "revenue"
+    assert revenue.raw_fact_json["akshare_statement_interface"] == "sina_report"
+    assert revenue.raw_fact_json["akshare_statement_interface_for_statement"] == (
+        "ths_report"
+    )
+    assert revenue.raw_fact_json["local_core_mapping"]["source_field_role"] == (
+        "sina_field"
+    )
+
+
+def test_financial_statements_sync_emits_derived_parent_net_income_fact():
+    bundle = FinancialStatementBundle(
+        instrument_id="603019.SH",
+        symbol="603019",
+        exchange="SSE",
+        report_period="2024-06-30",
+        publish_date="2024-08-30",
+        fiscal_year=2024,
+        fiscal_quarter=2,
+        source="akshare",
+        source_mode="direct",
+        raw_statements=[
+            FinancialStatementRawSnapshot(
+                instrument_id="603019.SH",
+                symbol="603019",
+                exchange="SSE",
+                statement_type="profit_sheet",
+                report_period="2024-06-30",
+                publish_date="2024-08-30",
+                fiscal_year=2024,
+                fiscal_quarter=2,
+                source="akshare",
+                source_mode="direct",
+                statement_json={
+                    "净利润": 567271735.85,
+                    "少数股东损益": 4113070.43,
+                },
+            )
+        ],
+        facts=FinancialFactsSnapshot(
+            instrument_id="603019.SH",
+            symbol="603019",
+            exchange="SSE",
+            report_period="2024-06-30",
+            report_type="semiannual",
+            net_income=563158665.42,
+            source="akshare",
+            source_mode="direct",
+            lineage_json={
+                "core_fact_alias_matches": {
+                    "net_income": {
+                        "derived": True,
+                        "method": "total_net_profit_minus_minority_interest_income",
+                        "fact_name": "净利润-少数股东损益",
+                        "fact_value": 563158665.42,
+                    }
+                }
+            },
+        ),
+        raw_payload={"akshare_statement_interface": "sina_report"},
+    )
+
+    numeric_facts = FinancialStatementsShadowSyncService._numeric_facts_from_fallback_bundle(
+        bundle,
+        source_file_id="source-file-5",
+        payload_hash="payload-hash-5",
+        parser_version="akshare_financial_statements.v1",
+        statement_profile="nonbank",
+    )
+    derived = [
+        fact
+        for fact in numeric_facts
+        if fact.canonical_fact_name == "net_income_parent"
+    ]
+
+    assert len(derived) == 1
+    assert derived[0].fact_name == "derived.net_income_parent"
+    assert derived[0].fact_value == 563158665.42
+    assert derived[0].raw_fact_json["local_core_mapping"]["source_field_role"] == (
+        "derived_formula"
+    )
+
+
 @pytest.mark.asyncio
 async def test_financial_statements_sync_allows_optional_empty_bse(tmp_path):
     research_config = _build_research_config(tmp_path)

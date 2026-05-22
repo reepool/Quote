@@ -1,6 +1,8 @@
 from scripts.research_financial_l1_full_import import (
     DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES,
     DEFAULT_ACCEPTED_SOURCE_GAPS,
+    accepted_source_gaps_from_manifest_lifecycle,
+    merge_accepted_source_gaps,
     resolve_report_periods,
     selected_batches,
     split_ready_existing_targets,
@@ -31,6 +33,51 @@ def test_default_accepted_source_gaps_include_reviewed_bse_and_star_cases():
 
 def test_full_import_defaults_accept_bse_source_gaps():
     assert DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES == ("BSE",)
+
+
+def test_manifest_lifecycle_exclusions_become_accepted_source_gaps():
+    accepted = accepted_source_gaps_from_manifest_lifecycle(
+        {
+            "targets": [
+                {
+                    "instrument_id": "600355.SH",
+                    "excluded_report_periods": [
+                        {
+                            "report_period": "2026-03-31",
+                            "classification": "post_delisting_or_no_disclosure",
+                        }
+                    ],
+                }
+            ]
+        },
+        required_canonical_facts=["revenue", "net_income_parent"],
+    )
+
+    entry = accepted[("600355.SH", "2026-03-31")]
+    assert entry["facts"] == {"revenue", "net_income_parent"}
+    assert entry["classification"] == "post_delisting_or_no_disclosure"
+
+
+def test_merge_accepted_source_gaps_keeps_all_fact_names():
+    merged = merge_accepted_source_gaps(
+        {
+            ("600355.SH", "2026-03-31"): {
+                "facts": {"revenue"},
+                "classification": "source_confirmed_missing",
+            }
+        },
+        {
+            ("600355.SH", "2026-03-31"): {
+                "facts": {"net_income_parent"},
+                "classification": "source_confirmed_missing",
+            }
+        },
+    )
+
+    assert merged[("600355.SH", "2026-03-31")]["facts"] == {
+        "revenue",
+        "net_income_parent",
+    }
 
 
 def test_resolve_report_periods_prefers_explicit_periods():

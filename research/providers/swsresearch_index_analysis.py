@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from .base import BaseIndustryIndexAnalysisProvider, IndustryIndexAnalysisSnapshot
+from .tls_support import build_ca_bundle_with_extra_certificate
 
 
 class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
@@ -56,6 +57,7 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
         retry_backoff_seconds: float = 0.5,
         page_size: int = 200,
         max_pages_per_type: int = 10,
+        extra_ca_cert_path: Optional[str] = None,
     ):
         self.endpoint = endpoint
         self.taxonomy_system = taxonomy_system
@@ -69,6 +71,7 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
         self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
         self.page_size = max(1, int(page_size))
         self.max_pages_per_type = max(1, int(max_pages_per_type))
+        self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
 
     async def fetch_latest_index_analysis(
         self,
@@ -191,6 +194,7 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
                     params=params,
                     headers=headers,
                     timeout=self.request_timeout_seconds,
+                    verify=self.request_verify,
                 )
                 response.raise_for_status()
                 return response.json()

@@ -294,6 +294,7 @@ class IndustryStandardProviderRegistry:
                 ),
                 minimum_code_rows=swsresearch_cfg.get("minimum_code_rows", 400),
                 symbol_aliases=swsresearch_cfg.get("symbol_aliases", []),
+                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path"),
             ),
             "akshare": AkshareShenwanIndustryProvider(
                 taxonomy_system=industry_standard_cfg.get("taxonomy_system", "sw"),
@@ -451,6 +452,7 @@ class IndustryIndexAnalysisProviderRegistry:
                 retry_backoff_seconds=index_cfg.get("retry_backoff_seconds", 0.5),
                 page_size=index_cfg.get("page_size", 200),
                 max_pages_per_type=index_cfg.get("max_pages_per_type", 10),
+                extra_ca_cert_path=index_cfg.get("extra_ca_cert_path"),
             ),
             "akshare": AkshareSWSResearchIndexAnalysisProvider(
                 endpoint=akshare_index_cfg.get(

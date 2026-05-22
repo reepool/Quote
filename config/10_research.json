@@ -755,6 +755,7 @@
         "industry_standard": {
           "stock_history_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/StockClassifyUse_stock.xls",
           "code_table_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/SwClassCode_2021.xls",
+          "extra_ca_cert_path": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
           "request_timeout_seconds": 30.0,
           "parser_version": "swsresearch_shenwan_classification.v1",
           "minimum_stock_history_rows": 5000,
@@ -777,6 +778,7 @@
         "index_analysis": {
           "enabled": true,
           "endpoint": "https://www.swsresearch.com/institute-sw/api/index_analysis/day_week_month_report/",
+          "extra_ca_cert_path": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
           "request_timeout_seconds": 20.0,
           "retry_attempts": 2,
           "retry_backoff_seconds": 0.5,

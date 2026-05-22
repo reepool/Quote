@@ -16,6 +16,7 @@ import requests
 
 from utils import dm_logger
 
+from .tls_support import build_ca_bundle_with_extra_certificate
 from .base import (
     BaseIndustryStandardProvider,
     BaseOfficialIndustryHistoryProvider,
@@ -73,6 +74,7 @@ class SWSResearchShenwanClassificationProvider(
         minimum_stock_history_rows: int = 5000,
         minimum_code_rows: int = 400,
         symbol_aliases: Optional[List[Dict[str, Any]]] = None,
+        extra_ca_cert_path: Optional[str] = None,
     ):
         self.stock_history_url = stock_history_url
         self.code_table_url = code_table_url
@@ -83,6 +85,7 @@ class SWSResearchShenwanClassificationProvider(
         self.minimum_stock_history_rows = max(1, int(minimum_stock_history_rows))
         self.minimum_code_rows = max(1, int(minimum_code_rows))
         self.symbol_aliases = list(symbol_aliases or [])
+        self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
         self._bundle_cache: Optional[SWSResearchClassificationBundle] = None
         self._last_fetch_metadata: Dict[str, Any] = {}
 
@@ -302,7 +305,12 @@ class SWSResearchShenwanClassificationProvider(
             if last_modified:
                 headers["If-Modified-Since"] = last_modified
 
-        response = session.get(url, headers=headers, timeout=self.request_timeout_seconds)
+        response = session.get(
+            url,
+            headers=headers,
+            timeout=self.request_timeout_seconds,
+            verify=self.request_verify,
+        )
         raw_headers = {key: value for key, value in response.headers.items()}
         if response.status_code == 304 and previous:
             snapshot = IndustrySourceFileSnapshot(

@@ -8,6 +8,7 @@ import asyncio
 import json
 import sys
 from collections import Counter
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -95,12 +96,19 @@ def build_local_core_import_manifest(
                 exchange=exchange,
             )
             profile_resolutions.append({"instrument_id": instrument_id, **resolution})
+            lifecycle = classify_report_period_lifecycle(
+                instrument=instrument,
+                report_periods=report_periods,
+            )
             targets.append(
                 {
                     "instrument_id": instrument_id,
                     "exchange": exchange,
                     "symbol": instrument.get("symbol"),
                     "name": instrument.get("name"),
+                    "listed_date": lifecycle["listed_date"],
+                    "delisted_date": lifecycle["delisted_date"],
+                    "excluded_report_periods": lifecycle["excluded_report_periods"],
                     "profile": resolution["profile"],
                     "target": f"{instrument_id}:{exchange}:{resolution['profile']}",
                     "profile_confidence": resolution["confidence"],
@@ -133,6 +141,7 @@ def build_local_core_import_manifest(
             profile_resolutions
         ),
         "profile_resolution_risks": profile_resolution_risks(profile_resolutions),
+        "report_period_lifecycle_summary": summarize_report_period_lifecycle(targets),
         "mapping_readiness_by_profile": mapping_readiness,
         "batch_size": max(1, int(batch_size or 1)),
         "batch_count": len(batches),
@@ -230,6 +239,156 @@ def profile_resolution_risks(resolutions: Sequence[Dict[str, Any]]) -> Dict[str,
     }
 
 
+def classify_report_period_lifecycle(
+    *,
+    instrument: Dict[str, Any],
+    report_periods: Sequence[str],
+) -> Dict[str, Any]:
+    """Classify periods that should not block import when source facts are absent."""
+    listed_date = parse_optional_date(
+        instrument.get("listed_date") or instrument.get("list_date")
+    )
+    delisted_date = parse_optional_date(
+        instrument.get("delisted_date") or instrument.get("delist_date")
+    )
+    excluded: List[Dict[str, Any]] = []
+    for raw_period in report_periods:
+        period_end = parse_report_period_date(str(raw_period))
+        if period_end is None:
+            continue
+        disclosure_deadline = disclosure_deadline_for_report_period(period_end)
+        if listed_date is not None and period_end < listed_date:
+            excluded.append(
+                {
+                    "report_period": period_end.isoformat(),
+                    "classification": "pre_listing_period",
+                    "reason": "报告期早于上市日期，第三方结构化财报缺失视为正常。",
+                    "listed_date": listed_date.isoformat(),
+                    "delisted_date": delisted_date.isoformat()
+                    if delisted_date is not None
+                    else None,
+                    "disclosure_deadline": disclosure_deadline.isoformat(),
+                }
+            )
+            continue
+        if delisted_date is not None and (
+            period_end > delisted_date
+            or (
+                period_end == latest_quarter_end_before(delisted_date)
+                and delisted_date <= disclosure_deadline
+            )
+        ):
+            excluded.append(
+                {
+                    "report_period": period_end.isoformat(),
+                    "classification": "post_delisting_or_no_disclosure",
+                    "reason": "退市日在该报告期法定披露截止日前，未披露结构化财报视为正常待记录事项。",
+                    "listed_date": listed_date.isoformat()
+                    if listed_date is not None
+                    else None,
+                    "delisted_date": delisted_date.isoformat(),
+                    "disclosure_deadline": disclosure_deadline.isoformat(),
+                }
+            )
+    return {
+        "listed_date": listed_date.isoformat() if listed_date is not None else None,
+        "delisted_date": delisted_date.isoformat() if delisted_date is not None else None,
+        "excluded_report_periods": excluded,
+    }
+
+
+def summarize_report_period_lifecycle(targets: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    by_classification: Counter[str] = Counter()
+    by_period: Counter[str] = Counter()
+    examples: List[Dict[str, Any]] = []
+    for target in targets:
+        for item in target.get("excluded_report_periods") or []:
+            classification = str(item.get("classification") or "")
+            report_period = str(item.get("report_period") or "")
+            if classification:
+                by_classification[classification] += 1
+            if report_period:
+                by_period[report_period] += 1
+            if len(examples) < 20:
+                examples.append(
+                    {
+                        "instrument_id": target.get("instrument_id"),
+                        "name": target.get("name"),
+                        "exchange": target.get("exchange"),
+                        "report_period": report_period,
+                        "classification": classification,
+                        "listed_date": item.get("listed_date"),
+                        "delisted_date": item.get("delisted_date"),
+                        "disclosure_deadline": item.get("disclosure_deadline"),
+                    }
+                )
+    return {
+        "excluded_read_count": sum(by_classification.values()),
+        "by_classification": dict(sorted(by_classification.items())),
+        "by_report_period": dict(sorted(by_period.items())),
+        "examples": examples,
+    }
+
+
+def parse_optional_date(value: Any) -> Optional[date]:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    text = str(value).strip()
+    if not text or text.lower() in {"none", "nan", "nat"}:
+        return None
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%Y%m%d"):
+        try:
+            candidate = text[:10] if fmt != "%Y%m%d" else text[:8]
+            return datetime.strptime(candidate, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_report_period_date(value: str) -> Optional[date]:
+    text = str(value).strip()
+    if not text:
+        return None
+    if len(text) == 6 and text[4].upper() == "Q" and text[:4].isdigit():
+        year = int(text[:4])
+        quarter = int(text[5])
+        return {
+            1: date(year, 3, 31),
+            2: date(year, 6, 30),
+            3: date(year, 9, 30),
+            4: date(year, 12, 31),
+        }.get(quarter)
+    return parse_optional_date(text)
+
+
+def disclosure_deadline_for_report_period(period_end: date) -> date:
+    if period_end.month == 3 and period_end.day == 31:
+        return date(period_end.year, 4, 30)
+    if period_end.month == 6 and period_end.day == 30:
+        return date(period_end.year, 8, 31)
+    if period_end.month == 9 and period_end.day == 30:
+        return date(period_end.year, 10, 31)
+    if period_end.month == 12 and period_end.day == 31:
+        return date(period_end.year + 1, 4, 30)
+    return period_end
+
+
+def latest_quarter_end_before(anchor: date) -> date:
+    quarter_ends = (
+        date(anchor.year - 1, 12, 31),
+        date(anchor.year, 3, 31),
+        date(anchor.year, 6, 30),
+        date(anchor.year, 9, 30),
+        date(anchor.year, 12, 31),
+    )
+    candidates = [period_end for period_end in quarter_ends if period_end < anchor]
+    return max(candidates)
+
+
 def manifest_status(
     profile_resolutions: Sequence[Dict[str, Any]],
     mapping_readiness: Dict[str, Dict[str, Any]],
@@ -313,6 +472,9 @@ def manifest_console_summary(
         "target_count_by_exchange": manifest.get("target_count_by_exchange"),
         "target_count_by_profile": manifest.get("target_count_by_profile"),
         "profile_resolution_risks": manifest.get("profile_resolution_risks"),
+        "report_period_lifecycle_summary": manifest.get(
+            "report_period_lifecycle_summary"
+        ),
         "mapping_readiness_by_profile": manifest.get("mapping_readiness_by_profile"),
         "batch_size": manifest.get("batch_size"),
         "batch_count": manifest.get("batch_count"),

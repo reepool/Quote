@@ -210,6 +210,55 @@ def split_ready_existing_targets(
     return ready_targets, pending_targets
 
 
+def accepted_source_gaps_from_manifest_lifecycle(
+    manifest: Dict[str, Any],
+    *,
+    required_canonical_facts: Sequence[str],
+) -> Dict[tuple[str, str], Dict[str, Any]]:
+    """Treat manifest lifecycle exclusions as accepted readback gaps."""
+    required = {str(fact) for fact in required_canonical_facts if str(fact)}
+    accepted: Dict[tuple[str, str], Dict[str, Any]] = {}
+    if not required:
+        return accepted
+    for target in manifest.get("targets") or []:
+        instrument_id = str(target.get("instrument_id") or "")
+        if not instrument_id:
+            continue
+        for item in target.get("excluded_report_periods") or []:
+            report_period = str(item.get("report_period") or "")
+            classification = str(item.get("classification") or "")
+            if not report_period or not classification:
+                continue
+            entry = accepted.setdefault(
+                (instrument_id, report_period),
+                {"facts": set(), "classification": classification},
+            )
+            entry["facts"].update(required)
+            if entry["classification"] != classification:
+                entry["classification"] = "mixed_lifecycle_exclusion"
+    return accepted
+
+
+def merge_accepted_source_gaps(
+    base: Dict[tuple[str, str], Dict[str, Any]],
+    extra: Dict[tuple[str, str], Dict[str, Any]],
+) -> Dict[tuple[str, str], Dict[str, Any]]:
+    merged = dict(base)
+    for key, item in extra.items():
+        entry = merged.setdefault(
+            key,
+            {
+                "facts": set(),
+                "classification": item.get("classification"),
+            },
+        )
+        entry["facts"].update(set(item.get("facts") or set()))
+        classification = item.get("classification")
+        if classification and entry.get("classification") != classification:
+            entry["classification"] = "mixed_accepted_source_gap"
+    return merged
+
+
 async def build_or_load_manifest(
     *,
     log_dir: Path,
@@ -331,7 +380,13 @@ async def run_full_import(
         "batch_results": [],
     }
     completed = {int(item) for item in progress.get("completed_batches") or []}
-    accepted_source_gaps = parse_accepted_source_gaps(accepted_source_gap_specs)
+    accepted_source_gaps = merge_accepted_source_gaps(
+        parse_accepted_source_gaps(accepted_source_gap_specs),
+        accepted_source_gaps_from_manifest_lifecycle(
+            manifest,
+            required_canonical_facts=required_canonical_facts,
+        ),
+    )
     batches = selected_batches(
         manifest.get("batches") or [],
         start_batch=start_batch,
@@ -504,6 +559,9 @@ async def run_full_import(
         "db_path": str(db_path),
         "report_periods": list(report_periods),
         "manifest_path": str(log_dir / "manifest.json"),
+        "report_period_lifecycle_summary": manifest.get(
+            "report_period_lifecycle_summary"
+        ),
         "progress_path": str(progress_path(log_dir)),
         "target_count": manifest.get("target_count"),
         "batch_count": manifest.get("batch_count"),

@@ -247,6 +247,7 @@ backups/
 *.pem
 *.key
 *.crt
+!config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt
 *.p12
 *.pfx
 certificates/

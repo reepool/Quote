@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 
 from research.industry_index_analysis_sync import IndustryIndexAnalysisSyncService
 from research.providers.base import (
@@ -69,6 +70,15 @@ def test_swsresearch_index_analysis_parses_empty_numeric_fields_as_none():
     assert snapshot.markup is None
     assert snapshot.turnover_rate is None
     assert snapshot.pe == 18.14
+
+
+def test_swsresearch_index_analysis_accepts_extra_ca_bundle():
+    provider = SWSResearchIndexAnalysisProvider(
+        extra_ca_cert_path="config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt"
+    )
+
+    assert provider.request_verify is not True
+    assert Path(str(provider.request_verify)).exists()
 
 
 def test_akshare_swsresearch_index_analysis_parses_history_row_with_units():

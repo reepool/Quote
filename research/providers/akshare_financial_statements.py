@@ -177,6 +177,28 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         "SharesOutstanding",
         "TotalSharesOutstanding",
     )
+    _core_alias_groups = (
+        _revenue_aliases,
+        _operating_cost_aliases,
+        _gross_profit_aliases,
+        _operating_profit_aliases,
+        _pre_tax_profit_aliases,
+        _net_income_aliases,
+        _minority_net_income_aliases,
+        _operating_cf_aliases,
+        _total_cf_aliases,
+        _total_assets_aliases,
+        _total_liabilities_aliases,
+        _equity_aliases,
+        _minority_equity_aliases,
+        _current_assets_aliases,
+        _current_liabilities_aliases,
+        _inventory_aliases,
+        _receivables_aliases,
+        _fixed_assets_aliases,
+        _intangible_assets_aliases,
+        _shares_outstanding_aliases,
+    )
 
     def __init__(self, provider_config: Optional[Dict[str, Any]] = None):
         self.provider_config = provider_config or {}
@@ -290,6 +312,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             "cash_flow_sheet": {},
         }
         statement_interfaces_by_period: Dict[str, Dict[str, str]] = {}
+        statement_field_interfaces_by_period: Dict[str, Dict[str, Dict[str, str]]] = {}
 
         for statement_interface in self.statement_interface_order:
             try:
@@ -317,14 +340,35 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
                     if report_period not in target_periods:
                         continue
                     if report_period in rows_by_type[statement_type]:
+                        added_fact_fields = self._merge_statement_row_fields(
+                            rows_by_type[statement_type][report_period],
+                            row,
+                            field_interfaces=(
+                                statement_field_interfaces_by_period
+                                .setdefault(report_period, {})
+                                .setdefault(statement_type, {})
+                            ),
+                            statement_interface=statement_interface,
+                        )
+                        if added_fact_fields and (
+                            statement_interfaces_by_period
+                            .setdefault(report_period, {})
+                            .get(statement_type)
+                            != statement_interface
+                        ):
+                            statement_interfaces_by_period[report_period][
+                                statement_type
+                            ] = "mixed"
                         continue
-                    rows_by_type[statement_type][report_period] = row
+                    rows_by_type[statement_type][report_period] = dict(row)
                     statement_interfaces_by_period.setdefault(report_period, {})[
                         statement_type
                     ] = statement_interface
-
-            if self._target_statement_coverage_complete(rows_by_type, target_periods):
-                break
+                    statement_field_interfaces_by_period.setdefault(report_period, {})[
+                        statement_type
+                    ] = {
+                        str(key): statement_interface for key in row.keys()
+                    }
 
         return self._build_bundles_from_indexed_rows(
             instrument=instrument,
@@ -332,7 +376,72 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             rows_by_type=rows_by_type,
             report_periods=target_periods,
             statement_interfaces_by_period=statement_interfaces_by_period,
+            statement_field_interfaces_by_period=statement_field_interfaces_by_period,
         )
+
+    @staticmethod
+    def _merge_statement_row_fields(
+        base_row: Dict[str, Any],
+        incoming_row: Dict[str, Any],
+        *,
+        field_interfaces: Dict[str, str],
+        statement_interface: str,
+    ) -> bool:
+        """Fill missing/empty fields in an already-selected statement row."""
+        added_fact_fields = False
+        metadata_fields = set(AkshareFinancialStatementsProvider._report_period_aliases) | set(
+            AkshareFinancialStatementsProvider._publish_date_aliases
+        )
+        for key, incoming_value in incoming_row.items():
+            text_key = str(key)
+            if AkshareFinancialStatementsProvider._is_empty_statement_value(
+                incoming_value
+            ):
+                continue
+            existing_value = base_row.get(key)
+            if text_key not in base_row and (
+                AkshareFinancialStatementsProvider._has_equivalent_core_alias_value(
+                    base_row,
+                    text_key,
+                )
+            ):
+                continue
+            if text_key not in base_row or AkshareFinancialStatementsProvider._is_empty_statement_value(
+                existing_value
+            ):
+                base_row[key] = incoming_value
+                field_interfaces[text_key] = statement_interface
+                if text_key not in metadata_fields:
+                    added_fact_fields = True
+        return added_fact_fields
+
+    @staticmethod
+    def _has_equivalent_core_alias_value(
+        row: Dict[str, Any],
+        candidate_key: str,
+    ) -> bool:
+        for aliases in AkshareFinancialStatementsProvider._core_alias_groups:
+            if candidate_key not in aliases:
+                continue
+            for alias in aliases:
+                if alias == candidate_key:
+                    continue
+                if alias in row and not AkshareFinancialStatementsProvider._is_empty_statement_value(
+                    row.get(alias)
+                ):
+                    return True
+        return False
+
+    @staticmethod
+    def _is_empty_statement_value(value: Any) -> bool:
+        if value is None:
+            return True
+        if isinstance(value, str):
+            return not value.strip() or value.strip() in {"--", "nan", "NaT", "None"}
+        try:
+            return bool(pd.isna(value))
+        except Exception:
+            return False
 
     @staticmethod
     def _target_statement_coverage_complete(
@@ -458,6 +567,9 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         rows_by_type: Dict[str, Dict[str, Dict[str, Any]]],
         report_periods: set[str],
         statement_interfaces_by_period: Dict[str, Dict[str, str]],
+        statement_field_interfaces_by_period: Optional[
+            Dict[str, Dict[str, Dict[str, str]]]
+        ] = None,
     ) -> List[FinancialStatementBundle]:
         candidate_periods = {
             report_period
@@ -482,6 +594,10 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
                     else "mixed"
                 ),
                 statement_interfaces=statement_interfaces,
+                statement_field_interfaces=(
+                    (statement_field_interfaces_by_period or {}).get(report_period)
+                    or {}
+                ),
             )
             if bundle is not None:
                 bundles.append(bundle)
@@ -496,6 +612,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
         report_period: str,
         statement_interface: Optional[str] = None,
         statement_interfaces: Optional[Dict[str, str]] = None,
+        statement_field_interfaces: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> Optional[FinancialStatementBundle]:
         aligned_rows = {
             statement_type: rows.get(report_period)
@@ -580,6 +697,7 @@ class AkshareFinancialStatementsProvider(BaseFinancialStatementsProvider):
             raw_payload={
                 "akshare_statement_interface": statement_interface,
                 "akshare_statement_interfaces": statement_interfaces or {},
+                "akshare_statement_field_interfaces": statement_field_interfaces or {},
                 "balance_sheet": aligned_rows["balance_sheet"] or {},
                 "profit_sheet": aligned_rows["profit_sheet"] or {},
                 "cash_flow_sheet": aligned_rows["cash_flow_sheet"] or {},
