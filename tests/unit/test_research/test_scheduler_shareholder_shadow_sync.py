@@ -17,13 +17,35 @@ def test_shareholder_shadow_sync_task_calls_data_manager_and_clears_active_flag(
         return_value={
             "status": "success",
             "successful_exchanges": 1,
+            "attempted_exchanges": 1,
+            "total_snapshots_written": 1,
             "exchanges": [
                 {
                     "exchange": "SSE",
                     "status": "success",
                     "source": "efinance",
+                    "requested_instruments": 1,
+                    "resolved_instruments": 1,
+                    "snapshots_written": 1,
+                    "missing_instruments": 0,
+                    "attempted_sources": ["cninfo:direct"],
+                    "successful_sources": ["cninfo:direct"],
                 }
             ],
+        }
+    )
+    data_manager.get_research_shareholder_readiness = AsyncMock(
+        return_value={
+            "ready_for_paid_high_availability_rollout": True,
+            "target_instrument_count": 1,
+            "snapshot_total": 1,
+            "missing_snapshot_count": 0,
+            "scope_counts": {
+                "holder_count": 1,
+                "top10_holders": 1,
+                "reference_only_ownership_clues": 1,
+            },
+            "blockers": [],
         }
     )
     monkeypatch.setattr(task_module, "data_manager", data_manager)
@@ -44,7 +66,14 @@ def test_shareholder_shadow_sync_task_calls_data_manager_and_clears_active_flag(
         budget_mode="balanced",
         allow_paid_proxy=False,
     )
+    data_manager.get_research_shareholder_readiness.assert_awaited_once()
     task._send_task_report.assert_awaited_once()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "结论: *成功" in report_data["content"]
+    assert "本次写入/刷新快照: 1" in report_data["content"]
+    assert "readiness: ready" in report_data["content"]
+    assert "• SSE: success，覆盖 1/1，写入 1，缺口 0" in report_data["content"]
+    assert "来源: cninfo:direct" in report_data["content"]
     assert "shareholder_shadow_sync" not in task._active_tasks
 
 

@@ -129,6 +129,108 @@ def _attach_instrument_master_governance_report(
     return report_data
 
 
+def _format_shareholder_shadow_scheduler_report(
+    result: Dict[str, Any],
+    readiness: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Build a clear operator-facing report for shareholder shadow sync."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    exchanges = result.get("exchanges") or []
+    successful_exchanges = int(result.get("successful_exchanges", 0) or 0)
+    attempted_exchanges = int(result.get("attempted_exchanges", len(exchanges)) or 0)
+    total_written = int(result.get("total_snapshots_written", 0) or 0)
+    missing_total = sum(
+        int(exchange.get("missing_instruments", 0) or 0)
+        for exchange in exchanges
+        if isinstance(exchange, dict)
+    )
+
+    if status == "success" and missing_total == 0:
+        conclusion = "成功 - 本次同步已覆盖全部目标标的，股东户数、前十大股东、实控线索均满足要求。"
+    elif status in {"success", "degraded"}:
+        conclusion = f"{label} - 本次仍有 {missing_total} 个标的未满足 required scope。"
+    else:
+        conclusion = f"{label} - 股东摘要同步失败或未完成。"
+
+    lines = [
+        f"{icon} *股东摘要影子同步*",
+        "",
+        "任务: `shareholder_shadow_sync`",
+        f"结论: *{conclusion}*",
+        "",
+        f"状态: `{status}`",
+        f"交易所: {successful_exchanges}/{attempted_exchanges} 成功",
+        f"本次写入/刷新快照: {total_written}",
+        f"本次未补齐标的: {missing_total}",
+    ]
+
+    if isinstance(readiness, dict):
+        ready = bool(readiness.get("ready_for_paid_high_availability_rollout"))
+        blockers = readiness.get("blockers") or []
+        target_count = int(readiness.get("target_instrument_count", 0) or 0)
+        snapshot_total = int(readiness.get("snapshot_total", 0) or 0)
+        missing_snapshot_count = int(readiness.get("missing_snapshot_count", 0) or 0)
+        scope_counts = readiness.get("scope_counts") or {}
+        lines.extend(
+            [
+                "",
+                "当前覆盖:",
+                f"readiness: {'ready' if ready else 'not_ready'}",
+                f"目标标的: {target_count}",
+                f"当前快照: {snapshot_total}",
+                f"缺失快照: {missing_snapshot_count}",
+                (
+                    "required_scope: "
+                    f"holder_count={scope_counts.get('holder_count', 0)}, "
+                    f"top10={scope_counts.get('top10_holders', 0)}, "
+                    f"ownership_clues={scope_counts.get('reference_only_ownership_clues', 0)}"
+                ),
+            ]
+        )
+        if blockers:
+            lines.append("blockers: " + "；".join(str(item) for item in blockers[:5]))
+
+    governance_summary = _format_instrument_master_governance_summary(
+        result.get("instrument_master_governance")
+    )
+    if governance_summary:
+        lines.extend(["", "证券主数据:", governance_summary])
+
+    lines.extend(["", "交易所明细:"])
+    for exchange_result in exchanges:
+        if not isinstance(exchange_result, dict):
+            continue
+        exchange = exchange_result.get("exchange", "unknown")
+        exchange_status = exchange_result.get("status", "unknown")
+        requested = int(exchange_result.get("requested_instruments", 0) or 0)
+        resolved = int(exchange_result.get("resolved_instruments", 0) or 0)
+        written = int(exchange_result.get("snapshots_written", 0) or 0)
+        missing = int(exchange_result.get("missing_instruments", 0) or 0)
+        attempted_sources = exchange_result.get("attempted_sources") or []
+        successful_sources = exchange_result.get("successful_sources") or []
+        source_text = (
+            ", ".join(str(item) for item in successful_sources)
+            or exchange_result.get("source")
+            or "N/A"
+        )
+        lines.append(
+            f"• {exchange}: {exchange_status}，覆盖 {resolved}/{requested}，写入 {written}，缺口 {missing}"
+        )
+        lines.append(f"  来源: {source_text}")
+        if attempted_sources:
+            lines.append(
+                "  尝试: " + ", ".join(str(item) for item in attempted_sources)
+            )
+        missing_ids = exchange_result.get("missing_instrument_ids") or []
+        if missing_ids:
+            lines.append(
+                "  未补齐样例: " + ", ".join(str(item) for item in missing_ids[:5])
+            )
+
+    return "\n".join(lines)
+
+
 def _format_source_mode(result: Dict[str, Any]) -> str:
     source = result.get("source") or "N/A"
     mode = result.get("mode") or "N/A"
@@ -1868,6 +1970,14 @@ class ScheduledTasks:
                 budget_mode=budget_mode,
                 allow_paid_proxy=allow_paid_proxy,
             )
+            try:
+                readiness = await data_manager.get_research_shareholder_readiness()
+            except Exception as readiness_error:
+                scheduler_logger.warning(
+                    "[Scheduler] Failed to load shareholder readiness for report: %s",
+                    readiness_error,
+                )
+                readiness = None
 
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
@@ -1877,6 +1987,10 @@ class ScheduledTasks:
                 'status': 'success' if success else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
                 'duration': 'N/A',
+                'content': _format_shareholder_shadow_scheduler_report(
+                    result,
+                    readiness,
+                ),
                 'maintenance_tasks': [
                     {
                         'task_name': exchange_result.get('exchange', 'unknown'),
