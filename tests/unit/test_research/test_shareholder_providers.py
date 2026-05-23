@@ -35,7 +35,15 @@ def test_shareholder_registry_applies_akshare_shareholder_config():
                 },
             },
             "efinance": {"enabled": True},
-            "cninfo": {"enabled": True},
+            "cninfo": {
+                "enabled": True,
+                "shareholders": {
+                    "request_timeout_seconds": 8.0,
+                    "request_interval_seconds": 0.4,
+                    "retry_attempts": 1,
+                    "retry_backoff_seconds": 0.2,
+                },
+            },
         },
     )
 
@@ -46,6 +54,14 @@ def test_shareholder_registry_applies_akshare_shareholder_config():
     assert provider.top_holders_request_interval_seconds == 0.3
     assert provider.top_holders_retry_attempts == 2
     assert provider.top_holders_retry_backoff_seconds == 0.4
+
+    cninfo_provider = registry.get("cninfo")
+
+    assert isinstance(cninfo_provider, CninfoShareholdersProvider)
+    assert cninfo_provider.request_timeout_seconds == 8.0
+    assert cninfo_provider.request_interval_seconds == 0.4
+    assert cninfo_provider.retry_attempts == 1
+    assert cninfo_provider.retry_backoff_seconds == 0.2
 
 
 def test_akshare_shareholders_provider_builds_normalized_snapshot(monkeypatch):
@@ -284,7 +300,7 @@ def test_akshare_shareholders_provider_tries_bse_920_symbol_candidate(monkeypatc
 
 
 def test_cninfo_shareholders_provider_builds_partial_snapshot(monkeypatch):
-    provider = CninfoShareholdersProvider()
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
     monkeypatch.setattr(
         provider,
         "_candidate_report_dates",
@@ -317,6 +333,7 @@ def test_cninfo_shareholders_provider_builds_partial_snapshot(monkeypatch):
             ),
         ),
     )
+    monkeypatch.setattr(provider, "_load_top_holder_bundles", lambda *args: {})
 
     snapshots = provider._fetch_shareholder_snapshots_sync(
         [
@@ -345,10 +362,94 @@ def test_cninfo_shareholders_provider_builds_partial_snapshot(monkeypatch):
     assert snapshot.raw_payload["control_holder"]["变动日期"] == "2025-12-31"
 
 
+def test_cninfo_shareholders_provider_builds_top10_snapshot(monkeypatch):
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
+    monkeypatch.setattr(
+        provider,
+        "_candidate_report_dates",
+        lambda limit=8: ["20260331"],
+    )
+    monkeypatch.setattr(
+        "research.providers.cninfo_shareholders.load_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_hold_num_cninfo=lambda **kwargs: pd.DataFrame(
+                [
+                    {
+                        "证券代码": "600519",
+                        "证券简称": "贵州茅台",
+                        "变动日期": date(2026, 3, 31),
+                        "本期股东人数": 87654,
+                    }
+                ]
+            ),
+            stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(),
+        ),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_load_top_holder_bundles",
+        lambda *args: {
+            "600519.SH": {
+                "request_symbol": "600519",
+                "raw_records": [
+                    {
+                        "F001D": "2026-03-31",
+                        "F002V": "中国贵州茅台酒厂（集团）有限责任公司",
+                        "F003N": 77882.1955,
+                        "F004N": 54.07,
+                        "F005N": 1,
+                        "F006V": "流通A股",
+                        "F007V": "不变",
+                    }
+                ],
+                "top_holders": [
+                    {
+                        "rank": 1,
+                        "holder_name": "中国贵州茅台酒厂（集团）有限责任公司",
+                        "holding_shares": 778821955,
+                        "holding_ratio": 54.07,
+                        "holder_type": "流通A股",
+                        "change": "不变",
+                        "report_date": "2026-03-31",
+                    }
+                ],
+                "top_holders_report_date": "2026-03-31",
+                "top_holders_total_ratio": 54.07,
+                "fetch_errors": {},
+            }
+        },
+    )
+
+    snapshots = provider._fetch_shareholder_snapshots_sync(
+        [
+            {
+                "instrument_id": "600519.SH",
+                "symbol": "600519",
+                "exchange": "SSE",
+                "type": "stock",
+            }
+        ],
+        "SSE",
+    )
+
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    assert snapshot.top_holders_report_date == "2026-03-31"
+    assert snapshot.top_holders_count == 1
+    assert snapshot.top_holders_total_ratio == 54.07
+    assert snapshot.snapshot_json["coverage_scope"] == [
+        "holder_count",
+        "top10_holders",
+        "reference_only_ownership_clues",
+    ]
+    assert snapshot.snapshot_json["top_holders"][0]["holding_shares"] == 778821955
+    assert snapshot.raw_payload["request_symbol"] == "600519"
+
+
 def test_cninfo_shareholders_provider_continues_to_older_reports_for_unresolved_symbols(
     monkeypatch,
 ):
-    provider = CninfoShareholdersProvider()
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
     requested_dates = []
     monkeypatch.setattr(
         provider,
@@ -387,6 +488,7 @@ def test_cninfo_shareholders_provider_continues_to_older_reports_for_unresolved_
             stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(),
         ),
     )
+    monkeypatch.setattr(provider, "_load_top_holder_bundles", lambda *args: {})
 
     snapshots = provider._fetch_shareholder_snapshots_sync(
         [
@@ -428,7 +530,7 @@ def test_cninfo_shareholders_provider_candidate_dates_do_not_include_future_quar
 
 
 def test_cninfo_shareholders_provider_matches_bse_920_control_owner(monkeypatch):
-    provider = CninfoShareholdersProvider()
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
     monkeypatch.setattr(
         provider,
         "_candidate_report_dates",
@@ -452,6 +554,7 @@ def test_cninfo_shareholders_provider_matches_bse_920_control_owner(monkeypatch)
             ),
         ),
     )
+    monkeypatch.setattr(provider, "_load_top_holder_bundles", lambda *args: {})
 
     snapshots = provider._fetch_shareholder_snapshots_sync(
         [
@@ -472,6 +575,79 @@ def test_cninfo_shareholders_provider_matches_bse_920_control_owner(monkeypatch)
     assert snapshot.control_owner_name == "蚌埠市人民政府国有资产监督管理委员会"
     assert snapshot.raw_payload["request_symbol_candidates"] == ["430489", "920489"]
     assert snapshot.raw_payload["control_holder"]["证券代码"] == "920489"
+
+
+def test_cninfo_shareholders_provider_tries_bse_920_for_top10(monkeypatch):
+    provider = CninfoShareholdersProvider(request_interval_seconds=0)
+    requested = []
+    monkeypatch.setattr(
+        provider,
+        "_candidate_report_dates",
+        lambda limit=8: ["20260331"],
+    )
+    monkeypatch.setattr(
+        "research.providers.cninfo_shareholders.load_akshare",
+        lambda mode="direct": SimpleNamespace(
+            stock_hold_num_cninfo=lambda **kwargs: pd.DataFrame(),
+            stock_hold_control_cninfo=lambda symbol="全部": pd.DataFrame(),
+        ),
+    )
+
+    def _request_data20_records(session, endpoint, symbol):
+        requested.append((endpoint, symbol))
+        if symbol == "430489":
+            raise RuntimeError(
+                "CNInfo data20 request failed: http=500 code=9240002 message=错误的股票代码"
+            )
+        if endpoint == "getStockholderNum":
+            return (
+                [{"ENDDATE": "2025-09-30", "F001N": 11627}],
+                {"data": {"records": []}},
+            )
+        return (
+            [
+                {
+                    "F001D": "2025-09-30",
+                    "F002V": "蚌埠能源集团有限公司",
+                    "F003N": 3744.0002,
+                    "F004N": 27.44,
+                    "F005N": 1,
+                    "F006V": "限售流通股",
+                    "F007V": "不变",
+                }
+            ],
+            {"records": []},
+        )
+
+    monkeypatch.setattr(provider, "_request_data20_records", _request_data20_records)
+
+    snapshots = provider._fetch_shareholder_snapshots_sync(
+        [
+            {
+                "instrument_id": "430489.BJ",
+                "symbol": "430489",
+                "exchange": "BSE",
+                "type": "stock",
+            }
+        ],
+        "BSE",
+    )
+
+    assert requested == [
+        ("getTopTenStockholders", "430489"),
+        ("getTopTenStockholders", "920489"),
+        ("getStockholderNum", "920489"),
+    ]
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    assert snapshot.raw_payload["request_symbol"] == "920489"
+    assert snapshot.holder_count == 11627
+    assert snapshot.holder_count_report_date == "2025-09-30"
+    assert snapshot.top_holders_count == 1
+    assert snapshot.snapshot_json["top_holders"][0]["holding_shares"] == 37440002
+    assert snapshot.raw_payload["fetch_errors"]["top_holders"]["430489"].startswith(
+        "CNInfo data20 request failed"
+    )
 
 
 def test_akshare_shareholders_provider_records_partial_fetch_errors(monkeypatch):

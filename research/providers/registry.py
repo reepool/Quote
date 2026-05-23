@@ -151,10 +151,22 @@ class ShareholderProviderRegistry:
     ):
         research_config = research_config or config_manager.get_research_config()
         akshare_cfg = research_config.sources.get("akshare", {}).get("shareholders", {})
+        cninfo_cfg = research_config.sources.get("cninfo", {}).get("shareholders", {})
+        cninfo_provider_cfg = {
+            key: value
+            for key, value in cninfo_cfg.items()
+            if key
+            in {
+                "request_timeout_seconds",
+                "request_interval_seconds",
+                "retry_attempts",
+                "retry_backoff_seconds",
+            }
+        }
         self._providers = providers if providers is not None else {
             "akshare": AkshareShareholdersProvider(**akshare_cfg),
             "efinance": EfinanceShareholdersProvider(),
-            "cninfo": CninfoShareholdersProvider(),
+            "cninfo": CninfoShareholdersProvider(**cninfo_provider_cfg),
         }
 
     def get(self, source_name: str) -> Optional[BaseShareholderProvider]:

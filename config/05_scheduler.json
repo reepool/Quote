@@ -592,7 +592,7 @@
         }
       },
       "shareholder_shadow_sync": {
-        "enabled": false,
+        "enabled": true,
         "description": "研究域股东摘要影子同步",
         "report": true,
         "pre_run_notify": false,

@@ -108,6 +108,7 @@ def test_repository_research_config_has_explicit_shareholder_gate():
     research_config = manager.get_research_config()
 
     shareholders_config = research_config.modules["shareholders"]
+    shareholders_routing = research_config.routing["shareholders"]
 
     assert shareholders_config["enabled"] is True
     assert shareholders_config["delivery_mode"] == "paid_high_availability"
@@ -119,6 +120,12 @@ def test_repository_research_config_has_explicit_shareholder_gate():
         "holder_count",
         "top10_holders",
         "reference_only_ownership_clues",
+    ]
+    assert shareholders_routing["free_chain"] == [
+        {"source": "cninfo", "mode": "direct"},
+    ]
+    assert shareholders_routing["paid_chain"] == [
+        {"source": "akshare", "mode": "proxy_patch"},
     ]
 
 
@@ -162,7 +169,10 @@ def test_repository_research_config_has_financial_statement_rollout_config():
         "manifest_url" in item and "endpoint_url" in item
         for item in financial_config["official_structured_sources"]["candidates"]
     )
-    assert research_config.sources["sse"]["financial_statements"]["status"] == "needs_probe"
+    assert (
+        research_config.sources["sse"]["financial_statements"]["status"]
+        == "sse_structured_json_parser_ready_disabled"
+    )
     assert (
         research_config.sources["akshare"]["financial_statements"]["parser_version"]
         == "akshare_financial_statements.v1"

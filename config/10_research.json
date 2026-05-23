@@ -100,7 +100,7 @@
         }
       },
       "shareholders": {
-        "enabled": false,
+        "enabled": true,
         "delivery_mode": "paid_high_availability",
         "optional_empty_exchanges": [
           "BSE"
@@ -111,8 +111,7 @@
           "reference_only_ownership_clues"
         ],
         "same_source_recovery_candidates": [
-          "akshare:proxy_patch",
-          "akshare:direct"
+          "cninfo:direct"
         ],
         "force_merge_candidates": [
           "cninfo:direct"
@@ -121,7 +120,7 @@
         "same_source_recovery_max_instruments": 20,
         "skip_same_source_full_fallback_after_success": true,
         "snapshot_api_requires_mode": "paid_high_availability",
-        "note": "Shareholders are enabled for local standardized snapshot/API reads under paid_high_availability. Shareholder refresh uses weekly full sync; cninfo:direct is force-merged for actual-controller clues. BSE remains optional-empty in readiness targets even though current snapshots are populated."
+        "note": "Shareholder ingestion is enabled after bounded and full validation passed on 2026-05-23. The target route is cninfo:direct as primary, akshare:proxy_patch as high-availability backup, and direct AkShare/efinance only as last-resort references because Sina/Eastmoney shareholder endpoints can trigger anti-crawl refusal."
       },
       "financial_summary": {
         "enabled": true,
@@ -835,6 +834,13 @@
         "anti_crawl_risk": "medium",
         "supports_proxy_patch": false,
         "role": "official_a_share_disclosure_fallback",
+        "shareholders": {
+          "request_timeout_seconds": 15.0,
+          "request_interval_seconds": 0.3,
+          "retry_attempts": 3,
+          "retry_backoff_seconds": 1.0,
+          "note": "Uses CNInfo official data20 stockholderCapital structured endpoints for top-10 shareholders. Handles HTTP 200 logical rate-limit responses such as resultCode=429 with bounded backoff retries."
+        },
         "financial_statements": {
           "enabled": false,
           "exchanges": [
@@ -1223,22 +1229,19 @@
         ]
       },
       "shareholders": {
-        "free_chain": [],
+        "free_chain": [
+          {
+            "source": "cninfo",
+            "mode": "direct"
+          }
+        ],
         "paid_chain": [
           {
             "source": "akshare",
             "mode": "proxy_patch"
-          },
-          {
-            "source": "efinance",
-            "mode": "proxy_patch"
           }
         ],
         "fallback_chain": [
-          {
-            "source": "cninfo",
-            "mode": "direct"
-          },
           {
             "source": "akshare",
             "mode": "direct"
