@@ -1,3 +1,4 @@
+import asyncio
 import json
 from datetime import date
 from dataclasses import dataclass
@@ -29,6 +30,13 @@ class _EmptyProvider(BaseShareholderProvider):
 
     async def fetch_shareholder_snapshots(self, **kwargs):
         return []
+
+
+class _CancelledProvider(BaseShareholderProvider):
+    source_name = "akshare"
+
+    async def fetch_shareholder_snapshots(self, **kwargs):
+        raise asyncio.CancelledError()
 
 
 class _ShareholderProvider(BaseShareholderProvider):
@@ -189,6 +197,34 @@ class _BatchThenSingleRecoveryProvider(BaseShareholderProvider):
         ]
 
 
+class _PartialModeRecordingProvider(_ShareholderProvider):
+    supported_modes = {"direct", "proxy_patch"}
+
+    def __init__(self):
+        super().__init__(
+            source_name="akshare",
+            coverage_scope=["holder_count", "reference_only_ownership_clues"],
+        )
+        self.calls: list[tuple[str, int]] = []
+
+    async def fetch_shareholder_snapshots(
+        self,
+        *,
+        instruments,
+        exchange,
+        mode="direct",
+        limit=None,
+    ):
+        selected = instruments[:limit] if limit is not None else instruments
+        self.calls.append((mode, len(selected)))
+        return await super().fetch_shareholder_snapshots(
+            instruments=instruments,
+            exchange=exchange,
+            mode=mode,
+            limit=limit,
+        )
+
+
 def _build_research_config(tmp_path) -> ResearchConfig:
     return ResearchConfig(
         enabled=True,
@@ -323,6 +359,53 @@ async def test_shareholder_sync_degrades_when_no_provider_returns_rows(tmp_path)
     assert result["status"] == "degraded"
     assert result["total_snapshots_written"] == 0
     assert result["exchanges"][0]["status"] == "degraded"
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_marks_ingestion_run_failed_when_cancelled(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "name": "贵州茅台",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry({"akshare": _CancelledProvider()}),
+    )
+
+    with pytest.raises(asyncio.CancelledError):
+        await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT status, rows_written, error_message, metadata_json, completed_at
+            FROM ingestion_runs
+            WHERE job_name = 'shareholder_shadow_sync'
+            ORDER BY id DESC
+            LIMIT 1
+            """
+        ).fetchone()
+
+    assert row is not None
+    assert row["status"] == "failed"
+    assert row["rows_written"] == 0
+    assert "cancelled before exchange completion" in row["error_message"]
+    assert json.loads(row["metadata_json"])["cancelled"] is True
+    assert row["completed_at"] is not None
 
 
 @pytest.mark.asyncio
@@ -701,6 +784,87 @@ async def test_shareholder_sync_runs_same_source_recovery_for_missing_scope(tmp_
     assert metadata["same_source_recovery_runs"] == 2
     assert metadata["same_source_recovery_attempted_instruments"] == 2
     assert metadata["same_source_recovery_resolved_instruments"] == 2
+
+
+@pytest.mark.asyncio
+async def test_shareholder_sync_skips_same_source_full_fallback_after_success(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    research_config.budget.default_mode = "availability_first"
+    research_config.budget.allow_paid_proxy = True
+    research_config.modules["shareholders"][
+        "skip_same_source_full_fallback_after_success"
+    ] = True
+    research_config.modules["shareholders"]["same_source_recovery_candidates"] = []
+    research_config.modules["shareholders"]["force_merge_candidates"] = ["cninfo:direct"]
+    research_config.routing["shareholders"] = {
+        "free_chain": [],
+        "paid_chain": [{"source": "akshare", "mode": "proxy_patch"}],
+        "fallback_chain": [
+            {"source": "cninfo", "mode": "direct"},
+            {"source": "akshare", "mode": "direct"},
+        ],
+    }
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    instruments = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "name": "贵州茅台",
+            "exchange": "SSE",
+            "type": "stock",
+            "is_active": True,
+        },
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "name": "浦发银行",
+            "exchange": "SSE",
+            "type": "stock",
+            "is_active": True,
+        },
+    ]
+    akshare_provider = _PartialModeRecordingProvider()
+    service = ShareholderShadowSyncService(
+        db_ops=_MockDbOps(instruments=instruments),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=ShareholderProviderRegistry(
+            {
+                "akshare": akshare_provider,
+                "cninfo": _EmptyProvider(),
+            }
+        ),
+    )
+
+    result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=2,
+        budget_mode="availability_first",
+        allow_paid_proxy=True,
+    )
+
+    exchange_result = result["exchanges"][0]
+    assert exchange_result["status"] == "degraded"
+    assert exchange_result["attempted_sources"] == ["akshare:proxy_patch", "cninfo:direct"]
+    assert akshare_provider.calls == [("proxy_patch", 2)]
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT metadata_json
+            FROM ingestion_runs
+            WHERE domain = 'shareholders'
+            ORDER BY id DESC
+            LIMIT 1
+            """
+        ).fetchone()
+    assert row is not None
+    metadata = json.loads(row["metadata_json"])
+    assert metadata["skipped_sources"] == ["akshare:direct"]
+    assert metadata["skip_same_source_full_fallback_after_success"] is True
 
 
 @pytest.mark.asyncio

@@ -4,16 +4,22 @@
 
 2026-05-21 的本地排查发现，`quotes.db` 中 `600355.SH` 仍被标记为 `status=active,is_active=1,source=akshare,updated_at=2026-04-09 21:46:05.599604`，而该股实际已在 2026 年 4 月退市；同时 BSE 本地活跃股票数量为 300 只，低于当时公开当前列表约 314 只。这说明只依赖历史缓存会让股票数据字典滞后，进而影响日更股票池。
 
+## 通用治理层
+
+主数据新鲜度现在由 `DataManager.ensure_instrument_master_fresh()` 统一治理。该入口包装现有 `sync_instrument_master()`，只负责判断是否需要同步、是否复用本地新鲜状态、历史任务是否跳过、失败后是否继续，以及把结果写入报告；A 股 BaoStock/AkShare/pytdx 的实际源优先级和 upsert 规则仍只在 `sync_instrument_master()` 中维护。
+
+普通行情日更、研究同步、财务同步和当前快照类任务都应通过这个共享治理入口后再读取 `instruments.is_active` 股票池。行情日更保留 `instrument_master_sync` 报告字段作为兼容字段，同时也会产生同一份 `instrument_master_governance` 结果；研究和财务维护任务使用 `instrument_master_governance` 报告段。最终架构不再保留一套行情专用主数据前置逻辑和另一套研究/财务主数据逻辑。
+
 ## 日更行为
 
-`DataManager.update_daily_data()` 在普通 A 股日更前会先执行 `sync_instrument_master()`：
+`DataManager.update_daily_data()` 在普通 A 股日更前会先执行共享主数据治理：
 
 - 同步范围默认是 `SSE`、`SZSE`、`BSE` 的 `stock` 主数据。
 - 同步完成后，日更重新从数据库读取 active instruments，再开始行情抓取。
 - 当前退市或停用的 instrument 只改变主数据状态，不删除历史行情。
 - 历史回补默认跳过当前主数据同步，避免用今天的股票状态改写历史回补语义；报告中会记录 `historical_backfill_current_master_sync_skipped`。
 
-相关配置位于 `config/03_data.json` 的 `data_config.instrument_master_sync`。
+兼容配置位于 `config/03_data.json` 的 `data_config.instrument_master_sync`；通用治理配置位于 `data_config.instrument_master_governance`。治理配置默认继承同步配置中的超时、新鲜度阈值、历史回补 skip、失败继续和 pytdx 诊断开关。
 
 ## 数据源优先级
 
@@ -38,6 +44,14 @@
 - warnings/errors。
 
 Telegram 日更报告会渲染“证券主数据同步”段落；即使行情更新成功，主数据同步警告也会暴露给操作员。
+
+研究、财务和快照维护任务的结构化结果包含 `instrument_master_governance`：
+
+- `status/action/reason` 表示已同步、复用新鲜本地状态、按历史语义跳过、按市场策略跳过、warning 或 error。
+- `summary` 展示新增、停用、活跃合计。
+- `warnings/errors` 保留 BSE fallback-only、unsupported market、失败继续等治理诊断。
+
+Telegram 维护报告会独立渲染“证券主数据治理”段落，避免把业务任务成功误解为主数据来源完全权威。
 
 ## HKEX 边界
 

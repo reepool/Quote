@@ -46,3 +46,13 @@ def test_shareholder_shadow_sync_task_calls_data_manager_and_clears_active_flag(
     )
     task._send_task_report.assert_awaited_once()
     assert "shareholder_shadow_sync" not in task._active_tasks
+
+
+def test_scheduler_timeout_error_message_is_not_blank():
+    from scheduler.scheduler import TaskScheduler
+
+    scheduler = TaskScheduler()
+    assert (
+        scheduler._format_job_exception(asyncio.TimeoutError())
+        == "TimeoutError: task exceeded max_runtime_seconds"
+    )

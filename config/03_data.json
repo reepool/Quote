@@ -24,6 +24,34 @@
         "BSE"
       ]
     },
+    "instrument_master_governance": {
+      "enabled": true,
+      "reuse_fresh_master": true,
+      "skip_for_backfill": true,
+      "continue_on_failure": true,
+      "timeout_sec": 180,
+      "freshness_threshold_hours": 48,
+      "pytdx_validation_enabled": false,
+      "supported_exchanges": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "current_job_names": [
+        "daily_data_update",
+        "company_profile_shadow_sync",
+        "industry_shadow_sync",
+        "industry_standard_sync",
+        "financial_summary_shadow_sync",
+        "financial_statements_shadow_sync",
+        "shareholder_shadow_sync",
+        "analyst_forecast_shadow_sync",
+        "research_report_shadow_sync",
+        "sentiment_event_shadow_sync",
+        "technical_snapshot_refresh",
+        "risk_snapshot_rebuild"
+      ]
+    },
     "default_start_years": {
       "SSE": 1990,
       "SZSE": 1990,

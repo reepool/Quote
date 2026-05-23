@@ -48,13 +48,10 @@ def test_load_akshare_proxy_patch_requests_patch_install(monkeypatch):
 
 
 def test_proxy_patch_install_fails_explicitly_when_disabled(monkeypatch):
-    monkeypatch.setattr(akshare_support, "_PROXY_PATCH_ATTEMPTED", False)
-    monkeypatch.setattr(akshare_support, "_PROXY_PATCH_READY", False)
-    monkeypatch.setattr(akshare_support, "_PROXY_PATCH_ERROR", None)
     monkeypatch.setattr(
         akshare_support,
-        "_load_proxy_patch_config",
-        lambda: {"enabled": False},
+        "install_akshare_proxy_patch",
+        lambda *, required: (_ for _ in ()).throw(RuntimeError("disabled")),
     )
 
     with pytest.raises(RuntimeError, match="disabled"):

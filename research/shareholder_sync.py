@@ -4,8 +4,10 @@ Shareholder summary shadow sync service.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
+import time
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Set
 
@@ -118,9 +120,16 @@ class ShareholderShadowSyncService:
             market=exchange,
             metadata={"instrument_count": len(stock_instruments)},
         )
+        dm_logger.info(
+            "[ShareholderSync] Exchange sync started: exchange=%s instruments=%s run_id=%s",
+            exchange,
+            len(stock_instruments),
+            run_id,
+        )
 
         attempted_sources: List[str] = []
         successful_sources: List[str] = []
+        skipped_sources: List[str] = []
         optional_empty_exchange = allows_optional_empty_exchange(
             self.research_config,
             "shareholders",
@@ -131,6 +140,13 @@ class ShareholderShadowSyncService:
                 "shareholders",
                 budget_mode=budget_mode,
                 allow_paid_proxy=allow_paid_proxy,
+            )
+            dm_logger.info(
+                "[ShareholderSync] Source plan resolved: exchange=%s budget_mode=%s allow_paid_proxy=%s candidates=%s",
+                exchange,
+                plan.budget_mode,
+                plan.allow_paid_proxy,
+                [f"{candidate.source}:{candidate.mode}" for candidate in plan.candidates],
             )
             module_cfg = self.research_config.modules.get("shareholders", {})
             required_scope = {
@@ -148,6 +164,9 @@ class ShareholderShadowSyncService:
                 for candidate_key in module_cfg.get("force_merge_candidates", [])
                 if str(candidate_key).strip()
             }
+            skip_same_source_full_fallback_after_success = bool(
+                module_cfg.get("skip_same_source_full_fallback_after_success", False)
+            )
             recovery_batch_size = max(
                 1,
                 int(module_cfg.get("same_source_recovery_batch_size", 1)),
@@ -167,6 +186,7 @@ class ShareholderShadowSyncService:
             recovery_attempted_instruments = 0
             recovery_resolved_instruments = 0
             recovery_runs = 0
+            successful_source_names: Set[str] = set()
 
             all_instrument_ids = {
                 str(instrument["instrument_id"])
@@ -182,17 +202,55 @@ class ShareholderShadowSyncService:
                 if not candidate_instruments:
                     continue
 
+                if (
+                    skip_same_source_full_fallback_after_success
+                    and candidate.source in successful_source_names
+                    and not force_merge_candidate
+                ):
+                    skipped_sources.append(candidate_key)
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate skipped: exchange=%s source=%s mode=%s reason=same_source_already_successful remaining=%s successful_sources=%s",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                        len(candidate_instruments),
+                        successful_sources,
+                    )
+                    continue
+
                 attempted_sources.append(candidate_key)
                 provider = self.registry.get(candidate.source)
                 if provider is None or not provider.supports_mode(candidate.mode):
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate skipped: exchange=%s source=%s mode=%s reason=unsupported",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                    )
                     continue
 
                 try:
+                    candidate_started_at = time.monotonic()
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate fetch started: exchange=%s source=%s mode=%s instruments=%s",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                        len(candidate_instruments),
+                    )
                     snapshots = await provider.fetch_shareholder_snapshots(
                         instruments=candidate_instruments,
                         exchange=exchange,
                         mode=candidate.mode,
                         limit=len(candidate_instruments),
+                    )
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate fetch finished: exchange=%s source=%s mode=%s snapshots=%s elapsed=%.1fs",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                        len(snapshots or []),
+                        time.monotonic() - candidate_started_at,
                     )
                 except Exception as exc:
                     dm_logger.warning(
@@ -205,6 +263,13 @@ class ShareholderShadowSyncService:
                     continue
 
                 if not snapshots:
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate returned no snapshots: exchange=%s source=%s mode=%s remaining=%s",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                        len(remaining_ids),
+                    )
                     continue
 
                 accepted_snapshots = []
@@ -218,8 +283,24 @@ class ShareholderShadowSyncService:
                     accepted_snapshots.append(snapshot)
 
                 if not accepted_snapshots:
+                    dm_logger.info(
+                        "[ShareholderSync] Candidate snapshots rejected by eligibility/dedup: exchange=%s source=%s mode=%s snapshots=%s eligible=%s",
+                        exchange,
+                        candidate.source,
+                        candidate.mode,
+                        len(snapshots),
+                        len(eligible_ids),
+                    )
                     continue
 
+                dm_logger.debug(
+                    "[ShareholderSync] Candidate accepted snapshots: exchange=%s source=%s mode=%s accepted=%s first_ids=%s",
+                    exchange,
+                    candidate.source,
+                    candidate.mode,
+                    len(accepted_snapshots),
+                    [snapshot.instrument_id for snapshot in accepted_snapshots[:10]],
+                )
                 for snapshot in accepted_snapshots:
                     existing_snapshot = merged_snapshots.get(snapshot.instrument_id)
                     merged_snapshot = self._merge_snapshots(
@@ -242,6 +323,7 @@ class ShareholderShadowSyncService:
                     primary_source = candidate.source
                     primary_mode = candidate.mode
                 successful_sources.append(candidate_key)
+                successful_source_names.add(candidate.source)
                 remaining_ids = {
                     instrument_id
                     for instrument_id in remaining_ids
@@ -250,6 +332,14 @@ class ShareholderShadowSyncService:
                         required_scope,
                     )
                 }
+                dm_logger.info(
+                    "[ShareholderSync] Candidate processed: exchange=%s source=%s mode=%s merged=%s remaining_missing_scope=%s",
+                    exchange,
+                    candidate.source,
+                    candidate.mode,
+                    len(merged_snapshots),
+                    len(remaining_ids),
+                )
                 if (
                     recovery_max_instruments > 0
                     and candidate_key in recovery_candidate_keys
@@ -335,6 +425,10 @@ class ShareholderShadowSyncService:
                     "force_merge_candidates": sorted(force_merge_candidate_keys),
                     "attempted_sources": attempted_sources,
                     "successful_sources": successful_sources,
+                    "skipped_sources": skipped_sources,
+                    "skip_same_source_full_fallback_after_success": (
+                        skip_same_source_full_fallback_after_success
+                    ),
                     "requested_instruments": len(stock_instruments),
                     "resolved_instruments": resolved_instruments,
                     "missing_instruments": len(missing_ids),
@@ -344,6 +438,15 @@ class ShareholderShadowSyncService:
                     "same_source_recovery_resolved_instruments": recovery_resolved_instruments,
                     "optional_empty_exchange": optional_empty_exchange,
                 },
+            )
+            dm_logger.info(
+                "[ShareholderSync] Exchange sync finished: exchange=%s status=%s written=%s resolved=%s/%s run_id=%s",
+                exchange,
+                status,
+                total_written,
+                resolved_instruments,
+                len(stock_instruments),
+                run_id,
             )
             return ShareholderExchangeSyncResult(
                 exchange=exchange,
@@ -360,13 +463,42 @@ class ShareholderShadowSyncService:
                 error_message=error_message,
             )
 
+        except asyncio.CancelledError:
+            error_message = (
+                "Shareholder shadow sync was cancelled before exchange completion; "
+                "the scheduler max_runtime_seconds timeout was likely reached."
+            )
+            self.storage.finish_ingestion_run(
+                run_id,
+                status="failed",
+                rows_written=0,
+                error_message=error_message,
+                metadata={
+                    "exchange": exchange,
+                    "attempted_sources": attempted_sources,
+                    "skipped_sources": skipped_sources,
+                    "requested_instruments": len(stock_instruments),
+                    "cancelled": True,
+                },
+            )
+            dm_logger.error(
+                "[ShareholderSync] Exchange sync cancelled: exchange=%s run_id=%s attempted_sources=%s",
+                exchange,
+                run_id,
+                attempted_sources,
+            )
+            raise
         except Exception as exc:
             self.storage.finish_ingestion_run(
                 run_id,
                 status="failed",
                 rows_written=0,
                 error_message=str(exc),
-                metadata={"exchange": exchange, "attempted_sources": attempted_sources},
+                metadata={
+                    "exchange": exchange,
+                    "attempted_sources": attempted_sources,
+                    "skipped_sources": skipped_sources,
+                },
             )
             return ShareholderExchangeSyncResult(
                 exchange=exchange,

@@ -6,6 +6,13 @@ Uses APScheduler to manage and execute scheduled tasks.
 import asyncio
 from datetime import datetime
 from typing import Dict, Any, Optional
+from builtins import TimeoutError as BuiltinTimeoutError
+
+# Scheduler can be imported by operational scripts without going through
+# main.py; install the patch before importing project utilities.
+from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshare_proxy_patch
+
+_install_akshare_proxy_patch(required=False)
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -225,16 +232,29 @@ class TaskScheduler:
         job_id = event.job_id if hasattr(event, 'job_id') else 'unknown'
         exception = event.exception if hasattr(event, 'exception') else 'Unknown error'
         scheduled_time = event.scheduled_run_time if hasattr(event, 'scheduled_run_time') else None
+        exception_message = self._format_job_exception(exception)
 
-        scheduler_logger.error(f"[Scheduler] Job {job_id} failed at {scheduled_time}: {exception}")
+        scheduler_logger.error(f"[Scheduler] Job {job_id} failed at {scheduled_time}: {exception_message}")
 
         try:
             bot = TelegramBot()
             asyncio.create_task(
-                bot.send_scheduler_notification(f"定时任务 {job_id} 执行失败: {str(exception)}", level='error')
+                bot.send_scheduler_notification(
+                    f"定时任务 {job_id} 执行失败: {exception_message}",
+                    level='error',
+                )
             )
         except Exception:
             scheduler_logger.error("[Scheduler] Failed to send error notification")
+
+    @staticmethod
+    def _format_job_exception(exception) -> str:
+        if isinstance(exception, (asyncio.TimeoutError, BuiltinTimeoutError)):
+            return "TimeoutError: task exceeded max_runtime_seconds"
+        message = str(exception).strip()
+        if message:
+            return message
+        return type(exception).__name__
 
     def _job_missed_listener(self, event):
         """任务错过监听器"""

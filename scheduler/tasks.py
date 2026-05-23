@@ -8,6 +8,12 @@ import os
 from datetime import datetime, date, timedelta, time
 from typing import List, Dict, Any, Optional
 
+# Some tests and operator scripts import scheduler.tasks directly. Install the
+# proxy patch before project utility imports can pull in HTTP client stacks.
+from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshare_proxy_patch
+
+_install_akshare_proxy_patch(required=False)
+
 from utils import scheduler_logger, config_manager, TelegramBot
 from .job_config import JobConfig
 from data_manager import data_manager
@@ -77,6 +83,50 @@ def _format_scheduler_status(status: Any) -> tuple[str, str]:
     if normalized in {"failed", "error"}:
         return "❌", "失败"
     return "ℹ️", status_text
+
+
+def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
+    """Return a compact operator summary for shared instrument master governance."""
+    if not isinstance(governance, dict) or not governance:
+        return ""
+
+    status = governance.get("status", "unknown")
+    action = governance.get("action") or governance.get("reason") or "unknown"
+    lines = [f"状态: {status} ({action})"]
+
+    summary = governance.get("summary")
+    if isinstance(summary, dict):
+        lines.append(
+            "新增: "
+            f"{summary.get('added_instruments', 0)}，"
+            f"停用: {summary.get('deactivated_instruments', 0)}，"
+            f"活跃合计: {summary.get('active_count', 0)}"
+        )
+
+    warnings = governance.get("warnings") or []
+    errors = governance.get("errors") or []
+    if warnings:
+        lines.append("警告: " + "；".join(str(item) for item in warnings[:3]))
+    if errors:
+        lines.append("错误: " + "；".join(str(item) for item in errors[:3]))
+    return "\n".join(lines)
+
+
+def _attach_instrument_master_governance_report(
+    report_data: Dict[str, Any],
+    result: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Attach shared master-governance diagnostics to scheduler reports."""
+    if not isinstance(result, dict):
+        return report_data
+    governance = result.get("instrument_master_governance")
+    if not isinstance(governance, dict):
+        return report_data
+    report_data["instrument_master_governance"] = governance
+    report_data["instrument_master_governance_summary"] = (
+        _format_instrument_master_governance_summary(governance)
+    )
+    return report_data
 
 
 def _format_source_mode(result: Dict[str, Any]) -> str:
@@ -246,6 +296,16 @@ class ScheduledTasks:
             bool: 是否发送成功
         """
         try:
+            if (
+                isinstance(report_data.get('instrument_master_governance'), dict)
+                and not report_data.get('instrument_master_governance_summary')
+            ):
+                report_data['instrument_master_governance_summary'] = (
+                    _format_instrument_master_governance_summary(
+                        report_data.get('instrument_master_governance')
+                    )
+                )
+
             # 检查是否应该发送报告
             should_send = False
             if job_config and hasattr(job_config, 'report'):
@@ -1081,6 +1141,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1150,6 +1211,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1222,6 +1284,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1755,6 +1818,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1824,6 +1888,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1891,6 +1956,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -1946,23 +2012,25 @@ class ScheduledTasks:
             )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '财务报表日度增量同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('rows_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
             await self._send_task_report(
-                report_data={
-                    'name': '财务报表日度增量同步报告',
-                    'status': 'success' if success else 'error',
-                    'tasks_completed': result.get('successful_exchanges', 0),
-                    'duration': 'N/A',
-                    'maintenance_tasks': [
-                        {
-                            'task_name': exchange_result.get('exchange', 'unknown'),
-                            'status': (
-                                f"{exchange_result.get('status')} "
-                                f"(rows={exchange_result.get('rows_written', 0)})"
-                            ),
-                        }
-                        for exchange_result in result.get('exchanges', [])
-                    ],
-                },
+                report_data=report_data,
                 report_type='maintenance_report',
                 task_name='财务报表日度增量同步',
                 job_config=job_config,
@@ -2011,23 +2079,25 @@ class ScheduledTasks:
             )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '财务报表周度对账修复报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('rows_written', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
             await self._send_task_report(
-                report_data={
-                    'name': '财务报表周度对账修复报告',
-                    'status': 'success' if success else 'error',
-                    'tasks_completed': result.get('successful_exchanges', 0),
-                    'duration': 'N/A',
-                    'maintenance_tasks': [
-                        {
-                            'task_name': exchange_result.get('exchange', 'unknown'),
-                            'status': (
-                                f"{exchange_result.get('status')} "
-                                f"(rows={exchange_result.get('rows_written', 0)})"
-                            ),
-                        }
-                        for exchange_result in result.get('exchanges', [])
-                    ],
-                },
+                report_data=report_data,
                 report_type='maintenance_report',
                 task_name='财务报表周度对账修复',
                 job_config=job_config,
@@ -2087,6 +2157,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -2153,6 +2224,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -2219,6 +2291,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -2285,6 +2358,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -2351,6 +2425,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,
@@ -2413,6 +2488,7 @@ class ScheduledTasks:
                     for exchange_result in result.get('exchanges', [])
                 ],
             }
+            _attach_instrument_master_governance_report(report_data, result)
 
             await self._send_task_report(
                 report_data=report_data,

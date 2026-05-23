@@ -5,6 +5,7 @@ AkShare-backed shareholder summary provider.
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 import warnings
 from datetime import date, datetime
@@ -14,6 +15,9 @@ import pandas as pd
 
 from .akshare_support import load_akshare
 from .base import BaseShareholderProvider, ShareholderSnapshot
+
+
+_logger = logging.getLogger("DataManager")
 
 
 class AkshareShareholdersProvider(BaseShareholderProvider):
@@ -111,30 +115,84 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
         exchange: str,
         mode: str,
     ) -> List[ShareholderSnapshot]:
+        started_at = time.monotonic()
+        _logger.info(
+            "[AkshareShareholders] Batch fetch started: exchange=%s mode=%s instruments=%s",
+            exchange,
+            mode,
+            len(target_instruments),
+        )
         akshare = load_akshare(mode)
         snapshots: List[ShareholderSnapshot] = []
-        for instrument in target_instruments:
+        for index, instrument in enumerate(target_instruments, start=1):
             symbol = str(instrument.get("symbol") or "").strip()
             if not symbol:
+                _logger.debug(
+                    "[AkshareShareholders] Instrument skipped: exchange=%s mode=%s index=%s/%s instrument_id=%s reason=missing_symbol",
+                    exchange,
+                    mode,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                )
                 continue
 
+            instrument_started_at = time.monotonic()
             request_symbols = self._request_symbol_candidates(instrument, exchange)
+            _logger.debug(
+                "[AkshareShareholders] Instrument fetch started: exchange=%s mode=%s index=%s/%s instrument_id=%s symbol=%s request_symbols=%s",
+                exchange,
+                mode,
+                index,
+                len(target_instruments),
+                instrument.get("instrument_id"),
+                symbol,
+                request_symbols,
+            )
             for request_symbol in request_symbols:
                 holder_count_payload: Any = None
                 top_holders_payload: Any = None
                 holder_count_error: Optional[str] = None
                 top_holders_error: Optional[str] = None
                 try:
+                    holder_started_at = time.monotonic()
+                    _logger.debug(
+                        "[AkshareShareholders] Holder-count request started: exchange=%s mode=%s instrument_id=%s request_symbol=%s",
+                        exchange,
+                        mode,
+                        instrument.get("instrument_id"),
+                        request_symbol,
+                    )
                     holder_count_payload = self._fetch_holder_count_payload(
                         akshare,
                         request_symbol,
                     )
+                    _logger.debug(
+                        "[AkshareShareholders] Holder-count request finished: exchange=%s mode=%s instrument_id=%s request_symbol=%s rows=%s elapsed=%.2fs",
+                        exchange,
+                        mode,
+                        instrument.get("instrument_id"),
+                        request_symbol,
+                        self._payload_rows_count(holder_count_payload),
+                        time.monotonic() - holder_started_at,
+                    )
                 except Exception as exc:
                     holder_count_payload = None
                     holder_count_error = str(exc)
+                    _logger.debug(
+                        "[AkshareShareholders] Holder-count request failed: exchange=%s mode=%s instrument_id=%s request_symbol=%s error=%s",
+                        exchange,
+                        mode,
+                        instrument.get("instrument_id"),
+                        request_symbol,
+                        exc,
+                    )
                 top_holders_payload, top_holders_error = self._fetch_top_holders_with_retry(
                     akshare,
                     request_symbol,
+                    exchange=exchange,
+                    instrument_id=str(instrument.get("instrument_id") or ""),
+                    mode=mode,
                 )
 
                 snapshot = self._build_snapshot(
@@ -150,7 +208,43 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
                 )
                 if snapshot is not None:
                     snapshots.append(snapshot)
+                    _logger.debug(
+                        "[AkshareShareholders] Instrument fetch finished: exchange=%s mode=%s instrument_id=%s request_symbol=%s coverage=%s elapsed=%.2fs",
+                        exchange,
+                        mode,
+                        instrument.get("instrument_id"),
+                        request_symbol,
+                        snapshot.snapshot_json.get("coverage_scope", []),
+                        time.monotonic() - instrument_started_at,
+                    )
                     break
+            else:
+                _logger.debug(
+                    "[AkshareShareholders] Instrument fetch produced no snapshot: exchange=%s mode=%s instrument_id=%s symbol=%s elapsed=%.2fs",
+                    exchange,
+                    mode,
+                    instrument.get("instrument_id"),
+                    symbol,
+                    time.monotonic() - instrument_started_at,
+                )
+            if index % 100 == 0:
+                _logger.info(
+                    "[AkshareShareholders] Batch progress: exchange=%s mode=%s processed=%s/%s snapshots=%s elapsed=%.1fs",
+                    exchange,
+                    mode,
+                    index,
+                    len(target_instruments),
+                    len(snapshots),
+                    time.monotonic() - started_at,
+                )
+        _logger.info(
+            "[AkshareShareholders] Batch fetch finished: exchange=%s mode=%s instruments=%s snapshots=%s elapsed=%.1fs",
+            exchange,
+            mode,
+            len(target_instruments),
+            len(snapshots),
+            time.monotonic() - started_at,
+        )
         return snapshots
 
     def _fetch_holder_count_payload(self, akshare: Any, symbol: str) -> Any:
@@ -169,6 +263,10 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
         self,
         akshare: Any,
         symbol: str,
+        *,
+        exchange: str,
+        instrument_id: str,
+        mode: str,
     ) -> tuple[Any, Optional[str]]:
         last_error: Optional[str] = None
         total_attempts = 1 + self.top_holders_retry_attempts
@@ -176,15 +274,56 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
         for attempt_index in range(total_attempts):
             self._wait_for_top_holders_slot()
             try:
+                top_started_at = time.monotonic()
+                _logger.debug(
+                    "[AkshareShareholders] Top-holders request started: exchange=%s mode=%s instrument_id=%s request_symbol=%s attempt=%s/%s",
+                    exchange,
+                    mode,
+                    instrument_id,
+                    symbol,
+                    attempt_index + 1,
+                    total_attempts,
+                )
                 payload = self._fetch_top_holders_payload(akshare, symbol)
             except Exception as exc:
                 last_error = str(exc)
                 payload = None
+                _logger.debug(
+                    "[AkshareShareholders] Top-holders request failed: exchange=%s mode=%s instrument_id=%s request_symbol=%s attempt=%s/%s error=%s",
+                    exchange,
+                    mode,
+                    instrument_id,
+                    symbol,
+                    attempt_index + 1,
+                    total_attempts,
+                    exc,
+                )
             else:
                 if self._payload_rows(payload):
+                    _logger.debug(
+                        "[AkshareShareholders] Top-holders request finished: exchange=%s mode=%s instrument_id=%s request_symbol=%s attempt=%s/%s rows=%s elapsed=%.2fs",
+                        exchange,
+                        mode,
+                        instrument_id,
+                        symbol,
+                        attempt_index + 1,
+                        total_attempts,
+                        self._payload_rows_count(payload),
+                        time.monotonic() - top_started_at,
+                    )
                     return payload, None
                 last_error = (
                     f"empty payload after attempt {attempt_index + 1}/{total_attempts}"
+                )
+                _logger.debug(
+                    "[AkshareShareholders] Top-holders request empty: exchange=%s mode=%s instrument_id=%s request_symbol=%s attempt=%s/%s elapsed=%.2fs",
+                    exchange,
+                    mode,
+                    instrument_id,
+                    symbol,
+                    attempt_index + 1,
+                    total_attempts,
+                    time.monotonic() - top_started_at,
                 )
 
             if attempt_index >= total_attempts - 1:
@@ -195,6 +334,9 @@ class AkshareShareholdersProvider(BaseShareholderProvider):
                 time.sleep(backoff_seconds)
 
         return None, last_error
+
+    def _payload_rows_count(self, payload: Any) -> int:
+        return len(self._payload_rows(payload))
 
     def _wait_for_top_holders_slot(self) -> None:
         interval_seconds = self.top_holders_request_interval_seconds

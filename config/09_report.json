@@ -283,6 +283,12 @@
             ]
           },
           {
+            "name": "instrument_master_governance",
+            "type": "static",
+            "content": "*证券主数据治理*\n{instrument_master_governance_summary}",
+            "condition": "instrument_master_governance_summary"
+          },
+          {
             "name": "details",
             "type": "list",
             "data_source": "maintenance_tasks",

@@ -395,6 +395,66 @@
 - **`max_concurrent_downloads`**: `int` (默认: `1`) —— *同时并发执行拉取任务的协程数上限限制（请考虑机器 IP 并发拦截率）*
 - **`retry_times`**: `int` (默认: `3`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
 - **`retry_interval_seconds`**: `int` (默认: `5`) —— *下载出现报错异常时候的基础退坡缓冲等待期（秒）*
+
+### data_config.instrument_master_sync
+
+> A 股证券主数据同步底层配置。普通日更和通用主数据治理最终都复用这套 `sync_instrument_master()` 源优先级与写入规则。
+
+```json
+{
+  "instrument_master_sync": {
+    "enabled": true,
+    "run_before_daily_update": true,
+    "skip_for_backfill": true,
+    "continue_on_failure": true,
+    "timeout_sec": 180,
+    "freshness_threshold_hours": 48,
+    "pytdx_validation_enabled": false,
+    "exchanges": ["SSE", "SZSE", "BSE"]
+  }
+}
+```
+
+- **`enabled`**: 是否允许 A 股主数据同步。
+- **`run_before_daily_update`**: 普通行情日更是否前置主数据治理。
+- **`skip_for_backfill`**: 历史补数是否默认跳过当前主数据刷新，避免当前股票池污染历史语义。
+- **`continue_on_failure`**: 同步失败时是否允许下游任务继续使用本地已有股票池。
+- **`timeout_sec`**: 单市场主数据同步超时秒数。
+- **`freshness_threshold_hours`**: 本地主数据新鲜度窗口。
+- **`pytdx_validation_enabled`**: 是否启用 pytdx 当前列表差异诊断；pytdx 不作为权威状态源。
+- **`exchanges`**: 当前启用的 A 股市场，默认 `SSE/SZSE/BSE`。
+
+### data_config.instrument_master_governance
+
+> 通用证券主数据治理配置。该层覆盖行情、研究、财务和当前快照任务，统一调用 `DataManager.ensure_instrument_master_fresh()`；它不另起一套行情外的主数据源逻辑，而是包装并复用 `instrument_master_sync`。
+
+```json
+{
+  "instrument_master_governance": {
+    "enabled": true,
+    "reuse_fresh_master": true,
+    "skip_for_backfill": true,
+    "continue_on_failure": true,
+    "timeout_sec": 180,
+    "freshness_threshold_hours": 48,
+    "pytdx_validation_enabled": false,
+    "supported_exchanges": ["SSE", "SZSE", "BSE"],
+    "current_job_names": [
+      "daily_data_update",
+      "financial_summary_shadow_sync",
+      "financial_statements_shadow_sync"
+    ]
+  }
+}
+```
+
+- **`enabled`**: 是否启用通用主数据治理入口。
+- **`reuse_fresh_master`**: 本地 `instruments.updated_at` 在新鲜度窗口内时，后续当前任务复用本地状态，不重复请求上游主数据列表。
+- **`skip_for_backfill`**: 历史、回补和 point-in-time 类任务是否默认跳过当前主数据刷新。
+- **`continue_on_failure`**: 治理失败后是否允许业务任务继续使用本地股票池，并在报告中暴露 warning/error。
+- **`supported_exchanges`**: 已启用主数据策略的市场；当前仅 `SSE/SZSE/BSE`，`HKEX` 会按 unsupported market 记录 skip，待港股专用策略后再启用。
+- **`current_job_names`**: 参与治理的当前任务清单，用于配置审计和运维可读性。
+
 ### data_config.default_start_years
 
 > **💠 节点释源**: 若无强制历史拉取点，新部署拉取各类股票/指数必须强制从哪一年起跑

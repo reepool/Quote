@@ -5,6 +5,14 @@ trading calendar integration, data quality assessment, and gap detection.
 """
 
 from __future__ import annotations
+
+# Some runtime entry points import DataManager directly instead of going through
+# main.py. Keep the proxy patch bootstrap before imports that may pull in
+# requests/akshare/efinance transitively.
+from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshare_proxy_patch
+
+_install_akshare_proxy_patch(required=False)
+
 import asyncio
 import inspect
 import json
@@ -823,17 +831,22 @@ class DataManager:
 
         from research.company_profile_sync import CompanyProfileShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='company_profile_shadow_sync',
+        )
         service = CompanyProfileShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def get_research_company_profile(
         self,
@@ -896,17 +909,22 @@ class DataManager:
 
         from research.industry_sync import IndustryShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='industry_shadow_sync',
+        )
         service = IndustryShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_industry_standard_sync(
         self,
@@ -947,12 +965,16 @@ class DataManager:
 
         from research.industry_standard_sync import IndustryStandardSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='industry_standard_sync',
+        )
         service = IndustryStandardSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             instrument_ids_by_exchange=instrument_ids_by_exchange,
@@ -960,6 +982,7 @@ class DataManager:
             allow_paid_proxy=allow_paid_proxy,
             force_component_refresh=force_component_refresh,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def rebuild_official_industry_standard(
         self,
@@ -2826,17 +2849,22 @@ class DataManager:
 
         from research.financial_summary_sync import FinancialSummaryShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='financial_summary_shadow_sync',
+        )
         service = FinancialSummaryShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_shareholder_shadow_sync(
         self,
@@ -2868,17 +2896,22 @@ class DataManager:
 
         from research.shareholder_sync import ShareholderShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='shareholder_shadow_sync',
+        )
         service = ShareholderShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def get_research_shareholder_readiness(self) -> Dict[str, Any]:
         """Return shareholder-domain readiness and rollout blockers."""
@@ -3533,12 +3566,16 @@ class DataManager:
 
         from research import FinancialStatementsShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='financial_statements_shadow_sync',
+        )
         service = FinancialStatementsShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
@@ -3547,6 +3584,7 @@ class DataManager:
             sync_mode=sync_mode,
             force_full=force_full,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_analyst_forecast_shadow_sync(
         self,
@@ -3578,17 +3616,22 @@ class DataManager:
 
         from research.analyst_forecast_sync import AnalystForecastShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='analyst_forecast_shadow_sync',
+        )
         service = AnalystForecastShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_research_report_shadow_sync(
         self,
@@ -3620,17 +3663,22 @@ class DataManager:
 
         from research.research_report_sync import ResearchReportShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='research_report_shadow_sync',
+        )
         service = ResearchReportShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_sentiment_event_shadow_sync(
         self,
@@ -3662,17 +3710,22 @@ class DataManager:
 
         from research.sentiment_event_sync import SentimentEventShadowSyncService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='sentiment_event_shadow_sync',
+        )
         service = SentimentEventShadowSyncService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_valuation_history_rebuild(
         self,
@@ -3702,15 +3755,21 @@ class DataManager:
 
         from research.valuation_history_sync import ValuationHistoryRebuildService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='valuation_history_rebuild',
+            job_type='historical',
+        )
         service = ValuationHistoryRebuildService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_risk_snapshot_rebuild(
         self,
@@ -3740,15 +3799,20 @@ class DataManager:
 
         from research.risk_snapshot_sync import RiskSnapshotRebuildService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='risk_snapshot_rebuild',
+        )
         service = RiskSnapshotRebuildService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def run_technical_snapshot_refresh(
         self,
@@ -3792,18 +3856,23 @@ class DataManager:
 
         from research.technical_snapshot_sync import TechnicalIndicatorLatestRefreshService
 
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='technical_snapshot_refresh',
+        )
         service = TechnicalIndicatorLatestRefreshService(
             db_ops=self.db_ops,
             storage=self.research_storage,
             research_config=self.research_config,
             adjust_quotes=self._apply_research_adjustment,
         )
-        return await service.sync(
+        result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             adjustment=normalized_adjustment,
             period=period,
         )
+        return self._attach_instrument_master_governance(result, governance)
 
     async def get_research_financial_summary(
         self,
@@ -6055,6 +6124,7 @@ class DataManager:
             if not isinstance(exchange_stats, dict):
                 exchange_stats = {}
             instrument_master_sync = update_results.get('instrument_master_sync')
+            instrument_master_governance = update_results.get('instrument_master_governance') or instrument_master_sync
 
             report = {
                 'summary': {
@@ -6069,6 +6139,7 @@ class DataManager:
                 'exchange_stats': {},
                 'update_results': exchange_stats,
                 'instrument_master_sync': instrument_master_sync,
+                'instrument_master_governance': instrument_master_governance,
                 'errors': []
             }
 
@@ -6138,6 +6209,7 @@ class DataManager:
                 'exchange_stats': {},
                 'update_results': update_results.get('exchange_stats', {}),
                 'instrument_master_sync': update_results.get('instrument_master_sync'),
+                'instrument_master_governance': update_results.get('instrument_master_governance'),
                 'errors': [str(e)]
             }
 
@@ -6160,6 +6232,297 @@ class DataManager:
         if isinstance(raw_config, dict):
             defaults.update(raw_config)
         return defaults
+
+    def _get_instrument_master_governance_config(self) -> Dict[str, Any]:
+        """Return shared master-governance config while preserving sync defaults."""
+        sync_config = self._get_instrument_master_sync_config()
+        defaults: Dict[str, Any] = {
+            'enabled': sync_config.get('enabled', True),
+            'reuse_fresh_master': True,
+            'skip_for_backfill': sync_config.get('skip_for_backfill', True),
+            'continue_on_failure': sync_config.get('continue_on_failure', True),
+            'timeout_sec': sync_config.get('timeout_sec', 180),
+            'freshness_threshold_hours': sync_config.get('freshness_threshold_hours', 48),
+            'pytdx_validation_enabled': sync_config.get('pytdx_validation_enabled', False),
+            'supported_exchanges': sync_config.get('exchanges', ['SSE', 'SZSE', 'BSE']),
+            'current_job_names': [
+                'daily_data_update',
+                'company_profile_shadow_sync',
+                'industry_shadow_sync',
+                'industry_standard_sync',
+                'financial_summary_shadow_sync',
+                'financial_statements_shadow_sync',
+                'shareholder_shadow_sync',
+                'analyst_forecast_shadow_sync',
+                'research_report_shadow_sync',
+                'sentiment_event_shadow_sync',
+                'technical_snapshot_refresh',
+                'risk_snapshot_rebuild',
+            ],
+        }
+
+        raw_config = self.data_config.get('instrument_master_governance')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.instrument_master_governance', {})
+        if isinstance(raw_config, dict):
+            defaults.update(raw_config)
+        return defaults
+
+    def _resolve_master_governance_exchanges(
+        self,
+        exchanges: Optional[List[str]],
+    ) -> List[str]:
+        """Resolve a job exchange list for master governance."""
+        if exchanges:
+            return list(exchanges)
+
+        research_markets = getattr(self.research_config, 'markets', None)
+        if research_markets:
+            return list(research_markets)
+
+        config = self._get_instrument_master_governance_config()
+        return list(config.get('supported_exchanges') or ['SSE', 'SZSE', 'BSE'])
+
+    def _parse_master_updated_at(self, value: Optional[Any]) -> Optional[datetime]:
+        if not value:
+            return None
+        try:
+            parsed = datetime.fromisoformat(str(value).replace('Z', '+00:00'))
+            if parsed.tzinfo is not None:
+                parsed = parsed.replace(tzinfo=None)
+            return parsed
+        except Exception:
+            return None
+
+    async def _build_fresh_master_governance_result(
+        self,
+        *,
+        exchanges: List[str],
+        freshness_threshold_hours: Optional[float],
+        job_name: str,
+        job_type: str,
+        started_at: datetime,
+        unsupported_exchanges: Optional[List[str]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Return a fresh-governance payload when all supported exchanges are fresh."""
+        if not exchanges or freshness_threshold_hours is None:
+            return None
+
+        now = datetime.now()
+        exchange_results: Dict[str, Dict[str, Any]] = {}
+        active_count = 0
+        warnings: List[str] = []
+
+        for exchange in exchanges:
+            snapshot = await self._get_instrument_master_snapshot(exchange)
+            latest_raw = snapshot.get('freshness', {}).get('latest_updated_at')
+            latest = self._parse_master_updated_at(latest_raw)
+            freshness = dict(snapshot.get('freshness') or {})
+            if latest is None:
+                return None
+            age_hours = (now - latest).total_seconds() / 3600
+            freshness['age_hours'] = round(age_hours, 2)
+            if age_hours > float(freshness_threshold_hours):
+                return None
+
+            active_count += int(snapshot.get('active_count', 0) or 0)
+            exchange_results[exchange] = {
+                'status': 'fresh',
+                'reason': 'master_data_within_freshness_window',
+                'before': {},
+                'after': {
+                    'total_count': snapshot.get('total_count', 0),
+                    'active_count': snapshot.get('active_count', 0),
+                    'inactive_count': snapshot.get('inactive_count', 0),
+                    'status_counts': snapshot.get('status_counts', {}),
+                    'source_counts': snapshot.get('source_counts', {}),
+                },
+                'fetched_count': 0,
+                'source_usage': {},
+                'added_count': 0,
+                'deactivated_count': 0,
+                'added_samples': [],
+                'deactivated_samples': [],
+                'freshness': freshness,
+                'pytdx_validation': None,
+                'warnings': [],
+                'errors': [],
+            }
+
+        unsupported = list(unsupported_exchanges or [])
+        for exchange in unsupported:
+            warnings.append(f"{exchange}: unsupported market for instrument master governance")
+
+        finished_at = get_shanghai_time()
+        status = 'warning' if warnings else 'fresh'
+        return {
+            'status': status,
+            'action': 'reused_fresh_master',
+            'reason': 'master_data_within_freshness_window',
+            'job_name': job_name,
+            'job_type': job_type,
+            'started_at': started_at.isoformat(),
+            'finished_at': finished_at.isoformat(),
+            'elapsed_sec': round((finished_at - started_at).total_seconds(), 3),
+            'source_priority': ['local_freshness', 'baostock', 'akshare', 'pytdx_validation_only'],
+            'exchanges': exchange_results,
+            'unsupported_exchanges': unsupported,
+            'summary': {
+                'exchanges': exchanges,
+                'added_instruments': 0,
+                'deactivated_instruments': 0,
+                'active_count': active_count,
+            },
+            'warnings': warnings,
+            'errors': [],
+        }
+
+    async def ensure_instrument_master_fresh(
+        self,
+        exchanges: Optional[List[str]] = None,
+        *,
+        job_name: str = 'unknown',
+        job_type: str = 'current',
+        target_date: Optional[date] = None,
+        force_refresh: bool = False,
+        include_pytdx_validation: Optional[bool] = None,
+        timeout_sec: Optional[int] = None,
+        freshness_threshold_hours: Optional[float] = None,
+        continue_on_failure: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """Shared pre-run governance for current instrument master freshness.
+
+        This is the only production pre-run entry point for master freshness.
+        It delegates actual A-share source collection and merge semantics to
+        sync_instrument_master() so quote, research, and financial jobs share
+        one master-data implementation.
+        """
+        config = self._get_instrument_master_governance_config()
+        started_at = get_shanghai_time()
+
+        if not config.get('enabled', True):
+            return {
+                'status': 'skipped',
+                'action': 'skipped',
+                'reason': 'disabled_by_config',
+                'job_name': job_name,
+                'job_type': job_type,
+                'started_at': started_at.isoformat(),
+                'finished_at': get_shanghai_time().isoformat(),
+                'elapsed_sec': 0.0,
+                'exchanges': {},
+                'unsupported_exchanges': [],
+                'summary': {'exchanges': [], 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
+                'warnings': [],
+                'errors': [],
+            }
+
+        resolved_exchanges = self._resolve_master_governance_exchanges(exchanges)
+        supported_set = set(config.get('supported_exchanges') or ['SSE', 'SZSE', 'BSE'])
+        supported_exchanges = [ex for ex in resolved_exchanges if ex in supported_set and ex in ('SSE', 'SZSE', 'BSE')]
+        unsupported_exchanges = [ex for ex in resolved_exchanges if ex not in supported_exchanges]
+
+        local_today = get_shanghai_time().date()
+        historical_job = job_type in {'historical', 'backfill', 'point_in_time'}
+        if target_date is not None and target_date < local_today:
+            historical_job = True
+        if historical_job and config.get('skip_for_backfill', True) and not force_refresh:
+            return {
+                'status': 'skipped',
+                'action': 'skipped',
+                'reason': 'historical_current_master_governance_skipped',
+                'job_name': job_name,
+                'job_type': job_type,
+                'target_date': target_date.isoformat() if target_date else None,
+                'started_at': started_at.isoformat(),
+                'finished_at': get_shanghai_time().isoformat(),
+                'elapsed_sec': 0.0,
+                'exchanges': {},
+                'unsupported_exchanges': unsupported_exchanges,
+                'summary': {'exchanges': supported_exchanges, 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
+                'warnings': [f"{ex}: unsupported market for instrument master governance" for ex in unsupported_exchanges],
+                'errors': [],
+            }
+
+        if not supported_exchanges:
+            return {
+                'status': 'skipped',
+                'action': 'skipped',
+                'reason': 'no_supported_exchange_in_update_scope',
+                'job_name': job_name,
+                'job_type': job_type,
+                'started_at': started_at.isoformat(),
+                'finished_at': get_shanghai_time().isoformat(),
+                'elapsed_sec': 0.0,
+                'exchanges': {},
+                'unsupported_exchanges': unsupported_exchanges,
+                'summary': {'exchanges': [], 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
+                'warnings': [f"{ex}: unsupported market for instrument master governance" for ex in unsupported_exchanges],
+                'errors': [],
+            }
+
+        effective_freshness_hours = (
+            freshness_threshold_hours
+            if freshness_threshold_hours is not None
+            else config.get('freshness_threshold_hours')
+        )
+        if config.get('reuse_fresh_master', True) and not force_refresh:
+            try:
+                fresh_result = await self._build_fresh_master_governance_result(
+                    exchanges=supported_exchanges,
+                    freshness_threshold_hours=effective_freshness_hours,
+                    job_name=job_name,
+                    job_type=job_type,
+                    started_at=started_at,
+                    unsupported_exchanges=unsupported_exchanges,
+                )
+            except Exception as exc:
+                dm_logger.warning(
+                    "[DataManager] Instrument master freshness check failed before %s: %s; running sync",
+                    job_name,
+                    exc,
+                )
+                fresh_result = None
+            if fresh_result is not None:
+                return fresh_result
+
+        result = await self.sync_instrument_master(
+            supported_exchanges,
+            include_pytdx_validation=(
+                include_pytdx_validation
+                if include_pytdx_validation is not None
+                else config.get('pytdx_validation_enabled', True)
+            ),
+            timeout_sec=timeout_sec if timeout_sec is not None else config.get('timeout_sec'),
+            freshness_threshold_hours=effective_freshness_hours,
+        )
+        result['action'] = 'synced'
+        result['job_name'] = job_name
+        result['job_type'] = job_type
+        result['reason'] = result.get('reason') or 'master_sync_executed'
+        result['unsupported_exchanges'] = unsupported_exchanges
+        if unsupported_exchanges:
+            unsupported_warnings = [
+                f"{ex}: unsupported market for instrument master governance"
+                for ex in unsupported_exchanges
+            ]
+            result.setdefault('warnings', []).extend(unsupported_warnings)
+            if result.get('status') == 'success':
+                result['status'] = 'warning'
+
+        should_continue = (
+            continue_on_failure
+            if continue_on_failure is not None
+            else config.get('continue_on_failure', True)
+        )
+        if result.get('status') == 'error':
+            result['continued_on_failure'] = bool(should_continue)
+            if not should_continue:
+                raise RuntimeError(
+                    f"instrument master governance failed before {job_name}: "
+                    f"{result.get('errors', [])}"
+                )
+        return result
 
     async def _get_instrument_master_snapshot(self, exchange: str) -> Dict[str, Any]:
         """Read a compact stock master snapshot for one exchange."""
@@ -6447,9 +6810,8 @@ class DataManager:
         exchanges: List[str],
         target_date: date,
     ) -> Dict[str, Any]:
-        """Run current master-data sync before normal daily update unless config says to skip."""
+        """Compatibility wrapper for daily update master governance."""
         config = self._get_instrument_master_sync_config()
-        today = date.today()
 
         if not config.get('enabled', True) or not config.get('run_before_daily_update', True):
             return {
@@ -6460,34 +6822,43 @@ class DataManager:
                 'errors': [],
             }
 
-        if config.get('skip_for_backfill', True) and target_date < today:
-            return {
-                'status': 'skipped',
-                'reason': 'historical_backfill_current_master_sync_skipped',
-                'target_date': target_date.isoformat(),
-                'exchanges': {},
-                'warnings': [],
-                'errors': [],
-            }
-
-        a_share_exchanges = [ex for ex in exchanges if ex in ('SSE', 'SZSE', 'BSE')]
-        if not a_share_exchanges:
-            return {
-                'status': 'skipped',
-                'reason': 'no_a_share_exchange_in_update_scope',
-                'exchanges': {},
-                'warnings': [],
-                'errors': [],
-            }
-
-        result = await self.sync_instrument_master(
-            a_share_exchanges,
+        result = await self.ensure_instrument_master_fresh(
+            exchanges,
+            job_name='daily_data_update',
+            job_type='current',
+            target_date=target_date,
+            force_refresh=False,
             include_pytdx_validation=config.get('pytdx_validation_enabled', True),
             timeout_sec=config.get('timeout_sec'),
             freshness_threshold_hours=config.get('freshness_threshold_hours'),
+            continue_on_failure=config.get('continue_on_failure', True),
         )
-        if result.get('status') == 'error' and not config.get('continue_on_failure', True):
-            raise RuntimeError(f"instrument master sync failed before daily update: {result.get('errors', [])}")
+        if result.get('reason') == 'historical_current_master_governance_skipped':
+            result['reason'] = 'historical_backfill_current_master_sync_skipped'
+        return result
+
+    async def _ensure_research_job_instrument_master_governance(
+        self,
+        *,
+        exchanges: Optional[List[str]],
+        job_name: str,
+        job_type: str = 'current',
+    ) -> Dict[str, Any]:
+        """Run shared master governance before research jobs resolve universes."""
+        return await self.ensure_instrument_master_fresh(
+            exchanges,
+            job_name=job_name,
+            job_type=job_type,
+        )
+
+    def _attach_instrument_master_governance(
+        self,
+        result: Dict[str, Any],
+        governance: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Attach governance diagnostics without changing domain-specific fields."""
+        if isinstance(result, dict) and governance is not None:
+            result['instrument_master_governance'] = governance
         return result
 
     async def _save_progress(self):
@@ -7246,6 +7617,7 @@ class DataManager:
                 target_date,
             )
             update_results['instrument_master_sync'] = instrument_master_sync
+            update_results['instrument_master_governance'] = instrument_master_sync
 
             for exchange in exchanges:
                 try:

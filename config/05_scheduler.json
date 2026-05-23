@@ -592,7 +592,7 @@
         }
       },
       "shareholder_shadow_sync": {
-        "enabled": true,
+        "enabled": false,
         "description": "研究域股东摘要影子同步",
         "report": true,
         "pre_run_notify": false,
@@ -615,7 +615,7 @@
           "limit_per_exchange": null,
           "budget_mode": "availability_first",
           "allow_paid_proxy": true,
-          "max_runtime_seconds": 7200
+          "max_runtime_seconds": 18000
         }
       },
       "financial_statements_shadow_sync": {

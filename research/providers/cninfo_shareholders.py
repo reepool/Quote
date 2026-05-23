@@ -5,6 +5,8 @@ cninfo-backed shareholder fallback provider.
 from __future__ import annotations
 
 import asyncio
+import logging
+import time
 from datetime import date, datetime
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -12,6 +14,9 @@ import pandas as pd
 
 from .akshare_support import load_akshare
 from .base import BaseShareholderProvider, ShareholderSnapshot
+
+
+_logger = logging.getLogger("DataManager")
 
 
 class CninfoShareholdersProvider(BaseShareholderProvider):
@@ -52,6 +57,12 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
         target_instruments: List[Dict[str, Any]],
         exchange: str,
     ) -> List[ShareholderSnapshot]:
+        started_at = time.monotonic()
+        _logger.info(
+            "[CninfoShareholders] Batch fetch started: exchange=%s instruments=%s",
+            exchange,
+            len(target_instruments),
+        )
         akshare = load_akshare("direct")
         symbols = {
             symbol
@@ -59,15 +70,34 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
             for symbol in self._request_symbol_candidates(instrument, exchange)
         }
         if not symbols:
+            _logger.info(
+                "[CninfoShareholders] Batch fetch skipped: exchange=%s reason=no_request_symbols",
+                exchange,
+            )
             return []
 
         holder_count_rows = self._load_latest_holder_count_rows(akshare, symbols)
         control_rows = self._load_control_holder_rows(akshare, symbols)
+        _logger.info(
+            "[CninfoShareholders] Source tables loaded: exchange=%s symbols=%s holder_count_rows=%s control_rows=%s elapsed=%.1fs",
+            exchange,
+            len(symbols),
+            len(holder_count_rows),
+            len(control_rows),
+            time.monotonic() - started_at,
+        )
 
         snapshots: List[ShareholderSnapshot] = []
-        for instrument in target_instruments:
+        for index, instrument in enumerate(target_instruments, start=1):
             symbol = str(instrument.get("symbol") or "").strip()
             if not symbol:
+                _logger.debug(
+                    "[CninfoShareholders] Instrument skipped: exchange=%s index=%s/%s instrument_id=%s reason=missing_symbol",
+                    exchange,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                )
                 continue
             request_symbols = self._request_symbol_candidates(instrument, exchange)
             holder_count_row = self._first_row_for_symbols(
@@ -87,6 +117,40 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
             )
             if snapshot is not None:
                 snapshots.append(snapshot)
+                _logger.debug(
+                    "[CninfoShareholders] Instrument resolved: exchange=%s index=%s/%s instrument_id=%s request_symbols=%s coverage=%s",
+                    exchange,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                    request_symbols,
+                    snapshot.snapshot_json.get("coverage_scope", []),
+                )
+            else:
+                _logger.debug(
+                    "[CninfoShareholders] Instrument unresolved: exchange=%s index=%s/%s instrument_id=%s request_symbols=%s",
+                    exchange,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                    request_symbols,
+                )
+            if index % 500 == 0:
+                _logger.info(
+                    "[CninfoShareholders] Batch progress: exchange=%s processed=%s/%s snapshots=%s elapsed=%.1fs",
+                    exchange,
+                    index,
+                    len(target_instruments),
+                    len(snapshots),
+                    time.monotonic() - started_at,
+                )
+        _logger.info(
+            "[CninfoShareholders] Batch fetch finished: exchange=%s instruments=%s snapshots=%s elapsed=%.1fs",
+            exchange,
+            len(target_instruments),
+            len(snapshots),
+            time.monotonic() - started_at,
+        )
         return snapshots
 
     def _load_latest_holder_count_rows(

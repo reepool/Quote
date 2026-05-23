@@ -100,7 +100,7 @@
         }
       },
       "shareholders": {
-        "enabled": true,
+        "enabled": false,
         "delivery_mode": "paid_high_availability",
         "optional_empty_exchanges": [
           "BSE"
@@ -119,6 +119,7 @@
         ],
         "same_source_recovery_batch_size": 1,
         "same_source_recovery_max_instruments": 20,
+        "skip_same_source_full_fallback_after_success": true,
         "snapshot_api_requires_mode": "paid_high_availability",
         "note": "Shareholders are enabled for local standardized snapshot/API reads under paid_high_availability. Shareholder refresh uses weekly full sync; cninfo:direct is force-merged for actual-controller clues. BSE remains optional-empty in readiness targets even though current snapshots are populated."
       },

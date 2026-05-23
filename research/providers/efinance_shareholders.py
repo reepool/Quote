@@ -6,12 +6,17 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import logging
+import time
 from datetime import date, datetime
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 
 from .base import BaseShareholderProvider, ShareholderSnapshot
+
+
+_logger = logging.getLogger("DataManager")
 
 
 class EfinanceShareholdersProvider(BaseShareholderProvider):
@@ -91,12 +96,37 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
         exchange: str,
         mode: str,
     ) -> List[ShareholderSnapshot]:
+        started_at = time.monotonic()
+        _logger.info(
+            "[EfinanceShareholders] Batch fetch started: exchange=%s mode=%s instruments=%s",
+            exchange,
+            mode,
+            len(target_instruments),
+        )
         snapshots: List[ShareholderSnapshot] = []
-        for instrument in target_instruments:
+        for index, instrument in enumerate(target_instruments, start=1):
             symbol = str(instrument.get("symbol") or "").strip()
             if not symbol:
+                _logger.debug(
+                    "[EfinanceShareholders] Instrument skipped: exchange=%s mode=%s index=%s/%s instrument_id=%s reason=missing_symbol",
+                    exchange,
+                    mode,
+                    index,
+                    len(target_instruments),
+                    instrument.get("instrument_id"),
+                )
                 continue
 
+            instrument_started_at = time.monotonic()
+            _logger.debug(
+                "[EfinanceShareholders] Instrument fetch started: exchange=%s mode=%s index=%s/%s instrument_id=%s symbol=%s",
+                exchange,
+                mode,
+                index,
+                len(target_instruments),
+                instrument.get("instrument_id"),
+                symbol,
+            )
             holder_count_payload = self._fetch_holder_count_payload(symbol)
             top_holders_payload = self._fetch_top_holders_payload(symbol)
             snapshot = self._build_snapshot(
@@ -108,6 +138,40 @@ class EfinanceShareholdersProvider(BaseShareholderProvider):
             )
             if snapshot is not None:
                 snapshots.append(snapshot)
+                _logger.debug(
+                    "[EfinanceShareholders] Instrument fetch finished: exchange=%s mode=%s instrument_id=%s coverage=%s elapsed=%.2fs",
+                    exchange,
+                    mode,
+                    instrument.get("instrument_id"),
+                    snapshot.snapshot_json.get("coverage_scope", []),
+                    time.monotonic() - instrument_started_at,
+                )
+            else:
+                _logger.debug(
+                    "[EfinanceShareholders] Instrument fetch produced no snapshot: exchange=%s mode=%s instrument_id=%s elapsed=%.2fs",
+                    exchange,
+                    mode,
+                    instrument.get("instrument_id"),
+                    time.monotonic() - instrument_started_at,
+                )
+            if index % 100 == 0:
+                _logger.info(
+                    "[EfinanceShareholders] Batch progress: exchange=%s mode=%s processed=%s/%s snapshots=%s elapsed=%.1fs",
+                    exchange,
+                    mode,
+                    index,
+                    len(target_instruments),
+                    len(snapshots),
+                    time.monotonic() - started_at,
+                )
+        _logger.info(
+            "[EfinanceShareholders] Batch fetch finished: exchange=%s mode=%s instruments=%s snapshots=%s elapsed=%.1fs",
+            exchange,
+            mode,
+            len(target_instruments),
+            len(snapshots),
+            time.monotonic() - started_at,
+        )
         return snapshots
 
     def _fetch_holder_count_payload(self, symbol: str) -> Any:

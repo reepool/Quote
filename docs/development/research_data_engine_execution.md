@@ -65,6 +65,7 @@
 - 将研究域默认 source policy 固化为“稳定免费 -> 稳定付费 -> 免费不稳定补充”
 - 对所有研究域，统一遵循“1. 稳定+免费，2. 稳定+收费，3. 不稳定+免费补充”的 source priority
 - 保持研究域读取链路本地优先，不在请求时依赖外部源
+- 当前研究、财务和最新快照类写入任务在解析 `instruments.is_active` 股票池前，统一经过 `DataManager.ensure_instrument_master_fresh()` 主数据治理入口；该入口复用行情系统已有 `sync_instrument_master()`，不另建研究/财务专用股票字典逻辑
 - 将 `BSE` 保留在 research universe 内；对暂不具备稳定上游覆盖的模块，允许按 `optional_empty_exchanges=["BSE"]` 返回空占位结果
 - 为后续行业、股东、完整财务报表、估值、风险等模块预留统一扩展面
 

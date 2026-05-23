@@ -74,6 +74,10 @@ class ReportFormatter:
                     eval_locals['non_trading_day'] = False
                 if 'status' not in eval_locals:
                     eval_locals['status'] = 'success'
+                if 'instrument_master_governance_summary' not in eval_locals:
+                    eval_locals['instrument_master_governance_summary'] = ''
+                if 'instrument_master_sync_summary' not in eval_locals:
+                    eval_locals['instrument_master_sync_summary'] = ''
                 if not eval(condition, {}, eval_locals):
                     return ""  # 条件不满足，不渲染此段落
             except Exception as e:

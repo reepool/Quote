@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, Mock, patch
 
 import pandas as pd
@@ -31,7 +32,10 @@ def _build_mock_config(tmp_path, *, research_enabled: bool = True):
     def _get_nested(path, default=None):
         mapping = {
             "telegram_config.enabled": False,
-            "data_config": {"data_dir": str(tmp_path)},
+            "data_config": {
+                "data_dir": str(tmp_path),
+                "instrument_master_governance": {"enabled": False},
+            },
         }
         return mapping.get(path, default)
 
@@ -89,7 +93,7 @@ def test_data_manager_bootstraps_research_storage_when_enabled(tmp_path):
     with patch("data_manager.config_manager", mock_config):
         manager = DataManager()
 
-    with patch("research.ResearchStorageManager") as storage_cls:
+    with patch("research.storage.ResearchStorageManager") as storage_cls:
         storage_instance = Mock()
         storage_cls.return_value = storage_instance
 
@@ -106,7 +110,7 @@ def test_data_manager_research_storage_init_failure_does_not_raise(tmp_path):
     with patch("data_manager.config_manager", mock_config):
         manager = DataManager()
 
-    with patch("research.ResearchStorageManager") as storage_cls:
+    with patch("research.storage.ResearchStorageManager") as storage_cls:
         storage_instance = Mock()
         storage_instance.initialize.side_effect = RuntimeError("boom")
         storage_cls.return_value = storage_instance
@@ -272,7 +276,7 @@ def test_data_manager_run_company_profile_shadow_sync_delegates_to_service(tmp_p
 
     manager.research_storage = object()
 
-    with patch("research.CompanyProfileShadowSyncService") as service_cls:
+    with patch("research.company_profile_sync.CompanyProfileShadowSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -312,7 +316,7 @@ def test_data_manager_run_financial_summary_shadow_sync_delegates_to_service(tmp
 
     manager.research_storage = object()
 
-    with patch("research.FinancialSummaryShadowSyncService") as service_cls:
+    with patch("research.financial_summary_sync.FinancialSummaryShadowSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -326,6 +330,43 @@ def test_data_manager_run_financial_summary_shadow_sync_delegates_to_service(tmp
 
     assert result["status"] == "success"
     service_cls.assert_called_once()
+
+
+def test_data_manager_financial_summary_sync_attaches_master_governance(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+    manager.ensure_instrument_master_fresh = AsyncMock(
+        return_value={
+            "status": "fresh",
+            "action": "reused_fresh_master",
+            "summary": {"active_count": 1},
+            "warnings": [],
+            "errors": [],
+        }
+    )
+
+    with patch("research.financial_summary_sync.FinancialSummaryShadowSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_financial_summary_shadow_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+            )
+        )
+
+    manager.ensure_instrument_master_fresh.assert_awaited_once_with(
+        ["SSE"],
+        job_name="financial_summary_shadow_sync",
+        job_type="current",
+    )
+    assert result["instrument_master_governance"]["status"] == "fresh"
 
 
 def test_data_manager_run_shareholder_shadow_sync_returns_unavailable_without_storage(tmp_path):
@@ -358,7 +399,7 @@ def test_data_manager_run_shareholder_shadow_sync_delegates_to_service(tmp_path)
 
     manager.research_storage = object()
 
-    with patch("research.ShareholderShadowSyncService") as service_cls:
+    with patch("research.shareholder_sync.ShareholderShadowSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -444,7 +485,7 @@ def test_data_manager_run_industry_shadow_sync_delegates_to_service(tmp_path):
 
     manager.research_storage = object()
 
-    with patch("research.IndustryShadowSyncService") as service_cls:
+    with patch("research.industry_sync.IndustryShadowSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -490,7 +531,7 @@ def test_data_manager_run_industry_standard_sync_delegates_to_service(tmp_path):
 
     manager.research_storage = object()
 
-    with patch("research.IndustryStandardSyncService") as service_cls:
+    with patch("research.industry_standard_sync.IndustryStandardSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -724,7 +765,7 @@ def test_data_manager_run_industry_official_mapping_refresh_delegates_to_service
 
     manager.research_storage = object()
 
-    with patch("research.IndustryStandardSyncService") as service_cls:
+    with patch("research.industry_standard_sync.IndustryStandardSyncService") as service_cls:
         service_instance = Mock()
         service_instance.refresh_official_mapping_cache = AsyncMock(
             return_value={"status": "success"}
@@ -778,7 +819,7 @@ def test_data_manager_run_valuation_history_rebuild_delegates_to_service(tmp_pat
 
     manager.research_storage = object()
 
-    with patch("research.ValuationHistoryRebuildService") as service_cls:
+    with patch("research.valuation_history_sync.ValuationHistoryRebuildService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -824,7 +865,7 @@ def test_data_manager_run_analyst_forecast_shadow_sync_delegates_to_service(tmp_
 
     manager.research_storage = object()
 
-    with patch("research.AnalystForecastShadowSyncService") as service_cls:
+    with patch("research.analyst_forecast_sync.AnalystForecastShadowSyncService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -870,7 +911,7 @@ def test_data_manager_run_risk_snapshot_rebuild_delegates_to_service(tmp_path):
 
     manager.research_storage = object()
 
-    with patch("research.RiskSnapshotRebuildService") as service_cls:
+    with patch("research.risk_snapshot_sync.RiskSnapshotRebuildService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(return_value={"status": "success"})
         service_cls.return_value = service_instance
@@ -2128,11 +2169,12 @@ def test_data_manager_get_research_industry_standard_readiness_reports_blockers(
         "mapped": 2,
         "unmapped": 1,
     }
+    recent_ts = datetime.now(timezone(timedelta(hours=8))).isoformat()
     storage.get_latest_official_industry_code_mapping_cache_info.return_value = {
         "source": "akshare",
         "source_mode": "proxy_patch",
-        "built_at": "2026-04-19T12:00:00+08:00",
-        "updated_at": "2026-04-19T12:00:00+08:00",
+        "built_at": recent_ts,
+        "updated_at": recent_ts,
     }
     storage.summarize_official_industry_classifications.return_value = {
         "total": 2,
@@ -2825,7 +2867,7 @@ def test_data_manager_get_research_company_overview_delegates_to_query_service(t
 
     manager.research_storage = object()
 
-    with patch("research.ResearchQueryService") as service_cls:
+    with patch("research.query_service.ResearchQueryService") as service_cls:
         service_instance = Mock()
         service_instance.get_company_overview.return_value = {
             "instrument_id": "600000.SH",
@@ -2885,7 +2927,7 @@ def test_data_manager_returns_optional_empty_bse_collection_payloads_and_overvie
         }
     )
 
-    with patch("research.ResearchQueryService") as service_cls:
+    with patch("research.query_service.ResearchQueryService") as service_cls:
         service_instance = Mock()
         service_instance.get_latest_analyst_forecast.return_value = None
         service_instance.list_research_reports.return_value = []
@@ -2969,7 +3011,7 @@ def test_data_manager_get_research_technical_summary_delegates_to_service(tmp_pa
     )
     manager.get_cached_adjustment_factors = AsyncMock(return_value=[])
 
-    with patch("research.ResearchTechnicalAnalysisService") as service_cls:
+    with patch("research.technical_service.ResearchTechnicalAnalysisService") as service_cls:
         service_instance = Mock()
         service_instance.build_summary.return_value = {
             "instrument_id": "600000.SH",
@@ -3094,7 +3136,7 @@ def test_data_manager_run_technical_snapshot_refresh_delegates_to_service(tmp_pa
 
     manager.research_storage = Mock()
 
-    with patch("research.TechnicalIndicatorLatestRefreshService") as service_cls:
+    with patch("research.technical_snapshot_sync.TechnicalIndicatorLatestRefreshService") as service_cls:
         service_instance = Mock()
         service_instance.sync = AsyncMock(
             return_value={"status": "success", "total_rows_written": 1}
@@ -3174,7 +3216,7 @@ def test_data_manager_get_research_technical_indicators_delegates_to_service(tmp
     )
     manager.get_cached_adjustment_factors = AsyncMock(return_value=[])
 
-    with patch("research.ResearchTechnicalAnalysisService") as service_cls:
+    with patch("research.technical_service.ResearchTechnicalAnalysisService") as service_cls:
         service_instance = Mock()
         service_instance.build_indicator_series.return_value = {
             "instrument_id": "600000.SH",

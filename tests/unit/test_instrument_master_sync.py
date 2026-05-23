@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 import pytest
@@ -158,3 +158,130 @@ async def test_daily_update_runs_master_sync_before_active_instrument_read():
     assert events[:2] == ['sync', 'get_active']
     assert result['instrument_master_sync']['status'] == 'success'
     manager.sync_instrument_master.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_governance_reuses_fresh_master_without_sync():
+    manager = _manager()
+    recent_ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            'instrument_id': '600000.SH',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'baostock',
+            'updated_at': recent_ts,
+        }
+    ])
+    manager.sync_instrument_master = AsyncMock()
+
+    result = await manager.ensure_instrument_master_fresh(
+        ['SSE'],
+        job_name='financial_summary_shadow_sync',
+    )
+
+    assert result['status'] == 'fresh'
+    assert result['action'] == 'reused_fresh_master'
+    assert result['summary']['active_count'] == 1
+    manager.sync_instrument_master.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_governance_forced_refresh_uses_existing_master_sync():
+    manager = _manager()
+    recent_ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[
+        {
+            'instrument_id': '600000.SH',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'baostock',
+            'updated_at': recent_ts,
+        }
+    ])
+    manager.sync_instrument_master = AsyncMock(return_value={
+        'status': 'success',
+        'summary': {'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 1},
+        'exchanges': {},
+        'warnings': [],
+        'errors': [],
+    })
+
+    result = await manager.ensure_instrument_master_fresh(
+        ['SSE'],
+        job_name='daily_data_update',
+        force_refresh=True,
+    )
+
+    assert result['action'] == 'synced'
+    manager.sync_instrument_master.assert_awaited_once_with(
+        ['SSE'],
+        include_pytdx_validation=False,
+        timeout_sec=30,
+        freshness_threshold_hours=48,
+    )
+
+
+@pytest.mark.asyncio
+async def test_governance_skips_unsupported_market():
+    manager = _manager()
+    manager.sync_instrument_master = AsyncMock()
+
+    result = await manager.ensure_instrument_master_fresh(
+        ['HKEX'],
+        job_name='company_profile_shadow_sync',
+    )
+
+    assert result['status'] == 'skipped'
+    assert result['reason'] == 'no_supported_exchange_in_update_scope'
+    assert result['unsupported_exchanges'] == ['HKEX']
+    manager.sync_instrument_master.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_governance_skips_historical_job_by_default():
+    manager = _manager()
+    manager.sync_instrument_master = AsyncMock()
+
+    result = await manager.ensure_instrument_master_fresh(
+        ['SSE'],
+        job_name='valuation_history_rebuild',
+        job_type='historical',
+        target_date=date.today() - timedelta(days=3),
+    )
+
+    assert result['status'] == 'skipped'
+    assert result['reason'] == 'historical_current_master_governance_skipped'
+    manager.sync_instrument_master.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_governance_failure_continuation_policy():
+    manager = _manager()
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(return_value=[])
+    manager.sync_instrument_master = AsyncMock(return_value={
+        'status': 'error',
+        'summary': {},
+        'exchanges': {},
+        'warnings': [],
+        'errors': ['boom'],
+    })
+
+    result = await manager.ensure_instrument_master_fresh(
+        ['SSE'],
+        job_name='financial_summary_shadow_sync',
+        continue_on_failure=True,
+    )
+
+    assert result['status'] == 'error'
+    assert result['continued_on_failure'] is True
+
+    with pytest.raises(RuntimeError):
+        await manager.ensure_instrument_master_fresh(
+            ['SSE'],
+            job_name='financial_summary_shadow_sync',
+            continue_on_failure=False,
+        )
