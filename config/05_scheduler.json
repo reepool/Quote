@@ -208,8 +208,8 @@
         "pre_run_notify": true,
         "trigger": {
           "type": "cron",
-          "day": 1,
-          "hour": 3,
+          "day": 2,
+          "hour": 11,
           "minute": 0,
           "second": 0
         },
@@ -264,8 +264,8 @@
           "type": "cron",
           "month": "3,6,9,12",
           "day": "last",
-          "hour": 4,
-          "minute": 0,
+          "hour": 14,
+          "minute": 30,
           "second": 0
         },
         "max_instances": 1,
@@ -335,8 +335,8 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "sat",
-          "hour": 6,
-          "minute": 0,
+          "hour": 3,
+          "minute": 30,
           "second": 0
         },
         "max_instances": 1,
@@ -463,7 +463,7 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-fri",
-          "hour": 8,
+          "hour": 10,
           "minute": 45,
           "second": 0
         },
@@ -628,7 +628,7 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "sat",
-          "hour": 7,
+          "hour": 12,
           "minute": 30,
           "second": 0
         },

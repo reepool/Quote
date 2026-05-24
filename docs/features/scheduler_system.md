@@ -22,6 +22,26 @@
 - **研究域股东维护**：每日公告驱动增量检查、周六 changed-only 周期复核，以及手工全量刷新入口
 - **数据库备份**：定期备份数据库文件
 
+### 2.1 生产错峰时间表
+
+除行情日更任务外，当前自动启用任务按业务域和写库压力错峰安排如下。轻量监控任务允许与其他任务重叠；长任务和同源研究域任务尽量保持独立窗口。
+
+| 任务 | 业务类型 | 当前时间 | 运行窗口/说明 |
+|---|---|---|---|
+| `system_health_check` | 监控 | 每小时 | 轻量检查，允许与其他任务并行 |
+| `trading_calendar_update` | 交易日历 | 每月 1 日 `01:00` | 月初轻量更新，早于月度修复 |
+| `weekly_data_maintenance` | 周维护 | 周日 `02:00` | 预留 5 小时，避开周日白天修复 |
+| `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
+| `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
+| `cache_warm_up` | 缓存 | 每日 `08:00` | 轻量预热，早于研究域写库任务 |
+| `industry_standard_sync` | 申万分类 | 每日 `08:30` | 预留 2 小时，先维护分类/归属基础层 |
+| `industry_index_analysis_sync` | 申万指数指标 | 周一至周五 `10:45` | 与申万分类同源，后移到分类窗口之后 |
+| `market_dependency_version_check` | 依赖检查 | 每日 `12:00` | 轻量网络检查 |
+| `monthly_data_integrity_check` | 月度完整性 | 每月 2 日 `11:00` | 避开 1 日交易日历和周日凌晨维护高峰 |
+| `shareholder_reconciliation_sync` | 股东周期复核 | 周六 `12:30` | 预留 5 小时，避开备份和申万任务 |
+| `quarterly_cleanup` | 季度清理 | 季度最后一天 `14:30` | 避开凌晨维护/备份窗口 |
+| `find_gap_and_repair` | 缺口修复 | 周日 `15:00` | 周维护完成后执行，预留 4 小时 |
+
 ### 3. 任务监控
 - **状态监控**：实时查看任务执行状态
 - **执行日志**：详细的任务执行记录
@@ -393,7 +413,7 @@ async def weekly_data_maintenance(self,
 | 任务 | 触发方式 | 是否全量读取 | 是否全量写入 | 主要用途 |
 |---|---|---:|---:|---|
 | `shareholder_incremental_sync` | 每日 `06:30` 自动，也可 `/run` | 否，只读取公告候选、缺失或 pending 标的 | 否，只写变化、缺失或 required scope 不完整标的 | 日常及时更新，覆盖季报/年报/半年报和权益变动类公告 |
-| `shareholder_reconciliation_sync` | 每周六 `07:30` 自动，也可 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 否，`changed_only`，本地 hash 和 required scope 相同则跳过 | 周期复核、补足历史缺口、捕捉 CNInfo data20 静默修正或公告漏识别 |
+| `shareholder_reconciliation_sync` | 每周六 `12:30` 自动，也可 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 否，`changed_only`，本地 hash 和 required scope 相同则跳过 | 周期复核、补足历史缺口、捕捉 CNInfo data20 静默修正或公告漏识别 |
 | `shareholder_shadow_sync` | 仅手工 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 是，`refresh_all` | 初始化、灾后修复、operator 明确要求的全量重写 |
 
 三者共用股东 provider 路由和 required scope 定义。区别在于候选范围和写入策略：每日增量先用公告缩小候选；周期复核全量读取但只写差异；手工全量刷新全量读取并刷新写入。
@@ -401,7 +421,7 @@ async def weekly_data_maintenance(self,
 ### 6.4 研究域股东摘要周期复核与补足 (shareholder_reconciliation_sync)
 
 #### 功能描述
-每周六 `07:30` 对 `SSE / SZSE / BSE` 做全量读取和本地 hash 对比，只写入结构化内容变化、本地缺失或 required scope 覆盖不完整的标的。这个任务用于兜底 CNInfo data20 静默修正、历史快照缺口和增量公告漏识别；它不做无差别全量重写。
+每周六 `12:30` 对 `SSE / SZSE / BSE` 做全量读取和本地 hash 对比，只写入结构化内容变化、本地缺失或 required scope 覆盖不完整的标的。这个任务用于兜底 CNInfo data20 静默修正、历史快照缺口和增量公告漏识别；它不做无差别全量重写。
 
 #### 变更判断
 1. **全量读取目标股票池**：与全量刷新一样读取 `SSE / SZSE / BSE` 活跃股票。
@@ -416,7 +436,7 @@ async def weekly_data_maintenance(self,
   "shareholder_reconciliation_sync": {
     "enabled": true,
     "description": "研究域股东摘要周期复核与补足",
-    "trigger": {"type": "cron", "day_of_week": "sat", "hour": 7, "minute": 30, "second": 0},
+    "trigger": {"type": "cron", "day_of_week": "sat", "hour": 12, "minute": 30, "second": 0},
     "parameters": {
       "exchanges": ["SSE", "SZSE", "BSE"],
       "limit_per_exchange": null,

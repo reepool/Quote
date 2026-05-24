@@ -1201,7 +1201,7 @@ technical readiness 接口会聚合：
     - `cninfo.stock_hold_num_cninfo(date=YYYYMMDD)` 可按季末报告期批量读取股东人数及持股集中度，适合作为报告期级别的官方口径交叉验证
     - 新增通用公告扫描能力不按单标的逐个查询公告，而是按 CNInfo 市场/栏目和时间窗口分页扫描公告元数据，支持按业务传入标题/分类/谓词过滤与独立水位；股东增量作为首个消费者，筛出相关公告后再对候选标的拉取 `holder_count / top10_holders / ownership_clues` 并做规范化 hash 比较；只有 hash 或覆盖范围变化才写入快照
     - `shareholder_incremental_sync` 默认每日 `06:30` 运行，写入 `cninfo_announcement_scan_state / cninfo_announcement_audit / shareholder_change_manifest` 以解释水位、候选、hash 和 pending recheck；同一批公告的 pending 截止时间固定为第一次进入 pending 的 `first_pending_at + pending_recheck_days`，不会因每日扫描滚动延长
-    - `shareholder_shadow_sync` 保留为 `manual_only=true` 的手工全量刷新、灾后补齐和抽样审计入口，不再作为常驻周六定时任务；该任务仍出现在 `/status` 中，展示为仅手工执行入口；每日任务承担增量发现与定向刷新，每周六 `07:30` 的 `shareholder_reconciliation_sync` 做全量读取 + changed-only hash 对比，只补写变化、缺失或 required scope 不完整标的
+    - `shareholder_shadow_sync` 保留为 `manual_only=true` 的手工全量刷新、灾后补齐和抽样审计入口，不再作为常驻周六定时任务；该任务仍出现在 `/status` 中，展示为仅手工执行入口；每日任务承担增量发现与定向刷新，每周六 `12:30` 的 `shareholder_reconciliation_sync` 做全量读取 + changed-only hash 对比，只补写变化、缺失或 required scope 不完整标的
   - 前十大股东当前仍缺少足够轻量的全市场变更清单：
     - 当前主链依赖 `akshare.stock_main_stock_holder(stock=...)`，本质是按单标的读取新浪财经主要股东历史数据
     - 不建议对全 A+BSE 每日全量刷新 `top10_holders`；调度层已将 shareholders 固定为每日公告驱动增量检查和周六 changed-only 周期复核，`shareholder_shadow_sync` 仅作为手工全量刷新入口，默认不设置 `limit_per_exchange`
@@ -1223,7 +1223,7 @@ technical readiness 接口会聚合：
     - `scheduler.jobs.shareholder_shadow_sync.enabled = true`
     - `scheduler.jobs.shareholder_shadow_sync.manual_only = true`
     - `scheduler.jobs.shareholder_reconciliation_sync.enabled = true`
-  - 当前全量刷新策略：`shareholder_shadow_sync` 仅手工触发，`SSE / SZSE / BSE` 全量刷新，`limit_per_exchange = null`，`max_runtime_seconds = 18000`；常驻调度改为每日 `06:30` 的 `shareholder_incremental_sync` 和每周六 `07:30` 的 `shareholder_reconciliation_sync`
+  - 当前全量刷新策略：`shareholder_shadow_sync` 仅手工触发，`SSE / SZSE / BSE` 全量刷新，`limit_per_exchange = null`，`max_runtime_seconds = 18000`；常驻调度改为每日 `06:30` 的 `shareholder_incremental_sync` 和每周六 `12:30` 的 `shareholder_reconciliation_sync`
   - 三种股东更新任务的边界：
     - `shareholder_incremental_sync`：每日公告驱动增量检查，不逐标的扫描公告；只读取公告候选、缺失 required scope 和 pending recheck 标的；只写变化、缺失或覆盖不完整标的
     - `shareholder_reconciliation_sync`：每周六周期复核与补足，全量读取目标股票池，但按 `changed_only` 写入；本地 `snapshot_json` hash 和 required scope 相同则跳过
