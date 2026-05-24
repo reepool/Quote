@@ -134,7 +134,7 @@
 | 审计与运行记录 | 已完成 | `ingestion_runs`、`raw_payload_audit` 已落地 |
 | `company_profile` provider + sync + read | 已完成 | `BaoStock`、`PyTDX` 主备链和读取接口已落地；`BSE` 在无稳定上游时允许返回空占位结果 |
 | `financial_summary` provider + sync + read | 已完成 | `BaoStock`、`PyTDX` 主备链和读取接口已落地；`BSE` 在无稳定上游时允许返回空占位结果 |
-| `shareholders` provider + sync + gated read | 已完成并开放本地 API | 已落地股东摘要表、shadow sync、scheduler、gated API 与 readiness；当前配置为 `enabled=true / paid_high_availability`，采用 `AkShare proxy_patch` 主链，`cninfo:direct` 强制合并实控人线索，`akshare:direct / efinance:direct` 作为补充 fallback；同步逻辑已升级为“缺失标的 + 缺失 required scope 继续 fallback 并按 scope merge”；`BSE` 当前已落快照但 readiness 仍保留 optional-empty 保护 |
+| `shareholders` provider + sync + gated read | 已完成并开放本地 API | 已落地股东摘要表、shadow sync、scheduler、gated API 与 readiness；当前配置为 `enabled=true / paid_high_availability`，运行主链已调整为 `cninfo:direct` 官方结构化股东数据优先，`akshare:proxy_patch / akshare:direct / efinance:direct` 作为定向 fallback；同步逻辑已升级为“缺失标的 + 缺失 required scope 继续 fallback 并按 scope merge”；`BSE` 当前已落快照但 readiness 仍保留 optional-empty 保护 |
 | `industry` provider + sync + read | 已完成基线实现 | 行业参考层已完成；`BSE` 已纳入 optional-empty 口径，读取可返回空占位，`industry_standard_sync` 也不再因 `BSE` 空结果单独降级 |
 | `industry_standard` current membership + rollout readiness | 官方分类主源已落地，API 读路径已补齐 | 已以申万官方 `StockClassifyUse_stock.xls + SwClassCode_2021.xls` 作为 strict Shenwan 主源重建 taxonomy、classification history 和 latest membership；官方六位分类代码作为 taxonomy/membership 主标识；已补齐 taxonomy、stock membership、component-set API 读路径。若 `industry_component_sets` 物理缓存为空，component-set API 会从 authoritative `industry_memberships` 派生股票组合 |
 | `industry_index_analysis` provider + sync + read | 已完成存储/同步/API、日更、历史回补与补缺入口 | 已接入申万 `day_week_month_report` 最新日频指数分析指标，并接入与 AkShare `index_analysis_daily_sw` 同上游语义的历史日期区间回补源；两条链路均独立写入 `industry_index_analysis_daily`，并提供按 `sw_index_code`、日期区间、latest、taxonomy alias benchmark 的 API 读取；`2026-04-27` 完成 `2010-01-01` 至 `2026-04-24` 全量回补复核，主表 `1,104,548` 行；该表不反推股票分类 |
@@ -1196,13 +1196,15 @@ technical readiness 接口会聚合：
     - 但这仍然是样本级 live validation，不等于已经完成全市场或多轮次稳定性确认
     - 当前项目决策已明确：不再把继续扩大样本或全市场 shadow validation 作为后续推进前置；工程主线改为保持 `AkShare:proxy_patch` 导入主链，模块是否正式开放仍由 `delivery_mode / snapshot_api_requires_mode` 单独控制
 - `2026-04-27` 增量更新策略与 BSE 覆盖评估：
-  - 股东户数存在轻量变化检测路径，但当前工程策略已按业务要求统一收口为周更：
+  - 股东户数存在轻量变化检测路径；此前工程策略按业务要求统一收口为周更，但 `2026-05-23` 已新增 OpenSpec `add-shareholder-incremental-sync` 并落地通用 CNInfo 公告元数据扫描/过滤/水位模块，股东域已改造为“每日公告驱动增量检查 + 周期性/手工全量刷新”双模式：
     - `akshare.stock_zh_a_gdhs(symbol="最新")` 可一次返回当前全市场股东户数列表，现场探测返回 `5505` 行，其中 `920` 前缀 BSE-like 代码 `311` 行
     - `cninfo.stock_hold_num_cninfo(date=YYYYMMDD)` 可按季末报告期批量读取股东人数及持股集中度，适合作为报告期级别的官方口径交叉验证
-    - 当前不再单独实现日更变化检测任务；`holder_count / top10_holders / ownership_clues` 统一随 `shareholder_shadow_sync` 每周全量或手工全量运行刷新
+    - 新增通用公告扫描能力不按单标的逐个查询公告，而是按 CNInfo 市场/栏目和时间窗口分页扫描公告元数据，支持按业务传入标题/分类/谓词过滤与独立水位；股东增量作为首个消费者，筛出相关公告后再对候选标的拉取 `holder_count / top10_holders / ownership_clues` 并做规范化 hash 比较；只有 hash 或覆盖范围变化才写入快照
+    - `shareholder_incremental_sync` 默认每日 `06:30` 运行，写入 `cninfo_announcement_scan_state / cninfo_announcement_audit / shareholder_change_manifest` 以解释水位、候选、hash 和 pending recheck；同一批公告的 pending 截止时间固定为第一次进入 pending 的 `first_pending_at + pending_recheck_days`，不会因每日扫描滚动延长
+    - `shareholder_shadow_sync` 保留为 `manual_only=true` 的手工全量刷新、灾后补齐和抽样审计入口，不再作为常驻周六定时任务；该任务仍出现在 `/status` 中，展示为仅手工执行入口；每日任务承担增量发现与定向刷新，每周六 `07:30` 的 `shareholder_reconciliation_sync` 做全量读取 + changed-only hash 对比，只补写变化、缺失或 required scope 不完整标的
   - 前十大股东当前仍缺少足够轻量的全市场变更清单：
     - 当前主链依赖 `akshare.stock_main_stock_holder(stock=...)`，本质是按单标的读取新浪财经主要股东历史数据
-    - 不建议对全 A+BSE 每日全量刷新 `top10_holders`；调度层已将 shareholders 固定为周六全量 shadow sync，默认不设置 `limit_per_exchange`
+    - 不建议对全 A+BSE 每日全量刷新 `top10_holders`；调度层已将 shareholders 固定为每日公告驱动增量检查和周六 changed-only 周期复核，`shareholder_shadow_sync` 仅作为手工全量刷新入口，默认不设置 `limit_per_exchange`
   - BSE 数据源结论：
     - 北交所官网公开 `董监高及相关人员持股变动`，`akshare.stock_share_hold_change_bse(symbol=...)` 可返回结构化持股变动事件；现场样例 `430489` 返回 `8` 行
     - 该接口覆盖的是董监高及相关人员持股变动事件，不等价于标准化股东快照，不能补足 `holder_count / top10_holders`
@@ -1219,7 +1221,13 @@ technical readiness 接口会聚合：
     - `research.modules.shareholders.delivery_mode = paid_high_availability`
     - `research.modules.shareholders.snapshot_api_requires_mode = paid_high_availability`
     - `scheduler.jobs.shareholder_shadow_sync.enabled = true`
-  - 调度频率：每周六 `10:00`，`SSE / SZSE / BSE` 全量刷新，`limit_per_exchange = null`，`max_runtime_seconds = 7200`
+    - `scheduler.jobs.shareholder_shadow_sync.manual_only = true`
+    - `scheduler.jobs.shareholder_reconciliation_sync.enabled = true`
+  - 当前全量刷新策略：`shareholder_shadow_sync` 仅手工触发，`SSE / SZSE / BSE` 全量刷新，`limit_per_exchange = null`，`max_runtime_seconds = 18000`；常驻调度改为每日 `06:30` 的 `shareholder_incremental_sync` 和每周六 `07:30` 的 `shareholder_reconciliation_sync`
+  - 三种股东更新任务的边界：
+    - `shareholder_incremental_sync`：每日公告驱动增量检查，不逐标的扫描公告；只读取公告候选、缺失 required scope 和 pending recheck 标的；只写变化、缺失或覆盖不完整标的
+    - `shareholder_reconciliation_sync`：每周六周期复核与补足，全量读取目标股票池，但按 `changed_only` 写入；本地 `snapshot_json` hash 和 required scope 相同则跳过
+    - `shareholder_shadow_sync`：仅手工 `/run` 的全量刷新，`manual_only=true`，不注册自动 cron；用于初始化、灾后修复或明确需要全量重写的场景
   - 只读 readiness 复核命令：
     - `python scripts/research_shareholder_rollout_validation.py --exchanges SSE,SZSE,BSE --skip-sync --fail-on-not-ready`
   - 当前复核结果：

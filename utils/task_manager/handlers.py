@@ -43,6 +43,8 @@ class TaskManagerHandlers:
         message += "• `/detail <任务ID>` - 查看任务详情\n"
         message += "• `/run <任务ID>` - 立即执行任务\n"
         message += "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
+        message += "• `/run shareholder_reconciliation_sync` - 手工触发股东摘要周期复核与补足\n"
+        message += "• `/run shareholder_incremental_sync` - 手工触发股东摘要每日增量检查\n"
         message += "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
         message += "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
         message += "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
@@ -92,6 +94,8 @@ class TaskManagerHandlers:
             "• `/detail <任务ID>` - 查看任务详情\n"
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
+            "• `/run shareholder_reconciliation_sync` - 手工触发股东摘要周期复核与补足\n"
+            "• `/run shareholder_incremental_sync` - 手工触发股东摘要每日增量检查\n"
             "• `/backfill <日期|开始日期 结束日期> [交易所...]` - 补齐指定日期或日期范围的缺失数据\n"
             "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
             "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"
@@ -111,7 +115,9 @@ class TaskManagerHandlers:
             "• `quarterly_cleanup` - 季度数据清理\n"
             "• `cache_warm_up` - 缓存预热\n\n"
             "*研究域任务ID：*\n"
-            "• `shareholder_shadow_sync` - 股东摘要周更全量刷新\n"
+            "• `shareholder_shadow_sync` - 股东摘要手工全量刷新\n"
+            "• `shareholder_reconciliation_sync` - 股东摘要周期复核与补足\n"
+            "• `shareholder_incremental_sync` - 股东摘要每日增量检查\n"
             "• `industry_standard_sync` - 申万官方分类日更同步\n"
             "• `industry_standard_rebuild` - 申万官方分类全量重建\n"
             "• `industry_index_analysis_sync` - 申万指数分析日频同步\n"
@@ -128,6 +134,8 @@ class TaskManagerHandlers:
             "• `/run system_health_check`\n"
             "• `/run daily_data_update 2026-03-27`\n"
             "• `/run shareholder_shadow_sync`\n"
+            "• `/run shareholder_reconciliation_sync`\n"
+            "• `/run shareholder_incremental_sync`\n"
             "• `/backfill 2026-03-27`\n"
             "• `/backfill 2026-04-09 2026-05-21 SSE SZSE BSE`\n"
             "• `/backfill_factors HKEX full`\n"
@@ -672,6 +680,7 @@ class TaskManagerHandlers:
 
                     config_dict = {
                         'enabled': job_config.enabled,
+                        'manual_only': getattr(job_config, 'manual_only', False),
                         'description': job_config.description,
                         'trigger': trigger_dict,
                         'parameters': job_config.parameters,
@@ -1794,8 +1803,35 @@ class TaskManagerHandlers:
             self.task_manager.logger.info(f"[TaskManagerHandlers] 调度器中的可用任务: {available_jobs}")
 
             if job_id not in scheduler.jobs:
-                self.task_manager.logger.error(f"[TaskManagerHandlers] 任务 {job_id} 不在调度器中！可用任务: {available_jobs}")
-                return False
+                from scheduler.tasks import scheduled_tasks
+                from utils import config_manager
+
+                job_cfg = config_manager.get_nested(f'scheduler_config.jobs.{job_id}', {})
+                if not job_cfg.get('manual_only', False):
+                    self.task_manager.logger.error(f"[TaskManagerHandlers] 任务 {job_id} 不在调度器中！可用任务: {available_jobs}")
+                    return False
+
+                task_func = getattr(scheduled_tasks, job_id, None)
+                if task_func is None:
+                    self.task_manager.logger.error(f"[TaskManagerHandlers] 手工任务函数不存在: {job_id}")
+                    return False
+
+                params = dict(job_cfg.get('parameters', {}) or {})
+                max_runtime_seconds = params.pop('max_runtime_seconds', None)
+                job_config = self.task_manager.job_config_manager.get_job_config(job_id)
+                params['job_config'] = job_config
+                self.task_manager.logger.info(
+                    f"[TaskManagerHandlers] 直接执行 manual_only 任务: {job_id}, max_runtime_seconds={max_runtime_seconds}"
+                )
+                if max_runtime_seconds:
+                    result = await asyncio.wait_for(
+                        task_func(**params),
+                        timeout=max_runtime_seconds,
+                    )
+                else:
+                    result = await task_func(**params)
+                self.task_manager.logger.info(f"[TaskManagerHandlers] manual_only 任务执行结果: {job_id}, 成功: {result}")
+                return bool(result)
 
             success = await scheduler.run_job_now(job_id)
             self.task_manager.logger.info(f"[TaskManagerHandlers] 任务调度结果: {job_id}, 成功: {success}")

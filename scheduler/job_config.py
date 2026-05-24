@@ -21,6 +21,7 @@ class JobConfig:
     """任务配置数据类"""
     job_id: str
     enabled: bool
+    manual_only: bool
     description: str
     trigger: Any  # CronTrigger or IntervalTrigger
     max_instances: int
@@ -80,6 +81,7 @@ class JobConfigManager:
             job_config = JobConfig(
                 job_id=job_id,
                 enabled=job_data.get('enabled', True),
+                manual_only=bool(job_data.get('manual_only', False)),
                 description=job_data.get('description', ''),
                 trigger=trigger,
                 # 优先使用任务自身的配置，否则使用从SchedulerConfig对象中读取的全局默认值

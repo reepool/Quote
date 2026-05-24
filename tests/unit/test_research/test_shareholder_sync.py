@@ -328,6 +328,16 @@ async def test_shareholder_sync_writes_latest_snapshot(tmp_path):
     assert snapshot["holder_count"] == 123456
     assert snapshot["coverage_status"] == "reference_only"
 
+    second_result = await service.sync(
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        write_policy="changed_only",
+    )
+    assert second_result["status"] == "success"
+    assert second_result["write_policy"] == "changed_only"
+    assert second_result["total_snapshots_written"] == 0
+    assert second_result["exchanges"][0]["unchanged_instruments"] == 1
+
 
 @pytest.mark.asyncio
 async def test_shareholder_sync_degrades_when_no_provider_returns_rows(tmp_path):

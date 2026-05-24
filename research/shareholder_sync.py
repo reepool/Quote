@@ -35,6 +35,7 @@ class ShareholderExchangeSyncResult:
     missing_instruments: int = 0
     missing_instrument_ids: List[str] = field(default_factory=list)
     snapshots_written: int = 0
+    unchanged_instruments: int = 0
     error_message: Optional[str] = None
 
 
@@ -65,6 +66,7 @@ class ShareholderShadowSyncService:
         limit_per_exchange: Optional[int] = None,
         budget_mode: Optional[str] = None,
         allow_paid_proxy: Optional[bool] = None,
+        write_policy: str = "refresh_all",
     ) -> Dict[str, Any]:
         target_exchanges = exchanges or self.research_config.markets
         results: List[ShareholderExchangeSyncResult] = []
@@ -76,6 +78,7 @@ class ShareholderShadowSyncService:
                     limit_per_exchange=limit_per_exchange,
                     budget_mode=budget_mode,
                     allow_paid_proxy=allow_paid_proxy,
+                    write_policy=write_policy,
                 )
             )
 
@@ -86,6 +89,7 @@ class ShareholderShadowSyncService:
             "status": "success" if success_count else "degraded",
             "exchanges": [asdict(result) for result in results],
             "total_snapshots_written": total_written,
+            "write_policy": write_policy,
             "successful_exchanges": success_count,
             "attempted_exchanges": len(results),
         }
@@ -97,6 +101,7 @@ class ShareholderShadowSyncService:
         limit_per_exchange: Optional[int],
         budget_mode: Optional[str],
         allow_paid_proxy: Optional[bool],
+        write_policy: str,
     ) -> ShareholderExchangeSyncResult:
         instruments = await self.db_ops.get_instruments_by_exchange(exchange)
         stock_instruments = [
@@ -308,16 +313,17 @@ class ShareholderShadowSyncService:
                         snapshot,
                     )
                     merged_snapshots[snapshot.instrument_id] = merged_snapshot
-                    payload_hash = self._hash_payload(snapshot.raw_payload)
-                    self.storage.store_raw_payload(
-                        domain="shareholders",
-                        instrument_id=snapshot.instrument_id,
-                        source=snapshot.source,
-                        source_mode=snapshot.source_mode,
-                        payload=snapshot.raw_payload,
-                        payload_hash=payload_hash,
-                        ingestion_run_id=run_id,
-                    )
+                    if write_policy != "changed_only":
+                        payload_hash = self._hash_payload(snapshot.raw_payload)
+                        self.storage.store_raw_payload(
+                            domain="shareholders",
+                            instrument_id=snapshot.instrument_id,
+                            source=snapshot.source,
+                            source_mode=snapshot.source_mode,
+                            payload=snapshot.raw_payload,
+                            payload_hash=payload_hash,
+                            ingestion_run_id=run_id,
+                        )
 
                 if primary_source is None:
                     primary_source = candidate.source
@@ -357,6 +363,7 @@ class ShareholderShadowSyncService:
                         batch_size=recovery_batch_size,
                         max_instruments=recovery_max_instruments,
                         required_scope=required_scope,
+                        write_policy=write_policy,
                     )
                     recovery_attempted_instruments += recovery_result["attempted_instruments"]
                     recovery_resolved_instruments += recovery_result["resolved_instruments"]
@@ -376,7 +383,48 @@ class ShareholderShadowSyncService:
                 ]
 
             total_written = 0
+            unchanged_instruments = 0
+            existing_snapshots: Dict[str, Dict[str, Any]] = {}
+            if write_policy == "changed_only" and merged_snapshots:
+                existing_snapshots = self.storage.get_shareholder_snapshots(
+                    list(merged_snapshots.keys())
+                )
             for snapshot in merged_snapshots.values():
+                if write_policy == "changed_only":
+                    existing_snapshot = existing_snapshots.get(snapshot.instrument_id)
+                    existing_json = (
+                        existing_snapshot.get("snapshot")
+                        if existing_snapshot
+                        else None
+                    )
+                    existing_hash = (
+                        self._hash_payload(existing_json)
+                        if isinstance(existing_json, dict)
+                        else None
+                    )
+                    incoming_hash = self._hash_payload(snapshot.snapshot_json)
+                    existing_scope = {
+                        str(scope).strip()
+                        for scope in (
+                            (existing_json or {}).get("coverage_scope", [])
+                            if isinstance(existing_json, dict)
+                            else []
+                        )
+                        if str(scope).strip()
+                    }
+                    if existing_hash == incoming_hash and required_scope.issubset(existing_scope):
+                        unchanged_instruments += 1
+                        continue
+                    payload_hash = self._hash_payload(snapshot.raw_payload)
+                    self.storage.store_raw_payload(
+                        domain="shareholders",
+                        instrument_id=snapshot.instrument_id,
+                        source=snapshot.source,
+                        source_mode=snapshot.source_mode,
+                        payload=snapshot.raw_payload,
+                        payload_hash=payload_hash,
+                        ingestion_run_id=run_id,
+                    )
                 self.storage.upsert_shareholder_snapshot(
                     snapshot,
                     ingestion_run_id=run_id,
@@ -401,7 +449,11 @@ class ShareholderShadowSyncService:
                 resolved_instruments = len(stock_instruments) - len(missing_ids)
                 status = (
                     "success"
-                    if resolved_instruments == len(stock_instruments) and total_written > 0
+                    if resolved_instruments == len(stock_instruments)
+                    and (
+                        total_written > 0
+                        or (write_policy == "changed_only" and bool(merged_snapshots))
+                    )
                     else "degraded"
                 )
                 error_message = None
@@ -433,6 +485,8 @@ class ShareholderShadowSyncService:
                     "resolved_instruments": resolved_instruments,
                     "missing_instruments": len(missing_ids),
                     "missing_instrument_ids": missing_ids[:20],
+                    "write_policy": write_policy,
+                    "unchanged_instruments": unchanged_instruments,
                     "same_source_recovery_runs": recovery_runs,
                     "same_source_recovery_attempted_instruments": recovery_attempted_instruments,
                     "same_source_recovery_resolved_instruments": recovery_resolved_instruments,
@@ -460,6 +514,7 @@ class ShareholderShadowSyncService:
                 missing_instruments=len(missing_ids),
                 missing_instrument_ids=missing_ids[:20],
                 snapshots_written=total_written,
+                unchanged_instruments=unchanged_instruments,
                 error_message=error_message,
             )
 
@@ -532,6 +587,7 @@ class ShareholderShadowSyncService:
         batch_size: int,
         max_instruments: int,
         required_scope: Set[str],
+        write_policy: str,
     ) -> Dict[str, int]:
         recovery_targets = [
             instrument
@@ -584,16 +640,17 @@ class ShareholderShadowSyncService:
                     merged_snapshots.get(instrument_id),
                     snapshot,
                 )
-                payload_hash = self._hash_payload(snapshot.raw_payload)
-                self.storage.store_raw_payload(
-                    domain="shareholders",
-                    instrument_id=snapshot.instrument_id,
-                    source=snapshot.source,
-                    source_mode=snapshot.source_mode,
-                    payload=snapshot.raw_payload,
-                    payload_hash=payload_hash,
-                    ingestion_run_id=run_id,
-                )
+                if write_policy != "changed_only":
+                    payload_hash = self._hash_payload(snapshot.raw_payload)
+                    self.storage.store_raw_payload(
+                        domain="shareholders",
+                        instrument_id=snapshot.instrument_id,
+                        source=snapshot.source,
+                        source_mode=snapshot.source_mode,
+                        payload=snapshot.raw_payload,
+                        payload_hash=payload_hash,
+                        ingestion_run_id=run_id,
+                    )
 
         unresolved_after = sum(
             1

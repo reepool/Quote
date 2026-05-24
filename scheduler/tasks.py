@@ -140,6 +140,12 @@ def _format_shareholder_shadow_scheduler_report(
     successful_exchanges = int(result.get("successful_exchanges", 0) or 0)
     attempted_exchanges = int(result.get("attempted_exchanges", len(exchanges)) or 0)
     total_written = int(result.get("total_snapshots_written", 0) or 0)
+    write_policy = str(result.get("write_policy") or "refresh_all")
+    unchanged_total = sum(
+        int(exchange.get("unchanged_instruments", 0) or 0)
+        for exchange in exchanges
+        if isinstance(exchange, dict)
+    )
     missing_total = sum(
         int(exchange.get("missing_instruments", 0) or 0)
         for exchange in exchanges
@@ -160,8 +166,10 @@ def _format_shareholder_shadow_scheduler_report(
         f"结论: *{conclusion}*",
         "",
         f"状态: `{status}`",
+        f"写入策略: `{write_policy}`",
         f"交易所: {successful_exchanges}/{attempted_exchanges} 成功",
         f"本次写入/刷新快照: {total_written}",
+        f"本次无需改写快照: {unchanged_total}",
         f"本次未补齐标的: {missing_total}",
     ]
 
@@ -206,6 +214,7 @@ def _format_shareholder_shadow_scheduler_report(
         requested = int(exchange_result.get("requested_instruments", 0) or 0)
         resolved = int(exchange_result.get("resolved_instruments", 0) or 0)
         written = int(exchange_result.get("snapshots_written", 0) or 0)
+        unchanged = int(exchange_result.get("unchanged_instruments", 0) or 0)
         missing = int(exchange_result.get("missing_instruments", 0) or 0)
         attempted_sources = exchange_result.get("attempted_sources") or []
         successful_sources = exchange_result.get("successful_sources") or []
@@ -215,7 +224,7 @@ def _format_shareholder_shadow_scheduler_report(
             or "N/A"
         )
         lines.append(
-            f"• {exchange}: {exchange_status}，覆盖 {resolved}/{requested}，写入 {written}，缺口 {missing}"
+            f"• {exchange}: {exchange_status}，覆盖 {resolved}/{requested}，写入 {written}，未变 {unchanged}，缺口 {missing}"
         )
         lines.append(f"  来源: {source_text}")
         if attempted_sources:
@@ -227,6 +236,90 @@ def _format_shareholder_shadow_scheduler_report(
             lines.append(
                 "  未补齐样例: " + ", ".join(str(item) for item in missing_ids[:5])
             )
+
+    return "\n".join(lines)
+
+
+def _format_shareholder_incremental_scheduler_report(
+    result: Dict[str, Any],
+    readiness: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Build a clear operator-facing report for shareholder incremental sync."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    changed = int(result.get("changed_instruments", 0) or 0)
+    unchanged = int(result.get("unchanged_instruments", 0) or 0)
+    pending = int(result.get("pending_rechecks", 0) or 0)
+    failed = int(result.get("failed_instruments", 0) or 0)
+    candidates = int(result.get("candidate_instruments", 0) or 0)
+    written = int(result.get("snapshots_written", 0) or 0)
+    would_write = int(result.get("would_write_snapshots", 0) or 0)
+    dry_run = bool(result.get("dry_run", False))
+
+    if status == "success" and changed == 0 and failed == 0:
+        conclusion = "成功 - 已完成公告驱动增量检查，本次没有发现需要写入的股东快照变化。"
+    elif status in {"success", "degraded"}:
+        write_text = f"预计写入 {would_write}" if dry_run else f"写入 {written}"
+        conclusion = f"{label} - 本次检查候选 {candidates} 个，{write_text} 个，失败 {failed} 个。"
+    else:
+        conclusion = f"{label} - 股东增量检查失败或未完成。"
+
+    lines = [
+        f"{icon} *股东摘要每日增量检查*",
+        "",
+        "任务: `shareholder_incremental_sync`",
+        f"结论: *{conclusion}*",
+        "",
+        f"状态: `{status}`",
+        f"运行模式: {'dry_run' if dry_run else 'write'}",
+        f"公告扫描: pages={result.get('pages_scanned', 0)}，records={result.get('announcements_scanned', 0)}，selected={result.get('selected_announcements', 0)}",
+        f"候选标的: {candidates}",
+        f"变化写入: {written}",
+        f"未变化: {unchanged}",
+        f"待复查: {pending}",
+        f"失败: {failed}",
+    ]
+    if dry_run:
+        lines.append(f"dry_run 预计写入: {would_write}")
+
+    attempted_sources = result.get("attempted_sources") or []
+    successful_sources = result.get("successful_sources") or []
+    if attempted_sources or successful_sources:
+        lines.extend(
+            [
+                "",
+                "数据源:",
+                "尝试: " + (", ".join(str(item) for item in attempted_sources) or "N/A"),
+                "成功: " + (", ".join(str(item) for item in successful_sources) or "N/A"),
+            ]
+        )
+
+    if isinstance(readiness, dict):
+        ready = bool(readiness.get("ready_for_paid_high_availability_rollout"))
+        blockers = readiness.get("blockers") or []
+        lines.extend(
+            [
+                "",
+                f"readiness: {'ready' if ready else 'not_ready'}",
+                f"缺失快照: {int(readiness.get('missing_snapshot_count', 0) or 0)}",
+            ]
+        )
+        if blockers:
+            lines.append("blockers: " + "；".join(str(item) for item in blockers[:5]))
+
+    governance_summary = _format_instrument_master_governance_summary(
+        result.get("instrument_master_governance")
+    )
+    if governance_summary:
+        lines.extend(["", "证券主数据:", governance_summary])
+
+    failed_ids = result.get("failed_instrument_ids") or []
+    if failed_ids:
+        lines.extend(["", "失败样例: " + ", ".join(str(item) for item in failed_ids[:10])])
+
+    scan_errors = result.get("scan_errors") or []
+    if scan_errors:
+        lines.extend(["", "公告扫描异常: " + "；".join(str(item) for item in scan_errors[:3])])
 
     return "\n".join(lines)
 
@@ -1957,6 +2050,7 @@ class ScheduledTasks:
         limit_per_exchange: Optional[int] = None,
         budget_mode: Optional[str] = None,
         allow_paid_proxy: Optional[bool] = None,
+        write_policy: str = "refresh_all",
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """研究域 shareholders 影子同步任务。"""
@@ -1969,6 +2063,7 @@ class ScheduledTasks:
                 limit_per_exchange=limit_per_exchange,
                 budget_mode=budget_mode,
                 allow_paid_proxy=allow_paid_proxy,
+                write_policy=write_policy,
             )
             try:
                 readiness = await data_manager.get_research_shareholder_readiness()
@@ -2030,6 +2125,181 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('shareholder_shadow_sync')
+
+    async def shareholder_reconciliation_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        write_policy: str = "changed_only",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 shareholders 周期复核与补足任务。"""
+        self._active_tasks.add('shareholder_reconciliation_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting shareholder reconciliation sync...")
+
+            result = await data_manager.run_shareholder_shadow_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                write_policy=write_policy,
+            )
+            try:
+                readiness = await data_manager.get_research_shareholder_readiness()
+            except Exception as readiness_error:
+                scheduler_logger.warning(
+                    "[Scheduler] Failed to load shareholder readiness for reconciliation report: %s",
+                    readiness_error,
+                )
+                readiness = None
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '股东摘要周期复核与补足报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'content': _format_shareholder_shadow_scheduler_report(
+                    result,
+                    readiness,
+                ),
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"({exchange_result.get('source') or 'no-source'}, "
+                            f"write_policy={result.get('write_policy', write_policy)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='股东摘要周期复核与补足',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Shareholder reconciliation sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '股东摘要周期复核与补足报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'shareholder_reconciliation_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='股东摘要周期复核与补足',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('shareholder_reconciliation_sync')
+
+    async def shareholder_incremental_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages_per_market: Optional[int] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 shareholders 每日增量/变更检查任务。"""
+        self._active_tasks.add('shareholder_incremental_sync')
+        try:
+            scheduler_logger.info("[Scheduler] Starting shareholder incremental sync...")
+
+            result = await data_manager.run_shareholder_incremental_sync(
+                exchanges=exchanges,
+                lookback_days=lookback_days,
+                overlap_days=overlap_days,
+                page_size=page_size,
+                max_pages_per_market=max_pages_per_market,
+                max_candidates=max_candidates,
+                pending_recheck_days=pending_recheck_days,
+                budget_mode=budget_mode,
+                allow_paid_proxy=allow_paid_proxy,
+                dry_run=dry_run,
+            )
+            try:
+                readiness = await data_manager.get_research_shareholder_readiness()
+            except Exception as readiness_error:
+                scheduler_logger.warning(
+                    "[Scheduler] Failed to load shareholder readiness for incremental report: %s",
+                    readiness_error,
+                )
+                readiness = None
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+
+            report_data = {
+                'name': '股东摘要每日增量检查报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('changed_instruments', 0),
+                'duration': 'N/A',
+                'content': _format_shareholder_incremental_scheduler_report(
+                    result,
+                    readiness,
+                ),
+                'maintenance_tasks': [
+                    {
+                        'task_name': 'shareholder_incremental_sync',
+                        'status': (
+                            f"{status} "
+                            f"(candidates={result.get('candidate_instruments', 0)}, "
+                            f"written={result.get('snapshots_written', 0)})"
+                        ),
+                    }
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='股东摘要每日增量检查',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Shareholder incremental sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '股东摘要每日增量检查报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'shareholder_incremental_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='股东摘要每日增量检查',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('shareholder_incremental_sync')
 
     async def financial_statements_shadow_sync(
         self,

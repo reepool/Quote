@@ -76,6 +76,9 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "company_profiles" in tables
     assert "financial_summaries" in tables
     assert "shareholder_snapshots" in tables
+    assert "cninfo_announcement_scan_state" in tables
+    assert "cninfo_announcement_audit" in tables
+    assert "shareholder_change_manifest" in tables
     assert "financial_statements_raw" in tables
     assert "financial_source_files" in tables
     assert "financial_numeric_facts" in tables

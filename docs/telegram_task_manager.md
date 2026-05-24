@@ -85,7 +85,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 #### 任务控制命令
 - `/run <task_id>` - 立即执行指定任务
 - `/run daily_data_update <日期>` - 以补数据模式执行每日更新（跳过交易日检查）
-- `/run shareholder_shadow_sync` - 立即执行股东摘要周更任务，刷新本地 `shareholder_snapshots`
+- `/run shareholder_shadow_sync` - 手工执行股东摘要全量刷新，刷新本地 `shareholder_snapshots`
+- `/run shareholder_reconciliation_sync` - 立即执行股东摘要周期复核与补足，全量读取后只写变化或本地缺失/覆盖不完整标的
+- `/run shareholder_incremental_sync` - 立即执行股东摘要每日增量检查，公告驱动且有变化才写入
 - `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
 - `/backfill <开始日期> <结束日期> [交易所...]` - 以区间模式补充日期范围内缺失数据
 - `/industry_standard_sync [force]` - 申万官方分类日更同步；默认使用 source manifest，官方文件未变化时短路
@@ -104,6 +106,8 @@ python3 main.py api --host 0.0.0.0 --port 8000
 /run daily_data_update                   # 立即执行每日更新
 /run daily_data_update 2026-03-27        # 补充 3/27 的缺失数据
 /run shareholder_shadow_sync             # 手工触发股东摘要全量刷新
+/run shareholder_reconciliation_sync     # 手工触发股东摘要周期复核与补足
+/run shareholder_incremental_sync        # 手工触发股东摘要每日增量检查
 /backfill 2026-03-27                     # 补充 3/27 所有交易所数据
 /backfill 2026-03-27 SSE                 # 仅补充上交所 3/27 数据
 /backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # 一次性补充 A 股日期区间
@@ -120,7 +124,15 @@ python3 main.py api --host 0.0.0.0 --port 8000
 该脚本默认按“月份 + index_type”分块提交，适合直接给大日期范围；失败后可用同一命令重跑，已成功分块会通过主键 upsert 保持幂等。
 当某个月份出现分页 404、上游限流或局部缺口时，使用 `--chunk-frequency day` 做按日补缺；Telegram 对应参数为 `chunk=day`。`chunk=month` 适合全量或按年回补，`chunk=day` 适合修复少量缺失交易日。
 
-股东摘要当前没有单独的 Telegram 专用命令，使用通用 `/run shareholder_shadow_sync` 触发；常规更新由 scheduler 周六 `10:00` 自动执行。配置变更后使用 `/reload_config` 可刷新同进程内的 scheduler 与 `DataManager` 运行时配置；如果 API 是单独进程，需要重启 API 进程才能加载修改后的 research 配置。
+股东摘要当前没有单独的 Telegram 专用命令，使用通用 `/run shareholder_shadow_sync` 手工触发全量刷新，使用 `/run shareholder_reconciliation_sync` 触发周期复核与补足，使用 `/run shareholder_incremental_sync` 触发公告驱动增量检查。全量刷新任务在 scheduler 中配置为 `manual_only=true`，不会自动注册为周六定时任务，但仍会出现在 `/status` 中，状态为仅手工执行入口；周期复核默认周六 `07:30` 执行，全量读取后通过本地 `snapshot_json` hash 和 required scope 判断，只写变化、本地缺失或覆盖不完整标的；每日增量检查默认 `06:30` 执行。增量检查会按 CNInfo 市场/栏目和时间窗口扫描公告元数据，筛出候选标的后做结构化股东数据 hash 比较，只有变化或 required scope 缺失才写入快照；公告先到、data20 结构化数据滞后的候选会进入 5 个自然日 pending recheck，同一批公告的截止时间固定为第一次进入 pending 的时间加 `pending_recheck_days`，不会滚动延长。配置变更后使用 `/reload_config` 可刷新同进程内的 scheduler 与 `DataManager` 运行时配置；如果 API 是单独进程，需要重启 API 进程才能加载修改后的 research 配置。
+
+股东信息更新任务分工：
+
+| 任务 | 触发方式 | 读取范围 | 写入策略 |
+|---|---|---|---|
+| `shareholder_incremental_sync` | 每日 `06:30` / `/run` | CNInfo 公告候选、缺失 required scope、pending recheck 标的 | hash 变化、缺失或 required scope 不完整才写 |
+| `shareholder_reconciliation_sync` | 周六 `07:30` / `/run` | `SSE / SZSE / BSE` 全量活跃股票 | `changed_only`，本地 hash 和 required scope 相同则跳过 |
+| `shareholder_shadow_sync` | 仅 `/run` | `SSE / SZSE / BSE` 全量活跃股票 | `refresh_all`，用于手工全量刷新 |
 
 ### BotFather 命令映射
 

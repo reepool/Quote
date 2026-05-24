@@ -5506,6 +5506,407 @@ class ResearchStorageManager:
             if row["exchange"] is not None
         }
 
+    def get_shareholder_snapshots(
+        self,
+        instrument_ids: List[str],
+        *,
+        include_snapshot: bool = True,
+    ) -> Dict[str, Dict[str, Any]]:
+        """Fetch latest shareholder snapshots for a bounded instrument list."""
+        normalized_ids = [
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        ]
+        if not normalized_ids:
+            return {}
+
+        result: Dict[str, Dict[str, Any]] = {}
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for start in range(0, len(normalized_ids), 500):
+                batch = normalized_ids[start : start + 500]
+                placeholders = ",".join("?" for _ in batch)
+                rows = conn.execute(
+                    f"""
+                    SELECT
+                        instrument_id,
+                        symbol,
+                        exchange,
+                        coverage_status,
+                        holder_count,
+                        holder_count_report_date,
+                        top_holders_report_date,
+                        top_holders_count,
+                        top_holders_total_ratio,
+                        control_owner_name,
+                        control_owner_ratio,
+                        schema_version,
+                        source,
+                        source_mode,
+                        data_as_of,
+                        snapshot_json,
+                        ingestion_run_id,
+                        created_at,
+                        updated_at
+                    FROM shareholder_snapshots
+                    WHERE instrument_id IN ({placeholders})
+                    """,
+                    batch,
+                ).fetchall()
+                for row in rows:
+                    data = dict(row)
+                    snapshot_json = data.pop("snapshot_json", None)
+                    if include_snapshot:
+                        data["snapshot"] = self._deserialize_json(snapshot_json)
+                    result[str(data["instrument_id"])] = data
+        return result
+
+    def get_cninfo_announcement_scan_state(
+        self,
+        *,
+        purpose_key: str,
+        market: str,
+        column: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return the latest reusable CNInfo announcement scan state."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT *
+                FROM cninfo_announcement_scan_state
+                WHERE purpose_key = ? AND market = ? AND column_name = ?
+                LIMIT 1
+                """,
+                (purpose_key, market, column),
+            ).fetchone()
+        if row is None:
+            return None
+        item = dict(row)
+        item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+        return item
+
+    def upsert_cninfo_announcement_scan_state(
+        self,
+        *,
+        purpose_key: str,
+        market: str,
+        column: str,
+        last_watermark: Optional[str],
+        last_scan_started_at: Optional[str] = None,
+        last_scan_completed_at: Optional[str] = None,
+        pages_scanned: int = 0,
+        announcements_seen: int = 0,
+        selected_announcements: int = 0,
+        status: str = "success",
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Upsert reusable CNInfo announcement scan checkpoint state."""
+        now = get_shanghai_time().isoformat()
+        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO cninfo_announcement_scan_state (
+                    purpose_key,
+                    market,
+                    column_name,
+                    last_watermark,
+                    last_scan_started_at,
+                    last_scan_completed_at,
+                    pages_scanned,
+                    announcements_seen,
+                    selected_announcements,
+                    status,
+                    metadata_json,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(purpose_key, market, column_name)
+                DO UPDATE SET
+                    last_watermark = excluded.last_watermark,
+                    last_scan_started_at = excluded.last_scan_started_at,
+                    last_scan_completed_at = excluded.last_scan_completed_at,
+                    pages_scanned = excluded.pages_scanned,
+                    announcements_seen = excluded.announcements_seen,
+                    selected_announcements = excluded.selected_announcements,
+                    status = excluded.status,
+                    metadata_json = excluded.metadata_json,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    purpose_key,
+                    market,
+                    column,
+                    last_watermark,
+                    last_scan_started_at,
+                    last_scan_completed_at,
+                    int(pages_scanned or 0),
+                    int(announcements_seen or 0),
+                    int(selected_announcements or 0),
+                    status,
+                    metadata_json,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def store_cninfo_announcement_audit(
+        self,
+        *,
+        purpose_key: str,
+        announcement_id: str,
+        instrument_id: Optional[str],
+        symbol: Optional[str],
+        market: str,
+        column: str,
+        announcement_time: Optional[str],
+        title: str,
+        adjunct_url: Optional[str],
+        selection_reasons: List[str],
+        raw_payload: Dict[str, Any],
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Store selected CNInfo announcement metadata for audit."""
+        now = get_shanghai_time().isoformat()
+        reasons_json = json.dumps(selection_reasons or [], ensure_ascii=False, sort_keys=True)
+        raw_json = json.dumps(raw_payload or {}, ensure_ascii=False, sort_keys=True, default=str)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO cninfo_announcement_audit (
+                    purpose_key,
+                    announcement_id,
+                    instrument_id,
+                    symbol,
+                    market,
+                    column_name,
+                    announcement_time,
+                    title,
+                    adjunct_url,
+                    selection_reasons_json,
+                    raw_payload_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(purpose_key, announcement_id, instrument_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    market = excluded.market,
+                    column_name = excluded.column_name,
+                    announcement_time = excluded.announcement_time,
+                    title = excluded.title,
+                    adjunct_url = excluded.adjunct_url,
+                    selection_reasons_json = excluded.selection_reasons_json,
+                    raw_payload_json = excluded.raw_payload_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    purpose_key,
+                    announcement_id,
+                    instrument_id or "",
+                    symbol,
+                    market,
+                    column,
+                    announcement_time,
+                    title,
+                    adjunct_url,
+                    reasons_json,
+                    raw_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def get_shareholder_change_manifest(
+        self,
+        instrument_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return one shareholder incremental manifest row."""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT *
+                FROM shareholder_change_manifest
+                WHERE instrument_id = ?
+                LIMIT 1
+                """,
+                (instrument_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self._decode_shareholder_manifest_row(row)
+
+    def get_shareholder_change_manifests(
+        self,
+        instrument_ids: List[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Return shareholder incremental manifests for a bounded instrument list."""
+        normalized_ids = [
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        ]
+        if not normalized_ids:
+            return {}
+        result: Dict[str, Dict[str, Any]] = {}
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            for start in range(0, len(normalized_ids), 500):
+                batch = normalized_ids[start : start + 500]
+                placeholders = ",".join("?" for _ in batch)
+                rows = conn.execute(
+                    f"""
+                    SELECT *
+                    FROM shareholder_change_manifest
+                    WHERE instrument_id IN ({placeholders})
+                    """,
+                    batch,
+                ).fetchall()
+                for row in rows:
+                    item = self._decode_shareholder_manifest_row(row)
+                    result[str(item["instrument_id"])] = item
+        return result
+
+    def list_pending_shareholder_rechecks(
+        self,
+        *,
+        as_of: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return shareholder manifests still inside pending recheck horizon."""
+        as_of_value = as_of or get_shanghai_time().isoformat()
+        sql = """
+            SELECT *
+            FROM shareholder_change_manifest
+            WHERE status = 'pending_recheck'
+              AND pending_recheck_until IS NOT NULL
+              AND pending_recheck_until >= ?
+            ORDER BY pending_recheck_until ASC
+        """
+        params: List[Any] = [as_of_value]
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(sql, params).fetchall()
+        return [self._decode_shareholder_manifest_row(row) for row in rows]
+
+    def upsert_shareholder_change_manifest(
+        self,
+        *,
+        instrument_id: str,
+        symbol: str,
+        exchange: str,
+        content_hash: Optional[str],
+        top_holders_hash: Optional[str],
+        holder_count_hash: Optional[str],
+        ownership_hash: Optional[str],
+        latest_report_date: Optional[str],
+        coverage_scope: List[str],
+        status: str,
+        last_checked_at: Optional[str] = None,
+        last_changed_at: Optional[str] = None,
+        pending_recheck_until: Optional[str] = None,
+        last_announcement_time: Optional[str] = None,
+        reasons: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one shareholder incremental change-check manifest."""
+        now = get_shanghai_time().isoformat()
+        checked_at = last_checked_at or now
+        scope_json = json.dumps(coverage_scope or [], ensure_ascii=False, sort_keys=True)
+        reasons_json = json.dumps(reasons or [], ensure_ascii=False, sort_keys=True)
+        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True, default=str)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO shareholder_change_manifest (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    content_hash,
+                    top_holders_hash,
+                    holder_count_hash,
+                    ownership_hash,
+                    latest_report_date,
+                    coverage_scope_json,
+                    status,
+                    last_checked_at,
+                    last_changed_at,
+                    pending_recheck_until,
+                    last_announcement_time,
+                    reasons_json,
+                    metadata_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    content_hash = excluded.content_hash,
+                    top_holders_hash = excluded.top_holders_hash,
+                    holder_count_hash = excluded.holder_count_hash,
+                    ownership_hash = excluded.ownership_hash,
+                    latest_report_date = excluded.latest_report_date,
+                    coverage_scope_json = excluded.coverage_scope_json,
+                    status = excluded.status,
+                    last_checked_at = excluded.last_checked_at,
+                    last_changed_at = COALESCE(excluded.last_changed_at, shareholder_change_manifest.last_changed_at),
+                    pending_recheck_until = excluded.pending_recheck_until,
+                    last_announcement_time = excluded.last_announcement_time,
+                    reasons_json = excluded.reasons_json,
+                    metadata_json = excluded.metadata_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    content_hash,
+                    top_holders_hash,
+                    holder_count_hash,
+                    ownership_hash,
+                    latest_report_date,
+                    scope_json,
+                    status,
+                    checked_at,
+                    last_changed_at,
+                    pending_recheck_until,
+                    last_announcement_time,
+                    reasons_json,
+                    metadata_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def _decode_shareholder_manifest_row(self, row: sqlite3.Row) -> Dict[str, Any]:
+        item = dict(row)
+        item["coverage_scope"] = (
+            self._deserialize_json(item.pop("coverage_scope_json", None)) or []
+        )
+        item["reasons"] = self._deserialize_json(item.pop("reasons_json", None)) or []
+        item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+        return item
+
     def get_industry_membership(
         self,
         instrument_id: str,
@@ -7772,6 +8173,78 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_shareholder_snapshots_exchange_source
             ON shareholder_snapshots(exchange, source, updated_at);
+
+            CREATE TABLE IF NOT EXISTS cninfo_announcement_scan_state (
+                purpose_key TEXT NOT NULL,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                last_watermark TEXT,
+                last_scan_started_at TEXT,
+                last_scan_completed_at TEXT,
+                pages_scanned INTEGER NOT NULL DEFAULT 0,
+                announcements_seen INTEGER NOT NULL DEFAULT 0,
+                selected_announcements INTEGER NOT NULL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'success',
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (purpose_key, market, column_name)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_cninfo_announcement_scan_state_updated
+            ON cninfo_announcement_scan_state(purpose_key, updated_at);
+
+            CREATE TABLE IF NOT EXISTS cninfo_announcement_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                purpose_key TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL DEFAULT '',
+                symbol TEXT,
+                market TEXT NOT NULL,
+                column_name TEXT NOT NULL,
+                announcement_time TEXT,
+                title TEXT NOT NULL,
+                adjunct_url TEXT,
+                selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                raw_payload_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id),
+                UNIQUE(purpose_key, announcement_id, instrument_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_cninfo_announcement_audit_lookup
+            ON cninfo_announcement_audit(purpose_key, announcement_time, instrument_id);
+
+            CREATE TABLE IF NOT EXISTS shareholder_change_manifest (
+                instrument_id TEXT PRIMARY KEY,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                content_hash TEXT,
+                top_holders_hash TEXT,
+                holder_count_hash TEXT,
+                ownership_hash TEXT,
+                latest_report_date TEXT,
+                coverage_scope_json TEXT NOT NULL DEFAULT '[]',
+                status TEXT NOT NULL DEFAULT 'unknown',
+                last_checked_at TEXT,
+                last_changed_at TEXT,
+                pending_recheck_until TEXT,
+                last_announcement_time TEXT,
+                reasons_json TEXT NOT NULL DEFAULT '[]',
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_shareholder_change_manifest_status
+            ON shareholder_change_manifest(status, pending_recheck_until, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_shareholder_change_manifest_exchange
+            ON shareholder_change_manifest(exchange, last_checked_at);
 
             CREATE TABLE IF NOT EXISTS financial_statements_raw (
                 instrument_id TEXT NOT NULL,

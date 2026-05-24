@@ -119,6 +119,16 @@
         "same_source_recovery_batch_size": 1,
         "same_source_recovery_max_instruments": 20,
         "skip_same_source_full_fallback_after_success": true,
+        "incremental_sync": {
+          "enabled": true,
+          "lookback_days": 7,
+          "overlap_days": 2,
+          "page_size": 30,
+          "max_pages_per_market": 20,
+          "max_candidates": 300,
+          "pending_recheck_days": 5,
+          "note": "Daily shareholder incremental mode uses reusable CNInfo announcement scans to select candidate instruments, then writes snapshots only when normalized shareholder content hashes change or required scope is missing. Pending recheck is kept for five calendar days to absorb CNInfo announcement-vs-data20 structured-data lag across weekends and holidays. The same announcement set uses first_pending_at as a hard deadline anchor and is not extended by repeated daily scans."
+        },
         "snapshot_api_requires_mode": "paid_high_availability",
         "note": "Shareholder ingestion is enabled after bounded and full validation passed on 2026-05-23. The target route is cninfo:direct as primary, akshare:proxy_patch as high-availability backup, and direct AkShare/efinance only as last-resort references because Sina/Eastmoney shareholder endpoints can trigger anti-crawl refusal."
       },
@@ -840,6 +850,33 @@
           "retry_attempts": 3,
           "retry_backoff_seconds": 1.0,
           "note": "Uses CNInfo official data20 stockholderCapital structured endpoints for top-10 shareholders. Handles HTTP 200 logical rate-limit responses such as resultCode=429 with bounded backoff retries."
+        },
+        "announcement_scan": {
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "markets": {
+            "SSE": {
+              "market": "SSE",
+              "column": "sse",
+              "plate": "sh",
+              "tab_name": "fulltext"
+            },
+            "SZSE": {
+              "market": "SZSE",
+              "column": "szse",
+              "plate": "sz",
+              "tab_name": "fulltext"
+            },
+            "BSE": {
+              "market": "BSE",
+              "column": "neeq",
+              "plate": "bj",
+              "tab_name": "fulltext"
+            }
+          },
+          "note": "Reusable CNInfo announcement metadata scanner. Domain workflows provide their own filter rules and purpose-specific watermarks."
         },
         "financial_statements": {
           "enabled": false,

@@ -2873,6 +2873,7 @@ class DataManager:
         limit_per_exchange: Optional[int] = None,
         budget_mode: Optional[str] = None,
         allow_paid_proxy: Optional[bool] = None,
+        write_policy: str = "refresh_all",
     ) -> Dict[str, Any]:
         """运行 shareholders 影子同步。"""
         if not self.research_config.enabled:
@@ -2910,6 +2911,66 @@ class DataManager:
             limit_per_exchange=limit_per_exchange,
             budget_mode=budget_mode,
             allow_paid_proxy=allow_paid_proxy,
+            write_policy=write_policy,
+        )
+        return self._attach_instrument_master_governance(result, governance)
+
+    async def run_shareholder_incremental_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages_per_market: Optional[int] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        budget_mode: Optional[str] = None,
+        allow_paid_proxy: Optional[bool] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """运行 shareholders 每日增量/变更检查同步。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module_cfg = self.research_config.modules.get("shareholders", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research shareholders module is disabled",
+            }
+
+        from research.shareholder_incremental_sync import ShareholderIncrementalSyncService
+
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='shareholder_incremental_sync',
+        )
+        service = ShareholderIncrementalSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        result = await service.sync(
+            exchanges=exchanges,
+            lookback_days=lookback_days,
+            overlap_days=overlap_days,
+            page_size=page_size,
+            max_pages_per_market=max_pages_per_market,
+            max_candidates=max_candidates,
+            pending_recheck_days=pending_recheck_days,
+            budget_mode=budget_mode,
+            allow_paid_proxy=allow_paid_proxy,
+            dry_run=dry_run,
         )
         return self._attach_instrument_master_governance(result, governance)
 

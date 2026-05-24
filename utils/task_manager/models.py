@@ -156,9 +156,12 @@ class TaskStatusInfo:
         task_manager_logger.debug(f"[TaskManager] Determining task status for job {job_id}: {enabled}")
         in_scheduler = job_id in scheduler_data.get('jobs', {})
         task_manager_logger.debug(f"[TaskManager] Determining task status for job {job_id}: {in_scheduler}")
+        manual_only = bool(config_data.get('manual_only', False)) if config_data else False
 
         if not enabled:
             status = TaskStatus.DISABLED
+        elif manual_only and not in_scheduler:
+            status = TaskStatus.PAUSED
         elif not in_scheduler:
             status = TaskStatus.ERROR
         # 如果任务在调度器中，但没有下一次运行时间，则认为是暂停状态
@@ -170,7 +173,12 @@ class TaskStatusInfo:
 
         # 处理触发器信息
         trigger_info = None
-        if in_scheduler:
+        if manual_only and not in_scheduler:
+            trigger_info = TaskTriggerInfo(
+                trigger_type="manual",
+                description="仅手工执行",
+            )
+        elif in_scheduler:
             job_data = scheduler_data['jobs'][job_id]
             task_manager_logger.debug(f"[TaskManager] Getting trigger info for job {job_id}: {job_data}")
             # 这里需要实际的APScheduler Job对象来获取触发器信息

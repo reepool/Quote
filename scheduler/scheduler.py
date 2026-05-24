@@ -85,6 +85,11 @@ class TaskScheduler:
                     if not job_config.enabled:
                         scheduler_logger.info(f"[Scheduler] Job '{job_id}' is disabled, skipping scheduling.")
                         continue
+                    if getattr(job_config, 'manual_only', False):
+                        scheduler_logger.info(
+                            f"[Scheduler] Job '{job_id}' is manual-only, skipping automatic scheduling."
+                        )
+                        continue
 
                     # 获取任务函数
                     task_func = getattr(scheduled_tasks, job_id, None)

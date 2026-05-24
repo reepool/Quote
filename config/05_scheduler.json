@@ -593,6 +593,7 @@
       },
       "shareholder_shadow_sync": {
         "enabled": true,
+        "manual_only": true,
         "description": "研究域股东摘要影子同步",
         "report": true,
         "pre_run_notify": false,
@@ -615,7 +616,68 @@
           "limit_per_exchange": null,
           "budget_mode": "availability_first",
           "allow_paid_proxy": true,
+          "write_policy": "refresh_all",
           "max_runtime_seconds": 18000
+        }
+      },
+      "shareholder_reconciliation_sync": {
+        "enabled": true,
+        "description": "研究域股东摘要周期复核与补足",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 7,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "write_policy": "changed_only",
+          "max_runtime_seconds": 18000
+        }
+      },
+      "shareholder_incremental_sync": {
+        "enabled": true,
+        "description": "研究域股东摘要每日增量检查",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "hour": 6,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "lookback_days": 7,
+          "overlap_days": 2,
+          "page_size": 30,
+          "max_pages_per_market": 20,
+          "max_candidates": 300,
+          "pending_recheck_days": 5,
+          "budget_mode": "availability_first",
+          "allow_paid_proxy": true,
+          "dry_run": false,
+          "max_runtime_seconds": 3600
         }
       },
       "financial_statements_shadow_sync": {

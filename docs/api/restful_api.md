@@ -391,7 +391,17 @@ curl "http://localhost:8000/api/v1/research/shareholders/readiness"
 - `shareholders.enabled = true`
 - `delivery_mode = paid_high_availability`
 - `snapshot_api_requires_mode = paid_high_availability`
-- `shareholder_shadow_sync` 周六 `10:00` 全量刷新 `SSE / SZSE / BSE`
+- `shareholder_shadow_sync` 仅作为 Telegram `/run shareholder_shadow_sync` 手工全量刷新入口，不再常驻周六定时运行
+- `shareholder_reconciliation_sync` 每周六 `07:30` 做全量读取 + changed-only 复核，只补写变化、缺失或 required scope 不完整标的
+- `shareholder_incremental_sync` 每日 `06:30` 做 CNInfo 公告驱动增量检查，有变化才重写本地股东快照；公告先到而 data20 结构化数据未更新时进入 5 个自然日 pending recheck，且同一批公告不会滚动延长
+
+股东信息更新任务：
+
+| 任务 | 触发方式 | 对 API 数据的影响 |
+|---|---|---|
+| `shareholder_incremental_sync` | 每日 `06:30` / `/run` | 按公告候选定向刷新，变化或缺口才更新 `shareholder_snapshots` |
+| `shareholder_reconciliation_sync` | 周六 `07:30` / `/run` | 全量读取后做 changed-only 复核，补足静默变化或历史缺口 |
+| `shareholder_shadow_sync` | 仅 `/run` | 手工全量刷新 `shareholder_snapshots` |
 
 ---
 

@@ -19,6 +19,7 @@ from .query_service import ResearchQueryService
 from .research_report_sync import ResearchReportShadowSyncService
 from .risk_service import ResearchRiskService
 from .risk_snapshot_sync import RiskSnapshotRebuildService
+from .shareholder_incremental_sync import ShareholderIncrementalSyncService
 from .shareholder_sync import ShareholderShadowSyncService
 from .sentiment_event_sync import SentimentEventShadowSyncService
 from .technical_snapshot_sync import TechnicalIndicatorLatestRefreshService
@@ -42,6 +43,7 @@ __all__ = [
     "ResearchReportShadowSyncService",
     "ResearchRiskService",
     "RiskSnapshotRebuildService",
+    "ShareholderIncrementalSyncService",
     "ShareholderShadowSyncService",
     "SentimentEventShadowSyncService",
     "TechnicalIndicatorLatestRefreshService",

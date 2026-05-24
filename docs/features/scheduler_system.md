@@ -19,7 +19,7 @@
 - **数据维护**：每周数据备份和清理
 - **月度缺口检查**：按范围检测并修复缺口
 - **数据缺口检测与修复**：检测缺口并触发自动补齐
-- **研究域股东周更**：每周全量刷新本地股东摘要快照
+- **研究域股东维护**：每日公告驱动增量检查、周六 changed-only 周期复核，以及手工全量刷新入口
 - **数据库备份**：定期备份数据库文件
 
 ### 3. 任务监控
@@ -348,16 +348,21 @@ async def weekly_data_maintenance(self,
 2. **定向补齐**：仅对缺口标的调用 `industry_standard_sync`，通过 `instrument_ids_by_exchange` 缩小同步范围。
 3. **结果复核**：输出补齐前后 `missing_authoritative_membership_count` 与修复数量摘要。
 
-### 6.2 研究域股东摘要周更 (shareholder_shadow_sync)
+### 6.2 研究域股东摘要手工全量刷新 (shareholder_shadow_sync)
 
 #### 功能描述
-每周刷新本地 `shareholder_snapshots`，覆盖股东户数、前十大股东和股权结构线索。当前股东域已完成全量导入并开放本地 API，调度任务用于维持后续更新。
+手工全量刷新本地 `shareholder_snapshots`，覆盖股东户数、前十大股东和股权结构线索。当前股东域已完成全量导入并开放本地 API；常驻维护由每日增量和周期复核任务承担，全量刷新只作为 operator 显式补救入口。
+
+`2026-05-23` 已新增 OpenSpec `add-shareholder-incremental-sync` 并落地通用 CNInfo 公告元数据扫描/过滤/水位模块。`shareholder_shadow_sync` 保留为手工全量刷新/修复任务，不再作为常驻周六定时任务；`shareholder_incremental_sync` 作为每日公告驱动的股东增量检查任务。增量任务的目标不是每天逐标的全量读取股东详情，而是按 CNInfo 市场/栏目和时间窗口扫描公告元数据，筛选候选标的后再做结构化股东数据 hash 比较。
+
+`manual_only=true` 的任务仍保留在任务配置和 `/status` 中，但不会注册进 APScheduler 自动触发队列；状态展示为手工执行入口，可通过 `/run shareholder_shadow_sync` 执行。
 
 #### 当前配置
 ```json
 {
   "shareholder_shadow_sync": {
     "enabled": true,
+    "manual_only": true,
     "description": "研究域股东摘要影子同步",
     "trigger": {
       "type": "cron",
@@ -371,7 +376,8 @@ async def weekly_data_maintenance(self,
       "limit_per_exchange": null,
       "budget_mode": "availability_first",
       "allow_paid_proxy": true,
-      "max_runtime_seconds": 7200
+      "write_policy": "refresh_all",
+      "max_runtime_seconds": 18000
     }
   }
 }
@@ -379,17 +385,94 @@ async def weekly_data_maintenance(self,
 
 #### 业务逻辑
 1. **全量扫描**：按 `SSE / SZSE / BSE` 股票池运行，不设置单交易所数量上限。
-2. **主链导入**：优先使用 `AkShare:proxy_patch`，并通过 `cninfo:direct` 合并实控人线索。
+2. **主链导入**：优先使用 `cninfo:direct` 官方结构化股东数据，`AkShare:proxy_patch / akshare:direct / efinance:direct` 仅作为定向 fallback。
 3. **本地落库**：写入 `research.db` 的 `shareholder_snapshots`，API 读取不实时访问外部源。
-4. **健康复核**：运行后可通过 `/api/v1/research/shareholders/readiness` 或 `scripts/research_shareholder_rollout_validation.py --skip-sync` 复核 required scope 覆盖。
 
-### 6.3 研究域财务报表日更与对账
+### 6.3 股东信息更新任务对照
+
+| 任务 | 触发方式 | 是否全量读取 | 是否全量写入 | 主要用途 |
+|---|---|---:|---:|---|
+| `shareholder_incremental_sync` | 每日 `06:30` 自动，也可 `/run` | 否，只读取公告候选、缺失或 pending 标的 | 否，只写变化、缺失或 required scope 不完整标的 | 日常及时更新，覆盖季报/年报/半年报和权益变动类公告 |
+| `shareholder_reconciliation_sync` | 每周六 `07:30` 自动，也可 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 否，`changed_only`，本地 hash 和 required scope 相同则跳过 | 周期复核、补足历史缺口、捕捉 CNInfo data20 静默修正或公告漏识别 |
+| `shareholder_shadow_sync` | 仅手工 `/run` | 是，读取 `SSE / SZSE / BSE` 活跃股票 | 是，`refresh_all` | 初始化、灾后修复、operator 明确要求的全量重写 |
+
+三者共用股东 provider 路由和 required scope 定义。区别在于候选范围和写入策略：每日增量先用公告缩小候选；周期复核全量读取但只写差异；手工全量刷新全量读取并刷新写入。
+
+### 6.4 研究域股东摘要周期复核与补足 (shareholder_reconciliation_sync)
+
+#### 功能描述
+每周六 `07:30` 对 `SSE / SZSE / BSE` 做全量读取和本地 hash 对比，只写入结构化内容变化、本地缺失或 required scope 覆盖不完整的标的。这个任务用于兜底 CNInfo data20 静默修正、历史快照缺口和增量公告漏识别；它不做无差别全量重写。
+
+#### 变更判断
+1. **全量读取目标股票池**：与全量刷新一样读取 `SSE / SZSE / BSE` 活跃股票。
+2. **生成新快照**：按 `cninfo:direct -> akshare:proxy_patch -> akshare:direct -> efinance:direct` 的股东域路由合并快照。
+3. **本地 hash 对比**：将新 `snapshot_json` 与本地 `shareholder_snapshots.snapshot_json` 做规范化 JSON hash 对比。
+4. **required scope 检查**：本地快照必须覆盖 `holder_count / top10_holders / reference_only_ownership_clues`。
+5. **只写必要变更**：hash 相同且 required scope 完整时跳过；hash 变化、本地缺失或 required scope 不完整时才写入 `shareholder_snapshots` 和 `raw_payload_audit`。
+
+#### 当前配置
+```json
+{
+  "shareholder_reconciliation_sync": {
+    "enabled": true,
+    "description": "研究域股东摘要周期复核与补足",
+    "trigger": {"type": "cron", "day_of_week": "sat", "hour": 7, "minute": 30, "second": 0},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "limit_per_exchange": null,
+      "budget_mode": "availability_first",
+      "allow_paid_proxy": true,
+      "write_policy": "changed_only",
+      "max_runtime_seconds": 18000
+    }
+  }
+}
+```
+
+### 6.5 研究域股东摘要每日增量检查 (shareholder_incremental_sync)
+
+#### 功能描述
+每日按 CNInfo 公告元数据发现可能发生股东信息变化的候选标的，再对候选标的读取结构化股东数据并计算规范化 hash。只有 hash、报告期或 required scope 发生变化时才写入 `shareholder_snapshots` 和 `raw_payload_audit`；未变化的候选只更新 `shareholder_change_manifest`。
+
+#### 当前配置
+```json
+{
+  "shareholder_incremental_sync": {
+    "enabled": true,
+    "description": "研究域股东摘要每日增量检查",
+    "trigger": {"type": "cron", "hour": 6, "minute": 30, "second": 0},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "lookback_days": 7,
+      "overlap_days": 2,
+      "page_size": 30,
+      "max_pages_per_market": 20,
+      "max_candidates": 300,
+      "pending_recheck_days": 5,
+      "budget_mode": "availability_first",
+      "allow_paid_proxy": true,
+      "dry_run": false,
+      "max_runtime_seconds": 3600
+    }
+  }
+}
+```
+
+#### 业务逻辑
+1. **公告扫描**：通用 CNInfo scanner 按市场/栏目和时间窗口分页扫描，不逐股票查询公告。
+2. **候选筛选**：股东域过滤季度/年度/半年度报告、权益变动、控股股东/实控人变更等公告，并合并本地缺失 required scope 与 pending recheck 标的。
+3. **变更判断**：对候选标的读取股东结构化数据，计算 `holder_count / top10_holders / ownership_clues` 规范化 hash。
+4. **有变才写**：hash 未变化时不重写快照；公告早于结构化数据更新时进入 5 个自然日 pending recheck，用于吸收 CNInfo 公告元数据与 data20 结构化股东数据之间的更新滞后。
+5. **pending 硬上限**：同一批公告第一次进入 pending 时记录 `first_pending_at`，截止时间固定为 `first_pending_at + pending_recheck_days`；同一公告不会因每日扫描而滚动延长。完成更新会转为 `changed` 并清空 pending，超过截止时间会转为普通 unchanged，不再从 pending 队列重试；新的公告 ID 会开启新的 pending 周期。
+6. **健康复核**：运行后可通过 `/api/v1/research/shareholders/readiness` 或 `scripts/research_shareholder_rollout_validation.py --skip-sync` 复核 required scope 覆盖。
+
+### 6.6 研究域财务报表日更与对账
 
 #### 功能描述
 财务报表不再依赖周六股东刷新窗口。当前新增两个默认禁用任务：
 
 - `financial_statements_catchup_sync`：周一至周五 `17:45` 运行日度 `catchup`，用于处理新披露或变化的报告期。
-- `financial_statements_reconciliation_sync`：周日 `08:30` 运行有界对账修复，默认 `force_full=true`，避开周六 `shareholder_shadow_sync`。
+- `financial_statements_reconciliation_sync`：周日 `08:30` 运行有界对账修复，默认 `force_full=true`，避开周六股东周期复核窗口。
 
 #### 当前配置
 ```json

@@ -1,6 +1,6 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-05-18
+> 更新日期：2026-05-23
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
@@ -8,6 +8,7 @@
 > 配套 source policy 变更包：`openspec/changes/harden-research-source-priority-policy/`
 > 配套行业 readiness 变更包：`openspec/changes/add-industry-standard-readiness-api/`
 > 配套股东 readiness 变更包：`openspec/changes/add-shareholder-readiness-api/`
+> 配套 CNInfo 公告扫描与股东增量同步变更包：`openspec/changes/add-shareholder-incremental-sync/`
 > 配套 BSE 可空策略变更包：`openspec/changes/add-bse-empty-exchange-policy/`
 > 配套申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
 > 配套 official-code backlog 变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`
@@ -60,8 +61,8 @@
 - **`BSE` 必须保留在研究目标 universe 中**，但对暂不具备稳定上游覆盖的域，可按模块配置返回空占位结果，而不是让同步失败或读取硬 `404`
 - **shareholders 已进入正式本地 snapshot/API 阶段**：
   - 当前配置为 `enabled=true / delivery_mode=paid_high_availability`
-  - 导入主链采用 `AkShare:proxy_patch`，`cninfo:direct` 强制合并实控人线索，`akshare:direct / efinance:direct` 保留为 fallback
-  - 周更任务 `shareholder_shadow_sync` 已启用，周六 `10:00` 对 `SSE / SZSE / BSE` 做全量刷新
+  - 当前运行主链已调整为 `cninfo:direct` 官方结构化股东数据优先，`akshare:proxy_patch / akshare:direct / efinance:direct` 保留为定向 fallback
+  - 全量任务 `shareholder_shadow_sync` 保留为 `manual_only=true`，只通过 Telegram `/run shareholder_shadow_sync` 手工触发，仍会出现在 `/status` 中作为仅手工执行入口；`shareholder_reconciliation_sync` 每周六 `07:30` 做全量读取 + changed-only hash 对比，只补写变化、缺失或 required scope 不完整标的；`2026-05-23` 已新增 OpenSpec `add-shareholder-incremental-sync` 并落地通用 CNInfo 公告元数据扫描/过滤/水位模块，每日 `06:30` 的 `shareholder_incremental_sync` 按公告候选 + 股东结构化数据 hash 做增量检查，有变化或 required scope 缺失才写入快照；同一批公告的 pending recheck 固定为首次 pending 起 5 个自然日，不会滚动延长
   - rollout 复核命令：`python scripts/research_shareholder_rollout_validation.py --exchanges SSE,SZSE,BSE --skip-sync --fail-on-not-ready`
 - **严格的申万行业体系应切换为申万官方分类文件主源**：
   - 分类主源使用 `swsresearch_classification_direct` 直连下载 `StockClassifyUse_stock.xls` 与 `SwClassCode_2021.xls`，直接维护官方分类 taxonomy、股票分类历史和 latest membership
@@ -482,7 +483,7 @@ L4  Research API（新增）
     - 当前项目决策已明确：不再把继续扩大样本或全市场验证作为继续开发的前置条件；后续保持 `AkShare:proxy_patch` 作为默认导入主链，正式 snapshot/API 由模块 gate 和业务决策控制
   - `2026-04-30` 全量导入与 API gate 收口：
     - `config/10_research.json` 已将 `shareholders.enabled=true`、`delivery_mode=paid_high_availability`、`snapshot_api_requires_mode=paid_high_availability`
-    - `config/05_scheduler.json` 已启用 `shareholder_shadow_sync`，周六 `10:00` 对 `SSE / SZSE / BSE` 全量刷新，`limit_per_exchange=null`
+    - `config/05_scheduler.json` 保留 `shareholder_shadow_sync` 为 `manual_only=true` 的手工全量刷新入口，不再作为常驻周六定时任务；该任务仍在 `/status` 中显示为仅手工执行入口；日常由 `shareholder_incremental_sync` 每日 `06:30` 做公告驱动增量检查，每周六 `07:30` 由 `shareholder_reconciliation_sync` 做全量 changed-only 复核与补足
     - 只读 readiness 复核：`snapshot_api_enabled=true`、`ready_for_paid_high_availability_rollout=true`、`blockers=[]`
     - 当前目标股票数 `5191`，`holder_count / top10_holders / reference_only_ownership_clues` 三个 required scope 均覆盖 `5191 / 5191`
     - 当前快照来源分布为 `akshare:proxy_patch = 5191`；`BSE` 已有 `300` 条快照，但 readiness target 仍按 `optional_empty_exchanges=["BSE"]` 口径不计入必达目标
@@ -1531,10 +1532,13 @@ GET /api/v1/research/company/{instrument_id}/events
 | `industry_official_mapping_refresh` | 手动/归档 | 旧 official code -> index taxonomy 映射审计缓存；官方分类代码成为主键后不再作为 membership 同步前置 |
 | `industry_index_analysis_sync` | 每日收盘后 | 同步申万行业指数最新日频估值、换手、涨跌幅、市值和股息率等指标，只写 `industry_index_analysis_daily` |
 | `industry_index_analysis_backfill` | 手动/禁用定时 | 按日期区间回补申万行业指数分析历史数据；默认按“月份 + index_type”分块，必要时可用按日分块补缺 |
+| `shareholder_incremental_sync` | 每日 `06:30` | 股东摘要公告驱动增量检查。按 CNInfo 市场/栏目 + 时间窗口扫描公告元数据，筛出候选标的后读取结构化股东数据并做规范化 hash；只有 hash 变化、缺失快照或 required scope 不完整才写入。公告先到、data20 未更新时进入 pending recheck，同一批公告最多重查 5 个自然日且不滚动延长 |
+| `shareholder_reconciliation_sync` | 每周六 `07:30` | 股东摘要周期复核与补足。全量读取 `SSE / SZSE / BSE` 活跃股票后与本地 `snapshot_json` hash 和 required scope 对比，只补写变化、缺失或覆盖不完整标的；用于兜底 CNInfo 静默修正、公告漏识别和历史缺口 |
+| `shareholder_shadow_sync` | 手工 `/run` | 股东摘要手工全量刷新。`manual_only=true`，不注册自动 cron，但保留在 `/status` 中作为仅手工执行入口；用于上线初始化、灾后修复或 operator 明确要求的全量重写 |
 | `financial_statement_official_probe` | 手动/开发验证 | 按 `sse_commonquery` 与 `cninfo_data20` source profile 探测 SSE/SZSE/BSE 官方结构化财报源，记录覆盖率、延迟、下载证据、request policy、parser profile 和字段稳定性；使用 `scripts/dev_validation/validate_sse_official_financial_json_live.py --official-source ...` 做单批验证，并使用 `scripts/dev_validation/validate_sse_official_financial_json_batches_live.py --official-source ...` 做 bounded batch / checkpoint dry-run；使用 `scripts/dev_validation/compare_official_financial_source_profiles_live.py` 对同一 exchange/instrument/report-period 样本比较速度、失败数、numeric facts 丰富度和核心字段一致性；使用 `scripts/dev_validation/probe_sse_official_period_availability.py` 对 SSE `commonQuery.do` 指定报告期做 row/numeric-field/max-year 诊断；所有命令默认写临时 SQLite 库，不写生产表 |
 | `financial_statement_backfill` | 手动/灰度批处理 | 按配置化 baseline、rolling quarters 和目标市场做多期财报回填，写 source manifest、全数值事实和核心事实，并按 hot/cold tier 维护最近报告期与历史报告期 |
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
-| `financial_statement_reconciliation` | 每周，避开股东周更窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
+| `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
 | `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |

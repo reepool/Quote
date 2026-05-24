@@ -8,7 +8,7 @@
 ## [Unreleased] - 2026-04-30
 
 ### 新增
-- 研究域股东摘要已完成全量本地快照导入、`paid_high_availability` API gate 开放和周六 `10:00` 全量刷新调度。
+- 研究域股东摘要已完成全量本地快照导入和 `paid_high_availability` API gate 开放；全量刷新改为 Telegram 手工触发，常驻调度由每日 `06:30` 的公告驱动增量检查和周六 `07:30` 的 changed-only 周期复核承担。
 - REST API 文档新增股东快照读取与 readiness 接口说明。
 
 ### 变更

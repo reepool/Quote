@@ -149,6 +149,8 @@ class TaskManagerBot:
             "• `/status` - 查看任务状态\n"
             "• `/run <任务ID>` - 立即执行任务\n"
             "• `/run shareholder_shadow_sync` - 手工触发股东摘要全量刷新\n"
+            "• `/run shareholder_reconciliation_sync` - 手工触发股东摘要周期复核与补足\n"
+            "• `/run shareholder_incremental_sync` - 手工触发股东摘要每日增量检查\n"
             "• `/backfill <日期|开始日期 结束日期> [交易所...]` - 补充指定日期或日期范围的缺失数据\n"
             "• `/backfill_factors [交易所...] [missing|full]` - 回填复权因子\n"
             "• `/industry_standard_sync [force]` - 申万官方分类日更同步\n"

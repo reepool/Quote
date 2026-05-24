@@ -415,6 +415,48 @@ def test_data_manager_run_shareholder_shadow_sync_delegates_to_service(tmp_path)
     service_cls.assert_called_once()
 
 
+def test_data_manager_run_shareholder_incremental_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "shareholders": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch(
+        "research.shareholder_incremental_sync.ShareholderIncrementalSyncService"
+    ) as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_shareholder_incremental_sync(
+                exchanges=["SSE"],
+                lookback_days=7,
+                dry_run=True,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+    service_instance.sync.assert_awaited_once_with(
+        exchanges=["SSE"],
+        lookback_days=7,
+        overlap_days=None,
+        page_size=None,
+        max_pages_per_market=None,
+        max_candidates=None,
+        pending_recheck_days=None,
+        budget_mode=None,
+        allow_paid_proxy=None,
+        dry_run=True,
+    )
+
+
 def test_data_manager_run_financial_statements_shadow_sync_returns_unavailable_without_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
