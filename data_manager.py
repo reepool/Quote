@@ -18,6 +18,7 @@ import inspect
 import json
 import os
 from calendar import monthrange
+from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta
 from dataclasses import dataclass, field
@@ -3644,6 +3645,241 @@ class DataManager:
             report_periods=report_periods,
             sync_mode=sync_mode,
             force_full=force_full,
+        )
+        return self._attach_instrument_master_governance(result, governance)
+
+    async def run_financial_l1_full_import(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        db_path: str = "data/financials.db",
+        log_dir: Optional[str] = None,
+        limit_per_exchange: Optional[int] = None,
+        batch_size: int = 20,
+        resume: bool = False,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        financial_disclosure_events_path: Optional[str] = None,
+        manifest_only: bool = False,
+        start_batch: Optional[int] = None,
+        end_batch: Optional[int] = None,
+        max_batches: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Run Financial L1 full import through the Python orchestrator."""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        from scripts.research_financial_l1_full_import import (
+            DEFAULT_ACCEPTED_SOURCE_GAPS,
+            DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES,
+            DEFAULT_EXCHANGES,
+            DEFAULT_SOURCE_ORDER,
+            resolve_report_periods,
+            run_full_import,
+        )
+        from scripts.dev_validation.audit_financial_numeric_fact_coverage import (
+            DEFAULT_REQUIRED_CANONICAL_FACTS,
+        )
+        from scripts.dev_validation.prepare_sina_ths_local_core_import_manifest import (
+            load_financial_disclosure_events,
+        )
+        from research.financial_source_field_mapping import MAPPING_VERSION
+
+        resolved_periods = resolve_report_periods(
+            report_periods=",".join(report_periods or []),
+            period_window=period_window,
+            rolling_quarters=rolling_quarters,
+            baseline_report_period=baseline_report_period,
+            latest_report_period=latest_report_period,
+            optional_anchor_period=None,
+            include_optional_anchor=False,
+        )
+        target_log_dir = Path(log_dir) if log_dir else Path("log") / "financial_l1_full_import" / get_shanghai_time().strftime("%Y%m%d_%H%M%S")
+        return await run_full_import(
+            log_dir=target_log_dir,
+            db_path=Path(db_path),
+            report_periods=resolved_periods,
+            exchanges=exchanges or list(DEFAULT_EXCHANGES),
+            limit_per_exchange=limit_per_exchange,
+            batch_size=batch_size,
+            mapping_version=MAPPING_VERSION,
+            source_order=list(DEFAULT_SOURCE_ORDER),
+            required_canonical_facts=list(DEFAULT_REQUIRED_CANONICAL_FACTS),
+            financial_disclosure_events=load_financial_disclosure_events(
+                Path(financial_disclosure_events_path)
+                if financial_disclosure_events_path
+                else None
+            ),
+            accepted_source_gap_specs=list(DEFAULT_ACCEPTED_SOURCE_GAPS),
+            accepted_source_gap_exchanges=list(DEFAULT_ACCEPTED_SOURCE_GAP_EXCHANGES),
+            continue_on_needs_review=True,
+            skip_ready_targets=True,
+            request_interval_seconds=request_interval_seconds,
+            request_timeout_seconds=request_timeout_seconds,
+            instrument_master_governance_enabled=True,
+            resume=resume,
+            manifest_only=manifest_only,
+            start_batch=start_batch,
+            end_batch=end_batch,
+            max_batches=max_batches,
+        )
+
+    async def run_financial_disclosure_incremental_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages_per_market: Optional[int] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        target_symbols: Optional[List[str]] = None,
+        announcement_search_key: Optional[str] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        db_path: Optional[str] = None,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run CNInfo announcement-driven Financial L1 incremental maintenance."""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research financial_statements module is disabled",
+            }
+
+        from research.financial_disclosure_incremental_sync import (
+            FinancialDisclosureIncrementalSyncService,
+        )
+
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='financial_disclosure_incremental_sync',
+        )
+        service = FinancialDisclosureIncrementalSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        result = await service.sync(
+            exchanges=exchanges,
+            lookback_days=lookback_days,
+            overlap_days=overlap_days,
+            page_size=page_size,
+            max_pages_per_market=max_pages_per_market,
+            max_candidates=max_candidates,
+            pending_recheck_days=pending_recheck_days,
+            target_instrument_ids=target_instrument_ids,
+            target_symbols=target_symbols,
+            announcement_search_key=announcement_search_key,
+            report_periods=report_periods,
+            period_window=period_window,
+            rolling_quarters=rolling_quarters,
+            baseline_report_period=baseline_report_period,
+            latest_report_period=latest_report_period,
+            db_path=db_path,
+            request_interval_seconds=request_interval_seconds,
+            request_timeout_seconds=request_timeout_seconds,
+            dry_run=dry_run,
+            reconciliation=False,
+        )
+        return self._attach_instrument_master_governance(result, governance)
+
+    async def run_financial_disclosure_reconciliation_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        target_symbols: Optional[List[str]] = None,
+        db_path: Optional[str] = None,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run bounded Financial L1 reconciliation over configured report periods."""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research financial_statements module is disabled",
+            }
+
+        from research.financial_disclosure_incremental_sync import (
+            FinancialDisclosureIncrementalSyncService,
+        )
+
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='financial_disclosure_reconciliation_sync',
+        )
+        service = FinancialDisclosureIncrementalSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        result = await service.sync(
+            exchanges=exchanges,
+            max_candidates=max_candidates,
+            pending_recheck_days=pending_recheck_days,
+            target_instrument_ids=target_instrument_ids,
+            target_symbols=target_symbols,
+            report_periods=report_periods,
+            period_window=period_window,
+            rolling_quarters=rolling_quarters,
+            baseline_report_period=baseline_report_period,
+            latest_report_period=latest_report_period,
+            db_path=db_path,
+            request_interval_seconds=request_interval_seconds,
+            request_timeout_seconds=request_timeout_seconds,
+            dry_run=dry_run,
+            reconciliation=True,
         )
         return self._attach_instrument_master_governance(result, governance)
 

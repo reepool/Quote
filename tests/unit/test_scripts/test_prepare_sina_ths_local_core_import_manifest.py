@@ -150,6 +150,44 @@ def test_build_local_core_import_manifest_marks_lifecycle_excluded_periods():
     }
 
 
+def test_build_local_core_import_manifest_marks_financial_disclosure_events():
+    manifest = build_local_core_import_manifest(
+        instruments_by_exchange={
+            "SZSE": [
+                {
+                    "instrument_id": "002731.SZ",
+                    "symbol": "002731",
+                    "exchange": "SZSE",
+                    "listed_date": "2014-11-04",
+                }
+            ]
+        },
+        storage=_FakeStorage(),
+        report_periods=["2025-12-31", "2026-03-31"],
+        financial_disclosure_events=[
+            {
+                "instrument_id": "002731.SZ",
+                "report_periods": ["2025-12-31", "2026-03-31"],
+                "classification": "periodic_report_delayed_or_suspended",
+                "title": "关于无法按期披露2025年年度报告暨股票停牌的公告",
+                "announcement_id": "test-announcement",
+            }
+        ],
+    )
+
+    excluded = manifest["targets"][0]["excluded_report_periods"]
+    assert [item["classification"] for item in excluded] == [
+        "periodic_report_delayed_or_suspended",
+        "periodic_report_delayed_or_suspended",
+    ]
+    assert excluded[0]["disclosure_events"][0]["announcement_id"] == (
+        "test-announcement"
+    )
+    assert manifest["report_period_lifecycle_summary"]["by_classification"] == {
+        "periodic_report_delayed_or_suspended": 2
+    }
+
+
 def test_classify_report_period_lifecycle_supports_quarter_aliases():
     lifecycle = classify_report_period_lifecycle(
         instrument={"listed_date": "2021-07-27", "delisted_date": "2026-04-27"},

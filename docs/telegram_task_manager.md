@@ -88,6 +88,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/run shareholder_shadow_sync` - 手工执行股东摘要全量刷新，刷新本地 `shareholder_snapshots`
 - `/run shareholder_reconciliation_sync` - 立即执行股东摘要周期复核与补足，全量读取后只写变化或本地缺失/覆盖不完整标的
 - `/run shareholder_incremental_sync` - 立即执行股东摘要每日增量检查，公告驱动且有变化才写入
+- `/run financial_l1_full_import` - 手工执行财务 L1 本地核心层全量导入或补处理，写入 `data/financials.db`
+- `/run financial_disclosure_incremental_sync` - 手工执行财务公告驱动增量检查，按定期报告公告候选定向补处理
+- `/run financial_disclosure_reconciliation_sync` - 手工执行财务周度对账修复，补缺失或变化的财务报告期
 - `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
 - `/backfill <开始日期> <结束日期> [交易所...]` - 以区间模式补充日期范围内缺失数据
 - `/industry_standard_sync [force]` - 申万官方分类日更同步；默认使用 source manifest，官方文件未变化时短路
@@ -108,6 +111,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 /run shareholder_shadow_sync             # 手工触发股东摘要全量刷新
 /run shareholder_reconciliation_sync     # 手工触发股东摘要周期复核与补足
 /run shareholder_incremental_sync        # 手工触发股东摘要每日增量检查
+/run financial_l1_full_import            # 手工触发财务 L1 全量导入/补处理
+/run financial_disclosure_incremental_sync  # 手工触发财务公告驱动增量检查
+/run financial_disclosure_reconciliation_sync # 手工触发财务周度对账修复
 /backfill 2026-03-27                     # 补充 3/27 所有交易所数据
 /backfill 2026-03-27 SSE                 # 仅补充上交所 3/27 数据
 /backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # 一次性补充 A 股日期区间
@@ -133,6 +139,26 @@ python3 main.py api --host 0.0.0.0 --port 8000
 | `shareholder_incremental_sync` | 每日 `06:30` / `/run` | CNInfo 公告候选、缺失 required scope、pending recheck 标的 | hash 变化、缺失或 required scope 不完整才写 |
 | `shareholder_reconciliation_sync` | 周六 `12:30` / `/run` | `SSE / SZSE / BSE` 全量活跃股票 | `changed_only`，本地 hash 和 required scope 相同则跳过 |
 | `shareholder_shadow_sync` | 仅 `/run` | `SSE / SZSE / BSE` 全量活跃股票 | `refresh_all`，用于手工全量刷新 |
+
+财务 L1 维护任务分工：
+
+当前实现状态（`2026-05-24`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 和 `financial_disclosure_reconciliation_sync` 已接入 `/run` 和配置，但默认不自动定时。`002731.SZ / 688121.SH` 定向写入 smoke 已验证公告驱动路径：可映射报告期的延期年报公告进入 `pending_recheck`，不可映射报告期的退市风险提示只保留审计证据。
+
+| 任务 | 触发方式 | 读取范围 | 写入策略 |
+|---|---|---|---|
+| `financial_l1_full_import` | 仅 `/run` | `SSE / SZSE / BSE` active 股票池和最近 rolling 报告期 | 可续跑；已完整落库的标的/报告期跳过；用于初始化和大范围补处理 |
+| `financial_disclosure_incremental_sync` | 每日可配置 / `/run` | CNInfo 定期报告公告候选、pending recheck、本地缺失报告期 | 只对候选补处理；公告先到但结构化源未更新时进入 pending recheck |
+| `financial_disclosure_reconciliation_sync` | 每周可配置 / `/run` | 最近 rolling 报告期全市场覆盖情况 | 只补缺失、变化或 required core facts 不完整的 instrument-period |
+
+财务公告驱动任务识别年度报告、半年度报告、一季报、三季报、更正公告和披露异常公告。历史缺报且公告显示停牌、退市风险警示或可能终止上市时，报告中应显示“待退市风险/披露异常待补”，不把该类缺口误报为字段映射错误。
+公告先到但结构化财报未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间以首次 pending 为硬上限，不会因每日扫描滚动延长。
+
+财务任务报告应重点看四组数字：
+
+- `candidate_count`：公告、pending recheck 或对账发现的待处理 instrument-period。
+- `changed_count / unchanged_count`：本次实际修复写入与已完整跳过数量。
+- `pending_recheck_count / pending_delisting_risk_count`：公告先到但结构化源滞后，或公告解释为待退市风险的数量。
+- `accepted_gap_count / blocking_gap_count`：可审计解释的缺口与仍需字段映射/源数据补处理的 blocker 数量。
 
 ### BotFather 命令映射
 

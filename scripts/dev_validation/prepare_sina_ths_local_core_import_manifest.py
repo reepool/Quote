@@ -23,6 +23,10 @@ from research.financial_source_field_mapping import (  # noqa: E402
     MAPPING_VERSION,
     get_financial_source_field_mappings,
 )
+from research.financial_disclosure_events import (  # noqa: E402
+    FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION,
+    build_financial_disclosure_event_index,
+)
 from research.financial_statement_profile import (  # noqa: E402
     resolve_financial_statement_profile,
     summarize_financial_statement_profile_resolutions,
@@ -81,10 +85,14 @@ def build_local_core_import_manifest(
     mapping_version: str = MAPPING_VERSION,
     required_canonical_facts: Sequence[str] = DEFAULT_REQUIRED_CANONICAL_FACTS,
     batch_size: int = 20,
+    financial_disclosure_events: Optional[Sequence[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Build target lines, profile evidence, mapping checks, and dry-run batches."""
     profile_resolutions: List[Dict[str, Any]] = []
     targets: List[Dict[str, Any]] = []
+    disclosure_event_index = build_financial_disclosure_event_index(
+        financial_disclosure_events
+    )
     for exchange in sorted(instruments_by_exchange):
         for instrument in instruments_by_exchange[exchange]:
             instrument_id = str(instrument.get("instrument_id") or "").strip()
@@ -99,6 +107,7 @@ def build_local_core_import_manifest(
             lifecycle = classify_report_period_lifecycle(
                 instrument=instrument,
                 report_periods=report_periods,
+                financial_disclosure_events=disclosure_event_index.get(instrument_id),
             )
             targets.append(
                 {
@@ -243,6 +252,7 @@ def classify_report_period_lifecycle(
     *,
     instrument: Dict[str, Any],
     report_periods: Sequence[str],
+    financial_disclosure_events: Optional[Dict[str, List[Dict[str, Any]]]] = None,
 ) -> Dict[str, Any]:
     """Classify periods that should not block import when source facts are absent."""
     listed_date = parse_optional_date(
@@ -252,6 +262,7 @@ def classify_report_period_lifecycle(
         instrument.get("delisted_date") or instrument.get("delist_date")
     )
     excluded: List[Dict[str, Any]] = []
+    disclosure_events_by_period = financial_disclosure_events or {}
     for raw_period in report_periods:
         period_end = parse_report_period_date(str(raw_period))
         if period_end is None:
@@ -290,6 +301,24 @@ def classify_report_period_lifecycle(
                     "disclosure_deadline": disclosure_deadline.isoformat(),
                 }
             )
+            continue
+        disclosure_events = disclosure_events_by_period.get(period_end.isoformat()) or []
+        if disclosure_events:
+            excluded.append(
+                {
+                    "report_period": period_end.isoformat(),
+                    "classification": FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION,
+                    "reason": "公告显示定期报告披露异常或相关停牌/退市风险，结构化财报缺失视为待补事项。",
+                    "listed_date": listed_date.isoformat()
+                    if listed_date is not None
+                    else None,
+                    "delisted_date": delisted_date.isoformat()
+                    if delisted_date is not None
+                    else None,
+                    "disclosure_deadline": disclosure_deadline.isoformat(),
+                    "disclosure_events": disclosure_events,
+                }
+            )
     return {
         "listed_date": listed_date.isoformat() if listed_date is not None else None,
         "delisted_date": delisted_date.isoformat() if delisted_date is not None else None,
@@ -320,6 +349,7 @@ def summarize_report_period_lifecycle(targets: Sequence[Dict[str, Any]]) -> Dict
                         "listed_date": item.get("listed_date"),
                         "delisted_date": item.get("delisted_date"),
                         "disclosure_deadline": item.get("disclosure_deadline"),
+                        "event_count": len(item.get("disclosure_events") or []),
                     }
                 )
     return {
@@ -456,6 +486,22 @@ def write_batch_target_files(batch_dir: Path, batches: Sequence[Dict[str, Any]])
     return files
 
 
+def load_financial_disclosure_events(path: Optional[Path]) -> List[Dict[str, Any]]:
+    """Load manifest-ready financial disclosure events from JSON."""
+    if path is None:
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(payload, dict):
+        raw_events = payload.get("events") or payload.get("financial_disclosure_events")
+    else:
+        raw_events = payload
+    if not isinstance(raw_events, list):
+        raise ValueError(
+            "Financial disclosure events JSON must be a list or contain an events list"
+        )
+    return [dict(item) for item in raw_events if isinstance(item, dict)]
+
+
 def manifest_console_summary(
     manifest: Dict[str, Any],
     *,
@@ -472,6 +518,7 @@ def manifest_console_summary(
         "target_count_by_exchange": manifest.get("target_count_by_exchange"),
         "target_count_by_profile": manifest.get("target_count_by_profile"),
         "profile_resolution_risks": manifest.get("profile_resolution_risks"),
+        "instrument_master_governance": manifest.get("instrument_master_governance"),
         "report_period_lifecycle_summary": manifest.get(
             "report_period_lifecycle_summary"
         ),
@@ -503,6 +550,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional directory to write one target file per manifest batch.",
     )
     parser.add_argument(
+        "--financial-disclosure-events-path",
+        type=Path,
+        help=(
+            "Optional JSON event file from CNInfo announcement scans. Events with "
+            "classification=periodic_report_delayed_or_suspended are converted "
+            "to manifest exclusions."
+        ),
+    )
+    parser.add_argument(
         "--quiet",
         action="store_true",
         help="Print a compact summary instead of the full manifest JSON.",
@@ -530,6 +586,9 @@ async def async_main(argv: Optional[List[str]] = None) -> int:
                 args.required_canonical_facts
             ),
             batch_size=args.batch_size,
+            financial_disclosure_events=load_financial_disclosure_events(
+                args.financial_disclosure_events_path
+            ),
         )
     finally:
         close = getattr(data_manager, "close", None)

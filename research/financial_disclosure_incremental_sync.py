@@ -1,0 +1,802 @@
+"""
+Financial statement maintenance driven by CNInfo disclosure announcements.
+"""
+
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+
+from research.financial_disclosure_events import (
+    ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
+    FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION,
+    FINANCIAL_PERIODIC_REPORT_CLASSIFICATION,
+    PENDING_DELISTING_RISK_CLASSIFICATION,
+    FinancialDisclosureEvent,
+    build_financial_disclosure_events,
+    build_financial_symbol_index,
+    financial_disclosure_event_filter,
+)
+from research.financial_source_field_mapping import MAPPING_VERSION
+from research.financial_statement_profile import resolve_financial_statement_profile
+from research.financial_statements_sync import build_financial_report_periods
+from research.providers.cninfo_announcements import (
+    CninfoAnnouncementScanConfig,
+    CninfoAnnouncementScanner,
+)
+from research.storage import ResearchStorageManager
+from scripts.dev_validation.audit_financial_numeric_fact_coverage import (
+    DEFAULT_REQUIRED_CANONICAL_FACTS,
+)
+from utils import dm_logger
+from utils.config_manager import ResearchConfig, config_manager
+from utils.date_utils import get_shanghai_time
+
+
+@dataclass
+class FinancialDisclosureMaintenanceCandidate:
+    instrument_id: str
+    symbol: str
+    exchange: str
+    report_period: str
+    profile: str
+    reasons: List[str] = field(default_factory=list)
+    events: List[FinancialDisclosureEvent] = field(default_factory=list)
+
+    @property
+    def key(self) -> Tuple[str, str]:
+        return (self.instrument_id, self.report_period)
+
+    @property
+    def classification(self) -> str:
+        if any(
+            event.classification == PENDING_DELISTING_RISK_CLASSIFICATION
+            or "pending_delisting_risk" in event.reasons
+            for event in self.events
+        ):
+            return PENDING_DELISTING_RISK_CLASSIFICATION
+        if any(
+            event.classification == FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
+            or "periodic_report_delayed" in event.reasons
+            for event in self.events
+        ):
+            return FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
+        return FINANCIAL_PERIODIC_REPORT_CLASSIFICATION
+
+
+class FinancialDisclosureIncrementalSyncService:
+    """Run targeted Financial L1 maintenance from CNInfo disclosure events."""
+
+    purpose_key = "financial_disclosure_incremental_sync"
+
+    def __init__(
+        self,
+        *,
+        db_ops: Any,
+        storage: ResearchStorageManager,
+        research_config: Optional[ResearchConfig] = None,
+        announcement_scanner: Optional[CninfoAnnouncementScanner] = None,
+    ) -> None:
+        self.db_ops = db_ops
+        self.storage = storage
+        self.research_config = research_config or config_manager.get_research_config()
+        self.announcement_scanner = announcement_scanner or self._build_scanner()
+
+    async def sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages_per_market: Optional[int] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        target_symbols: Optional[List[str]] = None,
+        announcement_search_key: Optional[str] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        db_path: Optional[str] = None,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        dry_run: bool = False,
+        reconciliation: bool = False,
+    ) -> Dict[str, Any]:
+        started_at = time.monotonic()
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        maintenance_cfg = module_cfg.get("disclosure_incremental_sync", {})
+        target_exchanges = exchanges or list(self.research_config.markets)
+        lookback = int(maintenance_cfg.get("lookback_days", 14) if lookback_days is None else lookback_days)
+        overlap = int(maintenance_cfg.get("overlap_days", 3) if overlap_days is None else overlap_days)
+        scan_page_size = int(maintenance_cfg.get("page_size", 30) if page_size is None else page_size)
+        max_pages = int(
+            maintenance_cfg.get("max_pages_per_market", 40)
+            if max_pages_per_market is None
+            else max_pages_per_market
+        )
+        candidate_limit = int(
+            maintenance_cfg.get("max_candidates", 500)
+            if max_candidates is None
+            else max_candidates
+        )
+        recheck_days = int(
+            maintenance_cfg.get("pending_recheck_days", 7)
+            if pending_recheck_days is None
+            else pending_recheck_days
+        )
+        required_facts = list(
+            module_cfg.get("readiness", {}).get(
+                "required_core_facts",
+                DEFAULT_REQUIRED_CANONICAL_FACTS,
+            )
+        )
+        target_periods = self._resolve_report_periods(
+            report_periods=report_periods,
+            period_window=period_window,
+            rolling_quarters=rolling_quarters,
+            baseline_report_period=baseline_report_period,
+            latest_report_period=latest_report_period,
+        )
+        financial_db_path = Path(
+            db_path
+            or getattr(self.research_config.storage, "financials_db_path", None)
+            or "data/financials.db"
+        )
+
+        run_id: Optional[int] = None
+        if not dry_run:
+            with self.storage.financial_database_scope():
+                run_id = self.storage.start_ingestion_run(
+                    domain="financial_statements",
+                    job_name=(
+                        "financial_disclosure_reconciliation_sync"
+                        if reconciliation
+                        else self.purpose_key
+                    ),
+                    market=",".join(target_exchanges),
+                    metadata={
+                        "exchanges": target_exchanges,
+                        "report_periods": target_periods,
+                        "target_instrument_ids": list(target_instrument_ids or []),
+                        "target_symbols": list(target_symbols or []),
+                        "announcement_search_key": announcement_search_key,
+                        "dry_run": dry_run,
+                        "reconciliation": reconciliation,
+                    },
+                )
+
+        try:
+            instruments = await self._load_active_instruments(
+                target_exchanges,
+                target_instrument_ids=target_instrument_ids,
+                target_symbols=target_symbols,
+            )
+            scan_result = (
+                {
+                    "events": [],
+                    "announcements_scanned": 0,
+                    "selected_announcements": 0,
+                    "selected_announcements_preview": [],
+                    "event_count": 0,
+                    "pages_scanned": 0,
+                    "errors": [],
+                }
+                if reconciliation
+                else self._scan_announcements(
+                    exchanges=target_exchanges,
+                    instruments=instruments,
+                    lookback_days=lookback,
+                    overlap_days=overlap,
+                    page_size=scan_page_size,
+                    max_pages_per_market=max_pages,
+                    search_key=announcement_search_key,
+                    run_id=run_id,
+                    dry_run=dry_run,
+                )
+            )
+            candidates = self._build_candidates(
+                instruments=instruments,
+                events=scan_result["events"],
+                report_periods=target_periods if reconciliation else None,
+                required_core_facts=required_facts,
+                mapping_version=MAPPING_VERSION,
+                max_candidates=candidate_limit,
+            )
+            write_result = await self._apply_candidates(
+                candidates=list(candidates.values()),
+                required_core_facts=required_facts,
+                mapping_version=MAPPING_VERSION,
+                db_path=financial_db_path,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                pending_recheck_days=recheck_days,
+                run_id=run_id,
+                dry_run=dry_run,
+            )
+            elapsed = round(time.monotonic() - started_at, 3)
+            status = self._derive_status(
+                candidate_count=len(candidates),
+                failed_count=write_result["failed_count"],
+                blocking_count=write_result["blocking_gap_count"],
+                scan_errors=scan_result["errors"],
+            )
+            result = {
+                "status": status,
+                "job_name": (
+                    "financial_disclosure_reconciliation_sync"
+                    if reconciliation
+                    else self.purpose_key
+                ),
+                "dry_run": dry_run,
+                "reconciliation": reconciliation,
+                "db_path": str(financial_db_path),
+                "exchanges": target_exchanges,
+                "report_periods": target_periods,
+                "target_instrument_ids": list(target_instrument_ids or []),
+                "target_symbols": list(target_symbols or []),
+                "announcement_search_key": announcement_search_key,
+                "announcements_scanned": scan_result["announcements_scanned"],
+                "selected_announcements": scan_result["selected_announcements"],
+                "selected_announcements_preview": scan_result.get(
+                    "selected_announcements_preview",
+                    [],
+                ),
+                "event_count": scan_result.get("event_count", 0),
+                "pages_scanned": scan_result["pages_scanned"],
+                "candidate_count": len(candidates),
+                "scan_errors": scan_result["errors"][:10],
+                "elapsed_seconds": elapsed,
+                **write_result,
+            }
+            if run_id is not None:
+                with self.storage.financial_database_scope():
+                    self.storage.finish_ingestion_run(
+                        run_id,
+                        status=status,
+                        rows_written=write_result["written_count"],
+                        error_message=(
+                            "; ".join(scan_result["errors"][:3])
+                            if status == "failed"
+                            else None
+                        ),
+                        metadata=result,
+                    )
+            return result
+        except Exception as exc:
+            if run_id is not None:
+                with self.storage.financial_database_scope():
+                    self.storage.finish_ingestion_run(
+                        run_id,
+                        status="failed",
+                        rows_written=0,
+                        error_message=str(exc),
+                        metadata={
+                            "exchanges": target_exchanges,
+                            "dry_run": dry_run,
+                            "elapsed_seconds": round(time.monotonic() - started_at, 3),
+                        },
+                    )
+            raise
+
+    def _build_scanner(self) -> CninfoAnnouncementScanner:
+        cninfo_cfg = self.research_config.sources.get("cninfo", {})
+        scan_cfg = cninfo_cfg.get("announcement_scan", {})
+        return CninfoAnnouncementScanner(
+            request_timeout_seconds=float(scan_cfg.get("request_timeout_seconds", 20.0)),
+            request_interval_seconds=float(scan_cfg.get("request_interval_seconds", 0.2)),
+            retry_attempts=int(scan_cfg.get("retry_attempts", 2)),
+            retry_backoff_seconds=float(scan_cfg.get("retry_backoff_seconds", 0.5)),
+        )
+
+    async def _load_active_instruments(
+        self,
+        exchanges: Sequence[str],
+        *,
+        target_instrument_ids: Optional[Sequence[str]] = None,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        target_ids = {
+            str(item).strip().upper()
+            for item in target_instrument_ids or []
+            if str(item).strip()
+        }
+        target_symbol_set = {
+            str(item).strip()
+            for item in target_symbols or []
+            if str(item).strip()
+        }
+        instruments: List[Dict[str, Any]] = []
+        for exchange in exchanges:
+            rows = await self.db_ops.get_instruments_by_exchange(exchange)
+            for row in rows:
+                instrument_id = str(row.get("instrument_id") or "").strip().upper()
+                symbol = str(row.get("symbol") or "").strip()
+                if target_ids and instrument_id not in target_ids:
+                    continue
+                if target_symbol_set and symbol not in target_symbol_set:
+                    continue
+                if row.get("type") == "stock" and row.get("is_active", True):
+                    instruments.append(dict(row))
+        return instruments
+
+    def _scan_announcements(
+        self,
+        *,
+        exchanges: Sequence[str],
+        instruments: Sequence[Mapping[str, Any]],
+        lookback_days: int,
+        overlap_days: int,
+        page_size: int,
+        max_pages_per_market: int,
+        search_key: Optional[str],
+        run_id: Optional[int],
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        now = get_shanghai_time()
+        end_date = now.date().isoformat()
+        symbol_index = build_financial_symbol_index(instruments)
+        market_configs = self._announcement_market_configs()
+        all_selected = []
+        pages_scanned = 0
+        announcements_scanned = 0
+        selected_announcements = 0
+        errors: List[str] = []
+        for exchange in exchanges:
+            cfg = market_configs.get(exchange, {})
+            column = str(cfg.get("column") or exchange.lower()).strip()
+            market = str(cfg.get("market") or exchange).strip()
+            with self.storage.financial_database_scope():
+                state = self.storage.get_cninfo_announcement_scan_state(
+                    purpose_key=self.purpose_key,
+                    market=market,
+                    column=column,
+                )
+            watermark = None if state is None else state.get("last_watermark")
+            config = CninfoAnnouncementScanConfig(
+                purpose_key=self.purpose_key,
+                market=market,
+                column=column,
+                plate=cfg.get("plate"),
+                tab_name=str(cfg.get("tab_name") or "fulltext"),
+                category=cfg.get("category"),
+                search_key=search_key or cfg.get("search_key"),
+                start_date=(now - timedelta(days=max(lookback_days, overlap_days))).date().isoformat(),
+                end_date=end_date,
+                page_size=page_size,
+                max_pages=max_pages_per_market,
+                stop_at_watermark=watermark,
+            )
+            scan_started_at = get_shanghai_time().isoformat()
+            result = self.announcement_scanner.scan(
+                config,
+                filters=[financial_disclosure_event_filter],
+            )
+            scan_completed_at = get_shanghai_time().isoformat()
+            pages_scanned += result.pages_scanned
+            announcements_scanned += result.announcements_seen
+            selected_announcements += len(result.selected_records)
+            all_selected.extend(result.selected_records)
+            errors.extend(result.errors)
+            if not dry_run:
+                with self.storage.financial_database_scope():
+                    self.storage.upsert_cninfo_announcement_scan_state(
+                        purpose_key=self.purpose_key,
+                        market=market,
+                        column=column,
+                        last_watermark=result.max_announcement_time or watermark,
+                        last_scan_started_at=scan_started_at,
+                        last_scan_completed_at=scan_completed_at,
+                        pages_scanned=result.pages_scanned,
+                        announcements_seen=result.announcements_seen,
+                        selected_announcements=len(result.selected_records),
+                        status="success" if not result.errors else "degraded",
+                        metadata={"errors": result.errors[:5]},
+                    )
+                    for record in result.selected_records:
+                        for symbol in record.symbols or [""]:
+                            instrument = symbol_index.get(symbol)
+                            self.storage.store_cninfo_announcement_audit(
+                                purpose_key=self.purpose_key,
+                                announcement_id=record.announcement_id,
+                                instrument_id=(
+                                    None
+                                    if instrument is None
+                                    else str(instrument.get("instrument_id") or "")
+                                ),
+                                symbol=symbol or None,
+                                market=record.market,
+                                column=record.column,
+                                announcement_time=record.announcement_time,
+                                title=record.title,
+                                adjunct_url=record.adjunct_url,
+                                selection_reasons=record.selection_reasons,
+                                raw_payload=record.raw_payload,
+                                ingestion_run_id=run_id,
+                            )
+        events = build_financial_disclosure_events(all_selected, symbol_index)
+        return {
+            "events": events,
+            "pages_scanned": pages_scanned,
+            "announcements_scanned": announcements_scanned,
+            "selected_announcements": selected_announcements,
+            "selected_announcements_preview": [
+                {
+                    "announcement_id": record.announcement_id,
+                    "announcement_time": record.announcement_time,
+                    "market": record.market,
+                    "symbols": list(record.symbols),
+                    "title": record.title,
+                    "selection_reasons": list(record.selection_reasons),
+                    "mapped_event": any(
+                        event.announcement_id == record.announcement_id
+                        for event in events
+                    ),
+                }
+                for record in all_selected[:20]
+            ],
+            "event_count": len(events),
+            "errors": errors,
+        }
+
+    def _announcement_market_configs(self) -> Dict[str, Dict[str, Any]]:
+        cninfo_cfg = self.research_config.sources.get("cninfo", {})
+        scan_cfg = cninfo_cfg.get("announcement_scan", {})
+        configured = scan_cfg.get("markets") or {}
+        defaults = {
+            "SSE": {"market": "SSE", "column": "sse", "plate": "sh"},
+            "SZSE": {"market": "SZSE", "column": "szse", "plate": "sz"},
+            "BSE": {"market": "BSE", "column": "neeq", "plate": "bj"},
+        }
+        for exchange, value in configured.items():
+            if isinstance(value, dict):
+                defaults[str(exchange)] = {**defaults.get(str(exchange), {}), **value}
+        return defaults
+
+    def _build_candidates(
+        self,
+        *,
+        instruments: Sequence[Mapping[str, Any]],
+        events: Sequence[FinancialDisclosureEvent],
+        report_periods: Optional[Sequence[str]],
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+        max_candidates: int,
+    ) -> Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate]:
+        instruments_by_id = {
+            str(instrument.get("instrument_id") or ""): instrument
+            for instrument in instruments
+            if instrument.get("instrument_id")
+        }
+        candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
+        for event in events:
+            instrument = instruments_by_id.get(event.instrument_id)
+            if instrument is None:
+                continue
+            candidate = self._candidate_for_event(instrument, event)
+            candidates.setdefault(candidate.key, candidate).events.append(event)
+            candidates[candidate.key].reasons.extend(
+                reason for reason in event.reasons if reason not in candidates[candidate.key].reasons
+            )
+        with self.storage.financial_database_scope():
+            pending_states = self.storage.list_financial_disclosure_event_states(
+                statuses=["pending_recheck", "pending_delisting_risk"],
+                limit=max_candidates if max_candidates > 0 else None,
+            )
+        for state in pending_states:
+            instrument = instruments_by_id.get(str(state.get("instrument_id") or ""))
+            if instrument is None:
+                continue
+            event = FinancialDisclosureEvent(
+                instrument_id=str(state.get("instrument_id") or ""),
+                report_period=str(state.get("report_period") or ""),
+                classification=str(
+                    state.get("classification") or FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
+                ),
+                reasons=list(state.get("selection_reasons") or ["pending_recheck"]),
+                announcement_id=str(state.get("announcement_id") or "pending"),
+                announcement_time=state.get("announcement_time"),
+                title=state.get("title"),
+            )
+            candidate = self._candidate_for_event(instrument, event)
+            candidates.setdefault(candidate.key, candidate).events.append(event)
+        if report_periods:
+            for instrument in instruments:
+                for report_period in report_periods:
+                    if max_candidates > 0 and len(candidates) >= max_candidates:
+                        return dict(list(candidates.items())[:max_candidates])
+                    candidate = self._candidate_for_period(instrument, report_period)
+                    if candidate.key in candidates:
+                        continue
+                    readiness = self._readiness_for_candidate(
+                        candidate,
+                        required_core_facts=required_core_facts,
+                        mapping_version=mapping_version,
+                    )
+                    if not readiness.get("ready"):
+                        candidate.reasons.append("missing_or_incomplete_local_core")
+                        candidates[candidate.key] = candidate
+        if max_candidates > 0 and len(candidates) > max_candidates:
+            return dict(list(candidates.items())[:max_candidates])
+        return candidates
+
+    def _candidate_for_event(
+        self,
+        instrument: Mapping[str, Any],
+        event: FinancialDisclosureEvent,
+    ) -> FinancialDisclosureMaintenanceCandidate:
+        candidate = self._candidate_for_period(instrument, event.report_period)
+        candidate.reasons = list(event.reasons)
+        candidate.events = [event]
+        return candidate
+
+    def _candidate_for_period(
+        self,
+        instrument: Mapping[str, Any],
+        report_period: str,
+    ) -> FinancialDisclosureMaintenanceCandidate:
+        instrument_id = str(instrument.get("instrument_id") or "")
+        resolution = resolve_financial_statement_profile(instrument=instrument)
+        return FinancialDisclosureMaintenanceCandidate(
+            instrument_id=instrument_id,
+            symbol=str(instrument.get("symbol") or instrument_id.split(".")[0]),
+            exchange=str(instrument.get("exchange") or ""),
+            report_period=report_period,
+            profile=resolution.profile,
+        )
+
+    async def _apply_candidates(
+        self,
+        *,
+        candidates: Sequence[FinancialDisclosureMaintenanceCandidate],
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+        db_path: Path,
+        request_interval_seconds: float,
+        request_timeout_seconds: float,
+        pending_recheck_days: int,
+        run_id: Optional[int],
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        before_ready = {
+            candidate.key: self._readiness_for_candidate(
+                candidate,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
+            )
+            for candidate in candidates
+        }
+        to_fetch = [
+            candidate
+            for candidate in candidates
+            if not before_ready[candidate.key].get("ready")
+        ]
+        unchanged = len(candidates) - len(to_fetch)
+        written = 0
+        failed = 0
+        blocking = 0
+        accepted = 0
+        pending = 0
+        pending_delisting = 0
+        changed = 0
+        outcomes: List[Dict[str, Any]] = []
+        if to_fetch and not dry_run:
+            try:
+                await self._run_targeted_import(
+                    candidates=to_fetch,
+                    required_core_facts=required_core_facts,
+                    mapping_version=mapping_version,
+                    db_path=db_path,
+                    request_interval_seconds=request_interval_seconds,
+                    request_timeout_seconds=request_timeout_seconds,
+                )
+            except Exception as exc:
+                dm_logger.warning(
+                    "[FinancialDisclosureIncremental] targeted import failed: %s",
+                    exc,
+                )
+                failed = len(to_fetch)
+        for candidate in candidates:
+            before = before_ready[candidate.key]
+            after = self._readiness_for_candidate(
+                candidate,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
+            )
+            status = "unchanged" if before.get("ready") else "pending_recheck"
+            if after.get("ready") and not before.get("ready"):
+                status = "changed"
+                changed += 1
+                written += 1
+            elif after.get("ready"):
+                status = "unchanged"
+            elif failed and candidate in to_fetch:
+                status = "failed"
+            elif candidate.classification == PENDING_DELISTING_RISK_CLASSIFICATION:
+                status = "pending_delisting_risk"
+                pending_delisting += 1
+                accepted += 1
+            elif candidate.events:
+                status = "pending_recheck"
+                pending += 1
+            else:
+                status = "blocking_gap"
+                blocking += 1
+            if status == "failed":
+                failed += 0
+            outcome = self._record_candidate_state(
+                candidate=candidate,
+                status=status,
+                readiness=after,
+                pending_recheck_days=pending_recheck_days,
+                run_id=run_id,
+                dry_run=dry_run,
+            )
+            outcomes.append(outcome)
+        return {
+            "changed_count": changed,
+            "unchanged_count": unchanged,
+            "pending_recheck_count": pending,
+            "pending_delisting_risk_count": pending_delisting,
+            "accepted_gap_count": accepted,
+            "blocking_gap_count": blocking,
+            "failed_count": failed,
+            "written_count": written,
+            "outcomes": outcomes[:50],
+        }
+
+    async def _run_targeted_import(
+        self,
+        *,
+        candidates: Sequence[FinancialDisclosureMaintenanceCandidate],
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+        db_path: Path,
+        request_interval_seconds: float,
+        request_timeout_seconds: float,
+    ) -> None:
+        from scripts.dev_validation.live_audit_sina_ths_local_core import LiveAuditTarget
+        from scripts.dev_validation.validate_sina_ths_local_core_dryrun import (
+            DEFAULT_SOURCE_ORDER,
+            run_local_core_dryrun,
+        )
+
+        grouped: Dict[str, List[FinancialDisclosureMaintenanceCandidate]] = {}
+        for candidate in candidates:
+            grouped.setdefault(candidate.report_period, []).append(candidate)
+        accepted_source_gaps = {
+            candidate.key: {
+                "facts": set(required_core_facts),
+                "classification": candidate.classification,
+            }
+            for candidate in candidates
+            if candidate.classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
+        }
+        for report_period, period_candidates in grouped.items():
+            targets = [
+                LiveAuditTarget(
+                    candidate.instrument_id,
+                    candidate.exchange,
+                    candidate.profile,
+                )
+                for candidate in period_candidates
+            ]
+            await run_local_core_dryrun(
+                targets=targets,
+                report_periods=[report_period],
+                db_path=db_path,
+                mapping_version=mapping_version,
+                source_order=DEFAULT_SOURCE_ORDER,
+                required_canonical_facts=required_core_facts,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                accepted_source_gaps=accepted_source_gaps,
+                accepted_source_gap_exchanges=(),
+            )
+
+    def _readiness_for_candidate(
+        self,
+        candidate: FinancialDisclosureMaintenanceCandidate,
+        *,
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+    ) -> Dict[str, Any]:
+        with self.storage.financial_database_scope():
+            return self.storage.financial_statements.get_local_core_facts(
+                candidate.instrument_id,
+                report_period=candidate.report_period,
+                requested_canonical_facts=list(required_core_facts),
+                profile=candidate.profile,
+                mapping_version=mapping_version,
+                include_history=True,
+            )
+
+    def _record_candidate_state(
+        self,
+        *,
+        candidate: FinancialDisclosureMaintenanceCandidate,
+        status: str,
+        readiness: Mapping[str, Any],
+        pending_recheck_days: int,
+        run_id: Optional[int],
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        now = get_shanghai_time()
+        pending_until = None
+        first_pending = None
+        if status in {"pending_recheck", "pending_delisting_risk"}:
+            first_pending = now.isoformat()
+            pending_until = (now + timedelta(days=pending_recheck_days)).isoformat()
+        event = candidate.events[0] if candidate.events else None
+        announcement_id = (
+            event.announcement_id
+            if event and event.announcement_id
+            else f"local-gap:{candidate.instrument_id}:{candidate.report_period}"
+        )
+        outcome = {
+            "instrument_id": candidate.instrument_id,
+            "report_period": candidate.report_period,
+            "status": status,
+            "classification": candidate.classification if candidate.events else "local_core_gap",
+            "missing_field_count": len(readiness.get("missing_fields") or []),
+        }
+        if not dry_run:
+            with self.storage.financial_database_scope():
+                self.storage.upsert_financial_disclosure_event_state(
+                    instrument_id=candidate.instrument_id,
+                    report_period=candidate.report_period,
+                    announcement_id=str(announcement_id),
+                    symbol=candidate.symbol,
+                    exchange=candidate.exchange,
+                    status=status,
+                    classification=outcome["classification"],
+                    title=None if event is None else event.title,
+                    announcement_time=None if event is None else event.announcement_time,
+                    selection_reasons=list(candidate.reasons),
+                    missing_fields=list(readiness.get("missing_fields") or []),
+                    first_pending_at=first_pending,
+                    pending_recheck_until=pending_until,
+                    processed_at=now.isoformat(),
+                    metadata={"event_count": len(candidate.events)},
+                    ingestion_run_id=run_id,
+                )
+        return outcome
+
+    @staticmethod
+    def _resolve_report_periods(
+        *,
+        report_periods: Optional[Sequence[str]],
+        period_window: str,
+        rolling_quarters: int,
+        baseline_report_period: str,
+        latest_report_period: Optional[str],
+    ) -> List[str]:
+        if report_periods:
+            return [str(item) for item in report_periods if str(item)]
+        if period_window != "latest":
+            return []
+        return build_financial_report_periods(
+            baseline_report_period=baseline_report_period,
+            rolling_min_quarters=rolling_quarters,
+            latest_report_period=latest_report_period,
+        )
+
+    @staticmethod
+    def _derive_status(
+        *,
+        candidate_count: int,
+        failed_count: int,
+        blocking_count: int,
+        scan_errors: Sequence[str],
+    ) -> str:
+        if scan_errors and candidate_count <= 0:
+            return "failed"
+        if failed_count or blocking_count or scan_errors:
+            return "degraded"
+        return "success"

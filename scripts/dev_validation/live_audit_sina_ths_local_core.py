@@ -578,7 +578,11 @@ def _load_numeric_facts(
             """
             SELECT fact_name, canonical_fact_name, fact_value, unit, canonical_unit,
                    statement_family, source, source_mode, raw_fact_json
-            FROM financial_numeric_facts
+            FROM (
+                SELECT * FROM financial_numeric_facts_hot
+                UNION ALL
+                SELECT * FROM financial_numeric_facts_history
+            )
             WHERE instrument_id = ? AND report_period = ?
             ORDER BY fact_name ASC
             """,

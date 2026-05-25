@@ -680,6 +680,120 @@
           "max_runtime_seconds": 3600
         }
       },
+      "financial_l1_full_import": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "财务 L1 本地核心层全量导入/补处理",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 8,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "period_window": "latest",
+          "rolling_quarters": 10,
+          "baseline_report_period": "2024Q1",
+          "latest_report_period": null,
+          "db_path": "data/financials.db",
+          "log_dir": null,
+          "limit_per_exchange": null,
+          "batch_size": 20,
+          "resume": true,
+          "request_interval_seconds": 0.2,
+          "request_timeout_seconds": 20.0,
+          "financial_disclosure_events_path": null,
+          "manifest_only": false,
+          "max_runtime_seconds": 18000
+        }
+      },
+      "financial_disclosure_incremental_sync": {
+        "enabled": false,
+        "description": "财务公告驱动增量检查",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "hour": 18,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "lookback_days": 14,
+          "overlap_days": 3,
+          "page_size": 30,
+          "max_pages_per_market": 40,
+          "max_candidates": 500,
+          "pending_recheck_days": 7,
+          "target_instrument_ids": null,
+          "target_symbols": null,
+          "announcement_search_key": null,
+          "period_window": "latest",
+          "rolling_quarters": 10,
+          "baseline_report_period": "2024Q1",
+          "latest_report_period": null,
+          "db_path": "data/financials.db",
+          "request_interval_seconds": 0.2,
+          "request_timeout_seconds": 20.0,
+          "dry_run": false,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "financial_disclosure_reconciliation_sync": {
+        "enabled": false,
+        "description": "财务本地核心层周度有界对账",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 8,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "period_window": "latest",
+          "rolling_quarters": 10,
+          "baseline_report_period": "2024Q1",
+          "latest_report_period": null,
+          "max_candidates": 500,
+          "pending_recheck_days": 7,
+          "target_instrument_ids": null,
+          "target_symbols": null,
+          "db_path": "data/financials.db",
+          "request_interval_seconds": 0.2,
+          "request_timeout_seconds": 20.0,
+          "dry_run": false,
+          "max_runtime_seconds": 10800
+        }
+      },
       "financial_statements_shadow_sync": {
         "enabled": false,
         "description": "研究域财务报表影子同步",

@@ -58,6 +58,30 @@ def test_manifest_lifecycle_exclusions_become_accepted_source_gaps():
     assert entry["classification"] == "post_delisting_or_no_disclosure"
 
 
+def test_manifest_financial_disclosure_events_become_accepted_source_gaps():
+    accepted = accepted_source_gaps_from_manifest_lifecycle(
+        {
+            "targets": [
+                {
+                    "instrument_id": "002731.SZ",
+                    "excluded_report_periods": [
+                        {
+                            "report_period": "2025-12-31",
+                            "classification": "periodic_report_delayed_or_suspended",
+                            "disclosure_events": [{"announcement_id": "a1"}],
+                        }
+                    ],
+                }
+            ]
+        },
+        required_canonical_facts=["revenue", "net_income_parent"],
+    )
+
+    entry = accepted[("002731.SZ", "2025-12-31")]
+    assert entry["facts"] == {"revenue", "net_income_parent"}
+    assert entry["classification"] == "periodic_report_delayed_or_suspended"
+
+
 def test_merge_accepted_source_gaps_keeps_all_fact_names():
     merged = merge_accepted_source_gaps(
         {

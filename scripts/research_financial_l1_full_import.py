@@ -29,6 +29,7 @@ from scripts.dev_validation.prepare_sina_ths_local_core_import_manifest import (
     DEFAULT_EXCHANGES,
     build_local_core_import_manifest,
     collect_target_instruments,
+    load_financial_disclosure_events,
     manifest_console_summary,
     parse_required_canonical_facts,
     parse_report_periods,
@@ -167,14 +168,42 @@ def target_has_required_facts(
     if not required:
         return True
     placeholders = ",".join("?" for _ in required)
-    query = (
-        "SELECT DISTINCT canonical_fact_name "
-        "FROM financial_numeric_facts "
-        "WHERE instrument_id = ? AND report_period = ? "
-        f"AND canonical_fact_name IN ({placeholders}) "
-        "AND fact_value IS NOT NULL"
-    )
     with sqlite3.connect(db_path) as conn:
+        available = {
+            str(row[0])
+            for row in conn.execute(
+                """
+                SELECT name
+                FROM sqlite_master
+                WHERE type IN ('table', 'view')
+                  AND name IN (
+                    'financial_numeric_facts_hot',
+                    'financial_numeric_facts_history',
+                    'financial_numeric_facts'
+                  )
+                """
+            ).fetchall()
+        }
+        if {
+            "financial_numeric_facts_hot",
+            "financial_numeric_facts_history",
+        }.issubset(available):
+            source_sql = (
+                "SELECT * FROM financial_numeric_facts_hot "
+                "UNION ALL "
+                "SELECT * FROM financial_numeric_facts_history"
+            )
+        elif "financial_numeric_facts" in available:
+            source_sql = "SELECT * FROM financial_numeric_facts"
+        else:
+            return False
+        query = (
+            "SELECT DISTINCT canonical_fact_name "
+            f"FROM ({source_sql}) "
+            "WHERE instrument_id = ? AND report_period = ? "
+            f"AND canonical_fact_name IN ({placeholders}) "
+            "AND fact_value IS NOT NULL"
+        )
         rows = conn.execute(
             query,
             [instrument_id, report_period, *sorted(required)],
@@ -268,6 +297,8 @@ async def build_or_load_manifest(
     batch_size: int,
     mapping_version: str,
     required_canonical_facts: Sequence[str],
+    financial_disclosure_events: Optional[Sequence[Dict[str, Any]]],
+    instrument_master_governance_enabled: bool,
     resume: bool,
 ) -> Dict[str, Any]:
     manifest_path = log_dir / "manifest.json"
@@ -287,6 +318,15 @@ async def build_or_load_manifest(
 
     await initialize_manager_for_research_cli(data_manager)
     try:
+        instrument_master_governance = None
+        if instrument_master_governance_enabled:
+            ensure_master = getattr(data_manager, "ensure_instrument_master_fresh", None)
+            if ensure_master is not None:
+                instrument_master_governance = await ensure_master(
+                    list(exchanges),
+                    job_name="financial_l1_full_import",
+                    job_type="current",
+                )
         instruments_by_exchange = await collect_target_instruments(
             data_manager.db_ops,
             exchanges=exchanges,
@@ -299,7 +339,10 @@ async def build_or_load_manifest(
             mapping_version=mapping_version,
             required_canonical_facts=required_canonical_facts,
             batch_size=batch_size,
+            financial_disclosure_events=financial_disclosure_events,
         )
+        if instrument_master_governance is not None:
+            manifest["instrument_master_governance"] = instrument_master_governance
     finally:
         close = getattr(data_manager, "close", None)
         if close is not None:
@@ -333,12 +376,14 @@ async def run_full_import(
     mapping_version: str,
     source_order: Sequence[str],
     required_canonical_facts: Sequence[str],
+    financial_disclosure_events: Optional[Sequence[Dict[str, Any]]],
     accepted_source_gap_specs: Sequence[str],
     accepted_source_gap_exchanges: Sequence[str],
     continue_on_needs_review: bool,
     skip_ready_targets: bool,
     request_interval_seconds: float,
     request_timeout_seconds: float,
+    instrument_master_governance_enabled: bool,
     resume: bool,
     manifest_only: bool,
     start_batch: Optional[int],
@@ -365,6 +410,8 @@ async def run_full_import(
         batch_size=batch_size,
         mapping_version=mapping_version,
         required_canonical_facts=required_canonical_facts,
+        financial_disclosure_events=financial_disclosure_events,
+        instrument_master_governance_enabled=instrument_master_governance_enabled,
         resume=resume,
     )
     if manifest.get("status") == "blocked":
@@ -559,6 +606,7 @@ async def run_full_import(
         "db_path": str(db_path),
         "report_periods": list(report_periods),
         "manifest_path": str(log_dir / "manifest.json"),
+        "instrument_master_governance": manifest.get("instrument_master_governance"),
         "report_period_lifecycle_summary": manifest.get(
             "report_period_lifecycle_summary"
         ),
@@ -682,6 +730,20 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Do not include the currently reviewed BSE/pre-listing STAR accepted gaps.",
     )
+    parser.add_argument(
+        "--financial-disclosure-events-path",
+        type=Path,
+        help=(
+            "Optional JSON event file generated from CNInfo announcement scans. "
+            "periodic_report_delayed_or_suspended events are merged into manifest "
+            "accepted gaps."
+        ),
+    )
+    parser.add_argument(
+        "--skip-instrument-master-governance",
+        action="store_true",
+        help="Skip the shared A-share instrument-master freshness check before manifest build.",
+    )
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--manifest-only", action="store_true")
     parser.add_argument("--start-batch", type=int)
@@ -716,12 +778,16 @@ async def async_main(argv: Optional[List[str]] = None) -> int:
         required_canonical_facts=parse_required_canonical_facts(
             args.required_canonical_facts
         ),
+        financial_disclosure_events=load_financial_disclosure_events(
+            args.financial_disclosure_events_path
+        ),
         accepted_source_gap_specs=accepted_gaps,
         accepted_source_gap_exchanges=parse_csv(args.accepted_source_gap_exchanges),
         continue_on_needs_review=not args.stop_on_needs_review,
         skip_ready_targets=not args.no_skip_ready_targets,
         request_interval_seconds=args.request_interval_seconds,
         request_timeout_seconds=args.request_timeout_seconds,
+        instrument_master_governance_enabled=not args.skip_instrument_master_governance,
         resume=args.resume,
         manifest_only=args.manifest_only,
         start_batch=args.start_batch,

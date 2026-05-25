@@ -1332,13 +1332,6 @@ class ResearchStorageManager:
                 self._upsert_financial_numeric_fact_row(
                     conn,
                     fact,
-                    table_name="financial_numeric_facts",
-                    ingestion_run_id=ingestion_run_id,
-                    now=now,
-                )
-                self._upsert_financial_numeric_fact_row(
-                    conn,
-                    fact,
                     table_name=tier_table,
                     ingestion_run_id=ingestion_run_id,
                     now=now,
@@ -5726,6 +5719,147 @@ class ResearchStorageManager:
             )
             conn.commit()
 
+    def upsert_financial_disclosure_event_state(
+        self,
+        *,
+        instrument_id: str,
+        report_period: str,
+        announcement_id: str,
+        symbol: Optional[str],
+        exchange: Optional[str],
+        status: str,
+        classification: str,
+        title: Optional[str],
+        announcement_time: Optional[str],
+        selection_reasons: Optional[List[str]] = None,
+        missing_fields: Optional[List[Dict[str, Any]]] = None,
+        first_pending_at: Optional[str] = None,
+        pending_recheck_until: Optional[str] = None,
+        processed_at: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Persist financial announcement maintenance state by instrument-period."""
+        now = get_shanghai_time().isoformat()
+        reasons_json = json.dumps(selection_reasons or [], ensure_ascii=False, sort_keys=True)
+        missing_json = json.dumps(missing_fields or [], ensure_ascii=False, sort_keys=True)
+        metadata_json = json.dumps(metadata or {}, ensure_ascii=False, sort_keys=True, default=str)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO financial_disclosure_event_state (
+                    instrument_id,
+                    report_period,
+                    announcement_id,
+                    symbol,
+                    exchange,
+                    status,
+                    classification,
+                    title,
+                    announcement_time,
+                    selection_reasons_json,
+                    missing_fields_json,
+                    first_pending_at,
+                    pending_recheck_until,
+                    processed_at,
+                    metadata_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, report_period, announcement_id)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    status = excluded.status,
+                    classification = excluded.classification,
+                    title = excluded.title,
+                    announcement_time = excluded.announcement_time,
+                    selection_reasons_json = excluded.selection_reasons_json,
+                    missing_fields_json = excluded.missing_fields_json,
+                    first_pending_at = COALESCE(
+                        financial_disclosure_event_state.first_pending_at,
+                        excluded.first_pending_at
+                    ),
+                    pending_recheck_until = CASE
+                        WHEN excluded.status IN ('pending_recheck', 'pending_delisting_risk')
+                        THEN COALESCE(
+                            financial_disclosure_event_state.pending_recheck_until,
+                            excluded.pending_recheck_until
+                        )
+                        ELSE excluded.pending_recheck_until
+                    END,
+                    processed_at = excluded.processed_at,
+                    metadata_json = excluded.metadata_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    instrument_id,
+                    report_period,
+                    announcement_id,
+                    symbol,
+                    exchange,
+                    status,
+                    classification,
+                    title,
+                    announcement_time,
+                    reasons_json,
+                    missing_json,
+                    first_pending_at,
+                    pending_recheck_until,
+                    processed_at,
+                    metadata_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def list_financial_disclosure_event_states(
+        self,
+        *,
+        statuses: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return persisted financial announcement maintenance state."""
+        params: List[Any] = []
+        where = ""
+        if statuses:
+            placeholders = ",".join("?" for _ in statuses)
+            where = f"WHERE status IN ({placeholders})"
+            params.extend(statuses)
+        limit_clause = ""
+        if limit is not None:
+            limit_clause = "LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM financial_disclosure_event_state
+                {where}
+                ORDER BY updated_at ASC
+                {limit_clause}
+                """,
+                params,
+            ).fetchall()
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["selection_reasons"] = self._deserialize_json(
+                item.pop("selection_reasons_json", None)
+            ) or []
+            item["missing_fields"] = self._deserialize_json(
+                item.pop("missing_fields_json", None)
+            ) or []
+            item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
+            result.append(item)
+        return result
+
     def get_shareholder_change_manifest(
         self,
         instrument_id: str,
@@ -7846,6 +7980,20 @@ class ResearchStorageManager:
         )
 
     @staticmethod
+    def _sqlite_object_type(conn: sqlite3.Connection, object_name: str) -> Optional[str]:
+        row = conn.execute(
+            """
+            SELECT type
+            FROM sqlite_master
+            WHERE name = ?
+            ORDER BY type
+            LIMIT 1
+            """,
+            (object_name,),
+        ).fetchone()
+        return None if row is None else str(row["type"])
+
+    @staticmethod
     def _ensure_column(
         conn: sqlite3.Connection,
         table_name: str,
@@ -7856,7 +8004,10 @@ class ResearchStorageManager:
             row["name"]
             for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
         }
-        if column_name not in columns:
+        if (
+            column_name not in columns
+            and ResearchStorageManager._sqlite_object_type(conn, table_name) != "view"
+        ):
             conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_sql}")
 
     @staticmethod
@@ -8031,12 +8182,13 @@ class ResearchStorageManager:
                 "canonical_version",
                 "canonical_version TEXT",
             )
-        conn.execute(
-            """
-            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_canonical
-            ON financial_numeric_facts(instrument_id, report_period, canonical_fact_name)
-            """
-        )
+        if cls._sqlite_object_type(conn, "financial_numeric_facts") == "table":
+            conn.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_canonical
+                ON financial_numeric_facts(instrument_id, report_period, canonical_fact_name)
+                """
+            )
         conn.execute(
             """
             CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_hot_canonical
@@ -8217,6 +8369,32 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_cninfo_announcement_audit_lookup
             ON cninfo_announcement_audit(purpose_key, announcement_time, instrument_id);
 
+            CREATE TABLE IF NOT EXISTS financial_disclosure_event_state (
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                announcement_id TEXT NOT NULL,
+                symbol TEXT,
+                exchange TEXT,
+                status TEXT NOT NULL DEFAULT 'pending_recheck',
+                classification TEXT NOT NULL,
+                title TEXT,
+                announcement_time TEXT,
+                selection_reasons_json TEXT NOT NULL DEFAULT '[]',
+                missing_fields_json TEXT NOT NULL DEFAULT '[]',
+                first_pending_at TEXT,
+                pending_recheck_until TEXT,
+                processed_at TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, report_period, announcement_id),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_financial_disclosure_event_state_status
+            ON financial_disclosure_event_state(status, pending_recheck_until, updated_at);
+
             CREATE TABLE IF NOT EXISTS shareholder_change_manifest (
                 instrument_id TEXT PRIMARY KEY,
                 symbol TEXT NOT NULL,
@@ -8382,9 +8560,6 @@ class ResearchStorageManager:
                 PRIMARY KEY (source_file_id, fact_name, context_id, unit, dimensions_hash),
                 FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
             );
-
-            CREATE INDEX IF NOT EXISTS idx_financial_numeric_facts_instrument
-            ON financial_numeric_facts(instrument_id, report_period, fact_name);
 
             CREATE TABLE IF NOT EXISTS financial_numeric_facts_hot (
                 source_file_id TEXT NOT NULL,

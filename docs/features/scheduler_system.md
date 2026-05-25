@@ -489,14 +489,61 @@ async def weekly_data_maintenance(self,
 ### 6.6 研究域财务报表日更与对账
 
 #### 功能描述
-财务报表不再依赖周六股东刷新窗口。当前新增两个默认禁用任务：
+财务报表不再依赖周六股东刷新窗口。L1 本地核心层完成初始化后，财务维护应拆成手工全量入口、公告驱动增量入口和周期对账入口，模式参考股东摘要更新，但写入目标为 `data/financials.db`。
 
-- `financial_statements_catchup_sync`：周一至周五 `17:45` 运行日度 `catchup`，用于处理新披露或变化的报告期。
-- `financial_statements_reconciliation_sync`：周日 `08:30` 运行有界对账修复，默认 `force_full=true`，避开周六股东周期复核窗口。
+- `financial_l1_full_import`：仅手工 `/run`，封装当前 L1 全量导入/补处理脚本，不注册 cron；用于初始化、灾后恢复和大范围补处理。
+- `financial_disclosure_incremental_sync`：公告驱动日更，扫描 CNInfo 定期报告公告和披露异常公告，生成候选标的/报告期后定向补处理。
+- `financial_disclosure_reconciliation_sync`：周度兜底，复核缺失报告期、accepted gap、pending recheck 和 CNInfo 静默更新。
+- 旧 `financial_statements_catchup_sync / financial_statements_reconciliation_sync` 在新任务落地前保持禁用；后续应迁移到新的公告驱动语义或作为兼容别名。
+
+实现状态（`2026-05-24`）：新三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`；增量和对账任务默认 `enabled=false`，可先 `/run` 验证后再启用 cron。
 
 #### 当前配置
 ```json
 {
+  "financial_l1_full_import": {
+    "enabled": true,
+    "manual_only": true,
+    "description": "财务 L1 本地核心层手工全量导入与补处理",
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "period_window": "latest",
+      "rolling_quarters": 10,
+      "baseline_report_period": "2024Q1",
+      "db_path": "data/financials.db",
+      "batch_size": 20,
+      "max_runtime_seconds": 18000
+    }
+  },
+  "financial_disclosure_incremental_sync": {
+    "enabled": false,
+    "trigger": {"type": "cron", "hour": 18, "minute": 30},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "lookback_days": 14,
+      "overlap_days": 3,
+      "page_size": 30,
+      "max_pages_per_market": 40,
+      "pending_recheck_days": 7,
+      "max_candidates": 500,
+      "db_path": "data/financials.db",
+      "dry_run": false,
+      "max_runtime_seconds": 7200
+    }
+  },
+  "financial_disclosure_reconciliation_sync": {
+    "enabled": false,
+    "trigger": {"type": "cron", "day_of_week": "sun", "hour": 8, "minute": 30},
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "period_window": "latest",
+      "rolling_quarters": 10,
+      "max_candidates": 500,
+      "pending_recheck_days": 7,
+      "db_path": "data/financials.db",
+      "max_runtime_seconds": 10800
+    }
+  },
   "financial_statements_catchup_sync": {
     "enabled": false,
     "trigger": {"type": "cron", "day_of_week": "mon-fri", "hour": 17, "minute": 45},
@@ -521,9 +568,14 @@ async def weekly_data_maintenance(self,
 ```
 
 #### 业务逻辑
-1. **增量维护**：catch-up 依赖上次成功 `ingestion_runs` checkpoint、source hash 和 core facts 存在性跳过未变化文件。
-2. **对账修复**：reconciliation 复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比和 hot/cold tier consistency。
-3. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
+1. **主数据前置**：三个财务任务在读取 active 股票池前都先走共享证券主数据治理，历史回补语义除外。
+2. **公告候选**：增量任务按 CNInfo 市场/栏目和时间窗口扫描公告，不逐股票扫描；筛选年度报告、半年度报告、一季报、三季报、更正公告、延期披露、停牌、退市风险警示和可能终止上市公告。
+3. **待退市标记**：历史缺报且公告显示停牌、退市风险或可能终止上市时，先标记为 `pending_delisting_risk`，并记录公告证据；该状态解释披露异常，不替代字段映射。
+4. **定向补处理**：只对公告候选、pending recheck、本地缺失报告期和 required core facts 不完整标的调用 L1 导入；已完整落库的 instrument-period 跳过。
+5. **结构化数据滞后**：公告先到但 Sina/THS 结构化源未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间固定为首次 pending 派生值，不滚动延长。
+6. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。
+7. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
+8. **状态持久化**：财务公告候选和处理结果写入 `financial_disclosure_event_state`，扫描水位和公告证据使用独立 purpose key 写入 CNInfo announcement 状态/审计表。
 
 ### 7. 系统健康检查 (system_health_check)
 

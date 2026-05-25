@@ -503,6 +503,95 @@ def test_data_manager_run_financial_statements_shadow_sync_delegates_to_service(
     service_cls.assert_called_once()
 
 
+def test_data_manager_run_financial_l1_full_import_delegates_to_python_orchestrator(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch(
+        "scripts.research_financial_l1_full_import.run_full_import",
+        new_callable=AsyncMock,
+    ) as run_full_import:
+        run_full_import.return_value = {"status": "success"}
+        result = _run(
+            manager.run_financial_l1_full_import(
+                exchanges=["SSE"],
+                period_window="latest",
+                rolling_quarters=1,
+                latest_report_period="2026Q1",
+                db_path=str(tmp_path / "financials.db"),
+                log_dir=str(tmp_path / "log"),
+            )
+        )
+
+    assert result["status"] == "success"
+    run_full_import.assert_awaited_once()
+    kwargs = run_full_import.await_args.kwargs
+    assert kwargs["exchanges"] == ["SSE"]
+    assert kwargs["report_periods"][0] == "2024-03-31"
+    assert kwargs["report_periods"][-1] == "2026-03-31"
+    assert str(kwargs["db_path"]).endswith("financials.db")
+
+
+def test_data_manager_run_financial_disclosure_incremental_sync_delegates_to_service(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+    manager._ensure_research_job_instrument_master_governance = AsyncMock(
+        return_value={"status": "skipped"}
+    )
+
+    with patch(
+        "research.financial_disclosure_incremental_sync.FinancialDisclosureIncrementalSyncService"
+    ) as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+        result = _run(
+            manager.run_financial_disclosure_incremental_sync(
+                exchanges=["SZSE"],
+                dry_run=True,
+            )
+        )
+
+    assert result["status"] == "success"
+    assert result["instrument_master_governance"]["status"] == "skipped"
+    service_instance.sync.assert_awaited_once_with(
+        exchanges=["SZSE"],
+        lookback_days=None,
+        overlap_days=None,
+        page_size=None,
+        max_pages_per_market=None,
+        max_candidates=None,
+        pending_recheck_days=None,
+        target_instrument_ids=None,
+        target_symbols=None,
+        announcement_search_key=None,
+        report_periods=None,
+        period_window="latest",
+        rolling_quarters=10,
+        baseline_report_period="2024Q1",
+        latest_report_period=None,
+        db_path=None,
+        request_interval_seconds=0.2,
+        request_timeout_seconds=20.0,
+        dry_run=True,
+        reconciliation=False,
+    )
+
+
 def test_data_manager_run_industry_shadow_sync_returns_unavailable_without_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
 

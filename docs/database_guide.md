@@ -36,9 +36,10 @@
 
 1. **存储隔离**
    - `2026-05-20` 起，财务域生产读写必须通过 `financials_db_path` 路由到 `data/financials.db`；`data/research.db` 中已有的 `financial_*` 表只作为历史兼容/迁移来源，不再作为新增财务事实的目标库。
-   - 财务仓表包括 `financial_summaries`、`financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`、`financial_source_files`、`financial_numeric_facts`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`、`financial_source_field_mappings` 和 `financial_source_mapping_audits`。
+   - 财务仓表包括 `financial_summaries`、`financial_statements_raw`、`financial_facts`、`financial_indicator_snapshots`、`financial_source_files`、`financial_core_facts_hot/history`、`financial_numeric_facts_hot/history`、`financial_indicator_snapshots_hot/history`、`financial_source_field_mappings` 和 `financial_source_mapping_audits`。`financial_numeric_facts` 在优化后只作为 `hot UNION ALL history` 兼容视图，不再作为重复物理表写入。
    - 官方 XBRL 或等价结构化文件归档放在 `data/filings/`，归档路径写入 `financial_source_files.archive_path`。
    - `quotes.db` 不承载财务事实表，避免行情主库被低频大字段写入放大。
+   - 财务库离线优化必须保持最终库名 `data/financials.db`；如需备份生产库，默认写入 `/home/python/Quote/data/PVE-Bak/QuoteBak`。
 
 2. **访问抽象**
    - `DataManager`、API 路由、provider 和 sync service 只依赖 storage/repository 方法。

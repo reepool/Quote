@@ -240,6 +240,79 @@ def _format_shareholder_shadow_scheduler_report(
     return "\n".join(lines)
 
 
+def _format_financial_l1_import_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build compact Telegram content for Financial L1 full import."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    review_batches = result.get("review_batches") or []
+    failed_batches = result.get("failed_batches") or []
+    lines = [
+        f"结论: {icon} *{label}*",
+        f"status: `{status}`",
+        f"数据库: `{result.get('db_path', 'unknown')}`",
+        f"日志目录: `{result.get('log_dir', 'unknown')}`",
+        f"manifest: `{result.get('manifest_path', 'unknown')}`",
+        f"progress: `{result.get('progress_path', 'unknown')}`",
+        f"报告期: `{', '.join(result.get('report_periods') or [])}`",
+        (
+            "批次: "
+            f"{result.get('completed_batch_count', 0)}/"
+            f"{result.get('selected_batch_count', result.get('batch_count', 0))}"
+        ),
+        f"目标标的: `{result.get('target_count', 0)}`",
+        f"需复核批次: `{len(review_batches)}`，失败批次: `{len(failed_batches)}`",
+        f"耗时: `{result.get('elapsed_seconds', 0)}s`",
+    ]
+    lifecycle = result.get("report_period_lifecycle_summary")
+    if isinstance(lifecycle, dict):
+        lines.append(
+            "生命周期排除: "
+            f"上市前 {lifecycle.get('pre_listing', 0)}，"
+            f"退市后 {lifecycle.get('post_delisting', 0)}，"
+            f"公告解释 {lifecycle.get('disclosure_events', 0)}"
+        )
+    if review_batches:
+        lines.append("后续动作: 查看 review batch 明细，属于公告/生命周期解释的继续记录，字段缺失 blocker 单独补处理。")
+    return "\n".join(lines)
+
+
+def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build compact Telegram content for financial disclosure maintenance."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    lines = [
+        f"结论: {icon} *{label}*",
+        f"status: `{status}`",
+        f"数据库: `{result.get('db_path', 'unknown')}`",
+        f"模式: `{'reconciliation' if result.get('reconciliation') else 'incremental'}`",
+        f"报告期: `{', '.join(result.get('report_periods') or [])}`",
+        f"公告扫描: {result.get('announcements_scanned', 0)}，命中 {result.get('selected_announcements', 0)}，页数 {result.get('pages_scanned', 0)}",
+        f"候选: `{result.get('candidate_count', 0)}`",
+        (
+            "处理: "
+            f"写入/修复 {result.get('changed_count', 0)}，"
+            f"跳过未变 {result.get('unchanged_count', 0)}，"
+            f"pending recheck {result.get('pending_recheck_count', 0)}，"
+            f"待退市风险 {result.get('pending_delisting_risk_count', 0)}"
+        ),
+        (
+            "质量状态: "
+            f"accepted gaps {result.get('accepted_gap_count', 0)}，"
+            f"blockers {result.get('blocking_gap_count', 0)}，"
+            f"failed {result.get('failed_count', 0)}"
+        ),
+        f"耗时: `{result.get('elapsed_seconds', 0)}s`",
+    ]
+    scan_errors = result.get("scan_errors") or []
+    if scan_errors:
+        lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))
+    if result.get("pending_delisting_risk_count", 0):
+        lines.append("说明: 待退市风险只是披露异常待补状态，不会改写股票主数据退市状态。")
+    if result.get("blocking_gap_count", 0):
+        lines.append("后续动作: blocker 仍按字段映射/源数据缺失处理，不能并入 accepted gaps。")
+    return "\n".join(lines)
+
+
 def _format_shareholder_incremental_scheduler_report(
     result: Dict[str, Any],
     readiness: Optional[Dict[str, Any]] = None,
@@ -2370,6 +2443,276 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('financial_statements_shadow_sync')
+
+    async def financial_l1_full_import(
+        self,
+        exchanges: Optional[List[str]] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        db_path: str = "data/financials.db",
+        log_dir: Optional[str] = None,
+        limit_per_exchange: Optional[int] = None,
+        batch_size: int = 20,
+        resume: bool = False,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        financial_disclosure_events_path: Optional[str] = None,
+        manifest_only: bool = False,
+        start_batch: Optional[int] = None,
+        end_batch: Optional[int] = None,
+        max_batches: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """财务 L1 本地核心层全量/补处理手工任务。"""
+        task_name = 'financial_l1_full_import'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial L1 full import...")
+            result = await data_manager.run_financial_l1_full_import(
+                exchanges=exchanges,
+                report_periods=report_periods,
+                period_window=period_window,
+                rolling_quarters=rolling_quarters,
+                baseline_report_period=baseline_report_period,
+                latest_report_period=latest_report_period,
+                db_path=db_path,
+                log_dir=log_dir,
+                limit_per_exchange=limit_per_exchange,
+                batch_size=batch_size,
+                resume=resume,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                financial_disclosure_events_path=financial_disclosure_events_path,
+                manifest_only=manifest_only,
+                start_batch=start_batch,
+                end_batch=end_batch,
+                max_batches=max_batches,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'success_with_review', 'manifest_ready'}
+            report_data = {
+                'name': '财务 L1 本地核心层全量导入报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('completed_batch_count', 0),
+                'duration': f"{result.get('elapsed_seconds', 0)}s",
+                'content': _format_financial_l1_import_scheduler_report(result),
+                'maintenance_tasks': [
+                    {
+                        'task_name': task_name,
+                        'status': (
+                            f"{status} "
+                            f"(batches={result.get('completed_batch_count', 0)}/"
+                            f"{result.get('selected_batch_count', result.get('batch_count', 0))})"
+                        ),
+                    }
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='财务 L1 本地核心层全量导入',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial L1 full import failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务 L1 本地核心层全量导入报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='财务 L1 本地核心层全量导入',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
+    async def financial_disclosure_incremental_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages_per_market: Optional[int] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        target_symbols: Optional[List[str]] = None,
+        announcement_search_key: Optional[str] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        db_path: Optional[str] = None,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """财务公告驱动增量检查任务。"""
+        task_name = 'financial_disclosure_incremental_sync'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial disclosure incremental sync...")
+            result = await data_manager.run_financial_disclosure_incremental_sync(
+                exchanges=exchanges,
+                lookback_days=lookback_days,
+                overlap_days=overlap_days,
+                page_size=page_size,
+                max_pages_per_market=max_pages_per_market,
+                max_candidates=max_candidates,
+                pending_recheck_days=pending_recheck_days,
+                target_instrument_ids=target_instrument_ids,
+                target_symbols=target_symbols,
+                announcement_search_key=announcement_search_key,
+                report_periods=report_periods,
+                period_window=period_window,
+                rolling_quarters=rolling_quarters,
+                baseline_report_period=baseline_report_period,
+                latest_report_period=latest_report_period,
+                db_path=db_path,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                dry_run=dry_run,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '财务公告驱动增量检查报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('changed_count', 0),
+                'duration': f"{result.get('elapsed_seconds', 0)}s",
+                'content': _format_financial_disclosure_scheduler_report(result),
+                'maintenance_tasks': [
+                    {
+                        'task_name': task_name,
+                        'status': (
+                            f"{status} "
+                            f"(candidates={result.get('candidate_count', 0)}, "
+                            f"changed={result.get('changed_count', 0)})"
+                        ),
+                    }
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='财务公告驱动增量检查',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial disclosure incremental sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务公告驱动增量检查报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='财务公告驱动增量检查',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
+    async def financial_disclosure_reconciliation_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        report_periods: Optional[List[str]] = None,
+        period_window: str = "latest",
+        rolling_quarters: int = 10,
+        baseline_report_period: str = "2024Q1",
+        latest_report_period: Optional[str] = None,
+        max_candidates: Optional[int] = None,
+        pending_recheck_days: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        target_symbols: Optional[List[str]] = None,
+        db_path: Optional[str] = None,
+        request_interval_seconds: float = 0.2,
+        request_timeout_seconds: float = 20.0,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """财务本地核心层周度有界对账任务。"""
+        task_name = 'financial_disclosure_reconciliation_sync'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting financial disclosure reconciliation sync...")
+            result = await data_manager.run_financial_disclosure_reconciliation_sync(
+                exchanges=exchanges,
+                report_periods=report_periods,
+                period_window=period_window,
+                rolling_quarters=rolling_quarters,
+                baseline_report_period=baseline_report_period,
+                latest_report_period=latest_report_period,
+                max_candidates=max_candidates,
+                pending_recheck_days=pending_recheck_days,
+                target_instrument_ids=target_instrument_ids,
+                target_symbols=target_symbols,
+                db_path=db_path,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                dry_run=dry_run,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '财务本地核心层周度对账报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('changed_count', 0),
+                'duration': f"{result.get('elapsed_seconds', 0)}s",
+                'content': _format_financial_disclosure_scheduler_report(result),
+                'maintenance_tasks': [
+                    {
+                        'task_name': task_name,
+                        'status': (
+                            f"{status} "
+                            f"(candidates={result.get('candidate_count', 0)}, "
+                            f"blockers={result.get('blocking_gap_count', 0)})"
+                        ),
+                    }
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='财务本地核心层周度对账',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Financial disclosure reconciliation sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '财务本地核心层周度对账报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='财务本地核心层周度对账',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
 
     async def financial_statements_catchup_sync(
         self,

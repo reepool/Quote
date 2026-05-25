@@ -78,6 +78,7 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "shareholder_snapshots" in tables
     assert "cninfo_announcement_scan_state" in tables
     assert "cninfo_announcement_audit" in tables
+    assert "financial_disclosure_event_state" in tables
     assert "shareholder_change_manifest" in tables
     assert "financial_statements_raw" in tables
     assert "financial_source_files" in tables
@@ -103,6 +104,55 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "industry_source_files" in tables
     assert "industry_classification_history" in tables
     assert "industry_memberships" in tables
+
+
+def test_financial_disclosure_pending_deadline_is_not_extended(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+
+    common = {
+        "instrument_id": "688121.SH",
+        "report_period": "2025-12-31",
+        "announcement_id": "ann-1",
+        "symbol": "688121",
+        "exchange": "SSE",
+        "classification": "periodic_report_delayed_or_suspended",
+        "title": "关于延期披露2025年年度报告的公告",
+        "announcement_time": "2026-04-27T16:00:00+00:00",
+        "selection_reasons": ["periodic_report_delayed"],
+        "missing_fields": [{"canonical_fact": "profit_sheet.net_profit"}],
+        "processed_at": "2026-05-24T10:00:00+08:00",
+        "metadata": {},
+        "ingestion_run_id": None,
+    }
+
+    storage.upsert_financial_disclosure_event_state(
+        **common,
+        status="pending_recheck",
+        first_pending_at="2026-05-24T10:00:00+08:00",
+        pending_recheck_until="2026-05-31T10:00:00+08:00",
+    )
+    storage.upsert_financial_disclosure_event_state(
+        **common,
+        status="pending_recheck",
+        first_pending_at="2026-05-25T10:00:00+08:00",
+        pending_recheck_until="2026-06-01T10:00:00+08:00",
+    )
+
+    pending_state = storage.list_financial_disclosure_event_states()[0]
+    assert pending_state["first_pending_at"] == "2026-05-24T10:00:00+08:00"
+    assert pending_state["pending_recheck_until"] == "2026-05-31T10:00:00+08:00"
+
+    storage.upsert_financial_disclosure_event_state(
+        **common,
+        status="changed",
+        first_pending_at=None,
+        pending_recheck_until=None,
+    )
+
+    changed_state = storage.list_financial_disclosure_event_states()[0]
+    assert changed_state["status"] == "changed"
+    assert changed_state["pending_recheck_until"] is None
 
 
 def test_financial_writes_use_financials_db_when_configured(tmp_path):
@@ -1551,7 +1601,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
             "SELECT COUNT(*) FROM financial_numeric_facts_hot"
         ).fetchone()[0]
 
-    assert canonical_count == 1
+    assert canonical_count == 0
     assert hot_count == 1
 
 

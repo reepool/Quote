@@ -1,6 +1,6 @@
 # 财务数据系统专项文档
 
-> 更新日期：2026-05-22
+> 更新日期：2026-05-24
 > 适用范围：A 股 `SSE / SZSE / BSE` 财务报表结构化获取、字段映射、统一存储、本地核心层全量导入与后续运维。  
 > 配套工程文档：`implementation_plan.md`、`docs/development/research_data_engine_execution.md`、`config/10_research.json`
 
@@ -23,6 +23,7 @@
 - BSE 与少数上市前科创板历史期存在已确认上游缺口；这些缺口只允许显式登记为 accepted source gap，不能通过放宽映射伪造完整性。
 - 全量导入入口默认把 `BSE` required 字段缺失记录为 `exchange_optional_source_gap`，不阻断后续批次；`SSE/SZSE` 仍按严格 gate 处理。
 - Manifest 现在记录每个标的的 `listed_date / delisted_date` 和报告期生命周期排除项；上市前历史期、退市后未披露期会进入 accepted source gap，不再被误判为字段映射失败。
+- Manifest 后续还必须接收财务披露公告事件：当 CNInfo 公告证明公司存在定期报告无法按期披露、停牌、退市风险警示或可能终止上市等事项时，对应报告期可标记为 `periodic_report_delayed_or_suspended`，作为“披露异常导致的正常待补”处理；该分类不能替代字段映射修复。
 - L1 写入允许受控派生 `net_income_parent`：优先使用直接字段；若只有 `净利润 + 少数股东损益`，按 `归母净利润 = 净利润 - 少数股东损益` 派生；若没有少数股东损益和少数股东权益披露，才允许以 `净利润` 作为归母净利润，并在 lineage 中标记 `net_income_total_when_no_minority_interest_disclosed`。
 
 ## 2. 数据库与存储边界
@@ -53,7 +54,8 @@
 |---|---|
 | `financial_source_files` | source manifest，记录数据源、报表族、报告期、归档路径、parser 版本等 |
 | `financial_statements_raw` | 原始报表 JSON 快照 |
-| `financial_numeric_facts` / `financial_numeric_facts_hot/history` | 全数值事实长表，保留 source lineage 和 canonical 元数据 |
+| `financial_numeric_facts_hot/history` | 全数值事实长表的权威物理存储，保留 source lineage 和 canonical 元数据 |
+| `financial_numeric_facts` | 兼容读取层；优化后数据库中应为 `hot UNION ALL history` 视图，不再作为重复物理表写入 |
 | `financial_core_facts_hot/history` | 核心事实层，服务常用查询 |
 | `financial_source_field_mappings` | 持久化字段映射目录，按 mapping version 与 profile 管理 |
 | `financial_source_mapping_audits` | 字段映射审计证据 |
@@ -61,6 +63,49 @@
 | `ingestion_runs`、`raw_payload_audit` | 财务域运行审计和 payload 审计 |
 
 物理存储采用长表事实模型，不因上游字段变动动态增删宽表列。新增字段、字段削减、字段语义变化通过 mapping version 和审计状态控制，再由 read model 投影为调用方需要的宽表或字段集合。
+
+### 2.3 存储体积优化
+
+`2026-05-25` 已确认 `data/financials.db` 体积约 `78.973 GiB`，`freelist_count=3`，不是删除后未回收空间导致。主要冗余来自 `financial_numeric_facts` 与 `financial_numeric_facts_hot` 同时保存 `23,395,207` 行全量 numeric facts，而 `financial_numeric_facts_history=0`。
+
+当前优化策略：
+
+- 新增写入只落到 `financial_numeric_facts_hot` 或 `financial_numeric_facts_history`，不再双写 legacy 物理表 `financial_numeric_facts`。
+- 内部读取和脚本使用 hot/history union；老测试库或迁移前库缺少 tier 表时才回退 legacy 表。
+- 后续执行离线优化迁移时，最终库名仍保持 `data/financials.db`；迁移会把 `financial_numeric_facts` 改为兼容视图。
+- 生产库迁移前必须先备份到 `/home/python/Quote/data/PVE-Bak/QuoteBak`。
+
+轻量审计命令：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_financial_db_storage_audit.py \
+  --db-path data/financials.db \
+  --sample-size 1000 \
+  --format markdown
+```
+
+优化迁移 dry-run 命令：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_financial_db_optimize.py \
+  --db-path data/financials.db \
+  --backup-dir /home/python/Quote/data/PVE-Bak/QuoteBak \
+  --dry-run
+```
+
+正式执行命令只在人工确认维护窗口后使用：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_financial_db_optimize.py \
+  --db-path data/financials.db \
+  --backup-dir /home/python/Quote/data/PVE-Bak/QuoteBak \
+  --execute
+```
+
+注意：正式执行会先生成 NAS 备份，再构建临时优化库，验证通过后仍替换为原路径 `data/financials.db`。执行期间需要预留较长 IO 时间和足够临时空间；失败时应保留原库和备份，不允许无验证切换。
 
 ## 3. 字段统一规则
 
@@ -130,11 +175,21 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 |---|---|---|
 | `pre_listing_period` | 报告期结束日早于上市日 | 记录为正常缺口，不阻断全量导入 |
 | `post_delisting_or_no_disclosure` | 报告期结束日晚于退市日，或为退市日前最近一期且退市日在该期披露截止日前 | 记录为正常缺口，不阻断全量导入 |
+| `periodic_report_delayed_or_suspended` | 公司仍为 active，但 CNInfo 公告显示对应定报无法按期披露或延期披露 | 记录为披露异常待补，不阻断全量导入；后续公告或结构化源更新后应补处理 |
+| `pending_delisting_risk` | 公司仍为 active，但 CNInfo 公告显示停牌、退市风险警示、可能被实施退市风险警示或可能终止上市 | 记录为待退市风险/披露异常待补，不阻断全量导入；不改写股票主数据退市状态 |
 
 该规则解决两类常见误报：
 
 - 新股或科创板上市前历史期没有完整三表。
 - 退市标的在退市后不再披露最新季报，例如 `600355.SH / 2026-03-31`。
+- 仍为 active 但定报披露异常的标的，例如 `002731.SZ / 688121.SH` 在 `2025-12-31 / 2026-03-31` 尚无结构化三表时，不应被误判为字段映射失败。
+
+公告事件进入 manifest 的要求：
+
+- 事件必须来自可审计公告元数据，至少包含 `instrument_id / report_period / classification / title / announcement_time`。
+- 允许的财务披露异常分类目前包括 `periodic_report_delayed_or_suspended` 和 `pending_delisting_risk`；普通“年度报告”“一季报”公告只能作为触发增量更新的候选，不能作为 accepted gap。
+- 如果公告显示“更正”“取消”“补充”，只能触发重抓或复核，不得直接接受缺口。
+- 如果公告事件缺少明确报告期，只能进入待复核清单，不得自动放宽 readiness gate。
 
 ### 4.2 静态已确认缺口
 
@@ -172,9 +227,35 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 
 | 标的 | 报告期 | 状态 |
 |---|---|---|
-| `002731.SZ` | `2025-12-31`、`2026-03-31` | active 标的，Sina/THS/Eastmoney 本次探测均未返回该期结构化三表，保留 review |
-| `688121.SH` | `2025-12-31`、`2026-03-31` | active 标的，Sina/THS/Eastmoney 本次探测均未返回该期结构化三表，保留 review |
+| `002731.SZ` | `2025-12-31`、`2026-03-31` | active 标的，Sina/THS/Eastmoney 本次探测均未返回该期结构化三表；`2026-05-24` 写入 smoke 命中多条停牌/退市风险提示公告，但标题未指向具体报告期，因此只保留审计证据，不自动放宽 readiness gate |
+| `688121.SH` | `2025-12-31`、`2026-03-31` | active 标的，Sina/THS/Eastmoney 本次探测均未返回该期结构化三表；`2026-05-24` 写入 smoke 命中 2025 年年报延期披露公告，并把 `2025-12-31` 记录为 `periodic_report_delayed_or_suspended / pending_recheck` |
 | `600355.SH` | `2026-03-31` | 已退市，按 `post_delisting_or_no_disclosure` 记录为正常生命周期缺口 |
+
+### 4.4 2026-05-24 公告驱动写入 smoke
+
+定向命令：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/dev_validation/run_financial_disclosure_targeted_smoke.py \
+  --instrument-ids 002731.SZ,688121.SH \
+  --exchanges SZSE,SSE \
+  --report-periods 2025-12-31,2026-03-31 \
+  --lookback-days 180 \
+  --max-pages-per-market 20 \
+  --db-path data/financials.db \
+  --output-path log/financial_disclosure_smoke/20260524_002731_688121.json \
+  --write-enabled
+```
+
+验证结果：
+
+| 标的 | CNInfo 扫描结果 | 写入结果 | 处理结论 |
+|---|---|---|---|
+| `002731.SZ` | 扫描 `94` 条公告，选中 `4` 条停牌/退市风险提示 | `candidate_count=0`，`event_count=0` | 公告未映射到具体报告期，只作为审计证据；不能据此接受某个报告期缺口 |
+| `688121.SH` | 扫描 `36` 条公告，选中 `5` 条，其中 `3` 条延期 2025 年年报可映射报告期 | `candidate_count=1`，`financial_disclosure_event_state` 写入 `688121.SH / 2025-12-31 / pending_recheck` | 结构化源仍未更新时进入待重查，不作为字段映射 blocker |
+
+该 smoke 同时验证：公告先于结构化财报时，系统会拉取候选对应的最新财务数据；若本地仍缺 required core facts，则写入 `pending_recheck` 并保留 `first_pending_at / pending_recheck_until`。同一公告的 `pending_recheck_until` 使用首次 pending 时间作为硬上限，后续重复扫描不会滚动延长；待结构化源更新后，下一次增量或对账任务会重新拉取并把状态更新为 `changed` 或 `unchanged`。
 
 ## 5. 全量导入脚本
 
@@ -230,6 +311,81 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
   --log-dir logs/financial_full_import/20260520_l1_full_2023q4_2026q1 \
   --resume
 ```
+
+如果已有 CNInfo 公告筛选结果，可把披露异常事件作为 JSON 传给全量脚本；脚本会把 `periodic_report_delayed_or_suspended` 事件合并进 manifest 生命周期缺口，并在 readback gate 中按 accepted source gap 处理：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_financial_l1_full_import.py \
+  --period-window latest \
+  --rolling-quarters 10 \
+  --baseline-report-period 2024Q1 \
+  --db-path data/financials.db \
+  --batch-size 20 \
+  --log-dir logs/financial_full_import/20260524_l1_repair_with_disclosure_events \
+  --financial-disclosure-events-path data/financial_disclosure_events/latest.json
+```
+
+事件文件格式：
+
+```json
+{
+  "events": [
+    {
+      "instrument_id": "002731.SZ",
+      "report_periods": ["2025-12-31", "2026-03-31"],
+      "classification": "periodic_report_delayed_or_suspended",
+      "title": "关于无法按期披露2025年年度报告暨股票停牌的公告",
+      "announcement_id": "example",
+      "announcement_time": "2026-05-06"
+    }
+  ]
+}
+```
+
+默认全量脚本会在新建 manifest 前执行通用 A 股主数据治理，刷新上市、退市和 active 股票池。若只做离线复核或复用已确认的新鲜主数据，可显式加 `--skip-instrument-master-governance`。
+
+公告事件文件可由 CNInfo 扫描脚本生成：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_financial_disclosure_event_scan.py \
+  --exchanges SSE,SZSE,BSE \
+  --start-date 2026-04-01 \
+  --end-date 2026-05-24 \
+  --output-path data/financial_disclosure_events/latest.json \
+  --max-pages 20
+```
+
+该扫描只输出公告事件，不下载财务报表、不写 `financials.db`。实际生产可先扫描公告，再把输出文件传给全量/补处理脚本。
+
+### 5.2 Telegram 与增量维护目标
+
+财务 L1 全量导入后续应进入 scheduler/Telegram 任务体系，而不是长期依赖 operator 手工敲脚本。
+
+截至 `2026-05-24`，任务化入口已落地到 `config/05_scheduler.json`、`data_manager.py` 和 `scheduler/tasks.py`：
+
+- `financial_l1_full_import` 为 `enabled=true/manual_only=true`，只通过 `/run` 或直接调度调用执行，不注册自动 cron。
+- `financial_disclosure_incremental_sync` 与 `financial_disclosure_reconciliation_sync` 默认 `enabled=false`，可先通过 `/run` 验证，稳定后再决定是否启用日更/周更。
+- 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps 和 blockers。
+
+| 任务 | 触发方式 | 是否自动定时 | 主要用途 |
+|---|---|---:|---|
+| `financial_l1_full_import` | `/run financial_l1_full_import` | 否 | 手工执行全量初始化、灾后修复或大范围补处理；封装 `scripts/research_financial_l1_full_import.py` |
+| `financial_disclosure_incremental_sync` | 每日或 `/run` | 是，可配置 | 基于 CNInfo 定期报告公告发现候选标的和报告期，只对候选做财务补处理 |
+| `financial_disclosure_reconciliation_sync` | 每周或 `/run` | 是，可配置 | 兜底公告漏识别、CNInfo 静默更新和历史缺口；可全量扫描 active 股票池但只补缺失或变化项 |
+
+增量维护规则：
+
+- 定期报告公告包括年度报告、半年度报告、第一季度报告和第三季度报告；普通公告只作为候选触发，不直接代表结构化财报已经可用。
+- 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `pending_delisting_risk` 或 `periodic_report_delayed_or_suspended`，不阻断批次，但必须保留公告 ID、公告标题和首次发现时间。
+- 公告先到而 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
+- 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
+
+状态表：
+
+- `financial_disclosure_event_state`：按 `instrument_id + report_period + announcement_id` 记录候选、pending recheck、待退市风险、缺失字段、首次 pending 时间、重试截止时间和处理结果。
+- `cninfo_announcement_scan_state / cninfo_announcement_audit`：财务任务使用独立 purpose key 记录扫描水位和入选公告证据。
 
 只生成计划，不下载、不写库：
 
