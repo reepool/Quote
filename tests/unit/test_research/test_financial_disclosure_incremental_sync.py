@@ -173,6 +173,38 @@ def test_incremental_sync_classifies_pending_delisting_risk(tmp_path):
     assert result["blocking_gap_count"] == 0
 
 
+def test_incremental_sync_accepts_delayed_report_without_source_retry(tmp_path):
+    record = CninfoAnnouncementRecord(
+        announcement_id="ann-delay",
+        title="收到《关于公司2025年年度报告预计无法在法定期限内披露的监管工作函》的公告",
+        announcement_time="2026-05-06",
+        market="SSE",
+        column="sse",
+        symbols=["688121"],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=_FakeStorage(ready=False),
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([record]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SSE"],
+            latest_report_period="2026Q1",
+            dry_run=False,
+        )
+    )
+
+    assert result["candidate_count"] == 1
+    assert result["accepted_gap_count"] == 1
+    assert result["pending_recheck_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert service.storage.states[0]["status"] == "accepted_disclosure_gap"
+
+
 def test_incremental_sync_skips_ready_regular_report_candidate(tmp_path):
     record = CninfoAnnouncementRecord(
         announcement_id="ann-2",

@@ -734,8 +734,14 @@ class FinancialDisclosureIncrementalSyncService:
             candidate
             for candidate in candidates
             if not before_ready[candidate.key].get("ready")
+            and candidate.classification
+            not in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
         ]
-        unchanged = len(candidates) - len(to_fetch)
+        unchanged = sum(
+            1
+            for candidate in candidates
+            if before_ready[candidate.key].get("ready")
+        )
         written = 0
         failed = 0
         blocking = 0
@@ -782,6 +788,9 @@ class FinancialDisclosureIncrementalSyncService:
             elif candidate.classification == PENDING_DELISTING_RISK_CLASSIFICATION:
                 status = "pending_delisting_risk"
                 pending_delisting += 1
+                accepted += 1
+            elif candidate.classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS:
+                status = "accepted_disclosure_gap"
                 accepted += 1
             elif candidate.events:
                 status = "pending_recheck"

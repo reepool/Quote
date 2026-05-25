@@ -416,7 +416,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 
 - 定期报告公告只允许正式年报、半年报、一季报、三季报主公告及其更正/修订、延期披露和定报相关停牌/退市风险公告触发候选。业绩说明会预告、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤，不进入 `pending_recheck`。
 - 历史 `pending_recheck` 状态每次进入候选前都会重新套用当前公告筛选规则。由旧逻辑留下的说明会预告、英文版、图文版、问询函专项说明等噪声会计入 `filtered_stale_pending`，不再触发补数请求。
-- 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `pending_delisting_risk` 或 `periodic_report_delayed_or_suspended`，不阻断批次，但必须保留公告 ID、公告标题和首次发现时间。
+- 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，不触发每日补数重试、不阻断批次，但必须保留公告 ID、公告标题和首次发现时间；后续正式定报主公告出现时再重新触发财务补数。
 - 公告先到而 CNInfo data20 与 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
 - 报告中的 `CNInfo ready` 表示 CNInfo data20 写入后已满足 required canonical facts 的候选数量；`CNInfo 批处理通过` 只表示 CNInfo 批处理未把该 instrument-period 判为失败，不等同于本地核心字段已经修复。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
