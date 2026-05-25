@@ -40,6 +40,7 @@
    - 官方 XBRL 或等价结构化文件归档放在 `data/filings/`，归档路径写入 `financial_source_files.archive_path`。
    - `quotes.db` 不承载财务事实表，避免行情主库被低频大字段写入放大。
    - 财务库离线优化必须保持最终库名 `data/financials.db`；如需备份生产库，默认写入 `/home/python/Quote/data/PVE-Bak/QuoteBak`。
+   - `2026-05-25` 已完成 `data/financials.db` 离线优化：生产库从约 `79G` 降至约 `53G`，`financial_numeric_facts` 已改为兼容视图，`financial_numeric_facts_hot/history` 为权威物理表，NAS 备份保留为 `/home/python/Quote/data/PVE-Bak/QuoteBak/financials.db.20260525_011603.bak`。
 
 2. **访问抽象**
    - `DataManager`、API 路由、provider 和 sync service 只依赖 storage/repository 方法。

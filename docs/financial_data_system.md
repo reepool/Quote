@@ -66,7 +66,7 @@
 
 ### 2.3 存储体积优化
 
-`2026-05-25` 已确认 `data/financials.db` 体积约 `78.973 GiB`，`freelist_count=3`，不是删除后未回收空间导致。主要冗余来自 `financial_numeric_facts` 与 `financial_numeric_facts_hot` 同时保存 `23,395,207` 行全量 numeric facts，而 `financial_numeric_facts_history=0`。
+`2026-05-25` 优化前确认 `data/financials.db` 体积约 `78.973 GiB`，`freelist_count=3`，不是删除后未回收空间导致。主要冗余来自 `financial_numeric_facts` 与 `financial_numeric_facts_hot` 同时保存 `23,395,207` 行全量 numeric facts，而 `financial_numeric_facts_history=0`。
 
 当前优化策略：
 
@@ -106,6 +106,42 @@
 ```
 
 注意：正式执行会先生成 NAS 备份，再构建临时优化库，验证通过后仍替换为原路径 `data/financials.db`。执行期间需要预留较长 IO 时间和足够临时空间；失败时应保留原库和备份，不允许无验证切换。
+
+生产库优化执行结果：
+
+| 项目 | 结果 |
+|---|---|
+| 执行日期 | `2026-05-25` |
+| 生产库路径 | `data/financials.db`，路径未改变 |
+| 优化前文件大小 | 约 `79G` |
+| 优化后文件大小 | 约 `53G`，SQLite page bytes `52.26 GiB` |
+| `freelist_count` | `0` |
+| `financial_numeric_facts` | 已变更为兼容 `view` |
+| `financial_numeric_facts_hot` | 物理表 |
+| `financial_numeric_facts_history` | 物理表 |
+| NAS 备份 | `/home/python/Quote/data/PVE-Bak/QuoteBak/financials.db.20260525_011603.bak`，约 `79G` |
+| 中间文件 | `financials.db.optimize_*`、`financials.db-wal`、`financials.db-shm` 已清理 |
+
+优化后轻量验证：
+
+```sql
+select round(page_count*page_size/1024.0/1024.0/1024.0,3),
+       page_count,
+       page_size,
+       freelist_count
+from pragma_page_count, pragma_page_size, pragma_freelist_count;
+
+select name,type
+from sqlite_master
+where name in (
+  'financial_numeric_facts',
+  'financial_numeric_facts_hot',
+  'financial_numeric_facts_history'
+)
+order by name;
+```
+
+当前结果为 `52.26 GiB / page_count=13699729 / page_size=4096 / freelist_count=0`，且 `financial_numeric_facts=view`。完整 `quick_check/integrity_check` 会扫描大表，建议仅在低峰维护窗口执行。
 
 ## 3. 字段统一规则
 
