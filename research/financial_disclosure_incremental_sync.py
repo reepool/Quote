@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from research.financial_disclosure_events import (
     ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
@@ -19,11 +19,18 @@ from research.financial_disclosure_events import (
     build_financial_disclosure_events,
     build_financial_symbol_index,
     financial_disclosure_event_filter,
+    infer_report_periods_from_title,
+    is_financial_disclosure_like_title,
 )
 from research.financial_source_field_mapping import MAPPING_VERSION
+from research.financial_statement_maintenance_repair import (
+    FinancialMaintenanceRepairRouter,
+    FinancialMaintenanceRepairTarget,
+)
 from research.financial_statement_profile import resolve_financial_statement_profile
 from research.financial_statements_sync import build_financial_report_periods
 from research.providers.cninfo_announcements import (
+    CninfoAnnouncementRecord,
     CninfoAnnouncementScanConfig,
     CninfoAnnouncementScanner,
 )
@@ -79,11 +86,18 @@ class FinancialDisclosureIncrementalSyncService:
         storage: ResearchStorageManager,
         research_config: Optional[ResearchConfig] = None,
         announcement_scanner: Optional[CninfoAnnouncementScanner] = None,
+        repair_router: Optional[FinancialMaintenanceRepairRouter] = None,
     ) -> None:
         self.db_ops = db_ops
         self.storage = storage
         self.research_config = research_config or config_manager.get_research_config()
         self.announcement_scanner = announcement_scanner or self._build_scanner()
+        self.repair_router = repair_router or FinancialMaintenanceRepairRouter(
+            storage=storage,
+            research_config=self.research_config,
+        )
+        self._last_repair_source_summary: Dict[str, Any] = {}
+        self._last_candidate_source_summary: Dict[str, int] = {}
 
     async def sync(
         self,
@@ -183,6 +197,9 @@ class FinancialDisclosureIncrementalSyncService:
                     "events": [],
                     "announcements_scanned": 0,
                     "selected_announcements": 0,
+                    "financial_like_announcements": 0,
+                    "filtered_financial_like_announcements": 0,
+                    "selected_without_event_count": 0,
                     "selected_announcements_preview": [],
                     "event_count": 0,
                     "pages_scanned": 0,
@@ -208,6 +225,8 @@ class FinancialDisclosureIncrementalSyncService:
                 required_core_facts=required_facts,
                 mapping_version=MAPPING_VERSION,
                 max_candidates=candidate_limit,
+                run_id=run_id,
+                dry_run=dry_run,
             )
             write_result = await self._apply_candidates(
                 candidates=list(candidates.values()),
@@ -244,6 +263,18 @@ class FinancialDisclosureIncrementalSyncService:
                 "announcement_search_key": announcement_search_key,
                 "announcements_scanned": scan_result["announcements_scanned"],
                 "selected_announcements": scan_result["selected_announcements"],
+                "financial_like_announcements": scan_result.get(
+                    "financial_like_announcements",
+                    0,
+                ),
+                "filtered_financial_like_announcements": scan_result.get(
+                    "filtered_financial_like_announcements",
+                    0,
+                ),
+                "selected_without_event_count": scan_result.get(
+                    "selected_without_event_count",
+                    0,
+                ),
                 "selected_announcements_preview": scan_result.get(
                     "selected_announcements_preview",
                     [],
@@ -251,6 +282,7 @@ class FinancialDisclosureIncrementalSyncService:
                 "event_count": scan_result.get("event_count", 0),
                 "pages_scanned": scan_result["pages_scanned"],
                 "candidate_count": len(candidates),
+                "candidate_sources": dict(self._last_candidate_source_summary),
                 "scan_errors": scan_result["errors"][:10],
                 "elapsed_seconds": elapsed,
                 **write_result,
@@ -347,6 +379,7 @@ class FinancialDisclosureIncrementalSyncService:
         pages_scanned = 0
         announcements_scanned = 0
         selected_announcements = 0
+        financial_like_announcements = 0
         errors: List[str] = []
         for exchange in exchanges:
             cfg = market_configs.get(exchange, {})
@@ -382,10 +415,22 @@ class FinancialDisclosureIncrementalSyncService:
             pages_scanned += result.pages_scanned
             announcements_scanned += result.announcements_seen
             selected_announcements += len(result.selected_records)
+            financial_like_announcements += sum(
+                1 for record in result.records if is_financial_disclosure_like_title(record.title)
+            )
             all_selected.extend(result.selected_records)
             errors.extend(result.errors)
             if not dry_run:
                 with self.storage.financial_database_scope():
+                    noisy_filtered = max(
+                        0,
+                        sum(
+                            1
+                            for record in result.records
+                            if is_financial_disclosure_like_title(record.title)
+                        )
+                        - len(result.selected_records),
+                    )
                     self.storage.upsert_cninfo_announcement_scan_state(
                         purpose_key=self.purpose_key,
                         market=market,
@@ -397,7 +442,15 @@ class FinancialDisclosureIncrementalSyncService:
                         announcements_seen=result.announcements_seen,
                         selected_announcements=len(result.selected_records),
                         status="success" if not result.errors else "degraded",
-                        metadata={"errors": result.errors[:5]},
+                        metadata={
+                            "errors": result.errors[:5],
+                            "financial_like_announcements": sum(
+                                1
+                                for record in result.records
+                                if is_financial_disclosure_like_title(record.title)
+                            ),
+                            "filtered_financial_like_announcements": noisy_filtered,
+                        },
                     )
                     for record in result.selected_records:
                         for symbol in record.symbols or [""]:
@@ -421,11 +474,32 @@ class FinancialDisclosureIncrementalSyncService:
                                 ingestion_run_id=run_id,
                             )
         events = build_financial_disclosure_events(all_selected, symbol_index)
+        selected_event_ids = {
+            str(event.announcement_id)
+            for event in events
+            if event.announcement_id
+        }
+        selected_without_event = max(
+            0,
+            len(
+                {
+                    str(record.announcement_id)
+                    for record in all_selected
+                    if record.announcement_id
+                }
+            )
+            - len(selected_event_ids),
+        )
         return {
             "events": events,
             "pages_scanned": pages_scanned,
             "announcements_scanned": announcements_scanned,
             "selected_announcements": selected_announcements,
+            "financial_like_announcements": financial_like_announcements,
+            "filtered_financial_like_announcements": max(
+                0, financial_like_announcements - selected_announcements
+            ),
+            "selected_without_event_count": selected_without_event,
             "selected_announcements_preview": [
                 {
                     "announcement_id": record.announcement_id,
@@ -468,6 +542,8 @@ class FinancialDisclosureIncrementalSyncService:
         required_core_facts: Sequence[str],
         mapping_version: str,
         max_candidates: int,
+        run_id: Optional[int],
+        dry_run: bool,
     ) -> Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate]:
         instruments_by_id = {
             str(instrument.get("instrument_id") or ""): instrument
@@ -475,12 +551,21 @@ class FinancialDisclosureIncrementalSyncService:
             if instrument.get("instrument_id")
         }
         candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
+        candidate_sources = {
+            "new_event": 0,
+            "pending_state": 0,
+            "local_gap": 0,
+            "filtered_stale_pending": 0,
+        }
         for event in events:
             instrument = instruments_by_id.get(event.instrument_id)
             if instrument is None:
                 continue
             candidate = self._candidate_for_event(instrument, event)
+            is_new = candidate.key not in candidates
             candidates.setdefault(candidate.key, candidate).events.append(event)
+            if is_new:
+                candidate_sources["new_event"] += 1
             candidates[candidate.key].reasons.extend(
                 reason for reason in event.reasons if reason not in candidates[candidate.key].reasons
             )
@@ -492,6 +577,15 @@ class FinancialDisclosureIncrementalSyncService:
         for state in pending_states:
             instrument = instruments_by_id.get(str(state.get("instrument_id") or ""))
             if instrument is None:
+                continue
+            if self._is_stale_filtered_pending_state(state):
+                candidate_sources["filtered_stale_pending"] += 1
+                self._record_filtered_stale_pending_state(
+                    state,
+                    instrument=instrument,
+                    run_id=run_id,
+                    dry_run=dry_run,
+                )
                 continue
             event = FinancialDisclosureEvent(
                 instrument_id=str(state.get("instrument_id") or ""),
@@ -505,7 +599,10 @@ class FinancialDisclosureIncrementalSyncService:
                 title=state.get("title"),
             )
             candidate = self._candidate_for_event(instrument, event)
+            is_new = candidate.key not in candidates
             candidates.setdefault(candidate.key, candidate).events.append(event)
+            if is_new:
+                candidate_sources["pending_state"] += 1
         if report_periods:
             for instrument in instruments:
                 for report_period in report_periods:
@@ -522,9 +619,70 @@ class FinancialDisclosureIncrementalSyncService:
                     if not readiness.get("ready"):
                         candidate.reasons.append("missing_or_incomplete_local_core")
                         candidates[candidate.key] = candidate
+                        candidate_sources["local_gap"] += 1
         if max_candidates > 0 and len(candidates) > max_candidates:
+            self._last_candidate_source_summary = candidate_sources
             return dict(list(candidates.items())[:max_candidates])
+        self._last_candidate_source_summary = candidate_sources
         return candidates
+
+    @staticmethod
+    def _is_stale_filtered_pending_state(state: Mapping[str, Any]) -> bool:
+        title = str(state.get("title") or "")
+        if not title:
+            return False
+        current_reasons = financial_disclosure_event_filter(
+            CninfoAnnouncementRecord(
+                announcement_id=str(state.get("announcement_id") or "pending"),
+                title=title,
+                announcement_time=state.get("announcement_time"),
+                market=str(state.get("exchange") or ""),
+                column=str(state.get("exchange") or "").lower(),
+                symbols=[str(state.get("symbol") or "")],
+            )
+        )
+        if not current_reasons:
+            return True
+        report_period = str(state.get("report_period") or "")
+        return report_period not in infer_report_periods_from_title(title)
+
+    def _record_filtered_stale_pending_state(
+        self,
+        state: Mapping[str, Any],
+        *,
+        instrument: Mapping[str, Any],
+        run_id: Optional[int],
+        dry_run: bool,
+    ) -> None:
+        if dry_run:
+            return
+        now = get_shanghai_time().isoformat()
+        reasons = list(state.get("selection_reasons") or [])
+        if "filtered_by_current_announcement_rules" not in reasons:
+            reasons.append("filtered_by_current_announcement_rules")
+        with self.storage.financial_database_scope():
+            self.storage.upsert_financial_disclosure_event_state(
+                instrument_id=str(state.get("instrument_id") or ""),
+                report_period=str(state.get("report_period") or ""),
+                announcement_id=str(state.get("announcement_id") or "pending"),
+                symbol=str(state.get("symbol") or instrument.get("symbol") or ""),
+                exchange=str(state.get("exchange") or instrument.get("exchange") or ""),
+                status="filtered_stale_noise",
+                classification=str(state.get("classification") or "stale_noise"),
+                title=state.get("title"),
+                announcement_time=state.get("announcement_time"),
+                selection_reasons=reasons,
+                missing_fields=list(state.get("missing_fields") or []),
+                first_pending_at=state.get("first_pending_at"),
+                pending_recheck_until=None,
+                processed_at=now,
+                metadata={
+                    **dict(state.get("metadata") or {}),
+                    "filtered_stale_pending": True,
+                    "filter_version": "financial_disclosure_event_filter.current",
+                },
+                ingestion_run_id=run_id,
+            )
 
     def _candidate_for_event(
         self,
@@ -588,7 +746,7 @@ class FinancialDisclosureIncrementalSyncService:
         outcomes: List[Dict[str, Any]] = []
         if to_fetch and not dry_run:
             try:
-                await self._run_targeted_import(
+                repair_summary = await self._run_targeted_import(
                     candidates=to_fetch,
                     required_core_facts=required_core_facts,
                     mapping_version=mapping_version,
@@ -596,12 +754,15 @@ class FinancialDisclosureIncrementalSyncService:
                     request_interval_seconds=request_interval_seconds,
                     request_timeout_seconds=request_timeout_seconds,
                 )
+                self._last_repair_source_summary = repair_summary
             except Exception as exc:
                 dm_logger.warning(
                     "[FinancialDisclosureIncremental] targeted import failed: %s",
                     exc,
                 )
                 failed = len(to_fetch)
+                self._last_repair_source_summary = self.repair_router.default_summary()
+                self._last_repair_source_summary["errors"] = [str(exc)]
         for candidate in candidates:
             before = before_ready[candidate.key]
             after = self._readiness_for_candidate(
@@ -648,6 +809,8 @@ class FinancialDisclosureIncrementalSyncService:
             "blocking_gap_count": blocking,
             "failed_count": failed,
             "written_count": written,
+            "source_routing": self._last_repair_source_summary
+            or self.repair_router.default_summary(),
             "outcomes": outcomes[:50],
         }
 
@@ -660,45 +823,19 @@ class FinancialDisclosureIncrementalSyncService:
         db_path: Path,
         request_interval_seconds: float,
         request_timeout_seconds: float,
-    ) -> None:
-        from scripts.dev_validation.live_audit_sina_ths_local_core import LiveAuditTarget
-        from scripts.dev_validation.validate_sina_ths_local_core_dryrun import (
-            DEFAULT_SOURCE_ORDER,
-            run_local_core_dryrun,
+    ) -> Dict[str, Any]:
+        return await self.repair_router.repair_targets(
+            targets=[
+                self._repair_target_for_candidate(candidate)
+                for candidate in candidates
+            ],
+            required_core_facts=required_core_facts,
+            mapping_version=mapping_version,
+            db_path=db_path,
+            request_interval_seconds=request_interval_seconds,
+            request_timeout_seconds=request_timeout_seconds,
+            accepted_gap_classifications=ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
         )
-
-        grouped: Dict[str, List[FinancialDisclosureMaintenanceCandidate]] = {}
-        for candidate in candidates:
-            grouped.setdefault(candidate.report_period, []).append(candidate)
-        accepted_source_gaps = {
-            candidate.key: {
-                "facts": set(required_core_facts),
-                "classification": candidate.classification,
-            }
-            for candidate in candidates
-            if candidate.classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
-        }
-        for report_period, period_candidates in grouped.items():
-            targets = [
-                LiveAuditTarget(
-                    candidate.instrument_id,
-                    candidate.exchange,
-                    candidate.profile,
-                )
-                for candidate in period_candidates
-            ]
-            await run_local_core_dryrun(
-                targets=targets,
-                report_periods=[report_period],
-                db_path=db_path,
-                mapping_version=mapping_version,
-                source_order=DEFAULT_SOURCE_ORDER,
-                required_canonical_facts=required_core_facts,
-                request_interval_seconds=request_interval_seconds,
-                request_timeout_seconds=request_timeout_seconds,
-                accepted_source_gaps=accepted_source_gaps,
-                accepted_source_gap_exchanges=(),
-            )
 
     def _readiness_for_candidate(
         self,
@@ -707,15 +844,24 @@ class FinancialDisclosureIncrementalSyncService:
         required_core_facts: Sequence[str],
         mapping_version: str,
     ) -> Dict[str, Any]:
-        with self.storage.financial_database_scope():
-            return self.storage.financial_statements.get_local_core_facts(
-                candidate.instrument_id,
-                report_period=candidate.report_period,
-                requested_canonical_facts=list(required_core_facts),
-                profile=candidate.profile,
-                mapping_version=mapping_version,
-                include_history=True,
-            )
+        return self.repair_router.readiness_for_target(
+            self._repair_target_for_candidate(candidate),
+            required_core_facts=required_core_facts,
+            mapping_version=mapping_version,
+        )
+
+    @staticmethod
+    def _repair_target_for_candidate(
+        candidate: FinancialDisclosureMaintenanceCandidate,
+    ) -> FinancialMaintenanceRepairTarget:
+        return FinancialMaintenanceRepairTarget(
+            instrument_id=candidate.instrument_id,
+            symbol=candidate.symbol,
+            exchange=candidate.exchange,
+            report_period=candidate.report_period,
+            profile=candidate.profile,
+            classification=candidate.classification if candidate.events else "local_core_gap",
+        )
 
     def _record_candidate_state(
         self,

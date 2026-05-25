@@ -719,14 +719,14 @@
         }
       },
       "financial_disclosure_incremental_sync": {
-        "enabled": false,
+        "enabled": true,
         "description": "财务公告驱动增量检查",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
-          "hour": 18,
-          "minute": 30,
+          "hour": 21,
+          "minute": 45,
           "second": 0
         },
         "max_instances": 1,
@@ -759,14 +759,14 @@
         }
       },
       "financial_disclosure_reconciliation_sync": {
-        "enabled": false,
+        "enabled": true,
         "description": "财务本地核心层周度有界对账",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
           "day_of_week": "sun",
-          "hour": 8,
+          "hour": 9,
           "minute": 30,
           "second": 0
         },

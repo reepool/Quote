@@ -496,7 +496,7 @@ async def weekly_data_maintenance(self,
 - `financial_disclosure_reconciliation_sync`：周度兜底，复核缺失报告期、accepted gap、pending recheck 和 CNInfo 静默更新。
 - 旧 `financial_statements_catchup_sync / financial_statements_reconciliation_sync` 在新任务落地前保持禁用；后续应迁移到新的公告驱动语义或作为兼容别名。
 
-实现状态（`2026-05-24`）：新三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`；增量和对账任务默认 `enabled=false`，可先 `/run` 验证后再启用 cron。
+实现状态（`2026-05-25`）：新三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`，只通过 `/run` 手工触发；公告驱动增量任务已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；周度对账任务已启用为周日 `09:30` 自动运行，二者仍可通过 `/run` 手工验证。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；业绩说明会、英文版、图文版、问询函回复、专项说明、投资者接待日和摘要默认不产生候选。
 
 #### 当前配置
 ```json
@@ -516,8 +516,8 @@ async def weekly_data_maintenance(self,
     }
   },
   "financial_disclosure_incremental_sync": {
-    "enabled": false,
-    "trigger": {"type": "cron", "hour": 18, "minute": 30},
+    "enabled": true,
+    "trigger": {"type": "cron", "hour": 21, "minute": 45},
     "parameters": {
       "exchanges": ["SSE", "SZSE", "BSE"],
       "lookback_days": 14,
@@ -532,8 +532,8 @@ async def weekly_data_maintenance(self,
     }
   },
   "financial_disclosure_reconciliation_sync": {
-    "enabled": false,
-    "trigger": {"type": "cron", "day_of_week": "sun", "hour": 8, "minute": 30},
+    "enabled": true,
+    "trigger": {"type": "cron", "day_of_week": "sun", "hour": 9, "minute": 30},
     "parameters": {
       "exchanges": ["SSE", "SZSE", "BSE"],
       "period_window": "latest",
@@ -569,13 +569,16 @@ async def weekly_data_maintenance(self,
 
 #### 业务逻辑
 1. **主数据前置**：三个财务任务在读取 active 股票池前都先走共享证券主数据治理，历史回补语义除外。
-2. **公告候选**：增量任务按 CNInfo 市场/栏目和时间窗口扫描公告，不逐股票扫描；筛选年度报告、半年度报告、一季报、三季报、更正公告、延期披露、停牌、退市风险警示和可能终止上市公告。
+2. **公告候选**：增量任务按 CNInfo 市场/栏目和时间窗口扫描公告，不逐股票扫描；只筛选正式年度报告、半年度报告、一季报、三季报主公告及其更正/修订、延期披露、停牌、退市风险警示和可能终止上市公告。业绩说明会、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤。
+   历史 `pending_recheck` 在再次进入候选前也会重新套用当前筛选规则，旧逻辑留下的说明会、英文版、图文版、问询函专项说明等噪声计入 `filtered_stale_pending`，不再触发补数。
 3. **待退市标记**：历史缺报且公告显示停牌、退市风险或可能终止上市时，先标记为 `pending_delisting_risk`，并记录公告证据；该状态解释披露异常，不替代字段映射。
-4. **定向补处理**：只对公告候选、pending recheck、本地缺失报告期和 required core facts 不完整标的调用 L1 导入；已完整落库的 instrument-period 跳过。
-5. **结构化数据滞后**：公告先到但 Sina/THS 结构化源未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间固定为首次 pending 派生值，不滚动延长。
-6. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。
-7. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
-8. **状态持久化**：财务公告候选和处理结果写入 `financial_disclosure_event_state`，扫描水位和公告证据使用独立 purpose key 写入 CNInfo announcement 状态/审计表。
+4. **定向补处理**：只对公告候选、pending recheck、本地缺失报告期和 required core facts 不完整标的调用补数流程；已完整落库的 instrument-period 跳过。
+5. **补数源路由**：增量和周度对账维护任务按 `CNInfo data20 -> THS -> Sina` 执行。CNInfo data20 是官方结构化优先源；THS/Sina 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做字段级补齐。源顺序、CNInfo-first 修复、fallback 和 readiness 合并由 `FinancialMaintenanceRepairRouter` 统一处理，调度任务不直接写各数据源调用逻辑。
+   Telegram 报告中的 `CNInfo ready` 是最终 canonical readiness 成功数；`CNInfo 批处理通过` 是 CNInfo 批处理层面的 instrument-period 通过数，二者必须分开解读。
+6. **结构化数据滞后**：公告先到但 CNInfo data20 与 Sina/THS 结构化源均未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间固定为首次 pending 派生值，不滚动延长。
+7. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。
+8. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
+9. **状态持久化**：财务公告候选和处理结果写入 `financial_disclosure_event_state`，扫描水位和公告证据使用独立 purpose key 写入 CNInfo announcement 状态/审计表。
 
 ### 7. 系统健康检查 (system_health_check)
 

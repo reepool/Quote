@@ -180,6 +180,26 @@ class FinancialStatementStorageRepository:
                 limit=limit,
             )
 
+    def get_numeric_facts(
+        self,
+        instrument_id: str,
+        *,
+        include_history: bool = False,
+        report_period: Optional[str] = None,
+        fact_name: Optional[str] = None,
+        canonical_fact_name: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_numeric_facts(
+                instrument_id,
+                include_history=include_history,
+                report_period=report_period,
+                fact_name=fact_name,
+                canonical_fact_name=canonical_fact_name,
+                limit=limit,
+            )
+
     def detect_coverage_gaps(
         self,
         *,

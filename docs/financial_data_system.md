@@ -1,6 +1,6 @@
 # 财务数据系统专项文档
 
-> 更新日期：2026-05-24
+> 更新日期：2026-05-25
 > 适用范围：A 股 `SSE / SZSE / BSE` 财务报表结构化获取、字段映射、统一存储、本地核心层全量导入与后续运维。  
 > 配套工程文档：`implementation_plan.md`、`docs/development/research_data_engine_execution.md`、`config/10_research.json`
 
@@ -11,7 +11,7 @@
 | 层级 | 定位 | 当前源 | 是否本地持久化 | 说明 |
 |---|---|---|---|---|
 | L1 本地核心层 | 高频、本地、字段统一的核心财务事实 | 同花顺 + 新浪严格语义交集 | 是，写入 `data/financials.db` | 只接收已审核通过的 canonical 字段，按 profile 区分 `nonbank / bank / securities / insurance` |
-| L2 官方摘要校验层 | 官方大项校验和结构化披露辅助 | CNInfo data20，历史保留 SSE commonQuery 能力 | 作为 source manifest / numeric facts 能力保留 | CNInfo data20 字段较少，不能当完整三表源；commonQuery 已不适合作为最新年报主源 |
+| L2 官方结构化维护/校验层 | 官方大项补数、结构化披露辅助和交叉校验 | CNInfo data20，历史保留 SSE commonQuery 能力 | 作为 source manifest / numeric facts 能力保留；维护任务可优先写入支持的 canonical facts | CNInfo data20 权威但字段较少，不能当完整三表源；commonQuery 已不适合作为最新年报主源 |
 | L3 远程扩展层 | 本地核心字段不足时按需补字段 | 东财 | 默认不写入 L1 核心层 | 字段最宽但慢，仅在显式允许远程扩展时调用，并转换为本地 canonical schema |
 
 关键边界：
@@ -19,7 +19,7 @@
 - 生产财务数据写入目标是 `data/financials.db`，不是 `data/research.db`。
 - `data/research.db` 当前不应保留 `financial_*` 财务物理表；代码初始化时也会在独立财务库配置下移除研究库内的财务表。
 - L1 字段必须来自已批准 mapping catalog；字段名相似、单样本数值相近、会计等式另一边相等，都不能自动进入本地核心层。
-- CNInfo data20 当前作为官方摘要层和交叉校验层，不再投入大量时间追求完整三表覆盖。
+- CNInfo data20 当前在财务日更/周度对账中作为官方结构化优先补数源：能明确覆盖的 canonical facts 优先使用 CNInfo data20；缺失、失败或总项/归母等语义不明确的字段再由 Sina/THS 字段级补齐。源顺序和 fallback 由 `research/financial_statement_maintenance_repair.py` 的维护路由器统一管理，增量和周度对账任务只提交标准 instrument-period 目标，避免不同任务各自硬编码数据源调用。
 - BSE 与少数上市前科创板历史期存在已确认上游缺口；这些缺口只允许显式登记为 accepted source gap，不能通过放宽映射伪造完整性。
 - 全量导入入口默认把 `BSE` required 字段缺失记录为 `exchange_optional_source_gap`，不阻断后续批次；`SSE/SZSE` 仍按严格 gate 处理。
 - Manifest 现在记录每个标的的 `listed_date / delisted_date` 和报告期生命周期排除项；上市前历史期、退市后未披露期会进入 accepted source gap，不再被误判为字段映射失败。
@@ -399,23 +399,26 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 
 财务 L1 全量导入后续应进入 scheduler/Telegram 任务体系，而不是长期依赖 operator 手工敲脚本。
 
-截至 `2026-05-24`，任务化入口已落地到 `config/05_scheduler.json`、`data_manager.py` 和 `scheduler/tasks.py`：
+截至 `2026-05-25`，任务化入口已落地到 `config/05_scheduler.json`、`data_manager.py` 和 `scheduler/tasks.py`：
 
 - `financial_l1_full_import` 为 `enabled=true/manual_only=true`，只通过 `/run` 或直接调度调用执行，不注册自动 cron。
-- `financial_disclosure_incremental_sync` 与 `financial_disclosure_reconciliation_sync` 默认 `enabled=false`，可先通过 `/run` 验证，稳定后再决定是否启用日更/周更。
+- `financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。
+- 两个维护任务的补数源顺序为 `CNInfo data20 -> THS -> Sina`。CNInfo 公告只负责发现候选；CNInfo data20 才是官方结构化补数源。Sina/THS 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做补齐。实际路由通过统一维护路由器执行，后续如果增加东财或其他源，应扩展同一抽象层，而不是在全量、增量或周更任务里重复实现。
 - 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps 和 blockers。
 
 | 任务 | 触发方式 | 是否自动定时 | 主要用途 |
 |---|---|---:|---|
 | `financial_l1_full_import` | `/run financial_l1_full_import` | 否 | 手工执行全量初始化、灾后修复或大范围补处理；封装 `scripts/research_financial_l1_full_import.py` |
-| `financial_disclosure_incremental_sync` | 每日或 `/run` | 是，可配置 | 基于 CNInfo 定期报告公告发现候选标的和报告期，只对候选做财务补处理 |
-| `financial_disclosure_reconciliation_sync` | 每周或 `/run` | 是，可配置 | 兜底公告漏识别、CNInfo 静默更新和历史缺口；可全量扫描 active 股票池但只补缺失或变化项 |
+| `financial_disclosure_incremental_sync` | 每日 `21:45` 或 `/run` | 是 | 基于 CNInfo 定期报告公告发现候选标的和报告期，只对候选做财务补处理 |
+| `financial_disclosure_reconciliation_sync` | 周日 `09:30` 或 `/run` | 是 | 兜底公告漏识别、CNInfo 静默更新和历史缺口；可全量扫描 active 股票池但只补缺失或变化项 |
 
 增量维护规则：
 
-- 定期报告公告包括年度报告、半年度报告、第一季度报告和第三季度报告；普通公告只作为候选触发，不直接代表结构化财报已经可用。
+- 定期报告公告只允许正式年报、半年报、一季报、三季报主公告及其更正/修订、延期披露和定报相关停牌/退市风险公告触发候选。业绩说明会预告、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤，不进入 `pending_recheck`。
+- 历史 `pending_recheck` 状态每次进入候选前都会重新套用当前公告筛选规则。由旧逻辑留下的说明会预告、英文版、图文版、问询函专项说明等噪声会计入 `filtered_stale_pending`，不再触发补数请求。
 - 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `pending_delisting_risk` 或 `periodic_report_delayed_or_suspended`，不阻断批次，但必须保留公告 ID、公告标题和首次发现时间。
-- 公告先到而 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
+- 公告先到而 CNInfo data20 与 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
+- 报告中的 `CNInfo ready` 表示 CNInfo data20 写入后已满足 required canonical facts 的候选数量；`CNInfo 批处理通过` 只表示 CNInfo 批处理未把该 instrument-period 判为失败，不等同于本地核心字段已经修复。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
 
 状态表：

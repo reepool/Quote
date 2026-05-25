@@ -282,6 +282,16 @@
             "akshare"
           ]
         },
+        "disclosure_incremental_sync": {
+          "repair_source_order": [
+            "cninfo_data20",
+            "ths_report",
+            "sina_report"
+          ],
+          "official_first": true,
+          "fallback_only_missing_or_ambiguous_facts": true,
+          "note": "Financial disclosure incremental and reconciliation maintenance use CNInfo data20 official structured facts first, then THS/Sina only for missing, failed, or semantically ambiguous canonical facts."
+        },
         "readiness": {
           "required_core_facts": [
             "revenue",

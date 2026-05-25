@@ -287,6 +287,12 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         f"模式: `{'reconciliation' if result.get('reconciliation') else 'incremental'}`",
         f"报告期: `{', '.join(result.get('report_periods') or [])}`",
         f"公告扫描: {result.get('announcements_scanned', 0)}，命中 {result.get('selected_announcements', 0)}，页数 {result.get('pages_scanned', 0)}",
+        (
+            "公告过滤: "
+            f"财报相关 {result.get('financial_like_announcements', 0)}，"
+            f"过滤噪声 {result.get('filtered_financial_like_announcements', 0)}，"
+            f"命中未成事件 {result.get('selected_without_event_count', 0)}"
+        ),
         f"候选: `{result.get('candidate_count', 0)}`",
         (
             "处理: "
@@ -303,6 +309,31 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         ),
         f"耗时: `{result.get('elapsed_seconds', 0)}s`",
     ]
+    source_routing = result.get("source_routing") or {}
+    candidate_sources = result.get("candidate_sources") or {}
+    if candidate_sources:
+        lines.append(
+            "候选来源: "
+            f"新公告 {candidate_sources.get('new_event', 0)}，"
+            f"历史pending {candidate_sources.get('pending_state', 0)}，"
+            f"本地缺口 {candidate_sources.get('local_gap', 0)}，"
+            f"旧噪声过滤 {candidate_sources.get('filtered_stale_pending', 0)}"
+        )
+    if source_routing:
+        lines.append(
+            "补数源: "
+            f"CNInfo尝试 {source_routing.get('cninfo_attempts', 0)}，"
+            f"ready {source_routing.get('cninfo_successes', 0)}，"
+            f"批处理通过 {source_routing.get('cninfo_batch_successes', 0)}，"
+            f"缺失/歧义 {source_routing.get('cninfo_missing_or_ambiguous', 0)}；"
+            f"Sina/THS fallback尝试 {source_routing.get('fallback_attempts', 0)}，"
+            f"成功 {source_routing.get('fallback_successes', 0)}"
+        )
+        routing_errors = source_routing.get("errors") or []
+        if routing_errors:
+            lines.append(
+                "补数源警告: " + "；".join(str(item) for item in routing_errors[:3])
+            )
     scan_errors = result.get("scan_errors") or []
     if scan_errors:
         lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))

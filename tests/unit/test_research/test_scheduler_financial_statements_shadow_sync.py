@@ -243,6 +243,12 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
             "selected_announcements": 1,
             "pages_scanned": 1,
             "candidate_count": 1,
+            "candidate_sources": {
+                "new_event": 0,
+                "pending_state": 1,
+                "local_gap": 0,
+                "filtered_stale_pending": 2,
+            },
             "changed_count": 0,
             "unchanged_count": 0,
             "pending_recheck_count": 0,
@@ -250,6 +256,18 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
             "accepted_gap_count": 1,
             "blocking_gap_count": 0,
             "failed_count": 0,
+            "financial_like_announcements": 3,
+            "filtered_financial_like_announcements": 2,
+            "selected_without_event_count": 0,
+            "source_routing": {
+                "cninfo_attempts": 1,
+                "cninfo_successes": 0,
+                "cninfo_batch_successes": 1,
+                "cninfo_missing_or_ambiguous": 1,
+                "fallback_attempts": 1,
+                "fallback_successes": 0,
+                "errors": [],
+            },
             "elapsed_seconds": 0.5,
         }
     )
@@ -266,5 +284,10 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
     data_manager.run_financial_disclosure_incremental_sync.assert_awaited_once()
     report_data = task._send_task_report.await_args.kwargs["report_data"]
     assert "待退市风险 1" in report_data["content"]
+    assert "过滤噪声 2" in report_data["content"]
+    assert "旧噪声过滤 2" in report_data["content"]
+    assert "CNInfo尝试 1" in report_data["content"]
+    assert "批处理通过 1" in report_data["content"]
+    assert "fallback尝试 1" in report_data["content"]
     assert "不会改写股票主数据退市状态" in report_data["content"]
     assert "financial_disclosure_incremental_sync" not in task._active_tasks

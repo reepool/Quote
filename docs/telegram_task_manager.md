@@ -142,22 +142,24 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 财务 L1 维护任务分工：
 
-当前实现状态（`2026-05-24`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 和 `financial_disclosure_reconciliation_sync` 已接入 `/run` 和配置，但默认不自动定时。`002731.SZ / 688121.SH` 定向写入 smoke 已验证公告驱动路径：可映射报告期的延期年报公告进入 `pending_recheck`，不可映射报告期的退市风险提示只保留审计证据。
+当前实现状态（`2026-05-25`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。源路由统一封装在 `FinancialMaintenanceRepairRouter`，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
 
 | 任务 | 触发方式 | 读取范围 | 写入策略 |
 |---|---|---|---|
 | `financial_l1_full_import` | 仅 `/run` | `SSE / SZSE / BSE` active 股票池和最近 rolling 报告期 | 可续跑；已完整落库的标的/报告期跳过；用于初始化和大范围补处理 |
-| `financial_disclosure_incremental_sync` | 每日可配置 / `/run` | CNInfo 定期报告公告候选、pending recheck、本地缺失报告期 | 只对候选补处理；公告先到但结构化源未更新时进入 pending recheck |
-| `financial_disclosure_reconciliation_sync` | 每周可配置 / `/run` | 最近 rolling 报告期全市场覆盖情况 | 只补缺失、变化或 required core facts 不完整的 instrument-period |
+| `financial_disclosure_incremental_sync` | 每日 `21:45` / `/run` | CNInfo 正式定报/更正/延期/风险公告候选、pending recheck、本地缺失报告期 | 只对候选补处理；先用 CNInfo data20，缺口再用 THS/Sina；公告先到但结构化源未更新时进入 pending recheck |
+| `financial_disclosure_reconciliation_sync` | 周日 `09:30` / `/run` | 最近 rolling 报告期全市场覆盖情况 | 只补缺失、变化或 required core facts 不完整的 instrument-period |
 
-财务公告驱动任务识别年度报告、半年度报告、一季报、三季报、更正公告和披露异常公告。历史缺报且公告显示停牌、退市风险警示或可能终止上市时，报告中应显示“待退市风险/披露异常待补”，不把该类缺口误报为字段映射错误。
-公告先到但结构化财报未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间以首次 pending 为硬上限，不会因每日扫描滚动延长。
+财务公告驱动任务识别正式年度报告、半年度报告、一季报、三季报、更正/修订公告和披露异常公告。业绩说明会预告、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤，不进入 `pending_recheck`。历史缺报且公告显示停牌、退市风险警示或可能终止上市时，报告中应显示“待退市风险/披露异常待补”，不把该类缺口误报为字段映射错误。
+历史 `pending_recheck` 会在再次处理前按当前公告规则复核；旧逻辑遗留的说明会、英文版、图文版、问询函专项说明等噪声会显示在“旧噪声过滤”，不再进入补数源路由。
+公告先到但 CNInfo data20 与 THS/Sina 结构化财报未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间以首次 pending 为硬上限，不会因每日扫描滚动延长。
 
 财务任务报告应重点看四组数字：
 
 - `candidate_count`：公告、pending recheck 或对账发现的待处理 instrument-period。
 - `changed_count / unchanged_count`：本次实际修复写入与已完整跳过数量。
 - `pending_recheck_count / pending_delisting_risk_count`：公告先到但结构化源滞后，或公告解释为待退市风险的数量。
+- `source_routing`：CNInfo data20 官方尝试、CNInfo ready、CNInfo 批处理通过、缺失/歧义，以及 THS/Sina fallback 尝试/成功数量。`ready` 才代表 required canonical facts 已满足；批处理通过只代表 CNInfo 源请求没有把该 instrument-period 判为失败。
 - `accepted_gap_count / blocking_gap_count`：可审计解释的缺口与仍需字段映射/源数据补处理的 blocker 数量。
 
 ### BotFather 命令映射

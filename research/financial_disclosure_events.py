@@ -24,6 +24,17 @@ FINANCIAL_PERIODIC_REPORT_KEYWORDS = (
     "季度报告",
 )
 
+FORMAL_PERIODIC_REPORT_PHRASES = (
+    "年度报告",
+    "年报",
+    "第一季度报告",
+    "一季度报告",
+    "半年度报告",
+    "半年报",
+    "第三季度报告",
+    "三季度报告",
+)
+
 DISCLOSURE_DELAY_KEYWORDS = (
     "无法按期披露",
     "不能按期披露",
@@ -38,6 +49,23 @@ DISCLOSURE_CORRECTION_KEYWORDS = (
     "更正",
     "修订",
     "补充",
+)
+
+NON_PRIMARY_ANNOUNCEMENT_KEYWORDS = (
+    "业绩说明会",
+    "说明会预告",
+    "年度报告说明会",
+    "年报说明会",
+    "英文版",
+    "图文版",
+    "问询函",
+    "问询函回复",
+    "监管问询",
+    "专项说明",
+    "投资者网上集体接待日",
+    "投资者接待日",
+    "集体接待日",
+    "摘要",
 )
 
 TRADING_RISK_KEYWORDS = (
@@ -96,35 +124,61 @@ def financial_disclosure_event_filter(record: CninfoAnnouncementRecord) -> List[
     has_periodic_report = any(
         keyword in title for keyword in FINANCIAL_PERIODIC_REPORT_KEYWORDS
     )
+    has_delay = any(keyword in title for keyword in DISCLOSURE_DELAY_KEYWORDS)
+    has_trading_risk = any(keyword in title for keyword in TRADING_RISK_KEYWORDS)
+    has_correction = any(keyword in title for keyword in DISCLOSURE_CORRECTION_KEYWORDS)
+    is_non_primary = is_non_primary_financial_announcement_title(title)
+    report_periods = infer_report_periods_from_title(title)
+
+    if is_non_primary and not (has_delay or has_trading_risk):
+        return []
+
+    if has_periodic_report and not report_periods and not (has_delay or has_trading_risk):
+        return []
+
     if has_periodic_report and any(keyword in title for keyword in DISCLOSURE_DELAY_KEYWORDS):
         reasons.append("periodic_report_delayed")
-    if has_periodic_report and any(keyword in title for keyword in TRADING_RISK_KEYWORDS):
+    if has_periodic_report and has_trading_risk:
         reasons.append("periodic_report_related_trading_risk")
-    if has_periodic_report and any(keyword in title for keyword in DISCLOSURE_CORRECTION_KEYWORDS):
+    if has_periodic_report and has_correction:
         reasons.append("periodic_report_correction")
     if has_periodic_report and not reasons:
         reasons.append("periodic_report")
-    if any(keyword in title for keyword in TRADING_RISK_KEYWORDS):
+    if has_trading_risk:
         reasons.append("pending_delisting_risk")
     return reasons
+
+
+def is_non_primary_financial_announcement_title(title: str) -> bool:
+    """Return True for finance-related announcements that should not trigger repair."""
+    text = str(title or "")
+    return any(keyword in text for keyword in NON_PRIMARY_ANNOUNCEMENT_KEYWORDS)
+
+
+def is_financial_disclosure_like_title(title: str) -> bool:
+    """Return True when a title looks related to periodic reports or disclosure risk."""
+    text = str(title or "")
+    return any(keyword in text for keyword in FINANCIAL_PERIODIC_REPORT_KEYWORDS) or any(
+        keyword in text for keyword in DISCLOSURE_DELAY_KEYWORDS + TRADING_RISK_KEYWORDS
+    )
 
 
 def infer_report_periods_from_title(title: str) -> List[str]:
     """Infer report periods mentioned by a Chinese periodic-report title."""
     text = str(title or "")
-    years = [int(value) for value in re.findall(r"(20\d{2})\s*年", text)]
-    if not years:
-        return []
-    year = years[0]
-    if "第一季度报告" in text or "一季度报告" in text:
-        return [f"{year}-03-31"]
-    if "半年度报告" in text or "半年报" in text:
-        return [f"{year}-06-30"]
-    if "第三季度报告" in text or "三季度报告" in text:
-        return [f"{year}-09-30"]
-    if "年度报告" in text or "年报" in text:
-        return [f"{year}-12-31"]
-    return []
+    periods: List[str] = []
+    patterns = (
+        (r"(20\d{2})\s*年\s*(?:第一季度报告|一季度报告)", "03-31"),
+        (r"(20\d{2})\s*年\s*(?:半年度报告|半年报)", "06-30"),
+        (r"(20\d{2})\s*年\s*(?:第三季度报告|三季度报告)", "09-30"),
+        (r"(20\d{2})\s*年?\s*(?:年度报告|年报)", "12-31"),
+    )
+    for pattern, suffix in patterns:
+        for year_text in re.findall(pattern, text):
+            period = f"{int(year_text):04d}-{suffix}"
+            if period not in periods:
+                periods.append(period)
+    return periods
 
 
 def build_financial_disclosure_events(
