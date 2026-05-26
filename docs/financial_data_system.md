@@ -408,6 +408,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 周度对账会把 `outside_approved_local_core / mapping_catalog_empty` 归为 `mapping_policy_gap`，这类问题表示字段标准或准入配置不一致，不再反复调用 CNInfo/THS/Sina 补数。只有 `missing_local_core_fact` 等源数据缺口才进入补数源路由。
 - 周度对账在构造本地缺口候选时前置股票主数据生命周期判断：报告期结束日早于上市日的 `pre_listing_period`、退市后或无披露窗口的 `post_delisting_or_no_disclosure` 直接记录为 `accepted_disclosure_gap`，不再调用 CNInfo/THS/Sina，也不计入 degraded blockers。
 - 周度对账会复用已经落库的 `accepted_disclosure_gap` 状态；已由公告解释的缺报不会在下一轮对账中重新退回 `local_core_gap` blocker。
+- 周度对账会复用 `cninfo_announcement_audit` 中已经扫描到的停牌、无法披露定期报告、退市风险公告。若公告标题未写明具体报告期，则只允许解释公告日前 180 天内的近端报告期，避免把更早历史缺口误标为正常。
 - 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps、mapping policy gaps、source missing 和 blockers。
 
 | 任务 | 触发方式 | 是否自动定时 | 主要用途 |
@@ -426,6 +427,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 周度对账候选达到上限时，按交易所、报表 profile 和报告期做均衡抽样，不再固定取前若干 SSE 标的。报告中的“候选限制”会显示本轮选择数量与总候选数量。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
 - `2026-05-26` 对 `financial_disclosure_reconciliation_sync` 真实结果复核：`ingestion_run_id=405` 的 260 个 blockers 中，256 个为报告期早于上市日的新股历史期；剩余 4 个为 `002731.SZ` 与 `688121.SH` 的 `2025-12-31 / 2026-03-31`，CNInfo data20 返回 HTTP 200 但目标期结构化记录无数值，Sina/THS fallback 也未写入三大核心事实，结合公告与停牌/退市风险上下文按披露异常待补处理，而不是字段映射缺陷。
+- `2026-05-26` 再次对账 `ingestion_run_id=446` 的 122 个 blockers 中，119 个来自 BSE。根因不是财务字段映射失败，而是 `AkShareSource.get_instrument_list(BSE)` 过去没有写入 AkShare 已返回的 `上市日期`，导致所有 BSE 新股历史期无法被识别为 `pre_listing_period`。已修复 BSE `上市日期 / 所属行业 / 地区` 写入并刷新 BSE 主数据，`quotes.db.instruments` 中 315 个 BSE 标的已全部具备 `listed_date`。剩余 `002731.SZ / 688121.SH` 近端缺口由既有 CNInfo 公告审计按停牌/退市风险解释。
 
 状态表：
 

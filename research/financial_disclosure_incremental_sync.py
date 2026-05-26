@@ -573,6 +573,9 @@ class FinancialDisclosureIncrementalSyncService:
         }
         candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
         filtered_stale_pending = 0
+        risk_audits_by_instrument = self._load_disclosure_risk_audits_by_instrument(
+            instruments_by_id.keys()
+        )
         for event in events:
             instrument = instruments_by_id.get(event.instrument_id)
             if instrument is None:
@@ -639,7 +642,18 @@ class FinancialDisclosureIncrementalSyncService:
                         mapping_version=mapping_version,
                     )
                     if not readiness.get("ready"):
-                        if candidate.lifecycle_classification:
+                        audit_event = self._disclosure_risk_event_for_candidate(
+                            candidate,
+                            risk_audits_by_instrument.get(candidate.instrument_id, []),
+                        )
+                        if audit_event is not None:
+                            candidate.events.append(audit_event)
+                            candidate.reasons.extend(
+                                reason
+                                for reason in audit_event.reasons
+                                if reason not in candidate.reasons
+                            )
+                        elif candidate.lifecycle_classification:
                             candidate.reasons.append(
                                 f"lifecycle:{candidate.lifecycle_classification}"
                             )
@@ -803,6 +817,62 @@ class FinancialDisclosureIncrementalSyncService:
                 report_period,
             ),
         )
+
+    def _load_disclosure_risk_audits_by_instrument(
+        self,
+        instrument_ids: Sequence[str],
+    ) -> Dict[str, List[Mapping[str, Any]]]:
+        loader = getattr(self.storage, "list_cninfo_announcement_audit", None)
+        if loader is None:
+            return {}
+        with self.storage.financial_database_scope():
+            rows = loader(
+                purpose_key=self.purpose_key,
+                instrument_ids=[str(item) for item in instrument_ids if str(item)],
+            )
+        result: Dict[str, List[Mapping[str, Any]]] = {}
+        accepted_reasons = {"pending_delisting_risk", "periodic_report_delayed"}
+        for row in rows:
+            reasons = {str(item) for item in row.get("selection_reasons") or []}
+            if not reasons & accepted_reasons:
+                continue
+            instrument_id = str(row.get("instrument_id") or "")
+            if not instrument_id:
+                continue
+            result.setdefault(instrument_id, []).append(row)
+        return result
+
+    def _disclosure_risk_event_for_candidate(
+        self,
+        candidate: FinancialDisclosureMaintenanceCandidate,
+        audits: Sequence[Mapping[str, Any]],
+    ) -> Optional[FinancialDisclosureEvent]:
+        period_end = self._parse_date_text(candidate.report_period)
+        if period_end is None:
+            return None
+        for audit in audits:
+            announcement_time = self._parse_date_text(audit.get("announcement_time"))
+            if announcement_time is None:
+                continue
+            days_after_period = (announcement_time.date() - period_end.date()).days
+            if days_after_period < 0 or days_after_period > 180:
+                continue
+            reasons = [str(item) for item in audit.get("selection_reasons") or []]
+            classification = (
+                PENDING_DELISTING_RISK_CLASSIFICATION
+                if "pending_delisting_risk" in reasons
+                else FINANCIAL_DISCLOSURE_GAP_CLASSIFICATION
+            )
+            return FinancialDisclosureEvent(
+                instrument_id=candidate.instrument_id,
+                report_period=candidate.report_period,
+                classification=classification,
+                reasons=reasons,
+                announcement_id=str(audit.get("announcement_id") or "audit-risk"),
+                announcement_time=audit.get("announcement_time"),
+                title=audit.get("title"),
+            )
+        return None
 
     @staticmethod
     def _parse_date_text(value: Any) -> Optional[datetime]:

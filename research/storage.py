@@ -5793,6 +5793,51 @@ class ResearchStorageManager:
             )
             conn.commit()
 
+    def list_cninfo_announcement_audit(
+        self,
+        *,
+        purpose_key: str,
+        instrument_ids: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return selected CNInfo announcement audit rows for maintenance reuse."""
+        params: List[Any] = [purpose_key]
+        where = ["purpose_key = ?"]
+        if instrument_ids:
+            ids = [str(item) for item in instrument_ids if str(item)]
+            if ids:
+                where.append(
+                    f"instrument_id IN ({','.join('?' for _ in ids)})"
+                )
+                params.extend(ids)
+        limit_clause = ""
+        if limit is not None:
+            limit_clause = "LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT *
+                FROM cninfo_announcement_audit
+                WHERE {' AND '.join(where)}
+                ORDER BY announcement_time DESC, updated_at DESC
+                {limit_clause}
+                """,
+                params,
+            ).fetchall()
+        result: List[Dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["selection_reasons"] = self._deserialize_json(
+                item.pop("selection_reasons_json", None)
+            ) or []
+            item["raw_payload"] = self._deserialize_json(
+                item.pop("raw_payload_json", None)
+            ) or {}
+            result.append(item)
+        return result
+
     def upsert_financial_disclosure_event_state(
         self,
         *,

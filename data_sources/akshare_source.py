@@ -276,12 +276,23 @@ class AkShareSource(BaseDataSource):
                             symbol = str(row.证券代码)
                             name = str(row.证券简称)
                             exchange_code = "BSE"
+                            listed_date = str(getattr(row, "上市日期", "") or "").strip() or None
+                            industry = str(getattr(row, "所属行业", "") or "").strip()
+                            sector = str(getattr(row, "地区", "") or "").strip()
                         else:  # stock_info_a_code_name (fallback)
                             symbol = str(row.code)
                             name = str(row.name)
                             exchange_code = exchange or _get_exchange(symbol)
                             if exchange_code == "UNKNOWN":
                                 continue
+                            listed_date = None
+                            industry = ""
+                            sector = ""
+
+                        if exchange_code != "BSE":
+                            listed_date = None
+                            industry = ""
+                            sector = ""
 
                         # 所有API都没有价格信息，默认设为活跃状态
                         is_active = True
@@ -299,10 +310,10 @@ class AkShareSource(BaseDataSource):
                             "exchange": exchange_code,
                             "type": "stock",  # 统一为小写
                             "currency": "CNY",
-                            "listed_date": None,  # AkShare API 暂时没有提供
+                            "listed_date": listed_date,
                             "delisted_date": None,  # AkShare API 暂时没有提供
-                            "industry": "",  # AkShare API 暂时没有提供
-                            "sector": "",   # AkShare API 暂时没有提供
+                            "industry": industry,
+                            "sector": sector,
                             "market": "",   # AkShare API 暂时没有提供
                             "status": "active",  # 默认为活跃
                             "is_active": is_active,

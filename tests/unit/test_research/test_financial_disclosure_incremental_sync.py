@@ -70,7 +70,15 @@ class _FakeFinancialStatements:
 
 
 class _FakeStorage:
-    def __init__(self, *, ready=False, numeric_rows=None, pending_states=None, missing_fields=None):
+    def __init__(
+        self,
+        *,
+        ready=False,
+        numeric_rows=None,
+        pending_states=None,
+        missing_fields=None,
+        audit_rows=None,
+    ):
         self.financial_statements = _FakeFinancialStatements(
             ready=ready,
             numeric_rows=numeric_rows,
@@ -78,6 +86,7 @@ class _FakeStorage:
         )
         self.states = []
         self.pending_states = list(pending_states or [])
+        self.audit_rows = list(audit_rows or [])
 
     @contextmanager
     def financial_database_scope(self):
@@ -88,6 +97,13 @@ class _FakeStorage:
 
     def list_financial_disclosure_event_states(self, **kwargs):
         return list(self.pending_states)
+
+    def list_cninfo_announcement_audit(self, **kwargs):
+        ids = set(kwargs.get("instrument_ids") or [])
+        return [
+            row for row in self.audit_rows
+            if not ids or row.get("instrument_id") in ids
+        ]
 
     def start_ingestion_run(self, **kwargs):
         return 1
@@ -662,6 +678,54 @@ def test_reconciliation_reuses_accepted_disclosure_state_without_source_retry(tm
     assert result["source_routing"]["cninfo_attempts"] == 0
     assert result["source_routing"]["fallback_attempts"] == 0
     assert storage.states[-1]["status"] == "accepted_disclosure_gap"
+
+
+def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        audit_rows=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "market": "SZSE",
+                "announcement_id": "risk-generic",
+                "announcement_time": "2026-05-05T16:00:00+00:00",
+                "title": "关于无法在法定期限内披露定期报告暨股票停牌的公告",
+                "selection_reasons": ["pending_delisting_risk"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("recent disclosure risk audits must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            target_instrument_ids=["002731.SZ"],
+            report_periods=["2026-03-31"],
+            max_candidates=5,
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["pending_delisting_risk_count"] == 1
+    assert result["accepted_gap_count"] == 1
+    assert result["blocking_gap_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert storage.states[-1]["status"] == "pending_delisting_risk"
+    assert storage.states[-1]["announcement_id"] == "risk-generic"
 
 
 def test_reconciliation_candidate_limit_is_balanced_across_groups():
