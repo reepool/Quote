@@ -467,6 +467,42 @@ def test_incremental_sync_marks_stale_pending_noise_when_not_dry_run(tmp_path):
     )
 
 
+def test_incremental_sync_keeps_pending_delisting_risk_without_explicit_period(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "002731.SZ",
+                "symbol": "002731",
+                "exchange": "SZSE",
+                "report_period": "2026-03-31",
+                "announcement_id": "risk-without-period",
+                "announcement_time": "2026-04-28",
+                "title": "关于定期报告披露进展暨股票交易可能被实施退市风险警示的风险提示公告",
+                "classification": "pending_delisting_risk",
+                "selection_reasons": ["pending_delisting_risk"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            latest_report_period="2026Q1",
+            dry_run=True,
+        )
+    )
+
+    assert result["candidate_sources"]["filtered_stale_pending"] == 0
+    assert result["candidate_sources"]["pending_state"] == 1
+
+
 def test_readiness_accepts_cninfo_data20_official_fact_for_missing_core(tmp_path):
     service = FinancialDisclosureIncrementalSyncService(
         db_ops=_FakeDbOps(),

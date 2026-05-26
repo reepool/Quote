@@ -748,6 +748,11 @@ class FinancialDisclosureIncrementalSyncService:
         )
         if not current_reasons:
             return True
+        if any(
+            reason in current_reasons
+            for reason in ("pending_delisting_risk", "periodic_report_delayed")
+        ):
+            return False
         report_period = str(state.get("report_period") or "")
         return report_period not in infer_report_periods_from_title(title)
 
