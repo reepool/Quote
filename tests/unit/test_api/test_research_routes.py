@@ -22,6 +22,7 @@ from api.models import (
     ResearchCompanyOverviewResponse,
     ResearchDcfValuationResponse,
     ResearchFinancialStatementsResponse,
+    ResearchFinancialStatementsHistoryResponse,
     ResearchFinancialStatementsReadinessResponse,
     ResearchFinancialSummaryResponse,
     ResearchMetadataReadinessResponse,
@@ -52,6 +53,7 @@ from api.routes import (
     get_research_company_profile,
     get_research_dcf_valuation,
     get_research_financial_statements,
+    get_research_financial_statements_history,
     get_research_financial_statements_readiness,
     get_research_financial_summary,
     get_research_metadata_readiness,
@@ -1939,6 +1941,125 @@ class TestResearchRoutes:
             requested_canonical_facts=["revenue", "equity_parent"],
             profile="nonbank",
             mapping_version="sina_ths_core_financial_facts.v1",
+            include_local_core=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_financial_statements_history_success(self, mock_dm):
+        mock_dm.get_research_financial_statements_history = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "period_window": "latest",
+                "rolling_quarters": 2,
+                "requested_report_periods": [],
+                "report_periods": ["2026-03-31", "2025-12-31"],
+                "period_count": 2,
+                "items": [
+                    {
+                        "instrument_id": "600000.SH",
+                        "symbol": "600000",
+                        "exchange": "SSE",
+                        "report_period": "2026-03-31",
+                        "publish_date": None,
+                        "fiscal_year": 2026,
+                        "fiscal_quarter": 1,
+                        "currency": "CNY",
+                        "schema_version": "financial_facts.v1",
+                        "revenue": 1000.0,
+                        "source": "akshare",
+                        "source_mode": "direct",
+                        "data_as_of": "2026-05-19T10:00:00",
+                        "ingestion_run_id": None,
+                        "created_at": "2026-05-19T10:00:00",
+                        "updated_at": "2026-05-19T10:00:00",
+                        "facts": {"revenue": 1000.0},
+                        "indicators": None,
+                        "statements": [],
+                    },
+                    {
+                        "instrument_id": "600000.SH",
+                        "symbol": "600000",
+                        "exchange": "SSE",
+                        "report_period": "2025-12-31",
+                        "publish_date": None,
+                        "fiscal_year": 2025,
+                        "fiscal_quarter": 4,
+                        "currency": "CNY",
+                        "schema_version": "financial_facts.v1",
+                        "revenue": 900.0,
+                        "source": "akshare",
+                        "source_mode": "direct",
+                        "data_as_of": "2026-05-19T10:00:00",
+                        "ingestion_run_id": None,
+                        "created_at": "2026-05-19T10:00:00",
+                        "updated_at": "2026-05-19T10:00:00",
+                        "facts": {"revenue": 900.0},
+                        "indicators": None,
+                        "statements": [],
+                    },
+                ],
+            }
+        )
+
+        response = _run(
+            get_research_financial_statements_history(
+                "600000.SH",
+                include_statements=False,
+                rolling_quarters=2,
+            )
+        )
+
+        assert isinstance(response, ResearchFinancialStatementsHistoryResponse)
+        assert response.period_count == 2
+        assert response.items[0].report_period == "2026-03-31"
+        mock_dm.get_research_financial_statements_history.assert_awaited_once_with(
+            "600000.SH",
+            include_statements=False,
+            period_window="latest",
+            rolling_quarters=2,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_financial_statements_history_passes_options(self, mock_dm):
+        mock_dm.get_research_financial_statements_history = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "period_window": "latest",
+                "rolling_quarters": 12,
+                "requested_report_periods": ["2025-12-31"],
+                "report_periods": [],
+                "period_count": 0,
+                "items": [],
+            }
+        )
+
+        response = _run(
+            get_research_financial_statements_history(
+                "600000.SH",
+                include_statements=False,
+                report_periods="2025-12-31",
+                requested_canonical_facts="revenue,equity_parent",
+                profile="nonbank",
+                mapping_version="sina_ths_core_financial_facts.v5",
+                include_local_core=True,
+                allow_remote_extension=False,
+            )
+        )
+
+        assert response.requested_report_periods == ["2025-12-31"]
+        mock_dm.get_research_financial_statements_history.assert_awaited_once_with(
+            "600000.SH",
+            include_statements=False,
+            period_window="latest",
+            rolling_quarters=12,
+            report_periods=["2025-12-31"],
+            requested_canonical_facts=["revenue", "equity_parent"],
+            profile="nonbank",
+            mapping_version="sina_ths_core_financial_facts.v5",
             include_local_core=True,
         )
 

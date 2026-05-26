@@ -404,7 +404,9 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - `financial_l1_full_import` 为 `enabled=true/manual_only=true`，只通过 `/run` 或直接调度调用执行，不注册自动 cron。
 - `financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。
 - 两个维护任务的补数源顺序为 `CNInfo data20 -> THS -> Sina`。CNInfo 公告只负责发现候选；CNInfo data20 才是官方结构化补数源。Sina/THS 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做补齐。实际路由通过统一维护路由器执行，后续如果增加东财或其他源，应扩展同一抽象层，而不是在全量、增量或周更任务里重复实现。
-- 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps 和 blockers。
+- L1 required facts 采用已经批准的精确口径：`revenue / net_income_parent / equity_parent / total_assets / total_liabilities`。不要再用旧的 `net_income / equity` 泛化字段作为本地核心层 readiness 要求；归母与合计口径必须保持分离。
+- 周度对账会把 `outside_approved_local_core / mapping_catalog_empty` 归为 `mapping_policy_gap`，这类问题表示字段标准或准入配置不一致，不再反复调用 CNInfo/THS/Sina 补数。只有 `missing_local_core_fact` 等源数据缺口才进入补数源路由。
+- 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps、mapping policy gaps、source missing 和 blockers。
 
 | 任务 | 触发方式 | 是否自动定时 | 主要用途 |
 |---|---|---:|---|
@@ -419,6 +421,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 公告显示“无法按期披露”“停牌”“退市风险警示”“可能被终止上市”时，对历史缺口先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，不触发每日补数重试、不阻断批次，但必须保留公告 ID、公告标题和首次发现时间；后续正式定报主公告出现时再重新触发财务补数。
 - 公告先到而 CNInfo data20 与 Sina/THS 结构化财报暂未更新时，候选进入 pending recheck；同一公告的重试窗口使用首次 pending 时间作为硬上限，不因每日扫描滚动延长。
 - 报告中的 `CNInfo ready` 表示 CNInfo data20 写入后已满足 required canonical facts 的候选数量；`CNInfo 批处理通过` 只表示 CNInfo 批处理未把该 instrument-period 判为失败，不等同于本地核心字段已经修复。
+- 周度对账候选达到上限时，按交易所、报表 profile 和报告期做均衡抽样，不再固定取前若干 SSE 标的。报告中的“候选限制”会显示本轮选择数量与总候选数量。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
 
 状态表：
@@ -593,7 +596,29 @@ sqlite3 data/financials.db "PRAGMA quick_check;"
 - 首次全量导入建议避开行情日更高峰，或降低 batch 范围观察资源占用。
 - 后续接入 scheduler/Telegram 时，应配置为手动触发或低峰任务，不应默认和行情日更同时抢占网络预算。
 
-## 8. 后续待办
+## 8. API 读取
+
+单期财务报表读取：
+
+```text
+GET /api/v1/research/company/{instrument_id}/financial-statements
+```
+
+多期财务报表历史读取：
+
+```text
+GET /api/v1/research/company/{instrument_id}/financial-statements/history?period_window=latest&rolling_quarters=12&include_statements=false
+```
+
+显式报告期读取：
+
+```text
+GET /api/v1/research/company/{instrument_id}/financial-statements/history?report_periods=2026-03-31,2025-12-31&include_statements=false
+```
+
+历史接口的 `items` 每项复用单期接口结构，包含标准 `facts`、派生 `indicators` 和可选 `statements`。默认只读本地财务库，不隐式触发远程扩展；需要 L1 本地核心诊断时可追加 `include_local_core=true` 与 `requested_canonical_facts=...`。
+
+## 9. 后续待办
 
 1. 将 `scripts/research_financial_l1_full_import.py` 接入 scheduler/Telegram 的任务注册和帮助文案。
 2. 对 `success_with_review` 输出的 review batch 建立补处理命令，例如退市/未披露最新期、临时源失败、映射缺口三类。

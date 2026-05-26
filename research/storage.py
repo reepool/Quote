@@ -4620,6 +4620,60 @@ class ResearchStorageManager:
             facts["statements"] = statements
         return facts
 
+    def get_financial_statement_bundles(
+        self,
+        instrument_id: str,
+        *,
+        include_statements: bool = True,
+        report_periods: Optional[List[str]] = None,
+        limit: int = 12,
+    ) -> List[Dict[str, Any]]:
+        """Fetch multiple financial statement bundles for one instrument."""
+        normalized_limit = max(1, min(int(limit), 80))
+        requested_periods = [
+            str(item).strip()
+            for item in (report_periods or [])
+            if str(item).strip()
+        ]
+        params: List[Any] = [instrument_id]
+        if requested_periods:
+            placeholders = ",".join("?" for _ in requested_periods)
+            where_period = f"AND report_period IN ({placeholders})"
+            params.extend(requested_periods)
+            limit_clause = ""
+        else:
+            where_period = ""
+            limit_clause = "LIMIT ?"
+            params.append(normalized_limit)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT DISTINCT report_period
+                FROM financial_facts
+                WHERE instrument_id = ?
+                {where_period}
+                ORDER BY report_period DESC
+                {limit_clause}
+                """,
+                params,
+            ).fetchall()
+
+        periods = [str(row["report_period"]) for row in rows if row["report_period"]]
+        if requested_periods:
+            periods = periods[:normalized_limit]
+        bundles: List[Dict[str, Any]] = []
+        for period in periods:
+            bundle = self.get_financial_statement_bundle(
+                instrument_id,
+                include_statements=include_statements,
+                report_period=period,
+            )
+            if bundle is not None:
+                bundles.append(bundle)
+        return bundles
+
     def get_financial_core_facts(
         self,
         instrument_id: str,

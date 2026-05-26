@@ -573,10 +573,10 @@ async def weekly_data_maintenance(self,
    历史 `pending_recheck` 在再次进入候选前也会重新套用当前筛选规则，旧逻辑留下的说明会、英文版、图文版、问询函专项说明等噪声计入 `filtered_stale_pending`，不再触发补数。
 3. **披露异常标记**：历史缺报且公告显示无法按期披露、停牌、退市风险或可能终止上市时，先标记为 `accepted_disclosure_gap` 或 `pending_delisting_risk`，并记录公告证据；该状态解释披露异常，不替代字段映射，也不触发每日补数重试。
 4. **定向补处理**：只对公告候选、pending recheck、本地缺失报告期和 required core facts 不完整标的调用补数流程；已完整落库的 instrument-period 跳过。
-5. **补数源路由**：增量和周度对账维护任务按 `CNInfo data20 -> THS -> Sina` 执行。CNInfo data20 是官方结构化优先源；THS/Sina 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做字段级补齐。源顺序、CNInfo-first 修复、fallback 和 readiness 合并由 `FinancialMaintenanceRepairRouter` 统一处理，调度任务不直接写各数据源调用逻辑。
+5. **字段口径与补数源路由**：L1 required facts 使用 `revenue / net_income_parent / equity_parent / total_assets / total_liabilities`，保持归母与合计口径分离。增量和周度对账维护任务按 `CNInfo data20 -> THS -> Sina` 执行。CNInfo data20 是官方结构化优先源；THS/Sina 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做字段级补齐。源顺序、CNInfo-first 修复、fallback 和 readiness 合并由 `FinancialMaintenanceRepairRouter` 统一处理，调度任务不直接写各数据源调用逻辑。
    Telegram 报告中的 `CNInfo ready` 是最终 canonical readiness 成功数；`CNInfo 批处理通过` 是 CNInfo 批处理层面的 instrument-period 通过数，二者必须分开解读。
 6. **结构化数据滞后**：公告先到但 CNInfo data20 与 Sina/THS 结构化源均未更新时，候选进入 `pending_recheck`；同一公告的重查截止时间固定为首次 pending 派生值，不滚动延长。
-7. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。
+7. **对账修复**：周度任务复核报告期覆盖、核心事实、source manifest、parser diagnostics、fallback 占比、accepted gap 和 hot/cold tier consistency。`outside_approved_local_core / mapping_catalog_empty` 会归为 `mapping_policy_gap`，不再调用补数源；`missing_local_core_fact` 等才归为 source missing 并进入补数路由。候选超过上限时按交易所、profile 和报告期均衡抽样。
 8. **readiness gate**：运行后通过 `/api/v1/research/financial-statements/readiness` 与 `/api/v1/research/valuation/readiness` 判断是否允许 valuation rollout。
 9. **状态持久化**：财务公告候选和处理结果写入 `financial_disclosure_event_state`，扫描水位和公告证据使用独立 purpose key 写入 CNInfo announcement 状态/审计表。
 

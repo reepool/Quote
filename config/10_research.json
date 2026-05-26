@@ -295,11 +295,41 @@
         "readiness": {
           "required_core_facts": [
             "revenue",
-            "net_income",
-            "equity",
+            "net_income_parent",
+            "equity_parent",
             "total_assets",
             "total_liabilities"
           ],
+          "required_core_facts_by_profile": {
+            "nonbank": [
+              "revenue",
+              "net_income_parent",
+              "equity_parent",
+              "total_assets",
+              "total_liabilities"
+            ],
+            "bank": [
+              "revenue",
+              "net_income_parent",
+              "equity_parent",
+              "total_assets",
+              "total_liabilities"
+            ],
+            "securities": [
+              "revenue",
+              "net_income_parent",
+              "equity_parent",
+              "total_assets",
+              "total_liabilities"
+            ],
+            "insurance": [
+              "revenue",
+              "net_income_parent",
+              "equity_parent",
+              "total_assets",
+              "total_liabilities"
+            ]
+          },
           "min_period_coverage_ratio": 0.95,
           "min_core_fact_coverage_ratio": 0.95,
           "max_fallback_share": 0.5,

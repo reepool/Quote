@@ -43,6 +43,9 @@ from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
 
 
+MAPPING_POLICY_GAP_REASONS = {"mapping_catalog_empty", "outside_approved_local_core"}
+
+
 @dataclass
 class FinancialDisclosureMaintenanceCandidate:
     instrument_id: str
@@ -98,6 +101,8 @@ class FinancialDisclosureIncrementalSyncService:
         )
         self._last_repair_source_summary: Dict[str, Any] = {}
         self._last_candidate_source_summary: Dict[str, int] = {}
+        self._last_candidate_unlimited_count: int = 0
+        self._last_candidate_limit: int = 0
 
     async def sync(
         self,
@@ -244,6 +249,7 @@ class FinancialDisclosureIncrementalSyncService:
                 candidate_count=len(candidates),
                 failed_count=write_result["failed_count"],
                 blocking_count=write_result["blocking_gap_count"],
+                mapping_policy_gap_count=write_result["mapping_policy_gap_count"],
                 scan_errors=scan_result["errors"],
             )
             result = {
@@ -282,6 +288,8 @@ class FinancialDisclosureIncrementalSyncService:
                 "event_count": scan_result.get("event_count", 0),
                 "pages_scanned": scan_result["pages_scanned"],
                 "candidate_count": len(candidates),
+                "candidate_unlimited_count": self._last_candidate_unlimited_count,
+                "candidate_limit": self._last_candidate_limit,
                 "candidate_sources": dict(self._last_candidate_source_summary),
                 "scan_errors": scan_result["errors"][:10],
                 "elapsed_seconds": elapsed,
@@ -551,12 +559,7 @@ class FinancialDisclosureIncrementalSyncService:
             if instrument.get("instrument_id")
         }
         candidates: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
-        candidate_sources = {
-            "new_event": 0,
-            "pending_state": 0,
-            "local_gap": 0,
-            "filtered_stale_pending": 0,
-        }
+        filtered_stale_pending = 0
         for event in events:
             instrument = instruments_by_id.get(event.instrument_id)
             if instrument is None:
@@ -564,8 +567,6 @@ class FinancialDisclosureIncrementalSyncService:
             candidate = self._candidate_for_event(instrument, event)
             is_new = candidate.key not in candidates
             candidates.setdefault(candidate.key, candidate).events.append(event)
-            if is_new:
-                candidate_sources["new_event"] += 1
             candidates[candidate.key].reasons.extend(
                 reason for reason in event.reasons if reason not in candidates[candidate.key].reasons
             )
@@ -579,7 +580,7 @@ class FinancialDisclosureIncrementalSyncService:
             if instrument is None:
                 continue
             if self._is_stale_filtered_pending_state(state):
-                candidate_sources["filtered_stale_pending"] += 1
+                filtered_stale_pending += 1
                 self._record_filtered_stale_pending_state(
                     state,
                     instrument=instrument,
@@ -613,18 +614,85 @@ class FinancialDisclosureIncrementalSyncService:
                         continue
                     readiness = self._readiness_for_candidate(
                         candidate,
-                        required_core_facts=required_core_facts,
+                        required_core_facts=self._required_core_facts_for_profile(
+                            candidate.profile,
+                            required_core_facts,
+                        ),
                         mapping_version=mapping_version,
                     )
                     if not readiness.get("ready"):
                         candidate.reasons.append("missing_or_incomplete_local_core")
                         candidates[candidate.key] = candidate
-                        candidate_sources["local_gap"] += 1
-        if max_candidates > 0 and len(candidates) > max_candidates:
-            self._last_candidate_source_summary = candidate_sources
-            return dict(list(candidates.items())[:max_candidates])
-        self._last_candidate_source_summary = candidate_sources
-        return candidates
+        self._last_candidate_unlimited_count = len(candidates)
+        self._last_candidate_limit = int(max_candidates)
+        limited = self._limit_candidates_balanced(candidates, max_candidates)
+        self._last_candidate_source_summary = self._summarize_candidate_sources(
+            limited.values(),
+            filtered_stale_pending=filtered_stale_pending,
+        )
+        return limited
+
+    @staticmethod
+    def _limit_candidates_balanced(
+        candidates: Mapping[Tuple[str, str], FinancialDisclosureMaintenanceCandidate],
+        max_candidates: int,
+    ) -> Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate]:
+        if max_candidates <= 0 or len(candidates) <= max_candidates:
+            return dict(candidates)
+        grouped: Dict[Tuple[str, str, str], List[FinancialDisclosureMaintenanceCandidate]] = {}
+        for candidate in sorted(
+            candidates.values(),
+            key=lambda item: (
+                item.exchange,
+                item.profile,
+                item.report_period,
+                item.instrument_id,
+            ),
+        ):
+            grouped.setdefault(
+                (candidate.exchange, candidate.profile, candidate.report_period),
+                [],
+            ).append(candidate)
+        selected: Dict[Tuple[str, str], FinancialDisclosureMaintenanceCandidate] = {}
+        keys = sorted(grouped)
+        while keys and len(selected) < max_candidates:
+            next_keys: List[Tuple[str, str, str]] = []
+            for key in keys:
+                bucket = grouped[key]
+                if bucket and len(selected) < max_candidates:
+                    candidate = bucket.pop(0)
+                    selected[candidate.key] = candidate
+                if bucket:
+                    next_keys.append(key)
+            keys = next_keys
+        return selected
+
+    @staticmethod
+    def _summarize_candidate_sources(
+        candidates: Sequence[FinancialDisclosureMaintenanceCandidate],
+        *,
+        filtered_stale_pending: int,
+    ) -> Dict[str, int]:
+        summary = {
+            "new_event": 0,
+            "pending_state": 0,
+            "local_gap": 0,
+            "filtered_stale_pending": filtered_stale_pending,
+        }
+        for candidate in candidates:
+            if candidate.events:
+                if any(
+                    event.announcement_id == "pending"
+                    or "pending_recheck" in event.reasons
+                    or "pending_delisting_risk" in event.reasons
+                    for event in candidate.events
+                ):
+                    summary["pending_state"] += 1
+                else:
+                    summary["new_event"] += 1
+            elif "missing_or_incomplete_local_core" in candidate.reasons:
+                summary["local_gap"] += 1
+        return summary
 
     @staticmethod
     def _is_stale_filtered_pending_state(state: Mapping[str, Any]) -> bool:
@@ -725,7 +793,10 @@ class FinancialDisclosureIncrementalSyncService:
         before_ready = {
             candidate.key: self._readiness_for_candidate(
                 candidate,
-                required_core_facts=required_core_facts,
+                required_core_facts=self._required_core_facts_for_profile(
+                    candidate.profile,
+                    required_core_facts,
+                ),
                 mapping_version=mapping_version,
             )
             for candidate in candidates
@@ -734,6 +805,7 @@ class FinancialDisclosureIncrementalSyncService:
             candidate
             for candidate in candidates
             if not before_ready[candidate.key].get("ready")
+            and not self._has_mapping_policy_gap(before_ready[candidate.key])
             and candidate.classification
             not in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
         ]
@@ -748,6 +820,8 @@ class FinancialDisclosureIncrementalSyncService:
         accepted = 0
         pending = 0
         pending_delisting = 0
+        mapping_policy = 0
+        source_missing = 0
         changed = 0
         outcomes: List[Dict[str, Any]] = []
         if to_fetch and not dry_run:
@@ -773,7 +847,10 @@ class FinancialDisclosureIncrementalSyncService:
             before = before_ready[candidate.key]
             after = self._readiness_for_candidate(
                 candidate,
-                required_core_facts=required_core_facts,
+                required_core_facts=self._required_core_facts_for_profile(
+                    candidate.profile,
+                    required_core_facts,
+                ),
                 mapping_version=mapping_version,
             )
             status = "unchanged" if before.get("ready") else "pending_recheck"
@@ -792,12 +869,17 @@ class FinancialDisclosureIncrementalSyncService:
             elif candidate.classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS:
                 status = "accepted_disclosure_gap"
                 accepted += 1
+            elif self._has_mapping_policy_gap(after):
+                status = "mapping_policy_gap"
+                mapping_policy += 1
             elif candidate.events:
                 status = "pending_recheck"
                 pending += 1
             else:
                 status = "blocking_gap"
                 blocking += 1
+                if self._has_source_missing_gap(after):
+                    source_missing += 1
             if status == "failed":
                 failed += 0
             outcome = self._record_candidate_state(
@@ -815,6 +897,8 @@ class FinancialDisclosureIncrementalSyncService:
             "pending_recheck_count": pending,
             "pending_delisting_risk_count": pending_delisting,
             "accepted_gap_count": accepted,
+            "mapping_policy_gap_count": mapping_policy,
+            "source_missing_gap_count": source_missing,
             "blocking_gap_count": blocking,
             "failed_count": failed,
             "written_count": written,
@@ -833,18 +917,31 @@ class FinancialDisclosureIncrementalSyncService:
         request_interval_seconds: float,
         request_timeout_seconds: float,
     ) -> Dict[str, Any]:
-        return await self.repair_router.repair_targets(
-            targets=[
-                self._repair_target_for_candidate(candidate)
-                for candidate in candidates
-            ],
-            required_core_facts=required_core_facts,
-            mapping_version=mapping_version,
-            db_path=db_path,
-            request_interval_seconds=request_interval_seconds,
-            request_timeout_seconds=request_timeout_seconds,
-            accepted_gap_classifications=ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
-        )
+        merged = self.repair_router.default_summary()
+        grouped: Dict[Tuple[str, ...], List[FinancialDisclosureMaintenanceCandidate]] = {}
+        for candidate in candidates:
+            profile_required = tuple(
+                self._required_core_facts_for_profile(
+                    candidate.profile,
+                    required_core_facts,
+                )
+            )
+            grouped.setdefault(profile_required, []).append(candidate)
+        for profile_required, group in grouped.items():
+            summary = await self.repair_router.repair_targets(
+                targets=[
+                    self._repair_target_for_candidate(candidate)
+                    for candidate in group
+                ],
+                required_core_facts=list(profile_required),
+                mapping_version=mapping_version,
+                db_path=db_path,
+                request_interval_seconds=request_interval_seconds,
+                request_timeout_seconds=request_timeout_seconds,
+                accepted_gap_classifications=ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS,
+            )
+            merged = self._merge_repair_summaries(merged, summary)
+        return merged
 
     def _readiness_for_candidate(
         self,
@@ -858,6 +955,60 @@ class FinancialDisclosureIncrementalSyncService:
             required_core_facts=required_core_facts,
             mapping_version=mapping_version,
         )
+
+    def _required_core_facts_for_profile(
+        self,
+        profile: str,
+        default_required_core_facts: Sequence[str],
+    ) -> List[str]:
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        readiness_cfg = module_cfg.get("readiness", {})
+        by_profile = readiness_cfg.get("required_core_facts_by_profile")
+        if isinstance(by_profile, Mapping):
+            profile_required = by_profile.get(profile)
+            if isinstance(profile_required, Sequence) and not isinstance(profile_required, str):
+                return [str(item) for item in profile_required if str(item)]
+        return [str(item) for item in default_required_core_facts if str(item)]
+
+    @staticmethod
+    def _missing_reasons(readiness: Mapping[str, Any]) -> set[str]:
+        return {
+            str(item.get("reason") or "")
+            for item in readiness.get("missing_fields") or []
+            if str(item.get("reason") or "")
+        }
+
+    @classmethod
+    def _has_mapping_policy_gap(cls, readiness: Mapping[str, Any]) -> bool:
+        return bool(cls._missing_reasons(readiness) & MAPPING_POLICY_GAP_REASONS)
+
+    @classmethod
+    def _has_source_missing_gap(cls, readiness: Mapping[str, Any]) -> bool:
+        reasons = cls._missing_reasons(readiness)
+        return bool(reasons) and not bool(reasons - {"missing_local_core_fact"})
+
+    @staticmethod
+    def _merge_repair_summaries(
+        left: Dict[str, Any],
+        right: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        merged = dict(left)
+        for key in (
+            "cninfo_attempts",
+            "cninfo_successes",
+            "cninfo_batch_successes",
+            "cninfo_failed_instrument_periods",
+            "cninfo_missing_or_ambiguous",
+            "fallback_attempts",
+            "fallback_successes",
+        ):
+            merged[key] = int(merged.get(key, 0) or 0) + int(right.get(key, 0) or 0)
+        merged["errors"] = list(merged.get("errors") or []) + list(right.get("errors") or [])
+        merged["source_order"] = list(right.get("source_order") or merged.get("source_order") or [])
+        merged["fallback_sources"] = list(
+            right.get("fallback_sources") or merged.get("fallback_sources") or []
+        )
+        return merged
 
     @staticmethod
     def _repair_target_for_candidate(
@@ -948,10 +1099,11 @@ class FinancialDisclosureIncrementalSyncService:
         candidate_count: int,
         failed_count: int,
         blocking_count: int,
+        mapping_policy_gap_count: int = 0,
         scan_errors: Sequence[str],
     ) -> str:
         if scan_errors and candidate_count <= 0:
             return "failed"
-        if failed_count or blocking_count or scan_errors:
+        if failed_count or blocking_count or mapping_policy_gap_count or scan_errors:
             return "degraded"
         return "success"

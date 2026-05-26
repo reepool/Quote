@@ -512,10 +512,11 @@ technical readiness 接口会聚合：
 - shadow sync
 - scheduler 任务
 - `/api/v1/research/company/{instrument_id}/financial-statements`
+- `/api/v1/research/company/{instrument_id}/financial-statements/history`
 
 当前边界：
 
-- 当前落地的是“最新报告期快照”模型，而不是全历史财务仓
+- 当前单期接口返回最新或指定报告期；历史接口支持按公司读取最近 rolling 报告期或显式报告期列表，默认仍只读本地 `financials.db`，不隐式触发远程补数
 - 当前完整三大报表可运行基线仍以 `AkShare proxy_patch -> direct` 为主；官方结构化源、CNInfo data20 与 AkShare fallback 已进入同一长表事实模型，但尚未形成可生产推广的全市场本地财务仓
 - `2026-05-18` 之后，本地常规财务服务目标调整为“新浪/同花顺严格交集核心层 + CNInfo 官方摘要校验 + 东财远程扩展”，不再把未审计的单一来源字段直接作为本地标准事实
 - `BaoStock / PyTDX` 在完整报表域仍不具备同等级覆盖，因此暂不作为主源
@@ -659,6 +660,7 @@ technical readiness 接口会聚合：
   - `2026-05-24` 财务任务化实现启动：新增 `financial_l1_full_import` 手工 `/run` 入口，直接复用 `run_full_import()`；新增 `FinancialDisclosureIncrementalSyncService`，复用 CNInfo announcement scanner 识别定期报告、更正、延期披露、停牌、退市风险和可能终止上市公告，候选维度为 `instrument_id + report_period`；新增 `financial_disclosure_event_state` 记录 pending recheck、`pending_delisting_risk`、accepted gap、blocking gap 和处理结果。增量/对账任务默认不自动启用，先通过 `/run` 做小范围验证。
   - 同日 live no-write 验证：`scripts/research_financial_disclosure_event_scan.py --exchanges SZSE,SSE --start-date 2026-04-01 --end-date 2026-05-24 --max-pages 1` 在联网放行后成功返回，SZSE/SSE 各扫描 30 条，SSE 命中 1 条 `关于收到股票终止上市决定的公告`，selection reason 为 `pending_delisting_risk`，但该公告未映射到财务报告期，因此仅作为审计证据，不放宽任何 instrument-period readiness gate。
   - 同日写入 smoke 覆盖 `002731.SZ / 688121.SH`、报告期 `2025-12-31 / 2026-03-31`：`002731.SZ` 扫描 `94` 条公告并选中 `4` 条停牌/退市风险提示，但均未映射到具体报告期，因此不生成候选、不接受缺口；`688121.SH` 扫描 `36` 条公告并选中 `5` 条，其中 `3` 条延期 2025 年年报公告可映射到 `2025-12-31`，状态写入 `financial_disclosure_event_state` 为 `periodic_report_delayed_or_suspended / pending_recheck`，缺失核心字段数为 `5`。存储层同步固定 pending recheck 截止时间，后续重复扫描不会滚动延长等待窗口。
+  - `2026-05-26` 根据周度对账报告修正维护层 readiness 口径：本地核心 required facts 改为 `revenue / net_income_parent / equity_parent / total_assets / total_liabilities`，并支持 `required_core_facts_by_profile`；`outside_approved_local_core / mapping_catalog_empty` 归为 `mapping_policy_gap`，表示字段标准或映射准入不一致，不再调用 CNInfo/THS/Sina 补数；`missing_local_core_fact` 等才进入 source missing 路由。reconciliation 候选超过上限时按交易所、profile 和报告期均衡抽样，Telegram 报告拆分 accepted gaps、mapping policy gaps、source missing 和 blockers。
   - `2026-05-22` 针对首次全量后剩余 blocking 缺口完成收口修正。Manifest 新增 `listed_date / delisted_date / excluded_report_periods / report_period_lifecycle_summary`，并在 full import 中自动把 `pre_listing_period` 与 `post_delisting_or_no_disclosure` 合并为 accepted source gap，避免上市前历史期和退市后未披露期阻断全量。AkShare fallback provider 改为字段级跨源补齐：在 target-period 模式下会继续读取后续源，只填补同一语义核心字段缺失项，不把同义备选字段重复写入同一 canonical 事实，并在 raw payload 中记录字段级来源。L1 local-core 写入新增两类受控派生归母净利润：`净利润 - 少数股东损益`，以及无少数股东损益/少数股东权益披露时 `净利润 -> 归母净利润`，均写入 `derived.net_income_parent` 并保留公式 lineage。定向真实 dry-run 覆盖原 `36` 条缺口涉及的 `20` 个标的 x `10` 个报告期：修正后 `ready_read_count=195/200`，剩余 `5` 条整期无结构化三表，其中 `600355.SH / 2026-03-31` 属退市后未披露生命周期缺口；`002731.SZ` 与 `688121.SH` 的 `2025-12-31 / 2026-03-31` 在本次 Sina/THS/Eastmoney 小范围探测中均未返回该期结构化三表，仍保留 review，不作为字段映射缺陷处理。
   - `2026-05-24` 补充财务披露异常分类要求：财务全量/补处理 manifest 在生命周期规则之外，还应接收 CNInfo 公告筛选结果，把 active 标的中由“定期报告无法按期披露、停牌、退市风险警示、可能终止上市”等公告解释的缺口标记为 `periodic_report_delayed_or_suspended`。该状态只表示当前结构化源缺失有披露事件依据，不能替代字段映射或跨源补齐；一旦后续公告或结构化源更新，仍应通过补处理导入补齐本地核心字段。
 4. 官方 provider 与解析层

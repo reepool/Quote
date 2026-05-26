@@ -4301,6 +4301,85 @@ class DataManager:
             return placeholder
         return None
 
+    async def get_research_financial_statements_history(
+        self,
+        instrument_id: str,
+        *,
+        include_statements: bool = False,
+        period_window: str = "latest",
+        rolling_quarters: int = 12,
+        report_periods: Optional[List[str]] = None,
+        requested_canonical_facts: Optional[List[str]] = None,
+        profile: Optional[str] = None,
+        mapping_version: Optional[str] = None,
+        include_local_core: bool = False,
+        allow_remote_extension: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域多报告期 financial statements history。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research financial_statements module is disabled")
+        if period_window != "latest" and not report_periods:
+            raise ValueError("Only period_window=latest is supported unless report_periods is supplied")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        limit = max(1, min(int(rolling_quarters), 40))
+        requested_periods = [
+            str(item).strip()
+            for item in (report_periods or [])
+            if str(item).strip()
+        ]
+        bundles = await asyncio.to_thread(
+            storage.get_financial_statement_bundles,
+            normalized_id,
+            include_statements=include_statements,
+            report_periods=requested_periods or None,
+            limit=limit,
+        )
+        instrument = await self._get_research_instrument_info(normalized_id)
+        items: List[Dict[str, Any]] = []
+        for bundle in bundles:
+            service_layers = await self._get_research_financial_statement_service_layers(
+                storage,
+                normalized_id,
+                bundle=bundle,
+                instrument=instrument,
+                report_period=bundle.get("report_period"),
+                requested_canonical_facts=requested_canonical_facts,
+                profile=profile,
+                mapping_version=mapping_version,
+                include_local_core=include_local_core,
+                allow_remote_extension=allow_remote_extension,
+            )
+            if service_layers:
+                bundle["service_layers"] = service_layers
+            items.append(bundle)
+
+        if not items and instrument is None:
+            return None
+        symbol = (
+            (items[0].get("symbol") if items else None)
+            or (instrument or {}).get("symbol")
+            or normalized_id.split(".")[0]
+        )
+        exchange = (
+            (items[0].get("exchange") if items else None)
+            or (instrument or {}).get("exchange")
+            or ""
+        )
+        return {
+            "instrument_id": normalized_id,
+            "symbol": symbol,
+            "exchange": exchange,
+            "period_window": period_window,
+            "rolling_quarters": limit,
+            "requested_report_periods": requested_periods,
+            "report_periods": [item.get("report_period") for item in items],
+            "period_count": len(items),
+            "items": items,
+        }
+
     def _financial_statement_service_layer_config(self) -> Dict[str, Any]:
         module_cfg = self.research_config.modules.get("financial_statements", {})
         module_layers = module_cfg.get("service_layers")

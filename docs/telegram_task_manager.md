@@ -142,7 +142,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 财务 L1 维护任务分工：
 
-当前实现状态（`2026-05-25`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。源路由统一封装在 `FinancialMaintenanceRepairRouter`，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
+当前实现状态（`2026-05-26`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。L1 required facts 使用 `net_income_parent / equity_parent` 等精确口径，不再用旧的 `net_income / equity` 泛化字段作为本地核心层准入要求。源路由统一封装在 `FinancialMaintenanceRepairRouter`，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
 
 | 任务 | 触发方式 | 读取范围 | 写入策略 |
 |---|---|---|---|
@@ -161,7 +161,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `changed_count / unchanged_count`：本次实际修复写入与已完整跳过数量。
 - `pending_recheck_count / pending_delisting_risk_count`：公告先到但结构化源滞后，或公告解释为待退市风险的数量。
 - `source_routing`：CNInfo data20 官方尝试、CNInfo ready、CNInfo 批处理通过、缺失/歧义，以及 THS/Sina fallback 尝试/成功数量。`ready` 才代表 required canonical facts 已满足；批处理通过只代表 CNInfo 源请求没有把该 instrument-period 判为失败。
-- `accepted_gap_count / blocking_gap_count`：可审计解释的缺口与仍需字段映射/源数据补处理的 blocker 数量。
+- `accepted_gap_count / mapping_policy_gap_count / source_missing_gap_count / blocking_gap_count`：可审计解释的缺口、字段标准或映射准入缺口、源数据缺口和其他 blocker 数量。`mapping_policy_gap` 不会反复调用 CNInfo/THS/Sina，应先修正字段标准或 mapping catalog；`source_missing` 才进入补数源路由。
 
 ### BotFather 命令映射
 

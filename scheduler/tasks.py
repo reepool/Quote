@@ -304,11 +304,21 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         (
             "质量状态: "
             f"accepted gaps {result.get('accepted_gap_count', 0)}，"
+            f"mapping policy gaps {result.get('mapping_policy_gap_count', 0)}，"
+            f"source missing {result.get('source_missing_gap_count', 0)}，"
             f"blockers {result.get('blocking_gap_count', 0)}，"
             f"failed {result.get('failed_count', 0)}"
         ),
         f"耗时: `{result.get('elapsed_seconds', 0)}s`",
     ]
+    unlimited_candidates = int(result.get("candidate_unlimited_count", 0) or 0)
+    candidate_limit = int(result.get("candidate_limit", 0) or 0)
+    if candidate_limit > 0 and unlimited_candidates > result.get("candidate_count", 0):
+        lines.append(
+            "候选限制: "
+            f"本轮选择 {result.get('candidate_count', 0)}/"
+            f"{unlimited_candidates}，按交易所/profile/报告期均衡抽样"
+        )
     source_routing = result.get("source_routing") or {}
     candidate_sources = result.get("candidate_sources") or {}
     if candidate_sources:
@@ -339,8 +349,10 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         lines.append("扫描警告: " + "；".join(str(item) for item in scan_errors[:3]))
     if result.get("pending_delisting_risk_count", 0):
         lines.append("说明: 待退市风险只是披露异常待补状态，不会改写股票主数据退市状态。")
+    if result.get("mapping_policy_gap_count", 0):
+        lines.append("说明: mapping policy gap 是字段标准或映射准入问题，不会反复调用 CNInfo/THS/Sina 补数。")
     if result.get("blocking_gap_count", 0):
-        lines.append("后续动作: blocker 仍按字段映射/源数据缺失处理，不能并入 accepted gaps。")
+        lines.append("后续动作: blocker 按 source missing 或其他数据质量问题补处理，不能并入 accepted gaps。")
     return "\n".join(lines)
 
 

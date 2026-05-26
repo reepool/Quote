@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import asyncio
 
 from research.financial_disclosure_incremental_sync import (
+    FinancialDisclosureMaintenanceCandidate,
     FinancialDisclosureIncrementalSyncService,
 )
 from research.providers.cninfo_announcements import (
@@ -32,14 +33,21 @@ class _FakeDbOps:
 
 
 class _FakeFinancialStatements:
-    def __init__(self, *, ready=False, numeric_rows=None):
+    def __init__(self, *, ready=False, numeric_rows=None, missing_fields=None):
         self.ready = ready
         self.numeric_rows = list(numeric_rows or [])
+        self.missing_fields = missing_fields
 
     def get_local_core_facts(self, *args, **kwargs):
         return {
             "ready": self.ready,
-            "missing_fields": [] if self.ready else [{"canonical_fact": "total_assets"}],
+            "missing_fields": []
+            if self.ready
+            else (
+                self.missing_fields
+                if self.missing_fields is not None
+                else [{"canonical_fact": "total_assets"}]
+            ),
             "facts": {},
         }
 
@@ -48,10 +56,11 @@ class _FakeFinancialStatements:
 
 
 class _FakeStorage:
-    def __init__(self, *, ready=False, numeric_rows=None, pending_states=None):
+    def __init__(self, *, ready=False, numeric_rows=None, pending_states=None, missing_fields=None):
         self.financial_statements = _FakeFinancialStatements(
             ready=ready,
             numeric_rows=numeric_rows,
+            missing_fields=missing_fields,
         )
         self.states = []
         self.pending_states = list(pending_states or [])
@@ -515,3 +524,75 @@ def test_targeted_import_uses_cninfo_before_fallback(tmp_path):
     assert result["cninfo_attempts"] == 1
     assert result["cninfo_successes"] == 1
     assert result["fallback_attempts"] == 0
+
+
+def test_reconciliation_mapping_policy_gap_does_not_retry_sources(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        missing_fields=[
+            {
+                "canonical_fact": "net_income",
+                "reason": "outside_approved_local_core",
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("mapping policy gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            max_candidates=1,
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "degraded"
+    assert result["mapping_policy_gap_count"] == 1
+    assert result["source_missing_gap_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert storage.states[0]["status"] == "mapping_policy_gap"
+
+
+def test_reconciliation_candidate_limit_is_balanced_across_groups():
+    candidates = {
+        (f"60000{i}.SH", "2026-03-31"): FinancialDisclosureMaintenanceCandidate(
+            instrument_id=f"60000{i}.SH",
+            symbol=f"60000{i}",
+            exchange="SSE",
+            report_period="2026-03-31",
+            profile="nonbank",
+        )
+        for i in range(4)
+    }
+    candidates.update(
+        {
+            (f"00000{i}.SZ", "2026-03-31"): FinancialDisclosureMaintenanceCandidate(
+                instrument_id=f"00000{i}.SZ",
+                symbol=f"00000{i}",
+                exchange="SZSE",
+                report_period="2026-03-31",
+                profile="nonbank",
+            )
+            for i in range(4)
+        }
+    )
+
+    limited = FinancialDisclosureIncrementalSyncService._limit_candidates_balanced(
+        candidates,
+        max_candidates=2,
+    )
+
+    assert {candidate.exchange for candidate in limited.values()} == {"SSE", "SZSE"}

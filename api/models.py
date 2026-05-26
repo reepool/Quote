@@ -749,6 +749,29 @@ class ResearchFinancialStatementsResponse(BaseModel):
     )
 
 
+class ResearchFinancialStatementsHistoryResponse(BaseModel):
+    """研究域多报告期财务报表读模型。"""
+
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: str = Field(..., description="交易代码")
+    exchange: str = Field(..., description="交易所")
+    period_window: str = Field(..., description="报告期窗口模式")
+    rolling_quarters: int = Field(..., description="最近报告期数量上限")
+    requested_report_periods: List[str] = Field(
+        default_factory=list,
+        description="显式请求的报告期",
+    )
+    report_periods: List[str] = Field(
+        default_factory=list,
+        description="实际返回的报告期",
+    )
+    period_count: int = Field(..., description="返回报告期数量")
+    items: List[ResearchFinancialStatementsResponse] = Field(
+        default_factory=list,
+        description="逐报告期财务报表数据",
+    )
+
+
 class ResearchValuationHistoryItemResponse(BaseModel):
     """研究域估值历史单点响应模型。"""
 

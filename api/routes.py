@@ -845,6 +845,99 @@ async def get_research_financial_statements(
 
 
 @router.get(
+    "/research/company/{instrument_id}/financial-statements/history",
+    response_model=ResearchFinancialStatementsHistoryResponse,
+    tags=["Research"],
+)
+async def get_research_financial_statements_history(
+    instrument_id: str,
+    include_statements: bool = Query(False, description="是否包含原始报表详情"),
+    period_window: str = Query("latest", description="报告期窗口模式，目前支持 latest"),
+    rolling_quarters: int = Query(12, description="最近报告期数量", ge=1, le=40),
+    report_periods: Optional[str] = Query(None, description="逗号分隔的显式报告期列表"),
+    requested_canonical_facts: Optional[str] = Query(
+        None,
+        description="逗号分隔的 canonical 财务字段，仅用于 L1/L3 分层读取",
+    ),
+    profile: Optional[str] = Query(None, description="字段映射 profile，例如 nonbank/bank"),
+    mapping_version: Optional[str] = Query(None, description="字段映射版本"),
+    include_local_core: bool = Query(False, description="是否附加 L1 本地核心字段诊断"),
+    allow_remote_extension: bool = Query(
+        False,
+        description="是否显式允许 L3 东财远程扩展",
+    ),
+):
+    """获取研究域公司多报告期财务报表历史。"""
+    try:
+        include_statements = include_statements if isinstance(include_statements, bool) else False
+        period_window = period_window if isinstance(period_window, str) else "latest"
+        rolling_quarters = rolling_quarters if isinstance(rolling_quarters, int) else 12
+        report_periods = report_periods if isinstance(report_periods, str) else None
+        requested_canonical_facts = (
+            requested_canonical_facts
+            if isinstance(requested_canonical_facts, str)
+            else None
+        )
+        profile = profile if isinstance(profile, str) else None
+        mapping_version = mapping_version if isinstance(mapping_version, str) else None
+        include_local_core = include_local_core if isinstance(include_local_core, bool) else False
+        allow_remote_extension = (
+            allow_remote_extension
+            if isinstance(allow_remote_extension, bool)
+            else False
+        )
+        requested = (
+            [
+                item.strip()
+                for item in requested_canonical_facts.split(",")
+                if item.strip()
+            ]
+            if requested_canonical_facts
+            else None
+        )
+        periods = (
+            [item.strip() for item in report_periods.split(",") if item.strip()]
+            if report_periods
+            else None
+        )
+        manager_kwargs = {
+            "include_statements": include_statements,
+            "period_window": period_window,
+            "rolling_quarters": rolling_quarters,
+        }
+        if periods is not None:
+            manager_kwargs["report_periods"] = periods
+        if requested is not None:
+            manager_kwargs["requested_canonical_facts"] = requested
+        if profile:
+            manager_kwargs["profile"] = profile
+        if mapping_version:
+            manager_kwargs["mapping_version"] = mapping_version
+        if include_local_core:
+            manager_kwargs["include_local_core"] = include_local_core
+        if allow_remote_extension:
+            manager_kwargs["allow_remote_extension"] = allow_remote_extension
+        payload = await data_manager.get_research_financial_statements_history(
+            instrument_id,
+            **manager_kwargs,
+        )
+        if not payload:
+            raise HTTPException(status_code=404, detail="Research financial statements history not found")
+        return ResearchFinancialStatementsHistoryResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research financial statements history: {str(e)}",
+        )
+
+
+@router.get(
     "/research/company/{instrument_id}/valuation/history",
     response_model=ResearchValuationHistoryResponse,
     tags=["Research"],

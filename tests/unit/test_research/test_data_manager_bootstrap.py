@@ -1513,6 +1513,120 @@ def test_data_manager_get_research_financial_statements_delegates_to_storage(tmp
     )
 
 
+def test_data_manager_get_research_financial_statements_history_delegates_to_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundles.return_value = [
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+        },
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2025-12-31",
+        },
+    ]
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={"instrument_id": "600000.SH", "symbol": "600000", "exchange": "SSE"}
+    )
+
+    result = _run(
+        manager.get_research_financial_statements_history(
+            "600000.SH",
+            include_statements=False,
+            rolling_quarters=10,
+        )
+    )
+
+    assert result["period_count"] == 2
+    assert result["report_periods"] == ["2026-03-31", "2025-12-31"]
+    storage.get_financial_statement_bundles.assert_called_once_with(
+        "600000.SH",
+        include_statements=False,
+        report_periods=None,
+        limit=10,
+    )
+
+
+def test_data_manager_get_research_financial_statements_history_includes_local_core_per_period(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "local_core": {
+                        "enabled": True,
+                        "mapping_version": "sina_ths_core_financial_facts.v1",
+                    }
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundles.return_value = [
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+        },
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2025-12-31",
+        },
+    ]
+    storage.get_financial_local_core_facts.side_effect = [
+        {"ready": True, "facts": {"revenue": {"fact_value": 1}}, "missing_fields": []},
+        {"ready": True, "facts": {"revenue": {"fact_value": 2}}, "missing_fields": []},
+    ]
+    manager.research_storage = storage
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={"instrument_id": "600000.SH", "symbol": "600000", "exchange": "SSE"}
+    )
+
+    result = _run(
+        manager.get_research_financial_statements_history(
+            "600000.SH",
+            report_periods=["2026-03-31", "2025-12-31"],
+            requested_canonical_facts=["revenue"],
+            profile="nonbank",
+            include_local_core=True,
+        )
+    )
+
+    assert result["items"][0]["service_layers"]["local_core"]["status"] == "passed"
+    assert storage.get_financial_local_core_facts.call_count == 2
+    storage.get_financial_statement_bundles.assert_called_once_with(
+        "600000.SH",
+        include_statements=False,
+        report_periods=["2026-03-31", "2025-12-31"],
+        limit=12,
+    )
+
+
 def test_data_manager_get_research_financial_statements_includes_local_core_layer(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
