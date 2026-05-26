@@ -32,6 +32,20 @@ class _FakeDbOps:
         ]
 
 
+class _FakeLifecycleDbOps:
+    async def get_instruments_by_exchange(self, exchange):
+        return [
+            {
+                "instrument_id": "001237.SZ",
+                "symbol": "001237",
+                "exchange": "SZSE",
+                "type": "stock",
+                "is_active": True,
+                "listed_date": "2026-05-22 00:00:00.000000",
+            }
+        ]
+
+
 class _FakeFinancialStatements:
     def __init__(self, *, ready=False, numeric_rows=None, missing_fields=None):
         self.ready = ready
@@ -564,6 +578,90 @@ def test_reconciliation_mapping_policy_gap_does_not_retry_sources(tmp_path):
     assert result["source_routing"]["cninfo_attempts"] == 0
     assert result["source_routing"]["fallback_attempts"] == 0
     assert storage.states[0]["status"] == "mapping_policy_gap"
+
+
+def test_reconciliation_accepts_pre_listing_period_without_source_retry(tmp_path):
+    storage = _FakeStorage(ready=False)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeLifecycleDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("pre-listing gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            report_periods=["2026-03-31"],
+            max_candidates=1,
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["accepted_gap_count"] == 1
+    assert result["blocking_gap_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert result["report_period_lifecycle_summary"]["pre_listing"] == 1
+    assert storage.states[0]["status"] == "accepted_disclosure_gap"
+    assert storage.states[0]["classification"] == "pre_listing_period"
+
+
+def test_reconciliation_reuses_accepted_disclosure_state_without_source_retry(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "688121.SH",
+                "symbol": "688121",
+                "exchange": "SSE",
+                "report_period": "2025-12-31",
+                "announcement_id": "accepted-delay",
+                "announcement_time": "2026-05-06",
+                "title": "收到《关于公司2025年年度报告预计无法在法定期限内披露的监管工作函》的公告",
+                "status": "accepted_disclosure_gap",
+                "classification": "periodic_report_delayed_or_suspended",
+                "selection_reasons": ["periodic_report_delayed"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("accepted disclosure gaps must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SSE"],
+            target_instrument_ids=["688121.SH"],
+            report_periods=["2025-12-31"],
+            max_candidates=5,
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["candidate_count"] == 1
+    assert result["accepted_gap_count"] == 1
+    assert result["blocking_gap_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert storage.states[-1]["status"] == "accepted_disclosure_gap"
 
 
 def test_reconciliation_candidate_limit_is_balanced_across_groups():

@@ -44,6 +44,16 @@ from utils.date_utils import get_shanghai_time
 
 
 MAPPING_POLICY_GAP_REASONS = {"mapping_catalog_empty", "outside_approved_local_core"}
+ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS = frozenset(
+    {
+        "pre_listing_period",
+        "post_delisting_or_no_disclosure",
+    }
+)
+ACCEPTED_MAINTENANCE_GAP_CLASSIFICATIONS = (
+    ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
+    | ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS
+)
 
 
 @dataclass
@@ -55,6 +65,7 @@ class FinancialDisclosureMaintenanceCandidate:
     profile: str
     reasons: List[str] = field(default_factory=list)
     events: List[FinancialDisclosureEvent] = field(default_factory=list)
+    lifecycle_classification: Optional[str] = None
 
     @property
     def key(self) -> Tuple[str, str]:
@@ -62,6 +73,8 @@ class FinancialDisclosureMaintenanceCandidate:
 
     @property
     def classification(self) -> str:
+        if self.lifecycle_classification:
+            return self.lifecycle_classification
         if any(
             event.classification == PENDING_DELISTING_RISK_CLASSIFICATION
             or "pending_delisting_risk" in event.reasons
@@ -572,14 +585,22 @@ class FinancialDisclosureIncrementalSyncService:
             )
         with self.storage.financial_database_scope():
             pending_states = self.storage.list_financial_disclosure_event_states(
-                statuses=["pending_recheck", "pending_delisting_risk"],
+                statuses=[
+                    "pending_recheck",
+                    "pending_delisting_risk",
+                    "accepted_disclosure_gap",
+                ],
                 limit=max_candidates if max_candidates > 0 else None,
             )
         for state in pending_states:
             instrument = instruments_by_id.get(str(state.get("instrument_id") or ""))
             if instrument is None:
                 continue
-            if self._is_stale_filtered_pending_state(state):
+            state_status = str(state.get("status") or "")
+            if (
+                state_status != "accepted_disclosure_gap"
+                and self._is_stale_filtered_pending_state(state)
+            ):
                 filtered_stale_pending += 1
                 self._record_filtered_stale_pending_state(
                     state,
@@ -600,10 +621,7 @@ class FinancialDisclosureIncrementalSyncService:
                 title=state.get("title"),
             )
             candidate = self._candidate_for_event(instrument, event)
-            is_new = candidate.key not in candidates
             candidates.setdefault(candidate.key, candidate).events.append(event)
-            if is_new:
-                candidate_sources["pending_state"] += 1
         if report_periods:
             for instrument in instruments:
                 for report_period in report_periods:
@@ -621,7 +639,12 @@ class FinancialDisclosureIncrementalSyncService:
                         mapping_version=mapping_version,
                     )
                     if not readiness.get("ready"):
-                        candidate.reasons.append("missing_or_incomplete_local_core")
+                        if candidate.lifecycle_classification:
+                            candidate.reasons.append(
+                                f"lifecycle:{candidate.lifecycle_classification}"
+                            )
+                        else:
+                            candidate.reasons.append("missing_or_incomplete_local_core")
                         candidates[candidate.key] = candidate
         self._last_candidate_unlimited_count = len(candidates)
         self._last_candidate_limit = int(max_candidates)
@@ -775,7 +798,45 @@ class FinancialDisclosureIncrementalSyncService:
             exchange=str(instrument.get("exchange") or ""),
             report_period=report_period,
             profile=resolution.profile,
+            lifecycle_classification=self._classify_report_period_lifecycle(
+                instrument,
+                report_period,
+            ),
         )
+
+    @staticmethod
+    def _parse_date_text(value: Any) -> Optional[datetime]:
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return datetime.strptime(text[:26], fmt)
+            except ValueError:
+                continue
+        try:
+            return datetime.fromisoformat(text)
+        except ValueError:
+            return None
+
+    @classmethod
+    def _classify_report_period_lifecycle(
+        cls,
+        instrument: Mapping[str, Any],
+        report_period: str,
+    ) -> Optional[str]:
+        period_end = cls._parse_date_text(report_period)
+        if period_end is None:
+            return None
+        listed_at = cls._parse_date_text(instrument.get("listed_date"))
+        if listed_at is not None and period_end.date() < listed_at.date():
+            return "pre_listing_period"
+        delisted_at = cls._parse_date_text(instrument.get("delisted_date"))
+        if delisted_at is not None and period_end.date() > delisted_at.date():
+            return "post_delisting_or_no_disclosure"
+        return None
 
     async def _apply_candidates(
         self,
@@ -807,7 +868,7 @@ class FinancialDisclosureIncrementalSyncService:
             if not before_ready[candidate.key].get("ready")
             and not self._has_mapping_policy_gap(before_ready[candidate.key])
             and candidate.classification
-            not in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS
+            not in ACCEPTED_MAINTENANCE_GAP_CLASSIFICATIONS
         ]
         unchanged = sum(
             1
@@ -823,6 +884,11 @@ class FinancialDisclosureIncrementalSyncService:
         mapping_policy = 0
         source_missing = 0
         changed = 0
+        lifecycle_summary = {
+            "pre_listing": 0,
+            "post_delisting": 0,
+            "disclosure_events": 0,
+        }
         outcomes: List[Dict[str, Any]] = []
         if to_fetch and not dry_run:
             try:
@@ -862,13 +928,22 @@ class FinancialDisclosureIncrementalSyncService:
                 status = "unchanged"
             elif failed and candidate in to_fetch:
                 status = "failed"
+            elif candidate.classification in ACCEPTED_LIFECYCLE_GAP_CLASSIFICATIONS:
+                status = "accepted_disclosure_gap"
+                accepted += 1
+                if candidate.classification == "pre_listing_period":
+                    lifecycle_summary["pre_listing"] += 1
+                elif candidate.classification == "post_delisting_or_no_disclosure":
+                    lifecycle_summary["post_delisting"] += 1
             elif candidate.classification == PENDING_DELISTING_RISK_CLASSIFICATION:
                 status = "pending_delisting_risk"
                 pending_delisting += 1
                 accepted += 1
+                lifecycle_summary["disclosure_events"] += 1
             elif candidate.classification in ACCEPTED_FINANCIAL_DISCLOSURE_CLASSIFICATIONS:
                 status = "accepted_disclosure_gap"
                 accepted += 1
+                lifecycle_summary["disclosure_events"] += 1
             elif self._has_mapping_policy_gap(after):
                 status = "mapping_policy_gap"
                 mapping_policy += 1
@@ -902,6 +977,7 @@ class FinancialDisclosureIncrementalSyncService:
             "blocking_gap_count": blocking,
             "failed_count": failed,
             "written_count": written,
+            "report_period_lifecycle_summary": lifecycle_summary,
             "source_routing": self._last_repair_source_summary
             or self.repair_router.default_summary(),
             "outcomes": outcomes[:50],
@@ -1049,7 +1125,11 @@ class FinancialDisclosureIncrementalSyncService:
             "instrument_id": candidate.instrument_id,
             "report_period": candidate.report_period,
             "status": status,
-            "classification": candidate.classification if candidate.events else "local_core_gap",
+            "classification": (
+                candidate.classification
+                if candidate.events or candidate.lifecycle_classification
+                else "local_core_gap"
+            ),
             "missing_field_count": len(readiness.get("missing_fields") or []),
         }
         if not dry_run:
@@ -1069,7 +1149,10 @@ class FinancialDisclosureIncrementalSyncService:
                     first_pending_at=first_pending,
                     pending_recheck_until=pending_until,
                     processed_at=now.isoformat(),
-                    metadata={"event_count": len(candidate.events)},
+                    metadata={
+                        "event_count": len(candidate.events),
+                        "lifecycle_classification": candidate.lifecycle_classification,
+                    },
                     ingestion_run_id=run_id,
                 )
         return outcome

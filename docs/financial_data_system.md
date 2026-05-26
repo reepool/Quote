@@ -406,6 +406,8 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 两个维护任务的补数源顺序为 `CNInfo data20 -> THS -> Sina`。CNInfo 公告只负责发现候选；CNInfo data20 才是官方结构化补数源。Sina/THS 只对 CNInfo 缺失、失败或语义不明确的 canonical facts 做补齐。实际路由通过统一维护路由器执行，后续如果增加东财或其他源，应扩展同一抽象层，而不是在全量、增量或周更任务里重复实现。
 - L1 required facts 采用已经批准的精确口径：`revenue / net_income_parent / equity_parent / total_assets / total_liabilities`。不要再用旧的 `net_income / equity` 泛化字段作为本地核心层 readiness 要求；归母与合计口径必须保持分离。
 - 周度对账会把 `outside_approved_local_core / mapping_catalog_empty` 归为 `mapping_policy_gap`，这类问题表示字段标准或准入配置不一致，不再反复调用 CNInfo/THS/Sina 补数。只有 `missing_local_core_fact` 等源数据缺口才进入补数源路由。
+- 周度对账在构造本地缺口候选时前置股票主数据生命周期判断：报告期结束日早于上市日的 `pre_listing_period`、退市后或无披露窗口的 `post_delisting_or_no_disclosure` 直接记录为 `accepted_disclosure_gap`，不再调用 CNInfo/THS/Sina，也不计入 degraded blockers。
+- 周度对账会复用已经落库的 `accepted_disclosure_gap` 状态；已由公告解释的缺报不会在下一轮对账中重新退回 `local_core_gap` blocker。
 - 三个任务均写入 `data/financials.db`，并在报告中显示实际 DB 路径、候选数量、写入/跳过数量、pending recheck、待退市风险、accepted gaps、mapping policy gaps、source missing 和 blockers。
 
 | 任务 | 触发方式 | 是否自动定时 | 主要用途 |
@@ -423,6 +425,7 @@ Manifest 对每个目标标的、每个报告期执行以下判断：
 - 报告中的 `CNInfo ready` 表示 CNInfo data20 写入后已满足 required canonical facts 的候选数量；`CNInfo 批处理通过` 只表示 CNInfo 批处理未把该 instrument-period 判为失败，不等同于本地核心字段已经修复。
 - 周度对账候选达到上限时，按交易所、报表 profile 和报告期做均衡抽样，不再固定取前若干 SSE 标的。报告中的“候选限制”会显示本轮选择数量与总候选数量。
 - 全量任务、增量任务和周度对账任务都必须写入 `data/financials.db`，并复用相同的字段 mapping、单位转换、生命周期缺口和 accepted gap 规则。
+- `2026-05-26` 对 `financial_disclosure_reconciliation_sync` 真实结果复核：`ingestion_run_id=405` 的 260 个 blockers 中，256 个为报告期早于上市日的新股历史期；剩余 4 个为 `002731.SZ` 与 `688121.SH` 的 `2025-12-31 / 2026-03-31`，CNInfo data20 返回 HTTP 200 但目标期结构化记录无数值，Sina/THS fallback 也未写入三大核心事实，结合公告与停牌/退市风险上下文按披露异常待补处理，而不是字段映射缺陷。
 
 状态表：
 
