@@ -1191,10 +1191,11 @@ class FinancialDisclosureIncrementalSyncService:
             first_pending = now.isoformat()
             pending_until = (now + timedelta(days=pending_recheck_days)).isoformat()
         event = candidate.events[0] if candidate.events else None
+        local_gap_announcement_id = f"local-gap:{candidate.instrument_id}:{candidate.report_period}"
         announcement_id = (
             event.announcement_id
             if event and event.announcement_id
-            else f"local-gap:{candidate.instrument_id}:{candidate.report_period}"
+            else local_gap_announcement_id
         )
         outcome = {
             "instrument_id": candidate.instrument_id,
@@ -1230,6 +1231,22 @@ class FinancialDisclosureIncrementalSyncService:
                     },
                     ingestion_run_id=run_id,
                 )
+                if (
+                    str(announcement_id) != local_gap_announcement_id
+                    and status
+                    in {
+                        "accepted_disclosure_gap",
+                        "pending_delisting_risk",
+                        "changed",
+                        "unchanged",
+                    }
+                ):
+                    self.storage.delete_financial_disclosure_event_state(
+                        instrument_id=candidate.instrument_id,
+                        report_period=candidate.report_period,
+                        announcement_id=local_gap_announcement_id,
+                        statuses=["blocking_gap", "mapping_policy_gap", "source_missing"],
+                    )
         return outcome
 
     @staticmethod

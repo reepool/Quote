@@ -339,6 +339,7 @@ class ResearchStorageManager:
         return (
             "financial_core_facts_history",
             "financial_core_facts_hot",
+            "financial_disclosure_event_state",
             "financial_facts",
             "financial_indicator_snapshots",
             "financial_indicator_snapshots_history",
@@ -5978,6 +5979,36 @@ class ResearchStorageManager:
             item["metadata"] = self._deserialize_json(item.pop("metadata_json", None)) or {}
             result.append(item)
         return result
+
+    def delete_financial_disclosure_event_state(
+        self,
+        *,
+        instrument_id: str,
+        report_period: str,
+        announcement_id: str,
+        statuses: Optional[List[str]] = None,
+    ) -> int:
+        """Delete obsolete financial disclosure maintenance state rows."""
+        params: List[Any] = [instrument_id, report_period, announcement_id]
+        status_clause = ""
+        if statuses:
+            placeholders = ",".join("?" for _ in statuses)
+            status_clause = f" AND status IN ({placeholders})"
+            params.extend(statuses)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                f"""
+                DELETE FROM financial_disclosure_event_state
+                WHERE instrument_id = ?
+                  AND report_period = ?
+                  AND announcement_id = ?
+                  {status_clause}
+                """,
+                params,
+            )
+            conn.commit()
+            return int(cursor.rowcount or 0)
 
     def get_shareholder_change_manifest(
         self,

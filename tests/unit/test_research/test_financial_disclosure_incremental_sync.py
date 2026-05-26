@@ -85,6 +85,7 @@ class _FakeStorage:
             missing_fields=missing_fields,
         )
         self.states = []
+        self.deleted_states = []
         self.pending_states = list(pending_states or [])
         self.audit_rows = list(audit_rows or [])
 
@@ -119,6 +120,10 @@ class _FakeStorage:
 
     def upsert_financial_disclosure_event_state(self, **kwargs):
         self.states.append(kwargs)
+
+    def delete_financial_disclosure_event_state(self, **kwargs):
+        self.deleted_states.append(kwargs)
+        return 1
 
 
 class _FakeScanner:
@@ -762,6 +767,12 @@ def test_reconciliation_accepts_recent_generic_risk_audit_without_source_retry(t
     assert result["source_routing"]["fallback_attempts"] == 0
     assert storage.states[-1]["status"] == "pending_delisting_risk"
     assert storage.states[-1]["announcement_id"] == "risk-generic"
+    assert storage.deleted_states[-1] == {
+        "instrument_id": "002731.SZ",
+        "report_period": "2026-03-31",
+        "announcement_id": "local-gap:002731.SZ:2026-03-31",
+        "statuses": ["blocking_gap", "mapping_policy_gap", "source_missing"],
+    }
 
 
 def test_reconciliation_candidate_limit_is_balanced_across_groups():
