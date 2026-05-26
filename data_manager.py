@@ -20,7 +20,7 @@ import os
 from calendar import monthrange
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
 from dataclasses import dataclass, field
 
 import pandas as pd
@@ -6600,6 +6600,9 @@ class DataManager:
             'freshness_threshold_hours': 48,
             'pytdx_validation_enabled': False,
             'exchanges': ['SSE', 'SZSE', 'BSE'],
+            'bse_delisting_check_enabled': True,
+            'bse_delisting_scan_days': 730,
+            'bse_delisting_scan_max_pages': 30,
         }
 
         raw_config = self.data_config.get('instrument_master_sync')
@@ -7015,6 +7018,232 @@ class DataManager:
 
         return result
 
+    @staticmethod
+    def _normalize_cninfo_title(title: Optional[str]) -> str:
+        """Normalize CNInfo highlighted titles before keyword classification."""
+        text = str(title or "")
+        return (
+            text.replace("<em>", "")
+            .replace("</em>", "")
+            .replace("&nbsp;", " ")
+            .strip()
+        )
+
+    @classmethod
+    def _classify_bse_delisting_title(cls, title: Optional[str]) -> str:
+        """Classify BSE delisting announcement titles for master-data mutation."""
+        text = cls._normalize_cninfo_title(title)
+        if not text:
+            return "irrelevant"
+        if any(keyword in text for keyword in ("收购", "交易进展", "公开摘牌方式")):
+            return "irrelevant"
+        if "摘牌" in text and ("股票" in text or "终止上市" in text):
+            return "confirmed_delisted"
+        if "终止上市暨摘牌" in text or "退市整理期届满" in text:
+            return "confirmed_delisted"
+        if any(
+            keyword in text
+            for keyword in (
+                "拟终止",
+                "可能被终止上市",
+                "退市风险",
+                "风险提示",
+                "事先告知书",
+            )
+        ):
+            return "risk_only"
+        if "终止上市决定" in text or "将被终止上市" in text:
+            return "decision_pending_effective_date"
+        return "irrelevant"
+
+    @staticmethod
+    def _cninfo_announcement_local_date(value: Optional[str]) -> Optional[date]:
+        if not value:
+            return None
+        try:
+            parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                parsed = parsed.astimezone(timezone(timedelta(hours=8))).replace(tzinfo=None)
+            return parsed.date()
+        except Exception:
+            return None
+
+    async def _scan_bse_delisting_announcements(
+        self,
+        *,
+        start_date: str,
+        end_date: str,
+        max_pages: int,
+    ) -> List[Any]:
+        """Scan CNInfo BSE delisting-related metadata without per-stock requests."""
+        from research.providers.cninfo_announcements import (
+            CninfoAnnouncementScanConfig,
+            CninfoAnnouncementScanner,
+        )
+
+        scanner = CninfoAnnouncementScanner(
+            request_timeout_seconds=20.0,
+            request_interval_seconds=0.2,
+            retry_attempts=2,
+        )
+        configs = [
+            CninfoAnnouncementScanConfig(
+                purpose_key="instrument_master_bse_delisting",
+                market="BSE",
+                column="neeq",
+                plate="bj",
+                category="category_tbclts_szsh",
+                start_date=start_date,
+                end_date=end_date,
+                page_size=30,
+                max_pages=max_pages,
+            ),
+            CninfoAnnouncementScanConfig(
+                purpose_key="instrument_master_bse_delisting",
+                market="BSE",
+                column="neeq",
+                plate="bj",
+                category="category_tszlq_szsh",
+                start_date=start_date,
+                end_date=end_date,
+                page_size=30,
+                max_pages=max_pages,
+            ),
+            CninfoAnnouncementScanConfig(
+                purpose_key="instrument_master_bse_delisting",
+                market="BSE",
+                column="neeq",
+                plate="bj",
+                search_key="终止上市",
+                start_date=start_date,
+                end_date=end_date,
+                page_size=30,
+                max_pages=max_pages,
+            ),
+            CninfoAnnouncementScanConfig(
+                purpose_key="instrument_master_bse_delisting",
+                market="BSE",
+                column="neeq",
+                plate="bj",
+                search_key="摘牌",
+                start_date=start_date,
+                end_date=end_date,
+                page_size=30,
+                max_pages=max_pages,
+            ),
+        ]
+
+        records_by_id: Dict[str, Any] = {}
+        for config in configs:
+            result = scanner.scan(config)
+            for record in result.records:
+                if record.announcement_id:
+                    records_by_id[record.announcement_id] = record
+        return list(records_by_id.values())
+
+    async def _sync_bse_delisting_status(
+        self,
+        *,
+        before_snapshot: Dict[str, Any],
+        fetched_instruments: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Confirm BSE current-list disappearances through CNInfo terminal announcements."""
+        config = self._get_instrument_master_sync_config()
+        result: Dict[str, Any] = {
+            "status": "skipped",
+            "enabled": bool(config.get("bse_delisting_check_enabled", True)),
+            "candidate_count": 0,
+            "confirmed_count": 0,
+            "risk_only_count": 0,
+            "unconfirmed_count": 0,
+            "updated_samples": [],
+            "unconfirmed_samples": [],
+            "warnings": [],
+            "errors": [],
+        }
+        if not result["enabled"]:
+            result["reason"] = "disabled_by_config"
+            return result
+
+        current_ids = {
+            str(item.get("instrument_id") or "")
+            for item in (fetched_instruments or [])
+            if str(item.get("exchange") or "").upper() == "BSE"
+            and str(item.get("type") or "stock").lower() == "stock"
+            and item.get("instrument_id")
+        }
+        if not current_ids:
+            result["status"] = "warning"
+            result["warnings"].append("BSE current list empty; delisting check skipped")
+            return result
+
+        candidates = sorted(before_snapshot.get("active_ids", set()) - current_ids)
+        result["candidate_count"] = len(candidates)
+        if not candidates:
+            result["status"] = "success"
+            return result
+
+        symbol_to_instrument = {
+            instrument_id.split(".")[0]: instrument_id
+            for instrument_id in candidates
+            if instrument_id.endswith(".BJ")
+        }
+        end_dt = get_shanghai_time().date()
+        start_dt = end_dt - timedelta(days=int(config.get("bse_delisting_scan_days", 730)))
+        records = await self._scan_bse_delisting_announcements(
+            start_date=start_dt.isoformat(),
+            end_date=end_dt.isoformat(),
+            max_pages=int(config.get("bse_delisting_scan_max_pages", 30)),
+        )
+
+        confirmed_ids: Set[str] = set()
+        for record in records:
+            classification = self._classify_bse_delisting_title(record.title)
+            if classification == "irrelevant":
+                continue
+            for raw_symbol in record.symbols or []:
+                symbol = str(raw_symbol).strip().zfill(6)
+                instrument_id = symbol_to_instrument.get(symbol)
+                if not instrument_id:
+                    continue
+                if classification != "confirmed_delisted":
+                    result["risk_only_count"] += 1
+                    continue
+
+                delisted_on = self._cninfo_announcement_local_date(record.announcement_time)
+                if delisted_on is None:
+                    result["errors"].append(f"{instrument_id}: confirmed announcement has no parseable date")
+                    continue
+                updated = await self.db_ops.mark_instrument_delisted(
+                    instrument_id,
+                    delisted_date=delisted_on,
+                    source="cninfo_bse_delisting",
+                )
+                if updated:
+                    confirmed_ids.add(instrument_id)
+                    result["confirmed_count"] += 1
+                    if len(result["updated_samples"]) < 20:
+                        result["updated_samples"].append(
+                            {
+                                "instrument_id": instrument_id,
+                                "delisted_date": delisted_on.isoformat(),
+                                "announcement_id": record.announcement_id,
+                                "title": self._normalize_cninfo_title(record.title),
+                            }
+                        )
+
+        unconfirmed = sorted(set(candidates) - confirmed_ids)
+        result["unconfirmed_count"] = len(unconfirmed)
+        result["unconfirmed_samples"] = unconfirmed[:20]
+        if result["errors"]:
+            result["status"] = "error"
+        elif result["unconfirmed_count"]:
+            result["status"] = "warning"
+            result["warnings"].append("BSE current-list disappearance has no confirmed delisting announcement")
+        else:
+            result["status"] = "success"
+        return result
+
     async def sync_instrument_master(
         self,
         exchanges: Optional[List[str]] = None,
@@ -7051,6 +7280,7 @@ class DataManager:
                 'exchanges': sync_exchanges,
                 'added_instruments': 0,
                 'deactivated_instruments': 0,
+                'bse_delisting_confirmed': 0,
                 'active_count': 0,
             },
             'warnings': [],
@@ -7088,6 +7318,13 @@ class DataManager:
                     instruments = await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
                 else:
                     instruments = await fetch_coro
+
+                bse_delisting = None
+                if exchange == 'BSE':
+                    bse_delisting = await self._sync_bse_delisting_status(
+                        before_snapshot=before,
+                        fetched_instruments=instruments or [],
+                    )
                 after = await self._get_instrument_master_snapshot(exchange)
 
                 added_ids = sorted(after['all_ids'] - before['all_ids'])
@@ -7115,6 +7352,7 @@ class DataManager:
                     'added_samples': added_ids[:20],
                     'deactivated_samples': deactivated_ids[:20],
                     'freshness': after['freshness'],
+                    'bse_delisting': bse_delisting,
                 })
 
                 if not instruments:
@@ -7156,6 +7394,17 @@ class DataManager:
 
                 result['summary']['added_instruments'] += exchange_result['added_count']
                 result['summary']['deactivated_instruments'] += exchange_result['deactivated_count']
+                if bse_delisting:
+                    result['summary']['bse_delisting_confirmed'] += int(
+                        bse_delisting.get('confirmed_count', 0) or 0
+                    )
+                    if bse_delisting.get('warnings'):
+                        exchange_result['warnings'].extend(bse_delisting['warnings'])
+                        if exchange_result['status'] == 'success':
+                            exchange_result['status'] = 'warning'
+                    if bse_delisting.get('errors'):
+                        exchange_result['errors'].extend(bse_delisting['errors'])
+                        exchange_result['status'] = 'error'
                 result['summary']['active_count'] += exchange_result['after'].get('active_count', 0)
 
             except asyncio.TimeoutError:

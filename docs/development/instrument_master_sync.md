@@ -27,6 +27,20 @@
 - `AkShare` 是备用源和补充源，尤其用于发现 BSE 新股或 BaoStock 临时不可用时的当前列表。
 - `pytdx` 只做当前列表差异诊断，不写入 `listed_date`、`delisted_date`、`status` 或最终 `is_active`。2026-05-21 实测 SSE/BSE 返回 0、SZSE 覆盖不完整，因此默认关闭 `pytdx_validation_enabled`，只在人工诊断时显式开启。
 
+## BSE 退市确认
+
+北交所当前上市名单使用 BSE 官方 `nqxxController/nqxxCnzq.do` 当前列表口径。2026-05-26 现场验证显示，`xxfcbj[]=2` 返回当前 BSE 上市股票 `315` 只，且包含停牌未退市股票：名单中 `xxtpbz=T` 的 `920058.BJ`、`920305.BJ` 仍在当前列表内；已公告终止上市并摘牌的 `920680.BJ` 不在当前列表中。因此，BSE 当前名单“消失”可以作为退市候选信号，但不能单独作为正式退市依据。
+
+`DataManager.sync_instrument_master()` 在 BSE 主数据刷新后会执行二次确认：
+
+- 用本地刷新前 active BSE 股票集合减去本次 BSE 当前名单，得到候选。
+- 通过现有 CNInfo 公告扫描器按市场级入口扫描 `column=neeq, plate=bj`，不逐股抓取。
+- 只有标题命中“股票终止上市暨摘牌”“摘牌”等终局公告时，才调用 `DatabaseOperations.mark_instrument_delisted()` 写入 `status=delisted,is_active=0,trading_status=0,delisted_date`。
+- “可能被终止上市”“拟终止上市”“退市风险警示”“事先告知书”等只作为风险或待确认事项，不反写正式退市状态。
+- 若当前名单消失但未找到终局公告，报告中的 `bse_delisting.unconfirmed_count` 和样例会提示人工或后续周度复核，不会直接误杀。
+
+该逻辑补齐 BSE 无 BaoStock `outDate/status` 的缺口，并确保停牌不会被误判为退市。
+
 现有 `DataSourceFactory.get_instrument_list(force_refresh=True)` 会按 `instrument_list.a_stock = ["baostock", "akshare"]` 路由获取数据；BaoStock 正常返回时，AkShare 只补充主源缺失的 instrument。若 BaoStock 抛异常，AkShare 会作为备用源接管，但报告会提示该结果不具备退市日期权威性。
 
 ## Upsert 防线

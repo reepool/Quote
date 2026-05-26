@@ -7,6 +7,14 @@ from data_manager import DataManager
 from database.operations import DatabaseOperations
 
 
+class _CninfoRecord:
+    def __init__(self, *, announcement_id, title, symbols, announcement_time):
+        self.announcement_id = announcement_id
+        self.title = title
+        self.symbols = symbols
+        self.announcement_time = announcement_time
+
+
 def _build_config_manager() -> Mock:
     config = Mock()
     config.get_research_config.return_value = {}
@@ -67,7 +75,7 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
     result = await manager.sync_instrument_master(
         ['SSE'],
         include_pytdx_validation=False,
-        freshness_threshold_hours=None,
+        freshness_threshold_hours=9999,
     )
 
     assert result['status'] == 'success'
@@ -285,3 +293,83 @@ async def test_governance_failure_continuation_policy():
             job_name='financial_summary_shadow_sync',
             continue_on_failure=False,
         )
+
+
+def test_bse_delisting_title_classifier_separates_terminal_and_risk_events():
+    assert (
+        DataManager._classify_bse_delisting_title("关于公司股票终止上市暨摘牌的公告")
+        == "confirmed_delisted"
+    )
+    assert (
+        DataManager._classify_bse_delisting_title("关于收到北京证券交易所拟终止公司股票上市事先告知书的公告")
+        == "risk_only"
+    )
+    assert (
+        DataManager._classify_bse_delisting_title("关于通过公开摘牌方式收购某公司股权的进展公告")
+        == "irrelevant"
+    )
+
+
+@pytest.mark.asyncio
+async def test_bse_delisting_sync_confirms_current_list_disappearance_with_cninfo():
+    manager = _manager()
+    manager.db_ops = Mock()
+    manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
+    manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
+        _CninfoRecord(
+            announcement_id="ann-920680",
+            title="关于公司股票终止上市暨摘牌的公告",
+            symbols=["920680"],
+            announcement_time="2025-12-30T16:00:00+00:00",
+        )
+    ])
+
+    result = await manager._sync_bse_delisting_status(
+        before_snapshot={"active_ids": {"920680.BJ", "920305.BJ"}},
+        fetched_instruments=[
+            {
+                "instrument_id": "920305.BJ",
+                "exchange": "BSE",
+                "type": "stock",
+            }
+        ],
+    )
+
+    assert result["status"] == "success"
+    assert result["candidate_count"] == 1
+    assert result["confirmed_count"] == 1
+    assert result["unconfirmed_count"] == 0
+    manager.db_ops.mark_instrument_delisted.assert_awaited_once()
+    kwargs = manager.db_ops.mark_instrument_delisted.await_args.kwargs
+    assert kwargs["delisted_date"].isoformat() == "2025-12-31"
+
+
+@pytest.mark.asyncio
+async def test_bse_delisting_sync_keeps_risk_only_disappearance_unconfirmed():
+    manager = _manager()
+    manager.db_ops = Mock()
+    manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
+    manager._scan_bse_delisting_announcements = AsyncMock(return_value=[
+        _CninfoRecord(
+            announcement_id="ann-920305",
+            title="关于公司股票可能被终止上市的风险提示公告",
+            symbols=["920305"],
+            announcement_time="2026-04-28T16:00:00+00:00",
+        )
+    ])
+
+    result = await manager._sync_bse_delisting_status(
+        before_snapshot={"active_ids": {"920305.BJ", "920000.BJ"}},
+        fetched_instruments=[
+            {
+                "instrument_id": "920000.BJ",
+                "exchange": "BSE",
+                "type": "stock",
+            }
+        ],
+    )
+
+    assert result["status"] == "warning"
+    assert result["candidate_count"] == 1
+    assert result["confirmed_count"] == 0
+    manager.db_ops.mark_instrument_delisted.assert_not_awaited()

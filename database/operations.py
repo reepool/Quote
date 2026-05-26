@@ -597,6 +597,62 @@ class DatabaseOperations:
             self.db_logger.error(f"Traceback: {traceback.format_exc()}")
             return False
 
+    async def mark_instrument_delisted(
+        self,
+        instrument_id: str,
+        *,
+        delisted_date: Union[str, date, datetime],
+        source: str = "cninfo_bse_delisting",
+    ) -> bool:
+        """Mark one instrument as formally delisted using confirmed evidence.
+
+        This mutates only lifecycle status fields; historical quotes remain
+        intact and available for research.
+        """
+        if not instrument_id or delisted_date is None:
+            return False
+
+        if isinstance(delisted_date, datetime):
+            parsed_date = delisted_date
+        elif isinstance(delisted_date, date):
+            parsed_date = datetime.combine(delisted_date, datetime.min.time())
+        elif isinstance(delisted_date, str):
+            text_value = delisted_date.strip()
+            if not text_value:
+                return False
+            try:
+                parsed_date = datetime.fromisoformat(text_value[:10])
+            except ValueError:
+                self.db_logger.warning(
+                    "Invalid delisted_date for %s: %s",
+                    instrument_id,
+                    delisted_date,
+                )
+                return False
+        else:
+            return False
+
+        try:
+            async with self.get_async_session() as session:
+                result = await session.execute(
+                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
+                )
+                record = result.scalar_one_or_none()
+                if record is None:
+                    return False
+
+                record.delisted_date = parsed_date
+                record.status = "delisted"
+                record.is_active = False
+                record.trading_status = 0
+                record.source = source
+                record.updated_at = get_shanghai_time()
+                await session.commit()
+                return True
+        except Exception as exc:
+            self.db_logger.error("Failed to mark %s delisted: %s", instrument_id, exc)
+            return False
+
     async def cleanup_ghost_instruments(self, grace_days: int, zombie_grace_days: int = 180) -> int:
         """
         清理由于数据源脏数据引入的长期无交易记录的“幽灵股”。
