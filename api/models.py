@@ -745,7 +745,7 @@ class ResearchFinancialStatementsResponse(BaseModel):
     )
     service_layers: Optional[Dict[str, Any]] = Field(
         None,
-        description="可选财务服务分层结果，包括 L1 本地核心和显式 L3 远程扩展诊断",
+        description="可选财务服务分层结果，包括 L1 本地核心、L1.5 行业专项和显式 L3 远程扩展诊断",
     )
 
 

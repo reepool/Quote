@@ -42,6 +42,12 @@ from research.empty_support import (
     get_optional_empty_exchanges,
 )
 from research.financial_statement_profile import resolve_financial_statement_profile
+from research.financial_source_field_mapping import MAPPING_VERSION as FINANCIAL_MAPPING_VERSION
+from research.financial_industry_fact_packs import (
+    INDUSTRY_FACT_PACK_VERSION,
+    build_industry_pack_payload,
+    get_approved_industry_canonical_facts,
+)
 
 
 @dataclass
@@ -4238,6 +4244,7 @@ class DataManager:
         profile: Optional[str] = None,
         mapping_version: Optional[str] = None,
         include_local_core: bool = False,
+        include_industry_facts: bool = False,
         allow_remote_extension: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域 financial statements bundle。"""
@@ -4263,6 +4270,7 @@ class DataManager:
                 profile=profile,
                 mapping_version=mapping_version,
                 include_local_core=include_local_core,
+                include_industry_facts=include_industry_facts,
                 allow_remote_extension=allow_remote_extension,
             )
             if service_layers:
@@ -4279,6 +4287,7 @@ class DataManager:
             profile=profile,
             mapping_version=mapping_version,
             include_local_core=include_local_core,
+            include_industry_facts=include_industry_facts,
             allow_remote_extension=allow_remote_extension,
         )
         if service_layers and self._financial_statement_service_layers_have_data(service_layers):
@@ -4313,6 +4322,7 @@ class DataManager:
         profile: Optional[str] = None,
         mapping_version: Optional[str] = None,
         include_local_core: bool = False,
+        include_industry_facts: bool = False,
         allow_remote_extension: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域多报告期 financial statements history。"""
@@ -4350,6 +4360,7 @@ class DataManager:
                 profile=profile,
                 mapping_version=mapping_version,
                 include_local_core=include_local_core,
+                include_industry_facts=include_industry_facts,
                 allow_remote_extension=allow_remote_extension,
             )
             if service_layers:
@@ -4404,20 +4415,30 @@ class DataManager:
         profile: Optional[str] = None,
         mapping_version: Optional[str] = None,
         include_local_core: bool = False,
+        include_industry_facts: bool = False,
         allow_remote_extension: bool = False,
     ) -> Dict[str, Any]:
         requested = [str(item) for item in (requested_canonical_facts or []) if str(item)]
-        if not include_local_core and not allow_remote_extension and not requested:
+        if (
+            not include_local_core
+            and not include_industry_facts
+            and not allow_remote_extension
+            and not requested
+        ):
             return {}
 
         layers_cfg = self._financial_statement_service_layer_config()
         result: Dict[str, Any] = {}
         local_core_payload: Optional[Dict[str, Any]] = None
         local_cfg = layers_cfg.get("local_core", {})
-        resolved_mapping_version = mapping_version or local_cfg.get("mapping_version")
+        resolved_mapping_version = (
+            mapping_version
+            or local_cfg.get("mapping_version")
+            or FINANCIAL_MAPPING_VERSION
+        )
         profile_resolution = None
         resolved_profile = profile
-        if (include_local_core or requested) and resolved_profile is None:
+        if (include_local_core or include_industry_facts or requested) and resolved_profile is None:
             profile_resolution = await self._resolve_research_financial_statement_profile(
                 storage,
                 instrument_id,
@@ -4460,6 +4481,59 @@ class DataManager:
                     "passed" if local_core_payload.get("ready") else "partial"
                 )
             result["local_core"] = local_core_payload
+
+        if include_industry_facts:
+            industry_cfg = layers_cfg.get("industry_pack", {})
+            industry_enabled = bool(industry_cfg.get("enabled", True))
+            industry_pack_version = industry_cfg.get(
+                "pack_version",
+                INDUSTRY_FACT_PACK_VERSION,
+            )
+            if not industry_enabled:
+                result["industry_pack"] = {
+                    "status": "disabled_by_config",
+                    "ready": False,
+                    "is_optional": True,
+                    "instrument_id": instrument_id,
+                    "report_period": report_period,
+                    "profile": resolved_profile,
+                    "profile_resolution": profile_resolution,
+                    "pack_version": industry_pack_version,
+                    "facts": {},
+                    "missing_fields": [
+                        {
+                            "canonical_fact": None,
+                            "reason": "industry_pack_disabled_by_config",
+                            "profile": resolved_profile,
+                            "pack_version": industry_pack_version,
+                            "report_period": report_period,
+                        }
+                    ],
+                }
+            else:
+                industry_requested_facts = get_approved_industry_canonical_facts(
+                    profile=resolved_profile,
+                    pack_version=industry_pack_version,
+                )
+                industry_local_result = None
+                if industry_requested_facts:
+                    industry_local_result = await asyncio.to_thread(
+                        storage.get_financial_local_core_facts,
+                        instrument_id,
+                        report_period=report_period,
+                        requested_canonical_facts=industry_requested_facts,
+                        profile=resolved_profile,
+                        mapping_version=resolved_mapping_version,
+                    )
+                industry_payload = build_industry_pack_payload(
+                    instrument_id=instrument_id,
+                    report_period=report_period,
+                    profile=resolved_profile,
+                    local_fact_result=industry_local_result,
+                    pack_version=industry_pack_version,
+                )
+                industry_payload["profile_resolution"] = profile_resolution
+                result["industry_pack"] = industry_payload
 
         if allow_remote_extension:
             remote_cfg = layers_cfg.get("remote_extension", {})
@@ -4557,6 +4631,9 @@ class DataManager:
         local_core = service_layers.get("local_core") or {}
         if local_core.get("facts"):
             return True
+        industry_pack = service_layers.get("industry_pack") or {}
+        if industry_pack.get("facts"):
+            return True
         remote_extension = service_layers.get("remote_extension") or {}
         return bool(remote_extension.get("facts"))
 
@@ -4573,6 +4650,7 @@ class DataManager:
         selected_period = (
             report_period
             or local_core.get("report_period")
+            or (service_layers.get("industry_pack") or {}).get("report_period")
             or self._latest_remote_extension_report_period(service_layers)
             or ""
         )

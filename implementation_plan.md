@@ -1,6 +1,6 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-05-23
+> 更新日期：2026-05-27
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
@@ -25,6 +25,7 @@
 > 已归档 SSE 财务生产 backfill gate 变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-production-backfill/`
 > 当前财务 source profile 变更包：`openspec/changes/promote-cninfo-data20-financial-source/`
 > 当前财务 coverage gap 分类变更包：`openspec/changes/classify-financial-coverage-gaps/`
+> 当前财务行业专项字段包变更包：`openspec/changes/add-financial-industry-specific-fields/`
 
 ---
 
@@ -52,6 +53,7 @@
   - 当前财务主线已补齐 source manifest、全数值事实长表、hot/cold tier、多期回填/增量 catch-up checkpoint、覆盖缺口检测和仓库级 readiness 验证；`2026-05-06` 已进一步补齐官方响应分类、manifest-to-artifact 候选抽取、XBRL/XML/ZIP parser dispatch、SSE structured JSON parser、parse-failed fallback、parsed-only readiness 语义和 disabled-by-default artifact endpoint 候选配置
   - 当前估值历史已补齐 PE/PB/PS 静态、TTM、forward/MRQ 口径拆分，相对估值已支持显式 metric variants、干净同行统计和排除诊断，scheduler/API readiness gate 已接入；SSE official 已完成 `300` 标的单报告期 dry-run 和 `100x2` 多报告期 dry-run，剩余生产化关键在生产 backfill gate、CNInfo/BSE 结构化 artifact 证据与全量 readiness 复核
   - `2026-05-18` 后续财务源策略调整为三层模型：本地核心层以新浪/同花顺严格语义交集为目标，CNInfo data20 作为官方摘要校验层，东财作为按需远程扩展层；该策略尚未完成代码落地，必须先形成字段映射审计和版本化标准。
+  - `2026-05-27` 新增财务 L1.5 行业专项字段包：通用 L1 common facts 保持不变，银行/证券/保险专项字段通过 `service_layers.industry_pack` 单独暴露；当前 `sina_ths_industry_financial_facts.v1` 先批准银行高价值字段，证券和保险为显式 `not_yet_approved` 占位，避免把非银通用字段误当作专项字段。
 - **财务域不允许把上游 URL、报告期起点、限流、重试、并发、parser version、事实字段 alias、估值假设写死在业务逻辑里**；这些变量必须进入 `config/10_research.json`、scheduler 参数或后续独立 financial config，并在 `ingestion_runs` / source manifest 中留下运行时参数快照。
 - **研究域数据源优先级应固定为“稳定免费 -> 稳定付费 -> 免费不稳定补充”**：
   - `BaoStock` 适合作为 A 股基础主数据、交易日历、复权因子、部分财务指标等稳定免费主源
@@ -1771,6 +1773,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - 关键财务指标可本地查询
 - 所有 P0 接口读路径不依赖外网
 - 研究域主备源可通过配置切换
+- 银行/证券/保险专项财务字段通过独立 L1.5 字段包读取；专项缺失必须返回非阻断诊断，不能污染通用 L1 财务完整性判断
 
 ### 15.2 API 层
 
@@ -1781,6 +1784,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - 计算型接口返回 `calc_version`
 - 数据型接口返回 `source_summary`
 - 行业接口若未完成申万一/二/三级 authoritative 映射，必须显式标明该结果仅为参考层信息
+- 财务接口在显式 `include_industry_facts=true` 时返回 `service_layers.industry_pack`，并保持原 `facts / indicators / statements` 兼容
 
 ### 15.3 性能层
 

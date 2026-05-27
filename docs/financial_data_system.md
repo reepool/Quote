@@ -178,6 +178,28 @@ order by name;
 - 银行的“发放贷款及垫款净额”才与 THS `loans_payments_behalf` 和东财 `LOAN_ADVANCE` 对齐。
 - 银行“现金及存放中央银行款项”不能等同通用 `total_cash`。
 
+### 3.2.1 L1.5 行业专项字段包
+
+行业专项字段不再继续塞进通用 L1 必备字段，而是通过独立的 L1.5 字段包暴露：
+
+| 项目 | 当前口径 |
+|---|---|
+| 字段包版本 | `sina_ths_industry_financial_facts.v1` |
+| 配置位置 | `config/10_research.json` -> `akshare.financial_statements.service_layers.industry_pack` |
+| 存储方式 | 复用 `financial_numeric_facts` canonical 长表，不新增动态物理列 |
+| API 暴露 | `service_layers.industry_pack`，不混入通用 `facts` 和 `indicators` |
+| 缺失状态 | `industry_pack_missing`，属于可见的非阻断诊断，不计入 L1 common blocker |
+
+当前 `v1` 先批准银行高价值字段，字段均要求已存在于 `sina_ths_core_financial_facts.v5` 的审核映射中，并保留原始 Sina/THS 字段、单位、期间属性和 evidence：
+
+| Profile | 当前状态 |
+|---|---|
+| `bank` | 已批准银行专项字段包，包含存款、发放贷款及垫款净额、利息收入/支出、手续费及佣金支出、信用减值损失和银行现金流专项项 |
+| `securities` | 显式占位，状态为 `not_yet_approved`，不继承非银通用字段作为证券专项字段 |
+| `insurance` | 显式占位，状态为 `not_yet_approved`，不继承非银通用字段作为保险专项字段 |
+
+读取层只在显式请求时返回行业字段包。行业字段缺失说明该 profile 的专项覆盖不足或该期源数据未披露，不代表公司通用财务数据不可用。
+
 ### 3.3 字段进入 L1 的条件
 
 字段关系必须明确分类：
@@ -624,12 +646,26 @@ GET /api/v1/research/company/{instrument_id}/financial-statements/history?report
 
 历史接口的 `items` 每项复用单期接口结构，包含标准 `facts`、派生 `indicators` 和可选 `statements`。默认只读本地财务库，不隐式触发远程扩展；需要 L1 本地核心诊断时可追加 `include_local_core=true` 与 `requested_canonical_facts=...`。
 
+需要 L1.5 行业专项字段时追加：
+
+```text
+GET /api/v1/research/company/{instrument_id}/financial-statements?report_period=2026-03-31&include_industry_facts=true
+```
+
+或多期读取：
+
+```text
+GET /api/v1/research/company/{instrument_id}/financial-statements/history?period_window=latest&rolling_quarters=12&include_industry_facts=true
+```
+
+返回结果位于 `service_layers.industry_pack`，其中 `facts` 仅包含当前 profile 字段包批准的行业专项事实；`missing_fields.reason=industry_pack_missing` 或 `industry_pack_not_yet_approved` 均为非阻断诊断。
+
 ## 9. 后续增强项
 
 当前财务更新主流程已具备全量手工导入、每日公告驱动增量、周度对账、统一补数路由、生命周期缺口和披露异常处理能力；以下不作为当前上线 blocker，只作为后续增强项：
 
 1. 对 `success_with_review` 输出的 review batch 建立更细的补处理命令，例如退市/未披露最新期、临时源失败、映射缺口三类。
 2. 把内部 `dryrun` 命名的批处理函数重命名为中性 `import_batch` 类名称，降低长期维护误解。
-3. 继续扩展证券、保险、银行专项字段，但必须通过新 mapping version 和多期证据。
+3. 继续扩展证券、保险专项字段，并扩大银行专项字段包；必须通过新 pack version、多期证据和明确 profile 审批。
 4. 对新增 accepted source gap 建立单独审计文档或结构化清单，避免默认缺口清单膨胀。
 5. 后续如迁移 DuckDB/PostgreSQL，只替换 storage adapter 和迁移脚本，不改变 canonical schema、source lineage 和 API 语义。

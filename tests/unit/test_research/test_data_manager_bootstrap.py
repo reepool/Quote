@@ -1767,6 +1767,123 @@ def test_data_manager_get_research_financial_statements_auto_resolves_local_core
     )
 
 
+def test_data_manager_get_research_financial_statements_exposes_bank_industry_pack(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "local_core": {
+                        "enabled": False,
+                        "mapping_version": MAPPING_VERSION,
+                    },
+                    "industry_pack": {
+                        "enabled": True,
+                        "pack_version": "sina_ths_industry_financial_facts.v1",
+                    },
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600000.SH",
+        "symbol": "600000",
+        "exchange": "SSE",
+        "report_period": "2026-03-31",
+        "facts": {"revenue": 1.0},
+    }
+    storage.get_financial_local_core_facts.return_value = {
+        "instrument_id": "600000.SH",
+        "report_period": "2026-03-31",
+        "profile": "bank",
+        "mapping_version": MAPPING_VERSION,
+        "facts": {
+            "balance_sheet.deposits_and_deposits": {
+                "fact_value": 200.0,
+                "canonical_fact_name": "balance_sheet.deposits_and_deposits",
+            },
+        },
+        "missing_fields": [],
+        "ready": False,
+    }
+    manager.research_storage = storage
+
+    result = _run(
+        manager.get_research_financial_statements(
+            "600000.SH",
+            report_period="2026-03-31",
+            profile="bank",
+            include_industry_facts=True,
+        )
+    )
+
+    assert result["facts"] == {"revenue": 1.0}
+    industry_pack = result["service_layers"]["industry_pack"]
+    assert industry_pack["is_optional"] is True
+    assert industry_pack["profile"] == "bank"
+    assert (
+        industry_pack["facts"]["balance_sheet.deposits_and_deposits"]["fact_value"]
+        == 200.0
+    )
+    _, kwargs = storage.get_financial_local_core_facts.call_args
+    assert kwargs["profile"] == "bank"
+    assert "balance_sheet.loans_payments_behalf" in kwargs["requested_canonical_facts"]
+
+
+def test_data_manager_get_research_financial_statements_does_not_query_placeholder_pack(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+    mock_config.get_research_config.return_value.sources = {
+        "akshare": {
+            "financial_statements": {
+                "service_layers": {
+                    "local_core": {"enabled": False, "mapping_version": MAPPING_VERSION},
+                    "industry_pack": {
+                        "enabled": True,
+                        "pack_version": "sina_ths_industry_financial_facts.v1",
+                    },
+                }
+            }
+        }
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600030.SH",
+        "symbol": "600030",
+        "exchange": "SSE",
+        "report_period": "2026-03-31",
+    }
+    manager.research_storage = storage
+
+    result = _run(
+        manager.get_research_financial_statements(
+            "600030.SH",
+            report_period="2026-03-31",
+            profile="securities",
+            include_industry_facts=True,
+        )
+    )
+
+    industry_pack = result["service_layers"]["industry_pack"]
+    assert industry_pack["profile_pack_status"]["status"] == "not_yet_approved"
+    assert industry_pack["missing_fields"][0]["reason"] == "industry_pack_not_yet_approved"
+    storage.get_financial_local_core_facts.assert_not_called()
+
+
 def test_data_manager_get_research_financial_statements_remote_extension_disabled_by_config(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {

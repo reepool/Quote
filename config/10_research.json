@@ -600,6 +600,17 @@
                 "ttl_seconds": 86400
               }
             },
+            "industry_pack": {
+              "enabled": true,
+              "pack_version": "sina_ths_industry_financial_facts.v1",
+              "profiles": [
+                "bank",
+                "securities",
+                "insurance"
+              ],
+              "status": "optional_l1_5_non_blocking",
+              "note": "Industry-specific financial facts are exposed separately from common L1 facts. Missing values are reported as industry_pack_missing and do not block local-core readiness."
+            },
             "official_summary_check": {
               "enabled": true,
               "source": "cninfo",

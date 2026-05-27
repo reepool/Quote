@@ -782,6 +782,7 @@ async def get_research_financial_statements(
     profile: Optional[str] = Query(None, description="字段映射 profile，例如 nonbank/bank"),
     mapping_version: Optional[str] = Query(None, description="字段映射版本"),
     include_local_core: bool = Query(False, description="是否附加 L1 本地核心字段诊断"),
+    include_industry_facts: bool = Query(False, description="是否附加 L1.5 行业专项字段诊断"),
     allow_remote_extension: bool = Query(
         False,
         description="是否显式允许 L3 东财远程扩展",
@@ -798,6 +799,11 @@ async def get_research_financial_statements(
         profile = profile if isinstance(profile, str) else None
         mapping_version = mapping_version if isinstance(mapping_version, str) else None
         include_local_core = include_local_core if isinstance(include_local_core, bool) else False
+        include_industry_facts = (
+            include_industry_facts
+            if isinstance(include_industry_facts, bool)
+            else False
+        )
         allow_remote_extension = (
             allow_remote_extension
             if isinstance(allow_remote_extension, bool)
@@ -823,6 +829,8 @@ async def get_research_financial_statements(
             manager_kwargs["mapping_version"] = mapping_version
         if include_local_core:
             manager_kwargs["include_local_core"] = include_local_core
+        if include_industry_facts:
+            manager_kwargs["include_industry_facts"] = include_industry_facts
         if allow_remote_extension:
             manager_kwargs["allow_remote_extension"] = allow_remote_extension
         bundle = await data_manager.get_research_financial_statements(
@@ -862,6 +870,7 @@ async def get_research_financial_statements_history(
     profile: Optional[str] = Query(None, description="字段映射 profile，例如 nonbank/bank"),
     mapping_version: Optional[str] = Query(None, description="字段映射版本"),
     include_local_core: bool = Query(False, description="是否附加 L1 本地核心字段诊断"),
+    include_industry_facts: bool = Query(False, description="是否附加 L1.5 行业专项字段诊断"),
     allow_remote_extension: bool = Query(
         False,
         description="是否显式允许 L3 东财远程扩展",
@@ -881,6 +890,11 @@ async def get_research_financial_statements_history(
         profile = profile if isinstance(profile, str) else None
         mapping_version = mapping_version if isinstance(mapping_version, str) else None
         include_local_core = include_local_core if isinstance(include_local_core, bool) else False
+        include_industry_facts = (
+            include_industry_facts
+            if isinstance(include_industry_facts, bool)
+            else False
+        )
         allow_remote_extension = (
             allow_remote_extension
             if isinstance(allow_remote_extension, bool)
@@ -915,6 +929,8 @@ async def get_research_financial_statements_history(
             manager_kwargs["mapping_version"] = mapping_version
         if include_local_core:
             manager_kwargs["include_local_core"] = include_local_core
+        if include_industry_facts:
+            manager_kwargs["include_industry_facts"] = include_industry_facts
         if allow_remote_extension:
             manager_kwargs["allow_remote_extension"] = allow_remote_extension
         payload = await data_manager.get_research_financial_statements_history(
