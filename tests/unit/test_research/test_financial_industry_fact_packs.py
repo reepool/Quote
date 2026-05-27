@@ -13,6 +13,8 @@ def test_bank_industry_pack_exposes_only_approved_bank_specific_facts():
 
     facts = {entry.canonical_fact for entry in entries}
     assert "balance_sheet.loans_payments_behalf" in facts
+    assert "balance_sheet.customer_deposits" in facts
+    assert "balance_sheet.interbank_deposits" in facts
     assert "balance_sheet.deposits_and_deposits" in facts
     assert "profit_sheet.interest_income" in facts
     assert all(entry.profile == "bank" for entry in entries)
@@ -31,6 +33,56 @@ def test_securities_and_insurance_industry_packs_are_explicit_placeholders():
     assert insurance_status["status"] == PACK_STATUS_NOT_YET_APPROVED
 
 
+def test_industry_pack_derives_bank_deposit_total_from_cninfo_components():
+    payload = build_industry_pack_payload(
+        instrument_id="600000.SH",
+        report_period="2026-03-31",
+        profile="bank",
+        local_fact_result={
+            "instrument_id": "600000.SH",
+            "report_period": "2026-03-31",
+            "profile": "bank",
+            "mapping_version": "sina_ths_core_financial_facts.v5",
+            "facts": {},
+        },
+        numeric_fact_rows=[
+            {
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "report_period": "2026-03-31",
+                "fact_name": "吸收存款",
+                "source": "cninfo",
+                "source_mode": "direct",
+                "fact_value": 10.0,
+                "raw_fact": {},
+            },
+            {
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "report_period": "2026-03-31",
+                "fact_name": "同业存放及其他金融机构存放款项",
+                "source": "cninfo",
+                "source_mode": "direct",
+                "fact_value": 3.0,
+                "raw_fact": {},
+            },
+        ],
+    )
+
+    assert payload["is_optional"] is True
+    assert payload["facts"]["balance_sheet.customer_deposits"]["fact_value"] == 10.0
+    assert payload["facts"]["balance_sheet.interbank_deposits"]["fact_value"] == 3.0
+    assert payload["facts"]["balance_sheet.deposits_and_deposits"]["fact_value"] == 13.0
+    assert (
+        payload["facts"]["balance_sheet.deposits_and_deposits"]["raw_fact"][
+            "industry_pack_mapping"
+        ]["relationship"]
+        == "derived_equivalent"
+    )
+
+
 def test_industry_pack_missing_is_optional_and_not_a_core_blocker():
     payload = build_industry_pack_payload(
         instrument_id="600000.SH",
@@ -41,15 +93,12 @@ def test_industry_pack_missing_is_optional_and_not_a_core_blocker():
             "report_period": "2026-03-31",
             "profile": "bank",
             "mapping_version": "sina_ths_core_financial_facts.v5",
-            "facts": {
-                "balance_sheet.deposits_and_deposits": {"fact_value": 1.0},
-            },
+            "facts": {},
         },
     )
 
     assert payload["is_optional"] is True
     assert payload["status"] == "partial"
-    assert payload["facts"]["balance_sheet.deposits_and_deposits"]["fact_value"] == 1.0
     assert {
         item["reason"] for item in payload["missing_fields"]
     } == {"industry_pack_missing"}

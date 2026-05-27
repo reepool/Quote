@@ -13,6 +13,8 @@ from typing import Any, Dict, List, Optional
 
 from research.financial_source_field_mapping import (
     MAPPING_VERSION,
+    RELATIONSHIP_DERIVED_EQUIVALENT,
+    RELATIONSHIP_EXACT_EQUIVALENT,
     FinancialSourceFieldMapping,
     get_financial_source_field_mappings,
 )
@@ -38,10 +40,13 @@ class IndustryFinancialFactPackEntry:
     canonical_unit: str
     value_type: str
     approval_status: str
+    relationship: str = RELATIONSHIP_EXACT_EQUIVALENT
     pack_version: str = INDUSTRY_FACT_PACK_VERSION
     mapping_version: str = MAPPING_VERSION
     semantic: str = ""
     required_for_core: bool = False
+    raw_fact_names: tuple[str, ...] = ()
+    derived_components: tuple[str, ...] = ()
     evidence: tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
@@ -75,14 +80,60 @@ def _entry_from_local_core_mapping(canonical_fact: str) -> IndustryFinancialFact
         canonical_unit=mapping.canonical_unit,
         value_type=mapping.value_type,
         approval_status=PACK_STATUS_APPROVED,
+        relationship=mapping.relationship,
         mapping_version=mapping.mapping_version,
         semantic=mapping.semantic,
         evidence=mapping.evidence,
     )
 
 
+def _bank_raw_entry(
+    *,
+    canonical_fact: str,
+    cninfo_field: str,
+    semantic: str,
+) -> IndustryFinancialFactPackEntry:
+    return IndustryFinancialFactPackEntry(
+        canonical_fact=canonical_fact,
+        statement_family="balance_sheet",
+        profile="bank",
+        source_mappings={"cninfo_data20": cninfo_field},
+        source_unit="CNY",
+        canonical_unit="CNY",
+        value_type="point_in_time",
+        approval_status=PACK_STATUS_APPROVED,
+        relationship=RELATIONSHIP_EXACT_EQUIVALENT,
+        semantic=semantic,
+        raw_fact_names=(cninfo_field,),
+        evidence=("cninfo_data20_balance_sheet_raw_bank_deposit_fields",),
+    )
+
+
+def _bank_deposit_total_entry() -> IndustryFinancialFactPackEntry:
+    return IndustryFinancialFactPackEntry(
+        canonical_fact="balance_sheet.deposits_and_deposits",
+        statement_family="balance_sheet",
+        profile="bank",
+        source_mappings={
+            "derived": "balance_sheet.customer_deposits + balance_sheet.interbank_deposits",
+            "sina_report": "吸收存款及同业存放",
+            "ths_report": "deposits_and_deposits",
+        },
+        source_unit="CNY",
+        canonical_unit="CNY",
+        value_type="point_in_time",
+        approval_status=PACK_STATUS_APPROVED,
+        relationship=RELATIONSHIP_DERIVED_EQUIVALENT,
+        semantic="customer_deposits_plus_interbank_deposits",
+        derived_components=(
+            "balance_sheet.customer_deposits",
+            "balance_sheet.interbank_deposits",
+        ),
+        evidence=("cninfo_data20_balance_sheet_raw_bank_deposit_fields",),
+    )
+
+
 _BANK_FACTS_V1 = (
-    "balance_sheet.deposits_and_deposits",
     "balance_sheet.loans_payments_behalf",
     "profit_sheet.interest_income",
     "profit_sheet.interest_expenses",
@@ -95,9 +146,26 @@ _BANK_FACTS_V1 = (
     "cash_flow_sheet.pay_interest_fee_and_commission_cash",
 )
 
+_BANK_RAW_AND_DERIVED_FACTS_V1 = (
+    _bank_raw_entry(
+        canonical_fact="balance_sheet.customer_deposits",
+        cninfo_field="吸收存款",
+        semantic="bank_customer_deposits",
+    ),
+    _bank_raw_entry(
+        canonical_fact="balance_sheet.interbank_deposits",
+        cninfo_field="同业存放及其他金融机构存放款项",
+        semantic="bank_interbank_and_other_financial_institution_deposits",
+    ),
+    _bank_deposit_total_entry(),
+)
+
 _PACKS_BY_VERSION: Dict[str, Dict[str, tuple[IndustryFinancialFactPackEntry, ...]]] = {
     INDUSTRY_FACT_PACK_VERSION: {
-        "bank": tuple(_entry_from_local_core_mapping(fact) for fact in _BANK_FACTS_V1),
+        "bank": (
+            *_BANK_RAW_AND_DERIVED_FACTS_V1,
+            *(tuple(_entry_from_local_core_mapping(fact) for fact in _BANK_FACTS_V1)),
+        ),
         "securities": tuple(),
         "insurance": tuple(),
     }
@@ -175,12 +243,125 @@ def get_approved_industry_canonical_facts(
     ]
 
 
+def get_local_core_industry_canonical_facts(
+    *,
+    profile: Optional[str],
+    pack_version: str = INDUSTRY_FACT_PACK_VERSION,
+) -> List[str]:
+    """Return pack facts that should be read through local-core lineage."""
+    return [
+        entry.canonical_fact
+        for entry in get_financial_industry_fact_pack(
+            profile=profile,
+            pack_version=pack_version,
+        )
+        if not entry.raw_fact_names and not entry.derived_components
+    ]
+
+
+def _row_source_priority(row: Dict[str, Any]) -> tuple[int, str]:
+    source = str(row.get("source") or "")
+    source_mode = str(row.get("source_mode") or "")
+    priority = {
+        ("cninfo", "direct"): 0,
+        ("akshare", "direct"): 1,
+    }.get((source, source_mode), 5)
+    return priority, str(row.get("updated_at") or "")
+
+
+def _best_raw_row(
+    rows: List[Dict[str, Any]],
+    *,
+    fact_names: tuple[str, ...],
+) -> Optional[Dict[str, Any]]:
+    candidates = [
+        row
+        for row in rows
+        if str(row.get("fact_name") or "") in fact_names
+        and row.get("fact_value") is not None
+    ]
+    if not candidates:
+        return None
+    return sorted(candidates, key=_row_source_priority)[0]
+
+
+def _fact_row_from_raw_source(
+    *,
+    entry: IndustryFinancialFactPackEntry,
+    row: Dict[str, Any],
+) -> Dict[str, Any]:
+    payload = dict(row)
+    payload["canonical_fact_name"] = entry.canonical_fact
+    payload["canonical_unit"] = entry.canonical_unit
+    payload["statement_family"] = entry.statement_family
+    raw_fact = dict(payload.get("raw_fact") or {})
+    raw_fact["industry_pack_mapping"] = {
+        "pack_version": entry.pack_version,
+        "relationship": entry.relationship,
+        "source_mappings": entry.source_mappings,
+        "semantic": entry.semantic,
+    }
+    payload["raw_fact"] = raw_fact
+    return payload
+
+
+def _derived_fact_row(
+    *,
+    entry: IndustryFinancialFactPackEntry,
+    component_rows: Dict[str, Dict[str, Any]],
+    report_period: Optional[str],
+) -> Optional[Dict[str, Any]]:
+    values = []
+    for component in entry.derived_components:
+        row = component_rows.get(component)
+        if row is None or row.get("fact_value") is None:
+            return None
+        values.append(float(row["fact_value"]))
+    first = component_rows[entry.derived_components[0]]
+    return {
+        "instrument_id": first.get("instrument_id"),
+        "symbol": first.get("symbol"),
+        "exchange": first.get("exchange"),
+        "report_period": first.get("report_period") or report_period,
+        "fact_name": entry.canonical_fact,
+        "canonical_fact_name": entry.canonical_fact,
+        "statement_family": entry.statement_family,
+        "fact_value": sum(values),
+        "unit": entry.canonical_unit,
+        "canonical_unit": entry.canonical_unit,
+        "source": "derived",
+        "source_mode": "industry_pack",
+        "raw_fact": {
+            "industry_pack_mapping": {
+                "pack_version": entry.pack_version,
+                "relationship": entry.relationship,
+                "source_mappings": entry.source_mappings,
+                "semantic": entry.semantic,
+                "derived_components": list(entry.derived_components),
+                "component_values": {
+                    component: component_rows[component].get("fact_value")
+                    for component in entry.derived_components
+                },
+                "component_sources": {
+                    component: {
+                        "source": component_rows[component].get("source"),
+                        "source_mode": component_rows[component].get("source_mode"),
+                        "fact_name": component_rows[component].get("fact_name"),
+                    }
+                    for component in entry.derived_components
+                },
+            }
+        },
+    }
+
+
 def build_industry_pack_payload(
     *,
     instrument_id: str,
     report_period: Optional[str],
     profile: Optional[str],
     local_fact_result: Optional[Dict[str, Any]],
+    numeric_fact_rows: Optional[List[Dict[str, Any]]] = None,
     pack_version: str = INDUSTRY_FACT_PACK_VERSION,
 ) -> Dict[str, Any]:
     """Build a non-blocking L1.5 service-layer payload from local canonical facts."""
@@ -198,6 +379,36 @@ def build_industry_pack_payload(
         for fact, row in (source_payload.get("facts") or {}).items()
         if fact in approved_facts
     }
+    rows = numeric_fact_rows or []
+    if pack_status["status"] == PACK_STATUS_APPROVED:
+        entries = get_financial_industry_fact_pack(
+            profile=profile,
+            pack_version=pack_version,
+        )
+        for entry in entries:
+            if not entry.raw_fact_names or entry.canonical_fact in facts:
+                continue
+            raw_row = _best_raw_row(rows, fact_names=entry.raw_fact_names)
+            if raw_row is not None:
+                facts[entry.canonical_fact] = _fact_row_from_raw_source(
+                    entry=entry,
+                    row=raw_row,
+                )
+        for entry in entries:
+            if not entry.derived_components or entry.canonical_fact in facts:
+                continue
+            component_rows = {
+                component: facts[component]
+                for component in entry.derived_components
+                if component in facts
+            }
+            derived = _derived_fact_row(
+                entry=entry,
+                component_rows=component_rows,
+                report_period=source_payload.get("report_period") or report_period,
+            )
+            if derived is not None:
+                facts[entry.canonical_fact] = derived
     missing_fields: List[Dict[str, Any]] = []
     if pack_status["status"] != PACK_STATUS_APPROVED:
         missing_fields.append(

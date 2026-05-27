@@ -46,7 +46,7 @@ from research.financial_source_field_mapping import MAPPING_VERSION as FINANCIAL
 from research.financial_industry_fact_packs import (
     INDUSTRY_FACT_PACK_VERSION,
     build_industry_pack_payload,
-    get_approved_industry_canonical_facts,
+    get_local_core_industry_canonical_facts,
 )
 
 
@@ -4511,7 +4511,7 @@ class DataManager:
                     ],
                 }
             else:
-                industry_requested_facts = get_approved_industry_canonical_facts(
+                industry_requested_facts = get_local_core_industry_canonical_facts(
                     profile=resolved_profile,
                     pack_version=industry_pack_version,
                 )
@@ -4525,11 +4525,17 @@ class DataManager:
                         profile=resolved_profile,
                         mapping_version=resolved_mapping_version,
                     )
+                industry_numeric_rows = await asyncio.to_thread(
+                    storage.get_financial_numeric_facts,
+                    instrument_id,
+                    report_period=report_period,
+                )
                 industry_payload = build_industry_pack_payload(
                     instrument_id=instrument_id,
                     report_period=report_period,
                     profile=resolved_profile,
                     local_fact_result=industry_local_result,
+                    numeric_fact_rows=industry_numeric_rows,
                     pack_version=industry_pack_version,
                 )
                 industry_payload["profile_resolution"] = profile_resolution

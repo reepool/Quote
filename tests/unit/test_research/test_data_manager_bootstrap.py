@@ -1806,14 +1806,38 @@ def test_data_manager_get_research_financial_statements_exposes_bank_industry_pa
         "profile": "bank",
         "mapping_version": MAPPING_VERSION,
         "facts": {
-            "balance_sheet.deposits_and_deposits": {
+            "balance_sheet.loans_payments_behalf": {
                 "fact_value": 200.0,
-                "canonical_fact_name": "balance_sheet.deposits_and_deposits",
+                "canonical_fact_name": "balance_sheet.loans_payments_behalf",
             },
         },
         "missing_fields": [],
         "ready": False,
     }
+    storage.get_financial_numeric_facts.return_value = [
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+            "fact_name": "吸收存款",
+            "source": "cninfo",
+            "source_mode": "direct",
+            "fact_value": 10.0,
+            "raw_fact": {},
+        },
+        {
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+            "fact_name": "同业存放及其他金融机构存放款项",
+            "source": "cninfo",
+            "source_mode": "direct",
+            "fact_value": 3.0,
+            "raw_fact": {},
+        },
+    ]
     manager.research_storage = storage
 
     result = _run(
@@ -1830,12 +1854,21 @@ def test_data_manager_get_research_financial_statements_exposes_bank_industry_pa
     assert industry_pack["is_optional"] is True
     assert industry_pack["profile"] == "bank"
     assert (
-        industry_pack["facts"]["balance_sheet.deposits_and_deposits"]["fact_value"]
+        industry_pack["facts"]["balance_sheet.loans_payments_behalf"]["fact_value"]
         == 200.0
+    )
+    assert (
+        industry_pack["facts"]["balance_sheet.deposits_and_deposits"]["fact_value"]
+        == 13.0
     )
     _, kwargs = storage.get_financial_local_core_facts.call_args
     assert kwargs["profile"] == "bank"
     assert "balance_sheet.loans_payments_behalf" in kwargs["requested_canonical_facts"]
+    assert "balance_sheet.deposits_and_deposits" not in kwargs["requested_canonical_facts"]
+    storage.get_financial_numeric_facts.assert_called_once_with(
+        "600000.SH",
+        report_period="2026-03-31",
+    )
 
 
 def test_data_manager_get_research_financial_statements_does_not_query_placeholder_pack(tmp_path):
@@ -1867,6 +1900,7 @@ def test_data_manager_get_research_financial_statements_does_not_query_placehold
         "exchange": "SSE",
         "report_period": "2026-03-31",
     }
+    storage.get_financial_numeric_facts.return_value = []
     manager.research_storage = storage
 
     result = _run(

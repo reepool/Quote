@@ -194,11 +194,21 @@ order by name;
 
 | Profile | 当前状态 |
 |---|---|
-| `bank` | 已批准银行专项字段包，包含存款、发放贷款及垫款净额、利息收入/支出、手续费及佣金支出、信用减值损失和银行现金流专项项 |
+| `bank` | 已批准银行专项字段包，包含吸收存款、同业存放及其他金融机构存放款项、派生的吸收存款及同业存放、发放贷款及垫款净额、利息收入/支出、手续费及佣金支出、信用减值损失和银行现金流专项项 |
 | `securities` | 显式占位，状态为 `not_yet_approved`，不继承非银通用字段作为证券专项字段 |
 | `insurance` | 显式占位，状态为 `not_yet_approved`，不继承非银通用字段作为保险专项字段 |
 
 读取层只在显式请求时返回行业字段包。行业字段缺失说明该 profile 的专项覆盖不足或该期源数据未披露，不代表公司通用财务数据不可用。
+
+银行存款字段采用“拆分项 + 派生合计”模型：
+
+| Canonical fact | 字段含义 | 当前来源 |
+|---|---|---|
+| `balance_sheet.customer_deposits` | 吸收存款 | CNInfo data20 原始行 |
+| `balance_sheet.interbank_deposits` | 同业存放及其他金融机构存放款项 | CNInfo data20 原始行 |
+| `balance_sheet.deposits_and_deposits` | 吸收存款及同业存放 | `customer_deposits + interbank_deposits` 派生，`relationship=derived_equivalent` |
+
+派生合计必须在 `raw_fact.industry_pack_mapping` 中保留组件字段、组件数值和组件来源，不能伪装成原始披露字段。`cash_flow_sheet.deposits_and_funds_net_addition` 属于银行现金流可选专项字段；如果某一报告期源数据未披露或未解析，按 `industry_pack_missing` 处理。
 
 ### 3.3 字段进入 L1 的条件
 
