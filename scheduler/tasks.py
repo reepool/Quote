@@ -4069,58 +4069,98 @@ class ScheduledTasks:
             scheduler_logger.debug(f"[Scheduler] use_backup_config parameter: {use_backup_config}")
 
             # 读取配置 - 按优先级合并参数
-            backup_config = self.config.get_nested('backup_config', {})
+            backup_config = self.config.get_nested('backup_config', {}) or {}
 
             # 使用传入参数，否则使用配置文件中的值，最后使用默认值
-            source_db_path = source_db_path or backup_config.get('source_db_path', 'data/quotes.db')
             backup_directory = backup_directory or backup_config.get('backup_directory', 'data/PVE-Bak/QuoteBak')
             retention_days = retention_days or backup_config.get('retention_days', 30)
             notification_enabled = notification_enabled if notification_enabled is not None else backup_config.get('notification_enabled', True)
             filename_pattern = filename_pattern or backup_config.get('filename_pattern', 'quotes_backup_{timestamp}.db')
             max_backup_files = max_backup_files or backup_config.get('max_backup_files', 10)
+            backup_sources = self._resolve_database_backup_sources(
+                backup_config=backup_config,
+                source_db_path=source_db_path,
+                filename_pattern=filename_pattern,
+            )
+            if not backup_sources:
+                raise RuntimeError("没有可备份的数据库文件")
 
-            # 验证源数据库文件是否存在
             import os
-            if not os.path.exists(source_db_path):
-                raise FileNotFoundError(f"源数据库文件不存在: {source_db_path}")
+            for source in backup_sources:
+                if not os.path.exists(source["path"]):
+                    raise FileNotFoundError(f"源数据库文件不存在: {source['path']}")
 
-            # 获取源文件大小
-            source_size = os.path.getsize(source_db_path)
-
-            # 检查磁盘空间
-            await self._check_disk_space_for_backup(source_size, backup_directory)
+            total_source_size = sum(os.path.getsize(source["path"]) for source in backup_sources)
 
             # 创建备份目录
             os.makedirs(backup_directory, exist_ok=True)
 
+            # 检查磁盘空间
+            await self._check_disk_space_for_backup(total_source_size, backup_directory)
+
             # 生成备份文件名
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_filename = filename_pattern.format(timestamp=timestamp)
-            backup_path = os.path.join(backup_directory, backup_filename)
 
             # 执行备份
             start_time = datetime.now()
-            scheduler_logger.info(f"[Scheduler] Copying database from {source_db_path} to {backup_path}")
 
             import shutil
-            shutil.copy2(source_db_path, backup_path)
+            backup_results = []
+            cleanup_patterns = []
+            for source in backup_sources:
+                source_path = source["path"]
+                source_size = os.path.getsize(source_path)
+                source_name = source["name"]
+                source_stem = os.path.splitext(os.path.basename(source_path))[0]
+                source_pattern = source["filename_pattern"]
+                backup_filename = source_pattern.format(
+                    timestamp=timestamp,
+                    name=source_name,
+                    stem=source_stem,
+                )
+                backup_path = os.path.join(backup_directory, backup_filename)
+                scheduler_logger.info(
+                    f"[Scheduler] Copying database from {source_path} to {backup_path}"
+                )
+                shutil.copy2(source_path, backup_path)
+                if not os.path.exists(backup_path) or os.path.getsize(backup_path) != source_size:
+                    raise IOError(f"备份文件创建失败或大小不匹配: {backup_path}")
+                backup_results.append(
+                    {
+                        "name": source_name,
+                        "source": source_path,
+                        "backup_file": backup_filename,
+                        "file_size": source_size,
+                    }
+                )
+                cleanup_patterns.append(
+                    source_pattern.format(timestamp="*", name=source_name, stem=source_stem)
+                )
 
             end_time = datetime.now()
             duration = (end_time - start_time).total_seconds()
 
-            # 验证备份文件
-            if not os.path.exists(backup_path) or os.path.getsize(backup_path) != source_size:
-                raise IOError(f"备份文件创建失败或大小不匹配: {backup_path}")
-
-            scheduler_logger.info(f"[Scheduler] Database backup completed successfully: {backup_path}")
+            scheduler_logger.info(
+                f"[Scheduler] Database backup completed successfully: {len(backup_results)} files"
+            )
 
             # 清理过期备份
-            await self._cleanup_old_backups(backup_directory, retention_days, max_backup_files)
+            await self._cleanup_old_backups(
+                backup_directory,
+                retention_days,
+                max_backup_files,
+                backup_patterns=cleanup_patterns,
+            )
 
             # 使用统一报告接口发送通知
             report_data = {
-                'name': '数据库备份报告', 'success': True, 'backup_file': backup_filename,
-                'file_size': source_size, 'duration': duration, 'timestamp': datetime.now().isoformat()
+                'name': '数据库备份报告',
+                'success': True,
+                'backup_file': f"{len(backup_results)} files",
+                'backup_files': backup_results,
+                'file_size': total_source_size,
+                'duration': duration,
+                'timestamp': datetime.now().isoformat()
             }
             await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
             return True
@@ -4131,6 +4171,71 @@ class ScheduledTasks:
             report_data = {'name': '数据库备份报告', 'success': False, 'error_message': str(e)}
             await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
             return False
+
+    def _resolve_database_backup_sources(
+        self,
+        *,
+        backup_config: Dict[str, Any],
+        source_db_path: Optional[str],
+        filename_pattern: str,
+    ) -> List[Dict[str, str]]:
+        """Resolve the database files covered by the backup task."""
+        import glob
+
+        if source_db_path:
+            source_stem = os.path.splitext(os.path.basename(source_db_path))[0]
+            return [
+                {
+                    "name": source_stem,
+                    "path": source_db_path,
+                    "filename_pattern": filename_pattern,
+                }
+            ]
+
+        configured = backup_config.get("source_databases")
+        sources: List[Dict[str, str]] = []
+        if configured:
+            for item in configured:
+                if isinstance(item, str):
+                    path = item
+                    stem = os.path.splitext(os.path.basename(path))[0]
+                    pattern = f"{stem}_backup_{{timestamp}}.db"
+                    name = stem
+                else:
+                    path = str(item.get("path") or "")
+                    stem = os.path.splitext(os.path.basename(path))[0]
+                    name = str(item.get("name") or stem)
+                    pattern = str(
+                        item.get("filename_pattern") or f"{stem}_backup_{{timestamp}}.db"
+                    )
+                if path:
+                    sources.append({"name": name, "path": path, "filename_pattern": pattern})
+        else:
+            path = backup_config.get("source_db_path", "data/quotes.db")
+            sources.append(
+                {
+                    "name": os.path.splitext(os.path.basename(path))[0],
+                    "path": path,
+                    "filename_pattern": filename_pattern,
+                }
+            )
+
+        known_paths = {os.path.abspath(source["path"]) for source in sources}
+        if backup_config.get("include_extra_data_dbs", False):
+            for path in sorted(glob.glob(str(backup_config.get("extra_db_glob", "data/*.db")))):
+                abs_path = os.path.abspath(path)
+                if abs_path in known_paths:
+                    continue
+                stem = os.path.splitext(os.path.basename(path))[0]
+                sources.append(
+                    {
+                        "name": stem,
+                        "path": path,
+                        "filename_pattern": f"{stem}_backup_{{timestamp}}.db",
+                    }
+                )
+                known_paths.add(abs_path)
+        return sources
 
     async def _check_disk_space_for_backup(self, required_bytes: int, backup_directory: str):
         """检查备份目录的磁盘空间"""
@@ -4155,7 +4260,13 @@ class ScheduledTasks:
             scheduler_logger.error(f"[Scheduler] Disk space check failed: {e}")
             raise
 
-    async def _cleanup_old_backups(self, backup_directory: str, retention_days: int, max_files: int):
+    async def _cleanup_old_backups(
+        self,
+        backup_directory: str,
+        retention_days: int,
+        max_files: int,
+        backup_patterns: Optional[List[str]] = None,
+    ):
         """清理过期的备份文件"""
         try:
             import glob
@@ -4164,41 +4275,45 @@ class ScheduledTasks:
             if not os.path.exists(backup_directory):
                 return
 
-            # 获取所有备份文件
-            backup_pattern = os.path.join(backup_directory, "quotes_backup_*.db")
-            backup_files = glob.glob(backup_pattern)
-
-            if not backup_files:
-                return
-
-            # 按修改时间排序（最新的在前）
-            backup_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
-
             cutoff_date = datetime.now() - timedelta(days=retention_days)
             deleted_count = 0
+            patterns = backup_patterns or ["quotes_backup_*.db"]
 
-            # 清理过期文件
-            for backup_file in backup_files[max_files:]:  # 超过最大文件数量的
-                try:
-                    file_mtime = datetime.fromtimestamp(os.path.getmtime(backup_file))
-                    if file_mtime < cutoff_date:
+            for pattern in patterns:
+                backup_pattern = os.path.join(backup_directory, pattern)
+                backup_files = glob.glob(backup_pattern)
+                if not backup_files:
+                    continue
+                backup_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+
+                for backup_file in backup_files[max_files:]:
+                    try:
+                        file_mtime = datetime.fromtimestamp(os.path.getmtime(backup_file))
+                        if file_mtime < cutoff_date:
+                            os.remove(backup_file)
+                            deleted_count += 1
+                            scheduler_logger.info(
+                                f"[Scheduler] Deleted old backup: {os.path.basename(backup_file)}"
+                            )
+                    except Exception as e:
+                        scheduler_logger.warning(
+                            f"[Scheduler] Failed to delete old backup {backup_file}: {e}"
+                        )
+
+                remaining_files = glob.glob(backup_pattern)
+                remaining_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+
+                for backup_file in remaining_files[max_files:]:
+                    try:
                         os.remove(backup_file)
                         deleted_count += 1
-                        scheduler_logger.info(f"[Scheduler] Deleted old backup: {os.path.basename(backup_file)}")
-                except Exception as e:
-                    scheduler_logger.warning(f"[Scheduler] Failed to delete old backup {backup_file}: {e}")
-
-            # 如果文件数量仍超过限制，删除最旧的文件
-            remaining_files = glob.glob(backup_pattern)
-            remaining_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
-
-            for backup_file in remaining_files[max_files:]:
-                try:
-                    os.remove(backup_file)
-                    deleted_count += 1
-                    scheduler_logger.info(f"[Scheduler] Deleted excess backup: {os.path.basename(backup_file)}")
-                except Exception as e:
-                    scheduler_logger.warning(f"[Scheduler] Failed to delete excess backup {backup_file}: {e}")
+                        scheduler_logger.info(
+                            f"[Scheduler] Deleted excess backup: {os.path.basename(backup_file)}"
+                        )
+                    except Exception as e:
+                        scheduler_logger.warning(
+                            f"[Scheduler] Failed to delete excess backup {backup_file}: {e}"
+                        )
 
             if deleted_count > 0:
                 scheduler_logger.info(f"[Scheduler] Cleanup completed: deleted {deleted_count} old backup files")

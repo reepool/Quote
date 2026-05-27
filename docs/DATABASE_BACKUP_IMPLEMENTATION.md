@@ -2,7 +2,7 @@
 
 ## 🎯 任务概述
 
-成功实现了 `database_backup` 定时任务，将数据库文件从 `data/quotes.db` 自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。
+`database_backup` 定时任务负责将 Quote 系统的本地 SQLite 数据库自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。当前备份范围不再只限 `data/quotes.db`，而是覆盖 `quotes.db / research.db / financials.db / market_data.db`，并可通过 `include_extra_data_dbs` 自动纳入 `data/*.db` 下未来新增的数据库。
 
 > 存储布局说明：生产环境中 `data/` 是 `/dev/sda3` 挂载到
 > `/home/python/Quote/data` 的本地数据卷；`data/PVE-Bak` 和
@@ -21,6 +21,30 @@
   "backup_config": {
     "enabled": true,
     "source_db_path": "data/quotes.db",
+    "source_databases": [
+      {
+        "name": "quotes",
+        "path": "data/quotes.db",
+        "filename_pattern": "quotes_backup_{timestamp}.db"
+      },
+      {
+        "name": "research",
+        "path": "data/research.db",
+        "filename_pattern": "research_backup_{timestamp}.db"
+      },
+      {
+        "name": "financials",
+        "path": "data/financials.db",
+        "filename_pattern": "financials_backup_{timestamp}.db"
+      },
+      {
+        "name": "market_data",
+        "path": "data/market_data.db",
+        "filename_pattern": "market_data_backup_{timestamp}.db"
+      }
+    ],
+    "include_extra_data_dbs": true,
+    "extra_db_glob": "data/*.db",
     "backup_directory": "data/PVE-Bak/QuoteBak",
     "retention_days": 30,
     "compression_enabled": false,
@@ -59,12 +83,15 @@
 
 **新增方法**:
 - `database_backup()` - 主备份任务方法
+- `_resolve_database_backup_sources()` - 解析需要备份的数据库清单
 - `_check_disk_space_for_backup()` - 磁盘空间检查
 - `_cleanup_old_backups()` - 清理过期备份
 - `_send_backup_notification()` - 发送备份通知
 
 **核心功能**:
 - ✅ 配置优先级合并（任务参数 > 全局配置 > 默认值）
+- ✅ 多数据库清单备份，覆盖行情、研究、财务和市场数据数据库
+- ✅ 可自动纳入 `data/*.db` 下新增的 SQLite 数据库
 - ✅ 源文件验证和大小检查
 - ✅ 磁盘空间检查
 - ✅ 自动创建备份目录
@@ -81,6 +108,7 @@
 
 ### 配置管理
 - **统一配置**: 使用 `backup_config` 作为全局配置
+- **数据库清单**: `source_databases` 是生产备份清单；旧的 `source_db_path` 仍保留为单库手工覆盖兼容项
 - **灵活覆盖**: 任务参数可选择性覆盖全局配置
 - **避免冲突**: 清晰的配置优先级机制
 
@@ -97,7 +125,7 @@
 
 ### 清理策略
 - **时间保留**: 默认保留30天的备份文件
-- **数量限制**: 最多保留10个备份文件
+- **数量限制**: 每个数据库备份文件模式最多保留10个备份文件
 - **智能清理**: 按修改时间排序，优先保留最新备份
 
 ## 📊 测试验证

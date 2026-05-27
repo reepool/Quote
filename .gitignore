@@ -255,6 +255,7 @@ ssl/
 
 # Telegram 相关
 *.session
+*.session-journal
 session_name*
 
 # Jupyter Notebook

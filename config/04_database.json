@@ -7,6 +7,30 @@
         "backup_config": {
         "enabled": true,
         "source_db_path": "data/quotes.db",
+        "source_databases": [
+            {
+                "name": "quotes",
+                "path": "data/quotes.db",
+                "filename_pattern": "quotes_backup_{timestamp}.db"
+            },
+            {
+                "name": "research",
+                "path": "data/research.db",
+                "filename_pattern": "research_backup_{timestamp}.db"
+            },
+            {
+                "name": "financials",
+                "path": "data/financials.db",
+                "filename_pattern": "financials_backup_{timestamp}.db"
+            },
+            {
+                "name": "market_data",
+                "path": "data/market_data.db",
+                "filename_pattern": "market_data_backup_{timestamp}.db"
+            }
+        ],
+        "include_extra_data_dbs": true,
+        "extra_db_glob": "data/*.db",
         "backup_directory": "data/PVE-Bak/QuoteBak",
         "retention_days": 30,
         "compression_enabled": false,

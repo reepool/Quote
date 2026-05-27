@@ -1301,6 +1301,14 @@
   "backup_config": {
     "enabled": true,
     "source_db_path": "data/quotes.db",
+    "source_databases": [
+      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db"},
+      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db"},
+      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db"},
+      {"name": "market_data", "path": "data/market_data.db", "filename_pattern": "market_data_backup_{timestamp}.db"}
+    ],
+    "include_extra_data_dbs": true,
+    "extra_db_glob": "data/*.db",
     "backup_directory": "data/PVE-Bak/QuoteBak"
   }
 }
@@ -1308,7 +1316,10 @@
 ```
 
 - **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`source_db_path`**: `str` (默认: `data/quotes.db`) —— *Quote 本地数据卷中的源数据库路径；生产环境中 `data/` 应由 `/dev/sda3` 挂载到 `/home/python/Quote/data`*
+- **`source_db_path`**: `str` (默认: `data/quotes.db`) —— *单库手工覆盖兼容项；正常自动备份使用 `source_databases`*
+- **`source_databases`**: `List[dict]` —— *生产备份数据库清单，当前覆盖 `quotes.db / research.db / financials.db / market_data.db`*
+- **`include_extra_data_dbs`**: `bool` (默认: `False`) —— *是否自动把 `extra_db_glob` 命中的新增 SQLite 数据库纳入备份*
+- **`extra_db_glob`**: `str` (默认: `data/*.db`) —— *新增数据库自动发现范围*
 - **`backup_directory`**: `str` (默认: `data/PVE-Bak/QuoteBak`) —— *NAS 备份输出路径；`data/PVE-Bak` 必须是 NAS 子挂载，不能退化为本地空目录*
 - **`retention_days`**: `int` (默认: `30`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`compression_enabled`**: `bool` (默认: `False`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*

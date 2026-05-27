@@ -18,6 +18,7 @@
 
 - 生产财务数据写入目标是 `data/financials.db`，不是 `data/research.db`。
 - `data/research.db` 当前不应保留 `financial_*` 财务物理表；代码初始化时也会在独立财务库配置下移除研究库内的财务表。
+- `database_backup` 已将 `data/financials.db` 纳入生产数据库备份清单，与 `quotes.db / research.db / market_data.db` 一起备份到 `data/PVE-Bak/QuoteBak`；未来新增的 `data/*.db` 也会按配置自动纳入备份。
 - L1 字段必须来自已批准 mapping catalog；字段名相似、单样本数值相近、会计等式另一边相等，都不能自动进入本地核心层。
 - CNInfo data20 当前在财务日更/周度对账中作为官方结构化优先补数源：能明确覆盖的 canonical facts 优先使用 CNInfo data20；缺失、失败或总项/归母等语义不明确的字段再由 Sina/THS 字段级补齐。源顺序和 fallback 由 `research/financial_statement_maintenance_repair.py` 的维护路由器统一管理，增量和周度对账任务只提交标准 instrument-period 目标，避免不同任务各自硬编码数据源调用。
 - BSE 与少数上市前科创板历史期存在已确认上游缺口；这些缺口只允许显式登记为 accepted source gap，不能通过放宽映射伪造完整性。
@@ -623,11 +624,12 @@ GET /api/v1/research/company/{instrument_id}/financial-statements/history?report
 
 历史接口的 `items` 每项复用单期接口结构，包含标准 `facts`、派生 `indicators` 和可选 `statements`。默认只读本地财务库，不隐式触发远程扩展；需要 L1 本地核心诊断时可追加 `include_local_core=true` 与 `requested_canonical_facts=...`。
 
-## 9. 后续待办
+## 9. 后续增强项
 
-1. 将 `scripts/research_financial_l1_full_import.py` 接入 scheduler/Telegram 的任务注册和帮助文案。
-2. 对 `success_with_review` 输出的 review batch 建立补处理命令，例如退市/未披露最新期、临时源失败、映射缺口三类。
-3. 把内部 `dryrun` 命名的批处理函数重命名为中性 `import_batch` 类名称，降低长期维护误解。
-4. 继续扩展证券、保险、银行专项字段，但必须通过新 mapping version 和多期证据。
-5. 对新增 accepted source gap 建立单独审计文档或结构化清单，避免默认缺口清单膨胀。
-6. 后续如迁移 DuckDB/PostgreSQL，只替换 storage adapter 和迁移脚本，不改变 canonical schema、source lineage 和 API 语义。
+当前财务更新主流程已具备全量手工导入、每日公告驱动增量、周度对账、统一补数路由、生命周期缺口和披露异常处理能力；以下不作为当前上线 blocker，只作为后续增强项：
+
+1. 对 `success_with_review` 输出的 review batch 建立更细的补处理命令，例如退市/未披露最新期、临时源失败、映射缺口三类。
+2. 把内部 `dryrun` 命名的批处理函数重命名为中性 `import_batch` 类名称，降低长期维护误解。
+3. 继续扩展证券、保险、银行专项字段，但必须通过新 mapping version 和多期证据。
+4. 对新增 accepted source gap 建立单独审计文档或结构化清单，避免默认缺口清单膨胀。
+5. 后续如迁移 DuckDB/PostgreSQL，只替换 storage adapter 和迁移脚本，不改变 canonical schema、source lineage 和 API 语义。
