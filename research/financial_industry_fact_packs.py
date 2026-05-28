@@ -9,6 +9,7 @@ analysis without turning their absence into a core-readiness blocker.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import math
 from typing import Any, Dict, List, Optional
 
 from research.financial_source_field_mapping import (
@@ -293,6 +294,81 @@ _INSURANCE_RAW_FACTS_V1 = (
         semantic="insurance_surrender_benefit_or_withdrawal_payment",
         value_type="period_reported_value",
     ),
+    _raw_entry(
+        canonical_fact="balance_sheet.bonds_payable",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "bonds_payable"},
+        raw_fact_names=("bonds_payable",),
+        semantic="insurance_bonds_payable",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.other_debt_investment",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "other_debt_investment"},
+        raw_fact_names=("other_debt_investment",),
+        semantic="insurance_other_debt_investment",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.other_equity_tools_investment",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "other_equity_tools_investment"},
+        raw_fact_names=("other_equity_tools_investment",),
+        semantic="insurance_other_equity_instrument_investment",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.derivative_financial_assets",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "derivative_financial_assets"},
+        raw_fact_names=("derivative_financial_assets",),
+        semantic="insurance_derivative_financial_assets",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.derivative_financial_liabilities",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "derivative_financial_debt"},
+        raw_fact_names=("derivative_financial_debt",),
+        semantic="insurance_derivative_financial_liabilities",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.trading_financial_liabilities",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"ths_report": "trade_finance_debt"},
+        raw_fact_names=("trade_finance_debt",),
+        semantic="insurance_trading_financial_liabilities",
+    ),
+    _raw_entry(
+        canonical_fact="profit_sheet.exchange_income",
+        statement_family="income_statement",
+        profile="insurance",
+        source_mappings={"ths_report": "exchange_income"},
+        raw_fact_names=("exchange_income",),
+        semantic="insurance_exchange_gain_or_loss",
+        value_type="period_reported_value",
+    ),
+    _raw_entry(
+        canonical_fact="profit_sheet.associate_invest_income",
+        statement_family="income_statement",
+        profile="insurance",
+        source_mappings={"ths_report": "associate_invest_income"},
+        raw_fact_names=("associate_invest_income",),
+        semantic="insurance_associate_and_joint_venture_investment_income",
+        value_type="period_reported_value",
+    ),
+    _raw_entry(
+        canonical_fact="profit_sheet.assets_impairment_loss",
+        statement_family="income_statement",
+        profile="insurance",
+        source_mappings={"ths_report": "assets_impairment_loss"},
+        raw_fact_names=("assets_impairment_loss",),
+        semantic="insurance_asset_impairment_loss",
+        value_type="period_reported_value",
+    ),
 )
 
 _PACKS_BY_VERSION: Dict[str, Dict[str, tuple[IndustryFinancialFactPackEntry, ...]]] = {
@@ -425,11 +501,20 @@ def _best_raw_row(
         row
         for row in rows
         if str(row.get("fact_name") or "") in fact_names
-        and row.get("fact_value") is not None
+        and _has_valid_numeric_value(row.get("fact_value"))
     ]
     if not candidates:
         return None
     return sorted(candidates, key=_row_source_priority)[0]
+
+
+def _has_valid_numeric_value(value: Any) -> bool:
+    if value is None:
+        return False
+    try:
+        return not math.isnan(float(value))
+    except (TypeError, ValueError):
+        return True
 
 
 def _fact_row_from_raw_source(

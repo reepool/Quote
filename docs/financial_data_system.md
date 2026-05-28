@@ -196,7 +196,7 @@ order by name;
 |---|---|
 | `bank` | 已批准银行专项字段包，包含吸收存款、同业存放及其他金融机构存放款项、派生的吸收存款及同业存放、发放贷款及垫款净额、利息收入/支出、手续费及佣金支出、信用减值损失和银行现金流专项项 |
 | `securities` | 已批准证券专项字段包，包含代理买卖证券款、代理承销证券款、卖出回购金融资产款、手续费及佣金净收入、买入返售金融资产、交易性金融资产、一般风险准备、投资收益、公允价值变动收益、利息收支、信用减值损失和证券现金流专项项 |
-| `insurance` | 已批准保险专项字段包，包含预收保费、定期存款、卖出回购金融资产款、退保金、债权投资、买入返售金融资产、交易性金融资产、一般风险准备、投资收益、公允价值变动收益、利息收支、手续费及佣金支出和信用减值损失 |
+| `insurance` | 已批准保险专项字段包，包含预收保费、定期存款、卖出回购金融资产款、退保金、债权投资、其他债权投资、其他权益工具投资、衍生金融资产/负债、交易性金融负债、买入返售金融资产、交易性金融资产、一般风险准备、投资收益、联营/合营投资收益、公允价值变动收益、汇兑损益、资产减值损失、利息收支、手续费及佣金支出和信用减值损失 |
 
 读取层只在显式请求时返回行业字段包。行业字段缺失说明该 profile 的专项覆盖不足或该期源数据未披露，不代表公司通用财务数据不可用。
 
@@ -210,7 +210,7 @@ order by name;
 
 派生合计必须在 `raw_fact.industry_pack_mapping` 中保留组件字段、组件数值和组件来源，不能伪装成原始披露字段。`cash_flow_sheet.deposits_and_funds_net_addition` 属于银行现金流可选专项字段；如果某一报告期源数据未披露或未解析，按 `industry_pack_missing` 处理。
 
-证券与保险字段包当前仍保持保守边界：只纳入样本中能由本地 canonical facts 或 exact raw rows 直接解释的字段；保险合同负债、赔付支出、未到期责任准备金等更细的保险业务字段尚未纳入，后续需要更多样本和明确源字段证据后再追加新 pack version。
+证券与保险字段包当前仍保持保守边界：只纳入样本中能由本地 canonical facts 或 exact raw rows 直接解释且非空的字段。已扫描当前保险样本的 AkShare/THS raw JSON 和 CNInfo data20 摘要行：`insurance_contract_reserve`、`receivable_premium`、`receivable_reinsurance_accounts`、`receivable_reinsurance_contract_reserves`、`reinsurance_accounts_payable`、`premiums_earned`、`surrender_money`、`received_origin_insurance_cash`、`pay_origin_insurance_contract_cash`、`pay_policy_dividends_cash` 等字段在当前已入库 raw JSON 中存在字段名，但样本值为空或 NaN，CNInfo data20 也未提供这些明细，因此不得进入 approved L1.5 pack。后续如果源数据开始稳定返回这些字段，应以新 pack version 追加，并保留多公司、多报告期 evidence。
 
 ### 3.3 字段进入 L1 的条件
 

@@ -53,7 +53,7 @@
   - 当前财务主线已补齐 source manifest、全数值事实长表、hot/cold tier、多期回填/增量 catch-up checkpoint、覆盖缺口检测和仓库级 readiness 验证；`2026-05-06` 已进一步补齐官方响应分类、manifest-to-artifact 候选抽取、XBRL/XML/ZIP parser dispatch、SSE structured JSON parser、parse-failed fallback、parsed-only readiness 语义和 disabled-by-default artifact endpoint 候选配置
   - 当前估值历史已补齐 PE/PB/PS 静态、TTM、forward/MRQ 口径拆分，相对估值已支持显式 metric variants、干净同行统计和排除诊断，scheduler/API readiness gate 已接入；SSE official 已完成 `300` 标的单报告期 dry-run 和 `100x2` 多报告期 dry-run，剩余生产化关键在生产 backfill gate、CNInfo/BSE 结构化 artifact 证据与全量 readiness 复核
   - `2026-05-18` 后续财务源策略调整为三层模型：本地核心层以新浪/同花顺严格语义交集为目标，CNInfo data20 作为官方摘要校验层，东财作为按需远程扩展层；该策略尚未完成代码落地，必须先形成字段映射审计和版本化标准。
-  - `2026-05-27` 新增财务 L1.5 行业专项字段包：通用 L1 common facts 保持不变，银行/证券/保险专项字段通过 `service_layers.industry_pack` 单独暴露；当前 `sina_ths_industry_financial_facts.v1` 已批准银行、证券、保险三类保守字段包。银行存款字段采用“吸收存款 + 同业存放及其他金融机构存放款项 + 派生吸收存款及同业存放”的三字段模型，派生项保留组件 lineage；证券先覆盖代理买卖/承销证券款、卖出回购、手续费佣金净收入、投资/利息/公允价值等字段；保险先覆盖预收保费、定期存款、卖出回购、退保金、债权投资、投资/利息/公允价值等字段。
+  - `2026-05-27` 新增财务 L1.5 行业专项字段包：通用 L1 common facts 保持不变，银行/证券/保险专项字段通过 `service_layers.industry_pack` 单独暴露；当前 `sina_ths_industry_financial_facts.v1` 已批准银行、证券、保险三类保守字段包。银行存款字段采用“吸收存款 + 同业存放及其他金融机构存放款项 + 派生吸收存款及同业存放”的三字段模型，派生项保留组件 lineage；证券覆盖代理买卖/承销证券款、卖出回购、手续费佣金净收入、投资/利息/公允价值等字段；保险在预收保费、定期存款、卖出回购、退保金、债权投资、投资/利息/公允价值字段基础上，继续追加其他债权投资、其他权益工具投资、衍生金融资产/负债、交易性金融负债、联营/合营投资收益、汇兑损益和资产减值损失等稳定非空字段。当前保险合同负债、应收保费、应收/应付分保、保险合同准备金、原保险合同现金流、保单红利等 raw 字段在已入库样本中为空或 NaN，暂不批准进入 L1.5。
 - **财务域不允许把上游 URL、报告期起点、限流、重试、并发、parser version、事实字段 alias、估值假设写死在业务逻辑里**；这些变量必须进入 `config/10_research.json`、scheduler 参数或后续独立 financial config，并在 `ingestion_runs` / source manifest 中留下运行时参数快照。
 - **研究域数据源优先级应固定为“稳定免费 -> 稳定付费 -> 免费不稳定补充”**：
   - `BaoStock` 适合作为 A 股基础主数据、交易日历、复权因子、部分财务指标等稳定免费主源

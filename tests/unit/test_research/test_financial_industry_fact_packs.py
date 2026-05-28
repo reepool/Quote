@@ -44,6 +44,9 @@ def test_securities_and_insurance_industry_packs_are_approved_profile_scoped_pac
     assert "profit_sheet.net_fee_commission_income" in securities_facts
     assert "balance_sheet.advance_premiums" in insurance_facts
     assert "profit_sheet.withdrawal_insurance_money" in insurance_facts
+    assert "balance_sheet.other_debt_investment" in insurance_facts
+    assert "balance_sheet.derivative_financial_liabilities" in insurance_facts
+    assert "profit_sheet.assets_impairment_loss" in insurance_facts
     assert "balance_sheet.agent_trading_security" not in insurance_facts
     assert "balance_sheet.advance_premiums" not in securities_facts
 
@@ -212,6 +215,39 @@ def test_insurance_pack_reads_exact_raw_fields():
                 "fact_value": 11.0,
                 "raw_fact": {},
             },
+            {
+                "instrument_id": "601318.SH",
+                "symbol": "601318",
+                "exchange": "SSE",
+                "report_period": "2026-03-31",
+                "fact_name": "other_debt_investment",
+                "source": "akshare",
+                "source_mode": "direct",
+                "fact_value": 30.0,
+                "raw_fact": {},
+            },
+            {
+                "instrument_id": "601318.SH",
+                "symbol": "601318",
+                "exchange": "SSE",
+                "report_period": "2026-03-31",
+                "fact_name": "derivative_financial_debt",
+                "source": "akshare",
+                "source_mode": "direct",
+                "fact_value": 3.0,
+                "raw_fact": {},
+            },
+            {
+                "instrument_id": "601318.SH",
+                "symbol": "601318",
+                "exchange": "SSE",
+                "report_period": "2026-03-31",
+                "fact_name": "assets_impairment_loss",
+                "source": "akshare",
+                "source_mode": "direct",
+                "fact_value": float("nan"),
+                "raw_fact": {},
+            },
         ],
     )
 
@@ -220,6 +256,12 @@ def test_insurance_pack_reads_exact_raw_fields():
     assert payload["facts"]["balance_sheet.debt_investment"]["fact_value"] == 30.0
     assert payload["facts"]["balance_sheet.advance_premiums"]["fact_value"] == 7.0
     assert payload["facts"]["balance_sheet.time_deposits"]["fact_value"] == 11.0
+    assert payload["facts"]["balance_sheet.other_debt_investment"]["fact_value"] == 30.0
+    assert (
+        payload["facts"]["balance_sheet.derivative_financial_liabilities"]["fact_value"]
+        == 3.0
+    )
+    assert "profit_sheet.assets_impairment_loss" not in payload["facts"]
 
 
 def test_unsupported_profile_reports_policy_status_not_source_missing():
