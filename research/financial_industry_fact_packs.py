@@ -53,12 +53,16 @@ class IndustryFinancialFactPackEntry:
         return asdict(self)
 
 
-def _entry_from_local_core_mapping(canonical_fact: str) -> IndustryFinancialFactPackEntry:
+def _entry_from_local_core_mapping(
+    canonical_fact: str,
+    *,
+    profile: str = "bank",
+) -> IndustryFinancialFactPackEntry:
     mapping: Optional[FinancialSourceFieldMapping] = next(
         (
             item
             for item in get_financial_source_field_mappings(
-                profile="bank",
+                profile=profile,
                 approved_for_core=True,
                 mapping_version=MAPPING_VERSION,
             )
@@ -67,11 +71,13 @@ def _entry_from_local_core_mapping(canonical_fact: str) -> IndustryFinancialFact
         None,
     )
     if mapping is None:
-        raise ValueError(f"Bank industry fact is not backed by an approved mapping: {canonical_fact}")
+        raise ValueError(
+            f"{profile} industry fact is not backed by an approved mapping: {canonical_fact}"
+        )
     return IndustryFinancialFactPackEntry(
         canonical_fact=mapping.canonical_fact,
         statement_family=mapping.statement_family,
-        profile="bank",
+        profile=profile,
         source_mappings={
             "sina_report": mapping.sina_field,
             "ths_report": mapping.ths_metric,
@@ -87,25 +93,29 @@ def _entry_from_local_core_mapping(canonical_fact: str) -> IndustryFinancialFact
     )
 
 
-def _bank_raw_entry(
+def _raw_entry(
     *,
     canonical_fact: str,
-    cninfo_field: str,
+    statement_family: str,
+    profile: str,
+    source_mappings: Dict[str, str],
+    raw_fact_names: tuple[str, ...],
     semantic: str,
+    value_type: str = "point_in_time",
 ) -> IndustryFinancialFactPackEntry:
     return IndustryFinancialFactPackEntry(
         canonical_fact=canonical_fact,
-        statement_family="balance_sheet",
-        profile="bank",
-        source_mappings={"cninfo_data20": cninfo_field},
+        statement_family=statement_family,
+        profile=profile,
+        source_mappings=source_mappings,
         source_unit="CNY",
         canonical_unit="CNY",
-        value_type="point_in_time",
+        value_type=value_type,
         approval_status=PACK_STATUS_APPROVED,
         relationship=RELATIONSHIP_EXACT_EQUIVALENT,
         semantic=semantic,
-        raw_fact_names=(cninfo_field,),
-        evidence=("cninfo_data20_balance_sheet_raw_bank_deposit_fields",),
+        raw_fact_names=raw_fact_names,
+        evidence=("financial_industry_fact_pack_raw_exact_fields.v1",),
     )
 
 
@@ -147,35 +157,172 @@ _BANK_FACTS_V1 = (
 )
 
 _BANK_RAW_AND_DERIVED_FACTS_V1 = (
-    _bank_raw_entry(
+    _raw_entry(
         canonical_fact="balance_sheet.customer_deposits",
-        cninfo_field="吸收存款",
+        statement_family="balance_sheet",
+        profile="bank",
+        source_mappings={"cninfo_data20": "吸收存款"},
+        raw_fact_names=("吸收存款",),
         semantic="bank_customer_deposits",
     ),
-    _bank_raw_entry(
+    _raw_entry(
         canonical_fact="balance_sheet.interbank_deposits",
-        cninfo_field="同业存放及其他金融机构存放款项",
+        statement_family="balance_sheet",
+        profile="bank",
+        source_mappings={"cninfo_data20": "同业存放及其他金融机构存放款项"},
+        raw_fact_names=("同业存放及其他金融机构存放款项",),
         semantic="bank_interbank_and_other_financial_institution_deposits",
     ),
     _bank_deposit_total_entry(),
+)
+
+_SECURITIES_LOCAL_CORE_FACTS_V1 = (
+    "balance_sheet.general_risk_preparation",
+    "balance_sheet.repurchase_financial_assets",
+    "balance_sheet.trade_financial_assets",
+    "cash_flow_sheet.pay_interest_fee_and_commission_cash",
+    "cash_flow_sheet.receive_interest_fee_and_commission_cash",
+    "profit_sheet.benefit_credit_impairment_loss",
+    "profit_sheet.charges_commissions_expenses",
+    "profit_sheet.fair_changes_income",
+    "profit_sheet.interest_expenses",
+    "profit_sheet.interest_income",
+    "profit_sheet.invest_income",
+)
+
+_SECURITIES_RAW_FACTS_V1 = (
+    _raw_entry(
+        canonical_fact="balance_sheet.agent_trading_security",
+        statement_family="balance_sheet",
+        profile="securities",
+        source_mappings={
+            "ths_report": "agent_trading_security",
+            "cninfo_data20": "代理买卖证券款",
+        },
+        raw_fact_names=("agent_trading_security", "代理买卖证券款"),
+        semantic="securities_customer_brokerage_funds",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.agent_underwriting_security",
+        statement_family="balance_sheet",
+        profile="securities",
+        source_mappings={"ths_report": "agent_underwriting_security"},
+        raw_fact_names=("agent_underwriting_security",),
+        semantic="securities_underwriting_funds",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.sale_repurchase_financial_assets",
+        statement_family="balance_sheet",
+        profile="securities",
+        source_mappings={
+            "ths_report": "sale_repurchase_financial_assets",
+            "cninfo_data20": "卖出回购金融资产款",
+        },
+        raw_fact_names=("sale_repurchase_financial_assets", "卖出回购金融资产款"),
+        semantic="securities_sale_repurchase_financial_assets",
+    ),
+    _raw_entry(
+        canonical_fact="profit_sheet.net_fee_commission_income",
+        statement_family="income_statement",
+        profile="securities",
+        source_mappings={"cninfo_data20": "手续费及佣金净收入"},
+        raw_fact_names=("手续费及佣金净收入",),
+        semantic="securities_net_fee_and_commission_income",
+        value_type="period_reported_value",
+    ),
+    _raw_entry(
+        canonical_fact="cash_flow_sheet.repurchase_funds_net_addition",
+        statement_family="cash_flow",
+        profile="securities",
+        source_mappings={"ths_report": "repurchase_funds_net_addition"},
+        raw_fact_names=("repurchase_funds_net_addition",),
+        semantic="securities_net_cash_increase_from_repurchase_business",
+        value_type="period_reported_value",
+    ),
+)
+
+_INSURANCE_LOCAL_CORE_FACTS_V1 = (
+    "balance_sheet.debt_investment",
+    "balance_sheet.general_risk_preparation",
+    "balance_sheet.repurchase_financial_assets",
+    "balance_sheet.trade_financial_assets",
+    "cash_flow_sheet.pay_interest_fee_and_commission_cash",
+    "cash_flow_sheet.receive_interest_fee_and_commission_cash",
+    "profit_sheet.benefit_credit_impairment_loss",
+    "profit_sheet.charges_commissions_expenses",
+    "profit_sheet.fair_changes_income",
+    "profit_sheet.interest_expenses",
+    "profit_sheet.interest_income",
+    "profit_sheet.invest_income",
+)
+
+_INSURANCE_RAW_FACTS_V1 = (
+    _raw_entry(
+        canonical_fact="balance_sheet.advance_premiums",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"cninfo_data20": "预收保费"},
+        raw_fact_names=("预收保费",),
+        semantic="insurance_advance_premiums",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.time_deposits",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={"cninfo_data20": "定期存款"},
+        raw_fact_names=("定期存款",),
+        semantic="insurance_time_deposits",
+    ),
+    _raw_entry(
+        canonical_fact="balance_sheet.sale_repurchase_financial_assets",
+        statement_family="balance_sheet",
+        profile="insurance",
+        source_mappings={
+            "ths_report": "sale_repurchase_financial_assets",
+            "cninfo_data20": "卖出回购金融资产款",
+        },
+        raw_fact_names=("sale_repurchase_financial_assets", "卖出回购金融资产款"),
+        semantic="insurance_sale_repurchase_financial_assets",
+    ),
+    _raw_entry(
+        canonical_fact="profit_sheet.withdrawal_insurance_money",
+        statement_family="income_statement",
+        profile="insurance",
+        source_mappings={"ths_report": "withdrawal_insurance_money"},
+        raw_fact_names=("withdrawal_insurance_money",),
+        semantic="insurance_surrender_benefit_or_withdrawal_payment",
+        value_type="period_reported_value",
+    ),
 )
 
 _PACKS_BY_VERSION: Dict[str, Dict[str, tuple[IndustryFinancialFactPackEntry, ...]]] = {
     INDUSTRY_FACT_PACK_VERSION: {
         "bank": (
             *_BANK_RAW_AND_DERIVED_FACTS_V1,
-            *(tuple(_entry_from_local_core_mapping(fact) for fact in _BANK_FACTS_V1)),
+            *(tuple(_entry_from_local_core_mapping(fact, profile="bank") for fact in _BANK_FACTS_V1)),
         ),
-        "securities": tuple(),
-        "insurance": tuple(),
+        "securities": (
+            *_SECURITIES_RAW_FACTS_V1,
+            *(tuple(
+                _entry_from_local_core_mapping(fact, profile="securities")
+                for fact in _SECURITIES_LOCAL_CORE_FACTS_V1
+            )),
+        ),
+        "insurance": (
+            *_INSURANCE_RAW_FACTS_V1,
+            *(tuple(
+                _entry_from_local_core_mapping(fact, profile="insurance")
+                for fact in _INSURANCE_LOCAL_CORE_FACTS_V1
+            )),
+        ),
     }
 }
 
 _PROFILE_STATUS_BY_VERSION: Dict[str, Dict[str, str]] = {
     INDUSTRY_FACT_PACK_VERSION: {
         "bank": PACK_STATUS_APPROVED,
-        "securities": PACK_STATUS_NOT_YET_APPROVED,
-        "insurance": PACK_STATUS_NOT_YET_APPROVED,
+        "securities": PACK_STATUS_APPROVED,
+        "insurance": PACK_STATUS_APPROVED,
     }
 }
 

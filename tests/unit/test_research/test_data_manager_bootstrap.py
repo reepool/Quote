@@ -1871,7 +1871,7 @@ def test_data_manager_get_research_financial_statements_exposes_bank_industry_pa
     )
 
 
-def test_data_manager_get_research_financial_statements_does_not_query_placeholder_pack(tmp_path):
+def test_data_manager_get_research_financial_statements_exposes_securities_industry_pack(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
         "financial_statements": {"enabled": True},
@@ -1900,7 +1900,33 @@ def test_data_manager_get_research_financial_statements_does_not_query_placehold
         "exchange": "SSE",
         "report_period": "2026-03-31",
     }
-    storage.get_financial_numeric_facts.return_value = []
+    storage.get_financial_local_core_facts.return_value = {
+        "instrument_id": "600030.SH",
+        "report_period": "2026-03-31",
+        "profile": "securities",
+        "mapping_version": MAPPING_VERSION,
+        "facts": {
+            "balance_sheet.trade_financial_assets": {
+                "fact_value": 20.0,
+                "canonical_fact_name": "balance_sheet.trade_financial_assets",
+            },
+        },
+        "missing_fields": [],
+        "ready": False,
+    }
+    storage.get_financial_numeric_facts.return_value = [
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+            "fact_name": "代理买卖证券款",
+            "source": "cninfo",
+            "source_mode": "direct",
+            "fact_value": 100.0,
+            "raw_fact": {},
+        }
+    ]
     manager.research_storage = storage
 
     result = _run(
@@ -1913,9 +1939,13 @@ def test_data_manager_get_research_financial_statements_does_not_query_placehold
     )
 
     industry_pack = result["service_layers"]["industry_pack"]
-    assert industry_pack["profile_pack_status"]["status"] == "not_yet_approved"
-    assert industry_pack["missing_fields"][0]["reason"] == "industry_pack_not_yet_approved"
-    storage.get_financial_local_core_facts.assert_not_called()
+    assert industry_pack["profile_pack_status"]["status"] == "approved"
+    assert industry_pack["facts"]["balance_sheet.trade_financial_assets"]["fact_value"] == 20.0
+    assert industry_pack["facts"]["balance_sheet.agent_trading_security"]["fact_value"] == 100.0
+    _, kwargs = storage.get_financial_local_core_facts.call_args
+    assert kwargs["profile"] == "securities"
+    assert "balance_sheet.trade_financial_assets" in kwargs["requested_canonical_facts"]
+    assert "balance_sheet.agent_trading_security" not in kwargs["requested_canonical_facts"]
 
 
 def test_data_manager_get_research_financial_statements_remote_extension_disabled_by_config(tmp_path):
