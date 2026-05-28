@@ -4475,6 +4475,7 @@ class DataManager:
                     requested_canonical_facts=requested or None,
                     profile=resolved_profile,
                     mapping_version=resolved_mapping_version,
+                    include_history=True,
                 )
                 local_core_payload["profile_resolution"] = profile_resolution
                 local_core_payload["status"] = (
@@ -4524,11 +4525,13 @@ class DataManager:
                         requested_canonical_facts=industry_requested_facts,
                         profile=resolved_profile,
                         mapping_version=resolved_mapping_version,
+                        include_history=True,
                     )
                 industry_numeric_rows = await asyncio.to_thread(
                     storage.get_financial_numeric_facts,
                     instrument_id,
                     report_period=report_period,
+                    include_history=True,
                 )
                 industry_payload = build_industry_pack_payload(
                     instrument_id=instrument_id,

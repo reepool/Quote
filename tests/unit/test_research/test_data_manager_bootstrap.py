@@ -1691,6 +1691,7 @@ def test_data_manager_get_research_financial_statements_includes_local_core_laye
         requested_canonical_facts=["revenue"],
         profile="nonbank",
         mapping_version="sina_ths_core_financial_facts.v1",
+        include_history=True,
     )
 
 
@@ -1764,6 +1765,7 @@ def test_data_manager_get_research_financial_statements_auto_resolves_local_core
         requested_canonical_facts=["equity_parent"],
         profile="securities",
         mapping_version=MAPPING_VERSION,
+        include_history=True,
     )
 
 
@@ -1868,6 +1870,7 @@ def test_data_manager_get_research_financial_statements_exposes_bank_industry_pa
     storage.get_financial_numeric_facts.assert_called_once_with(
         "600000.SH",
         report_period="2026-03-31",
+        include_history=True,
     )
 
 
