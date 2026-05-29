@@ -906,14 +906,14 @@
       },
       "valuation_input_sync": {
         "enabled": false,
-        "description": "研究域估值输入股本/市值同步",
+        "description": "研究域估值输入股本/市值日更同步（暂不自动启用）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
           "day_of_week": "mon-fri",
-          "hour": 18,
-          "minute": 10,
+          "hour": 19,
+          "minute": 20,
           "second": 0
         },
         "max_instances": 1,
@@ -925,11 +925,41 @@
             "SZSE",
             "BSE"
           ],
-          "limit_per_exchange": 50,
+          "limit_per_exchange": null,
           "source": "cninfo",
           "source_mode": "direct",
           "sync_mode": "incremental",
           "max_runtime_seconds": 7200
+        }
+      },
+      "valuation_input_full_backfill": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "研究域估值输入股本/市值全量历史回填（仅手动启动）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 8,
+          "minute": 15,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "source": "cninfo",
+          "source_mode": "direct",
+          "start_date": "1990-01-01",
+          "end_date": null,
+          "max_runtime_seconds": 172800
         }
       },
       "technical_snapshot_refresh": {

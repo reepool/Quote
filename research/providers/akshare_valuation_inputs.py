@@ -123,7 +123,20 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
     ) -> List[ValuationInputSnapshot]:
         frame = self._fetch_all_market_frame(akshare, mode)
         if frame.empty:
+            _logger.warning(
+                "[ValuationInputs] CNInfo latest all-market frame is empty: exchange=%s mode=%s instruments=%s",
+                exchange,
+                mode,
+                len(instruments),
+            )
             return []
+        _logger.info(
+            "[ValuationInputs] CNInfo latest all-market frame loaded: exchange=%s mode=%s raw_rows=%s instruments=%s",
+            exchange,
+            mode,
+            len(frame),
+            len(instruments),
+        )
         by_code: Dict[str, Dict[str, Any]] = {}
         for _, row in frame.iterrows():
             row_dict = row.to_dict()
@@ -149,6 +162,12 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
             )
             if snapshot is not None:
                 snapshots.append(snapshot)
+        _logger.info(
+            "[ValuationInputs] CNInfo latest snapshots prepared: exchange=%s requested=%s snapshots=%s",
+            exchange,
+            len(instruments),
+            len(snapshots),
+        )
         return snapshots
 
     def _fetch_history_snapshots(
@@ -167,6 +186,16 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
             code = self._instrument_code(instrument)
             if not code:
                 continue
+            if index == 1 or index % 100 == 0 or index == len(instruments):
+                _logger.info(
+                    "[ValuationInputs] CNInfo history fetch progress: exchange=%s index=%s/%s instrument_id=%s symbol=%s snapshots=%s",
+                    exchange,
+                    index,
+                    len(instruments),
+                    instrument.get("instrument_id"),
+                    code,
+                    len(snapshots),
+                )
             try:
                 frame = self._call_with_retry(
                     akshare.stock_share_change_cninfo,
@@ -199,6 +228,14 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
                 )
                 if snapshot is not None:
                     snapshots.append(snapshot)
+        _logger.info(
+            "[ValuationInputs] CNInfo history snapshots prepared: exchange=%s requested=%s snapshots=%s start=%s end=%s",
+            exchange,
+            len(instruments),
+            len(snapshots),
+            start_key,
+            end_key,
+        )
         return snapshots
 
     def _fetch_all_market_frame(self, akshare: Any, mode: str) -> pd.DataFrame:
@@ -208,6 +245,11 @@ class AkshareCninfoValuationInputProvider(BaseValuationInputProvider):
         frame = self._call_with_retry(akshare.stock_hold_change_cninfo, symbol="全部")
         if frame is None:
             frame = pd.DataFrame()
+        _logger.info(
+            "[ValuationInputs] CNInfo all-market snapshot fetched: mode=%s rows=%s",
+            mode,
+            len(frame),
+        )
         self._all_market_frame_cache[mode] = frame
         return frame
 

@@ -343,6 +343,10 @@ API 补齐原则：
   - runner 生命周期现已改为优先使用 `DataManager.initialize(include_data_sources=false, load_progress=false)`，只初始化 research 存储和数据库，不再为只读复核拉起整套行情源
   - `--skip-sync` 模式只做 readiness 快速读链路复核；正式 rollout 前仍必须用 bounded rebuild 检查 `data/valuation.db.valuation_inputs` 与 `valuation_history` 的实表结果
   - `2026-05-29` bounded 样本验证已覆盖 SSE/SZSE/BSE：`600000.SH / 001233.SZ / 920009.BJ` 输入同步 `3/3`，估值历史重建写入 `55` 行，其中 SSE `39`、SZSE `4`、BSE `12`
+  - `2026-05-29` 样本股本复核：上述三只样本的落库股本与 CNInfo/AkShare live read-only 返回一致，源值按 `10k_share * 10000` 转为股；`001233.SZ` 与 `920009.BJ` 的流通股本加限售股本可回到总股本，`600000.SH` 当期无单列限售股本
+  - `2026-05-29` 只读耗时采样：日更全市场快照覆盖 `5525` 个当前活跃 A 股标的约 `3s`，生产含 upsert 与重试按 `1-5min` 规划；全量历史回填按当前 `0.2s` 请求间隔和样本返回量估算约 `2-6h`，保守任务超时配置为 `48h`
+  - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
+  - scheduler 已预留两个入口：`valuation_input_sync` 为每日 `19:20` 禁用任务；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务，用于正式全量回填前准备
 
 ### 4.7 当前项目级 Source Policy
 

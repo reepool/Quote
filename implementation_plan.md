@@ -84,6 +84,10 @@
   - `DCF`、敏感性分析、同行对比等保留实时计算或 bounded aggregate cache，不落全量 `subject x peer x date` 相对估值矩阵
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，生产启用仍需全市场覆盖率、财务 readiness 与 strict Shenwan blocker 通过
+  - `2026-05-29` 股本样本复核：`600000.SH / 001233.SZ / 920009.BJ` 在 `valuation.db.valuation_inputs` 中的 `shares_outstanding / float_shares` 与 CNInfo/AkShare live read-only 返回一致；源单位为 `10k_share`，落库前按 `10000` 转换为股，`as_of_date` 保留股本生效日，`data_as_of` 保留公告日
+  - 日更只读采样：一次 CNInfo 全市场快照覆盖 `SSE 2315 / SZSE 2893 / BSE 317` 个当前活跃 A 股标的，接口与本地匹配耗时约 `3s`；考虑 DB upsert、日志、网络波动和重试，生产日更预计通常在 `1-5min` 内完成，配置上限保守设为 `7200s`
+  - 全量历史回填只读采样：`3` 个样本标的返回 `257` 条股本变动记录，耗时约 `1.2s`；全市场约 `5525` 个当前活跃标的按 `0.2s` 请求间隔估算，纯请求下限约 `18-25min`，考虑限流、重试、空返回和写库后建议按 `2-6h` 规划，配置上限保守设为 `48h`
+  - `valuation_inputs` 属于低频事件表：按当前样本每标的几十到百余条历史变动记录估算，全市场全量约 `30-70万` 行；按每行含 JSON lineage 与索引 `0.8-2KB` 估算，存储量约 `0.3-1.5GiB`，显著小于日频 `valuation_history`
 - **部署策略建议 Phase 1 采用“服务集成、存储隔离”**：
   - 复用现有 Quote System 的代码仓、调度器、API、监控和 Telegram 运维能力
   - 研究域模块、表、路由和任务要独立命名与隔离
@@ -1573,7 +1577,8 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
-| `valuation_input_sync` | 每日收盘后，估值历史重建前 | 同步 CNInfo/AkShare 股本输入；日更走全市场快照，全量回填走单标的股本变动历史，写入 `valuation.db.valuation_inputs` |
+| `valuation_input_sync` | 每日 `19:20`，暂不自动启用 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；当前保持 `enabled=false`，等待全量回填和 readiness 复核 |
+| `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
 | `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |

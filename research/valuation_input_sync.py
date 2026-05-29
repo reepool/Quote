@@ -4,6 +4,8 @@ Valuation input synchronization service.
 
 from __future__ import annotations
 
+import logging
+import time
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
 
@@ -11,6 +13,9 @@ from research.providers.base import BaseValuationInputProvider
 from research.providers.registry import ValuationInputProviderRegistry
 from research.storage import ResearchStorageManager
 from utils.config_manager import ResearchConfig, config_manager
+
+
+_logger = logging.getLogger("DataManager")
 
 
 @dataclass(frozen=True)
@@ -68,6 +73,12 @@ class ValuationInputSyncService:
         selected_mode = source_mode or str(input_cfg.get("source_mode", "direct"))
         provider = self.provider or self.provider_registry.get(selected_source)
         if provider is None:
+            _logger.warning(
+                "[ValuationInputs] Provider unavailable: source=%s mode=%s sync_mode=%s",
+                selected_source,
+                selected_mode,
+                sync_mode,
+            )
             return {
                 "status": "unavailable",
                 "reason": f"valuation input provider not found: {selected_source}",
@@ -76,6 +87,12 @@ class ValuationInputSyncService:
                 "sync_mode": sync_mode,
             }
         if not provider.supports_mode(selected_mode):
+            _logger.warning(
+                "[ValuationInputs] Provider mode unsupported: source=%s mode=%s sync_mode=%s",
+                selected_source,
+                selected_mode,
+                sync_mode,
+            )
             return {
                 "status": "unavailable",
                 "reason": (
@@ -88,6 +105,19 @@ class ValuationInputSyncService:
             }
 
         target_exchanges = exchanges or self.research_config.markets
+        started_at = time.perf_counter()
+        _logger.info(
+            "[ValuationInputs] Sync started: exchanges=%s source=%s source_mode=%s "
+            "sync_mode=%s limit_per_exchange=%s target_count=%s start_date=%s end_date=%s",
+            target_exchanges,
+            selected_source,
+            selected_mode,
+            sync_mode,
+            limit_per_exchange,
+            len(target_instrument_ids or []),
+            start_date,
+            end_date,
+        )
         results: List[ValuationInputExchangeSyncResult] = []
         for exchange in target_exchanges:
             results.append(
@@ -106,6 +136,18 @@ class ValuationInputSyncService:
 
         successful = sum(1 for item in results if item.status == "success")
         written = sum(item.snapshots_written for item in results)
+        elapsed = time.perf_counter() - started_at
+        _logger.info(
+            "[ValuationInputs] Sync finished: status=%s successful_exchanges=%s/%s "
+            "snapshots_written=%s covered=%s missing=%s elapsed=%.1fs",
+            "success" if successful else "degraded",
+            successful,
+            len(results),
+            written,
+            sum(item.covered_instruments for item in results),
+            sum(item.missing_instruments for item in results),
+            elapsed,
+        )
         return {
             "status": "success" if successful else "degraded",
             "source": selected_source,
@@ -154,6 +196,11 @@ class ValuationInputSyncService:
         if limit_per_exchange is not None:
             stock_instruments = stock_instruments[:limit_per_exchange]
         if not stock_instruments:
+            _logger.info(
+                "[ValuationInputs] Exchange skipped: exchange=%s sync_mode=%s reason=no_active_stock",
+                exchange,
+                sync_mode,
+            )
             return ValuationInputExchangeSyncResult(
                 exchange=exchange,
                 status="skipped",
@@ -178,6 +225,18 @@ class ValuationInputSyncService:
             },
         )
         snapshots_written = 0
+        exchange_started_at = time.perf_counter()
+        _logger.info(
+            "[ValuationInputs] Exchange sync started: exchange=%s instruments=%s "
+            "source=%s source_mode=%s sync_mode=%s start_date=%s end_date=%s",
+            exchange,
+            len(stock_instruments),
+            source,
+            source_mode,
+            sync_mode,
+            start_date,
+            end_date,
+        )
         try:
             snapshots = await provider.fetch_valuation_inputs(
                 instruments=stock_instruments,
@@ -205,6 +264,18 @@ class ValuationInputSyncService:
 
             missing_ids = sorted(target_ids - covered_ids)
             status = "success" if snapshots_written > 0 else "degraded"
+            elapsed = time.perf_counter() - exchange_started_at
+            _logger.info(
+                "[ValuationInputs] Exchange sync finished: exchange=%s status=%s "
+                "requested=%s covered=%s missing=%s snapshots_written=%s elapsed=%.1fs",
+                exchange,
+                status,
+                len(stock_instruments),
+                len(covered_ids),
+                len(missing_ids),
+                snapshots_written,
+                elapsed,
+            )
             self.storage.finish_ingestion_run(
                 run_id,
                 status=status,
@@ -218,6 +289,7 @@ class ValuationInputSyncService:
                     "covered_instruments": len(covered_ids),
                     "missing_instrument_ids": missing_ids[:50],
                     "valuation_db_path": self.storage.valuation_db_path,
+                    "elapsed_seconds": round(elapsed, 3),
                 },
             )
             return ValuationInputExchangeSyncResult(
@@ -233,6 +305,16 @@ class ValuationInputSyncService:
                 missing_instrument_ids=missing_ids[:20],
             )
         except Exception as exc:
+            elapsed = time.perf_counter() - exchange_started_at
+            _logger.exception(
+                "[ValuationInputs] Exchange sync failed: exchange=%s requested=%s "
+                "snapshots_written=%s elapsed=%.1fs error=%s",
+                exchange,
+                len(stock_instruments),
+                snapshots_written,
+                elapsed,
+                exc,
+            )
             self.storage.finish_ingestion_run(
                 run_id,
                 status="failed",
