@@ -14,6 +14,7 @@ from .akshare_official_shenwan_history import AkshareOfficialShenwanHistoryProvi
 from .akshare_shareholders import AkshareShareholdersProvider
 from .akshare_shenwan_industry import AkshareShenwanIndustryProvider
 from .akshare_swsresearch_index_analysis import AkshareSWSResearchIndexAnalysisProvider
+from .akshare_valuation_inputs import AkshareCninfoValuationInputProvider
 from .baostock_company_profile import BaostockCompanyProfileProvider
 from .baostock_financial_summary import BaostockFinancialSummaryProvider
 from .baostock_industry import BaostockIndustryProvider
@@ -39,6 +40,7 @@ from .base import (
     BaseResearchReportProvider,
     BaseShareholderProvider,
     BaseSentimentEventProvider,
+    BaseValuationInputProvider,
 )
 from .pytdx_company_profile import PytdxCompanyProfileProvider
 from .pytdx_financial_summary import PytdxFinancialSummaryProvider
@@ -209,6 +211,35 @@ class ResearchReportProviderRegistry:
         }
 
     def get(self, source_name: str) -> Optional[BaseResearchReportProvider]:
+        return self._providers.get(source_name)
+
+
+class ValuationInputProviderRegistry:
+    """Registry for valuation market-cap/share-count input providers."""
+
+    def __init__(
+        self,
+        providers: Optional[Dict[str, BaseValuationInputProvider]] = None,
+        research_config: Optional[ResearchConfig] = None,
+    ):
+        research_config = research_config or config_manager.get_research_config()
+        cninfo_cfg = {
+            key: value
+            for key, value in research_config.sources.get("cninfo", {})
+            .get("valuation_inputs", {})
+            .items()
+            if key
+            in {
+                "request_interval_seconds",
+                "retry_attempts",
+                "retry_backoff_seconds",
+            }
+        }
+        self._providers = providers if providers is not None else {
+            "cninfo": AkshareCninfoValuationInputProvider(**cninfo_cfg),
+        }
+
+    def get(self, source_name: str) -> Optional[BaseValuationInputProvider]:
         return self._providers.get(source_name)
 
 

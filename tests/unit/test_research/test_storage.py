@@ -29,6 +29,7 @@ from research.providers.base import (
     SentimentEventSnapshot,
     TechnicalIndicatorLatestSnapshot,
     ValuationHistorySnapshot,
+    ValuationInputSnapshot,
 )
 from utils.config_manager import (
     ResearchBudgetConfig,
@@ -52,6 +53,7 @@ def _build_storage_manager(tmp_path, *, attach_quotes_db: bool = False):
             quotes_db_path=str(quotes_db_path),
             quotes_db_alias="quotes",
             financials_db_path=str(research_db_path),
+            valuation_db_path=str(tmp_path / "valuation.db"),
         ),
         budget=ResearchBudgetConfig(),
     )
@@ -91,7 +93,7 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "financial_indicator_snapshots" in tables
     assert "financial_indicator_snapshots_hot" in tables
     assert "financial_indicator_snapshots_history" in tables
-    assert "valuation_history" in tables
+    assert "valuation_history" not in tables
     assert "analyst_forecasts" in tables
     assert "research_reports" in tables
     assert "sentiment_events" in tables
@@ -104,6 +106,16 @@ def test_initialize_creates_phase_zero_tables(tmp_path):
     assert "industry_source_files" in tables
     assert "industry_classification_history" in tables
     assert "industry_memberships" in tables
+
+    with sqlite3.connect(storage.valuation_db_path) as conn:
+        valuation_tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    assert "valuation_inputs" in valuation_tables
+    assert "valuation_history" in valuation_tables
 
 
 def test_financial_disclosure_pending_deadline_is_not_extended(tmp_path):
@@ -2249,7 +2261,7 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
         ingestion_run_id=run_id,
     )
 
-    with sqlite3.connect(research_db_path) as conn:
+    with sqlite3.connect(storage.valuation_db_path) as conn:
         valuation_count = conn.execute(
             "SELECT COUNT(*) FROM valuation_history"
         ).fetchone()[0]
@@ -2308,6 +2320,70 @@ def test_upsert_valuation_history_and_query_peer_rows(tmp_path):
     assert valuation_summary["calc_version_counts"] == {"valuation_history.v1": 2}
     assert valuation_summary["latest_as_of_date"] == "2026-04-18"
     assert valuation_by_exchange == {"SSE": 1, "SZSE": 1}
+
+
+def test_upsert_valuation_input_uses_valuation_database_and_rejects_amount_units(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+
+    storage.upsert_valuation_input(
+        ValuationInputSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-18",
+            market_cap=2000.0,
+            shares_outstanding=100.0,
+            source="manual",
+            source_mode="local",
+            input_kind="market_cap_and_share_count",
+            unit="share",
+            diagnostics_json={"unit_policy": "explicit_share_unit"},
+        )
+    )
+
+    with sqlite3.connect(research_db_path) as conn:
+        research_tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    assert "valuation_inputs" not in research_tables
+
+    latest = storage.get_latest_valuation_input(
+        "600519.SH",
+        as_of_date="2026-04-20",
+    )
+    assert latest is not None
+    assert latest["market_cap"] == 2000.0
+    assert latest["shares_outstanding"] == 100.0
+    assert latest["diagnostics"]["unit_policy"] == "explicit_share_unit"
+
+    coverage = storage.summarize_valuation_input_coverage()
+    assert coverage["instrument_count"] == 1
+    assert coverage["market_cap_count"] == 1
+    assert coverage["shares_outstanding_count"] == 1
+    assert coverage["usable_input_count"] == 1
+
+    try:
+        storage.upsert_valuation_input(
+            ValuationInputSnapshot(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                exchange="SZSE",
+                as_of_date="2026-04-18",
+                shares_outstanding=1000000.0,
+                source="financial_numeric_fact",
+                source_mode="local",
+                input_kind="share_capital_amount",
+                unit="CNY",
+            )
+        )
+    except ValueError as exc:
+        assert "explicit share unit" in str(exc)
+    else:
+        raise AssertionError("amount-denominated share-count input should be rejected")
 
 
 def test_upsert_analyst_forecast_writes_snapshot(tmp_path):

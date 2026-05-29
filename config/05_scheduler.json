@@ -904,6 +904,34 @@
           "max_runtime_seconds": 10800
         }
       },
+      "valuation_input_sync": {
+        "enabled": false,
+        "description": "研究域估值输入股本/市值同步",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 18,
+          "minute": 10,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": 50,
+          "source": "cninfo",
+          "source_mode": "direct",
+          "sync_mode": "incremental",
+          "max_runtime_seconds": 7200
+        }
+      },
       "technical_snapshot_refresh": {
         "enabled": false,
         "description": "研究域技术指标最新快照刷新",

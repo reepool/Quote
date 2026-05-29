@@ -411,6 +411,19 @@
           "require_availability_date": true,
           "forward_metrics_enabled": false
         },
+        "input_sync": {
+          "primary_source": "cninfo",
+          "source_mode": "direct",
+          "daily_sync_mode": "incremental",
+          "full_sync_mode": "full",
+          "availability_policy": "use_announcement_date_for_lineage_and_effective_date_for_capital_series",
+          "unit_conversion": {
+            "source_unit": "10k_share",
+            "canonical_unit": "share",
+            "multiplier": 10000.0
+          },
+          "note": "valuation_inputs is populated before valuation_history_rebuild. Daily sync uses CNInfo all-market capital snapshot; full backfill fetches per-symbol CNInfo capital-change events. Values are stored in data/valuation.db and reads never fetch remote sources synchronously."
+        },
         "metrics": {
           "enabled_variants": [
             "pe_static",
@@ -485,6 +498,7 @@
       "quotes_db_path": "data/quotes.db",
       "quotes_db_alias": "quotes",
       "financials_db_path": "data/financials.db",
+      "valuation_db_path": "data/valuation.db",
       "filings_archive_root": "data/filings/financial_statements"
     },
     "budget": {
@@ -901,6 +915,12 @@
           "retry_attempts": 3,
           "retry_backoff_seconds": 1.0,
           "note": "Uses CNInfo official data20 stockholderCapital structured endpoints for top-10 shareholders. Handles HTTP 200 logical rate-limit responses such as resultCode=429 with bounded backoff retries."
+        },
+        "valuation_inputs": {
+          "request_interval_seconds": 0.2,
+          "retry_attempts": 2,
+          "retry_backoff_seconds": 0.5,
+          "note": "Uses AkShare CNInfo wrappers: stock_hold_change_cninfo(symbol='全部') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
         },
         "announcement_scan": {
           "request_timeout_seconds": 20.0,
@@ -1363,8 +1383,8 @@
           }
         ]
       },
-      "financial_statements": {
-        "free_chain": [
+            "financial_statements": {
+                "free_chain": [
           {
             "source": "sse",
             "mode": "direct"
@@ -1389,10 +1409,20 @@
             "source": "akshare",
             "mode": "direct"
           }
-        ]
-      },
-      "analyst_forecasts": {
-        "free_chain": [],
+                ]
+            },
+            "valuation_inputs": {
+                "free_chain": [
+                    {
+                        "source": "cninfo",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [],
+                "fallback_chain": []
+            },
+            "analyst_forecasts": {
+                "free_chain": [],
         "paid_chain": [
           {
             "source": "akshare",

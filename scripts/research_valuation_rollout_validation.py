@@ -25,6 +25,13 @@ def _parse_exchanges(raw: Optional[str]) -> Optional[List[str]]:
     return exchanges or None
 
 
+def _parse_csv(raw: Optional[str]) -> Optional[List[str]]:
+    if raw is None:
+        return None
+    values = [part.strip() for part in raw.split(",") if part.strip()]
+    return values or None
+
+
 def _json_ready(value: Any) -> Any:
     if isinstance(value, (datetime, date)):
         return value.isoformat()
@@ -40,9 +47,24 @@ async def run_rollout_validation(
     *,
     exchanges: Optional[List[str]] = None,
     limit_per_exchange: Optional[int] = None,
+    target_instrument_ids: Optional[List[str]] = None,
+    sync_inputs: bool = False,
+    input_sync_mode: str = "incremental",
     skip_sync: bool = False,
+    allow_disabled_module: bool = False,
 ) -> Dict[str, Any]:
     """Run valuation_history rebuild -> readiness and return a structured summary."""
+    input_sync_result: Dict[str, Any]
+    if sync_inputs:
+        input_sync_result = await manager.run_valuation_input_sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            target_instrument_ids=target_instrument_ids,
+            sync_mode=input_sync_mode,
+        )
+    else:
+        input_sync_result = {"status": "skipped", "reason": "sync_inputs=false"}
+
     sync_result: Dict[str, Any]
     if skip_sync:
         sync_result = {"status": "skipped", "reason": "skip_sync=true"}
@@ -50,6 +72,8 @@ async def run_rollout_validation(
         sync_result = await manager.run_valuation_history_rebuild(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
+            target_instrument_ids=target_instrument_ids,
+            allow_disabled_module=allow_disabled_module,
         )
 
     readiness = await manager.get_research_valuation_readiness()
@@ -60,8 +84,13 @@ async def run_rollout_validation(
         "requested": {
             "exchanges": exchanges,
             "limit_per_exchange": limit_per_exchange,
+            "target_instrument_ids": target_instrument_ids,
+            "sync_inputs": sync_inputs,
+            "input_sync_mode": input_sync_mode,
             "skip_sync": skip_sync,
+            "allow_disabled_module": allow_disabled_module,
         },
+        "input_sync": input_sync_result,
         "sync": sync_result,
         "readiness": readiness,
         "summary": {
@@ -83,7 +112,11 @@ async def run_rollout_validation_with_lifecycle(
     *,
     exchanges: Optional[List[str]] = None,
     limit_per_exchange: Optional[int] = None,
+    target_instrument_ids: Optional[List[str]] = None,
+    sync_inputs: bool = False,
+    input_sync_mode: str = "incremental",
     skip_sync: bool = False,
+    allow_disabled_module: bool = False,
 ) -> Dict[str, Any]:
     """Initialize manager, run validation, and always close resources."""
     await _initialize_manager(manager)
@@ -92,7 +125,11 @@ async def run_rollout_validation_with_lifecycle(
             manager,
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
+            target_instrument_ids=target_instrument_ids,
+            sync_inputs=sync_inputs,
+            input_sync_mode=input_sync_mode,
             skip_sync=skip_sync,
+            allow_disabled_module=allow_disabled_module,
         )
     finally:
         close = getattr(manager, "close", None)
@@ -151,9 +188,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional per-exchange instrument limit for valuation_history_rebuild.",
     )
     parser.add_argument(
+        "--target-instrument-ids",
+        help="Comma-separated instrument IDs for bounded validation, for example 600000.SH,001233.SZ,920003.BJ.",
+    )
+    parser.add_argument(
+        "--sync-inputs",
+        action="store_true",
+        help="Run valuation_input_sync before valuation_history_rebuild.",
+    )
+    parser.add_argument(
+        "--input-sync-mode",
+        default="incremental",
+        choices=["incremental", "full", "history", "backfill"],
+        help="Input sync mode when --sync-inputs is used.",
+    )
+    parser.add_argument(
         "--skip-sync",
         action="store_true",
         help="Skip valuation_history_rebuild and only query readiness.",
+    )
+    parser.add_argument(
+        "--allow-disabled-module",
+        action="store_true",
+        help="Allow bounded validation rebuild while valuation.enabled remains false.",
     )
     parser.add_argument(
         "--fail-on-not-ready",
@@ -170,7 +227,11 @@ async def _async_main(args: argparse.Namespace) -> int:
         data_manager,
         exchanges=_parse_exchanges(args.exchanges),
         limit_per_exchange=args.limit_per_exchange,
+        target_instrument_ids=_parse_csv(args.target_instrument_ids),
+        sync_inputs=bool(args.sync_inputs),
+        input_sync_mode=args.input_sync_mode,
         skip_sync=args.skip_sync,
+        allow_disabled_module=bool(args.allow_disabled_module),
     )
     print(json.dumps(_json_ready(result), ensure_ascii=False, indent=2, sort_keys=True))
     return exit_code_for_result(

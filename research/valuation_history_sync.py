@@ -24,6 +24,7 @@ class ValuationExchangeRebuildResult:
     skipped_instruments: int = 0
     error_message: Optional[str] = None
     missing_financials: List[str] = field(default_factory=list)
+    missing_valuation_inputs: List[str] = field(default_factory=list)
 
 
 class ValuationHistoryRebuildService:
@@ -48,6 +49,7 @@ class ValuationHistoryRebuildService:
         *,
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         target_exchanges = exchanges or self.research_config.markets
         results: List[ValuationExchangeRebuildResult] = []
@@ -57,6 +59,7 @@ class ValuationHistoryRebuildService:
                 await self._sync_exchange(
                     exchange=exchange,
                     limit_per_exchange=limit_per_exchange,
+                    target_instrument_ids=target_instrument_ids,
                 )
             )
 
@@ -74,6 +77,7 @@ class ValuationHistoryRebuildService:
         *,
         exchange: str,
         limit_per_exchange: Optional[int],
+        target_instrument_ids: Optional[List[str]],
     ) -> ValuationExchangeRebuildResult:
         valuation_config = self.research_config.modules.get("valuation", {})
         history_config = valuation_config.get("history", {})
@@ -85,6 +89,13 @@ class ValuationHistoryRebuildService:
             for instrument in instruments
             if instrument.get("type") == "stock" and instrument.get("is_active", True)
         ]
+        if target_instrument_ids:
+            target_set = {str(item).strip() for item in target_instrument_ids if str(item).strip()}
+            stock_instruments = [
+                instrument
+                for instrument in stock_instruments
+                if str(instrument.get("instrument_id") or "").strip() in target_set
+            ]
         if limit_per_exchange is not None:
             stock_instruments = stock_instruments[:limit_per_exchange]
 
@@ -106,18 +117,20 @@ class ValuationHistoryRebuildService:
         instruments_processed = 0
         skipped_instruments = 0
         missing_financials: List[str] = []
+        missing_valuation_inputs: List[str] = []
 
         try:
             for instrument in stock_instruments:
-                bundle = self.storage.get_financial_statement_bundle(
-                    instrument["instrument_id"],
-                    include_statements=False,
-                )
-                core_facts = self.storage.get_financial_core_facts(
-                    instrument["instrument_id"],
-                    include_history=True,
-                    limit=12,
-                )
+                with self.storage.financial_database_scope():
+                    bundle = self.storage.get_financial_statement_bundle(
+                        instrument["instrument_id"],
+                        include_statements=False,
+                    )
+                    core_facts = self.storage.get_financial_core_facts(
+                        instrument["instrument_id"],
+                        include_history=True,
+                        limit=12,
+                    )
                 if bundle is None and not core_facts:
                     skipped_instruments += 1
                     missing_financials.append(instrument["instrument_id"])
@@ -127,6 +140,13 @@ class ValuationHistoryRebuildService:
                 else:
                     bundle = dict(bundle)
                 bundle["financial_history"] = core_facts or [bundle]
+                valuation_inputs = self.storage.get_valuation_inputs(
+                    instrument["instrument_id"],
+                    limit=0,
+                )
+                bundle["valuation_inputs"] = valuation_inputs
+                if not valuation_inputs:
+                    missing_valuation_inputs.append(instrument["instrument_id"])
 
                 quotes = await self.db_ops.get_daily_data(
                     instrument_id=instrument["instrument_id"],
@@ -167,6 +187,8 @@ class ValuationHistoryRebuildService:
                     "instruments_processed": instruments_processed,
                     "skipped_instruments": skipped_instruments,
                     "missing_financials": missing_financials,
+                    "missing_valuation_inputs": missing_valuation_inputs,
+                    "valuation_db_path": self.storage.valuation_db_path,
                 },
             )
             return ValuationExchangeRebuildResult(
@@ -176,6 +198,7 @@ class ValuationHistoryRebuildService:
                 rows_written=rows_written,
                 skipped_instruments=skipped_instruments,
                 missing_financials=missing_financials,
+                missing_valuation_inputs=missing_valuation_inputs,
             )
         except Exception as e:
             self.storage.finish_ingestion_run(
@@ -189,6 +212,8 @@ class ValuationHistoryRebuildService:
                     "instruments_processed": instruments_processed,
                     "skipped_instruments": skipped_instruments,
                     "missing_financials": missing_financials,
+                    "missing_valuation_inputs": missing_valuation_inputs,
+                    "valuation_db_path": self.storage.valuation_db_path,
                 },
             )
             return ValuationExchangeRebuildResult(
@@ -199,4 +224,5 @@ class ValuationHistoryRebuildService:
                 skipped_instruments=skipped_instruments,
                 error_message=str(e),
                 missing_financials=missing_financials,
+                missing_valuation_inputs=missing_valuation_inputs,
             )

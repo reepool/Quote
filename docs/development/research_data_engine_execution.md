@@ -1,10 +1,11 @@
 # 投研数据引擎实施主线与工程化推进文档
 
-> 更新日期：2026-05-18
+> 更新日期：2026-05-28
 > 配套需求文档：[implementation_plan.md](/home/python/Quote/implementation_plan.md)
 > 配套配置：[config/10_research.json](/home/python/Quote/config/10_research.json)
 > 财务数据专项文档：[financial_data_system.md](/home/python/Quote/docs/financial_data_system.md)
-> 当前推进焦点：在已有 official/CNInfo/AkShare 财务长表基线之上，设计下一阶段本地核心财务层：以新浪与同花顺严格语义交集作为本地高频服务层，CNInfo data20 作为官方摘要校验层，东财作为按需远程扩展层；字段进入本地核心层前必须通过 bank/nonbank profile 下的语义、单位、多样本数值和会计恒等式审计
+> 当前推进焦点：在已完成财务获取、存储和公告驱动维护主线后，进入估值生产 rollout 准备：先通过 CNInfo/AkShare 同步 `shares_outstanding / float_shares` 到 `data/valuation.db.valuation_inputs`，再日频生成 `PE/PB/PS/market_cap/float_market_cap` 等核心估值序列；相对估值从 `valuation.db.valuation_history + research.db.industry_memberships` 动态计算，不持久化全量同行矩阵
+> 当前估值生产 rollout 准备变更包：`openspec/changes/prepare-valuation-production-rollout/`
 > 当前财务 source profile 变更包：`openspec/changes/promote-cninfo-data20-financial-source/`
 > 当前财务 coverage gap 分类变更包：`openspec/changes/classify-financial-coverage-gaps/`
 > 当前 source policy 变更包：`openspec/changes/harden-research-source-priority-policy/`
@@ -79,7 +80,7 @@
 
 1. 明确需求边界与数据源策略
 2. 明确模块开关、预算模式、主备链配置
-3. 在 `research.db` 中建立独立表结构与审计表
+3. 在对应独立库中建立表结构与审计表：轻量研究维表默认进入 `research.db`，财务事实进入 `financials.db`，高行数估值派生序列进入 `valuation.db`
 4. 建立 provider 抽象、source policy、registry
 5. 建立 shadow sync 服务和调度任务
 6. 建立 read model / query service / API 路由
@@ -253,7 +254,7 @@ API 补齐原则：
 | `industry_index_analysis` | 已完成 provider/storage/sync/API、日更、历史回补与按日补缺入口 | 已确认官方最新日频字段并落 `industry_index_analysis_daily`；已提供 index-code/latest/date/taxonomy-alias benchmark API；直连 provider 继续负责最新横截面日更；AkShare-compatible 历史 provider 复用 `index_analysis_daily_sw` 的 SWS `index_analysis_report` 上游语义并自行控制 timeout/retry，负责历史日期区间回补并写同一张表；历史回补会返回按 index_type 的覆盖率与缺失指标统计，默认通过 ops/Telegram 手动触发，scheduler 配置项保持 disabled；CLI 支持按日分块补缺 |
 | `shareholders` | 已完成并开放本地 API | 已落地 `shareholder_snapshots`、shadow sync、scheduler、gated snapshot API 与 readiness API；当前语义覆盖 `holder_count / top10_holders / reference_only_ownership_clues`，配置已切到 `enabled=true / paid_high_availability`；仓库默认路由为 `AkShare proxy_patch` 主链，`cninfo:direct` 强制合并实控人线索，`akshare:direct / efinance:direct` 为补充 fallback；全量导入后 readiness 已无 blockers，后续进入周更维护和异常补缺阶段 |
 | `financial_statements` | 多期财务仓主线进行中 | 已落地原始报表表、事实表、指标快照表、shadow sync、读取 API、官方 source manifest、全数值事实长表、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与 `scripts/research_financial_statements_rollout_validation.py`；`2026-05-01` 检查当前生产 `research.db` 中财务摘要、完整报表、事实、指标表均为 `0` 行，说明工程链路已升级但尚未完成真实全市场财务数据维护 |
-| `valuation` | 已完成基线并完成指标口径加固，默认禁用 | 已落地 `valuation_history`、相对估值、DCF 抽象、scheduler 与 API；估值历史已拆分 static/TTM/forward/MRQ 指标，相对估值可按 metric variants 明确计算 valid peer count、分位数、percentile rank 和排除诊断；production rollout 后续不仅取决于全市场 current authoritative membership 覆盖率，还必须依赖真实多期财务事实、可得日和 readiness gate |
+| `valuation` | 已完成基线并完成指标口径加固，默认禁用；下一步准备独立 `valuation.db` rollout | 已落地 `valuation_history`、相对估值、DCF 抽象、scheduler 与 API；估值历史已拆分 static/TTM/forward/MRQ 指标，相对估值可按 metric variants 明确计算 valid peer count、分位数、percentile rank 和排除诊断；production rollout 后续不仅取决于全市场 current authoritative membership 覆盖率，还必须依赖真实多期财务事实、可得日、market-cap/share-count 输入和 `valuation.db` readiness gate |
 | `analyst_forecasts` | 已完成基线实现，默认禁用 | 已落地标准化存储、shadow sync、scheduler 与 API；当前以 `AkShare stock_profit_forecast_em` 为主，默认保持 disabled 等待 source stability 与预算确认 |
 | `research_reports` | 已完成基线实现，默认禁用 | 已落地研报元数据表、shadow sync、scheduler 与 API；仅承诺元数据覆盖，不承诺全文与长期稳定可用性 |
 | `sentiment_events` | 已完成基线实现，默认禁用 | 已落地 `notice / executive_share_change / pledge_ratio` 事件基线、shadow sync、scheduler 与 API；后续可扩展龙虎榜和资金流事件 |
@@ -263,7 +264,7 @@ API 补齐原则：
 财务域当前必须明确三个层次，避免后续开发误判：
 
 - 已有代码层：`financial_summary`、`financial_statements`、`valuation_history` 均有 provider/sync/storage/API 基线；`financial_statements` 已升级为支持多报告期、source manifest、all numeric facts、hot/cold tier 和 repository readiness 的同步/存储链路。
-- 当前数据层：截至 `2026-05-01` 本地 `research.db` 财务与估值核心表尚未落入全市场数据，不能把 API 存在等同于数据已可用。
+- 当前数据层：财务生产数据已迁入并维护在 `data/financials.db`；估值域代码层已接入独立 `data/valuation.db`，用于保存 `valuation_inputs`、`valuation_history`、估值运行审计和 lineage，不能把 API 存在或表结构存在等同于估值已可用。
 - 下一阶段目标层：`harden-financial-xbrl-and-relative-valuation` 已补齐 PE/PB/PS 指标语义、relative valuation 统计、scheduler 任务和 readiness API gate；当前 `implement-sse-official-financial-json-source`、`prepare-sse-financial-batch-backfill-rollout` 与 `prepare-sse-financial-multiperiod-backfill` 已推进到 SSE 官方 structured JSON parser、`300` 标的单报告期 dry-run、`100x2` 多报告期 dry-run 和 checkpoint 续跑验证；`promote-cninfo-data20-financial-source` 已确认 SSE/SZSE/BSE 均可走 CNInfo data20 结构化 JSON，其中 SSE 默认主源仍保持交易所 commonQuery；SSE 同样本对比显示 CNInfo 可用但不应替代 commonQuery，主要风险是 `equity` 归母权益/所有者权益合计口径差异。官方结构化源生产化仍取决于 source-profile-aware production backfill gate、字段稳定性、全量 readiness 证据和业务确认。
 - 新的服务分层目标层：`2026-05-18` 之后，完整财务域不再把“单一源覆盖最全”作为唯一主线，而拆成三层：
   - L1 本地核心层：以新浪和同花顺在 bank/nonbank profile 下通过审计的严格语义交集为准，提供高频、本地、统一单位的财务事实服务；同花顺因速度和长表结构暂定为候选主更新源，新浪作为互备和中文语义校验源。
@@ -336,9 +337,12 @@ API 补齐原则：
   - `validate_yfinance_source_live.py`
   - 三条验证链路已统一为共享 runtime，并用于分别验证直接 patch、兼容脚本和项目内生产抓取路径
 - 当前已补齐仓库级 `valuation` rollout validation runner：
-  - `python scripts/research_valuation_rollout_validation.py --exchanges SSE,SZSE`
-  - 用于串联 `valuation_history_rebuild -> /api/v1/research/valuation/readiness` 等价读链路复核
+  - `python scripts/research_valuation_rollout_validation.py --exchanges SSE,SZSE,BSE --skip-sync`
+  - `python scripts/research_valuation_rollout_validation.py --exchanges SSE,SZSE,BSE --sync-inputs --target-instrument-ids 600000.SH,001233.SZ,920009.BJ --allow-disabled-module`
+  - 用于串联 `valuation_input_sync -> valuation_history_rebuild -> /api/v1/research/valuation/readiness` 等价读链路复核
   - runner 生命周期现已改为优先使用 `DataManager.initialize(include_data_sources=false, load_progress=false)`，只初始化 research 存储和数据库，不再为只读复核拉起整套行情源
+  - `--skip-sync` 模式只做 readiness 快速读链路复核；正式 rollout 前仍必须用 bounded rebuild 检查 `data/valuation.db.valuation_inputs` 与 `valuation_history` 的实表结果
+  - `2026-05-29` bounded 样本验证已覆盖 SSE/SZSE/BSE：`600000.SH / 001233.SZ / 920009.BJ` 输入同步 `3/3`，估值历史重建写入 `55` 行，其中 SSE `39`、SZSE `4`、BSE `12`
 
 ### 4.7 当前项目级 Source Policy
 
@@ -539,6 +543,7 @@ technical readiness 接口会聚合：
 已完成内容：
 
 - `valuation_history`
+- `valuation_input_sync`
 - `relative valuation`
 - `DCF` engine abstraction
 - `valuation_history_rebuild`
@@ -553,8 +558,15 @@ technical readiness 接口会聚合：
 当前边界：
 
 - `valuation` 默认仍建议保持 disabled
+- 估值日频派生序列的生产物理目标已在 storage 层指向 `data/valuation.db`，而不是继续扩大 `research.db`
+- `valuation.db` 只保存估值输入、`valuation_history`、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
+- `valuation_inputs` 必须显式记录 source、source_mode、input_kind、unit、as_of_date、data_as_of 与 diagnostics；金额单位的股本/资本事实不能作为 share-count 输入，除非存在明确 share unit 映射
+- A 股股本输入主线使用 CNInfo/AkShare：全量回填走 `stock_share_change_cninfo(symbol, start_date, end_date)` 拉单标的股本变动历史；日更走 `stock_hold_change_cninfo(symbol="全部")` 拉全市场最新股本变动快照。CNInfo `总股本 / 已流通股份` 按万股转换为股后写入 `valuation_inputs`，`as_of_date` 记录变动日期，`data_as_of` 记录公告日期
+- `valuation_history.market_cap` 明确为总市值，优先由本地收盘价乘 `shares_outstanding` 得到；`float_market_cap` 由本地收盘价乘 `float_shares` 得到。两者是估值结果和审计 lineage 的派生冗余，保留在 `valuation.db` 便于复现、API 查询和后续备份/迁移
 - `relative valuation` 默认依赖 current authoritative `sw_l2` peer group
-- 在全市场 current authoritative membership 覆盖不足时，relative valuation rollout 仍应保持 gated，而不是降级使用 reference-only 行业字段
+- 相对估值默认从 `valuation.db.valuation_history + research.db.industry_memberships` 即时计算或使用 bounded aggregate cache，不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵
+- valuation rollout readiness 现在同时返回 `valuation_history` 覆盖、估值输入覆盖、metric coverage、财务 readiness、行业 readiness 与 storage 摘要
+- 在全市场 current authoritative membership 或 valuation input 覆盖不足时，relative valuation rollout 仍应保持 gated，而不是降级使用 reference-only 行业字段或从成交额/换手率反推市值
 
 #### Stage H：研究元数据与风险
 
@@ -740,7 +752,8 @@ technical readiness 接口会聚合：
 - 主线维护：以全量本地化为核心，固定执行 `taxonomy 全量刷新 -> 三级成分股集合全量刷新 -> 当前 membership 全量重建/重映射 -> targeted gap fill -> readiness`
 - 审计旁路：继续保留 `stock_industry_clf_hist_sw()`、official-code mapping cache、backlog/override review，但它们只服务历史分类审计，不再参与当前归属和相对估值同行分组
 - valuation readiness：通过 `/api/v1/research/valuation/readiness` 同时观察估值历史覆盖、模块 gate 与相对估值行业前置条件
-- valuation rollout validation runner：通过 `python scripts/research_valuation_rollout_validation.py --exchanges SSE,SZSE` 将 `valuation_history_rebuild -> readiness` 串成可重复执行的仓库级复核命令
+- valuation input sync runner：通过 `python scripts/research_valuation_input_sync.py --exchanges SSE,SZSE,BSE --sync-mode incremental` 做日更输入同步；全量回填用 `--sync-mode full --start-date 1990-01-01`，必须按交易所/limit 分批放量
+- valuation rollout validation runner：通过 `python scripts/research_valuation_rollout_validation.py --sync-inputs --exchanges SSE,SZSE` 将 `valuation_input_sync -> valuation_history_rebuild -> readiness` 串成可重复执行的仓库级复核命令
 - `industry` / `valuation` 两条 rollout validation runner 在只读复核场景下已切换为轻量初始化路径，不再默认初始化 `DataSourceFactory`、`pytdx`、`baostock`、`akshare`、`yfinance`
 - technical readiness：通过 `/api/v1/research/technical/readiness` 观察最新技术快照缓存覆盖、口径、状态与信号分布
 
@@ -1379,6 +1392,8 @@ technical readiness 接口会聚合：
 - strict Shenwan 行业映射真实环境验证完成
 - `financial_statements` 影子同步代表性样本校验完成
 - 申万二级 peer group 规则与估值口径完成配置化定义
+- `data/valuation.db` 存储边界、备份策略和 repository 访问层完成
+- market-cap/share-count 估值输入源、单位、可得日期和缺失诊断完成审计
 
 ---
 
@@ -1386,7 +1401,7 @@ technical readiness 接口会聚合：
 
 后续继续开发时，统一遵循下面的工程规则：
 
-- 所有新模块先进入 `research.db`，不直接改写现有行情表
+- 轻量 research 维表默认进入 `research.db`，但高行数或大体量域必须独立存储：财务事实进入 `financials.db`，估值日频派生序列进入 `valuation.db`；任何新物理库都必须通过 storage/repository 层访问
 - 所有读取接口统一挂到 `/api/v1/research/*`
 - 所有数据源策略必须通过配置表达，不在业务代码里硬编码
 - 财务域所有上游 URL、报告期 baseline、rolling window、hot window、anchor policy、限流、重试、并发、parser version、字段 alias、估值指标定义和 fallback policy 必须配置化或版本化
@@ -1408,7 +1423,8 @@ technical readiness 接口会聚合：
   - `publish_date`
   - `data_available_date`
   - `source_file_id` 或等价 source lineage
-- `DataManager`、API 路由和 provider 不应直接依赖 SQLite 方言；如果必须使用 SQLite 特性，应封装在 storage 层，便于后续拆分 `financials.db` 或迁移到 DuckDB/PostgreSQL
+- 估值历史只持久化 `instrument_id + trade_date + metric variants` 的单标的日频结果；相对估值同行统计不得落全量 subject-peer-date 矩阵
+- `DataManager`、API 路由和 provider 不应直接依赖 SQLite 方言；如果必须使用 SQLite 特性，应封装在 storage 层，便于后续拆分 `financials.db`、`valuation.db` 或迁移到 DuckDB/PostgreSQL
 - hot/cold 财务表、分区表或历史列式仓都必须由 storage/repository 层屏蔽；业务层只能表达“查最近窗口”或“查长历史”
 - 新模块必须先补单元测试，再考虑开放接口
 - 文档、配置、代码状态不一致时，以“代码实际能力 + 本文档状态定义”为准，并及时回写文档
@@ -1422,8 +1438,8 @@ technical readiness 接口会聚合：
 接下来的工作重点不再是继续扩张需求范围，而是把已有成果按工程主线串起来，并按以下顺序持续推进：
 
 1. `industry` 严格申万标准层与 `shareholders` 本阶段均已完成，后续只保留 readiness 复核、异常补缺和调度维护
-2. 进入财务主线：官方结构化披露源探测、source manifest、全数值事实长表、多期 backfill、daily catch-up、weekly reconciliation 和 financial readiness
-3. 在财务 readiness 通过前，`valuation` 继续保持 gate，不把当前空 `valuation_history` 或单期财务快照视作 production-ready
+2. 财务主线已进入生产数据资产与维护任务阶段：后续继续观察 daily catch-up、weekly reconciliation、accepted gap 和 financial readiness
+3. 进入 valuation rollout 准备：新建 `data/valuation.db`，补齐 market-cap/share-count 本地输入层，重建日频 PE/PB/PS/market_cap，并通过 `/api/v1/research/valuation/readiness` 验证后再决定是否启用模块
 4. 按模块 gate 继续推进 `research metadata` 的 production rollout 决策与质量加固
 5. 对 `risk / technical cache` 做参数调优、覆盖率复核和 API 使用体验优化
 6. 持续把已交付模块回写到执行文档与 OpenSpec 状态

@@ -3212,6 +3212,7 @@ class DataManager:
 
         def _load_storage_state() -> Dict[str, Any]:
             metric_coverage: Dict[str, Any] = {}
+            input_coverage: Dict[str, Any] = {}
             try:
                 candidate = storage.summarize_valuation_metric_coverage(
                     metric_fields=metric_fields,
@@ -3220,16 +3221,24 @@ class DataManager:
                     metric_coverage = candidate
             except Exception:
                 metric_coverage = {}
+            try:
+                candidate = storage.summarize_valuation_input_coverage()
+                if isinstance(candidate, dict):
+                    input_coverage = candidate
+            except Exception:
+                input_coverage = {}
             return {
                 "summary": storage.summarize_valuation_history(),
                 "by_exchange": storage.count_valuation_history_by_exchange(),
                 "metric_coverage": metric_coverage,
+                "input_coverage": input_coverage,
             }
 
         storage_state = self._load_research_storage_state(_load_storage_state)
         summary = storage_state["summary"]
         valuation_by_exchange = storage_state["by_exchange"]
         metric_coverage = storage_state.get("metric_coverage", {})
+        input_coverage = storage_state.get("input_coverage", {})
 
         enabled = bool(module_cfg.get("enabled", False))
         require_authoritative = bool(relative_cfg.get("require_authoritative", True))
@@ -3237,10 +3246,12 @@ class DataManager:
         benchmark_field = str(relative_cfg.get("benchmark_field", "sw_l2_code"))
 
         valuation_history_total = int(summary.get("total", 0))
+        valuation_input_total = int(input_coverage.get("usable_input_count", 0) or 0)
         missing_valuation_history_count = max(
             target_total - valuation_history_total,
             0,
         )
+        missing_valuation_input_count = max(target_total - valuation_input_total, 0)
 
         exchange_coverage = []
         for exchange in markets:
@@ -3277,23 +3288,6 @@ class DataManager:
             industry_relative_ready = False
             industry_relative_blockers = ["industry_standard_readiness_unavailable"]
 
-        financial_readiness_payload: Optional[Dict[str, Any]] = None
-        financial_ready = True
-        financial_cfg = self.research_config.modules.get("financial_statements", {})
-        if bool(financial_cfg.get("enabled", False)):
-            try:
-                financial_readiness_payload = await self.get_research_financial_statements_readiness()
-                financial_ready = bool(
-                    financial_readiness_payload.get("ready_for_rollout", False)
-                )
-            except Exception as exc:
-                financial_ready = False
-                financial_readiness_payload = {
-                    "ready_for_rollout": False,
-                    "blockers": ["financial_statement_readiness_unavailable"],
-                    "error": str(exc),
-                }
-
         blockers: List[str] = []
         if not enabled:
             blockers.append("valuation_module_disabled")
@@ -3303,19 +3297,49 @@ class DataManager:
             blockers.append("no_valuation_history")
         if target_total > 0 and valuation_history_total < target_total:
             blockers.append("valuation_history_coverage_incomplete")
+        if valuation_input_total <= 0:
+            blockers.append("no_valuation_inputs")
+        if target_total > 0 and valuation_input_total < target_total:
+            blockers.append("valuation_input_coverage_incomplete")
         blockers.extend(
             blocker
             for blocker in industry_relative_blockers
             if blocker not in blockers
         )
-        if not financial_ready and "financial_statement_readiness_incomplete" not in blockers:
-            blockers.append("financial_statement_readiness_incomplete")
 
         history_ready = (
             target_total > 0
             and valuation_history_total >= target_total
             and valuation_history_total > 0
+            and valuation_input_total >= target_total
         )
+        financial_readiness_payload: Optional[Dict[str, Any]] = None
+        financial_ready = True
+        financial_cfg = self.research_config.modules.get("financial_statements", {})
+        if bool(financial_cfg.get("enabled", False)):
+            if not history_ready:
+                financial_readiness_payload = {
+                    "ready_for_rollout": None,
+                    "status": "skipped",
+                    "reason": "skipped_until_valuation_input_and_history_coverage_pass",
+                    "blockers": [],
+                }
+            else:
+                try:
+                    financial_readiness_payload = await self.get_research_financial_statements_readiness()
+                    financial_ready = bool(
+                        financial_readiness_payload.get("ready_for_rollout", False)
+                    )
+                except Exception as exc:
+                    financial_ready = False
+                    financial_readiness_payload = {
+                        "ready_for_rollout": False,
+                        "blockers": ["financial_statement_readiness_unavailable"],
+                        "error": str(exc),
+                    }
+        if not financial_ready and "financial_statement_readiness_incomplete" not in blockers:
+            blockers.append("financial_statement_readiness_incomplete")
+
         relative_valuation_ready = (
             enabled
             and history_ready
@@ -3332,6 +3356,12 @@ class DataManager:
             "target_instruments_by_exchange": target_by_exchange,
             "valuation_history_total": valuation_history_total,
             "missing_valuation_history_count": missing_valuation_history_count,
+            "valuation_input_total": valuation_input_total,
+            "missing_valuation_input_count": missing_valuation_input_count,
+            "valuation_inputs": input_coverage,
+            "valuation_storage": {
+                "db_path": getattr(storage, "valuation_db_path", None),
+            },
             "source_counts": summary.get("source_counts", {}),
             "source_mode_counts": summary.get("source_mode_counts", {}),
             "calc_method_counts": summary.get("calc_method_counts", {}),
@@ -3358,6 +3388,8 @@ class DataManager:
                             "no_target_instruments",
                             "no_valuation_history",
                             "valuation_history_coverage_incomplete",
+                            "no_valuation_inputs",
+                            "valuation_input_coverage_incomplete",
                         }
                     ]))
                 ),
@@ -4035,6 +4067,8 @@ class DataManager:
         *,
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+        allow_disabled_module: bool = False,
     ) -> Dict[str, Any]:
         """运行 valuation_history 重建。"""
         if not self.research_config.enabled:
@@ -4050,7 +4084,7 @@ class DataManager:
             }
 
         module_cfg = self.research_config.modules.get("valuation", {})
-        if not module_cfg.get("enabled", False):
+        if not module_cfg.get("enabled", False) and not allow_disabled_module:
             return {
                 "status": "disabled",
                 "reason": "research valuation module is disabled",
@@ -4071,6 +4105,62 @@ class DataManager:
         result = await service.sync(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
+            target_instrument_ids=target_instrument_ids,
+        )
+        return self._attach_instrument_master_governance(result, governance)
+
+    async def run_valuation_input_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        sync_mode: str = "incremental",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        target_instrument_ids: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """同步 valuation_inputs 所需股本/市值输入。"""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        from research.valuation_input_sync import ValuationInputSyncService
+
+        normalized_mode = str(sync_mode or "incremental").strip().lower()
+        job_type = (
+            "historical"
+            if normalized_mode in {"full", "backfill", "history", "historical"}
+            else "incremental"
+        )
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=exchanges,
+            job_name='valuation_input_sync',
+            job_type=job_type,
+        )
+        service = ValuationInputSyncService(
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        result = await service.sync(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            source=source,
+            source_mode=source_mode,
+            sync_mode=sync_mode,
+            start_date=start_date,
+            end_date=end_date,
+            target_instrument_ids=target_instrument_ids,
         )
         return self._attach_instrument_master_governance(result, governance)
 

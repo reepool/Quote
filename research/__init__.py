@@ -25,6 +25,7 @@ from .sentiment_event_sync import SentimentEventShadowSyncService
 from .technical_snapshot_sync import TechnicalIndicatorLatestRefreshService
 from .technical_service import ResearchTechnicalAnalysisService
 from .valuation_history_sync import ValuationHistoryRebuildService
+from .valuation_input_sync import ValuationInputSyncService
 from .valuation_service import BaseDcfEngine, ResearchValuationService, SimpleGrowthDcfEngine
 
 __all__ = [
@@ -49,6 +50,7 @@ __all__ = [
     "TechnicalIndicatorLatestRefreshService",
     "ResearchTechnicalAnalysisService",
     "ValuationHistoryRebuildService",
+    "ValuationInputSyncService",
     "BaseDcfEngine",
     "SimpleGrowthDcfEngine",
     "ResearchValuationService",

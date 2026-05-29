@@ -49,6 +49,7 @@ from research.providers.base import (
     SentimentEventSnapshot,
     TechnicalIndicatorLatestSnapshot,
     ValuationHistorySnapshot,
+    ValuationInputSnapshot,
 )
 
 
@@ -252,6 +253,7 @@ class ResearchStorageManager:
         self.research_config = research_config or config_manager.get_research_config()
         self.db_path = self.research_config.storage.db_path
         self.financials_db_path = self.research_config.storage.financials_db_path
+        self.valuation_db_path = self.research_config.storage.valuation_db_path
         if (
             os.path.normpath(self.financials_db_path)
             == os.path.normpath("data/financials.db")
@@ -262,10 +264,21 @@ class ResearchStorageManager:
                 "financials.db",
             )
             self.research_config.storage.financials_db_path = self.financials_db_path
+        if (
+            os.path.normpath(self.valuation_db_path)
+            == os.path.normpath("data/valuation.db")
+            and os.path.normpath(self.db_path) != os.path.normpath("data/research.db")
+        ):
+            self.valuation_db_path = os.path.join(
+                os.path.dirname(self.db_path),
+                "valuation.db",
+            )
+            self.research_config.storage.valuation_db_path = self.valuation_db_path
         self.quotes_db_path = self.research_config.storage.quotes_db_path
         self.quotes_db_alias = self.research_config.storage.quotes_db_alias
         self._active_db_path: Optional[str] = None
         self._financial_ingestion_run_ids: set[int] = set()
+        self._valuation_ingestion_run_ids: set[int] = set()
         self.financial_statements = FinancialStatementStorageRepository(self)
 
     def initialize(self) -> None:
@@ -277,6 +290,8 @@ class ResearchStorageManager:
             self._migrate_tables(conn)
             if self._uses_separate_financial_database():
                 self._drop_financial_tables_from_research_database(conn)
+            if self._uses_separate_valuation_database():
+                self._drop_valuation_tables_from_research_database(conn)
 
             if self.research_config.storage.attach_quotes_db:
                 self._attach_quotes_db(conn)
@@ -294,6 +309,18 @@ class ResearchStorageManager:
             db_logger.info(
                 "[ResearchStorage] Initialized financial database at %s",
                 self.financials_db_path,
+            )
+        if self.valuation_db_path and self.valuation_db_path != self.db_path:
+            os.makedirs(os.path.dirname(self.valuation_db_path), exist_ok=True)
+            with self.valuation_database_scope():
+                with self.get_connection() as conn:
+                    self._apply_pragmas(conn)
+                    self._create_tables(conn)
+                    self._migrate_tables(conn)
+                    conn.commit()
+            db_logger.info(
+                "[ResearchStorage] Initialized valuation database at %s",
+                self.valuation_db_path,
             )
 
     @contextmanager
@@ -316,6 +343,16 @@ class ResearchStorageManager:
         finally:
             self._active_db_path = previous_db_path
 
+    @contextmanager
+    def valuation_database_scope(self) -> Generator[None, None, None]:
+        """Route storage operations inside this block to the valuation database."""
+        previous_db_path = self._active_db_path
+        self._active_db_path = self.valuation_db_path or self.db_path
+        try:
+            yield
+        finally:
+            self._active_db_path = previous_db_path
+
     def active_storage_db_path(self) -> str:
         """Return the SQLite path currently used by storage operations."""
         return self._active_db_path or self.db_path
@@ -325,6 +362,11 @@ class ResearchStorageManager:
             os.path.abspath(self.financials_db_path) != os.path.abspath(self.db_path)
         )
 
+    def _uses_separate_valuation_database(self) -> bool:
+        return bool(self.valuation_db_path) and (
+            os.path.abspath(self.valuation_db_path) != os.path.abspath(self.db_path)
+        )
+
     @classmethod
     def _drop_financial_tables_from_research_database(
         cls,
@@ -332,6 +374,15 @@ class ResearchStorageManager:
     ) -> None:
         """Remove financial-domain physical tables from the non-financial research DB."""
         for table_name in cls._financial_table_names():
+            conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+    @classmethod
+    def _drop_valuation_tables_from_research_database(
+        cls,
+        conn: sqlite3.Connection,
+    ) -> None:
+        """Remove valuation-domain physical tables from the non-valuation research DB."""
+        for table_name in cls._valuation_table_names():
             conn.execute(f"DROP TABLE IF EXISTS {table_name}")
 
     @staticmethod
@@ -354,6 +405,13 @@ class ResearchStorageManager:
             "financial_summaries",
         )
 
+    @staticmethod
+    def _valuation_table_names() -> tuple[str, ...]:
+        return (
+            "valuation_history",
+            "valuation_inputs",
+        )
+
     def start_ingestion_run(
         self,
         *,
@@ -367,6 +425,16 @@ class ResearchStorageManager:
         """Create a new ingestion run row."""
         if self._is_financial_domain(domain) and self._active_db_path is None:
             with self.financial_database_scope():
+                return self.start_ingestion_run(
+                    domain=domain,
+                    job_name=job_name,
+                    market=market,
+                    source=source,
+                    mode=mode,
+                    metadata=metadata,
+                )
+        if self._is_valuation_domain(domain) and self._active_db_path is None:
+            with self.valuation_database_scope():
                 return self.start_ingestion_run(
                     domain=domain,
                     job_name=job_name,
@@ -414,6 +482,8 @@ class ResearchStorageManager:
             run_id = int(cursor.lastrowid)
             if self._is_financial_domain(domain):
                 self._financial_ingestion_run_ids.add(run_id)
+            if self._is_valuation_domain(domain):
+                self._valuation_ingestion_run_ids.add(run_id)
             return run_id
 
     def finish_ingestion_run(
@@ -428,6 +498,15 @@ class ResearchStorageManager:
         """Update an ingestion run on completion."""
         if run_id in self._financial_ingestion_run_ids and self._active_db_path is None:
             with self.financial_database_scope():
+                return self.finish_ingestion_run(
+                    run_id,
+                    status=status,
+                    rows_written=rows_written,
+                    error_message=error_message,
+                    metadata=metadata,
+                )
+        if run_id in self._valuation_ingestion_run_ids and self._active_db_path is None:
+            with self.valuation_database_scope():
                 return self.finish_ingestion_run(
                     run_id,
                     status=status,
@@ -480,6 +559,13 @@ class ResearchStorageManager:
                     job_name=job_name,
                     market=market,
                 )
+        if self._is_valuation_domain(domain) and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.get_latest_successful_ingestion_run(
+                    domain=domain,
+                    job_name=job_name,
+                    market=market,
+                )
         filters = ["domain = ?", "job_name = ?", "status = ?"]
         params: List[Any] = [domain, job_name, "success"]
         if market is not None:
@@ -519,6 +605,17 @@ class ResearchStorageManager:
         """Store or replace a raw payload snapshot."""
         if self._is_financial_domain(domain) and self._active_db_path is None:
             with self.financial_database_scope():
+                return self.store_raw_payload(
+                    domain=domain,
+                    instrument_id=instrument_id,
+                    source=source,
+                    source_mode=source_mode,
+                    payload=payload,
+                    payload_hash=payload_hash,
+                    ingestion_run_id=ingestion_run_id,
+                )
+        if self._is_valuation_domain(domain) and self._active_db_path is None:
+            with self.valuation_database_scope():
                 return self.store_raw_payload(
                     domain=domain,
                     instrument_id=instrument_id,
@@ -575,6 +672,10 @@ class ResearchStorageManager:
     @staticmethod
     def _is_financial_domain(domain: Optional[str]) -> bool:
         return str(domain or "").startswith("financial")
+
+    @staticmethod
+    def _is_valuation_domain(domain: Optional[str]) -> bool:
+        return str(domain or "").startswith("valuation")
 
     def upsert_company_profile(
         self,
@@ -1663,6 +1764,13 @@ class ResearchStorageManager:
         ingestion_run_id: Optional[int] = None,
     ) -> None:
         """Upsert one derived valuation history row."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                self.upsert_valuation_history(
+                    snapshot,
+                    ingestion_run_id=ingestion_run_id,
+                )
+            return
         now = get_shanghai_time().isoformat()
         details_json = json.dumps(
             snapshot.details_json,
@@ -1682,6 +1790,7 @@ class ResearchStorageManager:
                     currency,
                     close_price,
                     market_cap,
+                    float_market_cap,
                     pe_ratio,
                     pb_ratio,
                     ps_ratio,
@@ -1702,7 +1811,7 @@ class ResearchStorageManager:
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -1710,6 +1819,7 @@ class ResearchStorageManager:
                     currency = excluded.currency,
                     close_price = excluded.close_price,
                     market_cap = excluded.market_cap,
+                    float_market_cap = excluded.float_market_cap,
                     pe_ratio = excluded.pe_ratio,
                     pb_ratio = excluded.pb_ratio,
                     ps_ratio = excluded.ps_ratio,
@@ -1735,6 +1845,7 @@ class ResearchStorageManager:
                     snapshot.currency,
                     snapshot.close_price,
                     snapshot.market_cap,
+                    snapshot.float_market_cap,
                     snapshot.pe_ratio,
                     snapshot.pb_ratio,
                     snapshot.ps_ratio,
@@ -1752,6 +1863,96 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     details_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_valuation_input(
+        self,
+        snapshot: ValuationInputSnapshot,
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert one explicit valuation input row into valuation storage."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                self.upsert_valuation_input(
+                    snapshot,
+                    ingestion_run_id=ingestion_run_id,
+                )
+            return
+        if (
+            snapshot.shares_outstanding is not None
+            or snapshot.float_shares is not None
+        ) and not self._is_share_unit(snapshot.unit):
+            raise ValueError(
+                "share-count valuation inputs require an explicit share unit"
+            )
+        now = get_shanghai_time().isoformat()
+        diagnostics_json = json.dumps(
+            snapshot.diagnostics_json,
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        data_as_of = snapshot.data_as_of or snapshot.as_of_date
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO valuation_inputs (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    currency,
+                    market_cap,
+                    shares_outstanding,
+                    float_market_cap,
+                    float_shares,
+                    source,
+                    source_mode,
+                    input_kind,
+                    unit,
+                    data_as_of,
+                    diagnostics_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, as_of_date, source, source_mode, input_kind)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    currency = excluded.currency,
+                    market_cap = excluded.market_cap,
+                    shares_outstanding = excluded.shares_outstanding,
+                    float_market_cap = excluded.float_market_cap,
+                    float_shares = excluded.float_shares,
+                    unit = excluded.unit,
+                    data_as_of = excluded.data_as_of,
+                    diagnostics_json = excluded.diagnostics_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.as_of_date,
+                    snapshot.currency,
+                    snapshot.market_cap,
+                    snapshot.shares_outstanding,
+                    snapshot.float_market_cap,
+                    snapshot.float_shares,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    snapshot.input_kind,
+                    snapshot.unit,
+                    data_as_of,
+                    diagnostics_json,
                     ingestion_run_id,
                     now,
                     now,
@@ -6983,6 +7184,15 @@ class ResearchStorageManager:
         include_details: bool = True,
     ) -> list[Dict[str, Any]]:
         """Fetch valuation history rows for one instrument."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.get_valuation_history_rows(
+                    instrument_id,
+                    start_date=start_date,
+                    end_date=end_date,
+                    limit=limit,
+                    include_details=include_details,
+                )
         query = """
             SELECT
                 instrument_id,
@@ -6992,6 +7202,7 @@ class ResearchStorageManager:
                 currency,
                 close_price,
                 market_cap,
+                float_market_cap,
                 pe_ratio,
                 pb_ratio,
                 ps_ratio,
@@ -7040,6 +7251,89 @@ class ResearchStorageManager:
             items.append(item)
         return items
 
+    def get_valuation_inputs(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: int = 0,
+        include_diagnostics: bool = True,
+    ) -> list[Dict[str, Any]]:
+        """Fetch explicit valuation inputs for one instrument."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.get_valuation_inputs(
+                    instrument_id,
+                    start_date=start_date,
+                    end_date=end_date,
+                    limit=limit,
+                    include_diagnostics=include_diagnostics,
+                )
+        query = """
+            SELECT
+                instrument_id,
+                symbol,
+                exchange,
+                as_of_date,
+                currency,
+                market_cap,
+                shares_outstanding,
+                float_market_cap,
+                float_shares,
+                source,
+                source_mode,
+                input_kind,
+                unit,
+                data_as_of,
+                diagnostics_json,
+                ingestion_run_id,
+                created_at,
+                updated_at
+            FROM valuation_inputs
+            WHERE instrument_id = ?
+        """
+        parameters: list[Any] = [instrument_id]
+        if start_date:
+            query += " AND as_of_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND as_of_date <= ?"
+            parameters.append(end_date)
+        query += " ORDER BY as_of_date DESC, updated_at DESC"
+        if limit > 0:
+            query += " LIMIT ?"
+            parameters.append(limit)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(query, tuple(parameters)).fetchall()
+
+        items = []
+        for row in rows:
+            item = dict(row)
+            diagnostics_json = item.pop("diagnostics_json", None)
+            if include_diagnostics:
+                item["diagnostics"] = self._deserialize_json(diagnostics_json) or {}
+            items.append(item)
+        return items
+
+    def get_latest_valuation_input(
+        self,
+        instrument_id: str,
+        *,
+        as_of_date: str,
+        include_diagnostics: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """Fetch the latest valuation input available on or before as_of_date."""
+        rows = self.get_valuation_inputs(
+            instrument_id,
+            end_date=as_of_date,
+            limit=1,
+            include_diagnostics=include_diagnostics,
+        )
+        return rows[0] if rows else None
+
     def get_latest_valuation_history_row(
         self,
         instrument_id: str,
@@ -7058,6 +7352,9 @@ class ResearchStorageManager:
 
     def summarize_valuation_history(self) -> Dict[str, Any]:
         """Return aggregate summary for instruments with valuation history."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.summarize_valuation_history()
         latest_rows_query = """
             WITH latest AS (
                 SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
@@ -7146,6 +7443,9 @@ class ResearchStorageManager:
 
     def count_valuation_history_by_exchange(self) -> Dict[str, int]:
         """Count instruments with valuation history per exchange."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.count_valuation_history_by_exchange()
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             rows = conn.execute(
@@ -7161,6 +7461,109 @@ class ResearchStorageManager:
             if row["exchange"] is not None
         }
 
+    def summarize_valuation_input_coverage(
+        self,
+        *,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Return aggregate coverage for explicit market-cap/share-count inputs."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.summarize_valuation_input_coverage(
+                    instrument_ids=instrument_ids,
+                )
+        filters: List[str] = []
+        params: List[Any] = []
+        if instrument_ids is not None:
+            normalized_ids = [
+                str(instrument_id).strip()
+                for instrument_id in instrument_ids
+                if str(instrument_id).strip()
+            ]
+            if not normalized_ids:
+                return {
+                    "instrument_count": 0,
+                    "market_cap_count": 0,
+                    "shares_outstanding_count": 0,
+                    "source_counts": {},
+                    "source_mode_counts": {},
+                    "latest_as_of_date": None,
+                    "latest_updated_at": None,
+                }
+            placeholders = ", ".join("?" for _ in normalized_ids)
+            filters.append(f"vi.instrument_id IN ({placeholders})")
+            params.extend(normalized_ids)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+        latest_rows_query = f"""
+            WITH latest AS (
+                SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
+                FROM valuation_inputs
+                GROUP BY instrument_id
+            )
+            SELECT vi.*
+            FROM valuation_inputs vi
+            JOIN latest
+              ON latest.instrument_id = vi.instrument_id
+             AND latest.latest_as_of_date = vi.as_of_date
+            {where_clause}
+        """
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            row = conn.execute(
+                f"""
+                SELECT
+                    COUNT(DISTINCT instrument_id) AS instrument_count,
+                    COUNT(DISTINCT CASE WHEN market_cap IS NOT NULL AND market_cap > 0 THEN instrument_id END) AS market_cap_count,
+                    COUNT(DISTINCT CASE WHEN shares_outstanding IS NOT NULL AND shares_outstanding > 0 THEN instrument_id END) AS shares_outstanding_count,
+                    COUNT(DISTINCT CASE WHEN (market_cap IS NOT NULL AND market_cap > 0) OR (shares_outstanding IS NOT NULL AND shares_outstanding > 0) THEN instrument_id END) AS usable_input_count,
+                    MAX(as_of_date) AS latest_as_of_date,
+                    MAX(updated_at) AS latest_updated_at
+                FROM ({latest_rows_query})
+                """,
+                tuple(params),
+            ).fetchone()
+            source_rows = conn.execute(
+                f"""
+                SELECT source, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY source
+                """,
+                tuple(params),
+            ).fetchall()
+            mode_rows = conn.execute(
+                f"""
+                SELECT source_mode, COUNT(DISTINCT instrument_id) AS row_count
+                FROM ({latest_rows_query})
+                GROUP BY source_mode
+                """,
+                tuple(params),
+            ).fetchall()
+
+        instrument_count = int((row["instrument_count"] if row is not None else 0) or 0)
+        market_cap_count = int((row["market_cap_count"] if row is not None else 0) or 0)
+        shares_count = int(
+            (row["shares_outstanding_count"] if row is not None else 0) or 0
+        )
+        usable_count = int((row["usable_input_count"] if row is not None else 0) or 0)
+        return {
+            "instrument_count": instrument_count,
+            "market_cap_count": market_cap_count,
+            "shares_outstanding_count": shares_count,
+            "usable_input_count": usable_count,
+            "source_counts": {
+                str(item["source"]): int(item["row_count"] or 0)
+                for item in source_rows
+                if item["source"] is not None
+            },
+            "source_mode_counts": {
+                str(item["source_mode"]): int(item["row_count"] or 0)
+                for item in mode_rows
+                if item["source_mode"] is not None
+            },
+            "latest_as_of_date": None if row is None else row["latest_as_of_date"],
+            "latest_updated_at": None if row is None else row["latest_updated_at"],
+        }
+
     def summarize_valuation_metric_coverage(
         self,
         *,
@@ -7168,6 +7571,12 @@ class ResearchStorageManager:
         instrument_ids: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Summarize latest valuation metric coverage by metric variant."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.summarize_valuation_metric_coverage(
+                    metric_fields=metric_fields,
+                    instrument_ids=instrument_ids,
+                )
         allowed_fields = {
             "pe_ratio",
             "pb_ratio",
@@ -7274,65 +7683,82 @@ class ResearchStorageManager:
             membership_query += " AND instrument_id != ?"
             membership_parameters.append(exclude_instrument_id)
 
-        with self.get_connection() as conn:
-            self._apply_pragmas(conn)
-            peer_ids = [
-                row["instrument_id"]
-                for row in conn.execute(
-                    membership_query,
-                    tuple(membership_parameters),
-                ).fetchall()
-            ]
-            if not peer_ids:
-                return []
+        previous_db_path = self._active_db_path
+        if self._uses_separate_valuation_database() and previous_db_path is None:
+            self._active_db_path = self.db_path
+        try:
+            with self.get_connection() as conn:
+                self._apply_pragmas(conn)
+                peer_ids = [
+                    row["instrument_id"]
+                    for row in conn.execute(
+                        membership_query,
+                        tuple(membership_parameters),
+                    ).fetchall()
+                ]
+        finally:
+            self._active_db_path = previous_db_path
 
-            placeholders = ", ".join("?" for _ in peer_ids)
-            latest_query = f"""
-                SELECT
-                    vh.instrument_id,
-                    vh.symbol,
-                    vh.exchange,
-                    vh.as_of_date,
-                    vh.currency,
-                    vh.close_price,
-                    vh.market_cap,
-                    vh.pe_ratio,
-                    vh.pb_ratio,
-                    vh.ps_ratio,
-                    vh.pe_static,
-                    vh.pe_ttm,
-                    vh.pe_forward,
-                    vh.pb_mrq,
-                    vh.ps_static,
-                    vh.ps_ttm,
-                    vh.ps_forward,
-                    vh.calc_method,
-                    vh.calc_version,
-                    vh.parameter_hash,
-                    vh.source,
-                    vh.source_mode,
-                    vh.data_as_of,
-                    vh.details_json,
-                    vh.ingestion_run_id,
-                    vh.created_at,
-                    vh.updated_at
-                FROM valuation_history vh
-                WHERE vh.instrument_id IN ({placeholders})
-                  AND vh.as_of_date = (
-                      SELECT MAX(vh2.as_of_date)
-                      FROM valuation_history vh2
-                      WHERE vh2.instrument_id = vh.instrument_id
-                  )
-                ORDER BY vh.pe_ratio ASC, vh.instrument_id ASC
-            """
-            if limit is not None and limit > 0:
-                latest_query += " LIMIT ?"
-                valuation_rows = conn.execute(
-                    latest_query,
-                    tuple(peer_ids) + (limit,),
-                ).fetchall()
-            else:
-                valuation_rows = conn.execute(latest_query, tuple(peer_ids)).fetchall()
+        if not peer_ids:
+            return []
+
+        placeholders = ", ".join("?" for _ in peer_ids)
+        latest_query = f"""
+            SELECT
+                vh.instrument_id,
+                vh.symbol,
+                vh.exchange,
+                vh.as_of_date,
+                vh.currency,
+                vh.close_price,
+                vh.market_cap,
+                vh.pe_ratio,
+                vh.pb_ratio,
+                vh.ps_ratio,
+                vh.pe_static,
+                vh.pe_ttm,
+                vh.pe_forward,
+                vh.pb_mrq,
+                vh.ps_static,
+                vh.ps_ttm,
+                vh.ps_forward,
+                vh.calc_method,
+                vh.calc_version,
+                vh.parameter_hash,
+                vh.source,
+                vh.source_mode,
+                vh.data_as_of,
+                vh.details_json,
+                vh.ingestion_run_id,
+                vh.created_at,
+                vh.updated_at
+            FROM valuation_history vh
+            WHERE vh.instrument_id IN ({placeholders})
+              AND vh.as_of_date = (
+                  SELECT MAX(vh2.as_of_date)
+                  FROM valuation_history vh2
+                  WHERE vh2.instrument_id = vh.instrument_id
+              )
+            ORDER BY vh.pe_ratio ASC, vh.instrument_id ASC
+        """
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            self._active_db_path = self.valuation_db_path
+        try:
+            with self.get_connection() as conn:
+                self._apply_pragmas(conn)
+                if limit is not None and limit > 0:
+                    latest_query += " LIMIT ?"
+                    valuation_rows = conn.execute(
+                        latest_query,
+                        tuple(peer_ids) + (limit,),
+                    ).fetchall()
+                else:
+                    valuation_rows = conn.execute(
+                        latest_query,
+                        tuple(peer_ids),
+                    ).fetchall()
+        finally:
+            self._active_db_path = previous_db_path
 
         items = []
         for row in valuation_rows:
@@ -7358,6 +7784,11 @@ class ResearchStorageManager:
     @staticmethod
     def _json_text(value: Dict[str, Any]) -> str:
         return json.dumps(value or {}, ensure_ascii=False, sort_keys=True)
+
+    @staticmethod
+    def _is_share_unit(unit: Optional[str]) -> bool:
+        normalized = str(unit or "").strip().lower()
+        return normalized in {"share", "shares", "股"}
 
     @staticmethod
     def _build_financial_source_file_id(
@@ -8359,6 +8790,7 @@ class ResearchStorageManager:
             "ps_static",
             "ps_ttm",
             "ps_forward",
+            "float_market_cap",
         ):
             cls._ensure_column(conn, "valuation_history", column_name, f"{column_name} REAL")
 
@@ -9050,6 +9482,7 @@ class ResearchStorageManager:
                 currency TEXT NOT NULL DEFAULT 'CNY',
                 close_price REAL,
                 market_cap REAL,
+                float_market_cap REAL,
                 pe_ratio REAL,
                 pb_ratio REAL,
                 ps_ratio REAL,
@@ -9076,6 +9509,32 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_valuation_history_instrument
             ON valuation_history(instrument_id, as_of_date, updated_at);
+
+            CREATE TABLE IF NOT EXISTS valuation_inputs (
+                instrument_id TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                market_cap REAL,
+                shares_outstanding REAL,
+                float_market_cap REAL,
+                float_shares REAL,
+                source TEXT NOT NULL,
+                source_mode TEXT NOT NULL,
+                input_kind TEXT NOT NULL,
+                unit TEXT,
+                data_as_of TEXT NOT NULL,
+                diagnostics_json TEXT NOT NULL,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (instrument_id, as_of_date, source, source_mode, input_kind),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_valuation_inputs_instrument
+            ON valuation_inputs(instrument_id, as_of_date, updated_at);
 
             CREATE TABLE IF NOT EXISTS analyst_forecasts (
                 instrument_id TEXT NOT NULL,

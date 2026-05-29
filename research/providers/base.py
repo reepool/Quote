@@ -337,6 +337,7 @@ class ValuationHistorySnapshot:
     currency: str = "CNY"
     close_price: Optional[float] = None
     market_cap: Optional[float] = None
+    float_market_cap: Optional[float] = None
     pe_ratio: Optional[float] = None
     pb_ratio: Optional[float] = None
     ps_ratio: Optional[float] = None
@@ -353,6 +354,51 @@ class ValuationHistorySnapshot:
     source: str = "local_quotes_financial_facts"
     source_mode: str = "derived"
     details_json: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class ValuationInputSnapshot:
+    """One valuation input row with explicit source, unit, and date lineage."""
+
+    instrument_id: str
+    symbol: str
+    exchange: str
+    as_of_date: str
+    currency: str = "CNY"
+    market_cap: Optional[float] = None
+    shares_outstanding: Optional[float] = None
+    float_market_cap: Optional[float] = None
+    float_shares: Optional[float] = None
+    source: str = ""
+    source_mode: str = "direct"
+    input_kind: str = "market_cap_or_share_count"
+    unit: Optional[str] = None
+    data_as_of: Optional[str] = None
+    diagnostics_json: Dict[str, Any] = field(default_factory=dict)
+
+
+class BaseValuationInputProvider(ABC):
+    """Base contract for market-cap and share-count valuation inputs."""
+
+    source_name: str = ""
+    supported_modes: set[str] = {"direct"}
+
+    def supports_mode(self, mode: str) -> bool:
+        return mode in self.supported_modes
+
+    @abstractmethod
+    async def fetch_valuation_inputs(
+        self,
+        *,
+        instruments: List[Dict[str, Any]],
+        exchange: str,
+        mode: str = "direct",
+        sync_mode: str = "incremental",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[ValuationInputSnapshot]:
+        """Fetch normalized valuation input snapshots for a set of instruments."""
 
 
 @dataclass(frozen=True)

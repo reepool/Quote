@@ -24,6 +24,11 @@
                 "filename_pattern": "financials_backup_{timestamp}.db"
             },
             {
+                "name": "valuation",
+                "path": "data/valuation.db",
+                "filename_pattern": "valuation_backup_{timestamp}.db"
+            },
+            {
                 "name": "market_data",
                 "path": "data/market_data.db",
                 "filename_pattern": "market_data_backup_{timestamp}.db"

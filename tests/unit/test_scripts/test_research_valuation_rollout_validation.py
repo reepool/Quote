@@ -26,6 +26,10 @@ class FakeValidationManager:
         self.calls.append(("sync", kwargs))
         return {"status": "success", "rows_written": 24}
 
+    async def run_valuation_input_sync(self, **kwargs):
+        self.calls.append(("input_sync", kwargs))
+        return {"status": "success", "snapshots_written": 2}
+
     async def get_research_valuation_readiness(self):
         self.calls.append(("readiness", {}))
         return {
@@ -49,14 +53,51 @@ async def test_rollout_validation_runs_sync_and_readiness_by_default():
         manager,
         exchanges=["SSE", "SZSE"],
         limit_per_exchange=2,
+        target_instrument_ids=["600000.SH"],
     )
 
     assert result["status"] == "ready"
     assert result["summary"]["ready_for_rollout"] is True
+    assert result["input_sync"]["status"] == "skipped"
     assert [call[0] for call in manager.calls] == ["sync", "readiness"]
     assert manager.calls[0][1] == {
         "exchanges": ["SSE", "SZSE"],
         "limit_per_exchange": 2,
+        "target_instrument_ids": ["600000.SH"],
+        "allow_disabled_module": False,
+    }
+
+
+@pytest.mark.asyncio
+async def test_rollout_validation_can_sync_inputs_before_history():
+    manager = FakeValidationManager(ready=True)
+
+    result = await run_rollout_validation(
+        manager,
+        exchanges=["SSE"],
+        limit_per_exchange=1,
+        target_instrument_ids=["600000.SH"],
+        sync_inputs=True,
+        input_sync_mode="incremental",
+    )
+
+    assert result["input_sync"]["status"] == "success"
+    assert [call[0] for call in manager.calls] == [
+        "input_sync",
+        "sync",
+        "readiness",
+    ]
+    assert manager.calls[0][1] == {
+        "exchanges": ["SSE"],
+        "limit_per_exchange": 1,
+        "target_instrument_ids": ["600000.SH"],
+        "sync_mode": "incremental",
+    }
+    assert manager.calls[1][1] == {
+        "exchanges": ["SSE"],
+        "limit_per_exchange": 1,
+        "target_instrument_ids": ["600000.SH"],
+        "allow_disabled_module": False,
     }
 
 

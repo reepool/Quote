@@ -966,6 +966,62 @@ def test_data_manager_run_valuation_history_rebuild_delegates_to_service(tmp_pat
     service_cls.assert_called_once()
 
 
+def test_data_manager_run_valuation_history_rebuild_can_force_disabled_module_for_validation(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.valuation_history_sync.ValuationHistoryRebuildService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_valuation_history_rebuild(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+                allow_disabled_module=True,
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
+def test_data_manager_run_valuation_input_sync_delegates_to_service_even_when_module_disabled(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": False},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+
+    with patch("research.valuation_input_sync.ValuationInputSyncService") as service_cls:
+        service_instance = Mock()
+        service_instance.sync = AsyncMock(return_value={"status": "success"})
+        service_cls.return_value = service_instance
+
+        result = _run(
+            manager.run_valuation_input_sync(
+                exchanges=["SSE"],
+                limit_per_exchange=10,
+                sync_mode="incremental",
+            )
+        )
+
+    assert result["status"] == "success"
+    service_cls.assert_called_once()
+
+
 def test_data_manager_run_analyst_forecast_shadow_sync_returns_unavailable_without_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
@@ -2273,6 +2329,14 @@ def test_data_manager_get_research_valuation_readiness_reports_blockers(tmp_path
         "SSE": 1,
         "SZSE": 1,
     }
+    storage.summarize_valuation_input_coverage.return_value = {
+        "instrument_count": 2,
+        "market_cap_count": 2,
+        "shares_outstanding_count": 0,
+        "usable_input_count": 2,
+        "source_counts": {"manual": 2},
+        "source_mode_counts": {"local": 2},
+    }
     manager.research_storage = storage
     manager.db_ops = Mock()
     manager.db_ops.get_instruments_by_exchange = AsyncMock(
@@ -2301,6 +2365,8 @@ def test_data_manager_get_research_valuation_readiness_reports_blockers(tmp_path
     assert result["target_instrument_count"] == 3
     assert result["valuation_history_total"] == 2
     assert result["missing_valuation_history_count"] == 1
+    assert result["valuation_input_total"] == 2
+    assert result["missing_valuation_input_count"] == 1
     assert result["source_counts"] == {"local_quotes_financial_facts": 2}
     assert result["exchange_coverage"][0]["exchange"] == "SSE"
     assert result["exchange_coverage"][0]["coverage_ratio"] == 0.5
@@ -2309,6 +2375,7 @@ def test_data_manager_get_research_valuation_readiness_reports_blockers(tmp_path
     assert result["ready_for_rollout"] is False
     assert "valuation_module_disabled" in result["blockers"]
     assert "valuation_history_coverage_incomplete" in result["blockers"]
+    assert "valuation_input_coverage_incomplete" in result["blockers"]
     assert "authoritative_membership_coverage_incomplete" in result["blockers"]
     storage.summarize_valuation_history.assert_called_once()
     storage.count_valuation_history_by_exchange.assert_called_once()
@@ -2390,6 +2457,12 @@ def test_data_manager_valuation_readiness_requires_financial_readiness(tmp_path)
     storage.summarize_valuation_metric_coverage.return_value = {
         "instrument_count": 1,
         "metrics": {"pe_ttm": {"covered_instruments": 1, "coverage_ratio": 1.0}},
+    }
+    storage.summarize_valuation_input_coverage.return_value = {
+        "instrument_count": 1,
+        "market_cap_count": 1,
+        "shares_outstanding_count": 0,
+        "usable_input_count": 1,
     }
     storage.validate_financial_statement_readiness.return_value = {
         "status": "not_ready",

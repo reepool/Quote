@@ -278,6 +278,7 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statemen
 当前边界：
 - `pe_ratio / pb_ratio / ps_ratio` 仍作为兼容字段保留，其中 `pe_ratio` 优先映射 `pe_ttm`、缺失时回退 `pe_static`，`pb_ratio` 映射 `pb_mrq`，`ps_ratio` 优先映射 `ps_ttm`、缺失时回退 `ps_static`。
 - 当前估值历史已拆分 `pe_static / pe_ttm / pe_forward / pb_mrq / ps_static / ps_ttm / ps_forward`；`include_details=true` 时返回每个指标的 numerator、denominator、报告期和可得日。
+- `market_cap` 为总市值，`float_market_cap` 为流通市值；两者来自本地收盘价和已落库 `valuation_inputs`，读取接口不会同步请求 CNInfo/AkShare。
 - `pe_forward / ps_forward` 在 analyst forecast 输入未启用或缺失时返回空值，并在 details 中给出 explicit unavailable 状态和原因。
 
 示例：

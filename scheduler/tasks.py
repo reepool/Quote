@@ -2956,6 +2956,81 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('valuation_history_rebuild')
 
+    async def valuation_input_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        sync_mode: str = "incremental",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 valuation inputs 同步任务。"""
+        task_name = 'valuation_input_sync'
+        self._active_tasks.add(task_name)
+        try:
+            scheduler_logger.info("[Scheduler] Starting valuation input sync...")
+
+            result = await data_manager.run_valuation_input_sync(
+                exchanges=exchanges,
+                limit_per_exchange=limit_per_exchange,
+                source=source,
+                source_mode=source_mode,
+                sync_mode=sync_mode,
+                start_date=start_date,
+                end_date=end_date,
+            )
+
+            status = result.get('status', 'failed')
+            success = status in {'success', 'degraded'}
+            report_data = {
+                'name': '估值输入同步报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': result.get('successful_exchanges', 0),
+                'duration': 'N/A',
+                'maintenance_tasks': [
+                    {
+                        'task_name': exchange_result.get('exchange', 'unknown'),
+                        'status': (
+                            f"{exchange_result.get('status')} "
+                            f"(rows={exchange_result.get('snapshots_written', 0)}, "
+                            f"missing={exchange_result.get('missing_instruments', 0)})"
+                        ),
+                    }
+                    for exchange_result in result.get('exchanges', [])
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='估值输入同步',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Valuation input sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '估值输入同步报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': task_name, 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='估值输入同步',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
     async def technical_snapshot_refresh(
         self,
         exchanges: Optional[List[str]] = None,

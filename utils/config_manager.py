@@ -162,6 +162,7 @@ class ResearchStorageConfig:
     quotes_db_path: str = "data/quotes.db"
     quotes_db_alias: str = "quotes"
     financials_db_path: str = "data/financials.db"
+    valuation_db_path: str = "data/valuation.db"
     filings_archive_root: str = "data/filings/financial_statements"
 
 
@@ -657,6 +658,10 @@ class UnifiedConfigManager:
                     financials_db_path=storage_data.get(
                         'financials_db_path',
                         'data/financials.db',
+                    ),
+                    valuation_db_path=storage_data.get(
+                        'valuation_db_path',
+                        'data/valuation.db',
                     ),
                     filings_archive_root=storage_data.get(
                         'filings_archive_root',

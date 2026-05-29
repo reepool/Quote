@@ -782,6 +782,7 @@ class ResearchValuationHistoryItemResponse(BaseModel):
     currency: str = Field(..., description="货币")
     close_price: Optional[float] = Field(None, description="收盘价")
     market_cap: Optional[float] = Field(None, description="估算总市值")
+    float_market_cap: Optional[float] = Field(None, description="估算流通市值")
     pe_ratio: Optional[float] = Field(None, description="市盈率")
     pb_ratio: Optional[float] = Field(None, description="市净率")
     ps_ratio: Optional[float] = Field(None, description="市销率")
@@ -831,6 +832,7 @@ class ResearchRelativeValuationPeerResponse(BaseModel):
     as_of_date: Optional[str] = Field(None, description="估值日期")
     close_price: Optional[float] = Field(None, description="收盘价")
     market_cap: Optional[float] = Field(None, description="估算总市值")
+    float_market_cap: Optional[float] = Field(None, description="估算流通市值")
     pe_ratio: Optional[float] = Field(None, description="市盈率")
     pb_ratio: Optional[float] = Field(None, description="市净率")
     ps_ratio: Optional[float] = Field(None, description="市销率")
@@ -947,6 +949,19 @@ class ResearchValuationReadinessResponse(BaseModel):
     missing_valuation_history_count: int = Field(
         ...,
         description="仍缺失估值历史的股票数量",
+    )
+    valuation_input_total: int = Field(0, description="已有可用估值输入的股票数量")
+    missing_valuation_input_count: int = Field(
+        0,
+        description="仍缺失估值输入的股票数量",
+    )
+    valuation_inputs: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="估值输入覆盖与来源摘要",
+    )
+    valuation_storage: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="估值域物理存储摘要",
     )
     source_counts: Dict[str, int] = Field(default_factory=dict, description="按 source 统计")
     source_mode_counts: Dict[str, int] = Field(

@@ -2,7 +2,7 @@
 
 ## 🎯 任务概述
 
-`database_backup` 定时任务负责将 Quote 系统的本地 SQLite 数据库自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。当前备份范围不再只限 `data/quotes.db`，而是覆盖 `quotes.db / research.db / financials.db / market_data.db`，并可通过 `include_extra_data_dbs` 自动纳入 `data/*.db` 下未来新增的数据库。
+`database_backup` 定时任务负责将 Quote 系统的本地 SQLite 数据库自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。当前备份范围不再只限 `data/quotes.db`，而是覆盖 `quotes.db / research.db / financials.db / valuation.db / market_data.db`，并可通过 `include_extra_data_dbs` 自动纳入 `data/*.db` 下未来新增的数据库。
 
 > 存储布局说明：生产环境中 `data/` 是 `/dev/sda3` 挂载到
 > `/home/python/Quote/data` 的本地数据卷；`data/PVE-Bak` 和
@@ -36,6 +36,11 @@
         "name": "financials",
         "path": "data/financials.db",
         "filename_pattern": "financials_backup_{timestamp}.db"
+      },
+      {
+        "name": "valuation",
+        "path": "data/valuation.db",
+        "filename_pattern": "valuation_backup_{timestamp}.db"
       },
       {
         "name": "market_data",

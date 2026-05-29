@@ -9,6 +9,7 @@
 > 配套行业 readiness 变更包：`openspec/changes/add-industry-standard-readiness-api/`
 > 配套股东 readiness 变更包：`openspec/changes/add-shareholder-readiness-api/`
 > 配套 CNInfo 公告扫描与股东增量同步变更包：`openspec/changes/add-shareholder-incremental-sync/`
+> 当前估值生产 rollout 准备变更包：`openspec/changes/prepare-valuation-production-rollout/`
 > 配套 BSE 可空策略变更包：`openspec/changes/add-bse-empty-exchange-policy/`
 > 配套申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
 > 配套 official-code backlog 变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`
@@ -79,13 +80,16 @@
   - 最新快照缓存
   - 热门标的短期缓存
 - **估值历史建议采用混合模式**：
-  - `PE/PB/PS/market_cap` 等核心序列可以日更预计算
-  - `DCF`、敏感性分析、同行对比等保留实时计算
+  - `PE/PB/PS/market_cap/float_market_cap` 等核心日频序列应日更预计算，并单独落入 `data/valuation.db`
+  - `DCF`、敏感性分析、同行对比等保留实时计算或 bounded aggregate cache，不落全量 `subject x peer x date` 相对估值矩阵
+  - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
+  - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，生产启用仍需全市场覆盖率、财务 readiness 与 strict Shenwan blocker 通过
 - **部署策略建议 Phase 1 采用“服务集成、存储隔离”**：
   - 复用现有 Quote System 的代码仓、调度器、API、监控和 Telegram 运维能力
   - 研究域模块、表、路由和任务要独立命名与隔离
   - 为降低对现有生产库的影响，**推荐新增 `research.db` 或等价独立库文件**，而不是直接把全部研究表并入 `quotes.db`
   - `2026-05-20` 修正后，财务仓生产读写必须使用 `data/financials.db`，不再把新增财务事实写入 `data/research.db`；业务层仍必须通过 repository/storage 抽象访问，不允许在 `DataManager`、provider 或 API 层散落 SQLite 方言和文件路径假设
+  - `2026-05-28` 估值域进一步明确为独立 `data/valuation.db`：`research.db` 继续承载公司画像、行业、股东、研报元数据、风险/技术轻量快照等研究维表，`valuation.db` 承载高行数、可重建的日频估值派生序列，便于备份、压缩、迁移和未来替换 DuckDB/PostgreSQL/列式适配层
   - 若未来迁移到 DuckDB/PostgreSQL 等性能更优的数据库，应保持 `instrument_id + report_period + source lineage + availability metadata` 等逻辑模型不变，只替换存储适配层、迁移脚本和连接配置
 - **市场范围建议分两期**：
   - Phase 1：A 股完整研究能力 + 港股价格/技术/基础信息能力
@@ -651,7 +655,7 @@ research_routing.financial_statements
 | 数据类型 | A 股估算 | A 股 + 港股估算 | 结论 |
 |----------|----------|----------------|------|
 | 财务原始报表 + 规范化事实 + 指标 | `1.5 ~ 4 GiB` | `3 ~ 8 GiB` | 可接受 |
-| 估值历史（PE/PB/PS/market_cap，5~10年） | `1 ~ 3 GiB` | `2 ~ 5 GiB` | 可接受 |
+| 估值历史（PE/PB/PS/market_cap，5~10年，独立 `valuation.db`） | `7 ~ 14 GiB` | `10 ~ 20 GiB` | 可接受，建议独立库隔离 |
 | 技术指标最新快照缓存 | `< 200 MiB` | `< 400 MiB` | 很轻 |
 | 技术指标全量全历史缓存 | `> 5 GiB` | `> 10 GiB` | Phase 1 不建议 |
 
@@ -799,13 +803,15 @@ research_routing.financial_statements
 #### 估值历史（M10）
 
 - **核心序列**：`PE/PB/PS/market_cap` 建议日更预计算
+- **存储策略**：核心估值序列单独写入 `data/valuation.db`，不继续扩大 `research.db`
+- **相对估值策略**：按请求从 `valuation.db.valuation_history + research.db.industry_memberships` 计算同行统计，不持久化全量同行比较矩阵
 - **实时部分**：`DCF`、参数覆盖、敏感性分析实时计算
 
 #### 选择依据
 
 - 单标的技术指标实时计算已经被本地基准证明是低成本
 - 估值历史如果财务本地化，计算本身也不重
-- 真正昂贵的是全市场全历史的全量缓存存储，而不是单次计算
+- 真正昂贵的是全市场全历史的全量缓存存储和索引维护，而不是单次计算；估值日频序列属于高行数可重建派生资产，应从一开始与 `research.db` 隔离
 
 ### Q4：DCF 模型是否同时支持默认参数与敏感性分析？
 
@@ -846,6 +852,7 @@ research_routing.financial_statements
   - 同 FastAPI 服务
   - 同调度器
   - **研究域建议独立 `research.db`**
+  - **估值日频派生序列建议独立 `valuation.db`**
   - 研究域使用独立模块、独立表前缀、独立路由前缀
 - **Phase 2/3**
   - 如果研究 API 流量或分析任务明显增长，再考虑拆成独立读服务
@@ -919,6 +926,10 @@ Phase 1 就应落实：
 - 继续复用当前代码仓、FastAPI、Scheduler、Telegram 运维与监控
 - 研究接口仍集成在现有服务下，通过 `/api/v1/research/*` 暴露
 - 研究表默认落到 `research.db`（或等价独立库文件）
+- 估值日频派生表默认落到 `valuation.db`，通过 storage/repository 层与 `research.db`、`financials.db` 和 `quotes.db` 逻辑拼装
+- `valuation_inputs` 作为独立输入层记录 source、unit、as_of_date、data_as_of 与缺失诊断；不能用金额单位的股本/资本事实冒充股数，也不能从成交额/换手率隐式反推市值
+- A 股初始免费股本输入主线为 CNInfo/AkShare：全量回填使用 `stock_share_change_cninfo(symbol, start_date, end_date)` 获取单标的股本变动历史，日更使用 `stock_hold_change_cninfo(symbol="全部")` 获取全市场最新股本变动快照；`总股本 / 已流通股份` 按万股转换为股后写入 `valuation.db.valuation_inputs`
+- `valuation_history.market_cap` 明确为总市值，`float_market_cap` 明确为流通市值，均由本地未复权收盘价和本地显式股数输入计算；这是估值结果层的可复现冗余，不替代 `valuation_inputs` 的源数据 lineage
 - 现有 `quotes.db` 保持读多写少，不让研究域大批量回填直接冲击原生产库
 
 上线策略：
@@ -976,7 +987,7 @@ Phase 1 就应落实：
 | `analyst_forecasts` | 分析师覆盖与一致预期 |
 | `research_reports` | 研报元数据 |
 | `sentiment_events` | 资金流、龙虎榜、减持、质押等事件 |
-| `valuation_history` | 日度估值历史 |
+| `valuation_history` | 日度估值历史，物理存储在独立 `data/valuation.db` |
 | `technical_indicator_latest` | 最新技术指标快照 |
 | `ingestion_runs` | 同步任务运行记录 |
 | `raw_payload_audit` | 原始 payload 审计（可选但强烈建议） |
@@ -1562,7 +1573,8 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
-| `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
+| `valuation_input_sync` | 每日收盘后，估值历史重建前 | 同步 CNInfo/AkShare 股本输入；日更走全市场快照，全量回填走单标的股本变动历史，写入 `valuation.db.valuation_inputs` |
+| `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |
@@ -1655,7 +1667,8 @@ GET /api/v1/research/company/{instrument_id}/events
 - `industry_classification_history` 保存官方股票分类历史全量行，并派生 latest membership
 - `industry_memberships` authoritative 映射、行业变更后的重映射与缺口补齐
 - `industry_index_analysis` 后续按申万行业指数代码保存官方指数分析指标，与股票分类同步解耦
-- `valuation_history`
+- `valuation_history` 独立落 `data/valuation.db`
+- `valuation_inputs` 独立落 `data/valuation.db`，先由 `valuation_input_sync` 完成全量或日更，再由 `valuation_history_rebuild` 消费
 - 同行业对标
 - 相对估值
 - DCF + 参数覆盖 + 敏感性分析
@@ -1665,8 +1678,10 @@ GET /api/v1/research/company/{instrument_id}/events
 
 - 申万一/二/三级行业定位
 - 仓库级标准执行顺序：`industry_standard_sync(官方分类文件刷新/重建) -> industry_standard_gap_fill(异常补缺) -> industry/standard-readiness`
-- 估值时间轴
-- 支持以 **申万一级 / 二级 / 三级行业** 作为同行比较中枢的矩阵；未显式指定时默认使用 **申万二级行业**，工程实现通过 `valuation.relative.benchmark_field` 配置解析，默认 `sw_l2_code`
+- 估值时间轴，按 `instrument_id + trade_date + calc_version` 存储在 `valuation.db`
+- 总市值使用收盘价乘总股本，流通市值使用收盘价乘流通股本；股本输入必须保留 source、source_mode、unit、effective date 和 announcement date
+- 支持以 **申万一级 / 二级 / 三级行业** 作为同行比较中枢的相对估值统计输出；未显式指定时默认使用 **申万二级行业**，工程实现通过 `valuation.relative.benchmark_field` 配置解析，默认 `sw_l2_code`
+- 相对估值不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵，而是从 `valuation.db.valuation_history` 与 `research.db.industry_memberships` 即时计算或使用 bounded aggregate cache
 - 当 `valuation.relative.require_authoritative=true` 时，相对估值只能使用 current authoritative 行业归属，不允许降级使用 reference-only 行业字段
 - 相对估值按 `valuation.relative.metric_variants` 显式选择指标口径，默认 `pe_ttm / pb_mrq / ps_ttm`，并返回 valid peer count、mean、median、p25、p75、percentile rank、相对中位数溢价/折价和逐指标排除诊断
 - valuation rollout readiness 应同时检查 `valuation_history` 覆盖、模块 gate 与 strict Shenwan current authoritative membership 前置条件

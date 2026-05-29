@@ -359,6 +359,7 @@ class ResearchValuationService:
         financial_facts = self._prepare_financial_fact_history(financial_bundle)
         if not financial_facts:
             return []
+        valuation_inputs = self._prepare_valuation_inputs(financial_bundle)
 
         ordered = quotes.copy()
         ordered["time"] = pd.to_datetime(ordered["time"])
@@ -380,14 +381,38 @@ class ResearchValuationService:
                 continue
 
             latest_fact = eligible_facts[0]
-            shares_outstanding = self._latest_positive_fact_value(
-                eligible_facts,
-                "shares_outstanding",
+            valuation_input = self._resolve_valuation_input(
+                valuation_inputs,
+                as_of_date=as_of_date,
+                close_price=close_price,
             )
-            if shares_outstanding is None:
+            shares_outstanding = valuation_input.get("shares_outstanding")
+            market_cap = valuation_input.get("market_cap")
+            float_market_cap = valuation_input.get("float_market_cap")
+            input_source = valuation_input.get("source")
+            if market_cap is None:
+                shares_outstanding = self._latest_positive_fact_value(
+                    eligible_facts,
+                    "shares_outstanding",
+                )
+                if shares_outstanding is None:
+                    continue
+                market_cap = close_price * shares_outstanding
+                input_source = {
+                    "source": "financial_core_facts",
+                    "source_mode": "local",
+                    "input_kind": "shares_outstanding",
+                    "as_of_date": latest_fact.get("data_available_date"),
+                    "unit": "share",
+                    "resolution": "price_times_explicit_shares_outstanding",
+                }
+            elif shares_outstanding is None:
+                shares_outstanding = self._latest_positive_fact_value(
+                    eligible_facts,
+                    "shares_outstanding",
+                )
+            if market_cap is None:
                 continue
-
-            market_cap = close_price * shares_outstanding
             metric_details = self._build_metric_details(
                 market_cap=market_cap,
                 eligible_facts=eligible_facts,
@@ -408,6 +433,7 @@ class ResearchValuationService:
                     as_of_date=as_of_date,
                     close_price=close_price,
                     market_cap=market_cap,
+                    float_market_cap=float_market_cap,
                     pe_ratio=pe_ttm if pe_ttm is not None else pe_static,
                     pb_ratio=pb_mrq,
                     ps_ratio=ps_ttm if ps_ttm is not None else ps_static,
@@ -425,7 +451,9 @@ class ResearchValuationService:
                         "latest_financial_available_date": latest_fact.get(
                             "data_available_date"
                         ),
+                        "valuation_input": input_source,
                         "shares_outstanding": shares_outstanding,
+                        "float_market_cap": float_market_cap,
                         "revenue": latest_fact.get("revenue"),
                         "net_income": latest_fact.get("net_income"),
                         "equity": latest_fact.get("equity"),
@@ -502,6 +530,119 @@ class ResearchValuationService:
             if fact.get("data_available_date")
             and str(fact["data_available_date"]) <= as_of_date
         ]
+
+    def _prepare_valuation_inputs(
+        self,
+        financial_bundle: Dict[str, Any],
+    ) -> List[Dict[str, Any]]:
+        raw_inputs = financial_bundle.get("valuation_inputs") or []
+        if not isinstance(raw_inputs, list):
+            raw_inputs = [raw_inputs]
+
+        prepared: List[Dict[str, Any]] = []
+        for raw_input in raw_inputs:
+            if not isinstance(raw_input, dict):
+                continue
+            as_of_date = self._normalize_date(
+                raw_input.get("as_of_date") or raw_input.get("data_as_of")
+            )
+            if not as_of_date:
+                continue
+            market_cap = self._safe_positive_float(raw_input.get("market_cap"))
+            shares_outstanding = self._safe_positive_float(
+                raw_input.get("shares_outstanding")
+            )
+            if market_cap is None and shares_outstanding is None:
+                continue
+            unit = str(raw_input.get("unit") or "").strip().lower()
+            diagnostics = raw_input.get("diagnostics") or raw_input.get("diagnostics_json")
+            item = dict(raw_input)
+            item["as_of_date"] = as_of_date
+            item["market_cap"] = market_cap
+            item["shares_outstanding"] = shares_outstanding
+            item["unit"] = unit or None
+            item["diagnostics"] = diagnostics if isinstance(diagnostics, dict) else {}
+            prepared.append(item)
+
+        prepared.sort(
+            key=lambda item: (
+                str(item.get("as_of_date") or ""),
+                str(item.get("updated_at") or ""),
+            ),
+            reverse=True,
+        )
+        return prepared
+
+    def _resolve_valuation_input(
+        self,
+        valuation_inputs: List[Dict[str, Any]],
+        *,
+        as_of_date: str,
+        close_price: float,
+    ) -> Dict[str, Any]:
+        for valuation_input in valuation_inputs:
+            input_date = str(valuation_input.get("as_of_date") or "")
+            if input_date > as_of_date:
+                continue
+            data_as_of = str(valuation_input.get("data_as_of") or input_date)
+            if data_as_of > as_of_date:
+                continue
+            market_cap = self._safe_positive_float(valuation_input.get("market_cap"))
+            shares_outstanding = self._safe_positive_float(
+                valuation_input.get("shares_outstanding")
+            )
+            float_market_cap = self._safe_positive_float(
+                valuation_input.get("float_market_cap")
+            )
+            float_shares = self._safe_positive_float(
+                valuation_input.get("float_shares")
+            )
+            if market_cap is None and shares_outstanding is None:
+                continue
+            resolved_market_cap = (
+                market_cap
+                if market_cap is not None
+                else close_price * shares_outstanding
+            )
+            resolved_float_market_cap = (
+                float_market_cap
+                if float_market_cap is not None
+                else (
+                    close_price * float_shares if float_shares is not None else None
+                )
+            )
+            source = {
+                "source": valuation_input.get("source"),
+                "source_mode": valuation_input.get("source_mode"),
+                "input_kind": valuation_input.get("input_kind"),
+                "as_of_date": input_date,
+                "data_as_of": data_as_of,
+                "unit": valuation_input.get("unit"),
+                "market_cap": market_cap,
+                "shares_outstanding": shares_outstanding,
+                "float_market_cap": float_market_cap,
+                "float_shares": float_shares,
+                "resolution": (
+                    "explicit_market_cap"
+                    if market_cap is not None
+                    else "price_times_explicit_shares_outstanding"
+                ),
+                "diagnostics": valuation_input.get("diagnostics") or {},
+            }
+            return {
+                "market_cap": resolved_market_cap,
+                "float_market_cap": resolved_float_market_cap,
+                "shares_outstanding": shares_outstanding,
+                "source": source,
+            }
+        return {
+            "market_cap": None,
+            "float_market_cap": None,
+            "shares_outstanding": None,
+            "source": {
+                "missing_reason": "valuation_input_not_available",
+            },
+        }
 
     def _build_metric_details(
         self,

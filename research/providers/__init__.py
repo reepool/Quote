@@ -10,6 +10,7 @@ from .akshare_official_shenwan_history import AkshareOfficialShenwanHistoryProvi
 from .akshare_shareholders import AkshareShareholdersProvider
 from .akshare_shenwan_industry import AkshareShenwanIndustryProvider
 from .akshare_swsresearch_index_analysis import AkshareSWSResearchIndexAnalysisProvider
+from .akshare_valuation_inputs import AkshareCninfoValuationInputProvider
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
 from .official_financial_filings import ConfiguredOfficialFinancialFilingProvider
@@ -30,6 +31,7 @@ from .base import (
     IndustryNameHintSnapshot,
     BaseResearchReportProvider,
     BaseSentimentEventProvider,
+    BaseValuationInputProvider,
     CompanyProfileSnapshot,
     IndustryClassificationHistorySnapshot,
     IndustrySourceFileSnapshot,
@@ -57,6 +59,7 @@ from .base import (
     FinancialStatementBundle,
     FinancialStatementRawSnapshot,
     ValuationHistorySnapshot,
+    ValuationInputSnapshot,
     BaseIndustryProvider,
     BaseIndustryStandardProvider,
     FinancialSummarySnapshot,
@@ -81,6 +84,7 @@ from .registry import (
     ResearchReportProviderRegistry,
     ShareholderProviderRegistry,
     SentimentEventProviderRegistry,
+    ValuationInputProviderRegistry,
 )
 
 __all__ = [
@@ -95,6 +99,7 @@ __all__ = [
     "IndustryNameHintSnapshot",
     "BaseResearchReportProvider",
     "BaseSentimentEventProvider",
+    "BaseValuationInputProvider",
     "CompanyProfileSnapshot",
     "IndustryClassificationHistorySnapshot",
     "IndustrySourceFileSnapshot",
@@ -114,6 +119,7 @@ __all__ = [
     "FinancialIndicatorSnapshot",
     "FinancialStatementBundle",
     "ValuationHistorySnapshot",
+    "ValuationInputSnapshot",
     "BaseFinancialSummaryProvider",
     "FinancialSummarySnapshot",
     "BaseIndustryProvider",
@@ -129,6 +135,7 @@ __all__ = [
     "AkshareShenwanIndustryProvider",
     "AkshareSWSResearchIndexAnalysisProvider",
     "AkshareShareholdersProvider",
+    "AkshareCninfoValuationInputProvider",
     "EastmoneyIndustryNameSupplementProvider",
     "ManualIndustryNameSupplementProvider",
     "ConfiguredOfficialFinancialFilingProvider",
@@ -156,4 +163,5 @@ __all__ = [
     "ResearchReportProviderRegistry",
     "ShareholderProviderRegistry",
     "SentimentEventProviderRegistry",
+    "ValuationInputProviderRegistry",
 ]
