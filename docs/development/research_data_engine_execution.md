@@ -346,7 +346,7 @@ API 补齐原则：
   - `2026-05-29` 样本股本复核：上述三只样本的落库股本与 CNInfo/AkShare live read-only 返回一致，源值按 `10k_share * 10000` 转为股；`001233.SZ` 与 `920009.BJ` 的流通股本加限售股本可回到总股本，`600000.SH` 当期无单列限售股本
   - `2026-05-29` 只读耗时采样：日更全市场快照覆盖 `5525` 个当前活跃 A 股标的约 `3s`，生产含 upsert 与重试按 `1-5min` 规划；全量历史回填按当前 `0.2s` 请求间隔和样本返回量估算约 `2-6h`，保守任务超时配置为 `48h`
   - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
-  - scheduler 已预留三个入口：`valuation_input_sync` 为周二至周六 `04:30` 禁用任务，`valuation_history_rebuild` 为周二至周六 `04:45` 禁用任务，两者均安排在 A 股行情日更、财务公告增量和数据库备份之后；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务，用于正式全量回填前准备
+  - scheduler 已预留三个入口：`valuation_input_sync` 为周二至周六 `04:30` 已开启日更测试任务，`valuation_history_rebuild` 为周二至周六 `04:45` 禁用任务，两者均安排在 A 股行情日更、财务公告增量和数据库备份之后；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
 
 ### 4.7 当前项目级 Source Policy
 

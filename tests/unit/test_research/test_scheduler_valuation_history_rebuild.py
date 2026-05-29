@@ -179,7 +179,7 @@ def test_valuation_input_scheduler_config_keeps_daily_disabled_and_full_manual_o
     jobs = config["scheduler_config"]["jobs"]
 
     daily = jobs["valuation_input_sync"]
-    assert daily["enabled"] is False
+    assert daily["enabled"] is True
     assert daily["trigger"]["day_of_week"] == "tue-sat"
     assert daily["trigger"]["hour"] == 4
     assert daily["trigger"]["minute"] == 30
