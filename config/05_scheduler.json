@@ -905,8 +905,8 @@
         }
       },
       "valuation_input_sync": {
-        "enabled": false,
-        "description": "研究域估值输入股本/市值日更同步（暂不自动启用）",
+        "enabled": true,
+        "description": "研究域估值输入股本/市值日更同步",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
