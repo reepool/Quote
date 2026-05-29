@@ -143,10 +143,18 @@ def test_valuation_input_scheduler_config_keeps_daily_disabled_and_full_manual_o
 
     daily = jobs["valuation_input_sync"]
     assert daily["enabled"] is False
-    assert daily["trigger"]["hour"] == 19
-    assert daily["trigger"]["minute"] == 20
+    assert daily["trigger"]["day_of_week"] == "tue-sat"
+    assert daily["trigger"]["hour"] == 4
+    assert daily["trigger"]["minute"] == 30
     assert daily["parameters"]["sync_mode"] == "incremental"
     assert daily["parameters"]["limit_per_exchange"] is None
+
+    history = jobs["valuation_history_rebuild"]
+    assert history["enabled"] is False
+    assert history["trigger"]["day_of_week"] == "tue-sat"
+    assert history["trigger"]["hour"] == 4
+    assert history["trigger"]["minute"] == 45
+    assert history["parameters"]["limit_per_exchange"] is None
 
     full = jobs["valuation_input_full_backfill"]
     assert full["enabled"] is True

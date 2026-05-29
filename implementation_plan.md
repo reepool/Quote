@@ -1577,9 +1577,9 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
-| `valuation_input_sync` | 每日 `19:20`，暂不自动启用 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；当前保持 `enabled=false`，等待全量回填和 readiness 复核 |
+| `valuation_input_sync` | 次日 `04:30`，周二至周六，暂不自动启用 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更、财务公告增量和数据库备份之后，当前保持 `enabled=false`，等待全量回填和 readiness 复核 |
 | `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
-| `valuation_history_rebuild` | 每日收盘后 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；静态、TTM、forward 指标必须分口径输出 |
+| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，暂不自动启用 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；必须在 A 股行情日更完成后运行，确保使用当天最新本地收盘价；静态、TTM、forward 指标必须分口径输出 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |

@@ -881,14 +881,14 @@
       },
       "valuation_history_rebuild": {
         "enabled": false,
-        "description": "研究域估值历史重建",
+        "description": "研究域估值历史重建（行情日更后，暂不自动启用）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
-          "day_of_week": "mon-fri",
-          "hour": 18,
-          "minute": 30,
+          "day_of_week": "tue-sat",
+          "hour": 4,
+          "minute": 45,
           "second": 0
         },
         "max_instances": 1,
@@ -900,8 +900,8 @@
             "SZSE",
             "BSE"
           ],
-          "limit_per_exchange": 50,
-          "max_runtime_seconds": 10800
+          "limit_per_exchange": null,
+          "max_runtime_seconds": 21600
         }
       },
       "valuation_input_sync": {
@@ -911,9 +911,9 @@
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
-          "day_of_week": "mon-fri",
-          "hour": 19,
-          "minute": 20,
+          "day_of_week": "tue-sat",
+          "hour": 4,
+          "minute": 30,
           "second": 0
         },
         "max_instances": 1,
