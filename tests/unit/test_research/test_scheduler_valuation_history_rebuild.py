@@ -54,12 +54,26 @@ def test_valuation_input_sync_task_calls_data_manager_and_clears_active_flag(mon
         return_value={
             "status": "success",
             "successful_exchanges": 1,
+            "attempted_exchanges": 1,
+            "source": "cninfo",
+            "source_mode": "direct",
+            "sync_mode": "incremental",
+            "start_date": "2026-01-01",
+            "end_date": "2026-05-29",
+            "total_requested_instruments": 10,
+            "total_covered_instruments": 10,
+            "total_missing_instruments": 0,
+            "total_snapshots_written": 10,
+            "elapsed_seconds": 12.3,
             "exchanges": [
                 {
                     "exchange": "SSE",
                     "status": "success",
                     "snapshots_written": 10,
+                    "requested_instruments": 10,
+                    "covered_instruments": 10,
                     "missing_instruments": 0,
+                    "elapsed_seconds": 12.3,
                 }
             ],
         }
@@ -89,6 +103,10 @@ def test_valuation_input_sync_task_calls_data_manager_and_clears_active_flag(mon
         end_date="2026-05-29",
     )
     assert "valuation_input_sync" not in task._active_tasks
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "content" in report_data
+    assert "写入/更新: 10" in report_data["content"]
+    assert "请求标的: 10" in report_data["content"]
 
 
 def test_valuation_input_full_backfill_task_forces_full_mode_and_clears_active_flag(monkeypatch):
@@ -101,12 +119,26 @@ def test_valuation_input_full_backfill_task_forces_full_mode_and_clears_active_f
         return_value={
             "status": "success",
             "successful_exchanges": 1,
+            "attempted_exchanges": 1,
+            "source": "cninfo",
+            "source_mode": "direct",
+            "sync_mode": "full",
+            "start_date": "1990-01-01",
+            "end_date": "2026-05-29",
+            "total_requested_instruments": 10,
+            "total_covered_instruments": 10,
+            "total_missing_instruments": 0,
+            "total_snapshots_written": 100,
+            "elapsed_seconds": 75.0,
             "exchanges": [
                 {
                     "exchange": "SSE",
                     "status": "success",
                     "snapshots_written": 100,
+                    "requested_instruments": 10,
+                    "covered_instruments": 10,
                     "missing_instruments": 0,
+                    "elapsed_seconds": 75.0,
                 }
             ],
         }
@@ -135,6 +167,11 @@ def test_valuation_input_full_backfill_task_forces_full_mode_and_clears_active_f
         end_date="2026-05-29",
     )
     assert "valuation_input_full_backfill" not in task._active_tasks
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "content" in report_data
+    assert "估值输入全量回填报告" in report_data["content"]
+    assert "写入/更新: 100" in report_data["content"]
+    assert "耗时: 1m15s" in report_data["content"]
 
 
 def test_valuation_input_scheduler_config_keeps_daily_disabled_and_full_manual_only():

@@ -129,6 +129,100 @@ def _attach_instrument_master_governance_report(
     return report_data
 
 
+def _format_seconds_for_report(value: Any) -> str:
+    """Format elapsed seconds for compact operator reports."""
+    try:
+        seconds = float(value)
+    except (TypeError, ValueError):
+        return "N/A"
+    if seconds < 60:
+        return f"{seconds:.1f}s"
+    minutes, sec = divmod(int(round(seconds)), 60)
+    if minutes < 60:
+        return f"{minutes}m{sec:02d}s"
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours}h{minutes:02d}m{sec:02d}s"
+
+
+def _format_valuation_input_scheduler_report(
+    result: Dict[str, Any],
+    *,
+    title: str,
+) -> str:
+    """Build a detailed Telegram report for valuation input sync/backfill."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    exchanges = [
+        item for item in (result.get("exchanges") or [])
+        if isinstance(item, dict)
+    ]
+    attempted = int(result.get("attempted_exchanges", len(exchanges)) or 0)
+    successful = int(result.get("successful_exchanges", 0) or 0)
+    total_rows = int(result.get("total_snapshots_written", 0) or 0)
+    total_requested = int(
+        result.get("total_requested_instruments")
+        or sum(int(item.get("requested_instruments", 0) or 0) for item in exchanges)
+    )
+    total_covered = int(
+        result.get("total_covered_instruments")
+        or sum(int(item.get("covered_instruments", 0) or 0) for item in exchanges)
+    )
+    total_missing = int(
+        result.get("total_missing_instruments")
+        or sum(int(item.get("missing_instruments", 0) or 0) for item in exchanges)
+    )
+    elapsed_seconds = result.get("elapsed_seconds")
+    if elapsed_seconds is None:
+        elapsed_seconds = sum(
+            float(item.get("elapsed_seconds", 0) or 0) for item in exchanges
+        ) or None
+
+    start_date = result.get("start_date") or "未指定"
+    end_date = result.get("end_date") or "latest"
+    lines = [
+        f"🔧 *{title}*",
+        f"{icon} 状态: {label} ({status})",
+        "",
+        "*执行摘要*",
+        f"• source: {result.get('source', 'unknown')} / {result.get('source_mode', 'unknown')}",
+        f"• sync_mode: {result.get('sync_mode', 'unknown')}",
+        f"• 日期范围: {start_date} ~ {end_date}",
+        f"• 交易所: {successful}/{attempted}",
+        f"• 请求标的: {total_requested}",
+        f"• 覆盖标的: {total_covered}",
+        f"• 缺失标的: {total_missing}",
+        f"• 写入/更新: {total_rows}",
+        f"• 耗时: {_format_seconds_for_report(elapsed_seconds)}",
+    ]
+
+    if exchanges:
+        lines.extend(["", "*分交易所*"])
+        for item in exchanges:
+            ex_status = item.get("status", "unknown")
+            ex_icon, ex_label = _format_scheduler_status(ex_status)
+            lines.append(
+                f"• {item.get('exchange', 'unknown')}: {ex_icon} {ex_label}, "
+                f"rows={item.get('snapshots_written', 0)}, "
+                f"requested={item.get('requested_instruments', 0)}, "
+                f"covered={item.get('covered_instruments', 0)}, "
+                f"missing={item.get('missing_instruments', 0)}, "
+                f"elapsed={_format_seconds_for_report(item.get('elapsed_seconds'))}"
+            )
+            missing_ids = item.get("missing_instrument_ids") or []
+            if missing_ids:
+                lines.append(
+                    "  缺失样例: " + ", ".join(str(x) for x in missing_ids[:10])
+                )
+
+    governance_summary = _format_instrument_master_governance_summary(
+        result.get("instrument_master_governance")
+    )
+    if governance_summary:
+        lines.extend(["", "*证券主数据治理*", governance_summary])
+
+    return "\n".join(lines)
+
+
 def _format_shareholder_shadow_scheduler_report(
     result: Dict[str, Any],
     readiness: Optional[Dict[str, Any]] = None,
@@ -2996,11 +3090,20 @@ class ScheduledTasks:
 
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
+            duration = _format_seconds_for_report(result.get('elapsed_seconds'))
             report_data = {
                 'name': '估值输入同步报告',
                 'status': 'success' if success else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
-                'duration': 'N/A',
+                'duration': duration,
+                'total_requested_instruments': result.get('total_requested_instruments', 0),
+                'total_covered_instruments': result.get('total_covered_instruments', 0),
+                'total_missing_instruments': result.get('total_missing_instruments', 0),
+                'total_snapshots_written': result.get('total_snapshots_written', 0),
+                'content': _format_valuation_input_scheduler_report(
+                    result,
+                    title='估值输入同步报告',
+                ),
                 'maintenance_tasks': [
                     {
                         'task_name': exchange_result.get('exchange', 'unknown'),
@@ -3079,11 +3182,20 @@ class ScheduledTasks:
 
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
+            duration = _format_seconds_for_report(result.get('elapsed_seconds'))
             report_data = {
                 'name': '估值输入全量回填报告',
                 'status': 'success' if success else 'error',
                 'tasks_completed': result.get('successful_exchanges', 0),
-                'duration': 'N/A',
+                'duration': duration,
+                'total_requested_instruments': result.get('total_requested_instruments', 0),
+                'total_covered_instruments': result.get('total_covered_instruments', 0),
+                'total_missing_instruments': result.get('total_missing_instruments', 0),
+                'total_snapshots_written': result.get('total_snapshots_written', 0),
+                'content': _format_valuation_input_scheduler_report(
+                    result,
+                    title='估值输入全量回填报告',
+                ),
                 'maintenance_tasks': [
                     {
                         'task_name': exchange_result.get('exchange', 'unknown'),

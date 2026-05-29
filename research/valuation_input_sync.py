@@ -32,6 +32,7 @@ class ValuationInputExchangeSyncResult:
     covered_instruments: int = 0
     missing_instruments: int = 0
     missing_instrument_ids: List[str] = field(default_factory=list)
+    elapsed_seconds: Optional[float] = None
     error_message: Optional[str] = None
 
 
@@ -165,6 +166,10 @@ class ValuationInputSyncService:
             "total_missing_instruments": sum(
                 item.missing_instruments for item in results
             ),
+            "total_requested_instruments": sum(
+                item.requested_instruments for item in results
+            ),
+            "elapsed_seconds": round(elapsed, 3),
         }
 
     async def _sync_exchange(
@@ -303,6 +308,7 @@ class ValuationInputSyncService:
                 covered_instruments=len(covered_ids),
                 missing_instruments=len(missing_ids),
                 missing_instrument_ids=missing_ids[:20],
+                elapsed_seconds=round(elapsed, 3),
             )
         except Exception as exc:
             elapsed = time.perf_counter() - exchange_started_at
@@ -337,5 +343,6 @@ class ValuationInputSyncService:
                 sync_mode=sync_mode,
                 requested_instruments=len(stock_instruments),
                 snapshots_written=snapshots_written,
+                elapsed_seconds=round(elapsed, 3),
                 error_message=str(exc),
             )
