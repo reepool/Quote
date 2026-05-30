@@ -40,6 +40,7 @@ def test_valuation_history_rebuild_task_calls_data_manager_and_clears_active_fla
     data_manager.run_valuation_history_rebuild.assert_awaited_once_with(
         exchanges=["SSE"],
         limit_per_exchange=10,
+        allow_disabled_module=True,
     )
     assert "valuation_history_rebuild" not in task._active_tasks
 
@@ -180,14 +181,14 @@ def test_valuation_input_scheduler_config_keeps_daily_disabled_and_full_manual_o
 
     daily = jobs["valuation_input_sync"]
     assert daily["enabled"] is True
-    assert daily["trigger"]["day_of_week"] == "tue-sat"
-    assert daily["trigger"]["hour"] == 4
-    assert daily["trigger"]["minute"] == 30
+    assert daily["trigger"]["day_of_week"] == "mon-fri"
+    assert daily["trigger"]["hour"] == 23
+    assert daily["trigger"]["minute"] == 0
     assert daily["parameters"]["sync_mode"] == "incremental"
     assert daily["parameters"]["limit_per_exchange"] is None
 
     history = jobs["valuation_history_rebuild"]
-    assert history["enabled"] is False
+    assert history["enabled"] is True
     assert history["trigger"]["day_of_week"] == "tue-sat"
     assert history["trigger"]["hour"] == 4
     assert history["trigger"]["minute"] == 45

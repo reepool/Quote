@@ -658,6 +658,7 @@ class ResearchValuationService:
                 market_cap=market_cap,
                 eligible_facts=eligible_facts,
                 fact_field="net_income",
+                allow_negative_denominator=True,
             ),
             "pe_ttm": self._build_ttm_metric(
                 metric_name="pe_ttm",
@@ -665,6 +666,7 @@ class ResearchValuationService:
                 latest_fact=latest_fact,
                 facts_by_period=by_period,
                 fact_field="net_income",
+                allow_negative_denominator=True,
             ),
             "pb_mrq": self._build_latest_metric(
                 metric_name="pb_mrq",
@@ -697,6 +699,7 @@ class ResearchValuationService:
         market_cap: float,
         eligible_facts: List[Dict[str, Any]],
         fact_field: str,
+        allow_negative_denominator: bool = False,
     ) -> Dict[str, Any]:
         annual_fact = next(
             (
@@ -719,6 +722,7 @@ class ResearchValuationService:
             denominator_fact=fact_field,
             report_periods=[annual_fact],
             calc_method="latest_annual",
+            allow_negative_denominator=allow_negative_denominator,
         )
 
     def _build_ttm_metric(
@@ -729,6 +733,7 @@ class ResearchValuationService:
         latest_fact: Dict[str, Any],
         facts_by_period: Dict[Tuple[int, int], Dict[str, Any]],
         fact_field: str,
+        allow_negative_denominator: bool = False,
     ) -> Dict[str, Any]:
         year, quarter = latest_fact["period_key"]
         latest_value = latest_fact.get(fact_field)
@@ -748,6 +753,7 @@ class ResearchValuationService:
                 denominator_fact=fact_field,
                 report_periods=[latest_fact],
                 calc_method="annual_ttm",
+                allow_negative_denominator=allow_negative_denominator,
             )
 
         prior_annual = facts_by_period.get((year - 1, 4))
@@ -782,6 +788,7 @@ class ResearchValuationService:
             denominator_fact=fact_field,
             report_periods=[latest_fact, prior_annual, prior_same_quarter],
             calc_method="cumulative_ytd_ttm",
+            allow_negative_denominator=allow_negative_denominator,
         )
 
     def _build_latest_metric(
@@ -833,6 +840,7 @@ class ResearchValuationService:
         denominator_fact: str,
         report_periods: List[Dict[str, Any]],
         calc_method: str,
+        allow_negative_denominator: bool = False,
     ) -> Dict[str, Any]:
         if denominator is None:
             return self._unavailable_metric(
@@ -843,7 +851,7 @@ class ResearchValuationService:
                 report_periods=report_periods,
                 calc_method=calc_method,
             )
-        if denominator <= 0:
+        if denominator == 0 or (denominator < 0 and not allow_negative_denominator):
             return self._unavailable_metric(
                 metric_name,
                 "invalid_denominator",
@@ -1314,6 +1322,9 @@ class ResearchValuationService:
         except (TypeError, ValueError):
             return None, "non_numeric_value"
         if numeric <= 0:
+            pe_fields = {"pe_ratio", "pe_static", "pe_ttm", "pe_forward"}
+            if field_name in pe_fields and numeric != 0:
+                return numeric, ""
             return None, "invalid_value"
         return numeric, ""
 

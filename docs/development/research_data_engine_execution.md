@@ -346,7 +346,9 @@ API 补齐原则：
   - `2026-05-29` 样本股本复核：上述三只样本的落库股本与 CNInfo/AkShare live read-only 返回一致，源值按 `10k_share * 10000` 转为股；`001233.SZ` 与 `920009.BJ` 的流通股本加限售股本可回到总股本，`600000.SH` 当期无单列限售股本
   - `2026-05-29` 只读耗时采样：日更全市场快照覆盖 `5525` 个当前活跃 A 股标的约 `3s`，生产含 upsert 与重试按 `1-5min` 规划；全量历史回填按当前 `0.2s` 请求间隔和样本返回量估算约 `2-6h`，保守任务超时配置为 `48h`
   - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
-  - scheduler 已预留三个入口：`valuation_input_sync` 为周二至周六 `04:30` 已开启日更测试任务，`valuation_history_rebuild` 为周二至周六 `04:45` 禁用任务，两者均安排在 A 股行情日更、财务公告增量和数据库备份之后；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
+  - `2026-05-30` 新增财务核心事实可得日回填工具 `research/financial_available_date_backfill.py`：`data_available_date` 代表披露可得日，不等同于 `report_period`；本地真实公告/披露证据优先，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage。生产回填更新 `financial_core_facts_hot` `54316` 行，SSE/SZSE/BSE core facts 可得日覆盖恢复到 `100%`
+  - `2026-05-30` 回填后估值 dry-run：SSE `20/20` 写入 `5040` 行，SZSE `20/20` 写入 `5040` 行，BSE `10/10` 写入 `2176` 行，`missing_financials=[]`
+  - scheduler 已预留三个入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启，可手动启动全量重建，任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
 
 ### 4.7 当前项目级 Source Policy
 
@@ -699,6 +701,7 @@ technical readiness 接口会聚合：
 6. 估值语义升级
    - 当前 `valuation_history` 已拆成 `pe_static / pe_ttm / pe_forward / pb_mrq / ps_static / ps_ttm / ps_forward`，并保留 `pe_ratio / pb_ratio / ps_ratio` 兼容字段
    - TTM 使用已披露的累计 YTD 财务事实构造，估值日只能使用 `data_available_date <= as_of_date` 的报告期，避免未来函数
+   - 负净利润会生成负 PE 并可进入 PE 行业统计；分母为 `0` 的 PE 仍为 unavailable。PB/PS 继续要求正分母，避免负净资产或异常收入污染同行统计
    - 每个指标在 details 中记录 numerator、denominator、报告期和可得日；forward PE/PS 在 analyst forecast 未启用或覆盖不足时返回 explicit unavailable，不能复用 static/TTM denominator
 7. readiness 与 rollout
    - 当前 storage/repository 已新增 `detect_financial_coverage_gaps` 与 `validate_financial_statement_readiness`，覆盖报告期、source file、核心事实、source/parser 分布、fallback 占比、parser failure、hot/cold tier coverage、stale hot rows 和 duplicate-tier conflicts

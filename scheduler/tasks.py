@@ -3001,6 +3001,7 @@ class ScheduledTasks:
             result = await data_manager.run_valuation_history_rebuild(
                 exchanges=exchanges,
                 limit_per_exchange=limit_per_exchange,
+                allow_disabled_module=True,
             )
 
             status = result.get('status', 'failed')

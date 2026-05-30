@@ -83,7 +83,7 @@
   - `PE/PB/PS/market_cap/float_market_cap` 等核心日频序列应日更预计算，并单独落入 `data/valuation.db`
   - `DCF`、敏感性分析、同行对比等保留实时计算或 bounded aggregate cache，不落全量 `subject x peer x date` 相对估值矩阵
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
-  - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，生产启用仍需全市场覆盖率、财务 readiness 与 strict Shenwan blocker 通过
+  - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过
   - `2026-05-29` 股本样本复核：`600000.SH / 001233.SZ / 920009.BJ` 在 `valuation.db.valuation_inputs` 中的 `shares_outstanding / float_shares` 与 CNInfo/AkShare live read-only 返回一致；源单位为 `10k_share`，落库前按 `10000` 转换为股，`as_of_date` 保留股本生效日，`data_as_of` 保留公告日
   - 日更只读采样：一次 CNInfo 全市场快照覆盖 `SSE 2315 / SZSE 2893 / BSE 317` 个当前活跃 A 股标的，接口与本地匹配耗时约 `3s`；考虑 DB upsert、日志、网络波动和重试，生产日更预计通常在 `1-5min` 内完成，配置上限保守设为 `7200s`
   - 全量历史回填只读采样：`3` 个样本标的返回 `257` 条股本变动记录，耗时约 `1.2s`；全市场约 `5525` 个当前活跃标的按 `0.2s` 请求间隔估算，纯请求下限约 `18-25min`，考虑限流、重试、空返回和写库后建议按 `2-6h` 规划，配置上限保守设为 `48h`
@@ -1577,9 +1577,9 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
-| `valuation_input_sync` | 次日 `04:30`，周二至周六，已开启 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更、财务公告增量和数据库备份之后，当前 `enabled=true` 进入日更测试 |
+| `valuation_input_sync` | 每日 `23:00`，周一至周五，已开启 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更之后，当前实测约 `1-2min` 完成，`enabled=true` 进入日更测试 |
 | `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
-| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，暂不自动启用 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；必须在 A 股行情日更完成后运行，确保使用当天最新本地收盘价；静态、TTM、forward 指标必须分口径输出 |
+| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，已开启，可手动启动 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；必须在 A 股行情日更完成后运行，确保使用当天最新本地收盘价；静态、TTM、forward 指标必须分口径输出；任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |
@@ -1674,6 +1674,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - `industry_index_analysis` 后续按申万行业指数代码保存官方指数分析指标，与股票分类同步解耦
 - `valuation_history` 独立落 `data/valuation.db`
 - `valuation_inputs` 独立落 `data/valuation.db`，先由 `valuation_input_sync` 完成全量或日更，再由 `valuation_history_rebuild` 消费
+- 财务核心事实的 `data_available_date` 不等同于报告期末日；估值使用 `data_available_date <= trade_date` 防止未来函数。`2026-05-30` 新增本地回填工具 `research/financial_available_date_backfill.py`：优先使用已存在公告/披露证据，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage 标记
 - 同行业对标
 - 相对估值
 - DCF + 参数覆盖 + 敏感性分析

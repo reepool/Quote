@@ -880,8 +880,8 @@
         }
       },
       "valuation_history_rebuild": {
-        "enabled": false,
-        "description": "研究域估值历史重建（行情日更后，暂不自动启用）",
+        "enabled": true,
+        "description": "研究域估值历史重建（行情日更后，可手动启动全量重建；valuation 模块仍由 readiness 单独控制）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -911,9 +911,9 @@
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
-          "day_of_week": "tue-sat",
-          "hour": 4,
-          "minute": 30,
+          "day_of_week": "mon-fri",
+          "hour": 23,
+          "minute": 0,
           "second": 0
         },
         "max_instances": 1,

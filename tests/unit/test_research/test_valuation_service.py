@@ -185,7 +185,7 @@ def test_valuation_service_marks_missing_ttm_periods():
     assert snapshots[0].details_json["metrics"]["pb_mrq"]["status"] == "available"
 
 
-def test_valuation_service_marks_loss_making_and_zero_denominators_unavailable():
+def test_valuation_service_keeps_negative_pe_and_rejects_zero_sales():
     service = ResearchValuationService()
     quotes = pd.DataFrame([{"time": "2026-05-10", "close": 10.0}])
     instrument = {
@@ -209,9 +209,10 @@ def test_valuation_service_marks_loss_making_and_zero_denominators_unavailable()
     snapshots = service.build_history_snapshots(quotes, instrument, bundle)
 
     assert len(snapshots) == 1
-    assert snapshots[0].pe_static is None
+    assert snapshots[0].pe_static == -200.0
+    assert snapshots[0].pe_ttm == -200.0
     assert snapshots[0].ps_static is None
-    assert snapshots[0].details_json["metrics"]["pe_static"]["missing_reason"] == "invalid_denominator"
+    assert snapshots[0].details_json["metrics"]["pe_static"]["status"] == "available"
     assert snapshots[0].details_json["metrics"]["ps_static"]["missing_reason"] == "invalid_denominator"
 
 
@@ -352,10 +353,10 @@ def test_valuation_service_relative_valuation_reports_variant_exclusions():
     )
 
     assert result["metric_variants"] == ["pe_static", "pe_ttm", "pe_forward"]
-    assert result["benchmark_summary"]["pe_static"]["valid_peer_count"] == 1
-    assert result["benchmark_summary"]["pe_static"]["excluded_peer_count"] == 1
+    assert result["benchmark_summary"]["pe_static"]["valid_peer_count"] == 2
+    assert result["benchmark_summary"]["pe_static"]["excluded_peer_count"] == 0
+    assert result["benchmark_summary"]["pe_static"]["peer_median"] == 9.5
     assert result["benchmark_summary"]["pe_forward"]["valid_peer_count"] == 0
-    assert result["diagnostics"]["metric_exclusions"]["pe_static"][0]["reason"] == "invalid_value"
     assert result["diagnostics"]["metric_exclusions"]["pe_ttm"][0]["reason"] == "missing_value"
 
 
