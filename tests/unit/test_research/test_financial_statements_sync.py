@@ -396,6 +396,8 @@ async def test_financial_statements_sync_writes_bundle_rows(tmp_path):
         MAPPING_VERSION
     )
     assert exchange_result["local_core_mapping_catalog"]["rows_synced"] > 0
+    assert exchange_result["available_date_backfill"]["status"] == "success"
+    assert exchange_result["available_date_backfill"]["dry_run"] is False
 
     bundle = storage.get_financial_statement_bundle("600519.SH")
     assert bundle is not None

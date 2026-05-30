@@ -48,6 +48,7 @@ async def run_rollout_validation(
     exchanges: Optional[List[str]] = None,
     limit_per_exchange: Optional[int] = None,
     target_instrument_ids: Optional[List[str]] = None,
+    quote_limit_days: Optional[int] = None,
     sync_inputs: bool = False,
     input_sync_mode: str = "incremental",
     skip_sync: bool = False,
@@ -74,6 +75,7 @@ async def run_rollout_validation(
             limit_per_exchange=limit_per_exchange,
             target_instrument_ids=target_instrument_ids,
             allow_disabled_module=allow_disabled_module,
+            quote_limit_days=quote_limit_days,
         )
 
     readiness = await manager.get_research_valuation_readiness()
@@ -85,6 +87,7 @@ async def run_rollout_validation(
             "exchanges": exchanges,
             "limit_per_exchange": limit_per_exchange,
             "target_instrument_ids": target_instrument_ids,
+            "quote_limit_days": quote_limit_days,
             "sync_inputs": sync_inputs,
             "input_sync_mode": input_sync_mode,
             "skip_sync": skip_sync,
@@ -113,6 +116,7 @@ async def run_rollout_validation_with_lifecycle(
     exchanges: Optional[List[str]] = None,
     limit_per_exchange: Optional[int] = None,
     target_instrument_ids: Optional[List[str]] = None,
+    quote_limit_days: Optional[int] = None,
     sync_inputs: bool = False,
     input_sync_mode: str = "incremental",
     skip_sync: bool = False,
@@ -126,6 +130,7 @@ async def run_rollout_validation_with_lifecycle(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             target_instrument_ids=target_instrument_ids,
+            quote_limit_days=quote_limit_days,
             sync_inputs=sync_inputs,
             input_sync_mode=input_sync_mode,
             skip_sync=skip_sync,
@@ -192,6 +197,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Comma-separated instrument IDs for bounded validation, for example 600000.SH,001233.SZ,920003.BJ.",
     )
     parser.add_argument(
+        "--quote-limit-days",
+        type=int,
+        help="Optional quote window for valuation_history_rebuild. Defaults to valuation.history.lookback_days.",
+    )
+    parser.add_argument(
         "--sync-inputs",
         action="store_true",
         help="Run valuation_input_sync before valuation_history_rebuild.",
@@ -228,6 +238,7 @@ async def _async_main(args: argparse.Namespace) -> int:
         exchanges=_parse_exchanges(args.exchanges),
         limit_per_exchange=args.limit_per_exchange,
         target_instrument_ids=_parse_csv(args.target_instrument_ids),
+        quote_limit_days=args.quote_limit_days,
         sync_inputs=bool(args.sync_inputs),
         input_sync_mode=args.input_sync_mode,
         skip_sync=args.skip_sync,

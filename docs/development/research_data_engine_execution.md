@@ -346,9 +346,9 @@ API 补齐原则：
   - `2026-05-29` 样本股本复核：上述三只样本的落库股本与 CNInfo/AkShare live read-only 返回一致，源值按 `10k_share * 10000` 转为股；`001233.SZ` 与 `920009.BJ` 的流通股本加限售股本可回到总股本，`600000.SH` 当期无单列限售股本
   - `2026-05-29` 只读耗时采样：日更全市场快照覆盖 `5525` 个当前活跃 A 股标的约 `3s`，生产含 upsert 与重试按 `1-5min` 规划；全量历史回填按当前 `0.2s` 请求间隔和样本返回量估算约 `2-6h`，保守任务超时配置为 `48h`
   - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
-  - `2026-05-30` 新增财务核心事实可得日回填工具 `research/financial_available_date_backfill.py`：`data_available_date` 代表披露可得日，不等同于 `report_period`；本地真实公告/披露证据优先，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage。生产回填更新 `financial_core_facts_hot` `54316` 行，SSE/SZSE/BSE core facts 可得日覆盖恢复到 `100%`
+  - `2026-05-30` 新增财务核心事实可得日回填工具 `research/financial_available_date_backfill.py`：`data_available_date` 代表披露可得日，不等同于 `report_period`；本地真实公告/披露证据优先，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage。生产回填更新 `financial_core_facts_hot` `54316` 行，SSE/SZSE/BSE core facts 可得日覆盖恢复到 `100%`；该维护步骤已接入 `FinancialStatementsShadowSyncService` 成功收尾阶段，后续财务全量 backfill、catchup 和 reconciliation 成功后会自动补齐新增/更新 core facts 的可得日
   - `2026-05-30` 回填后估值 dry-run：SSE `20/20` 写入 `5040` 行，SZSE `20/20` 写入 `5040` 行，BSE `10/10` 写入 `2176` 行，`missing_financials=[]`
-  - scheduler 已预留三个入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启，可手动启动全量重建，任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
+  - scheduler 已预留估值任务入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启日更小窗口任务，默认重算最近 `7` 个交易日；`valuation_history_weekly_reconcile` 为周六 `05:45` 已开启周度回补校验任务，默认重算最近 `60` 个交易日；`valuation_history_full_rebuild` 为 `enabled=true / manual_only=true` 手动全量窗口任务，默认使用 `valuation.history.lookback_days=252`；上述重建任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
 
 ### 4.7 当前项目级 Source Policy
 

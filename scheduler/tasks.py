@@ -2991,6 +2991,8 @@ class ScheduledTasks:
         self,
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
+        quote_limit_days: Optional[int] = None,
+        progress_log_every: int = 200,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """研究域 valuation history 重建任务。"""
@@ -3002,6 +3004,8 @@ class ScheduledTasks:
                 exchanges=exchanges,
                 limit_per_exchange=limit_per_exchange,
                 allow_disabled_module=True,
+                quote_limit_days=quote_limit_days,
+                progress_log_every=progress_log_every,
             )
 
             status = result.get('status', 'failed')
@@ -3050,6 +3054,40 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('valuation_history_rebuild')
+
+    async def valuation_history_weekly_reconcile(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        quote_limit_days: Optional[int] = 60,
+        progress_log_every: int = 200,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 valuation history 周度回补校验任务。"""
+        return await self.valuation_history_rebuild(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            quote_limit_days=quote_limit_days,
+            progress_log_every=progress_log_every,
+            job_config=job_config,
+        )
+
+    async def valuation_history_full_rebuild(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        quote_limit_days: Optional[int] = None,
+        progress_log_every: int = 200,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 valuation history 手动全量窗口重建任务。"""
+        return await self.valuation_history_rebuild(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            quote_limit_days=quote_limit_days,
+            progress_log_every=progress_log_every,
+            job_config=job_config,
+        )
 
     async def valuation_input_sync(
         self,

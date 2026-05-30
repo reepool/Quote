@@ -65,6 +65,7 @@ async def test_rollout_validation_runs_sync_and_readiness_by_default():
         "limit_per_exchange": 2,
         "target_instrument_ids": ["600000.SH"],
         "allow_disabled_module": False,
+        "quote_limit_days": None,
     }
 
 
@@ -98,6 +99,7 @@ async def test_rollout_validation_can_sync_inputs_before_history():
         "limit_per_exchange": 1,
         "target_instrument_ids": ["600000.SH"],
         "allow_disabled_module": False,
+        "quote_limit_days": None,
     }
 
 

@@ -1579,7 +1579,9 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
 | `valuation_input_sync` | 每日 `23:00`，周一至周五，已开启 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更之后，当前实测约 `1-2min` 完成，`enabled=true` 进入日更测试 |
 | `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
-| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，已开启，可手动启动 | 基于已可得财务事实、行情和本地估值输入重算核心估值历史；必须在 A 股行情日更完成后运行，确保使用当天最新本地收盘价；静态、TTM、forward 指标必须分口径输出；任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制 |
+| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，已开启 | 估值历史日更小窗口任务，默认只重算最近 `7` 个交易日，基于已可得财务事实、行情和本地估值输入生成核心估值历史；任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制 |
+| `valuation_history_weekly_reconcile` | 每周六 `05:45`，已开启 | 周度回补校验任务，默认重算最近 `60` 个交易日，用于修复某天日更失败、行情/股本/财务补数后的短期一致性缺口 |
+| `valuation_history_full_rebuild` | 手工 `/run` | 手动全量窗口重建任务。`enabled=true / manual_only=true`，默认使用 `valuation.history.lookback_days=252`，用于首次生产重建或重大口径调整后的整窗重算 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |
@@ -1674,7 +1676,7 @@ GET /api/v1/research/company/{instrument_id}/events
 - `industry_index_analysis` 后续按申万行业指数代码保存官方指数分析指标，与股票分类同步解耦
 - `valuation_history` 独立落 `data/valuation.db`
 - `valuation_inputs` 独立落 `data/valuation.db`，先由 `valuation_input_sync` 完成全量或日更，再由 `valuation_history_rebuild` 消费
-- 财务核心事实的 `data_available_date` 不等同于报告期末日；估值使用 `data_available_date <= trade_date` 防止未来函数。`2026-05-30` 新增本地回填工具 `research/financial_available_date_backfill.py`：优先使用已存在公告/披露证据，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage 标记
+- 财务核心事实的 `data_available_date` 不等同于报告期末日；估值使用 `data_available_date <= trade_date` 防止未来函数。`2026-05-30` 新增本地回填工具 `research/financial_available_date_backfill.py`：优先使用已存在公告/披露证据，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage 标记；该维护步骤已接入 `FinancialStatementsShadowSyncService` 成功收尾阶段，后续财务全量 backfill、catchup 和 reconciliation 成功后会自动补齐新增/更新 core facts 的可得日
 - 同行业对标
 - 相对估值
 - DCF + 参数覆盖 + 敏感性分析

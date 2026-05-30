@@ -24,6 +24,9 @@ from research.financial_statement_profile import (
     resolve_financial_statement_profiles_for_instruments,
     summarize_financial_statement_profile_resolutions,
 )
+from research.financial_available_date_backfill import (
+    backfill_financial_available_dates,
+)
 from research.official_financial_source_profiles import (
     parser_profile_for,
     source_profile_for,
@@ -118,6 +121,7 @@ class FinancialStatementsExchangeSyncResult:
     core_facts_written: int = 0
     unchanged_files_skipped: int = 0
     tier_maintenance: Optional[Dict[str, Any]] = None
+    available_date_backfill: Optional[Dict[str, Any]] = None
     coverage_gaps: Optional[Dict[str, Any]] = None
     official_fallback_reasons: List[str] = field(default_factory=list)
     error_message: Optional[str] = None
@@ -983,6 +987,7 @@ class FinancialStatementsShadowSyncService:
         source_profile = source_profile_for(exchange, source, strict=False)
         parser_profile = parser_profile_for(exchange, source)
         tier_result = self._run_tier_maintenance_if_enabled()
+        available_date_backfill = self._run_available_date_backfill_if_enabled()
         coverage_gaps = self._build_coverage_gaps(
             instruments=stock_instruments,
             report_periods=report_periods,
@@ -1030,6 +1035,7 @@ class FinancialStatementsShadowSyncService:
                     "unchanged_files_skipped": unchanged_files_skipped,
                 },
                 "tier_maintenance": tier_result,
+                "available_date_backfill": available_date_backfill,
                 "coverage_gaps": coverage_gaps,
                 "official_fallback_reasons": official_fallback_reasons,
                 "runtime_metadata": runtime_metadata or {},
@@ -1055,6 +1061,7 @@ class FinancialStatementsShadowSyncService:
             core_facts_written=core_facts_written,
             unchanged_files_skipped=unchanged_files_skipped,
             tier_maintenance=tier_result,
+            available_date_backfill=available_date_backfill,
             coverage_gaps=coverage_gaps,
             official_fallback_reasons=official_fallback_reasons,
         )
@@ -1099,6 +1106,20 @@ class FinancialStatementsShadowSyncService:
         return self.storage.financial_statements.maintain_tiers(
             hot_quarter_window=int(storage_cfg.get("hot_quarter_window", 12)),
         )
+
+    def _run_available_date_backfill_if_enabled(self) -> Optional[Dict[str, Any]]:
+        module_cfg = self._module_config()
+        available_date_cfg = module_cfg.get("available_date_backfill", {})
+        if not bool(available_date_cfg.get("enabled", True)):
+            return None
+        if not bool(available_date_cfg.get("run_after_successful_sync", True)):
+            return None
+        report = backfill_financial_available_dates(
+            self.storage.financials_db_path,
+            write_enabled=True,
+            limit=available_date_cfg.get("limit"),
+        )
+        return report.to_dict()
 
     def _has_unchanged_manifest_with_core(
         self,

@@ -41,6 +41,8 @@ def test_valuation_history_rebuild_task_calls_data_manager_and_clears_active_fla
         exchanges=["SSE"],
         limit_per_exchange=10,
         allow_disabled_module=True,
+        quote_limit_days=None,
+        progress_log_every=200,
     )
     assert "valuation_history_rebuild" not in task._active_tasks
 
@@ -193,6 +195,19 @@ def test_valuation_input_scheduler_config_keeps_daily_disabled_and_full_manual_o
     assert history["trigger"]["hour"] == 4
     assert history["trigger"]["minute"] == 45
     assert history["parameters"]["limit_per_exchange"] is None
+    assert history["parameters"]["quote_limit_days"] == 7
+
+    weekly = jobs["valuation_history_weekly_reconcile"]
+    assert weekly["enabled"] is True
+    assert weekly["trigger"]["day_of_week"] == "sat"
+    assert weekly["trigger"]["hour"] == 5
+    assert weekly["trigger"]["minute"] == 45
+    assert weekly["parameters"]["quote_limit_days"] == 60
+
+    full_history = jobs["valuation_history_full_rebuild"]
+    assert full_history["enabled"] is True
+    assert full_history["manual_only"] is True
+    assert full_history["parameters"]["quote_limit_days"] is None
 
     full = jobs["valuation_input_full_backfill"]
     assert full["enabled"] is True

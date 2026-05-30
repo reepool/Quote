@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
 
 from research.storage import ResearchStorageManager
+from utils import dm_logger
 from utils.config_manager import ResearchConfig, config_manager
 
 from .valuation_service import ResearchValuationService
@@ -50,6 +51,8 @@ class ValuationHistoryRebuildService:
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
         target_instrument_ids: Optional[List[str]] = None,
+        quote_limit_days: Optional[int] = None,
+        progress_log_every: int = 200,
     ) -> Dict[str, Any]:
         target_exchanges = exchanges or self.research_config.markets
         results: List[ValuationExchangeRebuildResult] = []
@@ -60,6 +63,8 @@ class ValuationHistoryRebuildService:
                     exchange=exchange,
                     limit_per_exchange=limit_per_exchange,
                     target_instrument_ids=target_instrument_ids,
+                    quote_limit_days=quote_limit_days,
+                    progress_log_every=progress_log_every,
                 )
             )
 
@@ -78,10 +83,13 @@ class ValuationHistoryRebuildService:
         exchange: str,
         limit_per_exchange: Optional[int],
         target_instrument_ids: Optional[List[str]],
+        quote_limit_days: Optional[int],
+        progress_log_every: int,
     ) -> ValuationExchangeRebuildResult:
         valuation_config = self.research_config.modules.get("valuation", {})
         history_config = valuation_config.get("history", {})
-        lookback_days = int(history_config.get("lookback_days", 252))
+        configured_lookback_days = int(history_config.get("lookback_days", 252))
+        lookback_days = int(quote_limit_days or configured_lookback_days)
 
         instruments = await self.db_ops.get_instruments_by_exchange(exchange)
         stock_instruments = [
@@ -110,7 +118,19 @@ class ValuationHistoryRebuildService:
             domain="valuation_history",
             job_name="valuation_history_rebuild",
             market=exchange,
-            metadata={"instrument_count": len(stock_instruments)},
+            metadata={
+                "instrument_count": len(stock_instruments),
+                "lookback_days": lookback_days,
+                "configured_lookback_days": configured_lookback_days,
+            },
+        )
+        dm_logger.info(
+            "[ValuationHistoryRebuild] exchange=%s start instruments=%s lookback_days=%s limit_per_exchange=%s target_count=%s",
+            exchange,
+            len(stock_instruments),
+            lookback_days,
+            limit_per_exchange,
+            len(target_instrument_ids or []),
         )
 
         rows_written = 0
@@ -120,7 +140,24 @@ class ValuationHistoryRebuildService:
         missing_valuation_inputs: List[str] = []
 
         try:
-            for instrument in stock_instruments:
+            total_instruments = len(stock_instruments)
+            log_every = max(1, int(progress_log_every or 200))
+            def _log_progress(index: int, instrument: Dict[str, Any]) -> None:
+                if index == 1 or index == total_instruments or index % log_every == 0:
+                    dm_logger.info(
+                        "[ValuationHistoryRebuild] exchange=%s progress=%s/%s processed=%s skipped=%s rows=%s missing_financials=%s missing_inputs=%s current=%s",
+                        exchange,
+                        index,
+                        total_instruments,
+                        instruments_processed,
+                        skipped_instruments,
+                        rows_written,
+                        len(missing_financials),
+                        len(missing_valuation_inputs),
+                        instrument.get("instrument_id"),
+                    )
+
+            for index, instrument in enumerate(stock_instruments, start=1):
                 with self.storage.financial_database_scope():
                     bundle = self.storage.get_financial_statement_bundle(
                         instrument["instrument_id"],
@@ -134,6 +171,7 @@ class ValuationHistoryRebuildService:
                 if bundle is None and not core_facts:
                     skipped_instruments += 1
                     missing_financials.append(instrument["instrument_id"])
+                    _log_progress(index, instrument)
                     continue
                 if bundle is None:
                     bundle = dict(core_facts[0])
@@ -155,6 +193,7 @@ class ValuationHistoryRebuildService:
                 )
                 if quotes is None or quotes.empty:
                     skipped_instruments += 1
+                    _log_progress(index, instrument)
                     continue
 
                 snapshots = self.valuation_service.build_history_snapshots(
@@ -165,6 +204,7 @@ class ValuationHistoryRebuildService:
                 if not snapshots:
                     skipped_instruments += 1
                     missing_financials.append(instrument["instrument_id"])
+                    _log_progress(index, instrument)
                     continue
 
                 for snapshot in snapshots:
@@ -175,8 +215,19 @@ class ValuationHistoryRebuildService:
                     rows_written += 1
 
                 instruments_processed += 1
+                _log_progress(index, instrument)
 
             status = "success" if rows_written > 0 else "degraded"
+            dm_logger.info(
+                "[ValuationHistoryRebuild] exchange=%s finished status=%s processed=%s skipped=%s rows=%s missing_financials=%s missing_inputs=%s",
+                exchange,
+                status,
+                instruments_processed,
+                skipped_instruments,
+                rows_written,
+                len(missing_financials),
+                len(missing_valuation_inputs),
+            )
             self.storage.finish_ingestion_run(
                 run_id,
                 status=status,
@@ -184,6 +235,7 @@ class ValuationHistoryRebuildService:
                 metadata={
                     "exchange": exchange,
                     "lookback_days": lookback_days,
+                    "configured_lookback_days": configured_lookback_days,
                     "instruments_processed": instruments_processed,
                     "skipped_instruments": skipped_instruments,
                     "missing_financials": missing_financials,
@@ -201,6 +253,14 @@ class ValuationHistoryRebuildService:
                 missing_valuation_inputs=missing_valuation_inputs,
             )
         except Exception as e:
+            dm_logger.error(
+                "[ValuationHistoryRebuild] exchange=%s failed processed=%s skipped=%s rows=%s error=%s",
+                exchange,
+                instruments_processed,
+                skipped_instruments,
+                rows_written,
+                e,
+            )
             self.storage.finish_ingestion_run(
                 run_id,
                 status="failed",
@@ -209,6 +269,7 @@ class ValuationHistoryRebuildService:
                 metadata={
                     "exchange": exchange,
                     "lookback_days": lookback_days,
+                    "configured_lookback_days": configured_lookback_days,
                     "instruments_processed": instruments_processed,
                     "skipped_instruments": skipped_instruments,
                     "missing_financials": missing_financials,

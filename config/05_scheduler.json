@@ -881,7 +881,7 @@
       },
       "valuation_history_rebuild": {
         "enabled": true,
-        "description": "研究域估值历史重建（行情日更后，可手动启动全量重建；valuation 模块仍由 readiness 单独控制）",
+        "description": "研究域估值历史日更重建（行情日更后，只重算最近交易窗口；valuation 模块仍由 readiness 单独控制）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -901,6 +901,63 @@
             "BSE"
           ],
           "limit_per_exchange": null,
+          "quote_limit_days": 7,
+          "progress_log_every": 200,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "valuation_history_weekly_reconcile": {
+        "enabled": true,
+        "description": "研究域估值历史周度回补校验（重算最近约一季度交易窗口，修复日更遗漏）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 5,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "quote_limit_days": 60,
+          "progress_log_every": 200,
+          "max_runtime_seconds": 14400
+        }
+      },
+      "valuation_history_full_rebuild": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "研究域估值历史手动全量窗口重建（按 valuation.history.lookback_days，默认 252 个交易日）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 9,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "quote_limit_days": null,
+          "progress_log_every": 200,
           "max_runtime_seconds": 21600
         }
       },

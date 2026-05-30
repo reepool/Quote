@@ -164,6 +164,12 @@
             "preserve_source_lineage": true
           }
         },
+        "available_date_backfill": {
+          "enabled": true,
+          "run_after_successful_sync": true,
+          "policy": "observed_disclosure_date_then_conservative_statutory_deadline",
+          "mark_estimated_lineage": true
+        },
         "official_structured_sources": {
           "enabled": false,
           "candidates": [
