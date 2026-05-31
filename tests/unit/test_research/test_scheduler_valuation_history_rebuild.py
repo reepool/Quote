@@ -24,6 +24,8 @@ def test_valuation_history_rebuild_task_calls_data_manager_and_clears_active_fla
         return_value={
             "status": "success",
             "successful_exchanges": 1,
+            "window_mode": "trading_days",
+            "write_policy": "missing_only",
             "exchanges": [{"exchange": "SSE", "status": "success", "rows_written": 10}],
         }
     )
@@ -47,6 +49,10 @@ def test_valuation_history_rebuild_task_calls_data_manager_and_clears_active_fla
         progress_log_every=200,
     )
     assert "valuation_history_rebuild" not in task._active_tasks
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "content" in report_data
+    assert "估值历史重建报告" in report_data["content"]
+    assert "写入/更新: 10" in report_data["content"]
 
 
 def test_valuation_history_12q_rebuild_accepts_config_window_mode(monkeypatch):
@@ -59,6 +65,8 @@ def test_valuation_history_12q_rebuild_accepts_config_window_mode(monkeypatch):
         return_value={
             "status": "success",
             "successful_exchanges": 1,
+            "window_mode": "last_12_quarters",
+            "write_policy": "missing_only",
             "exchanges": [{"exchange": "SSE", "status": "success", "rows_written": 10}],
         }
     )
@@ -85,6 +93,10 @@ def test_valuation_history_12q_rebuild_accepts_config_window_mode(monkeypatch):
         progress_log_every=200,
     )
     assert "valuation_history_rebuild" not in task._active_tasks
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "content" in report_data
+    assert "估值历史重建报告" in report_data["content"]
+    assert "窗口: 过去12个季度" in report_data["content"]
 
 
 def test_valuation_input_sync_task_calls_data_manager_and_clears_active_flag(monkeypatch):

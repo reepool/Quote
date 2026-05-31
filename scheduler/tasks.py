@@ -223,6 +223,87 @@ def _format_valuation_input_scheduler_report(
     return "\n".join(lines)
 
 
+def _format_valuation_history_scheduler_report(
+    result: Dict[str, Any],
+    *,
+    title: str,
+) -> str:
+    """Build a detailed Telegram report for valuation history rebuild jobs."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    exchanges = [
+        item for item in (result.get("exchanges") or [])
+        if isinstance(item, dict)
+    ]
+    attempted = int(result.get("attempted_exchanges", len(exchanges)) or 0)
+    successful = int(result.get("successful_exchanges", 0) or 0)
+    total_rows = int(
+        result.get("total_rows_written")
+        or sum(int(item.get("rows_written", 0) or 0) for item in exchanges)
+    )
+    total_existing = int(
+        result.get("total_existing_rows_skipped")
+        or sum(int(item.get("existing_rows_skipped", 0) or 0) for item in exchanges)
+    )
+    total_processed = int(
+        result.get("total_instruments_processed")
+        or sum(int(item.get("instruments_processed", 0) or 0) for item in exchanges)
+    )
+    total_skipped = sum(int(item.get("skipped_instruments", 0) or 0) for item in exchanges)
+    missing_financials = sum(len(item.get("missing_financials") or []) for item in exchanges)
+    missing_inputs = sum(len(item.get("missing_valuation_inputs") or []) for item in exchanges)
+
+    window_mode = result.get("window_mode") or "trading_days"
+    if window_mode == "last_12_quarters":
+        window_label = "过去12个季度"
+    else:
+        quote_limit_days = result.get("quote_limit_days")
+        window_label = f"最近{quote_limit_days}个交易日" if quote_limit_days else "配置交易日窗口"
+
+    lines = [
+        f"🔧 *{title}*",
+        f"{icon} 状态: {label} ({status})",
+        "",
+        "*执行摘要*",
+        f"• 窗口: {window_label} ({window_mode})",
+        f"• 写入策略: {result.get('write_policy', 'unknown')}",
+        f"• 交易所: {successful}/{attempted}",
+        f"• 处理标的: {total_processed}",
+        f"• 跳过标的: {total_skipped}",
+        f"• 写入/更新: {total_rows}",
+        f"• 已存在跳过: {total_existing}",
+        f"• 缺财务数据: {missing_financials}",
+        f"• 缺估值输入: {missing_inputs}",
+        f"• 耗时: {_format_seconds_for_report(result.get('elapsed_seconds'))}",
+    ]
+
+    if exchanges:
+        lines.extend(["", "*分交易所*"])
+        for item in exchanges:
+            ex_status = item.get("status", "unknown")
+            ex_icon, ex_label = _format_scheduler_status(ex_status)
+            lines.append(
+                f"• {item.get('exchange', 'unknown')}: {ex_icon} {ex_label}, "
+                f"processed={item.get('instruments_processed', 0)}, "
+                f"skipped={item.get('skipped_instruments', 0)}, "
+                f"rows={item.get('rows_written', 0)}, "
+                f"existing={item.get('existing_rows_skipped', 0)}, "
+                f"missing_fin={len(item.get('missing_financials') or [])}, "
+                f"missing_input={len(item.get('missing_valuation_inputs') or [])}"
+            )
+            missing_samples = (item.get("missing_financials") or [])[:5]
+            if missing_samples:
+                lines.append("  缺财务样例: " + ", ".join(str(x) for x in missing_samples))
+
+    governance_summary = _format_instrument_master_governance_summary(
+        result.get("instrument_master_governance")
+    )
+    if governance_summary:
+        lines.extend(["", "*证券主数据治理*", governance_summary])
+
+    return "\n".join(lines)
+
+
 def _format_shareholder_shadow_scheduler_report(
     result: Dict[str, Any],
     readiness: Optional[Dict[str, Any]] = None,
@@ -3017,6 +3098,10 @@ class ScheduledTasks:
             report_data = {
                 'name': '估值历史重建报告',
                 'status': 'success' if success else 'error',
+                'content': _format_valuation_history_scheduler_report(
+                    result,
+                    title='估值历史重建报告',
+                ),
                 'tasks_completed': result.get('successful_exchanges', 0),
                 'duration': 'N/A',
                 'maintenance_tasks': [

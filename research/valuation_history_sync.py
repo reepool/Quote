@@ -59,6 +59,7 @@ class ValuationHistoryRebuildService:
         write_policy: str = "missing_only",
         progress_log_every: int = 200,
     ) -> Dict[str, Any]:
+        started_at = datetime.now()
         target_exchanges = exchanges or self.research_config.markets
         results: List[ValuationExchangeRebuildResult] = []
 
@@ -75,6 +76,7 @@ class ValuationHistoryRebuildService:
                 )
             )
 
+        finished_at = datetime.now()
         return {
             "status": "success" if any(item.status == "success" for item in results) else "degraded",
             "exchanges": [asdict(item) for item in results],
@@ -83,6 +85,10 @@ class ValuationHistoryRebuildService:
             "total_rows_written": sum(item.rows_written for item in results),
             "total_existing_rows_skipped": sum(item.existing_rows_skipped for item in results),
             "total_instruments_processed": sum(item.instruments_processed for item in results),
+            "quote_limit_days": quote_limit_days,
+            "window_mode": str(window_mode or "trading_days").strip().lower(),
+            "write_policy": str(write_policy or "missing_only").strip().lower(),
+            "elapsed_seconds": round((finished_at - started_at).total_seconds(), 3),
         }
 
     async def _sync_exchange(
