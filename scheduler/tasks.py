@@ -2992,6 +2992,8 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
         quote_limit_days: Optional[int] = None,
+        window_mode: str = "trading_days",
+        write_policy: str = "missing_only",
         progress_log_every: int = 200,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
@@ -3005,6 +3007,8 @@ class ScheduledTasks:
                 limit_per_exchange=limit_per_exchange,
                 allow_disabled_module=True,
                 quote_limit_days=quote_limit_days,
+                window_mode=window_mode,
+                write_policy=write_policy,
                 progress_log_every=progress_log_every,
             )
 
@@ -3020,7 +3024,8 @@ class ScheduledTasks:
                         'task_name': exchange_result.get('exchange', 'unknown'),
                         'status': (
                             f"{exchange_result.get('status')} "
-                            f"(rows={exchange_result.get('rows_written', 0)})"
+                            f"(rows={exchange_result.get('rows_written', 0)}, "
+                            f"existing={exchange_result.get('existing_rows_skipped', 0)})"
                         ),
                     }
                     for exchange_result in result.get('exchanges', [])
@@ -3060,6 +3065,7 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
         quote_limit_days: Optional[int] = 60,
+        write_policy: str = "missing_only",
         progress_log_every: int = 200,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
@@ -3068,6 +3074,29 @@ class ScheduledTasks:
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             quote_limit_days=quote_limit_days,
+            window_mode="trading_days",
+            write_policy=write_policy,
+            progress_log_every=progress_log_every,
+            job_config=job_config,
+        )
+
+    async def valuation_history_12q_rebuild(
+        self,
+        exchanges: Optional[List[str]] = None,
+        limit_per_exchange: Optional[int] = None,
+        quote_limit_days: Optional[int] = None,
+        window_mode: str = "last_12_quarters",
+        write_policy: str = "missing_only",
+        progress_log_every: int = 200,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """研究域 valuation history 过去 12 个季度窗口重建任务。"""
+        return await self.valuation_history_rebuild(
+            exchanges=exchanges,
+            limit_per_exchange=limit_per_exchange,
+            quote_limit_days=quote_limit_days,
+            window_mode="last_12_quarters",
+            write_policy=write_policy,
             progress_log_every=progress_log_every,
             job_config=job_config,
         )
@@ -3077,14 +3106,18 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         limit_per_exchange: Optional[int] = None,
         quote_limit_days: Optional[int] = None,
+        window_mode: str = "last_12_quarters",
+        write_policy: str = "missing_only",
         progress_log_every: int = 200,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """研究域 valuation history 手动全量窗口重建任务。"""
-        return await self.valuation_history_rebuild(
+        """Backward-compatible alias for the 12-quarter valuation rebuild."""
+        return await self.valuation_history_12q_rebuild(
             exchanges=exchanges,
             limit_per_exchange=limit_per_exchange,
             quote_limit_days=quote_limit_days,
+            window_mode=window_mode,
+            write_policy=write_policy,
             progress_log_every=progress_log_every,
             job_config=job_config,
         )

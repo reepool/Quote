@@ -464,6 +464,65 @@ class ResearchValuationService:
 
         return snapshots
 
+    def history_identity(self) -> Dict[str, str]:
+        """Return the storage identity for current valuation history parameters."""
+        return {
+            "calc_method": ValuationHistorySnapshot.calc_method,
+            "calc_version": ValuationHistorySnapshot.calc_version,
+            "parameter_hash": self._build_parameter_hash(
+                self.parameters.get("history", {})
+            ),
+        }
+
+    def candidate_history_dates(
+        self,
+        quotes: pd.DataFrame,
+        financial_bundle: Dict[str, Any],
+    ) -> List[str]:
+        """Return dates that could produce valuation rows without full metric work."""
+        if quotes is None or quotes.empty:
+            return []
+
+        financial_facts = self._prepare_financial_fact_history(financial_bundle)
+        if not financial_facts:
+            return []
+        valuation_inputs = self._prepare_valuation_inputs(financial_bundle)
+
+        ordered = quotes.copy()
+        ordered["time"] = pd.to_datetime(ordered["time"])
+        ordered = ordered.sort_values("time").reset_index(drop=True)
+
+        dates: List[str] = []
+        for _, row in ordered.iterrows():
+            close_price = self._safe_positive_float(row.get("close"))
+            if close_price is None:
+                continue
+
+            as_of_date = row["time"].date().isoformat()
+            eligible_facts = self._eligible_financial_facts(
+                financial_facts,
+                as_of_date=as_of_date,
+            )
+            if not eligible_facts:
+                continue
+
+            valuation_input = self._resolve_valuation_input(
+                valuation_inputs,
+                as_of_date=as_of_date,
+                close_price=close_price,
+            )
+            market_cap = valuation_input.get("market_cap")
+            if market_cap is None:
+                shares_outstanding = self._latest_positive_fact_value(
+                    eligible_facts,
+                    "shares_outstanding",
+                )
+                if shares_outstanding is None:
+                    continue
+            dates.append(as_of_date)
+
+        return dates
+
     def _prepare_financial_fact_history(
         self,
         financial_bundle: Dict[str, Any],

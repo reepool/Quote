@@ -49,6 +49,8 @@ async def run_rollout_validation(
     limit_per_exchange: Optional[int] = None,
     target_instrument_ids: Optional[List[str]] = None,
     quote_limit_days: Optional[int] = None,
+    window_mode: str = "trading_days",
+    write_policy: str = "missing_only",
     sync_inputs: bool = False,
     input_sync_mode: str = "incremental",
     skip_sync: bool = False,
@@ -76,6 +78,8 @@ async def run_rollout_validation(
             target_instrument_ids=target_instrument_ids,
             allow_disabled_module=allow_disabled_module,
             quote_limit_days=quote_limit_days,
+            window_mode=window_mode,
+            write_policy=write_policy,
         )
 
     readiness = await manager.get_research_valuation_readiness()
@@ -88,6 +92,8 @@ async def run_rollout_validation(
             "limit_per_exchange": limit_per_exchange,
             "target_instrument_ids": target_instrument_ids,
             "quote_limit_days": quote_limit_days,
+            "window_mode": window_mode,
+            "write_policy": write_policy,
             "sync_inputs": sync_inputs,
             "input_sync_mode": input_sync_mode,
             "skip_sync": skip_sync,
@@ -117,6 +123,8 @@ async def run_rollout_validation_with_lifecycle(
     limit_per_exchange: Optional[int] = None,
     target_instrument_ids: Optional[List[str]] = None,
     quote_limit_days: Optional[int] = None,
+    window_mode: str = "trading_days",
+    write_policy: str = "missing_only",
     sync_inputs: bool = False,
     input_sync_mode: str = "incremental",
     skip_sync: bool = False,
@@ -131,6 +139,8 @@ async def run_rollout_validation_with_lifecycle(
             limit_per_exchange=limit_per_exchange,
             target_instrument_ids=target_instrument_ids,
             quote_limit_days=quote_limit_days,
+            window_mode=window_mode,
+            write_policy=write_policy,
             sync_inputs=sync_inputs,
             input_sync_mode=input_sync_mode,
             skip_sync=skip_sync,
@@ -202,6 +212,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional quote window for valuation_history_rebuild. Defaults to valuation.history.lookback_days.",
     )
     parser.add_argument(
+        "--window-mode",
+        default="trading_days",
+        choices=["trading_days", "last_12_quarters"],
+        help="Valuation history window mode.",
+    )
+    parser.add_argument(
+        "--write-policy",
+        default="missing_only",
+        choices=["missing_only", "overwrite"],
+        help="Write policy for valuation_history_rebuild.",
+    )
+    parser.add_argument(
         "--sync-inputs",
         action="store_true",
         help="Run valuation_input_sync before valuation_history_rebuild.",
@@ -239,6 +261,8 @@ async def _async_main(args: argparse.Namespace) -> int:
         limit_per_exchange=args.limit_per_exchange,
         target_instrument_ids=_parse_csv(args.target_instrument_ids),
         quote_limit_days=args.quote_limit_days,
+        window_mode=args.window_mode,
+        write_policy=args.write_policy,
         sync_inputs=bool(args.sync_inputs),
         input_sync_mode=args.input_sync_mode,
         skip_sync=args.skip_sync,

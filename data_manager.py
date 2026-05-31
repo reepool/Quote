@@ -4070,6 +4070,8 @@ class DataManager:
         target_instrument_ids: Optional[List[str]] = None,
         allow_disabled_module: bool = False,
         quote_limit_days: Optional[int] = None,
+        window_mode: str = "trading_days",
+        write_policy: str = "missing_only",
         progress_log_every: int = 200,
     ) -> Dict[str, Any]:
         """运行 valuation_history 重建。"""
@@ -4109,6 +4111,8 @@ class DataManager:
             limit_per_exchange=limit_per_exchange,
             target_instrument_ids=target_instrument_ids,
             quote_limit_days=quote_limit_days,
+            window_mode=window_mode,
+            write_policy=write_policy,
             progress_log_every=progress_log_every,
         )
         return self._attach_instrument_master_governance(result, governance)

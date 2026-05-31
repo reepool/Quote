@@ -1579,9 +1579,10 @@ GET /api/v1/research/company/{instrument_id}/events
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
 | `valuation_input_sync` | 每日 `23:00`，周一至周五，已开启 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更之后，当前实测约 `1-2min` 完成，`enabled=true` 进入日更测试 |
 | `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
-| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，已开启 | 估值历史日更小窗口任务，默认只重算最近 `7` 个交易日，基于已可得财务事实、行情和本地估值输入生成核心估值历史；任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制 |
-| `valuation_history_weekly_reconcile` | 每周六 `05:45`，已开启 | 周度回补校验任务，默认重算最近 `60` 个交易日，用于修复某天日更失败、行情/股本/财务补数后的短期一致性缺口 |
-| `valuation_history_full_rebuild` | 手工 `/run` | 手动全量窗口重建任务。`enabled=true / manual_only=true`，默认使用 `valuation.history.lookback_days=252`，用于首次生产重建或重大口径调整后的整窗重算 |
+| `valuation_history_rebuild` | 次日 `04:45`，周二至周六，已开启 | 估值历史日更小窗口任务，默认检查最近 `7` 个交易日且 `write_policy=missing_only`，只补足缺失的 `instrument_id + as_of_date + calc_method + calc_version + parameter_hash` 行；若某标的窗口内候选估值日期已完整，则直接跳过完整指标计算；必要时可手动传 `write_policy=overwrite` 覆写窗口内估值行 |
+| `valuation_history_weekly_reconcile` | 每周六 `05:45`，已开启 | 周度回补校验任务，默认检查最近 `60` 个交易日且 `write_policy=missing_only`，用于修复某天日更失败、行情/股本/财务补数后的短期一致性缺口；完整标的直接跳过计算，必要时可覆写 |
+| `valuation_history_12q_rebuild` | 手工 `/run` | 过去 `12` 个季度估值历史窗口重建任务。`enabled=true / manual_only=true`，按本地最近 `12` 个季度财务事实的最早可得日确定行情窗口，默认补足缺失而非全量覆写；已完整标的直接跳过计算，用于首次生产补齐、上游补数后大窗口校验或口径修复 |
+| `valuation_history_full_rebuild` | 手工 `/run`，默认禁用 | 兼容旧命令的别名，语义等同 `valuation_history_12q_rebuild`；不再作为“无限历史全量重建”入口，避免误解 |
 | `analyst_forecast_sync` | 每日/每周 | 更新一致预期 |
 | `research_report_sync` | 每日 | 更新研报元数据 |
 | `sentiment_event_sync` | 每日 | 更新资金流、龙虎榜、减持等事件 |
@@ -1676,6 +1677,8 @@ GET /api/v1/research/company/{instrument_id}/events
 - `industry_index_analysis` 后续按申万行业指数代码保存官方指数分析指标，与股票分类同步解耦
 - `valuation_history` 独立落 `data/valuation.db`
 - `valuation_inputs` 独立落 `data/valuation.db`，先由 `valuation_input_sync` 完成全量或日更，再由 `valuation_history_rebuild` 消费
+- 估值历史更新默认采用“缺失补足”策略：日更、周更和过去 `12` 个季度窗口任务都先按标的推导窗口内候选估值日期，再检查完整估值主键是否已存在；若该标的窗口内候选日期已完整，直接跳过完整指标计算，若存在缺口则只计算并写入缺失品种/日期/口径；当上游股本、财务可得日、估值计算逻辑或参数发生修复时，operator 可显式使用 `write_policy=overwrite` 覆写指定窗口
+- “过去 `12` 个季度更新”不是无限历史全量重建。由于当前财务核心事实只保留最近 `12` 个季度，估值历史窗口以这组本地可得财务事实为边界，早于最早可得财务日的 PE/PB/PS 不做生产派生
 - 财务核心事实的 `data_available_date` 不等同于报告期末日；估值使用 `data_available_date <= trade_date` 防止未来函数。`2026-05-30` 新增本地回填工具 `research/financial_available_date_backfill.py`：优先使用已存在公告/披露证据，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage 标记；该维护步骤已接入 `FinancialStatementsShadowSyncService` 成功收尾阶段，后续财务全量 backfill、catchup 和 reconciliation 成功后会自动补齐新增/更新 core facts 的可得日
 - 同行业对标
 - 相对估值

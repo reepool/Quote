@@ -348,7 +348,7 @@ API 补齐原则：
   - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
   - `2026-05-30` 新增财务核心事实可得日回填工具 `research/financial_available_date_backfill.py`：`data_available_date` 代表披露可得日，不等同于 `report_period`；本地真实公告/披露证据优先，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage。生产回填更新 `financial_core_facts_hot` `54316` 行，SSE/SZSE/BSE core facts 可得日覆盖恢复到 `100%`；该维护步骤已接入 `FinancialStatementsShadowSyncService` 成功收尾阶段，后续财务全量 backfill、catchup 和 reconciliation 成功后会自动补齐新增/更新 core facts 的可得日
   - `2026-05-30` 回填后估值 dry-run：SSE `20/20` 写入 `5040` 行，SZSE `20/20` 写入 `5040` 行，BSE `10/10` 写入 `2176` 行，`missing_financials=[]`
-  - scheduler 已预留估值任务入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启日更小窗口任务，默认重算最近 `7` 个交易日；`valuation_history_weekly_reconcile` 为周六 `05:45` 已开启周度回补校验任务，默认重算最近 `60` 个交易日；`valuation_history_full_rebuild` 为 `enabled=true / manual_only=true` 手动全量窗口任务，默认使用 `valuation.history.lookback_days=252`；上述重建任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
+  - scheduler 已预留估值任务入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启日更小窗口任务，默认检查最近 `7` 个交易日且 `write_policy=missing_only`；`valuation_history_weekly_reconcile` 为周六 `05:45` 已开启周度回补校验任务，默认检查最近 `60` 个交易日且只补缺失；`valuation_history_12q_rebuild` 为 `enabled=true / manual_only=true` 手动过去 `12` 个季度窗口任务，按本地最近 `12` 个季度财务事实最早可得日确定行情窗口，默认补缺失而非覆写；missing-only 路径会先按标的推导候选估值日期并检查完整主键，窗口已完整的标的直接跳过完整指标计算；`valuation_history_full_rebuild` 仅作为禁用的兼容旧别名，不再表达无限历史全量重建；上述重建任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
 
 ### 4.7 当前项目级 Source Policy
 
@@ -568,6 +568,8 @@ technical readiness 接口会聚合：
 - `valuation.db` 只保存估值输入、`valuation_history`、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
 - `valuation_inputs` 必须显式记录 source、source_mode、input_kind、unit、as_of_date、data_as_of 与 diagnostics；金额单位的股本/资本事实不能作为 share-count 输入，除非存在明确 share unit 映射
 - A 股股本输入主线使用 CNInfo/AkShare：全量回填走 `stock_share_change_cninfo(symbol, start_date, end_date)` 拉单标的股本变动历史；日更走 `stock_hold_change_cninfo(symbol="全部")` 拉全市场最新股本变动快照。CNInfo `总股本 / 已流通股份` 按万股转换为股后写入 `valuation_inputs`，`as_of_date` 记录变动日期，`data_as_of` 记录公告日期
+- `valuation_history` 更新默认使用 `write_policy=missing_only`：日更、周更和过去 `12` 个季度窗口任务均先轻量推导候选估值日期，再按完整主键 `instrument_id + as_of_date + calc_method + calc_version + parameter_hash` 检查缺失；窗口已完整的标的直接跳过完整 PE/PB/PS 指标计算，存在缺口时只写缺失行；显式 `write_policy=overwrite` 用于股本历史、财务可得日、计算逻辑或参数修复后的受控覆写
+- 过去 `12` 个季度窗口任务不是无限历史全量重建。当前财务核心事实只保留最近 `12` 个季度，因此 PE/PB/PS 历史派生以这组本地可得事实的最早 `data_available_date` 为边界；早于该边界的长历史估值需要另行扩展财务历史层后再设计
 - `valuation_history.market_cap` 明确为总市值，优先由本地收盘价乘 `shares_outstanding` 得到；`float_market_cap` 由本地收盘价乘 `float_shares` 得到。两者是估值结果和审计 lineage 的派生冗余，保留在 `valuation.db` 便于复现、API 查询和后续备份/迁移
 - `relative valuation` 默认依赖 current authoritative `sw_l2` peer group
 - 相对估值默认从 `valuation.db.valuation_history + research.db.industry_memberships` 即时计算或使用 bounded aggregate cache，不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵
@@ -760,7 +762,7 @@ technical readiness 接口会聚合：
 - 审计旁路：继续保留 `stock_industry_clf_hist_sw()`、official-code mapping cache、backlog/override review，但它们只服务历史分类审计，不再参与当前归属和相对估值同行分组
 - valuation readiness：通过 `/api/v1/research/valuation/readiness` 同时观察估值历史覆盖、模块 gate 与相对估值行业前置条件
 - valuation input sync runner：通过 `python scripts/research_valuation_input_sync.py --exchanges SSE,SZSE,BSE --sync-mode incremental` 做日更输入同步；全量回填用 `--sync-mode full --start-date 1990-01-01`，必须按交易所/limit 分批放量
-- valuation rollout validation runner：通过 `python scripts/research_valuation_rollout_validation.py --sync-inputs --exchanges SSE,SZSE` 将 `valuation_input_sync -> valuation_history_rebuild -> readiness` 串成可重复执行的仓库级复核命令
+- valuation rollout validation runner：通过 `python scripts/research_valuation_rollout_validation.py --sync-inputs --exchanges SSE,SZSE` 将 `valuation_input_sync -> valuation_history_rebuild -> readiness` 串成可重复执行的仓库级复核命令；支持 `--window-mode trading_days|last_12_quarters` 与 `--write-policy missing_only|overwrite`
 - `industry` / `valuation` 两条 rollout validation runner 在只读复核场景下已切换为轻量初始化路径，不再默认初始化 `DataSourceFactory`、`pytdx`、`baostock`、`akshare`、`yfinance`
 - technical readiness：通过 `/api/v1/research/technical/readiness` 观察最新技术快照缓存覆盖、口径、状态与信号分布
 

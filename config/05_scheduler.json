@@ -902,6 +902,8 @@
           ],
           "limit_per_exchange": null,
           "quote_limit_days": 7,
+          "window_mode": "trading_days",
+          "write_policy": "missing_only",
           "progress_log_every": 200,
           "max_runtime_seconds": 7200
         }
@@ -929,14 +931,16 @@
           ],
           "limit_per_exchange": null,
           "quote_limit_days": 60,
+          "window_mode": "trading_days",
+          "write_policy": "missing_only",
           "progress_log_every": 200,
           "max_runtime_seconds": 14400
         }
       },
-      "valuation_history_full_rebuild": {
+      "valuation_history_12q_rebuild": {
         "enabled": true,
         "manual_only": true,
-        "description": "研究域估值历史手动全量窗口重建（按 valuation.history.lookback_days，默认 252 个交易日）",
+        "description": "研究域估值历史过去12个季度窗口重建（默认补足缺失，可手动覆写）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -957,8 +961,40 @@
           ],
           "limit_per_exchange": null,
           "quote_limit_days": null,
+          "window_mode": "last_12_quarters",
+          "write_policy": "missing_only",
           "progress_log_every": 200,
-          "max_runtime_seconds": 21600
+          "max_runtime_seconds": 28800
+        }
+      },
+      "valuation_history_full_rebuild": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "兼容旧命令的别名；请改用 valuation_history_12q_rebuild，避免误解为无限历史全量重建",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 9,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "limit_per_exchange": null,
+          "quote_limit_days": null,
+          "window_mode": "last_12_quarters",
+          "write_policy": "missing_only",
+          "progress_log_every": 200,
+          "max_runtime_seconds": 28800
         }
       },
       "valuation_input_sync": {

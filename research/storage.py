@@ -1870,6 +1870,174 @@ class ResearchStorageManager:
             )
             conn.commit()
 
+    def upsert_valuation_history_many(
+        self,
+        snapshots: list[ValuationHistorySnapshot],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> None:
+        """Upsert derived valuation history rows in one transaction."""
+        if not snapshots:
+            return
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                self.upsert_valuation_history_many(
+                    snapshots,
+                    ingestion_run_id=ingestion_run_id,
+                )
+            return
+
+        now = get_shanghai_time().isoformat()
+        rows = []
+        for snapshot in snapshots:
+            details_json = json.dumps(
+                snapshot.details_json,
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+            rows.append(
+                (
+                    snapshot.instrument_id,
+                    snapshot.symbol,
+                    snapshot.exchange,
+                    snapshot.as_of_date,
+                    snapshot.currency,
+                    snapshot.close_price,
+                    snapshot.market_cap,
+                    snapshot.float_market_cap,
+                    snapshot.pe_ratio,
+                    snapshot.pb_ratio,
+                    snapshot.ps_ratio,
+                    snapshot.pe_static,
+                    snapshot.pe_ttm,
+                    snapshot.pe_forward,
+                    snapshot.pb_mrq,
+                    snapshot.ps_static,
+                    snapshot.ps_ttm,
+                    snapshot.ps_forward,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    now,
+                    details_json,
+                    ingestion_run_id,
+                    now,
+                    now,
+                )
+            )
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.executemany(
+                """
+                INSERT INTO valuation_history (
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    as_of_date,
+                    currency,
+                    close_price,
+                    market_cap,
+                    float_market_cap,
+                    pe_ratio,
+                    pb_ratio,
+                    ps_ratio,
+                    pe_static,
+                    pe_ttm,
+                    pe_forward,
+                    pb_mrq,
+                    ps_static,
+                    ps_ttm,
+                    ps_forward,
+                    calc_method,
+                    calc_version,
+                    parameter_hash,
+                    source,
+                    source_mode,
+                    data_as_of,
+                    details_json,
+                    ingestion_run_id,
+                    created_at,
+                    updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
+                DO UPDATE SET
+                    symbol = excluded.symbol,
+                    exchange = excluded.exchange,
+                    currency = excluded.currency,
+                    close_price = excluded.close_price,
+                    market_cap = excluded.market_cap,
+                    float_market_cap = excluded.float_market_cap,
+                    pe_ratio = excluded.pe_ratio,
+                    pb_ratio = excluded.pb_ratio,
+                    ps_ratio = excluded.ps_ratio,
+                    pe_static = excluded.pe_static,
+                    pe_ttm = excluded.pe_ttm,
+                    pe_forward = excluded.pe_forward,
+                    pb_mrq = excluded.pb_mrq,
+                    ps_static = excluded.ps_static,
+                    ps_ttm = excluded.ps_ttm,
+                    ps_forward = excluded.ps_forward,
+                    source = excluded.source,
+                    source_mode = excluded.source_mode,
+                    data_as_of = excluded.data_as_of,
+                    details_json = excluded.details_json,
+                    ingestion_run_id = excluded.ingestion_run_id,
+                    updated_at = excluded.updated_at
+                """,
+                rows,
+            )
+            conn.commit()
+
+    def get_existing_valuation_history_dates(
+        self,
+        instrument_id: str,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        calc_method: str,
+        calc_version: str,
+        parameter_hash: str,
+    ) -> set[str]:
+        """Return dates already present for one valuation-history identity."""
+        if self._uses_separate_valuation_database() and self._active_db_path is None:
+            with self.valuation_database_scope():
+                return self.get_existing_valuation_history_dates(
+                    instrument_id,
+                    start_date=start_date,
+                    end_date=end_date,
+                    calc_method=calc_method,
+                    calc_version=calc_version,
+                    parameter_hash=parameter_hash,
+                )
+        query = """
+            SELECT as_of_date
+            FROM valuation_history
+            WHERE instrument_id = ?
+              AND calc_method = ?
+              AND calc_version = ?
+              AND parameter_hash = ?
+        """
+        parameters: list[Any] = [
+            instrument_id,
+            calc_method,
+            calc_version,
+            parameter_hash,
+        ]
+        if start_date:
+            query += " AND as_of_date >= ?"
+            parameters.append(start_date)
+        if end_date:
+            query += " AND as_of_date <= ?"
+            parameters.append(end_date)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(query, tuple(parameters)).fetchall()
+        return {str(row[0]) for row in rows}
+
     def upsert_valuation_input(
         self,
         snapshot: ValuationInputSnapshot,
@@ -9509,6 +9677,12 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_valuation_history_instrument
             ON valuation_history(instrument_id, as_of_date, updated_at);
+
+            CREATE INDEX IF NOT EXISTS idx_valuation_history_exchange_date
+            ON valuation_history(exchange, as_of_date, instrument_id);
+
+            CREATE INDEX IF NOT EXISTS idx_valuation_history_ingestion_run
+            ON valuation_history(ingestion_run_id);
 
             CREATE TABLE IF NOT EXISTS valuation_inputs (
                 instrument_id TEXT NOT NULL,

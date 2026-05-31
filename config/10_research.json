@@ -413,6 +413,8 @@
         "enabled": false,
         "history": {
           "lookback_days": 252,
+          "default_write_policy": "missing_only",
+          "periodic_rebuild_window_mode": "last_12_quarters",
           "flow_input_mode": "cumulative_ytd",
           "require_availability_date": true,
           "forward_metrics_enabled": false

@@ -15,11 +15,25 @@ from utils.config_manager import ResearchBudgetConfig, ResearchConfig, ResearchS
 @dataclass
 class _MockDbOps:
     instruments: list[dict]
+    calls: list[dict] = None
+
+    def __post_init__(self):
+        if self.calls is None:
+            self.calls = []
 
     async def get_instruments_by_exchange(self, exchange: str):
         return [item for item in self.instruments if item["exchange"] == exchange]
 
-    async def get_daily_data(self, instrument_id: str, limit: int = None, return_format: str = "pandas"):
+    async def get_daily_data(
+        self,
+        instrument_id: str,
+        start_date=None,
+        limit: int = None,
+        return_format: str = "pandas",
+    ):
+        self.calls.append(
+            {"instrument_id": instrument_id, "start_date": start_date, "limit": limit}
+        )
         frame = pd.DataFrame(
             [
                 {"time": "2026-04-16", "close": 10.0},
@@ -150,3 +164,165 @@ def test_valuation_history_rebuild_writes_rows(tmp_path):
             ).fetchall()
         }
     assert "valuation_history" not in research_tables
+
+
+def test_valuation_history_rebuild_defaults_to_missing_only(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    with storage.financial_database_scope():
+        storage.upsert_financial_statement_bundle(
+            FinancialStatementBundle(
+                instrument_id="600519.SH",
+                symbol="600519",
+                exchange="SSE",
+                report_period="2025-12-31",
+                source="akshare",
+                source_mode="direct",
+                facts=FinancialFactsSnapshot(
+                    instrument_id="600519.SH",
+                    symbol="600519",
+                    exchange="SSE",
+                    report_period="2025Q4",
+                    publish_date="2026-04-15",
+                    data_available_date="2026-04-15",
+                    fiscal_year=2025,
+                    fiscal_quarter=4,
+                    revenue=80.0,
+                    net_income=20.0,
+                    equity=50.0,
+                    shares_outstanding=100.0,
+                    source="akshare",
+                    source_mode="direct",
+                    facts_json={"report_period": "2025-12-31"},
+                ),
+            ),
+        )
+    storage.upsert_valuation_input(
+        ValuationInputSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-15",
+            shares_outstanding=100.0,
+            source="manual",
+            source_mode="local",
+            input_kind="shares_outstanding",
+            unit="share",
+        )
+    )
+
+    service = ValuationHistoryRebuildService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+    )
+
+    first = _run(service.sync(exchanges=["SSE"], limit_per_exchange=1))
+    original_build_history_snapshots = service.valuation_service.build_history_snapshots
+    service.valuation_service.build_history_snapshots = (
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("complete missing_only instruments should skip calculation")
+        )
+    )
+    second = _run(service.sync(exchanges=["SSE"], limit_per_exchange=1))
+    service.valuation_service.build_history_snapshots = original_build_history_snapshots
+    overwrite = _run(
+        service.sync(
+            exchanges=["SSE"],
+            limit_per_exchange=1,
+            write_policy="overwrite",
+        )
+    )
+
+    assert first["total_rows_written"] == 2
+    assert second["total_rows_written"] == 0
+    assert second["total_existing_rows_skipped"] == 2
+    assert overwrite["total_rows_written"] == 2
+
+
+def test_valuation_history_last_12_quarters_uses_earliest_available_date(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+
+    with storage.financial_database_scope():
+        storage.upsert_financial_statement_bundle(
+            FinancialStatementBundle(
+                instrument_id="600519.SH",
+                symbol="600519",
+                exchange="SSE",
+                report_period="2025-12-31",
+                source="akshare",
+                source_mode="direct",
+                facts=FinancialFactsSnapshot(
+                    instrument_id="600519.SH",
+                    symbol="600519",
+                    exchange="SSE",
+                    report_period="2025Q4",
+                    publish_date="2026-04-15",
+                    data_available_date="2026-04-15",
+                    fiscal_year=2025,
+                    fiscal_quarter=4,
+                    revenue=80.0,
+                    net_income=20.0,
+                    equity=50.0,
+                    shares_outstanding=100.0,
+                    source="akshare",
+                    source_mode="direct",
+                    facts_json={"report_period": "2025-12-31"},
+                ),
+            ),
+        )
+    storage.upsert_valuation_input(
+        ValuationInputSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-15",
+            shares_outstanding=100.0,
+            source="manual",
+            source_mode="local",
+            input_kind="shares_outstanding",
+            unit="share",
+        )
+    )
+    db_ops = _MockDbOps(
+        instruments=[
+            {
+                "instrument_id": "600519.SH",
+                "symbol": "600519",
+                "exchange": "SSE",
+                "type": "stock",
+                "is_active": True,
+            }
+        ]
+    )
+    service = ValuationHistoryRebuildService(
+        db_ops=db_ops,
+        storage=storage,
+        research_config=research_config,
+    )
+
+    result = _run(
+        service.sync(
+            exchanges=["SSE"],
+            limit_per_exchange=1,
+            window_mode="last_12_quarters",
+        )
+    )
+
+    assert result["status"] == "success"
+    assert db_ops.calls[0]["limit"] is None
+    assert db_ops.calls[0]["start_date"].date().isoformat() == "2026-04-15"

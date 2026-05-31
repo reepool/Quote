@@ -66,6 +66,8 @@ async def test_rollout_validation_runs_sync_and_readiness_by_default():
         "target_instrument_ids": ["600000.SH"],
         "allow_disabled_module": False,
         "quote_limit_days": None,
+        "window_mode": "trading_days",
+        "write_policy": "missing_only",
     }
 
 
@@ -100,6 +102,8 @@ async def test_rollout_validation_can_sync_inputs_before_history():
         "target_instrument_ids": ["600000.SH"],
         "allow_disabled_module": False,
         "quote_limit_days": None,
+        "window_mode": "trading_days",
+        "write_policy": "missing_only",
     }
 
 
