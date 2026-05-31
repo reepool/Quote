@@ -3209,6 +3209,9 @@ class DataManager:
             for item in relative_cfg.get("metric_variants", ["pe_ttm", "pb_mrq", "ps_ttm"])
             if str(item).strip()
         ]
+        from research.valuation_service import ResearchValuationService
+
+        history_identity = ResearchValuationService(module_cfg).history_identity()
 
         def _load_storage_state() -> Dict[str, Any]:
             metric_coverage: Dict[str, Any] = {}
@@ -3216,6 +3219,9 @@ class DataManager:
             try:
                 candidate = storage.summarize_valuation_metric_coverage(
                     metric_fields=metric_fields,
+                    calc_method=history_identity["calc_method"],
+                    calc_version=history_identity["calc_version"],
+                    parameter_hash=history_identity["parameter_hash"],
                 )
                 if isinstance(candidate, dict):
                     metric_coverage = candidate
@@ -3228,8 +3234,16 @@ class DataManager:
             except Exception:
                 input_coverage = {}
             return {
-                "summary": storage.summarize_valuation_history(),
-                "by_exchange": storage.count_valuation_history_by_exchange(),
+                "summary": storage.summarize_valuation_history(
+                    calc_method=history_identity["calc_method"],
+                    calc_version=history_identity["calc_version"],
+                    parameter_hash=history_identity["parameter_hash"],
+                ),
+                "by_exchange": storage.count_valuation_history_by_exchange(
+                    calc_method=history_identity["calc_method"],
+                    calc_version=history_identity["calc_version"],
+                    parameter_hash=history_identity["parameter_hash"],
+                ),
                 "metric_coverage": metric_coverage,
                 "input_coverage": input_coverage,
             }
@@ -4854,6 +4868,7 @@ class DataManager:
 
         query_service = ResearchQueryService(storage)
         valuation_service = ResearchValuationService(module_cfg)
+        identity = valuation_service.history_identity()
         rows = await asyncio.to_thread(
             query_service.get_valuation_history_rows,
             normalized_id,
@@ -4861,6 +4876,9 @@ class DataManager:
             end_date=None if end_date is None else end_date.isoformat(),
             limit=limit,
             include_details=include_details,
+            calc_method=identity["calc_method"],
+            calc_version=identity["calc_version"],
+            parameter_hash=identity["parameter_hash"],
         )
         return valuation_service.build_history_response(rows)
 
@@ -4884,10 +4902,14 @@ class DataManager:
 
         query_service = ResearchQueryService(storage)
         valuation_service = ResearchValuationService(module_cfg)
+        identity = valuation_service.history_identity()
         subject_row = await asyncio.to_thread(
             query_service.get_latest_valuation_history_row,
             normalized_id,
             include_details=True,
+            calc_method=identity["calc_method"],
+            calc_version=identity["calc_version"],
+            parameter_hash=identity["parameter_hash"],
         )
         industry_membership = await asyncio.to_thread(
             query_service.get_industry_membership,
@@ -4924,6 +4946,9 @@ class DataManager:
                 benchmark_field=benchmark_context["benchmark_field"],
                 limit=int(relative_cfg.get("max_peer_rows", 20)),
                 include_details=False,
+                calc_method=identity["calc_method"],
+                calc_version=identity["calc_version"],
+                parameter_hash=identity["parameter_hash"],
             )
 
         result = valuation_service.build_relative_valuation(

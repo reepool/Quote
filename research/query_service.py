@@ -126,6 +126,9 @@ class ResearchQueryService:
         end_date: Optional[str] = None,
         limit: int = 120,
         include_details: bool = True,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> list[Dict[str, Any]]:
         return self.storage.get_valuation_history_rows(
             instrument_id,
@@ -133,6 +136,9 @@ class ResearchQueryService:
             end_date=end_date,
             limit=limit,
             include_details=include_details,
+            calc_method=calc_method,
+            calc_version=calc_version,
+            parameter_hash=parameter_hash,
         )
 
     def get_latest_valuation_history_row(
@@ -140,10 +146,16 @@ class ResearchQueryService:
         instrument_id: str,
         *,
         include_details: bool = True,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         return self.storage.get_latest_valuation_history_row(
             instrument_id,
             include_details=include_details,
+            calc_method=calc_method,
+            calc_version=calc_version,
+            parameter_hash=parameter_hash,
         )
 
     def get_company_overview(

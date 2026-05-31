@@ -85,6 +85,9 @@
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过
   - `2026-05-29` 股本样本复核：`600000.SH / 001233.SZ / 920009.BJ` 在 `valuation.db.valuation_inputs` 中的 `shares_outstanding / float_shares` 与 CNInfo/AkShare live read-only 返回一致；源单位为 `10k_share`，落库前按 `10000` 转换为股，`as_of_date` 保留股本生效日，`data_as_of` 保留公告日
+  - `2026-05-31` 过去 12 个季度估值历史任务完成后复核：`valuation_history` 同一完整主键无重复，但表内曾并存旧 `252` 交易日窗口 parameter hash 与新 `last_12_quarters` parameter hash。读路径必须按当前 `calc_method + calc_version + parameter_hash` 过滤，避免旧口径污染 API、readiness 和 relative valuation；旧 hash 只能在备份后通过显式维护脚本清理。
+  - 新股或刚挂牌标的若尚无本地财务事实，但已有 `valuation_inputs` 和行情，应写入 `market_cap / float_market_cap` 的 partial 估值历史行，PE/PB/PS 等财务依赖指标保持 unavailable 并记录 `financial_facts_not_available`，不应把这类生命周期缺口作为普通财务缺失告警。
+  - `valuation_history.details_json` 必须保持 compact lineage：保留估值输入来源、关键财务期、指标分母和 unavailable reason；不得在日频行中重复保存完整外部 payload 或大体量 diagnostics。存储维护通过 `scripts/research_valuation_storage_maintenance.py` 先审计 parameter hash 与 `dbstat` 体积，再显式清理旧口径。
   - 日更只读采样：一次 CNInfo 全市场快照覆盖 `SSE 2315 / SZSE 2893 / BSE 317` 个当前活跃 A 股标的，接口与本地匹配耗时约 `3s`；考虑 DB upsert、日志、网络波动和重试，生产日更预计通常在 `1-5min` 内完成，配置上限保守设为 `7200s`
   - 全量历史回填只读采样：`3` 个样本标的返回 `257` 条股本变动记录，耗时约 `1.2s`；全市场约 `5525` 个当前活跃标的按 `0.2s` 请求间隔估算，纯请求下限约 `18-25min`，考虑限流、重试、空返回和写库后建议按 `2-6h` 规划，配置上限保守设为 `48h`
   - `valuation_inputs` 属于低频事件表：按当前样本每标的几十到百余条历史变动记录估算，全市场全量约 `30-70万` 行；按每行含 JSON lineage 与索引 `0.8-2KB` 估算，存储量约 `0.3-1.5GiB`，显著小于日频 `valuation_history`

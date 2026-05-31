@@ -571,6 +571,9 @@ technical readiness 接口会聚合：
 - `valuation_history` 更新默认使用 `write_policy=missing_only`：日更、周更和过去 `12` 个季度窗口任务均先轻量推导候选估值日期，再按完整主键 `instrument_id + as_of_date + calc_method + calc_version + parameter_hash` 检查缺失；窗口已完整的标的直接跳过完整 PE/PB/PS 指标计算，存在缺口时只写缺失行；显式 `write_policy=overwrite` 用于股本历史、财务可得日、计算逻辑或参数修复后的受控覆写
 - 过去 `12` 个季度窗口任务不是无限历史全量重建。当前财务核心事实只保留最近 `12` 个季度，因此 PE/PB/PS 历史派生以这组本地可得事实的最早 `data_available_date` 为边界；早于该边界的长历史估值需要另行扩展财务历史层后再设计
 - `valuation_history.market_cap` 明确为总市值，优先由本地收盘价乘 `shares_outstanding` 得到；`float_market_cap` 由本地收盘价乘 `float_shares` 得到。两者是估值结果和审计 lineage 的派生冗余，保留在 `valuation.db` 便于复现、API 查询和后续备份/迁移
+- `valuation_history` 读路径必须使用当前 valuation 参数身份过滤，即当前 `calc_method / calc_version / parameter_hash`。历史运行留下的旧窗口或旧参数行可以保留为审计资产，但不得参与 API 最新值、readiness 覆盖率或 relative valuation 同行统计。清理旧 hash 前必须备份，推荐先运行 `scripts/research_valuation_storage_maintenance.py --db-path data/valuation.db` 做只读审计，再显式指定 `--delete-parameter-hash ... --confirm-delete`。
+- 新股、刚挂牌标的或上市前财务历史不足标的，如果已经有本地 `valuation_inputs` 和交易行情，即使没有可用财务事实，也应写入 partial 估值历史行：`market_cap / float_market_cap` 正常计算，PE/PB/PS 指标置空并在 `details_json.metrics.*.missing_reason` 中记录 `financial_facts_not_available`。这类行用于保持市值序列连续，不代表财务估值口径已经可用。
+- `details_json` 是日频高行数字段，必须保持 compact：保留输入 lineage、报告期、可得日、分母、指标状态和缺失原因，不保存完整 provider payload 或大体量 diagnostics。若需要完整审计，应放入源文件/raw payload 表或单独审计表，而不是在每个交易日重复写入。
 - `relative valuation` 默认依赖 current authoritative `sw_l2` peer group
 - 相对估值默认从 `valuation.db.valuation_history + research.db.industry_memberships` 即时计算或使用 bounded aggregate cache，不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵
 - valuation rollout readiness 现在同时返回 `valuation_history` 覆盖、估值输入覆盖、metric coverage、财务 readiness、行业 readiness 与 storage 摘要

@@ -202,13 +202,8 @@ class ValuationHistoryRebuildService:
                         include_history=True,
                         limit=12,
                     )
-                if bundle is None and not core_facts:
-                    skipped_instruments += 1
-                    missing_financials.append(instrument["instrument_id"])
-                    _log_progress(index, instrument)
-                    continue
                 if bundle is None:
-                    bundle = dict(core_facts[0])
+                    bundle = dict(core_facts[0]) if core_facts else {}
                 else:
                     bundle = dict(bundle)
                 bundle["financial_history"] = core_facts or [bundle]
@@ -217,17 +212,30 @@ class ValuationHistoryRebuildService:
                     limit=0,
                 )
                 bundle["valuation_inputs"] = valuation_inputs
+                if not core_facts and not valuation_inputs:
+                    skipped_instruments += 1
+                    missing_financials.append(instrument["instrument_id"])
+                    missing_valuation_inputs.append(instrument["instrument_id"])
+                    _log_progress(index, instrument)
+                    continue
                 if not valuation_inputs:
                     missing_valuation_inputs.append(instrument["instrument_id"])
 
                 quote_start_date = None
+                quote_limit = lookback_days
                 if normalized_window_mode == "last_12_quarters":
                     quote_start_date = self._earliest_available_date(core_facts or [bundle])
+                    if quote_start_date is None:
+                        quote_start_date = self._normalize_date(
+                            instrument.get("listed_date") or instrument.get("list_date")
+                        )
+                        if quote_start_date is None:
+                            quote_limit = configured_lookback_days
 
                 quotes = await self.db_ops.get_daily_data(
                     instrument_id=instrument["instrument_id"],
                     start_date=self._to_datetime(quote_start_date),
-                    limit=lookback_days,
+                    limit=quote_limit,
                     return_format="pandas",
                 )
                 if quotes is None or quotes.empty:
@@ -242,7 +250,8 @@ class ValuationHistoryRebuildService:
                     )
                     if not candidate_dates:
                         skipped_instruments += 1
-                        missing_financials.append(instrument["instrument_id"])
+                        if core_facts:
+                            missing_financials.append(instrument["instrument_id"])
                         _log_progress(index, instrument)
                         continue
                     identity = self.valuation_service.history_identity()
@@ -272,7 +281,8 @@ class ValuationHistoryRebuildService:
                 )
                 if not snapshots:
                     skipped_instruments += 1
-                    missing_financials.append(instrument["instrument_id"])
+                    if core_facts:
+                        missing_financials.append(instrument["instrument_id"])
                     _log_progress(index, instrument)
                     continue
 
@@ -423,3 +433,15 @@ class ValuationHistoryRebuildService:
         if not value:
             return None
         return datetime.fromisoformat(str(value)[:10])
+
+    @staticmethod
+    def _normalize_date(value: Any) -> Optional[str]:
+        if value in (None, ""):
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        try:
+            return datetime.fromisoformat(text[:10]).date().isoformat()
+        except ValueError:
+            return text[:10]

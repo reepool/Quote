@@ -357,8 +357,6 @@ class ResearchValuationService:
             return []
 
         financial_facts = self._prepare_financial_fact_history(financial_bundle)
-        if not financial_facts:
-            return []
         valuation_inputs = self._prepare_valuation_inputs(financial_bundle)
 
         ordered = quotes.copy()
@@ -377,10 +375,7 @@ class ResearchValuationService:
                 financial_facts,
                 as_of_date=as_of_date,
             )
-            if not eligible_facts:
-                continue
 
-            latest_fact = eligible_facts[0]
             valuation_input = self._resolve_valuation_input(
                 valuation_inputs,
                 as_of_date=as_of_date,
@@ -390,6 +385,38 @@ class ResearchValuationService:
             market_cap = valuation_input.get("market_cap")
             float_market_cap = valuation_input.get("float_market_cap")
             input_source = valuation_input.get("source")
+            if not eligible_facts:
+                if market_cap is None:
+                    continue
+                metric_details = self._build_unavailable_metric_details(
+                    market_cap=market_cap,
+                    missing_reason="financial_facts_not_available",
+                )
+                snapshots.append(
+                    ValuationHistorySnapshot(
+                        instrument_id=instrument.get("instrument_id", ""),
+                        symbol=instrument.get("symbol", ""),
+                        exchange=instrument.get("exchange", ""),
+                        as_of_date=as_of_date,
+                        close_price=close_price,
+                        market_cap=market_cap,
+                        float_market_cap=float_market_cap,
+                        parameter_hash=parameter_hash,
+                        details_json={
+                            "valuation_scope": "market_cap_only",
+                            "missing_reason": "financial_facts_not_available",
+                            "valuation_input": self._compact_valuation_input_lineage(
+                                input_source
+                            ),
+                            "shares_outstanding": shares_outstanding,
+                            "float_market_cap": float_market_cap,
+                            "metrics": metric_details,
+                        },
+                    )
+                )
+                continue
+
+            latest_fact = eligible_facts[0]
             if market_cap is None:
                 shares_outstanding = self._latest_positive_fact_value(
                     eligible_facts,
@@ -403,9 +430,9 @@ class ResearchValuationService:
                     "source_mode": "local",
                     "input_kind": "shares_outstanding",
                     "as_of_date": latest_fact.get("data_available_date"),
-                    "unit": "share",
-                    "resolution": "price_times_explicit_shares_outstanding",
-                }
+                        "unit": "share",
+                        "resolution": "price_times_explicit_shares_outstanding",
+                    }
             elif shares_outstanding is None:
                 shares_outstanding = self._latest_positive_fact_value(
                     eligible_facts,
@@ -451,7 +478,9 @@ class ResearchValuationService:
                         "latest_financial_available_date": latest_fact.get(
                             "data_available_date"
                         ),
-                        "valuation_input": input_source,
+                        "valuation_input": self._compact_valuation_input_lineage(
+                            input_source
+                        ),
                         "shares_outstanding": shares_outstanding,
                         "float_market_cap": float_market_cap,
                         "revenue": latest_fact.get("revenue"),
@@ -484,8 +513,6 @@ class ResearchValuationService:
             return []
 
         financial_facts = self._prepare_financial_fact_history(financial_bundle)
-        if not financial_facts:
-            return []
         valuation_inputs = self._prepare_valuation_inputs(financial_bundle)
 
         ordered = quotes.copy()
@@ -503,8 +530,6 @@ class ResearchValuationService:
                 financial_facts,
                 as_of_date=as_of_date,
             )
-            if not eligible_facts:
-                continue
 
             valuation_input = self._resolve_valuation_input(
                 valuation_inputs,
@@ -512,6 +537,10 @@ class ResearchValuationService:
                 close_price=close_price,
             )
             market_cap = valuation_input.get("market_cap")
+            if not eligible_facts:
+                if market_cap is not None:
+                    dates.append(as_of_date)
+                continue
             if market_cap is None:
                 shares_outstanding = self._latest_positive_fact_value(
                     eligible_facts,
@@ -522,6 +551,45 @@ class ResearchValuationService:
             dates.append(as_of_date)
 
         return dates
+
+    def _build_unavailable_metric_details(
+        self,
+        *,
+        market_cap: float,
+        missing_reason: str,
+    ) -> Dict[str, Dict[str, Any]]:
+        return {
+            metric_name: self._unavailable_metric(
+                metric_name,
+                missing_reason,
+                numerator=market_cap,
+            )
+            for metric_name in VALUATION_METRIC_FIELDS
+        }
+
+    @staticmethod
+    def _compact_valuation_input_lineage(source: Any) -> Dict[str, Any]:
+        if not isinstance(source, dict):
+            return {}
+        allowed = {
+            "source",
+            "source_mode",
+            "input_kind",
+            "as_of_date",
+            "data_as_of",
+            "unit",
+            "market_cap",
+            "shares_outstanding",
+            "float_market_cap",
+            "float_shares",
+            "resolution",
+            "missing_reason",
+        }
+        return {
+            key: value
+            for key, value in source.items()
+            if key in allowed and value is not None
+        }
 
     def _prepare_financial_fact_history(
         self,

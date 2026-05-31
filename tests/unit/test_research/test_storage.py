@@ -2386,6 +2386,55 @@ def test_upsert_valuation_input_uses_valuation_database_and_rejects_amount_units
         raise AssertionError("amount-denominated share-count input should be rejected")
 
 
+def test_valuation_history_read_filters_current_identity(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+
+    storage.upsert_valuation_history(
+        ValuationHistorySnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-18",
+            market_cap=1000.0,
+            pe_ratio=10.0,
+            parameter_hash="old",
+            details_json={"version": "old"},
+        )
+    )
+    storage.upsert_valuation_history(
+        ValuationHistorySnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-18",
+            market_cap=2000.0,
+            pe_ratio=20.0,
+            parameter_hash="current",
+            details_json={"version": "current"},
+        )
+    )
+
+    all_rows = storage.get_valuation_history_rows("600519.SH")
+    current_rows = storage.get_valuation_history_rows(
+        "600519.SH",
+        calc_method="valuation_history_builtin",
+        calc_version="valuation_history.v1",
+        parameter_hash="current",
+    )
+
+    assert len(all_rows) == 2
+    assert len(current_rows) == 1
+    assert current_rows[0]["market_cap"] == 2000.0
+    latest_current = storage.get_latest_valuation_history_row(
+        "600519.SH",
+        calc_method="valuation_history_builtin",
+        calc_version="valuation_history.v1",
+        parameter_hash="current",
+    )
+    assert latest_current["details"]["version"] == "current"
+
+
 def test_upsert_analyst_forecast_writes_snapshot(tmp_path):
     storage, _ = _build_storage_manager(tmp_path)
     storage.initialize()

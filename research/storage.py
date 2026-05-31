@@ -7350,6 +7350,9 @@ class ResearchStorageManager:
         end_date: Optional[str] = None,
         limit: int = 120,
         include_details: bool = True,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> list[Dict[str, Any]]:
         """Fetch valuation history rows for one instrument."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7360,6 +7363,9 @@ class ResearchStorageManager:
                     end_date=end_date,
                     limit=limit,
                     include_details=include_details,
+                    calc_method=calc_method,
+                    calc_version=calc_version,
+                    parameter_hash=parameter_hash,
                 )
         query = """
             SELECT
@@ -7401,6 +7407,15 @@ class ResearchStorageManager:
         if end_date:
             query += " AND as_of_date <= ?"
             parameters.append(end_date)
+        if calc_method:
+            query += " AND calc_method = ?"
+            parameters.append(calc_method)
+        if calc_version:
+            query += " AND calc_version = ?"
+            parameters.append(calc_version)
+        if parameter_hash:
+            query += " AND parameter_hash = ?"
+            parameters.append(parameter_hash)
         query += " ORDER BY as_of_date DESC"
         if limit > 0:
             query += " LIMIT ?"
@@ -7507,26 +7522,70 @@ class ResearchStorageManager:
         instrument_id: str,
         *,
         include_details: bool = True,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
         """Fetch the latest valuation history row for one instrument."""
         rows = self.get_valuation_history_rows(
             instrument_id,
             limit=1,
             include_details=include_details,
+            calc_method=calc_method,
+            calc_version=calc_version,
+            parameter_hash=parameter_hash,
         )
         if not rows:
             return None
         return rows[0]
 
-    def summarize_valuation_history(self) -> Dict[str, Any]:
+    def summarize_valuation_history(
+        self,
+        *,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return aggregate summary for instruments with valuation history."""
+        return self.summarize_valuation_history_for_identity(
+            calc_method=calc_method,
+            calc_version=calc_version,
+            parameter_hash=parameter_hash,
+        )
+
+    def summarize_valuation_history_for_identity(
+        self,
+        *,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Return aggregate summary for instruments with valuation history."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
             with self.valuation_database_scope():
-                return self.summarize_valuation_history()
+                return self.summarize_valuation_history_for_identity(
+                    calc_method=calc_method,
+                    calc_version=calc_version,
+                    parameter_hash=parameter_hash,
+                )
+        filters: list[str] = []
+        params: list[Any] = []
+        if calc_method:
+            filters.append("calc_method = ?")
+            params.append(calc_method)
+        if calc_version:
+            filters.append("calc_version = ?")
+            params.append(calc_version)
+        if parameter_hash:
+            filters.append("parameter_hash = ?")
+            params.append(parameter_hash)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+        latest_where = "" if not filters else "WHERE " + " AND ".join(filters)
         latest_rows_query = """
             WITH latest AS (
                 SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
                 FROM valuation_history
+                {latest_where}
                 GROUP BY instrument_id
             )
             SELECT vh.*
@@ -7534,46 +7593,53 @@ class ResearchStorageManager:
             JOIN latest
               ON latest.instrument_id = vh.instrument_id
              AND latest.latest_as_of_date = vh.as_of_date
-        """
+            {where_clause}
+        """.format(latest_where=latest_where, where_clause=where_clause.replace("calc_", "vh.calc_").replace("parameter_hash", "vh.parameter_hash"))
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             summary_row = conn.execute(
-                """
+                f"""
                 SELECT
                     COUNT(DISTINCT instrument_id) AS total,
                     MAX(as_of_date) AS latest_as_of_date,
                     MAX(updated_at) AS latest_updated_at,
                     MAX(data_as_of) AS latest_data_as_of
                 FROM valuation_history
-                """
+                {where_clause}
+                """,
+                tuple(params),
             ).fetchone()
             source_rows = conn.execute(
                 f"""
                 SELECT source, COUNT(DISTINCT instrument_id) AS row_count
                 FROM ({latest_rows_query})
                 GROUP BY source
-                """
+                """,
+                tuple(params + params),
             ).fetchall()
             mode_rows = conn.execute(
                 f"""
                 SELECT source_mode, COUNT(DISTINCT instrument_id) AS row_count
                 FROM ({latest_rows_query})
                 GROUP BY source_mode
-                """
+                """,
+                tuple(params + params),
             ).fetchall()
             method_rows = conn.execute(
                 f"""
                 SELECT calc_method, COUNT(DISTINCT instrument_id) AS row_count
                 FROM ({latest_rows_query})
                 GROUP BY calc_method
-                """
+                """,
+                tuple(params + params),
             ).fetchall()
             version_rows = conn.execute(
                 f"""
                 SELECT calc_version, COUNT(DISTINCT instrument_id) AS row_count
                 FROM ({latest_rows_query})
                 GROUP BY calc_version
-                """
+                """,
+                tuple(params + params),
             ).fetchall()
 
         return {
@@ -7609,19 +7675,57 @@ class ResearchStorageManager:
             ),
         }
 
-    def count_valuation_history_by_exchange(self) -> Dict[str, int]:
+    def count_valuation_history_by_exchange(
+        self,
+        *,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Count instruments with valuation history per exchange."""
+        return self.count_valuation_history_by_exchange_for_identity(
+            calc_method=calc_method,
+            calc_version=calc_version,
+            parameter_hash=parameter_hash,
+        )
+
+    def count_valuation_history_by_exchange_for_identity(
+        self,
+        *,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
+    ) -> Dict[str, int]:
         """Count instruments with valuation history per exchange."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
             with self.valuation_database_scope():
-                return self.count_valuation_history_by_exchange()
+                return self.count_valuation_history_by_exchange_for_identity(
+                    calc_method=calc_method,
+                    calc_version=calc_version,
+                    parameter_hash=parameter_hash,
+                )
+        filters: list[str] = []
+        params: list[Any] = []
+        if calc_method:
+            filters.append("calc_method = ?")
+            params.append(calc_method)
+        if calc_version:
+            filters.append("calc_version = ?")
+            params.append(calc_version)
+        if parameter_hash:
+            filters.append("parameter_hash = ?")
+            params.append(parameter_hash)
+        where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             rows = conn.execute(
-                """
+                f"""
                 SELECT exchange, COUNT(DISTINCT instrument_id) AS row_count
                 FROM valuation_history
+                {where_clause}
                 GROUP BY exchange
-                """
+                """,
+                tuple(params),
             ).fetchall()
         return {
             str(row["exchange"]): int(row["row_count"] or 0)
@@ -7737,6 +7841,9 @@ class ResearchStorageManager:
         *,
         metric_fields: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Summarize latest valuation metric coverage by metric variant."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7744,6 +7851,9 @@ class ResearchStorageManager:
                 return self.summarize_valuation_metric_coverage(
                     metric_fields=metric_fields,
                     instrument_ids=instrument_ids,
+                    calc_method=calc_method,
+                    calc_version=calc_version,
+                    parameter_hash=parameter_hash,
                 )
         allowed_fields = {
             "pe_ratio",
@@ -7778,7 +7888,27 @@ class ResearchStorageManager:
             placeholders = ", ".join("?" for _ in normalized_ids)
             filters.append(f"vh.instrument_id IN ({placeholders})")
             params.extend(normalized_ids)
+        latest_filters: List[str] = []
+        latest_params: List[Any] = []
+        if calc_method:
+            filters.append("vh.calc_method = ?")
+            params.append(calc_method)
+            latest_filters.append("calc_method = ?")
+            latest_params.append(calc_method)
+        if calc_version:
+            filters.append("vh.calc_version = ?")
+            params.append(calc_version)
+            latest_filters.append("calc_version = ?")
+            latest_params.append(calc_version)
+        if parameter_hash:
+            filters.append("vh.parameter_hash = ?")
+            params.append(parameter_hash)
+            latest_filters.append("parameter_hash = ?")
+            latest_params.append(parameter_hash)
         where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
+        latest_where_clause = (
+            "" if not latest_filters else "WHERE " + " AND ".join(latest_filters)
+        )
 
         metric_selects = ",\n                    ".join(
             f"SUM(CASE WHEN vh.{field} IS NOT NULL AND vh.{field} > 0 THEN 1 ELSE 0 END) AS {field}_count"
@@ -7791,6 +7921,7 @@ class ResearchStorageManager:
                 WITH latest AS (
                     SELECT instrument_id, MAX(as_of_date) AS latest_as_of_date
                     FROM valuation_history
+                    {latest_where_clause}
                     GROUP BY instrument_id
                 )
                 SELECT
@@ -7802,7 +7933,7 @@ class ResearchStorageManager:
                  AND latest.latest_as_of_date = vh.as_of_date
                 {where_clause}
                 """,
-                tuple(params),
+                tuple(latest_params + params),
             ).fetchone()
 
         instrument_count = int((row["instrument_count"] if row is not None else 0) or 0)
@@ -7830,6 +7961,9 @@ class ResearchStorageManager:
         benchmark_field: str = "sw_l2_code",
         limit: Optional[int] = None,
         include_details: bool = False,
+        calc_method: Optional[str] = None,
+        calc_version: Optional[str] = None,
+        parameter_hash: Optional[str] = None,
     ) -> list[Dict[str, Any]]:
         """Fetch latest valuation rows for peers in the configured Shenwan level."""
         allowed_benchmark_fields = {"sw_l1_code", "sw_l2_code", "sw_l3_code"}
@@ -7871,6 +8005,31 @@ class ResearchStorageManager:
             return []
 
         placeholders = ", ".join("?" for _ in peer_ids)
+        valuation_filters: list[str] = []
+        latest_filters: list[str] = []
+        valuation_params: list[Any] = []
+        latest_params: list[Any] = []
+        if calc_method:
+            valuation_filters.append("vh.calc_method = ?")
+            valuation_params.append(calc_method)
+            latest_filters.append("vh2.calc_method = ?")
+            latest_params.append(calc_method)
+        if calc_version:
+            valuation_filters.append("vh.calc_version = ?")
+            valuation_params.append(calc_version)
+            latest_filters.append("vh2.calc_version = ?")
+            latest_params.append(calc_version)
+        if parameter_hash:
+            valuation_filters.append("vh.parameter_hash = ?")
+            valuation_params.append(parameter_hash)
+            latest_filters.append("vh2.parameter_hash = ?")
+            latest_params.append(parameter_hash)
+        valuation_where = (
+            "" if not valuation_filters else " AND " + " AND ".join(valuation_filters)
+        )
+        latest_where = (
+            "" if not latest_filters else " AND " + " AND ".join(latest_filters)
+        )
         latest_query = f"""
             SELECT
                 vh.instrument_id,
@@ -7902,13 +8061,16 @@ class ResearchStorageManager:
                 vh.updated_at
             FROM valuation_history vh
             WHERE vh.instrument_id IN ({placeholders})
+              {valuation_where}
               AND vh.as_of_date = (
                   SELECT MAX(vh2.as_of_date)
                   FROM valuation_history vh2
                   WHERE vh2.instrument_id = vh.instrument_id
+                    {latest_where}
               )
             ORDER BY vh.pe_ratio ASC, vh.instrument_id ASC
         """
+        query_params = tuple(peer_ids) + tuple(valuation_params) + tuple(latest_params)
         if self._uses_separate_valuation_database() and self._active_db_path is None:
             self._active_db_path = self.valuation_db_path
         try:
@@ -7918,12 +8080,12 @@ class ResearchStorageManager:
                     latest_query += " LIMIT ?"
                     valuation_rows = conn.execute(
                         latest_query,
-                        tuple(peer_ids) + (limit,),
+                        query_params + (limit,),
                     ).fetchall()
                 else:
                     valuation_rows = conn.execute(
                         latest_query,
-                        tuple(peer_ids),
+                        query_params,
                     ).fetchall()
         finally:
             self._active_db_path = previous_db_path

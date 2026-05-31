@@ -43,6 +43,51 @@ def test_valuation_service_builds_history_snapshots():
     )
 
 
+def test_valuation_service_writes_market_cap_only_rows_without_financial_facts():
+    service = ResearchValuationService({"history": {"lookback_days": 5}})
+    quotes = pd.DataFrame(
+        [
+            {"time": "2026-05-27", "close": 10.0},
+            {"time": "2026-05-28", "close": 11.0},
+        ]
+    )
+    instrument = {
+        "instrument_id": "688635.SH",
+        "symbol": "688635",
+        "exchange": "SSE",
+    }
+    bundle = {
+        "financial_history": [],
+        "valuation_inputs": [
+            {
+                "as_of_date": "2026-05-27",
+                "shares_outstanding": 100.0,
+                "float_shares": 40.0,
+                "source": "cninfo",
+                "source_mode": "direct",
+                "input_kind": "share_count",
+                "unit": "share",
+            }
+        ],
+    }
+
+    snapshots = service.build_history_snapshots(quotes, instrument, bundle)
+
+    assert len(snapshots) == 2
+    assert snapshots[0].market_cap == 1000.0
+    assert snapshots[0].float_market_cap == 400.0
+    assert snapshots[0].pe_ratio is None
+    assert snapshots[0].details_json["valuation_scope"] == "market_cap_only"
+    assert (
+        snapshots[0].details_json["metrics"]["pe_ttm"]["missing_reason"]
+        == "financial_facts_not_available"
+    )
+    assert service.candidate_history_dates(quotes, bundle) == [
+        "2026-05-27",
+        "2026-05-28",
+    ]
+
+
 def test_valuation_service_builds_ttm_without_future_report_data():
     service = ResearchValuationService({"history": {"lookback_days": 5}})
     quotes = pd.DataFrame(
