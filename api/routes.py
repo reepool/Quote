@@ -1255,7 +1255,7 @@ async def get_research_beta(
     instrument_id: str,
     benchmark_family: str = Query(
         "market_default",
-        description="基准族: market_default, market_broad, board, industry_sw_l2, custom",
+        description="基准族: market_default, market_broad, board, industry_sw_l2, custom, all",
     ),
     benchmark_instrument_id: Optional[str] = Query(None, description="显式基准标的ID"),
     window_days: Optional[int] = Query(

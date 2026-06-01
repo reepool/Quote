@@ -233,6 +233,33 @@ class ResearchBetaService:
         benchmark_volatility = float(
             sample["ret_benchmark"].std(ddof=1) * math.sqrt(annualization_days)
         )
+        fitted = alpha + beta * sample["ret_benchmark"]
+        residual = sample["ret_stock"] - fitted
+        active_return = sample["ret_stock"] - sample["ret_benchmark"]
+        residual_volatility = float(residual.std(ddof=1) * math.sqrt(annualization_days))
+        tracking_error = float(active_return.std(ddof=1) * math.sqrt(annualization_days))
+        standard_error_beta = self._standard_error_beta(
+            residual=residual,
+            benchmark_return=sample["ret_benchmark"],
+        )
+        t_stat_beta = (
+            None
+            if standard_error_beta is None or standard_error_beta == 0
+            else float(beta / standard_error_beta)
+        )
+        p_value_beta = (
+            None
+            if t_stat_beta is None
+            else self._normal_two_tailed_p_value(t_stat_beta)
+        )
+        quality_flag, interpretation_flags = self._quality_assessment(
+            r_squared=r_squared,
+            p_value_beta=p_value_beta,
+            observation_count=int(len(sample)),
+            min_observations=min_observations,
+            tracking_error=tracking_error,
+            stock_volatility=stock_volatility,
+        )
         as_of_date = pd.to_datetime(sample["time"].max()).date().isoformat()
         window_start = pd.to_datetime(sample["time"].min()).date().isoformat()
 
@@ -253,6 +280,13 @@ class ResearchBetaService:
             r_squared=r_squared,
             stock_volatility=stock_volatility,
             benchmark_volatility=benchmark_volatility,
+            residual_volatility=residual_volatility,
+            tracking_error=tracking_error,
+            standard_error_beta=standard_error_beta,
+            t_stat_beta=t_stat_beta,
+            p_value_beta=p_value_beta,
+            quality_flag=quality_flag,
+            interpretation_flags=interpretation_flags,
             observation_count=int(len(sample)),
             min_observation_count=min_observations,
             window_start=window_start,
@@ -269,6 +303,7 @@ class ResearchBetaService:
                 "benchmark_return_count": int(len(benchmark_frame)),
                 "aligned_observation_count": int(len(merged)),
                 "benchmark_selection_rule": benchmark.get("selection_rule"),
+                "p_value_method": "normal_approximation",
             },
         )
 
@@ -294,6 +329,68 @@ class ResearchBetaService:
         frame = frame.dropna(subset=["time", price_column]).sort_values("time")
         frame[f"ret_{suffix}"] = frame[price_column].pct_change()
         return frame[["time", f"ret_{suffix}"]].dropna()
+
+    @staticmethod
+    def _standard_error_beta(
+        *,
+        residual: pd.Series,
+        benchmark_return: pd.Series,
+    ) -> Optional[float]:
+        n = len(residual)
+        if n <= 2:
+            return None
+        x = pd.to_numeric(benchmark_return, errors="coerce")
+        e = pd.to_numeric(residual, errors="coerce")
+        sxx = float(((x - x.mean()) ** 2).sum())
+        if sxx <= 0:
+            return None
+        rss = float((e ** 2).sum())
+        sigma2 = rss / (n - 2)
+        if sigma2 < 0:
+            return None
+        return float(math.sqrt(sigma2 / sxx))
+
+    @staticmethod
+    def _normal_two_tailed_p_value(t_stat: float) -> float:
+        return float(math.erfc(abs(float(t_stat)) / math.sqrt(2.0)))
+
+    @staticmethod
+    def _quality_assessment(
+        *,
+        r_squared: Optional[float],
+        p_value_beta: Optional[float],
+        observation_count: int,
+        min_observations: int,
+        tracking_error: Optional[float],
+        stock_volatility: Optional[float],
+    ) -> tuple[str, List[str]]:
+        flags: List[str] = []
+        r2 = 0.0 if r_squared is None else float(r_squared)
+        p_value = 1.0 if p_value_beta is None else float(p_value_beta)
+
+        if r2 < 0.2:
+            flags.append("low_explanatory_power")
+        elif r2 < 0.4:
+            flags.append("moderate_explanatory_power")
+        if p_value > 0.05:
+            flags.append("beta_not_statistically_significant")
+        if observation_count <= min_observations:
+            flags.append("near_minimum_observation_count")
+        if (
+            tracking_error is not None
+            and stock_volatility is not None
+            and stock_volatility > 0
+            and tracking_error / stock_volatility >= 0.75
+        ):
+            flags.append("active_risk_dominates")
+
+        if r2 >= 0.5 and p_value <= 0.05:
+            quality = "high"
+        elif r2 >= 0.25 and p_value <= 0.10:
+            quality = "medium"
+        else:
+            quality = "low"
+        return quality, flags
 
     def _unavailable(
         self,
@@ -322,6 +419,8 @@ class ResearchBetaService:
             missing_reason=missing_reason,
             observation_count=int(observation_count),
             min_observation_count=int(min_observations),
+            quality_flag="unavailable",
+            interpretation_flags=[missing_reason],
             stock_adjustment=stock_adjustment,
             benchmark_adjustment=benchmark_adjustment,
             calc_method=self.calc_method,

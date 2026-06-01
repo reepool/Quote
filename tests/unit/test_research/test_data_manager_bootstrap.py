@@ -1142,6 +1142,79 @@ def test_data_manager_get_research_beta_accepts_custom_window(tmp_path):
     assert "diagnostics" not in item
 
 
+def test_data_manager_get_research_beta_all_returns_deduped_benchmarks(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "beta": {
+            "enabled": True,
+            "windows": [3],
+            "min_observations_floor": 2,
+            "min_observation_ratio": 0.5,
+            "stock_adjustment": "none",
+            "benchmark_adjustment": "none",
+            "benchmarks": {
+                "market_broad": [
+                    {"instrument_id": "000300.SH", "name": "沪深300"},
+                    {"instrument_id": "000905.SH", "name": "中证500"},
+                ]
+            },
+            "board_benchmark_rules": [
+                {
+                    "name": "sse_main_board",
+                    "exchanges": ["SSE"],
+                    "benchmark_instrument_id": "000001.SH",
+                    "benchmark_name": "上证综合指数",
+                }
+            ],
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = None
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    returns = [0.01, -0.02, 0.03]
+    manager.db_ops.get_daily_data = AsyncMock(
+        side_effect=[
+            _beta_quotes("2026-01-01", returns),
+            _beta_quotes("2026-01-01", returns),
+            _beta_quotes("2026-01-01", returns),
+            _beta_quotes("2026-01-01", returns),
+        ]
+    )
+
+    result = _run(
+        manager.get_research_beta(
+            "600000.SH",
+            benchmark_family="all",
+            window_days=3,
+        )
+    )
+
+    assert result["benchmark_family"] == "all"
+    assert result["data_points"] == 4
+    assert {
+        item["benchmark_instrument_id"]
+        for item in result["items"]
+        if item["benchmark_instrument_id"]
+    } == {"000001.SH", "000300.SH", "000905.SH"}
+    assert any(
+        item["status"] == "unavailable"
+        and item["diagnostics"]["benchmark_selection_rule"]
+        == "research_storage_required_for_industry_beta"
+        for item in result["items"]
+    )
+
+
 def test_data_manager_get_research_beta_reports_missing_industry_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {

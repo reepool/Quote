@@ -1318,6 +1318,16 @@ class ResearchBetaResultResponse(BaseModel):
     r_squared: Optional[float] = Field(None, description="R平方")
     stock_volatility: Optional[float] = Field(None, description="股票年化波动率")
     benchmark_volatility: Optional[float] = Field(None, description="基准年化波动率")
+    residual_volatility: Optional[float] = Field(None, description="残差年化波动率")
+    tracking_error: Optional[float] = Field(None, description="相对基准主动波动")
+    standard_error_beta: Optional[float] = Field(None, description="Beta标准误")
+    t_stat_beta: Optional[float] = Field(None, description="Beta t统计量")
+    p_value_beta: Optional[float] = Field(None, description="Beta显著性p值")
+    quality_flag: Optional[str] = Field(None, description="Beta质量标记")
+    interpretation_flags: List[str] = Field(
+        default_factory=list,
+        description="解释性标记",
+    )
     observation_count: int = Field(..., description="有效对齐观测数")
     min_observation_count: int = Field(..., description="最小观测数要求")
     window_start: Optional[str] = Field(None, description="窗口开始日期")

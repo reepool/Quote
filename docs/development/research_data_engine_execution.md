@@ -198,12 +198,24 @@
 - `GET /api/v1/research/company/{instrument_id}/technical/summary`
 - `GET /api/v1/research/company/{instrument_id}/technical/indicators`
 - `GET /api/v1/research/technical/readiness`
+- `GET /api/v1/research/company/{instrument_id}/beta`
 
 API 补齐原则：
 
 - 所有已经落到本地 research 存储的标准化表或物化快照，都必须有 API 读路径，或明确返回 gated/disabled 原因
 - 新 research 域不能只完成 provider / storage / sync；进入完成态前必须补齐 read API、模型、路由测试和文档
 - API 不应暴露上游源的临时字段名作为唯一语义；对字段含义或单位尚未确认的指标，应同时保留 `raw_payload` 或 source diagnostics
+
+Beta API 调用约定：
+
+- `GET /api/v1/research/company/{instrument_id}/beta` 为实时计算接口，不要求也不读取 `beta_snapshots` 预计算表
+- 默认参数为 `benchmark_family=market_default&include_details=true`；未传 `window_days` 时返回配置默认 `60 / 120 / 252` 三个窗口
+- 传入 `window_days=N` 时只计算指定 n 天窗口；传入 `as_of_date=YYYY-MM-DD` 时使用该日期前的本地行情
+- `benchmark_family=custom` 必须同时传 `benchmark_instrument_id`；`market_broad` 会对配置的多个宽基逐一返回结果；`benchmark_family=all` 会聚合 `market_default / board / market_broad / industry_sw_l2` 并按基准 ID 去重；`industry_sw_l2` 只使用 authoritative 申万二级行业指数
+- 示例：`/api/v1/research/company/600000.SH/beta?benchmark_family=custom&benchmark_instrument_id=000300.SH&window_days=252&as_of_date=2026-05-29`
+- 示例：`/api/v1/research/company/300708.SZ/beta?benchmark_family=all&window_days=252`
+- 示例：`/api/v1/research/company/300750.SZ/beta?benchmark_family=board&window_days=120`
+- 响应 `items[]` 除 `beta/alpha/correlation/R²/volatility` 外，还返回 `residual_volatility / tracking_error / standard_error_beta / t_stat_beta / p_value_beta / quality_flag / interpretation_flags`；`diagnostics` 保留 stock/benchmark quote rows、return rows、aligned observation count、benchmark selection rule、p-value method 和 unavailable reason 上下文
 
 申万行业 API 当前状态：
 

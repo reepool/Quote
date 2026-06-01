@@ -41,6 +41,33 @@ def test_beta_service_calculates_beta_and_diagnostics():
     assert result.benchmark_adjustment == "none"
     assert result.correlation > 0.99
     assert result.r_squared > 0.99
+    assert result.residual_volatility < 1e-12
+    assert result.tracking_error is not None
+    assert result.standard_error_beta is not None
+    assert result.t_stat_beta is not None
+    assert result.p_value_beta is not None
+    assert result.quality_flag == "high"
+    assert result.interpretation_flags == []
+    assert result.details_json["p_value_method"] == "normal_approximation"
+
+
+def test_beta_service_marks_low_quality_when_explanatory_power_is_low():
+    service = ResearchBetaService({"min_observations_floor": 4})
+
+    result = service.build_result(
+        stock_quotes=_quotes("2026-01-01", [0.05, -0.04, 0.03, -0.02, 0.01, -0.03]),
+        benchmark_quotes=_quotes("2026-01-01", [0.01, 0.01, -0.01, -0.01, 0.01, -0.01]),
+        instrument={"instrument_id": "600000.SH", "symbol": "600000", "exchange": "SSE"},
+        benchmark={
+            "benchmark_family": "market_default",
+            "benchmark_instrument_id": "000300.SH",
+        },
+        window_days=6,
+    )
+
+    assert result.status == "success"
+    assert result.quality_flag in {"low", "medium"}
+    assert result.interpretation_flags
 
 
 def test_beta_service_build_results_uses_default_windows():

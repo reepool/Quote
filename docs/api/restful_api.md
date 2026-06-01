@@ -387,6 +387,69 @@ curl "http://localhost:8000/api/v1/research/valuation/readiness"
 curl "http://localhost:8000/api/v1/research/financial-statements/readiness"
 ```
 
+### GET /api/v1/research/company/{instrument_id}/beta
+
+按需实时计算 benchmark-aware Beta。该接口只读取本地行情、本地复权因子和本地申万行业指数数据；不会预计算入库，也不会在读取时访问外部数据源。
+
+可选参数：
+- `benchmark_family`：基准族，默认 `market_default`。可选值：
+  - `market_default`：按股票交易所/板块规则选择默认基准
+  - `market_broad`：返回配置的宽基基准，当前包括沪深300、中证500、中证1000
+  - `board`：返回板块/交易所基准，例如上证综指、深证成指、创业板指、科创50、北证50
+  - `industry_sw_l2`：使用 authoritative 申万二级行业指数
+  - `custom`：使用 `benchmark_instrument_id` 指定的自定义基准
+  - `all`：一次返回 `market_default`、`board`、`market_broad`、`industry_sw_l2` 的去重基准结果
+- `benchmark_instrument_id`：显式基准标的 ID，例如 `000300.SH`。传入后按该基准计算，不再自动替换为默认基准。
+- `window_days`：Beta 窗口天数。未传入时返回配置默认窗口 `60 / 120 / 252`；传入时只计算指定 n 天窗口。
+- `as_of_date`：计算截止日期，格式 `YYYY-MM-DD`。未传入时使用最新本地行情日期。
+- `include_details`：是否返回 `diagnostics`，默认 `true`。
+
+当前计算口径：
+- 股票收益率默认使用本地 `qfq` 前复权 close。
+- 指数基准默认使用不复权 price-index close。
+- 申万二级行业 Beta 只使用 authoritative `industry_memberships` 映射出的行业指数，不使用 reference-only 行业字段。
+- 若基准行情缺失、样本不足、基准收益方差为 0 或行业映射缺失，结果返回 `status=unavailable` 和结构化 `missing_reason`。
+
+常用示例：
+```bash
+# 1. 默认 market_default 基准，返回默认 60/120/252 三个窗口
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta"
+
+# 2. 指定 180 天窗口，仍使用 market_default 基准
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta?window_days=180"
+
+# 3. 指定沪深300为自定义基准，并指定计算截止日期
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta?benchmark_family=custom&benchmark_instrument_id=000300.SH&window_days=252&as_of_date=2026-05-29"
+
+# 4. 返回所有配置的宽基 Beta，默认窗口 60/120/252 都会计算
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta?benchmark_family=market_broad"
+
+# 5. 一次返回默认、板块、宽基和行业基准的去重结果
+curl "http://localhost:8000/api/v1/research/company/300708.SZ/beta?benchmark_family=all&window_days=252"
+
+# 6. 板块/交易所基准，例如创业板股票会映射到创业板指
+curl "http://localhost:8000/api/v1/research/company/300750.SZ/beta?benchmark_family=board&window_days=120"
+
+# 7. authoritative 申万二级行业 Beta
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta?benchmark_family=industry_sw_l2&window_days=252"
+
+# 8. 关闭诊断字段，减少响应体
+curl "http://localhost:8000/api/v1/research/company/600000.SH/beta?window_days=60&include_details=false"
+```
+
+响应字段要点：
+- `items[].beta`：Beta 值；不可用时为 `null`
+- `items[].benchmark_family / benchmark_instrument_id / benchmark_name`：实际使用的基准
+- `items[].alpha`：日频单因子回归截距，不应直接年化为稳定超额收益
+- `items[].residual_volatility`：残差年化波动率
+- `items[].tracking_error`：股票相对基准的主动波动
+- `items[].standard_error_beta / t_stat_beta / p_value_beta`：Beta 标准误、t 统计量和显著性 p 值；当前 p 值为无新增依赖的正态近似双尾 p 值
+- `items[].quality_flag`：`high / medium / low / unavailable`，基于 R²、p 值和样本数的简化质量标记
+- `items[].interpretation_flags`：解释性标记，例如 `low_explanatory_power`、`beta_not_statistically_significant`、`active_risk_dominates`、`unstable_across_windows`
+- `items[].window_days / observation_count / min_observation_count / window_start / window_end`：窗口与样本信息
+- `items[].stock_adjustment / benchmark_adjustment`：收益率口径
+- `items[].diagnostics`：本地行情行数、收益率行数、对齐观测数、基准选择规则、p 值方法和跨窗口 Beta 差异等计算诊断
+
 ### GET /api/v1/research/company/{instrument_id}/shareholders
 
 读取本地股东摘要快照。当前 `shareholders` 已按 `paid_high_availability` gate 开放，接口只读取本地 `shareholder_snapshots`，不会在请求时访问外部数据源。

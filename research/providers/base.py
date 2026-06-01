@@ -520,6 +520,13 @@ class BetaResult:
     r_squared: Optional[float] = None
     stock_volatility: Optional[float] = None
     benchmark_volatility: Optional[float] = None
+    residual_volatility: Optional[float] = None
+    tracking_error: Optional[float] = None
+    standard_error_beta: Optional[float] = None
+    t_stat_beta: Optional[float] = None
+    p_value_beta: Optional[float] = None
+    quality_flag: Optional[str] = None
+    interpretation_flags: List[str] = field(default_factory=list)
     observation_count: int = 0
     min_observation_count: int = 0
     window_start: Optional[str] = None

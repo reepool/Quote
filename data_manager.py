@@ -5382,6 +5382,7 @@ class DataManager:
                         include_details=include_details,
                     )
                 )
+        self._attach_research_beta_window_stability_flags(items)
 
         return {
             "instrument_id": normalized_id,
@@ -5407,7 +5408,7 @@ class DataManager:
         if benchmark_instrument_id:
             return [
                 {
-                    "benchmark_family": family,
+                    "benchmark_family": "custom" if family == "all" else family,
                     "benchmark_instrument_id": benchmark_instrument_id,
                     "benchmark_name": None,
                     "selection_rule": "explicit_benchmark_instrument_id",
@@ -5452,11 +5453,39 @@ class DataManager:
             return [] if board is None else [board]
         if family == "industry_sw_l2":
             return [await self._resolve_research_beta_industry_benchmark(instrument)]
+        if family == "all":
+            candidates: List[Dict[str, Any]] = []
+            for target_family in ["market_default", "board", "market_broad", "industry_sw_l2"]:
+                candidates.extend(
+                    await self._resolve_research_beta_benchmarks(
+                        instrument,
+                        benchmark_family=target_family,
+                        benchmark_instrument_id=None,
+                    )
+                )
+            return self._dedupe_research_beta_benchmarks(candidates)
         if family == "custom":
             raise ValueError("benchmark_instrument_id is required when benchmark_family=custom")
         raise ValueError(
-            "benchmark_family must be one of market_default, market_broad, board, industry_sw_l2, custom"
+            "benchmark_family must be one of market_default, market_broad, board, industry_sw_l2, custom, all"
         )
+
+    @staticmethod
+    def _dedupe_research_beta_benchmarks(
+        benchmarks: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        deduped: List[Dict[str, Any]] = []
+        seen: set[str] = set()
+        for benchmark in benchmarks:
+            benchmark_id = str(benchmark.get("benchmark_instrument_id") or "")
+            key = benchmark_id or (
+                f"{benchmark.get('benchmark_family')}:{benchmark.get('selection_rule')}"
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(benchmark)
+        return deduped
 
     def _resolve_research_beta_board_benchmark(
         self,
@@ -5615,6 +5644,36 @@ class DataManager:
         if include_details:
             data["diagnostics"] = details
         return data
+
+    @staticmethod
+    def _attach_research_beta_window_stability_flags(
+        items: List[Dict[str, Any]],
+    ) -> None:
+        grouped: Dict[tuple[str, str], List[Dict[str, Any]]] = {}
+        for item in items:
+            if item.get("status") != "success" or item.get("beta") is None:
+                continue
+            key = (
+                str(item.get("benchmark_family") or ""),
+                str(item.get("benchmark_instrument_id") or ""),
+            )
+            grouped.setdefault(key, []).append(item)
+
+        for group_items in grouped.values():
+            if len(group_items) < 2:
+                continue
+            betas = [float(item["beta"]) for item in group_items]
+            beta_range = max(betas) - min(betas)
+            if beta_range < 0.4:
+                continue
+            for item in group_items:
+                flags = list(item.get("interpretation_flags") or [])
+                if "unstable_across_windows" not in flags:
+                    flags.append("unstable_across_windows")
+                item["interpretation_flags"] = flags
+                diagnostics = item.get("diagnostics")
+                if isinstance(diagnostics, dict):
+                    diagnostics["beta_range_across_returned_windows"] = beta_range
 
     async def get_research_company_overview(
         self,

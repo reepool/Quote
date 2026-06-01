@@ -574,7 +574,7 @@
             "benchmark_name": "北证50"
           }
         ],
-        "note": "Beta is calculated on demand from local quote data. If window_days is omitted, the API returns configured default windows. Stock returns default to qfq-adjusted close from local adjustment_factors; index benchmarks default to unadjusted price-index close. Industry beta requires authoritative sw_l2 membership and local Shenwan index-analysis close_index history."
+        "note": "Beta is calculated on demand from local quote data. If window_days is omitted, the API returns configured default windows. benchmark_family=all returns deduped market_default, board, market_broad, and industry_sw_l2 results. Stock returns default to qfq-adjusted close from local adjustment_factors; index benchmarks default to unadjusted price-index close. Industry beta requires authoritative sw_l2 membership and local Shenwan index-analysis close_index history."
       },
       "risk": {
         "enabled": true,

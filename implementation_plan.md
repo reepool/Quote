@@ -1540,8 +1540,25 @@ GET /api/v1/research/company/{instrument_id}/analyst-coverage
 GET /api/v1/research/company/{instrument_id}/research-reports
 GET /api/v1/research/metadata/readiness
 GET /api/v1/research/company/{instrument_id}/risk
+GET /api/v1/research/company/{instrument_id}/beta
 GET /api/v1/research/company/{instrument_id}/events
 ```
+
+Beta 实时计算参数约定：
+
+```text
+GET /api/v1/research/company/{instrument_id}/beta
+  ?benchmark_family=market_default|market_broad|board|industry_sw_l2|custom|all
+  &benchmark_instrument_id=000300.SH
+  &window_days=252
+  &as_of_date=2026-05-29
+  &include_details=true
+```
+
+- `window_days` 不传时返回配置默认 `60 / 120 / 252`；传入时只计算指定 n 天窗口。
+- `benchmark_family=custom` 必须传 `benchmark_instrument_id`；`market_broad` 可返回多个宽基基准；`benchmark_family=all` 聚合默认、板块、宽基和申万二级行业基准并去重。
+- 股票收益默认用本地 `qfq` close，指数基准默认用不复权 close。
+- 响应 JSON 必须包含 `residual_volatility / tracking_error / standard_error_beta / t_stat_beta / p_value_beta / quality_flag / interpretation_flags` 和 `diagnostics`，用于记录统计显著性、解释力、行情行数、收益率对齐、基准选择规则和 unavailable reason。
 
 ### 10.2 Phase 1 必须满足的接口要求
 
