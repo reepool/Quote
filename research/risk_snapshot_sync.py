@@ -150,7 +150,6 @@ class RiskSnapshotRebuildService:
                     end_date=event_end_date,
                     negative_only=True,
                 )
-
                 snapshot = self.risk_service.build_snapshot(
                     quotes,
                     instrument,

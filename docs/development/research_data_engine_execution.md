@@ -133,6 +133,7 @@
 | `sentiment_events` provider + sync + read | 已完成基线实现 | 已落地 `notice / executive_share_change / pledge_ratio` 事件标准化、影子同步、读取 API；仓库默认路由为 `proxy_patch -> direct`，模块默认保持 disabled；`BSE` 在无稳定上游时允许空占位结果 |
 | `research metadata` rollout readiness read | 已完成 | 已新增 `analyst_forecasts / research_reports / sentiment_events` grouped readiness，可按域汇总 module gate、distinct instrument 覆盖、source/source_mode 分布、交易所覆盖率与 blockers |
 | `risk` 派生重建 + read | 已完成 | 已落地本地 `risk_snapshots`、重建任务与读取 API，默认 enabled |
+| `beta` 实时计算读接口 | 开发中 | 当前按需从本地行情、本地复权因子和本地行业指数数据计算 benchmark-aware Beta；不预计算、不入 `research.db`；`window_days` 为空时返回默认 `60d / 120d / 252d`，传入时计算指定 n 天窗口，并在 JSON 中返回计算诊断 |
 | `company overview` 聚合读取 | 已完成 | 可聚合 company profile 与 financial summary |
 | `technical` 实时计算读接口 | 已完成 | 已支持 summary 与 indicators 时间序列 |
 | `technical_indicator_latest` 持久化 | 已完成基线实现 | 已落地最新技术指标快照表、`technical_snapshot_refresh` 刷新服务与 scheduler 任务、cache coverage readiness API；现有 technical summary / indicators API 仍保持实时计算 |
@@ -241,7 +242,7 @@ API 补齐原则：
 | `industry_index_analysis` | 已完成 provider/storage/sync/API、日更、历史回补与按日补缺入口 | 已确认官方最新日频字段并落 `industry_index_analysis_daily`；已提供 index-code/latest/date/taxonomy-alias benchmark API；直连 provider 继续负责最新横截面日更；AkShare-compatible 历史 provider 复用 `index_analysis_daily_sw` 的 SWS `index_analysis_report` 上游语义并自行控制 timeout/retry，负责历史日期区间回补并写同一张表；历史回补会返回按 index_type 的覆盖率与缺失指标统计，默认通过 ops/Telegram 手动触发，scheduler 配置项保持 disabled；CLI 支持按日分块补缺 |
 | `shareholders` | 已完成并开放本地 API | 已落地 `shareholder_snapshots`、shadow sync、scheduler、gated snapshot API 与 readiness API；当前语义覆盖 `holder_count / top10_holders / reference_only_ownership_clues`，配置已切到 `enabled=true / paid_high_availability`；仓库默认路由为 `AkShare proxy_patch` 主链，`cninfo:direct` 强制合并实控人线索，`akshare:direct / efinance:direct` 为补充 fallback；全量导入后 readiness 已无 blockers，后续进入周更维护和异常补缺阶段 |
 | `financial_statements` | 多期财务仓主线进行中 | 已落地原始报表表、事实表、指标快照表、shadow sync、读取 API、官方 source manifest、全数值事实长表、hot/cold tier、多期 backfill/catchup checkpoint、coverage gap detection 与 `scripts/research_financial_statements_rollout_validation.py`；`2026-05-01` 检查当前生产 `research.db` 中财务摘要、完整报表、事实、指标表均为 `0` 行，说明工程链路已升级但尚未完成真实全市场财务数据维护 |
-| `valuation` | 已完成基线并完成指标口径加固，默认禁用；下一步准备独立 `valuation.db` rollout | 已落地 `valuation_history`、相对估值、DCF 抽象、scheduler 与 API；估值历史已拆分 static/TTM/forward/MRQ 指标，相对估值可按 metric variants 明确计算 valid peer count、分位数、percentile rank 和排除诊断；production rollout 后续不仅取决于全市场 current authoritative membership 覆盖率，还必须依赖真实多期财务事实、可得日、market-cap/share-count 输入和 `valuation.db` readiness gate |
+| `valuation` | 已启用并完成首次生产落库，进入日更维护和 readiness 复核 | 当前 `valuation.enabled=true`，已落地 `valuation_inputs`、`valuation_history`、相对估值、历史分位、DCF 抽象、scheduler 与 API；估值历史已拆分 static/TTM/forward/MRQ 指标，相对估值可按 metric variants 明确计算 valid peer count、分位数、percentile rank 和排除诊断。`data/valuation.db` 已作为估值输入和日频派生序列的生产物理库；对外 rollout 仍应以财务 readiness、行业 authoritative membership、估值输入覆盖和 `/api/v1/research/valuation/readiness` 为准 |
 | `analyst_forecasts` | 已完成基线实现，默认禁用 | 已落地标准化存储、shadow sync、scheduler 与 API；当前以 `AkShare stock_profit_forecast_em` 为主，默认保持 disabled 等待 source stability 与预算确认 |
 | `research_reports` | 已完成基线实现，默认禁用 | 已落地研报元数据表、shadow sync、scheduler 与 API；仅承诺元数据覆盖，不承诺全文与长期稳定可用性 |
 | `sentiment_events` | 已完成基线实现，默认禁用 | 已落地 `notice / executive_share_change / pledge_ratio` 事件基线、shadow sync、scheduler 与 API；后续可扩展龙虎榜和资金流事件 |
@@ -251,7 +252,7 @@ API 补齐原则：
 财务域当前必须明确三个层次，避免后续开发误判：
 
 - 已有代码层：`financial_summary`、`financial_statements`、`valuation_history` 均有 provider/sync/storage/API 基线；`financial_statements` 已升级为支持多报告期、source manifest、all numeric facts、hot/cold tier 和 repository readiness 的同步/存储链路。
-- 当前数据层：财务生产数据已迁入并维护在 `data/financials.db`；估值域代码层已接入独立 `data/valuation.db`，用于保存 `valuation_inputs`、`valuation_history`、估值运行审计和 lineage，不能把 API 存在或表结构存在等同于估值已可用。
+- 当前数据层：财务生产数据已迁入并维护在 `data/financials.db`；估值域已接入独立 `data/valuation.db`，用于保存 `valuation_inputs`、`valuation_history`、估值运行审计和 lineage。`2026-06-01` 本地复核显示 `valuation_inputs` 已有 `247,107` 行，`valuation_history` 已有 `2,707,947` 行，`PRAGMA quick_check=ok`；这代表估值输入和历史估值主链已完成首次生产落库，但覆盖率、口径可解释性和对外开放仍需由 readiness 与业务确认共同约束。
 - 下一阶段目标层：`harden-financial-xbrl-and-relative-valuation` 已补齐 PE/PB/PS 指标语义、relative valuation 统计、scheduler 任务和 readiness API gate；当前 `implement-sse-official-financial-json-source`、`prepare-sse-financial-batch-backfill-rollout` 与 `prepare-sse-financial-multiperiod-backfill` 已推进到 SSE 官方 structured JSON parser、`300` 标的单报告期 dry-run、`100x2` 多报告期 dry-run 和 checkpoint 续跑验证；`promote-cninfo-data20-financial-source` 已确认 SSE/SZSE/BSE 均可走 CNInfo data20 结构化 JSON，其中 SSE 默认主源仍保持交易所 commonQuery；SSE 同样本对比显示 CNInfo 可用但不应替代 commonQuery，主要风险是 `equity` 归母权益/所有者权益合计口径差异。官方结构化源生产化仍取决于 source-profile-aware production backfill gate、字段稳定性、全量 readiness 证据和业务确认。
 - 新的服务分层目标层：`2026-05-18` 之后，完整财务域不再把“单一源覆盖最全”作为唯一主线，而拆成三层：
   - L1 本地核心层：以新浪和同花顺在 bank/nonbank profile 下通过审计的严格语义交集为准，提供高频、本地、统一单位的财务事实服务；同花顺因速度和长表结构暂定为候选主更新源，新浪作为互备和中文语义校验源。
@@ -335,7 +336,7 @@ API 补齐原则：
   - `valuation_inputs` 全量历史预计 `30-70万` 行，约 `0.3-1.5GiB`；日更快照会按 `(instrument_id, as_of_date, source, source_mode, input_kind)` upsert，未变更股本不会产生无限日增行
   - `2026-05-30` 新增财务核心事实可得日回填工具 `research/financial_available_date_backfill.py`：`data_available_date` 代表披露可得日，不等同于 `report_period`；本地真实公告/披露证据优先，缺失时使用 A 股法定披露截止日做保守估算并写入 lineage。生产回填更新 `financial_core_facts_hot` `54316` 行，SSE/SZSE/BSE core facts 可得日覆盖恢复到 `100%`；该维护步骤已接入 `FinancialStatementsShadowSyncService` 成功收尾阶段，后续财务全量 backfill、catchup 和 reconciliation 成功后会自动补齐新增/更新 core facts 的可得日
   - `2026-05-30` 回填后估值 dry-run：SSE `20/20` 写入 `5040` 行，SZSE `20/20` 写入 `5040` 行，BSE `10/10` 写入 `2176` 行，`missing_financials=[]`
-  - scheduler 已预留估值任务入口：`valuation_input_sync` 为周一至周五 `23:00` 已开启日更测试任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 已开启日更小窗口任务，默认检查最近 `7` 个交易日且 `write_policy=missing_only`；`valuation_history_weekly_reconcile` 为周六 `05:45` 已开启周度回补校验任务，默认检查最近 `60` 个交易日且只补缺失；`valuation_history_12q_rebuild` 为 `enabled=true / manual_only=true` 手动过去 `12` 个季度窗口任务，按本地最近 `12` 个季度财务事实最早可得日确定行情窗口，默认补缺失而非覆写；missing-only 路径会先按标的推导候选估值日期并检查完整主键，窗口已完整的标的直接跳过完整指标计算；`valuation_history_full_rebuild` 仅作为禁用的兼容旧别名，不再表达无限历史全量重建；上述重建任务允许在 `valuation.enabled=false` 时做受控重建，API 模块 gate 仍由 readiness 单独控制；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
+  - scheduler 已开启估值维护任务：`valuation_input_sync` 为周一至周五 `23:00` 日更任务，实测约 `1-2min` 完成并安排在 A 股行情日更之后；`valuation_history_rebuild` 为周二至周六 `04:45` 日更小窗口任务，默认检查最近 `7` 个交易日且 `write_policy=missing_only`；`valuation_history_weekly_reconcile` 为周六 `05:45` 周度回补校验任务，默认检查最近 `60` 个交易日且只补缺失；`valuation_history_12q_rebuild` 为 `enabled=true / manual_only=true` 手动过去 `12` 个季度窗口任务，按本地最近 `12` 个季度财务事实最早可得日确定行情窗口，默认补缺失而非覆写；missing-only 路径会先按标的推导候选估值日期并检查完整主键，窗口已完整的标的直接跳过完整指标计算；`valuation_history_full_rebuild` 仅作为禁用的兼容旧别名，不再表达无限历史全量重建；`valuation_input_full_backfill` 为 `enabled=true / manual_only=true` 手动任务
 
 ### 4.7 当前项目级 Source Policy
 
@@ -585,6 +586,7 @@ technical readiness 接口会聚合：
 - `/api/v1/research/company/{instrument_id}/research-reports`
 - `/api/v1/research/company/{instrument_id}/events`
 - `/api/v1/research/company/{instrument_id}/risk`
+- `/api/v1/research/company/{instrument_id}/beta`
 
 当前边界：
 
@@ -592,10 +594,11 @@ technical readiness 接口会聚合：
 - 外部 research metadata 源仍以 `AkShare` 为主，默认保持 disabled，避免对生产读取链路产生“已上线”的误导
 - `sentiment_events` 第一轮只覆盖 `notice / executive_share_change / pledge_ratio`
 - `risk` 当前采用本地派生模式，默认 enabled，但风险分数仍属于 Phase 1 baseline，需要后续结合行业、估值和更多事件流继续调优
+- `beta` 当前进入 OpenSpec 开发阶段，第一版采用实时计算读路径，不做预计算入库，也不新增 scheduler rebuild job；默认以本地行情、本地复权因子和本地行业指数数据计算 Beta。`window_days` 未传入时返回配置默认 `60d / 120d / 252d`，传入时计算指定 n 天窗口；股票收益默认使用 `qfq` 复权 close，指数基准默认使用不复权 price-index close，计算口径、样本数、对齐观测数、基准选择规则和不可用原因写入响应 JSON diagnostics。当前本地确认宽基/板块基准已有 `000001.SH / 399001.SZ / 399006.SZ / 000688.SH / 000300.SH / 000905.SH / 000852.SH` 行情；北证 50 本地 quote master 暂缺，BSE 默认 Beta 会先返回 benchmark unavailable。申万二级行业 Beta 通过 authoritative `industry_memberships.sw_l2_name` 映射到 `industry_index_analysis_daily.sw_index_code`，不能使用 reference-only 行业字段。
 
 ### 5.2 当前下一主线
 
-当前 active OpenSpec change 已清空。`valuation` readiness、`valuation_history`、`valuation_inputs`、相对估值、个股历史分位和 `technical_indicator_latest` 最新快照缓存基线均已完成并归档；行业和股东进入维护复核。下一主线回到财务域：围绕 L1 本地核心层、官方摘要校验层和远程扩展层，继续做 production readiness、coverage gap 分类、source profile 稳定化、真实样本 evidence、生产 backfill gate 和行业专项字段包覆盖验证。此前 SSE structured JSON、CNInfo data20 source profile、coverage gap 分类、Sina/THS L1 本地核心层、财务行业专项字段包等变更均已归档，后续新增开发应重新开 OpenSpec change，而不是复用历史 active change 名称。
+当前 active OpenSpec change 为 `add-beta-benchmark-factor-layer`，用于把原先嵌在 risk 内部的单基准 Beta 升级为 benchmark-aware 共享研究因子层。`valuation` readiness、`valuation_history`、`valuation_inputs`、相对估值、个股历史分位和 `technical_indicator_latest` 最新快照缓存基线均已完成并归档；行业和股东进入维护复核。财务域后续仍围绕 L1 本地核心层、官方摘要校验层和远程扩展层，继续做 production readiness、coverage gap 分类、source profile 稳定化、真实样本 evidence、生产 backfill gate 和行业专项字段包覆盖验证。
 
 财务主线执行顺序：
 

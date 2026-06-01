@@ -481,8 +481,100 @@
             0.09,
             0.1,
             0.11
-          ]
+          ],
+          "beta": {
+            "enabled": true,
+            "benchmark_family": "market_default",
+            "window_days": 252,
+            "fallback_beta": 1.0,
+            "note": "DCF prefers on-demand calculated beta when available. Explicit discount_rate overrides still take precedence; fallback_beta is used only when no calculated beta is available."
+          }
         }
+      },
+      "beta": {
+        "enabled": true,
+        "windows": [
+          60,
+          120,
+          252
+        ],
+        "quote_limit_days": 320,
+        "min_observation_ratio": 0.8,
+        "min_observations_floor": 40,
+        "stock_adjustment": "qfq",
+        "benchmark_adjustment": "none",
+        "default_benchmark_families": [
+          "market_default",
+          "market_broad",
+          "board",
+          "industry_sw_l2"
+        ],
+        "benchmarks": {
+          "market_broad": [
+            {
+              "instrument_id": "000300.SH",
+              "name": "沪深300"
+            },
+            {
+              "instrument_id": "000905.SH",
+              "name": "中证500"
+            },
+            {
+              "instrument_id": "000852.SH",
+              "name": "中证1000"
+            }
+          ]
+        },
+        "board_benchmark_rules": [
+          {
+            "name": "star_market",
+            "exchanges": [
+              "SSE"
+            ],
+            "symbol_prefixes": [
+              "688"
+            ],
+            "benchmark_instrument_id": "000688.SH",
+            "benchmark_name": "科创50"
+          },
+          {
+            "name": "sse_main_board",
+            "exchanges": [
+              "SSE"
+            ],
+            "benchmark_instrument_id": "000001.SH",
+            "benchmark_name": "上证综合指数"
+          },
+          {
+            "name": "chinext",
+            "exchanges": [
+              "SZSE"
+            ],
+            "symbol_prefixes": [
+              "300",
+              "301"
+            ],
+            "benchmark_instrument_id": "399006.SZ",
+            "benchmark_name": "创业板指数"
+          },
+          {
+            "name": "szse_main_board",
+            "exchanges": [
+              "SZSE"
+            ],
+            "benchmark_instrument_id": "399001.SZ",
+            "benchmark_name": "深证成份指数"
+          },
+          {
+            "name": "bse_default",
+            "exchanges": [
+              "BSE"
+            ],
+            "benchmark_instrument_id": "899050.BJ",
+            "benchmark_name": "北证50"
+          }
+        ],
+        "note": "Beta is calculated on demand from local quote data. If window_days is omitted, the API returns configured default windows. Stock returns default to qfq-adjusted close from local adjustment_factors; index benchmarks default to unadjusted price-index close. Industry beta requires authoritative sw_l2 membership and local Shenwan index-analysis close_index history."
       },
       "risk": {
         "enabled": true,

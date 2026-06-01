@@ -501,6 +501,40 @@ class RiskSnapshot:
 
 
 @dataclass(frozen=True)
+class BetaResult:
+    """One on-demand benchmark-aware beta calculation result."""
+
+    instrument_id: str
+    symbol: str
+    exchange: str
+    as_of_date: str
+    benchmark_family: str
+    benchmark_instrument_id: str
+    benchmark_name: Optional[str] = None
+    window_days: int = 60
+    status: str = "success"
+    missing_reason: Optional[str] = None
+    beta: Optional[float] = None
+    alpha: Optional[float] = None
+    correlation: Optional[float] = None
+    r_squared: Optional[float] = None
+    stock_volatility: Optional[float] = None
+    benchmark_volatility: Optional[float] = None
+    observation_count: int = 0
+    min_observation_count: int = 0
+    window_start: Optional[str] = None
+    window_end: Optional[str] = None
+    stock_adjustment: str = "none"
+    benchmark_adjustment: str = "none"
+    calc_method: str = "beta_ols_daily_return"
+    calc_version: str = "beta_on_demand.v1"
+    parameter_hash: str = ""
+    source: str = "local_quotes"
+    source_mode: str = "derived"
+    details_json: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class TechnicalIndicatorLatestSnapshot:
     """One derived latest technical indicator snapshot."""
 

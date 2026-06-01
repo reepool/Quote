@@ -147,6 +147,7 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
         facts = financial_bundle or {}
         overrides = overrides or {}
         shares_outstanding = self._to_positive_float(facts.get("shares_outstanding"))
+        beta_context = self._resolve_beta_context(overrides, None)
         base_cash_flow, base_cash_flow_source = self._select_base_cash_flow(facts)
         if base_cash_flow is None or base_cash_flow <= 0:
             return {
@@ -163,6 +164,9 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
                 "projection_years": int(overrides.get("projection_years", self.parameters["projection_years"])),
                 "shares_outstanding": shares_outstanding,
                 "latest_close": latest_close,
+                "beta": beta_context["beta"],
+                "beta_source": beta_context["beta_source"],
+                "beta_benchmark": beta_context["beta_benchmark"],
                 "scenarios": [],
                 "sensitivity": [],
             }
@@ -189,6 +193,9 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
                 "projection_years": projection_years,
                 "shares_outstanding": shares_outstanding,
                 "latest_close": latest_close,
+                "beta": beta_context["beta"],
+                "beta_source": beta_context["beta_source"],
+                "beta_benchmark": beta_context["beta_benchmark"],
                 "scenarios": [],
                 "sensitivity": [],
             }
@@ -257,6 +264,9 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
             "projection_years": projection_years,
             "shares_outstanding": shares_outstanding,
             "latest_close": latest_close,
+            "beta": beta_context["beta"],
+            "beta_source": beta_context["beta_source"],
+            "beta_benchmark": beta_context["beta_benchmark"],
             "scenarios": scenarios,
             "sensitivity": sensitivity,
         }
@@ -318,6 +328,15 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
         if "discount_rate" in overrides:
             return float(overrides["discount_rate"])
 
+        if overrides.get("beta") is not None and overrides.get("use_beta_discount_rate", True):
+            risk_free_rate = float(
+                overrides.get("risk_free_rate", self.parameters["risk_free_rate"])
+            )
+            equity_risk_premium = float(
+                overrides.get("equity_risk_premium", self.parameters["equity_risk_premium"])
+            )
+            return risk_free_rate + float(overrides["beta"]) * equity_risk_premium
+
         configured_discount = self.parameters.get("discount_rate")
         if configured_discount is not None:
             return float(configured_discount)
@@ -326,6 +345,24 @@ class SimpleGrowthDcfEngine(BaseDcfEngine):
         equity_risk_premium = float(self.parameters["equity_risk_premium"])
         beta = float(overrides.get("beta", self.parameters["default_beta"]))
         return risk_free_rate + beta * equity_risk_premium
+
+    def _resolve_beta_context(
+        self,
+        overrides: Dict[str, Any],
+        discount_rate: Optional[float],
+    ) -> Dict[str, Any]:
+        beta = overrides.get("beta")
+        if beta is not None:
+            return {
+                "beta": float(beta),
+                "beta_source": overrides.get("beta_source", "override"),
+                "beta_benchmark": overrides.get("beta_benchmark"),
+            }
+        return {
+            "beta": float(self.parameters["default_beta"]),
+            "beta_source": "configured_default_beta",
+            "beta_benchmark": None,
+        }
 
     @staticmethod
     def _select_base_cash_flow(facts: Dict[str, Any]) -> tuple[Optional[float], str]:

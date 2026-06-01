@@ -1022,6 +1022,173 @@ def test_data_manager_run_valuation_input_sync_delegates_to_service_even_when_mo
     service_cls.assert_called_once()
 
 
+def _beta_quotes(start: str, returns: list[float]) -> pd.DataFrame:
+    values = [100.0]
+    for item in returns:
+        values.append(values[-1] * (1.0 + item))
+    return pd.DataFrame(
+        [
+            {"time": day.to_pydatetime(), "close": value}
+            for day, value in zip(pd.date_range(start, periods=len(values), freq="D"), values)
+        ]
+    )
+
+
+def test_data_manager_get_research_beta_calculates_default_windows(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "beta": {
+            "enabled": True,
+            "windows": [3, 5],
+            "min_observations_floor": 2,
+            "min_observation_ratio": 0.5,
+            "stock_adjustment": "none",
+            "benchmark_adjustment": "none",
+            "board_benchmark_rules": [
+                {
+                    "name": "sse_main_board",
+                    "exchanges": ["SSE"],
+                    "benchmark_instrument_id": "000001.SH",
+                    "benchmark_name": "上证综合指数",
+                }
+            ],
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    benchmark_returns = [0.01, -0.02, 0.03, 0.01, -0.01]
+    stock_returns = [item * 1.5 for item in benchmark_returns]
+    manager.db_ops.get_daily_data = AsyncMock(
+        side_effect=[
+            _beta_quotes("2026-01-01", stock_returns),
+            _beta_quotes("2026-01-01", benchmark_returns),
+        ]
+    )
+
+    result = _run(manager.get_research_beta("600000.SH"))
+
+    assert result["data_points"] == 2
+    assert result["windows"] == [3, 5]
+    assert {item["window_days"] for item in result["items"]} == {3, 5}
+    assert all(item["status"] == "success" for item in result["items"])
+    assert all(round(item["beta"], 6) == 1.5 for item in result["items"])
+    assert result["items"][0]["diagnostics"]["benchmark_selection_rule"].startswith(
+        "market_default_from_"
+    )
+
+
+def test_data_manager_get_research_beta_accepts_custom_window(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "beta": {
+            "enabled": True,
+            "windows": [60, 120, 252],
+            "min_observations_floor": 2,
+            "min_observation_ratio": 0.5,
+            "stock_adjustment": "none",
+            "benchmark_adjustment": "none",
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    benchmark_returns = [0.01, -0.02, 0.03, 0.01]
+    stock_returns = [item * 0.8 for item in benchmark_returns]
+    manager.db_ops.get_daily_data = AsyncMock(
+        side_effect=[
+            _beta_quotes("2026-01-01", stock_returns),
+            _beta_quotes("2026-01-01", benchmark_returns),
+        ]
+    )
+
+    result = _run(
+        manager.get_research_beta(
+            "600000.SH",
+            benchmark_family="custom",
+            benchmark_instrument_id="000300.SH",
+            window_days=4,
+            include_details=False,
+        )
+    )
+
+    assert result["windows"] == [4]
+    assert result["data_points"] == 1
+    item = result["items"][0]
+    assert item["benchmark_family"] == "custom"
+    assert item["benchmark_instrument_id"] == "000300.SH"
+    assert item["window_days"] == 4
+    assert round(item["beta"], 6) == 0.8
+    assert "diagnostics" not in item
+
+
+def test_data_manager_get_research_beta_reports_missing_industry_storage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "beta": {
+            "enabled": True,
+            "windows": [3],
+            "min_observations_floor": 2,
+            "min_observation_ratio": 0.5,
+            "stock_adjustment": "none",
+            "benchmark_adjustment": "none",
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = None
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "type": "stock",
+        }
+    )
+    manager.db_ops.get_daily_data = AsyncMock(
+        return_value=_beta_quotes("2026-01-01", [0.01, -0.02, 0.03])
+    )
+
+    result = _run(
+        manager.get_research_beta(
+            "600000.SH",
+            benchmark_family="industry_sw_l2",
+            window_days=3,
+        )
+    )
+
+    assert result["data_points"] == 1
+    assert result["items"][0]["status"] == "unavailable"
+    assert result["items"][0]["missing_reason"] == "benchmark_quotes_not_available"
+    assert (
+        result["items"][0]["diagnostics"]["benchmark_selection_rule"]
+        == "research_storage_required_for_industry_beta"
+    )
+
+
 def test_data_manager_run_analyst_forecast_shadow_sync_returns_unavailable_without_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {

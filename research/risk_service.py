@@ -147,6 +147,7 @@ class ResearchRiskService:
                     "events": int(self.parameters["event_window_days"]),
                 },
                 "financial_source_report_period": facts.get("report_period"),
+                "beta_source": "calculated_inline",
             },
         )
 

@@ -1247,6 +1247,53 @@ async def get_research_sentiment_events(
 
 
 @router.get(
+    "/research/company/{instrument_id}/beta",
+    response_model=ResearchBetaResponse,
+    tags=["Research"],
+)
+async def get_research_beta(
+    instrument_id: str,
+    benchmark_family: str = Query(
+        "market_default",
+        description="基准族: market_default, market_broad, board, industry_sw_l2, custom",
+    ),
+    benchmark_instrument_id: Optional[str] = Query(None, description="显式基准标的ID"),
+    window_days: Optional[int] = Query(
+        None,
+        description="Beta窗口天数；为空时返回配置默认的60/120/252",
+        ge=2,
+    ),
+    as_of_date: Optional[date] = Query(None, description="计算截止日期"),
+    include_details: bool = Query(True, description="是否包含计算诊断"),
+):
+    """按需实时计算研究域 Beta。"""
+    try:
+        result = await data_manager.get_research_beta(
+            instrument_id,
+            benchmark_family=benchmark_family,
+            benchmark_instrument_id=benchmark_instrument_id,
+            window_days=window_days,
+            as_of_date=as_of_date,
+            include_details=include_details,
+        )
+        if not result:
+            raise HTTPException(status_code=404, detail="Research beta result not found")
+
+        return ResearchBetaResponse(**result)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to calculate research beta: {str(e)}",
+        )
+
+
+@router.get(
     "/research/company/{instrument_id}/risk",
     response_model=ResearchRiskSnapshotResponse,
     tags=["Research"],

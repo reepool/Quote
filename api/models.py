@@ -1178,6 +1178,9 @@ class ResearchDcfValuationResponse(BaseModel):
     projection_years: int = Field(..., description="投影年数")
     shares_outstanding: Optional[float] = Field(None, description="总股本")
     latest_close: Optional[float] = Field(None, description="最新收盘价")
+    beta: Optional[float] = Field(None, description="DCF 使用的 Beta")
+    beta_source: Optional[str] = Field(None, description="Beta 来源")
+    beta_benchmark: Optional[Dict[str, Any]] = Field(None, description="Beta 基准信息")
     scenarios: List[ResearchDcfScenarioResponse] = Field(
         default_factory=list,
         description="DCF 场景结果",
@@ -1293,6 +1296,57 @@ class ResearchSentimentEventsResponse(BaseModel):
     items: List[ResearchSentimentEventItemResponse] = Field(
         default_factory=list,
         description="事件/情绪列表",
+    )
+
+
+class ResearchBetaResultResponse(BaseModel):
+    """研究域 Beta 单条计算结果。"""
+
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: str = Field(..., description="交易代码")
+    exchange: str = Field(..., description="交易所")
+    as_of_date: Optional[str] = Field(None, description="计算截止日期")
+    benchmark_family: str = Field(..., description="基准族")
+    benchmark_instrument_id: str = Field(..., description="基准标的ID")
+    benchmark_name: Optional[str] = Field(None, description="基准名称")
+    window_days: int = Field(..., description="Beta窗口天数")
+    status: str = Field(..., description="计算状态")
+    missing_reason: Optional[str] = Field(None, description="不可用原因")
+    beta: Optional[float] = Field(None, description="Beta")
+    alpha: Optional[float] = Field(None, description="日频Alpha")
+    correlation: Optional[float] = Field(None, description="相关系数")
+    r_squared: Optional[float] = Field(None, description="R平方")
+    stock_volatility: Optional[float] = Field(None, description="股票年化波动率")
+    benchmark_volatility: Optional[float] = Field(None, description="基准年化波动率")
+    observation_count: int = Field(..., description="有效对齐观测数")
+    min_observation_count: int = Field(..., description="最小观测数要求")
+    window_start: Optional[str] = Field(None, description="窗口开始日期")
+    window_end: Optional[str] = Field(None, description="窗口结束日期")
+    stock_adjustment: str = Field(..., description="股票复权口径")
+    benchmark_adjustment: str = Field(..., description="基准复权口径")
+    calc_method: str = Field(..., description="计算方法")
+    calc_version: str = Field(..., description="计算版本")
+    parameter_hash: str = Field(..., description="参数哈希")
+    source: str = Field(..., description="来源标识")
+    source_mode: str = Field(..., description="来源模式")
+    diagnostics: Optional[Dict[str, Any]] = Field(None, description="计算诊断")
+
+
+class ResearchBetaResponse(BaseModel):
+    """研究域 Beta 实时计算响应。"""
+
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: Optional[str] = Field(None, description="交易代码")
+    exchange: Optional[str] = Field(None, description="交易所")
+    benchmark_family: str = Field(..., description="请求基准族")
+    benchmark_instrument_id: Optional[str] = Field(None, description="请求基准标的ID")
+    window_days: Optional[int] = Field(None, description="请求窗口；为空时返回默认窗口")
+    windows: List[int] = Field(default_factory=list, description="实际计算窗口")
+    as_of_date: Optional[str] = Field(None, description="请求计算截止日期")
+    data_points: int = Field(..., description="返回结果条数")
+    items: List[ResearchBetaResultResponse] = Field(
+        default_factory=list,
+        description="Beta计算结果",
     )
 
 

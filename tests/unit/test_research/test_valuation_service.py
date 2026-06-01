@@ -719,3 +719,30 @@ def test_valuation_service_runs_dcf():
     assert len(result["scenarios"]) == 3
     assert result["scenarios"][1]["intrinsic_value_per_share"] is not None
     assert len(result["sensitivity"]) > 0
+
+
+def test_valuation_service_dcf_records_on_demand_beta_lineage():
+    service = ResearchValuationService({"dcf": {"discount_rate": None}})
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+        },
+        financial_bundle={
+            "operating_cf": 100.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "beta": 1.2,
+            "beta_source": "beta_on_demand",
+            "beta_benchmark": {"benchmark_instrument_id": "000300.SH"},
+        },
+    )
+
+    assert result["status"] == "success"
+    assert result["beta"] == 1.2
+    assert result["beta_source"] == "beta_on_demand"
+    assert result["beta_benchmark"]["benchmark_instrument_id"] == "000300.SH"

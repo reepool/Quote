@@ -17,6 +17,7 @@ from .industry_index_analysis_sync import IndustryIndexAnalysisSyncService
 from .industry_standard_sync import IndustryStandardSyncService
 from .query_service import ResearchQueryService
 from .research_report_sync import ResearchReportShadowSyncService
+from .beta_service import ResearchBetaService
 from .risk_service import ResearchRiskService
 from .risk_snapshot_sync import RiskSnapshotRebuildService
 from .shareholder_incremental_sync import ShareholderIncrementalSyncService
@@ -42,6 +43,7 @@ __all__ = [
     "IndustryStandardSyncService",
     "ResearchQueryService",
     "ResearchReportShadowSyncService",
+    "ResearchBetaService",
     "ResearchRiskService",
     "RiskSnapshotRebuildService",
     "ShareholderIncrementalSyncService",

@@ -5071,6 +5071,37 @@ class DataManager:
             }.items()
             if value is not None
         }
+        dcf_beta_cfg = module_cfg.get("dcf", {}).get("beta", {})
+        if "beta" not in overrides and dcf_beta_cfg.get("enabled", True):
+            try:
+                beta_payload = await self.get_research_beta(
+                    normalized_id,
+                    benchmark_family=dcf_beta_cfg.get("benchmark_family", "market_default"),
+                    benchmark_instrument_id=dcf_beta_cfg.get("benchmark_instrument_id"),
+                    window_days=int(dcf_beta_cfg.get("window_days", 252)),
+                    include_details=False,
+                )
+            except RuntimeError:
+                beta_payload = None
+            if beta_payload:
+                beta_result = next(
+                    (
+                        item
+                        for item in beta_payload.get("items", [])
+                        if item.get("status") == "success" and item.get("beta") is not None
+                    ),
+                    None,
+                )
+                if beta_result:
+                    overrides["beta"] = float(beta_result["beta"])
+                    overrides["beta_source"] = "beta_on_demand"
+                    overrides["beta_benchmark"] = {
+                        "benchmark_family": beta_result.get("benchmark_family"),
+                        "benchmark_instrument_id": beta_result.get("benchmark_instrument_id"),
+                        "benchmark_name": beta_result.get("benchmark_name"),
+                        "window_days": beta_result.get("window_days"),
+                        "as_of_date": beta_result.get("as_of_date"),
+                    }
 
         from research.valuation_service import ResearchValuationService
 
@@ -5244,6 +5275,346 @@ class DataManager:
 
         risk_service = ResearchRiskService(module_cfg)
         return risk_service.build_response(snapshot)
+
+    async def get_research_beta(
+        self,
+        instrument_id: str,
+        *,
+        benchmark_family: str = "market_default",
+        benchmark_instrument_id: Optional[str] = None,
+        window_days: Optional[int] = None,
+        as_of_date: Optional[date] = None,
+        include_details: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """按需实时计算 benchmark-aware beta。"""
+        module_cfg = self.research_config.modules.get("beta", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research beta module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        windows = (
+            [int(window_days)]
+            if window_days is not None
+            else [int(item) for item in module_cfg.get("windows", [60, 120, 252])]
+        )
+        if not windows or any(item < 2 for item in windows):
+            raise ValueError("window_days must be at least 2")
+
+        stock_adjustment = self._normalize_research_adjustment(
+            str(module_cfg.get("stock_adjustment", "qfq"))
+        )
+        benchmark_adjustment = str(module_cfg.get("benchmark_adjustment", "none"))
+        quote_limit_days = max(
+            int(module_cfg.get("quote_limit_days", 0) or 0),
+            max(windows) + 40,
+        )
+        end_datetime = None
+        if as_of_date is not None:
+            end_datetime = datetime(
+                as_of_date.year,
+                as_of_date.month,
+                as_of_date.day,
+                23,
+                59,
+                59,
+            )
+
+        raw_stock_quotes = await self.db_ops.get_daily_data(
+            instrument_id=normalized_id,
+            end_date=end_datetime,
+            limit=quote_limit_days,
+            return_format="pandas",
+        )
+        stock_quotes = raw_stock_quotes
+        applied_stock_adjustment = "none"
+        if raw_stock_quotes is not None and not raw_stock_quotes.empty:
+            stock_quotes, applied_stock_adjustment = await self._apply_research_adjustment(
+                raw_stock_quotes,
+                normalized_id,
+                instrument,
+                stock_adjustment,
+            )
+
+        benchmarks = await self._resolve_research_beta_benchmarks(
+            instrument,
+            benchmark_family=benchmark_family,
+            benchmark_instrument_id=benchmark_instrument_id,
+        )
+        if not benchmarks:
+            benchmarks = [
+                {
+                    "benchmark_family": benchmark_family or "custom",
+                    "benchmark_instrument_id": benchmark_instrument_id or "",
+                    "benchmark_name": None,
+                    "selection_rule": "benchmark_not_resolved",
+                    "as_of_date": None if as_of_date is None else as_of_date.isoformat(),
+                }
+            ]
+
+        from research.beta_service import ResearchBetaService
+
+        service = ResearchBetaService(module_cfg)
+        items: List[Dict[str, Any]] = []
+        benchmark_cache: Dict[str, Optional[pd.DataFrame]] = {}
+        for benchmark in benchmarks:
+            benchmark_quotes = await self._get_research_beta_benchmark_quotes(
+                benchmark,
+                quote_limit_days=quote_limit_days,
+                end_date=end_datetime,
+                cache=benchmark_cache,
+            )
+            for result in service.build_results(
+                stock_quotes=stock_quotes,
+                benchmark_quotes=benchmark_quotes,
+                instrument=instrument,
+                benchmark=benchmark,
+                windows=windows,
+                stock_adjustment=applied_stock_adjustment,
+                benchmark_adjustment=benchmark_adjustment,
+            ):
+                items.append(
+                    self._research_beta_result_to_dict(
+                        result,
+                        include_details=include_details,
+                    )
+                )
+
+        return {
+            "instrument_id": normalized_id,
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "benchmark_family": benchmark_family,
+            "benchmark_instrument_id": benchmark_instrument_id,
+            "window_days": window_days,
+            "windows": windows,
+            "as_of_date": None if as_of_date is None else as_of_date.isoformat(),
+            "data_points": len(items),
+            "items": items,
+        }
+
+    async def _resolve_research_beta_benchmarks(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        benchmark_family: str,
+        benchmark_instrument_id: Optional[str],
+    ) -> List[Dict[str, Any]]:
+        family = (benchmark_family or "market_default").strip()
+        if benchmark_instrument_id:
+            return [
+                {
+                    "benchmark_family": family,
+                    "benchmark_instrument_id": benchmark_instrument_id,
+                    "benchmark_name": None,
+                    "selection_rule": "explicit_benchmark_instrument_id",
+                }
+            ]
+
+        beta_cfg = self.research_config.modules.get("beta", {})
+        if family == "market_default":
+            board = self._resolve_research_beta_board_benchmark(instrument)
+            if board:
+                return [
+                    {
+                        **board,
+                        "benchmark_family": "market_default",
+                        "selection_rule": f"market_default_from_{board.get('selection_rule')}",
+                    }
+                ]
+            broad = beta_cfg.get("benchmarks", {}).get("market_broad", [])
+            if broad:
+                item = broad[0]
+                return [
+                    {
+                        "benchmark_family": "market_default",
+                        "benchmark_instrument_id": item.get("instrument_id"),
+                        "benchmark_name": item.get("name"),
+                        "selection_rule": "fallback_first_market_broad",
+                    }
+                ]
+        if family == "market_broad":
+            return [
+                {
+                    "benchmark_family": "market_broad",
+                    "benchmark_instrument_id": item.get("instrument_id"),
+                    "benchmark_name": item.get("name"),
+                    "selection_rule": "configured_market_broad",
+                }
+                for item in beta_cfg.get("benchmarks", {}).get("market_broad", [])
+                if item.get("instrument_id")
+            ]
+        if family == "board":
+            board = self._resolve_research_beta_board_benchmark(instrument)
+            return [] if board is None else [board]
+        if family == "industry_sw_l2":
+            return [await self._resolve_research_beta_industry_benchmark(instrument)]
+        if family == "custom":
+            raise ValueError("benchmark_instrument_id is required when benchmark_family=custom")
+        raise ValueError(
+            "benchmark_family must be one of market_default, market_broad, board, industry_sw_l2, custom"
+        )
+
+    def _resolve_research_beta_board_benchmark(
+        self,
+        instrument: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        beta_cfg = self.research_config.modules.get("beta", {})
+        symbol = str(instrument.get("symbol") or "")
+        exchange = str(instrument.get("exchange") or "")
+        for rule in beta_cfg.get("board_benchmark_rules", []):
+            exchanges = rule.get("exchanges") or []
+            prefixes = rule.get("symbol_prefixes") or []
+            if exchanges and exchange not in exchanges:
+                continue
+            if prefixes and not any(symbol.startswith(str(prefix)) for prefix in prefixes):
+                continue
+            return {
+                "benchmark_family": "board",
+                "benchmark_instrument_id": rule.get("benchmark_instrument_id"),
+                "benchmark_name": rule.get("benchmark_name"),
+                "selection_rule": rule.get("name", "configured_board_rule"),
+            }
+        return None
+
+    async def _resolve_research_beta_industry_benchmark(
+        self,
+        instrument: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        if self.research_storage is None:
+            return {
+                "benchmark_family": "industry_sw_l2",
+                "benchmark_instrument_id": "",
+                "benchmark_name": None,
+                "selection_rule": "research_storage_required_for_industry_beta",
+            }
+        membership = await asyncio.to_thread(
+            self.research_storage.get_industry_membership,
+            instrument["instrument_id"],
+            include_snapshot=False,
+        )
+        if not membership or membership.get("mapping_status") != "authoritative":
+            return {
+                "benchmark_family": "industry_sw_l2",
+                "benchmark_instrument_id": "",
+                "benchmark_name": None,
+                "selection_rule": "authoritative_sw_l2_membership_required",
+            }
+        sw_index_code = membership.get("sw_l2_index_code")
+        sw_l2_name = membership.get("sw_l2_name")
+        if not sw_index_code and sw_l2_name:
+            sw_index_code = await asyncio.to_thread(
+                self._lookup_research_beta_industry_index_code_by_name,
+                sw_l2_name,
+            )
+        if not sw_index_code:
+            return {
+                "benchmark_family": "industry_sw_l2",
+                "benchmark_instrument_id": "",
+                "benchmark_name": sw_l2_name,
+                "selection_rule": "industry_benchmark_index_code_not_available",
+            }
+        return {
+            "benchmark_family": "industry_sw_l2",
+            "benchmark_instrument_id": str(sw_index_code),
+            "benchmark_name": sw_l2_name,
+            "selection_rule": "authoritative_sw_l2_membership",
+            "taxonomy_system": membership.get("taxonomy_system", "sw"),
+            "taxonomy_version": membership.get("taxonomy_version", "sw_2021"),
+        }
+
+    def _lookup_research_beta_industry_index_code_by_name(
+        self,
+        sw_l2_name: str,
+    ) -> Optional[str]:
+        if self.research_storage is None:
+            return None
+        normalized = str(sw_l2_name or "").replace("Ⅱ", "").replace("II", "").strip()
+        if not normalized:
+            return None
+        with self.research_storage.get_connection() as conn:
+            self.research_storage._apply_pragmas(conn)
+            row = conn.execute(
+                """
+                SELECT sw_index_code
+                FROM industry_index_analysis_daily
+                WHERE sw_index_name = ?
+                   OR REPLACE(REPLACE(sw_index_name, 'Ⅱ', ''), 'II', '') = ?
+                GROUP BY sw_index_code
+                ORDER BY COUNT(*) DESC
+                LIMIT 1
+                """,
+                (sw_l2_name, normalized),
+            ).fetchone()
+        return None if row is None else str(row["sw_index_code"])
+
+    async def _get_research_beta_benchmark_quotes(
+        self,
+        benchmark: Dict[str, Any],
+        *,
+        quote_limit_days: int,
+        end_date: Optional[datetime],
+        cache: Dict[str, Optional[pd.DataFrame]],
+    ) -> Optional[pd.DataFrame]:
+        benchmark_id = benchmark.get("benchmark_instrument_id")
+        if not benchmark_id:
+            return None
+        family = benchmark.get("benchmark_family")
+        cache_key = f"{family}:{benchmark_id}:{quote_limit_days}:{end_date}"
+        if cache_key in cache:
+            return cache[cache_key]
+        if family == "industry_sw_l2":
+            if self.research_storage is None:
+                cache[cache_key] = None
+                return None
+            end_date_text = None if end_date is None else end_date.date().isoformat()
+            rows = await asyncio.to_thread(
+                self.research_storage.list_industry_index_analysis_daily,
+                taxonomy_system=str(benchmark.get("taxonomy_system", "sw")),
+                taxonomy_version=str(benchmark.get("taxonomy_version", "sw_2021")),
+                sw_index_code=str(benchmark_id),
+                end_date=end_date_text,
+                limit=quote_limit_days,
+                include_payload=False,
+            )
+            if not rows:
+                cache[cache_key] = None
+                return None
+            frame = pd.DataFrame(
+                [
+                    {
+                        "time": item.get("trade_date"),
+                        "close": item.get("close_index"),
+                    }
+                    for item in rows
+                ]
+            )
+            cache[cache_key] = frame
+            return frame
+
+        frame = await self.db_ops.get_daily_data(
+            instrument_id=str(benchmark_id),
+            end_date=end_date,
+            limit=quote_limit_days,
+            return_format="pandas",
+        )
+        cache[cache_key] = frame
+        return frame
+
+    @staticmethod
+    def _research_beta_result_to_dict(
+        result: Any,
+        *,
+        include_details: bool,
+    ) -> Dict[str, Any]:
+        data = dict(result.__dict__)
+        details = data.pop("details_json", {})
+        if include_details:
+            data["diagnostics"] = details
+        return data
 
     async def get_research_company_overview(
         self,

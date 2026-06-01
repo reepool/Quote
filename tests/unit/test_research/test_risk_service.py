@@ -42,3 +42,4 @@ def test_risk_service_builds_snapshot_from_quotes_and_financials():
     assert snapshot.beta_60d is not None
     assert snapshot.risk_level in {"low", "medium", "high"}
     assert snapshot.negative_event_count_30d == 1
+
