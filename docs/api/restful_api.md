@@ -255,14 +255,35 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-indicato
 - `facts`、`indicators`、`statements`
 
 当前边界：
-- API 响应暂未暴露长历史 period range 查询；长历史读取由 storage/repository 层先行支持，后续再扩展 API 参数。
+- 单期接口保持兼容形态；多期读取使用 `/financial-statements/history`，避免在单期响应里混入不同报告期结构。
 - 官方结构化 `SSE/CNInfo/BSE` 源默认仍 disabled；在 live probe 和小样本 backfill 通过前，实际生产链路仍以 AkShare fallback 为主。
-- 仓库级财务 readiness 当前通过 `scripts/research_financial_statements_rollout_validation.py` 验证，正式 REST readiness endpoint 会在后续 scheduler/API gate 阶段补上。
+- 仓库级财务 readiness 已提供 REST endpoint，也仍可通过 `scripts/research_financial_statements_rollout_validation.py` 做离线/调度前验证。
 
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements"
 curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements?include_statements=false"
+```
+
+### GET /api/v1/research/company/{instrument_id}/financial-statements/history
+
+读取公司多报告期财务报表历史。默认只读本地 `financials.db`，不在请求时触发远程补数。
+
+可选参数：
+- `period_window`：报告期窗口模式，当前支持 `latest`
+- `rolling_quarters`：最近报告期数量，默认 `12`
+- `report_periods`：逗号分隔的显式报告期列表
+- `include_statements`：是否包含原始报表详情，默认 `false`
+- `requested_canonical_facts`：逗号分隔的 canonical 字段，用于 L1/L3 分层读取
+- `profile`、`mapping_version`：字段映射 profile 与版本
+- `include_local_core`：是否附加 L1 本地核心字段诊断
+- `include_industry_facts`：是否附加 L1.5 行业专项字段诊断
+- `allow_remote_extension`：是否显式允许 L3 东财远程扩展，默认 `false`
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements/history?period_window=latest&rolling_quarters=12&include_statements=false"
+curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements/history?report_periods=2026-03-31,2025-12-31&include_local_core=true"
 ```
 
 ### GET /api/v1/research/company/{instrument_id}/valuation/history
@@ -303,6 +324,27 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/history?
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/relative"
+```
+
+### GET /api/v1/research/company/{instrument_id}/valuation/percentile
+
+读取单个品种在过去 N 个季度窗口内的估值历史分位。接口现场基于本地 `valuation_history` 序列计算，不持久化全市场分位矩阵。
+
+可选参数：
+- `as_of_date`：估值日期，默认使用最新可得日
+- `quarters`：历史窗口季度数，默认 `12`
+- `metrics`：逗号分隔的估值口径，默认 `pe_ttm,pb_mrq,ps_ttm`
+- `min_points`：最小有效样本数，默认 `60`
+- `negative_policy`：负值估值处理策略，支持 `flag/include/exclude`，默认 `flag`
+- `include_series`：是否返回样本序列，默认 `false`
+
+当前边界：
+- `negative_policy=flag` 会保留负值样本并返回负值/零值计数，调用方不能把负 PE 静默解释为普通低估。
+- `negative_policy=exclude` 且当前值本身被排除时，对应指标返回 `current_value_excluded`，分位为 `null`。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percentile?as_of_date=2026-05-29&quarters=12&metrics=pe_ttm,pb_mrq,ps_ttm&min_points=60&negative_policy=flag"
 ```
 
 ### GET /api/v1/research/valuation/readiness

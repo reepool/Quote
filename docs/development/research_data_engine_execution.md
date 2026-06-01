@@ -1,37 +1,24 @@
 # 投研数据引擎实施主线与工程化推进文档
 
-> 更新日期：2026-05-28
+> 更新日期：2026-06-01
 > 配套需求文档：[implementation_plan.md](/home/python/Quote/implementation_plan.md)
 > 配套配置：[config/10_research.json](/home/python/Quote/config/10_research.json)
 > 财务数据专项文档：[financial_data_system.md](/home/python/Quote/docs/financial_data_system.md)
-> 当前推进焦点：在已完成财务获取、存储和公告驱动维护主线后，进入估值生产 rollout 准备：先通过 CNInfo/AkShare 同步 `shares_outstanding / float_shares` 到 `data/valuation.db.valuation_inputs`，再日频生成 `PE/PB/PS/market_cap/float_market_cap` 等核心估值序列；相对估值从 `valuation.db.valuation_history + research.db.industry_memberships` 动态计算，不持久化全量同行矩阵
-> 当前估值生产 rollout 准备变更包：`openspec/changes/prepare-valuation-production-rollout/`
-> 当前财务 source profile 变更包：`openspec/changes/promote-cninfo-data20-financial-source/`
-> 当前财务 coverage gap 分类变更包：`openspec/changes/classify-financial-coverage-gaps/`
-> 当前 source policy 变更包：`openspec/changes/harden-research-source-priority-policy/`
-> 当前行业 rollout readiness 变更包：`openspec/changes/add-industry-standard-readiness-api/`
-> 当前股东 rollout readiness 变更包：`openspec/changes/add-shareholder-readiness-api/`
-> 当前 BSE 可空策略变更包：`openspec/changes/add-bse-empty-exchange-policy/`
-> 当前申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
-> 当前申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
-> 当前申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
+> OpenSpec 状态：当前无 active change；截至 `2026-06-01`，历史 complete change 已同步主 spec 并归档。
+> 当前推进焦点：估值域已完成 `valuation_inputs / valuation_history / relative / percentile / readiness` 主链并进入维护复核；下一主线为财务域 production readiness、coverage gap 分类、source profile 稳定化和行业专项字段包真实覆盖验证。
+> 已归档估值 rollout 变更包：`openspec/changes/archive/2026-06-01-prepare-valuation-production-rollout/`
+> 已归档估值历史分位变更包：`openspec/changes/archive/2026-06-01-add-valuation-history-percentile/`
+> 已归档估值 readiness 变更包：`openspec/changes/archive/2026-06-01-add-valuation-readiness-api/`
 > 已归档财务/XBRL 与相对估值加固变更包：`openspec/changes/archive/2026-05-06-harden-financial-xbrl-and-relative-valuation/`
 > 已归档官方财务 endpoint/parser 变更包：`openspec/changes/archive/2026-05-06-discover-official-financial-xbrl-endpoints/`
 > 已归档官方财务 SSE structured JSON 实现变更包：`openspec/changes/archive/2026-05-08-implement-sse-official-financial-json-source/`
 > 已归档 SSE 财务批量回填准备变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-batch-backfill-rollout/`
 > 已归档 SSE 财务多报告期回填准备变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-multiperiod-backfill/`
 > 已归档 SSE 财务生产 backfill gate 变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-production-backfill/`
-> official-code backlog 相关变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`（仅作为历史分类审计链路）
-> 当前 readiness backlog 可视化变更包：`openspec/changes/surface-unmapped-backlog-in-industry-readiness/`
-> 当前 backlog override-review 信号变更包：`openspec/changes/add-override-readiness-signals-for-official-backlog/`
-> 当前 backlog manual-override 建议变更包：`openspec/changes/add-manual-override-suggestions-for-official-backlog/`
-> 当前 override candidate 导出变更包：`openspec/changes/add-official-manual-override-export-api/`
-> 当前 override review 变更包：`openspec/changes/add-official-override-review-api/`
-> 当前 readiness override-review 摘要变更包：`openspec/changes/surface-official-override-review-in-industry-readiness/`
-> 当前 override review filter 变更包：`openspec/changes/add-official-override-review-filters/`
-> strict Shenwan current membership 变更包：`openspec/changes/use-shenwan-third-components-as-current-membership-source/`
-> strict Shenwan rollout validation runner 变更包：`openspec/changes/add-industry-standard-rollout-validation-runner/`
-> strict Shenwan gap detect + targeted repair 变更包：`openspec/changes/add-gap-detect-repair-task/`
+> 已归档财务 source profile 变更包：`openspec/changes/archive/2026-05-26-promote-cninfo-data20-financial-source/`
+> 已归档财务 coverage gap 分类变更包：`openspec/changes/archive/2026-05-26-classify-financial-coverage-gaps/`
+> 已归档财务行业专项字段包变更包：`openspec/changes/archive/2026-05-28-add-financial-industry-specific-fields/`
+> 已归档 strict Shenwan / shareholder / metadata / scheduler housekeeping 变更包已统一移动到 `openspec/changes/archive/2026-06-01-*`
 > 已归档官方申万主源变更包：`openspec/changes/archive/2026-04-19-add-official-shenwan-membership-source/`
 > 已归档行业加固变更包：`openspec/changes/archive/2026-04-18-harden-research-industry-standard-rollout/`
 > 已归档基线变更包：`openspec/changes/archive/2026-04-18-implement-research-data-engine-phase1/`
@@ -324,8 +311,8 @@ API 补齐原则：
   - `technical_indicator_latest` 最新快照缓存基线
 - 当前尚未完成的是：
   - SSE `structured_json` 已完成 `300` 标的单报告期临时库 dry-run，并完成 `100` 标的 x `2` 报告期多期 dry-run；SSE/SZSE/BSE 已确认 CNInfo data20 结构化 JSON 小样本可解析或可直接返回结构化 payload；SSE 同样本对比显示 `sse_commonquery` 比 `cninfo_data20` 更快、facts 更丰富，且 CNInfo 当前只能提供总权益口径，不能直接填标准归母 `equity`。下一步需要 profile-aware 生产 backfill CLI/readiness gate、生产库放量前复核和更长报告期窗口验证。BSE 官网托管 XBRL/XML/ZIP artifact 尚未找到，但这不阻塞 BSE 通过 CNInfo data20 source profile 推进结构化财务源
-  - `research metadata / valuation` 等默认 disabled 或受 gate 控制模块的 production rollout 决策与更大范围运行复核
-- 因此，`financial_statements.enabled=true` 只代表本地同步/读取链路可用，不代表官方结构化源已经生产可用或全市场历史财务仓已完成；`valuation` 虽已实现，但正式开放仍应以财务 readiness、`/api/v1/research/valuation/readiness`、模块 gate 和业务确认结果为准
+  - `research metadata` 等默认 disabled 模块的 production rollout 决策与更大范围运行复核；`valuation` 当前已按测试/试运行打开配置开关，但仍受 readiness 与业务确认约束
+- 因此，`financial_statements.enabled=true` 只代表本地同步/读取链路可用，不代表官方结构化源已经生产可用或全市场历史财务仓已完成；`valuation.enabled=true` 代表估值读写链路已进入试运行/可用状态，不等同于所有估值口径、覆盖率和对外 rollout 均已无条件完成，正式开放仍应以财务 readiness、`/api/v1/research/valuation/readiness`、模块 gate 和业务确认结果为准
 
 补充说明：
 
@@ -564,7 +551,7 @@ technical readiness 接口会聚合：
 
 当前边界：
 
-- `valuation` 默认仍建议保持 disabled
+- `valuation` 当前配置已打开 `enabled=true`，用于已完成的输入同步、历史估值、相对估值、readiness 和个股历史分位读链路；生产对外口径仍应以 readiness、财务覆盖、行业权威映射和业务确认结果为准
 - 估值日频派生序列的生产物理目标已在 storage 层指向 `data/valuation.db`，而不是继续扩大 `research.db`
 - `valuation.db` 只保存估值输入、`valuation_history`、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
 - `valuation_inputs` 必须显式记录 source、source_mode、input_kind、unit、as_of_date、data_as_of 与 diagnostics；金额单位的股本/资本事实不能作为 share-count 输入，除非存在明确 share unit 映射
@@ -608,7 +595,7 @@ technical readiness 接口会聚合：
 
 ### 5.2 当前下一主线
 
-当前活跃主线已完成 `valuation` readiness 与 `technical_indicator_latest` 最新快照缓存基线，行业和股东进入维护复核；财务数据获取、存储和更新能力加固 change 已于 `2026-05-06` 归档，上一轮官方 endpoint 探测 change `discover-official-financial-xbrl-endpoints` 也已归档，SSE 批量单报告期准备 change `prepare-sse-financial-batch-backfill-rollout`、多报告期准备 change `prepare-sse-financial-multiperiod-backfill`、SSE structured JSON 实现 change `implement-sse-official-financial-json-source`、生产 backfill gate change `prepare-sse-financial-production-backfill` 均已于 `2026-05-08` 归档。当前 SSE 主线已经具备受 gate 控制的小步生产 backfill 入口，并已完成前 `10` 个 SSE 标的 x `2` 个报告期的生产写入 smoke；`2026-05-09` 新增主线是将 CNInfo data20 从 SZSE/BSE discovery evidence 提升为覆盖 `SSE/SZSE/BSE` 的 `cninfo_data20` source profile，统一管理 official source、parser、request policy、checkpoint 和 AkShare fallback。`2026-05-18` 后，财务主线已完成并归档 OpenSpec change `build-sina-ths-core-financial-layer`，按新浪/同花顺交集、字段映射审计、L1 本地核心读取和东财远程扩展接口完成代码落地；`2026-05-19` 新开 OpenSpec change `validate-sina-ths-local-core-live-audit`，进入真实样本 evidence 与生产启用 gate 阶段。
+当前 active OpenSpec change 已清空。`valuation` readiness、`valuation_history`、`valuation_inputs`、相对估值、个股历史分位和 `technical_indicator_latest` 最新快照缓存基线均已完成并归档；行业和股东进入维护复核。下一主线回到财务域：围绕 L1 本地核心层、官方摘要校验层和远程扩展层，继续做 production readiness、coverage gap 分类、source profile 稳定化、真实样本 evidence、生产 backfill gate 和行业专项字段包覆盖验证。此前 SSE structured JSON、CNInfo data20 source profile、coverage gap 分类、Sina/THS L1 本地核心层、财务行业专项字段包等变更均已归档，后续新增开发应重新开 OpenSpec change，而不是复用历史 active change 名称。
 
 财务主线执行顺序：
 

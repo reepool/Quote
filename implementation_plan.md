@@ -1,32 +1,23 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-05-27
+> 更新日期：2026-06-01
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
-> 配套工程变更包：`openspec/changes/stabilize-shenwan-official-mapping-cache/`
-> 配套 source policy 变更包：`openspec/changes/harden-research-source-priority-policy/`
-> 配套行业 readiness 变更包：`openspec/changes/add-industry-standard-readiness-api/`
-> 配套股东 readiness 变更包：`openspec/changes/add-shareholder-readiness-api/`
-> 配套 CNInfo 公告扫描与股东增量同步变更包：`openspec/changes/add-shareholder-incremental-sync/`
-> 当前估值生产 rollout 准备变更包：`openspec/changes/prepare-valuation-production-rollout/`
-> 配套 BSE 可空策略变更包：`openspec/changes/add-bse-empty-exchange-policy/`
-> 配套申万组件集缓存变更包：`openspec/changes/cache-shenwan-component-sets/`
-> 配套 official-code backlog 变更包：`openspec/changes/assetize-unmapped-official-code-backlog/`
-> 配套 readiness backlog 可视化变更包：`openspec/changes/surface-unmapped-backlog-in-industry-readiness/`
-> 配套 backlog override-review 信号变更包：`openspec/changes/add-override-readiness-signals-for-official-backlog/`
-> 配套 backlog manual-override 建议变更包：`openspec/changes/add-manual-override-suggestions-for-official-backlog/`
-> 配套申万官方分类主源变更包：`openspec/changes/promote-swsresearch-shenwan-classification-primary/`
-> 配套申万指数分析历史回补变更包：`openspec/changes/add-akshare-sws-index-analysis-history/`
+> OpenSpec 状态：当前无 active change；截至 `2026-06-01`，历史 complete change 已同步到 `openspec/specs/*` 并归档。
+> 当前推进焦点：估值域已进入功能完成和维护复核阶段；下一主线回到财务域 production readiness、coverage gap 分类、source profile 稳定化和行业专项字段包真实覆盖验证。
+> 已归档估值 rollout 变更包：`openspec/changes/archive/2026-06-01-prepare-valuation-production-rollout/`
+> 已归档估值历史分位变更包：`openspec/changes/archive/2026-06-01-add-valuation-history-percentile/`
+> 已归档估值 readiness 变更包：`openspec/changes/archive/2026-06-01-add-valuation-readiness-api/`
 > 已归档财务/XBRL 与相对估值加固变更包：`openspec/changes/archive/2026-05-06-harden-financial-xbrl-and-relative-valuation/`
 > 已归档官方财务 endpoint/parser 变更包：`openspec/changes/archive/2026-05-06-discover-official-financial-xbrl-endpoints/`
 > 已归档官方财务 SSE structured JSON 实现变更包：`openspec/changes/archive/2026-05-08-implement-sse-official-financial-json-source/`
 > 已归档 SSE 财务批量回填准备变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-batch-backfill-rollout/`
 > 已归档 SSE 财务多报告期回填准备变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-multiperiod-backfill/`
 > 已归档 SSE 财务生产 backfill gate 变更包：`openspec/changes/archive/2026-05-08-prepare-sse-financial-production-backfill/`
-> 当前财务 source profile 变更包：`openspec/changes/promote-cninfo-data20-financial-source/`
-> 当前财务 coverage gap 分类变更包：`openspec/changes/classify-financial-coverage-gaps/`
-> 当前财务行业专项字段包变更包：`openspec/changes/add-financial-industry-specific-fields/`
+> 已归档财务 source profile 变更包：`openspec/changes/archive/2026-05-26-promote-cninfo-data20-financial-source/`
+> 已归档财务 coverage gap 分类变更包：`openspec/changes/archive/2026-05-26-classify-financial-coverage-gaps/`
+> 已归档财务行业专项字段包变更包：`openspec/changes/archive/2026-05-28-add-financial-industry-specific-fields/`
 
 ---
 
@@ -549,7 +540,7 @@ L4  Research API（新增）
   - `2026-05-18` 已开启 OpenSpec change `build-sina-ths-core-financial-layer` 并进入实现：`config/10_research.json` 新增 `service_layers.local_core / official_summary_check / remote_extension` 配置槽；`AkshareFinancialStatementsProvider` 已新增 `ths_report` 调度和同花顺长表聚合，保留 `metric_name/value/single/yoy/mom/single_yoy` 审计字段；新增 `sina_ths_core_financial_facts.v1` 映射目录模型，按 `bank/nonbank` profile、relationship、unit、value_type、approval flag 和 rejection reason 管理字段关系。
   - `2026-05-19` 继续完成 `build-sina-ths-core-financial-layer` 的核心实现：新增 `scripts/dev_validation/audit_sina_ths_financial_mapping.py`，可用离线样本比较 Sina/THS/CNInfo/Eastmoney 字段数、mapping relationship、单位、相对差异、恒等式和 `approved_for_core`；storage 增加 `financial_source_field_mappings` 与 `financial_source_mapping_audits` 两张长表，不做动态宽表迁移；fallback numeric facts 对已批准 Sina/THS L1 字段写入 `raw_fact.local_core_mapping` lineage；新增 L1 local core read helper，按 `mapping_version/profile` 返回本地事实和 `outside_approved_local_core / missing_local_core_fact` 诊断；新增 `FinancialRemoteExtensionService`，仅在显式 `allow_remote_extension=true` 时调用东财并返回 `is_remote=true` 的 canonical facts，不写入 L1 本地核心层。
   - `2026-05-19` 已把上述财务分层能力接入现有 `GET /api/v1/research/company/{instrument_id}/financial-statements` 读路径：默认响应保持兼容；调用方可显式传入 `report_period / requested_canonical_facts / profile / mapping_version / include_local_core / allow_remote_extension`，在响应的 `service_layers.local_core` 中读取 L1 本地核心事实与缺字段诊断，在 `service_layers.remote_extension` 中读取显式远程扩展状态。当前 `config/10_research.json` 仍保持 `local_core.enabled=false`、`remote_extension.enabled=false`，因此生产默认不会把未审计字段或东财远程字段静默混入本地核心层。
-  - `2026-05-19` 已归档 `build-sina-ths-core-financial-layer`，并将其 delta spec 同步进主 `research-data-engine` spec。后续新开 OpenSpec change `validate-sina-ths-local-core-live-audit`，专门处理生产启用前的真实样本证据：新增 `scripts/dev_validation/live_audit_sina_ths_local_core.py`，接受显式 `instrument_id:exchange:profile`、报告期、source 列表、timeout/throttle、mapping version 与输出路径；通过既有 AkShare provider 获取 Sina/THS/Eastmoney，通过既有 official batch runner 获取 CNInfo data20 临时库 numeric facts，复用离线 mapping audit 生成非破坏性 JSON evidence，并输出 source timing/error、field count、semantic audit、promotion blockers。当前只完成脚本与 fake-source 单元测试，尚未执行真实联网样本。
+  - `2026-05-19` 已归档 `build-sina-ths-core-financial-layer`，并将其 delta spec 同步进主 `research-data-engine` spec。随后通过 OpenSpec change `validate-sina-ths-local-core-live-audit` 专门处理生产启用前的真实样本证据：新增 `scripts/dev_validation/live_audit_sina_ths_local_core.py`，接受显式 `instrument_id:exchange:profile`、报告期、source 列表、timeout/throttle、mapping version 与输出路径；通过既有 AkShare provider 获取 Sina/THS/Eastmoney，通过既有 official batch runner 获取 CNInfo data20 临时库 numeric facts，复用离线 mapping audit 生成非破坏性 JSON evidence，并输出 source timing/error、field count、semantic audit、promotion blockers。该变更已完成并归档；后续条目记录了真实联网样本、跨市场样本、v2/v3/v5 映射升级和 dry-run 证据。
   - `2026-05-19` 已执行一次受限 live smoke：`600000.SH:SSE:bank`、`600519.SH:SSE:nonbank`，报告期 `2024-12-31`，sources 为 `sina_report / ths_report / cninfo_data20 / eastmoney_report`，证据文件 `/tmp/quote_sina_ths_local_core_live_audit_20260519_rerun.json`。四个源均 fetch 成功，无 source failure；总耗时约 `78.674s`。修复审计中的 `NaN` 误报后，两个样本仍为 `needs_review`，阻塞原因只剩 `approved_local_core_fact_missing`：银行样本缺 `equity_parent / net_income_parent` 的已批准 exact mapping，非银行样本缺 `equity_parent` 的已批准 exact mapping。这说明源数据中 canonical 值存在，但当前严格 mapping catalog 的 Sina 精确字段名没有覆盖 live 标签变体；在补充多样本证据前不得启用 `local_core.enabled=true`。同日审计输出继续增强为 `canonical_field_matches`，live promotion blocker 会在 `source_field_candidates` 中列出每个缺失 canonical fact 在 Sina/THS/CNInfo/Eastmoney 中实际命中的字段名、报表类型、值、canonical semantic 和单位，后续只能据此人工确认并升级 mapping version，不能自动把候选并入 L1。
   - `2026-05-19` 基于增强 evidence 明确确认了三组 live 标签变体，并升级本地核心映射目录到 `sina_ths_core_financial_facts.v2`：非银 `equity_parent` 新增新浪 `归属于母公司股东权益合计 -> parent_holder_equity_total`；银行 `net_income_parent` 新增新浪 `归属于母公司的净利润 -> parent_holder_net_profit`；银行 `equity_parent` 新增新浪 `归属于母公司股东的权益 -> parent_holder_equity_total`。v1 仍保留可查询以兼容历史审计。v2 复跑同一 live smoke，证据文件 `/tmp/quote_sina_ths_local_core_live_audit_v2_20260519.json`，结果 `status=passed`、`promotable_sample_count=2/2`、无 source failure、无 promotion blocker，总耗时约 `54.925s`；当时 `config/10_research.json` 的 `service_layers.local_core.mapping_version` 已指向 v2，但 `local_core.enabled` 仍保持 `false`，生产默认仍不启用。
   - `2026-05-19` 继续做跨市场 bounded live audit：`000001.SZ:SZSE:bank`、`000333.SZ:SZSE:nonbank`、`300750.SZ:SZSE:nonbank`、`920833.BJ:BSE:nonbank`，报告期 `2024-12-31`，证据文件 `/tmp/quote_sina_ths_local_core_live_audit_v2_cross_market_tolerance_20260519.json`。四个源均 fetch 成功，结果 `status=passed`、`promotable_sample_count=4/4`、无 promotion blocker，总耗时约 `79.815s`。本次发现 CNInfo data20 官方摘要层存在 `CNY_10K -> CNY` 后几十元级舍入差异，因此审计已将 CNInfo canonical cross-check 容差单独设为 `absolute_tolerance=100`、`relative_tolerance=1e-5`；该容差只作用于 CNInfo 摘要层跨源校验，不放宽 Sina/THS L1 exact mapping。
@@ -598,7 +589,7 @@ L4  Research API（新增）
   - `2026-05-25` 根据首次 `financial_disclosure_incremental_sync` 真实运行结果开启并推进 OpenSpec `tighten-financial-disclosure-source-routing`：公告筛选已收紧，业绩说明会预告、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认不再生成候选；补数源路由改为官方 `CNInfo data20 -> THS -> Sina`，由 CNInfo data20 优先满足支持的 canonical facts，再由 THS/Sina 对官方缺失、失败或语义不明确的字段做字段级补齐，并在 Telegram 报告中显示公告过滤和 source routing 统计。当前已新增 `research/financial_statement_maintenance_repair.py` 统一维护源抽象，增量和周度对账只构建标准 repair target，不再各自硬编码 CNInfo/THS/Sina 调用。定向单元测试覆盖正式定报/更正/延期/风险公告、噪声公告排除、报告期推断、CNInfo 官方事实并入 readiness、CNInfo-first 路由和报告摘要。
   - `2026-05-25` 晚间复核财务日更报告后继续修正：历史 `pending_recheck` 会在重新进入候选前复用当前公告筛选规则，旧逻辑遗留的业绩说明会预告、英文版、图文版、问询函专项说明等记录计入 `filtered_stale_pending`，不再触发 CNInfo/THS/Sina 补数；Telegram 报告新增候选来源拆分，并将 `CNInfo成功` 口径改为 `CNInfo ready`，另列 `CNInfo 批处理通过`，避免把批处理状态误读为本地核心字段修复成功。
   - 同日确认剩余唯一候选为 `688121.SH / 2025-12-31`，公告为年报预计无法在法定期限内披露监管工作函，属于真实披露异常而非正常财报缺采；已调整为 `accepted_disclosure_gap` 类处理，不再每日调用 CNInfo/THS/Sina 重试，待正式定报主公告出现后再重新触发补处理。
-  - `2026-05-25` 新开 OpenSpec `add-financial-statements-history-api` 并实现公司多期财务报表读取接口：`GET /api/v1/research/company/{instrument_id}/financial-statements/history`，支持 `period_window=latest&rolling_quarters=N` 和显式 `report_periods`，每期复用单期 `facts / indicators / statements / service_layers` 结构，默认只读本地 `financials.db`，不隐式触发远程补数。
+  - `2026-05-25` 已实现并归档 OpenSpec `add-financial-statements-history-api`：公司多期财务报表读取接口 `GET /api/v1/research/company/{instrument_id}/financial-statements/history`，支持 `period_window=latest&rolling_quarters=N` 和显式 `report_periods`，每期复用单期 `facts / indicators / statements / service_layers` 结构，默认只读本地 `financials.db`，不隐式触发远程补数。
   - `2026-05-26` 根据 `financial_disclosure_reconciliation_sync` 首次周度对账报告修正 L1 readiness 口径和缺口分类：`required_core_facts` 从旧的 `net_income / equity` 泛化字段改为已批准映射的 `net_income_parent / equity_parent` 归母口径，并增加 profile 级配置；`outside_approved_local_core / mapping_catalog_empty` 单独归为 `mapping_policy_gap`，不再反复调用 CNInfo/THS/Sina 补数；`missing_local_core_fact` 等才计入 source missing 并进入补数路由。reconciliation 候选超过上限时改为按交易所、profile、报告期均衡抽样，Telegram 报告拆分 accepted gaps、mapping policy gaps、source missing、blockers。
   - `2026-05-26` 继续复核第二次 `financial_disclosure_reconciliation_sync`：最新运行 `ingestion_run_id=405` 中 `changed=240 / blocking=260`，`mapping_policy_gap=0`，说明映射准入口径已修正。260 个 blockers 拆分后，256 个为报告期早于上市日的新股历史期，剩余 4 个为 `002731.SZ` 与 `688121.SH` 的 `2025-12-31 / 2026-03-31`，CNInfo data20 返回目标结构但无目标期数值，Sina/THS fallback 也未补足核心事实。已把周度对账候选生成调整为前置股票主数据生命周期判断，`pre_listing_period / post_delisting_or_no_disclosure` 直接记录为 accepted disclosure gap，不再进入补数源路由或 degraded blockers；并复用已落库的 accepted disclosure state，避免已由公告解释的精确 instrument-period 在后续对账中重新退回 local blocker。
   - `2026-05-26` 第三次对账 `ingestion_run_id=446` 仍出现 `blocking=122` 后继续排查：`119` 个来自 BSE，根因是 `AkShareSource.get_instrument_list(BSE)` 没有写入 AkShare 已返回的 `上市日期`，导致北交所 920 新股历史期无法被生命周期规则识别。已修复 BSE `上市日期 / 所属行业 / 地区` 解析，并执行 BSE 主数据刷新；当前 `quotes.db.instruments` 中 `BSE=315` 且 `listed_date=315`。对原 blockers 重新套规则，BSE `119` 条均为 `pre_listing_period`。剩余 `002731.SZ / 688121.SH` 近端缺口已通过 `financials.db.cninfo_announcement_audit` 中的停牌、无法披露定期报告、退市风险公告解释；新增规则只复用公告日前 `180` 天内的近端报告期，避免放宽历史缺口。定向 dry-run 覆盖 `920178.BJ / 002731.SZ / 688121.SH` 近端期次，结果 `blocking_gap_count=0`。
