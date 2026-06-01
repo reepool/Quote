@@ -1767,7 +1767,7 @@ GET /api/v1/research/company/{instrument_id}/beta
   - PE/PB/PS 分位、EV/EBITDA、PEG
 - 风险因子
   - 波动率、最大回撤、Beta、Altman Z-Score
-  - Beta 第一版应作为 benchmark-aware 实时计算因子层，而不是继续只保留 risk 内部的 `000300.SH` 单基准短窗口计算，也不做默认预计算入库。`window_days` 未传入时返回默认 `60d / 120d / 252d`，传入时计算指定 n 天窗口；股票收益使用本地 `qfq` 复权 close，指数基准使用本地不复权 price-index close；结果 JSON 必须记录 benchmark family、benchmark instrument、窗口、样本数、correlation、R²、缺失原因、复权口径和计算诊断。申万二级行业 Beta 只允许使用 authoritative membership 映射出的行业指数，不允许使用 reference-only 行业字段。
+  - Beta 第一版应作为 benchmark-aware 实时计算因子层，而不是继续只保留 risk 内部的 `000300.SH` 单基准短窗口计算，也不做默认预计算入库。`window_days` 未传入时返回默认 `60d / 120d / 252d`，传入时计算指定 n 天窗口；`benchmark_family=all` 聚合默认、板块、宽基和申万二级行业基准并去重；股票收益使用本地 `qfq` 复权 close，指数基准使用本地不复权 price-index close；结果 JSON 必须记录 benchmark family、benchmark instrument、窗口、样本数、correlation、R²、residual volatility、tracking error、Beta 标准误、t 统计量、p 值、quality flag、interpretation flags、缺失原因、复权口径和计算诊断。申万二级行业 Beta 只允许使用 authoritative membership 映射出的行业指数，不允许使用 reference-only 行业字段。
 - 技术因子
   - MACD、RSI、ATR、动量、均线偏离
 
