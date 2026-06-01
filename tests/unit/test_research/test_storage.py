@@ -2422,10 +2422,38 @@ def test_valuation_history_read_filters_current_identity(tmp_path):
         calc_version="valuation_history.v1",
         parameter_hash="current",
     )
+    compatible_rows = storage.get_valuation_history_rows(
+        "600519.SH",
+        calc_method="valuation_history_builtin",
+        calc_version="valuation_history.v1",
+        parameter_hash="current",
+        parameter_hashes=["current", "old"],
+    )
+    compatible_dates = storage.get_existing_valuation_history_dates(
+        "600519.SH",
+        start_date="2026-04-18",
+        end_date="2026-04-18",
+        calc_method="valuation_history_builtin",
+        calc_version="valuation_history.v1",
+        parameter_hash="current",
+        parameter_hashes=["current", "old"],
+    )
 
     assert len(all_rows) == 2
     assert len(current_rows) == 1
+    assert len(compatible_rows) == 1
+    assert compatible_rows[0]["market_cap"] == 2000.0
+    assert compatible_dates == {"2026-04-18"}
     assert current_rows[0]["market_cap"] == 2000.0
+    metric_coverage = storage.summarize_valuation_metric_coverage(
+        metric_fields=["pe_ratio"],
+        calc_method="valuation_history_builtin",
+        calc_version="valuation_history.v1",
+        parameter_hash="current",
+        parameter_hashes=["current", "old"],
+    )
+    assert metric_coverage["instrument_count"] == 1
+    assert metric_coverage["metrics"]["pe_ratio"]["covered_instruments"] == 1
     latest_current = storage.get_latest_valuation_history_row(
         "600519.SH",
         calc_method="valuation_history_builtin",
@@ -2433,6 +2461,62 @@ def test_valuation_history_read_filters_current_identity(tmp_path):
         parameter_hash="current",
     )
     assert latest_current["details"]["version"] == "current"
+
+
+def test_valuation_history_details_are_stored_compact_and_expanded(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+
+    storage.upsert_valuation_history(
+        ValuationHistorySnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-18",
+            market_cap=2000.0,
+            pe_ttm=20.0,
+            parameter_hash="current",
+            details_json={
+                "latest_financial_report_period": "2025-12-31",
+                "latest_financial_available_date": "2026-04-30",
+                "valuation_input": {
+                    "source": "cninfo",
+                    "source_mode": "direct",
+                    "input_kind": "share_capital",
+                    "as_of_date": "2026-04-18",
+                    "shares_outstanding": 100.0,
+                },
+                "metrics": {
+                    "pe_ttm": {
+                        "metric": "pe_ttm",
+                        "status": "available",
+                        "value": 20.0,
+                        "numerator": 2000.0,
+                        "denominator": 100.0,
+                        "denominator_fact": "net_income",
+                        "report_periods": ["2025-12-31"],
+                        "availability_dates": ["2026-04-30"],
+                        "calc_method": "annual_ttm",
+                    }
+                },
+            },
+        )
+    )
+
+    with sqlite3.connect(storage.valuation_db_path) as conn:
+        raw_details = conn.execute(
+            "SELECT details_json FROM valuation_history WHERE instrument_id = ?",
+            ("600519.SH",),
+        ).fetchone()[0]
+
+    assert "latest_financial_report_period" not in raw_details
+    assert '"v":2' in raw_details
+    assert '"m"' in raw_details
+    latest = storage.get_latest_valuation_history_row("600519.SH")
+    assert latest["details"]["latest_financial_report_period"] == "2025-12-31"
+    assert latest["details"]["valuation_input"]["source"] == "cninfo"
+    assert latest["details"]["metrics"]["pe_ttm"]["status"] == "available"
+    assert latest["details"]["metrics"]["pe_ttm"]["denominator"] == 100.0
 
 
 def test_upsert_analyst_forecast_writes_snapshot(tmp_path):

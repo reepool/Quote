@@ -5,7 +5,7 @@ Query helpers for research read APIs.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from .storage import ResearchStorageManager
 
@@ -129,6 +129,7 @@ class ResearchQueryService:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> list[Dict[str, Any]]:
         return self.storage.get_valuation_history_rows(
             instrument_id,
@@ -139,6 +140,7 @@ class ResearchQueryService:
             calc_method=calc_method,
             calc_version=calc_version,
             parameter_hash=parameter_hash,
+            parameter_hashes=parameter_hashes,
         )
 
     def get_latest_valuation_history_row(
@@ -149,6 +151,7 @@ class ResearchQueryService:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Optional[Dict[str, Any]]:
         return self.storage.get_latest_valuation_history_row(
             instrument_id,
@@ -156,6 +159,7 @@ class ResearchQueryService:
             calc_method=calc_method,
             calc_version=calc_version,
             parameter_hash=parameter_hash,
+            parameter_hashes=parameter_hashes,
         )
 
     def get_company_overview(

@@ -262,6 +262,7 @@ class ValuationHistoryRebuildService:
                         calc_method=identity["calc_method"],
                         calc_version=identity["calc_version"],
                         parameter_hash=identity["parameter_hash"],
+                        parameter_hashes=identity.get("compatible_parameter_hashes"),
                     )
                     missing_dates = [
                         as_of_date

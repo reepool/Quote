@@ -52,6 +52,35 @@ from research.providers.base import (
     ValuationInputSnapshot,
 )
 
+VALUATION_HISTORY_DETAILS_COMPACT_VERSION = 2
+
+VALUATION_HISTORY_INPUT_DETAIL_KEY_MAP = {
+    "source": "s",
+    "source_mode": "sm",
+    "input_kind": "k",
+    "as_of_date": "d",
+    "data_as_of": "da",
+    "unit": "u",
+    "market_cap": "mc",
+    "shares_outstanding": "sh",
+    "float_market_cap": "fmc",
+    "float_shares": "fsh",
+    "resolution": "res",
+    "missing_reason": "mr",
+}
+
+VALUATION_HISTORY_METRIC_DETAIL_KEY_MAP = {
+    "value": "v",
+    "numerator": "n",
+    "denominator": "d",
+    "denominator_fact": "df",
+    "report_periods": "rp",
+    "availability_dates": "ad",
+    "calc_method": "cm",
+    "missing_reason": "mr",
+    "status": "s",
+}
+
 
 @dataclass(frozen=True)
 class IngestionRunRecord:
@@ -1772,11 +1801,7 @@ class ResearchStorageManager:
                 )
             return
         now = get_shanghai_time().isoformat()
-        details_json = json.dumps(
-            snapshot.details_json,
-            ensure_ascii=False,
-            sort_keys=True,
-        )
+        details_json = self._valuation_history_details_json(snapshot.details_json)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
@@ -1890,11 +1915,7 @@ class ResearchStorageManager:
         now = get_shanghai_time().isoformat()
         rows = []
         for snapshot in snapshots:
-            details_json = json.dumps(
-                snapshot.details_json,
-                ensure_ascii=False,
-                sort_keys=True,
-            )
+            details_json = self._valuation_history_details_json(snapshot.details_json)
             rows.append(
                 (
                     snapshot.instrument_id,
@@ -2000,6 +2021,7 @@ class ResearchStorageManager:
         calc_method: str,
         calc_version: str,
         parameter_hash: str,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> set[str]:
         """Return dates already present for one valuation-history identity."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -2011,20 +2033,29 @@ class ResearchStorageManager:
                     calc_method=calc_method,
                     calc_version=calc_version,
                     parameter_hash=parameter_hash,
+                    parameter_hashes=parameter_hashes,
                 )
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or [parameter_hash])
+            if str(item)
+        ]
+        if not hash_values:
+            hash_values = [parameter_hash]
+        hash_placeholders = ", ".join("?" for _ in hash_values)
         query = """
             SELECT as_of_date
             FROM valuation_history
             WHERE instrument_id = ?
               AND calc_method = ?
               AND calc_version = ?
-              AND parameter_hash = ?
-        """
+              AND parameter_hash IN ({hash_placeholders})
+        """.format(hash_placeholders=hash_placeholders)
         parameters: list[Any] = [
             instrument_id,
             calc_method,
             calc_version,
-            parameter_hash,
+            *hash_values,
         ]
         if start_date:
             query += " AND as_of_date >= ?"
@@ -7353,6 +7384,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> list[Dict[str, Any]]:
         """Fetch valuation history rows for one instrument."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7366,6 +7398,7 @@ class ResearchStorageManager:
                     calc_method=calc_method,
                     calc_version=calc_version,
                     parameter_hash=parameter_hash,
+                    parameter_hashes=parameter_hashes,
                 )
         query = """
             SELECT
@@ -7413,25 +7446,45 @@ class ResearchStorageManager:
         if calc_version:
             query += " AND calc_version = ?"
             parameters.append(calc_version)
-        if parameter_hash:
-            query += " AND parameter_hash = ?"
-            parameters.append(parameter_hash)
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or ([parameter_hash] if parameter_hash else []))
+            if str(item)
+        ]
+        if hash_values:
+            placeholders = ", ".join("?" for _ in hash_values)
+            query += f" AND parameter_hash IN ({placeholders})"
+            parameters.extend(hash_values)
         query += " ORDER BY as_of_date DESC"
-        if limit > 0:
+        if parameter_hash and hash_values:
+            query += ", CASE WHEN parameter_hash = ? THEN 0 ELSE 1 END"
+            parameters.append(parameter_hash)
+        query_limit = limit
+        if parameter_hash and len(hash_values) > 1 and limit > 0:
+            query_limit = limit * len(hash_values)
+        if query_limit > 0:
             query += " LIMIT ?"
-            parameters.append(limit)
+            parameters.append(query_limit)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             rows = conn.execute(query, tuple(parameters)).fetchall()
 
         items = []
+        seen_dates: set[str] = set()
         for row in rows:
             item = dict(row)
+            if parameter_hash and len(hash_values) > 1:
+                as_of_date = str(item.get("as_of_date") or "")
+                if as_of_date in seen_dates:
+                    continue
+                seen_dates.add(as_of_date)
             details_json = item.pop("details_json", None)
             if include_details:
                 item["details"] = self._deserialize_json(details_json)
             items.append(item)
+        if limit > 0:
+            items = items[:limit]
         return items
 
     def get_valuation_inputs(
@@ -7525,6 +7578,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Optional[Dict[str, Any]]:
         """Fetch the latest valuation history row for one instrument."""
         rows = self.get_valuation_history_rows(
@@ -7534,6 +7588,7 @@ class ResearchStorageManager:
             calc_method=calc_method,
             calc_version=calc_version,
             parameter_hash=parameter_hash,
+            parameter_hashes=parameter_hashes,
         )
         if not rows:
             return None
@@ -7545,12 +7600,14 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Return aggregate summary for instruments with valuation history."""
         return self.summarize_valuation_history_for_identity(
             calc_method=calc_method,
             calc_version=calc_version,
             parameter_hash=parameter_hash,
+            parameter_hashes=parameter_hashes,
         )
 
     def summarize_valuation_history_for_identity(
@@ -7559,6 +7616,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Return aggregate summary for instruments with valuation history."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7567,6 +7625,7 @@ class ResearchStorageManager:
                     calc_method=calc_method,
                     calc_version=calc_version,
                     parameter_hash=parameter_hash,
+                    parameter_hashes=parameter_hashes,
                 )
         filters: list[str] = []
         params: list[Any] = []
@@ -7576,9 +7635,15 @@ class ResearchStorageManager:
         if calc_version:
             filters.append("calc_version = ?")
             params.append(calc_version)
-        if parameter_hash:
-            filters.append("parameter_hash = ?")
-            params.append(parameter_hash)
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or ([parameter_hash] if parameter_hash else []))
+            if str(item)
+        ]
+        if hash_values:
+            placeholders = ", ".join("?" for _ in hash_values)
+            filters.append(f"parameter_hash IN ({placeholders})")
+            params.extend(hash_values)
         where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
         latest_where = "" if not filters else "WHERE " + " AND ".join(filters)
         latest_rows_query = """
@@ -7681,12 +7746,14 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Dict[str, int]:
         """Count instruments with valuation history per exchange."""
         return self.count_valuation_history_by_exchange_for_identity(
             calc_method=calc_method,
             calc_version=calc_version,
             parameter_hash=parameter_hash,
+            parameter_hashes=parameter_hashes,
         )
 
     def count_valuation_history_by_exchange_for_identity(
@@ -7695,6 +7762,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Dict[str, int]:
         """Count instruments with valuation history per exchange."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7703,6 +7771,7 @@ class ResearchStorageManager:
                     calc_method=calc_method,
                     calc_version=calc_version,
                     parameter_hash=parameter_hash,
+                    parameter_hashes=parameter_hashes,
                 )
         filters: list[str] = []
         params: list[Any] = []
@@ -7712,9 +7781,15 @@ class ResearchStorageManager:
         if calc_version:
             filters.append("calc_version = ?")
             params.append(calc_version)
-        if parameter_hash:
-            filters.append("parameter_hash = ?")
-            params.append(parameter_hash)
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or ([parameter_hash] if parameter_hash else []))
+            if str(item)
+        ]
+        if hash_values:
+            placeholders = ", ".join("?" for _ in hash_values)
+            filters.append(f"parameter_hash IN ({placeholders})")
+            params.extend(hash_values)
         where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
@@ -7844,6 +7919,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Summarize latest valuation metric coverage by metric variant."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
@@ -7854,6 +7930,7 @@ class ResearchStorageManager:
                     calc_method=calc_method,
                     calc_version=calc_version,
                     parameter_hash=parameter_hash,
+                    parameter_hashes=parameter_hashes,
                 )
         allowed_fields = {
             "pe_ratio",
@@ -7900,18 +7977,26 @@ class ResearchStorageManager:
             params.append(calc_version)
             latest_filters.append("calc_version = ?")
             latest_params.append(calc_version)
-        if parameter_hash:
-            filters.append("vh.parameter_hash = ?")
-            params.append(parameter_hash)
-            latest_filters.append("parameter_hash = ?")
-            latest_params.append(parameter_hash)
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or ([parameter_hash] if parameter_hash else []))
+            if str(item)
+        ]
+        if hash_values:
+            placeholders = ", ".join("?" for _ in hash_values)
+            filters.append(f"vh.parameter_hash IN ({placeholders})")
+            params.extend(hash_values)
+            latest_filters.append(f"parameter_hash IN ({placeholders})")
+            latest_params.extend(hash_values)
         where_clause = "" if not filters else "WHERE " + " AND ".join(filters)
         latest_where_clause = (
             "" if not latest_filters else "WHERE " + " AND ".join(latest_filters)
         )
 
         metric_selects = ",\n                    ".join(
-            f"SUM(CASE WHEN vh.{field} IS NOT NULL AND vh.{field} > 0 THEN 1 ELSE 0 END) AS {field}_count"
+            "COUNT(DISTINCT CASE "
+            f"WHEN vh.{field} IS NOT NULL AND vh.{field} > 0 "
+            f"THEN vh.instrument_id END) AS {field}_count"
             for field in fields
         )
         with self.get_connection() as conn:
@@ -7964,6 +8049,7 @@ class ResearchStorageManager:
         calc_method: Optional[str] = None,
         calc_version: Optional[str] = None,
         parameter_hash: Optional[str] = None,
+        parameter_hashes: Optional[List[str]] = None,
     ) -> list[Dict[str, Any]]:
         """Fetch latest valuation rows for peers in the configured Shenwan level."""
         allowed_benchmark_fields = {"sw_l1_code", "sw_l2_code", "sw_l3_code"}
@@ -8004,7 +8090,7 @@ class ResearchStorageManager:
         if not peer_ids:
             return []
 
-        placeholders = ", ".join("?" for _ in peer_ids)
+        peer_placeholders = ", ".join("?" for _ in peer_ids)
         valuation_filters: list[str] = []
         latest_filters: list[str] = []
         valuation_params: list[Any] = []
@@ -8019,11 +8105,17 @@ class ResearchStorageManager:
             valuation_params.append(calc_version)
             latest_filters.append("vh2.calc_version = ?")
             latest_params.append(calc_version)
-        if parameter_hash:
-            valuation_filters.append("vh.parameter_hash = ?")
-            valuation_params.append(parameter_hash)
-            latest_filters.append("vh2.parameter_hash = ?")
-            latest_params.append(parameter_hash)
+        hash_values = [
+            str(item)
+            for item in (parameter_hashes or ([parameter_hash] if parameter_hash else []))
+            if str(item)
+        ]
+        if hash_values:
+            hash_placeholders = ", ".join("?" for _ in hash_values)
+            valuation_filters.append(f"vh.parameter_hash IN ({hash_placeholders})")
+            valuation_params.extend(hash_values)
+            latest_filters.append(f"vh2.parameter_hash IN ({hash_placeholders})")
+            latest_params.extend(hash_values)
         valuation_where = (
             "" if not valuation_filters else " AND " + " AND ".join(valuation_filters)
         )
@@ -8060,7 +8152,7 @@ class ResearchStorageManager:
                 vh.created_at,
                 vh.updated_at
             FROM valuation_history vh
-            WHERE vh.instrument_id IN ({placeholders})
+            WHERE vh.instrument_id IN ({peer_placeholders})
               {valuation_where}
               AND vh.as_of_date = (
                   SELECT MAX(vh2.as_of_date)
@@ -8076,11 +8168,14 @@ class ResearchStorageManager:
         try:
             with self.get_connection() as conn:
                 self._apply_pragmas(conn)
-                if limit is not None and limit > 0:
+                sql_limit = limit
+                if parameter_hash and len(hash_values) > 1:
+                    sql_limit = None
+                if sql_limit is not None and sql_limit > 0:
                     latest_query += " LIMIT ?"
                     valuation_rows = conn.execute(
                         latest_query,
-                        query_params + (limit,),
+                        query_params + (sql_limit,),
                     ).fetchall()
                 else:
                     valuation_rows = conn.execute(
@@ -8091,12 +8186,40 @@ class ResearchStorageManager:
             self._active_db_path = previous_db_path
 
         items = []
+        by_instrument: dict[str, Dict[str, Any]] = {}
         for row in valuation_rows:
             item = dict(row)
+            if parameter_hash and len(hash_values) > 1:
+                instrument_id = str(item.get("instrument_id") or "")
+                existing = by_instrument.get(instrument_id)
+                if existing is None or (
+                    existing.get("parameter_hash") != parameter_hash
+                    and item.get("parameter_hash") == parameter_hash
+                ):
+                    by_instrument[instrument_id] = item
+                continue
             details_json = item.pop("details_json", None)
             if include_details:
                 item["details"] = self._deserialize_json(details_json)
             items.append(item)
+            if limit is not None and limit > 0 and len(items) >= limit:
+                break
+        if parameter_hash and len(hash_values) > 1:
+            raw_items = sorted(
+                by_instrument.values(),
+                key=lambda item: (
+                    item.get("pe_ratio") is None,
+                    item.get("pe_ratio") if item.get("pe_ratio") is not None else 0,
+                    str(item.get("instrument_id") or ""),
+                ),
+            )
+            for item in raw_items:
+                details_json = item.pop("details_json", None)
+                if include_details:
+                    item["details"] = self._deserialize_json(details_json)
+                items.append(item)
+                if limit is not None and limit > 0 and len(items) >= limit:
+                    break
         return items
 
     @staticmethod
@@ -8109,7 +8232,218 @@ class ResearchStorageManager:
     def _deserialize_json(value: Optional[str]) -> Optional[Dict[str, Any]]:
         if not value:
             return None
-        return json.loads(value)
+        data = json.loads(value)
+        if isinstance(data, dict):
+            return ResearchStorageManager.expand_valuation_history_details_payload(data)
+        return data
+
+    @staticmethod
+    def _valuation_history_details_json(value: Dict[str, Any]) -> str:
+        compacted = ResearchStorageManager.compact_valuation_history_details_payload(
+            value
+        )
+        return json.dumps(
+            compacted,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+
+    @staticmethod
+    def compact_valuation_history_details_payload(
+        value: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Return the compact on-disk valuation-history details representation."""
+        if not isinstance(value, dict):
+            return {}
+        if value.get("v") == VALUATION_HISTORY_DETAILS_COMPACT_VERSION and "m" in value:
+            return value
+
+        compact: Dict[str, Any] = {"v": VALUATION_HISTORY_DETAILS_COMPACT_VERSION}
+        top_level_map = {
+            "valuation_scope": "vs",
+            "missing_reason": "mr",
+            "report_period": "rp",
+            "latest_financial_report_period": "rp",
+            "latest_financial_available_date": "lad",
+            "shares_outstanding": "sh",
+            "float_market_cap": "fmc",
+            "revenue": "rev",
+            "net_income": "ni",
+            "equity": "eq",
+        }
+        for source_key, compact_key in top_level_map.items():
+            if compact_key in compact:
+                continue
+            item = value.get(source_key)
+            if ResearchStorageManager._keep_compact_json_value(item):
+                compact[compact_key] = item
+
+        valuation_input = value.get("valuation_input")
+        if isinstance(valuation_input, dict):
+            compact_input = ResearchStorageManager._map_compact_json_keys(
+                valuation_input,
+                VALUATION_HISTORY_INPUT_DETAIL_KEY_MAP,
+            )
+            if compact_input:
+                compact["vi"] = compact_input
+
+        metrics = value.get("metrics")
+        if isinstance(metrics, dict):
+            compact_metrics: Dict[str, Dict[str, Any]] = {}
+            shared_numerator = ResearchStorageManager._first_metric_numerator(metrics)
+            if ResearchStorageManager._keep_compact_json_value(shared_numerator):
+                compact["mc"] = shared_numerator
+            for metric_name, metric_detail in metrics.items():
+                if not isinstance(metric_detail, dict):
+                    continue
+                compact_metric = ResearchStorageManager._compact_metric_detail(
+                    metric_detail,
+                    shared_numerator=shared_numerator,
+                )
+                if compact_metric:
+                    compact_metrics[str(metric_name)] = compact_metric
+            if compact_metrics:
+                compact["m"] = compact_metrics
+
+        if set(compact) == {"v"}:
+            return value
+        return compact
+
+    @staticmethod
+    def expand_valuation_history_details_payload(value: Dict[str, Any]) -> Dict[str, Any]:
+        """Expand compact valuation-history details for existing read APIs."""
+        if value.get("v") != VALUATION_HISTORY_DETAILS_COMPACT_VERSION:
+            return value
+
+        expanded: Dict[str, Any] = {}
+        reverse_top_level_map = {
+            "vs": "valuation_scope",
+            "mr": "missing_reason",
+            "rp": "report_period",
+            "lad": "latest_financial_available_date",
+            "sh": "shares_outstanding",
+            "fmc": "float_market_cap",
+            "rev": "revenue",
+            "ni": "net_income",
+            "eq": "equity",
+        }
+        for compact_key, source_key in reverse_top_level_map.items():
+            item = value.get(compact_key)
+            if ResearchStorageManager._keep_compact_json_value(item):
+                expanded[source_key] = item
+        if "rp" in value:
+            expanded["latest_financial_report_period"] = value.get("rp")
+
+        valuation_input = value.get("vi")
+        if isinstance(valuation_input, dict):
+            expanded["valuation_input"] = ResearchStorageManager._unmap_compact_json_keys(
+                valuation_input,
+                VALUATION_HISTORY_INPUT_DETAIL_KEY_MAP,
+            )
+
+        metrics = value.get("m")
+        if isinstance(metrics, dict):
+            expanded_metrics: Dict[str, Dict[str, Any]] = {}
+            for metric_name, metric_detail in metrics.items():
+                if not isinstance(metric_detail, dict):
+                    continue
+                expanded_metrics[str(metric_name)] = (
+                    ResearchStorageManager._expand_metric_detail(
+                        str(metric_name),
+                        metric_detail,
+                        shared_numerator=value.get("mc"),
+                    )
+                )
+            expanded["metrics"] = expanded_metrics
+
+        return expanded
+
+    @staticmethod
+    def _compact_metric_detail(
+        metric_detail: Dict[str, Any],
+        *,
+        shared_numerator: Any,
+    ) -> Dict[str, Any]:
+        compact = ResearchStorageManager._map_compact_json_keys(
+            metric_detail,
+            VALUATION_HISTORY_METRIC_DETAIL_KEY_MAP,
+        )
+        compact.pop("s", None)
+        if compact.get("n") == shared_numerator:
+            compact.pop("n", None)
+        return compact
+
+    @staticmethod
+    def _expand_metric_detail(
+        metric_name: str,
+        metric_detail: Dict[str, Any],
+        *,
+        shared_numerator: Any,
+    ) -> Dict[str, Any]:
+        expanded = ResearchStorageManager._unmap_compact_json_keys(
+            metric_detail,
+            VALUATION_HISTORY_METRIC_DETAIL_KEY_MAP,
+        )
+        expanded["metric"] = metric_name
+        expanded.setdefault("value", None)
+        if "numerator" not in expanded and ResearchStorageManager._keep_compact_json_value(
+            shared_numerator
+        ):
+            expanded["numerator"] = shared_numerator
+        expanded.setdefault("denominator", None)
+        expanded.setdefault("denominator_fact", None)
+        expanded.setdefault("report_periods", [])
+        expanded.setdefault("availability_dates", [])
+        expanded.setdefault("calc_method", None)
+        if "missing_reason" not in expanded:
+            expanded["missing_reason"] = None
+        expanded["status"] = (
+            "available"
+            if expanded.get("value") is not None
+            and expanded.get("missing_reason") is None
+            else "unavailable"
+        )
+        return expanded
+
+    @staticmethod
+    def _map_compact_json_keys(
+        value: Dict[str, Any],
+        key_map: Dict[str, str],
+    ) -> Dict[str, Any]:
+        return {
+            compact_key: item
+            for source_key, compact_key in key_map.items()
+            for item in [value.get(source_key)]
+            if ResearchStorageManager._keep_compact_json_value(item)
+        }
+
+    @staticmethod
+    def _unmap_compact_json_keys(
+        value: Dict[str, Any],
+        key_map: Dict[str, str],
+    ) -> Dict[str, Any]:
+        reverse_map = {compact_key: source_key for source_key, compact_key in key_map.items()}
+        return {
+            source_key: item
+            for compact_key, source_key in reverse_map.items()
+            for item in [value.get(compact_key)]
+            if ResearchStorageManager._keep_compact_json_value(item)
+        }
+
+    @staticmethod
+    def _first_metric_numerator(metrics: Dict[str, Any]) -> Optional[Any]:
+        for metric_detail in metrics.values():
+            if not isinstance(metric_detail, dict):
+                continue
+            numerator = metric_detail.get("numerator")
+            if ResearchStorageManager._keep_compact_json_value(numerator):
+                return numerator
+        return None
+
+    @staticmethod
+    def _keep_compact_json_value(value: Any) -> bool:
+        return value is not None and value != [] and value != {}
 
     @staticmethod
     def _json_text(value: Dict[str, Any]) -> str:

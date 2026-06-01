@@ -58,6 +58,16 @@ VALUATION_METRIC_FIELDS: Tuple[str, ...] = (
     "ps_forward",
 )
 
+HISTORY_PARAMETER_HASH_EXCLUDED_KEYS = {
+    "lookback_days",
+    "window_mode",
+    "quote_limit_days",
+    "default_write_policy",
+    "periodic_rebuild_window_mode",
+    "progress_log_every",
+    "max_runtime_seconds",
+}
+
 BENCHMARK_FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     "sw_l1_code": {
         "level": 1,
@@ -363,7 +373,7 @@ class ResearchValuationService:
         ordered["time"] = pd.to_datetime(ordered["time"])
         ordered = ordered.sort_values("time").reset_index(drop=True)
 
-        parameter_hash = self._build_parameter_hash(self.parameters.get("history", {}))
+        parameter_hash = self.history_identity()["parameter_hash"]
         snapshots: List[ValuationHistorySnapshot] = []
         for _, row in ordered.iterrows():
             close_price = self._safe_positive_float(row.get("close"))
@@ -493,14 +503,20 @@ class ResearchValuationService:
 
         return snapshots
 
-    def history_identity(self) -> Dict[str, str]:
+    def history_identity(self) -> Dict[str, Any]:
         """Return the storage identity for current valuation history parameters."""
+        canonical_hash = self._build_parameter_hash(
+            self._history_calculation_parameters()
+        )
+        legacy_hash = self._build_parameter_hash(self.parameters.get("history", {}))
+        compatible_hashes = [canonical_hash]
+        if legacy_hash != canonical_hash:
+            compatible_hashes.append(legacy_hash)
         return {
             "calc_method": ValuationHistorySnapshot.calc_method,
             "calc_version": ValuationHistorySnapshot.calc_version,
-            "parameter_hash": self._build_parameter_hash(
-                self.parameters.get("history", {})
-            ),
+            "parameter_hash": canonical_hash,
+            "compatible_parameter_hashes": compatible_hashes,
         }
 
     def candidate_history_dates(
@@ -1503,6 +1519,17 @@ class ResearchValuationService:
         merged = deepcopy(DEFAULT_VALUATION_PARAMETERS)
         self._deep_update(merged, overrides)
         return merged
+
+    def _history_calculation_parameters(self) -> Dict[str, Any]:
+        """Return only parameters that can affect one date's valuation result."""
+        history = self.parameters.get("history", {})
+        if not isinstance(history, dict):
+            return {}
+        return {
+            key: deepcopy(value)
+            for key, value in history.items()
+            if key not in HISTORY_PARAMETER_HASH_EXCLUDED_KEYS
+        }
 
     def _build_parameter_hash(self, payload: Dict[str, Any]) -> str:
         return hashlib.sha256(

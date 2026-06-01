@@ -2,14 +2,25 @@
 """Inspect and optionally clean valuation history storage.
 
 The default mode is read-only. Destructive cleanup requires
-`--delete-parameter-hash` and `--confirm-delete`.
+`--delete-parameter-hash` and `--confirm-delete`. Hash rewrites require
+`--rewrite-from-parameter-hash`, `--rewrite-to-parameter-hash`, and
+`--confirm-rewrite`.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sqlite3
+import sys
+import time
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from research.storage import ResearchStorageManager
 
 
 def _connect(path: Path) -> sqlite3.Connection:
@@ -80,11 +91,142 @@ def _delete_parameter_hash(conn: sqlite3.Connection, parameter_hash: str) -> int
     return int(cur.rowcount or 0)
 
 
+def _rewrite_parameter_hash(
+    conn: sqlite3.Connection,
+    *,
+    source_hash: str,
+    target_hash: str,
+) -> int:
+    conflict = conn.execute(
+        """
+        SELECT COUNT(*)
+        FROM valuation_history src
+        JOIN valuation_history dst
+          ON dst.instrument_id = src.instrument_id
+         AND dst.as_of_date = src.as_of_date
+         AND dst.calc_method = src.calc_method
+         AND dst.calc_version = src.calc_version
+         AND dst.parameter_hash = ?
+        WHERE src.parameter_hash = ?
+        """,
+        (target_hash, source_hash),
+    ).fetchone()[0]
+    if int(conflict or 0) > 0:
+        raise SystemExit(
+            "refusing to rewrite because target hash already has conflicting "
+            f"rows: {conflict}; delete or inspect duplicates first"
+        )
+
+    cur = conn.execute(
+        """
+        UPDATE valuation_history
+        SET parameter_hash = ?
+        WHERE parameter_hash = ?
+        """,
+        (target_hash, source_hash),
+    )
+    return int(cur.rowcount or 0)
+
+
+def _compact_valuation_history_details(
+    conn: sqlite3.Connection,
+    *,
+    batch_size: int,
+    limit: int,
+) -> dict[str, int]:
+    total_seen = 0
+    total_updated = 0
+    total_old_bytes = 0
+    total_new_bytes = 0
+    started = time.monotonic()
+
+    while True:
+        remaining = max(0, limit - total_seen) if limit > 0 else batch_size
+        if limit > 0 and remaining == 0:
+            break
+        current_batch_size = min(batch_size, remaining) if limit > 0 else batch_size
+        rows = conn.execute(
+            """
+            SELECT rowid, details_json
+            FROM valuation_history
+            WHERE instr(details_json, '"latest_financial_report_period"') > 0
+               OR instr(details_json, '"valuation_input"') > 0
+               OR instr(details_json, '"availability_dates"') > 0
+            LIMIT ?
+            """,
+            (current_batch_size,),
+        ).fetchall()
+        if not rows:
+            break
+
+        updates: list[tuple[str, int]] = []
+        for row in rows:
+            total_seen += 1
+            rowid = int(row["rowid"])
+            old_text = str(row["details_json"] or "{}")
+            try:
+                payload = json.loads(old_text)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(payload, dict):
+                continue
+            compact_payload = ResearchStorageManager.compact_valuation_history_details_payload(
+                payload
+            )
+            new_text = json.dumps(
+                compact_payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            if new_text == old_text:
+                continue
+            updates.append((new_text, rowid))
+            total_updated += 1
+            total_old_bytes += len(old_text.encode("utf-8"))
+            total_new_bytes += len(new_text.encode("utf-8"))
+
+        if updates:
+            conn.executemany(
+                """
+                UPDATE valuation_history
+                SET details_json = ?
+                WHERE rowid = ?
+                """,
+                updates,
+            )
+            conn.commit()
+
+        elapsed = time.monotonic() - started
+        saved = total_old_bytes - total_new_bytes
+        print(
+            "compacted valuation_history details: "
+            f"seen={total_seen}, updated={total_updated}, "
+            f"saved_bytes={saved}, elapsed={elapsed:.1f}s",
+            flush=True,
+        )
+
+    return {
+        "seen": total_seen,
+        "updated": total_updated,
+        "old_bytes": total_old_bytes,
+        "new_bytes": total_new_bytes,
+        "saved_bytes": total_old_bytes - total_new_bytes,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db-path", default="data/valuation.db")
     parser.add_argument("--delete-parameter-hash")
     parser.add_argument("--confirm-delete", action="store_true")
+    parser.add_argument("--rewrite-from-parameter-hash")
+    parser.add_argument("--rewrite-to-parameter-hash")
+    parser.add_argument("--confirm-rewrite", action="store_true")
+    parser.add_argument("--compact-valuation-history-details", action="store_true")
+    parser.add_argument("--confirm-compact", action="store_true")
+    parser.add_argument("--batch-size", type=int, default=5000)
+    parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--vacuum", action="store_true")
     args = parser.parse_args()
 
@@ -105,6 +247,38 @@ def main() -> int:
             deleted = _delete_parameter_hash(conn, args.delete_parameter_hash)
             conn.commit()
             print(f"deleted valuation_history rows: {deleted}")
+
+        if args.rewrite_from_parameter_hash or args.rewrite_to_parameter_hash:
+            if not (args.rewrite_from_parameter_hash and args.rewrite_to_parameter_hash):
+                raise SystemExit(
+                    "hash rewrite requires both --rewrite-from-parameter-hash "
+                    "and --rewrite-to-parameter-hash"
+                )
+            if not args.confirm_rewrite:
+                raise SystemExit(
+                    "refusing to rewrite without --confirm-rewrite; "
+                    "rerun after backup if the hash migration is intended"
+                )
+            rewritten = _rewrite_parameter_hash(
+                conn,
+                source_hash=args.rewrite_from_parameter_hash,
+                target_hash=args.rewrite_to_parameter_hash,
+            )
+            conn.commit()
+            print(f"rewritten valuation_history rows: {rewritten}")
+
+        if args.compact_valuation_history_details:
+            if not args.confirm_compact:
+                raise SystemExit(
+                    "refusing to compact without --confirm-compact; "
+                    "rerun after backup if details migration is intended"
+                )
+            summary = _compact_valuation_history_details(
+                conn,
+                batch_size=max(1, int(args.batch_size)),
+                limit=max(0, int(args.limit)),
+            )
+            print(f"valuation_history details compact summary: {summary}")
 
         if args.vacuum:
             print("running VACUUM; this can take a while on large valuation.db")

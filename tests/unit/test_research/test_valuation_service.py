@@ -43,6 +43,52 @@ def test_valuation_service_builds_history_snapshots():
     )
 
 
+def test_valuation_history_hash_excludes_window_parameters():
+    base = ResearchValuationService(
+        {
+            "history": {
+                "lookback_days": 7,
+                "periodic_rebuild_window_mode": "trading_days",
+                "flow_input_mode": "cumulative_ytd",
+                "require_availability_date": True,
+                "forward_metrics_enabled": False,
+            }
+        }
+    )
+    broad = ResearchValuationService(
+        {
+            "history": {
+                "lookback_days": 252,
+                "periodic_rebuild_window_mode": "last_12_quarters",
+                "flow_input_mode": "cumulative_ytd",
+                "require_availability_date": True,
+                "forward_metrics_enabled": False,
+            }
+        }
+    )
+    changed_calculation = ResearchValuationService(
+        {
+            "history": {
+                "lookback_days": 7,
+                "periodic_rebuild_window_mode": "trading_days",
+                "flow_input_mode": "cumulative_ytd",
+                "require_availability_date": False,
+                "forward_metrics_enabled": False,
+            }
+        }
+    )
+
+    base_identity = base.history_identity()
+    broad_identity = broad.history_identity()
+
+    assert base_identity["parameter_hash"] == broad_identity["parameter_hash"]
+    assert (
+        base_identity["parameter_hash"]
+        != changed_calculation.history_identity()["parameter_hash"]
+    )
+    assert len(base_identity["compatible_parameter_hashes"]) >= 1
+
+
 def test_valuation_service_writes_market_cap_only_rows_without_financial_facts():
     service = ResearchValuationService({"history": {"lookback_days": 5}})
     quotes = pd.DataFrame(

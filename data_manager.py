@@ -3222,6 +3222,7 @@ class DataManager:
                     calc_method=history_identity["calc_method"],
                     calc_version=history_identity["calc_version"],
                     parameter_hash=history_identity["parameter_hash"],
+                    parameter_hashes=history_identity.get("compatible_parameter_hashes"),
                 )
                 if isinstance(candidate, dict):
                     metric_coverage = candidate
@@ -3238,11 +3239,13 @@ class DataManager:
                     calc_method=history_identity["calc_method"],
                     calc_version=history_identity["calc_version"],
                     parameter_hash=history_identity["parameter_hash"],
+                    parameter_hashes=history_identity.get("compatible_parameter_hashes"),
                 ),
                 "by_exchange": storage.count_valuation_history_by_exchange(
                     calc_method=history_identity["calc_method"],
                     calc_version=history_identity["calc_version"],
                     parameter_hash=history_identity["parameter_hash"],
+                    parameter_hashes=history_identity.get("compatible_parameter_hashes"),
                 ),
                 "metric_coverage": metric_coverage,
                 "input_coverage": input_coverage,
@@ -4879,6 +4882,7 @@ class DataManager:
             calc_method=identity["calc_method"],
             calc_version=identity["calc_version"],
             parameter_hash=identity["parameter_hash"],
+            parameter_hashes=identity.get("compatible_parameter_hashes"),
         )
         return valuation_service.build_history_response(rows)
 
@@ -4910,6 +4914,7 @@ class DataManager:
             calc_method=identity["calc_method"],
             calc_version=identity["calc_version"],
             parameter_hash=identity["parameter_hash"],
+            parameter_hashes=identity.get("compatible_parameter_hashes"),
         )
         industry_membership = await asyncio.to_thread(
             query_service.get_industry_membership,
@@ -4949,6 +4954,7 @@ class DataManager:
                 calc_method=identity["calc_method"],
                 calc_version=identity["calc_version"],
                 parameter_hash=identity["parameter_hash"],
+                parameter_hashes=identity.get("compatible_parameter_hashes"),
             )
 
         result = valuation_service.build_relative_valuation(
