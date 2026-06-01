@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from statistics import fmean, median
@@ -56,6 +57,25 @@ VALUATION_METRIC_FIELDS: Tuple[str, ...] = (
     "ps_static",
     "ps_ttm",
     "ps_forward",
+)
+
+VALUATION_PERCENTILE_FIELDS: Tuple[str, ...] = (
+    "pe_ratio",
+    "pb_ratio",
+    "ps_ratio",
+    *VALUATION_METRIC_FIELDS,
+)
+
+VALUATION_PERCENTILE_DEFAULT_FIELDS: Tuple[str, ...] = (
+    "pe_ttm",
+    "pb_mrq",
+    "ps_ttm",
+)
+
+VALUATION_PERCENTILE_NEGATIVE_POLICIES: Tuple[str, ...] = (
+    "flag",
+    "include",
+    "exclude",
 )
 
 HISTORY_PARAMETER_HASH_EXCLUDED_KEYS = {
@@ -1134,6 +1154,110 @@ class ResearchValuationService:
             "items": items,
         }
 
+    def build_history_percentile_response(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        instrument: Optional[Dict[str, Any]] = None,
+        as_of_date: Optional[str] = None,
+        quarters: int = 12,
+        metrics: Optional[List[str]] = None,
+        min_points: int = 60,
+        negative_policy: str = "flag",
+        include_series: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """Build one instrument's longitudinal valuation percentile response."""
+        if not rows:
+            return None
+        if quarters <= 0:
+            raise ValueError("quarters must be positive")
+        if min_points <= 0:
+            raise ValueError("min_points must be positive")
+        if negative_policy not in VALUATION_PERCENTILE_NEGATIVE_POLICIES:
+            raise ValueError(
+                "negative_policy must be one of: "
+                + ", ".join(VALUATION_PERCENTILE_NEGATIVE_POLICIES)
+            )
+
+        metric_fields = self._history_percentile_fields(metrics)
+        ordered = sorted(rows, key=lambda item: str(item.get("as_of_date") or ""))
+        requested_as_of = as_of_date
+        effective_row = self._resolve_history_percentile_as_of_row(
+            ordered,
+            requested_as_of,
+        )
+        if effective_row is None:
+            return None
+
+        effective_as_of = str(effective_row.get("as_of_date"))
+        window_start = (
+            pd.Timestamp(effective_as_of) - pd.DateOffset(months=quarters * 3)
+        ).date().isoformat()
+        window_rows = [
+            row
+            for row in ordered
+            if window_start <= str(row.get("as_of_date") or "") <= effective_as_of
+        ]
+        identity = self.history_identity()
+        warnings: List[str] = []
+        metric_results: Dict[str, Dict[str, Any]] = {}
+        for field_name in metric_fields:
+            result = self._build_history_percentile_metric(
+                field_name=field_name,
+                current_row=effective_row,
+                window_rows=window_rows,
+                window_start=window_start,
+                window_end=effective_as_of,
+                min_points=min_points,
+                negative_policy=negative_policy,
+                include_series=include_series,
+            )
+            metric_results[field_name] = result
+            warnings.extend(result.get("warnings") or [])
+
+        source = instrument or effective_row
+        successful_metrics = [
+            item for item in metric_results.values() if item.get("status") == "success"
+        ]
+        status = "success" if successful_metrics else "insufficient_data"
+        if any(
+            item.get("status") in {"missing_current_value", "current_value_excluded"}
+            for item in metric_results.values()
+        ):
+            status = "partial" if successful_metrics else "unavailable"
+        parameter_hash = self._build_parameter_hash(
+            {
+                "calc_version": "valuation_history_percentile.v1",
+                "quarters": quarters,
+                "metrics": metric_fields,
+                "min_points": min_points,
+                "negative_policy": negative_policy,
+                "underlying_history": identity,
+            }
+        )
+        return {
+            "instrument_id": source.get("instrument_id"),
+            "symbol": source.get("symbol"),
+            "exchange": source.get("exchange"),
+            "status": status,
+            "calc_method": "valuation_history_percentile",
+            "calc_version": "valuation_history_percentile.v1",
+            "parameter_hash": parameter_hash,
+            "valuation_calc_method": identity["calc_method"],
+            "valuation_calc_version": identity["calc_version"],
+            "valuation_parameter_hash": identity["parameter_hash"],
+            "as_of_date": effective_as_of,
+            "requested_as_of_date": requested_as_of,
+            "quarters": quarters,
+            "window_start": window_start,
+            "window_end": effective_as_of,
+            "min_points": min_points,
+            "negative_policy": negative_policy,
+            "metric_variants": metric_fields,
+            "metrics": metric_results,
+            "warnings": sorted(set(warnings)),
+        }
+
     def build_relative_valuation(
         self,
         *,
@@ -1444,6 +1568,181 @@ class ResearchValuationService:
             if field_name not in unique_fields:
                 unique_fields.append(field_name)
         return unique_fields
+
+    def _history_percentile_fields(
+        self,
+        metrics: Optional[List[str]],
+    ) -> List[str]:
+        raw_fields = metrics or list(VALUATION_PERCENTILE_DEFAULT_FIELDS)
+        fields: List[str] = []
+        unsupported: List[str] = []
+        for raw_field in raw_fields:
+            field_name = str(raw_field or "").strip()
+            if not field_name:
+                continue
+            if field_name not in VALUATION_PERCENTILE_FIELDS:
+                unsupported.append(field_name)
+                continue
+            if field_name not in fields:
+                fields.append(field_name)
+        if unsupported:
+            raise ValueError(
+                "unsupported valuation percentile metrics: " + ", ".join(unsupported)
+            )
+        if not fields:
+            raise ValueError("at least one valuation percentile metric is required")
+        return fields
+
+    @staticmethod
+    def _resolve_history_percentile_as_of_row(
+        rows: List[Dict[str, Any]],
+        requested_as_of: Optional[str],
+    ) -> Optional[Dict[str, Any]]:
+        candidates = [
+            row
+            for row in rows
+            if row.get("as_of_date")
+            and (requested_as_of is None or str(row.get("as_of_date")) <= requested_as_of)
+        ]
+        if not candidates:
+            return None
+        return candidates[-1]
+
+    def _build_history_percentile_metric(
+        self,
+        *,
+        field_name: str,
+        current_row: Dict[str, Any],
+        window_rows: List[Dict[str, Any]],
+        window_start: str,
+        window_end: str,
+        min_points: int,
+        negative_policy: str,
+        include_series: bool,
+    ) -> Dict[str, Any]:
+        current_value, current_reason = self._history_metric_numeric_value(
+            current_row,
+            field_name,
+        )
+        if current_value is None:
+            return {
+                "metric": field_name,
+                "status": "missing_current_value",
+                "current_value": None,
+                "sample_count": 0,
+                "required_min_points": min_points,
+                "percentile_rank": None,
+                "positive_only_percentile_rank": None,
+                "metric_min": None,
+                "metric_max": None,
+                "metric_median": None,
+                "metric_p25": None,
+                "metric_p75": None,
+                "window_start": window_start,
+                "window_end": window_end,
+                "negative_sample_count": 0,
+                "zero_sample_count": 0,
+                "excluded_count": 0,
+                "warnings": [current_reason],
+                "series": [] if include_series else None,
+            }
+
+        raw_series: List[Tuple[str, float]] = []
+        invalid_count = 0
+        for row in window_rows:
+            value, _ = self._history_metric_numeric_value(row, field_name)
+            if value is None:
+                invalid_count += 1
+                continue
+            raw_series.append((str(row.get("as_of_date")), value))
+
+        non_positive_count = sum(1 for _, value in raw_series if value <= 0)
+        negative_count = sum(1 for _, value in raw_series if value < 0)
+        zero_count = sum(1 for _, value in raw_series if value == 0)
+        warnings: List[str] = []
+        if negative_policy == "exclude":
+            series = [(date_value, value) for date_value, value in raw_series if value > 0]
+            excluded_count = invalid_count + non_positive_count
+            if current_value <= 0:
+                warnings.append("current_non_positive_excluded_from_percentile")
+        else:
+            series = raw_series
+            excluded_count = invalid_count
+            if negative_policy == "flag" and negative_count:
+                warnings.append("negative_values_in_sample_limit_interpretation")
+            if negative_policy == "flag" and current_value < 0:
+                warnings.append("negative_current_value_limit_interpretation")
+            if negative_policy == "flag" and zero_count:
+                warnings.append("zero_values_in_sample_limit_interpretation")
+
+        sample_values = [value for _, value in series]
+        positive_values = [value for _, value in raw_series if value > 0]
+        positive_only_percentile = (
+            self._percentile_rank(current_value, positive_values)
+            if current_value > 0
+            and positive_values
+            and len(positive_values) != len(sample_values)
+            else None
+        )
+        if negative_policy == "exclude" and current_value <= 0:
+            status = "current_value_excluded"
+        else:
+            status = "success" if len(sample_values) >= min_points else "insufficient_data"
+        result_warnings = list(warnings)
+        if status == "insufficient_data":
+            result_warnings.append("insufficient_valid_observations")
+        return {
+            "metric": field_name,
+            "status": status,
+            "current_value": current_value,
+            "sample_count": len(sample_values),
+            "required_min_points": min_points,
+            "percentile_rank": (
+                self._percentile_rank(current_value, sample_values)
+                if status == "success"
+                else None
+            ),
+            "positive_only_percentile_rank": positive_only_percentile,
+            "metric_min": min(sample_values) if sample_values else None,
+            "metric_max": max(sample_values) if sample_values else None,
+            "metric_median": median(sample_values) if sample_values else None,
+            "metric_p25": self._quantile(sample_values, 0.25),
+            "metric_p75": self._quantile(sample_values, 0.75),
+            "window_start": window_start,
+            "window_end": window_end,
+            "negative_sample_count": negative_count,
+            "zero_sample_count": zero_count,
+            "excluded_count": excluded_count,
+            "warnings": result_warnings,
+            "series": (
+                [{"as_of_date": date_value, "value": value} for date_value, value in series]
+                if include_series
+                else None
+            ),
+        }
+
+    @staticmethod
+    def _history_metric_numeric_value(
+        row: Dict[str, Any],
+        field_name: str,
+    ) -> Tuple[Optional[float], str]:
+        value = row.get(field_name)
+        fallback_fields = {
+            "pe_ttm": "pe_ratio",
+            "pb_mrq": "pb_ratio",
+            "ps_ttm": "ps_ratio",
+        }
+        if value is None and field_name in fallback_fields:
+            value = row.get(fallback_fields[field_name])
+        if value is None:
+            return None, "missing_value"
+        try:
+            numeric = float(value)
+        except (TypeError, ValueError):
+            return None, "non_numeric_value"
+        if not math.isfinite(numeric):
+            return None, "non_finite_value"
+        return numeric, ""
 
     @staticmethod
     def _metric_value_from_row(

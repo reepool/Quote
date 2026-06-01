@@ -89,6 +89,202 @@ def test_valuation_history_hash_excludes_window_parameters():
     assert len(base_identity["compatible_parameter_hashes"]) >= 1
 
 
+def test_valuation_service_builds_history_percentile_default_metrics():
+    service = ResearchValuationService()
+    rows = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": date_value.date().isoformat(),
+            "pe_ttm": float(index),
+            "pb_mrq": float(index + 100),
+            "ps_ttm": float(index + 200),
+            "calc_method": "valuation_history_builtin",
+            "calc_version": "valuation_history.v1",
+            "parameter_hash": "current",
+        }
+        for index, date_value in enumerate(
+            pd.date_range("2026-01-01", periods=100, freq="D"),
+            start=1,
+        )
+    ]
+
+    result = service.build_history_percentile_response(
+        rows,
+        min_points=60,
+        quarters=4,
+    )
+
+    assert result["status"] == "success"
+    assert result["as_of_date"] == "2026-04-10"
+    assert result["metric_variants"] == ["pe_ttm", "pb_mrq", "ps_ttm"]
+    assert result["metrics"]["pe_ttm"]["sample_count"] == 100
+    assert result["metrics"]["pe_ttm"]["current_value"] == 100.0
+    assert result["metrics"]["pe_ttm"]["percentile_rank"] == 1.0
+    assert result["metrics"]["pe_ttm"]["metric_median"] == 50.5
+
+
+def test_valuation_service_history_percentile_handles_negative_policy_flag():
+    service = ResearchValuationService()
+    rows = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-01",
+            "pe_ttm": -10.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-02",
+            "pe_ttm": 5.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-03",
+            "pe_ttm": 10.0,
+        },
+    ]
+
+    result = service.build_history_percentile_response(
+        rows,
+        metrics=["pe_ttm"],
+        min_points=1,
+        negative_policy="flag",
+    )
+
+    metric = result["metrics"]["pe_ttm"]
+    assert metric["status"] == "success"
+    assert metric["sample_count"] == 3
+    assert metric["negative_sample_count"] == 1
+    assert metric["percentile_rank"] == 1.0
+    assert metric["positive_only_percentile_rank"] == 1.0
+    assert "negative_values_in_sample_limit_interpretation" in metric["warnings"]
+
+
+def test_valuation_service_history_percentile_excludes_non_positive_values():
+    service = ResearchValuationService()
+    rows = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-01",
+            "pb_mrq": -1.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-02",
+            "pb_mrq": 0.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-03",
+            "pb_mrq": 2.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-04",
+            "pb_mrq": 4.0,
+        },
+    ]
+
+    result = service.build_history_percentile_response(
+        rows,
+        metrics=["pb_mrq"],
+        min_points=1,
+        negative_policy="exclude",
+        include_series=True,
+    )
+
+    metric = result["metrics"]["pb_mrq"]
+    assert metric["sample_count"] == 2
+    assert metric["excluded_count"] == 2
+    assert metric["percentile_rank"] == 1.0
+    assert metric["series"] == [
+        {"as_of_date": "2026-01-03", "value": 2.0},
+        {"as_of_date": "2026-01-04", "value": 4.0},
+    ]
+
+
+def test_valuation_service_history_percentile_excludes_non_positive_current_value():
+    service = ResearchValuationService()
+    rows = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-01",
+            "pe_ttm": 2.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-02",
+            "pe_ttm": 4.0,
+        },
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-03",
+            "pe_ttm": -1.0,
+        },
+    ]
+
+    result = service.build_history_percentile_response(
+        rows,
+        metrics=["pe_ttm"],
+        min_points=1,
+        negative_policy="exclude",
+    )
+
+    metric = result["metrics"]["pe_ttm"]
+    assert result["status"] == "unavailable"
+    assert metric["status"] == "current_value_excluded"
+    assert metric["sample_count"] == 2
+    assert metric["percentile_rank"] is None
+    assert "current_non_positive_excluded_from_percentile" in metric["warnings"]
+
+
+def test_valuation_service_history_percentile_reports_insufficient_data():
+    service = ResearchValuationService()
+    rows = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "as_of_date": "2026-01-01",
+            "ps_ttm": 2.0,
+        }
+    ]
+
+    result = service.build_history_percentile_response(
+        rows,
+        metrics=["ps_ttm"],
+        min_points=2,
+    )
+
+    metric = result["metrics"]["ps_ttm"]
+    assert result["status"] == "insufficient_data"
+    assert metric["status"] == "insufficient_data"
+    assert metric["sample_count"] == 1
+    assert metric["percentile_rank"] is None
+    assert "insufficient_valid_observations" in metric["warnings"]
+
+
 def test_valuation_service_writes_market_cap_only_rows_without_financial_facts():
     service = ResearchValuationService({"history": {"lookback_days": 5}})
     quotes = pd.DataFrame(

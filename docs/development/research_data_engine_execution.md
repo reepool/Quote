@@ -555,6 +555,7 @@ technical readiness 接口会聚合：
 - `valuation_history_rebuild`
 - `/api/v1/research/company/{instrument_id}/valuation/history`
 - `/api/v1/research/company/{instrument_id}/valuation/relative`
+- `/api/v1/research/company/{instrument_id}/valuation/percentile`
 - `/api/v1/research/company/{instrument_id}/valuation/dcf`
 - `/api/v1/research/valuation/readiness`
 - 相对估值 peer group 由 `valuation.relative.benchmark_field` 解析，默认 `sw_l2_code`
@@ -576,6 +577,7 @@ technical readiness 接口会聚合：
 - `details_json` 是日频高行数字段，必须保持 compact：落库使用短字段 `v=2` 格式，读取 API 自动还原为原长字段结构；保留输入 lineage、报告期、可得日、分母、指标状态和缺失原因，不保存完整 provider payload 或大体量 diagnostics。若需要完整审计，应放入源文件/raw payload 表或单独审计表，而不是在每个交易日重复写入。既有历史可通过 `scripts/research_valuation_storage_maintenance.py --compact-valuation-history-details --confirm-compact --vacuum` 分批压缩并释放空间；`2026-06-01` 生产库已完成 `2,707,947` 行迁移，`details_json` 文本合计约 `7.96GB -> 3.10GB`，`valuation.db` 文件约 `12GB -> 5.9GB`。
 - `relative valuation` 默认依赖 current authoritative `sw_l2` peer group
 - 相对估值默认从 `valuation.db.valuation_history + research.db.industry_memberships` 即时计算或使用 bounded aggregate cache，不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵
+- 个股估值历史分位默认从当前 canonical `valuation_history` 本地序列即时计算，不新建持久化分位矩阵。默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度；响应必须包含样本数量、窗口边界、分位、四分位统计和负值估值解释提示，尤其不能把负 PE 静默视为普通低估信号；当 `negative_policy=exclude` 排除当前非正值时，指标返回 `current_value_excluded` 且不返回有效分位
 - valuation rollout readiness 现在同时返回 `valuation_history` 覆盖、估值输入覆盖、metric coverage、财务 readiness、行业 readiness 与 storage 摘要
 - 在全市场 current authoritative membership 或 valuation input 覆盖不足时，relative valuation rollout 仍应保持 gated，而不是降级使用 reference-only 行业字段或从成交额/换手率反推市值
 

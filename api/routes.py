@@ -1058,6 +1058,55 @@ async def get_research_relative_valuation(
 
 
 @router.get(
+    "/research/company/{instrument_id}/valuation/percentile",
+    response_model=ResearchValuationPercentileResponse,
+    tags=["Research"],
+)
+async def get_research_valuation_percentile(
+    instrument_id: str,
+    as_of_date: Optional[date] = Query(None, description="估值日期，默认使用最新可得日"),
+    quarters: int = Query(12, description="历史窗口季度数", ge=1, le=40),
+    metrics: str = Query("pe_ttm,pb_mrq,ps_ttm", description="逗号分隔的估值指标口径"),
+    min_points: int = Query(60, description="最小有效样本数", ge=1, le=5000),
+    negative_policy: str = Query(
+        "flag",
+        description="负值估值处理策略：flag/include/exclude",
+    ),
+    include_series: bool = Query(False, description="是否返回样本序列"),
+):
+    """获取研究域单品种估值历史分位。"""
+    try:
+        metric_list = [item.strip() for item in metrics.split(",") if item.strip()]
+        valuation = await data_manager.get_research_valuation_percentile(
+            instrument_id,
+            as_of_date=as_of_date,
+            quarters=quarters,
+            metrics=metric_list,
+            min_points=min_points,
+            negative_policy=negative_policy,
+            include_series=include_series,
+        )
+        if not valuation:
+            raise HTTPException(
+                status_code=404,
+                detail="Research valuation percentile not found",
+            )
+
+        return ResearchValuationPercentileResponse(**valuation)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research valuation percentile: {str(e)}",
+        )
+
+
+@router.get(
     "/research/company/{instrument_id}/valuation/dcf",
     response_model=ResearchDcfValuationResponse,
     tags=["Research"],

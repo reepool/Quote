@@ -41,6 +41,7 @@ from api.models import (
     ResearchTechnicalIndicatorsResponse,
     ResearchTechnicalSummaryResponse,
     ResearchValuationHistoryResponse,
+    ResearchValuationPercentileResponse,
     ResearchValuationReadinessResponse,
 )
 from api.routes import (
@@ -63,6 +64,7 @@ from api.routes import (
     get_research_reports,
     get_research_risk,
     get_research_relative_valuation,
+    get_research_valuation_percentile,
     get_research_shareholder_readiness,
     get_research_shareholders,
     get_research_sentiment_events,
@@ -2131,6 +2133,80 @@ class TestResearchRoutes:
         assert response.instrument_id == "600000.SH"
         assert response.data_points == 2
         assert response.items[0].details["report_period"] == "2025-12-31"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_valuation_percentile_success(self, mock_dm):
+        mock_dm.get_research_valuation_percentile = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "status": "success",
+                "calc_method": "valuation_history_percentile",
+                "calc_version": "valuation_history_percentile.v1",
+                "parameter_hash": "percentile-hash",
+                "valuation_calc_method": "valuation_history_builtin",
+                "valuation_calc_version": "valuation_history.v1",
+                "valuation_parameter_hash": "history-hash",
+                "as_of_date": "2026-04-17",
+                "requested_as_of_date": None,
+                "quarters": 12,
+                "window_start": "2023-04-17",
+                "window_end": "2026-04-17",
+                "min_points": 60,
+                "negative_policy": "flag",
+                "metric_variants": ["pe_ttm"],
+                "metrics": {
+                    "pe_ttm": {
+                        "metric": "pe_ttm",
+                        "status": "success",
+                        "current_value": 22.0,
+                        "sample_count": 120,
+                        "required_min_points": 60,
+                        "percentile_rank": 0.75,
+                        "positive_only_percentile_rank": None,
+                        "metric_min": 10.0,
+                        "metric_max": 30.0,
+                        "metric_median": 20.0,
+                        "metric_p25": 15.0,
+                        "metric_p75": 25.0,
+                        "window_start": "2023-04-17",
+                        "window_end": "2026-04-17",
+                        "negative_sample_count": 0,
+                        "zero_sample_count": 0,
+                        "excluded_count": 0,
+                        "warnings": [],
+                        "series": None,
+                    }
+                },
+                "warnings": [],
+            }
+        )
+
+        response = _run(
+            get_research_valuation_percentile(
+                "600000.SH",
+                as_of_date=None,
+                quarters=12,
+                metrics="pe_ttm",
+                min_points=60,
+                negative_policy="flag",
+                include_series=False,
+            )
+        )
+
+        assert isinstance(response, ResearchValuationPercentileResponse)
+        assert response.status == "success"
+        assert response.metrics["pe_ttm"].percentile_rank == 0.75
+        mock_dm.get_research_valuation_percentile.assert_awaited_once_with(
+            "600000.SH",
+            as_of_date=None,
+            quarters=12,
+            metrics=["pe_ttm"],
+            min_points=60,
+            negative_policy="flag",
+            include_series=False,
+        )
 
     @patch("api.routes.data_manager")
     def test_get_research_valuation_readiness_success(self, mock_dm):

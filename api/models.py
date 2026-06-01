@@ -823,6 +823,64 @@ class ResearchValuationHistoryResponse(BaseModel):
     )
 
 
+class ResearchValuationPercentileMetricResponse(BaseModel):
+    """研究域估值历史分位单指标响应模型。"""
+
+    metric: str = Field(..., description="估值指标口径")
+    status: str = Field(..., description="指标计算状态")
+    current_value: Optional[float] = Field(None, description="当前估值值")
+    sample_count: int = Field(..., description="有效样本数")
+    required_min_points: int = Field(..., description="最小样本数要求")
+    percentile_rank: Optional[float] = Field(None, description="历史分位排名")
+    positive_only_percentile_rank: Optional[float] = Field(
+        None,
+        description="正值样本历史分位排名",
+    )
+    metric_min: Optional[float] = Field(None, description="样本最小值")
+    metric_max: Optional[float] = Field(None, description="样本最大值")
+    metric_median: Optional[float] = Field(None, description="样本中位数")
+    metric_p25: Optional[float] = Field(None, description="样本 25 分位")
+    metric_p75: Optional[float] = Field(None, description="样本 75 分位")
+    window_start: str = Field(..., description="窗口起点")
+    window_end: str = Field(..., description="窗口终点")
+    negative_sample_count: int = Field(..., description="负值样本数")
+    zero_sample_count: int = Field(..., description="零值样本数")
+    excluded_count: int = Field(..., description="被排除样本数")
+    warnings: List[str] = Field(default_factory=list, description="解释风险提示")
+    series: Optional[List[Dict[str, Any]]] = Field(None, description="可选样本序列")
+
+
+class ResearchValuationPercentileResponse(BaseModel):
+    """研究域估值历史分位响应模型。"""
+
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: str = Field(..., description="交易代码")
+    exchange: str = Field(..., description="交易所")
+    status: str = Field(..., description="整体计算状态")
+    calc_method: str = Field(..., description="分位计算方法")
+    calc_version: str = Field(..., description="分位计算版本")
+    parameter_hash: str = Field(..., description="分位参数哈希")
+    valuation_calc_method: str = Field(..., description="底层估值历史计算方法")
+    valuation_calc_version: str = Field(..., description="底层估值历史计算版本")
+    valuation_parameter_hash: str = Field(..., description="底层估值历史参数哈希")
+    as_of_date: str = Field(..., description="实际使用的估值日期")
+    requested_as_of_date: Optional[str] = Field(None, description="请求估值日期")
+    quarters: int = Field(..., description="历史窗口季度数")
+    window_start: str = Field(..., description="窗口起点")
+    window_end: str = Field(..., description="窗口终点")
+    min_points: int = Field(..., description="最小样本数要求")
+    negative_policy: str = Field(..., description="负值估值处理策略")
+    metric_variants: List[str] = Field(
+        default_factory=list,
+        description="本次计算使用的估值指标口径",
+    )
+    metrics: Dict[str, ResearchValuationPercentileMetricResponse] = Field(
+        default_factory=dict,
+        description="分指标历史分位结果",
+    )
+    warnings: List[str] = Field(default_factory=list, description="整体解释风险提示")
+
+
 class ResearchRelativeValuationPeerResponse(BaseModel):
     """研究域同行估值行响应模型。"""
 

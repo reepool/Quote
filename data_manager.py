@@ -4886,6 +4886,57 @@ class DataManager:
         )
         return valuation_service.build_history_response(rows)
 
+    async def get_research_valuation_percentile(
+        self,
+        instrument_id: str,
+        *,
+        as_of_date: Optional[date] = None,
+        quarters: int = 12,
+        metrics: Optional[List[str]] = None,
+        min_points: int = 60,
+        negative_policy: str = "flag",
+        include_series: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域单品种估值历史分位。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+
+        from research.query_service import ResearchQueryService
+        from research.valuation_service import ResearchValuationService
+
+        query_service = ResearchQueryService(storage)
+        valuation_service = ResearchValuationService(module_cfg)
+        identity = valuation_service.history_identity()
+        rows = await asyncio.to_thread(
+            query_service.get_valuation_history_rows,
+            normalized_id,
+            start_date=None,
+            end_date=None if as_of_date is None else as_of_date.isoformat(),
+            limit=0,
+            include_details=False,
+            calc_method=identity["calc_method"],
+            calc_version=identity["calc_version"],
+            parameter_hash=identity["parameter_hash"],
+            parameter_hashes=identity.get("compatible_parameter_hashes"),
+        )
+        return valuation_service.build_history_percentile_response(
+            rows,
+            instrument=instrument,
+            as_of_date=None if as_of_date is None else as_of_date.isoformat(),
+            quarters=quarters,
+            metrics=metrics,
+            min_points=min_points,
+            negative_policy=negative_policy,
+            include_series=include_series,
+        )
+
     async def get_research_relative_valuation(
         self,
         instrument_id: str,
