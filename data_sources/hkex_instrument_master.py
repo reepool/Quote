@@ -58,6 +58,8 @@ def _normalized_columns(frame: pd.DataFrame) -> pd.DataFrame:
 
 def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
     """Classify HKEX products into research scope and derivative/debt buckets."""
+    instrument_id = str(row.get("instrument_id") or "").strip().upper()
+    symbol = str(row.get("symbol") or row.get("code") or "").strip()
     category = str(row.get("category") or row.get("hkex_category") or "").strip().lower()
     sub_category = str(row.get("sub_category") or row.get("hkex_sub_category") or "").strip().lower()
     name = str(row.get("name") or row.get("stock_name") or "").strip().lower()
@@ -65,6 +67,20 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
 
     if "old code" in combined or " old" in combined or "-old" in combined or "(旧)" in combined:
         product_type = "old_code"
+        research_scope = "exclude"
+    elif instrument_id[0:3] == "029" or symbol[0:3] == "029":
+        product_type = "temporary_counter"
+        research_scope = "exclude"
+    elif (
+        "rights" in combined
+        or " rts" in combined
+        or combined.endswith("rts")
+        or "warrants for share rights" in combined
+    ):
+        product_type = "subscription_right"
+        research_scope = "exclude"
+    elif "-2000" in name or "-10k" in name or "-500" in name:
+        product_type = "temporary_counter"
         research_scope = "exclude"
     elif "callable bull/bear" in combined or "bull/bear" in combined or "cbbc" in combined:
         product_type = "cbbc"

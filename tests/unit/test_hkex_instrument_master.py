@@ -235,6 +235,12 @@ def test_product_classifier_separates_derivatives_debt_funds_and_equity():
     assert classify_hkex_product({"sub_category": "Debt Securities"})["product_type"] == "debt"
     assert classify_hkex_product({"sub_category": "Inline Warrant"})["product_type"] == "inline_warrant"
     assert classify_hkex_product({"sub_category": "Callable Bull/Bear Contract"})["product_type"] == "cbbc"
+    temporary = classify_hkex_product({"instrument_id": "02955.HK", "name": "GOFINTECH-2000"})
+    assert temporary["product_type"] == "temporary_counter"
+    assert temporary["research_scope"] == "exclude"
+    rights = classify_hkex_product({"instrument_id": "08556.HK", "name": "NIUHOLDINGS RTS"})
+    assert rights["product_type"] == "subscription_right"
+    assert rights["research_scope"] == "exclude"
 
 
 def test_lifecycle_policy_requires_official_evidence_for_reactivation_and_delisting():

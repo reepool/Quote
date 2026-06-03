@@ -169,6 +169,7 @@ asyncio.run(main())
 - 本地 HKEX stock：`total=4626, active=3020, inactive=1606`。
 - 决策计数：`insert_candidates=13419`、`metadata_update_candidates=3019`、`reactivation_candidates=1416`、`delisting_candidates=359`、`review_required=1`。这些是原始官方全证券差异，不等于可写入研究 universe。
 - safe-write 仍按 `allowed_product_types=["ordinary_equity","reit","etf"]`、canonical counter 和产品分类过滤；报告会输出 `safe_write_preview_count` 和允许生命周期候选数，防止把债券/窝轮/牛熊证误读为研究股票池。
+- safe-write 产品分类还需要排除 HKEX 029xx 临时代码、供股权/rights 和特殊交易单位后缀（如 `RTS`、`-2000`、`-10K`）；这类代码不应进入研究 active universe。
 - 行情诊断只读输出：`no_local_quote_count=1314`、`stale_local_quote_count=1611`、`mutation_candidates=[]`。
 
 2026-06-02 HKEX audit-only 开发验证：
