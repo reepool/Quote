@@ -65,6 +65,21 @@
           "progress_log_interval_sec": 300
         }
       },
+      "hkex_instrument_master_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "港股主数据同步/审计（仅手工触发，默认 audit_only 不写库）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "mode": "audit_only",
+          "timeout_sec": 60,
+          "max_runtime_seconds": 600
+        }
+      },
       "us_daily_data_update": {
         "enabled": false,
         "description": "美股每日数据更新（16:00 ET 收盘，次日 06:00 CST 更新）",

@@ -1,4 +1,9 @@
-from scheduler.tasks import _format_instrument_master_governance_summary
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
+
+from scheduler.job_config import JobConfigManager
+from scheduler.tasks import ScheduledTasks, _format_instrument_master_governance_summary
 
 
 def test_format_instrument_master_governance_summary_success():
@@ -79,3 +84,67 @@ def test_format_instrument_master_governance_summary_hkex_details():
     assert "HKEX生命周期候选: 可复活=1，可停牌=0" in summary
     assert "HKEX源: hkex_securities_list:8，hkexnews_active_list:4" in summary
     assert "HKEX行情诊断: 无本地行情=1314，过旧=1611" in summary
+
+
+def test_manual_only_job_can_omit_trigger():
+    config_manager = Mock()
+    scheduler_config = Mock()
+    scheduler_config.jobs = {
+        "hkex_instrument_master_sync": {
+            "enabled": True,
+            "manual_only": True,
+            "description": "港股主数据同步/审计",
+            "parameters": {"mode": "audit_only"},
+        }
+    }
+    scheduler_config.max_instances = 10
+    scheduler_config.misfire_grace_time = 300
+    scheduler_config.coalesce = True
+    config_manager.get_scheduler_config.return_value = scheduler_config
+
+    jobs = JobConfigManager(config_manager).load_job_configs()
+
+    assert "hkex_instrument_master_sync" in jobs
+    assert jobs["hkex_instrument_master_sync"].manual_only is True
+    assert jobs["hkex_instrument_master_sync"].trigger is None
+
+
+@pytest.mark.asyncio
+async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock(return_value=False)
+
+    with patch("scheduler.tasks.data_manager") as dm:
+        dm.sync_hkex_instrument_master = AsyncMock(return_value={
+            "status": "success",
+            "mode": "audit_only",
+            "summary": {"active_count": 3020, "review_required": 1},
+            "exchanges": {
+                "HKEX": {
+                    "safe_write_preview_count": 2792,
+                    "allowed_reactivation_count": 50,
+                    "allowed_suspension_count": 130,
+                    "official_suspension_count": 160,
+                    "source_usage": {"hkex_securities_list": 17671},
+                    "review_required_samples": [
+                        {
+                            "instrument_id": "02934.HK",
+                            "reason": "missing",
+                            "local": {"name": "圣马丁国际"},
+                        }
+                    ],
+                }
+            },
+            "warnings": [],
+            "errors": [],
+        })
+
+        success = await task.hkex_instrument_master_sync(mode="audit_only", timeout_sec=60)
+
+    assert success is True
+    dm.sync_hkex_instrument_master.assert_awaited_once_with(
+        mode="audit_only",
+        timeout_sec=60,
+    )
+    task._send_task_report.assert_awaited_once()

@@ -130,6 +130,24 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
   - `/hkex_review list [limit]`：查看已回灌记录。
   - `/hkex_review 02934.HK delisted 2026-05-30 已确认退市 evidence=https://...`：追加一条 reviewed lifecycle evidence。
 
+手工主数据任务：
+
+- `config/05_scheduler.json` 中的 `hkex_instrument_master_sync` 是 `manual_only=true`，没有自动运行时间。
+- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=audit_only, timeout_sec=60`，不会写生命周期字段。
+- 本地直接调用可用：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python -c 'exec("""import asyncio
+from scheduler.tasks import scheduled_tasks
+async def main():
+    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="audit_only", timeout_sec=60)
+    print({"success": ok})
+asyncio.run(main())
+""")'
+```
+
+- 未来需要自动运行时，把 `manual_only` 改为 `false` 并补充 `trigger`；切换到 `safe_write` 或 `lifecycle_write` 前必须先复核报告中的 safe-write、退市、复活和停牌候选样本。
+
 当前生产配置的官方源：
 
 - 主 active 源：HKEX `ListOfSecurities.xlsx`，来自 HKEX Securities Lists 的 Full List of Securities。

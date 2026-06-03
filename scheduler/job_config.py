@@ -23,7 +23,7 @@ class JobConfig:
     enabled: bool
     manual_only: bool
     description: str
-    trigger: Any  # CronTrigger or IntervalTrigger
+    trigger: Optional[Any]  # CronTrigger or IntervalTrigger; None for manual-only jobs without a schedule
     max_instances: int
     misfire_grace_time: int
     coalesce: bool
@@ -71,9 +71,13 @@ class JobConfigManager:
     def _parse_job_config(self, job_id: str, job_data: Dict[str, Any], scheduler_config) -> Optional[JobConfig]:
         """解析单个任务配置"""
         try:
-            # 解析触发器
-            trigger = self._parse_trigger(job_data.get('trigger', {}))
-            if trigger is None:
+            manual_only = bool(job_data.get('manual_only', False))
+
+            # 解析触发器；manual_only 任务允许完全不配置运行时间。
+            trigger = None
+            if job_data.get('trigger'):
+                trigger = self._parse_trigger(job_data.get('trigger', {}))
+            if trigger is None and not manual_only:
                 scheduler_logger.error(f"[JobConfigManager] Invalid trigger for job {job_id}")
                 return None
 
@@ -81,7 +85,7 @@ class JobConfigManager:
             job_config = JobConfig(
                 job_id=job_id,
                 enabled=job_data.get('enabled', True),
-                manual_only=bool(job_data.get('manual_only', False)),
+                manual_only=manual_only,
                 description=job_data.get('description', ''),
                 trigger=trigger,
                 # 优先使用任务自身的配置，否则使用从SchedulerConfig对象中读取的全局默认值

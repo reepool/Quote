@@ -801,6 +801,83 @@ class ScheduledTasks:
                 except Exception as e:
                     scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
 
+    async def hkex_instrument_master_sync(
+        self,
+        mode: str = "audit_only",
+        timeout_sec: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """手工触发 HKEX 主数据同步/审计任务。"""
+        try:
+            scheduler_logger.info(
+                "[Scheduler] Starting HKEX instrument master sync: mode=%s timeout=%s",
+                mode,
+                timeout_sec,
+            )
+            result = await data_manager.sync_hkex_instrument_master(
+                mode=mode,
+                timeout_sec=timeout_sec,
+            )
+            hkex = (result.get("exchanges") or {}).get("HKEX", {})
+            summary = result.get("summary") or {}
+            source_usage = hkex.get("source_usage") or {}
+            source_usage_text = ", ".join(
+                f"{key}={value}" for key, value in source_usage.items()
+            ) or "无"
+            samples = hkex.get("review_required_samples") or []
+            sample_lines = []
+            for item in samples[:5]:
+                local = item.get("local") or {}
+                sample_lines.append(
+                    f"- {item.get('instrument_id')}: {local.get('name', '')} "
+                    f"({item.get('reason')})"
+                )
+            sample_text = "\n".join(sample_lines) if sample_lines else "无"
+
+            content = (
+                "*HKEX 主数据同步*\n\n"
+                f"状态: `{result.get('status')}`\n"
+                f"mode: `{result.get('mode')}`\n"
+                f"active_count: `{summary.get('active_count', 0)}`\n"
+                f"待复核: `{summary.get('review_required', 0)}`\n"
+                f"safe_write候选: `{hkex.get('safe_write_preview_count', 0)}`\n"
+                f"可复活候选: `{hkex.get('allowed_reactivation_count', 0)}`\n"
+                f"可停牌候选: `{hkex.get('allowed_suspension_count', 0)}`\n"
+                f"官方停牌证据: `{hkex.get('official_suspension_count', 0)}`\n"
+                f"source_usage: `{source_usage_text}`\n"
+                f"warnings: `{len(result.get('warnings') or [])}`，"
+                f"errors: `{len(result.get('errors') or [])}`\n\n"
+                "待复核样本:\n"
+                f"{sample_text}"
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "HKEX 主数据同步",
+                    "status": result.get("status"),
+                    "content": content,
+                    "result": result,
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                },
+                report_type="maintenance_report",
+                task_name="hkex_instrument_master_sync",
+                job_config=job_config,
+            )
+            return result.get("status") in {"success", "warning"}
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] HKEX instrument master sync failed: {e}")
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_task_notification(
+                        f"HKEX 主数据同步失败: {e}",
+                        "hkex_instrument_master_sync",
+                        "error",
+                    )
+                except Exception as notify_error:
+                    scheduler_logger.error(
+                        f"[Scheduler] Failed to send HKEX master sync failure notification: {notify_error}"
+                    )
+            return False
+
     async def _send_task_report(self, report_data: dict, report_type: str,
                                task_name: str, job_config: Optional[JobConfig] = None) -> bool:
         """
