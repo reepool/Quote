@@ -133,20 +133,22 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 手工主数据任务：
 
 - `config/05_scheduler.json` 中的 `hkex_instrument_master_sync` 是 `manual_only=true`，没有自动运行时间。
-- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=audit_only, timeout_sec=60`，不会写生命周期字段。
+- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=safe_write, timeout_sec=60`；会写入安全新增/metadata 候选，但不会写退市、复牌、停牌生命周期字段。
+- `lifecycle_write` 是更高权限模式，会先执行 `safe_write` 能做的安全写入，再按官方/人工证据改写退市、复牌和停牌状态；它不是和 `safe_write` 并列同时打开的第二个开关。
+- `config/03_data.json` 的 HKEX governance 默认仍保持 `audit_only`，所以自动港股行情日更的前置治理暂时不写库；当前只启用手工任务写入。
 - 本地直接调用可用：
 
 ```bash
 /home/python/miniconda3/envs/Quote/bin/python -c 'exec("""import asyncio
 from scheduler.tasks import scheduled_tasks
 async def main():
-    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="audit_only", timeout_sec=60)
+    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="safe_write", timeout_sec=60)
     print({"success": ok})
 asyncio.run(main())
 """)'
 ```
 
-- 未来需要自动运行时，把 `manual_only` 改为 `false` 并补充 `trigger`；切换到 `safe_write` 或 `lifecycle_write` 前必须先复核报告中的 safe-write、退市、复活和停牌候选样本。
+- 未来需要自动运行时，把 `manual_only` 改为 `false` 并补充 `trigger`；切换到 `lifecycle_write` 前必须先复核报告中的退市、复活和停牌候选样本。
 
 当前生产配置的官方源：
 

@@ -243,7 +243,7 @@ HKEX 主数据底座要求：
 - `HKEXSourceEvidencePolicy` 已显式区分主源可用、HKEXnews active fallback、delisted 证据、suspension 证据和各类写入门控；主 active 源不可用时 fallback 只用于审计，不允许 safe-write 或 reactivation。
 - `manual_review_file` 已支持 JSON/CSV 人工复核回灌，可把 02934.HK 这类 review_required 样本转为 reviewed lifecycle evidence，再由 `lifecycle_write` 生效。
 - `manual_review_file` 默认写入 `data/hkex_manual_review.json`；API 提供 `/instruments/hkex/master/review-required`、`/instruments/hkex/master/manual-review`，Telegram 提供 `/hkex_review pending|list|<代码> <结论>`，三者共用同一份 review evidence。
-- `config/05_scheduler.json` 已新增 `hkex_instrument_master_sync` 手工任务，`manual_only=true` 且不设置自动运行时间；Telegram 使用 `/run hkex_instrument_master_sync` 触发，默认 `mode=audit_only`。
+- `config/05_scheduler.json` 已新增 `hkex_instrument_master_sync` 手工任务，`manual_only=true` 且不设置自动运行时间；Telegram 使用 `/run hkex_instrument_master_sync` 触发，默认 `mode=safe_write`，只写安全新增/metadata 候选，不写生命周期字段。`config/03_data.json` 的自动 HKEX governance 默认仍保持 `audit_only`。
 - HKEX prolonged suspension PDF 已接入 `HKEXSuspensionReportProvider`，通过 `pypdf` 解析为结构化 suspended 证据；缺少依赖或解析失败会降级为 warning。
 - 当前行情日更读取 active universe 时使用 `tradable_only=True`，会跳过 `trading_status=0` 的停牌品种；历史回补不改变该语义。
 - 2026-06-03 安装 `pypdf 6.12.2` 后，live `audit_only` 已验证 PDF 停牌解析可用：`source_usage.hkexnews_suspension_report=32`、`official_suspension_count=160`、`allowed_suspension_count=130`，本次仍未写库。
