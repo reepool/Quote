@@ -1,11 +1,11 @@
 # 投研数据引擎（Research Data Engine）需求文档 v2
 
-> 更新日期：2026-06-01
+> 更新日期：2026-06-02
 > 更新依据：基于 Quote System 当前代码、配置、数据库现状和本地基准测试。
 > 系统定位：本系统只输出结构化数据、时间序列、事件流和确定性计算结果；不直接生成研究报告。下游消费者包括 AI 报告生成器、研究员工作台、筛选器和量化特征消费方。
 > 配套执行文档：`docs/development/research_data_engine_execution.md`
-> OpenSpec 状态：当前无 active change；截至 `2026-06-01`，历史 complete change 已同步到 `openspec/specs/*` 并归档。
-> 当前推进焦点：估值域已进入功能完成和维护复核阶段；下一主线回到财务域 production readiness、coverage gap 分类、source profile 稳定化和行业专项字段包真实覆盖验证。
+> OpenSpec 状态：新增 active change `add-hkex-instrument-master-sync`，准备建设港股专用主数据系统。
+> 当前推进焦点：港股主数据底座已立项；其定位与 A 股主数据系统类似，是未来所有港股研究和信息获取模块的统一 universe 基础。估值域已进入功能完成和维护复核阶段，财务域 production readiness 仍保留为后续主线。
 > 已归档估值 rollout 变更包：`openspec/changes/archive/2026-06-01-prepare-valuation-production-rollout/`
 > 已归档估值历史分位变更包：`openspec/changes/archive/2026-06-01-add-valuation-history-percentile/`
 > 已归档估值 readiness 变更包：`openspec/changes/archive/2026-06-01-add-valuation-readiness-api/`
@@ -91,9 +91,10 @@
   - `2026-05-20` 修正后，财务仓生产读写必须使用 `data/financials.db`，不再把新增财务事实写入 `data/research.db`；业务层仍必须通过 repository/storage 抽象访问，不允许在 `DataManager`、provider 或 API 层散落 SQLite 方言和文件路径假设
   - `2026-05-28` 估值域进一步明确为独立 `data/valuation.db`：`research.db` 继续承载公司画像、行业、股东、研报元数据、风险/技术轻量快照等研究维表，`valuation.db` 承载高行数、可重建的日频估值派生序列，便于备份、压缩、迁移和未来替换 DuckDB/PostgreSQL/列式适配层
   - 若未来迁移到 DuckDB/PostgreSQL 等性能更优的数据库，应保持 `instrument_id + report_period + source lineage + availability metadata` 等逻辑模型不变，只替换存储适配层、迁移脚本和连接配置
-- **市场范围建议分两期**：
-  - Phase 1：A 股完整研究能力 + 港股价格/技术/基础信息能力
-  - Phase 2：港股财务、估值、事件、分析师数据按源验证逐步补齐
+- **市场范围建议调整为“先底座、后模块”**：
+  - Phase 1：A 股完整研究能力 + 港股行情/技术基础能力
+  - Phase 1.5：先建设 HKEX 专用主数据系统，作为所有港股研究模块的统一前置依赖；该系统必须独立定义官方源优先级、普通股票/REIT/ETF/债券/窝轮/牛熊证/双柜台/旧代码分类、停牌与退市证据、以及 AkShare/yfinance 是否可重新激活自动封禁品种
+  - Phase 2：港股财务、估值、事件、分析师数据按源验证逐步补齐，但不得绕过 HKEX 主数据治理自行维护股票池
 
 ---
 
@@ -216,13 +217,35 @@ P0/P1 阶段的核心读取接口不应在请求时访问外部数据源。
 - 后台回填任务
 - 管理员触发的补数任务
 
-### 3.4 A 股优先，港股逐步扩展
+### 3.4 A 股优先，港股先建主数据底座后扩展
 
 市场目标是 A 股 + 港股，但不能假设两者在数据源层面对称。
 工程策略必须是：
 
 - A 股：主交付面
-- 港股：先交付价格驱动模块，再验证基本面模块
+- 港股：已具备价格驱动模块基础；后续公司画像、财务、披露、估值、风险、事件和研究 metadata 模块必须先依赖 HKEX 主数据底座
+
+HKEX 主数据底座要求：
+
+- 官方 HKEX / HKEXnews 清单作为生命周期权威来源
+- AkShare / 东方财富作为高速候选发现和差异预警，不单独决定上市/退市状态
+- yfinance 和本地行情缺口只作为行情可得性诊断
+- 双柜台、旧代码、债券、窝轮、牛熊证、REIT、ETF 必须先分类后再决定是否进入研究 universe
+- 所有港股研究模块统一调用 `DataManager.resolve_hkex_current_universe()`，读取 HKEX 主数据治理后的本地 active universe，不各自维护代码表
+
+当前实现状态：
+
+- `DataManager.sync_hkex_instrument_master()` 已支持 `audit_only / safe_write / lifecycle_write` 三阶段 rollout。
+- `config/03_data.json` 已把 HKEX 加入共享 `instrument_master_governance.supported_exchanges`，并配置 HKEX `ListOfSecurities.xlsx`、HKEXnews active/delisted JSON、HKEXnews prolonged suspension PDF；初始 `hkex_instrument_master_sync.mode=audit_only`。
+- HKEX 辅助 metadata 进入 `instrument_master_metadata`，待复核差异进入 `instrument_master_discrepancies`。
+- 只有 `lifecycle_write` 才允许官方证据驱动 `active/suspended/delisted` 生命周期字段变更。
+- `safe_write` 会写入官方 in-scope 新标的和安全范围内存量标的的非破坏性字段，不会改变 `active/delisted/suspended` 生命周期。
+- `HKEXSourceEvidencePolicy` 已显式区分主源可用、HKEXnews active fallback、delisted 证据、suspension 证据和各类写入门控；主 active 源不可用时 fallback 只用于审计，不允许 safe-write 或 reactivation。
+- `manual_review_file` 已支持 JSON/CSV 人工复核回灌，可把 02934.HK 这类 review_required 样本转为 reviewed lifecycle evidence，再由 `lifecycle_write` 生效。
+- `manual_review_file` 默认写入 `data/hkex_manual_review.json`；API 提供 `/instruments/hkex/master/review-required`、`/instruments/hkex/master/manual-review`，Telegram 提供 `/hkex_review pending|list|<代码> <结论>`，三者共用同一份 review evidence。
+- HKEX prolonged suspension PDF 已接入 `HKEXSuspensionReportProvider`，通过 `pypdf` 解析为结构化 suspended 证据；缺少依赖或解析失败会降级为 warning。
+- 当前行情日更读取 active universe 时使用 `tradable_only=True`，会跳过 `trading_status=0` 的停牌品种；历史回补不改变该语义。
+- 2026-06-03 安装 `pypdf 6.12.2` 后，live `audit_only` 已验证 PDF 停牌解析可用：`source_usage.hkexnews_suspension_report=32`、`official_suspension_count=160`、`allowed_suspension_count=130`，本次仍未写库。
 
 ### 3.5 复用现有 Quote 底座
 

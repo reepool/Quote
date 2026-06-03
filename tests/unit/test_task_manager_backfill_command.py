@@ -65,3 +65,61 @@ async def test_backfill_range_rejects_invalid_exchange():
 
     sent_message = task_manager.send_message.await_args.args[1]
     assert '无效的交易所代码' in sent_message
+
+
+@pytest.mark.asyncio
+async def test_hkex_review_command_appends_manual_evidence():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/hkex_review 02934.HK delisted 2026-05-30 已确认退市 evidence=https://www.hkexnews.hk/',
+    )
+
+    with patch('data_manager.data_manager') as dm:
+        dm.append_hkex_manual_review_evidence = AsyncMock(return_value={
+            'status': 'success',
+            'path': 'data/hkex_manual_review.json',
+            'entry': {
+                'instrument_id': '02934.HK',
+                'action': 'delisted',
+                'effective_date': '2026-05-30',
+            },
+            'total': 1,
+        })
+        await handler.handle_hkex_review_command(event)
+
+    dm.append_hkex_manual_review_evidence.assert_awaited_once_with(
+        instrument_id='02934.HK',
+        action='delisted',
+        effective_date='2026-05-30',
+        reason='已确认退市',
+        evidence_url='https://www.hkexnews.hk/',
+        reviewed_by='2',
+    )
+    sent_message = task_manager.send_message.await_args.args[1]
+    assert '已追加港股主数据人工复核' in sent_message
+
+
+@pytest.mark.asyncio
+async def test_hkex_review_pending_command_runs_audit_only():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(chat_id=1, sender_id=2, text='/hkex_review pending 3')
+
+    with patch('data_manager.data_manager') as dm:
+        dm.sync_hkex_instrument_master = AsyncMock(return_value={
+            'status': 'success',
+            'summary': {'review_required': 1},
+            'exchanges': {
+                'HKEX': {
+                    'review_required_samples': [
+                        {'instrument_id': '02934.HK', 'reason': 'missing', 'local': {'name': '圣马丁国际'}}
+                    ]
+                }
+            },
+        })
+        await handler.handle_hkex_review_command(event)
+
+    dm.sync_hkex_instrument_master.assert_awaited_once_with(mode='audit_only')
+    sent_message = task_manager.send_message.await_args.args[1]
+    assert '02934.HK' in sent_message

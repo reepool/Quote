@@ -11,6 +11,7 @@ aiosqlite==0.20.0
 # Data Processing
 pandas==2.2.3
 numpy==1.26.4
+pypdf>=4.0.0
 
 # API and Serialization
 pydantic==2.11.0

@@ -7344,6 +7344,36 @@ class DataManager:
             defaults.update(raw_config)
         return defaults
 
+    def _get_hkex_instrument_master_sync_config(self) -> Dict[str, Any]:
+        """Return HKEX-specific master sync config with audit-first defaults."""
+        defaults: Dict[str, Any] = {
+            'enabled': False,
+            'mode': 'audit_only',
+            'timeout_sec': 60,
+            'official_securities_list_url': 'https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx',
+            'official_securities_list_file': '',
+            'hkexnews_active_list_url': 'https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json',
+            'hkexnews_active_list_file': '',
+            'hkexnews_delisted_list_url': 'https://www.hkexnews.hk/ncms/script/eds/inactivestock_sehk_e.json',
+            'hkexnews_delisted_list_file': '',
+            'hkexnews_suspension_main_board_url': 'https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_mb.pdf',
+            'hkexnews_suspension_gem_url': 'https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_gem.pdf',
+            'hkexnews_suspension_main_board_file': '',
+            'hkexnews_suspension_gem_file': '',
+            'manual_review_file': 'data/hkex_manual_review.json',
+            'akshare_spot_file': '',
+            'eastmoney_profile_file': '',
+            'fetch_supplemental_live': False,
+            'write_review_discrepancies': True,
+            'allowed_product_types': ['ordinary_equity', 'reit', 'etf'],
+        }
+        raw_config = self.data_config.get('hkex_instrument_master_sync')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.hkex_instrument_master_sync', {})
+        if isinstance(raw_config, dict):
+            defaults.update(raw_config)
+        return defaults
+
     def _resolve_master_governance_exchanges(
         self,
         exchanges: Optional[List[str]],
@@ -7495,7 +7525,15 @@ class DataManager:
 
         resolved_exchanges = self._resolve_master_governance_exchanges(exchanges)
         supported_set = set(config.get('supported_exchanges') or ['SSE', 'SZSE', 'BSE'])
-        supported_exchanges = [ex for ex in resolved_exchanges if ex in supported_set and ex in ('SSE', 'SZSE', 'BSE')]
+        hkex_config = self._get_hkex_instrument_master_sync_config()
+        supported_a_share_exchanges = [
+            ex for ex in resolved_exchanges if ex in supported_set and ex in ('SSE', 'SZSE', 'BSE')
+        ]
+        supported_hkex_exchanges = [
+            ex for ex in resolved_exchanges
+            if ex == 'HKEX' and ex in supported_set and hkex_config.get('enabled', False)
+        ]
+        supported_exchanges = supported_a_share_exchanges + supported_hkex_exchanges
         unsupported_exchanges = [ex for ex in resolved_exchanges if ex not in supported_exchanges]
 
         local_today = get_shanghai_time().date()
@@ -7562,16 +7600,55 @@ class DataManager:
             if fresh_result is not None:
                 return fresh_result
 
-        result = await self.sync_instrument_master(
-            supported_exchanges,
-            include_pytdx_validation=(
-                include_pytdx_validation
-                if include_pytdx_validation is not None
-                else config.get('pytdx_validation_enabled', True)
-            ),
-            timeout_sec=timeout_sec if timeout_sec is not None else config.get('timeout_sec'),
-            freshness_threshold_hours=effective_freshness_hours,
-        )
+        result: Optional[Dict[str, Any]] = None
+        if supported_a_share_exchanges:
+            result = await self.sync_instrument_master(
+                supported_a_share_exchanges,
+                include_pytdx_validation=(
+                    include_pytdx_validation
+                    if include_pytdx_validation is not None
+                    else config.get('pytdx_validation_enabled', True)
+                ),
+                timeout_sec=timeout_sec if timeout_sec is not None else config.get('timeout_sec'),
+                freshness_threshold_hours=effective_freshness_hours,
+            )
+        if supported_hkex_exchanges:
+            hkex_result = await self.sync_hkex_instrument_master(
+                mode=hkex_config.get('mode', 'audit_only'),
+                timeout_sec=timeout_sec if timeout_sec is not None else hkex_config.get('timeout_sec'),
+            )
+            if result is None:
+                result = hkex_result
+            else:
+                result.setdefault('exchanges', {}).update(hkex_result.get('exchanges') or {})
+                result.setdefault('warnings', []).extend(hkex_result.get('warnings') or [])
+                result.setdefault('errors', []).extend(hkex_result.get('errors') or [])
+                result.setdefault('source_priority', []).extend(
+                    item for item in hkex_result.get('source_priority', [])
+                    if item not in result.get('source_priority', [])
+                )
+                result_summary = result.setdefault('summary', {})
+                hkex_summary = hkex_result.get('summary') or {}
+                result_summary['exchanges'] = supported_exchanges
+                for key in (
+                    'added_instruments',
+                    'deactivated_instruments',
+                    'suspended_instruments',
+                    'reactivated_instruments',
+                    'active_count',
+                    'review_required',
+                ):
+                    result_summary[key] = int(result_summary.get(key, 0) or 0) + int(hkex_summary.get(key, 0) or 0)
+                if hkex_result.get('status') in ('warning', 'error') and result.get('status') == 'success':
+                    result['status'] = hkex_result.get('status')
+        if result is None:
+            result = {
+                'status': 'skipped',
+                'summary': {'exchanges': [], 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
+                'exchanges': {},
+                'warnings': [],
+                'errors': [],
+            }
         result['action'] = 'synced'
         result['job_name'] = job_name
         result['job_type'] = job_type
@@ -7941,6 +8018,666 @@ class DataManager:
             result["status"] = "success"
         return result
 
+    def _read_hkex_master_file(self, file_path: Optional[str]) -> Optional[str]:
+        if not file_path:
+            return None
+        path = Path(str(file_path))
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        if not path.exists():
+            return None
+        return path.read_text(encoding="utf-8-sig")
+
+    def _read_hkex_master_binary_file(self, file_path: Optional[str]) -> Optional[bytes]:
+        if not file_path:
+            return None
+        path = Path(str(file_path))
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        if not path.exists():
+            return None
+        return path.read_bytes()
+
+    def _get_hkex_manual_review_path(self) -> Path:
+        config = self._get_hkex_instrument_master_sync_config()
+        file_path = config.get('manual_review_file') or 'data/hkex_manual_review.json'
+        path = Path(str(file_path))
+        if not path.is_absolute():
+            path = Path.cwd() / path
+        return path
+
+    def _load_hkex_manual_review_entries(self) -> Tuple[Path, List[Dict[str, Any]]]:
+        path = self._get_hkex_manual_review_path()
+        entries: List[Dict[str, Any]] = []
+        if path.exists():
+            try:
+                payload = json.loads(path.read_text(encoding='utf-8-sig') or '[]')
+                if isinstance(payload, dict):
+                    payload = payload.get('reviews') or payload.get('rows') or payload.get('data') or []
+                if isinstance(payload, list):
+                    entries = [item for item in payload if isinstance(item, dict)]
+            except Exception as exc:
+                raise ValueError(f"invalid HKEX manual review file {path}: {exc}") from exc
+        return path, entries
+
+    async def get_hkex_manual_review_evidence(self, *, limit: int = 100) -> Dict[str, Any]:
+        """Return recently stored HKEX manual-review lifecycle evidence."""
+        path, entries = self._load_hkex_manual_review_entries()
+        bounded = entries[-max(1, min(int(limit), 1000)) :]
+        return {
+            'status': 'success',
+            'path': str(path),
+            'total': len(entries),
+            'entries': bounded,
+        }
+
+    async def append_hkex_manual_review_evidence(
+        self,
+        *,
+        instrument_id: str,
+        action: str,
+        effective_date: Optional[Any] = None,
+        reason: str = '',
+        evidence_url: str = '',
+        reviewed_by: str = '',
+    ) -> Dict[str, Any]:
+        """Append one operator-reviewed HKEX lifecycle evidence row."""
+        from data_sources.hkex_instrument_master import hkex_instrument_id, normalize_hkex_code
+
+        normalized_code = normalize_hkex_code(instrument_id)
+        normalized_id = hkex_instrument_id(normalized_code)
+        if not normalized_id:
+            raise ValueError("instrument_id or stock code is required")
+
+        normalized_action = str(action or '').strip().lower()
+        aliases = {
+            'delist': 'delisted',
+            'deactivate': 'delisted',
+            'inactive': 'delisted',
+            'suspend': 'suspended',
+            'reactivate': 'active',
+            'activate': 'active',
+        }
+        normalized_action = aliases.get(normalized_action, normalized_action)
+        if normalized_action not in {'active', 'suspended', 'delisted'}:
+            raise ValueError("action must be one of active, suspended, delisted")
+
+        effective_date_text = ''
+        if effective_date:
+            if isinstance(effective_date, (datetime, date)):
+                effective_date_text = effective_date.date().isoformat() if isinstance(effective_date, datetime) else effective_date.isoformat()
+            else:
+                effective_date_text = str(effective_date).strip()[:10]
+                try:
+                    datetime.fromisoformat(effective_date_text)
+                except ValueError as exc:
+                    raise ValueError("effective_date must use YYYY-MM-DD format") from exc
+
+        path = self._get_hkex_manual_review_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        _, entries = self._load_hkex_manual_review_entries()
+        entry = {
+            'instrument_id': normalized_id,
+            'code': normalized_code,
+            'action': normalized_action,
+            'effective_date': effective_date_text,
+            'reason': str(reason or '').strip(),
+            'evidence_url': str(evidence_url or '').strip(),
+            'reviewed_by': str(reviewed_by or '').strip(),
+            'reviewed_at': get_shanghai_time().isoformat(),
+        }
+        entries.append(entry)
+        tmp_path = path.with_suffix(path.suffix + '.tmp')
+        tmp_path.write_text(json.dumps(entries, ensure_ascii=False, indent=2, default=str), encoding='utf-8')
+        tmp_path.replace(path)
+        return {
+            'status': 'success',
+            'path': str(path),
+            'entry': entry,
+            'total': len(entries),
+        }
+
+    async def _get_hkex_local_master_rows(self) -> List[Dict[str, Any]]:
+        return await self.db_ops.execute_read_query(
+            """
+            SELECT instrument_id, symbol, name, exchange, type, status, is_active,
+                   listed_date, delisted_date, source, source_symbol, currency,
+                   market, industry, sector, trading_status, updated_at
+            FROM instruments
+            WHERE exchange = 'HKEX' AND type = 'stock'
+            """
+        )
+
+    async def _get_hkex_quote_availability_rows(self, *, stale_days: int = 14) -> List[Dict[str, Any]]:
+        rows = await self.db_ops.execute_read_query(
+            """
+            SELECT i.instrument_id, MAX(q.time) AS last_quote
+            FROM instruments i
+            LEFT JOIN daily_quotes q ON q.instrument_id = i.instrument_id
+            WHERE i.exchange = 'HKEX' AND i.type = 'stock'
+            GROUP BY i.instrument_id
+            """
+        )
+        cutoff = get_shanghai_time().date() - timedelta(days=stale_days)
+        for row in rows:
+            last_quote = row.get('last_quote')
+            parsed_date = self._parse_master_updated_at(last_quote)
+            row['quote_stale'] = parsed_date is None or parsed_date.date() < cutoff
+        return rows
+
+    async def _fetch_hkex_instrument_master_sources(
+        self,
+        config: Dict[str, Any],
+        *,
+        timeout_sec: Optional[float],
+    ) -> Dict[str, Any]:
+        from data_sources.hkex_instrument_master import (
+            HKEXManualReviewProvider,
+            HKEXNewsStockListProvider,
+            HKEXSecuritiesListProvider,
+            HKEXSuspensionReportProvider,
+            HKEXSupplementalAdapter,
+        )
+
+        result: Dict[str, Any] = {
+            'snapshots': [],
+            'official_active_rows': [],
+            'official_delisted_rows': [],
+            'supplemental_rows': [],
+            'suspension_rows': [],
+            'warnings': [],
+            'errors': [],
+        }
+        effective_timeout = float(timeout_sec or config.get('timeout_sec') or 60)
+
+        try:
+            raw = self._read_hkex_master_file(config.get('official_securities_list_file'))
+            provider = HKEXSecuritiesListProvider(
+                source_url=config.get('official_securities_list_url') or ''
+            )
+            if raw is not None:
+                snapshot = provider.parse_csv(raw)
+            elif config.get('official_securities_list_url'):
+                snapshot = await asyncio.to_thread(provider.fetch_csv, timeout_sec=effective_timeout)
+            else:
+                snapshot = None
+                result['warnings'].append('HKEX official securities-list source not configured')
+            if snapshot is not None:
+                result['snapshots'].append(snapshot)
+                result['official_active_rows'].extend(snapshot.rows)
+        except Exception as exc:
+            result['errors'].append(f"HKEX official securities-list fetch/parse failed: {exc}")
+
+        try:
+            raw = self._read_hkex_master_file(config.get('hkexnews_active_list_file'))
+            provider = HKEXNewsStockListProvider(
+                source_url=config.get('hkexnews_active_list_url') or ''
+            )
+            if raw is not None:
+                snapshot = provider.parse_html(raw, lifecycle_status='active')
+            elif config.get('hkexnews_active_list_url'):
+                snapshot = await asyncio.to_thread(
+                    provider.fetch_html,
+                    lifecycle_status='active',
+                    timeout_sec=effective_timeout,
+                )
+            else:
+                snapshot = None
+            if snapshot is not None:
+                result['snapshots'].append(snapshot)
+                result['official_active_rows'].extend(snapshot.rows)
+        except Exception as exc:
+            result['errors'].append(f"HKEXnews active-list fetch/parse failed: {exc}")
+
+        try:
+            raw = self._read_hkex_master_file(config.get('hkexnews_delisted_list_file'))
+            provider = HKEXNewsStockListProvider(
+                source_url=config.get('hkexnews_delisted_list_url') or ''
+            )
+            if raw is not None:
+                snapshot = provider.parse_html(raw, lifecycle_status='delisted')
+            elif config.get('hkexnews_delisted_list_url'):
+                snapshot = await asyncio.to_thread(
+                    provider.fetch_html,
+                    lifecycle_status='delisted',
+                    timeout_sec=effective_timeout,
+                )
+            else:
+                snapshot = None
+            if snapshot is not None:
+                result['snapshots'].append(snapshot)
+                result['official_delisted_rows'].extend(snapshot.rows)
+        except Exception as exc:
+            result['errors'].append(f"HKEXnews delisted-list fetch/parse failed: {exc}")
+
+        try:
+            raw = self._read_hkex_master_file(config.get('manual_review_file'))
+            if raw is not None:
+                snapshot = HKEXManualReviewProvider(
+                    source_url=config.get('manual_review_file') or 'manual_review_file'
+                ).parse(raw)
+                result['snapshots'].append(snapshot)
+                for row in snapshot.rows:
+                    status = str(row.get('status') or '').lower()
+                    if status == 'delisted':
+                        result['official_delisted_rows'].append(row)
+                    elif status == 'suspended':
+                        result['suspension_rows'].append(row)
+                        result['official_active_rows'].append(row)
+                    elif status == 'active':
+                        result['official_active_rows'].append(row)
+        except Exception as exc:
+            result['errors'].append(f"HKEX manual review evidence parse failed: {exc}")
+
+        for config_file_key, config_url_key, market in (
+            (
+                'hkexnews_suspension_main_board_file',
+                'hkexnews_suspension_main_board_url',
+                'Main Board',
+            ),
+            ('hkexnews_suspension_gem_file', 'hkexnews_suspension_gem_url', 'GEM'),
+        ):
+            try:
+                provider = HKEXSuspensionReportProvider(
+                    source_url=config.get(config_url_key) or config.get(config_file_key) or '',
+                    market=market,
+                )
+                raw_pdf = self._read_hkex_master_binary_file(config.get(config_file_key))
+                if raw_pdf is not None:
+                    snapshot = provider.parse_pdf(raw_pdf)
+                elif config.get(config_url_key):
+                    snapshot = await asyncio.to_thread(
+                        provider.fetch_pdf,
+                        timeout_sec=effective_timeout,
+                    )
+                else:
+                    snapshot = None
+                if snapshot is not None:
+                    result['snapshots'].append(snapshot)
+                    result['suspension_rows'].extend(snapshot.rows)
+                    result['official_active_rows'].extend(snapshot.rows)
+            except Exception as exc:
+                result['warnings'].append(f"HKEX suspension report fetch/parse failed ({market}): {exc}")
+
+        try:
+            raw = self._read_hkex_master_file(config.get('akshare_spot_file'))
+            if raw is not None:
+                snapshot = HKEXSupplementalAdapter.parse_akshare_spot_csv(raw)
+                result['snapshots'].append(snapshot)
+                result['supplemental_rows'].extend(snapshot.rows)
+        except Exception as exc:
+            result['warnings'].append(f"AkShare HKEX supplemental fixture parse failed: {exc}")
+
+        try:
+            raw = self._read_hkex_master_file(config.get('eastmoney_profile_file'))
+            if raw is not None:
+                snapshot = HKEXSupplementalAdapter.parse_eastmoney_profile_csv(raw)
+                result['snapshots'].append(snapshot)
+                result['supplemental_rows'].extend(snapshot.rows)
+        except Exception as exc:
+            result['warnings'].append(f"Eastmoney HKEX supplemental fixture parse failed: {exc}")
+
+        if config.get('fetch_supplemental_live'):
+            try:
+                if self.source_factory is None:
+                    from data_sources.source_factory import get_data_source_factory
+                    self.source_factory = await get_data_source_factory(self.db_ops)
+                live_rows = await self.source_factory.get_instrument_list(
+                    'HKEX',
+                    force_refresh=True,
+                    instrument_types=['stock'],
+                )
+                for row in live_rows or []:
+                    item = dict(row)
+                    item['lifecycle_authoritative'] = False
+                    item['source'] = item.get('source') or 'hkex_supplemental_live'
+                    result['supplemental_rows'].append(item)
+            except Exception as exc:
+                result['warnings'].append(f"HKEX supplemental live fetch failed: {exc}")
+
+        return result
+
+    def _merge_hkex_official_active_rows(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        merged: Dict[str, Dict[str, Any]] = {}
+        for row in rows or []:
+            instrument_id = row.get('instrument_id')
+            if not instrument_id:
+                continue
+            existing = merged.get(instrument_id, {})
+            combined = dict(existing)
+            combined.update({k: v for k, v in row.items() if v not in (None, '')})
+            merged[instrument_id] = combined
+        return list(merged.values())
+
+    def _build_hkex_metadata_rows(
+        self,
+        *,
+        rows: List[Dict[str, Any]],
+        snapshots: List[Any],
+    ) -> List[Dict[str, Any]]:
+        from data_sources.hkex_instrument_master import build_dual_counter_map
+
+        snapshot_by_source = {
+            snapshot.source: snapshot
+            for snapshot in snapshots or []
+            if getattr(snapshot, 'source', None)
+        }
+        dual_map = build_dual_counter_map(rows)
+        metadata_rows: List[Dict[str, Any]] = []
+        for row in rows or []:
+            instrument_id = row.get('instrument_id')
+            if not instrument_id:
+                continue
+            item = dict(row)
+            item.update(dual_map.get(instrument_id) or {
+                'canonical_instrument_id': instrument_id,
+                'is_canonical': True,
+                'counter_currency': row.get('currency'),
+            })
+            snapshot = snapshot_by_source.get(row.get('source'))
+            if snapshot is not None:
+                item['raw_snapshot_hash'] = snapshot.raw_snapshot_hash
+                item['parser_version'] = snapshot.parser_version
+                item['source_url'] = snapshot.source_url
+            metadata_rows.append(item)
+        return metadata_rows
+
+    def _filter_hkex_safe_write_rows(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        config: Dict[str, Any],
+        metadata_rows: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        metadata_by_id = {row.get('instrument_id'): row for row in metadata_rows if row.get('instrument_id')}
+        allowed_product_types = set(config.get('allowed_product_types') or ['ordinary_equity', 'reit', 'etf'])
+        valid_fields = {
+            'instrument_id', 'symbol', 'name', 'exchange', 'type', 'currency',
+            'listed_date', 'delisted_date', 'issue_date', 'industry', 'sector',
+            'market', 'status', 'is_active', 'is_st', 'trading_status', 'source',
+            'source_symbol',
+        }
+        safe_rows: List[Dict[str, Any]] = []
+        for row in rows or []:
+            instrument_id = row.get('instrument_id')
+            meta = metadata_by_id.get(instrument_id, {})
+            product_type = meta.get('product_type') or row.get('product_type')
+            if product_type not in allowed_product_types:
+                continue
+            if meta.get('is_canonical') is False:
+                continue
+            item = {
+                'instrument_id': instrument_id,
+                'symbol': row.get('symbol'),
+                'name': row.get('name') or instrument_id,
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'currency': row.get('currency') or meta.get('counter_currency') or 'HKD',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': row.get('source') or 'hkex_securities_list',
+                'source_symbol': row.get('source_symbol') or row.get('symbol'),
+            }
+            if row.get('listed_date'):
+                item['listed_date'] = row.get('listed_date')
+            safe_rows.append({key: value for key, value in item.items() if key in valid_fields})
+        return safe_rows
+
+    async def sync_hkex_instrument_master(
+        self,
+        *,
+        mode: Optional[str] = None,
+        timeout_sec: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Refresh/audit HKEX stock master data using HKEX-specific source authority."""
+        from data_sources.hkex_instrument_master import (
+            HKEXLifecyclePolicy,
+            HKEXSourceEvidencePolicy,
+            build_quote_availability_diagnostics,
+        )
+
+        config = self._get_hkex_instrument_master_sync_config()
+        started_at = get_shanghai_time()
+        selected_mode = (mode or config.get('mode') or 'audit_only').strip().lower()
+        if selected_mode not in {'audit_only', 'safe_write', 'lifecycle_write'}:
+            selected_mode = 'audit_only'
+
+        result: Dict[str, Any] = {
+            'status': 'success',
+            'started_at': started_at.isoformat(),
+            'finished_at': None,
+            'elapsed_sec': 0.0,
+            'mode': selected_mode,
+            'source_priority': [
+                'hkex_securities_list',
+                'hkexnews_active_list',
+                'hkexnews_delisted_list',
+                'akshare_eastmoney_diagnostics_only',
+                'yfinance_local_quote_diagnostics_only',
+            ],
+            'exchanges': {},
+            'summary': {
+                'exchanges': ['HKEX'],
+                'added_instruments': 0,
+                'deactivated_instruments': 0,
+                'suspended_instruments': 0,
+                'reactivated_instruments': 0,
+                'active_count': 0,
+                'review_required': 0,
+            },
+            'warnings': [],
+            'errors': [],
+        }
+
+        if not config.get('enabled', False):
+            result.update({
+                'status': 'skipped',
+                'reason': 'hkex_instrument_master_sync_disabled',
+                'finished_at': get_shanghai_time().isoformat(),
+            })
+            result['elapsed_sec'] = round((get_shanghai_time() - started_at).total_seconds(), 3)
+            return result
+
+        before = await self._get_instrument_master_snapshot('HKEX')
+        local_rows = await self._get_hkex_local_master_rows()
+        quote_rows = await self._get_hkex_quote_availability_rows(
+            stale_days=int(config.get('quote_stale_days', 14))
+        )
+        source_bundle = await self._fetch_hkex_instrument_master_sources(
+            config,
+            timeout_sec=timeout_sec if timeout_sec is not None else config.get('timeout_sec'),
+        )
+        official_active_rows = self._merge_hkex_official_active_rows(
+            source_bundle.get('official_active_rows') or []
+        )
+        official_delisted_rows = source_bundle.get('official_delisted_rows') or []
+        metadata_rows = self._build_hkex_metadata_rows(
+            rows=official_active_rows,
+            snapshots=source_bundle.get('snapshots') or [],
+        )
+        decisions = HKEXLifecyclePolicy.build_decisions(
+            local_rows=local_rows,
+            official_active_rows=official_active_rows,
+            official_delisted_rows=official_delisted_rows,
+            supplemental_rows=source_bundle.get('supplemental_rows') or [],
+        )
+        source_evidence_policy = HKEXSourceEvidencePolicy.assess(
+            snapshots=source_bundle.get('snapshots') or [],
+            errors=source_bundle.get('errors') or [],
+            official_active_rows=official_active_rows,
+            official_delisted_rows=official_delisted_rows,
+        )
+        quote_diagnostics = build_quote_availability_diagnostics(
+            local_rows=quote_rows,
+            yfinance_rows=[],
+        )
+        safe_write_preview_rows = self._filter_hkex_safe_write_rows(
+            decisions.get('insert_candidates', []) + decisions.get('metadata_update_candidates', []),
+            config=config,
+            metadata_rows=metadata_rows,
+        )
+        allowed_lifecycle_ids = {
+            row.get('instrument_id')
+            for row in self._filter_hkex_safe_write_rows(
+                official_active_rows,
+                config=config,
+                metadata_rows=metadata_rows,
+            )
+            if row.get('instrument_id')
+        }
+        allowed_reactivation_count = sum(
+            1
+            for item in decisions.get('reactivation_candidates', [])
+            if item.get('instrument_id') in allowed_lifecycle_ids
+        )
+        allowed_suspension_count = sum(
+            1
+            for item in decisions.get('suspension_candidates', [])
+            if item.get('instrument_id') in allowed_lifecycle_ids
+        )
+
+        result['warnings'].extend(source_bundle.get('warnings') or [])
+        result['errors'].extend(source_bundle.get('errors') or [])
+        if not official_active_rows:
+            result['warnings'].append('HKEX official active source returned no rows; lifecycle writes disabled')
+        if source_evidence_policy.get('active_fallback_used'):
+            result['warnings'].append(
+                'HKEX primary securities-list source unavailable; using HKEXnews active fallback for audit only'
+            )
+        if result['errors']:
+            result['status'] = 'error'
+        elif result['warnings']:
+            result['status'] = 'warning'
+
+        metadata_saved = 0
+        review_saved = 0
+        written_rows = 0
+        delisted_count = 0
+        suspended_count = 0
+        reactivated_count = 0
+        if (
+            selected_mode in {'safe_write', 'lifecycle_write'}
+            and source_evidence_policy.get('safe_write_allowed')
+            and official_active_rows
+        ):
+            safe_rows = safe_write_preview_rows
+            if safe_rows:
+                saved = await self.db_ops.save_instruments_batch(safe_rows)
+                written_rows = len(safe_rows) if saved else 0
+            if hasattr(self.db_ops, 'save_instrument_master_metadata_batch'):
+                metadata_saved = await self.db_ops.save_instrument_master_metadata_batch(metadata_rows)
+
+        if (
+            config.get('write_review_discrepancies', True)
+            and selected_mode in {'safe_write', 'lifecycle_write'}
+            and hasattr(self.db_ops, 'save_instrument_master_discrepancies')
+        ):
+            review_saved = await self.db_ops.save_instrument_master_discrepancies(
+                decisions.get('review_required', []),
+                exchange='HKEX',
+                run_id=started_at.strftime('hkex_master_%Y%m%d_%H%M%S'),
+            )
+
+        if selected_mode == 'lifecycle_write' and official_active_rows:
+            for item in decisions.get('delisting_candidates', []):
+                if not source_evidence_policy.get('delisting_write_allowed'):
+                    continue
+                official = item.get('official') or {}
+                delisted_date = official.get('delisted_date') or get_shanghai_time().date().isoformat()
+                updated = await self.db_ops.mark_instrument_delisted(
+                    item.get('instrument_id'),
+                    delisted_date=delisted_date,
+                    source=official.get('source') or 'hkexnews_delisted_list',
+                )
+                if updated:
+                    delisted_count += 1
+            for item in decisions.get('reactivation_candidates', []):
+                if not source_evidence_policy.get('reactivation_write_allowed'):
+                    continue
+                if item.get('instrument_id') not in allowed_lifecycle_ids:
+                    continue
+                official = item.get('official') or {}
+                if not hasattr(self.db_ops, 'mark_instrument_active'):
+                    continue
+                updated = await self.db_ops.mark_instrument_active(
+                    item.get('instrument_id'),
+                    source=official.get('source') or 'hkex_securities_list',
+                    listed_date=official.get('listed_date'),
+                )
+                if updated:
+                    reactivated_count += 1
+            for item in decisions.get('suspension_candidates', []):
+                if not source_evidence_policy.get('suspension_write_allowed'):
+                    continue
+                if item.get('instrument_id') not in allowed_lifecycle_ids:
+                    continue
+                official = item.get('official') or {}
+                if not hasattr(self.db_ops, 'mark_instrument_suspended'):
+                    continue
+                updated = await self.db_ops.mark_instrument_suspended(
+                    item.get('instrument_id'),
+                    source=official.get('source') or 'hkex_official_suspension',
+                )
+                if updated:
+                    suspended_count += 1
+
+        after = await self._get_instrument_master_snapshot('HKEX')
+        exchange_result = {
+            'status': result['status'],
+            'mode': selected_mode,
+            'before': {
+                'total_count': before['total_count'],
+                'active_count': before['active_count'],
+                'inactive_count': before['inactive_count'],
+                'status_counts': before['status_counts'],
+                'source_counts': before['source_counts'],
+            },
+            'after': {
+                'total_count': after['total_count'],
+                'active_count': after['active_count'],
+                'inactive_count': after['inactive_count'],
+                'status_counts': after['status_counts'],
+                'source_counts': after['source_counts'],
+            },
+            'source_usage': {
+                snapshot.source: snapshot.diagnostics.get('row_count', 0)
+                for snapshot in source_bundle.get('snapshots') or []
+            },
+            'source_evidence_policy': source_evidence_policy,
+            'official_active_count': len(official_active_rows),
+            'official_delisted_count': len(official_delisted_rows),
+            'official_suspension_count': len(source_bundle.get('suspension_rows') or []),
+            'supplemental_count': len(source_bundle.get('supplemental_rows') or []),
+            'decision_counts': decisions.get('counts', {}),
+            'safe_write_preview_count': len(safe_write_preview_rows),
+            'allowed_reactivation_count': allowed_reactivation_count,
+            'allowed_suspension_count': allowed_suspension_count,
+            'quote_availability': quote_diagnostics,
+            'written_rows': written_rows,
+            'metadata_saved': metadata_saved,
+            'review_discrepancies_saved': review_saved,
+            'delisted_count': delisted_count,
+            'suspended_count': suspended_count,
+            'reactivated_count': reactivated_count,
+            'review_required_samples': decisions.get('review_required', [])[:20],
+            'warnings': result['warnings'],
+            'errors': result['errors'],
+        }
+        result['exchanges']['HKEX'] = exchange_result
+        result['summary'].update({
+            'added_instruments': max(0, after['total_count'] - before['total_count']),
+            'deactivated_instruments': delisted_count,
+            'suspended_instruments': suspended_count,
+            'reactivated_instruments': reactivated_count,
+            'active_count': after['active_count'],
+            'review_required': decisions.get('counts', {}).get('review_required', 0),
+        })
+        finished_at = get_shanghai_time()
+        result['finished_at'] = finished_at.isoformat()
+        result['elapsed_sec'] = round((finished_at - started_at).total_seconds(), 3)
+        return result
+
     async def sync_instrument_master(
         self,
         exchanges: Optional[List[str]] = None,
@@ -8182,6 +8919,82 @@ class DataManager:
         if isinstance(result, dict) and governance is not None:
             result['instrument_master_governance'] = governance
         return result
+
+    async def resolve_hkex_current_universe(
+        self,
+        *,
+        governance: Optional[Dict[str, Any]] = None,
+        ensure_governance: bool = True,
+        allowed_product_types: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Resolve the shared HKEX current research universe after master governance."""
+        if governance is None and ensure_governance:
+            governance = await self.ensure_instrument_master_fresh(
+                ['HKEX'],
+                job_name='hkex_current_universe_resolver',
+                job_type='current',
+            )
+
+        instruments = await self.db_ops.get_active_instruments(
+            'HKEX',
+            instrument_types=['stock'],
+        )
+        allowed_types = set(
+            allowed_product_types
+            or self._get_hkex_instrument_master_sync_config().get(
+                'allowed_product_types',
+                ['ordinary_equity', 'reit', 'etf'],
+            )
+        )
+
+        metadata_rows = await self.db_ops.execute_read_query(
+            """
+            SELECT instrument_id, product_type, research_scope,
+                   canonical_instrument_id, is_canonical, counter_currency
+            FROM instrument_master_metadata
+            WHERE exchange = 'HKEX'
+            """
+        )
+        metadata_by_id = {
+            row.get('instrument_id'): row
+            for row in metadata_rows or []
+            if row.get('instrument_id')
+        }
+
+        resolved: List[Dict[str, Any]] = []
+        excluded_count = 0
+        for instrument in instruments or []:
+            item = dict(instrument)
+            metadata = metadata_by_id.get(item.get('instrument_id'))
+            if metadata:
+                product_type = metadata.get('product_type')
+                is_canonical = metadata.get('is_canonical') in (True, 1, '1')
+                if product_type not in allowed_types or not is_canonical:
+                    excluded_count += 1
+                    continue
+                item['hkex_master_metadata'] = metadata
+            resolved.append(item)
+
+        warnings: List[str] = []
+        readiness = 'ready'
+        governance_status = governance.get('status') if isinstance(governance, dict) else None
+        if governance_status in {'warning', 'error', 'skipped'}:
+            readiness = 'degraded'
+            warnings.append(f"HKEX master governance status is {governance_status}")
+        if not metadata_rows:
+            readiness = 'degraded'
+            warnings.append('HKEX product metadata unavailable; falling back to active instruments')
+
+        return {
+            'status': 'success',
+            'exchange': 'HKEX',
+            'readiness': readiness,
+            'instruments': resolved,
+            'instrument_count': len(resolved),
+            'excluded_count': excluded_count,
+            'governance': governance,
+            'warnings': warnings,
+        }
 
     async def _save_progress(self):
         """保存标准进度到文件"""
@@ -8946,7 +9759,11 @@ class DataManager:
                     dm_logger.info(f"[DataManager] Updating data for {exchange}, types: {instrument_types}")
 
                     # 获取该交易所的活跃股票
-                    instruments = await self.db_ops.get_active_instruments(exchange, instrument_types=instrument_types)
+                    instruments = await self.db_ops.get_active_instruments(
+                        exchange,
+                        instrument_types=instrument_types,
+                        tradable_only=True,
+                    )
                     total_instruments = len(instruments)
                     exchange_result = {
                         'success_count': 0,

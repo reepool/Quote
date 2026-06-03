@@ -35,10 +35,12 @@
       "supported_exchanges": [
         "SSE",
         "SZSE",
-        "BSE"
+        "BSE",
+        "HKEX"
       ],
       "current_job_names": [
         "daily_data_update",
+        "hk_daily_data_update",
         "company_profile_shadow_sync",
         "industry_shadow_sync",
         "industry_standard_sync",
@@ -51,6 +53,32 @@
         "sentiment_event_shadow_sync",
         "technical_snapshot_refresh",
         "risk_snapshot_rebuild"
+      ]
+    },
+    "hkex_instrument_master_sync": {
+      "enabled": true,
+      "mode": "audit_only",
+      "timeout_sec": 60,
+      "quote_stale_days": 14,
+      "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",
+      "official_securities_list_file": "",
+      "hkexnews_active_list_url": "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json",
+      "hkexnews_active_list_file": "",
+      "hkexnews_delisted_list_url": "https://www.hkexnews.hk/ncms/script/eds/inactivestock_sehk_e.json",
+      "hkexnews_delisted_list_file": "",
+      "hkexnews_suspension_main_board_url": "https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_mb.pdf",
+      "hkexnews_suspension_gem_url": "https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_gem.pdf",
+      "hkexnews_suspension_main_board_file": "",
+      "hkexnews_suspension_gem_file": "",
+      "manual_review_file": "data/hkex_manual_review.json",
+      "akshare_spot_file": "",
+      "eastmoney_profile_file": "",
+      "fetch_supplemental_live": false,
+      "write_review_discrepancies": true,
+      "allowed_product_types": [
+        "ordinary_equity",
+        "reit",
+        "etf"
       ]
     },
     "default_start_years": {

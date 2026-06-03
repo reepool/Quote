@@ -122,6 +122,83 @@ async def get_instrument_by_symbol(symbol: str):
         raise HTTPException(status_code=500, detail=f"Failed to get instrument: {str(e)}")
 
 
+@router.get(
+    "/instruments/hkex/master/review-required",
+    response_model=HKEXReviewRequiredResponse,
+    tags=["Instruments"],
+)
+async def get_hkex_master_review_required(
+    limit: int = Query(20, description="返回待复核样本数量", ge=1, le=100),
+):
+    """Run an audit-only HKEX master sync and return review-required samples."""
+    try:
+        result = await data_manager.sync_hkex_instrument_master(mode="audit_only")
+        hkex = (result.get("exchanges") or {}).get("HKEX", {})
+        samples = hkex.get("review_required_samples", [])[:limit]
+        return HKEXReviewRequiredResponse(
+            status=result.get("status", "unknown"),
+            mode=result.get("mode", "audit_only"),
+            review_required=int((result.get("summary") or {}).get("review_required", 0) or 0),
+            samples=samples,
+            warnings=result.get("warnings", []),
+            errors=result.get("errors", []),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get HKEX review-required samples: {str(e)}",
+        )
+
+
+@router.get(
+    "/instruments/hkex/master/manual-review",
+    response_model=HKEXManualReviewListResponse,
+    tags=["Instruments"],
+)
+async def list_hkex_manual_review_evidence(
+    limit: int = Query(100, description="返回最近人工复核记录数量", ge=1, le=1000),
+):
+    """List stored HKEX manual lifecycle review evidence."""
+    try:
+        payload = await data_manager.get_hkex_manual_review_evidence(limit=limit)
+        return HKEXManualReviewListResponse(**payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to list HKEX manual review evidence: {str(e)}",
+        )
+
+
+@router.post(
+    "/instruments/hkex/master/manual-review",
+    response_model=HKEXManualReviewResponse,
+    tags=["Instruments"],
+)
+async def append_hkex_manual_review_evidence(request: HKEXManualReviewRequest):
+    """Append one HKEX manual lifecycle review conclusion."""
+    try:
+        payload = await data_manager.append_hkex_manual_review_evidence(
+            instrument_id=request.instrument_id,
+            action=request.action,
+            effective_date=request.effective_date,
+            reason=request.reason,
+            evidence_url=request.evidence_url,
+            reviewed_by=request.reviewed_by,
+        )
+        if request.run_audit_after:
+            payload["audit"] = await data_manager.sync_hkex_instrument_master(mode="audit_only")
+        return HKEXManualReviewResponse(**payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to append HKEX manual review evidence: {str(e)}",
+        )
+
+
 # Research Data
 @router.get(
     "/research/company/{instrument_id}/overview",

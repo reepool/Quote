@@ -51,6 +51,7 @@ class TaskManagerHandlers:
         message += "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
         message += "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
         message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
+        message += "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
         message += "• `/find_gap_and_repair` - 精确逐日修复缺口\n"
         message += "• `/reload_config` - 重载配置文件\n"
@@ -102,6 +103,7 @@ class TaskManagerHandlers:
             "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
             "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
             "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
+            "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
             "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
             "• `/reload_config` - 重载配置文件\n"
@@ -917,6 +919,134 @@ class TaskManagerHandlers:
         if chat_id not in self.user_states:
             self.user_states[chat_id] = TaskManagerState(chat_id=chat_id)
         return self.user_states[chat_id]
+
+    async def handle_hkex_review_command(self, event) -> None:
+        """处理 /hkex_review 命令，用于港股主数据人工复核。"""
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        command_text = event.text if hasattr(event, 'text') else '/hkex_review'
+        parts = command_text.strip().split()
+
+        usage = (
+            "港股主数据人工复核用法:\n"
+            "`/hkex_review pending [limit]`\n"
+            "`/hkex_review list [limit]`\n"
+            "`/hkex_review 02934.HK delisted 2026-05-30 已确认退市 evidence=https://...`\n"
+            "`/hkex_review 00005.HK suspended 停牌复核`"
+        )
+        if len(parts) < 2:
+            await self.task_manager.send_message(chat_id, usage, parse_mode='markdown')
+            return
+
+        subcommand = parts[1].strip().lower()
+        try:
+            from data_manager import data_manager
+
+            if subcommand == 'pending':
+                limit = 5
+                if len(parts) >= 3:
+                    try:
+                        limit = max(1, min(int(parts[2]), 20))
+                    except ValueError:
+                        limit = 5
+                result = await data_manager.sync_hkex_instrument_master(mode='audit_only')
+                hkex = (result.get('exchanges') or {}).get('HKEX', {})
+                samples = hkex.get('review_required_samples', [])[:limit]
+                lines = [
+                    "港股主数据待复核",
+                    f"状态: `{result.get('status')}`",
+                    f"待复核: `{(result.get('summary') or {}).get('review_required', 0)}`",
+                ]
+                if samples:
+                    lines.append("样本:")
+                    for item in samples:
+                        local = item.get('local') or {}
+                        lines.append(
+                            f"- `{item.get('instrument_id')}` {local.get('name', '')} "
+                            f"`{item.get('reason')}`"
+                        )
+                else:
+                    lines.append("当前无待复核样本。")
+                await self.task_manager.send_message(chat_id, "\n".join(lines), parse_mode='markdown')
+                return
+
+            if subcommand == 'list':
+                limit = 10
+                if len(parts) >= 3:
+                    try:
+                        limit = max(1, min(int(parts[2]), 50))
+                    except ValueError:
+                        limit = 10
+                payload = await data_manager.get_hkex_manual_review_evidence(limit=limit)
+                lines = [
+                    "港股主数据人工复核记录",
+                    f"文件: `{payload.get('path')}`",
+                    f"总数: `{payload.get('total')}`",
+                ]
+                for item in payload.get('entries', [])[-limit:]:
+                    lines.append(
+                        f"- `{item.get('instrument_id')}` `{item.get('action')}` "
+                        f"`{item.get('effective_date') or '-'}` {item.get('reason') or ''}"
+                    )
+                await self.task_manager.send_message(chat_id, "\n".join(lines), parse_mode='markdown')
+                return
+
+            if len(parts) < 3:
+                await self.task_manager.send_message(chat_id, usage, parse_mode='markdown')
+                return
+
+            instrument_id = parts[1]
+            action = parts[2]
+            rest = parts[3:]
+            effective_date = None
+            if rest:
+                try:
+                    datetime.fromisoformat(rest[0][:10])
+                    effective_date = rest.pop(0)[:10]
+                except ValueError:
+                    effective_date = None
+
+            evidence_url = ''
+            reason_parts = []
+            for token in rest:
+                if token.startswith('evidence=') or token.startswith('url='):
+                    evidence_url = token.split('=', 1)[1].strip()
+                else:
+                    reason_parts.append(token)
+            reason = ' '.join(reason_parts).strip()
+
+            payload = await data_manager.append_hkex_manual_review_evidence(
+                instrument_id=instrument_id,
+                action=action,
+                effective_date=effective_date,
+                reason=reason,
+                evidence_url=evidence_url,
+                reviewed_by=str(user_id),
+            )
+            entry = payload.get('entry') or {}
+            message = (
+                "已追加港股主数据人工复核\n"
+                f"代码: `{entry.get('instrument_id')}`\n"
+                f"结论: `{entry.get('action')}`\n"
+                f"日期: `{entry.get('effective_date') or '-'}`\n"
+                f"文件: `{payload.get('path')}`\n"
+                f"总数: `{payload.get('total')}`\n\n"
+                "下一步可执行 `/hkex_review pending` 复核 audit_only 样本变化。"
+            )
+            await self.task_manager.send_message(chat_id, message, parse_mode='markdown')
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"参数错误: `{exc}`\n\n{usage}",
+                parse_mode='markdown',
+            )
+        except Exception as exc:
+            self.task_manager.logger.error(f"[TaskManagerHandlers] HKEX review command failed: {exc}")
+            await self.task_manager.send_message(
+                chat_id,
+                f"港股主数据人工复核失败: `{exc}`",
+                parse_mode='markdown',
+            )
 
     async def handle_run_command(self, event) -> None:
         """处理 /run 命令，支持 /run <task_id> [日期]"""

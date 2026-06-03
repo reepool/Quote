@@ -40,7 +40,7 @@
       },
       "hk_daily_data_update": {
         "enabled": true,
-        "description": "港股每日数据更新（16:00 HKT 收盘后）",
+        "description": "港股每日数据更新（16:00 HKT 收盘后，前置 HKEX 主数据 audit-only 治理）",
         "report": true,
         "pre_run_notify": true,
         "trigger": {

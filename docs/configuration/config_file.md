@@ -438,9 +438,10 @@
     "timeout_sec": 180,
     "freshness_threshold_hours": 48,
     "pytdx_validation_enabled": false,
-    "supported_exchanges": ["SSE", "SZSE", "BSE"],
+    "supported_exchanges": ["SSE", "SZSE", "BSE", "HKEX"],
     "current_job_names": [
       "daily_data_update",
+      "hk_daily_data_update",
       "financial_summary_shadow_sync",
       "financial_statements_shadow_sync"
     ]
@@ -452,8 +453,47 @@
 - **`reuse_fresh_master`**: 本地 `instruments.updated_at` 在新鲜度窗口内时，后续当前任务复用本地状态，不重复请求上游主数据列表。
 - **`skip_for_backfill`**: 历史、回补和 point-in-time 类任务是否默认跳过当前主数据刷新。
 - **`continue_on_failure`**: 治理失败后是否允许业务任务继续使用本地股票池，并在报告中暴露 warning/error。
-- **`supported_exchanges`**: 已启用主数据策略的市场；当前仅 `SSE/SZSE/BSE`，`HKEX` 会按 unsupported market 记录 skip，待港股专用策略后再启用。
+- **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
 - **`current_job_names`**: 参与治理的当前任务清单，用于配置审计和运维可读性。
+
+### data_config.hkex_instrument_master_sync
+
+> HKEX 专用主数据策略配置。初始生产配置为 `audit_only`，先暴露官方源、本地库、补充源和行情可得性差异，不写生命周期字段。
+
+```json
+{
+  "hkex_instrument_master_sync": {
+    "enabled": true,
+    "mode": "audit_only",
+    "timeout_sec": 60,
+    "quote_stale_days": 14,
+    "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",
+    "official_securities_list_file": "",
+    "hkexnews_active_list_url": "https://www.hkexnews.hk/ncms/script/eds/activestock_sehk_e.json",
+    "hkexnews_active_list_file": "",
+    "hkexnews_delisted_list_url": "https://www.hkexnews.hk/ncms/script/eds/inactivestock_sehk_e.json",
+    "hkexnews_delisted_list_file": "",
+    "hkexnews_suspension_main_board_url": "https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_mb.pdf",
+    "hkexnews_suspension_gem_url": "https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_gem.pdf",
+    "hkexnews_suspension_main_board_file": "",
+    "hkexnews_suspension_gem_file": "",
+    "manual_review_file": "data/hkex_manual_review.json",
+    "akshare_spot_file": "",
+    "eastmoney_profile_file": "",
+    "fetch_supplemental_live": false,
+    "write_review_discrepancies": true,
+    "allowed_product_types": ["ordinary_equity", "reit", "etf"]
+  }
+}
+```
+
+- **`mode`**: `audit_only` 只出差异，`safe_write` 写官方 in-scope 新标的、安全范围内存量标的的非破坏性字段和辅助 metadata，`lifecycle_write` 才允许官方证据驱动 active/suspended/delisted 状态变更。
+- **`official_*_url/file`**: 官方 HKEX / HKEXnews 快照来源；`file` 用于本地审计或离线 fixture，`url` 用于带超时的线上获取。当前主 active 源为 HKEX `ListOfSecurities.xlsx`，辅 active 源为 HKEXnews `activestock_sehk_e.json`，delisted 源为 HKEXnews `inactivestock_sehk_e.json`。
+- **`hkexnews_suspension_*_url/file`**: HKEXnews 月度 prolonged suspension PDF，作为停牌复核来源；自动解析依赖 `pypdf`，失败时报告 warning，不作为停牌证据。
+- **`manual_review_file`**: 人工复核结论回灌文件，默认 `data/hkex_manual_review.json`，支持 JSON/CSV，文件不存在时按空 review 处理。字段建议包含 `instrument_id`/`code`、`action`、`effective_date`、`reason`、`evidence_url`、`reviewed_by`；`action=delisted/suspended/active` 会在 `lifecycle_write` 下作为 reviewed lifecycle evidence 生效。API 与 Telegram `/hkex_review` 命令都会写入该文件。
+- **`akshare_spot_file` / `eastmoney_profile_file` / `fetch_supplemental_live`**: 补充源配置，仅用于候选发现、字段补充和差异诊断，不作为生命周期权威。
+- **`allowed_product_types`**: 进入研究 universe 的 HKEX 产品类型；默认保留普通股、REIT、ETF。
+- **`quote_stale_days`**: 本地行情过旧诊断窗口；yfinance/本地行情诊断不会产生生命周期 mutation candidates。
 
 ### data_config.default_start_years
 

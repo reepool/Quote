@@ -99,6 +99,44 @@ class InstrumentResponse(BaseModel):
         from_attributes = True
 
 
+class HKEXManualReviewRequest(BaseModel):
+    """HKEX manual lifecycle review evidence request."""
+    instrument_id: str = Field(..., description="HKEX instrument id or stock code, e.g. 02934.HK or 2934")
+    action: str = Field(..., description="Lifecycle conclusion: active, suspended, or delisted")
+    effective_date: Optional[date] = Field(None, description="Effective date for the reviewed conclusion")
+    reason: str = Field("", description="Short operator review reason")
+    evidence_url: str = Field("", description="Official evidence URL")
+    reviewed_by: str = Field("", description="Reviewer identifier")
+    run_audit_after: bool = Field(False, description="Run audit-only HKEX master sync after appending evidence")
+
+
+class HKEXManualReviewResponse(BaseModel):
+    """HKEX manual review operation response."""
+    status: str
+    path: str
+    entry: Optional[Dict[str, Any]] = None
+    total: int = 0
+    audit: Optional[Dict[str, Any]] = None
+
+
+class HKEXManualReviewListResponse(BaseModel):
+    """Stored HKEX manual review evidence list."""
+    status: str
+    path: str
+    total: int
+    entries: List[Dict[str, Any]]
+
+
+class HKEXReviewRequiredResponse(BaseModel):
+    """Current HKEX master review-required samples."""
+    status: str
+    mode: str
+    review_required: int
+    samples: List[Dict[str, Any]]
+    warnings: List[str] = Field(default_factory=list)
+    errors: List[str] = Field(default_factory=list)
+
+
 class DailyQuoteResponse(BaseModel):
     """增强日线行情响应模型"""
     time: datetime = Field(..., description="时间")

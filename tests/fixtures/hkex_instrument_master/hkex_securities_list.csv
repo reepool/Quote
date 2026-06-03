@@ -1,0 +1,9 @@
+Stock Code,Name of Securities,Category,Sub-Category,Board Lot,Trading Currency,ISIN
+00005,HSBC HOLDINGS,Equity,Ordinary Shares,400,HKD,GB0005405286
+02800,TRACKER FUND OF HONG KONG,Equity,Exchange Traded Fund,500,HKD,HK2800008867
+00823,LINK REIT,Equity,Real Estate Investment Trust,100,HKD,HK0823032773
+09988,ALIBABA GROUP-SW,Equity,Ordinary Shares,100,HKD,KYG017191142
+89988,ALIBABA GROUP-SW RMB,Equity,Ordinary Shares,100,CNY,KYG017191142
+02929,STERLING GP-OLD,Equity,Old Code,10000,HKD,
+11000,ABC CBBC,Bull/Bear Contract,Callable Bull/Bear Contract,10000,HKD,
+22000,ABC WARRANT,Warrant,Derivative Warrant,10000,HKD,

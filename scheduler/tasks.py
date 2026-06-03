@@ -100,8 +100,42 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
             "新增: "
             f"{summary.get('added_instruments', 0)}，"
             f"停用: {summary.get('deactivated_instruments', 0)}，"
+            f"停牌: {summary.get('suspended_instruments', 0)}，"
+            f"复活: {summary.get('reactivated_instruments', 0)}，"
+            f"待复核: {summary.get('review_required', 0)}，"
             f"活跃合计: {summary.get('active_count', 0)}"
         )
+
+    exchanges = governance.get("exchanges")
+    if isinstance(exchanges, dict) and "HKEX" in exchanges:
+        hkex = exchanges.get("HKEX") or {}
+        lines.append(
+            "HKEX: "
+            f"mode={hkex.get('mode', 'unknown')}，"
+            f"official_active={hkex.get('official_active_count', 0)}，"
+            f"official_delisted={hkex.get('official_delisted_count', 0)}，"
+            f"supplemental={hkex.get('supplemental_count', 0)}，"
+            f"safe_write候选={hkex.get('safe_write_preview_count', 0)}"
+        )
+        if hkex.get("allowed_reactivation_count") or hkex.get("allowed_suspension_count"):
+            lines.append(
+                "HKEX生命周期候选: "
+                f"可复活={hkex.get('allowed_reactivation_count', 0)}，"
+                f"可停牌={hkex.get('allowed_suspension_count', 0)}"
+            )
+        source_usage = hkex.get("source_usage")
+        if isinstance(source_usage, dict) and source_usage:
+            source_text = "，".join(
+                f"{source}:{count}" for source, count in list(source_usage.items())[:4]
+            )
+            lines.append(f"HKEX源: {source_text}")
+        quote_availability = hkex.get("quote_availability")
+        if isinstance(quote_availability, dict):
+            lines.append(
+                "HKEX行情诊断: "
+                f"无本地行情={quote_availability.get('no_local_quote_count', 0)}，"
+                f"过旧={quote_availability.get('stale_local_quote_count', 0)}"
+            )
 
     warnings = governance.get("warnings") or []
     errors = governance.get("errors") or []

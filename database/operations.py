@@ -4,6 +4,7 @@ Supports comprehensive data management with new schema.
 """
 
 import asyncio
+import json
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
@@ -216,7 +217,12 @@ class DatabaseOperations:
             is_active=is_active,
         )
 
-    async def get_active_instruments(self, exchange: str = None, instrument_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    async def get_active_instruments(
+        self,
+        exchange: str = None,
+        instrument_types: Optional[List[str]] = None,
+        tradable_only: bool = False,
+    ) -> List[Dict[str, Any]]:
         """获取活跃交易品种列表"""
         try:
             async with self.get_async_session() as session:
@@ -227,6 +233,9 @@ class DatabaseOperations:
                     
                 if instrument_types:
                     stmt = stmt.filter(InstrumentDB.type.in_(instrument_types))
+
+                if tradable_only:
+                    stmt = stmt.filter(InstrumentDB.trading_status == 1)
 
                 stmt = stmt.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
                 result = await session.execute(stmt)
@@ -652,6 +661,228 @@ class DatabaseOperations:
         except Exception as exc:
             self.db_logger.error("Failed to mark %s delisted: %s", instrument_id, exc)
             return False
+
+    async def mark_instrument_active(
+        self,
+        instrument_id: str,
+        *,
+        source: str,
+        listed_date: Optional[Union[str, date, datetime]] = None,
+    ) -> bool:
+        """Reactivate one instrument using confirmed official lifecycle evidence."""
+        if not instrument_id or not source:
+            return False
+
+        parsed_listed_date = None
+        if listed_date:
+            if isinstance(listed_date, datetime):
+                parsed_listed_date = listed_date
+            elif isinstance(listed_date, date):
+                parsed_listed_date = datetime.combine(listed_date, datetime.min.time())
+            elif isinstance(listed_date, str):
+                try:
+                    parsed_listed_date = datetime.fromisoformat(listed_date[:10])
+                except ValueError:
+                    parsed_listed_date = None
+
+        try:
+            async with self.get_async_session() as session:
+                result = await session.execute(
+                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
+                )
+                record = result.scalar_one_or_none()
+                if record is None:
+                    return False
+
+                record.status = "active"
+                record.is_active = True
+                record.trading_status = 1
+                record.delisted_date = None
+                record.source = source
+                if parsed_listed_date is not None and record.listed_date is None:
+                    record.listed_date = parsed_listed_date
+                record.updated_at = get_shanghai_time()
+                await session.commit()
+                return True
+        except Exception as exc:
+            self.db_logger.error("Failed to mark %s active: %s", instrument_id, exc)
+            return False
+
+    async def mark_instrument_suspended(
+        self,
+        instrument_id: str,
+        *,
+        source: str,
+    ) -> bool:
+        """Mark one instrument suspended using confirmed official lifecycle evidence."""
+        if not instrument_id or not source:
+            return False
+        try:
+            async with self.get_async_session() as session:
+                result = await session.execute(
+                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
+                )
+                record = result.scalar_one_or_none()
+                if record is None:
+                    return False
+
+                record.status = "suspended"
+                record.is_active = True
+                record.trading_status = 0
+                record.source = source
+                record.updated_at = get_shanghai_time()
+                await session.commit()
+                return True
+        except Exception as exc:
+            self.db_logger.error("Failed to mark %s suspended: %s", instrument_id, exc)
+            return False
+
+    async def save_instrument_master_metadata_batch(
+        self,
+        rows: List[Dict[str, Any]],
+    ) -> int:
+        """Save auxiliary instrument-master metadata outside the core instruments table."""
+        if not rows:
+            return 0
+
+        create_sql = text(
+            """
+            CREATE TABLE IF NOT EXISTS instrument_master_metadata (
+                instrument_id TEXT PRIMARY KEY,
+                exchange TEXT NOT NULL,
+                product_type TEXT,
+                research_scope TEXT,
+                canonical_instrument_id TEXT,
+                is_canonical INTEGER,
+                counter_currency TEXT,
+                official_lifecycle_source TEXT,
+                source_url TEXT,
+                raw_snapshot_hash TEXT,
+                parser_version TEXT,
+                metadata_json TEXT,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        upsert_sql = text(
+            """
+            INSERT INTO instrument_master_metadata (
+                instrument_id, exchange, product_type, research_scope,
+                canonical_instrument_id, is_canonical, counter_currency,
+                official_lifecycle_source, source_url, raw_snapshot_hash,
+                parser_version, metadata_json, updated_at
+            ) VALUES (
+                :instrument_id, :exchange, :product_type, :research_scope,
+                :canonical_instrument_id, :is_canonical, :counter_currency,
+                :official_lifecycle_source, :source_url, :raw_snapshot_hash,
+                :parser_version, :metadata_json, :updated_at
+            )
+            ON CONFLICT(instrument_id) DO UPDATE SET
+                exchange=excluded.exchange,
+                product_type=excluded.product_type,
+                research_scope=excluded.research_scope,
+                canonical_instrument_id=excluded.canonical_instrument_id,
+                is_canonical=excluded.is_canonical,
+                counter_currency=excluded.counter_currency,
+                official_lifecycle_source=excluded.official_lifecycle_source,
+                source_url=excluded.source_url,
+                raw_snapshot_hash=excluded.raw_snapshot_hash,
+                parser_version=excluded.parser_version,
+                metadata_json=excluded.metadata_json,
+                updated_at=excluded.updated_at
+            """
+        )
+
+        now_text = get_shanghai_time().isoformat()
+        saved = 0
+        try:
+            async with self.get_async_session() as session:
+                await session.execute(create_sql)
+                for row in rows:
+                    instrument_id = row.get("instrument_id")
+                    if not instrument_id:
+                        continue
+                    await session.execute(
+                        upsert_sql,
+                        {
+                            "instrument_id": instrument_id,
+                            "exchange": row.get("exchange") or "HKEX",
+                            "product_type": row.get("product_type"),
+                            "research_scope": row.get("research_scope"),
+                            "canonical_instrument_id": row.get("canonical_instrument_id"),
+                            "is_canonical": 1 if row.get("is_canonical") else 0,
+                            "counter_currency": row.get("counter_currency") or row.get("currency"),
+                            "official_lifecycle_source": row.get("official_lifecycle_source"),
+                            "source_url": row.get("source_url"),
+                            "raw_snapshot_hash": row.get("raw_snapshot_hash"),
+                            "parser_version": row.get("parser_version"),
+                            "metadata_json": json.dumps(row, ensure_ascii=False, default=str),
+                            "updated_at": now_text,
+                        },
+                    )
+                    saved += 1
+                await session.commit()
+            return saved
+        except Exception as exc:
+            self.db_logger.error("Failed to save instrument master metadata batch: %s", exc)
+            return 0
+
+    async def save_instrument_master_discrepancies(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        exchange: str,
+        run_id: str,
+    ) -> int:
+        """Persist review-required instrument-master discrepancies."""
+        if not rows:
+            return 0
+
+        create_sql = text(
+            """
+            CREATE TABLE IF NOT EXISTS instrument_master_discrepancies (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id TEXT NOT NULL,
+                exchange TEXT NOT NULL,
+                instrument_id TEXT,
+                reason TEXT,
+                payload_json TEXT,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        insert_sql = text(
+            """
+            INSERT INTO instrument_master_discrepancies (
+                run_id, exchange, instrument_id, reason, payload_json, created_at
+            ) VALUES (
+                :run_id, :exchange, :instrument_id, :reason, :payload_json, :created_at
+            )
+            """
+        )
+        now_text = get_shanghai_time().isoformat()
+        saved = 0
+        try:
+            async with self.get_async_session() as session:
+                await session.execute(create_sql)
+                for row in rows:
+                    await session.execute(
+                        insert_sql,
+                        {
+                            "run_id": run_id,
+                            "exchange": exchange,
+                            "instrument_id": row.get("instrument_id"),
+                            "reason": row.get("reason"),
+                            "payload_json": json.dumps(row, ensure_ascii=False, default=str),
+                            "created_at": now_text,
+                        },
+                    )
+                    saved += 1
+                await session.commit()
+            return saved
+        except Exception as exc:
+            self.db_logger.error("Failed to save instrument master discrepancies: %s", exc)
+            return 0
 
     async def cleanup_ghost_instruments(self, grace_days: int, zombie_grace_days: int = 180) -> int:
         """

@@ -73,6 +73,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/industry_index_analysis_sync', self.handlers.handle_industry_index_analysis_sync_command)
             self.telegram_bot.register_command_handler('/industry_index_analysis_backfill', self.handlers.handle_industry_index_analysis_backfill_command)
             self.telegram_bot.register_command_handler('/audit_factors', self.handlers.handle_audit_factors_command)
+            self.telegram_bot.register_command_handler('/hkex_review', self.handlers.handle_hkex_review_command)
             self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
             self.telegram_bot.register_command_handler('/find_gap_and_repair', self.handlers.handle_find_gap_and_repair_command)
             self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)
