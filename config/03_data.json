@@ -57,7 +57,7 @@
     },
     "hkex_instrument_master_sync": {
       "enabled": true,
-      "mode": "audit_only",
+      "mode": "lifecycle_write",
       "timeout_sec": 60,
       "quote_stale_days": 14,
       "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",

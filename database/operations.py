@@ -610,7 +610,7 @@ class DatabaseOperations:
         self,
         instrument_id: str,
         *,
-        delisted_date: Union[str, date, datetime],
+        delisted_date: Optional[Union[str, date, datetime]] = None,
         source: str = "cninfo_bse_delisting",
     ) -> bool:
         """Mark one instrument as formally delisted using confirmed evidence.
@@ -618,27 +618,27 @@ class DatabaseOperations:
         This mutates only lifecycle status fields; historical quotes remain
         intact and available for research.
         """
-        if not instrument_id or delisted_date is None:
+        if not instrument_id:
             return False
 
+        parsed_date = None
         if isinstance(delisted_date, datetime):
             parsed_date = delisted_date
         elif isinstance(delisted_date, date):
             parsed_date = datetime.combine(delisted_date, datetime.min.time())
         elif isinstance(delisted_date, str):
             text_value = delisted_date.strip()
-            if not text_value:
-                return False
-            try:
-                parsed_date = datetime.fromisoformat(text_value[:10])
-            except ValueError:
-                self.db_logger.warning(
-                    "Invalid delisted_date for %s: %s",
-                    instrument_id,
-                    delisted_date,
-                )
-                return False
-        else:
+            if text_value:
+                try:
+                    parsed_date = datetime.fromisoformat(text_value[:10])
+                except ValueError:
+                    self.db_logger.warning(
+                        "Invalid delisted_date for %s: %s",
+                        instrument_id,
+                        delisted_date,
+                    )
+                    return False
+        elif delisted_date is not None:
             return False
 
         try:

@@ -6,6 +6,7 @@ import pytest
 
 from data_manager import DataManager
 from database.operations import DatabaseOperations
+from data_sources.hkex_instrument_master import HKEXProviderSnapshot
 
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "hkex_instrument_master"
@@ -463,9 +464,96 @@ async def test_hkex_sync_lifecycle_write_requires_official_evidence_for_status_c
     assert result['summary']['reactivated_instruments'] == 1
     manager.db_ops.mark_instrument_delisted.assert_awaited_once()
     assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '00907.HK'
+    assert manager.db_ops.mark_instrument_delisted.await_args.kwargs['delisted_date'] == '2026-05-24'
     manager.db_ops.mark_instrument_active.assert_awaited_once()
     assert manager.db_ops.mark_instrument_active.await_args.args[0] == '09988.HK'
     manager.db_ops.mark_instrument_suspended.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_hkex_lifecycle_write_does_not_fallback_delisted_date_to_sync_date():
+    manager = _manager()
+    _attach_hkex_mock_db(manager, local_rows=[
+        {
+            'instrument_id': '00005.HK',
+            'symbol': '00005',
+            'name': 'HSBC HOLDINGS',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'akshare',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+        {
+            'instrument_id': '08888.HK',
+            'symbol': '08888',
+            'name': 'NO DATE DELIST',
+            'exchange': 'HKEX',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'akshare',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        },
+    ])
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=_hkex_sync_config("lifecycle_write"))
+    active_row = {
+        'instrument_id': '00005.HK',
+        'symbol': '00005',
+        'name': 'HSBC HOLDINGS',
+        'exchange': 'HKEX',
+        'type': 'stock',
+        'status': 'active',
+        'is_active': True,
+        'trading_status': 1,
+        'source': 'hkex_securities_list',
+        'product_type': 'ordinary_equity',
+        'research_scope': 'equity',
+    }
+    delisted_row = {
+        'instrument_id': '08888.HK',
+        'symbol': '08888',
+        'name': 'NO DATE DELIST',
+        'exchange': 'HKEX',
+        'type': 'stock',
+        'status': 'delisted',
+        'is_active': False,
+        'trading_status': 0,
+        'source': 'hkexnews_delisted_list',
+        'delisted_date': None,
+    }
+    manager._fetch_hkex_instrument_master_sources = AsyncMock(return_value={
+        'snapshots': [
+            HKEXProviderSnapshot(
+                source='hkex_securities_list',
+                source_url='fixture://active',
+                parser_version='test',
+                raw_snapshot_hash='active_hash',
+                rows=[active_row],
+            ),
+            HKEXProviderSnapshot(
+                source='hkexnews_delisted_list',
+                source_url='fixture://delisted',
+                parser_version='test',
+                raw_snapshot_hash='delisted_hash',
+                rows=[delisted_row],
+            ),
+        ],
+        'official_active_rows': [active_row],
+        'official_delisted_rows': [delisted_row],
+        'supplemental_rows': [],
+        'suspension_rows': [],
+        'warnings': [],
+        'errors': [],
+    })
+
+    result = await manager.sync_hkex_instrument_master()
+
+    assert result['summary']['deactivated_instruments'] == 1
+    manager.db_ops.mark_instrument_delisted.assert_awaited_once()
+    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '08888.HK'
+    assert manager.db_ops.mark_instrument_delisted.await_args.kwargs['delisted_date'] is None
 
 
 @pytest.mark.asyncio

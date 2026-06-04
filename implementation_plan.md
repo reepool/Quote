@@ -249,6 +249,7 @@ HKEX 主数据底座要求：
 - HKEX suspension PDF parser 已收紧为表格块解析：必须同时识别行首序号、公司名称括号代码和日期行；说明文字里的普通数字不会再被误判为停牌代码。
 - HKEX 官方 active 合并已保护主源 `ListOfSecurities.xlsx` 的产品分类字段，HKEXnews active fallback 不能覆盖主源给出的 `research_scope=exclude`、L&I/HDR/债券等分类。
 - `safe_write/lifecycle_write` 写入 metadata 后，会把官方分类为 excluded 的历史落库标的同步标为 `status='excluded', is_active=0, trading_status=0`，从而让港股日更和区间回补跳过这些非研究证券。
+- HKEXnews delisted JSON 没有真实退市日期时，系统只写退市状态，不用同步日填充 `delisted_date`；精确退市日后续从 HKEX 交易安排公告或公司公告补录。
 - 当前行情日更读取 active universe 时使用 `tradable_only=True`，会跳过 `trading_status=0` 的停牌品种；历史回补不改变该语义。
 - 2026-06-03 安装 `pypdf 6.12.2` 后，live `audit_only` 已验证 PDF 停牌解析可用：`source_usage.hkexnews_suspension_report=32`、`official_suspension_count=160`、`allowed_suspension_count=130`，本次仍未写库。
 - 2026-06-04 已在复制库运行 lifecycle-write gate：`validation.status=pass`，`review_required=0`，source evidence policy 全部满足；复制库 lifecycle diff 为 `suspended=74`、`delisted=113`、`reactivated=53`、`excluded=42`，且运行后 `excluded_active_or_tradable=0`。

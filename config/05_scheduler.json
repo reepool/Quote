@@ -68,14 +68,14 @@
       "hkex_instrument_master_sync": {
         "enabled": true,
         "manual_only": true,
-        "description": "港股主数据同步（仅手工触发，默认 safe_write 写入安全候选）",
+        "description": "港股主数据同步（仅手工触发，lifecycle_write 写入官方生命周期变更）",
         "report": true,
         "pre_run_notify": false,
         "max_instances": 1,
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "mode": "safe_write",
+          "mode": "lifecycle_write",
           "timeout_sec": 60,
           "max_runtime_seconds": 600
         }

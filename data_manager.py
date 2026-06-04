@@ -8620,10 +8620,9 @@ class DataManager:
                 if not source_evidence_policy.get('delisting_write_allowed'):
                     continue
                 official = item.get('official') or {}
-                delisted_date = official.get('delisted_date') or get_shanghai_time().date().isoformat()
                 updated = await self.db_ops.mark_instrument_delisted(
                     item.get('instrument_id'),
-                    delisted_date=delisted_date,
+                    delisted_date=official.get('delisted_date'),
                     source=official.get('source') or 'hkexnews_delisted_list',
                 )
                 if updated:
