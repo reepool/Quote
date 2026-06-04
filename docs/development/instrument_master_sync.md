@@ -119,7 +119,8 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 
 - `manual_review_file` 默认是 `data/hkex_manual_review.json`，可配置为 JSON 或 CSV；文件不存在时按空 review 处理。
 - 推荐字段：`instrument_id`/`code`、`action`、`effective_date`、`reason`、`evidence_url`、`reviewed_by`。
-- `action=delisted/suspended/active` 会被解析成经过人工确认的生命周期证据；这用于处理 02934.HK 这类“本地 active、官方 active 不存在、官方 inactive JSON 也未覆盖”的历史差异。
+- `action=delisted/suspended/active` 会被解析成经过人工确认的生命周期证据；这用于处理普通证券中“本地 active、官方 active 不存在、官方 inactive JSON 也未覆盖”的历史差异。
+- HKEX 临时代码不进入人工复核链路，直接在产品分类层排除。当前按 HKEX Stock Code Allocation Plan 的官方区间排除 `02900-02999`、`08551-08600`、`82900-82999`；不按证券简称里的 `RTS`、`-500` 等后缀做临时代码判断，避免误伤有连续行情的正式代码。
 - 在 `audit_only` 下仍只报告；在 `lifecycle_write` 下才会根据该证据改写状态。
 - API：
   - `GET /instruments/hkex/master/review-required`：现场运行 `audit_only`，返回当前待复核样本。
@@ -128,7 +129,7 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 - Telegram：
   - `/hkex_review pending [limit]`：查看当前待复核样本。
   - `/hkex_review list [limit]`：查看已回灌记录。
-  - `/hkex_review 02934.HK delisted 2026-05-30 已确认退市 evidence=https://...`：追加一条 reviewed lifecycle evidence。
+  - `/hkex_review 08888.HK delisted 2026-05-30 已确认退市 evidence=https://...`：追加一条 reviewed lifecycle evidence。
 
 手工主数据任务：
 
@@ -169,7 +170,7 @@ asyncio.run(main())
 - 本地 HKEX stock：`total=4626, active=3020, inactive=1606`。
 - 决策计数：`insert_candidates=13419`、`metadata_update_candidates=3019`、`reactivation_candidates=1416`、`delisting_candidates=359`、`review_required=1`。这些是原始官方全证券差异，不等于可写入研究 universe。
 - safe-write 仍按 `allowed_product_types=["ordinary_equity","reit","etf"]`、canonical counter 和产品分类过滤；报告会输出 `safe_write_preview_count` 和允许生命周期候选数，防止把债券/窝轮/牛熊证误读为研究股票池。
-- safe-write 产品分类还需要排除 HKEX 029xx 临时代码、供股权/rights 和特殊交易单位后缀（如 `RTS`、`-2000`、`-10K`）；这类代码不应进入研究 active universe。
+- safe-write 产品分类会排除 HKEX 官方临时代码区间；这类代码不应进入研究 active universe。
 - 行情诊断只读输出：`no_local_quote_count=1314`、`stale_local_quote_count=1611`、`mutation_candidates=[]`。
 
 2026-06-02 HKEX audit-only 开发验证：

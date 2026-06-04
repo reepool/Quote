@@ -129,9 +129,9 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
                     "source_usage": {"hkex_securities_list": 17671},
                     "review_required_samples": [
                         {
-                            "instrument_id": "02934.HK",
+                            "instrument_id": "08888.HK",
                             "reason": "missing",
-                            "local": {"name": "圣马丁国际"},
+                            "local": {"name": "REVIEW SAMPLE"},
                         }
                     ],
                 }

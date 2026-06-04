@@ -73,7 +73,7 @@ async def test_hkex_review_command_appends_manual_evidence():
     event = SimpleNamespace(
         chat_id=1,
         sender_id=2,
-        text='/hkex_review 02934.HK delisted 2026-05-30 已确认退市 evidence=https://www.hkexnews.hk/',
+        text='/hkex_review 08888.HK delisted 2026-05-30 已确认退市 evidence=https://www.hkexnews.hk/',
     )
 
     with patch('data_manager.data_manager') as dm:
@@ -81,7 +81,7 @@ async def test_hkex_review_command_appends_manual_evidence():
             'status': 'success',
             'path': 'data/hkex_manual_review.json',
             'entry': {
-                'instrument_id': '02934.HK',
+                'instrument_id': '08888.HK',
                 'action': 'delisted',
                 'effective_date': '2026-05-30',
             },
@@ -90,7 +90,7 @@ async def test_hkex_review_command_appends_manual_evidence():
         await handler.handle_hkex_review_command(event)
 
     dm.append_hkex_manual_review_evidence.assert_awaited_once_with(
-        instrument_id='02934.HK',
+        instrument_id='08888.HK',
         action='delisted',
         effective_date='2026-05-30',
         reason='已确认退市',
@@ -113,7 +113,7 @@ async def test_hkex_review_pending_command_runs_audit_only():
             'exchanges': {
                 'HKEX': {
                     'review_required_samples': [
-                        {'instrument_id': '02934.HK', 'reason': 'missing', 'local': {'name': '圣马丁国际'}}
+                        {'instrument_id': '08888.HK', 'reason': 'missing', 'local': {'name': 'REVIEW SAMPLE'}}
                     ]
                 }
             },
@@ -122,4 +122,4 @@ async def test_hkex_review_pending_command_runs_audit_only():
 
     dm.sync_hkex_instrument_master.assert_awaited_once_with(mode='audit_only')
     sent_message = task_manager.send_message.await_args.args[1]
-    assert '02934.HK' in sent_message
+    assert '08888.HK' in sent_message

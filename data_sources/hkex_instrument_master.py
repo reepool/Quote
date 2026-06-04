@@ -65,22 +65,19 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
     name = str(row.get("name") or row.get("stock_name") or "").strip().lower()
     combined = " ".join([category, sub_category, name])
 
-    if "old code" in combined or " old" in combined or "-old" in combined or "(旧)" in combined:
+    numeric_code = _hkex_numeric_code(instrument_id=instrument_id, symbol=symbol)
+
+    if _is_hkex_temporary_counter_code(numeric_code):
+        product_type = "temporary_counter"
+        research_scope = "exclude"
+    elif "old code" in combined or " old" in combined or "-old" in combined or "(旧)" in combined:
         product_type = "old_code"
         research_scope = "exclude"
-    elif instrument_id[0:3] == "029" or symbol[0:3] == "029":
-        product_type = "temporary_counter"
-        research_scope = "exclude"
     elif (
-        "rights" in combined
-        or " rts" in combined
-        or combined.endswith("rts")
-        or "warrants for share rights" in combined
+        "rights" in f"{category} {sub_category}"
+        or "warrants for share rights" in f"{category} {sub_category}"
     ):
         product_type = "subscription_right"
-        research_scope = "exclude"
-    elif "-2000" in name or "-10k" in name or "-500" in name:
-        product_type = "temporary_counter"
         research_scope = "exclude"
     elif "callable bull/bear" in combined or "bull/bear" in combined or "cbbc" in combined:
         product_type = "cbbc"
@@ -112,6 +109,24 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
         "research_scope": research_scope,
         "is_research_equity": product_type == "ordinary_equity",
     }
+
+
+def _hkex_numeric_code(*, instrument_id: str, symbol: str) -> Optional[int]:
+    raw = symbol or instrument_id.split(".")[0]
+    raw = raw.strip()
+    if raw.isdigit():
+        return int(raw)
+    return None
+
+
+def _is_hkex_temporary_counter_code(numeric_code: Optional[int]) -> bool:
+    if numeric_code is None:
+        return False
+    return (
+        2900 <= numeric_code <= 2999
+        or 8551 <= numeric_code <= 8600
+        or 82900 <= numeric_code <= 82999
+    )
 
 
 @dataclass
@@ -710,6 +725,9 @@ class HKEXLifecyclePolicy:
                 metadata_updates.append(active_row)
 
         for instrument_id, local in local_by_id.items():
+            local_classification = classify_hkex_product(local)
+            if local_classification.get("research_scope") == "exclude":
+                continue
             if instrument_id in delisted_by_id:
                 delistings.append({
                     "instrument_id": instrument_id,

@@ -80,9 +80,9 @@ def _hkex_local_rows():
             'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         },
         {
-            'instrument_id': '02929.HK',
-            'symbol': '02929',
-            'name': 'STERLING GP-OLD',
+            'instrument_id': '00907.HK',
+            'symbol': '00907',
+            'name': 'KAISER OPTICAL',
             'exchange': 'HKEX',
             'type': 'stock',
             'status': 'active',
@@ -135,7 +135,7 @@ async def test_hkex_manual_review_evidence_append_uses_configured_json_file(tmp_
     manager._get_hkex_instrument_master_sync_config = Mock(return_value=cfg)
 
     result = await manager.append_hkex_manual_review_evidence(
-        instrument_id='2934',
+        instrument_id='8888',
         action='delist',
         effective_date='2026-05-30',
         reason='operator confirmed',
@@ -144,7 +144,7 @@ async def test_hkex_manual_review_evidence_append_uses_configured_json_file(tmp_
     )
     listed = await manager.get_hkex_manual_review_evidence(limit=10)
 
-    assert result['entry']['instrument_id'] == '02934.HK'
+    assert result['entry']['instrument_id'] == '08888.HK'
     assert result['entry']['action'] == 'delisted'
     assert listed['total'] == 1
     assert listed['entries'][0]['reviewed_by'] == 'telegram:1'
@@ -432,7 +432,7 @@ async def test_hkex_sync_lifecycle_write_requires_official_evidence_for_status_c
     assert result['summary']['deactivated_instruments'] == 1
     assert result['summary']['reactivated_instruments'] == 1
     manager.db_ops.mark_instrument_delisted.assert_awaited_once()
-    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '02929.HK'
+    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '00907.HK'
     manager.db_ops.mark_instrument_active.assert_awaited_once()
     assert manager.db_ops.mark_instrument_active.await_args.args[0] == '09988.HK'
     manager.db_ops.mark_instrument_suspended.assert_not_awaited()
@@ -445,7 +445,7 @@ async def test_hkex_sync_manual_review_evidence_confirms_local_review_delisting(
         """
         [
           {
-            "instrument_id": "02934.HK",
+            "instrument_id": "08888.HK",
             "action": "delisted",
             "effective_date": "2026-05-30",
             "reason": "operator confirmed from official notice"
@@ -457,8 +457,8 @@ async def test_hkex_sync_manual_review_evidence_confirms_local_review_delisting(
     manager = _manager()
     _attach_hkex_mock_db(manager, local_rows=[
         {
-            'instrument_id': '02934.HK',
-            'symbol': '02934',
+            'instrument_id': '08888.HK',
+            'symbol': '08888',
             'name': 'SANDMARTIN INTL',
             'exchange': 'HKEX',
             'type': 'stock',
@@ -479,9 +479,9 @@ async def test_hkex_sync_manual_review_evidence_confirms_local_review_delisting(
         row['instrument_id']
         for row in result['exchanges']['HKEX']['review_required_samples']
     }
-    assert '02934.HK' not in review_ids
+    assert '08888.HK' not in review_ids
     manager.db_ops.mark_instrument_delisted.assert_awaited_once()
-    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '02934.HK'
+    assert manager.db_ops.mark_instrument_delisted.await_args.args[0] == '08888.HK'
     assert manager.db_ops.mark_instrument_delisted.await_args.kwargs['delisted_date'] == '2026-05-30'
 
 

@@ -49,7 +49,7 @@ def test_official_hkex_securities_list_parser_adds_lineage_and_classification():
     assert by_id["00823.HK"]["product_type"] == "reit"
     assert by_id["11000.HK"]["product_type"] == "cbbc"
     assert by_id["22000.HK"]["product_type"] == "warrant"
-    assert by_id["02929.HK"]["product_type"] == "old_code"
+    assert by_id["02929.HK"]["product_type"] == "temporary_counter"
     assert by_id["00005.HK"]["official_lifecycle_source"] == "hkex_securities_list"
 
 
@@ -239,8 +239,15 @@ def test_product_classifier_separates_derivatives_debt_funds_and_equity():
     assert temporary["product_type"] == "temporary_counter"
     assert temporary["research_scope"] == "exclude"
     rights = classify_hkex_product({"instrument_id": "08556.HK", "name": "NIUHOLDINGS RTS"})
-    assert rights["product_type"] == "subscription_right"
+    assert rights["product_type"] == "temporary_counter"
     assert rights["research_scope"] == "exclude"
+    named_not_rights = classify_hkex_product({"instrument_id": "01234.HK", "name": "SAMPLE RTS"})
+    assert named_not_rights["product_type"] == "ordinary_equity"
+    unit_suffix = classify_hkex_product({"instrument_id": "00290.HK", "name": "GOFINTECH-500"})
+    assert unit_suffix["product_type"] == "ordinary_equity"
+    assert classify_hkex_product({"instrument_id": "82901.HK", "name": "TEMP RMB"})["product_type"] == "temporary_counter"
+    gem_normal = classify_hkex_product({"instrument_id": "08619.HK", "name": "NIU HOLDINGS"})
+    assert gem_normal["product_type"] == "ordinary_equity"
 
 
 def test_lifecycle_policy_requires_official_evidence_for_reactivation_and_delisting():
@@ -271,7 +278,8 @@ def test_lifecycle_policy_requires_official_evidence_for_reactivation_and_delist
     review_ids = {row["instrument_id"] for row in decisions["review_required"]}
 
     assert "09988.HK" in reactivation_ids
-    assert "02929.HK" in delisting_ids
+    assert "02929.HK" not in delisting_ids
+    assert "02929.HK" not in review_ids
     assert "00907.HK" in delisting_ids
     assert "00907.HK" not in reactivation_ids
     assert "00907.HK" not in review_ids
