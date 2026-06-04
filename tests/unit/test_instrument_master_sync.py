@@ -123,7 +123,37 @@ def _attach_hkex_mock_db(manager: DataManager, *, local_rows=None):
     manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
     manager.db_ops.mark_instrument_active = AsyncMock(return_value=True)
     manager.db_ops.mark_instrument_suspended = AsyncMock(return_value=True)
+    manager.db_ops.mark_instruments_excluded = AsyncMock(return_value=0)
     return manager.db_ops
+
+
+def test_hkex_active_merge_preserves_primary_product_classification():
+    manager = _manager()
+
+    merged = manager._merge_hkex_official_active_rows([
+        {
+            'instrument_id': '07200.HK',
+            'symbol': '07200',
+            'name': 'L&I PRODUCT',
+            'source': 'hkex_securities_list',
+            'product_type': 'leveraged_inverse_product',
+            'research_scope': 'exclude',
+            'currency': 'HKD',
+        },
+        {
+            'instrument_id': '07200.HK',
+            'symbol': '07200',
+            'name': 'L&I PRODUCT',
+            'source': 'hkexnews_active_list',
+            'product_type': 'ordinary_equity',
+            'research_scope': 'equity',
+            'status': 'active',
+        },
+    ])
+
+    assert merged[0]['product_type'] == 'leveraged_inverse_product'
+    assert merged[0]['research_scope'] == 'exclude'
+    assert merged[0]['status'] == 'active'
 
 
 @pytest.mark.asyncio
@@ -488,7 +518,15 @@ async def test_hkex_sync_manual_review_evidence_confirms_local_review_delisting(
 @pytest.mark.asyncio
 async def test_hkex_sync_suspension_evidence_marks_trading_status_zero(tmp_path):
     suspension_file = tmp_path / "hkex_suspension.txt"
-    suspension_file.write_text("Prolonged Suspension Status Report\n00005 HSBC HOLDINGS\n", encoding="utf-8")
+    suspension_file.write_text(
+        """
+        1  HSBC HOLDINGS
+        (5)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """,
+        encoding="utf-8",
+    )
     manager = _manager()
     _attach_hkex_mock_db(manager, local_rows=[
         {

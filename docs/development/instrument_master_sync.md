@@ -128,6 +128,7 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
   - 特殊/过渡/非普通证券区：Stock Connect 特殊代码区、专业投资者债券/政府债/票据、专业优先股、HDR、受限证券、Leveraged and Inverse Products、预留或 future-use 区间。
 - 不按证券简称里的 `RTS`、`-500` 等后缀做临时代码判断，避免误伤有连续行情的正式代码，例如 `00290.HK`、`08239.HK`。
 - 上述 excluded 产品不允许作为 `safe_write` 新标的写入 `instruments`；已历史落库的 excluded 产品应在 `instrument_master_metadata.research_scope='exclude'` 留痕，并在 `instruments` 中标为 `status='excluded', is_active=0, trading_status=0`，让港股日更和区间回补直接跳过。
+- `safe_write` 和 `lifecycle_write` 写入 metadata 后，会把官方分类为 `research_scope='exclude'` 的历史落库标的批量标为不可用；该处理只改主数据可用性，不删除历史行情。
 - 在 `audit_only` 下仍只报告；在 `lifecycle_write` 下才会根据该证据改写状态。
 - API：
   - `GET /instruments/hkex/master/review-required`：现场运行 `audit_only`，返回当前待复核样本。
@@ -157,6 +158,7 @@ asyncio.run(main())
 ```
 
 - 未来需要自动运行时，把 `manual_only` 改为 `false` 并补充 `trigger`；切换到 `lifecycle_write` 前必须先复核报告中的退市、复活和停牌候选样本。
+- `lifecycle_write` 上线前必须先在复制库运行 `scripts/dev_validation/validate_hkex_lifecycle_write_on_copy.py`。通过条件是：source evidence policy 全部满足、`review_required=0`、停牌样本来自结构化 PDF/人工证据、复活样本在主 active 源中、退市样本在官方 delisted 源中、excluded 产品同步后无 active/tradable 残留、日更读取 `tradable_only=True` 可跳过 `trading_status=0` 标的。
 
 当前生产配置的官方源：
 
@@ -164,10 +166,23 @@ asyncio.run(main())
 - 辅 active 源：HKEXnews `activestock_sehk_e.json`。
 - delisted 源：HKEXnews `inactivestock_sehk_e.json`。
 - suspension 源：HKEXnews prolonged suspension monthly PDF（Main Board / GEM）；系统通过 `pypdf` 提取文本并解析代码。若运行环境未安装 `pypdf` 或 PDF 格式变化导致解析失败，结果会降级为 warning，不会静默作为停牌证据。
+- PDF 文本解析只接受报告表格行块：行首序号、公司名称中的括号代码、以及同一块内的日期行必须同时存在；说明文字里的普通数字不会被当成港股代码，避免把 `00001.HK`、`00005.HK` 等误标停牌。
 
 研究模块应通过 `DataManager.resolve_hkex_current_universe()` 获取港股当前研究 universe。该 resolver 会复用共享 governance，优先按 metadata 过滤普通股/REIT/ETF 和 canonical counter；metadata 不可用时允许降级回退到本地 active instruments，并在 `readiness='degraded'` 和 warnings 中暴露原因。
 
 ## 验证记录
+
+2026-06-04 HKEX lifecycle-write 复制库 gate 验证：
+
+- 使用 `scripts/dev_validation/validate_hkex_lifecycle_write_on_copy.py` 从 `data/quotes.db` 复制到 `/tmp/hkex_lifecycle_validation_20260604_pass2.db` 后运行 `mode=lifecycle_write`，生产库未执行 lifecycle 写入。
+- 结果文件：`/tmp/hkex_lifecycle_validation_20260604_pass2.json`，`validation.status=pass`，`blockers=[]`。
+- source usage：`hkex_securities_list=17749`、`hkexnews_active_list=18217`、`hkexnews_delisted_list=864`、`hkexnews_suspension_report=12`。
+- source evidence policy 全部通过：`safe_write_allowed=true`、`reactivation_write_allowed=true`、`delisting_write_allowed=true`、`suspension_write_allowed=true`，`source_error_count=0`。
+- 复制库运行前：HKEX `total=4649`、`active=2948`、`tradable_stock=2948`，`excluded_active_or_tradable=0`。
+- 复制库运行后：HKEX `total=4649`、`active=3034`、`tradable_stock=2960`，状态分布为 `active=2960`、`suspended=74`、`delisted=113`、`excluded=1435`、`auto_deactivated_no_data=46`、`auto_deactivated_zombie=21`；`excluded_active_or_tradable=0`。
+- lifecycle diff 合计 `282`：`suspended=74`、`delisted=113`、`reactivated=53`、`excluded=42`。这些变化只发生在复制库，用于证明 gate 规则和写入路径符合预期。
+- 本次 gate 前发现并修复三个上线风险：PDF parser 曾把说明文字数字误解析为停牌代码；HKEXnews active fallback 曾覆盖主源 XLSX 的产品分类字段；metadata 标为 exclude 的历史落库标的曾未同步改写 `instruments.status/trading_status`。
+- 当前生产配置仍未切到 lifecycle：`config/05_scheduler.json` 的手工任务仍为 `mode=safe_write`，`config/03_data.json` 的自动 HKEX governance 仍为 `mode=audit_only`。
 
 2026-06-03 HKEX live audit-only 验证：
 

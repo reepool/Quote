@@ -246,8 +246,13 @@ HKEX 主数据底座要求：
 - `manual_review_file` 默认写入 `data/hkex_manual_review.json`；API 提供 `/instruments/hkex/master/review-required`、`/instruments/hkex/master/manual-review`，Telegram 提供 `/hkex_review pending|list|<代码> <结论>`，三者共用同一份 review evidence。
 - `config/05_scheduler.json` 已新增 `hkex_instrument_master_sync` 手工任务，`manual_only=true` 且不设置自动运行时间；Telegram 使用 `/run hkex_instrument_master_sync` 触发，默认 `mode=safe_write`，只写安全新增/metadata 候选，不写生命周期字段。`config/03_data.json` 的自动 HKEX governance 默认仍保持 `audit_only`。
 - HKEX prolonged suspension PDF 已接入 `HKEXSuspensionReportProvider`，通过 `pypdf` 解析为结构化 suspended 证据；缺少依赖或解析失败会降级为 warning。
+- HKEX suspension PDF parser 已收紧为表格块解析：必须同时识别行首序号、公司名称括号代码和日期行；说明文字里的普通数字不会再被误判为停牌代码。
+- HKEX 官方 active 合并已保护主源 `ListOfSecurities.xlsx` 的产品分类字段，HKEXnews active fallback 不能覆盖主源给出的 `research_scope=exclude`、L&I/HDR/债券等分类。
+- `safe_write/lifecycle_write` 写入 metadata 后，会把官方分类为 excluded 的历史落库标的同步标为 `status='excluded', is_active=0, trading_status=0`，从而让港股日更和区间回补跳过这些非研究证券。
 - 当前行情日更读取 active universe 时使用 `tradable_only=True`，会跳过 `trading_status=0` 的停牌品种；历史回补不改变该语义。
 - 2026-06-03 安装 `pypdf 6.12.2` 后，live `audit_only` 已验证 PDF 停牌解析可用：`source_usage.hkexnews_suspension_report=32`、`official_suspension_count=160`、`allowed_suspension_count=130`，本次仍未写库。
+- 2026-06-04 已在复制库运行 lifecycle-write gate：`validation.status=pass`，`review_required=0`，source evidence policy 全部满足；复制库 lifecycle diff 为 `suspended=74`、`delisted=113`、`reactivated=53`、`excluded=42`，且运行后 `excluded_active_or_tradable=0`。
+- 当前生产配置仍未切到 lifecycle：手工 `hkex_instrument_master_sync` 仍为 `safe_write`，自动 HKEX governance 仍为 `audit_only`。切换前建议用最新生产库再跑一次复制库 gate，确认报告仍为 pass 后再只切手工任务到 `lifecycle_write`；自动日更前置 governance 继续保持 `audit_only` 观察。
 
 ### 3.5 复用现有 Quote 底座
 

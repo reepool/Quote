@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 import urllib.request
 from dataclasses import dataclass, field
 from io import BytesIO, StringIO
@@ -46,6 +47,34 @@ def _snapshot_hash(raw_text: str) -> str:
 
 def _snapshot_hash_bytes(raw_bytes: bytes) -> str:
     return hashlib.sha256(raw_bytes or b"").hexdigest()
+
+
+def _fetch_url_bytes(
+    source_url: str,
+    *,
+    timeout_sec: float,
+    user_agent: str,
+    attempts: int = 3,
+) -> bytes:
+    if not source_url:
+        raise ValueError("source_url is required")
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max(1, attempts) + 1):
+        request = urllib.request.Request(
+            source_url,
+            headers={"User-Agent": user_agent},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_sec) as response:
+                return response.read()
+        except Exception as exc:
+            last_error = exc
+            if attempt >= attempts:
+                break
+            time.sleep(min(2.0 * attempt, 5.0))
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError(f"failed to fetch {source_url}")
 
 
 def _normalized_columns(frame: pd.DataFrame) -> pd.DataFrame:
@@ -246,12 +275,11 @@ class HKEXSecuritiesListProvider:
     def fetch_csv(self, *, timeout_sec: float = 20.0) -> HKEXProviderSnapshot:
         if not self.source_url:
             raise ValueError("source_url is required for HKEX securities-list fetch")
-        request = urllib.request.Request(
+        raw_bytes = _fetch_url_bytes(
             self.source_url,
-            headers={"User-Agent": "Quote-HKEX-InstrumentMaster/1.0"},
+            timeout_sec=timeout_sec,
+            user_agent="Quote-HKEX-InstrumentMaster/1.0",
         )
-        with urllib.request.urlopen(request, timeout=timeout_sec) as response:
-            raw_bytes = response.read()
         if self.source_url.lower().endswith((".xlsx", ".xls")):
             return self.parse_excel(raw_bytes)
         raw = raw_bytes.decode("utf-8-sig", errors="replace")
@@ -342,12 +370,11 @@ class HKEXNewsStockListProvider:
     def fetch_html(self, *, lifecycle_status: str, timeout_sec: float = 20.0) -> HKEXProviderSnapshot:
         if not self.source_url:
             raise ValueError("source_url is required for HKEXnews fetch")
-        request = urllib.request.Request(
+        raw = _fetch_url_bytes(
             self.source_url,
-            headers={"User-Agent": "Quote-HKEX-InstrumentMaster/1.0"},
-        )
-        with urllib.request.urlopen(request, timeout=timeout_sec) as response:
-            raw = response.read().decode("utf-8-sig", errors="replace")
+            timeout_sec=timeout_sec,
+            user_agent="Quote-HKEX-InstrumentMaster/1.0",
+        ).decode("utf-8-sig", errors="replace")
         stripped = raw.lstrip()
         if stripped.startswith("[") or stripped.startswith("{"):
             return self.parse_json(raw, lifecycle_status=lifecycle_status)
@@ -528,12 +555,11 @@ class HKEXSuspensionReportProvider:
     def fetch_pdf(self, *, timeout_sec: float = 20.0) -> HKEXProviderSnapshot:
         if not self.source_url:
             raise ValueError("source_url is required for HKEX suspension-report fetch")
-        request = urllib.request.Request(
+        raw_pdf = _fetch_url_bytes(
             self.source_url,
-            headers={"User-Agent": "Quote-HKEX-InstrumentMaster/1.0"},
+            timeout_sec=timeout_sec,
+            user_agent="Quote-HKEX-InstrumentMaster/1.0",
         )
-        with urllib.request.urlopen(request, timeout=timeout_sec) as response:
-            raw_pdf = response.read()
         return self.parse_pdf(raw_pdf)
 
     def parse_pdf(self, raw_pdf: bytes) -> HKEXProviderSnapshot:
@@ -550,24 +576,62 @@ class HKEXSuspensionReportProvider:
         snapshot.diagnostics["page_count"] = len(reader.pages)
         return snapshot
 
+    @staticmethod
+    def _is_report_row_start(line: str) -> bool:
+        return re.match(r"^\s*\d{1,3}\s{2,}\S", line or "") is not None
+
+    @staticmethod
+    def _extract_report_block(block: List[str]) -> Optional[Dict[str, str]]:
+        if not block:
+            return None
+        first = block[0]
+        match = re.match(r"^\s*\d{1,3}\s{2,}(.+?)\s*$", first)
+        if not match:
+            return None
+
+        date_index = None
+        for index, line in enumerate(block):
+            if re.search(r"\b\d{1,2}-[A-Za-z]{3}-\d{4}\b", line or ""):
+                date_index = index
+                break
+        if date_index is None or date_index == 0:
+            return None
+
+        name_lines = [match.group(1).strip()]
+        name_lines.extend(line.strip() for line in block[1:date_index] if line.strip())
+        name_text = " ".join(name_lines)
+        code_matches = re.findall(r"\((\d{1,5})\)", name_text)
+        if not code_matches:
+            return None
+        raw_code = code_matches[-1]
+        code = normalize_hkex_code(raw_code)
+        if not code:
+            return None
+        name = re.sub(rf"\(\s*{re.escape(raw_code)}\s*\)", "", name_text).strip()
+        return {"code": code, "name": name}
+
     def parse_text(self, raw_text: str) -> HKEXProviderSnapshot:
         rows: List[Dict[str, Any]] = []
         seen: Set[str] = set()
         skipped = 0
-        for line in (raw_text or "").splitlines():
-            match = re.search(r"\b(\d{1,5})\b", line)
-            if not match:
-                continue
-            code = normalize_hkex_code(match.group(1))
-            if not code or code in seen:
+        current_block: List[str] = []
+
+        def flush_block() -> None:
+            nonlocal skipped
+            parsed = self._extract_report_block(current_block)
+            current_block.clear()
+            if parsed is None:
                 skipped += 1
-                continue
+                return
+            code = parsed["code"]
+            if code in seen:
+                skipped += 1
+                return
             seen.add(code)
-            name_text = line[match.end():].strip(" -\t")
             rows.append({
                 "instrument_id": hkex_instrument_id(code),
                 "symbol": code,
-                "name": name_text,
+                "name": parsed["name"],
                 "exchange": "HKEX",
                 "type": "stock",
                 "status": "suspended",
@@ -585,6 +649,23 @@ class HKEXSuspensionReportProvider:
                     "market": self.market,
                 },
             })
+
+        for line in (raw_text or "").splitlines():
+            stripped = (line or "").strip()
+            if not stripped:
+                continue
+            if self._is_report_row_start(stripped):
+                if current_block:
+                    flush_block()
+                current_block.append(stripped)
+                continue
+            if current_block:
+                if stripped.startswith("Link to HKEXnews") or stripped.startswith("Posted on "):
+                    flush_block()
+                    continue
+                current_block.append(stripped)
+        if current_block:
+            flush_block()
         return HKEXProviderSnapshot(
             source=self.source,
             source_url=self.source_url,
@@ -823,6 +904,8 @@ class HKEXLifecyclePolicy:
         for instrument_id, local in local_by_id.items():
             local_classification = classify_hkex_product(local)
             if local_classification.get("research_scope") == "exclude":
+                continue
+            if instrument_id in active_by_id:
                 continue
             if instrument_id in delisted_by_id:
                 delistings.append({

@@ -737,6 +737,45 @@ class DatabaseOperations:
             self.db_logger.error("Failed to mark %s suspended: %s", instrument_id, exc)
             return False
 
+    async def mark_instruments_excluded(
+        self,
+        instrument_ids: List[str],
+        *,
+        source: str = "hkex_product_scope_exclusion",
+    ) -> int:
+        """Mark non-research HKEX products unavailable without deleting history."""
+        ids = sorted({str(item).strip() for item in instrument_ids or [] if item})
+        if not ids:
+            return 0
+
+        updated_count = 0
+        try:
+            async with self.get_async_session() as session:
+                for start in range(0, len(ids), 500):
+                    chunk = ids[start:start + 500]
+                    result = await session.execute(
+                        select(InstrumentDB).filter(InstrumentDB.instrument_id.in_(chunk))
+                    )
+                    for record in result.scalars().all():
+                        changed = (
+                            record.status != "excluded"
+                            or record.is_active is not False
+                            or record.trading_status != 0
+                            or record.source != source
+                        )
+                        record.status = "excluded"
+                        record.is_active = False
+                        record.trading_status = 0
+                        record.source = source
+                        record.updated_at = get_shanghai_time()
+                        if changed:
+                            updated_count += 1
+                await session.commit()
+                return updated_count
+        except Exception as exc:
+            self.db_logger.error("Failed to mark excluded instruments: %s", exc)
+            return 0
+
     async def save_instrument_master_metadata_batch(
         self,
         rows: List[Dict[str, Any]],

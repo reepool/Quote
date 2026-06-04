@@ -8338,6 +8338,18 @@ class DataManager:
         return result
 
     def _merge_hkex_official_active_rows(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        preserve_from_primary = {
+            'product_type',
+            'research_scope',
+            'is_research_equity',
+            'currency',
+            'category',
+            'sub_category',
+            'isin',
+            'canonical_instrument_id',
+            'is_canonical',
+            'counter_currency',
+        }
         merged: Dict[str, Dict[str, Any]] = {}
         for row in rows or []:
             instrument_id = row.get('instrument_id')
@@ -8345,7 +8357,19 @@ class DataManager:
                 continue
             existing = merged.get(instrument_id, {})
             combined = dict(existing)
-            combined.update({k: v for k, v in row.items() if v not in (None, '')})
+            existing_source = existing.get('source')
+            incoming_source = row.get('source')
+            for key, value in row.items():
+                if value in (None, ''):
+                    continue
+                if (
+                    key in preserve_from_primary
+                    and existing_source == 'hkex_securities_list'
+                    and incoming_source == 'hkexnews_active_list'
+                    and existing.get(key) not in (None, '')
+                ):
+                    continue
+                combined[key] = value
             merged[instrument_id] = combined
         return list(merged.values())
 
@@ -8553,6 +8577,7 @@ class DataManager:
         metadata_saved = 0
         review_saved = 0
         written_rows = 0
+        excluded_count = 0
         delisted_count = 0
         suspended_count = 0
         reactivated_count = 0
@@ -8567,6 +8592,17 @@ class DataManager:
                 written_rows = len(safe_rows) if saved else 0
             if hasattr(self.db_ops, 'save_instrument_master_metadata_batch'):
                 metadata_saved = await self.db_ops.save_instrument_master_metadata_batch(metadata_rows)
+            if hasattr(self.db_ops, 'mark_instruments_excluded'):
+                excluded_ids = [
+                    row.get('instrument_id')
+                    for row in metadata_rows
+                    if row.get('instrument_id')
+                    and row.get('research_scope') == 'exclude'
+                ]
+                excluded_count = await self.db_ops.mark_instruments_excluded(
+                    excluded_ids,
+                    source='hkex_product_scope_exclusion',
+                )
 
         if (
             config.get('write_review_discrepancies', True)
@@ -8656,6 +8692,7 @@ class DataManager:
             'quote_availability': quote_diagnostics,
             'written_rows': written_rows,
             'metadata_saved': metadata_saved,
+            'excluded_count': excluded_count,
             'review_discrepancies_saved': review_saved,
             'delisted_count': delisted_count,
             'suspended_count': suspended_count,

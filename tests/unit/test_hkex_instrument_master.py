@@ -132,13 +132,27 @@ def test_suspension_report_text_parser_emits_official_suspended_rows():
     snapshot = HKEXSuspensionReportProvider(
         source_url="fixture://psuspenrep_mb.pdf",
         market="Main Board",
-    ).parse_text("Prolonged Suspension Status Report\n00005 HSBC HOLDINGS\n2934 SOME OLD CODE\n")
+    ).parse_text(
+        """
+        1. This report summarises the status of companies.
+        11  Renco Holdings
+        Group Limited (In
+        Liquidation) (2323)
+        20-Jan-2025 19-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        12  Lufax Holding Ltd
+        (6623)
+        28-Jan-2025 27-Jul-2026 1. Conduct an independent forensic investigation
+        Link to HKEXnews
+        """
+    )
 
     by_id = {row["instrument_id"]: row for row in snapshot.rows}
     assert snapshot.source == "hkexnews_suspension_report"
-    assert by_id["00005.HK"]["status"] == "suspended"
-    assert by_id["00005.HK"]["trading_status"] == 0
-    assert by_id["02934.HK"]["official_lifecycle_source"] == "hkexnews_suspension_report"
+    assert "00001.HK" not in by_id
+    assert by_id["02323.HK"]["status"] == "suspended"
+    assert by_id["02323.HK"]["trading_status"] == 0
+    assert by_id["06623.HK"]["official_lifecycle_source"] == "hkexnews_suspension_report"
 
 
 def test_manual_review_provider_turns_operator_conclusions_into_lifecycle_evidence():
