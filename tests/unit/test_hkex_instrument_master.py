@@ -47,7 +47,7 @@ def test_official_hkex_securities_list_parser_adds_lineage_and_classification():
     assert by_id["00005.HK"]["is_research_equity"] is True
     assert by_id["02800.HK"]["product_type"] == "etf"
     assert by_id["00823.HK"]["product_type"] == "reit"
-    assert by_id["11000.HK"]["product_type"] == "cbbc"
+    assert by_id["50000.HK"]["product_type"] == "cbbc"
     assert by_id["22000.HK"]["product_type"] == "warrant"
     assert by_id["02929.HK"]["product_type"] == "temporary_counter"
     assert by_id["00005.HK"]["official_lifecycle_source"] == "hkex_securities_list"
@@ -238,6 +238,53 @@ def test_product_classifier_separates_derivatives_debt_funds_and_equity():
     temporary = classify_hkex_product({"instrument_id": "02955.HK", "name": "GOFINTECH-2000"})
     assert temporary["product_type"] == "temporary_counter"
     assert temporary["research_scope"] == "exclude"
+
+
+def test_product_classifier_excludes_hkex_official_special_code_ranges():
+    cases = {
+        "00290.HK": "ordinary_equity",
+        "08239.HK": "ordinary_equity",
+        "04332.HK": "trading_only",
+        "10000.HK": "warrant",
+        "47000.HK": "inline_warrant",
+        "50000.HK": "cbbc",
+        "30000.HK": "stock_connect_special_counter",
+        "80016.HK": "rmb_counter",
+        "89988.HK": "rmb_counter",
+        "90000.HK": "stock_connect_special_counter",
+        "07200.HK": "leveraged_inverse_product",
+        "06300.HK": "restricted_security",
+    }
+
+    for instrument_id, product_type in cases.items():
+        result = classify_hkex_product({
+            "instrument_id": instrument_id,
+            "category": "Equity",
+            "sub_category": "Equity Securities (Main Board)",
+        })
+        assert result["product_type"] == product_type
+        if instrument_id not in {"00290.HK", "08239.HK"}:
+            assert result["research_scope"] == "exclude"
+
+
+def test_product_classifier_excludes_rmb_and_trading_only_metadata():
+    rmb = classify_hkex_product({
+        "instrument_id": "09988.HK",
+        "currency": "CNY",
+        "rmb_counter": "Y",
+        "category": "Equity",
+        "sub_category": "Equity Securities (Main Board)",
+    })
+    trading_only = classify_hkex_product({
+        "instrument_id": "04335.HK",
+        "category": "Equity",
+        "sub_category": "Trading Only Securities",
+    })
+
+    assert rmb["product_type"] == "rmb_counter"
+    assert rmb["research_scope"] == "exclude"
+    assert trading_only["product_type"] == "trading_only"
+    assert trading_only["research_scope"] == "exclude"
     rights = classify_hkex_product({"instrument_id": "08556.HK", "name": "NIUHOLDINGS RTS"})
     assert rights["product_type"] == "temporary_counter"
     assert rights["research_scope"] == "exclude"

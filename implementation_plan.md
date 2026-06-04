@@ -242,6 +242,7 @@ HKEX 主数据底座要求：
 - `safe_write` 会写入官方 in-scope 新标的和安全范围内存量标的的非破坏性字段，不会改变 `active/delisted/suspended` 生命周期。
 - `HKEXSourceEvidencePolicy` 已显式区分主源可用、HKEXnews active fallback、delisted 证据、suspension 证据和各类写入门控；主 active 源不可用时 fallback 只用于审计，不允许 safe-write 或 reactivation。
 - `manual_review_file` 已支持 JSON/CSV 人工复核回灌，可把普通证券的 review_required 样本转为 reviewed lifecycle evidence，再由 `lifecycle_write` 生效；HKEX 临时代码区间与 RTS/特殊交易单位直接在产品分类层过滤，不进入 review。
+- HKEX 产品过滤已按官方 Stock Code Allocation Plan 扩展：临时柜台、Trading Only / Nasdaq-Amex Pilot、人民币柜台、窝轮、牛熊证、inline warrant、Stock Connect 特殊代码区、债券/票据、专业优先股、HDR、受限证券、杠反产品、预留/过渡区等都归为 `research_scope=exclude`；这类代码不允许 safe-write 新增入库，历史已入库记录应标为不可用并让日更/区间回补跳过。
 - `manual_review_file` 默认写入 `data/hkex_manual_review.json`；API 提供 `/instruments/hkex/master/review-required`、`/instruments/hkex/master/manual-review`，Telegram 提供 `/hkex_review pending|list|<代码> <结论>`，三者共用同一份 review evidence。
 - `config/05_scheduler.json` 已新增 `hkex_instrument_master_sync` 手工任务，`manual_only=true` 且不设置自动运行时间；Telegram 使用 `/run hkex_instrument_master_sync` 触发，默认 `mode=safe_write`，只写安全新增/metadata 候选，不写生命周期字段。`config/03_data.json` 的自动 HKEX governance 默认仍保持 `audit_only`。
 - HKEX prolonged suspension PDF 已接入 `HKEXSuspensionReportProvider`，通过 `pypdf` 解析为结构化 suspended 证据；缺少依赖或解析失败会降级为 warning。

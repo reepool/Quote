@@ -63,11 +63,24 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
     category = str(row.get("category") or row.get("hkex_category") or "").strip().lower()
     sub_category = str(row.get("sub_category") or row.get("hkex_sub_category") or "").strip().lower()
     name = str(row.get("name") or row.get("stock_name") or "").strip().lower()
+    currency = str(row.get("currency") or row.get("trading_currency") or "").strip().upper()
+    rmb_counter = str(row.get("rmb_counter") or "").strip().upper()
     combined = " ".join([category, sub_category, name])
 
     numeric_code = _hkex_numeric_code(instrument_id=instrument_id, symbol=symbol)
 
-    if _is_hkex_temporary_counter_code(numeric_code):
+    code_range = _classify_hkex_code_range(numeric_code)
+
+    if rmb_counter in {"Y", "YES", "TRUE", "1"} or currency in {"CNY", "RMB"}:
+        product_type = "rmb_counter"
+        research_scope = "exclude"
+    elif code_range is not None:
+        product_type = code_range["product_type"]
+        research_scope = code_range["research_scope"]
+    elif "trading only" in combined or "nasdaq-amex pilot" in combined or "nasdaq amex pilot" in combined:
+        product_type = "trading_only"
+        research_scope = "exclude"
+    elif _is_hkex_temporary_counter_code(numeric_code):
         product_type = "temporary_counter"
         research_scope = "exclude"
     elif "old code" in combined or " old" in combined or "-old" in combined or "(旧)" in combined:
@@ -87,6 +100,12 @@ def classify_hkex_product(row: Dict[str, Any]) -> Dict[str, Any]:
         research_scope = "exclude"
     elif "warrant" in combined:
         product_type = "warrant"
+        research_scope = "exclude"
+    elif "leveraged and inverse" in combined or "leveraged/inverse" in combined:
+        product_type = "leveraged_inverse_product"
+        research_scope = "exclude"
+    elif "spac warrant" in combined:
+        product_type = "spac_warrant"
         research_scope = "exclude"
     elif "debt" in combined or "bond" in combined or "note" in combined:
         product_type = "debt"
@@ -127,6 +146,83 @@ def _is_hkex_temporary_counter_code(numeric_code: Optional[int]) -> bool:
         or 8551 <= numeric_code <= 8600
         or 82900 <= numeric_code <= 82999
     )
+
+
+def _classify_hkex_code_range(numeric_code: Optional[int]) -> Optional[Dict[str, str]]:
+    """Classify official HKEX stock-code allocation ranges that are out of research scope."""
+    if numeric_code is None:
+        return None
+
+    if _is_hkex_temporary_counter_code(numeric_code):
+        return {"product_type": "temporary_counter", "research_scope": "exclude"}
+    if 10000 <= numeric_code <= 29999 or 89200 <= numeric_code <= 89599:
+        return {"product_type": "warrant", "research_scope": "exclude"}
+    if 30000 <= numeric_code <= 39999 or 70000 <= numeric_code <= 79999 or 90000 <= numeric_code <= 99999:
+        return {"product_type": "stock_connect_special_counter", "research_scope": "exclude"}
+    if (
+        4000 <= numeric_code <= 4329
+        or 4400 <= numeric_code <= 4599
+        or 4700 <= numeric_code <= 4799
+        or 5000 <= numeric_code <= 6029
+        or 6750 <= numeric_code <= 6799
+        or 40000 <= numeric_code <= 40999
+        or 84300 <= numeric_code <= 84329
+        or 84400 <= numeric_code <= 84599
+        or 85000 <= numeric_code <= 85743
+        or 85744 <= numeric_code <= 86029
+        or 86600 <= numeric_code <= 86799
+        or 89000 <= numeric_code <= 89099
+    ):
+        return {"product_type": "debt", "research_scope": "exclude"}
+    if 4330 <= numeric_code <= 4399:
+        return {"product_type": "trading_only", "research_scope": "exclude"}
+    if 4600 <= numeric_code <= 4699 or 84600 <= numeric_code <= 84699:
+        return {"product_type": "professional_preference_share", "research_scope": "exclude"}
+    if 4800 <= numeric_code <= 4999:
+        return {"product_type": "spac_warrant", "research_scope": "exclude"}
+    if 6200 <= numeric_code <= 6299:
+        return {"product_type": "hdr", "research_scope": "exclude"}
+    if 6300 <= numeric_code <= 6399 or 86300 <= numeric_code <= 86399:
+        return {"product_type": "restricted_security", "research_scope": "exclude"}
+    if (
+        6400 <= numeric_code <= 6599
+        or 7000 <= numeric_code <= 7199
+        or 41000 <= numeric_code <= 41499
+        or 41600 <= numeric_code <= 46999
+        or 49000 <= numeric_code <= 49499
+        or 84000 <= numeric_code <= 84299
+        or 84330 <= numeric_code <= 84399
+        or 84700 <= numeric_code <= 84999
+        or 86200 <= numeric_code <= 86299
+        or 86400 <= numeric_code <= 86599
+        or 87100 <= numeric_code <= 87199
+        or 87800 <= numeric_code <= 88999
+        or 89100 <= numeric_code <= 89199
+        or 89700 <= numeric_code <= 89849
+    ):
+        return {"product_type": "reserved_or_transition_counter", "research_scope": "exclude"}
+    if (
+        7200 <= numeric_code <= 7399
+        or 7500 <= numeric_code <= 7599
+        or 7700 <= numeric_code <= 7799
+        or 9200 <= numeric_code <= 9399
+        or 9500 <= numeric_code <= 9599
+        or 9700 <= numeric_code <= 9799
+        or 87200 <= numeric_code <= 87399
+        or 87500 <= numeric_code <= 87599
+        or 87700 <= numeric_code <= 87799
+    ):
+        return {"product_type": "leveraged_inverse_product", "research_scope": "exclude"}
+    if 7800 <= numeric_code <= 7999:
+        return {"product_type": "spac_share", "research_scope": "exclude"}
+    if 47000 <= numeric_code <= 48999:
+        return {"product_type": "inline_warrant", "research_scope": "exclude"}
+    if 49500 <= numeric_code <= 69999:
+        return {"product_type": "cbbc", "research_scope": "exclude"}
+    if 80000 <= numeric_code <= 89999:
+        return {"product_type": "rmb_counter", "research_scope": "exclude"}
+
+    return None
 
 
 @dataclass

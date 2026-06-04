@@ -10009,6 +10009,7 @@ class DataManager:
                 instruments = await self.db_ops.get_active_instruments(
                     exchange,
                     instrument_types=instrument_types,
+                    tradable_only=True,
                 )
                 total_instruments = len(instruments)
                 exchange_result = {
