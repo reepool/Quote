@@ -1261,6 +1261,7 @@ class ResearchDcfValuationResponse(BaseModel):
     lineage: Optional[Dict[str, Any]] = Field(None, description="输入与参数 lineage")
     model_comparison: Optional[Dict[str, Any]] = Field(None, description="模型对比结果")
     workbook: Optional[Dict[str, Any]] = Field(None, description="工作簿 artifact 信息")
+    cache_info: Optional[Dict[str, Any]] = Field(None, description="bounded DCF run cache 信息")
     research_mode: Optional[bool] = Field(None, description="是否研究模式")
 
 

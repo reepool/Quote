@@ -14,6 +14,8 @@ from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshar
 _install_akshare_proxy_patch(required=False)
 
 import asyncio
+from copy import deepcopy
+import hashlib
 import inspect
 import json
 import os
@@ -137,6 +139,7 @@ class DataManager:
         # TTL = 1 小时, 适用于 API 高频查询场景
         self._factor_cache: Dict[str, tuple] = {}
         self._FACTOR_CACHE_TTL: float = 3600.0  # 秒
+        self._dcf_run_cache: Dict[str, Dict[str, Any]] = {}
 
     def refresh_runtime_config(self) -> None:
         """Refresh config references cached on the long-lived DataManager."""
@@ -5037,11 +5040,13 @@ class DataManager:
         valuation_date: Optional[str] = None,
         scenario_set: Optional[str] = None,
         terminal_method: Optional[str] = None,
+        cash_flow_model: Optional[str] = None,
         include_forecast_rows: bool = True,
         include_sensitivity: bool = True,
         include_lineage: bool = True,
         include_model_comparison: bool = False,
         include_workbook: bool = False,
+        workbook_style: Optional[str] = None,
         force_model: bool = False,
         research_mode: bool = False,
     ) -> Optional[Dict[str, Any]]:
@@ -5085,11 +5090,13 @@ class DataManager:
                 "valuation_date": valuation_date,
                 "scenario_set": scenario_set,
                 "terminal_method": terminal_method,
+                "cash_flow_model": cash_flow_model,
                 "include_forecast_rows": include_forecast_rows,
                 "include_sensitivity": include_sensitivity,
                 "include_lineage": include_lineage,
                 "include_model_comparison": include_model_comparison,
                 "include_workbook": include_workbook,
+                "workbook_style": workbook_style,
                 "force_model": force_model,
                 "research_mode": research_mode,
             }.items()
@@ -5127,15 +5134,27 @@ class DataManager:
                         "as_of_date": beta_result.get("as_of_date"),
                     }
 
+        cache_key = self._build_dcf_run_cache_key(
+            normalized_id,
+            financial_bundle,
+            latest_close,
+            overrides,
+        )
+        cached_result = self._get_dcf_run_cache(cache_key, module_cfg)
+        if cached_result is not None:
+            return cached_result
+
         from research.valuation_service import ResearchValuationService
 
         valuation_service = ResearchValuationService(module_cfg)
-        return valuation_service.run_dcf(
+        result = valuation_service.run_dcf(
             instrument=instrument,
             financial_bundle=financial_bundle,
             latest_close=latest_close,
             overrides=overrides,
         )
+        self._store_dcf_run_cache(cache_key, result, module_cfg)
+        return result
 
     async def get_research_dcf_assumptions(
         self,
@@ -5160,7 +5179,182 @@ class DataManager:
             "market": market,
             "currency": currency,
             "assumptions": list(assumptions.values()),
+            "source_registry": engine.list_assumption_sources(),
         }
+
+    async def refresh_research_dcf_assumptions(
+        self,
+        *,
+        source_profile: str = "manual_config",
+        timeout_seconds: Optional[int] = None,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        """显式刷新专业 DCF 假设参数。
+
+        当前阶段只暴露本地 source registry 和刷新诊断，不在 DCF 计算路径
+        里隐式访问外部数据源。
+        """
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        from research.professional_dcf import ProfessionalDcfEngine
+
+        engine = ProfessionalDcfEngine(
+            module_cfg.get("dcf", {}).get("professional")
+            or module_cfg.get("professional_dcf")
+            or module_cfg.get("dcf")
+        )
+        return engine.refresh_assumptions(
+            source_profile=source_profile,
+            timeout_seconds=timeout_seconds,
+            dry_run=dry_run,
+        )
+
+    async def get_research_dcf_workbook_artifact(self, artifact_id: str) -> Optional[Path]:
+        """Resolve a DCF workbook artifact inside the configured report directory."""
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+        if not artifact_id.startswith("dcf_"):
+            raise ValueError("invalid DCF workbook artifact id")
+        allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-"
+        if any(ch not in allowed_chars for ch in artifact_id):
+            raise ValueError("invalid DCF workbook artifact id")
+
+        dcf_cfg = module_cfg.get("dcf", {}) if isinstance(module_cfg, dict) else {}
+        professional = dcf_cfg.get("professional", {}) if isinstance(dcf_cfg, dict) else {}
+        workbook_cfg = professional.get("workbook") or dcf_cfg.get("workbook") or {}
+        artifact_dir = Path(workbook_cfg.get("artifact_dir", "data/reports/dcf_workbooks"))
+        candidate = (artifact_dir / f"{artifact_id}.xlsx").resolve()
+        root = artifact_dir.resolve()
+        if root not in candidate.parents:
+            raise ValueError("invalid DCF workbook artifact path")
+        if not candidate.exists() or not candidate.is_file():
+            return None
+        return candidate
+
+    def _build_dcf_run_cache_key(
+        self,
+        instrument_id: str,
+        financial_bundle: Dict[str, Any],
+        latest_close: Optional[float],
+        overrides: Dict[str, Any],
+    ) -> str:
+        payload = {
+            "instrument_id": instrument_id,
+            "financial_bundle_hash": self._stable_hash(financial_bundle),
+            "latest_close": latest_close,
+            "overrides": overrides,
+        }
+        return self._stable_hash(payload)
+
+    def _get_dcf_run_cache(
+        self,
+        cache_key: str,
+        module_cfg: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        cache_cfg = self._dcf_cache_config(module_cfg)
+        if not cache_cfg.get("enabled", False):
+            return None
+        entry = self._dcf_run_cache.get(cache_key)
+        if not entry:
+            return None
+        now = datetime.now(timezone.utc)
+        if entry["expires_at_dt"] <= now:
+            self._dcf_run_cache.pop(cache_key, None)
+            return None
+        result = deepcopy(entry["result"])
+        result["cache_info"] = {
+            "enabled": True,
+            "cache_hit": True,
+            "cache_key": cache_key,
+            "cached_at": entry["cached_at"],
+            "created_at": entry["cached_at"],
+            "expires_at": entry["expires_at"],
+            "input_hash": entry.get("input_hash"),
+            "parameter_hash": entry.get("parameter_hash"),
+            "entry_count": len(self._dcf_run_cache),
+            "invalidation_policy": entry["invalidation_policy"],
+        }
+        return result
+
+    def _store_dcf_run_cache(
+        self,
+        cache_key: str,
+        result: Dict[str, Any],
+        module_cfg: Dict[str, Any],
+    ) -> None:
+        cache_cfg = self._dcf_cache_config(module_cfg)
+        if not cache_cfg.get("enabled", False):
+            if isinstance(result, dict):
+                result["cache_info"] = {"enabled": False, "cache_hit": False}
+            return
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        ttl_hours = int(cache_cfg.get("ttl_hours", 24) or 24)
+        expires_at_dt = now + timedelta(hours=ttl_hours)
+        cache_result = deepcopy(result)
+        cache_result["cache_info"] = {
+            "enabled": True,
+            "cache_hit": False,
+            "cache_key": cache_key,
+            "cached_at": now.isoformat(),
+            "created_at": now.isoformat(),
+            "expires_at": expires_at_dt.isoformat(),
+            "input_hash": result.get("input_hash"),
+            "parameter_hash": result.get("parameter_hash"),
+            "entry_count": len(self._dcf_run_cache) + (0 if cache_key in self._dcf_run_cache else 1),
+            "invalidation_policy": "financial_bundle_hash/latest_close/overrides_identity_change",
+        }
+        result["cache_info"] = deepcopy(cache_result["cache_info"])
+        self._dcf_run_cache[cache_key] = {
+            "created_at": now.isoformat(),
+            "cached_at": now.isoformat(),
+            "expires_at": expires_at_dt.isoformat(),
+            "expires_at_dt": expires_at_dt,
+            "input_hash": result.get("input_hash"),
+            "parameter_hash": result.get("parameter_hash"),
+            "invalidation_policy": cache_result["cache_info"]["invalidation_policy"],
+            "summary": self._dcf_run_cache_summary(cache_result),
+            "result": cache_result,
+        }
+        self._trim_dcf_run_cache(cache_cfg)
+
+    def _dcf_run_cache_summary(self, result: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "instrument_id": result.get("instrument_id"),
+            "model_profile": result.get("model_profile"),
+            "status": result.get("status"),
+            "valuation_date": result.get("valuation_date"),
+            "input_hash": result.get("input_hash"),
+            "parameter_hash": result.get("parameter_hash"),
+            "assumption_snapshot": result.get("assumptions"),
+            "forecast_rows": result.get("forecast_rows", []),
+            "sensitivity": result.get("sensitivity", []),
+            "workbook": result.get("workbook"),
+        }
+
+    def _trim_dcf_run_cache(self, cache_cfg: Dict[str, Any]) -> None:
+        max_entries = int(cache_cfg.get("max_entries", 128) or 128)
+        while len(self._dcf_run_cache) > max_entries:
+            oldest_key = min(
+                self._dcf_run_cache,
+                key=lambda key: self._dcf_run_cache[key]["created_at"],
+            )
+            self._dcf_run_cache.pop(oldest_key, None)
+
+    @staticmethod
+    def _dcf_cache_config(module_cfg: Dict[str, Any]) -> Dict[str, Any]:
+        dcf_cfg = module_cfg.get("dcf", {}) if isinstance(module_cfg, dict) else {}
+        professional = dcf_cfg.get("professional", {}) if isinstance(dcf_cfg, dict) else {}
+        cache_cfg = professional.get("bounded_cache") or dcf_cfg.get("bounded_cache") or {}
+        return cache_cfg if isinstance(cache_cfg, dict) else {}
+
+    @staticmethod
+    def _stable_hash(payload: Any) -> str:
+        return hashlib.sha256(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+        ).hexdigest()[:16]
 
     async def get_research_dcf_model_profiles(self) -> Dict[str, Any]:
         """读取专业 DCF 模型 profile 注册表。"""

@@ -82,6 +82,7 @@ from api.routes import (
     list_research_industry_taxonomy,
     list_research_official_industry_mapping_backlog,
     list_research_official_industry_mappings,
+    refresh_research_dcf_assumptions,
 )
 
 
@@ -2455,8 +2456,10 @@ class TestResearchRoutes:
             get_research_dcf_valuation(
                 "600000.SH",
                 model_strategy="compare",
+                cash_flow_model="fcff",
                 include_model_comparison=True,
                 include_workbook=True,
+                workbook_style="consulting_clean",
                 research_mode=True,
             )
         )
@@ -2465,8 +2468,10 @@ class TestResearchRoutes:
         mock_dm.get_research_dcf_valuation.assert_awaited_once()
         kwargs = mock_dm.get_research_dcf_valuation.await_args.kwargs
         assert kwargs["model_strategy"] == "compare"
+        assert kwargs["cash_flow_model"] == "fcff"
         assert kwargs["include_model_comparison"] is True
         assert kwargs["include_workbook"] is True
+        assert kwargs["workbook_style"] == "consulting_clean"
         assert kwargs["research_mode"] is True
 
     @patch("api.routes.data_manager")
@@ -2488,6 +2493,31 @@ class TestResearchRoutes:
         response = _run(get_research_dcf_assumptions())
 
         assert response["assumptions"][0]["assumption_key"] == "risk_free_rate_rmb_10y"
+
+    @patch("api.routes.data_manager")
+    def test_refresh_research_dcf_assumptions_success(self, mock_dm):
+        mock_dm.refresh_research_dcf_assumptions = AsyncMock(
+            return_value={
+                "status": "dry_run",
+                "source_profile": "china_bond_10y",
+                "diagnostics": {"remote_fetch_performed": False},
+            }
+        )
+
+        response = _run(
+            refresh_research_dcf_assumptions(
+                source_profile="china_bond_10y",
+                timeout_seconds=5,
+                dry_run=True,
+            )
+        )
+
+        assert response["diagnostics"]["remote_fetch_performed"] is False
+        mock_dm.refresh_research_dcf_assumptions.assert_awaited_once_with(
+            source_profile="china_bond_10y",
+            timeout_seconds=5,
+            dry_run=True,
+        )
 
     @patch("api.routes.data_manager")
     def test_get_research_dcf_input_gaps_success(self, mock_dm):

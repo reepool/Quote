@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
 
+from research.professional_dcf import ProfessionalDcfEngine
 from research.valuation_service import ResearchValuationService
 
 
@@ -844,9 +845,15 @@ def test_valuation_service_dcf_model_comparison_for_close_scores():
 
     assert result["model_comparison"] is not None
     assert len(result["model_suitability_candidates"]) == 2
+    comparison = result["model_comparison"]
+    assert comparison["industry_model_result"]["model_profile"] == "nonfinancial_fcff.v1"
+    assert comparison["industry_model_result"]["status"] in {"success", "partial"}
+    assert comparison["company_characteristic_model_result"]["model_profile"] == "high_growth_staged_fcff.v1"
+    assert comparison["company_characteristic_model_result"]["status"] == "unavailable"
+    assert "model_profile_not_implemented" in comparison["company_characteristic_model_result"]["missing_reason"]
 
 
-def test_valuation_service_dcf_selects_fcfe_for_stable_low_leverage():
+def test_valuation_service_dcf_defers_fcfe_for_stable_low_leverage_until_supported():
     service = ResearchValuationService()
 
     result = service.run_dcf(
@@ -870,4 +877,348 @@ def test_valuation_service_dcf_selects_fcfe_for_stable_low_leverage():
         overrides={"valuation_date": "2026-04-18"},
     )
 
-    assert result["cash_flow_model_selection"]["selected_cash_flow_model"] == "fcfe"
+    assert result["cash_flow_model_selection"]["selected_cash_flow_model"] == "fcff"
+    assert "fcfe_candidate_deferred" in result["warnings"]
+
+
+def test_valuation_service_dcf_explicit_fcfe_does_not_masquerade_as_fcff_success():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600900.SH",
+            "symbol": "600900",
+            "exchange": "SSE",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 250.0,
+            "capital_expenditure": 50.0,
+            "total_debt": 100.0,
+            "equity": 1000.0,
+            "dividend_payout_ratio": 0.6,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18", "cash_flow_model": "fcfe"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["missing_reason"] == "fcfe_model_not_implemented"
+    assert result["selected_cash_flow_model"] == "fcfe"
+    assert result["base_cash_flow_source"] == "fcfe_unavailable"
+
+
+def test_valuation_service_dcf_honors_detail_suppression_and_validates_methods():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "include_forecast_rows": False,
+            "include_sensitivity": False,
+            "include_lineage": False,
+            "scenario_set": "downside_only",
+            "terminal_method": "gordon_growth",
+        },
+    )
+
+    assert result["status"] == "success"
+    assert result["forecast_rows"] == []
+    assert result["sensitivity"] == []
+    assert result["lineage"] is None
+    assert [item["scenario"] for item in result["scenarios"]] == ["bear", "base", "stress"]
+
+    invalid = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18", "terminal_method": "exit_multiple"},
+    )
+    assert invalid["status"] == "invalid_parameters"
+    assert invalid["missing_reason"] == "unsupported_terminal_method"
+
+
+def test_professional_dcf_assumptions_expose_fallback_missing_and_refresh_diagnostics():
+    engine = ProfessionalDcfEngine()
+
+    assumptions = engine.get_assumptions(market="SSE", currency="CNY")
+    risk_free = assumptions["risk_free_rate"]
+
+    assert risk_free["assumption_key"] == "risk_free_rate_rmb_10y"
+    assert risk_free["fallback_used"] is True
+    assert risk_free["lineage_hash"]
+    assert assumptions["commodity_price"]["quality_flag"] == "missing"
+    assert "assumption_value_missing" in assumptions["commodity_price"]["warnings"]
+
+    refresh = engine.refresh_assumptions(
+        source_profile="china_bond_10y",
+        timeout_seconds=3,
+        dry_run=False,
+    )
+
+    assert refresh["status"] == "unsupported"
+    assert refresh["diagnostics"]["remote_fetch_performed"] is False
+    assert refresh["source_results"][0]["timeout_seconds"] == 3
+
+
+def test_professional_dcf_missing_required_assumption_returns_structured_blocker():
+    service = ResearchValuationService(
+        {
+            "dcf": {
+                "professional": {
+                    "assumptions": {
+                        "risk_free_rate_rmb_10y": {
+                            "assumption_key": "risk_free_rate_rmb_10y",
+                            "market": "CN",
+                            "currency": "CNY",
+                            "tenor": "10Y",
+                            "value": None,
+                            "unit": "rate",
+                            "primary_source": "china_bond_10y",
+                            "fallback_sources": ["manual_config"],
+                            "source": None,
+                            "quality_flag": "missing",
+                            "fallback_used": False,
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["missing_reason"] == "assumption_risk_free_rate_rmb_10y_missing"
+
+
+def test_professional_dcf_fallback_assumptions_are_warned():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert "risk_free_rate_rmb_10y_fallback_used" in result["warnings"]
+    assert "equity_risk_premium_fallback_used" in result["warnings"]
+    assert "cost_of_debt_default_fallback_used" in result["warnings"]
+    assert "beta_fallback_used" in result["warnings"]
+
+
+def test_valuation_service_dcf_blocks_missing_availability_date():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["missing_reason"] == "missing_data_available_date"
+
+
+def test_valuation_service_dcf_missing_capex_blocks_full_fcff():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["missing_reason"] == "capital_expenditure_required"
+    assert "capital_expenditure_required" in result["readiness"]["blockers"]
+
+
+def test_valuation_service_dcf_financial_formula_and_net_debt_bridge():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "depreciation_and_amortization": 40.0,
+            "change_in_working_capital": 10.0,
+            "cash_and_equivalents": 100.0,
+            "total_debt": 200.0,
+            "lease_liabilities": 10.0,
+            "preferred_equity": 3.0,
+            "minority_interest": 5.0,
+            "non_operating_assets": 8.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "growth_rate": 0.0,
+            "projection_years": 1,
+            "discount_rate": 0.1,
+            "terminal_growth": 0.03,
+        },
+    )
+
+    first_row = result["forecast_rows"][0]
+    assert first_row["fcff"] == pytest.approx(105.0)
+    assert result["net_debt_adjustment"]["net_debt"] == pytest.approx(110.0)
+    assert result["assumptions"]["wacc"]["wacc"] == pytest.approx(0.1)
+    assert "discount_rate_override_used" in result["warnings"]
+
+
+def test_valuation_service_dcf_terminal_growth_must_be_below_wacc():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18", "discount_rate": 0.03, "terminal_growth": 0.03},
+    )
+
+    assert result["status"] == "invalid_parameters"
+    assert result["missing_reason"] == "wacc_must_exceed_terminal_growth"
+
+
+def test_valuation_service_dcf_forced_financial_fcff_records_warning():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry_name": "银行",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18", "model_profile": "nonfinancial_fcff.v1"},
+    )
+
+    assert result["status"] == "success"
+    assert "forced_model_warning" in result["warnings"]
+    assert "financial_sector_mismatch" in result["warnings"]
+
+
+def test_valuation_service_dcf_special_company_guardrail_fails_closed():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "688001.SH", "symbol": "688001", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": -50.0,
+            "capital_expenditure": 60.0,
+            "net_income": -100.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["model_profile"] == "high_growth_staged_fcff.v1"
+    assert result["missing_reason"] == "model_profile_not_implemented"
+
+
+def test_valuation_service_dcf_adapter_records_audit_fields_and_warnings():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={"instrument_id": "600519.SH", "symbol": "600519", "exchange": "SSE"},
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "total_debt": 2000.0,
+            "equity": 500.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    selection = result["cash_flow_model_selection"]
+    assert selection["selected_cash_flow_model"] == "fcff"
+    assert selection["candidate_models"] == ["fcff", "fcfe"]
+    assert "fcfe" in selection["rejected_models"]
+    assert "operating_cf" in selection["input_gap_by_model"]["fcfe"]
+    assert "high_leverage_fcfe_not_default" in selection["warnings"]

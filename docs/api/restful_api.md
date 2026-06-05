@@ -347,6 +347,116 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/valuation/relative
 curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percentile?as_of_date=2026-05-29&quarters=12&metrics=pe_ttm,pb_mrq,ps_ttm&min_points=60&negative_policy=flag"
 ```
 
+### GET /api/v1/research/company/{instrument_id}/valuation/dcf
+
+按需计算专业 DCF。当前默认走 `ProfessionalDcfEngine`，普通非金融公司使用 `nonfinancial_fcff.v1`；金融、地产、周期、公用事业、REIT、控股公司、高研发/亏损/短上市等 profile 已注册 guardrail，未实现完整模型时返回结构化 unavailable/partial，不静默套用通用 FCFF。
+
+可选参数：
+- `growth_rate`、`discount_rate`、`terminal_growth`、`projection_years`：估值假设覆盖。
+- `model_profile`：显式指定模型 profile；显式指定会绕过自动推荐，但仍返回 readiness/warning。
+- `model_strategy`：`auto / industry / characteristic / compare`。
+- `valuation_date`：估值日期；财务事实必须满足 `data_available_date <= valuation_date`。
+- `scenario_set`：当前支持 `standard / downside_only`；其他值返回 `invalid_parameters`。
+- `terminal_method`：当前支持 `gordon_growth / perpetual_growth`；exit multiple 仍属后续扩展。
+- `cash_flow_model`：`fcff / fcfe`。当前只有 FCFF 实算；显式 `fcfe` 会返回结构化 unavailable/partial，不会伪装为成功 FCFF。
+- `include_forecast_rows`、`include_sensitivity`、`include_lineage`：控制输出明细；关闭时会在 warnings/diagnostics 中记录 suppression。
+- `include_model_comparison`：强制返回模型对比诊断；比较结果包含行业候选和公司特性候选的 result object，未实现模型以 unavailable/partial 结果表达。
+- `include_workbook`：请求投行级 xlsx workbook artifact metadata；当前由本地 `DcfWorkbookBuilder` 生成 stdlib OOXML 工作簿，返回 `workbook_available / workbook_artifact_id / download_path / generated_at / expires_at / sheets / warnings`。
+- `workbook_style`：覆盖 workbook 输出样式标识。
+- `research_mode`：允许研究模式 partial 输出；生产默认缺关键字段时 fail closed。
+
+主要输出：
+- `model_profile / recommended_model / model_suitability_candidates / score_gap / selection_policy`
+- `selected_cash_flow_model / cash_flow_model_selection`
+- `assumptions`：WACC、无风险利率、ERP、债务成本、FX、行业 beta、商品价格假设及 lineage。
+- `forecast_rows / scenarios / sensitivity`
+- `readiness / diagnostics / warnings / lineage`
+- `workbook`：仅在 `include_workbook=true` 时返回。artifact 默认写入 `data/reports/dcf_workbooks`，不写入 `valuation_history`。
+- `cache_info`：进程内 bounded run cache 命中与 key/hash 摘要，包含 `cache_hit / cache_key / input_hash / parameter_hash / cached_at / expires_at / entry_count / invalidation_policy`。缓存身份包含标的、财务 bundle hash、最新收盘价和参数覆盖，输入或参数变化会自动失效。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/dcf?valuation_date=2026-04-18&model_strategy=auto&include_forecast_rows=true&include_sensitivity=true"
+curl "http://localhost:8000/api/v1/research/company/688001.SH/valuation/dcf?model_strategy=compare&include_model_comparison=true&research_mode=true"
+```
+
+### GET /api/v1/research/valuation/dcf/workbooks/{artifact_id}
+
+下载 `include_workbook=true` 返回的 DCF xlsx artifact。接口只允许读取配置报告目录内、以 `dcf_` 开头的 artifact id，避免路径穿越。
+
+示例：
+```bash
+curl -OJ "http://localhost:8000/api/v1/research/valuation/dcf/workbooks/dcf_600519_SH_20260605_abcd1234"
+```
+
+### GET /api/v1/research/company/{instrument_id}/valuation/dcf/readiness
+
+读取单公司专业 DCF profile readiness。接口只读本地标的、财务 bundle 和本地假设，不在请求时补远程数据。
+
+主要字段：
+- `ready`
+- `profiles[].model_profile`
+- `profiles[].implementation_status`
+- `profiles[].ready`
+- `profiles[].missing_fields`
+- `profiles[].blockers`
+- `coverage_diagnostics`
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/dcf/readiness"
+```
+
+### GET /api/v1/research/company/{instrument_id}/valuation/dcf/input-gaps
+
+读取某个模型 profile 的输入缺口。默认 profile 为 `nonfinancial_fcff.v1`。
+
+可选参数：
+- `model_profile`：如 `nonfinancial_fcff.v1`、`bank_residual_income.v1`、`cyclical_fcff_midcycle.v1`。
+
+输出会列出缺失字段、requiredness、候选主源、fallback 源、是否可刷新和风险说明。当前 refresh eligibility 只做显式诊断，不自动触发远程请求。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/dcf/input-gaps?model_profile=nonfinancial_fcff.v1"
+```
+
+### GET /api/v1/research/valuation/dcf/model-profiles
+
+读取 DCF 模型 profile 注册表，包括 required/optional fields、company types 和 implementation status。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/valuation/dcf/model-profiles"
+```
+
+### GET /api/v1/research/valuation/dcf/assumptions
+
+读取本地 DCF 假设和 source registry。当前包括 A 股/RMB 10 年期国债收益率、美股/USD 10 年期美债收益率、港股/HKD 10 年期港债或外汇基金票据收益率、ERP、债务成本、FX、行业 beta 和商品价格假设。
+
+可选参数：
+- `market`：默认 `SSE`
+- `currency`：默认 `CNY`
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/valuation/dcf/assumptions?market=SSE&currency=CNY"
+```
+
+### POST /api/v1/research/valuation/dcf/assumptions/refresh
+
+显式刷新 DCF 假设的入口。当前实现为本地优先 source policy/diagnostics：不会在 DCF 计算函数内部隐式联网；未配置远程 adapter 的 source 会返回 `unsupported`。
+
+可选参数：
+- `source_profile`：默认 `manual_config`，也可传 `china_bond_10y / us_treasury_10y / hk_gov_bond_or_efn_10y / all`
+- `timeout_seconds`：显式超时秒数
+- `dry_run`：默认 `true`
+
+示例：
+```bash
+curl -X POST "http://localhost:8000/api/v1/research/valuation/dcf/assumptions/refresh?source_profile=china_bond_10y&timeout_seconds=10&dry_run=true"
+```
+
 ### GET /api/v1/research/valuation/readiness
 
 读取估值域 readiness 与 rollout blockers。

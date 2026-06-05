@@ -2417,6 +2417,33 @@ def test_data_manager_get_research_dcf_assumptions_returns_lineage(tmp_path):
     assert assumptions["risk_free_rate_rmb_10y"]["currency"] == "CNY"
     assert assumptions["risk_free_rate_rmb_10y"]["source"] == "manual_config"
     assert assumptions["risk_free_rate_rmb_10y"]["quality_flag"] == "configured_fallback"
+    assert assumptions["risk_free_rate_rmb_10y"]["fallback_used"] is True
+    assert assumptions["risk_free_rate_rmb_10y"]["lineage_hash"]
+    assert result["source_registry"][0]["source_profile"]
+
+
+def test_data_manager_refresh_research_dcf_assumptions_is_explicit_and_local_first(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(
+        manager.refresh_research_dcf_assumptions(
+            source_profile="china_bond_10y",
+            timeout_seconds=5,
+            dry_run=False,
+        )
+    )
+
+    assert result["status"] == "unsupported"
+    assert result["refreshed"] is False
+    assert result["source_results"][0]["timeout_seconds"] == 5
+    assert result["diagnostics"]["remote_fetch_performed"] is False
+    assert result["diagnostics"]["hidden_refresh_inside_dcf"] is False
 
 
 def test_data_manager_get_research_dcf_model_profiles_returns_registry(tmp_path):
@@ -2515,6 +2542,101 @@ def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path
     assert profiles["bank_residual_income.v1"]["ready"] is False
     assert "model_profile_not_implemented" in profiles["bank_residual_income.v1"]["blockers"]
     assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+
+
+def test_data_manager_dcf_bounded_cache_hits_and_invalidates_on_price_change(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "dcf": {
+                "beta": {"enabled": False},
+                "professional": {
+                    "enabled": True,
+                    "bounded_cache": {"enabled": True, "ttl_hours": 1, "max_entries": 8},
+                    "workbook": {"artifact_dir": str(tmp_path / "workbooks")},
+                },
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "industry_name": "食品饮料",
+        }
+    )
+    manager.db_ops.get_daily_data = AsyncMock(
+        side_effect=[
+            pd.DataFrame([{"close": 12.0}]),
+            pd.DataFrame([{"close": 12.0}]),
+            pd.DataFrame([{"close": 13.0}]),
+        ]
+    )
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600519.SH",
+        "latest_facts": {
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+    }
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        first = _run(
+            manager.get_research_dcf_valuation(
+                "600519.SH",
+                valuation_date="2026-04-18",
+                include_workbook=True,
+            )
+        )
+        second = _run(
+            manager.get_research_dcf_valuation(
+                "600519.SH",
+                valuation_date="2026-04-18",
+                include_workbook=True,
+            )
+        )
+        third = _run(
+            manager.get_research_dcf_valuation(
+                "600519.SH",
+                valuation_date="2026-04-18",
+                include_workbook=True,
+            )
+        )
+
+    assert first["cache_info"]["cache_hit"] is False
+    assert second["cache_info"]["cache_hit"] is True
+    assert second["cache_info"]["cache_key"] == first["cache_info"]["cache_key"]
+    assert first["cache_info"]["input_hash"] == first["input_hash"]
+    assert first["cache_info"]["parameter_hash"] == first["parameter_hash"]
+    assert first["cache_info"]["cached_at"]
+    assert first["cache_info"]["expires_at"]
+    assert first["cache_info"]["entry_count"] >= 1
+    assert second["cache_info"]["entry_count"] >= 1
+    assert third["cache_info"]["cache_hit"] is False
+    assert third["cache_info"]["cache_key"] != first["cache_info"]["cache_key"]
+    assert first["workbook"]["workbook_available"] is True
+    cache_entry = manager._dcf_run_cache[first["cache_info"]["cache_key"]]
+    assert cache_entry["summary"]["input_hash"] == first["input_hash"]
+    assert cache_entry["summary"]["parameter_hash"] == first["parameter_hash"]
+    assert cache_entry["summary"]["assumption_snapshot"]
+    assert cache_entry["summary"]["forecast_rows"]
+    assert cache_entry["summary"]["sensitivity"]
+    assert cache_entry["summary"]["workbook"]["workbook_artifact_id"]
+    storage.get_valuation_history_rows.assert_not_called()
+    storage.get_latest_valuation_history_row.assert_not_called()
 
 
 def test_data_manager_relative_valuation_skips_peers_for_reference_only_membership(tmp_path):

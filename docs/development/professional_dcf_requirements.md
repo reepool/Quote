@@ -1014,10 +1014,10 @@ GET 只保留简单覆盖。
 
 - `GET /valuation/dcf?include_workbook=true` 可返回 artifact metadata。
 - `POST /valuation/dcf/run` 可在复杂参数运行后生成 workbook。
-- 可选新增下载接口：
+- 当前已实现下载接口：
 
 ```text
-GET /api/v1/research/company/{instrument_id}/valuation/dcf/workbook/{run_id}
+GET /api/v1/research/valuation/dcf/workbooks/{artifact_id}
 ```
 
 底稿内容至少包括：
@@ -1050,6 +1050,7 @@ GET /api/v1/research/company/{instrument_id}/valuation/dcf/workbook/{run_id}
 - workbook artifact 默认写入受控报告目录或短期缓存目录，不写入估值历史主表。
 - API 返回 `workbook_available / workbook_artifact_id / generated_at / expires_at / style / warnings`。
 - 大型 workbook 生成应支持异步任务或超时保护。
+- 当前工程实现采用 `stdlib_ooxml` builder，不新增 `openpyxl/xlsxwriter` 依赖；默认输出目录为 `data/reports/dcf_workbooks`，工作簿包含 `Cover / Assumptions / Financials / Forecast / WACC / Valuation / Scenarios / Sensitivity / Diagnostics / Lineage` sheet，并保留冻结窗格、分区样式、输入/输出/告警单元格填充和 artifact metadata。
 
 ---
 
@@ -1065,7 +1066,18 @@ GET /api/v1/research/company/{instrument_id}/valuation/dcf/workbook/{run_id}
 
 ### 11.2 bounded cache
 
-可选新增：
+当前工程已实现进程内 bounded run cache；未来如需要跨进程审计和复用，可再扩展为持久化 saved-run 表。
+
+当前缓存策略：
+
+- 默认 TTL 可配置，当前配置为 `24h`。
+- 默认最大条目数可配置，当前配置为 `128`。
+- cache key 包含标的、财务 bundle hash、最新收盘价和用户参数覆盖。
+- 输入财务事实、市场价格或参数变化后自然生成新 key，不复用旧结果。
+- 缓存响应附带 `cache_info`，包括 `cache_hit / cache_key / input_hash / parameter_hash / cached_at / expires_at / entry_count`。
+- 只缓存计算结果摘要和 workbook metadata，不写入 `valuation_history`，也不替代正式估值历史日更。
+
+可选持久化扩展：
 
 | 表 | 用途 |
 |---|---|
@@ -1074,7 +1086,7 @@ GET /api/v1/research/company/{instrument_id}/valuation/dcf/workbook/{run_id}
 | `dcf_run_forecasts` | 显式预测年份行，可选 |
 | `dcf_run_sensitivity` | 敏感性矩阵，可选 |
 
-缓存策略：
+持久化扩展策略：
 
 - 仅缓存 canonical default 参数和用户显式保存的运行。
 - 默认 TTL 可配置。
@@ -1224,7 +1236,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 
 ## 15. 分阶段落地建议
 
-### 15.0 当前实现状态（2026-06-04）
+### 15.0 当前实现状态（2026-06-05）
 
 已启动 OpenSpec change `add-professional-dcf-engine` 并完成第一批工程落地：
 
@@ -1232,14 +1244,17 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现 `nonfinancial_fcff.v1`：EBIT/NOPAT、capex、营运资本、WACC、终值、净债务桥、forecast rows、情景分析和敏感性矩阵。
 - 已实现模型 profile registry、行业/公司特性双候选 scoring、`model_strategy=auto|industry|characteristic|compare`、接近分数模型对比，以及 FCFE/FCFF adapter 输出。
 - 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。
+- 已实现显式 assumption refresh 入口，当前为本地优先 source policy/diagnostics，不在 DCF 计算路径隐式联网。
+- 已实现投行级 xlsx workbook artifact：由 `DcfWorkbookBuilder` 生成 stdlib OOXML 工作簿，通过 `/api/v1/research/valuation/dcf/workbooks/{artifact_id}` 下载。
+- 已实现进程内 bounded DCF run cache：按输入 hash、参数 hash、最新收盘价和 TTL 控制复用，不写入 `valuation_history`。
+- 已完成 DCF contract hardening：`compare` 返回行业/公司特性候选 result object，未实现模型 fail closed；显式 `fcfe` 不再伪装为成功 FCFF；`scenario_set / terminal_method / include_* / workbook_style / cash_flow_model` 参数具备明确语义；假设缺失和 fallback 进入结构化 blocker/warning；REST workbook metadata 不暴露本地 artifact path。
 - 已实现 `data_available_date <= valuation_date` 过滤 blocker，避免财务事实未来函数；缺失可得日默认在生产路径 fail closed。
 - 银行、证券、保险、地产、周期、公用事业、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
 
-- 显式 assumption refresh 入口和真实主备外部数据源刷新适配。
-- 投行级 xlsx 底稿生成器。
-- bounded DCF run cache / saved-run audit。
+- 真实主备外部数据源刷新 adapter 和生产级联网刷新调度。
+- 跨进程 saved-run audit 表和可检索历史运行视图。
 - 金融行业和特殊行业的完整实算模型。
 - 覆盖所有代表性行业/公司类型的大样本 fixture 与集成验证。
 
@@ -1339,7 +1354,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 | P1 | 周期、公用事业、地产、亏损公司处理 | 避免常见行业误估 |
 | P1 | 金融企业 blocker 和 residual model 设计 | 防止银行保险被错误套 FCFF |
 | P2 | 银行/证券/保险完整模型 | 字段和验证要求更高 |
-| P2 | bounded cache 和 saved run | 提升交互体验 |
+| P2 | saved run audit | 支持跨进程复核和历史运行检索 |
 | P3 | analyst forecast 融合 | 依赖外部源稳定性 |
 
 ---

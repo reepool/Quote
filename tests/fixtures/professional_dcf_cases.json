@@ -1,0 +1,1920 @@
+{
+    "research_config": {
+        "enabled": true,
+        "markets": [
+            "SSE",
+            "SZSE",
+            "BSE"
+        ],
+        "modules": {
+            "company_profile": {
+                "enabled": true,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ]
+            },
+            "industry": {
+                "enabled": true,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "standard": {
+                    "enabled": true,
+                    "taxonomy_system": "sw",
+                    "taxonomy_version": "sw_2021",
+                    "authoritative_source_required": true,
+                    "default_refresh_frequency": "weekly",
+                    "daily_refresh_supported": true,
+                    "relative_valuation_level": 2,
+                    "classification_primary_enabled": true,
+                    "classification_primary_source": "swsresearch",
+                    "source_file_manifest": {
+                        "enabled": true,
+                        "parser_version": "swsresearch_shenwan_classification.v1",
+                        "daily_refresh_short_circuit": true,
+                        "coverage_required_exchanges": [
+                            "SSE",
+                            "SZSE",
+                            "BSE"
+                        ]
+                    },
+                    "official_mapping": {
+                        "min_overlap_count": 2,
+                        "min_precision": 0.6,
+                        "min_recall": 0.6,
+                        "cache_max_age_days": 7,
+                        "minimum_mapping_rows": 400,
+                        "minimum_mapped_rows": 200,
+                        "backlog_review": {
+                            "minimum_current_classification_count": 1,
+                            "minimum_overlap_count": 2,
+                            "minimum_precision": 0.2,
+                            "minimum_recall": 0.5,
+                            "minimum_top_candidate_overlap_gap": 1
+                        },
+                        "readiness_override_review_limit": 5,
+                        "allow_live_rebuild_on_cache_miss": true,
+                        "manual_overrides": {}
+                    },
+                    "component_cache": {
+                        "cache_max_age_days": 7,
+                        "minimum_component_sets": 200
+                    },
+                    "name_supplement": {
+                        "enabled": true,
+                        "candidates": [
+                            {
+                                "source": "manual",
+                                "mode": "configured"
+                            },
+                            {
+                                "source": "sina",
+                                "mode": "direct"
+                            },
+                            {
+                                "source": "eastmoney",
+                                "mode": "direct"
+                            }
+                        ],
+                        "max_instruments_per_exchange": 200,
+                        "allow_level2_leaf_matches": true,
+                        "unmatched_sample_limit": 10,
+                        "manual_entries": [
+                            {
+                                "instrument_id": "688781.SH",
+                                "industry_name": "\u9762\u677f",
+                                "industry_code": "850831.SI",
+                                "reason": "Manual supplement approved after cross-checking Sina related-data page and other public market-data displays for 688781.SH.",
+                                "evidence": [
+                                    "https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpXiangGuan/stockid/688781.phtml",
+                                    "https://quote.eastmoney.com/concept/sh688781.html?from=guba",
+                                    "https://xueqiu.com/S/SH688781"
+                                ],
+                                "note": "Use as a bounded gap-fill override only when authoritative leaf component sets do not cover the stock. The taxonomy match is resolved locally by Shenwan name.",
+                                "source_classification": "\u4eba\u5de5\u786e\u8ba4\u7533\u4e07\u884c\u4e1a\u8865\u6e90"
+                            }
+                        ],
+                        "note": "Only runs for stocks missed by current Shenwan component sets. It maps provider industry names to local Shenwan taxonomy by normalized name; level-2 matches are accepted only when the local taxonomy has no level-3 children for that level-2 node."
+                    },
+                    "note": "Only authoritative Shenwan mappings can drive peer grouping or relative valuation. Unmapped raw industry fields remain reference_only."
+                }
+            },
+            "shareholders": {
+                "enabled": true,
+                "delivery_mode": "paid_high_availability",
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "allowed_scope": [
+                    "holder_count",
+                    "top10_holders",
+                    "reference_only_ownership_clues"
+                ],
+                "same_source_recovery_candidates": [
+                    "cninfo:direct"
+                ],
+                "force_merge_candidates": [
+                    "cninfo:direct"
+                ],
+                "same_source_recovery_batch_size": 1,
+                "same_source_recovery_max_instruments": 20,
+                "skip_same_source_full_fallback_after_success": true,
+                "incremental_sync": {
+                    "enabled": true,
+                    "lookback_days": 7,
+                    "overlap_days": 2,
+                    "page_size": 30,
+                    "max_pages_per_market": 20,
+                    "max_candidates": 300,
+                    "pending_recheck_days": 5,
+                    "note": "Daily shareholder incremental mode uses reusable CNInfo announcement scans to select candidate instruments, then writes snapshots only when normalized shareholder content hashes change or required scope is missing. Pending recheck is kept for five calendar days to absorb CNInfo announcement-vs-data20 structured-data lag across weekends and holidays. The same announcement set uses first_pending_at as a hard deadline anchor and is not extended by repeated daily scans."
+                },
+                "snapshot_api_requires_mode": "paid_high_availability",
+                "note": "Shareholder ingestion is enabled after bounded and full validation passed on 2026-05-23. The target route is cninfo:direct as primary, akshare:proxy_patch as high-availability backup, and direct AkShare/efinance only as last-resort references because Sina/Eastmoney shareholder endpoints can trigger anti-crawl refusal."
+            },
+            "financial_summary": {
+                "enabled": true,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ]
+            },
+            "financial_statements": {
+                "enabled": true,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "history": {
+                    "baseline_report_period": "2024Q1",
+                    "optional_ttm_anchor_period": "2023Q4",
+                    "rolling_min_quarters": 8
+                },
+                "storage": {
+                    "target_db_path": "data/financials.db",
+                    "archive_root": "data/filings/financial_statements",
+                    "hot_quarter_window": 12,
+                    "hot_anchor_policy": {
+                        "include_ttm_anchor_period": true,
+                        "include_yoy_anchor_periods": true,
+                        "include_latest_annual_period": true
+                    },
+                    "tier_maintenance": {
+                        "enabled": true,
+                        "run_after_successful_sync": true,
+                        "validate_duplicate_tier_conflicts": true,
+                        "preserve_source_lineage": true
+                    }
+                },
+                "available_date_backfill": {
+                    "enabled": true,
+                    "run_after_successful_sync": true,
+                    "policy": "observed_disclosure_date_then_conservative_statutory_deadline",
+                    "mark_estimated_lineage": true
+                },
+                "official_structured_sources": {
+                    "enabled": false,
+                    "candidates": [
+                        {
+                            "source": "sse",
+                            "exchanges": [
+                                "SSE"
+                            ],
+                            "mode": "direct",
+                            "enabled": false,
+                            "manifest_url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/index.shtml?productId={symbol}",
+                            "endpoint_url": "",
+                            "supports_xbrl": true,
+                            "status": "sse_structured_json_parser_ready_disabled",
+                            "note": "Source-level endpoint_candidates include SSE official XBRL commonQuery structured JSON probes. The structured_json parser and configurable core fact aliases are implemented; production stays disabled until bounded live validation and broader backfill readiness pass."
+                        },
+                        {
+                            "source": "cninfo",
+                            "exchanges": [
+                                "SSE",
+                                "SZSE",
+                                "BSE"
+                            ],
+                            "mode": "direct",
+                            "enabled": false,
+                            "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
+                            "endpoint_url": "",
+                            "supports_xbrl": true,
+                            "status": "official_structured_json_candidate_ready_disabled",
+                            "note": "Source-level endpoint_candidates include CNInfo data20 official structured financial JSON for SSE, SZSE, and BSE 920-code instruments. SSE still defaults to the exchange commonQuery profile; CNInfo data20 is available as explicit alternate official evidence, cross-check, or fallback profile. Announcement metadata remains PDF-only evidence and is not a readiness gate."
+                        },
+                        {
+                            "source": "bse",
+                            "exchanges": [
+                                "BSE"
+                            ],
+                            "mode": "direct",
+                            "enabled": false,
+                            "manifest_url": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
+                            "endpoint_url": "",
+                            "supports_xbrl": true,
+                            "status": "metadata_candidate_configured_disabled",
+                            "note": "BSE exchange announcement metadata remains configured for evidence only; representative samples expose PDF files. BSE structured statement ingestion is currently routed through CNInfo data20 920-code official structured JSON until a BSE-hosted XBRL/XML/ZIP artifact is validated."
+                        }
+                    ]
+                },
+                "official_source_selection": {
+                    "enabled": true,
+                    "period_unavailable_alternates": [
+                        {
+                            "exchange": "SSE",
+                            "source": "sse",
+                            "source_profile": "sse_commonquery",
+                            "alternate_source": "cninfo",
+                            "alternate_source_profile": "cninfo_data20",
+                            "switch_when": "all_periods_beyond_report_type_max_year",
+                            "report_type_max_year_by_id": {
+                                "5000": "2023"
+                            },
+                            "observed_on": "2026-05-15",
+                            "reason": "sse_commonquery_annual_report_max_year_2023",
+                            "note": "Live probe for 600000.SH on 2026-05-15 showed 2023Q4 annual SSE commonQuery rows were structured, while 2024Q4 and 2025Q4 returned HTTP 200 empty payloads and COMMON_MAP_MAXYEAR_L reported annual max year 2023. For latest annual SSE periods, default backfill may select CNInfo data20 unless the operator explicitly requests sse_commonquery."
+                        }
+                    ]
+                },
+                "runtime": {
+                    "max_concurrency": 2,
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5
+                },
+                "parser": {
+                    "parser_version": "financial_structured_filing.v1",
+                    "alias_mapping_version": "core_financial_facts.v1",
+                    "numeric_fact_parser": "xbrl_numeric_facts.v1",
+                    "structured_json_fact_parser": "sse_commonquery_structured_json_facts.v1",
+                    "core_fact_alias_overrides": {
+                        "revenue": [
+                            "S2020_0010",
+                            "S2020_0020"
+                        ],
+                        "operating_profit": [
+                            "S2020_0240"
+                        ],
+                        "pre_tax_profit": [
+                            "S2020_0280"
+                        ],
+                        "net_income": [
+                            "S2020_0310",
+                            "S2020_0300"
+                        ],
+                        "total_assets": [
+                            "S2010_0380"
+                        ],
+                        "total_liabilities": [
+                            "S2010_0690"
+                        ],
+                        "equity": [
+                            "S2010_0770",
+                            "S2010_0790"
+                        ],
+                        "operating_cf": [
+                            "S2030_0250"
+                        ],
+                        "total_cf": [
+                            "S2030_0520"
+                        ]
+                    }
+                },
+                "fallback_policy": {
+                    "allow_third_party_fallback": true,
+                    "fallback_only_missing_periods_or_facts": true,
+                    "do_not_overwrite_higher_priority_facts": true,
+                    "fallback_source_priority": [
+                        "akshare"
+                    ]
+                },
+                "disclosure_incremental_sync": {
+                    "repair_source_order": [
+                        "cninfo_data20",
+                        "ths_report",
+                        "sina_report"
+                    ],
+                    "official_first": true,
+                    "fallback_only_missing_or_ambiguous_facts": true,
+                    "note": "Financial disclosure incremental and reconciliation maintenance use CNInfo data20 official structured facts first, then THS/Sina only for missing, failed, or semantically ambiguous canonical facts."
+                },
+                "readiness": {
+                    "required_core_facts": [
+                        "revenue",
+                        "net_income_parent",
+                        "equity_parent",
+                        "total_assets",
+                        "total_liabilities"
+                    ],
+                    "required_core_facts_by_profile": {
+                        "nonbank": [
+                            "revenue",
+                            "net_income_parent",
+                            "equity_parent",
+                            "total_assets",
+                            "total_liabilities"
+                        ],
+                        "bank": [
+                            "revenue",
+                            "net_income_parent",
+                            "equity_parent",
+                            "total_assets",
+                            "total_liabilities"
+                        ],
+                        "securities": [
+                            "revenue",
+                            "net_income_parent",
+                            "equity_parent",
+                            "total_assets",
+                            "total_liabilities"
+                        ],
+                        "insurance": [
+                            "revenue",
+                            "net_income_parent",
+                            "equity_parent",
+                            "total_assets",
+                            "total_liabilities"
+                        ]
+                    },
+                    "min_period_coverage_ratio": 0.95,
+                    "min_core_fact_coverage_ratio": 0.95,
+                    "max_fallback_share": 0.5,
+                    "max_parser_failure_ratio": 0.05,
+                    "block_on_core_fact_semantic_warnings": true
+                },
+                "note": "Official structured_json parsing is implemented for SSE commonQuery and CNInfo data20 SZSE/BSE profiles, but production rollout remains disabled until each profile passes bounded dry-run evidence, production backfill gates, and readiness checks. AkShare remains the configured fallback for missing official periods or facts."
+            },
+            "analyst_forecasts": {
+                "enabled": false,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "note": "Implemented baseline storage/sync/API using AkShare earnings forecast coverage. Keep disabled by default until direct-source rollout and anti-crawl budget are explicitly accepted."
+            },
+            "research_reports": {
+                "enabled": false,
+                "max_reports_per_instrument": 20,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "note": "Implemented as report-metadata coverage only; not a full-text research archive. Keep disabled by default until source stability is validated."
+            },
+            "sentiment_events": {
+                "enabled": false,
+                "optional_empty_exchanges": [
+                    "BSE"
+                ],
+                "lookback_days": 7,
+                "event_families": [
+                    "notice",
+                    "executive_share_change",
+                    "pledge_ratio"
+                ],
+                "note": "Implemented as event/sentiment metadata baseline. Default disabled until direct-source freshness and event coverage are validated."
+            },
+            "technical": {
+                "enabled": true,
+                "default_adjustment": "qfq",
+                "latest_cache": {
+                    "enabled": true,
+                    "period": "1d",
+                    "adjustment": "qfq"
+                },
+                "summary": {
+                    "lookback_bars": 180,
+                    "min_bars": 60,
+                    "sma_windows": {
+                        "short": 20,
+                        "long": 60
+                    },
+                    "ema_windows": {
+                        "fast": 12,
+                        "slow": 26,
+                        "signal": 9
+                    },
+                    "rsi_window": 14,
+                    "adx_window": 14,
+                    "stoch_window": 14,
+                    "stoch_smooth_k": 3,
+                    "stoch_smooth_d": 3,
+                    "cci_window": 20,
+                    "williams_r_window": 14,
+                    "boll_window": 20,
+                    "boll_stddev": 2.0,
+                    "atr_window": 14,
+                    "volume_ratio_window": 20,
+                    "signal_thresholds": {
+                        "bullish": 0.25,
+                        "bearish": -0.25
+                    }
+                }
+            },
+            "valuation": {
+                "enabled": true,
+                "history": {
+                    "lookback_days": 252,
+                    "default_write_policy": "missing_only",
+                    "periodic_rebuild_window_mode": "last_12_quarters",
+                    "flow_input_mode": "cumulative_ytd",
+                    "require_availability_date": true,
+                    "forward_metrics_enabled": false
+                },
+                "input_sync": {
+                    "primary_source": "cninfo",
+                    "source_mode": "direct",
+                    "daily_sync_mode": "incremental",
+                    "full_sync_mode": "full",
+                    "availability_policy": "use_announcement_date_for_lineage_and_effective_date_for_capital_series",
+                    "unit_conversion": {
+                        "source_unit": "10k_share",
+                        "canonical_unit": "share",
+                        "multiplier": 10000.0
+                    },
+                    "note": "valuation_inputs is populated before valuation_history_rebuild. Daily sync uses CNInfo all-market capital snapshot; full backfill fetches per-symbol CNInfo capital-change events. Values are stored in data/valuation.db and reads never fetch remote sources synchronously."
+                },
+                "metrics": {
+                    "enabled_variants": [
+                        "pe_static",
+                        "pe_ttm",
+                        "pe_forward",
+                        "pb_mrq",
+                        "ps_static",
+                        "ps_ttm",
+                        "ps_forward"
+                    ],
+                    "compatibility_fields": {
+                        "pe_ratio": "pe_ttm_then_static",
+                        "pb_ratio": "pb_mrq",
+                        "ps_ratio": "ps_ttm_then_static"
+                    }
+                },
+                "relative": {
+                    "taxonomy_system": "sw",
+                    "benchmark_level": 2,
+                    "benchmark_field": "sw_l2_code",
+                    "require_authoritative": true,
+                    "min_peer_count": 3,
+                    "max_peer_rows": 20,
+                    "metric_variants": [
+                        "pe_ttm",
+                        "pb_mrq",
+                        "ps_ttm"
+                    ],
+                    "include_compatibility_metrics": true
+                },
+                "dcf": {
+                    "projection_years": 5,
+                    "risk_free_rate": 0.02,
+                    "equity_risk_premium": 0.06,
+                    "default_beta": 1.0,
+                    "discount_rate": 0.1,
+                    "terminal_growth": 0.03,
+                    "base_growth_rate": 0.08,
+                    "bear_growth_rate": 0.04,
+                    "bull_growth_rate": 0.12,
+                    "sensitivity_growth_rates": [
+                        0.04,
+                        0.06,
+                        0.08
+                    ],
+                    "sensitivity_discount_rates": [
+                        0.09,
+                        0.1,
+                        0.11
+                    ],
+                    "beta": {
+                        "enabled": true,
+                        "benchmark_family": "market_default",
+                        "window_days": 252,
+                        "fallback_beta": 1.0,
+                        "note": "DCF prefers on-demand calculated beta when available. Explicit discount_rate overrides still take precedence; fallback_beta is used only when no calculated beta is available."
+                    },
+                    "professional": {
+                        "enabled": true,
+                        "default_model_profile": "nonfinancial_fcff.v1",
+                        "default_model_strategy": "auto",
+                        "score_gap_threshold": 0.15,
+                        "terminal_value_warning_threshold": 0.8,
+                        "model_profiles": {
+                            "nonfinancial_fcff.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "implemented",
+                                "required_fields": [
+                                    "revenue",
+                                    "operating_profit",
+                                    "capital_expenditure"
+                                ],
+                                "optional_fields": [
+                                    "depreciation_and_amortization",
+                                    "change_in_working_capital",
+                                    "cash_and_equivalents",
+                                    "total_debt",
+                                    "lease_liabilities",
+                                    "minority_interest",
+                                    "preferred_equity",
+                                    "non_operating_assets"
+                                ]
+                            },
+                            "nonfinancial_fcfe.v1": {
+                                "candidate_type": "cash_flow_adapter",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "operating_cf",
+                                    "net_debt_change",
+                                    "interest_expense"
+                                ],
+                                "optional_fields": [
+                                    "dividend_payout_ratio",
+                                    "capital_expenditure",
+                                    "change_in_working_capital"
+                                ]
+                            },
+                            "asset_light_fcff.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "revenue",
+                                    "operating_profit"
+                                ],
+                                "optional_fields": [
+                                    "research_and_development",
+                                    "sbc_expense"
+                                ]
+                            },
+                            "high_growth_staged_fcff.v1": {
+                                "candidate_type": "company_characteristic",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "revenue",
+                                    "research_and_development"
+                                ]
+                            },
+                            "bank_residual_income.v1": {
+                                "candidate_type": "financial_sector",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "equity",
+                                    "net_income",
+                                    "roe",
+                                    "capital_adequacy_ratio"
+                                ]
+                            },
+                            "broker_excess_capital.v1": {
+                                "candidate_type": "financial_sector",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "net_income",
+                                    "equity",
+                                    "net_capital"
+                                ]
+                            },
+                            "insurance_embedded_value_or_ddm.v1": {
+                                "candidate_type": "financial_sector",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "embedded_value",
+                                    "new_business_value"
+                                ]
+                            },
+                            "real_estate_nav_dcf.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "inventory",
+                                    "contract_liabilities",
+                                    "total_debt"
+                                ]
+                            },
+                            "cyclical_fcff_midcycle.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "revenue",
+                                    "operating_profit",
+                                    "commodity_price_assumption"
+                                ]
+                            },
+                            "utility_fcfe_or_ddm.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "operating_cf",
+                                    "dividend_payout_ratio"
+                                ]
+                            },
+                            "reit_ffo_affo_ddm.v1": {
+                                "candidate_type": "industry",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "rental_income",
+                                    "ffo",
+                                    "dividend_payout_ratio"
+                                ]
+                            },
+                            "holdco_sotp.v1": {
+                                "candidate_type": "company_characteristic",
+                                "implementation_status": "guardrail",
+                                "required_fields": [
+                                    "segment_assets",
+                                    "investment_income"
+                                ]
+                            }
+                        },
+                        "assumptions": {
+                            "risk_free_rate_rmb_10y": {
+                                "assumption_key": "risk_free_rate_rmb_10y",
+                                "market": "CN",
+                                "currency": "CNY",
+                                "tenor": "10Y",
+                                "value": 0.02,
+                                "unit": "rate",
+                                "primary_source": "china_bond_10y",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "risk_free_rate_usd_10y": {
+                                "assumption_key": "risk_free_rate_usd_10y",
+                                "market": "US",
+                                "currency": "USD",
+                                "tenor": "10Y",
+                                "value": 0.04,
+                                "unit": "rate",
+                                "primary_source": "us_treasury_10y",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "risk_free_rate_hkd_10y": {
+                                "assumption_key": "risk_free_rate_hkd_10y",
+                                "market": "HK",
+                                "currency": "HKD",
+                                "tenor": "10Y",
+                                "value": 0.035,
+                                "unit": "rate",
+                                "primary_source": "hk_gov_bond_or_efn_10y",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "equity_risk_premium": {
+                                "assumption_key": "equity_risk_premium",
+                                "market": "GLOBAL",
+                                "currency": null,
+                                "tenor": null,
+                                "value": 0.06,
+                                "unit": "rate",
+                                "primary_source": "versioned_research_config",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "cost_of_debt_default": {
+                                "assumption_key": "cost_of_debt_default",
+                                "market": "GLOBAL",
+                                "currency": null,
+                                "tenor": null,
+                                "value": 0.045,
+                                "unit": "rate",
+                                "primary_source": "company_bond_or_interest_expense",
+                                "fallback_sources": [
+                                    "industry_credit_spread",
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "fx_usd_cny": {
+                                "assumption_key": "fx_usd_cny",
+                                "market": "FX",
+                                "currency": "CNY",
+                                "tenor": null,
+                                "value": 7.1,
+                                "unit": "fx_rate",
+                                "primary_source": "safe_or_pbo_fx_reference",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "fx_hkd_cny": {
+                                "assumption_key": "fx_hkd_cny",
+                                "market": "FX",
+                                "currency": "CNY",
+                                "tenor": null,
+                                "value": 0.91,
+                                "unit": "fx_rate",
+                                "primary_source": "safe_or_pbo_fx_reference",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "industry_beta_default": {
+                                "assumption_key": "industry_beta_default",
+                                "market": "GLOBAL",
+                                "currency": null,
+                                "tenor": null,
+                                "value": 1.0,
+                                "unit": "beta",
+                                "primary_source": "local_beta_service",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": "manual_config",
+                                "quality_flag": "configured_fallback",
+                                "fallback_used": true,
+                                "as_of_date": "2026-06-04",
+                                "last_updated_at": "2026-06-04T00:00:00"
+                            },
+                            "commodity_price_default": {
+                                "assumption_key": "commodity_price_default",
+                                "market": "GLOBAL",
+                                "currency": "USD",
+                                "tenor": null,
+                                "value": null,
+                                "unit": "price",
+                                "primary_source": "commodity_exchange_or_industry_dataset",
+                                "fallback_sources": [
+                                    "manual_config"
+                                ],
+                                "source": null,
+                                "quality_flag": "missing",
+                                "fallback_used": false,
+                                "as_of_date": null,
+                                "last_updated_at": null
+                            }
+                        },
+                        "assumption_sources": {
+                            "china_bond_10y": {
+                                "source_profile": "china_bond_10y",
+                                "assumption_keys": [
+                                    "risk_free_rate_rmb_10y"
+                                ],
+                                "provider": "china_bond_or_exchange_public_yield",
+                                "refresh_supported": false,
+                                "timeout_seconds": 10,
+                                "rate_limit_per_minute": 30
+                            },
+                            "us_treasury_10y": {
+                                "source_profile": "us_treasury_10y",
+                                "assumption_keys": [
+                                    "risk_free_rate_usd_10y"
+                                ],
+                                "provider": "us_treasury_public_yield",
+                                "refresh_supported": false,
+                                "timeout_seconds": 10,
+                                "rate_limit_per_minute": 30
+                            },
+                            "hk_gov_bond_or_efn_10y": {
+                                "source_profile": "hk_gov_bond_or_efn_10y",
+                                "assumption_keys": [
+                                    "risk_free_rate_hkd_10y"
+                                ],
+                                "provider": "hkma_or_gov_bond_public_yield",
+                                "refresh_supported": false,
+                                "timeout_seconds": 10,
+                                "rate_limit_per_minute": 30
+                            },
+                            "manual_config": {
+                                "source_profile": "manual_config",
+                                "assumption_keys": [
+                                    "*"
+                                ],
+                                "provider": "versioned_research_config",
+                                "refresh_supported": false,
+                                "timeout_seconds": 0,
+                                "rate_limit_per_minute": null
+                            }
+                        },
+                        "workbook": {
+                            "enabled": true,
+                            "default_style": "consulting_clean",
+                            "artifact_ttl_hours": 24,
+                            "artifact_dir": "data/reports/dcf_workbooks",
+                            "builder_dependency": "stdlib_ooxml"
+                        },
+                        "bounded_cache": {
+                            "enabled": true,
+                            "ttl_hours": 24,
+                            "max_entries": 128,
+                            "identity_fields": [
+                                "instrument_id",
+                                "valuation_date",
+                                "model_profile",
+                                "input_hash",
+                                "parameter_hash"
+                            ]
+                        }
+                    }
+                }
+            },
+            "beta": {
+                "enabled": true,
+                "windows": [
+                    60,
+                    120,
+                    252
+                ],
+                "quote_limit_days": 320,
+                "min_observation_ratio": 0.8,
+                "min_observations_floor": 40,
+                "stock_adjustment": "qfq",
+                "benchmark_adjustment": "none",
+                "default_benchmark_families": [
+                    "market_default",
+                    "market_broad",
+                    "board",
+                    "industry_sw_l2"
+                ],
+                "benchmarks": {
+                    "market_broad": [
+                        {
+                            "instrument_id": "000300.SH",
+                            "name": "\u6caa\u6df1300"
+                        },
+                        {
+                            "instrument_id": "000905.SH",
+                            "name": "\u4e2d\u8bc1500"
+                        },
+                        {
+                            "instrument_id": "000852.SH",
+                            "name": "\u4e2d\u8bc11000"
+                        }
+                    ]
+                },
+                "board_benchmark_rules": [
+                    {
+                        "name": "star_market",
+                        "exchanges": [
+                            "SSE"
+                        ],
+                        "symbol_prefixes": [
+                            "688"
+                        ],
+                        "benchmark_instrument_id": "000688.SH",
+                        "benchmark_name": "\u79d1\u521b50"
+                    },
+                    {
+                        "name": "sse_main_board",
+                        "exchanges": [
+                            "SSE"
+                        ],
+                        "benchmark_instrument_id": "000001.SH",
+                        "benchmark_name": "\u4e0a\u8bc1\u7efc\u5408\u6307\u6570"
+                    },
+                    {
+                        "name": "chinext",
+                        "exchanges": [
+                            "SZSE"
+                        ],
+                        "symbol_prefixes": [
+                            "300",
+                            "301"
+                        ],
+                        "benchmark_instrument_id": "399006.SZ",
+                        "benchmark_name": "\u521b\u4e1a\u677f\u6307\u6570"
+                    },
+                    {
+                        "name": "szse_main_board",
+                        "exchanges": [
+                            "SZSE"
+                        ],
+                        "benchmark_instrument_id": "399001.SZ",
+                        "benchmark_name": "\u6df1\u8bc1\u6210\u4efd\u6307\u6570"
+                    },
+                    {
+                        "name": "bse_default",
+                        "exchanges": [
+                            "BSE"
+                        ],
+                        "benchmark_instrument_id": "899050.BJ",
+                        "benchmark_name": "\u5317\u8bc150"
+                    }
+                ],
+                "note": "Beta is calculated on demand from local quote data. If window_days is omitted, the API returns configured default windows. benchmark_family=all returns deduped market_default, board, market_broad, and industry_sw_l2 results. Stock returns default to qfq-adjusted close from local adjustment_factors; index benchmarks default to unadjusted price-index close. Industry beta requires authoritative sw_l2 membership and local Shenwan index-analysis close_index history."
+            },
+            "risk": {
+                "enabled": true,
+                "benchmark_instrument_id": "000300.SH",
+                "volatility_window_short": 20,
+                "volatility_window_long": 60,
+                "beta_window": 60,
+                "drawdown_window": 252,
+                "liquidity_window": 20,
+                "event_window_days": 30,
+                "risk_level_thresholds": {
+                    "medium": 40.0,
+                    "high": 70.0
+                }
+            }
+        },
+        "storage": {
+            "db_path": "data/research.db",
+            "shadow_mode": true,
+            "attach_quotes_db": true,
+            "quotes_db_path": "data/quotes.db",
+            "quotes_db_alias": "quotes",
+            "financials_db_path": "data/financials.db",
+            "valuation_db_path": "data/valuation.db",
+            "filings_archive_root": "data/filings/financial_statements"
+        },
+        "budget": {
+            "default_mode": "availability_first",
+            "allow_paid_proxy": true,
+            "max_paid_candidates_per_domain": 1
+        },
+        "sources": {
+            "baostock": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "low",
+                "supports_proxy_patch": false,
+                "role": "structured_a_share_facts",
+                "financial_summary": {
+                    "lookback_quarters": 6
+                }
+            },
+            "pytdx": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "low",
+                "supports_proxy_patch": false,
+                "role": "market_data_and_raw_company_material",
+                "company_profile": {
+                    "connection_timeout": 10.0,
+                    "max_connect_attempts": 5,
+                    "max_content_categories": 4,
+                    "max_content_length": 4000
+                },
+                "financial_summary": {
+                    "connection_timeout": 10.0,
+                    "max_connect_attempts": 5
+                }
+            },
+            "efinance": {
+                "enabled": false,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "high",
+                "supports_proxy_patch": true,
+                "proxy_patch": {
+                    "provider": "ak_proxy_patch",
+                    "enabled": false,
+                    "cost_tier": "paid",
+                    "note": "efinance can use the same proxy patch approach as akshare, but the added availability is not free."
+                },
+                "role": "company_profile_shareholder_summary_financial_summary"
+            },
+            "akshare": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "high",
+                "supports_proxy_patch": true,
+                "proxy_patch": {
+                    "provider": "ak_proxy_patch",
+                    "enabled": true,
+                    "cost_tier": "paid",
+                    "note": "Use only when direct access is unstable or the data domain has no cheaper substitute."
+                },
+                "role": "fallback_for_full_financial_statements_and_sw_industry",
+                "shareholders": {
+                    "top_holders_request_interval_seconds": 0.2,
+                    "top_holders_retry_attempts": 2,
+                    "top_holders_retry_backoff_seconds": 0.5
+                },
+                "financial_statements": {
+                    "enabled": true,
+                    "role": "third_party_fallback_for_full_statement_rows",
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "statement_interface_order": [
+                        "sina_report",
+                        "eastmoney_report"
+                    ],
+                    "service_layers": {
+                        "local_core": {
+                            "enabled": false,
+                            "source_order": [
+                                "ths_report",
+                                "sina_report"
+                            ],
+                            "primary_source": "ths_report",
+                            "validation_source": "sina_report",
+                            "strict_intersection_only": true,
+                            "mapping_version": "sina_ths_core_financial_facts.v5",
+                            "promotion_required_canonical_facts": [
+                                "revenue",
+                                "net_income_parent",
+                                "total_assets",
+                                "total_liabilities",
+                                "equity_parent",
+                                "operating_cf"
+                            ],
+                            "profiles": [
+                                "nonbank",
+                                "bank",
+                                "securities",
+                                "insurance"
+                            ],
+                            "request_timeout_seconds": 20.0,
+                            "request_interval_seconds": 0.2,
+                            "retry_attempts": 2,
+                            "retry_backoff_seconds": 0.5,
+                            "cache_policy": {
+                                "enabled": true,
+                                "scope": "source_statement_rows",
+                                "ttl_seconds": 86400
+                            }
+                        },
+                        "industry_pack": {
+                            "enabled": true,
+                            "pack_version": "sina_ths_industry_financial_facts.v1",
+                            "profiles": [
+                                "bank",
+                                "securities",
+                                "insurance"
+                            ],
+                            "status": "optional_l1_5_non_blocking",
+                            "note": "Industry-specific financial facts are exposed separately from common L1 facts. Missing values are reported as industry_pack_missing and do not block local-core readiness."
+                        },
+                        "official_summary_check": {
+                            "enabled": true,
+                            "source": "cninfo",
+                            "source_profile": "cninfo_data20",
+                            "unit_conversion": {
+                                "source_unit": "CNY_10K",
+                                "canonical_unit": "CNY",
+                                "multiplier": 10000.0
+                            },
+                            "request_timeout_seconds": 20.0,
+                            "request_interval_seconds": 0.2,
+                            "retry_attempts": 2,
+                            "retry_backoff_seconds": 0.5,
+                            "cache_policy": {
+                                "enabled": true,
+                                "scope": "official_summary_check",
+                                "ttl_seconds": 86400
+                            }
+                        },
+                        "remote_extension": {
+                            "enabled": false,
+                            "source": "akshare",
+                            "statement_interface": "eastmoney_report",
+                            "requires_explicit_opt_in": true,
+                            "persist_to_local_core": false,
+                            "request_timeout_seconds": 30.0,
+                            "request_interval_seconds": 0.5,
+                            "retry_attempts": 2,
+                            "retry_backoff_seconds": 1.0,
+                            "cache_policy": {
+                                "enabled": true,
+                                "scope": "remote_extension_response",
+                                "ttl_seconds": 3600
+                            }
+                        }
+                    },
+                    "parser_version": "akshare_financial_statements.v1",
+                    "note": "Fallback only after official structured sources have missing periods or missing core facts. It must not overwrite higher-priority official facts."
+                },
+                "industry_standard": {
+                    "verified_interfaces": [
+                        "sw_index_first_info",
+                        "sw_index_second_info",
+                        "sw_index_third_info",
+                        "sw_index_third_cons",
+                        "stock_industry_clf_hist_sw",
+                        "index_component_sw"
+                    ],
+                    "membership_upstream_hosts": [
+                        "legulegu.com"
+                    ],
+                    "constituent_base_url": "https://legulegu.com/stockdata/index-composition",
+                    "constituent_request_timeout_seconds": 8.0,
+                    "max_constituent_fetch_seconds": 20.0,
+                    "max_failed_constituent_pages": 25,
+                    "failed_code_sample_limit": 10,
+                    "proxy_patch_note": "If proxy_patch is used for strict Shenwan memberships, config/03_data.json hook_domains must include legulegu.com."
+                },
+                "index_analysis": {
+                    "enabled": true,
+                    "mode": "direct",
+                    "endpoint": "https://www.swsresearch.com/institute-sw/api/index_analysis/index_analysis_report/",
+                    "request_timeout_seconds": 20.0,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "request_interval_seconds": 0.0,
+                    "page_size": 50,
+                    "max_pages_per_type": 200,
+                    "supported_index_types": [
+                        "\u5e02\u573a\u8868\u5f81",
+                        "\u4e00\u7ea7\u884c\u4e1a",
+                        "\u4e8c\u7ea7\u884c\u4e1a",
+                        "\u4e09\u7ea7\u884c\u4e1a",
+                        "\u98ce\u683c\u6307\u6570"
+                    ],
+                    "historical_backfill_enabled": true,
+                    "note": "Uses the same SWS index_analysis_report endpoint semantics as AkShare index_analysis_daily_sw, with project-controlled timeout/retry. This is the approved historical date-range source for industry_index_analysis_daily. Units match SWS display units: \u6210\u4ea4\u91cf is 100 million shares; percentage fields remain percent values."
+                }
+            },
+            "sse": {
+                "enabled": false,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "official_sse_structured_financial_filings",
+                "financial_statements": {
+                    "enabled": false,
+                    "exchanges": [
+                        "SSE"
+                    ],
+                    "manifest_url": "https://www.sse.com.cn/disclosure/listedinfo/announcement/index.shtml?productId={symbol}",
+                    "endpoint_url": "",
+                    "fetch_all_endpoint_candidates": true,
+                    "sample_symbols_by_exchange": {
+                        "SSE": [
+                            "600000"
+                        ]
+                    },
+                    "endpoint_candidates": [
+                        {
+                            "key": "sse_xbrl_income_statement_common_query",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://query.sse.com.cn/commonQuery.do",
+                            "evidence": {
+                                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                                "observed_on": "2026-05-06",
+                                "sql_id": "COMMON_MAP_INCOMESTATEMENT_C"
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                                },
+                                "query_params": {
+                                    "isPagination": "false",
+                                    "sqlId": "COMMON_MAP_INCOMESTATEMENT_C",
+                                    "type": "inParams",
+                                    "REPORT_YEAR": "{report_year}",
+                                    "STOCK_ID": "{symbol}",
+                                    "REPORT_PERIOD_ID": "{report_type_id}"
+                                }
+                            },
+                            "promotion_gate": "structured_json_with_core_fact_mapping",
+                            "status": "live_sample_structured_json_parser_ready",
+                            "note": "Observed from SSE official XBRL data page script; sample 600000 annual data returned numeric S2020 fields. Parser maps these field codes to numeric facts and configurable core aliases, while production endpoint use remains disabled."
+                        },
+                        {
+                            "key": "sse_xbrl_balance_sheet_common_query",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://query.sse.com.cn/commonQuery.do",
+                            "evidence": {
+                                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                                "observed_on": "2026-05-06",
+                                "sql_id": "COMMON_MAP_BALANCESHEET_C"
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                                },
+                                "query_params": {
+                                    "isPagination": "false",
+                                    "sqlId": "COMMON_MAP_BALANCESHEET_C",
+                                    "type": "inParams",
+                                    "REPORT_YEAR": "{report_year}",
+                                    "STOCK_ID": "{symbol}",
+                                    "REPORT_PERIOD_ID": "{report_type_id}"
+                                }
+                            },
+                            "promotion_gate": "structured_json_with_core_fact_mapping",
+                            "status": "live_sample_structured_json_parser_ready"
+                        },
+                        {
+                            "key": "sse_xbrl_cash_flow_common_query",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://query.sse.com.cn/commonQuery.do",
+                            "evidence": {
+                                "official_page": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}",
+                                "official_script": "https://english.sse.com.cn/xhtml/js/search/search_xbrl_new.js?v=V3.1.6_20251230",
+                                "observed_on": "2026-05-06",
+                                "sql_id": "COMMON_MAP_CASHFLOW_C"
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://english.sse.com.cn/markets/dataservice/xbrl/companyinfo/?stock_id={symbol}"
+                                },
+                                "query_params": {
+                                    "isPagination": "false",
+                                    "sqlId": "COMMON_MAP_CASHFLOW_C",
+                                    "type": "inParams",
+                                    "REPORT_YEAR": "{report_year}",
+                                    "STOCK_ID": "{symbol}",
+                                    "REPORT_PERIOD_ID": "{report_type_id}"
+                                }
+                            },
+                            "promotion_gate": "structured_json_with_core_fact_mapping",
+                            "status": "live_sample_structured_json_parser_ready"
+                        }
+                    ],
+                    "supports_xbrl": true,
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "status": "sse_structured_json_parser_ready_disabled",
+                    "note": "SSE official XBRL commonQuery endpoint candidates are configured and disabled. Live sample 600000 2023Q4 returned structured JSON for income, balance sheet, and cash flow; fetch_all_endpoint_candidates=true is required because each statement family is a separate commonQuery candidate. structured_json parser and core aliases are implemented. Production remains disabled until bounded live sync validation and coverage checks pass."
+                }
+            },
+            "swsresearch": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "primary_strict_shenwan_official_classification_files",
+                "industry_standard": {
+                    "stock_history_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/StockClassifyUse_stock.xls",
+                    "code_table_url": "https://www.swsresearch.com/swindex/pdf/SwClass2021/SwClassCode_2021.xls",
+                    "extra_ca_cert_path": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
+                    "request_timeout_seconds": 30.0,
+                    "parser_version": "swsresearch_shenwan_classification.v1",
+                    "minimum_stock_history_rows": 5000,
+                    "minimum_code_rows": 400,
+                    "symbol_aliases": [
+                        {
+                            "instrument_id": "302132.SZ",
+                            "current_symbol": "302132",
+                            "official_symbol": "300114",
+                            "exchange": "SZSE",
+                            "reason": "\u4e2d\u822a\u6210\u98de\u5f53\u524d\u4ea4\u6613\u4ee3\u7801\u4e3a 302132.SZ\uff1b\u7533\u4e07\u5b98\u65b9\u5206\u7c7b\u6587\u4ef6\u4ecd\u4ee5\u65e7\u4ee3\u7801 300114 \u8bb0\u5f55\u5176\u6700\u65b0\u5b98\u65b9\u5206\u7c7b\u3002",
+                            "evidence": [
+                                "SWS StockClassifyUse_stock.xls has latest 300114 -> 650501 but no 302132 row as of 2026-04-24 source file.",
+                                "Local instrument universe marks 302132.SZ \u4e2d\u822a\u6210\u98de active."
+                            ]
+                        }
+                    ],
+                    "note": "Official Shenwan classification files are the primary strict industry taxonomy and membership source. AkShare stock_industry_clf_hist_sw is only a fallback for stock history when direct official download is unavailable."
+                },
+                "index_analysis": {
+                    "enabled": true,
+                    "endpoint": "https://www.swsresearch.com/institute-sw/api/index_analysis/day_week_month_report/",
+                    "extra_ca_cert_path": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
+                    "request_timeout_seconds": 20.0,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "page_size": 200,
+                    "max_pages_per_type": 10,
+                    "supported_index_types": [
+                        "\u5e02\u573a\u8868\u5f81",
+                        "\u4e00\u7ea7\u884c\u4e1a",
+                        "\u4e8c\u7ea7\u884c\u4e1a",
+                        "\u4e09\u7ea7\u884c\u4e1a",
+                        "\u98ce\u683c\u6307\u6570"
+                    ],
+                    "note": "Official latest daily industry index metrics keyed by Shenwan index code; does not create stock memberships. Enabled for daily latest full-dimension refresh. Current observed endpoint ignores historical date filters, so true historical backfill must be validated separately before enabling range rebuild."
+                }
+            },
+            "eastmoney": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "strict_shenwan_name_supplement_for_component_gaps",
+                "industry_standard_supplement": {
+                    "endpoint": "https://push2.eastmoney.com/api/qt/stock/get",
+                    "fields": "f57,f58,f127",
+                    "request_timeout_seconds": 8.0,
+                    "request_interval_seconds": 0.05,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "note": "f127 returns Eastmoney's stock industry name. For current observed Shenwan steel gaps it returns names such as \u7279\u94a2\u2161, which are mapped by local Shenwan taxonomy name rather than remote code."
+                }
+            },
+            "sina": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "strict_shenwan_structured_leaf_supplement_for_component_gaps",
+                "industry_standard_supplement": {
+                    "endpoint_template": "https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpXiangGuan/stockid/{stockid}.phtml",
+                    "request_timeout_seconds": 8.0,
+                    "request_interval_seconds": 0.1,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "note": "Parses Sina Finance related-data pages for current Shenwan index rows. Prefer current 85xxxx level-3 rows, then locally validate level-2 candidates as leaf-only before writing memberships."
+                }
+            },
+            "cninfo": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "official_a_share_disclosure_fallback",
+                "shareholders": {
+                    "request_timeout_seconds": 15.0,
+                    "request_interval_seconds": 0.3,
+                    "retry_attempts": 3,
+                    "retry_backoff_seconds": 1.0,
+                    "note": "Uses CNInfo official data20 stockholderCapital structured endpoints for top-10 shareholders. Handles HTTP 200 logical rate-limit responses such as resultCode=429 with bounded backoff retries."
+                },
+                "valuation_inputs": {
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "note": "Uses AkShare CNInfo wrappers: stock_hold_change_cninfo(symbol='\u5168\u90e8') for daily all-market snapshots and stock_share_change_cninfo(symbol, start_date, end_date) for per-symbol historical capital-change events. CNInfo share-count fields are 10k shares and are converted to raw shares before persistence."
+                },
+                "announcement_scan": {
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "markets": {
+                        "SSE": {
+                            "market": "SSE",
+                            "column": "sse",
+                            "plate": "sh",
+                            "tab_name": "fulltext"
+                        },
+                        "SZSE": {
+                            "market": "SZSE",
+                            "column": "szse",
+                            "plate": "sz",
+                            "tab_name": "fulltext"
+                        },
+                        "BSE": {
+                            "market": "BSE",
+                            "column": "neeq",
+                            "plate": "bj",
+                            "tab_name": "fulltext"
+                        }
+                    },
+                    "note": "Reusable CNInfo announcement metadata scanner. Domain workflows provide their own filter rules and purpose-specific watermarks."
+                },
+                "financial_statements": {
+                    "enabled": false,
+                    "exchanges": [
+                        "SSE",
+                        "SZSE",
+                        "BSE"
+                    ],
+                    "manifest_url": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                    "endpoint_url": "",
+                    "sample_symbols_by_exchange": {
+                        "SSE": [
+                            "600000"
+                        ],
+                        "SZSE": [
+                            "000001"
+                        ],
+                        "BSE": [
+                            "920833"
+                        ]
+                    },
+                    "fetch_all_endpoint_candidates": true,
+                    "context_resolvers": [
+                        {
+                            "key": "cninfo_top_search_org_id",
+                            "kind": "json_row_template",
+                            "enabled": true,
+                            "url": "https://www.cninfo.com.cn/new/information/topSearch/query",
+                            "request": {
+                                "method": "POST",
+                                "headers": {
+                                    "Origin": "https://www.cninfo.com.cn",
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}"
+                                },
+                                "body_params": {
+                                    "keyWord": "{symbol}",
+                                    "maxNum": "10"
+                                }
+                            },
+                            "row_list_path": "",
+                            "row_match": {
+                                "code": "{symbol}"
+                            },
+                            "outputs": {
+                                "cninfo_org_id": "{orgId}",
+                                "cninfo_stock_param": "{code},{orgId}"
+                            },
+                            "note": "Resolves CNInfo orgId for announcement metadata discovery. It is not a financial data source by itself; only XBRL/XML/ZIP/structured JSON artifacts can satisfy promotion gates."
+                        },
+                        {
+                            "key": "cninfo_data20_company_info_sign",
+                            "kind": "json_row_template",
+                            "enabled": true,
+                            "url": "https://www.cninfo.com.cn/data20/companyOverview/getCompanyInfo",
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                },
+                                "query_params": {
+                                    "scode": "{symbol}"
+                                }
+                            },
+                            "row_list_path": "data.records",
+                            "row_match": {
+                                "SECCODE": "{symbol}"
+                            },
+                            "outputs": {
+                                "cninfo_data20_sign": "{F002N}"
+                            },
+                            "note": "Resolves the CNInfo data20 financial statement schema sign used by getIncomeStatement/getBalanceSheets/getCashFlowStatement. The returned financial endpoints are official structured JSON; statement amounts are parsed as CNY after applying the documented 10k-yuan page unit scale."
+                        }
+                    ],
+                    "endpoint_candidates": [
+                        {
+                            "key": "cninfo_data20_income_statement",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://www.cninfo.com.cn/data20/financialData/getIncomeStatement",
+                            "evidence": {
+                                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                                "observed_on": "2026-05-09",
+                                "metadata_fields": [
+                                    "path",
+                                    "data.records.year",
+                                    "data.records.middle",
+                                    "data.records.one",
+                                    "data.records.three",
+                                    "index"
+                                ],
+                                "sample_symbols": [
+                                    "600000",
+                                    "000001",
+                                    "000002",
+                                    "300750",
+                                    "920833"
+                                ]
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                },
+                                "query_params": {
+                                    "scode": "{symbol}",
+                                    "sign": "{cninfo_data20_sign}"
+                                }
+                            },
+                            "promotion_gate": "structured_payload_required",
+                            "status": "structured_json_live_evidence_ready_disabled",
+                            "note": "Official CNInfo data20 income statement JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+                        },
+                        {
+                            "key": "cninfo_data20_balance_sheet",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://www.cninfo.com.cn/data20/financialData/getBalanceSheets",
+                            "evidence": {
+                                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                                "observed_on": "2026-05-09",
+                                "metadata_fields": [
+                                    "path",
+                                    "data.records.year",
+                                    "data.records.middle",
+                                    "data.records.one",
+                                    "data.records.three",
+                                    "index"
+                                ],
+                                "sample_symbols": [
+                                    "600000",
+                                    "000001",
+                                    "000002",
+                                    "300750",
+                                    "920833"
+                                ]
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                },
+                                "query_params": {
+                                    "scode": "{symbol}",
+                                    "sign": "{cninfo_data20_sign}"
+                                }
+                            },
+                            "promotion_gate": "structured_payload_required",
+                            "status": "structured_json_live_evidence_ready_disabled",
+                            "note": "Official CNInfo data20 balance sheet JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+                        },
+                        {
+                            "key": "cninfo_data20_cash_flow_statement",
+                            "kind": "structured_json",
+                            "enabled": false,
+                            "url": "https://www.cninfo.com.cn/data20/financialData/getCashFlowStatement",
+                            "evidence": {
+                                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}",
+                                "official_script": "https://static.cninfo.com.cn/new/js/app/data/person-stock-news.js?v=20240529094546",
+                                "observed_on": "2026-05-09",
+                                "metadata_fields": [
+                                    "path",
+                                    "data.records.year",
+                                    "data.records.middle",
+                                    "data.records.one",
+                                    "data.records.three",
+                                    "index"
+                                ],
+                                "sample_symbols": [
+                                    "600000",
+                                    "000001",
+                                    "000002",
+                                    "300750",
+                                    "920833"
+                                ]
+                            },
+                            "request": {
+                                "method": "GET",
+                                "headers": {
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                },
+                                "query_params": {
+                                    "scode": "{symbol}",
+                                    "sign": "{cninfo_data20_sign}"
+                                }
+                            },
+                            "promotion_gate": "structured_payload_required",
+                            "status": "structured_json_live_evidence_ready_disabled",
+                            "note": "Official CNInfo data20 cash-flow statement JSON. Parser filters the requested report_period bucket/year and scales statement values from 10k CNY to CNY."
+                        },
+                        {
+                            "key": "cninfo_his_announcement_query",
+                            "kind": "metadata_json",
+                            "enabled": false,
+                            "url": "https://www.cninfo.com.cn/new/hisAnnouncement/query",
+                            "evidence": {
+                                "official_page": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}",
+                                "official_script": "https://static.cninfo.com.cn/new/assets/js/common.js?v=20260124055940",
+                                "observed_on": "2026-05-06",
+                                "metadata_fields": [
+                                    "announcementId",
+                                    "announcementTitle",
+                                    "announcementTime",
+                                    "adjunctUrl",
+                                    "adjunctType"
+                                ]
+                            },
+                            "request": {
+                                "method": "POST",
+                                "headers": {
+                                    "Origin": "https://www.cninfo.com.cn",
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                },
+                                "body_params": {
+                                    "pageNum": "1",
+                                    "pageSize": "5",
+                                    "column": "szse",
+                                    "tabName": "fulltext",
+                                    "plate": "sz",
+                                    "stock": "{cninfo_stock_param}",
+                                    "searchkey": "\u5e74\u5ea6\u62a5\u544a",
+                                    "category": "category_ndbg_szsh",
+                                    "seDate": "2024-01-01~2026-05-06",
+                                    "isHLtitle": "true"
+                                },
+                                "artifact_headers": {
+                                    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock?stockCode={symbol}&orgId={cninfo_org_id}"
+                                }
+                            },
+                            "artifact_base_url": "https://static.cninfo.com.cn/",
+                            "max_artifact_downloads": 1,
+                            "promotion_gate": "structured_artifact_download_required",
+                            "status": "metadata_ok_pdf_only_after_orgid_resolution",
+                            "note": "OrgId-aware metadata returns annual-report records for representative SZSE symbols, but observed attachments are PDF-only. PDF files are discovery evidence only and cannot satisfy official structured source readiness."
+                        }
+                    ],
+                    "supports_xbrl": true,
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "status": "official_structured_json_candidate_ready_disabled",
+                    "note": "CNInfo data20 official structured financial JSON is configured for SZSE and BSE 920-code instruments and remains disabled until bounded parser/backfill validation passes. Announcement metadata is still retained as PDF-only evidence and does not satisfy readiness by itself."
+                }
+            },
+            "bse": {
+                "enabled": false,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "official_bse_structured_financial_filings",
+                "financial_statements": {
+                    "enabled": false,
+                    "exchanges": [
+                        "BSE"
+                    ],
+                    "manifest_url": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
+                    "endpoint_url": "",
+                    "sample_symbols_by_exchange": {
+                        "BSE": [
+                            "430047"
+                        ]
+                    },
+                    "endpoint_candidates": [
+                        {
+                            "key": "bse_company_announcement_query",
+                            "kind": "metadata_jsonp",
+                            "enabled": false,
+                            "url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
+                            "evidence": {
+                                "official_page": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1",
+                                "official_script": "https://www.bse.cn/template/6/bluewise/_files/js/disclosure/list_company_2.min.js",
+                                "observed_on": "2026-05-06",
+                                "metadata_fields": [
+                                    "listInfo",
+                                    "content",
+                                    "disclosureTitle",
+                                    "destFilePath"
+                                ]
+                            },
+                            "request": {
+                                "method": "POST",
+                                "headers": {
+                                    "Referer": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1"
+                                },
+                                "body_params": {
+                                    "page": "0",
+                                    "companyCd": "{symbol}",
+                                    "isNewThree": "1",
+                                    "xxfcbj": "2",
+                                    "keyword": "\u5e74\u5ea6\u62a5\u544a",
+                                    "startTime": "2024-01-01",
+                                    "endTime": "2026-05-06"
+                                },
+                                "artifact_headers": {
+                                    "Referer": "https://www.bse.cn/disclosure/announcement.html?companyCode={symbol}&typename=Z&xxfcbj=1"
+                                }
+                            },
+                            "artifact_base_url": "https://www.bse.cn/",
+                            "max_artifact_downloads": 1,
+                            "promotion_gate": "structured_artifact_download_required",
+                            "status": "metadata_endpoint_confirmed_empty_sample",
+                            "note": "Official page script exposes companyAnnouncement.do. Current sample query returned no annual-report artifacts; BSE remains optional-empty and disabled."
+                        }
+                    ],
+                    "supports_xbrl": true,
+                    "request_timeout_seconds": 20.0,
+                    "request_interval_seconds": 0.2,
+                    "retry_attempts": 2,
+                    "retry_backoff_seconds": 0.5,
+                    "status": "metadata_candidate_configured_disabled",
+                    "note": "BSE company announcement metadata endpoint is configured and disabled. Current representative sample remains metadata/manifest-only; BSE stays optional-empty until structured artifact evidence and parser compatibility are confirmed."
+                }
+            },
+            "hkexnews": {
+                "enabled": true,
+                "transport": "direct",
+                "cost_tier": "free",
+                "anti_crawl_risk": "medium",
+                "supports_proxy_patch": false,
+                "role": "official_hk_disclosure_fallback"
+            }
+        },
+        "routing": {
+            "company_profile": {
+                "free_chain": [
+                    {
+                        "source": "baostock",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "pytdx",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [],
+                "fallback_chain": [
+                    {
+                        "source": "efinance",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "industry": {
+                "free_chain": [
+                    {
+                        "source": "baostock",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "pytdx",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [],
+                "fallback_chain": [
+                    {
+                        "source": "efinance",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "industry_standard": {
+                "free_chain": [
+                    {
+                        "source": "swsresearch",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "shareholders": {
+                "free_chain": [
+                    {
+                        "source": "cninfo",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "efinance",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "financial_summary": {
+                "free_chain": [
+                    {
+                        "source": "baostock",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "pytdx",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [],
+                "fallback_chain": [
+                    {
+                        "source": "efinance",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "financial_statements": {
+                "free_chain": [
+                    {
+                        "source": "sse",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "cninfo",
+                        "mode": "direct"
+                    },
+                    {
+                        "source": "bse",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "valuation_inputs": {
+                "free_chain": [
+                    {
+                        "source": "cninfo",
+                        "mode": "direct"
+                    }
+                ],
+                "paid_chain": [],
+                "fallback_chain": []
+            },
+            "analyst_forecasts": {
+                "free_chain": [],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "research_reports": {
+                "free_chain": [],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            },
+            "sentiment_events": {
+                "free_chain": [],
+                "paid_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "proxy_patch"
+                    }
+                ],
+                "fallback_chain": [
+                    {
+                        "source": "akshare",
+                        "mode": "direct"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, date, timedelta
 from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
 from fastapi.params import Param
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 import pandas as pd
 import io
 
@@ -1208,11 +1208,13 @@ async def get_research_dcf_valuation(
     valuation_date: Optional[date] = Query(None, description="估值日期"),
     scenario_set: Optional[str] = Query(None, description="情景集合"),
     terminal_method: Optional[str] = Query(None, description="终值方法"),
+    cash_flow_model: Optional[str] = Query(None, description="现金流模型：fcff / fcfe"),
     include_forecast_rows: bool = Query(True, description="是否返回显式预测行"),
     include_sensitivity: bool = Query(True, description="是否返回敏感性"),
     include_lineage: bool = Query(True, description="是否返回 lineage"),
     include_model_comparison: bool = Query(False, description="是否返回模型对比"),
     include_workbook: bool = Query(False, description="是否生成 xlsx 底稿 artifact"),
+    workbook_style: Optional[str] = Query(None, description="xlsx 底稿样式"),
     force_model: bool = Query(False, description="是否强制使用指定模型"),
     research_mode: bool = Query(False, description="是否允许研究模式降级结果"),
 ):
@@ -1230,11 +1232,13 @@ async def get_research_dcf_valuation(
             valuation_date=valuation_date_value.isoformat() if valuation_date_value else None,
             scenario_set=_query_default(scenario_set),
             terminal_method=_query_default(terminal_method),
+            cash_flow_model=_query_default(cash_flow_model),
             include_forecast_rows=_query_default(include_forecast_rows, True),
             include_sensitivity=_query_default(include_sensitivity, True),
             include_lineage=_query_default(include_lineage, True),
             include_model_comparison=_query_default(include_model_comparison, False),
             include_workbook=_query_default(include_workbook, False),
+            workbook_style=_query_default(workbook_style),
             force_model=_query_default(force_model, False),
             research_mode=_query_default(research_mode, False),
         )
@@ -1283,8 +1287,8 @@ async def get_research_dcf_assumptions(
     """获取专业 DCF 本地假设参数。"""
     try:
         return await data_manager.get_research_dcf_assumptions(
-            market=market,
-            currency=currency,
+            market=_query_default(market, "SSE"),
+            currency=_query_default(currency, "CNY"),
         )
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
@@ -1292,6 +1296,60 @@ async def get_research_dcf_assumptions(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to get research DCF assumptions: {str(e)}",
+        )
+
+
+@router.post(
+    "/research/valuation/dcf/assumptions/refresh",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def refresh_research_dcf_assumptions(
+    source_profile: str = Query("manual_config", description="假设源 profile"),
+    timeout_seconds: Optional[int] = Query(None, description="刷新超时秒数", ge=0, le=120),
+    dry_run: bool = Query(True, description="是否只返回刷新计划和诊断"),
+):
+    """显式刷新专业 DCF 假设参数。"""
+    try:
+        return await data_manager.refresh_research_dcf_assumptions(
+            source_profile=_query_default(source_profile, "manual_config"),
+            timeout_seconds=_query_default(timeout_seconds),
+            dry_run=_query_default(dry_run, True),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to refresh research DCF assumptions: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/valuation/dcf/workbooks/{artifact_id}",
+    tags=["Research"],
+)
+async def download_research_dcf_workbook(artifact_id: str):
+    """下载专业 DCF xlsx 底稿。"""
+    try:
+        artifact_path = await data_manager.get_research_dcf_workbook_artifact(artifact_id)
+        if not artifact_path:
+            raise HTTPException(status_code=404, detail="Research DCF workbook artifact not found")
+        return FileResponse(
+            artifact_path,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=f"{artifact_id}.xlsx",
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to download research DCF workbook: {str(e)}",
         )
 
 
@@ -1331,7 +1389,7 @@ async def get_research_dcf_input_gaps(
     try:
         result = await data_manager.get_research_dcf_input_gaps(
             instrument_id,
-            model_profile=model_profile,
+            model_profile=_query_default(model_profile, "nonfinancial_fcff.v1"),
         )
         if not result:
             raise HTTPException(status_code=404, detail="Research DCF input gaps not found")

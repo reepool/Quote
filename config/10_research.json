@@ -515,6 +515,32 @@
                   "non_operating_assets"
                 ]
               },
+              "nonfinancial_fcfe.v1": {
+                "candidate_type": "cash_flow_adapter",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "operating_cf",
+                  "net_debt_change",
+                  "interest_expense"
+                ],
+                "optional_fields": [
+                  "dividend_payout_ratio",
+                  "capital_expenditure",
+                  "change_in_working_capital"
+                ]
+              },
+              "asset_light_fcff.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "revenue",
+                  "operating_profit"
+                ],
+                "optional_fields": [
+                  "research_and_development",
+                  "sbc_expense"
+                ]
+              },
               "high_growth_staged_fcff.v1": {
                 "candidate_type": "company_characteristic",
                 "implementation_status": "guardrail",
@@ -549,6 +575,49 @@
                   "embedded_value",
                   "new_business_value"
                 ]
+              },
+              "real_estate_nav_dcf.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "inventory",
+                  "contract_liabilities",
+                  "total_debt"
+                ]
+              },
+              "cyclical_fcff_midcycle.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "revenue",
+                  "operating_profit",
+                  "commodity_price_assumption"
+                ]
+              },
+              "utility_fcfe_or_ddm.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "operating_cf",
+                  "dividend_payout_ratio"
+                ]
+              },
+              "reit_ffo_affo_ddm.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "rental_income",
+                  "ffo",
+                  "dividend_payout_ratio"
+                ]
+              },
+              "holdco_sotp.v1": {
+                "candidate_type": "company_characteristic",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "segment_assets",
+                  "investment_income"
+                ]
               }
             },
             "assumptions": {
@@ -564,7 +633,10 @@
                   "manual_config"
                 ],
                 "source": "manual_config",
-                "quality_flag": "configured_fallback"
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
               },
               "risk_free_rate_usd_10y": {
                 "assumption_key": "risk_free_rate_usd_10y",
@@ -578,7 +650,10 @@
                   "manual_config"
                 ],
                 "source": "manual_config",
-                "quality_flag": "configured_fallback"
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
               },
               "risk_free_rate_hkd_10y": {
                 "assumption_key": "risk_free_rate_hkd_10y",
@@ -592,7 +667,10 @@
                   "manual_config"
                 ],
                 "source": "manual_config",
-                "quality_flag": "configured_fallback"
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
               },
               "equity_risk_premium": {
                 "assumption_key": "equity_risk_premium",
@@ -606,7 +684,10 @@
                   "manual_config"
                 ],
                 "source": "manual_config",
-                "quality_flag": "configured_fallback"
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
               },
               "cost_of_debt_default": {
                 "assumption_key": "cost_of_debt_default",
@@ -621,17 +702,140 @@
                   "manual_config"
                 ],
                 "source": "manual_config",
-                "quality_flag": "configured_fallback"
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
+              },
+              "fx_usd_cny": {
+                "assumption_key": "fx_usd_cny",
+                "market": "FX",
+                "currency": "CNY",
+                "tenor": null,
+                "value": 7.1,
+                "unit": "fx_rate",
+                "primary_source": "safe_or_pbo_fx_reference",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
+              },
+              "fx_hkd_cny": {
+                "assumption_key": "fx_hkd_cny",
+                "market": "FX",
+                "currency": "CNY",
+                "tenor": null,
+                "value": 0.91,
+                "unit": "fx_rate",
+                "primary_source": "safe_or_pbo_fx_reference",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
+              },
+              "industry_beta_default": {
+                "assumption_key": "industry_beta_default",
+                "market": "GLOBAL",
+                "currency": null,
+                "tenor": null,
+                "value": 1.0,
+                "unit": "beta",
+                "primary_source": "local_beta_service",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback",
+                "fallback_used": true,
+                "as_of_date": "2026-06-04",
+                "last_updated_at": "2026-06-04T00:00:00"
+              },
+              "commodity_price_default": {
+                "assumption_key": "commodity_price_default",
+                "market": "GLOBAL",
+                "currency": "USD",
+                "tenor": null,
+                "value": null,
+                "unit": "price",
+                "primary_source": "commodity_exchange_or_industry_dataset",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": null,
+                "quality_flag": "missing",
+                "fallback_used": false,
+                "as_of_date": null,
+                "last_updated_at": null
+              }
+            },
+            "assumption_sources": {
+              "china_bond_10y": {
+                "source_profile": "china_bond_10y",
+                "assumption_keys": [
+                  "risk_free_rate_rmb_10y"
+                ],
+                "provider": "china_bond_or_exchange_public_yield",
+                "refresh_supported": false,
+                "timeout_seconds": 10,
+                "rate_limit_per_minute": 30
+              },
+              "us_treasury_10y": {
+                "source_profile": "us_treasury_10y",
+                "assumption_keys": [
+                  "risk_free_rate_usd_10y"
+                ],
+                "provider": "us_treasury_public_yield",
+                "refresh_supported": false,
+                "timeout_seconds": 10,
+                "rate_limit_per_minute": 30
+              },
+              "hk_gov_bond_or_efn_10y": {
+                "source_profile": "hk_gov_bond_or_efn_10y",
+                "assumption_keys": [
+                  "risk_free_rate_hkd_10y"
+                ],
+                "provider": "hkma_or_gov_bond_public_yield",
+                "refresh_supported": false,
+                "timeout_seconds": 10,
+                "rate_limit_per_minute": 30
+              },
+              "manual_config": {
+                "source_profile": "manual_config",
+                "assumption_keys": [
+                  "*"
+                ],
+                "provider": "versioned_research_config",
+                "refresh_supported": false,
+                "timeout_seconds": 0,
+                "rate_limit_per_minute": null
               }
             },
             "workbook": {
               "enabled": true,
               "default_style": "consulting_clean",
-              "artifact_ttl_hours": 24
+              "artifact_ttl_hours": 24,
+              "artifact_dir": "data/reports/dcf_workbooks",
+              "builder_dependency": "stdlib_ooxml"
             },
             "bounded_cache": {
-              "enabled": false,
-              "ttl_hours": 24
+              "enabled": true,
+              "ttl_hours": 24,
+              "max_entries": 128,
+              "identity_fields": [
+                "instrument_id",
+                "valuation_date",
+                "model_profile",
+                "input_hash",
+                "parameter_hash"
+              ]
             }
           }
         }
