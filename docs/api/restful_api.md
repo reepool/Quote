@@ -349,7 +349,7 @@ curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percenti
 
 ### GET /api/v1/research/company/{instrument_id}/valuation/dcf
 
-按需计算专业 DCF。当前默认走 `ProfessionalDcfEngine`，普通非金融公司使用 `nonfinancial_fcff.v1`；金融、地产、周期、公用事业、REIT、控股公司、高研发/亏损/短上市等 profile 已注册 guardrail，未实现完整模型时返回结构化 unavailable/partial，不静默套用通用 FCFF。
+按需计算专业 DCF。当前默认走 `ProfessionalDcfEngine`，普通非金融公司支持 `nonfinancial_fcff.v1`；稳定低杠杆且 FCFE 输入齐全的非金融公司支持 `nonfinancial_fcfe.v1`；公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/FCFE 分派模型。金融、地产 NAV、周期 mid-cycle、控股公司、高研发/亏损/短上市等 profile 已注册 guardrail，未实现完整模型时返回结构化 unavailable/partial，不静默套用通用 FCFF。
 
 可选参数：
 - `growth_rate`、`discount_rate`、`terminal_growth`、`projection_years`：估值假设覆盖。
@@ -358,7 +358,7 @@ curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percenti
 - `valuation_date`：估值日期；财务事实必须满足 `data_available_date <= valuation_date`。
 - `scenario_set`：当前支持 `standard / downside_only`；其他值返回 `invalid_parameters`。
 - `terminal_method`：当前支持 `gordon_growth / perpetual_growth`；exit multiple 仍属后续扩展。
-- `cash_flow_model`：`fcff / fcfe`。当前只有 FCFF 实算；显式 `fcfe` 会返回结构化 unavailable/partial，不会伪装为成功 FCFF。
+- `cash_flow_model`：`fcff / fcfe`。显式 `fcfe` 在 `operating_cf / net_debt_change / capex` 等输入足够时实算 FCFE；输入不足时返回结构化 unavailable/partial，不会伪装为成功 FCFF。
 - `include_forecast_rows`、`include_sensitivity`、`include_lineage`：控制输出明细；关闭时会在 warnings/diagnostics 中记录 suppression。
 - `include_model_comparison`：强制返回模型对比诊断；比较结果包含行业候选和公司特性候选的 result object，未实现模型以 unavailable/partial 结果表达。
 - `include_workbook`：请求投行级 xlsx workbook artifact metadata；当前由本地 `DcfWorkbookBuilder` 生成 stdlib OOXML 工作簿，返回 `workbook_available / workbook_artifact_id / download_path / generated_at / expires_at / sheets / warnings`。

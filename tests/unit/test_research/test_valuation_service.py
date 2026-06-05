@@ -853,7 +853,7 @@ def test_valuation_service_dcf_model_comparison_for_close_scores():
     assert "model_profile_not_implemented" in comparison["company_characteristic_model_result"]["missing_reason"]
 
 
-def test_valuation_service_dcf_defers_fcfe_for_stable_low_leverage_until_supported():
+def test_valuation_service_dcf_selects_fcfe_for_stable_low_leverage_when_inputs_ready():
     service = ResearchValuationService()
 
     result = service.run_dcf(
@@ -868,6 +868,8 @@ def test_valuation_service_dcf_defers_fcfe_for_stable_low_leverage_until_support
             "revenue": 1000.0,
             "operating_profit": 250.0,
             "capital_expenditure": 50.0,
+            "operating_cf": 180.0,
+            "net_debt_change": 5.0,
             "total_debt": 100.0,
             "equity": 1000.0,
             "dividend_payout_ratio": 0.6,
@@ -877,11 +879,50 @@ def test_valuation_service_dcf_defers_fcfe_for_stable_low_leverage_until_support
         overrides={"valuation_date": "2026-04-18"},
     )
 
-    assert result["cash_flow_model_selection"]["selected_cash_flow_model"] == "fcff"
-    assert "fcfe_candidate_deferred" in result["warnings"]
+    assert result["status"] == "success"
+    assert result["calc_method"] == "professional_dcf_fcfe"
+    assert result["calc_version"] == "nonfinancial_fcfe.v1"
+    assert result["cash_flow_model_selection"]["selected_cash_flow_model"] == "fcfe"
+    assert result["selected_cash_flow_model"] == "fcfe"
+    assert result["base_cash_flow_source"] == "fcfe"
+    assert result["base_cash_flow"] is not None
 
 
-def test_valuation_service_dcf_explicit_fcfe_does_not_masquerade_as_fcff_success():
+def test_valuation_service_dcf_explicit_fcfe_calculates_when_inputs_ready():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600900.SH",
+            "symbol": "600900",
+            "exchange": "SSE",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 250.0,
+            "capital_expenditure": 50.0,
+            "operating_cf": 180.0,
+            "net_debt_change": 5.0,
+            "total_debt": 100.0,
+            "equity": 1000.0,
+            "dividend_payout_ratio": 0.6,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18", "cash_flow_model": "fcfe"},
+    )
+
+    assert result["status"] == "success"
+    assert result["calc_method"] == "professional_dcf_fcfe"
+    assert result["selected_cash_flow_model"] == "fcfe"
+    assert result["base_cash_flow_source"] == "fcfe"
+    assert result["enterprise_value"] is None
+    assert result["equity_value"] is not None
+
+
+def test_valuation_service_dcf_explicit_fcfe_fails_closed_when_inputs_missing():
     service = ResearchValuationService()
 
     result = service.run_dcf(
@@ -906,9 +947,138 @@ def test_valuation_service_dcf_explicit_fcfe_does_not_masquerade_as_fcff_success
     )
 
     assert result["status"] == "unavailable"
-    assert result["missing_reason"] == "fcfe_model_not_implemented"
+    assert result["missing_reason"] == "fcfe_inputs_missing"
     assert result["selected_cash_flow_model"] == "fcfe"
-    assert result["base_cash_flow_source"] == "fcfe_unavailable"
+    assert "fcfe_inputs_missing" in result["readiness"]["blockers"]
+
+
+def test_valuation_service_dcf_keeps_high_leverage_company_on_fcff():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600900.SH",
+            "symbol": "600900",
+            "exchange": "SSE",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 250.0,
+            "capital_expenditure": 50.0,
+            "change_in_working_capital": 5.0,
+            "operating_cf": 180.0,
+            "net_debt_change": 5.0,
+            "total_debt": 1800.0,
+            "equity": 1000.0,
+            "dividend_payout_ratio": 0.6,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["selected_cash_flow_model"] == "fcff"
+    assert "high_leverage_fcfe_not_default" in result["warnings"]
+
+
+def test_valuation_service_dcf_utility_distribution_model_succeeds():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600900.SH",
+            "symbol": "600900",
+            "exchange": "SSE",
+            "industry_name": "电力 公用事业",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 250.0,
+            "operating_cf": 220.0,
+            "capital_expenditure": 80.0,
+            "net_debt_change": 0.0,
+            "net_income": 160.0,
+            "dividend_payout_ratio": 0.65,
+            "shares_outstanding": 10.0,
+            "total_debt": 500.0,
+            "equity": 2000.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "model_strategy": "compare",
+            "include_model_comparison": True,
+        },
+    )
+
+    assert result["status"] == "success"
+    assert result["model_profile"] == "utility_fcfe_or_ddm.v1"
+    assert result["calc_method"] == "professional_dcf_distribution"
+    assert result["selected_cash_flow_model"] == "ddm"
+    assert result["base_cash_flow_source"] == "fcfe_distribution"
+    assert result["enterprise_value"] is None
+    assert result["equity_value"] is not None
+    assert result["model_comparison"]["industry_model_result"]["model_profile"] == "utility_fcfe_or_ddm.v1"
+    assert result["model_comparison"]["industry_model_result"]["status"] == "success"
+
+
+def test_valuation_service_dcf_reit_distribution_model_uses_affo_or_ffo():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "508000.SH",
+            "symbol": "508000",
+            "exchange": "SSE",
+            "industry_name": "基础设施公募 REIT",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "affo": 120.0,
+            "ffo": 130.0,
+            "dividend_payout_ratio": 0.9,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=8.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["model_profile"] == "reit_ffo_affo_ddm.v1"
+    assert result["base_cash_flow_source"] == "affo_distribution"
+    assert result["selected_cash_flow_model"] == "ddm"
+    assert result["scenarios"][1]["dividend_yield"] is not None
+
+
+def test_valuation_service_dcf_reit_distribution_missing_inputs_fails_closed():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "508000.SH",
+            "symbol": "508000",
+            "exchange": "SSE",
+            "industry_name": "基础设施公募 REIT",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "dividend_payout_ratio": 0.9,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=8.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["missing_reason"] == "distribution_inputs_missing"
+    assert "distribution_cash_flow_required" in result["readiness"]["blockers"]
 
 
 def test_valuation_service_dcf_honors_detail_suppression_and_validates_methods():

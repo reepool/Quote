@@ -76,6 +76,7 @@
   - `2026-06-04` 专业 DCF 第一批实现已进入实时计算链路：默认接入 `ProfessionalDcfEngine`，普通非金融企业走 `nonfinancial_fcff.v1`，并返回模型选择、FCFE/FCFF adapter、假设 lineage、forecast rows、情景/敏感性和 readiness/input-gap 诊断；行业金融与特殊 profile 先以 guardrail/partial fail-closed 方式开放，不静默套用通用 FCFF
   - `2026-06-05` 专业 DCF 继续补齐显式 assumption refresh diagnostics、投行级 xlsx workbook artifact、本地下载接口和进程内 bounded run cache；DCF 仍按请求实时计算，不写入 `valuation_history`，后续重点转向真实主备外部数据源刷新 adapter、跨进程 saved-run audit 和金融/特殊行业实算模型
   - `2026-06-05` DCF contract hardening 已补齐比较输出 result object、显式 FCFE fail-closed、`scenario_set / terminal_method / include_* / cash_flow_model / workbook_style` 参数语义、assumption fallback/缺失诊断、API-safe workbook metadata 和完整 cache_info
+  - `2026-06-05` DCF FCFE/DDM 第二批实现已推进：`nonfinancial_fcfe.v1` 支持稳定低杠杆公司 equity cash flow 估值，公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/分派估值；银行/证券/保险/地产/周期/控股公司仍保持 guardrail/fail-closed
   - 个股历史估值分位按请求从 `valuation_history` 即时计算，不持久化全量 `instrument x date x metric x window` 分位矩阵；默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度，并对负值估值显式返回解释提示
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过

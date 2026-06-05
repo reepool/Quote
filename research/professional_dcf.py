@@ -39,9 +39,9 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
         },
         "nonfinancial_fcfe.v1": {
             "candidate_type": "cash_flow_adapter",
-            "implementation_status": "guardrail",
-            "required_fields": ["operating_cf", "net_debt_change", "interest_expense"],
-            "optional_fields": ["dividend_payout_ratio", "capex", "working_capital_change"],
+            "implementation_status": "implemented",
+            "required_fields": ["operating_cf", "net_debt_change"],
+            "optional_fields": ["dividend_payout_ratio", "capital_expenditure", "maintenance_capex"],
             "supported_company_types": ["stable_low_leverage", "utility", "infrastructure"],
         },
         "asset_light_fcff.v1": {
@@ -95,16 +95,16 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
         },
         "utility_fcfe_or_ddm.v1": {
             "candidate_type": "industry",
-            "implementation_status": "guardrail",
-            "required_fields": ["operating_cf", "dividend_payout_ratio"],
-            "optional_fields": ["regulated_return", "total_debt"],
+            "implementation_status": "implemented",
+            "required_fields": ["dividend_payout_ratio", "shares_outstanding"],
+            "optional_fields": ["operating_cf", "net_income", "maintenance_capex", "regulated_return", "total_debt"],
             "supported_company_types": ["utility"],
         },
         "reit_ffo_affo_ddm.v1": {
             "candidate_type": "industry",
-            "implementation_status": "guardrail",
-            "required_fields": ["rental_income", "ffo", "dividend_payout_ratio"],
-            "optional_fields": ["affo", "property_value", "occupancy_rate"],
+            "implementation_status": "implemented",
+            "required_fields": ["dividend_payout_ratio", "shares_outstanding"],
+            "optional_fields": ["affo", "ffo", "rental_income", "property_value", "occupancy_rate"],
             "supported_company_types": ["reit"],
         },
         "holdco_sotp.v1": {
@@ -423,7 +423,7 @@ class ProfessionalDcfEngine:
             for item in bundle.company_characteristics
         )
         if (
-            model_profile != "nonfinancial_fcff.v1"
+            model_profile not in {"nonfinancial_fcff.v1", "utility_fcfe_or_ddm.v1", "reit_ffo_affo_ddm.v1"}
             and selector.get("include_model_comparison")
             and not (special_guardrail and not research_mode)
         ):
@@ -443,6 +443,16 @@ class ProfessionalDcfEngine:
                     selector=selector,
                     research_mode=research_mode,
                 )
+
+        if model_profile in {"utility_fcfe_or_ddm.v1", "reit_ffo_affo_ddm.v1"}:
+            return self._run_distribution_dcf(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                research_mode=research_mode,
+                model_profile=model_profile,
+            )
 
         if model_profile != "nonfinancial_fcff.v1":
             return self._unavailable_result(
@@ -941,20 +951,14 @@ class ProfessionalDcfEngine:
         )
         scenarios = []
         if cash_flow_selection["selected_cash_flow_model"] == "fcfe":
-            result = self._unavailable_result(
+            return self._run_nonfinancial_fcfe(
                 instrument=instrument,
                 bundle=bundle,
                 overrides=overrides,
                 selector=selector,
-                status="partial" if research_mode else "unavailable",
-                missing_reason="fcfe_model_not_implemented",
                 research_mode=research_mode,
-                extra_blockers=["fcfe_model_not_implemented"],
+                cash_flow_selection=cash_flow_selection,
             )
-            result["selected_cash_flow_model"] = "fcfe"
-            result["cash_flow_model_selection"] = cash_flow_selection
-            result["base_cash_flow_source"] = "fcfe_unavailable"
-            return result
 
         scenario_specs = self._scenario_specs(scenario_set, revenue_growth, overrides)
         for scenario_name, growth_rate in scenario_specs:
@@ -1076,6 +1080,401 @@ class ProfessionalDcfEngine:
         result["workbook"] = self._workbook_metadata(overrides, result)
         return result
 
+    def _run_nonfinancial_fcfe(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        bundle: DcfInputBundle,
+        overrides: Dict[str, Any],
+        selector: Dict[str, Any],
+        research_mode: bool,
+        cash_flow_selection: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        facts = bundle.financial_facts
+        projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
+        terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
+        terminal_method = str(overrides.get("terminal_method") or "gordon_growth")
+        if terminal_method not in {"gordon_growth", "perpetual_growth"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_terminal_method",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_terminal_method:{terminal_method}"],
+            )
+        scenario_set = str(overrides.get("scenario_set") or "standard")
+        if scenario_set not in {"standard", "downside_only"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_scenario_set",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_scenario_set:{scenario_set}"],
+            )
+        assumption_blockers = [blocker for blocker in bundle.blockers if blocker.startswith("assumption_")]
+        if assumption_blockers:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="partial" if research_mode else "unavailable",
+                missing_reason=assumption_blockers[0],
+                research_mode=research_mode,
+            )
+
+        wacc_payload = self._build_wacc(bundle, overrides)
+        cost_of_equity = float(overrides.get("cost_of_equity", wacc_payload["cost_of_equity"]))
+        if cost_of_equity <= terminal_growth:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="cost_of_equity_must_exceed_terminal_growth",
+                research_mode=research_mode,
+            )
+
+        operating_cf = self._safe_float(facts.get("operating_cf") or overrides.get("operating_cf"))
+        capex = self._safe_float(
+            facts.get("maintenance_capex")
+            or overrides.get("maintenance_capex")
+            or facts.get("capital_expenditure")
+            or overrides.get("capital_expenditure")
+        )
+        net_debt_change = self._safe_float(facts.get("net_debt_change") or overrides.get("net_debt_change"))
+        blockers = [
+            f"{field_name}_required"
+            for field_name, value in (
+                ("operating_cf", operating_cf),
+                ("capital_expenditure", capex),
+                ("net_debt_change", net_debt_change),
+            )
+            if value is None
+        ]
+        if blockers and not research_mode:
+            result = self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="fcfe_inputs_missing",
+                research_mode=research_mode,
+                extra_blockers=["fcfe_inputs_missing", *blockers],
+            )
+            result["selected_cash_flow_model"] = "fcfe"
+            result["cash_flow_model_selection"] = cash_flow_selection
+            result["base_cash_flow_source"] = "fcfe"
+            return result
+
+        operating_cf = operating_cf or 0.0
+        capex = abs(capex or 0.0)
+        net_debt_change = net_debt_change or 0.0
+        starting_fcfe = operating_cf - capex + net_debt_change
+        fcfe_growth = float(overrides.get("fcfe_growth_rate", overrides.get("growth_rate", self.parameters.get("base_growth_rate", 0.08))))
+        scenario_specs = self._scenario_specs(scenario_set, fcfe_growth, overrides)
+        scenarios = [
+            self._project_fcfe_scenario(
+                scenario=scenario_name,
+                starting_fcfe=starting_fcfe,
+                growth_rate=growth_rate,
+                discount_rate=cost_of_equity,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=self._safe_positive_float(facts.get("shares_outstanding")),
+            )
+            for scenario_name, growth_rate in scenario_specs
+        ]
+        base_scenario = next(item for item in scenarios if item["scenario"] == "base")
+        sensitivity = self._build_fcfe_sensitivity(
+            starting_fcfe=starting_fcfe,
+            base_growth=fcfe_growth,
+            base_discount_rate=cost_of_equity,
+            terminal_growth=terminal_growth,
+            projection_years=projection_years,
+            latest_close=bundle.latest_close,
+            shares_outstanding=self._safe_positive_float(facts.get("shares_outstanding")),
+        )
+        warnings = list(bundle.warnings)
+        warnings.extend(
+            warning
+            for candidate in selector.get("candidates", [])
+            for warning in candidate.get("warnings", [])
+        )
+        warnings.extend(cash_flow_selection.get("warnings", []))
+        if not bool(overrides.get("include_sensitivity", True)):
+            warnings.append("sensitivity_suppressed_by_request")
+        if not bool(overrides.get("include_forecast_rows", True)):
+            warnings.append("forecast_rows_suppressed_by_request")
+        if not bool(overrides.get("include_lineage", True)):
+            warnings.append("lineage_suppressed_by_request")
+        if wacc_payload.get("discount_rate_override"):
+            warnings.append("discount_rate_override_used")
+        if blockers:
+            warnings.append("research_mode_fcfe_inputs_incomplete")
+
+        result = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "calc_method": "professional_dcf_fcfe",
+            "calc_version": "nonfinancial_fcfe.v1",
+            "parameter_hash": self._build_parameter_hash(overrides),
+            "input_hash": bundle.input_hash,
+            "status": "partial" if research_mode and blockers else "success",
+            "missing_reason": "fcfe_inputs_missing" if blockers else None,
+            "model_profile": "nonfinancial_fcff.v1",
+            "model_strategy": selector.get("model_strategy"),
+            "recommended_model": selector.get("recommended_model"),
+            "selection_confidence": selector.get("selection_confidence"),
+            "selection_policy": selector.get("selection_policy"),
+            "score_gap": selector.get("score_gap"),
+            "model_suitability_candidates": selector.get("candidates", []),
+            "selected_cash_flow_model": "fcfe",
+            "cash_flow_model_selection": cash_flow_selection,
+            "readiness": self._readiness_payload(blockers, warnings, selector),
+            "assumptions": {"wacc": wacc_payload, **bundle.assumptions},
+            "valuation_date": bundle.valuation_date,
+            "data_available_cutoff": bundle.data_available_cutoff,
+            "base_cash_flow": base_scenario.get("fcfe"),
+            "base_cash_flow_source": "fcfe",
+            "projection_years": projection_years,
+            "shares_outstanding": self._safe_positive_float(facts.get("shares_outstanding")),
+            "latest_close": bundle.latest_close,
+            "beta": bundle.beta_context.get("beta"),
+            "beta_source": bundle.beta_context.get("beta_source"),
+            "beta_benchmark": bundle.beta_context.get("beta_benchmark"),
+            "enterprise_value": None,
+            "equity_value": base_scenario.get("equity_value"),
+            "terminal_value": base_scenario.get("terminal_value"),
+            "terminal_value_pct": base_scenario.get("terminal_value_pct"),
+            "net_debt_adjustment": None,
+            "forecast_rows": base_scenario.get("forecast_rows", [])
+            if bool(overrides.get("include_forecast_rows", True))
+            else [],
+            "scenarios": scenarios,
+            "sensitivity": sensitivity if bool(overrides.get("include_sensitivity", True)) else [],
+            "diagnostics": {
+                "blockers": blockers,
+                "warnings": warnings,
+                "input_gaps": self.build_input_gaps(
+                    instrument=instrument,
+                    financial_bundle=facts,
+                    model_profile="nonfinancial_fcfe.v1",
+                )["missing_fields"],
+            },
+            "warnings": warnings,
+            "lineage": bundle.lineage if bool(overrides.get("include_lineage", True)) else None,
+            "model_comparison": None,
+            "workbook": None,
+        }
+        if selector.get("include_model_comparison"):
+            result["model_comparison"] = self._model_comparison(result, selector)
+        result["workbook"] = self._workbook_metadata(overrides, result)
+        return result
+
+    def _run_distribution_dcf(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        bundle: DcfInputBundle,
+        overrides: Dict[str, Any],
+        selector: Dict[str, Any],
+        research_mode: bool,
+        model_profile: str,
+    ) -> Dict[str, Any]:
+        facts = bundle.financial_facts
+        projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
+        terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
+        terminal_method = str(overrides.get("terminal_method") or "gordon_growth")
+        if terminal_method not in {"gordon_growth", "perpetual_growth"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_terminal_method",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_terminal_method:{terminal_method}"],
+            )
+        scenario_set = str(overrides.get("scenario_set") or "standard")
+        if scenario_set not in {"standard", "downside_only"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_scenario_set",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_scenario_set:{scenario_set}"],
+            )
+        assumption_blockers = [blocker for blocker in bundle.blockers if blocker.startswith("assumption_")]
+        if assumption_blockers:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="partial" if research_mode else "unavailable",
+                missing_reason=assumption_blockers[0],
+                research_mode=research_mode,
+            )
+        wacc_payload = self._build_wacc(bundle, overrides)
+        cost_of_equity = float(overrides.get("cost_of_equity", wacc_payload["cost_of_equity"]))
+        if cost_of_equity <= terminal_growth:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="cost_of_equity_must_exceed_terminal_growth",
+                research_mode=research_mode,
+            )
+        base_cash_flow, base_source, extra_warnings = self._distribution_cash_flow_base(
+            facts=facts,
+            overrides=overrides,
+            model_profile=model_profile,
+            research_mode=research_mode,
+        )
+        payout_ratio = self._safe_float(facts.get("dividend_payout_ratio") or overrides.get("dividend_payout_ratio"))
+        shares = self._safe_positive_float(facts.get("shares_outstanding"))
+        blockers = []
+        if base_cash_flow is None:
+            blockers.append("distribution_cash_flow_required")
+        if payout_ratio is None:
+            blockers.append("dividend_payout_ratio_required")
+        if shares is None:
+            blockers.append("shares_outstanding_required")
+        if blockers and not research_mode:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="distribution_inputs_missing",
+                research_mode=research_mode,
+                extra_blockers=["distribution_inputs_missing", *blockers],
+            )
+        base_cash_flow = base_cash_flow or 0.0
+        payout_ratio = payout_ratio if payout_ratio is not None else 0.0
+        distribution_base = base_cash_flow * payout_ratio
+        growth_rate = float(overrides.get("distribution_growth_rate", overrides.get("growth_rate", terminal_growth)))
+        scenario_specs = self._scenario_specs(scenario_set, growth_rate, overrides)
+        scenarios = [
+            self._project_distribution_scenario(
+                scenario=scenario_name,
+                starting_distribution=distribution_base,
+                growth_rate=scenario_growth,
+                discount_rate=cost_of_equity,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=shares,
+            )
+            for scenario_name, scenario_growth in scenario_specs
+        ]
+        base_scenario = next(item for item in scenarios if item["scenario"] == "base")
+        warnings = list(bundle.warnings)
+        warnings.extend(extra_warnings)
+        if blockers:
+            warnings.append("research_mode_distribution_inputs_incomplete")
+        if not bool(overrides.get("include_sensitivity", True)):
+            warnings.append("sensitivity_suppressed_by_request")
+        if not bool(overrides.get("include_forecast_rows", True)):
+            warnings.append("forecast_rows_suppressed_by_request")
+        if not bool(overrides.get("include_lineage", True)):
+            warnings.append("lineage_suppressed_by_request")
+        result = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "calc_method": "professional_dcf_distribution",
+            "calc_version": model_profile,
+            "parameter_hash": self._build_parameter_hash(overrides),
+            "input_hash": bundle.input_hash,
+            "status": "partial" if research_mode and blockers else "success",
+            "missing_reason": "distribution_inputs_missing" if blockers else None,
+            "model_profile": model_profile,
+            "model_strategy": selector.get("model_strategy"),
+            "recommended_model": selector.get("recommended_model"),
+            "selection_confidence": selector.get("selection_confidence"),
+            "selection_policy": selector.get("selection_policy"),
+            "score_gap": selector.get("score_gap"),
+            "model_suitability_candidates": selector.get("candidates", []),
+            "selected_cash_flow_model": "ddm",
+            "cash_flow_model_selection": {
+                "selected_cash_flow_model": "ddm",
+                "candidate_models": ["fcfe", "ddm"],
+                "selection_reasons": [f"{model_profile}_distribution_profile"],
+                "rejected_models": ["fcff"],
+                "input_gap_by_model": {"ddm": blockers},
+                "confidence": selector.get("selection_confidence"),
+                "warnings": warnings,
+            },
+            "readiness": self._readiness_payload(blockers, warnings, selector),
+            "assumptions": {"wacc": wacc_payload, **bundle.assumptions},
+            "valuation_date": bundle.valuation_date,
+            "data_available_cutoff": bundle.data_available_cutoff,
+            "base_cash_flow": distribution_base,
+            "base_cash_flow_source": base_source,
+            "projection_years": projection_years,
+            "shares_outstanding": shares,
+            "latest_close": bundle.latest_close,
+            "beta": bundle.beta_context.get("beta"),
+            "beta_source": bundle.beta_context.get("beta_source"),
+            "beta_benchmark": bundle.beta_context.get("beta_benchmark"),
+            "enterprise_value": None,
+            "equity_value": base_scenario.get("equity_value"),
+            "terminal_value": base_scenario.get("terminal_value"),
+            "terminal_value_pct": base_scenario.get("terminal_value_pct"),
+            "net_debt_adjustment": None,
+            "forecast_rows": base_scenario.get("forecast_rows", [])
+            if bool(overrides.get("include_forecast_rows", True))
+            else [],
+            "scenarios": scenarios,
+            "sensitivity": self._build_distribution_sensitivity(
+                starting_distribution=distribution_base,
+                base_growth=growth_rate,
+                base_discount_rate=cost_of_equity,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=shares,
+            )
+            if bool(overrides.get("include_sensitivity", True))
+            else [],
+            "diagnostics": {
+                "blockers": blockers,
+                "warnings": warnings,
+                "input_gaps": self.build_input_gaps(
+                    instrument=instrument,
+                    financial_bundle=facts,
+                    model_profile=model_profile,
+                )["missing_fields"],
+            },
+            "warnings": warnings,
+            "lineage": bundle.lineage if bool(overrides.get("include_lineage", True)) else None,
+            "model_comparison": None,
+            "workbook": None,
+        }
+        if selector.get("include_model_comparison"):
+            result["model_comparison"] = self._model_comparison(result, selector)
+        result["workbook"] = self._workbook_metadata(overrides, result)
+        return result
+
     def _project_fcff_scenario(
         self,
         *,
@@ -1169,6 +1568,142 @@ class ProfessionalDcfEngine:
             ],
         }
 
+    def _project_fcfe_scenario(
+        self,
+        *,
+        scenario: str,
+        starting_fcfe: float,
+        growth_rate: float,
+        discount_rate: float,
+        terminal_growth: float,
+        projection_years: int,
+        latest_close: Optional[float],
+        shares_outstanding: Optional[float],
+    ) -> Dict[str, Any]:
+        forecast_rows = []
+        discounted_sum = 0.0
+        fcfe = starting_fcfe
+        for year in range(1, projection_years + 1):
+            fcfe *= 1 + growth_rate
+            discount_factor = 1 / ((1 + discount_rate) ** year)
+            discounted_fcfe = fcfe * discount_factor
+            discounted_sum += discounted_fcfe
+            forecast_rows.append(
+                {
+                    "year": year,
+                    "fcfe_growth": growth_rate,
+                    "fcfe": fcfe,
+                    "discount_factor": discount_factor,
+                    "discounted_fcfe": discounted_fcfe,
+                }
+            )
+        terminal_value = fcfe * (1 + terminal_growth) / (discount_rate - terminal_growth)
+        terminal_value_present = terminal_value / ((1 + discount_rate) ** projection_years)
+        equity_value = discounted_sum + terminal_value_present
+        intrinsic_value_per_share = (
+            equity_value / shares_outstanding
+            if shares_outstanding and shares_outstanding > 0
+            else None
+        )
+        upside_to_last_close = (
+            intrinsic_value_per_share / latest_close - 1
+            if intrinsic_value_per_share is not None and latest_close not in (None, 0)
+            else None
+        )
+        return {
+            "scenario": scenario,
+            "growth_rate": growth_rate,
+            "discount_rate": discount_rate,
+            "terminal_growth": terminal_growth,
+            "enterprise_value": None,
+            "equity_value": equity_value,
+            "terminal_value": terminal_value_present,
+            "terminal_value_pct": terminal_value_present / equity_value if equity_value else None,
+            "fcfe": fcfe,
+            "intrinsic_value_per_share": intrinsic_value_per_share,
+            "upside_to_last_close": upside_to_last_close,
+            "forecast_rows": forecast_rows,
+            "projected_cash_flows": [
+                {
+                    "year": row["year"],
+                    "cash_flow": row["fcfe"],
+                    "discounted_cash_flow": row["discounted_fcfe"],
+                }
+                for row in forecast_rows
+            ],
+        }
+
+    def _project_distribution_scenario(
+        self,
+        *,
+        scenario: str,
+        starting_distribution: float,
+        growth_rate: float,
+        discount_rate: float,
+        terminal_growth: float,
+        projection_years: int,
+        latest_close: Optional[float],
+        shares_outstanding: Optional[float],
+    ) -> Dict[str, Any]:
+        forecast_rows = []
+        discounted_sum = 0.0
+        distribution = starting_distribution
+        for year in range(1, projection_years + 1):
+            distribution *= 1 + growth_rate
+            discount_factor = 1 / ((1 + discount_rate) ** year)
+            discounted_distribution = distribution * discount_factor
+            discounted_sum += discounted_distribution
+            forecast_rows.append(
+                {
+                    "year": year,
+                    "distribution_growth": growth_rate,
+                    "distribution": distribution,
+                    "discount_factor": discount_factor,
+                    "discounted_distribution": discounted_distribution,
+                }
+            )
+        terminal_value = distribution * (1 + terminal_growth) / (discount_rate - terminal_growth)
+        terminal_value_present = terminal_value / ((1 + discount_rate) ** projection_years)
+        equity_value = discounted_sum + terminal_value_present
+        intrinsic_value_per_share = (
+            equity_value / shares_outstanding
+            if shares_outstanding and shares_outstanding > 0
+            else None
+        )
+        upside_to_last_close = (
+            intrinsic_value_per_share / latest_close - 1
+            if intrinsic_value_per_share is not None and latest_close not in (None, 0)
+            else None
+        )
+        dividend_yield = (
+            starting_distribution / (latest_close * shares_outstanding)
+            if latest_close not in (None, 0) and shares_outstanding
+            else None
+        )
+        return {
+            "scenario": scenario,
+            "growth_rate": growth_rate,
+            "discount_rate": discount_rate,
+            "terminal_growth": terminal_growth,
+            "enterprise_value": None,
+            "equity_value": equity_value,
+            "terminal_value": terminal_value_present,
+            "terminal_value_pct": terminal_value_present / equity_value if equity_value else None,
+            "distribution": distribution,
+            "dividend_yield": dividend_yield,
+            "intrinsic_value_per_share": intrinsic_value_per_share,
+            "upside_to_last_close": upside_to_last_close,
+            "forecast_rows": forecast_rows,
+            "projected_cash_flows": [
+                {
+                    "year": row["year"],
+                    "cash_flow": row["distribution"],
+                    "discounted_cash_flow": row["discounted_distribution"],
+                }
+                for row in forecast_rows
+            ],
+        }
+
     def _build_wacc(
         self,
         bundle: DcfInputBundle,
@@ -1230,6 +1765,99 @@ class ProfessionalDcfEngine:
                     }
                 )
         return points
+
+    def _build_fcfe_sensitivity(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        base_discount_rate = float(kwargs.pop("base_discount_rate"))
+        base_growth = float(kwargs.pop("base_growth"))
+        points = []
+        for growth_rate in (base_growth - 0.02, base_growth, base_growth + 0.02):
+            for discount_rate in (base_discount_rate - 0.01, base_discount_rate, base_discount_rate + 0.01):
+                terminal_growth = float(kwargs["terminal_growth"])
+                if discount_rate <= terminal_growth:
+                    continue
+                scenario = self._project_fcfe_scenario(
+                    scenario="sensitivity",
+                    growth_rate=growth_rate,
+                    discount_rate=discount_rate,
+                    **kwargs,
+                )
+                points.append(
+                    {
+                        "growth_rate": growth_rate,
+                        "discount_rate": discount_rate,
+                        "terminal_growth": terminal_growth,
+                        "intrinsic_value_per_share": scenario["intrinsic_value_per_share"],
+                    }
+                )
+        return points
+
+    def _build_distribution_sensitivity(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        base_discount_rate = float(kwargs.pop("base_discount_rate"))
+        base_growth = float(kwargs.pop("base_growth"))
+        points = []
+        for growth_rate in (base_growth - 0.01, base_growth, base_growth + 0.01):
+            for discount_rate in (base_discount_rate - 0.01, base_discount_rate, base_discount_rate + 0.01):
+                terminal_growth = float(kwargs["terminal_growth"])
+                if discount_rate <= terminal_growth:
+                    continue
+                scenario = self._project_distribution_scenario(
+                    scenario="sensitivity",
+                    growth_rate=growth_rate,
+                    discount_rate=discount_rate,
+                    **kwargs,
+                )
+                points.append(
+                    {
+                        "growth_rate": growth_rate,
+                        "discount_rate": discount_rate,
+                        "terminal_growth": terminal_growth,
+                        "intrinsic_value_per_share": scenario["intrinsic_value_per_share"],
+                    }
+                )
+        return points
+
+    def _distribution_cash_flow_base(
+        self,
+        *,
+        facts: Dict[str, Any],
+        overrides: Dict[str, Any],
+        model_profile: str,
+        research_mode: bool,
+    ) -> Tuple[Optional[float], str, List[str]]:
+        warnings: List[str] = []
+        if model_profile == "reit_ffo_affo_ddm.v1":
+            affo = self._safe_float(facts.get("affo") or overrides.get("affo"))
+            if affo is not None:
+                return affo, "affo_distribution", warnings
+            ffo = self._safe_float(facts.get("ffo") or overrides.get("ffo"))
+            if ffo is not None:
+                warnings.append("reit_affo_missing_using_ffo")
+                return ffo, "ffo_distribution", warnings
+            rental_income = self._safe_float(facts.get("rental_income") or overrides.get("rental_income"))
+            if rental_income is not None and research_mode:
+                warnings.append("reit_ffo_affo_missing_using_rental_income_research_mode")
+                return rental_income, "rental_income_research_proxy", warnings
+            return None, "distribution_missing", warnings
+
+        operating_cf = self._safe_float(facts.get("operating_cf") or overrides.get("operating_cf"))
+        maintenance_capex = self._safe_float(
+            facts.get("maintenance_capex")
+            or overrides.get("maintenance_capex")
+            or facts.get("capital_expenditure")
+            or overrides.get("capital_expenditure")
+        )
+        net_debt_change = self._safe_float(facts.get("net_debt_change") or overrides.get("net_debt_change"))
+        if operating_cf is not None and maintenance_capex is not None:
+            return (
+                operating_cf - abs(maintenance_capex) + (net_debt_change or 0.0),
+                "fcfe_distribution",
+                warnings,
+            )
+        net_income = self._safe_float(facts.get("net_income") or overrides.get("net_income"))
+        if net_income is not None:
+            warnings.append("utility_fcfe_missing_using_net_income_distribution")
+            return net_income, "net_income_distribution", warnings
+        return None, "distribution_missing", warnings
 
     def _scenario_specs(
         self,
@@ -1638,7 +2266,7 @@ class ProfessionalDcfEngine:
                 "rejected_models": ["fcfe" if explicit == "fcff" else "fcff"],
                 "input_gap_by_model": {},
                 "confidence": 1.0,
-                "warnings": ["fcfe_model_not_implemented"] if explicit == "fcfe" else [],
+                "warnings": [],
             }
 
         debt = self._safe_float(facts.get("total_debt")) or 0.0
@@ -1679,7 +2307,7 @@ class ProfessionalDcfEngine:
                 if self._safe_float(facts.get(field)) is None
             ],
             "fcfe": [
-                field for field in ("operating_cf", "net_debt_change", "interest_expense")
+                field for field in ("operating_cf", "net_debt_change")
                 if self._safe_float(facts.get(field)) is None
             ],
         }
@@ -1695,16 +2323,20 @@ class ProfessionalDcfEngine:
             and stable_debt
             and sufficient_coverage
             and has_dividend_policy
+            and not input_gap_by_model["fcfe"]
             and (capex_ready or regulated_profile)
         )
         if fcfe_evidence:
-            selected = "fcff"
+            selected = "fcfe"
             reasons = [
-                "default_nonfinancial_enterprise_value_model",
-                "fcfe_candidate_deferred_until_formula_supported",
+                "stable_low_leverage",
+                "stable_debt_change",
+                "dividend_policy_available",
+                "fcfe_inputs_available",
             ]
-            warnings.append("fcfe_candidate_deferred")
-            confidence = 0.74
+            if regulated_profile:
+                reasons.append("regulated_or_distribution_profile")
+            confidence = 0.82
         else:
             selected = "fcff"
             reasons = ["default_nonfinancial_enterprise_value_model"]

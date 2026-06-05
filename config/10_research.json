@@ -517,16 +517,15 @@
               },
               "nonfinancial_fcfe.v1": {
                 "candidate_type": "cash_flow_adapter",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
                   "operating_cf",
-                  "net_debt_change",
-                  "interest_expense"
+                  "net_debt_change"
                 ],
                 "optional_fields": [
                   "dividend_payout_ratio",
                   "capital_expenditure",
-                  "change_in_working_capital"
+                  "maintenance_capex"
                 ]
               },
               "asset_light_fcff.v1": {
@@ -596,19 +595,32 @@
               },
               "utility_fcfe_or_ddm.v1": {
                 "candidate_type": "industry",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
+                  "dividend_payout_ratio",
+                  "shares_outstanding"
+                ],
+                "optional_fields": [
                   "operating_cf",
-                  "dividend_payout_ratio"
+                  "net_income",
+                  "maintenance_capex",
+                  "regulated_return",
+                  "total_debt"
                 ]
               },
               "reit_ffo_affo_ddm.v1": {
                 "candidate_type": "industry",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
-                  "rental_income",
+                  "dividend_payout_ratio",
+                  "shares_outstanding"
+                ],
+                "optional_fields": [
+                  "affo",
                   "ffo",
-                  "dividend_payout_ratio"
+                  "rental_income",
+                  "property_value",
+                  "occupancy_rate"
                 ]
               },
               "holdco_sotp.v1": {

@@ -1242,6 +1242,8 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 
 - 新增 `ProfessionalDcfEngine`，默认接入现有 DCF 计算路径；轻量 `SimpleGrowthDcfEngine` 保留为配置关闭专业 DCF 时的 fallback。
 - 已实现 `nonfinancial_fcff.v1`：EBIT/NOPAT、capex、营运资本、WACC、终值、净债务桥、forecast rows、情景分析和敏感性矩阵。
+- 已实现 `nonfinancial_fcfe.v1`：稳定低杠杆、分红政策明确且 FCFE 输入齐全的非金融企业可用 `operating_cf - capex + net_debt_change` equity cash flow 估值，显式 `cash_flow_model=fcfe` 输入充足时不再 fail closed。
+- 已实现轻量 `utility_fcfe_or_ddm.v1` / `reit_ffo_affo_ddm.v1`：公用事业/基础设施、REIT/类 REIT 在本地分红率、股本、FCFE 或 AFFO/FFO 输入充足时可输出 DDM/分派估值；缺少分派现金流时 fail closed。
 - 已实现模型 profile registry、行业/公司特性双候选 scoring、`model_strategy=auto|industry|characteristic|compare`、接近分数模型对比，以及 FCFE/FCFF adapter 输出。
 - 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。
 - 已实现显式 assumption refresh 入口，当前为本地优先 source policy/diagnostics，不在 DCF 计算路径隐式联网。
@@ -1249,7 +1251,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现进程内 bounded DCF run cache：按输入 hash、参数 hash、最新收盘价和 TTL 控制复用，不写入 `valuation_history`。
 - 已完成 DCF contract hardening：`compare` 返回行业/公司特性候选 result object，未实现模型 fail closed；显式 `fcfe` 不再伪装为成功 FCFF；`scenario_set / terminal_method / include_* / workbook_style / cash_flow_model` 参数具备明确语义；假设缺失和 fallback 进入结构化 blocker/warning；REST workbook metadata 不暴露本地 artifact path。
 - 已实现 `data_available_date <= valuation_date` 过滤 blocker，避免财务事实未来函数；缺失可得日默认在生产路径 fail closed。
-- 银行、证券、保险、地产、周期、公用事业、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
+- 银行、证券、保险、地产、周期、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
 
