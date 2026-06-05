@@ -472,10 +472,11 @@ class DatabaseOperations:
 
     @staticmethod
     def _apply_delisted_status(record) -> None:
-        """基于 delisted_date 自动校正 is_active 和 status（防线 B）
+        """基于 delisted_date 自动校正生命周期字段（防线 B）
 
-        若 delisted_date 已过期，强制设置 is_active=False, status='delisted'。
-        确保无论数据源传入什么值，退市状态始终正确。
+        若 delisted_date 已过期，强制设置 is_active=False、
+        status='delisted'、trading_status=0。确保无论数据源传入什么值，
+        退市标的都不会残留为可交易状态。
         """
         final_delisted = getattr(record, 'delisted_date', None)
         if final_delisted is None:
@@ -490,6 +491,7 @@ class DatabaseOperations:
         if delisted_val <= date_type.today():
             record.is_active = False
             record.status = 'delisted'
+            record.trading_status = 0
 
     @staticmethod
     def _should_preserve_protected_inactive_status(

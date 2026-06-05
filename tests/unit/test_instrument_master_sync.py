@@ -188,6 +188,20 @@ def test_akshare_fallback_cannot_reactivate_existing_delisted_without_delist_dat
     assert not DatabaseOperations._should_preserve_protected_inactive_status('active', 'akshare', None)
 
 
+def test_effective_delisted_date_clears_trading_status():
+    record = Mock()
+    record.delisted_date = date.today()
+    record.is_active = True
+    record.status = 'active'
+    record.trading_status = 1
+
+    DatabaseOperations._apply_delisted_status(record)
+
+    assert record.is_active is False
+    assert record.status == 'delisted'
+    assert record.trading_status == 0
+
+
 @pytest.mark.asyncio
 async def test_sync_instrument_master_reports_added_and_deactivated_rows():
     manager = _manager()
