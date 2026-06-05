@@ -2400,6 +2400,123 @@ def test_data_manager_get_research_dcf_valuation_requires_enabled_module(tmp_pat
         _run(manager.get_research_dcf_valuation("600000.SH"))
 
 
+def test_data_manager_get_research_dcf_assumptions_returns_lineage(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(manager.get_research_dcf_assumptions(market="SSE", currency="CNY"))
+
+    assumptions = {item["assumption_key"]: item for item in result["assumptions"]}
+    assert result["market"] == "SSE"
+    assert assumptions["risk_free_rate_rmb_10y"]["tenor"] == "10Y"
+    assert assumptions["risk_free_rate_rmb_10y"]["currency"] == "CNY"
+    assert assumptions["risk_free_rate_rmb_10y"]["source"] == "manual_config"
+    assert assumptions["risk_free_rate_rmb_10y"]["quality_flag"] == "configured_fallback"
+
+
+def test_data_manager_get_research_dcf_model_profiles_returns_registry(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    result = _run(manager.get_research_dcf_model_profiles())
+
+    profiles = {item["model_profile"]: item for item in result["model_profiles"]}
+    assert profiles["nonfinancial_fcff.v1"]["implementation_status"] == "implemented"
+    assert "capital_expenditure" in profiles["nonfinancial_fcff.v1"]["required_fields"]
+    assert profiles["bank_residual_income.v1"]["implementation_status"] == "guardrail"
+
+
+def test_data_manager_get_research_dcf_input_gaps_reports_missing_required_fields(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry": "制造业",
+        }
+    )
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600000.SH",
+        "latest_facts": {
+            "revenue": 1000.0,
+            "operating_profit": 120.0,
+            "data_available_date": "2026-03-31",
+        },
+    }
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_dcf_input_gaps("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    assert result["ready"] is False
+    missing = {item["field"]: item for item in result["missing_fields"]}
+    assert "capital_expenditure" in missing
+    assert missing["capital_expenditure"]["candidate_primary_source"] == "official_cash_flow_statement"
+    assert missing["capital_expenditure"]["refresh_eligible"] is False
+
+
+def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry": "制造业",
+        }
+    )
+    storage = Mock()
+    storage.get_financial_statement_bundle.return_value = {
+        "instrument_id": "600000.SH",
+        "latest_facts": {
+            "revenue": 1000.0,
+            "operating_profit": 120.0,
+            "capital_expenditure": 30.0,
+            "data_available_date": "2026-03-31",
+        },
+    }
+    manager.research_storage = storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_dcf_readiness("600000.SH"))
+
+    profiles = {item["model_profile"]: item for item in result["profiles"]}
+    assert result["ready"] is True
+    assert profiles["nonfinancial_fcff.v1"]["ready"] is True
+    assert profiles["bank_residual_income.v1"]["ready"] is False
+    assert "model_profile_not_implemented" in profiles["bank_residual_income.v1"]["blockers"]
+    assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+
+
 def test_data_manager_relative_valuation_skips_peers_for_reference_only_membership(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {

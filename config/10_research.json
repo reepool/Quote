@@ -488,6 +488,151 @@
             "window_days": 252,
             "fallback_beta": 1.0,
             "note": "DCF prefers on-demand calculated beta when available. Explicit discount_rate overrides still take precedence; fallback_beta is used only when no calculated beta is available."
+          },
+          "professional": {
+            "enabled": true,
+            "default_model_profile": "nonfinancial_fcff.v1",
+            "default_model_strategy": "auto",
+            "score_gap_threshold": 0.15,
+            "terminal_value_warning_threshold": 0.8,
+            "model_profiles": {
+              "nonfinancial_fcff.v1": {
+                "candidate_type": "industry",
+                "implementation_status": "implemented",
+                "required_fields": [
+                  "revenue",
+                  "operating_profit",
+                  "capital_expenditure"
+                ],
+                "optional_fields": [
+                  "depreciation_and_amortization",
+                  "change_in_working_capital",
+                  "cash_and_equivalents",
+                  "total_debt",
+                  "lease_liabilities",
+                  "minority_interest",
+                  "preferred_equity",
+                  "non_operating_assets"
+                ]
+              },
+              "high_growth_staged_fcff.v1": {
+                "candidate_type": "company_characteristic",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "revenue",
+                  "research_and_development"
+                ]
+              },
+              "bank_residual_income.v1": {
+                "candidate_type": "financial_sector",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "equity",
+                  "net_income",
+                  "roe",
+                  "capital_adequacy_ratio"
+                ]
+              },
+              "broker_excess_capital.v1": {
+                "candidate_type": "financial_sector",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "net_income",
+                  "equity",
+                  "net_capital"
+                ]
+              },
+              "insurance_embedded_value_or_ddm.v1": {
+                "candidate_type": "financial_sector",
+                "implementation_status": "guardrail",
+                "required_fields": [
+                  "embedded_value",
+                  "new_business_value"
+                ]
+              }
+            },
+            "assumptions": {
+              "risk_free_rate_rmb_10y": {
+                "assumption_key": "risk_free_rate_rmb_10y",
+                "market": "CN",
+                "currency": "CNY",
+                "tenor": "10Y",
+                "value": 0.02,
+                "unit": "rate",
+                "primary_source": "china_bond_10y",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback"
+              },
+              "risk_free_rate_usd_10y": {
+                "assumption_key": "risk_free_rate_usd_10y",
+                "market": "US",
+                "currency": "USD",
+                "tenor": "10Y",
+                "value": 0.04,
+                "unit": "rate",
+                "primary_source": "us_treasury_10y",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback"
+              },
+              "risk_free_rate_hkd_10y": {
+                "assumption_key": "risk_free_rate_hkd_10y",
+                "market": "HK",
+                "currency": "HKD",
+                "tenor": "10Y",
+                "value": 0.035,
+                "unit": "rate",
+                "primary_source": "hk_gov_bond_or_efn_10y",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback"
+              },
+              "equity_risk_premium": {
+                "assumption_key": "equity_risk_premium",
+                "market": "GLOBAL",
+                "currency": null,
+                "tenor": null,
+                "value": 0.06,
+                "unit": "rate",
+                "primary_source": "versioned_research_config",
+                "fallback_sources": [
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback"
+              },
+              "cost_of_debt_default": {
+                "assumption_key": "cost_of_debt_default",
+                "market": "GLOBAL",
+                "currency": null,
+                "tenor": null,
+                "value": 0.045,
+                "unit": "rate",
+                "primary_source": "company_bond_or_interest_expense",
+                "fallback_sources": [
+                  "industry_credit_spread",
+                  "manual_config"
+                ],
+                "source": "manual_config",
+                "quality_flag": "configured_fallback"
+              }
+            },
+            "workbook": {
+              "enabled": true,
+              "default_style": "consulting_clean",
+              "artifact_ttl_hours": 24
+            },
+            "bounded_cache": {
+              "enabled": false,
+              "ttl_hours": 24
+            }
           }
         }
       },

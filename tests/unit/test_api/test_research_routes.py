@@ -52,6 +52,10 @@ from api.routes import (
     get_research_industry_standard_readiness,
     get_research_company_overview,
     get_research_company_profile,
+    get_research_dcf_assumptions,
+    get_research_dcf_input_gaps,
+    get_research_dcf_model_profiles,
+    get_research_dcf_readiness,
     get_research_dcf_valuation,
     get_research_financial_statements,
     get_research_financial_statements_history,
@@ -2421,6 +2425,105 @@ class TestResearchRoutes:
         assert response.status == "success"
         assert response.base_cash_flow_source == "operating_cf"
         assert response.scenarios[0].intrinsic_value_per_share == 15.0
+
+    @patch("api.routes.data_manager")
+    def test_get_research_dcf_valuation_passes_professional_options(self, mock_dm):
+        mock_dm.get_research_dcf_valuation = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "symbol": "600000",
+                "exchange": "SSE",
+                "calc_method": "professional_dcf_fcff",
+                "calc_version": "nonfinancial_fcff.v1",
+                "parameter_hash": "hash",
+                "input_hash": "input",
+                "status": "success",
+                "missing_reason": None,
+                "model_profile": "nonfinancial_fcff.v1",
+                "model_strategy": "compare",
+                "base_cash_flow": 100.0,
+                "base_cash_flow_source": "fcff",
+                "projection_years": 5,
+                "shares_outstanding": 100.0,
+                "latest_close": 11.0,
+                "scenarios": [],
+                "sensitivity": [],
+            }
+        )
+
+        response = _run(
+            get_research_dcf_valuation(
+                "600000.SH",
+                model_strategy="compare",
+                include_model_comparison=True,
+                include_workbook=True,
+                research_mode=True,
+            )
+        )
+
+        assert response.model_strategy == "compare"
+        mock_dm.get_research_dcf_valuation.assert_awaited_once()
+        kwargs = mock_dm.get_research_dcf_valuation.await_args.kwargs
+        assert kwargs["model_strategy"] == "compare"
+        assert kwargs["include_model_comparison"] is True
+        assert kwargs["include_workbook"] is True
+        assert kwargs["research_mode"] is True
+
+    @patch("api.routes.data_manager")
+    def test_get_research_dcf_model_profiles_success(self, mock_dm):
+        mock_dm.get_research_dcf_model_profiles = AsyncMock(
+            return_value={"model_profiles": [{"model_profile": "nonfinancial_fcff.v1"}]}
+        )
+
+        response = _run(get_research_dcf_model_profiles())
+
+        assert response["model_profiles"][0]["model_profile"] == "nonfinancial_fcff.v1"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_dcf_assumptions_success(self, mock_dm):
+        mock_dm.get_research_dcf_assumptions = AsyncMock(
+            return_value={"assumptions": [{"assumption_key": "risk_free_rate_rmb_10y"}]}
+        )
+
+        response = _run(get_research_dcf_assumptions())
+
+        assert response["assumptions"][0]["assumption_key"] == "risk_free_rate_rmb_10y"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_dcf_input_gaps_success(self, mock_dm):
+        mock_dm.get_research_dcf_input_gaps = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "model_profile": "nonfinancial_fcff.v1",
+                "missing_fields": [{"field": "capital_expenditure"}],
+                "ready": False,
+            }
+        )
+
+        response = _run(get_research_dcf_input_gaps("600000.SH"))
+
+        assert response["missing_fields"][0]["field"] == "capital_expenditure"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_dcf_readiness_success(self, mock_dm):
+        mock_dm.get_research_dcf_readiness = AsyncMock(
+            return_value={
+                "instrument_id": "600000.SH",
+                "ready": False,
+                "profiles": [
+                    {
+                        "model_profile": "nonfinancial_fcff.v1",
+                        "ready": False,
+                        "blockers": ["missing_capital_expenditure"],
+                    }
+                ],
+                "coverage_diagnostics": {"ready_profile_count": 0},
+            }
+        )
+
+        response = _run(get_research_dcf_readiness("600000.SH"))
+
+        assert response["profiles"][0]["blockers"] == ["missing_capital_expenditure"]
 
     @patch("api.routes.data_manager")
     def test_get_research_technical_summary_success(self, mock_dm):

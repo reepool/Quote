@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from .professional_dcf import ProfessionalDcfEngine
 from .providers.base import ValuationHistorySnapshot
 
 
@@ -413,6 +414,11 @@ class ResearchValuationService:
     def __init__(self, parameters: Optional[Dict[str, Any]] = None):
         self.parameters = self._merge_parameters(parameters or {})
         self.dcf_engine = SimpleGrowthDcfEngine(self.parameters.get("dcf"))
+        self.professional_dcf_engine = ProfessionalDcfEngine(
+            self.parameters.get("dcf", {}).get("professional")
+            or self.parameters.get("professional_dcf")
+            or self.parameters.get("dcf")
+        )
 
     def build_history_snapshots(
         self,
@@ -1411,6 +1417,13 @@ class ResearchValuationService:
         latest_close: Optional[float],
         overrides: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
+        if self.parameters.get("dcf", {}).get("professional", {}).get("enabled", True):
+            return self.professional_dcf_engine.run(
+                instrument=instrument,
+                financial_bundle=financial_bundle,
+                latest_close=latest_close,
+                overrides=overrides,
+            )
         return self.dcf_engine.run(
             instrument=instrument,
             financial_bundle=financial_bundle,

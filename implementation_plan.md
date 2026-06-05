@@ -73,6 +73,7 @@
 - **估值历史建议采用混合模式**：
   - `PE/PB/PS/market_cap/float_market_cap` 等核心日频序列应日更预计算，并单独落入 `data/valuation.db`
   - `DCF`、敏感性分析、同行对比等保留实时计算或 bounded aggregate cache，不落全量 `subject x peer x date` 相对估值矩阵
+  - `2026-06-04` 专业 DCF 第一批实现已进入实时计算链路：默认接入 `ProfessionalDcfEngine`，普通非金融企业走 `nonfinancial_fcff.v1`，并返回模型选择、FCFE/FCFF adapter、假设 lineage、forecast rows、情景/敏感性和 readiness/input-gap 诊断；行业金融与特殊 profile 先以 guardrail/partial fail-closed 方式开放，不静默套用通用 FCFF
   - 个股历史估值分位按请求从 `valuation_history` 即时计算，不持久化全量 `instrument x date x metric x window` 分位矩阵；默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度，并对负值估值显式返回解释提示
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过
@@ -1552,6 +1553,10 @@ GET /api/v1/research/company/{instrument_id}/valuation/relative
 GET /api/v1/research/company/{instrument_id}/valuation/history
 GET /api/v1/research/company/{instrument_id}/valuation/percentile
 GET /api/v1/research/company/{instrument_id}/valuation/dcf
+GET /api/v1/research/company/{instrument_id}/valuation/dcf/readiness
+GET /api/v1/research/company/{instrument_id}/valuation/dcf/input-gaps
+GET /api/v1/research/valuation/dcf/model-profiles
+GET /api/v1/research/valuation/dcf/assumptions
 GET /api/v1/research/valuation/readiness
 ```
 
@@ -1744,6 +1749,7 @@ GET /api/v1/research/company/{instrument_id}/beta
 - valuation rollout readiness 应同时检查 `valuation_history` 覆盖、模块 gate 与 strict Shenwan current authoritative membership 前置条件
 - financial readiness 应检查目标报告期覆盖、核心事实覆盖、source/parser 分布、fallback 占比、缺失可得日和解析失败项；valuation readiness 必须依赖 financial readiness，而不是只看 `valuation_history` 是否有行
 - DCF 估值接口
+- 专业 DCF 第一批 API：model profiles、assumptions、per-company readiness、input gaps
 
 **预估工期**：`2 ~ 4 周`
 

@@ -6,6 +6,7 @@ Defines all REST API endpoints with comprehensive features.
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date, timedelta
 from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
+from fastapi.params import Param
 from fastapi.responses import JSONResponse, StreamingResponse
 import pandas as pd
 import io
@@ -17,6 +18,11 @@ from utils.date_utils import DateUtils, get_shanghai_time
 from .models import *
 
 router = APIRouter()
+
+
+def _query_default(value, default=None):
+    """Normalize FastAPI Param defaults when route functions are unit-called."""
+    return default if isinstance(value, Param) else value
 
 
 # Health Check
@@ -1194,15 +1200,43 @@ async def get_research_dcf_valuation(
     discount_rate: Optional[float] = Query(None, description="折现率覆盖"),
     terminal_growth: Optional[float] = Query(None, description="永续增长率覆盖"),
     projection_years: Optional[int] = Query(None, description="投影年数覆盖", ge=1, le=20),
+    model_profile: Optional[str] = Query(None, description="DCF 模型 profile 覆盖"),
+    model_strategy: Optional[str] = Query(
+        None,
+        description="模型策略：auto / industry / characteristic / compare",
+    ),
+    valuation_date: Optional[date] = Query(None, description="估值日期"),
+    scenario_set: Optional[str] = Query(None, description="情景集合"),
+    terminal_method: Optional[str] = Query(None, description="终值方法"),
+    include_forecast_rows: bool = Query(True, description="是否返回显式预测行"),
+    include_sensitivity: bool = Query(True, description="是否返回敏感性"),
+    include_lineage: bool = Query(True, description="是否返回 lineage"),
+    include_model_comparison: bool = Query(False, description="是否返回模型对比"),
+    include_workbook: bool = Query(False, description="是否生成 xlsx 底稿 artifact"),
+    force_model: bool = Query(False, description="是否强制使用指定模型"),
+    research_mode: bool = Query(False, description="是否允许研究模式降级结果"),
 ):
     """获取研究域 DCF 估值。"""
     try:
+        valuation_date_value = _query_default(valuation_date)
         dcf_result = await data_manager.get_research_dcf_valuation(
             instrument_id,
-            growth_rate=growth_rate,
-            discount_rate=discount_rate,
-            terminal_growth=terminal_growth,
-            projection_years=projection_years,
+            growth_rate=_query_default(growth_rate),
+            discount_rate=_query_default(discount_rate),
+            terminal_growth=_query_default(terminal_growth),
+            projection_years=_query_default(projection_years),
+            model_profile=_query_default(model_profile),
+            model_strategy=_query_default(model_strategy),
+            valuation_date=valuation_date_value.isoformat() if valuation_date_value else None,
+            scenario_set=_query_default(scenario_set),
+            terminal_method=_query_default(terminal_method),
+            include_forecast_rows=_query_default(include_forecast_rows, True),
+            include_sensitivity=_query_default(include_sensitivity, True),
+            include_lineage=_query_default(include_lineage, True),
+            include_model_comparison=_query_default(include_model_comparison, False),
+            include_workbook=_query_default(include_workbook, False),
+            force_model=_query_default(force_model, False),
+            research_mode=_query_default(research_mode, False),
         )
         if not dcf_result:
             raise HTTPException(status_code=404, detail="Research DCF valuation not found")
@@ -1216,6 +1250,100 @@ async def get_research_dcf_valuation(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to get research DCF valuation: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/valuation/dcf/model-profiles",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_dcf_model_profiles():
+    """获取专业 DCF 模型 profile 注册表。"""
+    try:
+        return await data_manager.get_research_dcf_model_profiles()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research DCF model profiles: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/valuation/dcf/assumptions",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_dcf_assumptions(
+    market: str = Query("SSE", description="市场或交易所"),
+    currency: str = Query("CNY", description="估值币种"),
+):
+    """获取专业 DCF 本地假设参数。"""
+    try:
+        return await data_manager.get_research_dcf_assumptions(
+            market=market,
+            currency=currency,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research DCF assumptions: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company/{instrument_id}/valuation/dcf/readiness",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_dcf_readiness(instrument_id: str):
+    """获取专业 DCF profile readiness。"""
+    try:
+        result = await data_manager.get_research_dcf_readiness(instrument_id)
+        if not result:
+            raise HTTPException(status_code=404, detail="Research DCF readiness not found")
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research DCF readiness: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company/{instrument_id}/valuation/dcf/input-gaps",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_dcf_input_gaps(
+    instrument_id: str,
+    model_profile: str = Query("nonfinancial_fcff.v1", description="DCF 模型 profile"),
+):
+    """获取专业 DCF 输入缺口。"""
+    try:
+        result = await data_manager.get_research_dcf_input_gaps(
+            instrument_id,
+            model_profile=model_profile,
+        )
+        if not result:
+            raise HTTPException(status_code=404, detail="Research DCF input gaps not found")
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research DCF input gaps: {str(e)}",
         )
 
 

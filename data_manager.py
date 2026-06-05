@@ -5032,6 +5032,18 @@ class DataManager:
         discount_rate: Optional[float] = None,
         terminal_growth: Optional[float] = None,
         projection_years: Optional[int] = None,
+        model_profile: Optional[str] = None,
+        model_strategy: Optional[str] = None,
+        valuation_date: Optional[str] = None,
+        scenario_set: Optional[str] = None,
+        terminal_method: Optional[str] = None,
+        include_forecast_rows: bool = True,
+        include_sensitivity: bool = True,
+        include_lineage: bool = True,
+        include_model_comparison: bool = False,
+        include_workbook: bool = False,
+        force_model: bool = False,
+        research_mode: bool = False,
     ) -> Optional[Dict[str, Any]]:
         """读取研究域 DCF 估值。"""
         storage = self._require_research_storage()
@@ -5068,6 +5080,18 @@ class DataManager:
                 "discount_rate": discount_rate,
                 "terminal_growth": terminal_growth,
                 "projection_years": projection_years,
+                "model_profile": model_profile,
+                "model_strategy": model_strategy,
+                "valuation_date": valuation_date,
+                "scenario_set": scenario_set,
+                "terminal_method": terminal_method,
+                "include_forecast_rows": include_forecast_rows,
+                "include_sensitivity": include_sensitivity,
+                "include_lineage": include_lineage,
+                "include_model_comparison": include_model_comparison,
+                "include_workbook": include_workbook,
+                "force_model": force_model,
+                "research_mode": research_mode,
             }.items()
             if value is not None
         }
@@ -5112,6 +5136,151 @@ class DataManager:
             latest_close=latest_close,
             overrides=overrides,
         )
+
+    async def get_research_dcf_assumptions(
+        self,
+        *,
+        market: str = "SSE",
+        currency: str = "CNY",
+    ) -> Dict[str, Any]:
+        """读取专业 DCF 本地假设参数。"""
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        from research.professional_dcf import ProfessionalDcfEngine
+
+        engine = ProfessionalDcfEngine(
+            module_cfg.get("dcf", {}).get("professional")
+            or module_cfg.get("professional_dcf")
+            or module_cfg.get("dcf")
+        )
+        assumptions = engine.get_assumptions(market=market, currency=currency)
+        return {
+            "market": market,
+            "currency": currency,
+            "assumptions": list(assumptions.values()),
+        }
+
+    async def get_research_dcf_model_profiles(self) -> Dict[str, Any]:
+        """读取专业 DCF 模型 profile 注册表。"""
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        from research.professional_dcf import ProfessionalDcfEngine
+
+        engine = ProfessionalDcfEngine(
+            module_cfg.get("dcf", {}).get("professional")
+            or module_cfg.get("professional_dcf")
+            or module_cfg.get("dcf")
+        )
+        return {"model_profiles": engine.list_model_profiles()}
+
+    async def get_research_dcf_input_gaps(
+        self,
+        instrument_id: str,
+        *,
+        model_profile: str = "nonfinancial_fcff.v1",
+    ) -> Optional[Dict[str, Any]]:
+        """读取专业 DCF 输入缺口。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+        financial_bundle = await asyncio.to_thread(
+            storage.get_financial_statement_bundle,
+            normalized_id,
+            include_statements=False,
+        )
+        if financial_bundle is None:
+            financial_bundle = {"instrument_id": normalized_id}
+
+        from research.professional_dcf import ProfessionalDcfEngine
+
+        engine = ProfessionalDcfEngine(
+            module_cfg.get("dcf", {}).get("professional")
+            or module_cfg.get("professional_dcf")
+            or module_cfg.get("dcf")
+        )
+        return engine.build_input_gaps(
+            instrument=instrument,
+            financial_bundle=financial_bundle,
+            model_profile=model_profile,
+        )
+
+    async def get_research_dcf_readiness(
+        self,
+        instrument_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        """读取单公司专业 DCF profile readiness。"""
+        storage = self._require_research_storage()
+        module_cfg = self.research_config.modules.get("valuation", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research valuation module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        instrument = await self.db_ops.get_instrument_by_id(normalized_id)
+        if not instrument:
+            return None
+        financial_bundle = await asyncio.to_thread(
+            storage.get_financial_statement_bundle,
+            normalized_id,
+            include_statements=False,
+        )
+        if financial_bundle is None:
+            financial_bundle = {"instrument_id": normalized_id}
+
+        from research.professional_dcf import ProfessionalDcfEngine
+
+        engine = ProfessionalDcfEngine(
+            module_cfg.get("dcf", {}).get("professional")
+            or module_cfg.get("professional_dcf")
+            or module_cfg.get("dcf")
+        )
+        profile_rows = []
+        for profile in engine.list_model_profiles():
+            profile_name = profile["model_profile"]
+            gaps = engine.build_input_gaps(
+                instrument=instrument,
+                financial_bundle=financial_bundle,
+                model_profile=profile_name,
+            )
+            implementation_status = profile.get("implementation_status", "unknown")
+            blockers = [f"missing_{item['field']}" for item in gaps["missing_fields"]]
+            if implementation_status != "implemented":
+                blockers.append("model_profile_not_implemented")
+            profile_rows.append(
+                {
+                    "model_profile": profile_name,
+                    "implementation_status": implementation_status,
+                    "supported_company_types": profile.get("supported_company_types", []),
+                    "ready": gaps["ready"] and implementation_status == "implemented",
+                    "missing_fields": gaps["missing_fields"],
+                    "blockers": blockers,
+                    "warnings": [] if implementation_status == "implemented" else ["guardrail_only"],
+                }
+            )
+
+        return {
+            "instrument_id": instrument.get("instrument_id", normalized_id),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "ready": any(item["ready"] for item in profile_rows),
+            "profiles": profile_rows,
+            "coverage_diagnostics": {
+                "profile_count": len(profile_rows),
+                "implemented_profile_count": sum(
+                    1 for item in profile_rows if item["implementation_status"] == "implemented"
+                ),
+                "ready_profile_count": sum(1 for item in profile_rows if item["ready"]),
+            },
+        }
 
     async def get_research_analyst_coverage(
         self,

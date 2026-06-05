@@ -1209,8 +1209,28 @@ class ResearchDcfValuationResponse(BaseModel):
     calc_method: str = Field(..., description="计算方法")
     calc_version: str = Field(..., description="计算版本")
     parameter_hash: str = Field(..., description="参数哈希")
+    input_hash: Optional[str] = Field(None, description="输入哈希")
     status: str = Field(..., description="计算状态")
     missing_reason: Optional[str] = Field(None, description="缺失原因")
+    model_profile: Optional[str] = Field(None, description="DCF 模型 Profile")
+    model_strategy: Optional[str] = Field(None, description="模型选择策略")
+    recommended_model: Optional[str] = Field(None, description="推荐模型")
+    selection_confidence: Optional[float] = Field(None, description="模型选择置信度")
+    selection_policy: Optional[str] = Field(None, description="模型选择策略说明")
+    score_gap: Optional[float] = Field(None, description="候选模型分数差")
+    model_suitability_candidates: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="模型适配候选及评分",
+    )
+    selected_cash_flow_model: Optional[str] = Field(None, description="选择的现金流模型")
+    cash_flow_model_selection: Optional[Dict[str, Any]] = Field(
+        None,
+        description="FCFE/FCFF 选择诊断",
+    )
+    readiness: Optional[Dict[str, Any]] = Field(None, description="DCF readiness")
+    assumptions: Optional[Dict[str, Any]] = Field(None, description="DCF 假设参数")
+    valuation_date: Optional[str] = Field(None, description="估值日期")
+    data_available_cutoff: Optional[str] = Field(None, description="数据可得日上限")
     base_cash_flow: Optional[float] = Field(None, description="基准现金流")
     base_cash_flow_source: str = Field(..., description="基准现金流来源")
     projection_years: int = Field(..., description="投影年数")
@@ -1219,6 +1239,15 @@ class ResearchDcfValuationResponse(BaseModel):
     beta: Optional[float] = Field(None, description="DCF 使用的 Beta")
     beta_source: Optional[str] = Field(None, description="Beta 来源")
     beta_benchmark: Optional[Dict[str, Any]] = Field(None, description="Beta 基准信息")
+    enterprise_value: Optional[float] = Field(None, description="企业价值")
+    equity_value: Optional[float] = Field(None, description="股权价值")
+    terminal_value: Optional[float] = Field(None, description="终值现值")
+    terminal_value_pct: Optional[float] = Field(None, description="终值占比")
+    net_debt_adjustment: Optional[Dict[str, Any]] = Field(None, description="净债务调整")
+    forecast_rows: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="显式预测行",
+    )
     scenarios: List[ResearchDcfScenarioResponse] = Field(
         default_factory=list,
         description="DCF 场景结果",
@@ -1227,6 +1256,12 @@ class ResearchDcfValuationResponse(BaseModel):
         default_factory=list,
         description="DCF 敏感性矩阵点集",
     )
+    diagnostics: Optional[Dict[str, Any]] = Field(None, description="诊断信息")
+    warnings: List[str] = Field(default_factory=list, description="风险提示")
+    lineage: Optional[Dict[str, Any]] = Field(None, description="输入与参数 lineage")
+    model_comparison: Optional[Dict[str, Any]] = Field(None, description="模型对比结果")
+    workbook: Optional[Dict[str, Any]] = Field(None, description="工作簿 artifact 信息")
+    research_mode: Optional[bool] = Field(None, description="是否研究模式")
 
 
 class ResearchAnalystCoverageResponse(BaseModel):
