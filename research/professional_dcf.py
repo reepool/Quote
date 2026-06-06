@@ -60,9 +60,15 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
         },
         "bank_residual_income.v1": {
             "candidate_type": "financial_sector",
-            "implementation_status": "guardrail",
-            "required_fields": ["equity", "net_income", "roe", "capital_adequacy_ratio"],
-            "optional_fields": ["npl_ratio", "provision_coverage_ratio"],
+            "implementation_status": "implemented",
+            "required_fields": ["equity", "net_income", "shares_outstanding"],
+            "optional_fields": [
+                "roe",
+                "capital_adequacy_ratio",
+                "npl_ratio",
+                "provision_coverage_ratio",
+                "dividend_payout_ratio",
+            ],
             "supported_company_types": ["bank"],
         },
         "broker_excess_capital.v1": {
@@ -423,7 +429,13 @@ class ProfessionalDcfEngine:
             for item in bundle.company_characteristics
         )
         if (
-            model_profile not in {"nonfinancial_fcff.v1", "utility_fcfe_or_ddm.v1", "reit_ffo_affo_ddm.v1"}
+            model_profile
+            not in {
+                "nonfinancial_fcff.v1",
+                "utility_fcfe_or_ddm.v1",
+                "reit_ffo_affo_ddm.v1",
+                "bank_residual_income.v1",
+            }
             and selector.get("include_model_comparison")
             and not (special_guardrail and not research_mode)
         ):
@@ -452,6 +464,15 @@ class ProfessionalDcfEngine:
                 selector=selector,
                 research_mode=research_mode,
                 model_profile=model_profile,
+            )
+
+        if model_profile == "bank_residual_income.v1":
+            return self._run_bank_residual_income(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                research_mode=research_mode,
             )
 
         if model_profile != "nonfinancial_fcff.v1":
@@ -1068,6 +1089,244 @@ class ProfessionalDcfEngine:
                     instrument=instrument,
                     financial_bundle=facts,
                     model_profile="nonfinancial_fcff.v1",
+                )["missing_fields"],
+            },
+            "warnings": warnings,
+            "lineage": bundle.lineage if bool(overrides.get("include_lineage", True)) else None,
+            "model_comparison": None,
+            "workbook": None,
+        }
+        if selector.get("include_model_comparison"):
+            result["model_comparison"] = self._model_comparison(result, selector)
+        result["workbook"] = self._workbook_metadata(overrides, result)
+        return result
+
+    def _run_bank_residual_income(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        bundle: DcfInputBundle,
+        overrides: Dict[str, Any],
+        selector: Dict[str, Any],
+        research_mode: bool,
+    ) -> Dict[str, Any]:
+        facts = bundle.financial_facts
+        projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
+        terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
+        scenario_set = str(overrides.get("scenario_set") or "standard")
+        if scenario_set not in {"standard", "downside_only"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_scenario_set",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_scenario_set:{scenario_set}"],
+            )
+        terminal_method = str(overrides.get("terminal_method") or "gordon_growth")
+        if terminal_method not in {"gordon_growth", "perpetual_growth"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_terminal_method",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_terminal_method:{terminal_method}"],
+            )
+        assumption_blockers = [blocker for blocker in bundle.blockers if blocker.startswith("assumption_")]
+        if assumption_blockers:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="partial" if research_mode else "unavailable",
+                missing_reason=assumption_blockers[0],
+                research_mode=research_mode,
+            )
+        wacc_payload = self._build_wacc(bundle, overrides)
+        cost_of_equity = float(overrides.get("cost_of_equity", wacc_payload["cost_of_equity"]))
+        if cost_of_equity <= terminal_growth:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="cost_of_equity_must_exceed_terminal_growth",
+                research_mode=research_mode,
+            )
+
+        equity = self._safe_float(facts.get("equity") or facts.get("equity_parent") or overrides.get("equity"))
+        net_income = self._safe_float(
+            facts.get("net_income_parent") or facts.get("net_income") or overrides.get("net_income")
+        )
+        shares = self._safe_positive_float(facts.get("shares_outstanding"))
+        blockers = [
+            f"{field_name}_required"
+            for field_name, value in (
+                ("equity", equity),
+                ("net_income", net_income),
+                ("shares_outstanding", shares),
+            )
+            if value is None
+        ]
+        if blockers and not research_mode:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="bank_core_inputs_missing",
+                research_mode=research_mode,
+                extra_blockers=["bank_core_inputs_missing", *blockers],
+            )
+
+        equity = equity or 0.0
+        net_income = net_income or 0.0
+        roe_raw = self._safe_float(facts.get("roe") or overrides.get("roe"))
+        warnings = list(bundle.warnings)
+        roe_source = "reported"
+        if roe_raw is None and equity:
+            roe_raw = net_income / equity
+            roe_source = "derived_net_income_over_equity"
+            warnings.append("bank_roe_derived_from_net_income_over_equity")
+        roe = roe_raw if roe_raw is not None else 0.0
+        payout_raw = self._safe_float(facts.get("dividend_payout_ratio") or overrides.get("dividend_payout_ratio"))
+        payout_ratio = payout_raw
+        if payout_ratio is None:
+            payout_ratio = float(overrides.get("bank_default_payout_ratio", self.parameters.get("bank_default_payout_ratio", 0.3)))
+            warnings.append("bank_payout_ratio_default_used")
+        capital_adequacy = self._safe_float(
+            facts.get("capital_adequacy_ratio") or overrides.get("capital_adequacy_ratio")
+        )
+        capital_threshold = float(self.parameters.get("bank_capital_adequacy_warning_threshold", 0.105))
+        capital_diagnostics = {
+            "capital_adequacy_ratio": capital_adequacy,
+            "warning_threshold": capital_threshold,
+            "status": "available",
+        }
+        if capital_adequacy is None:
+            capital_diagnostics["status"] = "missing"
+            warnings.append("bank_capital_adequacy_missing")
+        elif capital_adequacy < capital_threshold:
+            capital_diagnostics["status"] = "below_threshold"
+            warnings.append("bank_capital_adequacy_below_threshold")
+
+        scenario_specs = self._bank_roe_scenario_specs(scenario_set, roe, overrides)
+        scenarios = [
+            self._project_bank_residual_income_scenario(
+                scenario=scenario_name,
+                starting_equity=equity,
+                roe=scenario_roe,
+                payout_ratio=payout_ratio,
+                cost_of_equity=cost_of_equity,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=shares,
+            )
+            for scenario_name, scenario_roe in scenario_specs
+        ]
+        base_scenario = next(item for item in scenarios if item["scenario"] == "base")
+        sensitivity = self._build_bank_residual_income_sensitivity(
+            starting_equity=equity,
+            base_roe=roe,
+            payout_ratio=payout_ratio,
+            base_cost_of_equity=cost_of_equity,
+            terminal_growth=terminal_growth,
+            projection_years=projection_years,
+            latest_close=bundle.latest_close,
+            shares_outstanding=shares,
+        )
+        ddm_cross_check = self._bank_ddm_cross_check(
+            net_income=net_income,
+            payout_ratio=payout_raw,
+            cost_of_equity=cost_of_equity,
+            terminal_growth=terminal_growth,
+            shares_outstanding=shares,
+        )
+        if ddm_cross_check is None:
+            warnings.append("bank_ddm_cross_check_unavailable")
+        if not bool(overrides.get("include_sensitivity", True)):
+            warnings.append("sensitivity_suppressed_by_request")
+        if not bool(overrides.get("include_forecast_rows", True)):
+            warnings.append("forecast_rows_suppressed_by_request")
+        if not bool(overrides.get("include_lineage", True)):
+            warnings.append("lineage_suppressed_by_request")
+        if blockers:
+            warnings.append("research_mode_bank_core_inputs_incomplete")
+
+        result = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "calc_method": "professional_dcf_bank_residual_income",
+            "calc_version": "bank_residual_income.v1",
+            "parameter_hash": self._build_parameter_hash(overrides),
+            "input_hash": bundle.input_hash,
+            "status": "partial" if research_mode and blockers else "success",
+            "missing_reason": "bank_core_inputs_missing" if blockers else None,
+            "model_profile": "bank_residual_income.v1",
+            "model_strategy": selector.get("model_strategy"),
+            "recommended_model": selector.get("recommended_model"),
+            "selection_confidence": selector.get("selection_confidence"),
+            "selection_policy": selector.get("selection_policy"),
+            "score_gap": selector.get("score_gap"),
+            "model_suitability_candidates": selector.get("candidates", []),
+            "selected_cash_flow_model": "residual_income",
+            "cash_flow_model_selection": {
+                "selected_cash_flow_model": "residual_income",
+                "candidate_models": ["residual_income", "ddm"],
+                "selection_reasons": ["bank_financial_sector_profile"],
+                "rejected_models": ["fcff", "fcfe"],
+                "input_gap_by_model": {"residual_income": blockers},
+                "confidence": selector.get("selection_confidence"),
+                "warnings": warnings,
+            },
+            "readiness": self._readiness_payload(blockers, warnings, selector),
+            "assumptions": {"wacc": wacc_payload, **bundle.assumptions},
+            "valuation_date": bundle.valuation_date,
+            "data_available_cutoff": bundle.data_available_cutoff,
+            "base_cash_flow": base_scenario.get("residual_income"),
+            "base_cash_flow_source": "bank_residual_income",
+            "projection_years": projection_years,
+            "shares_outstanding": shares,
+            "latest_close": bundle.latest_close,
+            "beta": bundle.beta_context.get("beta"),
+            "beta_source": bundle.beta_context.get("beta_source"),
+            "beta_benchmark": bundle.beta_context.get("beta_benchmark"),
+            "enterprise_value": None,
+            "equity_value": base_scenario.get("equity_value"),
+            "terminal_value": base_scenario.get("terminal_value"),
+            "terminal_value_pct": base_scenario.get("terminal_value_pct"),
+            "implied_pb": base_scenario.get("implied_pb"),
+            "ddm_cross_check": ddm_cross_check,
+            "financial_model_diagnostics": {
+                "roe": roe,
+                "roe_source": roe_source,
+                "payout_ratio": payout_ratio,
+                "payout_ratio_source": "reported" if payout_raw is not None else "configured_default",
+                "capital": capital_diagnostics,
+            },
+            "net_debt_adjustment": None,
+            "forecast_rows": base_scenario.get("forecast_rows", [])
+            if bool(overrides.get("include_forecast_rows", True))
+            else [],
+            "scenarios": scenarios,
+            "sensitivity": sensitivity if bool(overrides.get("include_sensitivity", True)) else [],
+            "diagnostics": {
+                "blockers": blockers,
+                "warnings": warnings,
+                "input_gaps": self.build_input_gaps(
+                    instrument=instrument,
+                    financial_bundle=facts,
+                    model_profile="bank_residual_income.v1",
                 )["missing_fields"],
             },
             "warnings": warnings,
@@ -1704,6 +1963,89 @@ class ProfessionalDcfEngine:
             ],
         }
 
+    def _project_bank_residual_income_scenario(
+        self,
+        *,
+        scenario: str,
+        starting_equity: float,
+        roe: float,
+        payout_ratio: float,
+        cost_of_equity: float,
+        terminal_growth: float,
+        projection_years: int,
+        latest_close: Optional[float],
+        shares_outstanding: Optional[float],
+    ) -> Dict[str, Any]:
+        forecast_rows = []
+        discounted_sum = 0.0
+        beginning_book = starting_equity
+        residual_income = 0.0
+        for year in range(1, projection_years + 1):
+            net_income = beginning_book * roe
+            dividend = net_income * payout_ratio
+            equity_charge = beginning_book * cost_of_equity
+            residual_income = net_income - equity_charge
+            discount_factor = 1 / ((1 + cost_of_equity) ** year)
+            discounted_residual_income = residual_income * discount_factor
+            discounted_sum += discounted_residual_income
+            ending_book = beginning_book + net_income - dividend
+            forecast_rows.append(
+                {
+                    "year": year,
+                    "beginning_book_equity": beginning_book,
+                    "roe": roe,
+                    "net_income": net_income,
+                    "payout_ratio": payout_ratio,
+                    "dividend": dividend,
+                    "cost_of_equity": cost_of_equity,
+                    "equity_charge": equity_charge,
+                    "residual_income": residual_income,
+                    "discount_factor": discount_factor,
+                    "discounted_residual_income": discounted_residual_income,
+                    "ending_book_equity": ending_book,
+                }
+            )
+            beginning_book = ending_book
+        terminal_residual_income = residual_income * (1 + terminal_growth)
+        terminal_value = terminal_residual_income / (cost_of_equity - terminal_growth)
+        terminal_value_present = terminal_value / ((1 + cost_of_equity) ** projection_years)
+        equity_value = starting_equity + discounted_sum + terminal_value_present
+        intrinsic_value_per_share = (
+            equity_value / shares_outstanding
+            if shares_outstanding and shares_outstanding > 0
+            else None
+        )
+        upside_to_last_close = (
+            intrinsic_value_per_share / latest_close - 1
+            if intrinsic_value_per_share is not None and latest_close not in (None, 0)
+            else None
+        )
+        return {
+            "scenario": scenario,
+            "roe": roe,
+            "discount_rate": cost_of_equity,
+            "cost_of_equity": cost_of_equity,
+            "terminal_growth": terminal_growth,
+            "enterprise_value": None,
+            "equity_value": equity_value,
+            "book_equity": starting_equity,
+            "implied_pb": equity_value / starting_equity if starting_equity else None,
+            "terminal_value": terminal_value_present,
+            "terminal_value_pct": terminal_value_present / equity_value if equity_value else None,
+            "residual_income": residual_income,
+            "intrinsic_value_per_share": intrinsic_value_per_share,
+            "upside_to_last_close": upside_to_last_close,
+            "forecast_rows": forecast_rows,
+            "projected_cash_flows": [
+                {
+                    "year": row["year"],
+                    "cash_flow": row["residual_income"],
+                    "discounted_cash_flow": row["discounted_residual_income"],
+                }
+                for row in forecast_rows
+            ],
+        }
+
     def _build_wacc(
         self,
         bundle: DcfInputBundle,
@@ -1815,6 +2157,69 @@ class ProfessionalDcfEngine:
                     }
                 )
         return points
+
+    def _build_bank_residual_income_sensitivity(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        base_cost_of_equity = float(kwargs.pop("base_cost_of_equity"))
+        base_roe = float(kwargs.pop("base_roe"))
+        points = []
+        for roe in (base_roe - 0.02, base_roe, base_roe + 0.02):
+            for cost_of_equity in (base_cost_of_equity - 0.01, base_cost_of_equity, base_cost_of_equity + 0.01):
+                terminal_growth = float(kwargs["terminal_growth"])
+                if cost_of_equity <= terminal_growth:
+                    continue
+                scenario = self._project_bank_residual_income_scenario(
+                    scenario="sensitivity",
+                    roe=roe,
+                    cost_of_equity=cost_of_equity,
+                    **kwargs,
+                )
+                points.append(
+                    {
+                        "roe": roe,
+                        "cost_of_equity": cost_of_equity,
+                        "terminal_growth": terminal_growth,
+                        "implied_pb": scenario["implied_pb"],
+                        "intrinsic_value_per_share": scenario["intrinsic_value_per_share"],
+                    }
+                )
+        return points
+
+    def _bank_roe_scenario_specs(
+        self,
+        scenario_set: str,
+        roe: float,
+        overrides: Dict[str, Any],
+    ) -> List[Tuple[str, float]]:
+        specs = [
+            ("bear", float(overrides.get("bear_roe", max(roe - 0.02, 0.0)))),
+            ("base", roe),
+            ("bull", float(overrides.get("bull_roe", roe + 0.02))),
+            ("stress", float(overrides.get("stress_roe", max(roe - 0.04, 0.0)))),
+        ]
+        if scenario_set == "downside_only":
+            return [item for item in specs if item[0] in {"bear", "base", "stress"}]
+        return specs
+
+    def _bank_ddm_cross_check(
+        self,
+        *,
+        net_income: float,
+        payout_ratio: Optional[float],
+        cost_of_equity: float,
+        terminal_growth: float,
+        shares_outstanding: Optional[float],
+    ) -> Optional[Dict[str, Any]]:
+        if payout_ratio is None or shares_outstanding in (None, 0) or cost_of_equity <= terminal_growth:
+            return None
+        next_dividend = net_income * payout_ratio * (1 + terminal_growth)
+        equity_value = next_dividend / (cost_of_equity - terminal_growth)
+        return {
+            "method": "bank_ddm_cross_check",
+            "payout_ratio": payout_ratio,
+            "next_dividend": next_dividend,
+            "equity_value": equity_value,
+            "intrinsic_value_per_share": equity_value / shares_outstanding,
+        }
 
     def _distribution_cash_flow_base(
         self,
@@ -2502,10 +2907,12 @@ class ProfessionalDcfEngine:
             "base_cash_flow_source": result.get("base_cash_flow_source"),
             "enterprise_value": result.get("enterprise_value"),
             "equity_value": result.get("equity_value"),
+            "implied_pb": result.get("implied_pb"),
             "intrinsic_value_per_share": base_intrinsic,
             "readiness": result.get("readiness"),
             "warnings": result.get("warnings", []),
             "diagnostics": result.get("diagnostics"),
+            "financial_model_diagnostics": result.get("financial_model_diagnostics"),
         }
 
     def _workbook_metadata(

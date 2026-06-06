@@ -2460,7 +2460,8 @@ def test_data_manager_get_research_dcf_model_profiles_returns_registry(tmp_path)
     profiles = {item["model_profile"]: item for item in result["model_profiles"]}
     assert profiles["nonfinancial_fcff.v1"]["implementation_status"] == "implemented"
     assert "capital_expenditure" in profiles["nonfinancial_fcff.v1"]["required_fields"]
-    assert profiles["bank_residual_income.v1"]["implementation_status"] == "guardrail"
+    assert profiles["bank_residual_income.v1"]["implementation_status"] == "implemented"
+    assert "shares_outstanding" in profiles["bank_residual_income.v1"]["required_fields"]
 
 
 def test_data_manager_get_research_dcf_input_gaps_reports_missing_required_fields(tmp_path):
@@ -2540,7 +2541,9 @@ def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path
     assert result["ready"] is True
     assert profiles["nonfinancial_fcff.v1"]["ready"] is True
     assert profiles["bank_residual_income.v1"]["ready"] is False
-    assert "model_profile_not_implemented" in profiles["bank_residual_income.v1"]["blockers"]
+    assert "missing_equity" in profiles["bank_residual_income.v1"]["blockers"]
+    assert "missing_net_income" in profiles["bank_residual_income.v1"]["blockers"]
+    assert "missing_shares_outstanding" in profiles["bank_residual_income.v1"]["blockers"]
     assert result["coverage_diagnostics"]["ready_profile_count"] == 1
 
 

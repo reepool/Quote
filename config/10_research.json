@@ -550,12 +550,18 @@
               },
               "bank_residual_income.v1": {
                 "candidate_type": "financial_sector",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
                   "equity",
                   "net_income",
+                  "shares_outstanding"
+                ],
+                "optional_fields": [
                   "roe",
-                  "capital_adequacy_ratio"
+                  "capital_adequacy_ratio",
+                  "npl_ratio",
+                  "provision_coverage_ratio",
+                  "dividend_payout_ratio"
                 ]
               },
               "broker_excess_capital.v1": {

@@ -791,7 +791,40 @@ def test_valuation_service_dcf_excludes_future_financial_facts():
     assert "financial_fact_after_valuation_date" in result["readiness"]["blockers"]
 
 
-def test_valuation_service_dcf_does_not_default_financial_company_to_fcff():
+def test_valuation_service_dcf_bank_defaults_to_residual_income_model():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry_name": "银行",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "equity": 1000.0,
+            "net_income": 100.0,
+            "roe": 0.10,
+            "capital_adequacy_ratio": 0.13,
+            "dividend_payout_ratio": 0.3,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["model_profile"] == "bank_residual_income.v1"
+    assert result["calc_method"] == "professional_dcf_bank_residual_income"
+    assert result["enterprise_value"] is None
+    assert result["equity_value"] is not None
+    assert result["implied_pb"] is not None
+    assert result["ddm_cross_check"]["intrinsic_value_per_share"] is not None
+
+
+def test_valuation_service_dcf_bank_missing_core_inputs_fails_closed():
     service = ResearchValuationService()
 
     result = service.run_dcf(
@@ -813,7 +846,37 @@ def test_valuation_service_dcf_does_not_default_financial_company_to_fcff():
 
     assert result["status"] == "unavailable"
     assert result["model_profile"] == "bank_residual_income.v1"
-    assert result["missing_reason"] == "model_profile_not_implemented"
+    assert result["missing_reason"] == "bank_core_inputs_missing"
+    assert "shares_outstanding_required" in result["readiness"]["blockers"]
+
+
+def test_valuation_service_dcf_bank_derives_roe_and_flags_capital_warning():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry_name": "银行",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "equity": 1000.0,
+            "net_income": 80.0,
+            "capital_adequacy_ratio": 0.09,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["financial_model_diagnostics"]["roe_source"] == "derived_net_income_over_equity"
+    assert result["financial_model_diagnostics"]["capital"]["status"] == "below_threshold"
+    assert "bank_roe_derived_from_net_income_over_equity" in result["warnings"]
+    assert "bank_capital_adequacy_below_threshold" in result["warnings"]
 
 
 def test_valuation_service_dcf_model_comparison_for_close_scores():

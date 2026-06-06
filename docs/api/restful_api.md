@@ -349,7 +349,7 @@ curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percenti
 
 ### GET /api/v1/research/company/{instrument_id}/valuation/dcf
 
-按需计算专业 DCF。当前默认走 `ProfessionalDcfEngine`，普通非金融公司支持 `nonfinancial_fcff.v1`；稳定低杠杆且 FCFE 输入齐全的非金融公司支持 `nonfinancial_fcfe.v1`；公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/FCFE 分派模型。金融、地产 NAV、周期 mid-cycle、控股公司、高研发/亏损/短上市等 profile 已注册 guardrail，未实现完整模型时返回结构化 unavailable/partial，不静默套用通用 FCFF。
+按需计算专业 DCF。当前默认走 `ProfessionalDcfEngine`，普通非金融公司支持 `nonfinancial_fcff.v1`；稳定低杠杆且 FCFE 输入齐全的非金融公司支持 `nonfinancial_fcfe.v1`；公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/FCFE 分派模型；银行支持 `bank_residual_income.v1`，直接估算股权价值并输出 implied P/B。证券、保险、地产 NAV、周期 mid-cycle、控股公司、高研发/亏损/短上市等 profile 已注册 guardrail，未实现完整模型时返回结构化 unavailable/partial，不静默套用通用 FCFF。
 
 可选参数：
 - `growth_rate`、`discount_rate`、`terminal_growth`、`projection_years`：估值假设覆盖。
@@ -370,6 +370,7 @@ curl "http://localhost:8000/api/v1/research/company/600519.SH/valuation/percenti
 - `selected_cash_flow_model / cash_flow_model_selection`
 - `assumptions`：WACC、无风险利率、ERP、债务成本、FX、行业 beta、商品价格假设及 lineage。
 - `forecast_rows / scenarios / sensitivity`
+- 银行模型额外返回 `implied_pb / financial_model_diagnostics / ddm_cross_check`，且 `enterprise_value=null`。
 - `readiness / diagnostics / warnings / lineage`
 - `workbook`：仅在 `include_workbook=true` 时返回。artifact 默认写入 `data/reports/dcf_workbooks`，不写入 `valuation_history`。
 - `cache_info`：进程内 bounded run cache 命中与 key/hash 摘要，包含 `cache_hit / cache_key / input_hash / parameter_hash / cached_at / expires_at / entry_count / invalidation_policy`。缓存身份包含标的、财务 bundle hash、最新收盘价和参数覆盖，输入或参数变化会自动失效。
