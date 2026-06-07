@@ -15,8 +15,8 @@ import pandas as pd
 import requests
 
 from utils import dm_logger
+from utils.http_transport import HttpTlsConfig, create_requests_session
 
-from .tls_support import build_ca_bundle_with_extra_certificate
 from .base import (
     BaseIndustryStandardProvider,
     BaseOfficialIndustryHistoryProvider,
@@ -26,6 +26,7 @@ from .base import (
     IndustryTaxonomySnapshot,
     OfficialIndustryHistorySnapshot,
 )
+from .tls_support import build_ca_bundle_with_extra_certificate
 
 
 @dataclass(frozen=True)
@@ -85,6 +86,10 @@ class SWSResearchShenwanClassificationProvider(
         self.minimum_stock_history_rows = max(1, int(minimum_stock_history_rows))
         self.minimum_code_rows = max(1, int(minimum_code_rows))
         self.symbol_aliases = list(symbol_aliases or [])
+        self.tls_config = HttpTlsConfig(
+            source_name=self.source_name,
+            extra_ca_cert_path=extra_ca_cert_path,
+        )
         self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
         self._bundle_cache: Optional[SWSResearchClassificationBundle] = None
         self._last_fetch_metadata: Dict[str, Any] = {}
@@ -188,7 +193,7 @@ class SWSResearchShenwanClassificationProvider(
             dm_logger.info("[SWSResearchClassification] Reusing in-memory official bundle cache")
             return self._bundle_cache
 
-        session = requests.Session()
+        session = create_requests_session(tls_config=self.tls_config)
         dm_logger.info(
             "[SWSResearchClassification] Fetching official Shenwan classification artifacts "
             "(mode=%s, force_refresh=%s, previous_files=%s)",

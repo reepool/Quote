@@ -1176,7 +1176,19 @@ GET /api/v1/research/valuation/dcf/workbooks/{artifact_id}
 - 稳定性评分。
 - 是否允许进入 production DCF。
 
-### 13.3 本地 API 封装
+### 13.3 外部数据刷新 transport 约束
+
+专业 DCF 的计算路径不得直接远程补数；假设、宏观、利率、监管资本、行业参数或其他外部输入只能由专门的 provider 任务、刷新接口或本地缓存维护。所有由项目自研代码直接发起的 HTTP/HTTPS 刷新请求，必须遵循 `standardize-http-transport` OpenSpec change 的共享 transport 规则：
+
+- 默认启用 HTTPS 证书校验，不允许在生产 provider 中使用 `verify=False`。
+- 如上游证书链不完整，必须通过配置化 `extra_ca_cert_path` 合并默认 CA bundle，不得关闭校验。
+- source/profile 级配置必须记录 timeout、rate limit、source profile、lineage、错误诊断和 TLS/CA 策略。
+- DCF 输出中的 assumption lineage 需要能追溯到本地缓存或刷新任务，不得只记录远程 URL。
+- AkShare、yfinance 等第三方库内部联网行为暂不由该 transport 直接接管；若 DCF 相关 adapter 在第三方库外自行发起 requests/urllib/aiohttp 请求，则必须使用共享 transport。
+
+该要求不改变 DCF 实时计算边界：DCF 引擎仍只读取本地 API / 本地缓存；共享 transport 只服务于独立刷新或维护任务。
+
+### 13.4 本地 API 封装
 
 建议接口：
 

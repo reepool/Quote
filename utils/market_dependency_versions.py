@@ -9,13 +9,14 @@ from __future__ import annotations
 
 import json
 import urllib.error
-import urllib.request
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from importlib import metadata
 from typing import Any, Dict, Iterable, List, Optional
 
 from packaging.version import InvalidVersion, Version
+
+from utils.http_transport import HttpTlsConfig, urlopen_bytes
 
 
 DEFAULT_MARKET_DEPENDENCIES: List[Dict[str, str]] = [
@@ -157,14 +158,15 @@ def _fetch_pypi_metadata(
     pypi_url_template: str,
 ) -> Dict[str, Optional[str]]:
     url = pypi_url_template.format(distribution=distribution)
-    request = urllib.request.Request(
-        url,
-        headers={"User-Agent": "QuoteSystem/market-dependency-version-check"},
-    )
 
     try:
-        with urllib.request.urlopen(request, timeout=timeout_sec) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+        content = urlopen_bytes(
+            url,
+            timeout_sec=timeout_sec,
+            user_agent="QuoteSystem/market-dependency-version-check",
+            tls_config=HttpTlsConfig(source_name="pypi"),
+        )
+        payload = json.loads(content.decode("utf-8"))
     except urllib.error.HTTPError as exc:
         raise RuntimeError(f"PyPI HTTP {exc.code} for {distribution}") from exc
     except urllib.error.URLError as exc:

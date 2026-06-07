@@ -13,6 +13,8 @@ from typing import Any, Dict, Iterable, List, Optional
 import pandas as pd
 import requests
 
+from utils.http_transport import HttpTlsConfig, create_requests_session
+
 from .akshare_support import load_akshare
 from .base import BaseShareholderProvider, ShareholderSnapshot
 
@@ -48,6 +50,7 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
         self.request_interval_seconds = request_interval_seconds
         self.retry_attempts = max(0, retry_attempts)
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
+        self.tls_config = HttpTlsConfig(source_name=self.source_name)
 
     async def fetch_shareholder_snapshots(
         self,
@@ -100,7 +103,7 @@ class CninfoShareholdersProvider(BaseShareholderProvider):
             )
             return []
 
-        session = requests.Session()
+        session = create_requests_session(tls_config=self.tls_config)
         holder_count_rows = self._load_latest_holder_count_rows(akshare, symbols)
         control_rows = self._load_control_holder_rows(akshare, symbols)
         top_holder_bundles = self._load_top_holder_bundles(

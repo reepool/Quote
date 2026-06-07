@@ -17,6 +17,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 
 from research.official_financial_source_profiles import source_profile_metadata
+from utils.http_transport import HttpTlsConfig, create_requests_session
 
 from .base import (
     BaseOfficialFinancialFilingProvider,
@@ -794,7 +795,11 @@ class ConfiguredOfficialFinancialFilingProvider(BaseOfficialFinancialFilingProvi
         ]
         self.timeout = float(source_config.get("request_timeout_seconds", 20.0))
         self.request_interval = float(source_config.get("request_interval_seconds", 0.0))
-        self.session = session or requests.Session()
+        self.tls_config = HttpTlsConfig(
+            source_name=source_name,
+            extra_ca_cert_path=source_config.get("extra_ca_cert_path"),
+        )
+        self.session = session or create_requests_session(tls_config=self.tls_config)
 
     async def fetch_financial_filings(
         self,

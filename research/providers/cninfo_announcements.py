@@ -12,6 +12,8 @@ from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import requests
 
+from utils.http_transport import HttpTlsConfig, create_requests_session
+
 _logger = logging.getLogger("DataManager")
 
 _CNINFO_ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
@@ -97,7 +99,8 @@ class CninfoAnnouncementScanner:
         self.request_interval_seconds = max(0.0, request_interval_seconds)
         self.retry_attempts = max(0, retry_attempts)
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
-        self.session = session or requests.Session()
+        self.tls_config = HttpTlsConfig(source_name="cninfo")
+        self.session = session or create_requests_session(tls_config=self.tls_config)
 
     def scan(
         self,

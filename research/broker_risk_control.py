@@ -11,8 +11,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence
 
-import requests
-
 from research.financial_fact_aliases import describe_financial_numeric_fact_name
 from research.providers.base import (
     FinancialFilingPayload,
@@ -25,6 +23,7 @@ from research.providers.cninfo_announcements import (
     CninfoAnnouncementScanner,
 )
 from utils.date_utils import get_shanghai_time
+from utils.http_transport import HttpTlsConfig, request_get
 
 
 BROKER_RISK_CONTROL_SOURCE_PROFILE = "broker_risk_control_report"
@@ -977,6 +976,10 @@ class BrokerRiskControlReportSyncService:
         url = record.adjunct_url
         if not url.startswith(("http://", "https://")):
             url = f"https://static.cninfo.com.cn/{url.lstrip('/')}"
-        response = requests.get(url, timeout=20)
+        response = request_get(
+            url,
+            tls_config=HttpTlsConfig(source_name="cninfo"),
+            timeout=20,
+        )
         response.raise_for_status()
         return response.content

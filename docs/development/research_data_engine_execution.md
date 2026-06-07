@@ -1456,6 +1456,41 @@ technical readiness 接口会聚合：
 - 新模块必须先补单元测试，再考虑开放接口
 - 文档、配置、代码状态不一致时，以“代码实际能力 + 本文档状态定义”为准，并及时回写文档
 
+### 7.1 自研 HTTP/HTTPS transport 统一治理
+
+当前 active OpenSpec change 为 `standardize-http-transport`，用于把项目自研 provider 中直接发起的 HTTP/HTTPS 请求统一收口到共享 transport 层。该变更的边界是“项目代码自己调用 `requests`、`urllib` 或后续 aiohttp 的请求”，暂不接管 AkShare、yfinance、BaoStock、PyTDX、Tushare 等第三方库内部联网行为。
+
+背景与现状：
+
+- `2026-06-07` 的 `industry_standard_sync` 异常确认是申万官网新证书链未完整下发导致默认 CA 校验失败；项目已有的 SWS extra CA 机制需要提升为通用能力。
+- 现场 TLS 快速探测显示，当前主要源中只有 `www.swsresearch.com` 复现 `unable to get local issuer certificate`；CNInfo、static.cninfo、SSE、query.sse、BSE、HKEX/HKEXnews、Eastmoney、Sina、legulegu、Yahoo、PyPI 的证书校验结果均为正常。HTTP `403/429/500` 属于请求方法、限流或反爬策略问题，不归类为 TLS 证书链问题。
+- `research/providers/akshare_swsresearch_index_analysis.py` 虽然命名包含 AkShare，但实际由项目代码直连 SWS API，且存在 `verify=False`，必须纳入第一批迁移并移除。
+
+第一批迁移清单：
+
+| 模块 | 当前请求方式 | 迁移要求 |
+|---|---|---|
+| `research/providers/swsresearch_shenwan_classification.py` | `requests.Session.get` | 使用共享 transport 的 requests verify 策略，保留 source manifest 与条件请求语义 |
+| `research/providers/swsresearch_index_analysis.py` | `requests.Session.get` | 使用共享 transport 的 SWS extra CA 策略 |
+| `research/providers/akshare_swsresearch_index_analysis.py` | `requests.Session.get` | 移除 `verify=False`，改用共享 transport；保留历史 index-analysis fallback 语义 |
+| `research/providers/akshare_shenwan_industry.py` | `requests.get` | Legulegu 直连请求改用共享 transport |
+| `research/providers/cninfo_announcements.py` | `requests.Session.post` | 巨潮公告扫描改用共享 session/verify 策略 |
+| `research/providers/cninfo_shareholders.py` | `requests.Session.get` | 巨潮 data20 股东请求改用共享 session/verify 策略 |
+| `research/providers/official_financial_filings.py` | `requests.Session.get/request` | SSE/CNInfo/BSE 官方财报候选端点改用共享 session/verify 策略 |
+| `research/providers/eastmoney_industry_supplement.py` | `requests.Session.get` | 东财补源改用共享 session/verify 策略 |
+| `research/providers/sina_industry_supplement.py` | `requests.Session.get` | 新浪补源改用共享 session/verify 策略 |
+| `research/broker_risk_control.py` | `requests.get` | 巨潮附件下载改用共享 request helper |
+| `data_sources/hkex_instrument_master.py` | `urllib.request.urlopen` | HKEX/HKEXnews 官方主数据下载改用共享 `urlopen_bytes` / SSL context helper |
+
+统一规则：
+
+- 生产 provider 默认必须启用 HTTPS 证书校验；`verify=False` 不允许出现在生产 provider 代码中。
+- 额外 CA 证书路径必须支持项目根相对路径，即使 scheduler 或 CLI 的当前工作目录不是 `/home/python/Quote` 也应可解析。
+- `sources.<source>.tls.extra_ca_cert_path` 可作为 source-level 默认；provider 局部 `extra_ca_cert_path` 继续保留，优先级高于 source-level 默认。
+- transport 层只负责 TLS、session/request 构造和基础错误上下文；各 provider 的 timeout、retry、request interval、headers、分页、payload 校验、反爬策略和 parser diagnostics 仍由 provider 自己维护。
+- 迁移 transport 不得触发 source files、行业 membership、财务 facts、HKEX lifecycle rows 或其他缓存资产的无内容重写。
+- 单元测试必须加入生产代码 `verify=False` 守门；测试 fixture 或明确标注的非生产 probe 可以例外。
+
 ---
 
 ## 8. 当前结论

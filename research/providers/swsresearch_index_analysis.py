@@ -11,9 +11,11 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from utils import dm_logger
+from utils.http_transport import HttpTlsConfig, create_requests_session
+
 from .base import BaseIndustryIndexAnalysisProvider, IndustryIndexAnalysisSnapshot
 from .tls_support import build_ca_bundle_with_extra_certificate
-from utils import dm_logger
 
 
 class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
@@ -72,6 +74,10 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
         self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
         self.page_size = max(1, int(page_size))
         self.max_pages_per_type = max(1, int(max_pages_per_type))
+        self.tls_config = HttpTlsConfig(
+            source_name=self.source_name,
+            extra_ca_cert_path=extra_ca_cert_path,
+        )
         self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
 
     async def fetch_latest_index_analysis(
@@ -103,7 +109,7 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
         end_date: Optional[str] = None,
         latest_date: Optional[str] = None,
     ) -> List[IndustryIndexAnalysisSnapshot]:
-        session = requests.Session()
+        session = create_requests_session(tls_config=self.tls_config)
         rows: List[IndustryIndexAnalysisSnapshot] = []
         requested_start = _normalize_optional_date(start_date)
         requested_end = _normalize_optional_date(end_date)

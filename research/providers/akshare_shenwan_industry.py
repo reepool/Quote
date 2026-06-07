@@ -12,9 +12,9 @@ from io import StringIO
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-import requests
 
 from utils import dm_logger
+from utils.http_transport import HttpTlsConfig, request_get
 
 from .akshare_support import load_akshare
 from .base import (
@@ -86,6 +86,7 @@ class AkshareShenwanIndustryProvider(BaseIndustryStandardProvider):
         )
         self.max_failed_constituent_pages = max_failed_constituent_pages
         self.failed_code_sample_limit = max(1, failed_code_sample_limit)
+        self.tls_config = HttpTlsConfig(source_name=self.source_name)
         self._taxonomy_cache: Optional[_ShenwanTaxonomyCache] = None
         self._last_fetch_metadata: Dict[str, Any] = {}
 
@@ -386,8 +387,9 @@ class AkshareShenwanIndustryProvider(BaseIndustryStandardProvider):
         mode: str,
     ) -> pd.DataFrame:
         load_akshare(mode)
-        response = requests.get(
+        response = request_get(
             self.constituent_base_url,
+            tls_config=self.tls_config,
             params={"industryCode": third_code},
             headers=self._request_headers(),
             timeout=self.constituent_request_timeout_seconds,

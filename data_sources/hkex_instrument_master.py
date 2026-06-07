@@ -11,12 +11,13 @@ import hashlib
 import json
 import re
 import time
-import urllib.request
 from dataclasses import dataclass, field
 from io import BytesIO, StringIO
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 import pandas as pd
+
+from utils.http_transport import HttpTlsConfig, urlopen_bytes
 
 
 HKEX_MASTER_PARSER_VERSION = "hkex-instrument-master-v1"
@@ -60,13 +61,13 @@ def _fetch_url_bytes(
         raise ValueError("source_url is required")
     last_error: Optional[Exception] = None
     for attempt in range(1, max(1, attempts) + 1):
-        request = urllib.request.Request(
-            source_url,
-            headers={"User-Agent": user_agent},
-        )
         try:
-            with urllib.request.urlopen(request, timeout=timeout_sec) as response:
-                return response.read()
+            return urlopen_bytes(
+                source_url,
+                timeout_sec=timeout_sec,
+                user_agent=user_agent,
+                tls_config=HttpTlsConfig(source_name="hkex"),
+            )
         except Exception as exc:
             last_error = exc
             if attempt >= attempts:

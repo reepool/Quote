@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from utils import dm_logger
+from utils.http_transport import HttpTlsConfig, create_requests_session
 
 from .base import BaseIndustryNameSupplementProvider, IndustryNameHintSnapshot
 
@@ -41,6 +42,7 @@ class EastmoneyIndustryNameSupplementProvider(BaseIndustryNameSupplementProvider
         self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
         self.taxonomy_system = taxonomy_system
         self.taxonomy_version = taxonomy_version
+        self.tls_config = HttpTlsConfig(source_name=self.source_name)
 
     async def fetch_industry_name_hints(
         self,
@@ -76,7 +78,7 @@ class EastmoneyIndustryNameSupplementProvider(BaseIndustryNameSupplementProvider
         exchange: str,
         mode: str,
     ) -> List[IndustryNameHintSnapshot]:
-        session = requests.Session()
+        session = create_requests_session(tls_config=self.tls_config)
         hints: List[IndustryNameHintSnapshot] = []
 
         for index, instrument in enumerate(target_instruments):

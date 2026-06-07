@@ -301,7 +301,9 @@ class IndustryStandardProviderRegistry:
             "industry_standard",
             {},
         )
-        swsresearch_cfg = research_config.sources.get("swsresearch", {}).get(
+        swsresearch_source_cfg = research_config.sources.get("swsresearch", {})
+        swsresearch_tls_cfg = swsresearch_source_cfg.get("tls", {})
+        swsresearch_cfg = swsresearch_source_cfg.get(
             "industry_standard",
             {},
         )
@@ -337,7 +339,8 @@ class IndustryStandardProviderRegistry:
                 ),
                 minimum_code_rows=swsresearch_cfg.get("minimum_code_rows", 400),
                 symbol_aliases=swsresearch_cfg.get("symbol_aliases", []),
-                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path"),
+                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path")
+                or swsresearch_tls_cfg.get("extra_ca_cert_path"),
             ),
             "akshare": AkshareShenwanIndustryProvider(
                 taxonomy_system=industry_standard_cfg.get("taxonomy_system", "sw"),
@@ -455,7 +458,9 @@ class OfficialIndustryHistoryProviderRegistry:
     ):
         research_config = research_config or config_manager.get_research_config()
         industry_standard_cfg = research_config.modules.get("industry", {}).get("standard", {})
-        swsresearch_cfg = research_config.sources.get("swsresearch", {}).get(
+        swsresearch_source_cfg = research_config.sources.get("swsresearch", {})
+        swsresearch_tls_cfg = swsresearch_source_cfg.get("tls", {})
+        swsresearch_cfg = swsresearch_source_cfg.get(
             "industry_standard",
             {},
         )
@@ -491,7 +496,8 @@ class OfficialIndustryHistoryProviderRegistry:
                 ),
                 minimum_code_rows=swsresearch_cfg.get("minimum_code_rows", 400),
                 symbol_aliases=swsresearch_cfg.get("symbol_aliases", []),
-                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path"),
+                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path")
+                or swsresearch_tls_cfg.get("extra_ca_cert_path"),
             ),
             "akshare": AkshareOfficialShenwanHistoryProvider(),
         }
@@ -510,7 +516,9 @@ class IndustryIndexAnalysisProviderRegistry:
     ):
         research_config = research_config or config_manager.get_research_config()
         standard_cfg = research_config.modules.get("industry", {}).get("standard", {})
-        index_cfg = research_config.sources.get("swsresearch", {}).get("index_analysis", {})
+        swsresearch_source_cfg = research_config.sources.get("swsresearch", {})
+        swsresearch_tls_cfg = swsresearch_source_cfg.get("tls", {})
+        index_cfg = swsresearch_source_cfg.get("index_analysis", {})
         akshare_index_cfg = research_config.sources.get("akshare", {}).get(
             "index_analysis",
             {},
@@ -532,7 +540,8 @@ class IndustryIndexAnalysisProviderRegistry:
                 retry_backoff_seconds=index_cfg.get("retry_backoff_seconds", 0.5),
                 page_size=index_cfg.get("page_size", 200),
                 max_pages_per_type=index_cfg.get("max_pages_per_type", 10),
-                extra_ca_cert_path=index_cfg.get("extra_ca_cert_path"),
+                extra_ca_cert_path=index_cfg.get("extra_ca_cert_path")
+                or swsresearch_tls_cfg.get("extra_ca_cert_path"),
             ),
             "akshare": AkshareSWSResearchIndexAnalysisProvider(
                 endpoint=akshare_index_cfg.get(
@@ -563,6 +572,9 @@ class IndustryIndexAnalysisProviderRegistry:
                 ),
                 page_size=akshare_index_cfg.get("page_size", 50),
                 max_pages_per_type=akshare_index_cfg.get("max_pages_per_type", 200),
+                extra_ca_cert_path=akshare_index_cfg.get("extra_ca_cert_path")
+                or index_cfg.get("extra_ca_cert_path")
+                or swsresearch_tls_cfg.get("extra_ca_cert_path"),
             ),
         }
 

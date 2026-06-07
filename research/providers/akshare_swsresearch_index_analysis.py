@@ -12,12 +12,9 @@ from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional
 
 import requests
-import urllib3
 
 from .base import BaseIndustryIndexAnalysisProvider, IndustryIndexAnalysisSnapshot
-
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from utils.http_transport import HttpTlsConfig, create_requests_session
 
 
 class AkshareSWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
@@ -85,6 +82,7 @@ class AkshareSWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider)
         request_interval_seconds: float = 0.0,
         page_size: int = 50,
         max_pages_per_type: int = 200,
+        extra_ca_cert_path: Optional[str] = None,
     ):
         self.endpoint = endpoint
         self.taxonomy_system = taxonomy_system
@@ -96,6 +94,10 @@ class AkshareSWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider)
         self.request_interval_seconds = max(0.0, float(request_interval_seconds))
         self.page_size = max(1, int(page_size))
         self.max_pages_per_type = max(1, int(max_pages_per_type))
+        self.tls_config = HttpTlsConfig(
+            source_name=self.source_name,
+            extra_ca_cert_path=extra_ca_cert_path,
+        )
         self._last_request_started_at = 0.0
 
     async def fetch_latest_index_analysis(
@@ -137,7 +139,7 @@ class AkshareSWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider)
             raise ValueError("start_date must be earlier than or equal to end_date")
 
         snapshots: List[IndustryIndexAnalysisSnapshot] = []
-        session = requests.Session()
+        session = create_requests_session(tls_config=self.tls_config)
         for index_type in index_types:
             records = self._fetch_records(
                 session,
@@ -248,7 +250,6 @@ class AkshareSWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider)
                     )
                 },
                 timeout=self.request_timeout_seconds,
-                verify=False,
             )
         finally:
             socket.setdefaulttimeout(old_default_timeout)
