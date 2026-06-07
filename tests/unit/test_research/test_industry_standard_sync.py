@@ -859,6 +859,17 @@ class _MockSWSResearchOfficialBundleProvider(BaseIndustryStandardProvider):
         return []
 
 
+class _FailingSWSResearchOfficialBundleProvider(_MockSWSResearchOfficialBundleProvider):
+    async def fetch_official_classification_bundle(
+        self,
+        *,
+        mode="direct",
+        previous_source_files=None,
+        force_refresh=False,
+    ):
+        raise RuntimeError("certificate verify failed")
+
+
 class _EmptyTaxonomyIndustryStandardProvider(BaseIndustryStandardProvider):
     source_name = "akshare"
 
@@ -1006,6 +1017,78 @@ async def test_industry_standard_sync_uses_swsresearch_official_bundle_primary(t
     assert tuple(official_row) == ("340501", "340501", "mapped")
     assert history_count == 1
     assert source_file_count == 2
+
+
+@pytest.mark.asyncio
+async def test_industry_standard_sync_reports_existing_coverage_when_official_source_fails(
+    tmp_path,
+):
+    research_config = _build_research_config(
+        tmp_path,
+        industry_module={
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "classification_primary_enabled": True,
+            },
+        },
+    )
+    research_config.routing["industry_standard"]["free_chain"] = [
+        {"source": "swsresearch", "mode": "direct"}
+    ]
+    research_config.sources["swsresearch"] = {
+        "enabled": True,
+        "supports_proxy_patch": False,
+        "cost_tier": "free",
+    }
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    instruments = [
+        {
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "name": "贵州茅台",
+            "exchange": "SSE",
+            "type": "stock",
+            "is_active": True,
+        }
+    ]
+    db_ops = _MockDbOps(instruments=instruments)
+    service = IndustryStandardSyncService(
+        db_ops=db_ops,
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=IndustryStandardProviderRegistry(
+            {"swsresearch": _MockSWSResearchOfficialBundleProvider()}
+        ),
+        official_registry=OfficialIndustryHistoryProviderRegistry({}),
+    )
+    await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+
+    failing_service = IndustryStandardSyncService(
+        db_ops=db_ops,
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=IndustryStandardProviderRegistry(
+            {"swsresearch": _FailingSWSResearchOfficialBundleProvider()}
+        ),
+        official_registry=OfficialIndustryHistoryProviderRegistry({}),
+    )
+
+    result = await failing_service.sync(exchanges=["SSE"], limit_per_exchange=1)
+
+    assert result["status"] == "degraded"
+    assert result["source_unavailable"] is True
+    assert result["total_memberships_written"] == 0
+    assert result["reason"].startswith("官方分类上游临时不可用")
+    diagnostics = result["exchanges"][0]["diagnostics"]
+    assert diagnostics["source_unavailable"] is True
+    assert diagnostics["existing_authoritative_memberships"] == 1
+    assert diagnostics["target_instruments"] == 1
 
 
 @pytest.mark.asyncio

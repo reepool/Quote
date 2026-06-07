@@ -99,6 +99,41 @@ def test_industry_standard_sync_report_uses_operator_facing_content(monkeypatch)
     assert "任务执行状态" not in content
 
 
+def test_industry_standard_sync_report_uses_degraded_reason_and_existing_coverage():
+    content = task_module._format_industry_standard_scheduler_report(
+        {
+            "status": "degraded",
+            "source": "swsresearch",
+            "mode": "direct",
+            "reason": "官方分类上游临时不可用，本次未写入新数据；本地 authoritative coverage 已在交易所明细中列出。",
+            "successful_exchanges": 0,
+            "attempted_exchanges": 1,
+            "taxonomy_nodes_written": 0,
+            "classification_history_rows_written": 0,
+            "total_memberships_written": 0,
+            "total_official_classifications_written": 0,
+            "exchanges": [
+                {
+                    "exchange": "SSE",
+                    "status": "degraded",
+                    "memberships_written": 0,
+                    "official_classifications_written": 0,
+                    "diagnostics": {
+                        "source_unavailable": True,
+                        "existing_authoritative_memberships": 2315,
+                        "target_instruments": 2315,
+                    },
+                    "error_message": "certificate verify failed",
+                }
+            ],
+        }
+    )
+
+    assert "官方分类上游临时不可用" in content
+    assert "existing=2315/2315" in content
+    assert "reason=certificate verify failed" in content
+
+
 def test_industry_index_analysis_sync_report_uses_operator_facing_content(monkeypatch):
     task = ScheduledTasks.__new__(ScheduledTasks)
     task.config = Mock()

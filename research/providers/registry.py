@@ -454,8 +454,45 @@ class OfficialIndustryHistoryProviderRegistry:
         research_config: Optional[ResearchConfig] = None,
     ):
         research_config = research_config or config_manager.get_research_config()
+        industry_standard_cfg = research_config.modules.get("industry", {}).get("standard", {})
+        swsresearch_cfg = research_config.sources.get("swsresearch", {}).get(
+            "industry_standard",
+            {},
+        )
         self._providers = providers if providers is not None else {
-            "swsresearch": SWSResearchShenwanClassificationProvider(),
+            "swsresearch": SWSResearchShenwanClassificationProvider(
+                taxonomy_system=industry_standard_cfg.get("taxonomy_system", "sw"),
+                taxonomy_version=industry_standard_cfg.get("taxonomy_version", "sw_2021"),
+                stock_history_url=swsresearch_cfg.get(
+                    "stock_history_url",
+                    (
+                        "https://www.swsresearch.com/swindex/pdf/SwClass2021/"
+                        "StockClassifyUse_stock.xls"
+                    ),
+                ),
+                code_table_url=swsresearch_cfg.get(
+                    "code_table_url",
+                    (
+                        "https://www.swsresearch.com/swindex/pdf/SwClass2021/"
+                        "SwClassCode_2021.xls"
+                    ),
+                ),
+                request_timeout_seconds=swsresearch_cfg.get(
+                    "request_timeout_seconds",
+                    30.0,
+                ),
+                parser_version=swsresearch_cfg.get(
+                    "parser_version",
+                    "swsresearch_shenwan_classification.v1",
+                ),
+                minimum_stock_history_rows=swsresearch_cfg.get(
+                    "minimum_stock_history_rows",
+                    5000,
+                ),
+                minimum_code_rows=swsresearch_cfg.get("minimum_code_rows", 400),
+                symbol_aliases=swsresearch_cfg.get("symbol_aliases", []),
+                extra_ca_cert_path=swsresearch_cfg.get("extra_ca_cert_path"),
+            ),
             "akshare": AkshareOfficialShenwanHistoryProvider(),
         }
 

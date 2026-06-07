@@ -768,31 +768,14 @@ class IndustryStandardSyncService:
                 "[IndustryStandardSync] Official SWS classification source failed: %s",
                 exc,
             )
-            return {
-                "status": "degraded",
-                "source": candidate_source,
-                "mode": candidate_mode,
-                "attempted_sources": attempted_sources,
-                "taxonomy_nodes_written": 0,
-                "classification_history_rows_written": 0,
-                "total_memberships_written": 0,
-                "total_official_classifications_written": 0,
-                "successful_exchanges": 0,
-                "attempted_exchanges": len(target_exchanges),
-                "exchanges": [
-                    asdict(
-                        IndustryStandardExchangeSyncResult(
-                            exchange=exchange,
-                            status="degraded",
-                            source=candidate_source,
-                            mode=candidate_mode,
-                            diagnostics={"official_classification_primary": True},
-                            error_message=str(exc),
-                        )
-                    )
-                    for exchange in target_exchanges
-                ],
-            }
+            return self._build_source_unavailable_official_classification_result(
+                candidate_source=candidate_source,
+                candidate_mode=candidate_mode,
+                attempted_sources=attempted_sources,
+                target_exchanges=target_exchanges,
+                instruments_by_exchange=instruments_by_exchange,
+                error_message=str(exc),
+            )
 
         if not bundle.changed:
             dm_logger.info(
@@ -970,31 +953,14 @@ class IndustryStandardSyncService:
                 mode=candidate_mode,
             )
         except Exception as exc:
-            return {
-                "status": "degraded",
-                "source": candidate_source,
-                "mode": candidate_mode,
-                "attempted_sources": attempted_sources,
-                "taxonomy_nodes_written": 0,
-                "classification_history_rows_written": 0,
-                "total_memberships_written": 0,
-                "total_official_classifications_written": 0,
-                "successful_exchanges": 0,
-                "attempted_exchanges": len(target_exchanges),
-                "exchanges": [
-                    asdict(
-                        IndustryStandardExchangeSyncResult(
-                            exchange=exchange,
-                            status="degraded",
-                            source=candidate_source,
-                            mode=candidate_mode,
-                            diagnostics={"official_classification_primary": True},
-                            error_message=str(exc),
-                        )
-                    )
-                    for exchange in target_exchanges
-                ],
-            }
+            return self._build_source_unavailable_official_classification_result(
+                candidate_source=candidate_source,
+                candidate_mode=candidate_mode,
+                attempted_sources=attempted_sources,
+                target_exchanges=target_exchanges,
+                instruments_by_exchange=instruments_by_exchange,
+                error_message=str(exc),
+            )
 
         latest_by_symbol = {
             str(snapshot.symbol).strip(): snapshot for snapshot in latest_classifications
@@ -1225,6 +1191,77 @@ class IndustryStandardSyncService:
             "total_memberships_written": 0,
             "total_official_classifications_written": 0,
             "successful_exchanges": successful_exchanges,
+            "attempted_exchanges": len(exchange_results),
+            "exchanges": [asdict(result) for result in exchange_results],
+        }
+
+    def _build_source_unavailable_official_classification_result(
+        self,
+        *,
+        candidate_source: str,
+        candidate_mode: str,
+        attempted_sources: List[str],
+        target_exchanges: List[str],
+        instruments_by_exchange: Dict[str, List[Dict[str, Any]]],
+        error_message: str,
+    ) -> Dict[str, Any]:
+        standard_cfg = self.research_config.modules.get("industry", {}).get("standard", {})
+        taxonomy_system = str(standard_cfg.get("taxonomy_system", "sw"))
+        taxonomy_version = str(standard_cfg.get("taxonomy_version", "sw_2021"))
+        authoritative_by_exchange = self.storage.count_industry_memberships_by_exchange(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            mapping_status="authoritative",
+        )
+        exchange_results: List[IndustryStandardExchangeSyncResult] = []
+        for exchange in target_exchanges:
+            target_count = len(instruments_by_exchange.get(exchange, []))
+            if target_count <= 0:
+                exchange_results.append(
+                    IndustryStandardExchangeSyncResult(
+                        exchange=exchange,
+                        status="skipped",
+                        source=candidate_source,
+                        mode=candidate_mode,
+                        error_message="No active stock instruments found for exchange",
+                    )
+                )
+                continue
+            exchange_results.append(
+                IndustryStandardExchangeSyncResult(
+                    exchange=exchange,
+                    status="degraded",
+                    memberships_written=0,
+                    official_classifications_written=0,
+                    source=candidate_source,
+                    mode=candidate_mode,
+                    diagnostics={
+                        "official_classification_primary": True,
+                        "source_unavailable": True,
+                        "existing_authoritative_memberships": int(
+                            authoritative_by_exchange.get(exchange, 0)
+                        ),
+                        "target_instruments": target_count,
+                    },
+                    error_message=error_message,
+                )
+            )
+        return {
+            "status": "degraded",
+            "source": candidate_source,
+            "mode": candidate_mode,
+            "attempted_sources": attempted_sources,
+            "official_classification_primary": True,
+            "source_unavailable": True,
+            "reason": (
+                "官方分类上游临时不可用，本次未写入新数据；"
+                "本地 authoritative coverage 已在交易所明细中列出。"
+            ),
+            "taxonomy_nodes_written": 0,
+            "classification_history_rows_written": 0,
+            "total_memberships_written": 0,
+            "total_official_classifications_written": 0,
+            "successful_exchanges": 0,
             "attempted_exchanges": len(exchange_results),
             "exchanges": [asdict(result) for result in exchange_results],
         }

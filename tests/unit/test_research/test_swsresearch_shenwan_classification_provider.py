@@ -67,6 +67,21 @@ def test_swsresearch_extra_ca_bundle_keeps_tls_verification_enabled():
     assert Path(cert_path).read_text().strip() in Path(str(bundle)).read_text()
 
 
+def test_swsresearch_extra_ca_bundle_resolves_project_relative_path_from_other_cwd(
+    monkeypatch,
+    tmp_path,
+):
+    cert_path = "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt"
+    monkeypatch.chdir(tmp_path)
+
+    bundle = build_ca_bundle_with_extra_certificate(cert_path)
+
+    assert bundle is not True
+    assert Path(str(bundle)).exists()
+    project_cert = Path(__file__).resolve().parents[3] / cert_path
+    assert project_cert.read_text().strip() in Path(str(bundle)).read_text()
+
+
 def test_swsresearch_provider_parses_official_taxonomy_levels():
     provider = SWSResearchShenwanClassificationProvider(
         minimum_stock_history_rows=1,

@@ -22,7 +22,9 @@ def build_ca_bundle_with_extra_certificate(extra_certificate_path: Optional[str]
 
     extra_path = Path(extra_certificate_path).expanduser()
     if not extra_path.is_absolute():
-        extra_path = Path.cwd() / extra_path
+        cwd_path = Path.cwd() / extra_path
+        project_path = Path(__file__).resolve().parents[2] / extra_path
+        extra_path = cwd_path if cwd_path.exists() else project_path
     if not extra_path.exists():
         dm_logger.warning("[TLS] Extra CA certificate not found: %s", extra_path)
         return True

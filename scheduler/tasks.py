@@ -676,7 +676,7 @@ def _format_industry_standard_scheduler_report(result: Dict[str, Any]) -> str:
             f"{history_rows} 条分类历史。"
         )
     elif status == "degraded":
-        conclusion = "同步部分完成，至少存在交易所覆盖不足或上游/本地校验异常。"
+        conclusion = reason or "同步部分完成，至少存在交易所覆盖不足或上游/本地校验异常。"
     elif status in {"skipped", "disabled", "unavailable"}:
         conclusion = reason or "任务未执行，请查看原因和交易所明细。"
     else:
