@@ -12,10 +12,13 @@ from typing import Any, Dict, List, Optional
 import requests
 
 from utils import dm_logger
-from utils.http_transport import HttpTlsConfig, create_requests_session
+from utils.http_transport import (
+    HttpTlsConfig,
+    create_requests_session,
+    resolve_requests_verify,
+)
 
 from .base import BaseIndustryIndexAnalysisProvider, IndustryIndexAnalysisSnapshot
-from .tls_support import build_ca_bundle_with_extra_certificate
 
 
 class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
@@ -78,7 +81,7 @@ class SWSResearchIndexAnalysisProvider(BaseIndustryIndexAnalysisProvider):
             source_name=self.source_name,
             extra_ca_cert_path=extra_ca_cert_path,
         )
-        self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
+        self.request_verify = resolve_requests_verify(self.tls_config)
 
     async def fetch_latest_index_analysis(
         self,

@@ -67,6 +67,13 @@ def test_swsresearch_extra_ca_bundle_keeps_tls_verification_enabled():
     assert Path(cert_path).read_text().strip() in Path(str(bundle)).read_text()
 
 
+def test_swsresearch_provider_uses_known_extra_ca_by_default():
+    provider = SWSResearchShenwanClassificationProvider()
+
+    assert provider.request_verify is not True
+    assert Path(str(provider.request_verify)).exists()
+
+
 def test_swsresearch_extra_ca_bundle_resolves_project_relative_path_from_other_cwd(
     monkeypatch,
     tmp_path,

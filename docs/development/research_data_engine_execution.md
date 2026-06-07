@@ -1487,6 +1487,7 @@ technical readiness 接口会聚合：
 - 生产 provider 默认必须启用 HTTPS 证书校验；`verify=False` 不允许出现在生产 provider 代码中。
 - 额外 CA 证书路径必须支持项目根相对路径，即使 scheduler 或 CLI 的当前工作目录不是 `/home/python/Quote` 也应可解析。
 - `sources.<source>.tls.extra_ca_cert_path` 可作为 source-level 默认；provider 局部 `extra_ca_cert_path` 继续保留，优先级高于 source-level 默认。
+- 对已确认的上游证书链缺口，transport 可提供 source-known extra CA 兜底；当前 `swsresearch`、`swsresearch_index_analysis_direct`、`akshare_swsresearch_index_analysis` 会在未显式配置 CA 时自动使用项目内 GeoTrust CA 文件，避免绕过 registry 或配置缓存时退回裸系统 CA。
 - transport 层只负责 TLS、session/request 构造和基础错误上下文；各 provider 的 timeout、retry、request interval、headers、分页、payload 校验、反爬策略和 parser diagnostics 仍由 provider 自己维护。
 - 迁移 transport 不得触发 source files、行业 membership、财务 facts、HKEX lifecycle rows 或其他缓存资产的无内容重写。
 - 单元测试必须加入生产代码 `verify=False` 守门；测试 fixture 或明确标注的非生产 probe 可以例外。

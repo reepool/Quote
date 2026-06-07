@@ -18,6 +18,12 @@ from .logging_manager import dm_logger
 
 VerifySetting = Union[bool, str]
 
+SOURCE_DEFAULT_EXTRA_CA_CERT_PATHS = {
+    "akshare_swsresearch_index_analysis": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
+    "swsresearch": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
+    "swsresearch_index_analysis_direct": "config/certs/geotrust_g2_tls_cn_rsa4096_sha256_2022_ca1.crt",
+}
+
 
 @dataclass(frozen=True)
 class HttpTlsConfig:
@@ -103,7 +109,12 @@ def resolve_requests_verify(tls_config: Optional[HttpTlsConfig] = None) -> Verif
         return False
     if tls_config is None:
         return True
-    return build_ca_bundle_with_extra_certificate(tls_config.extra_ca_cert_path)
+    extra_ca_cert_path = tls_config.extra_ca_cert_path
+    if not extra_ca_cert_path and tls_config.source_name:
+        extra_ca_cert_path = SOURCE_DEFAULT_EXTRA_CA_CERT_PATHS.get(
+            tls_config.source_name
+        )
+    return build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
 
 
 def create_requests_session(

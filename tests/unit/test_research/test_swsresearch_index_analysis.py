@@ -81,6 +81,13 @@ def test_swsresearch_index_analysis_accepts_extra_ca_bundle():
     assert Path(str(provider.request_verify)).exists()
 
 
+def test_swsresearch_index_analysis_uses_known_extra_ca_by_default():
+    provider = SWSResearchIndexAnalysisProvider()
+
+    assert provider.request_verify is not True
+    assert Path(str(provider.request_verify)).exists()
+
+
 def test_akshare_swsresearch_index_analysis_parses_history_row_with_units():
     provider = AkshareSWSResearchIndexAnalysisProvider()
 

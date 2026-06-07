@@ -7,6 +7,7 @@ from utils.http_transport import (
     create_requests_session,
     create_ssl_context,
     resolve_project_relative_path,
+    resolve_requests_verify,
     urlopen_bytes,
 )
 
@@ -35,6 +36,13 @@ def test_create_requests_session_sets_shared_verify_policy():
 
     assert session.verify is not True
     assert Path(str(session.verify)).exists()
+
+
+def test_swsresearch_source_uses_known_extra_ca_by_default():
+    verify = resolve_requests_verify(HttpTlsConfig(source_name="swsresearch"))
+
+    assert verify is not True
+    assert Path(str(verify)).exists()
 
 
 def test_create_ssl_context_uses_extra_ca_bundle():

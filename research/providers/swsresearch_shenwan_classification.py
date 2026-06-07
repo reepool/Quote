@@ -15,7 +15,11 @@ import pandas as pd
 import requests
 
 from utils import dm_logger
-from utils.http_transport import HttpTlsConfig, create_requests_session
+from utils.http_transport import (
+    HttpTlsConfig,
+    create_requests_session,
+    resolve_requests_verify,
+)
 
 from .base import (
     BaseIndustryStandardProvider,
@@ -26,7 +30,6 @@ from .base import (
     IndustryTaxonomySnapshot,
     OfficialIndustryHistorySnapshot,
 )
-from .tls_support import build_ca_bundle_with_extra_certificate
 
 
 @dataclass(frozen=True)
@@ -90,7 +93,7 @@ class SWSResearchShenwanClassificationProvider(
             source_name=self.source_name,
             extra_ca_cert_path=extra_ca_cert_path,
         )
-        self.request_verify = build_ca_bundle_with_extra_certificate(extra_ca_cert_path)
+        self.request_verify = resolve_requests_verify(self.tls_config)
         self._bundle_cache: Optional[SWSResearchClassificationBundle] = None
         self._last_fetch_metadata: Dict[str, Any] = {}
 
