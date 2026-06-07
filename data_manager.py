@@ -5068,6 +5068,12 @@ class DataManager:
         )
         if financial_bundle is None:
             return None
+        financial_bundle = await asyncio.to_thread(
+            self._enrich_dcf_bundle_with_broker_risk_control_facts,
+            storage,
+            normalized_id,
+            financial_bundle,
+        )
 
         latest_quotes = await self.db_ops.get_daily_data(
             instrument_id=normalized_id,
@@ -5155,6 +5161,139 @@ class DataManager:
         )
         self._store_dcf_run_cache(cache_key, result, module_cfg)
         return result
+
+    def _enrich_dcf_bundle_with_broker_risk_control_facts(
+        self,
+        storage: Any,
+        instrument_id: str,
+        financial_bundle: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Merge local broker risk-control canonical facts into the DCF input bundle."""
+        from research.broker_risk_control import BROKER_RISK_CONTROL_CANONICAL_FACTS
+
+        if not hasattr(storage, "get_financial_numeric_facts"):
+            return financial_bundle
+        enriched = deepcopy(financial_bundle)
+        latest_facts = enriched.setdefault("latest_facts", {})
+        if not isinstance(latest_facts, dict):
+            latest_facts = {}
+            enriched["latest_facts"] = latest_facts
+        lineage = enriched.setdefault("lineage", {})
+        if not isinstance(lineage, dict):
+            lineage = {}
+            enriched["lineage"] = lineage
+        selected_rows: Dict[str, Dict[str, Any]] = {}
+        for canonical_name in BROKER_RISK_CONTROL_CANONICAL_FACTS:
+            try:
+                rows = storage.get_financial_numeric_facts(
+                    instrument_id,
+                    include_history=True,
+                    canonical_fact_name=canonical_name,
+                    limit=8,
+                )
+            except Exception:
+                continue
+            if not isinstance(rows, list):
+                continue
+            row = self._select_latest_broker_risk_control_fact(rows)
+            if row is None:
+                continue
+            selected_rows[canonical_name] = row
+            latest_facts.setdefault(canonical_name, row.get("fact_value"))
+            enriched.setdefault(canonical_name, row.get("fact_value"))
+
+        if not selected_rows:
+            return enriched
+
+        facts_lineage = {}
+        for canonical_name, row in selected_rows.items():
+            raw_fact = row.get("raw_fact") or {}
+            dimensions = row.get("dimensions") or {}
+            source_file_id = row.get("source_file_id")
+            manifest = self._find_financial_source_manifest(
+                storage,
+                instrument_id=instrument_id,
+                report_period=row.get("report_period"),
+                source=row.get("source"),
+                source_file_id=source_file_id,
+            )
+            facts_lineage[canonical_name] = {
+                "canonical_fact_name": canonical_name,
+                "report_period": row.get("report_period"),
+                "source_profile": raw_fact.get("source_profile"),
+                "source": row.get("source"),
+                "source_mode": row.get("source_mode"),
+                "source_file_id": source_file_id,
+                "unit": row.get("unit"),
+                "canonical_unit": row.get("canonical_unit"),
+                "data_available_date": (
+                    row.get("data_available_date")
+                    or (manifest or {}).get("published_at")
+                    or (manifest or {}).get("downloaded_at")
+                ),
+                "parser_version": row.get("parser_version"),
+                "report_scope": dimensions.get("report_scope") or raw_fact.get("report_scope"),
+                "physical_table": row.get("physical_table"),
+            }
+        lineage["broker_risk_control"] = {
+            "source_profile": "broker_risk_control_report",
+            "facts": facts_lineage,
+        }
+        net_capital_lineage = facts_lineage.get("net_capital") or {}
+        if net_capital_lineage:
+            latest_facts.setdefault(
+                "net_capital_report_scope",
+                net_capital_lineage.get("report_scope"),
+            )
+            enriched.setdefault("net_capital_report_scope", net_capital_lineage.get("report_scope"))
+            latest_facts.setdefault(
+                "net_capital_data_available_date",
+                net_capital_lineage.get("data_available_date"),
+            )
+        return enriched
+
+    @staticmethod
+    def _select_latest_broker_risk_control_fact(
+        rows: List[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        candidates = [
+            row for row in rows if row.get("fact_value") is not None and row.get("report_period")
+        ]
+        if not candidates:
+            return None
+        return max(
+            candidates,
+            key=lambda row: (
+                str(row.get("report_period") or ""),
+                str(row.get("updated_at") or ""),
+            ),
+        )
+
+    @staticmethod
+    def _find_financial_source_manifest(
+        storage: Any,
+        *,
+        instrument_id: str,
+        report_period: Optional[str],
+        source: Optional[str],
+        source_file_id: Optional[str],
+    ) -> Optional[Dict[str, Any]]:
+        if not hasattr(storage, "get_financial_source_file_manifests"):
+            return None
+        try:
+            manifests = storage.get_financial_source_file_manifests(
+                instrument_id=instrument_id,
+                report_period=report_period,
+                source=source,
+            )
+        except Exception:
+            return None
+        if not isinstance(manifests, list):
+            return None
+        for manifest in manifests:
+            if manifest.get("source_file_id") == source_file_id:
+                return manifest
+        return manifests[0] if manifests else None
 
     async def get_research_dcf_assumptions(
         self,

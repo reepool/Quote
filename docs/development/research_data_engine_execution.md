@@ -18,6 +18,7 @@
 > 已归档财务 source profile 变更包：`openspec/changes/archive/2026-05-26-promote-cninfo-data20-financial-source/`
 > 已归档财务 coverage gap 分类变更包：`openspec/changes/archive/2026-05-26-classify-financial-coverage-gaps/`
 > 已归档财务行业专项字段包变更包：`openspec/changes/archive/2026-05-28-add-financial-industry-specific-fields/`
+> 当前证券风控指标财务事实变更包：`openspec/changes/add-broker-risk-control-financial-facts/`
 > 已归档 strict Shenwan / shareholder / metadata / scheduler housekeeping 变更包已统一移动到 `openspec/changes/archive/2026-06-01-*`
 > 已归档官方申万主源变更包：`openspec/changes/archive/2026-04-19-add-official-shenwan-membership-source/`
 > 已归档行业加固变更包：`openspec/changes/archive/2026-04-18-harden-research-industry-standard-rollout/`
@@ -271,6 +272,7 @@ Beta API 调用约定：
   - L1 本地核心层：以新浪和同花顺在 bank/nonbank profile 下通过审计的严格语义交集为准，提供高频、本地、统一单位的财务事实服务；同花顺因速度和长表结构暂定为候选主更新源，新浪作为互备和中文语义校验源。
   - L2 官方摘要校验层：CNInfo data20 只承担官方摘要大项校验，字段远少于新浪/同花顺/东财，单位为 `CNY_10K`，不能被当作完整三表源。
   - L3 远程扩展层：东财字段最宽但较慢，默认不写入本地核心层，仅当 AI/研究请求需要 L1 不覆盖字段时按需调用，并转换成同一 canonical schema、单位和口径后返回。
+- 证券行业补充层：`add-broker-risk-control-financial-facts` 将证券公司《风险控制指标报告》作为 `financial_statements` 下的 source profile，而不是独立数据域。该层写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。
 
 #### 4.5.1 下一阶段财务字段映射原则
 
@@ -544,6 +546,7 @@ technical readiness 接口会聚合：
 - 全数值事实长表与核心事实表分层；字段 alias、单位换算、parser version 全部配置化或版本化
 - 财务事实和派生指标按 hot/cold tier 维护：默认 hot window 为最近 `12` 个季度，历史数据进入 history tier；`12` 是配置默认值，不得写死在查询逻辑中
 - 读取 API 继续本地优先，不在请求时访问官方披露或第三方财务接口
+- 证券风控指标报告接入财务披露链路：历史回补按配置年度和证券公司 universe 扫描公告/PDF；增量更新按公告 watermark 只处理新披露或重试 pending 报告。`net_capital` 是 broker DCF blocker；风险覆盖率、资本杠杆率、LCR、NSFR、净资本/净资产、净资本/负债、自营/融资占净资本比例和风险资本准备分项作为证券 L1.5 专项事实与 DCF 风险诊断输入。风控报告中的操作风险收入行如被披露，只能保存为监管口径 P2 字段，不能替代年报分部收入。
 
 #### Stage G：估值基线
 
@@ -554,6 +557,7 @@ technical readiness 接口会聚合：
 - `relative valuation`
 - `DCF` engine abstraction
 - 专业 DCF 第一批实现：`ProfessionalDcfEngine` 已接管默认 DCF 计算路径，支持 `nonfinancial_fcff.v1`、模型 suitability scoring、FCFE/FCFF adapter、`data_available_date <= valuation_date` blocker、本地假设读取、profile discovery、readiness 和 input-gap API；2026-06-05 追加实现 `nonfinancial_fcfe.v1` 以及公用事业/REIT 轻量 DDM/分派模型
+- 证券 DCF 数据供给进入实施准备：`add-broker-risk-control-financial-facts` 已完成 OpenSpec artifacts，下一步实现证券风控指标报告的历史回补、公告增量更新、PDF 解析、canonical numeric facts 写入和 DCF input bundle 合并。
 - `valuation_history_rebuild`
 - `/api/v1/research/company/{instrument_id}/valuation/history`
 - `/api/v1/research/company/{instrument_id}/valuation/relative`
@@ -583,7 +587,7 @@ technical readiness 接口会聚合：
 - `details_json` 是日频高行数字段，必须保持 compact：落库使用短字段 `v=2` 格式，读取 API 自动还原为原长字段结构；保留输入 lineage、报告期、可得日、分母、指标状态和缺失原因，不保存完整 provider payload 或大体量 diagnostics。若需要完整审计，应放入源文件/raw payload 表或单独审计表，而不是在每个交易日重复写入。既有历史可通过 `scripts/research_valuation_storage_maintenance.py --compact-valuation-history-details --confirm-compact --vacuum` 分批压缩并释放空间；`2026-06-01` 生产库已完成 `2,707,947` 行迁移，`details_json` 文本合计约 `7.96GB -> 3.10GB`，`valuation.db` 文件约 `12GB -> 5.9GB`。
 - `relative valuation` 默认依赖 current authoritative `sw_l2` peer group
 - 相对估值默认从 `valuation.db.valuation_history + research.db.industry_memberships` 即时计算或使用 bounded aggregate cache，不持久化全量 `subject_stock x peer_stock x trade_date x metric` 矩阵
-- 专业 DCF 当前仍属于实时计算路径，不写入 `valuation_history`；本轮实现已覆盖普通非金融 FCFF、稳定非金融 FCFE、公用事业/REIT 轻量 DDM/分派模型、银行 residual income、模型选择/对比、FCFE/FCFF adapter、假设 lineage、本地 readiness、显式 assumption refresh diagnostics、投行级 xlsx workbook artifact 和进程内 bounded run cache，并已完成参数/API 合约硬化：比较输出返回候选 result object，FCFE 输入不足时 fail closed，suppression/terminal/scenario/workbook 参数具备明确语义，assumption fallback/缺失进入结构化诊断。证券/保险/地产/周期/控股公司等 profile 当前以 guardrail/partial 状态 fail closed，不得静默降级套用通用 FCFF；真实主备外部数据源刷新 adapter、跨进程 saved-run audit 和剩余金融/特殊行业实算模型仍是后续扩展。
+- 专业 DCF 当前仍属于实时计算路径，不写入 `valuation_history`；本轮实现已覆盖普通非金融 FCFF、稳定非金融 FCFE、公用事业/REIT 轻量 DDM/分派模型、银行 residual income、证券 normalized residual income + excess capital、模型选择/对比、FCFE/FCFF adapter、假设 lineage、本地 readiness、显式 assumption refresh diagnostics、投行级 xlsx workbook artifact 和进程内 bounded run cache，并已完成参数/API 合约硬化：比较输出返回候选 result object，FCFE 输入不足时 fail closed，suppression/terminal/scenario/workbook 参数具备明确语义，assumption fallback/缺失进入结构化诊断。保险/地产/周期/控股公司等 profile 当前以 guardrail/partial 状态 fail closed，不得静默降级套用通用 FCFF；真实主备外部数据源刷新 adapter、跨进程 saved-run audit 和剩余金融/特殊行业实算模型仍是后续扩展。
 - 个股估值历史分位默认从当前 canonical `valuation_history` 本地序列即时计算，不新建持久化分位矩阵。默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度；响应必须包含样本数量、窗口边界、分位、四分位统计和负值估值解释提示，尤其不能把负 PE 静默视为普通低估信号；当 `negative_policy=exclude` 排除当前非正值时，指标返回 `current_value_excluded` 且不返回有效分位
 - valuation rollout readiness 现在同时返回 `valuation_history` 覆盖、估值输入覆盖、metric coverage、财务 readiness、行业 readiness 与 storage 摘要
 - 在全市场 current authoritative membership 或 valuation input 覆盖不足时，relative valuation rollout 仍应保持 gated，而不是降级使用 reference-only 行业字段或从成交额/换手率反推市值

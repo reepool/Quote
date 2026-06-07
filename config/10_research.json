@@ -235,6 +235,100 @@
             }
           ]
         },
+        "broker_risk_control_reports": {
+          "enabled": false,
+          "source_profile": "broker_risk_control_report",
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "title_patterns": [
+            "风险控制指标相关情况报告",
+            "风险控制指标报告",
+            "风险控制指标"
+          ],
+          "instrument_scope": {
+            "enabled": true,
+            "industry_keywords": [
+              "证券",
+              "券商"
+            ],
+            "override_allowed": true,
+            "note": "Only securities-company instruments are targeted by default; validation may override this for bounded fixtures."
+          },
+          "artifact": {
+            "artifact_kind": "broker_risk_control_pdf",
+            "parser_candidate": "broker_risk_control_pdf.v1",
+            "content_type": "application/pdf"
+          },
+          "storage": {
+            "archive_root": "data/filings/financial_statements/broker_risk_control",
+            "source_manifest_profile": "financial_source_file_manifest.v1",
+            "write_path": "financial_numeric_facts",
+            "historical_tier": "history",
+            "incremental_tier": "hot"
+          },
+          "parser": {
+            "parser_version": "broker_risk_control_pdf.v1",
+            "required_facts": [
+              "net_capital"
+            ],
+            "optional_facts": [
+              "core_net_capital",
+              "subordinated_net_capital",
+              "regulatory_net_assets",
+              "risk_capital_reserve_total",
+              "market_risk_capital_reserve",
+              "credit_risk_capital_reserve",
+              "operational_risk_capital_reserve",
+              "balance_sheet_assets_total",
+              "off_balance_sheet_assets_total",
+              "risk_coverage_ratio",
+              "capital_leverage_ratio",
+              "liquidity_coverage_ratio",
+              "net_stable_funding_ratio",
+              "net_capital_to_net_assets",
+              "net_capital_to_liabilities",
+              "net_assets_to_liabilities",
+              "proprietary_equity_securities_to_net_capital",
+              "proprietary_non_equity_securities_to_net_capital",
+              "margin_financing_to_net_capital",
+              "high_quality_liquid_assets",
+              "net_cash_outflow",
+              "available_stable_funding",
+              "required_stable_funding",
+              "single_client_concentration_ratio",
+              "single_security_concentration_ratio",
+              "broker_operational_risk_brokerage_net_revenue",
+              "broker_operational_risk_investment_banking_net_revenue",
+              "broker_operational_risk_asset_management_net_revenue",
+              "broker_operational_risk_proprietary_net_revenue"
+            ],
+            "business_line_revenue_mapping": "disabled"
+          },
+          "history": {
+            "enabled": false,
+            "baseline_annual_period": "2020-12-31",
+            "latest_annual_period": null,
+            "max_periods_per_run": 6
+          },
+          "incremental": {
+            "enabled": false,
+            "scan_recent_days": 14,
+            "watermark_enabled": true,
+            "pending_retry_days": 5,
+            "page_size": 30,
+            "max_pages": 20
+          },
+          "request_policy": {
+            "request_timeout_seconds": 20.0,
+            "request_interval_seconds": 0.2,
+            "retry_attempts": 2,
+            "retry_backoff_seconds": 0.5
+          },
+          "note": "Broker risk-control reports are integrated into the financial disclosure chain. Regulatory operation-risk revenue rows are stored only under regulatory_risk_control canonical facts and must not be treated as brokerage, investment-banking, asset-management, or proprietary business-line revenue."
+        },
         "runtime": {
           "max_concurrency": 2,
           "request_timeout_seconds": 20.0,
@@ -566,11 +660,20 @@
               },
               "broker_excess_capital.v1": {
                 "candidate_type": "financial_sector",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
                   "net_income",
                   "equity",
-                  "net_capital"
+                  "net_capital",
+                  "shares_outstanding"
+                ],
+                "optional_fields": [
+                  "roe",
+                  "brokerage_revenue",
+                  "investment_income",
+                  "market_turnover",
+                  "index_level",
+                  "leverage_ratio"
                 ]
               },
               "insurance_embedded_value_or_ddm.v1": {

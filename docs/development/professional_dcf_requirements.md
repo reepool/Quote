@@ -708,22 +708,26 @@ Residual Income = Net Income - Cost of Equity * Beginning Book Value
 
 核心输入：
 
-- 经纪业务收入
-- 投行业务收入
-- 资管收入
-- 利息净收入
-- 投资收益
-- 公允价值变动
-- 自营资产规模
-- 净资本
-- 杠杆率
-- ROE
+| 优先级 | 字段 | 来源与用途 |
+|---|---|---|
+| P0 | 净利润、净资产、股本、净资本 | `net_income / equity / shares_outstanding` 来自现有本地财务与估值输入；`net_capital` 必须通过证券公司风险控制指标报告进入财务披露链路，是证券 DCF production blocker |
+| P1 | 核心净资本、附属净资本、监管口径净资产、各项风险资本准备之和 | 用于判断净资本质量、excess capital 口径和监管资本消耗 |
+| P1 | 风险覆盖率、资本杠杆率、流动性覆盖率、净稳定资金率 | 证券公司核心监管指标，用于 readiness、风险警示和估值置信度 |
+| P1 | 净资本/净资产、净资本/负债、净资产/负债 | 用于杠杆约束和监管资本安全边际诊断 |
+| P1 | 自营权益类证券及其衍生品/净资本、自营非权益类证券及其衍生品/净资本、融资含融券金额/净资本 | 用于自营和融资类业务风险约束，不等同于业务收入 |
+| P2 | 市场/信用/操作/特定风险资本准备分项、表内外资产总额、LCR/NSFR 分解项、集中度前五名比例 | 如果报告明确披露则采集，用于风险资本结构和流动性拆解 |
+| P2 | 经纪/承销与保荐或财务顾问/资管/自营等操作风险收入行 | 仅当风险资本准备表明确披露时作为监管口径收入字段保存，不映射为年报业务分部收入 |
+| 增强 | 经纪业务收入、投行业务收入、资管收入、自营收入 | 应从年报业务分部、附注或管理层讨论解析，不能从风险控制指标报告推断 |
+| 增强 | 市场成交额、指数水平 | 应来自交易所市场统计或行情体系，不属于财务披露字段 |
+| 增强 | 利息净收入、投资收益、公允价值变动 | 可先使用现有财务长表字段，作为收入结构和周期诊断 proxy |
 
 模型要求：
 
 - 自营投资收益必须区分经常性与非经常性。
 - 牛市高 ROE 不得直接永久外推。
 - 必须输出市场成交额、指数水平或资本市场景气敏感性，若数据可得。
+- 风险控制指标报告只负责监管资本、流动性和风险约束字段。即使报告中出现操作风险资本准备使用的业务净收入行，也只能保存为监管口径 P2 字段，不能替代年报分部收入。
+- 监管净资本通常是母公司或监管口径，可能不同于 DCF 使用的合并口径会计权益；模型必须在 lineage 或 warning 中记录 scope 差异。
 
 ### 6.11 保险
 
@@ -1125,7 +1129,9 @@ GET /api/v1/research/valuation/dcf/workbooks/{artifact_id}
 
 证券：
 
-- 缺少净资本、ROE、净利润或收入拆分时降级。
+- 缺少净资本、净利润、净资产或股本时生产路径 fail closed。
+- 缺少风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等 P1 监管指标时降级为较低置信度或输出 warning，但不得阻塞 `net_capital` 已具备的基本 broker DCF。
+- 缺少经纪、投行、资管、自营分部收入时只能影响收入结构 diagnostics，不得作为 `broker_excess_capital.v1` 的 production blocker。
 
 保险：
 
@@ -1147,6 +1153,9 @@ GET /api/v1/research/valuation/dcf/workbooks/{artifact_id}
 | 营运资本 | 应收、存货、应付、合同负债、预付款 | FCFF | 需要口径和正负方向配置 |
 | 净债务调整 | 有息债务、现金、租赁负债、永续债、少数股东权益 | FCFF | 缺失时 equity value 降级 |
 | 金融监管资本 | CET1、核心资本充足率、净资本、偿付能力 | 银行/证券/保险 | 金融模型 blocker |
+| 证券监管指标 | 核心/附属净资本、风险覆盖率、资本杠杆率、LCR、NSFR、净资本/净资产、净资本/负债、自营和融资类业务占净资本比例 | 证券 | `net_capital` 为 blocker，其余为风险诊断和置信度输入 |
+| 证券风险资本准备 | 市场/信用/操作/特定风险资本准备及合计、表内外资产总额、LCR/NSFR 分解项 | 证券 | P2 拆解字段，报告明确披露才采集 |
+| 证券业务分部收入 | 经纪、投行、资管、自营收入 | 证券 | 应来自年报分部/附注；不得由风险控制指标报告的监管口径收入行替代 |
 | 保险 EV/NBV | 内含价值、新业务价值、投资收益率 | 保险 | 缺失时不能输出 EV model |
 | 地产项目数据 | 土地储备、项目销售、结算、货值 | 地产 NAV | 缺失时只允许低置信简化 NAV |
 | 商品价格 | 煤炭、有色、油气、化工品价格 | 周期行业 | 用于敏感性和 mid-cycle 假设 |
@@ -1245,6 +1254,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现 `nonfinancial_fcfe.v1`：稳定低杠杆、分红政策明确且 FCFE 输入齐全的非金融企业可用 `operating_cf - capex + net_debt_change` equity cash flow 估值，显式 `cash_flow_model=fcfe` 输入充足时不再 fail closed。
 - 已实现轻量 `utility_fcfe_or_ddm.v1` / `reit_ffo_affo_ddm.v1`：公用事业/基础设施、REIT/类 REIT 在本地分红率、股本、FCFE 或 AFFO/FFO 输入充足时可输出 DDM/分派估值；缺少分派现金流时 fail closed。
 - 已实现 `bank_residual_income.v1`：银行默认不走通用 FCFF，在净资产、净利润、股本和 cost of equity 假设充足时使用 book equity + PV residual income 直接估算股权价值，并输出 implied P/B、资本充足率诊断和可选 DDM cross-check。
+- 已实现 `broker_excess_capital.v1`：证券公司默认不走通用 FCFF，在净利润、净资产、净资本、股本和 cost of equity 假设充足时使用归一化 ROE residual income + excess capital 直接估算股权价值，并输出 implied P/B、normalized ROE、excess capital 和市场周期输入诊断。
 - 已实现模型 profile registry、行业/公司特性双候选 scoring、`model_strategy=auto|industry|characteristic|compare`、接近分数模型对比，以及 FCFE/FCFF adapter 输出。
 - 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。
 - 已实现显式 assumption refresh 入口，当前为本地优先 source policy/diagnostics，不在 DCF 计算路径隐式联网。
@@ -1252,13 +1262,14 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现进程内 bounded DCF run cache：按输入 hash、参数 hash、最新收盘价和 TTL 控制复用，不写入 `valuation_history`。
 - 已完成 DCF contract hardening：`compare` 返回行业/公司特性候选 result object，未实现模型 fail closed；显式 `fcfe` 不再伪装为成功 FCFF；`scenario_set / terminal_method / include_* / workbook_style / cash_flow_model` 参数具备明确语义；假设缺失和 fallback 进入结构化 blocker/warning；REST workbook metadata 不暴露本地 artifact path。
 - 已实现 `data_available_date <= valuation_date` 过滤 blocker，避免财务事实未来函数；缺失可得日默认在生产路径 fail closed。
-- 证券、保险、地产、周期、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
+- 保险、地产、周期、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
 
 - 真实主备外部数据源刷新 adapter 和生产级联网刷新调度。
 - 跨进程 saved-run audit 表和可检索历史运行视图。
-- 证券、保险、地产 NAV、周期 mid-cycle、控股公司等特殊行业/类型完整实算模型。
+- 保险、地产 NAV、周期 mid-cycle、控股公司等特殊行业/类型完整实算模型；证券模型后续仍需扩展更细的市场周期、两融、投行、资管和自营分部驱动。
+- 已新增待实现 OpenSpec change `add-broker-risk-control-financial-facts`：用于把证券公司《风险控制指标报告》接入现有财务披露链路，补齐 `net_capital`，并采集风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例、风险资本准备分项等证券监管字段。该变更同时要求历史年度回补和新增公告增量更新；经纪、投行、资管、自营收入仍归年报分部/附注解析，不从风控报告推断。
 - 覆盖所有代表性行业/公司类型的大样本 fixture 与集成验证。
 
 ### Phase 0：需求与规格固化

@@ -73,9 +73,16 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
         },
         "broker_excess_capital.v1": {
             "candidate_type": "financial_sector",
-            "implementation_status": "guardrail",
-            "required_fields": ["net_income", "equity", "net_capital"],
-            "optional_fields": ["brokerage_revenue", "investment_income"],
+            "implementation_status": "implemented",
+            "required_fields": ["net_income", "equity", "net_capital", "shares_outstanding"],
+            "optional_fields": [
+                "roe",
+                "brokerage_revenue",
+                "investment_income",
+                "market_turnover",
+                "index_level",
+                "leverage_ratio",
+            ],
             "supported_company_types": ["broker"],
         },
         "insurance_embedded_value_or_ddm.v1": {
@@ -435,6 +442,7 @@ class ProfessionalDcfEngine:
                 "utility_fcfe_or_ddm.v1",
                 "reit_ffo_affo_ddm.v1",
                 "bank_residual_income.v1",
+                "broker_excess_capital.v1",
             }
             and selector.get("include_model_comparison")
             and not (special_guardrail and not research_mode)
@@ -468,6 +476,15 @@ class ProfessionalDcfEngine:
 
         if model_profile == "bank_residual_income.v1":
             return self._run_bank_residual_income(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                research_mode=research_mode,
+            )
+
+        if model_profile == "broker_excess_capital.v1":
+            return self._run_broker_excess_capital(
                 instrument=instrument,
                 bundle=bundle,
                 overrides=overrides,
@@ -1339,6 +1356,282 @@ class ProfessionalDcfEngine:
         result["workbook"] = self._workbook_metadata(overrides, result)
         return result
 
+    def _run_broker_excess_capital(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        bundle: DcfInputBundle,
+        overrides: Dict[str, Any],
+        selector: Dict[str, Any],
+        research_mode: bool,
+    ) -> Dict[str, Any]:
+        facts = bundle.financial_facts
+        projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
+        terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
+        scenario_set = str(overrides.get("scenario_set") or "standard")
+        if scenario_set not in {"standard", "downside_only"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_scenario_set",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_scenario_set:{scenario_set}"],
+            )
+        terminal_method = str(overrides.get("terminal_method") or "gordon_growth")
+        if terminal_method not in {"gordon_growth", "perpetual_growth"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_terminal_method",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_terminal_method:{terminal_method}"],
+            )
+        assumption_blockers = [blocker for blocker in bundle.blockers if blocker.startswith("assumption_")]
+        if assumption_blockers:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="partial" if research_mode else "unavailable",
+                missing_reason=assumption_blockers[0],
+                research_mode=research_mode,
+            )
+        wacc_payload = self._build_wacc(bundle, overrides)
+        cost_of_equity = float(overrides.get("cost_of_equity", wacc_payload["cost_of_equity"]))
+        if cost_of_equity <= terminal_growth:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="cost_of_equity_must_exceed_terminal_growth",
+                research_mode=research_mode,
+            )
+
+        equity = self._safe_float(facts.get("equity") or facts.get("equity_parent") or overrides.get("equity"))
+        net_income = self._safe_float(
+            facts.get("net_income_parent") or facts.get("net_income") or overrides.get("net_income")
+        )
+        net_capital = self._safe_float(facts.get("net_capital") or overrides.get("net_capital"))
+        shares = self._safe_positive_float(facts.get("shares_outstanding"))
+        blockers = [
+            f"{field_name}_required"
+            for field_name, value in (
+                ("net_income", net_income),
+                ("equity", equity),
+                ("net_capital", net_capital),
+                ("shares_outstanding", shares),
+            )
+            if value is None
+        ]
+        if blockers and not research_mode:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="broker_core_inputs_missing",
+                research_mode=research_mode,
+                extra_blockers=["broker_core_inputs_missing", *blockers],
+            )
+
+        equity = equity or 0.0
+        net_income = net_income or 0.0
+        net_capital = net_capital or 0.0
+        roe_raw = self._safe_float(facts.get("roe") or overrides.get("roe"))
+        warnings = list(bundle.warnings)
+        net_capital_report_scope = str(
+            facts.get("net_capital_report_scope")
+            or facts.get("broker_net_capital_report_scope")
+            or ""
+        ).strip() or "unknown"
+        if net_capital_report_scope == "unknown":
+            warnings.append("broker_net_capital_report_scope_unknown")
+        if net_capital_report_scope in {"parent_company", "regulatory"}:
+            warnings.append("broker_net_capital_regulatory_scope_may_differ_from_accounting_equity")
+        roe_source = "reported"
+        if roe_raw is None and equity:
+            roe_raw = net_income / equity
+            roe_source = "derived_net_income_over_equity"
+            warnings.append("broker_roe_derived_from_net_income_over_equity")
+        reported_roe = roe_raw if roe_raw is not None else 0.0
+        roe_cap = float(overrides.get("broker_normalized_roe_cap", self.parameters.get("broker_normalized_roe_cap", 0.15)))
+        normalized_roe = min(reported_roe, roe_cap)
+        if reported_roe > roe_cap:
+            warnings.append("broker_roe_normalized_to_cap")
+        payout_raw = self._safe_float(facts.get("dividend_payout_ratio") or overrides.get("dividend_payout_ratio"))
+        payout_ratio = payout_raw
+        if payout_ratio is None:
+            payout_ratio = float(
+                overrides.get("broker_default_payout_ratio", self.parameters.get("broker_default_payout_ratio", 0.25))
+            )
+            warnings.append("broker_payout_ratio_default_used")
+        target_net_capital_to_equity = float(
+            overrides.get(
+                "broker_target_net_capital_to_equity",
+                self.parameters.get("broker_target_net_capital_to_equity", 0.20),
+            )
+        )
+        required_net_capital = max(equity * target_net_capital_to_equity, 0.0)
+        excess_capital = max(net_capital - required_net_capital, 0.0)
+
+        market_cycle_inputs = {
+            "market_turnover": self._safe_float(facts.get("market_turnover") or overrides.get("market_turnover")),
+            "index_level": self._safe_float(facts.get("index_level") or overrides.get("index_level")),
+            "brokerage_revenue": self._safe_float(
+                facts.get("brokerage_revenue") or overrides.get("brokerage_revenue")
+            ),
+            "investment_income": self._safe_float(
+                facts.get("investment_income") or overrides.get("investment_income")
+            ),
+            "leverage_ratio": self._safe_float(facts.get("leverage_ratio") or overrides.get("leverage_ratio")),
+        }
+        missing_cycle_inputs = [
+            field_name for field_name, value in market_cycle_inputs.items() if value is None
+        ]
+        if missing_cycle_inputs:
+            warnings.append("broker_market_cycle_inputs_missing")
+        if not bool(overrides.get("include_sensitivity", True)):
+            warnings.append("sensitivity_suppressed_by_request")
+        if not bool(overrides.get("include_forecast_rows", True)):
+            warnings.append("forecast_rows_suppressed_by_request")
+        if not bool(overrides.get("include_lineage", True)):
+            warnings.append("lineage_suppressed_by_request")
+        if blockers:
+            warnings.append("research_mode_broker_core_inputs_incomplete")
+
+        scenario_specs = self._broker_roe_scenario_specs(scenario_set, normalized_roe, overrides)
+        scenarios = [
+            self._project_broker_excess_capital_scenario(
+                scenario=scenario_name,
+                starting_equity=equity,
+                normalized_roe=scenario_roe,
+                payout_ratio=payout_ratio,
+                cost_of_equity=cost_of_equity,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=shares,
+                excess_capital=excess_capital,
+            )
+            for scenario_name, scenario_roe in scenario_specs
+        ]
+        base_scenario = next(item for item in scenarios if item["scenario"] == "base")
+        sensitivity = self._build_broker_excess_capital_sensitivity(
+            starting_equity=equity,
+            base_roe=normalized_roe,
+            payout_ratio=payout_ratio,
+            base_cost_of_equity=cost_of_equity,
+            terminal_growth=terminal_growth,
+            projection_years=projection_years,
+            latest_close=bundle.latest_close,
+            shares_outstanding=shares,
+            excess_capital=excess_capital,
+        )
+
+        result = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "calc_method": "professional_dcf_broker_excess_capital",
+            "calc_version": "broker_excess_capital.v1",
+            "parameter_hash": self._build_parameter_hash(overrides),
+            "input_hash": bundle.input_hash,
+            "status": "partial" if research_mode and blockers else "success",
+            "missing_reason": "broker_core_inputs_missing" if blockers else None,
+            "model_profile": "broker_excess_capital.v1",
+            "model_strategy": selector.get("model_strategy"),
+            "recommended_model": selector.get("recommended_model"),
+            "selection_confidence": selector.get("selection_confidence"),
+            "selection_policy": selector.get("selection_policy"),
+            "score_gap": selector.get("score_gap"),
+            "model_suitability_candidates": selector.get("candidates", []),
+            "selected_cash_flow_model": "broker_residual_income",
+            "cash_flow_model_selection": {
+                "selected_cash_flow_model": "broker_residual_income",
+                "candidate_models": ["broker_residual_income", "excess_capital_adjustment"],
+                "selection_reasons": ["broker_financial_sector_profile"],
+                "rejected_models": ["fcff", "fcfe"],
+                "input_gap_by_model": {"broker_residual_income": blockers},
+                "confidence": selector.get("selection_confidence"),
+                "warnings": warnings,
+            },
+            "readiness": self._readiness_payload(blockers, warnings, selector),
+            "assumptions": {"wacc": wacc_payload, **bundle.assumptions},
+            "valuation_date": bundle.valuation_date,
+            "data_available_cutoff": bundle.data_available_cutoff,
+            "base_cash_flow": base_scenario.get("residual_income"),
+            "base_cash_flow_source": "broker_residual_income",
+            "projection_years": projection_years,
+            "shares_outstanding": shares,
+            "latest_close": bundle.latest_close,
+            "beta": bundle.beta_context.get("beta"),
+            "beta_source": bundle.beta_context.get("beta_source"),
+            "beta_benchmark": bundle.beta_context.get("beta_benchmark"),
+            "enterprise_value": None,
+            "equity_value": base_scenario.get("equity_value"),
+            "terminal_value": base_scenario.get("terminal_value"),
+            "terminal_value_pct": base_scenario.get("terminal_value_pct"),
+            "implied_pb": base_scenario.get("implied_pb"),
+            "normalized_roe": normalized_roe,
+            "reported_roe": reported_roe,
+            "excess_capital": excess_capital,
+            "broker_model_diagnostics": {
+                "reported_roe": reported_roe,
+                "normalized_roe": normalized_roe,
+                "roe_source": roe_source,
+                "normalized_roe_cap": roe_cap,
+                "payout_ratio": payout_ratio,
+                "payout_ratio_source": "reported" if payout_raw is not None else "configured_default",
+                "net_capital": net_capital,
+                "net_capital_report_scope": net_capital_report_scope,
+                "required_net_capital": required_net_capital,
+                "target_net_capital_to_equity": target_net_capital_to_equity,
+                "excess_capital": excess_capital,
+                "market_cycle_inputs": market_cycle_inputs,
+                "missing_market_cycle_inputs": missing_cycle_inputs,
+            },
+            "financial_model_diagnostics": {
+                "model_type": "broker_excess_capital",
+                "normalized_roe": normalized_roe,
+                "excess_capital": excess_capital,
+                "net_capital_report_scope": net_capital_report_scope,
+                "missing_market_cycle_inputs": missing_cycle_inputs,
+            },
+            "net_debt_adjustment": None,
+            "forecast_rows": base_scenario.get("forecast_rows", [])
+            if bool(overrides.get("include_forecast_rows", True))
+            else [],
+            "scenarios": scenarios,
+            "sensitivity": sensitivity if bool(overrides.get("include_sensitivity", True)) else [],
+            "diagnostics": {
+                "blockers": blockers,
+                "warnings": warnings,
+                "input_gaps": self.build_input_gaps(
+                    instrument=instrument,
+                    financial_bundle=facts,
+                    model_profile="broker_excess_capital.v1",
+                )["missing_fields"],
+            },
+            "warnings": warnings,
+            "lineage": bundle.lineage if bool(overrides.get("include_lineage", True)) else None,
+            "model_comparison": None,
+            "workbook": None,
+        }
+        if selector.get("include_model_comparison"):
+            result["model_comparison"] = self._model_comparison(result, selector)
+        result["workbook"] = self._workbook_metadata(overrides, result)
+        return result
+
     def _run_nonfinancial_fcfe(
         self,
         *,
@@ -2046,6 +2339,93 @@ class ProfessionalDcfEngine:
             ],
         }
 
+    def _project_broker_excess_capital_scenario(
+        self,
+        *,
+        scenario: str,
+        starting_equity: float,
+        normalized_roe: float,
+        payout_ratio: float,
+        cost_of_equity: float,
+        terminal_growth: float,
+        projection_years: int,
+        latest_close: Optional[float],
+        shares_outstanding: Optional[float],
+        excess_capital: float,
+    ) -> Dict[str, Any]:
+        forecast_rows = []
+        discounted_sum = 0.0
+        beginning_book = starting_equity
+        residual_income = 0.0
+        for year in range(1, projection_years + 1):
+            normalized_net_income = beginning_book * normalized_roe
+            dividend = normalized_net_income * payout_ratio
+            equity_charge = beginning_book * cost_of_equity
+            residual_income = normalized_net_income - equity_charge
+            discount_factor = 1 / ((1 + cost_of_equity) ** year)
+            discounted_residual_income = residual_income * discount_factor
+            discounted_sum += discounted_residual_income
+            ending_book = beginning_book + normalized_net_income - dividend
+            forecast_rows.append(
+                {
+                    "year": year,
+                    "beginning_book_equity": beginning_book,
+                    "normalized_roe": normalized_roe,
+                    "normalized_net_income": normalized_net_income,
+                    "payout_ratio": payout_ratio,
+                    "dividend": dividend,
+                    "cost_of_equity": cost_of_equity,
+                    "equity_charge": equity_charge,
+                    "residual_income": residual_income,
+                    "discount_factor": discount_factor,
+                    "discounted_residual_income": discounted_residual_income,
+                    "ending_book_equity": ending_book,
+                }
+            )
+            beginning_book = ending_book
+        terminal_residual_income = residual_income * (1 + terminal_growth)
+        terminal_value = terminal_residual_income / (cost_of_equity - terminal_growth)
+        terminal_value_present = terminal_value / ((1 + cost_of_equity) ** projection_years)
+        franchise_value = starting_equity + discounted_sum + terminal_value_present
+        equity_value = franchise_value + excess_capital
+        intrinsic_value_per_share = (
+            equity_value / shares_outstanding
+            if shares_outstanding and shares_outstanding > 0
+            else None
+        )
+        upside_to_last_close = (
+            intrinsic_value_per_share / latest_close - 1
+            if intrinsic_value_per_share is not None and latest_close not in (None, 0)
+            else None
+        )
+        return {
+            "scenario": scenario,
+            "normalized_roe": normalized_roe,
+            "discount_rate": cost_of_equity,
+            "cost_of_equity": cost_of_equity,
+            "terminal_growth": terminal_growth,
+            "enterprise_value": None,
+            "equity_value": equity_value,
+            "franchise_value": franchise_value,
+            "book_equity": starting_equity,
+            "excess_capital": excess_capital,
+            "implied_pb": equity_value / starting_equity if starting_equity else None,
+            "terminal_value": terminal_value_present,
+            "terminal_value_pct": terminal_value_present / equity_value if equity_value else None,
+            "residual_income": residual_income,
+            "intrinsic_value_per_share": intrinsic_value_per_share,
+            "upside_to_last_close": upside_to_last_close,
+            "forecast_rows": forecast_rows,
+            "projected_cash_flows": [
+                {
+                    "year": row["year"],
+                    "cash_flow": row["residual_income"],
+                    "discounted_cash_flow": row["discounted_residual_income"],
+                }
+                for row in forecast_rows
+            ],
+        }
+
     def _build_wacc(
         self,
         bundle: DcfInputBundle,
@@ -2184,6 +2564,33 @@ class ProfessionalDcfEngine:
                 )
         return points
 
+    def _build_broker_excess_capital_sensitivity(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        base_cost_of_equity = float(kwargs.pop("base_cost_of_equity"))
+        base_roe = float(kwargs.pop("base_roe"))
+        points = []
+        for roe in (max(base_roe - 0.02, 0.0), base_roe, base_roe + 0.02):
+            for cost_of_equity in (base_cost_of_equity - 0.01, base_cost_of_equity, base_cost_of_equity + 0.01):
+                terminal_growth = float(kwargs["terminal_growth"])
+                if cost_of_equity <= terminal_growth:
+                    continue
+                scenario = self._project_broker_excess_capital_scenario(
+                    scenario="sensitivity",
+                    normalized_roe=roe,
+                    cost_of_equity=cost_of_equity,
+                    **kwargs,
+                )
+                points.append(
+                    {
+                        "normalized_roe": roe,
+                        "cost_of_equity": cost_of_equity,
+                        "terminal_growth": terminal_growth,
+                        "excess_capital": scenario["excess_capital"],
+                        "implied_pb": scenario["implied_pb"],
+                        "intrinsic_value_per_share": scenario["intrinsic_value_per_share"],
+                    }
+                )
+        return points
+
     def _bank_roe_scenario_specs(
         self,
         scenario_set: str,
@@ -2195,6 +2602,22 @@ class ProfessionalDcfEngine:
             ("base", roe),
             ("bull", float(overrides.get("bull_roe", roe + 0.02))),
             ("stress", float(overrides.get("stress_roe", max(roe - 0.04, 0.0)))),
+        ]
+        if scenario_set == "downside_only":
+            return [item for item in specs if item[0] in {"bear", "base", "stress"}]
+        return specs
+
+    def _broker_roe_scenario_specs(
+        self,
+        scenario_set: str,
+        normalized_roe: float,
+        overrides: Dict[str, Any],
+    ) -> List[Tuple[str, float]]:
+        specs = [
+            ("bear", float(overrides.get("bear_normalized_roe", max(normalized_roe - 0.02, 0.0)))),
+            ("base", normalized_roe),
+            ("bull", float(overrides.get("bull_normalized_roe", normalized_roe + 0.02))),
+            ("stress", float(overrides.get("stress_normalized_roe", max(normalized_roe - 0.04, 0.0)))),
         ]
         if scenario_set == "downside_only":
             return [item for item in specs if item[0] in {"bear", "base", "stress"}]
@@ -2908,11 +3331,14 @@ class ProfessionalDcfEngine:
             "enterprise_value": result.get("enterprise_value"),
             "equity_value": result.get("equity_value"),
             "implied_pb": result.get("implied_pb"),
+            "normalized_roe": result.get("normalized_roe"),
+            "excess_capital": result.get("excess_capital"),
             "intrinsic_value_per_share": base_intrinsic,
             "readiness": result.get("readiness"),
             "warnings": result.get("warnings", []),
             "diagnostics": result.get("diagnostics"),
             "financial_model_diagnostics": result.get("financial_model_diagnostics"),
+            "broker_model_diagnostics": result.get("broker_model_diagnostics"),
         }
 
     def _workbook_metadata(
@@ -2972,6 +3398,11 @@ class ProfessionalDcfEngine:
             "embedded_value": "insurer_annual_report",
             "new_business_value": "insurer_annual_report",
             "net_capital": "broker_annual_report",
+            "brokerage_revenue": "broker_segment_or_income_statement",
+            "investment_income": "broker_income_statement",
+            "market_turnover": "exchange_market_statistics",
+            "index_level": "exchange_or_index_provider",
+            "leverage_ratio": "broker_annual_report",
             "commodity_price_assumption": "commodity_exchange_or_industry_dataset",
             "rental_income": "reit_report_or_property_dataset",
             "ffo": "reit_report_or_adjusted_cash_flow_statement",

@@ -12,6 +12,10 @@ import zipfile
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from research.broker_risk_control import (
+    BROKER_RISK_CONTROL_ARTIFACT_KIND,
+    BrokerRiskControlPdfFactParser,
+)
 from research.financial_fact_aliases import describe_financial_numeric_fact_name
 from research.providers.official_financial_filings import (
     classify_official_filing_response,
@@ -490,6 +494,7 @@ class FinancialStructuredFilingParserDispatcher:
         xbrl_parser: Optional[FinancialXbrlNumericFactParser] = None,
         structured_json_parser: Optional[FinancialSseStructuredJsonFactParser] = None,
         cninfo_data20_parser: Optional[FinancialCninfoData20StructuredJsonFactParser] = None,
+        broker_risk_control_parser: Optional[BrokerRiskControlPdfFactParser] = None,
     ):
         self.parser_version = parser_version
         self.xbrl_parser = xbrl_parser or FinancialXbrlNumericFactParser()
@@ -498,6 +503,9 @@ class FinancialStructuredFilingParserDispatcher:
         )
         self.cninfo_data20_parser = (
             cninfo_data20_parser or FinancialCninfoData20StructuredJsonFactParser()
+        )
+        self.broker_risk_control_parser = (
+            broker_risk_control_parser or BrokerRiskControlPdfFactParser()
         )
 
     def parse(
@@ -574,6 +582,26 @@ class FinancialStructuredFilingParserDispatcher:
                     source_mode=source_mode,
                     report_type=report_type,
                 )
+            return FinancialXbrlParseResult(
+                numeric_facts=result.numeric_facts,
+                diagnostics={
+                    **result.diagnostics,
+                    "dispatcher_version": self.parser_version,
+                    "artifact_kind": resolved_kind,
+                },
+            )
+        if resolved_kind == BROKER_RISK_CONTROL_ARTIFACT_KIND:
+            result = self.broker_risk_control_parser.parse(
+                payload,
+                source_file_id=source_file_id,
+                instrument_id=instrument_id,
+                symbol=symbol,
+                exchange=exchange,
+                report_period=report_period,
+                source=source,
+                source_mode=source_mode,
+                report_type=report_type,
+            )
             return FinancialXbrlParseResult(
                 numeric_facts=result.numeric_facts,
                 diagnostics={

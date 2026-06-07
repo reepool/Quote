@@ -879,6 +879,102 @@ def test_valuation_service_dcf_bank_derives_roe_and_flags_capital_warning():
     assert "bank_capital_adequacy_below_threshold" in result["warnings"]
 
 
+def test_valuation_service_dcf_broker_defaults_to_excess_capital_model():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "industry_name": "证券",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "equity": 1000.0,
+            "net_income": 120.0,
+            "net_capital": 260.0,
+            "roe": 0.12,
+            "market_turnover": 90000.0,
+            "index_level": 3600.0,
+            "brokerage_revenue": 80.0,
+            "investment_income": 45.0,
+            "leverage_ratio": 2.5,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["model_profile"] == "broker_excess_capital.v1"
+    assert result["calc_method"] == "professional_dcf_broker_excess_capital"
+    assert result["enterprise_value"] is None
+    assert result["equity_value"] is not None
+    assert result["implied_pb"] is not None
+    assert result["normalized_roe"] == 0.12
+    assert result["excess_capital"] == 60.0
+    assert result["broker_model_diagnostics"]["missing_market_cycle_inputs"] == []
+
+
+def test_valuation_service_dcf_broker_missing_core_inputs_fails_closed():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "industry_name": "证券",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "equity": 1000.0,
+            "net_income": 120.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["model_profile"] == "broker_excess_capital.v1"
+    assert result["missing_reason"] == "broker_core_inputs_missing"
+    assert "net_capital_required" in result["readiness"]["blockers"]
+
+
+def test_valuation_service_dcf_broker_derives_and_caps_peak_roe():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "industry_name": "证券",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "equity": 1000.0,
+            "net_income": 300.0,
+            "net_capital": 250.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["normalized_roe"] == 0.15
+    assert result["broker_model_diagnostics"]["roe_source"] == "derived_net_income_over_equity"
+    assert "broker_roe_derived_from_net_income_over_equity" in result["warnings"]
+    assert "broker_roe_normalized_to_cap" in result["warnings"]
+    assert "broker_market_cycle_inputs_missing" in result["warnings"]
+
+
 def test_valuation_service_dcf_model_comparison_for_close_scores():
     service = ResearchValuationService()
 
@@ -1383,28 +1479,29 @@ def test_valuation_service_dcf_terminal_growth_must_be_below_wacc():
 def test_valuation_service_dcf_forced_financial_fcff_records_warning():
     service = ResearchValuationService()
 
-    result = service.run_dcf(
-        instrument={
-            "instrument_id": "600000.SH",
-            "symbol": "600000",
-            "exchange": "SSE",
-            "industry_name": "银行",
-        },
-        financial_bundle={
-            "report_period": "2025-12-31",
-            "data_available_date": "2026-03-30",
-            "revenue": 1000.0,
-            "operating_profit": 180.0,
-            "capital_expenditure": 60.0,
-            "shares_outstanding": 10.0,
-        },
-        latest_close=12.0,
-        overrides={"valuation_date": "2026-04-18", "model_profile": "nonfinancial_fcff.v1"},
-    )
+    for instrument_id, industry_name in (("600000.SH", "银行"), ("600030.SH", "证券")):
+        result = service.run_dcf(
+            instrument={
+                "instrument_id": instrument_id,
+                "symbol": instrument_id.split(".")[0],
+                "exchange": "SSE",
+                "industry_name": industry_name,
+            },
+            financial_bundle={
+                "report_period": "2025-12-31",
+                "data_available_date": "2026-03-30",
+                "revenue": 1000.0,
+                "operating_profit": 180.0,
+                "capital_expenditure": 60.0,
+                "shares_outstanding": 10.0,
+            },
+            latest_close=12.0,
+            overrides={"valuation_date": "2026-04-18", "model_profile": "nonfinancial_fcff.v1"},
+        )
 
-    assert result["status"] == "success"
-    assert "forced_model_warning" in result["warnings"]
-    assert "financial_sector_mismatch" in result["warnings"]
+        assert result["status"] == "success"
+        assert "forced_model_warning" in result["warnings"]
+        assert "financial_sector_mismatch" in result["warnings"]
 
 
 def test_valuation_service_dcf_special_company_guardrail_fails_closed():

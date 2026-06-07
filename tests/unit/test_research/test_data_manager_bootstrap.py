@@ -2462,6 +2462,9 @@ def test_data_manager_get_research_dcf_model_profiles_returns_registry(tmp_path)
     assert "capital_expenditure" in profiles["nonfinancial_fcff.v1"]["required_fields"]
     assert profiles["bank_residual_income.v1"]["implementation_status"] == "implemented"
     assert "shares_outstanding" in profiles["bank_residual_income.v1"]["required_fields"]
+    assert profiles["broker_excess_capital.v1"]["implementation_status"] == "implemented"
+    assert "net_capital" in profiles["broker_excess_capital.v1"]["required_fields"]
+    assert "shares_outstanding" in profiles["broker_excess_capital.v1"]["required_fields"]
 
 
 def test_data_manager_get_research_dcf_input_gaps_reports_missing_required_fields(tmp_path):
@@ -2544,6 +2547,11 @@ def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path
     assert "missing_equity" in profiles["bank_residual_income.v1"]["blockers"]
     assert "missing_net_income" in profiles["bank_residual_income.v1"]["blockers"]
     assert "missing_shares_outstanding" in profiles["bank_residual_income.v1"]["blockers"]
+    assert profiles["broker_excess_capital.v1"]["ready"] is False
+    assert "missing_equity" in profiles["broker_excess_capital.v1"]["blockers"]
+    assert "missing_net_income" in profiles["broker_excess_capital.v1"]["blockers"]
+    assert "missing_net_capital" in profiles["broker_excess_capital.v1"]["blockers"]
+    assert "missing_shares_outstanding" in profiles["broker_excess_capital.v1"]["blockers"]
     assert result["coverage_diagnostics"]["ready_profile_count"] == 1
 
 

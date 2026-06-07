@@ -76,8 +76,8 @@
   - `2026-06-04` 专业 DCF 第一批实现已进入实时计算链路：默认接入 `ProfessionalDcfEngine`，普通非金融企业走 `nonfinancial_fcff.v1`，并返回模型选择、FCFE/FCFF adapter、假设 lineage、forecast rows、情景/敏感性和 readiness/input-gap 诊断；行业金融与特殊 profile 先以 guardrail/partial fail-closed 方式开放，不静默套用通用 FCFF
   - `2026-06-05` 专业 DCF 继续补齐显式 assumption refresh diagnostics、投行级 xlsx workbook artifact、本地下载接口和进程内 bounded run cache；DCF 仍按请求实时计算，不写入 `valuation_history`，后续重点转向真实主备外部数据源刷新 adapter、跨进程 saved-run audit 和金融/特殊行业实算模型
   - `2026-06-05` DCF contract hardening 已补齐比较输出 result object、显式 FCFE fail-closed、`scenario_set / terminal_method / include_* / cash_flow_model / workbook_style` 参数语义、assumption fallback/缺失诊断、API-safe workbook metadata 和完整 cache_info
-  - `2026-06-05` DCF FCFE/DDM 第二批实现已推进：`nonfinancial_fcfe.v1` 支持稳定低杠杆公司 equity cash flow 估值，公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/分派估值；银行/证券/保险/地产/周期/控股公司仍保持 guardrail/fail-closed
-  - `2026-06-06` DCF 金融专项第一批已推进：`bank_residual_income.v1` 支持银行 book equity + PV residual income 股权估值、implied P/B、资本充足率诊断和 DDM cross-check；证券/保险仍保持 guardrail/fail-closed
+  - `2026-06-05` DCF FCFE/DDM 第二批实现已推进：`nonfinancial_fcfe.v1` 支持稳定低杠杆公司 equity cash flow 估值，公用事业/基础设施和 REIT/类 REIT 支持轻量 DDM/分派估值；当时银行/证券/保险/地产/周期/控股公司仍保持 guardrail/fail-closed，后续银行和证券已在 2026-06-06 金融专项中推进
+  - `2026-06-06` DCF 金融专项已继续推进：`bank_residual_income.v1` 支持银行 book equity + PV residual income 股权估值、implied P/B、资本充足率诊断和 DDM cross-check；`broker_excess_capital.v1` 支持证券公司归一化 ROE residual income + excess capital 股权估值，并输出 implied P/B、normalized ROE、excess capital 和市场周期输入诊断；保险仍保持 guardrail/fail-closed
   - 个股历史估值分位按请求从 `valuation_history` 即时计算，不持久化全量 `instrument x date x metric x window` 分位矩阵；默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度，并对负值估值显式返回解释提示
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过
@@ -1312,6 +1312,7 @@ Phase 1 就应落实：
 - 通过 `(instrument_id, report_period, fact_name, context_id, source_file_id)` 等组合唯一约束保证可重复写入
 - SSE `commonQuery.do` structured JSON 使用 `FinancialSseStructuredJsonFactParser` 进入同一张全数值事实长表，`COMMON_MAP_INCOMESTATEMENT_C / COMMON_MAP_BALANCESHEET_C / COMMON_MAP_CASHFLOW_C` 只作为配置化 endpoint/payload 元数据和 `statement_family` 诊断；由于三张表来自三个 endpoint candidate，`fetch_all_endpoint_candidates=true` 也必须是配置项，不改变下游事实表语义
 - CNInfo `data20/financialData` structured JSON 使用 `FinancialCninfoData20StructuredJsonFactParser` 进入同一张全数值事实长表，按中文行名、`one/middle/three/year` 报告期 bucket 和 `CNY_10K -> CNY` 单位归一化解析；该路径服务 `SSE/SZSE/BSE`，不等同于 XBRL/XML/ZIP artifact，但满足“可机器解析的官方结构化三大报表”要求
+- 证券公司《风险控制指标报告》PDF 作为 `broker_risk_control_report` source profile 进入同一张全数值事实长表。它不是普通三表 structured JSON，但属于财务披露链路的证券专项监管事实来源；历史回补和公告增量更新均需保留 source manifest、PDF hash、parser diagnostics、报告期、可得日和 hot/history tier 语义
 - 全数值事实长表的 `canonical_*` 列用于跨源字段统一，不改变原始 `fact_name` 和 `raw_fact_json`；示例：`S2010_0770 / 归属于母公司所有者权益` 映射为 `equity_parent`，`S2010_0790 / 所有者权益` 映射为 `equity_total`。下游若需要完整报表字段，应优先查询 `canonical_fact_name`；若需要估值核心字段，仍必须通过 core facts/readiness gate 确认口径可用
 
 #### 4. 核心规范化事实表
@@ -1630,6 +1631,8 @@ GET /api/v1/research/company/{instrument_id}/beta
 | `financial_statement_backfill` | 手动/灰度批处理 | 按配置化 baseline、rolling quarters 和目标市场做多期财报回填，写 source manifest、全数值事实和核心事实，并按 hot/cold tier 维护最近报告期与历史报告期 |
 | `financial_statement_catchup` | 每日晚间/季报季加密 | 根据 disclosure checkpoint 发现新增或修订披露，只处理变化的标的和报告期 |
 | `financial_statement_reconciliation` | 每周，避开股东周期复核窗口 | 校验覆盖率、source hash、缺失报告期、缺失核心事实、解析失败项和 hot/cold tier consistency，执行有界补缺 |
+| `broker_risk_control_backfill` | 手动/灰度批处理 | 证券公司《风险控制指标报告》历史回补。按配置年度和证券公司 universe 扫描 CNInfo/交易所公告，归档 PDF，解析 `net_capital` 与 P1/P2 监管指标，写 `financial_source_files` 和 `financial_numeric_facts_hot/history`；只补证券专项字段，不触发通用三表全量重写 |
+| `broker_risk_control_incremental_sync` | 每日晚间/公告季加密 | 证券风控指标公告增量更新。按公告 watermark 扫描新公告，只处理匹配风险控制指标报告标题的 PDF；PDF 暂不可得或解析失败进入 pending/retry 诊断，不把普通年报或其他公告误解析为风控报告 |
 | `financial_indicator_rebuild` | 财报同步后 | 基于核心事实重建规范化指标，记录 `calc_method / calc_version / parameter_hash` |
 | `valuation_input_sync` | 每日 `23:00`，周一至周五，已开启 | 同步 CNInfo/AkShare 股本输入日更；走全市场快照，写入 `valuation.db.valuation_inputs`；安排在 A 股行情日更之后，当前实测约 `1-2min` 完成，`enabled=true` 进入日更测试 |
 | `valuation_input_full_backfill` | 手工 `/run` | 估值输入股本历史全量回填。`enabled=true / manual_only=true`，不注册自动 cron；按单标的 CNInfo 股本变动历史接口回填 `valuation.db.valuation_inputs` |
@@ -1857,6 +1860,7 @@ GET /api/v1/research/company/{instrument_id}/beta
 - 所有 P0 接口读路径不依赖外网
 - 研究域主备源可通过配置切换
 - 银行/证券/保险专项财务字段通过独立 L1.5 字段包读取；专项缺失必须返回非阻断诊断，不能污染通用 L1 财务完整性判断
+- 证券公司风险控制指标报告通过财务披露链路维护历史回补和公告增量更新；`net_capital` 是证券 DCF 必需事实，风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例、风险资本准备分项等为证券专项诊断事实；经纪、投行、资管、自营收入不得从风控报告推断
 
 ### 15.2 API 层
 
