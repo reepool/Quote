@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import pytest
 
@@ -870,6 +870,38 @@ class _FailingSWSResearchOfficialBundleProvider(_MockSWSResearchOfficialBundlePr
         raise RuntimeError("certificate verify failed")
 
 
+class _UnchangedSWSResearchOfficialBundleProvider(_MockSWSResearchOfficialBundleProvider):
+    async def fetch_official_classification_bundle(
+        self,
+        *,
+        mode="direct",
+        previous_source_files=None,
+        force_refresh=False,
+    ):
+        bundle = await super().fetch_official_classification_bundle(
+            mode=mode,
+            previous_source_files=previous_source_files,
+            force_refresh=force_refresh,
+        )
+        return replace(
+            bundle,
+            changed=False,
+            source_files=[],
+            diagnostics={"source_files_unchanged": True, "unit": True},
+        )
+
+
+class _FailingOfficialIndustryProvider(_MockOfficialIndustryProvider):
+    async def fetch_all_latest_classifications(self, *, mode="direct"):
+        raise RuntimeError(
+            "HTTPSConnectionPool(host='www.swsresearch.com', port=443): "
+            "Max retries exceeded with url: /swindex/pdf/SwClass2021/"
+            "StockClassifyUse_stock.xls (Caused by SSLError("
+            "SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] "
+            "certificate verify failed: unable to get local issuer certificate')))"
+        )
+
+
 class _EmptyTaxonomyIndustryStandardProvider(BaseIndustryStandardProvider):
     source_name = "akshare"
 
@@ -1089,6 +1121,88 @@ async def test_industry_standard_sync_reports_existing_coverage_when_official_so
     assert diagnostics["source_unavailable"] is True
     assert diagnostics["existing_authoritative_memberships"] == 1
     assert diagnostics["target_instruments"] == 1
+
+
+@pytest.mark.asyncio
+async def test_industry_standard_sync_keeps_sws_unchanged_result_when_fallback_fails(
+    tmp_path,
+):
+    research_config = _build_research_config(
+        tmp_path,
+        industry_module={
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "classification_primary_enabled": True,
+            },
+        },
+    )
+    research_config.routing["industry_standard"]["free_chain"] = [
+        {"source": "swsresearch", "mode": "direct"},
+        {"source": "akshare", "mode": "direct"},
+    ]
+    research_config.sources.update(
+        {
+            "swsresearch": {
+                "enabled": True,
+                "supports_proxy_patch": False,
+                "cost_tier": "free",
+            },
+            "akshare": {
+                "enabled": True,
+                "supports_proxy_patch": True,
+                "cost_tier": "free",
+            },
+        }
+    )
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    sws_provider = _UnchangedSWSResearchOfficialBundleProvider()
+    for node in sws_provider._taxonomy_nodes():
+        storage.upsert_industry_taxonomy(node)
+
+    service = IndustryStandardSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "name": "贵州茅台",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=IndustryStandardProviderRegistry(
+            {
+                "swsresearch": sws_provider,
+                "akshare": _MockIndustryStandardProvider(),
+            }
+        ),
+        official_registry=OfficialIndustryHistoryProviderRegistry(
+            {"akshare": _FailingOfficialIndustryProvider()}
+        ),
+    )
+
+    result = await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+
+    assert result["status"] == "degraded"
+    assert result["source"] == "swsresearch"
+    assert result["source_files_unchanged"] is True
+    assert "source_unavailable" not in result
+    assert result["attempted_sources"] == ["swsresearch:direct", "akshare:direct"]
+    diagnostics = result["exchanges"][0]["diagnostics"]
+    assert diagnostics["source_files_unchanged"] is True
+    assert diagnostics["existing_authoritative_memberships"] == 0
+    assert result["exchanges"][0]["error_message"] == (
+        "Source files unchanged but existing membership coverage is incomplete"
+    )
 
 
 @pytest.mark.asyncio

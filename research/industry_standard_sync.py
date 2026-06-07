@@ -393,7 +393,10 @@ class IndustryStandardSyncService:
                                 },
                             )
                             return official_result
-                        best_degraded_result = official_result
+                        best_degraded_result = self._choose_better_degraded_result(
+                            best_degraded_result,
+                            official_result,
+                        )
                         continue
 
                 taxonomy_source = "live_fetch"
@@ -518,7 +521,10 @@ class IndustryStandardSyncService:
                     )
                     return current_result
 
-                best_degraded_result = current_result
+                best_degraded_result = self._choose_better_degraded_result(
+                    best_degraded_result,
+                    current_result,
+                )
                 dm_logger.warning(
                     "[IndustryStandardSync] Provider %s (%s) produced taxonomy but no authoritative memberships; trying next candidate if available",
                     candidate.source,
@@ -649,6 +655,49 @@ class IndustryStandardSyncService:
     def _official_classification_primary_enabled(self) -> bool:
         standard_cfg = self.research_config.modules.get("industry", {}).get("standard", {})
         return bool(standard_cfg.get("classification_primary_enabled", False))
+
+    def _choose_better_degraded_result(
+        self,
+        current: Optional[Dict[str, Any]],
+        candidate: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        if current is None:
+            return candidate
+        return (
+            candidate
+            if self._degraded_result_score(candidate) > self._degraded_result_score(current)
+            else current
+        )
+
+    def _degraded_result_score(self, result: Dict[str, Any]) -> tuple[int, int, int, int]:
+        exchanges = result.get("exchanges") or []
+        source_unavailable = bool(result.get("source_unavailable"))
+        source_files_unchanged = bool(result.get("source_files_unchanged"))
+        existing_coverage = 0
+        for item in exchanges:
+            diagnostics = item.get("diagnostics") if isinstance(item, dict) else None
+            if isinstance(diagnostics, dict):
+                source_unavailable = source_unavailable or bool(
+                    diagnostics.get("source_unavailable")
+                )
+                source_files_unchanged = source_files_unchanged or bool(
+                    diagnostics.get("source_files_unchanged")
+                )
+                existing_coverage += int(
+                    diagnostics.get("existing_authoritative_memberships") or 0
+                )
+        writes = (
+            int(result.get("taxonomy_nodes_written") or 0)
+            + int(result.get("classification_history_rows_written") or 0)
+            + int(result.get("total_memberships_written") or 0)
+            + int(result.get("total_official_classifications_written") or 0)
+        )
+        return (
+            int(result.get("successful_exchanges") or 0),
+            writes,
+            existing_coverage,
+            1 if source_files_unchanged and not source_unavailable else 0,
+        )
 
     async def _try_sync_official_classification_primary(
         self,
