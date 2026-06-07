@@ -192,12 +192,14 @@ reload_config - 热重载配置
 ### 1. 每日数据更新 (daily_data_update)
 - **执行时间**: 每周一至周五 20:00
 - **功能**: 自动更新当日股票数据
-- **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更会先刷新 `SSE/SZSE/BSE` 股票主数据，再重新读取 active 股票池抓取行情
+- **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更默认命中 `force_refresh_job_names`，会先强制刷新 `SSE/SZSE/BSE` 股票主数据，再重新读取 active/tradable 股票池抓取行情
 - **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
 
 ### 1.1 研究/财务任务的主数据治理
 
 通过 `/run` 手工触发或由 scheduler 自动执行的当前研究、财务和快照类任务，在解析 active 股票池前会先经过同一个证券主数据治理入口。包括公司画像、行业、严格申万、股东、财务摘要、完整财报、分析师预测、研报、舆情事件、技术快照和风险快照等任务。
+
+`force_refresh_job_names` 是强制刷新策略列表，不是“接入治理的任务列表”。当前默认强制刷新的自动任务是 `daily_data_update` 和 `industry_standard_sync`；其他已接入治理的当前任务通常采用 freshness-gated 策略，即本地主数据过期时才触发 BaoStock/AkShare 主数据同步。
 
 维护报告会显示“证券主数据治理”段落：
 

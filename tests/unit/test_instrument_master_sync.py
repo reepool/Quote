@@ -49,6 +49,36 @@ def _manager() -> DataManager:
         return DataManager()
 
 
+@pytest.mark.asyncio
+async def test_daily_update_master_governance_honors_force_refresh_job_names():
+    manager = _manager()
+    manager._get_instrument_master_force_refresh_job_names = Mock(
+        return_value={'daily_data_update'}
+    )
+    manager.ensure_instrument_master_fresh = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    target_date = date.today()
+
+    result = await manager._maybe_sync_instrument_master_before_daily_update(
+        ['SSE', 'SZSE'],
+        target_date,
+    )
+
+    assert result['status'] == 'success'
+    manager.ensure_instrument_master_fresh.assert_awaited_once_with(
+        ['SSE', 'SZSE'],
+        job_name='daily_data_update',
+        job_type='current',
+        target_date=target_date,
+        force_refresh=True,
+        include_pytdx_validation=False,
+        timeout_sec=30,
+        freshness_threshold_hours=48,
+        continue_on_failure=True,
+    )
+
+
 def _hkex_sync_config(mode: str = "audit_only") -> dict:
     return {
         'enabled': True,

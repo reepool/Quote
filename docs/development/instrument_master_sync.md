@@ -12,17 +12,40 @@
 
 普通行情日更、研究同步、财务同步和当前快照类任务都应通过这个共享治理入口后再读取 `instruments.is_active` 股票池。行情日更保留 `instrument_master_sync` 报告字段作为兼容字段，同时也会产生同一份 `instrument_master_governance` 结果；研究和财务维护任务使用 `instrument_master_governance` 报告段。最终架构不再保留一套行情专用主数据前置逻辑和另一套研究/财务主数据逻辑。
 
-`industry_standard_sync` 是当前申万 membership 的基础维护任务，默认列入 `force_refresh_job_names`：即使本地主数据仍在 freshness 窗口内，也会先刷新 A 股主数据，再解析当前 research target 股票池。这样可以覆盖当天新上市股票先进入主数据、申万 source file 未变化的时序。
+需要区分两个概念：
+
+- **前置治理**：任务开始前调用 `ensure_instrument_master_fresh()`。如果本地主数据仍在 `freshness_threshold_hours` 内，且任务没有强制刷新要求，治理结果可以是 `action=reused_fresh_master`，不会重复请求上游。
+- **强制刷新**：任务名命中 `instrument_master_governance.force_refresh_job_names` 时，即使本地主数据仍在 freshness 窗口内，也会跳过本地新鲜状态复用并执行实际主数据同步。
+
+因此，`force_refresh_job_names` 不是“哪些任务有主数据前置”的列表，而是“哪些已接入前置治理的当前任务必须强制拉取上游主数据”的策略列表。当前默认包含：
+
+- `daily_data_update`：A 股行情主日更，直接决定当晚行情抓取的 current/tradable universe，强制刷新主数据的成本相对行情下载较小。
+- `industry_standard_sync`：当前申万 membership 基础维护任务，需要在申万 source file 未变化时先获得最新 current universe，再用缓存分类历史补写新股 membership。
+
+其他已接入治理的当前任务默认采用 freshness-gated 策略：主数据过期、缺少 freshness 或 freshness 检查失败时会刷新；主数据仍新鲜时复用本地状态。
 
 ## 日更行为
 
 `DataManager.update_daily_data()` 在普通 A 股日更前会先执行共享主数据治理：
 
 - 同步范围默认是 `SSE`、`SZSE`、`BSE` 的 `stock` 主数据。
+- 行情日更命中 `force_refresh_job_names`，默认每次当前日更都跳过 freshness 复用并真实拉取 BaoStock/AkShare 主数据。
 - 同步完成后，日更重新从数据库读取 active instruments，再开始行情抓取。
 - 当前日更读取会要求 `tradable_only=True`，因此 `is_active=1` 但 `trading_status=0` 的停牌品种不会进入当日日更抓取；历史区间回补仍使用原 active universe 语义。
 - 当前退市或停用的 instrument 只改变主数据状态，不删除历史行情。
 - 历史回补默认跳过当前主数据同步，避免用今天的股票状态改写历史回补语义；报告中会记录 `historical_backfill_current_master_sync_skipped`。
+
+A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `daily_data_update` 的前置治理和已接入治理的研究/财务/当前快照任务。`config/05_scheduler.json` 中 `daily_data_update` 为周一至周五 `20:00` 运行，当前默认强制刷新 A 股主数据；若后续从 `force_refresh_job_names` 移除该任务，则是否真实刷新会回到 `freshness_threshold_hours` 控制。HKEX 主数据有独立 `hkex_instrument_master_sync` 任务，但当前配置为 `manual_only=true`。
+
+## 自动任务策略
+
+当前自动任务按主数据策略分三类：
+
+| 策略 | 任务 | 说明 |
+|---|---|---|
+| 强制刷新 | `daily_data_update`, `industry_standard_sync` | 每次当前任务都真实刷新 A 股主数据，再读取 current universe |
+| 前置治理，freshness-gated | `shareholder_incremental_sync`, `financial_disclosure_incremental_sync`, `financial_disclosure_reconciliation_sync`, `valuation_input_sync`, 以及已接入治理的研究/财务/当前快照任务 | 主数据过期时自动刷新；新鲜时复用本地状态 |
+| 跳过或无主数据依赖 | `valuation_history_rebuild`, 历史回补、监控、缓存、备份、交易日历、申万指数分析等 | 历史语义或非股票 universe 任务不应强制刷新主数据 |
 
 兼容配置位于 `config/03_data.json` 的 `data_config.instrument_master_sync`；通用治理配置位于 `data_config.instrument_master_governance`。治理配置默认继承同步配置中的超时、新鲜度阈值、历史回补 skip、失败继续和 pytdx 诊断开关。
 

@@ -24,7 +24,7 @@
 
 ### 2.1 生产错峰时间表
 
-除行情日更任务外，当前自动启用任务按业务域和写库压力错峰安排如下。轻量监控任务允许与其他任务重叠；长任务和同源研究域任务尽量保持独立窗口。
+当前自动启用任务按业务域和写库压力错峰安排如下。轻量监控任务允许与其他任务重叠；长任务和同源研究域任务尽量保持独立窗口。
 
 | 任务 | 业务类型 | 当前时间 | 运行窗口/说明 |
 |---|---|---|---|
@@ -34,13 +34,15 @@
 | `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
 | `cache_warm_up` | 缓存 | 每日 `08:00` | 轻量预热，早于研究域写库任务 |
-| `industry_standard_sync` | 申万分类 | 每日 `19:15` | 收盘后先强制治理 A 股主数据，再维护申万分类/归属基础层 |
 | `industry_index_analysis_sync` | 申万指数指标 | 周一至周五 `10:45` | 与申万分类同源，后移到分类窗口之后 |
 | `market_dependency_version_check` | 依赖检查 | 每日 `12:00` | 轻量网络检查 |
 | `monthly_data_integrity_check` | 月度完整性 | 每月 2 日 `11:00` | 避开 1 日交易日历和周日凌晨维护高峰 |
 | `shareholder_reconciliation_sync` | 股东周期复核 | 周六 `12:30` | 预留 5 小时，避开备份和申万任务 |
 | `quarterly_cleanup` | 季度清理 | 季度最后一天 `14:30` | 避开凌晨维护/备份窗口 |
 | `find_gap_and_repair` | 缺口修复 | 周日 `15:00` | 周维护完成后执行，预留 4 小时 |
+| `hk_daily_data_update` | 港股行情 | 周一至周五 `17:30` | 港股收盘后执行，前置 HKEX 主数据治理但不强制 lifecycle 写入 |
+| `industry_standard_sync` | 申万分类 | 每日 `19:15` | 收盘后强制刷新 A 股主数据，再维护申万分类/归属基础层 |
+| `daily_data_update` | A 股行情 | 周一至周五 `20:00` | 强制刷新 A 股主数据，再读取 tradable universe 做行情日更 |
 
 ### 3. 任务监控
 - **状态监控**：实时查看任务执行状态
@@ -74,6 +76,7 @@ SchedulerCore
 
 - 范围为 `SSE`、`SZSE`、`BSE` 的 `stock` 主数据。
 - 主源为 BaoStock，AkShare 作为备用和补充；BSE 当前以 AkShare 当前列表补齐新增股票。
+- 日更走共享主数据前置治理，并默认命中 `force_refresh_job_names`；当前日更会跳过 freshness 复用并重新拉取上游主数据。
 - 同步完成后重新读取 active instruments，再开始行情抓取。
 - 历史补数模式 `target_date < today` 默认跳过当前主数据同步，并在报告数据中记录 skip reason。
 - 日更报告会包含 `instrument_master_sync`，用于暴露新增、停用、主数据新鲜度和 warnings/errors。

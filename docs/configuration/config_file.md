@@ -439,24 +439,28 @@
     "freshness_threshold_hours": 48,
     "pytdx_validation_enabled": false,
     "supported_exchanges": ["SSE", "SZSE", "BSE", "HKEX"],
-    "force_refresh_job_names": ["industry_standard_sync"],
+    "force_refresh_job_names": ["daily_data_update", "industry_standard_sync"],
     "current_job_names": [
       "daily_data_update",
       "hk_daily_data_update",
       "financial_summary_shadow_sync",
-      "financial_statements_shadow_sync"
+      "financial_statements_shadow_sync",
+      "financial_disclosure_incremental_sync",
+      "financial_disclosure_reconciliation_sync",
+      "valuation_history_rebuild",
+      "valuation_input_sync"
     ]
   }
 }
 ```
 
 - **`enabled`**: 是否启用通用主数据治理入口。
-- **`reuse_fresh_master`**: 本地 `instruments.updated_at` 在新鲜度窗口内时，后续当前任务复用本地状态，不重复请求上游主数据列表。
-- **`force_refresh_job_names`**: 指定即使本地主数据仍在新鲜度窗口内，也必须先执行主数据同步的当前任务；`industry_standard_sync` 默认在此列表内，避免新股进入股票池晚于申万 source file 变更时造成 current membership 缺口。
+- **`reuse_fresh_master`**: 本地 `instruments.updated_at` 在新鲜度窗口内时，前置治理可以复用本地状态，不重复请求上游主数据列表。
+- **`force_refresh_job_names`**: 强制刷新策略列表，不是“有主数据前置的任务列表”。任务名命中该列表时，即使本地主数据仍在新鲜度窗口内，也会跳过本地复用并执行实际主数据同步；`daily_data_update` 默认在此列表内，保证 A 股行情主日更使用最新 current universe；`industry_standard_sync` 默认在此列表内，避免新股进入股票池晚于申万 source file 变更时造成 current membership 缺口。
 - **`skip_for_backfill`**: 历史、回补和 point-in-time 类任务是否默认跳过当前主数据刷新。
 - **`continue_on_failure`**: 治理失败后是否允许业务任务继续使用本地股票池，并在报告中暴露 warning/error。
 - **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
-- **`current_job_names`**: 参与治理的当前任务清单，用于配置审计和运维可读性。
+- **`current_job_names`**: 参与前置治理的当前任务清单，用于配置审计和运维可读性；是否真实刷新上游仍取决于 freshness 与 `force_refresh_job_names`。
 
 ### data_config.hkex_instrument_master_sync
 

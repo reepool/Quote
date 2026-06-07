@@ -39,6 +39,7 @@
         "HKEX"
       ],
       "force_refresh_job_names": [
+        "daily_data_update",
         "industry_standard_sync"
       ],
       "current_job_names": [
@@ -51,11 +52,15 @@
         "financial_statements_shadow_sync",
         "shareholder_shadow_sync",
         "shareholder_incremental_sync",
+        "financial_disclosure_incremental_sync",
+        "financial_disclosure_reconciliation_sync",
         "analyst_forecast_shadow_sync",
         "research_report_shadow_sync",
         "sentiment_event_shadow_sync",
         "technical_snapshot_refresh",
-        "risk_snapshot_rebuild"
+        "risk_snapshot_rebuild",
+        "valuation_history_rebuild",
+        "valuation_input_sync"
       ]
     },
     "hkex_instrument_master_sync": {

@@ -7823,20 +7823,26 @@ class DataManager:
             'freshness_threshold_hours': sync_config.get('freshness_threshold_hours', 48),
             'pytdx_validation_enabled': sync_config.get('pytdx_validation_enabled', False),
             'supported_exchanges': sync_config.get('exchanges', ['SSE', 'SZSE', 'BSE']),
-            'force_refresh_job_names': ['industry_standard_sync'],
+            'force_refresh_job_names': ['daily_data_update', 'industry_standard_sync'],
             'current_job_names': [
                 'daily_data_update',
+                'hk_daily_data_update',
                 'company_profile_shadow_sync',
                 'industry_shadow_sync',
                 'industry_standard_sync',
                 'financial_summary_shadow_sync',
                 'financial_statements_shadow_sync',
                 'shareholder_shadow_sync',
+                'shareholder_incremental_sync',
+                'financial_disclosure_incremental_sync',
+                'financial_disclosure_reconciliation_sync',
                 'analyst_forecast_shadow_sync',
                 'research_report_shadow_sync',
                 'sentiment_event_shadow_sync',
                 'technical_snapshot_refresh',
                 'risk_snapshot_rebuild',
+                'valuation_history_rebuild',
+                'valuation_input_sync',
             ],
         }
 
@@ -7846,6 +7852,15 @@ class DataManager:
         if isinstance(raw_config, dict):
             defaults.update(raw_config)
         return defaults
+
+    def _get_instrument_master_force_refresh_job_names(self) -> set[str]:
+        """Return job names that must bypass local master freshness reuse."""
+        config = self._get_instrument_master_governance_config()
+        return {
+            str(item).strip()
+            for item in (config.get('force_refresh_job_names') or [])
+            if str(item).strip()
+        }
 
     def _get_hkex_instrument_master_sync_config(self) -> Dict[str, Any]:
         """Return HKEX-specific master sync config with audit-first defaults."""
@@ -9410,6 +9425,7 @@ class DataManager:
     ) -> Dict[str, Any]:
         """Compatibility wrapper for daily update master governance."""
         config = self._get_instrument_master_sync_config()
+        force_refresh_job_names = self._get_instrument_master_force_refresh_job_names()
 
         if not config.get('enabled', True) or not config.get('run_before_daily_update', True):
             return {
@@ -9420,12 +9436,18 @@ class DataManager:
                 'errors': [],
             }
 
+        local_today = get_shanghai_time().date()
+        force_refresh = (
+            'daily_data_update' in force_refresh_job_names
+            and target_date >= local_today
+        )
+
         result = await self.ensure_instrument_master_fresh(
             exchanges,
             job_name='daily_data_update',
             job_type='current',
             target_date=target_date,
-            force_refresh=False,
+            force_refresh=force_refresh,
             include_pytdx_validation=config.get('pytdx_validation_enabled', True),
             timeout_sec=config.get('timeout_sec'),
             freshness_threshold_hours=config.get('freshness_threshold_hours'),
@@ -9443,12 +9465,7 @@ class DataManager:
         job_type: str = 'current',
     ) -> Dict[str, Any]:
         """Run shared master governance before research jobs resolve universes."""
-        config = self._get_instrument_master_governance_config()
-        force_refresh_job_names = {
-            str(item).strip()
-            for item in (config.get('force_refresh_job_names') or [])
-            if str(item).strip()
-        }
+        force_refresh_job_names = self._get_instrument_master_force_refresh_job_names()
         kwargs = {
             'job_name': job_name,
             'job_type': job_type,
