@@ -836,6 +836,7 @@ class IndustryStandardSyncService:
                 attempted_sources=attempted_sources,
                 target_exchanges=target_exchanges,
                 instruments_by_exchange=instruments_by_exchange,
+                run_id=run_id,
                 diagnostics=bundle.diagnostics,
             )
 
@@ -1174,17 +1175,25 @@ class IndustryStandardSyncService:
         attempted_sources: List[str],
         target_exchanges: List[str],
         instruments_by_exchange: Dict[str, List[Dict[str, Any]]],
+        run_id: int,
         diagnostics: Dict[str, Any],
     ) -> Dict[str, Any]:
         standard_cfg = self.research_config.modules.get("industry", {}).get("standard", {})
         taxonomy_system = str(standard_cfg.get("taxonomy_system", "sw"))
         taxonomy_version = str(standard_cfg.get("taxonomy_version", "sw_2021"))
+        taxonomy_nodes = self.storage.list_industry_taxonomy(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+        )
+        taxonomy_by_code = {node.industry_code: node for node in taxonomy_nodes}
         authoritative_by_exchange = self.storage.count_industry_memberships_by_exchange(
             taxonomy_system=taxonomy_system,
             taxonomy_version=taxonomy_version,
             mapping_status="authoritative",
         )
         exchange_results: List[IndustryStandardExchangeSyncResult] = []
+        total_memberships_written = 0
+        total_official_classifications_written = 0
         for exchange in target_exchanges:
             target_count = len(instruments_by_exchange.get(exchange, []))
             if target_count <= 0:
@@ -1199,18 +1208,58 @@ class IndustryStandardSyncService:
                 )
                 continue
             authoritative_count = int(authoritative_by_exchange.get(exchange, 0))
+            repair_result = None
+            if authoritative_count < target_count and taxonomy_nodes:
+                repair_result = self._repair_unchanged_official_memberships_for_exchange(
+                    taxonomy_nodes=taxonomy_nodes,
+                    taxonomy_by_code=taxonomy_by_code,
+                    taxonomy_system=taxonomy_system,
+                    taxonomy_version=taxonomy_version,
+                    candidate_source=candidate_source,
+                    candidate_mode=candidate_mode,
+                    stock_instruments=instruments_by_exchange.get(exchange, []),
+                    exchange=exchange,
+                    run_id=run_id,
+                    diagnostics={
+                        "official_classification_primary": True,
+                        "source_files_unchanged": True,
+                        **diagnostics,
+                    },
+                )
+                total_memberships_written += repair_result.memberships_written
+                total_official_classifications_written += (
+                    repair_result.official_classifications_written
+                )
+                authoritative_by_exchange = self.storage.count_industry_memberships_by_exchange(
+                    taxonomy_system=taxonomy_system,
+                    taxonomy_version=taxonomy_version,
+                    mapping_status="authoritative",
+                )
+                authoritative_count = int(authoritative_by_exchange.get(exchange, 0))
             status = "success" if authoritative_count >= target_count else "degraded"
+            repair_diagnostics = (
+                repair_result.diagnostics
+                if repair_result is not None
+                else {}
+            )
             exchange_results.append(
                 IndustryStandardExchangeSyncResult(
                     exchange=exchange,
                     status=status,
-                    memberships_written=0,
-                    official_classifications_written=0,
+                    memberships_written=(
+                        0 if repair_result is None else repair_result.memberships_written
+                    ),
+                    official_classifications_written=(
+                        0
+                        if repair_result is None
+                        else repair_result.official_classifications_written
+                    ),
                     source=candidate_source,
                     mode=candidate_mode,
                     diagnostics={
                         "official_classification_primary": True,
                         "source_files_unchanged": True,
+                        **repair_diagnostics,
                         "existing_authoritative_memberships": authoritative_count,
                         "target_instruments": target_count,
                         **diagnostics,
@@ -1237,12 +1286,86 @@ class IndustryStandardSyncService:
             "source_files_unchanged": True,
             "taxonomy_nodes_written": 0,
             "classification_history_rows_written": 0,
-            "total_memberships_written": 0,
-            "total_official_classifications_written": 0,
+            "total_memberships_written": total_memberships_written,
+            "total_official_classifications_written": total_official_classifications_written,
             "successful_exchanges": successful_exchanges,
             "attempted_exchanges": len(exchange_results),
             "exchanges": [asdict(result) for result in exchange_results],
         }
+
+    def _repair_unchanged_official_memberships_for_exchange(
+        self,
+        *,
+        taxonomy_nodes: List[IndustryTaxonomySnapshot],
+        taxonomy_by_code: Dict[str, IndustryTaxonomySnapshot],
+        taxonomy_system: str,
+        taxonomy_version: str,
+        candidate_source: str,
+        candidate_mode: str,
+        stock_instruments: List[Dict[str, Any]],
+        exchange: str,
+        run_id: int,
+        diagnostics: Dict[str, Any],
+    ) -> IndustryStandardExchangeSyncResult:
+        covered_ids = set(
+            self.storage.list_industry_membership_instrument_ids(
+                taxonomy_system=taxonomy_system,
+                taxonomy_version=taxonomy_version,
+                mapping_status="authoritative",
+                exchange=exchange,
+            )
+        )
+        missing_instruments = [
+            instrument
+            for instrument in stock_instruments
+            if str(instrument.get("instrument_id") or "").strip() not in covered_ids
+        ]
+        if not missing_instruments:
+            return IndustryStandardExchangeSyncResult(
+                exchange=exchange,
+                status="success",
+                source=candidate_source,
+                mode=candidate_mode,
+                diagnostics={
+                    **diagnostics,
+                    "source_files_unchanged_repair": "not_needed",
+                    "repair_target_instruments": 0,
+                },
+            )
+
+        latest_classifications = self.storage.list_latest_industry_classification_history(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            exchange=exchange,
+            instrument_ids=[
+                str(instrument.get("instrument_id") or "")
+                for instrument in missing_instruments
+            ],
+            symbols=[
+                str(instrument.get("symbol") or "")
+                for instrument in missing_instruments
+            ],
+        )
+        latest_by_symbol = {
+            str(snapshot.symbol).strip(): snapshot
+            for snapshot in latest_classifications
+        }
+        return self._write_official_memberships_for_exchange(
+            taxonomy_nodes=taxonomy_nodes,
+            taxonomy_by_code=taxonomy_by_code,
+            latest_by_symbol=latest_by_symbol,
+            stock_instruments=missing_instruments,
+            exchange=exchange,
+            source=candidate_source,
+            mode=candidate_mode,
+            run_id=run_id,
+            diagnostics={
+                **diagnostics,
+                "source_files_unchanged_repair": "cached_history",
+                "repair_target_instruments": len(missing_instruments),
+                "repair_cached_history_matches": len(latest_classifications),
+            },
+        )
 
     def _build_source_unavailable_official_classification_result(
         self,

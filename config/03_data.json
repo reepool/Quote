@@ -38,6 +38,9 @@
         "BSE",
         "HKEX"
       ],
+      "force_refresh_job_names": [
+        "industry_standard_sync"
+      ],
       "current_job_names": [
         "daily_data_update",
         "hk_daily_data_update",

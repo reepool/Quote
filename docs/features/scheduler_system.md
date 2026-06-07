@@ -34,7 +34,7 @@
 | `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
 | `cache_warm_up` | 缓存 | 每日 `08:00` | 轻量预热，早于研究域写库任务 |
-| `industry_standard_sync` | 申万分类 | 每日 `08:30` | 预留 2 小时，先维护分类/归属基础层 |
+| `industry_standard_sync` | 申万分类 | 每日 `19:15` | 收盘后先强制治理 A 股主数据，再维护申万分类/归属基础层 |
 | `industry_index_analysis_sync` | 申万指数指标 | 周一至周五 `10:45` | 与申万分类同源，后移到分类窗口之后 |
 | `market_dependency_version_check` | 依赖检查 | 每日 `12:00` | 轻量网络检查 |
 | `monthly_data_integrity_check` | 月度完整性 | 每月 2 日 `11:00` | 避开 1 日交易日历和周日凌晨维护高峰 |

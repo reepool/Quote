@@ -422,8 +422,8 @@
         "trigger": {
           "type": "cron",
           "day_of_week": "*",
-          "hour": 8,
-          "minute": 30,
+          "hour": 19,
+          "minute": 15,
           "second": 0
         },
         "max_instances": 1,

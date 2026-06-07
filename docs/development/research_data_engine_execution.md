@@ -936,6 +936,8 @@ technical readiness 接口会聚合：
 - `2026-04-23` 进一步排查 live 维护阻塞时确认：`DataManager.run_industry_standard_sync()` 原先通过 `from research import IndustryStandardSyncService` 走包根导入，会把整个 `research` 包及其无关服务一起拉起；在当前环境下，这会放大 strict Shenwan CLI/runner 的初始化副作用。现已改为按模块精确导入，并在 `DatabaseOperations` 中新增 `get_research_target_instruments_by_exchange(_sync)` 轻量研究标的读取入口，`IndustryStandardSyncService` 优先复用这条路径，不再强依赖通用 `get_instruments_by_exchange()` 异步大查询
 - `2026-04-25` 申万官方分类主源已从手工运行推进为系统功能：
   - 日更任务：`scheduler.tasks.industry_standard_sync` / `config/05_scheduler.json -> industry_standard_sync`，默认使用 source manifest/sha256 短路，Telegram 命令为 `/industry_standard_sync [force]`
+  - 调度时间调整为每日 `19:15`：先通过共享主数据治理强制刷新 A 股主数据，再解析当前 research target 股票池，避免新股进入主数据晚于申万文件变更时造成 current membership 缺口
+  - 当申万 source files 未变化但本地 authoritative coverage 不足时，日更任务不再只报 degraded；会利用已缓存的 `industry_classification_history` 与 `industry_taxonomy` 对缺口标的补写 current membership 和 official classification
   - 全量重建任务：`scheduler.tasks.industry_standard_rebuild_official` / `DataManager.rebuild_official_industry_standard()`，清理范围仅限 strict Shenwan 行业标准层，Telegram 命令为 `/industry_standard_rebuild [force] [drop_source_files]`
   - 正式运维 CLI 归入 `scripts/research_ops/`；开发验证 CLI 归入 `scripts/dev_validation/`；旧脚本路径已清理，不再保留兼容包装
 - `2026-04-25` 已开始落地独立的申万指数分析直连源：

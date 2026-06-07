@@ -12,6 +12,8 @@
 
 普通行情日更、研究同步、财务同步和当前快照类任务都应通过这个共享治理入口后再读取 `instruments.is_active` 股票池。行情日更保留 `instrument_master_sync` 报告字段作为兼容字段，同时也会产生同一份 `instrument_master_governance` 结果；研究和财务维护任务使用 `instrument_master_governance` 报告段。最终架构不再保留一套行情专用主数据前置逻辑和另一套研究/财务主数据逻辑。
 
+`industry_standard_sync` 是当前申万 membership 的基础维护任务，默认列入 `force_refresh_job_names`：即使本地主数据仍在 freshness 窗口内，也会先刷新 A 股主数据，再解析当前 research target 股票池。这样可以覆盖当天新上市股票先进入主数据、申万 source file 未变化的时序。
+
 ## 日更行为
 
 `DataManager.update_daily_data()` 在普通 A 股日更前会先执行共享主数据治理：

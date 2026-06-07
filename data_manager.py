@@ -7823,6 +7823,7 @@ class DataManager:
             'freshness_threshold_hours': sync_config.get('freshness_threshold_hours', 48),
             'pytdx_validation_enabled': sync_config.get('pytdx_validation_enabled', False),
             'supported_exchanges': sync_config.get('exchanges', ['SSE', 'SZSE', 'BSE']),
+            'force_refresh_job_names': ['industry_standard_sync'],
             'current_job_names': [
                 'daily_data_update',
                 'company_profile_shadow_sync',
@@ -9442,11 +9443,19 @@ class DataManager:
         job_type: str = 'current',
     ) -> Dict[str, Any]:
         """Run shared master governance before research jobs resolve universes."""
-        return await self.ensure_instrument_master_fresh(
-            exchanges,
-            job_name=job_name,
-            job_type=job_type,
-        )
+        config = self._get_instrument_master_governance_config()
+        force_refresh_job_names = {
+            str(item).strip()
+            for item in (config.get('force_refresh_job_names') or [])
+            if str(item).strip()
+        }
+        kwargs = {
+            'job_name': job_name,
+            'job_type': job_type,
+        }
+        if job_name in force_refresh_job_names:
+            kwargs['force_refresh'] = True
+        return await self.ensure_instrument_master_fresh(exchanges, **kwargs)
 
     def _attach_instrument_master_governance(
         self,

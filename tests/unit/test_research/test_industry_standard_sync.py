@@ -1124,6 +1124,102 @@ async def test_industry_standard_sync_reports_existing_coverage_when_official_so
 
 
 @pytest.mark.asyncio
+async def test_industry_standard_sync_repairs_missing_membership_when_source_files_unchanged(
+    tmp_path,
+):
+    research_config = _build_research_config(
+        tmp_path,
+        industry_module={
+            "enabled": True,
+            "standard": {
+                "enabled": True,
+                "taxonomy_system": "sw",
+                "taxonomy_version": "sw_2021",
+                "classification_primary_enabled": True,
+            },
+        },
+    )
+    research_config.routing["industry_standard"]["free_chain"] = [
+        {"source": "swsresearch", "mode": "direct"}
+    ]
+    research_config.sources["swsresearch"] = {
+        "enabled": True,
+        "supports_proxy_patch": False,
+        "cost_tier": "free",
+    }
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    sws_provider = _UnchangedSWSResearchOfficialBundleProvider()
+    for node in sws_provider._taxonomy_nodes():
+        storage.upsert_industry_taxonomy(node)
+    storage.replace_industry_classification_history(
+        [
+            IndustryClassificationHistorySnapshot(
+                instrument_id="600519.SH",
+                symbol="600519",
+                exchange="SSE",
+                taxonomy_system="sw",
+                taxonomy_version="sw_2021",
+                official_industry_code="340501",
+                official_start_date="2024-01-02",
+                official_update_time="2024-01-03",
+                row_hash="600519-340501",
+                source="swsresearch",
+                source_mode="direct",
+                classification_json={"symbol": "600519", "industry_code": "340501"},
+            )
+        ],
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+    )
+
+    service = IndustryStandardSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "name": "贵州茅台",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                }
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        resolver=ResearchSourcePolicyResolver(research_config),
+        registry=IndustryStandardProviderRegistry({"swsresearch": sws_provider}),
+        official_registry=OfficialIndustryHistoryProviderRegistry({}),
+    )
+
+    result = await service.sync(exchanges=["SSE"], limit_per_exchange=1)
+
+    assert result["status"] == "success"
+    assert result["source"] == "swsresearch"
+    assert result["source_files_unchanged"] is True
+    assert result["total_memberships_written"] == 1
+    assert result["total_official_classifications_written"] == 1
+    diagnostics = result["exchanges"][0]["diagnostics"]
+    assert diagnostics["source_files_unchanged_repair"] == "cached_history"
+    assert diagnostics["repair_target_instruments"] == 1
+    assert diagnostics["repair_cached_history_matches"] == 1
+    assert diagnostics["existing_authoritative_memberships"] == 1
+    assert diagnostics["target_instruments"] == 1
+
+    with storage.get_connection() as conn:
+        membership = conn.execute(
+            """
+            SELECT industry_code, sw_l1_code, sw_l2_code, sw_l3_code, mapping_status
+            FROM industry_memberships
+            WHERE instrument_id = ?
+            """,
+            ("600519.SH",),
+        ).fetchone()
+    assert tuple(membership) == ("340501", "340000", "340500", "340501", "authoritative")
+
+
+@pytest.mark.asyncio
 async def test_industry_standard_sync_keeps_sws_unchanged_result_when_fallback_fails(
     tmp_path,
 ):

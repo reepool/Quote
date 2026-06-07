@@ -55,6 +55,39 @@ async def _sync_to_thread(func, /, *args, **kwargs):
     return func(*args, **kwargs)
 
 
+def test_research_industry_standard_sync_forces_master_governance_refresh(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.data_config = {
+        "instrument_master_sync": {"enabled": True},
+        "instrument_master_governance": {
+            "enabled": True,
+            "force_refresh_job_names": ["industry_standard_sync"],
+        },
+    }
+    manager.ensure_instrument_master_fresh = AsyncMock(
+        return_value={"status": "success"}
+    )
+
+    result = _run(
+        manager._ensure_research_job_instrument_master_governance(
+            exchanges=["BSE"],
+            job_name="industry_standard_sync",
+        )
+    )
+
+    assert result["status"] == "success"
+    manager.ensure_instrument_master_fresh.assert_awaited_once_with(
+        ["BSE"],
+        job_name="industry_standard_sync",
+        job_type="current",
+        force_refresh=True,
+    )
+
+
 def test_data_manager_refresh_runtime_config_rebinds_research_config(tmp_path):
     initial_research_config = ResearchConfig(
         enabled=True,

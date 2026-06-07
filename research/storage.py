@@ -43,6 +43,7 @@ from research.providers.base import (
     IndustrySourceFileSnapshot,
     IndustryTaxonomySnapshot,
     OfficialIndustryClassificationSnapshot,
+    OfficialIndustryHistorySnapshot,
     ResearchReportSnapshot,
     RiskSnapshot,
     ShareholderSnapshot,
@@ -3423,6 +3424,94 @@ class ResearchStorageManager:
                 if row["exchange"] is not None
             },
         }
+
+    def list_latest_industry_classification_history(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        exchange: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        symbols: Optional[List[str]] = None,
+    ) -> List[OfficialIndustryHistorySnapshot]:
+        """Return latest cached official classification rows for selected instruments."""
+        conditions = [
+            "taxonomy_system = ?",
+            "taxonomy_version = ?",
+        ]
+        params: list[Any] = [taxonomy_system, taxonomy_version or ""]
+        if exchange:
+            conditions.append("exchange = ?")
+            params.append(exchange)
+
+        normalized_ids = [
+            str(instrument_id).strip()
+            for instrument_id in (instrument_ids or [])
+            if str(instrument_id).strip()
+        ]
+        normalized_symbols = [
+            str(symbol).strip()
+            for symbol in (symbols or [])
+            if str(symbol).strip()
+        ]
+        lookup_clauses = []
+        if normalized_ids:
+            lookup_clauses.append(
+                "instrument_id IN (" + ",".join("?" for _ in normalized_ids) + ")"
+            )
+            params.extend(normalized_ids)
+        if normalized_symbols:
+            lookup_clauses.append(
+                "symbol IN (" + ",".join("?" for _ in normalized_symbols) + ")"
+            )
+            params.extend(normalized_symbols)
+        if lookup_clauses:
+            conditions.append("(" + " OR ".join(lookup_clauses) + ")")
+
+        where_sql = " AND ".join(conditions)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    official_industry_code,
+                    official_start_date,
+                    official_update_time,
+                    source,
+                    source_mode,
+                    classification_json
+                FROM industry_classification_history
+                WHERE {where_sql}
+                ORDER BY
+                    symbol ASC,
+                    official_start_date ASC,
+                    official_update_time ASC,
+                    updated_at ASC
+                """,
+                params,
+            ).fetchall()
+
+        latest_by_symbol: Dict[str, sqlite3.Row] = {}
+        for row in rows:
+            latest_by_symbol[str(row["symbol"]).strip()] = row
+
+        return [
+            OfficialIndustryHistorySnapshot(
+                instrument_id=str(row["instrument_id"]),
+                symbol=str(row["symbol"]),
+                exchange=str(row["exchange"]),
+                official_industry_code=str(row["official_industry_code"]),
+                start_date=row["official_start_date"],
+                update_time=row["official_update_time"],
+                source=str(row["source"]),
+                source_mode=str(row["source_mode"]),
+                raw_payload=self._deserialize_json(row["classification_json"]) or {},
+            )
+            for row in latest_by_symbol.values()
+        ]
 
     def upsert_official_industry_classification(
         self,
