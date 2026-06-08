@@ -33,6 +33,7 @@ def test_resolve_financial_statement_profile_prefers_explicit_profile():
         ),
         (
             {
+                "instrument_id": "600030.SH",
                 "taxonomy_system": "sw",
                 "taxonomy_version": "sw_2021",
                 "industry_code": "490101",
@@ -84,6 +85,7 @@ def test_resolve_financial_statement_profile_from_strict_industry_membership(
 def test_resolve_financial_statement_profile_uses_company_profile_when_industry_missing():
     result = resolve_financial_statement_profile(
         company_profile={
+            "instrument_id": "600030.SH",
             "company_name": "样例证券股份有限公司",
             "short_name": "样例证券",
             "industry_raw": "证券",
@@ -94,6 +96,25 @@ def test_resolve_financial_statement_profile_uses_company_profile_when_industry_
     assert result.profile == "securities"
     assert result.confidence == "medium"
     assert result.source == "company_profile"
+
+
+def test_resolve_financial_statement_profile_rejects_shenwan_only_securities_candidate():
+    result = resolve_financial_statement_profile(
+        industry_membership={
+            "instrument_id": "300059.SZ",
+            "taxonomy_system": "sw",
+            "taxonomy_version": "sw_2021",
+            "industry_code": "490101",
+            "industry_name": "证券Ⅲ",
+            "sw_l1_name": "非银金融",
+            "sw_l2_name": "证券Ⅱ",
+            "sw_l3_name": "证券Ⅲ",
+        }
+    )
+
+    assert result.profile == "nonbank"
+    assert result.reason == "securities_candidate_without_confirmed_broker_scope"
+    assert result.evidence["listed_broker_dealer_scope"]["eligible"] is False
 
 
 def test_resolve_financial_statement_profile_defaults_to_nonbank_without_evidence():

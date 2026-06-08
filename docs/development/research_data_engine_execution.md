@@ -273,7 +273,7 @@ Beta API 调用约定：
   - L1 本地核心层：以新浪和同花顺在 bank/nonbank profile 下通过审计的严格语义交集为准，提供高频、本地、统一单位的财务事实服务；同花顺因速度和长表结构暂定为候选主更新源，新浪作为互备和中文语义校验源。
   - L2 官方摘要校验层：CNInfo data20 只承担官方摘要大项校验，字段远少于新浪/同花顺/东财，单位为 `CNY_10K`，不能被当作完整三表源。
   - L3 远程扩展层：东财字段最宽但较慢，默认不写入本地核心层，仅当 AI/研究请求需要 L1 不覆盖字段时按需调用，并转换成同一 canonical schema、单位和口径后返回。
-- 证券行业补充层：`add-broker-risk-control-financial-facts` 将证券公司《风险控制指标报告》作为 `financial_statements` 下的 source profile，而不是独立数据域。该层写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。
+- 证券行业补充层：`use-annual-report-broker-risk-control-source` 将上市证券公司正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表作为证券监管事实主源，独立《风险控制指标报告》仅作为补充、校验或非年报/半年报周期补源。证券公司 universe 不能只依赖申万“证券Ⅲ”，必须通过 CSRC 证券公司名录/证券经营机构信息公示与显式 `listed_broker_dealer_scope` 上市主体映射确认。该层仍写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。
 
 #### 4.5.1 下一阶段财务字段映射原则
 
@@ -547,7 +547,7 @@ technical readiness 接口会聚合：
 - 全数值事实长表与核心事实表分层；字段 alias、单位换算、parser version 全部配置化或版本化
 - 财务事实和派生指标按 hot/cold tier 维护：默认 hot window 为最近 `12` 个季度，历史数据进入 history tier；`12` 是配置默认值，不得写死在查询逻辑中
 - 读取 API 继续本地优先，不在请求时访问官方披露或第三方财务接口
-- 证券风控指标报告接入财务披露链路：历史回补按配置年度和证券公司 universe 扫描公告/PDF；增量更新按公告 watermark 只处理新披露或重试 pending 报告。`net_capital` 是 broker DCF blocker；风险覆盖率、资本杠杆率、LCR、NSFR、净资本/净资产、净资本/负债、自营/融资占净资本比例和风险资本准备分项作为证券 L1.5 专项事实与 DCF 风险诊断输入。风控报告中的操作风险收入行如被披露，只能保存为监管口径 P2 字段，不能替代年报分部收入。
+- 证券监管指标接入财务披露链路：历史回补默认按正式年报/半年报公告扫描上市证券公司 universe，增量更新按公告 watermark 处理新增年报/半年报，并可选扫描独立《风险控制指标报告》作为补充。`net_capital` 是 broker DCF blocker；风险覆盖率、资本杠杆率、LCR、NSFR、净资本/净资产、净资本/负债、自营/融资占净资本比例和风险资本准备分项作为证券 L1.5 专项事实与 DCF 风险诊断输入。监管风控表中的操作风险收入行如被披露，只能保存为监管口径 P2 字段，不能替代年报分部收入。
 
 #### Stage G：估值基线
 
@@ -558,7 +558,7 @@ technical readiness 接口会聚合：
 - `relative valuation`
 - `DCF` engine abstraction
 - 专业 DCF 第一批实现：`ProfessionalDcfEngine` 已接管默认 DCF 计算路径，支持 `nonfinancial_fcff.v1`、模型 suitability scoring、FCFE/FCFF adapter、`data_available_date <= valuation_date` blocker、本地假设读取、profile discovery、readiness 和 input-gap API；2026-06-05 追加实现 `nonfinancial_fcfe.v1` 以及公用事业/REIT 轻量 DDM/分派模型
-- 证券 DCF 数据供给进入实施准备：`add-broker-risk-control-financial-facts` 已完成 OpenSpec artifacts，下一步实现证券风控指标报告的历史回补、公告增量更新、PDF 解析、canonical numeric facts 写入和 DCF input bundle 合并。
+- 证券 DCF 数据供给进入方案调整：`use-annual-report-broker-risk-control-source` 将以 CSRC 名录 + 显式上市券商 scope gate 确认 universe，并以正式年报/半年报内嵌风控表作为 `net_capital` 与核心监管指标主源；独立风控指标报告只作为补充/校验源。下一步实现严格公告选择、内嵌表解析、canonical numeric facts 写入和 DCF input bundle 合并。
 - `valuation_history_rebuild`
 - `/api/v1/research/company/{instrument_id}/valuation/history`
 - `/api/v1/research/company/{instrument_id}/valuation/relative`

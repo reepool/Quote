@@ -945,6 +945,45 @@ def test_valuation_service_dcf_broker_missing_core_inputs_fails_closed():
     assert "net_capital_required" in result["readiness"]["blockers"]
 
 
+def test_valuation_service_dcf_broker_scope_required_for_platform_candidate():
+    service = ResearchValuationService()
+    instrument = {
+        "instrument_id": "300059.SZ",
+        "symbol": "300059",
+        "exchange": "SZSE",
+        "industry_name": "证券",
+    }
+    bundle = {
+        "report_period": "2025-12-31",
+        "data_available_date": "2026-03-30",
+        "equity": 1000.0,
+        "net_income": 120.0,
+        "net_capital": 260.0,
+        "shares_outstanding": 10.0,
+    }
+
+    auto_result = service.run_dcf(
+        instrument=instrument,
+        financial_bundle=bundle,
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+    forced_result = service.run_dcf(
+        instrument=instrument,
+        financial_bundle=bundle,
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "model_profile": "broker_excess_capital.v1",
+        },
+    )
+
+    assert auto_result["model_profile"] != "broker_excess_capital.v1"
+    assert forced_result["status"] == "unavailable"
+    assert forced_result["missing_reason"] == "broker_scope_unconfirmed"
+    assert "broker_scope_unconfirmed" in forced_result["readiness"]["blockers"]
+
+
 def test_valuation_service_dcf_broker_derives_and_caps_peak_roe():
     service = ResearchValuationService()
 

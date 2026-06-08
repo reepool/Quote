@@ -27,8 +27,18 @@ class _FakeScanner:
 
     def scan(self, config, *, filters=None):
         self.configs.append(config)
+        records = list(self.records)
+        if getattr(config, "stock", None):
+            stock_code = str(config.stock).split(",", 1)[0]
+            records = [record for record in records if stock_code in record.symbols]
+        else:
+            records = [
+                record
+                for record in records
+                if record.raw_payload.get("market_scan", True)
+            ]
         selected = []
-        for record in self.records:
+        for record in records:
             reasons = []
             for predicate in filters or []:
                 reasons.extend(predicate(record) or [])
@@ -51,10 +61,10 @@ class _FakeScanner:
                 )
         return CninfoAnnouncementScanResult(
             config=config,
-            records=list(self.records),
+            records=records,
             selected_records=selected,
             pages_scanned=1,
-            announcements_seen=len(self.records),
+            announcements_seen=len(records),
             max_announcement_time="2026-03-30",
         )
 
@@ -108,10 +118,19 @@ def test_default_window_uses_past_12_quarters():
 
 def test_select_broker_instruments_defaults_to_five():
     rows = [
-        {"instrument_id": f"6000{i:02d}.SH", "symbol": f"6000{i:02d}", "exchange": "SSE", "industry": "证券"}
-        for i in range(8)
+        {"instrument_id": instrument_id, "symbol": instrument_id[:6], "exchange": "SSE", "industry": "证券"}
+        for instrument_id in (
+            "600030.SH",
+            "600109.SH",
+            "600369.SH",
+            "600906.SH",
+            "600909.SH",
+            "600918.SH",
+            "600958.SH",
+            "600999.SH",
+        )
     ]
-    rows.append({"instrument_id": "600999.SH", "symbol": "600999", "exchange": "SSE", "industry": "银行"})
+    rows.append({"instrument_id": "600061.SH", "symbol": "600061", "exchange": "SSE", "industry": "证券"})
 
     selected = select_broker_instruments(
         _FakeDbOps({"SSE": rows}),
@@ -121,6 +140,7 @@ def test_select_broker_instruments_defaults_to_five():
 
     assert len(selected) == 5
     assert all(item["industry"] == "证券" for item in selected)
+    assert "600061.SH" not in {item["instrument_id"] for item in selected}
 
 
 def test_backfill_script_dry_run_parses_without_writes():
@@ -128,18 +148,18 @@ def test_backfill_script_dry_run_parses_without_writes():
     scanner = _FakeScanner(
         [
             CninfoAnnouncementRecord(
-                announcement_id="risk-2025",
-                title="2025年度风险控制指标相关情况报告",
+                announcement_id="annual-2025",
+                title="2025年年度报告",
                 announcement_time="2026-03-30",
                 market="SSE",
                 column="sse",
                 symbols=["600030"],
-                adjunct_url="/risk.pdf",
+                adjunct_url="/annual.pdf",
                 adjunct_type="PDF",
             ),
             CninfoAnnouncementRecord(
-                announcement_id="annual-2025",
-                title="2025年年度报告",
+                announcement_id="risk-2025",
+                title="2025年度风险控制指标相关情况报告",
                 announcement_time="2026-03-30",
                 market="SSE",
                 column="sse",
@@ -180,6 +200,81 @@ def test_backfill_script_dry_run_parses_without_writes():
     assert storage.facts_written == 0
 
 
+def test_backfill_script_per_instrument_scan_keeps_full_broker_universe():
+    storage = _FakeStorage()
+    scanner = _FakeScanner(
+        [
+            CninfoAnnouncementRecord(
+                announcement_id="annual-600030-2025",
+                title="2025年年度报告",
+                announcement_time="2026-03-30",
+                market="SSE",
+                column="sse",
+                symbols=["600030"],
+                adjunct_url="/annual-600030.pdf",
+                adjunct_type="PDF",
+            ),
+            CninfoAnnouncementRecord(
+                announcement_id="annual-600109-2025",
+                title="2025年年度报告",
+                announcement_time="2026-03-30",
+                market="SSE",
+                column="sse",
+                symbols=["600109"],
+                adjunct_url="/annual-600109.pdf",
+                adjunct_type="PDF",
+                raw_payload={"market_scan": False},
+            ),
+        ]
+    )
+
+    result = run_broker_risk_control_backfill(
+        db_ops=_FakeDbOps(
+            {
+                "SSE": [
+                    {
+                        "instrument_id": "600030.SH",
+                        "symbol": "600030",
+                        "exchange": "SSE",
+                        "name": "中信证券",
+                        "industry": "证券",
+                    },
+                    {
+                        "instrument_id": "600109.SH",
+                        "symbol": "600109",
+                        "exchange": "SSE",
+                        "name": "国金证券",
+                        "industry": "证券",
+                    },
+                    {
+                        "instrument_id": "600061.SH",
+                        "symbol": "600061",
+                        "exchange": "SSE",
+                        "name": "国投资本",
+                        "industry": "证券",
+                    },
+                ]
+            }
+        ),
+        storage=storage,
+        exchanges=["SSE"],
+        as_of_date="2026-06-06",
+        limit_instruments=0,
+        scanner=scanner,
+        payload_fetcher=lambda record: _risk_control_text(),
+        write=False,
+    )
+
+    assert len(result["target_instruments"]) == 2
+    assert result["announcement_scan"]["selected_announcements"] == 2
+    per_instrument = result["announcement_scan"]["per_instrument_scan"]
+    assert per_instrument["enabled"] is True
+    assert per_instrument["attempted_instruments"] == 2
+    assert per_instrument["instruments_with_matches"] == 2
+    assert per_instrument["selected_announcements_added"] == 2
+    assert result["backfill"]["reports_parsed"] == 2
+
+
 def test_backfill_script_scan_only_skips_payload_fetch():
     result = run_broker_risk_control_backfill(
         db_ops=_FakeDbOps(
@@ -201,7 +296,7 @@ def test_backfill_script_scan_only_skips_payload_fetch():
             [
                 CninfoAnnouncementRecord(
                     announcement_id="risk-2025",
-                    title="2025年度风险控制指标相关情况报告",
+                    title="2025年年度报告",
                     announcement_time="2026-03-30",
                     market="SSE",
                     column="sse",

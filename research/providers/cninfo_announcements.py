@@ -57,6 +57,8 @@ class CninfoAnnouncementScanConfig:
     tab_name: str = "fulltext"
     category: Optional[str] = None
     search_key: Optional[str] = None
+    stock: Optional[str] = None
+    org_id: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     page_size: int = 30
@@ -211,6 +213,10 @@ class CninfoAnnouncementScanner:
             body["category"] = config.category
         if config.search_key:
             body["searchkey"] = config.search_key
+        if config.stock:
+            body["stock"] = config.stock
+        if config.org_id:
+            body["orgId"] = config.org_id
         if config.start_date and config.end_date:
             body["seDate"] = f"{config.start_date}~{config.end_date}"
 

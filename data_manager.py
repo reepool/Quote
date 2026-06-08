@@ -5169,7 +5169,11 @@ class DataManager:
         financial_bundle: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Merge local broker risk-control canonical facts into the DCF input bundle."""
-        from research.broker_risk_control import BROKER_RISK_CONTROL_CANONICAL_FACTS
+        from research.broker_risk_control import (
+            BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+            BROKER_RISK_CONTROL_CANONICAL_FACTS,
+            BROKER_RISK_CONTROL_SOURCE_PROFILE,
+        )
 
         if not hasattr(storage, "get_financial_numeric_facts"):
             return financial_bundle
@@ -5236,7 +5240,9 @@ class DataManager:
                 "physical_table": row.get("physical_table"),
             }
         lineage["broker_risk_control"] = {
-            "source_profile": "broker_risk_control_report",
+            "source_profile": "broker_regulatory_financial_facts",
+            "primary_source_profile": BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+            "supplementary_source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
             "facts": facts_lineage,
         }
         net_capital_lineage = facts_lineage.get("net_capital") or {}
@@ -5256,6 +5262,12 @@ class DataManager:
     def _select_latest_broker_risk_control_fact(
         rows: List[Dict[str, Any]],
     ) -> Optional[Dict[str, Any]]:
+        from research.broker_risk_control import BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+
+        def _source_priority(row: Dict[str, Any]) -> int:
+            raw_fact = row.get("raw_fact") or {}
+            return 1 if raw_fact.get("source_profile") == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE else 0
+
         candidates = [
             row for row in rows if row.get("fact_value") is not None and row.get("report_period")
         ]
@@ -5265,6 +5277,7 @@ class DataManager:
             candidates,
             key=lambda row: (
                 str(row.get("report_period") or ""),
+                _source_priority(row),
                 str(row.get("updated_at") or ""),
             ),
         )

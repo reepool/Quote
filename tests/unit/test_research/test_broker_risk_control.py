@@ -4,13 +4,20 @@ import pytest
 
 from data_manager import DataManager
 from research.broker_risk_control import (
+    BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+    BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
     BROKER_RISK_CONTROL_ARTIFACT_KIND,
     BROKER_RISK_CONTROL_PARSER_VERSION,
+    BROKER_RISK_CONTROL_SOURCE_PROFILE,
     BrokerRiskControlPdfFactParser,
     BrokerRiskControlReportSyncService,
+    classify_broker_annual_report_risk_control_artifact,
     classify_broker_risk_control_artifact,
+    infer_broker_annual_report_period,
+    is_formal_broker_annual_or_semiannual_report_title,
     is_broker_risk_control_title,
 )
+from research.listed_broker_dealer_scope import resolve_listed_broker_dealer_scope
 from research.providers.base import FinancialSourceFileManifest
 from research.providers.cninfo_announcements import CninfoAnnouncementRecord
 from research.providers.cninfo_announcements import CninfoAnnouncementScanResult
@@ -104,6 +111,45 @@ def test_broker_risk_control_parser_reports_unknown_unit_and_ambiguous_rows():
     assert result.diagnostics["unknown_units"] is True
     assert result.diagnostics["missing_required_facts"] == ["net_capital"]
     assert result.diagnostics["ambiguous_rows"]
+
+
+def test_broker_annual_report_parser_uses_current_period_column():
+    parser = BrokerRiskControlPdfFactParser(
+        parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+    )
+
+    result = parser.parse(
+        """
+        第六节 重要事项
+        母公司的净资本及风险控制指标
+        单位：人民币万元
+        项目 本期末 上年末 监管标准
+        净资本 2,800.50 2,700.10 2,000.00
+        核心净资本 2,500.50 2,300.00 -
+        风险覆盖率 311.17% 300.00% 100.00%
+        资本杠杆率 18.20% 17.50% 8.00%
+        流动性覆盖率 245.00% 230.00% 100.00%
+        净稳定资金率 150.00% 140.00% 100.00%
+        """,
+        source_file_id="annual-600030-2025",
+        instrument_id="600030.SH",
+        symbol="600030",
+        exchange="SSE",
+        report_period="2025-12-31",
+        report_type="annual",
+        source="cninfo",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    facts = {item.canonical_fact_name: item for item in result.numeric_facts}
+    assert facts["net_capital"].fact_value == 28_005_000.0
+    assert facts["core_net_capital"].fact_value == 25_005_000.0
+    assert facts["risk_coverage_ratio"].fact_value == pytest.approx(3.1117)
+    assert facts["liquidity_coverage_ratio"].raw_fact_json["source_profile"] == (
+        BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+    )
+    assert result.diagnostics["missing_required_facts"] == []
+    assert result.diagnostics["report_scope"] == "parent_company"
 
 
 def test_broker_risk_control_facts_write_and_query_hot_history(tmp_path):
@@ -221,6 +267,7 @@ def test_data_manager_enriches_dcf_bundle_with_local_net_capital():
     )
 
     assert enriched["latest_facts"]["net_capital"] == 260.0
+    assert enriched["lineage"]["broker_risk_control"]["source_profile"] == "broker_regulatory_financial_facts"
     assert enriched["lineage"]["broker_risk_control"]["facts"]["net_capital"]["source_file_id"] == "risk-600030-2025"
     assert result["status"] == "success"
     assert result["broker_model_diagnostics"]["net_capital_report_scope"] == "parent_company"
@@ -275,6 +322,7 @@ def test_broker_risk_control_backfill_filters_and_reports_counters():
     service = BrokerRiskControlReportSyncService(
         storage=storage,
         payload_fetcher=lambda record: _risk_control_text(),
+        source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
     )
 
     result = service.backfill(
@@ -329,6 +377,7 @@ def test_broker_risk_control_incremental_reports_pending_and_watermark():
         storage=storage,
         scanner=_FakeScanner([record]),
         payload_fetcher=lambda record: None,
+        source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
     )
 
     result = service.incremental_update(
@@ -355,3 +404,39 @@ def test_broker_risk_control_artifact_classification_is_title_scoped():
         "source_profile": "broker_risk_control_report",
     }
     assert classify_broker_risk_control_artifact("2025年年度报告", adjunct_type="PDF") is None
+
+
+def test_formal_annual_report_title_selection_excludes_non_reports():
+    record = CninfoAnnouncementRecord(
+        announcement_id="annual-2025",
+        title="2025年年度报告",
+        announcement_time="2026-03-30",
+        market="沪市",
+        column="sse",
+        symbols=["600030"],
+        adjunct_type="PDF",
+    )
+
+    assert is_formal_broker_annual_or_semiannual_report_title("2025年年度报告")
+    assert is_formal_broker_annual_or_semiannual_report_title("2025年半年度报告")
+    assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度报告摘要")
+    assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度审计报告")
+    assert infer_broker_annual_report_period(record) == "2025-12-31"
+    assert classify_broker_annual_report_risk_control_artifact(
+        "2025年年度报告",
+        adjunct_type="PDF",
+    )["source_profile"] == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+
+
+def test_listed_broker_scope_gate_excludes_platform_candidates():
+    confirmed = resolve_listed_broker_dealer_scope("000166.SZ")
+    excluded = resolve_listed_broker_dealer_scope("300059.SZ")
+    missing = resolve_listed_broker_dealer_scope("688999.SH")
+
+    assert confirmed.eligible is True
+    assert confirmed.entry is not None
+    assert confirmed.entry.scope_type == "listed_broker_group"
+    assert excluded.eligible is False
+    assert excluded.reason == "internet_finance_platform_not_broker_dealer_subject"
+    assert missing.eligible is False
+    assert missing.reason == "listed_broker_dealer_scope_missing"

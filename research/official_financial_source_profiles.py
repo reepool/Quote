@@ -83,6 +83,30 @@ OFFICIAL_FINANCIAL_SOURCE_PROFILES: Dict[str, OfficialFinancialSourceProfile] = 
         fallback_policy_profile="akshare_fallback",
         anti_crawl_risk="high",
     ),
+    "broker_annual_report_embedded_risk_control": OfficialFinancialSourceProfile(
+        profile_id="broker_annual_report_embedded_risk_control",
+        source="cninfo",
+        supported_exchanges=("SSE", "SZSE", "BSE"),
+        interface_type="cninfo_formal_annual_semiannual_pdf_embedded_table",
+        parser_profile="broker_annual_report_embedded_risk_control_pdf.v1",
+        parser_candidate="broker_annual_report_embedded_risk_control_pdf.v1",
+        source_unit="report_declared",
+        source_unit_scale=1.0,
+        fallback_policy_profile="broker_risk_control_report_supplementary",
+        anti_crawl_risk="medium",
+    ),
+    "broker_risk_control_report_supplementary": OfficialFinancialSourceProfile(
+        profile_id="broker_risk_control_report_supplementary",
+        source="cninfo",
+        supported_exchanges=("SSE", "SZSE", "BSE"),
+        interface_type="cninfo_standalone_risk_control_pdf_supplementary",
+        parser_profile="broker_risk_control_pdf.v1",
+        parser_candidate="broker_risk_control_pdf.v1",
+        source_unit="report_declared",
+        source_unit_scale=1.0,
+        fallback_policy_profile="manual_review",
+        anti_crawl_risk="medium",
+    ),
 }
 
 

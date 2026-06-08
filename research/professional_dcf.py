@@ -13,6 +13,8 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from research.listed_broker_dealer_scope import resolve_listed_broker_dealer_scope
+
 
 DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
     "enabled": True,
@@ -522,6 +524,12 @@ class ProfessionalDcfEngine:
         research_mode: bool = False,
     ) -> DcfInputBundle:
         facts = self._extract_financial_facts(financial_bundle)
+        broker_scope = resolve_listed_broker_dealer_scope(instrument)
+        facts["listed_broker_dealer_scope"] = broker_scope.to_dict()
+        facts["listed_broker_dealer_scope_confirmed"] = broker_scope.eligible
+        if broker_scope.entry is not None:
+            facts.setdefault("licensed_broker_name", broker_scope.entry.licensed_broker_name)
+            facts.setdefault("broker_scope_type", broker_scope.entry.scope_type)
         data_available_date = self._normalize_date(
             facts.get("data_available_date") or facts.get("publish_date")
         )
@@ -534,6 +542,11 @@ class ProfessionalDcfEngine:
                 warnings.append("missing_data_available_date")
             else:
                 blockers.append("missing_data_available_date")
+        if (
+            str(overrides.get("model_profile") or "") == "broker_excess_capital.v1"
+            and not broker_scope.eligible
+        ):
+            blockers.append("broker_scope_unconfirmed")
         company_characteristics = self._detect_company_characteristics(
             instrument,
             facts,
@@ -589,6 +602,7 @@ class ProfessionalDcfEngine:
             },
             "beta": beta_context,
             "company_characteristics": list(company_characteristics),
+            "listed_broker_dealer_scope": broker_scope.to_dict(),
         }
         return DcfInputBundle(
             instrument=instrument,
@@ -1366,6 +1380,18 @@ class ProfessionalDcfEngine:
         research_mode: bool,
     ) -> Dict[str, Any]:
         facts = bundle.financial_facts
+        broker_scope = facts.get("listed_broker_dealer_scope") or {}
+        if not bool(facts.get("listed_broker_dealer_scope_confirmed")):
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="broker_scope_unconfirmed",
+                research_mode=research_mode,
+                extra_blockers=["broker_scope_unconfirmed"],
+            )
         projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
         terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
         scenario_set = str(overrides.get("scenario_set") or "standard")
@@ -1586,6 +1612,7 @@ class ProfessionalDcfEngine:
             "reported_roe": reported_roe,
             "excess_capital": excess_capital,
             "broker_model_diagnostics": {
+                "listed_broker_dealer_scope": broker_scope,
                 "reported_roe": reported_roe,
                 "normalized_roe": normalized_roe,
                 "roe_source": roe_source,
@@ -2969,7 +2996,10 @@ class ProfessionalDcfEngine:
         ).lower()
         if "银行" in text or "bank" in text:
             return "bank_residual_income.v1"
-        if "证券" in text or "broker" in text or "securities" in text:
+        if (
+            ("证券" in text or "broker" in text or "securities" in text)
+            and bool(bundle.financial_facts.get("listed_broker_dealer_scope_confirmed"))
+        ):
             return "broker_excess_capital.v1"
         if "保险" in text or "insurance" in text:
             return "insurance_embedded_value_or_ddm.v1"

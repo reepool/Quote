@@ -237,7 +237,8 @@
         },
         "broker_risk_control_reports": {
           "enabled": false,
-          "source_profile": "broker_risk_control_report",
+          "source_profile": "broker_annual_report_embedded_risk_control",
+          "supplementary_source_profile": "broker_risk_control_report",
           "exchanges": [
             "SSE",
             "SZSE",
@@ -255,11 +256,13 @@
               "券商"
             ],
             "override_allowed": true,
-            "note": "Only securities-company instruments are targeted by default; validation may override this for bounded fixtures."
+            "scope_config": "config/listed_broker_dealer_scope.json",
+            "candidate_universe": "Shenwan securities membership",
+            "note": "Only instruments with confirmed listed_broker_dealer_scope entries are targeted by default; Shenwan securities membership is a candidate universe only."
           },
           "artifact": {
-            "artifact_kind": "broker_risk_control_pdf",
-            "parser_candidate": "broker_risk_control_pdf.v1",
+            "artifact_kind": "broker_annual_or_semiannual_report_pdf",
+            "parser_candidate": "broker_annual_report_embedded_risk_control_pdf.v1",
             "content_type": "application/pdf"
           },
           "storage": {
@@ -270,7 +273,7 @@
             "incremental_tier": "hot"
           },
           "parser": {
-            "parser_version": "broker_risk_control_pdf.v1",
+            "parser_version": "broker_annual_report_embedded_risk_control_pdf.v1",
             "required_facts": [
               "net_capital"
             ],
@@ -327,7 +330,14 @@
             "retry_attempts": 2,
             "retry_backoff_seconds": 0.5
           },
-          "note": "Broker risk-control reports are integrated into the financial disclosure chain. Regulatory operation-risk revenue rows are stored only under regulatory_risk_control canonical facts and must not be treated as brokerage, investment-banking, asset-management, or proprietary business-line revenue."
+          "supplementary": {
+            "enabled": true,
+            "source_profile": "broker_risk_control_report",
+            "artifact_kind": "broker_risk_control_pdf",
+            "parser_version": "broker_risk_control_pdf.v1",
+            "source_priority": "supplementary_or_validation"
+          },
+          "note": "Broker regulatory facts are integrated into the financial disclosure chain. Annual/semiannual formal reports are the primary source; standalone risk-control reports are supplementary. Regulatory operation-risk revenue rows are stored only under regulatory_risk_control canonical facts and must not be treated as brokerage, investment-banking, asset-management, or proprietary business-line revenue."
         },
         "runtime": {
           "max_concurrency": 2,

@@ -22,6 +22,11 @@ from research.providers.cninfo_announcements import (
     CninfoAnnouncementScanConfig,
     CninfoAnnouncementScanner,
 )
+from research.listed_broker_dealer_scope import (
+    enrich_instrument_with_broker_scope,
+    is_confirmed_listed_broker_dealer,
+    resolve_listed_broker_dealer_scope,
+)
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import HttpTlsConfig, request_get
 
@@ -29,6 +34,9 @@ from utils.http_transport import HttpTlsConfig, request_get
 BROKER_RISK_CONTROL_SOURCE_PROFILE = "broker_risk_control_report"
 BROKER_RISK_CONTROL_ARTIFACT_KIND = "broker_risk_control_pdf"
 BROKER_RISK_CONTROL_PARSER_VERSION = "broker_risk_control_pdf.v1"
+BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE = "broker_annual_report_embedded_risk_control"
+BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = "broker_annual_or_semiannual_report_pdf"
+BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
 BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
 
 
@@ -233,6 +241,57 @@ def is_broker_risk_control_title(
     return any(str(pattern) and str(pattern).replace(" ", "") in text for pattern in patterns)
 
 
+def is_formal_broker_annual_or_semiannual_report_title(title: str) -> bool:
+    """Return whether a CNInfo title is a formal annual/semiannual report."""
+    text = _normalize_announcement_title(title)
+    if not text:
+        return False
+    if not ("年度报告" in text or "半年度报告" in text):
+        return False
+    excluded_tokens = (
+        "摘要",
+        "审计报告",
+        "审阅报告",
+        "法律意见",
+        "鉴证报告",
+        "问询函",
+        "回复",
+        "意见函",
+        "监管工作函",
+        "持续督导",
+        "保荐",
+        "业绩说明会",
+        "说明会",
+        "投资者关系",
+        "社会责任",
+        "环境、社会及治理",
+        "环境社会及治理",
+        "ESG",
+        "英文",
+        "修订说明",
+        "更正",
+        "取消",
+    )
+    if any(token in text for token in excluded_tokens):
+        return False
+    return True
+
+
+def infer_broker_annual_report_period(record: CninfoAnnouncementRecord) -> str:
+    """Infer report period from a formal annual/semiannual report title."""
+    title = _normalize_announcement_title(record.title)
+    year_match = re.search(r"(20\d{2}|19\d{2})", title)
+    if year_match:
+        year = year_match.group(1)
+        if "半年度报告" in title:
+            return f"{year}-06-30"
+        return f"{year}-12-31"
+    if record.announcement_time and re.match(r"^\d{4}", record.announcement_time):
+        year = int(record.announcement_time[:4]) - 1
+        return f"{year}-12-31"
+    return ""
+
+
 def infer_broker_risk_control_report_period(record: CninfoAnnouncementRecord) -> str:
     """Infer report period from a broker risk-control announcement title."""
     title = re.sub(r"<[^>]+>", "", str(record.title or ""))
@@ -262,20 +321,7 @@ def is_broker_risk_control_instrument(
     """Return whether an instrument is in the securities-company scope."""
     if allow_validation_override:
         return True
-    text = " ".join(
-        str(instrument.get(key) or "")
-        for key in (
-            "industry",
-            "industry_name",
-            "sw_l1_name",
-            "sw_l2_name",
-            "company_name",
-            "short_name",
-            "profile",
-            "type",
-        )
-    )
-    return "证券" in text or "券商" in text or "broker" in text.lower() or "securities" in text.lower()
+    return is_confirmed_listed_broker_dealer(instrument)
 
 
 def classify_broker_risk_control_artifact(title: str, *, adjunct_type: Optional[str] = None) -> Optional[Dict[str, Any]]:
@@ -290,6 +336,33 @@ def classify_broker_risk_control_artifact(title: str, *, adjunct_type: Optional[
         "parser_candidate": BROKER_RISK_CONTROL_PARSER_VERSION,
         "source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
     }
+
+
+def classify_broker_annual_report_risk_control_artifact(
+    title: str,
+    *,
+    adjunct_type: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Classify formal annual/semiannual report PDFs for embedded risk-control parsing."""
+    if not is_formal_broker_annual_or_semiannual_report_title(title):
+        return None
+    type_text = str(adjunct_type or "").lower()
+    if type_text and "pdf" not in type_text:
+        return None
+    report_type = "semiannual" if "半年度报告" in _normalize_announcement_title(title) else "annual"
+    return {
+        "artifact_kind": BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND,
+        "parser_candidate": BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
+        "source_profile": BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+        "report_type": report_type,
+        "source_priority": "primary",
+    }
+
+
+def _normalize_announcement_title(title: str) -> str:
+    text = re.sub(r"<[^>]+>", "", str(title or ""))
+    text = text.replace("&nbsp;", "").replace("&amp;", "&")
+    return re.sub(r"\s+", "", text)
 
 
 @dataclass(frozen=True)
@@ -328,6 +401,10 @@ class BrokerRiskControlPdfFactParser:
         source: str,
         source_mode: str = "direct",
         report_type: Optional[str] = None,
+        source_profile: str = BROKER_RISK_CONTROL_SOURCE_PROFILE,
+        artifact_kind: str = BROKER_RISK_CONTROL_ARTIFACT_KIND,
+        licensed_broker_name: Optional[str] = None,
+        listed_broker_scope: Optional[Dict[str, Any]] = None,
     ) -> BrokerRiskControlParseResult:
         text, text_diagnostics = self._extract_text(payload)
         source_unit, unit_scale = self._detect_money_unit(text)
@@ -357,7 +434,7 @@ class BrokerRiskControlPdfFactParser:
                     }
                 )
                 continue
-            value = self._extract_numeric_value(line)
+            value = self._extract_numeric_value(line, canonical_name=canonical_name)
             if value is None:
                 ambiguous_rows.append(
                     {
@@ -411,21 +488,27 @@ class BrokerRiskControlPdfFactParser:
                     or BROKER_RISK_CONTROL_CANONICAL_FACTS[canonical_name]["semantic"],
                     canonical_unit=standard_metadata.get("canonical_unit") or unit,
                     canonical_version=standard_metadata.get("canonical_version"),
-                    taxonomy_namespace="cninfo:broker_risk_control_report",
+                    taxonomy_namespace=f"cninfo:{source_profile}",
                     context_id=f"broker_risk_control:{report_period}:{canonical_name}",
                     unit=source_unit if unit == "CNY" else "percent" if value.get("percent") else "ratio",
                     period_end=report_period,
                     instant=report_period,
                     fact_value=canonical_value,
                     value_text=value["value_text"],
-                    dimensions_json={"report_scope": report_scope},
+                    dimensions_json={
+                        "report_scope": report_scope,
+                        "licensed_broker_name": licensed_broker_name,
+                        "listed_broker_scope": listed_broker_scope,
+                    },
                     raw_fact_json={
-                        "source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
-                        "artifact_kind": BROKER_RISK_CONTROL_ARTIFACT_KIND,
+                        "source_profile": source_profile,
+                        "artifact_kind": artifact_kind,
                         "parser_candidate": self.parser_version,
                         "source_unit": source_unit,
                         "source_unit_scale": unit_scale,
                         "report_scope": report_scope,
+                        "licensed_broker_name": licensed_broker_name,
+                        "listed_broker_scope": listed_broker_scope,
                         "raw_line": line,
                         "line_index": line_index,
                         "standardized_fact": standard_metadata,
@@ -446,11 +529,13 @@ class BrokerRiskControlPdfFactParser:
             **text_diagnostics,
             "numeric_fact_count": len(facts),
             "parser_version": self.parser_version,
-            "source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
-            "artifact_kind": BROKER_RISK_CONTROL_ARTIFACT_KIND,
+            "source_profile": source_profile,
+            "artifact_kind": artifact_kind,
             "source_unit": source_unit,
             "source_unit_scale": unit_scale,
             "report_scope": report_scope,
+            "licensed_broker_name": licensed_broker_name,
+            "listed_broker_scope": listed_broker_scope,
             "report_scope_uncertain": report_scope == "unknown",
             "candidate_row_count": len(rows),
             "matched_canonical_facts": sorted(matched_rows),
@@ -505,23 +590,24 @@ class BrokerRiskControlPdfFactParser:
         return rows
 
     def _detect_money_unit(self, text: str) -> tuple[Optional[str], Optional[float]]:
-        head = str(text or "")[:5000]
-        unit_match = re.search(r"单位\s*[:：]?\s*(?:人民币)?\s*(百万元|千元|万元|亿元|元)", head)
+        payload = str(text or "")
+        unit_match = re.search(r"单位\s*[:：]?\s*(?:人民币)?\s*(百万元|千元|万元|亿元|元)", payload)
         if unit_match:
             unit = unit_match.group(1)
             return unit, self._MONEY_UNITS[unit]
+        head = payload[:5000]
         for unit in ("百万元", "亿元", "万元", "千元", "元"):
             if f"单位：{unit}" in head or f"单位:{unit}" in head:
                 return unit, self._MONEY_UNITS[unit]
         return None, None
 
     def _detect_report_scope(self, text: str) -> str:
-        head = str(text or "")[:3000]
-        if re.search(r"母公司|公司本部", head):
+        payload = str(text or "")
+        if re.search(r"母公司|公司本部|母公司的净资本及风险控制指标", payload):
             return "parent_company"
-        if re.search(r"合并口径|合并报表", head):
+        if re.search(r"合并口径|合并报表", payload):
             return "consolidated"
-        if re.search(r"监管口径|风险控制指标监管报表", head):
+        if re.search(r"监管口径|风险控制指标监管报表", payload):
             return "regulatory"
         return "unknown"
 
@@ -540,11 +626,15 @@ class BrokerRiskControlPdfFactParser:
             matches.remove("regulatory_net_assets")
         return matches
 
-    def _extract_numeric_value(self, line: str) -> Optional[Dict[str, Any]]:
-        matches = list(self._NUMBER_PATTERN.finditer(line))
+    def _extract_numeric_value(self, line: str, *, canonical_name: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        search_text = line
+        label_end = self._label_match_end(line, canonical_name) if canonical_name else 0
+        matches = [match for match in self._NUMBER_PATTERN.finditer(search_text) if match.start() >= label_end]
+        if not matches:
+            matches = list(self._NUMBER_PATTERN.finditer(line))
         if not matches:
             return None
-        match = matches[-1]
+        match = matches[0]
         value_text = match.group("value")
         try:
             value = float(value_text.replace(",", ""))
@@ -555,6 +645,22 @@ class BrokerRiskControlPdfFactParser:
             "value_text": value_text,
             "percent": bool(match.group("percent")),
         }
+
+    def _label_match_end(self, line: str, canonical_name: Optional[str]) -> int:
+        if not canonical_name:
+            return 0
+        labels = BROKER_RISK_CONTROL_CANONICAL_FACTS.get(canonical_name, {}).get("aliases", [])
+        candidates = [canonical_name, *labels]
+        compact_line = re.sub(r"[\s　]+", "", line)
+        best_end = 0
+        for label in candidates:
+            compact_label = str(label).replace(" ", "")
+            if not compact_label:
+                continue
+            index = compact_line.find(compact_label)
+            if index >= 0:
+                best_end = max(best_end, index + len(compact_label))
+        return best_end
 
     def _normalize_value(
         self,
@@ -643,14 +749,20 @@ class BrokerRiskControlReportSyncService:
         parser: Optional[BrokerRiskControlPdfFactParser] = None,
         payload_fetcher: Optional[PayloadFetcher] = None,
         title_patterns: Optional[Sequence[str]] = None,
+        source_profile: str = BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
         allow_non_broker_validation_override: bool = False,
         archive_root: Optional[str | Path] = None,
     ) -> None:
         self.storage = storage
         self.scanner = scanner or CninfoAnnouncementScanner()
+        if parser is None and source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            parser = BrokerRiskControlPdfFactParser(
+                parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+            )
         self.parser = parser or BrokerRiskControlPdfFactParser()
         self.payload_fetcher = payload_fetcher or self._download_payload
         self.title_patterns = list(title_patterns or [])
+        self.source_profile = source_profile
         self.allow_non_broker_validation_override = allow_non_broker_validation_override
         self.archive_root = None if archive_root is None else Path(archive_root)
 
@@ -712,7 +824,7 @@ class BrokerRiskControlReportSyncService:
         max_pages: int = 20,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
-        purpose_key = BROKER_RISK_CONTROL_SOURCE_PROFILE
+        purpose_key = self.source_profile
         state = self.storage.get_cninfo_announcement_scan_state(
             purpose_key=purpose_key,
             market=market,
@@ -723,7 +835,9 @@ class BrokerRiskControlReportSyncService:
                 purpose_key=purpose_key,
                 market=market,
                 column=column,
-                search_key="风险控制指标",
+                search_key="年度报告"
+                if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                else "风险控制指标",
                 start_date=start_date,
                 end_date=end_date,
                 page_size=page_size,
@@ -774,7 +888,7 @@ class BrokerRiskControlReportSyncService:
                 selected_announcements=len(scan_result.selected_records),
                 status=result.status,
                 metadata={
-                    "source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
+                    "source_profile": self.source_profile,
                     "retryable_pending_reports": result.retryable_pending_reports,
                     "stopped_at_watermark": scan_result.stopped_at_watermark,
                 },
@@ -782,9 +896,15 @@ class BrokerRiskControlReportSyncService:
         return result.to_dict()
 
     def _record_filter(self, record: CninfoAnnouncementRecord) -> List[str]:
-        return ["broker_risk_control_title"] if self._record_matches(record) else []
+        if not self._record_matches(record):
+            return []
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return ["formal_annual_or_semiannual_report"]
+        return ["broker_risk_control_title"]
 
     def _record_matches(self, record: CninfoAnnouncementRecord) -> bool:
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return is_formal_broker_annual_or_semiannual_report_title(record.title)
         return is_broker_risk_control_title(record.title, title_patterns=self.title_patterns)
 
     def _instrument_in_scope(self, instrument: Dict[str, Any]) -> bool:
@@ -837,6 +957,11 @@ class BrokerRiskControlReportSyncService:
             )
         )
         try:
+            scope_resolution = resolve_listed_broker_dealer_scope(instrument)
+            listed_scope = scope_resolution.to_dict()
+            licensed_broker_name = (
+                scope_resolution.entry.licensed_broker_name if scope_resolution.entry else None
+            )
             parsed = self.parser.parse(
                 payload,
                 source_file_id=source_file_id,
@@ -844,9 +969,13 @@ class BrokerRiskControlReportSyncService:
                 symbol=str(instrument.get("symbol") or ""),
                 exchange=str(instrument.get("exchange") or ""),
                 report_period=report_period,
-                report_type="annual_risk_control",
+                report_type=self._record_report_type(record),
                 source="cninfo",
                 source_mode="direct",
+                source_profile=self.source_profile,
+                artifact_kind=self._artifact_kind(),
+                licensed_broker_name=licensed_broker_name,
+                listed_broker_scope=listed_scope,
             )
         except Exception as exc:
             result.parse_failures += 1
@@ -887,10 +1016,8 @@ class BrokerRiskControlReportSyncService:
         content_hash: str,
         archive_path: Optional[str] = None,
     ) -> FinancialSourceFileManifest:
-        classification = classify_broker_risk_control_artifact(
-            record.title,
-            adjunct_type=record.adjunct_type,
-        ) or {}
+        classification = self._classify_record(record)
+        scope_resolution = resolve_listed_broker_dealer_scope(instrument)
         return FinancialSourceFileManifest(
             source="cninfo",
             source_mode="direct",
@@ -898,7 +1025,7 @@ class BrokerRiskControlReportSyncService:
             symbol=str(instrument.get("symbol") or ""),
             exchange=str(instrument.get("exchange") or ""),
             report_period=report_period,
-            report_type="annual_risk_control",
+            report_type=self._record_report_type(record),
             filing_id=record.announcement_id,
             source_url=record.adjunct_url,
             archive_path=archive_path,
@@ -911,7 +1038,8 @@ class BrokerRiskControlReportSyncService:
             metadata_json={
                 **classification,
                 "announcement_title": record.title,
-                "source_profile": BROKER_RISK_CONTROL_SOURCE_PROFILE,
+                "source_profile": self.source_profile,
+                "listed_broker_dealer_scope": scope_resolution.to_dict(),
                 "announcement_record": {
                     "market": record.market,
                     "column": record.column,
@@ -957,7 +1085,39 @@ class BrokerRiskControlReportSyncService:
         )
 
     def _record_period(self, record: CninfoAnnouncementRecord) -> str:
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return infer_broker_annual_report_period(record)
         return infer_broker_risk_control_report_period(record)
+
+    def _record_report_type(self, record: CninfoAnnouncementRecord) -> str:
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            title = _normalize_announcement_title(record.title)
+            return "semiannual" if "半年度报告" in title else "annual"
+        period = self._record_period(record)
+        if period.endswith("06-30"):
+            return "semiannual_risk_control"
+        if period.endswith(("03-31", "09-30")):
+            return "quarterly_risk_control"
+        return "annual_risk_control"
+
+    def _artifact_kind(self) -> str:
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND
+        return BROKER_RISK_CONTROL_ARTIFACT_KIND
+
+    def _classify_record(self, record: CninfoAnnouncementRecord) -> Dict[str, Any]:
+        if self.source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return classify_broker_annual_report_risk_control_artifact(
+                record.title,
+                adjunct_type=record.adjunct_type,
+            ) or {}
+        payload = classify_broker_risk_control_artifact(
+            record.title,
+            adjunct_type=record.adjunct_type,
+        ) or {}
+        if payload:
+            payload["source_priority"] = "supplementary"
+        return payload
 
     def _resolve_record_instrument(
         self,

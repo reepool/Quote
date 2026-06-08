@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Mapping, Optional
 
 from research.financial_source_field_mapping import FINANCIAL_STATEMENT_PROFILES
+from research.listed_broker_dealer_scope import resolve_listed_broker_dealer_scope
 
 
 PROFILE_BANK = "bank"
@@ -157,6 +158,19 @@ def _resolve_from_industry_membership(
         return None
     texts = _industry_texts(industry_membership)
     profile = _profile_from_texts(texts)
+    if profile == PROFILE_SECURITIES:
+        broker_scope = resolve_listed_broker_dealer_scope(industry_membership)
+        if not broker_scope.eligible:
+            return FinancialStatementProfileResolution(
+                profile=PROFILE_NONBANK,
+                confidence="high",
+                source="industry_membership",
+                reason="securities_candidate_without_confirmed_broker_scope",
+                evidence={
+                    **_compact_industry_evidence(industry_membership),
+                    "listed_broker_dealer_scope": broker_scope.to_dict(),
+                },
+            )
     if profile is None:
         return FinancialStatementProfileResolution(
             profile=PROFILE_NONBANK,
@@ -188,6 +202,22 @@ def _resolve_from_company_profile(
     profile = _profile_from_texts(texts)
     if profile is None:
         return None
+    if profile == PROFILE_SECURITIES:
+        broker_scope = resolve_listed_broker_dealer_scope(company_profile)
+        if not broker_scope.eligible:
+            return FinancialStatementProfileResolution(
+                profile=PROFILE_NONBANK,
+                confidence="medium",
+                source="company_profile",
+                reason="securities_candidate_without_confirmed_broker_scope",
+                evidence={
+                    "industry_raw": company_profile.get("industry_raw"),
+                    "sector_raw": company_profile.get("sector_raw"),
+                    "company_name": company_profile.get("company_name"),
+                    "short_name": company_profile.get("short_name"),
+                    "listed_broker_dealer_scope": broker_scope.to_dict(),
+                },
+            )
     return FinancialStatementProfileResolution(
         profile=profile,
         confidence="medium",
@@ -216,6 +246,22 @@ def _resolve_from_instrument(
     profile = _profile_from_texts(texts)
     if profile is None:
         return None
+    if profile == PROFILE_SECURITIES:
+        broker_scope = resolve_listed_broker_dealer_scope(instrument)
+        if not broker_scope.eligible:
+            return FinancialStatementProfileResolution(
+                profile=PROFILE_NONBANK,
+                confidence="low",
+                source="instrument_metadata",
+                reason="securities_candidate_without_confirmed_broker_scope",
+                evidence={
+                    "industry": instrument.get("industry"),
+                    "sector": instrument.get("sector"),
+                    "name": instrument.get("name"),
+                    "short_name": instrument.get("short_name"),
+                    "listed_broker_dealer_scope": broker_scope.to_dict(),
+                },
+            )
     return FinancialStatementProfileResolution(
         profile=profile,
         confidence="low",

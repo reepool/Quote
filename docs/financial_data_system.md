@@ -200,7 +200,7 @@ order by name;
 
 读取层只在显式请求时返回行业字段包。行业字段缺失说明该 profile 的专项覆盖不足或该期源数据未披露，不代表公司通用财务数据不可用。
 
-证券专项字段包下一版将通过 `add-broker-risk-control-financial-facts` 扩展证券公司《风险控制指标报告》来源。该来源属于财务披露链路下的证券监管事实，不新建独立数据库，写入同一 `financial_source_files` 和 `financial_numeric_facts_hot/history`：
+证券专项字段包下一版将通过 `use-annual-report-broker-risk-control-source` 扩展证券公司年报/半年报内嵌风控表来源。该来源属于财务披露链路下的证券监管事实，不新建独立数据库，写入同一 `financial_source_files` 和 `financial_numeric_facts_hot/history`。证券公司 universe 必须先由 CSRC 证券公司名录/证券经营机构信息公示和显式 `listed_broker_dealer_scope` 上市主体映射确认；申万“证券Ⅲ”只作为候选池，不能直接决定 profile 或估值模型：
 
 | 优先级 | 字段边界 | 处理 |
 |---|---|---|
@@ -209,6 +209,8 @@ order by name;
 | P2 | 市场/信用/操作/特定风险资本准备分项、表内外资产总额、LCR/NSFR 分解项、集中度前五名比例、风险资本准备表中明确披露的操作风险收入行 | 报告明确披露且单位/口径可判定时才采集；操作风险收入行必须命名为监管口径字段，不得映射为年报业务分部收入 |
 
 风险控制指标报告不承担经纪、投行、资管、自营收入分部解析。真正的业务分部收入应来自年报业务分部、附注或管理层讨论；风控报告中的自营占净资本比例、融资占净资本比例和操作风险收入行只能作为监管风险事实或监管口径 P2 字段。
+
+正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表为证券监管事实主源；独立《风险控制指标报告》仅作为补充、交叉校验或 Q1/Q3 等非年报/半年报周期补源。AkShare 等第三方常规财务指标接口未稳定提供 `net_capital / risk_coverage_ratio / capital_leverage_ratio / LCR / NSFR` 等券商风控字段，最多可作为公告检索备选，不进入核心指标主链。
 
 银行存款字段采用“拆分项 + 派生合计”模型：
 

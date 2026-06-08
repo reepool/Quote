@@ -12,9 +12,10 @@ import argparse
 import asyncio
 import json
 import sys
+import time
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
@@ -22,11 +23,18 @@ if str(REPO_ROOT) not in sys.path:
 
 from data_manager import data_manager
 from research.broker_risk_control import (
+    BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
     BROKER_RISK_CONTROL_SOURCE_PROFILE,
     BrokerRiskControlReportSyncService,
+    infer_broker_annual_report_period,
     infer_broker_risk_control_report_period,
+    is_formal_broker_annual_or_semiannual_report_title,
     is_broker_risk_control_instrument,
     is_broker_risk_control_title,
+)
+from research.listed_broker_dealer_scope import (
+    enrich_instrument_with_broker_scope,
+    resolve_listed_broker_dealer_scope,
 )
 from research.providers.cninfo_announcements import (
     CninfoAnnouncementRecord,
@@ -44,6 +52,16 @@ _DEFAULT_MARKET_CONFIGS: Dict[str, Dict[str, Any]] = {
     "SSE": {"market": "SSE", "column": "sse", "plate": "sh"},
     "SZSE": {"market": "SZSE", "column": "szse", "plate": "sz"},
     "BSE": {"market": "BSE", "column": "neeq", "plate": "bj"},
+}
+_CNINFO_TOP_SEARCH_URL = "https://www.cninfo.com.cn/new/information/topSearch/query"
+_CNINFO_HEADERS = {
+    "Accept": "application/json, text/plain, */*",
+    "Origin": "https://www.cninfo.com.cn",
+    "Referer": "https://www.cninfo.com.cn/new/disclosure/stock",
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+    ),
 }
 
 
@@ -67,7 +85,12 @@ def build_default_announcement_window(
     return {"start_date": resolved_start.isoformat(), "end_date": resolved_end.isoformat()}
 
 
-def build_candidate_report_periods(*, as_of_date: Optional[str] = None, quarters: int = 12) -> List[str]:
+def build_candidate_report_periods(
+    *,
+    as_of_date: Optional[str] = None,
+    quarters: int = 12,
+    report_period_types: Optional[Sequence[str]] = None,
+) -> List[str]:
     """Build the latest completed quarter-end report periods."""
     as_of = _parse_date(as_of_date) if as_of_date else date.today()
     current_quarter = (as_of.month - 1) // 3 + 1
@@ -85,6 +108,25 @@ def build_candidate_report_periods(*, as_of_date: Optional[str] = None, quarters
         if cursor_quarter == 0:
             cursor_quarter = 4
             cursor_year -= 1
+    allowed = {str(item).strip().lower() for item in (report_period_types or []) if str(item).strip()}
+    if allowed:
+        suffix_by_type = {
+            "q1": "03-31",
+            "quarterly": "",
+            "semiannual": "06-30",
+            "halfyear": "06-30",
+            "annual": "12-31",
+            "fy": "12-31",
+            "q3": "09-30",
+        }
+        selected_suffixes = {
+            suffix
+            for key, suffix in suffix_by_type.items()
+            if key in allowed and suffix
+        }
+        include_all_quarters = "quarterly" in allowed or "all" in allowed
+        if not include_all_quarters:
+            periods = [period for period in periods if period[-5:] in selected_suffixes]
     return sorted(periods)
 
 
@@ -96,6 +138,7 @@ def select_broker_instruments(
     instrument_ids: Optional[Sequence[str]] = None,
     storage: Optional[Any] = None,
     candidate_symbols: Optional[Sequence[str]] = None,
+    require_confirmed_scope: bool = True,
 ) -> List[Dict[str, Any]]:
     """Select broker instruments from local master data."""
     requested = {str(item).strip() for item in (instrument_ids or []) if str(item).strip()}
@@ -114,7 +157,10 @@ def select_broker_instruments(
                 continue
             if not requested and not is_broker_risk_control_instrument(row):
                 continue
-            selected.append(row)
+            enriched = enrich_instrument_with_broker_scope(row)
+            if require_confirmed_scope and not _broker_scope_eligible(enriched):
+                continue
+            selected.append(enriched)
             seen.add(instrument_id)
             if limit and len(selected) >= limit:
                 return selected
@@ -127,7 +173,10 @@ def select_broker_instruments(
             symbol_scope=symbol_scope,
             seen=seen,
         ):
-            selected.append(row)
+            enriched = enrich_instrument_with_broker_scope(row)
+            if require_confirmed_scope and not _broker_scope_eligible(enriched):
+                continue
+            selected.append(enriched)
             seen.add(str(row.get("instrument_id") or ""))
             if limit and len(selected) >= limit:
                 return selected
@@ -210,44 +259,93 @@ def scan_broker_risk_control_announcements(
     scanner: CninfoAnnouncementScanner,
     *,
     exchanges: Sequence[str],
+    instruments: Optional[Sequence[Dict[str, Any]]] = None,
     start_date: str,
     end_date: str,
     page_size: int,
     max_pages: int,
+    per_instrument_scan: bool = True,
+    per_instrument_page_size: int = 30,
+    per_instrument_max_pages: int = 6,
     market_configs: Optional[Dict[str, Dict[str, Any]]] = None,
     title_patterns: Optional[Sequence[str]] = None,
+    source_profile: str = BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
 ) -> Dict[str, Any]:
-    """Scan CNInfo announcements for broker risk-control report candidates."""
+    """Scan CNInfo announcements for broker regulatory report candidates."""
     configs = {**_DEFAULT_MARKET_CONFIGS, **(market_configs or {})}
     selected: List[CninfoAnnouncementRecord] = []
-    scan_results: List[Dict[str, Any]] = []
+    seen_announcement_ids: set[str] = set()
+    market_scan_results: List[Dict[str, Any]] = []
+    per_instrument_results: List[Dict[str, Any]] = []
+
+    def _append_selected(records: Sequence[CninfoAnnouncementRecord]) -> int:
+        added = 0
+        for record in records:
+            key = str(record.announcement_id or "").strip()
+            if key and key in seen_announcement_ids:
+                continue
+            if key:
+                seen_announcement_ids.add(key)
+            selected.append(record)
+            added += 1
+        return added
+
+    def _filters() -> List[Any]:
+        if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE:
+            return [
+                lambda record: (
+                    ["formal_annual_or_semiannual_report"]
+                    if is_formal_broker_annual_or_semiannual_report_title(record.title)
+                    else []
+                )
+            ]
+        return [
+            lambda record: (
+                ["broker_risk_control_title"]
+                    if is_broker_risk_control_title(record.title, title_patterns=title_patterns)
+                    else []
+            )
+        ]
+
+    search_key = (
+        "年度报告"
+        if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        else "风险控制指标"
+    )
+    skip_market_scan = (
+        source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        and bool(instruments)
+    )
     for exchange in exchanges:
         market_cfg = configs.get(exchange)
         if not market_cfg:
-            scan_results.append({"exchange": exchange, "status": "market_config_missing"})
+            market_scan_results.append({"exchange": exchange, "status": "market_config_missing"})
+            continue
+        if skip_market_scan:
+            market_scan_results.append(
+                {
+                    "exchange": exchange,
+                    "status": "skipped_for_instrument_scoped_formal_report_source",
+                    "reason": "formal annual/semiannual reports must be scanned by confirmed broker instrument",
+                }
+            )
             continue
         result = scanner.scan(
             CninfoAnnouncementScanConfig(
-                purpose_key=BROKER_RISK_CONTROL_SOURCE_PROFILE,
+                purpose_key=source_profile,
                 market=str(market_cfg.get("market") or exchange),
                 column=str(market_cfg.get("column") or ""),
                 plate=market_cfg.get("plate"),
-                search_key="风险控制指标",
+                search_key=search_key,
                 start_date=start_date,
                 end_date=end_date,
                 page_size=page_size,
                 max_pages=max_pages,
             ),
-            filters=[
-                lambda record: (
-                    ["broker_risk_control_title"]
-                    if is_broker_risk_control_title(record.title, title_patterns=title_patterns)
-                    else []
-                )
-            ],
+            filters=_filters(),
         )
-        selected.extend(result.selected_records)
-        scan_results.append(
+        added = _append_selected(result.selected_records)
+        market_scan_results.append(
             {
                 "exchange": exchange,
                 "market": result.config.market,
@@ -255,11 +353,89 @@ def scan_broker_risk_control_announcements(
                 "pages_scanned": result.pages_scanned,
                 "announcements_seen": result.announcements_seen,
                 "selected_announcements": len(result.selected_records),
+                "selected_announcements_added": added,
                 "max_announcement_time": result.max_announcement_time,
                 "errors": list(result.errors),
             }
         )
-    return {"selected_records": selected, "scan_results": scan_results}
+    attempted = 0
+    instruments_with_matches = 0
+    if per_instrument_scan:
+        for instrument in instruments or []:
+            exchange = str(instrument.get("exchange") or "").strip()
+            if exchange not in exchanges:
+                continue
+            market_cfg = configs.get(exchange)
+            if not market_cfg:
+                per_instrument_results.append(
+                    {
+                        "instrument_id": instrument.get("instrument_id"),
+                        "symbol": instrument.get("symbol"),
+                        "exchange": exchange,
+                        "status": "market_config_missing",
+                    }
+                )
+                continue
+            stock_param = _cninfo_stock_param(instrument)
+            if not stock_param:
+                per_instrument_results.append(
+                    {
+                        "instrument_id": instrument.get("instrument_id"),
+                        "symbol": instrument.get("symbol"),
+                        "exchange": exchange,
+                        "status": "missing_stock_param",
+                    }
+                )
+                continue
+            attempted += 1
+            result = scanner.scan(
+                CninfoAnnouncementScanConfig(
+                    purpose_key=source_profile,
+                    market=str(market_cfg.get("market") or exchange),
+                    column=str(market_cfg.get("column") or ""),
+                    plate=market_cfg.get("plate"),
+                    search_key=search_key,
+                    stock=stock_param,
+                    org_id=_cninfo_org_id(instrument),
+                    start_date=start_date,
+                    end_date=end_date,
+                    page_size=per_instrument_page_size,
+                    max_pages=per_instrument_max_pages,
+                ),
+                filters=_filters(),
+            )
+            added = _append_selected(result.selected_records)
+            if result.selected_records:
+                instruments_with_matches += 1
+            per_instrument_results.append(
+                {
+                    "instrument_id": instrument.get("instrument_id"),
+                    "symbol": instrument.get("symbol"),
+                    "exchange": exchange,
+                    "stock_param": stock_param,
+                    "pages_scanned": result.pages_scanned,
+                    "announcements_seen": result.announcements_seen,
+                    "selected_announcements": len(result.selected_records),
+                    "selected_announcements_added": added,
+                    "max_announcement_time": result.max_announcement_time,
+                    "errors": list(result.errors),
+                }
+            )
+    return {
+        "selected_records": selected,
+        "scan_results": market_scan_results,
+        "market_scan_results": market_scan_results,
+        "per_instrument_scan": {
+            "enabled": per_instrument_scan,
+            "attempted_instruments": attempted,
+            "instruments_with_matches": instruments_with_matches,
+            "selected_announcements_added": sum(
+                int(item.get("selected_announcements_added") or 0)
+                for item in per_instrument_results
+            ),
+            "results": per_instrument_results,
+        },
+    }
 
 
 def run_broker_risk_control_backfill(
@@ -279,6 +455,12 @@ def run_broker_risk_control_backfill(
     payload_fetcher: Optional[Any] = None,
     page_size: int = 30,
     max_pages: int = 20,
+    per_instrument_scan: bool = True,
+    per_instrument_page_size: int = 30,
+    per_instrument_max_pages: int = 6,
+    report_period_types: Optional[Sequence[str]] = None,
+    source_profile: str = BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    include_standalone_supplement: bool = False,
     archive_root: Optional[str | Path] = None,
 ) -> Dict[str, Any]:
     """Run a broker risk-control report dry-run/backfill and return JSON-ready data."""
@@ -291,25 +473,49 @@ def run_broker_risk_control_backfill(
     periods = build_candidate_report_periods(
         as_of_date=end_date or as_of_date,
         quarters=quarters,
+        report_period_types=report_period_types or ("annual", "semiannual"),
     )
     active_scanner = scanner or CninfoAnnouncementScanner()
-    scan = scan_broker_risk_control_announcements(
-        active_scanner,
-        exchanges=exchanges,
-        start_date=window["start_date"],
-        end_date=window["end_date"],
-        page_size=page_size,
-        max_pages=max_pages,
-    )
-    candidate_symbols = _ordered_candidate_symbols(scan["selected_records"])
     selected_instruments = select_broker_instruments(
         db_ops,
         exchanges=exchanges,
         limit=limit_instruments,
         instrument_ids=instrument_ids,
         storage=storage,
-        candidate_symbols=None if instrument_ids else candidate_symbols,
+        require_confirmed_scope=True,
     )
+    selected_instruments, org_resolution = enrich_cninfo_stock_params(
+        active_scanner,
+        selected_instruments,
+    )
+    scan = scan_broker_risk_control_announcements(
+        active_scanner,
+        exchanges=exchanges,
+        instruments=selected_instruments,
+        start_date=window["start_date"],
+        end_date=window["end_date"],
+        page_size=page_size,
+        max_pages=max_pages,
+        per_instrument_scan=per_instrument_scan,
+        per_instrument_page_size=per_instrument_page_size,
+        per_instrument_max_pages=per_instrument_max_pages,
+        source_profile=source_profile,
+    )
+    standalone_scan: Optional[Dict[str, Any]] = None
+    if include_standalone_supplement:
+        standalone_scan = scan_broker_risk_control_announcements(
+            active_scanner,
+            exchanges=exchanges,
+            instruments=selected_instruments,
+            start_date=window["start_date"],
+            end_date=window["end_date"],
+            page_size=page_size,
+            max_pages=max_pages,
+            per_instrument_scan=per_instrument_scan,
+            per_instrument_page_size=per_instrument_page_size,
+            per_instrument_max_pages=per_instrument_max_pages,
+            source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
+        )
     service_result: Dict[str, Any]
     if scan_only:
         service_result = {
@@ -328,6 +534,7 @@ def run_broker_risk_control_backfill(
             scanner=active_scanner,
             payload_fetcher=payload_fetcher,
             archive_root=archive_root,
+            source_profile=source_profile,
         )
         service_result = service.backfill(
             instruments=selected_instruments,
@@ -336,6 +543,36 @@ def run_broker_risk_control_backfill(
             tier="history",
             dry_run=not write,
         )
+        if standalone_scan is not None:
+            supplement_service = BrokerRiskControlReportSyncService(
+                storage=storage,
+                scanner=active_scanner,
+                payload_fetcher=payload_fetcher,
+                archive_root=archive_root,
+                source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
+            )
+            supplement_result = supplement_service.backfill(
+                instruments=selected_instruments,
+                report_periods=periods,
+                announcement_records=standalone_scan["selected_records"],
+                tier="history",
+                dry_run=not write,
+            )
+            service_result["supplementary_standalone"] = supplement_result
+            for key in (
+                "reports_discovered",
+                "reports_parsed",
+                "facts_parsed",
+                "facts_written",
+                "unchanged_reports",
+                "parse_failures",
+                "retryable_pending_reports",
+            ):
+                service_result[key] = int(service_result.get(key) or 0) + int(
+                    supplement_result.get(key) or 0
+                )
+            if supplement_result.get("status") == "partial":
+                service_result["status"] = "partial"
     return {
         "status": service_result.get("status"),
         "dry_run": not write,
@@ -351,17 +588,27 @@ def run_broker_risk_control_backfill(
                 "name": item.get("name") or item.get("short_name"),
                 "industry": item.get("industry") or item.get("industry_name"),
                 "selection_source": item.get("selection_source") or "instrument_master",
+                "cninfo_org_id": item.get("cninfo_org_id"),
+                "listed_broker_dealer_scope": item.get("listed_broker_dealer_scope"),
             }
             for item in selected_instruments
         ],
         "announcement_scan": {
+            "cninfo_org_id_resolution": org_resolution,
             "selected_announcements": len(scan["selected_records"]),
             "scan_results": scan["scan_results"],
+            "market_scan_results": scan.get("market_scan_results", scan["scan_results"]),
+            "per_instrument_scan": scan.get("per_instrument_scan"),
             "selected_preview": [
                 {
                     "announcement_id": record.announcement_id,
                     "title": record.title,
-                    "report_period": infer_broker_risk_control_report_period(record),
+                    "report_period": (
+                        infer_broker_annual_report_period(record)
+                        if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+                        and is_formal_broker_annual_or_semiannual_report_title(record.title)
+                        else infer_broker_risk_control_report_period(record)
+                    ),
                     "announcement_time": record.announcement_time,
                     "market": record.market,
                     "column": record.column,
@@ -370,6 +617,18 @@ def run_broker_risk_control_backfill(
                 }
                 for record in scan["selected_records"][:30]
             ],
+            "source_profile": source_profile,
+            "standalone_supplement": (
+                None
+                if standalone_scan is None
+                else {
+                    "enabled": True,
+                    "selected_announcements": len(standalone_scan["selected_records"]),
+                    "fallback_reason": "supplementary_or_validation_source",
+                    "scan_results": standalone_scan["scan_results"],
+                    "per_instrument_scan": standalone_scan.get("per_instrument_scan"),
+                }
+            ),
         },
         "backfill": service_result,
     }
@@ -395,6 +654,12 @@ async def _run(args: argparse.Namespace) -> Dict[str, Any]:
         scan_only=args.scan_only,
         page_size=args.page_size,
         max_pages=args.max_pages,
+        per_instrument_scan=not args.no_per_instrument_scan,
+        per_instrument_page_size=args.per_instrument_page_size,
+        per_instrument_max_pages=args.per_instrument_max_pages,
+        report_period_types=_parse_csv(args.report_period_types),
+        source_profile=args.source_profile,
+        include_standalone_supplement=args.include_standalone_supplement,
         archive_root=args.archive_root,
     )
 
@@ -412,6 +677,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--instrument-ids", default="")
     parser.add_argument("--page-size", type=int, default=30)
     parser.add_argument("--max-pages", type=int, default=20)
+    parser.add_argument("--no-per-instrument-scan", action="store_true")
+    parser.add_argument("--per-instrument-page-size", type=int, default=30)
+    parser.add_argument("--per-instrument-max-pages", type=int, default=6)
+    parser.add_argument("--report-period-types", default="annual,semiannual")
+    parser.add_argument("--source-profile", default=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE)
+    parser.add_argument("--include-standalone-supplement", action="store_true")
     parser.add_argument("--archive-root", default="data/filings/financial_statements/broker_risk_control")
     parser.add_argument("--scan-only", action="store_true")
     parser.add_argument("--write", action="store_true", help="Persist manifests, archived PDFs, and numeric facts.")
@@ -450,14 +721,128 @@ def _quarter_end_period(year: int, quarter: int) -> str:
     return f"{year}-{suffix}"
 
 
-def _ordered_candidate_symbols(records: Iterable[CninfoAnnouncementRecord]) -> List[str]:
-    symbols: List[str] = []
-    for record in records:
-        for symbol in record.symbols:
-            clean = str(symbol).strip()
-            if clean and clean not in symbols:
-                symbols.append(clean)
-    return symbols
+def enrich_cninfo_stock_params(
+    scanner: Any,
+    instruments: Sequence[Dict[str, Any]],
+) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Resolve CNInfo orgId values so per-stock announcement scans are precise."""
+    if not instruments:
+        return [], {"attempted": 0, "resolved": 0, "skipped": 0, "errors": []}
+    if not hasattr(scanner, "session"):
+        return (
+            [dict(item) for item in instruments],
+            {
+                "attempted": 0,
+                "resolved": 0,
+                "skipped": len(instruments),
+                "errors": ["scanner_session_unavailable"],
+            },
+        )
+
+    enriched: List[Dict[str, Any]] = []
+    errors: List[Dict[str, Any]] = []
+    attempted = 0
+    resolved = 0
+    for instrument in instruments:
+        item = dict(instrument)
+        symbol = str(item.get("symbol") or "").strip()
+        if not symbol:
+            enriched.append(item)
+            continue
+        existing_org_id = _cninfo_org_id(item)
+        if existing_org_id:
+            item["cninfo_org_id"] = existing_org_id
+            item["cninfo_stock_param"] = f"{symbol},{existing_org_id}"
+            enriched.append(item)
+            resolved += 1
+            continue
+        attempted += 1
+        try:
+            org_id = _resolve_cninfo_org_id(scanner, symbol)
+        except Exception as exc:
+            org_id = None
+            errors.append({"symbol": symbol, "error": str(exc)})
+        if org_id:
+            item["cninfo_org_id"] = org_id
+            item["cninfo_stock_param"] = f"{symbol},{org_id}"
+            resolved += 1
+        enriched.append(item)
+        interval = float(getattr(scanner, "request_interval_seconds", 0.0) or 0.0)
+        if interval > 0:
+            time.sleep(interval)
+    return (
+        enriched,
+        {
+            "attempted": attempted,
+            "resolved": resolved,
+            "skipped": len(instruments) - attempted,
+            "errors": errors,
+        },
+    )
+
+
+def _resolve_cninfo_org_id(scanner: Any, symbol: str) -> Optional[str]:
+    response = scanner.session.post(
+        _CNINFO_TOP_SEARCH_URL,
+        data={"keyWord": symbol, "maxNum": "10"},
+        headers=_CNINFO_HEADERS,
+        timeout=float(getattr(scanner, "request_timeout_seconds", 20.0) or 20.0),
+    )
+    response.raise_for_status()
+    payload = response.json()
+    rows = _extract_cninfo_top_search_rows(payload)
+    for row in rows:
+        code = str(row.get("code") or row.get("stockCode") or "").strip()
+        org_id = str(row.get("orgId") or row.get("org_id") or "").strip()
+        if code == symbol and org_id:
+            return org_id
+    return None
+
+
+def _extract_cninfo_top_search_rows(payload: Any) -> List[Dict[str, Any]]:
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if not isinstance(payload, dict):
+        return []
+    for key in ("data", "rows", "records"):
+        value = payload.get(key)
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+    data = payload.get("data")
+    if isinstance(data, dict):
+        for key in ("rows", "records", "list"):
+            value = data.get(key)
+            if isinstance(value, list):
+                return [item for item in value if isinstance(item, dict)]
+    return []
+
+
+def _cninfo_stock_param(instrument: Dict[str, Any]) -> Optional[str]:
+    stock_param = str(instrument.get("cninfo_stock_param") or "").strip()
+    if stock_param:
+        return stock_param
+    symbol = str(instrument.get("symbol") or "").strip()
+    if not symbol:
+        return None
+    org_id = _cninfo_org_id(instrument)
+    if org_id:
+        return f"{symbol},{org_id}"
+    return symbol
+
+
+def _cninfo_org_id(instrument: Dict[str, Any]) -> Optional[str]:
+    for key in ("cninfo_org_id", "org_id", "orgId"):
+        value = str(instrument.get(key) or "").strip()
+        if value:
+            return value
+    return None
+
+
+def _broker_scope_eligible(instrument: Dict[str, Any]) -> bool:
+    scope = instrument.get("listed_broker_dealer_scope")
+    if isinstance(scope, dict):
+        return bool(scope.get("eligible"))
+    return resolve_listed_broker_dealer_scope(instrument).eligible
 
 
 if __name__ == "__main__":
