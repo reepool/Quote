@@ -562,6 +562,74 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
         lines.append("说明: mapping policy gap 是字段标准或映射准入问题，不会反复调用 CNInfo/THS/Sina 补数。")
     if result.get("blocking_gap_count", 0):
         lines.append("后续动作: blocker 按 source missing 或其他数据质量问题补处理，不能并入 accepted gaps。")
+    broker_post = result.get("broker_risk_control_post_task")
+    if isinstance(broker_post, dict):
+        broker_status = broker_post.get("status", "unknown")
+        broker_icon, broker_label = _format_scheduler_status(broker_status)
+        backfill = broker_post.get("backfill") or {}
+        announcement_scan = broker_post.get("announcement_scan") or {}
+        window = broker_post.get("date_window") or {}
+        lines.extend(
+            [
+                "",
+                "*券商风控后置任务*",
+                f"{broker_icon} 状态: {broker_label} ({broker_status})",
+                f"窗口: `{window.get('start_date', 'unknown')}` ~ `{window.get('end_date', 'unknown')}`",
+                f"tier: `{broker_post.get('tier', 'unknown')}`，dry_run: `{broker_post.get('dry_run')}`",
+                (
+                    "处理: "
+                    f"目标券商 {len(broker_post.get('target_instruments') or [])}，"
+                    f"公告 {announcement_scan.get('selected_announcements', 0)}，"
+                    f"解析报告 {backfill.get('reports_parsed', 0)}，"
+                    f"facts {backfill.get('facts_parsed', 0)}，"
+                    f"写入 {backfill.get('facts_written', 0)}"
+                ),
+            ]
+        )
+    return "\n".join(lines)
+
+
+def _format_broker_risk_control_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build compact Telegram content for broker regulatory fact maintenance."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    backfill = result.get("backfill") or {}
+    announcement_scan = result.get("announcement_scan") or {}
+    window = result.get("date_window") or {}
+    per_instrument = announcement_scan.get("per_instrument_scan") or {}
+    lines = [
+        f"结论: {icon} *{label}*",
+        f"status: `{status}`",
+        f"模式: `{result.get('mode', 'incremental_update')}`",
+        f"窗口: `{window.get('start_date', 'unknown')}` ~ `{window.get('end_date', 'unknown')}`",
+        f"tier: `{result.get('tier', 'unknown')}`，dry_run: `{result.get('dry_run')}`",
+        f"交易所: `{', '.join(result.get('exchanges') or [])}`",
+        f"目标券商: `{len(result.get('target_instruments') or [])}`",
+        (
+            "公告扫描: "
+            f"选中 {announcement_scan.get('selected_announcements', 0)}，"
+            f"逐公司尝试 {per_instrument.get('attempted_instruments', 0)}，"
+            f"命中公司 {per_instrument.get('instruments_with_matches', 0)}"
+        ),
+        (
+            "解析写入: "
+            f"reports {backfill.get('reports_parsed', 0)}/"
+            f"{backfill.get('reports_discovered', 0)}，"
+            f"facts parsed {backfill.get('facts_parsed', 0)}，"
+            f"facts written {backfill.get('facts_written', 0)}"
+        ),
+        (
+            "异常: "
+            f"parse_failures {backfill.get('parse_failures', 0)}，"
+            f"retryable_pending {backfill.get('retryable_pending_reports', 0)}"
+        ),
+        f"耗时: `{_format_seconds_for_report(result.get('elapsed_seconds'))}`",
+    ]
+    governance_summary = _format_instrument_master_governance_summary(
+        result.get("instrument_master_governance")
+    )
+    if governance_summary:
+        lines.extend(["", "*证券主数据治理*", governance_summary])
     return "\n".join(lines)
 
 
@@ -2865,6 +2933,132 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_name)
 
+    async def _run_broker_risk_control_incremental_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages: Optional[int] = None,
+        per_instrument_page_size: Optional[int] = None,
+        per_instrument_max_pages: Optional[int] = None,
+        limit_instruments: Optional[int] = None,
+        instrument_ids: Optional[List[str]] = None,
+        report_period_types: Optional[List[str]] = None,
+        source_profile: Optional[str] = None,
+        include_standalone_supplement: Optional[bool] = None,
+        archive_root: Optional[str] = None,
+        dry_run: bool = False,
+        scan_only: bool = False,
+    ) -> Dict[str, Any]:
+        """Execute broker regulatory incremental sync and return the raw result."""
+        scheduler_logger.info("[Scheduler] Starting broker risk-control incremental sync...")
+        return await data_manager.run_broker_risk_control_incremental_sync(
+            exchanges=exchanges,
+            lookback_days=lookback_days,
+            overlap_days=overlap_days,
+            page_size=page_size,
+            max_pages=max_pages,
+            per_instrument_page_size=per_instrument_page_size,
+            per_instrument_max_pages=per_instrument_max_pages,
+            limit_instruments=limit_instruments,
+            instrument_ids=instrument_ids,
+            report_period_types=report_period_types,
+            source_profile=source_profile,
+            include_standalone_supplement=include_standalone_supplement,
+            archive_root=archive_root,
+            dry_run=dry_run,
+            scan_only=scan_only,
+        )
+
+    async def broker_risk_control_incremental_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages: Optional[int] = None,
+        per_instrument_page_size: Optional[int] = None,
+        per_instrument_max_pages: Optional[int] = None,
+        limit_instruments: Optional[int] = None,
+        instrument_ids: Optional[List[str]] = None,
+        report_period_types: Optional[List[str]] = None,
+        source_profile: Optional[str] = None,
+        include_standalone_supplement: Optional[bool] = None,
+        archive_root: Optional[str] = None,
+        dry_run: bool = False,
+        scan_only: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """券商风控指标公告增量维护任务。"""
+        task_name = 'broker_risk_control_incremental_sync'
+        self._active_tasks.add(task_name)
+        try:
+            result = await self._run_broker_risk_control_incremental_sync(
+                exchanges=exchanges,
+                lookback_days=lookback_days,
+                overlap_days=overlap_days,
+                page_size=page_size,
+                max_pages=max_pages,
+                per_instrument_page_size=per_instrument_page_size,
+                per_instrument_max_pages=per_instrument_max_pages,
+                limit_instruments=limit_instruments,
+                instrument_ids=instrument_ids,
+                report_period_types=report_period_types,
+                source_profile=source_profile,
+                include_standalone_supplement=include_standalone_supplement,
+                archive_root=archive_root,
+                dry_run=dry_run,
+                scan_only=scan_only,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'partial', 'scan_only', 'disabled', 'unavailable'}
+            backfill = result.get("backfill") or {}
+            report_data = {
+                'name': '券商风控指标增量维护报告',
+                'status': 'success' if success else 'error',
+                'tasks_completed': backfill.get('facts_written', 0),
+                'duration': _format_seconds_for_report(result.get('elapsed_seconds')),
+                'content': _format_broker_risk_control_scheduler_report(result),
+                'maintenance_tasks': [
+                    {
+                        'task_name': task_name,
+                        'status': (
+                            f"{status} "
+                            f"(reports={backfill.get('reports_parsed', 0)}, "
+                            f"facts={backfill.get('facts_parsed', 0)}, "
+                            f"written={backfill.get('facts_written', 0)})"
+                        ),
+                    }
+                ],
+            }
+            _attach_instrument_master_governance_report(report_data, result)
+            await self._send_task_report(
+                report_data=report_data,
+                report_type='maintenance_report',
+                task_name='券商风控指标增量维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Broker risk-control incremental sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '券商风控指标增量维护报告',
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_name, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='券商风控指标增量维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_name)
+
     async def financial_disclosure_incremental_sync(
         self,
         exchanges: Optional[List[str]] = None,
@@ -2886,6 +3080,8 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.2,
         request_timeout_seconds: float = 20.0,
         dry_run: bool = False,
+        run_broker_risk_control_post_task: bool = True,
+        broker_risk_control_post_task_job_id: str = "broker_risk_control_incremental_sync",
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """财务公告驱动增量检查任务。"""
@@ -2916,6 +3112,61 @@ class ScheduledTasks:
             )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
+            broker_post_success = True
+            if success and run_broker_risk_control_post_task:
+                broker_post_result: Dict[str, Any]
+                task_name_post = 'broker_risk_control_incremental_sync'
+                self._active_tasks.add(task_name_post)
+                try:
+                    post_job_cfg = self.config.get_nested(
+                        f'scheduler_config.jobs.{broker_risk_control_post_task_job_id}',
+                        {},
+                    ) or {}
+                    post_params = dict(post_job_cfg.get('parameters') or {})
+                    max_runtime_seconds = post_params.pop('max_runtime_seconds', None)
+                    post_params.setdefault('exchanges', exchanges)
+                    post_params.setdefault('dry_run', dry_run)
+                    broker_runner = getattr(
+                        data_manager,
+                        'run_broker_risk_control_incremental_sync',
+                        None,
+                    )
+                    if broker_runner is None or not asyncio.iscoroutinefunction(broker_runner):
+                        broker_post_result = {
+                            'status': 'unavailable',
+                            'reason': 'data_manager.run_broker_risk_control_incremental_sync is unavailable',
+                        }
+                    elif max_runtime_seconds:
+                        broker_post_result = await asyncio.wait_for(
+                            self._run_broker_risk_control_incremental_sync(**post_params),
+                            timeout=max_runtime_seconds,
+                        )
+                    else:
+                        broker_post_result = await self._run_broker_risk_control_incremental_sync(
+                            **post_params,
+                        )
+                    broker_status = broker_post_result.get('status', 'failed')
+                    broker_post_success = broker_status in {
+                        'success',
+                        'partial',
+                        'scan_only',
+                        'disabled',
+                        'unavailable',
+                    }
+                except Exception as broker_error:
+                    broker_post_success = False
+                    broker_post_result = {
+                        'status': 'failed',
+                        'reason': str(broker_error),
+                    }
+                    scheduler_logger.error(
+                        "[Scheduler] Broker risk-control post task failed: %s",
+                        broker_error,
+                    )
+                finally:
+                    self._active_tasks.discard(task_name_post)
+                result['broker_risk_control_post_task'] = broker_post_result
+                success = success and broker_post_success
             report_data = {
                 'name': '财务公告驱动增量检查报告',
                 'status': 'success' if success else 'error',

@@ -3873,6 +3873,154 @@ class DataManager:
         )
         return self._attach_instrument_master_governance(result, governance)
 
+    async def run_broker_risk_control_incremental_sync(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        lookback_days: Optional[int] = None,
+        overlap_days: Optional[int] = None,
+        page_size: Optional[int] = None,
+        max_pages: Optional[int] = None,
+        per_instrument_page_size: Optional[int] = None,
+        per_instrument_max_pages: Optional[int] = None,
+        limit_instruments: Optional[int] = None,
+        instrument_ids: Optional[List[str]] = None,
+        report_period_types: Optional[List[str]] = None,
+        source_profile: Optional[str] = None,
+        include_standalone_supplement: Optional[bool] = None,
+        archive_root: Optional[str] = None,
+        dry_run: bool = False,
+        scan_only: bool = False,
+    ) -> Dict[str, Any]:
+        """Run broker regulatory fact maintenance as a financial-data post task."""
+        started_at = datetime.now()
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+                "mode": "incremental_update",
+            }
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+                "mode": "incremental_update",
+            }
+        module_cfg = self.research_config.modules.get("financial_statements", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "research financial_statements module is disabled",
+                "mode": "incremental_update",
+            }
+        broker_cfg = module_cfg.get("broker_risk_control_reports", {})
+        if not broker_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "reason": "broker_risk_control_reports module is disabled",
+                "mode": "incremental_update",
+            }
+
+        incremental_cfg = broker_cfg.get("incremental", {})
+        target_exchanges = exchanges or list(
+            broker_cfg.get("exchanges")
+            or self.research_config.markets
+            or ["SSE", "SZSE", "BSE"]
+        )
+        lookback = int(
+            incremental_cfg.get("lookback_days", 14)
+            if lookback_days is None
+            else lookback_days
+        )
+        overlap = int(
+            incremental_cfg.get("overlap_days", 3)
+            if overlap_days is None
+            else overlap_days
+        )
+        as_of = get_shanghai_time().date()
+        start = as_of - timedelta(days=max(1, lookback + overlap))
+        scan_page_size = int(
+            incremental_cfg.get("page_size", 30) if page_size is None else page_size
+        )
+        scan_max_pages = int(
+            incremental_cfg.get("max_pages", 10) if max_pages is None else max_pages
+        )
+        instrument_page_size = int(
+            incremental_cfg.get("per_instrument_page_size", 30)
+            if per_instrument_page_size is None
+            else per_instrument_page_size
+        )
+        instrument_max_pages = int(
+            incremental_cfg.get("per_instrument_max_pages", 2)
+            if per_instrument_max_pages is None
+            else per_instrument_max_pages
+        )
+        target_limit = int(
+            incremental_cfg.get("limit_instruments", 0)
+            if limit_instruments is None
+            else limit_instruments
+        )
+        periods_window = int(incremental_cfg.get("quarters", 12) or 12)
+        selected_source_profile = (
+            source_profile
+            or broker_cfg.get("source_profile")
+            or "broker_annual_report_embedded_risk_control"
+        )
+        selected_report_period_types = (
+            report_period_types
+            or incremental_cfg.get("report_period_types")
+            or ["annual", "semiannual"]
+        )
+        selected_archive_root = (
+            archive_root
+            or broker_cfg.get("storage", {}).get("archive_root")
+            or "data/filings/financial_statements/broker_risk_control"
+        )
+        include_supplement = bool(
+            incremental_cfg.get("include_standalone_supplement", False)
+            if include_standalone_supplement is None
+            else include_standalone_supplement
+        )
+        tier = str(broker_cfg.get("storage", {}).get("incremental_tier") or "hot")
+
+        from scripts.dev_validation.backfill_broker_risk_control_reports import (
+            run_broker_risk_control_backfill,
+        )
+
+        governance = await self._ensure_research_job_instrument_master_governance(
+            exchanges=target_exchanges,
+            job_name='broker_risk_control_incremental_sync',
+        )
+        result = await asyncio.to_thread(
+            run_broker_risk_control_backfill,
+            db_ops=self.db_ops,
+            storage=self.research_storage,
+            exchanges=target_exchanges,
+            as_of_date=as_of.isoformat(),
+            quarters=periods_window,
+            start_date=start.isoformat(),
+            end_date=as_of.isoformat(),
+            limit_instruments=target_limit,
+            instrument_ids=instrument_ids,
+            write=not dry_run,
+            scan_only=scan_only,
+            page_size=scan_page_size,
+            max_pages=scan_max_pages,
+            per_instrument_scan=True,
+            per_instrument_page_size=instrument_page_size,
+            per_instrument_max_pages=instrument_max_pages,
+            report_period_types=selected_report_period_types,
+            source_profile=selected_source_profile,
+            include_standalone_supplement=include_supplement,
+            archive_root=selected_archive_root,
+            tier=tier,
+        )
+        result["mode"] = "incremental_update"
+        result["elapsed_seconds"] = round((datetime.now() - started_at).total_seconds(), 3)
+        result["lookback_days"] = lookback
+        result["overlap_days"] = overlap
+        return self._attach_instrument_master_governance(result, governance)
+
     async def run_financial_disclosure_reconciliation_sync(
         self,
         *,

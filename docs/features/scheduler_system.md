@@ -499,7 +499,7 @@ async def weekly_data_maintenance(self,
 - `financial_disclosure_reconciliation_sync`：周度兜底，复核缺失报告期、accepted gap、pending recheck 和 CNInfo 静默更新。
 - 旧 `financial_statements_catchup_sync / financial_statements_reconciliation_sync` 在新任务落地前保持禁用；后续应迁移到新的公告驱动语义或作为兼容别名。
 
-实现状态（`2026-05-25`）：新三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`，只通过 `/run` 手工触发；公告驱动增量任务已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；周度对账任务已启用为周日 `09:30` 自动运行，二者仍可通过 `/run` 手工验证。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；业绩说明会、英文版、图文版、问询函回复、专项说明、投资者接待日和摘要默认不产生候选。
+实现状态（`2026-06-10`）：财务 L1 三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`，只通过 `/run` 手工触发；公告驱动增量任务已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；周度对账任务已启用为周日 `09:30` 自动运行，二者仍可通过 `/run` 手工验证。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；业绩说明会、英文版、图文版、问询函回复、专项说明、投资者接待日和摘要默认不产生候选。券商专项财务事实任务 `broker_risk_control_incremental_sync` 已接入调度管理，但配置为 `manual_only=true`，不会单独注册 cron；它由 `financial_disclosure_incremental_sync` 成功后作为后置任务自动触发，也可通过 `/run broker_risk_control_incremental_sync` 手工验证。
 
 #### 当前配置
 ```json
@@ -531,6 +531,22 @@ async def weekly_data_maintenance(self,
       "max_candidates": 500,
       "db_path": "data/financials.db",
       "dry_run": false,
+      "run_broker_risk_control_post_task": true,
+      "broker_risk_control_post_task_job_id": "broker_risk_control_incremental_sync",
+      "max_runtime_seconds": 7200
+    }
+  },
+  "broker_risk_control_incremental_sync": {
+    "enabled": true,
+    "manual_only": true,
+    "parameters": {
+      "exchanges": ["SSE", "SZSE", "BSE"],
+      "lookback_days": 14,
+      "overlap_days": 3,
+      "per_instrument_max_pages": 2,
+      "limit_instruments": 0,
+      "dry_run": false,
+      "scan_only": false,
       "max_runtime_seconds": 7200
     }
   },

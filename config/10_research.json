@@ -236,7 +236,7 @@
           ]
         },
         "broker_risk_control_reports": {
-          "enabled": false,
+          "enabled": true,
           "source_profile": "broker_annual_report_embedded_risk_control",
           "supplementary_source_profile": "broker_risk_control_report",
           "exchanges": [
@@ -317,12 +317,21 @@
             "max_periods_per_run": 6
           },
           "incremental": {
-            "enabled": false,
-            "scan_recent_days": 14,
-            "watermark_enabled": true,
-            "pending_retry_days": 5,
+            "enabled": true,
+            "lookback_days": 14,
+            "overlap_days": 3,
+            "quarters": 12,
             "page_size": 30,
-            "max_pages": 20
+            "max_pages": 10,
+            "per_instrument_page_size": 30,
+            "per_instrument_max_pages": 2,
+            "limit_instruments": 0,
+            "report_period_types": [
+              "annual",
+              "semiannual"
+            ],
+            "include_standalone_supplement": false,
+            "note": "Incremental maintenance is invoked as a post-task of financial_disclosure_incremental_sync and writes broker regulatory facts to the hot financial fact tier."
           },
           "request_policy": {
             "request_timeout_seconds": 20.0,

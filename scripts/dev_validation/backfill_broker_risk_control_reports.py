@@ -520,6 +520,7 @@ def run_broker_risk_control_backfill(
     source_profile: str = BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
     include_standalone_supplement: bool = False,
     archive_root: Optional[str | Path] = None,
+    tier: str = "history",
 ) -> Dict[str, Any]:
     """Run a broker risk-control report dry-run/backfill and return JSON-ready data."""
     window = build_default_announcement_window(
@@ -637,7 +638,7 @@ def run_broker_risk_control_backfill(
             instruments=selected_instruments,
             report_periods=periods,
             announcement_records=scan["selected_records"],
-            tier="history",
+            tier=tier,
             dry_run=not write,
         )
         LOGGER.info(
@@ -666,7 +667,7 @@ def run_broker_risk_control_backfill(
                 instruments=selected_instruments,
                 report_periods=periods,
                 announcement_records=standalone_scan["selected_records"],
-                tier="history",
+                tier=tier,
                 dry_run=not write,
             )
             LOGGER.info(
@@ -697,6 +698,7 @@ def run_broker_risk_control_backfill(
         "status": service_result.get("status"),
         "dry_run": not write,
         "scan_only": scan_only,
+        "tier": tier,
         "date_window": window,
         "report_periods": periods,
         "exchanges": list(exchanges),
@@ -781,6 +783,7 @@ async def _run(args: argparse.Namespace) -> Dict[str, Any]:
         source_profile=args.source_profile,
         include_standalone_supplement=args.include_standalone_supplement,
         archive_root=args.archive_root,
+        tier=args.tier,
     )
 
 
@@ -804,6 +807,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--source-profile", default=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE)
     parser.add_argument("--include-standalone-supplement", action="store_true")
     parser.add_argument("--archive-root", default="data/filings/financial_statements/broker_risk_control")
+    parser.add_argument("--tier", default="history", choices=["hot", "history"])
     parser.add_argument("--scan-only", action="store_true")
     parser.add_argument("--write", action="store_true", help="Persist manifests, archived PDFs, and numeric facts.")
     parser.add_argument("--output", default="")

@@ -770,6 +770,43 @@
           "request_interval_seconds": 0.2,
           "request_timeout_seconds": 20.0,
           "dry_run": false,
+          "run_broker_risk_control_post_task": true,
+          "broker_risk_control_post_task_job_id": "broker_risk_control_incremental_sync",
+          "max_runtime_seconds": 7200
+        }
+      },
+      "broker_risk_control_incremental_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "券商风控指标财务后置增量维护",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "lookback_days": 14,
+          "overlap_days": 3,
+          "page_size": 30,
+          "max_pages": 10,
+          "per_instrument_page_size": 30,
+          "per_instrument_max_pages": 2,
+          "limit_instruments": 0,
+          "instrument_ids": null,
+          "report_period_types": [
+            "annual",
+            "semiannual"
+          ],
+          "source_profile": "broker_annual_report_embedded_risk_control",
+          "include_standalone_supplement": false,
+          "archive_root": "data/filings/financial_statements/broker_risk_control",
+          "dry_run": false,
+          "scan_only": false,
           "max_runtime_seconds": 7200
         }
       },

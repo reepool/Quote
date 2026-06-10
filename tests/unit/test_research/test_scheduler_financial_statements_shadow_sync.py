@@ -291,3 +291,83 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
     assert "fallback尝试 1" in report_data["content"]
     assert "不会改写股票主数据退市状态" in report_data["content"]
     assert "financial_disclosure_incremental_sync" not in task._active_tasks
+
+
+def test_financial_disclosure_incremental_task_runs_broker_post_task(monkeypatch):
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.config = Mock()
+    task.config.get_nested.return_value = {
+        "parameters": {
+            "exchanges": ["SSE"],
+            "lookback_days": 14,
+            "overlap_days": 3,
+            "dry_run": False,
+            "max_runtime_seconds": 30,
+        }
+    }
+    task.telegram_enabled = False
+    task._active_tasks = set()
+    task._send_task_report = AsyncMock()
+
+    data_manager = Mock()
+    data_manager.run_financial_disclosure_incremental_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "db_path": "data/financials.db",
+            "reconciliation": False,
+            "report_periods": ["2026-03-31"],
+            "elapsed_seconds": 0.5,
+        }
+    )
+    data_manager.run_broker_risk_control_incremental_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "mode": "incremental_update",
+            "dry_run": False,
+            "tier": "hot",
+            "date_window": {"start_date": "2026-05-24", "end_date": "2026-06-10"},
+            "exchanges": ["SSE"],
+            "target_instruments": [{"instrument_id": "600030.SH"}],
+            "announcement_scan": {"selected_announcements": 1},
+            "backfill": {
+                "reports_discovered": 1,
+                "reports_parsed": 1,
+                "facts_parsed": 12,
+                "facts_written": 12,
+                "parse_failures": 0,
+                "retryable_pending_reports": 0,
+            },
+            "elapsed_seconds": 1.2,
+        }
+    )
+    monkeypatch.setattr(task_module, "data_manager", data_manager)
+
+    result = asyncio.run(
+        task.financial_disclosure_incremental_sync(
+            exchanges=["SSE"],
+            dry_run=False,
+        )
+    )
+
+    assert result is True
+    data_manager.run_broker_risk_control_incremental_sync.assert_awaited_once_with(
+        exchanges=["SSE"],
+        lookback_days=14,
+        overlap_days=3,
+        page_size=None,
+        max_pages=None,
+        per_instrument_page_size=None,
+        per_instrument_max_pages=None,
+        limit_instruments=None,
+        instrument_ids=None,
+        report_period_types=None,
+        source_profile=None,
+        include_standalone_supplement=None,
+        archive_root=None,
+        dry_run=False,
+        scan_only=False,
+    )
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "券商风控后置任务" in report_data["content"]
+    assert "写入 12" in report_data["content"]
+    assert "broker_risk_control_incremental_sync" not in task._active_tasks

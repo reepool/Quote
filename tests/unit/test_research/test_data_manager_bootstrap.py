@@ -625,6 +625,71 @@ def test_data_manager_run_financial_disclosure_incremental_sync_delegates_to_ser
     )
 
 
+def test_data_manager_run_broker_risk_control_incremental_sync_uses_hot_tier(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE", "SZSE", "BSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {
+            "enabled": True,
+            "broker_risk_control_reports": {
+                "enabled": True,
+                "source_profile": "broker_annual_report_embedded_risk_control",
+                "exchanges": ["SSE", "SZSE", "BSE"],
+                "storage": {
+                    "archive_root": "data/filings/financial_statements/broker_risk_control",
+                    "incremental_tier": "hot",
+                },
+                "incremental": {
+                    "lookback_days": 14,
+                    "overlap_days": 3,
+                    "quarters": 12,
+                    "page_size": 30,
+                    "max_pages": 10,
+                    "per_instrument_page_size": 30,
+                    "per_instrument_max_pages": 2,
+                    "limit_instruments": 0,
+                    "report_period_types": ["annual", "semiannual"],
+                },
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = object()
+    manager.db_ops = Mock()
+    manager._ensure_research_job_instrument_master_governance = AsyncMock(
+        return_value={"status": "skipped"}
+    )
+
+    expected = {
+        "status": "success",
+        "backfill": {"reports_parsed": 1, "facts_parsed": 10, "facts_written": 10},
+    }
+    with patch(
+        "scripts.dev_validation.backfill_broker_risk_control_reports.run_broker_risk_control_backfill",
+        return_value=expected,
+    ) as run_backfill:
+        with patch("data_manager.asyncio.to_thread", _sync_to_thread):
+            result = _run(
+                manager.run_broker_risk_control_incremental_sync(
+                    exchanges=["SSE"],
+                    dry_run=False,
+                )
+            )
+
+    assert result["status"] == "success"
+    assert result["mode"] == "incremental_update"
+    assert result["instrument_master_governance"]["status"] == "skipped"
+    kwargs = run_backfill.call_args.kwargs
+    assert kwargs["exchanges"] == ["SSE"]
+    assert kwargs["write"] is True
+    assert kwargs["tier"] == "hot"
+    assert kwargs["limit_instruments"] == 0
+    assert kwargs["report_period_types"] == ["annual", "semiannual"]
+
+
 def test_data_manager_run_industry_shadow_sync_returns_unavailable_without_storage(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
 

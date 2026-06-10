@@ -1,6 +1,6 @@
 # 专业 DCF 估值引擎专项需求报告
 
-> 更新日期：2026-06-04
+> 更新日期：2026-06-10
 > 适用项目：Quote System / Research Data Engine
 > 文档定位：本报告用于定义后续专业 DCF 专项 OpenSpec、实现设计、测试验收和生产 readiness 标准。当前仓库已有 `SimpleGrowthDcfEngine` 轻量基线；本报告目标是升级为专业、分行业、分类型、可审计、可替换的投行级 DCF 估值框架。
 > 使用边界：系统只输出结构化估值结果、模型假设、敏感性、诊断和 lineage，不输出买卖建议，不替代人工投资决策。
@@ -729,6 +729,22 @@ Residual Income = Net Income - Cost of Equity * Beginning Book Value
 - 证券公司身份不能只按申万“证券Ⅲ”判定；必须先以证监会证券公司名录/证券经营机构信息公示建立 `licensed_securities_company` 官方名单，再以显式 `listed_broker_dealer_scope` 映射确认上市主体是否为 `direct_listed_broker` 或 `listed_broker_group`。证券控股、参股平台、混业金融或互联网金融公司不得自动套用证券公司估值模型。
 - 年报/半年报内嵌风控表是证券监管资本和流动性字段主源；独立《风险控制指标报告》只作为补充、交叉校验或 Q1/Q3 等非年报/半年报周期补源。即使风控表中出现操作风险资本准备使用的业务净收入行，也只能保存为监管口径 P2 字段，不能替代年报分部收入。
 - 监管净资本通常是母公司或监管口径，可能不同于 DCF 使用的合并口径会计权益；模型必须在 lineage 或 warning 中记录 scope 差异。
+- 证券监管事实进入现有财务披露链路：历史回补通过 `scripts/dev_validation/backfill_broker_risk_control_reports.py` 写入 `financial_numeric_facts_history`，日更通过 `broker_risk_control_incremental_sync` 后置于 `financial_disclosure_incremental_sync` 写入 `financial_numeric_facts_hot`。两者都必须使用 `listed_broker_dealer_scope` gate，不得按申万“证券”直接全量套用。
+
+历史 12 个季度正式写库命令：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python scripts/dev_validation/backfill_broker_risk_control_reports.py \
+  --as-of-date 2026-06-10 \
+  --quarters 12 \
+  --limit-instruments 0 \
+  --per-instrument-max-pages 1 \
+  --write \
+  --output /tmp/broker_risk_control_all_12q_write.json \
+  > /tmp/broker_risk_control_all_12q_write.log 2>&1
+```
+
+不带 `--write` 即为 dry-run；历史回补默认 `--tier history`，日更入口由 DataManager 固定使用配置中的 `incremental_tier=hot`。
 
 ### 6.11 保险
 
@@ -1259,7 +1275,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 
 ## 15. 分阶段落地建议
 
-### 15.0 当前实现状态（2026-06-06）
+### 15.0 当前实现状态（2026-06-10）
 
 已启动 OpenSpec change `add-professional-dcf-engine` 并完成第一批工程落地：
 
@@ -1283,7 +1299,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 真实主备外部数据源刷新 adapter 和生产级联网刷新调度。
 - 跨进程 saved-run audit 表和可检索历史运行视图。
 - 保险、地产 NAV、周期 mid-cycle、控股公司等特殊行业/类型完整实算模型；证券模型后续仍需扩展更细的市场周期、两融、投行、资管和自营分部驱动。
-- 已新增待实现 OpenSpec change `use-annual-report-broker-risk-control-source`：用于把证券公司风控指标主源调整为正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表，并补充 CSRC 名录 + `listed_broker_dealer_scope` 上市券商主体 gate。独立《风险控制指标报告》降级为补充/校验源；经纪、投行、资管、自营收入仍归年报分部/附注解析，不从监管风控表推断。
+- 已实现 OpenSpec change `use-annual-report-broker-risk-control-source` 的核心链路：正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表为主源，CSRC 名录 + `listed_broker_dealer_scope` 作为上市券商主体 gate，解析结果写入现有财务事实表；独立《风险控制指标报告》保留为补充/校验源。历史回补使用显式 CLI，日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务。经纪、投行、资管、自营收入仍归年报分部/附注解析，不从监管风控表推断。
 - 覆盖所有代表性行业/公司类型的大样本 fixture 与集成验证。
 
 ### Phase 0：需求与规格固化

@@ -142,13 +142,27 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 财务 L1 维护任务分工：
 
-当前实现状态（`2026-05-26`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。L1 required facts 使用 `net_income_parent / equity_parent` 等精确口径，不再用旧的 `net_income / equity` 泛化字段作为本地核心层准入要求。源路由统一封装在 `FinancialMaintenanceRepairRouter`，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
+当前实现状态（`2026-06-10`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口，并在成功后自动触发券商专项财务后置任务 `broker_risk_control_incremental_sync`；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。L1 required facts 使用 `net_income_parent / equity_parent` 等精确口径，不再用旧的 `net_income / equity` 泛化字段作为本地核心层准入要求。券商风控事实使用正式年报/半年报内嵌“净资本及风险控制指标”表，按 `listed_broker_dealer_scope` gate 只处理确认上市券商，写入同一财务事实表；源路由统一封装在服务层，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
 
 | 任务 | 触发方式 | 读取范围 | 写入策略 |
 |---|---|---|---|
 | `financial_l1_full_import` | 仅 `/run` | `SSE / SZSE / BSE` active 股票池和最近 rolling 报告期 | 可续跑；已完整落库的标的/报告期跳过；用于初始化和大范围补处理 |
 | `financial_disclosure_incremental_sync` | 每日 `21:45` / `/run` | CNInfo 正式定报/更正/延期/风险公告候选、pending recheck、本地缺失报告期 | 只对候选补处理；先用 CNInfo data20，缺口再用 THS/Sina；公告先到但结构化源未更新时进入 pending recheck |
+| `broker_risk_control_incremental_sync` | `financial_disclosure_incremental_sync` 成功后的后置任务 / `/run` | 确认上市券商范围内最近公告窗口的正式年报/半年报 | 写 `financial_numeric_facts_hot`；提取 `net_capital`、风险覆盖率、资本杠杆率、LCR、NSFR 等券商监管事实 |
 | `financial_disclosure_reconciliation_sync` | 周日 `09:30` / `/run` | 最近 rolling 报告期全市场覆盖情况 | 只补缺失、变化或 required core facts 不完整的 instrument-period |
+
+券商风控历史 12 个季度回补不通过 Telegram 自动触发，使用 CLI 显式执行；不带 `--write` 为 dry-run，正式写库命令如下：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python scripts/dev_validation/backfill_broker_risk_control_reports.py \
+  --as-of-date 2026-06-10 \
+  --quarters 12 \
+  --limit-instruments 0 \
+  --per-instrument-max-pages 1 \
+  --write \
+  --output /tmp/broker_risk_control_all_12q_write.json \
+  > /tmp/broker_risk_control_all_12q_write.log 2>&1
+```
 
 财务公告驱动任务识别正式年度报告、半年度报告、一季报、三季报、更正/修订公告和披露异常公告。业绩说明会预告、英文版、图文版、问询函/回复、专项说明、投资者接待日和摘要类公告默认过滤，不进入 `pending_recheck`。历史缺报且公告显示停牌、退市风险警示或可能终止上市时，报告中应显示“待退市风险/披露异常待补”，不把该类缺口误报为字段映射错误。
 明确无法按期披露的候选记录为 `accepted_disclosure_gap`，不再每日调用 CNInfo/THS/Sina 反复补数；等正式定报主公告出现后再作为新事件触发补处理。
