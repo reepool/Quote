@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import io
+import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -38,6 +39,7 @@ BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE = "broker_annual_report_embedde
 BROKER_ANNUAL_REPORT_RISK_CONTROL_ARTIFACT_KIND = "broker_annual_or_semiannual_report_pdf"
 BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION = "broker_annual_report_embedded_risk_control_pdf.v1"
 BROKER_RISK_CONTROL_STATEMENT_FAMILY = "regulatory_risk_control"
+LOGGER = logging.getLogger(__name__)
 
 
 BROKER_RISK_CONTROL_REQUIRED_FACTS = ("net_capital",)
@@ -248,7 +250,10 @@ def is_formal_broker_annual_or_semiannual_report_title(title: str) -> bool:
         return False
     if not ("年度报告" in text or "半年度报告" in text):
         return False
+    if not re.search(r"(20\d{2}|19\d{2})", text):
+        return False
     excluded_tokens = (
+        "H股公告",
         "摘要",
         "审计报告",
         "审阅报告",
@@ -268,6 +273,14 @@ def is_formal_broker_annual_or_semiannual_report_title(title: str) -> bool:
         "环境社会及治理",
         "ESG",
         "英文",
+        "可视版",
+        "提质增效",
+        "重回报",
+        "行动方案",
+        "落实情况",
+        "披露时间",
+        "提示性公告",
+        "关于变更",
         "修订说明",
         "更正",
         "取消",
@@ -374,6 +387,24 @@ class BrokerRiskControlParseResult:
 class BrokerRiskControlPdfFactParser:
     """Parse broker regulatory risk-control metrics from PDF text."""
 
+    _FIXED_ORDER_EMBEDDED_FACTS = (
+        "core_net_capital",
+        "subordinated_net_capital",
+        "net_capital",
+        "regulatory_net_assets",
+        "risk_capital_reserve_total",
+        "balance_sheet_assets_total",
+        "risk_coverage_ratio",
+        "capital_leverage_ratio",
+        "liquidity_coverage_ratio",
+        "net_stable_funding_ratio",
+        "net_capital_to_net_assets",
+        "net_capital_to_liabilities",
+        "net_assets_to_liabilities",
+        "proprietary_equity_securities_to_net_capital",
+        "proprietary_non_equity_securities_to_net_capital",
+    )
+
     _MONEY_UNITS = {
         "元": 1.0,
         "千元": 1_000.0,
@@ -472,55 +503,100 @@ class BrokerRiskControlPdfFactParser:
                 "value": canonical_value,
             }
             facts.append(
-                FinancialNumericFactSnapshot(
+                self._build_fact_snapshot(
                     source_file_id=source_file_id,
                     instrument_id=instrument_id,
                     symbol=symbol,
                     exchange=exchange,
                     report_period=report_period,
-                    report_type=report_type or "annual_risk_control",
-                    statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
-                    fact_name=fact_name,
-                    canonical_fact_name=standard_metadata.get("canonical_fact_name") or canonical_name,
-                    canonical_statement_family=standard_metadata.get("canonical_statement_family")
-                    or BROKER_RISK_CONTROL_STATEMENT_FAMILY,
-                    canonical_semantic=standard_metadata.get("canonical_semantic")
-                    or BROKER_RISK_CONTROL_CANONICAL_FACTS[canonical_name]["semantic"],
-                    canonical_unit=standard_metadata.get("canonical_unit") or unit,
-                    canonical_version=standard_metadata.get("canonical_version"),
-                    taxonomy_namespace=f"cninfo:{source_profile}",
-                    context_id=f"broker_risk_control:{report_period}:{canonical_name}",
-                    unit=source_unit if unit == "CNY" else "percent" if value.get("percent") else "ratio",
-                    period_end=report_period,
-                    instant=report_period,
-                    fact_value=canonical_value,
-                    value_text=value["value_text"],
-                    dimensions_json={
-                        "report_scope": report_scope,
-                        "licensed_broker_name": licensed_broker_name,
-                        "listed_broker_scope": listed_broker_scope,
-                    },
-                    raw_fact_json={
-                        "source_profile": source_profile,
-                        "artifact_kind": artifact_kind,
-                        "parser_candidate": self.parser_version,
-                        "source_unit": source_unit,
-                        "source_unit_scale": unit_scale,
-                        "report_scope": report_scope,
-                        "licensed_broker_name": licensed_broker_name,
-                        "listed_broker_scope": listed_broker_scope,
-                        "raw_line": line,
-                        "line_index": line_index,
-                        "standardized_fact": standard_metadata,
-                        "risk_control_field_requiredness": (
-                            "required" if canonical_name in BROKER_RISK_CONTROL_REQUIRED_FACTS else "optional"
-                        ),
-                    },
+                    report_type=report_type,
                     source=source,
                     source_mode=source_mode,
-                    parser_version=self.parser_version,
+                    source_profile=source_profile,
+                    artifact_kind=artifact_kind,
+                    licensed_broker_name=licensed_broker_name,
+                    listed_broker_scope=listed_broker_scope,
+                    report_scope=report_scope,
+                    canonical_name=canonical_name,
+                    canonical_value=canonical_value,
+                    value=value,
+                    source_unit=source_unit,
+                    unit_scale=unit_scale,
+                    line=line,
+                    line_index=line_index,
+                    extraction_strategy="label_line",
                 )
             )
+
+        fixed_order_fallback_rows: List[Dict[str, Any]] = []
+        if (
+            source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+            and "net_capital" not in matched_rows
+        ):
+            fixed_order_fallback_rows = self._extract_fixed_order_embedded_rows(
+                rows,
+                source_unit=source_unit,
+                unit_scale=unit_scale,
+            )
+            for item in fixed_order_fallback_rows:
+                canonical_name = str(item["canonical_name"])
+                if canonical_name in matched_rows:
+                    continue
+                value = {
+                    "value": item["value"],
+                    "value_text": item["value_text"],
+                    "percent": item["percent"],
+                }
+                fallback_source_unit = item.get("source_unit") or source_unit
+                fallback_unit_scale = item.get("unit_scale") or unit_scale
+                unit = self._unit_for(canonical_name)
+                canonical_value = self._normalize_value(
+                    value,
+                    unit=unit,
+                    source_unit=fallback_source_unit,
+                    unit_scale=fallback_unit_scale,
+                )
+                if canonical_value is None:
+                    ambiguous_rows.append(
+                        {
+                            "line_index": item["line_index"],
+                            "line": item["line"],
+                            "matches": [canonical_name],
+                            "reason": "fixed_order_source_unit_unknown",
+                        }
+                    )
+                    continue
+                matched_rows[canonical_name] = {
+                    "line_index": item["line_index"],
+                    "line": item["line"],
+                    "value": canonical_value,
+                    "extraction_strategy": "fixed_order_embedded_table",
+                }
+                facts.append(
+                    self._build_fact_snapshot(
+                        source_file_id=source_file_id,
+                        instrument_id=instrument_id,
+                        symbol=symbol,
+                        exchange=exchange,
+                        report_period=report_period,
+                        report_type=report_type,
+                        source=source,
+                        source_mode=source_mode,
+                        source_profile=source_profile,
+                        artifact_kind=artifact_kind,
+                        licensed_broker_name=licensed_broker_name,
+                        listed_broker_scope=listed_broker_scope,
+                        report_scope=report_scope,
+                        canonical_name=canonical_name,
+                        canonical_value=canonical_value,
+                        value=value,
+                        source_unit=fallback_source_unit,
+                        unit_scale=fallback_unit_scale,
+                        line=item["line"],
+                        line_index=item["line_index"],
+                        extraction_strategy="fixed_order_embedded_table",
+                    )
+                )
 
         missing_required = [
             name for name in BROKER_RISK_CONTROL_REQUIRED_FACTS if name not in matched_rows
@@ -541,11 +617,96 @@ class BrokerRiskControlPdfFactParser:
             "matched_canonical_facts": sorted(matched_rows),
             "missing_required_facts": missing_required,
             "ambiguous_rows": ambiguous_rows,
+            "fixed_order_fallback_rows": fixed_order_fallback_rows,
             "parse_status": "parsed" if facts else "no_numeric_facts",
         }
         if source_unit is None:
             diagnostics["unknown_units"] = True
         return BrokerRiskControlParseResult(numeric_facts=facts, diagnostics=diagnostics)
+
+    def _build_fact_snapshot(
+        self,
+        *,
+        source_file_id: str,
+        instrument_id: str,
+        symbol: str,
+        exchange: str,
+        report_period: str,
+        report_type: Optional[str],
+        source: str,
+        source_mode: str,
+        source_profile: str,
+        artifact_kind: str,
+        licensed_broker_name: Optional[str],
+        listed_broker_scope: Optional[Dict[str, Any]],
+        report_scope: str,
+        canonical_name: str,
+        canonical_value: float,
+        value: Dict[str, Any],
+        source_unit: Optional[str],
+        unit_scale: Optional[float],
+        line: str,
+        line_index: int,
+        extraction_strategy: str,
+    ) -> FinancialNumericFactSnapshot:
+        unit = self._unit_for(canonical_name)
+        fact_name = self._source_fact_name(canonical_name)
+        standard_metadata = describe_financial_numeric_fact_name(fact_name)
+        if (
+            standard_metadata.get("canonical_fact_name") != canonical_name
+            or standard_metadata.get("canonical_statement_family")
+            != BROKER_RISK_CONTROL_STATEMENT_FAMILY
+        ):
+            standard_metadata = describe_financial_numeric_fact_name(canonical_name)
+        return FinancialNumericFactSnapshot(
+            source_file_id=source_file_id,
+            instrument_id=instrument_id,
+            symbol=symbol,
+            exchange=exchange,
+            report_period=report_period,
+            report_type=report_type or "annual_risk_control",
+            statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
+            fact_name=fact_name,
+            canonical_fact_name=standard_metadata.get("canonical_fact_name") or canonical_name,
+            canonical_statement_family=standard_metadata.get("canonical_statement_family")
+            or BROKER_RISK_CONTROL_STATEMENT_FAMILY,
+            canonical_semantic=standard_metadata.get("canonical_semantic")
+            or BROKER_RISK_CONTROL_CANONICAL_FACTS[canonical_name]["semantic"],
+            canonical_unit=standard_metadata.get("canonical_unit") or unit,
+            canonical_version=standard_metadata.get("canonical_version"),
+            taxonomy_namespace=f"cninfo:{source_profile}",
+            context_id=f"broker_risk_control:{report_period}:{canonical_name}",
+            unit=source_unit if unit == "CNY" else "percent" if value.get("percent") else "ratio",
+            period_end=report_period,
+            instant=report_period,
+            fact_value=canonical_value,
+            value_text=value["value_text"],
+            dimensions_json={
+                "report_scope": report_scope,
+                "licensed_broker_name": licensed_broker_name,
+                "listed_broker_scope": listed_broker_scope,
+            },
+            raw_fact_json={
+                "source_profile": source_profile,
+                "artifact_kind": artifact_kind,
+                "parser_candidate": self.parser_version,
+                "source_unit": source_unit,
+                "source_unit_scale": unit_scale,
+                "report_scope": report_scope,
+                "licensed_broker_name": licensed_broker_name,
+                "listed_broker_scope": listed_broker_scope,
+                "raw_line": line,
+                "line_index": line_index,
+                "extraction_strategy": extraction_strategy,
+                "standardized_fact": standard_metadata,
+                "risk_control_field_requiredness": (
+                    "required" if canonical_name in BROKER_RISK_CONTROL_REQUIRED_FACTS else "optional"
+                ),
+            },
+            source=source,
+            source_mode=source_mode,
+            parser_version=self.parser_version,
+        )
 
     def _extract_text(self, payload: bytes | str) -> tuple[str, Dict[str, Any]]:
         if isinstance(payload, str):
@@ -588,6 +749,124 @@ class BrokerRiskControlPdfFactParser:
             if row:
                 rows.append(row)
         return rows
+
+    def _extract_fixed_order_embedded_rows(
+        self,
+        rows: Sequence[str],
+        *,
+        source_unit: Optional[str],
+        unit_scale: Optional[float],
+    ) -> List[Dict[str, Any]]:
+        """Recover annual-report risk-control tables when PDF fonts garble labels.
+
+        The fallback is deliberately conservative: it only accepts a block whose
+        first rows satisfy core net capital + subordinated net capital ~= net
+        capital and whose following rows look like common regulatory ratios.
+        """
+        numeric_rows: List[Dict[str, Any]] = []
+        for line_index, line in enumerate(rows):
+            numbers = self._numbers_in_line(line)
+            if len(numbers) >= 2:
+                numeric_rows.append(
+                    {
+                        "line_index": line_index,
+                        "line": line,
+                        "numbers": numbers,
+                    }
+                )
+        minimum_rows = 10
+        for start in range(0, max(0, len(numeric_rows) - minimum_rows + 1)):
+            window = numeric_rows[start : start + len(self._FIXED_ORDER_EMBEDDED_FACTS)]
+            if len(window) < minimum_rows:
+                continue
+            if not self._looks_like_fixed_order_risk_control_block(window, source_unit=source_unit):
+                continue
+            result: List[Dict[str, Any]] = []
+            for canonical_name, row in zip(self._FIXED_ORDER_EMBEDDED_FACTS, window):
+                first = row["numbers"][0]
+                row_source_unit, row_unit_scale = self._fallback_money_unit(
+                    canonical_name,
+                    first["value"],
+                    source_unit=source_unit,
+                    unit_scale=unit_scale,
+                )
+                result.append(
+                    {
+                        "canonical_name": canonical_name,
+                        "line_index": row["line_index"],
+                        "line": row["line"],
+                        "value": first["value"],
+                        "value_text": first["value_text"],
+                        "percent": first["percent"],
+                        "source_unit": row_source_unit,
+                        "unit_scale": row_unit_scale,
+                    }
+                )
+            return result
+        return []
+
+    def _numbers_in_line(self, line: str) -> List[Dict[str, Any]]:
+        result: List[Dict[str, Any]] = []
+        for match in self._NUMBER_PATTERN.finditer(line):
+            value_text = match.group("value")
+            try:
+                value = float(value_text.replace(",", ""))
+            except ValueError:
+                continue
+            result.append(
+                {
+                    "value": value,
+                    "value_text": value_text,
+                    "percent": bool(match.group("percent")),
+                }
+            )
+        return result
+
+    def _looks_like_fixed_order_risk_control_block(
+        self,
+        window: Sequence[Dict[str, Any]],
+        *,
+        source_unit: Optional[str],
+    ) -> bool:
+        if len(window) < 10:
+            return False
+        gaps = [
+            int(window[index + 1]["line_index"]) - int(window[index]["line_index"])
+            for index in range(min(9, len(window) - 1))
+        ]
+        if any(gap <= 0 or gap > 4 for gap in gaps):
+            return False
+        first_values = [abs(float(row["numbers"][0]["value"])) for row in window[:10]]
+        core, subordinated, net_capital = first_values[0], first_values[1], first_values[2]
+        if net_capital <= 0:
+            return False
+        if abs((core + subordinated) - net_capital) / net_capital > 0.08:
+            return False
+        source_unit_known = source_unit in self._MONEY_UNITS
+        raw_amounts_look_absolute = all(value >= 100_000_000 for value in first_values[:6])
+        if not source_unit_known and not raw_amounts_look_absolute:
+            return False
+        risk_coverage, capital_leverage, lcr, nsfr = first_values[6:10]
+        return (
+            50.0 <= risk_coverage <= 1000.0
+            and 3.0 <= capital_leverage <= 100.0
+            and 50.0 <= lcr <= 1000.0
+            and 50.0 <= nsfr <= 500.0
+        )
+
+    def _fallback_money_unit(
+        self,
+        canonical_name: str,
+        raw_value: float,
+        *,
+        source_unit: Optional[str],
+        unit_scale: Optional[float],
+    ) -> tuple[Optional[str], Optional[float]]:
+        if self._unit_for(canonical_name) != "CNY":
+            return source_unit, unit_scale
+        if abs(float(raw_value)) >= 100_000_000:
+            return "元", 1.0
+        return source_unit, unit_scale
 
     def _detect_money_unit(self, text: str) -> tuple[Optional[str], Optional[float]]:
         payload = str(text or "")
@@ -713,6 +992,7 @@ class BrokerRiskControlSyncResult:
     retryable_pending_reports: int = 0
     filtered_announcements: int = 0
     errors: List[str] = field(default_factory=list)
+    parse_failure_details: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -732,6 +1012,7 @@ class BrokerRiskControlSyncResult:
             "retryable_pending_reports": self.retryable_pending_reports,
             "filtered_announcements": self.filtered_announcements,
             "errors": list(self.errors),
+            "parse_failure_details": list(self.parse_failure_details),
         }
 
 
@@ -924,18 +1205,51 @@ class BrokerRiskControlReportSyncService:
         dry_run: bool,
     ) -> None:
         result.matching_announcements += 1
+        report_period = self._record_period(record)
+        LOGGER.info(
+            "broker risk-control report start: instrument_id=%s symbol=%s exchange=%s report_period=%s announcement_id=%s title=%s dry_run=%s",
+            instrument.get("instrument_id"),
+            instrument.get("symbol"),
+            instrument.get("exchange"),
+            report_period,
+            record.announcement_id,
+            record.title,
+            dry_run,
+        )
         try:
             payload = self.payload_fetcher(record)
         except Exception as exc:
             result.retryable_pending_reports += 1
             result.errors.append(str(exc))
+            LOGGER.warning(
+                "broker risk-control report payload failed: instrument_id=%s symbol=%s report_period=%s announcement_id=%s error=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+                exc,
+            )
             return
         if not payload:
             result.retryable_pending_reports += 1
+            LOGGER.warning(
+                "broker risk-control report payload empty: instrument_id=%s symbol=%s report_period=%s announcement_id=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+            )
             return
         hash_payload = payload.encode("utf-8") if isinstance(payload, str) else payload
         content_hash = hashlib.sha256(hash_payload).hexdigest()
-        report_period = self._record_period(record)
+        LOGGER.info(
+            "broker risk-control report payload loaded: instrument_id=%s symbol=%s report_period=%s announcement_id=%s bytes=%s",
+            instrument.get("instrument_id"),
+            instrument.get("symbol"),
+            report_period,
+            record.announcement_id,
+            len(hash_payload),
+        )
         archive_path = None if dry_run else self._archive_payload(record, instrument, report_period, hash_payload)
         manifest = self._build_manifest(
             record,
@@ -947,6 +1261,14 @@ class BrokerRiskControlReportSyncService:
         )
         if self._unchanged_manifest_exists(manifest, content_hash):
             result.unchanged_reports += 1
+            LOGGER.info(
+                "broker risk-control report unchanged: instrument_id=%s symbol=%s report_period=%s announcement_id=%s content_hash=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+                content_hash[:12],
+            )
             return
         source_file_id = (
             f"dryrun:{record.announcement_id}:{content_hash[:12]}"
@@ -980,12 +1302,54 @@ class BrokerRiskControlReportSyncService:
         except Exception as exc:
             result.parse_failures += 1
             result.errors.append(str(exc))
+            result.parse_failure_details.append(
+                self._parse_failure_detail(
+                    record,
+                    instrument,
+                    report_period,
+                    reason="parser_exception",
+                    error=str(exc),
+                )
+            )
+            LOGGER.warning(
+                "broker risk-control report parse failed: instrument_id=%s symbol=%s report_period=%s announcement_id=%s error=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+                exc,
+            )
             return
         result.reports_parsed += 1
         result.facts_parsed += len(parsed.numeric_facts)
+        LOGGER.info(
+            "broker risk-control report parsed: instrument_id=%s symbol=%s report_period=%s announcement_id=%s facts=%s diagnostics_keys=%s",
+            instrument.get("instrument_id"),
+            instrument.get("symbol"),
+            report_period,
+            record.announcement_id,
+            len(parsed.numeric_facts),
+            ",".join(sorted(parsed.diagnostics.keys())) if parsed.diagnostics else "",
+        )
         if dry_run:
             if not parsed.numeric_facts:
                 result.parse_failures += 1
+                result.parse_failure_details.append(
+                    self._parse_failure_detail(
+                        record,
+                        instrument,
+                        report_period,
+                        reason="no_numeric_facts",
+                        diagnostics=parsed.diagnostics,
+                    )
+                )
+                LOGGER.warning(
+                    "broker risk-control report dry-run parsed no facts: instrument_id=%s symbol=%s report_period=%s announcement_id=%s",
+                    instrument.get("instrument_id"),
+                    instrument.get("symbol"),
+                    report_period,
+                    record.announcement_id,
+                )
             return
         parsed_manifest = FinancialSourceFileManifest(
             **{
@@ -1004,8 +1368,57 @@ class BrokerRiskControlReportSyncService:
             ingestion_run_id=ingestion_run_id,
             tier=tier,
         )
+        LOGGER.info(
+            "broker risk-control report write done: instrument_id=%s symbol=%s report_period=%s announcement_id=%s facts=%s tier=%s",
+            instrument.get("instrument_id"),
+            instrument.get("symbol"),
+            report_period,
+            record.announcement_id,
+            len(parsed.numeric_facts),
+            tier,
+        )
         if not parsed.numeric_facts:
             result.parse_failures += 1
+            result.parse_failure_details.append(
+                self._parse_failure_detail(
+                    record,
+                    instrument,
+                    report_period,
+                    reason="no_numeric_facts",
+                    diagnostics=parsed.diagnostics,
+                )
+            )
+            LOGGER.warning(
+                "broker risk-control report write produced no facts: instrument_id=%s symbol=%s report_period=%s announcement_id=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+            )
+
+    def _parse_failure_detail(
+        self,
+        record: CninfoAnnouncementRecord,
+        instrument: Dict[str, Any],
+        report_period: str,
+        *,
+        reason: str,
+        error: str = "",
+        diagnostics: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        return {
+            "reason": reason,
+            "error": error,
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "announcement_id": record.announcement_id,
+            "title": record.title,
+            "report_period": report_period,
+            "announcement_time": record.announcement_time,
+            "adjunct_url": record.adjunct_url,
+            "diagnostics": diagnostics or {},
+        }
 
     def _build_manifest(
         self,

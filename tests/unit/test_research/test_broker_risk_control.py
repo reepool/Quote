@@ -152,6 +152,55 @@ def test_broker_annual_report_parser_uses_current_period_column():
     assert result.diagnostics["report_scope"] == "parent_company"
 
 
+def test_broker_annual_report_parser_recovers_garbled_fixed_order_table():
+    parser = BrokerRiskControlPdfFactParser(
+        parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+    )
+
+    result = parser.parse(
+        """
+        010
+        ག॥ᇅᆷѓ
+        ֆ໊ ğ ದ૶лჭ
+        ཛଢ 2025年6月30日 2024年12月31日
+        ሧЧ 31,673,691,926 32,954,050,035
+        ሧЧ 14,750,000,000 16,477,025,017
+        ሧЧ 46,423,691,926 49,431,075,052
+        ሧӁ 87,366,993,963 87,481,231,559
+        ބ22,696,450,046 26,217,644,504
+        ح250,357,174,685 256,362,124,070
+        ੱ(%) 204.54 188.54
+        ੱ(%) 12.65 12.85
+        ੱ(%) 326.25 224.00
+        ੱ(%) 144.15 137.25
+        ሧӁ(%) 53.14 56.50
+        ᅏ(%) 20.17 20.93
+        ᅏ(%) 37.96 37.03
+        ሧЧ(%) 38.98 49.71
+        ሧЧ(%) 355.22 333.34
+        """,
+        source_file_id="annual-601995-2025h1",
+        instrument_id="601995.SH",
+        symbol="601995",
+        exchange="SSE",
+        report_period="2025-06-30",
+        report_type="semiannual",
+        source="cninfo",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    facts = {item.canonical_fact_name: item for item in result.numeric_facts}
+    assert facts["net_capital"].fact_value == 46_423_691_926.0
+    assert facts["risk_coverage_ratio"].fact_value == pytest.approx(2.0454)
+    assert facts["net_stable_funding_ratio"].fact_value == pytest.approx(1.4415)
+    assert facts["net_capital"].raw_fact_json["extraction_strategy"] == (
+        "fixed_order_embedded_table"
+    )
+    assert facts["net_capital"].unit == "元"
+    assert len(result.diagnostics["fixed_order_fallback_rows"]) == 15
+    assert result.diagnostics["missing_required_facts"] == []
+
+
 def test_broker_risk_control_facts_write_and_query_hot_history(tmp_path):
     storage = _build_storage_manager(tmp_path)
     parser = BrokerRiskControlPdfFactParser()
@@ -421,6 +470,15 @@ def test_formal_annual_report_title_selection_excludes_non_reports():
     assert is_formal_broker_annual_or_semiannual_report_title("2025年半年度报告")
     assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度报告摘要")
     assert not is_formal_broker_annual_or_semiannual_report_title("2025年年度审计报告")
+    assert not is_formal_broker_annual_or_semiannual_report_title("H股公告-二零二三年年度报告")
+    assert not is_formal_broker_annual_or_semiannual_report_title("二零二四年年度报告")
+    assert not is_formal_broker_annual_or_semiannual_report_title("2024年年度报告（可视版）")
+    assert not is_formal_broker_annual_or_semiannual_report_title(
+        "2025年度提质增效重回报行动方案落实情况半年度报告"
+    )
+    assert not is_formal_broker_annual_or_semiannual_report_title(
+        "关于变更2024年半年度报告披露时间的提示性公告"
+    )
     assert infer_broker_annual_report_period(record) == "2025-12-31"
     assert classify_broker_annual_report_risk_control_artifact(
         "2025年年度报告",

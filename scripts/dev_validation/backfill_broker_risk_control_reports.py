@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import logging
 import sys
 import time
 from datetime import date, datetime
@@ -63,6 +64,7 @@ _CNINFO_HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
     ),
 }
+LOGGER = logging.getLogger(__name__)
 
 
 def build_default_announcement_window(
@@ -319,9 +321,14 @@ def scan_broker_risk_control_announcements(
     for exchange in exchanges:
         market_cfg = configs.get(exchange)
         if not market_cfg:
+            LOGGER.warning("broker risk-control market scan skipped: exchange=%s reason=market_config_missing", exchange)
             market_scan_results.append({"exchange": exchange, "status": "market_config_missing"})
             continue
         if skip_market_scan:
+            LOGGER.info(
+                "broker risk-control market scan skipped: exchange=%s reason=instrument_scoped_formal_report_source",
+                exchange,
+            )
             market_scan_results.append(
                 {
                     "exchange": exchange,
@@ -330,6 +337,14 @@ def scan_broker_risk_control_announcements(
                 }
             )
             continue
+        LOGGER.info(
+            "broker risk-control market scan start: exchange=%s source_profile=%s window=%s..%s search_key=%s",
+            exchange,
+            source_profile,
+            start_date,
+            end_date,
+            search_key,
+        )
         result = scanner.scan(
             CninfoAnnouncementScanConfig(
                 purpose_key=source_profile,
@@ -345,6 +360,15 @@ def scan_broker_risk_control_announcements(
             filters=_filters(),
         )
         added = _append_selected(result.selected_records)
+        LOGGER.info(
+            "broker risk-control market scan done: exchange=%s pages=%s seen=%s selected=%s added=%s errors=%s",
+            exchange,
+            result.pages_scanned,
+            result.announcements_seen,
+            len(result.selected_records),
+            added,
+            len(result.errors),
+        )
         market_scan_results.append(
             {
                 "exchange": exchange,
@@ -367,6 +391,12 @@ def scan_broker_risk_control_announcements(
                 continue
             market_cfg = configs.get(exchange)
             if not market_cfg:
+                LOGGER.warning(
+                    "broker risk-control instrument scan skipped: instrument_id=%s symbol=%s exchange=%s reason=market_config_missing",
+                    instrument.get("instrument_id"),
+                    instrument.get("symbol"),
+                    exchange,
+                )
                 per_instrument_results.append(
                     {
                         "instrument_id": instrument.get("instrument_id"),
@@ -378,6 +408,12 @@ def scan_broker_risk_control_announcements(
                 continue
             stock_param = _cninfo_stock_param(instrument)
             if not stock_param:
+                LOGGER.warning(
+                    "broker risk-control instrument scan skipped: instrument_id=%s symbol=%s exchange=%s reason=missing_stock_param",
+                    instrument.get("instrument_id"),
+                    instrument.get("symbol"),
+                    exchange,
+                )
                 per_instrument_results.append(
                     {
                         "instrument_id": instrument.get("instrument_id"),
@@ -388,6 +424,17 @@ def scan_broker_risk_control_announcements(
                 )
                 continue
             attempted += 1
+            LOGGER.info(
+                "broker risk-control instrument scan start: instrument_id=%s symbol=%s exchange=%s source_profile=%s stock=%s org_id=%s window=%s..%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                exchange,
+                source_profile,
+                stock_param,
+                _cninfo_org_id(instrument),
+                start_date,
+                end_date,
+            )
             result = scanner.scan(
                 CninfoAnnouncementScanConfig(
                     purpose_key=source_profile,
@@ -407,6 +454,17 @@ def scan_broker_risk_control_announcements(
             added = _append_selected(result.selected_records)
             if result.selected_records:
                 instruments_with_matches += 1
+            LOGGER.info(
+                "broker risk-control instrument scan done: instrument_id=%s symbol=%s exchange=%s pages=%s seen=%s selected=%s added=%s errors=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                exchange,
+                result.pages_scanned,
+                result.announcements_seen,
+                len(result.selected_records),
+                added,
+                len(result.errors),
+            )
             per_instrument_results.append(
                 {
                     "instrument_id": instrument.get("instrument_id"),
@@ -475,6 +533,18 @@ def run_broker_risk_control_backfill(
         quarters=quarters,
         report_period_types=report_period_types or ("annual", "semiannual"),
     )
+    LOGGER.info(
+        "broker risk-control backfill start: mode=%s source_profile=%s exchanges=%s window=%s..%s periods=%s limit_instruments=%s instrument_ids=%s scan_only=%s",
+        "write" if write else "dry_run",
+        source_profile,
+        ",".join(exchanges),
+        window["start_date"],
+        window["end_date"],
+        len(periods),
+        limit_instruments,
+        ",".join(instrument_ids or []),
+        scan_only,
+    )
     active_scanner = scanner or CninfoAnnouncementScanner()
     selected_instruments = select_broker_instruments(
         db_ops,
@@ -484,9 +554,20 @@ def run_broker_risk_control_backfill(
         storage=storage,
         require_confirmed_scope=True,
     )
+    LOGGER.info(
+        "broker risk-control instruments selected: count=%s symbols=%s",
+        len(selected_instruments),
+        ",".join(str(item.get("symbol") or "") for item in selected_instruments[:20]),
+    )
     selected_instruments, org_resolution = enrich_cninfo_stock_params(
         active_scanner,
         selected_instruments,
+    )
+    LOGGER.info(
+        "broker risk-control cninfo org resolution done: attempted=%s resolved=%s errors=%s",
+        org_resolution.get("attempted"),
+        org_resolution.get("resolved"),
+        len(org_resolution.get("errors") or []),
     )
     scan = scan_broker_risk_control_announcements(
         active_scanner,
@@ -500,6 +581,12 @@ def run_broker_risk_control_backfill(
         per_instrument_page_size=per_instrument_page_size,
         per_instrument_max_pages=per_instrument_max_pages,
         source_profile=source_profile,
+    )
+    LOGGER.info(
+        "broker risk-control announcement scan done: selected_announcements=%s per_instrument_attempted=%s matched_instruments=%s",
+        len(scan["selected_records"]),
+        (scan.get("per_instrument_scan") or {}).get("attempted_instruments"),
+        (scan.get("per_instrument_scan") or {}).get("instruments_with_matches"),
     )
     standalone_scan: Optional[Dict[str, Any]] = None
     if include_standalone_supplement:
@@ -518,6 +605,11 @@ def run_broker_risk_control_backfill(
         )
     service_result: Dict[str, Any]
     if scan_only:
+        LOGGER.info(
+            "broker risk-control scan-only complete: target_instruments=%s reports_discovered=%s",
+            len(selected_instruments),
+            len(scan["selected_records"]),
+        )
         service_result = {
             "status": "scan_only",
             "mode": "dry_run" if not write else "write_skipped_by_scan_only",
@@ -529,6 +621,11 @@ def run_broker_risk_control_backfill(
             "facts_written": 0,
         }
     else:
+        LOGGER.info(
+            "broker risk-control parse stage start: reports=%s dry_run=%s tier=history",
+            len(scan["selected_records"]),
+            not write,
+        )
         service = BrokerRiskControlReportSyncService(
             storage=storage,
             scanner=active_scanner,
@@ -543,7 +640,21 @@ def run_broker_risk_control_backfill(
             tier="history",
             dry_run=not write,
         )
+        LOGGER.info(
+            "broker risk-control parse stage done: status=%s reports_parsed=%s facts_parsed=%s facts_written=%s parse_failures=%s retryable_pending=%s",
+            service_result.get("status"),
+            service_result.get("reports_parsed"),
+            service_result.get("facts_parsed"),
+            service_result.get("facts_written"),
+            service_result.get("parse_failures"),
+            service_result.get("retryable_pending_reports"),
+        )
         if standalone_scan is not None:
+            LOGGER.info(
+                "broker risk-control standalone supplement parse start: reports=%s dry_run=%s tier=history",
+                len(standalone_scan["selected_records"]),
+                not write,
+            )
             supplement_service = BrokerRiskControlReportSyncService(
                 storage=storage,
                 scanner=active_scanner,
@@ -557,6 +668,15 @@ def run_broker_risk_control_backfill(
                 announcement_records=standalone_scan["selected_records"],
                 tier="history",
                 dry_run=not write,
+            )
+            LOGGER.info(
+                "broker risk-control standalone supplement parse done: status=%s reports_parsed=%s facts_parsed=%s facts_written=%s parse_failures=%s retryable_pending=%s",
+                supplement_result.get("status"),
+                supplement_result.get("reports_parsed"),
+                supplement_result.get("facts_parsed"),
+                supplement_result.get("facts_written"),
+                supplement_result.get("parse_failures"),
+                supplement_result.get("retryable_pending_reports"),
             )
             service_result["supplementary_standalone"] = supplement_result
             for key in (
@@ -691,6 +811,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
     args = build_parser().parse_args()
     result = asyncio.run(_run(args))
     payload = json.dumps(json_ready(result), ensure_ascii=False, indent=2, sort_keys=True)
