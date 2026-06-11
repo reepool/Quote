@@ -7,6 +7,7 @@ from research.providers.cninfo_announcements import (
 from scripts.dev_validation.backfill_broker_risk_control_reports import (
     build_candidate_report_periods,
     build_default_announcement_window,
+    filter_standalone_supplement_records_for_primary_gaps,
     run_broker_risk_control_backfill,
     select_broker_instruments,
 )
@@ -73,6 +74,7 @@ class _FakeScanner:
 class _FakeStorage:
     manifests_written: int = 0
     facts_written: int = 0
+    numeric_facts: list | None = None
 
     def get_financial_source_file_manifests(self, **kwargs):
         return []
@@ -85,13 +87,49 @@ class _FakeStorage:
         self.facts_written += len(facts)
         return len(facts)
 
+    def get_financial_numeric_facts(
+        self,
+        instrument_id,
+        *,
+        include_history=False,
+        report_period=None,
+        fact_name=None,
+        canonical_fact_name=None,
+        limit=None,
+    ):
+        rows = [
+            row
+            for row in self.numeric_facts or []
+            if row.get("instrument_id") == instrument_id
+        ]
+        if report_period:
+            rows = [row for row in rows if row.get("report_period") == report_period]
+        if fact_name:
+            rows = [row for row in rows if row.get("fact_name") == fact_name]
+        if canonical_fact_name:
+            rows = [
+                row
+                for row in rows
+                if row.get("canonical_fact_name") == canonical_fact_name
+            ]
+        return rows[:limit] if limit is not None else rows
+
 
 def _risk_control_text():
     return """
     年度风险控制指标相关情况报告
     口径：母公司
     单位：人民币万元
-    净资本 2,800.50
+    净资本 280,050.00
+    风险覆盖率 311.17%
+    """
+
+
+def _annual_without_net_capital_text():
+    return """
+    2025年年度报告
+    母公司的净资本及风险控制指标
+    单位：人民币万元
     风险覆盖率 311.17%
     """
 
@@ -311,3 +349,194 @@ def test_backfill_script_scan_only_skips_payload_fetch():
     assert result["status"] == "scan_only"
     assert result["backfill"]["reports_discovered"] == 1
     assert result["backfill"]["reports_parsed"] == 0
+
+
+def test_standalone_supplement_only_parses_primary_net_capital_gaps():
+    storage = _FakeStorage()
+    records = [
+        CninfoAnnouncementRecord(
+            announcement_id="annual-2025",
+            title="2025年年度报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+            adjunct_url="/annual.pdf",
+            adjunct_type="PDF",
+        ),
+        CninfoAnnouncementRecord(
+            announcement_id="risk-2025",
+            title="2025年度风险控制指标相关情况报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+            adjunct_url="/risk.pdf",
+            adjunct_type="PDF",
+        ),
+    ]
+
+    def _payload(record):
+        if record.announcement_id == "annual-2025":
+            return _annual_without_net_capital_text()
+        return _risk_control_text()
+
+    result = run_broker_risk_control_backfill(
+        db_ops=_FakeDbOps(
+            {
+                "SSE": [
+                    {
+                        "instrument_id": "600030.SH",
+                        "symbol": "600030",
+                        "exchange": "SSE",
+                        "name": "中信证券",
+                        "industry": "证券",
+                    }
+                ]
+            }
+        ),
+        storage=storage,
+        exchanges=["SSE"],
+        as_of_date="2026-06-06",
+        scanner=_FakeScanner(records),
+        payload_fetcher=_payload,
+        write=False,
+        include_standalone_supplement=True,
+    )
+
+    supplement = result["backfill"]["supplementary_standalone"]
+    assert result["announcement_scan"]["standalone_supplement"]["selected_announcements"] == 1
+    assert result["announcement_scan"]["standalone_supplement"]["gap_fill_announcements"] == 1
+    assert supplement["reports_parsed"] == 1
+    assert supplement["primary_gap_filter"]["selected_records_count"] == 1
+    assert supplement["primary_gap_filter"]["missing_primary_pairs"] == [
+        {"instrument_id": "600030.SH", "report_period": "2025-12-31"}
+    ]
+
+
+def test_standalone_supplement_skips_primary_net_capital_covered_periods():
+    storage = _FakeStorage()
+    records = [
+        CninfoAnnouncementRecord(
+            announcement_id="annual-2025",
+            title="2025年年度报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+            adjunct_url="/annual.pdf",
+            adjunct_type="PDF",
+        ),
+        CninfoAnnouncementRecord(
+            announcement_id="risk-2025",
+            title="2025年度风险控制指标相关情况报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+            adjunct_url="/risk.pdf",
+            adjunct_type="PDF",
+        ),
+    ]
+
+    result = run_broker_risk_control_backfill(
+        db_ops=_FakeDbOps(
+            {
+                "SSE": [
+                    {
+                        "instrument_id": "600030.SH",
+                        "symbol": "600030",
+                        "exchange": "SSE",
+                        "name": "中信证券",
+                        "industry": "证券",
+                    }
+                ]
+            }
+        ),
+        storage=storage,
+        exchanges=["SSE"],
+        as_of_date="2026-06-06",
+        scanner=_FakeScanner(records),
+        payload_fetcher=lambda record: _risk_control_text(),
+        write=False,
+        include_standalone_supplement=True,
+    )
+
+    supplement = result["backfill"]["supplementary_standalone"]
+    assert result["announcement_scan"]["standalone_supplement"]["selected_announcements"] == 1
+    assert result["announcement_scan"]["standalone_supplement"]["gap_fill_announcements"] == 0
+    assert supplement["reports_parsed"] == 0
+    assert supplement["primary_gap_filter"]["selected_records_count"] == 0
+
+
+def test_standalone_gap_filter_uses_existing_facts_for_unchanged_primary_reports():
+    instruments = [
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+        }
+    ]
+    primary_records = [
+        CninfoAnnouncementRecord(
+            announcement_id="annual-2025",
+            title="2025年年度报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+        ),
+        CninfoAnnouncementRecord(
+            announcement_id="semi-2025",
+            title="2025年半年度报告",
+            announcement_time="2025-08-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+        ),
+    ]
+    standalone_records = [
+        CninfoAnnouncementRecord(
+            announcement_id="risk-annual-2025",
+            title="2025年度风险控制指标相关情况报告",
+            announcement_time="2026-03-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+        ),
+        CninfoAnnouncementRecord(
+            announcement_id="risk-semi-2025",
+            title="2025年半年度风险控制指标相关情况报告",
+            announcement_time="2025-08-30",
+            market="SSE",
+            column="sse",
+            symbols=["600030"],
+        ),
+    ]
+    storage = _FakeStorage(
+        numeric_facts=[
+            {
+                "instrument_id": "600030.SH",
+                "report_period": "2025-12-31",
+                "canonical_fact_name": "net_capital",
+                "fact_value": 2800500000.0,
+            }
+        ]
+    )
+
+    result = filter_standalone_supplement_records_for_primary_gaps(
+        standalone_records,
+        instruments=instruments,
+        report_periods=["2025-06-30", "2025-12-31"],
+        primary_result={"report_summaries": [], "unchanged_reports": 2},
+        primary_records=primary_records,
+        storage=storage,
+    )
+
+    assert result["expected_pairs_source"] == "primary_announcement_records"
+    assert result["missing_primary_pairs"] == [
+        {"instrument_id": "600030.SH", "report_period": "2025-06-30"}
+    ]
+    assert [record.announcement_id for record in result["selected_records"]] == [
+        "risk-semi-2025"
+    ]

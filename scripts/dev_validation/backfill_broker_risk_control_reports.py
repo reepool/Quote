@@ -14,6 +14,7 @@ import json
 import logging
 import sys
 import time
+from contextlib import nullcontext
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
@@ -24,7 +25,9 @@ if str(REPO_ROOT) not in sys.path:
 
 from data_manager import data_manager
 from research.broker_risk_control import (
+    BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION,
     BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    BROKER_RISK_CONTROL_PARSER_VERSION,
     BROKER_RISK_CONTROL_SOURCE_PROFILE,
     BrokerRiskControlReportSyncService,
     infer_broker_annual_report_period,
@@ -521,6 +524,7 @@ def run_broker_risk_control_backfill(
     include_standalone_supplement: bool = False,
     archive_root: Optional[str | Path] = None,
     tier: str = "history",
+    repair_existing: bool = False,
 ) -> Dict[str, Any]:
     """Run a broker risk-control report dry-run/backfill and return JSON-ready data."""
     window = build_default_announcement_window(
@@ -547,10 +551,11 @@ def run_broker_risk_control_backfill(
         scan_only,
     )
     active_scanner = scanner or CninfoAnnouncementScanner()
+    effective_limit = 0 if instrument_ids else limit_instruments
     selected_instruments = select_broker_instruments(
         db_ops,
         exchanges=exchanges,
-        limit=limit_instruments,
+        limit=effective_limit,
         instrument_ids=instrument_ids,
         storage=storage,
         require_confirmed_scope=True,
@@ -560,35 +565,50 @@ def run_broker_risk_control_backfill(
         len(selected_instruments),
         ",".join(str(item.get("symbol") or "") for item in selected_instruments[:20]),
     )
-    selected_instruments, org_resolution = enrich_cninfo_stock_params(
-        active_scanner,
-        selected_instruments,
-    )
-    LOGGER.info(
-        "broker risk-control cninfo org resolution done: attempted=%s resolved=%s errors=%s",
-        org_resolution.get("attempted"),
-        org_resolution.get("resolved"),
-        len(org_resolution.get("errors") or []),
-    )
-    scan = scan_broker_risk_control_announcements(
-        active_scanner,
-        exchanges=exchanges,
-        instruments=selected_instruments,
-        start_date=window["start_date"],
-        end_date=window["end_date"],
-        page_size=page_size,
-        max_pages=max_pages,
-        per_instrument_scan=per_instrument_scan,
-        per_instrument_page_size=per_instrument_page_size,
-        per_instrument_max_pages=per_instrument_max_pages,
-        source_profile=source_profile,
-    )
-    LOGGER.info(
-        "broker risk-control announcement scan done: selected_announcements=%s per_instrument_attempted=%s matched_instruments=%s",
-        len(scan["selected_records"]),
-        (scan.get("per_instrument_scan") or {}).get("attempted_instruments"),
-        (scan.get("per_instrument_scan") or {}).get("instruments_with_matches"),
-    )
+    org_resolution = {"attempted": 0, "resolved": 0, "skipped": len(selected_instruments), "errors": []}
+    if repair_existing:
+        scan = load_existing_broker_risk_control_records(
+            storage,
+            instruments=selected_instruments,
+            report_periods=periods,
+            source_profile=source_profile,
+        )
+        payload_fetcher = payload_fetcher or scan.get("payload_fetcher")
+        LOGGER.info(
+            "broker risk-control repair records loaded: selected_announcements=%s missing_archives=%s",
+            len(scan["selected_records"]),
+            (scan.get("repair_existing") or {}).get("missing_archives"),
+        )
+    else:
+        selected_instruments, org_resolution = enrich_cninfo_stock_params(
+            active_scanner,
+            selected_instruments,
+        )
+        LOGGER.info(
+            "broker risk-control cninfo org resolution done: attempted=%s resolved=%s errors=%s",
+            org_resolution.get("attempted"),
+            org_resolution.get("resolved"),
+            len(org_resolution.get("errors") or []),
+        )
+        scan = scan_broker_risk_control_announcements(
+            active_scanner,
+            exchanges=exchanges,
+            instruments=selected_instruments,
+            start_date=window["start_date"],
+            end_date=window["end_date"],
+            page_size=page_size,
+            max_pages=max_pages,
+            per_instrument_scan=per_instrument_scan,
+            per_instrument_page_size=per_instrument_page_size,
+            per_instrument_max_pages=per_instrument_max_pages,
+            source_profile=source_profile,
+        )
+        LOGGER.info(
+            "broker risk-control announcement scan done: selected_announcements=%s per_instrument_attempted=%s matched_instruments=%s",
+            len(scan["selected_records"]),
+            (scan.get("per_instrument_scan") or {}).get("attempted_instruments"),
+            (scan.get("per_instrument_scan") or {}).get("instruments_with_matches"),
+        )
     standalone_scan: Optional[Dict[str, Any]] = None
     if include_standalone_supplement:
         standalone_scan = scan_broker_risk_control_announcements(
@@ -605,6 +625,7 @@ def run_broker_risk_control_backfill(
             source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
         )
     service_result: Dict[str, Any]
+    standalone_gap_filter: Optional[Dict[str, Any]] = None
     if scan_only:
         LOGGER.info(
             "broker risk-control scan-only complete: target_instruments=%s reports_discovered=%s",
@@ -633,14 +654,17 @@ def run_broker_risk_control_backfill(
             payload_fetcher=payload_fetcher,
             archive_root=archive_root,
             source_profile=source_profile,
+            force_reparse_existing=repair_existing,
+            replace_existing_facts=repair_existing,
         )
-        service_result = service.backfill(
-            instruments=selected_instruments,
-            report_periods=periods,
-            announcement_records=scan["selected_records"],
-            tier=tier,
-            dry_run=not write,
-        )
+        with _financial_storage_scope(storage):
+            service_result = service.backfill(
+                instruments=selected_instruments,
+                report_periods=periods,
+                announcement_records=scan["selected_records"],
+                tier=tier,
+                dry_run=not write,
+            )
         LOGGER.info(
             "broker risk-control parse stage done: status=%s reports_parsed=%s facts_parsed=%s facts_written=%s parse_failures=%s retryable_pending=%s",
             service_result.get("status"),
@@ -651,9 +675,18 @@ def run_broker_risk_control_backfill(
             service_result.get("retryable_pending_reports"),
         )
         if standalone_scan is not None:
+            standalone_gap_filter = filter_standalone_supplement_records_for_primary_gaps(
+                standalone_scan["selected_records"],
+                instruments=selected_instruments,
+                report_periods=periods,
+                primary_result=service_result,
+                primary_records=scan["selected_records"],
+                storage=storage,
+            )
             LOGGER.info(
-                "broker risk-control standalone supplement parse start: reports=%s dry_run=%s tier=history",
+                "broker risk-control standalone supplement parse start: candidate_reports=%s gap_fill_reports=%s dry_run=%s tier=history",
                 len(standalone_scan["selected_records"]),
+                len(standalone_gap_filter["selected_records"]),
                 not write,
             )
             supplement_service = BrokerRiskControlReportSyncService(
@@ -663,13 +696,14 @@ def run_broker_risk_control_backfill(
                 archive_root=archive_root,
                 source_profile=BROKER_RISK_CONTROL_SOURCE_PROFILE,
             )
-            supplement_result = supplement_service.backfill(
-                instruments=selected_instruments,
-                report_periods=periods,
-                announcement_records=standalone_scan["selected_records"],
-                tier=tier,
-                dry_run=not write,
-            )
+            with _financial_storage_scope(storage):
+                supplement_result = supplement_service.backfill(
+                    instruments=selected_instruments,
+                    report_periods=periods,
+                    announcement_records=standalone_gap_filter["selected_records"],
+                    tier=tier,
+                    dry_run=not write,
+                )
             LOGGER.info(
                 "broker risk-control standalone supplement parse done: status=%s reports_parsed=%s facts_parsed=%s facts_written=%s parse_failures=%s retryable_pending=%s",
                 supplement_result.get("status"),
@@ -679,6 +713,11 @@ def run_broker_risk_control_backfill(
                 supplement_result.get("parse_failures"),
                 supplement_result.get("retryable_pending_reports"),
             )
+            supplement_result["primary_gap_filter"] = {
+                key: value
+                for key, value in standalone_gap_filter.items()
+                if key != "selected_records"
+            }
             service_result["supplementary_standalone"] = supplement_result
             for key in (
                 "reports_discovered",
@@ -740,13 +779,24 @@ def run_broker_risk_control_backfill(
                 for record in scan["selected_records"][:30]
             ],
             "source_profile": source_profile,
+            "repair_existing": scan.get("repair_existing"),
             "standalone_supplement": (
                 None
                 if standalone_scan is None
                 else {
                     "enabled": True,
                     "selected_announcements": len(standalone_scan["selected_records"]),
-                    "fallback_reason": "supplementary_or_validation_source",
+                    "gap_fill_announcements": None
+                    if standalone_gap_filter is None
+                    else len(standalone_gap_filter["selected_records"]),
+                    "fallback_reason": "primary_missing_net_capital_only",
+                    "primary_gap_filter": None
+                    if standalone_gap_filter is None
+                    else {
+                        key: value
+                        for key, value in standalone_gap_filter.items()
+                        if key != "selected_records"
+                    },
                     "scan_results": standalone_scan["scan_results"],
                     "per_instrument_scan": standalone_scan.get("per_instrument_scan"),
                 }
@@ -754,6 +804,267 @@ def run_broker_risk_control_backfill(
         },
         "backfill": service_result,
     }
+
+
+def filter_standalone_supplement_records_for_primary_gaps(
+    records: Sequence[CninfoAnnouncementRecord],
+    *,
+    instruments: Sequence[Dict[str, Any]],
+    report_periods: Sequence[str],
+    primary_result: Dict[str, Any],
+    primary_records: Optional[Sequence[CninfoAnnouncementRecord]] = None,
+    storage: Optional[Any] = None,
+) -> Dict[str, Any]:
+    """Select standalone reports only for primary annual/semiannual net-capital gaps."""
+    instrument_by_symbol = {
+        str(item.get("symbol") or "").strip(): item
+        for item in instruments
+        if item.get("symbol")
+    }
+    primary_pairs = {
+        (str(summary.get("instrument_id") or ""), str(summary.get("report_period") or ""))
+        for summary in primary_result.get("report_summaries", []) or []
+        if summary.get("instrument_id") and summary.get("report_period")
+    }
+    primary_record_pairs = {
+        (str((instrument or {}).get("instrument_id") or ""), str(report_period or ""))
+        for record in primary_records or []
+        for instrument, report_period in [
+            (
+                _resolve_record_instrument_by_symbol(record, instrument_by_symbol),
+                infer_broker_annual_report_period(record),
+            )
+        ]
+        if instrument is not None and report_period
+    }
+    all_candidate_pairs = {
+        (str(item.get("instrument_id") or ""), str(period))
+        for item in instruments
+        for period in report_periods
+        if item.get("instrument_id") and str(period)
+    }
+    expected_pairs = primary_pairs or primary_record_pairs or all_candidate_pairs
+    covered_pairs = {
+        (str(summary.get("instrument_id") or ""), str(summary.get("report_period") or ""))
+        for summary in primary_result.get("report_summaries", []) or []
+        if summary.get("net_capital")
+        or "net_capital" in (summary.get("matched_canonical_facts") or [])
+    }
+    covered_pairs.update(
+        _load_existing_net_capital_pairs(
+            storage,
+            instruments=instruments,
+            report_periods=[period for _, period in expected_pairs],
+        )
+    )
+    missing_pairs = expected_pairs - covered_pairs
+    selected: List[CninfoAnnouncementRecord] = []
+    ignored: List[Dict[str, Any]] = []
+    for record in records:
+        instrument = _resolve_record_instrument_by_symbol(record, instrument_by_symbol)
+        report_period = infer_broker_risk_control_report_period(record)
+        pair = (
+            str((instrument or {}).get("instrument_id") or ""),
+            str(report_period or ""),
+        )
+        if instrument is not None and pair in missing_pairs:
+            selected.append(record)
+            continue
+        ignored.append(
+            {
+                "announcement_id": record.announcement_id,
+                "symbols": list(record.symbols),
+                "report_period": report_period,
+                "reason": "primary_net_capital_already_present_or_not_target_gap",
+            }
+        )
+    return {
+        "selected_records": selected,
+        "candidate_records": len(records),
+        "selected_records_count": len(selected),
+        "ignored_records_count": len(ignored),
+        "primary_pairs_count": len(primary_pairs),
+        "primary_record_pairs_count": len(primary_record_pairs),
+        "covered_net_capital_pairs_count": len(covered_pairs),
+        "expected_pairs_source": (
+            "primary_report_summaries"
+            if primary_pairs
+            else "primary_announcement_records"
+            if primary_record_pairs
+            else "candidate_report_periods"
+        ),
+        "missing_primary_pairs": [
+            {"instrument_id": instrument_id, "report_period": period}
+            for instrument_id, period in sorted(missing_pairs)
+        ],
+        "ignored_preview": ignored[:20],
+    }
+
+
+def _resolve_record_instrument_by_symbol(
+    record: CninfoAnnouncementRecord,
+    instrument_by_symbol: Dict[str, Dict[str, Any]],
+) -> Optional[Dict[str, Any]]:
+    for symbol in record.symbols:
+        clean = str(symbol).strip()
+        if clean in instrument_by_symbol:
+            return instrument_by_symbol[clean]
+    return None
+
+
+def _load_existing_net_capital_pairs(
+    storage: Optional[Any],
+    *,
+    instruments: Sequence[Dict[str, Any]],
+    report_periods: Sequence[str],
+) -> set[tuple[str, str]]:
+    """Read local canonical net_capital coverage for unchanged primary reports."""
+    if storage is None or not hasattr(storage, "get_financial_numeric_facts"):
+        return set()
+    periods = {str(period) for period in report_periods if str(period)}
+    pairs: set[tuple[str, str]] = set()
+    for instrument in instruments:
+        instrument_id = str(instrument.get("instrument_id") or "")
+        if not instrument_id:
+            continue
+        try:
+            rows = storage.get_financial_numeric_facts(
+                instrument_id,
+                include_history=True,
+                canonical_fact_name="net_capital",
+            )
+        except Exception as exc:
+            LOGGER.warning(
+                "broker risk-control existing net_capital coverage read failed: instrument_id=%s error=%s",
+                instrument_id,
+                exc,
+            )
+            continue
+        for row in rows:
+            period = str(row.get("report_period") or "")
+            value = row.get("fact_value")
+            if period in periods and value is not None:
+                pairs.add((instrument_id, period))
+    return pairs
+
+
+def load_existing_broker_risk_control_records(
+    storage: Any,
+    *,
+    instruments: Sequence[Dict[str, Any]],
+    report_periods: Sequence[str],
+    source_profile: str,
+) -> Dict[str, Any]:
+    """Load already archived broker risk-control PDFs for parser repair."""
+    parser_version = (
+        BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+        if source_profile == BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
+        else BROKER_RISK_CONTROL_PARSER_VERSION
+    )
+    instrument_ids = [str(item.get("instrument_id") or "") for item in instruments if item.get("instrument_id")]
+    periods = [str(period) for period in report_periods if str(period)]
+    if not instrument_ids or not periods or not hasattr(storage, "get_connection"):
+        return {
+            "selected_records": [],
+            "scan_results": [],
+            "market_scan_results": [],
+            "per_instrument_scan": {
+                "enabled": False,
+                "attempted_instruments": len(instrument_ids),
+                "instruments_with_matches": 0,
+                "selected_announcements_added": 0,
+                "results": [],
+            },
+            "repair_existing": {
+                "enabled": True,
+                "loaded_manifests": 0,
+                "missing_archives": 0,
+            },
+            "payload_fetcher": lambda record: None,
+        }
+    params: List[Any] = [parser_version, *instrument_ids, *periods]
+    instrument_placeholders = ",".join("?" for _ in instrument_ids)
+    period_placeholders = ",".join("?" for _ in periods)
+    with _financial_storage_scope(storage), storage.get_connection() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT *
+            FROM financial_source_files
+            WHERE parser_version = ?
+              AND instrument_id IN ({instrument_placeholders})
+              AND report_period IN ({period_placeholders})
+              AND status IN ('downloaded', 'parsed', 'parse_failed')
+            ORDER BY instrument_id, report_period, updated_at DESC
+            """,
+            params,
+        ).fetchall()
+
+    records: List[CninfoAnnouncementRecord] = []
+    payload_by_announcement_id: Dict[str, Path] = {}
+    missing_archives = 0
+    for row in rows:
+        item = dict(row)
+        archive_path = Path(str(item.get("archive_path") or ""))
+        if not archive_path.is_absolute():
+            archive_path = REPO_ROOT / archive_path
+        if not archive_path.exists():
+            missing_archives += 1
+            continue
+        metadata = _json_dict(item.get("metadata_json"))
+        announcement_record = metadata.get("announcement_record")
+        if not isinstance(announcement_record, dict):
+            announcement_record = {}
+        announcement_id = str(item.get("filing_id") or item.get("source_file_id") or "")
+        if not announcement_id:
+            announcement_id = str(item.get("source_file_id") or "")
+        record = CninfoAnnouncementRecord(
+            announcement_id=announcement_id,
+            title=str(metadata.get("announcement_title") or ""),
+            announcement_time=str(item.get("published_at") or ""),
+            market=str(announcement_record.get("market") or ""),
+            column=str(announcement_record.get("column") or ""),
+            symbols=list(announcement_record.get("symbols") or [item.get("symbol")]),
+            adjunct_url=str(item.get("source_url") or ""),
+            adjunct_type="PDF",
+            selection_reasons=list(announcement_record.get("selection_reasons") or ["repair_existing_manifest"]),
+        )
+        records.append(record)
+        payload_by_announcement_id[announcement_id] = archive_path
+
+    def _payload_fetcher(record: CninfoAnnouncementRecord) -> Optional[bytes]:
+        path = payload_by_announcement_id.get(str(record.announcement_id or ""))
+        return None if path is None else path.read_bytes()
+
+    instruments_with_matches = {
+        str(row["instrument_id"])
+        for row in rows
+        if str(row["instrument_id"] or "") in instrument_ids
+    }
+    return {
+        "selected_records": records,
+        "scan_results": [],
+        "market_scan_results": [],
+        "per_instrument_scan": {
+            "enabled": False,
+            "attempted_instruments": len(instrument_ids),
+            "instruments_with_matches": len(instruments_with_matches),
+            "selected_announcements_added": len(records),
+            "results": [],
+        },
+        "repair_existing": {
+            "enabled": True,
+            "loaded_manifests": len(records),
+            "missing_archives": missing_archives,
+            "parser_version": parser_version,
+        },
+        "payload_fetcher": _payload_fetcher,
+    }
+
+
+def _financial_storage_scope(storage: Any):
+    if hasattr(storage, "financial_database_scope"):
+        return storage.financial_database_scope()
+    return nullcontext()
 
 
 async def _run(args: argparse.Namespace) -> Dict[str, Any]:
@@ -784,6 +1095,7 @@ async def _run(args: argparse.Namespace) -> Dict[str, Any]:
         include_standalone_supplement=args.include_standalone_supplement,
         archive_root=args.archive_root,
         tier=args.tier,
+        repair_existing=args.repair_existing,
     )
 
 
@@ -809,6 +1121,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--archive-root", default="data/filings/financial_statements/broker_risk_control")
     parser.add_argument("--tier", default="history", choices=["hot", "history"])
     parser.add_argument("--scan-only", action="store_true")
+    parser.add_argument(
+        "--repair-existing",
+        action="store_true",
+        help="Reparse existing archived manifests and replace facts instead of scanning CNInfo.",
+    )
     parser.add_argument("--write", action="store_true", help="Persist manifests, archived PDFs, and numeric facts.")
     parser.add_argument("--output", default="")
     return parser
@@ -833,6 +1150,16 @@ def _parse_csv(raw: Optional[str]) -> Optional[List[str]]:
         return None
     values = [item.strip() for item in raw.split(",") if item.strip()]
     return values or None
+
+
+def _json_dict(raw: Any) -> Dict[str, Any]:
+    if isinstance(raw, dict):
+        return raw
+    try:
+        payload = json.loads(str(raw or "{}"))
+    except Exception:
+        return {}
+    return payload if isinstance(payload, dict) else {}
 
 
 def _parse_date(raw: str) -> date:

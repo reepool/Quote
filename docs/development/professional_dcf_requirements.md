@@ -727,9 +727,10 @@ Residual Income = Net Income - Cost of Equity * Beginning Book Value
 - 牛市高 ROE 不得直接永久外推。
 - 必须输出市场成交额、指数水平或资本市场景气敏感性，若数据可得。
 - 证券公司身份不能只按申万“证券Ⅲ”判定；必须先以证监会证券公司名录/证券经营机构信息公示建立 `licensed_securities_company` 官方名单，再以显式 `listed_broker_dealer_scope` 映射确认上市主体是否为 `direct_listed_broker` 或 `listed_broker_group`。证券控股、参股平台、混业金融或互联网金融公司不得自动套用证券公司估值模型。
-- 年报/半年报内嵌风控表是证券监管资本和流动性字段主源；独立《风险控制指标报告》只作为补充、交叉校验或 Q1/Q3 等非年报/半年报周期补源。即使风控表中出现操作风险资本准备使用的业务净收入行，也只能保存为监管口径 P2 字段，不能替代年报分部收入。
+- 年报/半年报内嵌风控表是证券监管资本和流动性字段主源；独立《风险控制指标报告》只作为补充、交叉校验或 Q1/Q3 等非年报/半年报周期补源。补源必须后置于主源解析，且默认只处理主源本轮已发现但缺少 `net_capital` 的同一 `instrument_id + report_period`，不得覆盖主源已解析出的净资本事实。即使风控表中出现操作风险资本准备使用的业务净收入行，也只能保存为监管口径 P2 字段，不能替代年报分部收入。
 - 监管净资本通常是母公司或监管口径，可能不同于 DCF 使用的合并口径会计权益；模型必须在 lineage 或 warning 中记录 scope 差异。
 - 证券监管事实进入现有财务披露链路：历史回补通过 `scripts/dev_validation/backfill_broker_risk_control_reports.py` 写入 `financial_numeric_facts_history`，日更通过 `broker_risk_control_incremental_sync` 后置于 `financial_disclosure_incremental_sync` 写入 `financial_numeric_facts_hot`。两者都必须使用 `listed_broker_dealer_scope` gate，不得按申万“证券”直接全量套用。
+- 调度要求：券商后置任务当前是配置开关 + 代码编排的过渡方案；后续专业 DCF 数据供给层应推动通用 scheduler dependency DAG，使特殊行业补充任务可通过配置声明前置/后置、并行/串行、参数继承和失败策略。
 
 历史 12 个季度正式写库命令：
 
@@ -745,6 +746,14 @@ Residual Income = Net Income - Cost of Equity * Beginning Book Value
 ```
 
 不带 `--write` 即为 dry-run；历史回补默认 `--tier history`，日更入口由 DataManager 固定使用配置中的 `incremental_tier=hot`。
+
+解析质量门与修复记录：
+
+- broker 年报/半年报风控表 parser 必须执行金额单位识别和事实级质量门：金额字段需有明确 `元/千元/万元/百万元/亿元` 单位或能判定为绝对元值；`net_capital`、核心净资本、监管净资产、风险资本准备、表内外资产总额等关键金额不得小于 1 亿元或超过 10 万亿元；比例字段不得为负或异常大值。
+- PDF 文本抽取常见数字拆分形态包括 `7 ,968,303.78`、`5,658, 173.82`、`37 .48%`。parser 必须在不改变标签匹配范围的前提下还原这类数字，且完整比率标签（如 `净资本/净资产`、`净资本/负债`、自营/两融占净资本比例）优先于基础金额标签，避免误判为歧义行。
+- `2026-06-11` targeted repair 验证 11 家券商样本 67 份本地归档年报/半年报：dry-run 与 write 均解析 `966` 条事实；`net_capital` 覆盖目标 `66` 个 instrument-period 中 `60` 个，剩余真实披露缺口为 `002670.SZ` 的 `2023-06-30`、`2023-12-31`、`2024-06-30`、`2024-12-31`、`2025-06-30` 以及 `601211.SH` 的 `2023-06-30`。`601555.SH 2023-12-31` 的短附件无数值事实，但同报告期主年报 PDF 已覆盖，不计为 instrument-period 缺口。
+- `2026-06-11` 对上述 6 个缺口执行 CNInfo 独立《风险控制指标报告》/相关公告补源探测：标准“风险控制指标”逐标的扫描对 `002670.SZ`、`601211.SH` 均未命中公告；放宽到“风险控制/净资本”只命中董事会风险控制委员会规则等治理文件，不含监管指标表。因此当前 6 个缺口是披露源缺口，不是 parser 漏识别；后续若上游新增或镜像补出独立风控指标报告，可通过 `--include-standalone-supplement` gap-only 补源写入同一 canonical 财务事实链路。
+- 修复写库使用 `--repair-existing --write` 对既有 `financial_source_files.archive_path` 本地 PDF 重新解析，并按 `source_file_id + parser_version + regulatory_risk_control` 替换写入 `financial_numeric_facts_history`，用于清理旧的错误单位、截断数字或过少事实。
 
 ### 6.11 保险
 

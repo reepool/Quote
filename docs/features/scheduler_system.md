@@ -501,6 +501,53 @@ async def weekly_data_maintenance(self,
 
 实现状态（`2026-06-10`）：财务 L1 三项任务已写入 `config/05_scheduler.json`，并接入 `ScheduledTasks` 和 `DataManager`。全量任务为 `manual_only=true`，只通过 `/run` 手工触发；公告驱动增量任务已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口；周度对账任务已启用为周日 `09:30` 自动运行，二者仍可通过 `/run` 手工验证。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；业绩说明会、英文版、图文版、问询函回复、专项说明、投资者接待日和摘要默认不产生候选。券商专项财务事实任务 `broker_risk_control_incremental_sync` 已接入调度管理，但配置为 `manual_only=true`，不会单独注册 cron；它由 `financial_disclosure_incremental_sync` 成功后作为后置任务自动触发，也可通过 `/run broker_risk_control_incremental_sync` 手工验证。
 
+当前券商后置任务属于过渡实现：后置开关和后置 job id 来自 `config/05_scheduler.json`，但“`financial_disclosure_incremental_sync` 成功后执行该后置 job”的编排逻辑仍写在 `ScheduledTasks.financial_disclosure_incremental_sync` 内。后续调度架构应升级为配置驱动的任务依赖图，而不是在单个任务方法里逐个硬编码特殊行业分支。
+
+#### 后续架构要求：配置驱动任务依赖图
+
+调度器应支持在 `config/05_scheduler.json` 中声明任务依赖关系，统一表达前置、后置、并行和串行编排：
+
+```json
+{
+  "financial_disclosure_incremental_sync": {
+    "dependencies": {
+      "post_success": [
+        {
+          "job_id": "broker_risk_control_incremental_sync",
+          "mode": "async_group",
+          "inherit": ["exchanges", "dry_run"],
+          "timeout_seconds": 7200,
+          "failure_policy": "degrade_parent"
+        }
+      ]
+    }
+  },
+  "broker_risk_control_incremental_sync": {
+    "dependencies": {
+      "post_success": [
+        {
+          "job_id": "future_special_industry_incremental_sync",
+          "mode": "serial",
+          "failure_policy": "stop_chain"
+        }
+      ]
+    }
+  }
+}
+```
+
+语义要求：
+
+- `pre_success`：主任务运行前先执行，前置失败时按 `failure_policy` 决定跳过、降级或失败主任务。
+- `post_success`：主任务成功或 degraded 后执行；用于财务日更后的行业专项补充层。
+- `post_always`：主任务无论成功失败都执行，适合清理、报告、审计。
+- `mode=async_group`：同一依赖组内并行执行，例如任务 B/C 同时后置于 A。
+- `mode=serial`：按配置顺序串行执行，例如 C 后置于 B，B 后置于 A。
+- `inherit`：声明从父任务继承的参数，避免在代码中隐式复制。
+- `failure_policy`：至少支持 `fail_parent`、`degrade_parent`、`ignore`、`stop_chain`。
+- 调度报告应展示依赖图每个节点的状态、耗时、写入数量、错误摘要和继承参数；父任务报告不得只显示主任务结果。
+- `manual_only=true` 的任务可以作为依赖节点被自动编排触发，但不会单独注册 cron。
+
 #### 当前配置
 ```json
 {

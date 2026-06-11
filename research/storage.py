@@ -1491,6 +1491,57 @@ class ResearchStorageManager:
             conn.commit()
         return len(facts)
 
+    def replace_financial_numeric_facts_for_source_file(
+        self,
+        source_file_id: str,
+        facts: List[FinancialNumericFactSnapshot],
+        *,
+        ingestion_run_id: Optional[int] = None,
+        tier: str = "hot",
+        parser_version: Optional[str] = None,
+        statement_family: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Replace parsed numeric facts for one source file in a physical tier table.
+
+        This is intended for parser repair runs where newly rejected facts must
+        remove stale rows that an earlier parser version wrote for the same
+        source file.
+        """
+        if tier not in {"hot", "history"}:
+            raise ValueError("financial numeric fact tier must be 'hot' or 'history'")
+        table_name = (
+            "financial_numeric_facts_hot"
+            if tier == "hot"
+            else "financial_numeric_facts_history"
+        )
+        now = get_shanghai_time().isoformat()
+        filters = ["source_file_id = ?"]
+        params: List[Any] = [source_file_id]
+        if parser_version:
+            filters.append("parser_version = ?")
+            params.append(parser_version)
+        if statement_family:
+            filters.append("statement_family = ?")
+            params.append(statement_family)
+
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            cursor = conn.execute(
+                f"DELETE FROM {table_name} WHERE {' AND '.join(filters)}",
+                params,
+            )
+            deleted = int(cursor.rowcount if cursor.rowcount is not None else 0)
+            for fact in facts:
+                self._upsert_financial_numeric_fact_row(
+                    conn,
+                    fact,
+                    table_name=table_name,
+                    ingestion_run_id=ingestion_run_id,
+                    now=now,
+                )
+            conn.commit()
+        return {"deleted": deleted, "inserted": len(facts)}
+
     def get_financial_numeric_facts(
         self,
         instrument_id: str,

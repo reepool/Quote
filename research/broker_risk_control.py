@@ -412,8 +412,15 @@ class BrokerRiskControlPdfFactParser:
         "百万元": 1_000_000.0,
         "亿元": 100_000_000.0,
     }
+    _MONEY_UNIT_PATTERN = re.compile(
+        r"单位\s*[:：]?\s*(?:人民币)?\s*(百万元|千元|万元|亿元|元)"
+    )
+    _PAREN_MONEY_UNIT_PATTERN = re.compile(
+        r"[（(]\s*(?:人民币)?\s*(百万元|千元|万元|亿元|元)\s*[)）]"
+    )
     _NUMBER_PATTERN = re.compile(
-        r"(?P<value>[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|[+-]?\.\d+)\s*(?P<percent>%|％)?"
+        r"(?P<value>[+-]?(?:(?:\d{1,3}(?:\s*,\s*\d{3})+|\d+)"
+        r"(?:\s*\.\s*\d+)?|\.\s*\d+))\s*(?P<percent>%|％)?"
     )
 
     def __init__(self, *, parser_version: str = BROKER_RISK_CONTROL_PARSER_VERSION):
@@ -477,7 +484,21 @@ class BrokerRiskControlPdfFactParser:
                 )
                 continue
             unit = self._unit_for(canonical_name)
-            canonical_value = self._normalize_value(value, unit=unit, source_unit=source_unit, unit_scale=unit_scale)
+            effective_source_unit, effective_unit_scale, unit_detection = self._effective_money_unit(
+                canonical_name,
+                value["value"],
+                source_unit=source_unit,
+                unit_scale=unit_scale,
+                rows=rows,
+                line_index=line_index,
+                line=line,
+            )
+            canonical_value = self._normalize_value(
+                value,
+                unit=unit,
+                source_unit=effective_source_unit,
+                unit_scale=effective_unit_scale,
+            )
             if canonical_value is None:
                 ambiguous_rows.append(
                     {
@@ -485,6 +506,26 @@ class BrokerRiskControlPdfFactParser:
                         "line": line,
                         "matches": [canonical_name],
                         "reason": "source_unit_unknown",
+                    }
+                )
+                continue
+            quality_issue = self._fact_quality_issue(
+                canonical_name,
+                canonical_value,
+                source_unit=effective_source_unit,
+                value=value,
+            )
+            if quality_issue:
+                ambiguous_rows.append(
+                    {
+                        "line_index": line_index,
+                        "line": line,
+                        "matches": [canonical_name],
+                        "reason": quality_issue,
+                        "value": canonical_value,
+                        "value_text": value["value_text"],
+                        "source_unit": effective_source_unit,
+                        "unit_detection": unit_detection,
                     }
                 )
                 continue
@@ -520,8 +561,9 @@ class BrokerRiskControlPdfFactParser:
                     canonical_name=canonical_name,
                     canonical_value=canonical_value,
                     value=value,
-                    source_unit=source_unit,
-                    unit_scale=unit_scale,
+                    source_unit=effective_source_unit,
+                    unit_scale=effective_unit_scale,
+                    unit_detection=unit_detection,
                     line=line,
                     line_index=line_index,
                     extraction_strategy="label_line",
@@ -549,6 +591,7 @@ class BrokerRiskControlPdfFactParser:
                 }
                 fallback_source_unit = item.get("source_unit") or source_unit
                 fallback_unit_scale = item.get("unit_scale") or unit_scale
+                unit_detection = str(item.get("unit_detection") or "global_source_unit")
                 unit = self._unit_for(canonical_name)
                 canonical_value = self._normalize_value(
                     value,
@@ -563,6 +606,26 @@ class BrokerRiskControlPdfFactParser:
                             "line": item["line"],
                             "matches": [canonical_name],
                             "reason": "fixed_order_source_unit_unknown",
+                        }
+                    )
+                    continue
+                quality_issue = self._fact_quality_issue(
+                    canonical_name,
+                    canonical_value,
+                    source_unit=fallback_source_unit,
+                    value=value,
+                )
+                if quality_issue:
+                    ambiguous_rows.append(
+                        {
+                            "line_index": item["line_index"],
+                            "line": item["line"],
+                            "matches": [canonical_name],
+                            "reason": quality_issue,
+                            "value": canonical_value,
+                            "value_text": value["value_text"],
+                            "source_unit": fallback_source_unit,
+                            "unit_detection": unit_detection,
                         }
                     )
                     continue
@@ -592,6 +655,7 @@ class BrokerRiskControlPdfFactParser:
                         value=value,
                         source_unit=fallback_source_unit,
                         unit_scale=fallback_unit_scale,
+                        unit_detection=unit_detection,
                         line=item["line"],
                         line_index=item["line_index"],
                         extraction_strategy="fixed_order_embedded_table",
@@ -645,6 +709,7 @@ class BrokerRiskControlPdfFactParser:
         value: Dict[str, Any],
         source_unit: Optional[str],
         unit_scale: Optional[float],
+        unit_detection: str,
         line: str,
         line_index: int,
         extraction_strategy: str,
@@ -692,6 +757,7 @@ class BrokerRiskControlPdfFactParser:
                 "parser_candidate": self.parser_version,
                 "source_unit": source_unit,
                 "source_unit_scale": unit_scale,
+                "unit_detection": unit_detection,
                 "report_scope": report_scope,
                 "licensed_broker_name": licensed_broker_name,
                 "listed_broker_scope": listed_broker_scope,
@@ -784,11 +850,14 @@ class BrokerRiskControlPdfFactParser:
             result: List[Dict[str, Any]] = []
             for canonical_name, row in zip(self._FIXED_ORDER_EMBEDDED_FACTS, window):
                 first = row["numbers"][0]
-                row_source_unit, row_unit_scale = self._fallback_money_unit(
+                row_source_unit, row_unit_scale, unit_detection = self._effective_money_unit(
                     canonical_name,
                     first["value"],
                     source_unit=source_unit,
                     unit_scale=unit_scale,
+                    rows=rows,
+                    line_index=int(row["line_index"]),
+                    line=str(row["line"]),
                 )
                 result.append(
                     {
@@ -800,6 +869,7 @@ class BrokerRiskControlPdfFactParser:
                         "percent": first["percent"],
                         "source_unit": row_source_unit,
                         "unit_scale": row_unit_scale,
+                        "unit_detection": unit_detection,
                     }
                 )
             return result
@@ -810,7 +880,7 @@ class BrokerRiskControlPdfFactParser:
         for match in self._NUMBER_PATTERN.finditer(line):
             value_text = match.group("value")
             try:
-                value = float(value_text.replace(",", ""))
+                value = float(self._normalize_number_text(value_text))
             except ValueError:
                 continue
             result.append(
@@ -854,23 +924,99 @@ class BrokerRiskControlPdfFactParser:
             and 50.0 <= nsfr <= 500.0
         )
 
-    def _fallback_money_unit(
+    def _effective_money_unit(
         self,
         canonical_name: str,
         raw_value: float,
         *,
         source_unit: Optional[str],
         unit_scale: Optional[float],
-    ) -> tuple[Optional[str], Optional[float]]:
+        rows: Sequence[str],
+        line_index: int,
+        line: str,
+    ) -> tuple[Optional[str], Optional[float], str]:
         if self._unit_for(canonical_name) != "CNY":
-            return source_unit, unit_scale
+            return source_unit, unit_scale, "not_money_fact"
         if abs(float(raw_value)) >= 100_000_000:
-            return "元", 1.0
-        return source_unit, unit_scale
+            return "元", 1.0, "absolute_yuan_value"
+        local_unit = self._detect_local_money_unit(
+            rows,
+            line_index=line_index,
+            line=line,
+        )
+        if local_unit:
+            return local_unit, self._MONEY_UNITS[local_unit], "local_context_unit"
+        if source_unit in self._MONEY_UNITS:
+            return source_unit, unit_scale or self._MONEY_UNITS[source_unit], "document_unit"
+        return source_unit, unit_scale, "unknown_unit"
+
+    def _detect_local_money_unit(
+        self,
+        rows: Sequence[str],
+        *,
+        line_index: int,
+        line: str,
+    ) -> Optional[str]:
+        """Find the nearest table/header money unit instead of trusting whole-document unit."""
+        same_line = self._money_unit_from_line(line)
+        if same_line:
+            return same_line
+        start = max(0, int(line_index) - 8)
+        for candidate in reversed(rows[start:int(line_index)]):
+            unit = self._money_unit_from_line(candidate)
+            if unit:
+                return unit
+            if re.search(r"第[一二三四五六七八九十]+[章节]|释义|目录", candidate):
+                break
+        return None
+
+    def _money_unit_from_line(self, line: str) -> Optional[str]:
+        text = str(line or "")
+        unit_match = self._MONEY_UNIT_PATTERN.search(text)
+        if unit_match:
+            return unit_match.group(1)
+        paren_match = self._PAREN_MONEY_UNIT_PATTERN.search(text)
+        if paren_match and ("项目" in text or "指标" in text or "金额" in text):
+            return paren_match.group(1)
+        return None
+
+    def _fact_quality_issue(
+        self,
+        canonical_name: str,
+        canonical_value: float,
+        *,
+        source_unit: Optional[str],
+        value: Dict[str, Any],
+    ) -> Optional[str]:
+        if canonical_value != canonical_value:
+            return "numeric_value_nan"
+        unit = self._unit_for(canonical_name)
+        if unit == "CNY":
+            if source_unit not in self._MONEY_UNITS:
+                return "source_unit_unknown"
+            if abs(canonical_value) > 10_000_000_000_000:
+                return "money_value_out_of_plausible_range"
+            if canonical_name in {
+                "net_capital",
+                "core_net_capital",
+                "regulatory_net_assets",
+                "risk_capital_reserve_total",
+                "balance_sheet_assets_total",
+            } and canonical_value < 100_000_000:
+                return "money_value_out_of_plausible_range"
+        elif unit == "ratio":
+            if canonical_value < 0:
+                return "ratio_value_out_of_plausible_range"
+            if canonical_value > 100:
+                return "ratio_value_out_of_plausible_range"
+            raw = abs(float(value.get("value") or 0.0))
+            if raw > 10_000 and not value.get("percent"):
+                return "ratio_value_out_of_plausible_range"
+        return None
 
     def _detect_money_unit(self, text: str) -> tuple[Optional[str], Optional[float]]:
         payload = str(text or "")
-        unit_match = re.search(r"单位\s*[:：]?\s*(?:人民币)?\s*(百万元|千元|万元|亿元|元)", payload)
+        unit_match = self._MONEY_UNIT_PATTERN.search(payload)
         if unit_match:
             unit = unit_match.group(1)
             return unit, self._MONEY_UNITS[unit]
@@ -901,6 +1047,24 @@ class BrokerRiskControlPdfFactParser:
             matches.remove("net_capital")
         if "subordinated_net_capital" in matches and "net_capital" in matches:
             matches.remove("net_capital")
+        if "net_capital_to_net_assets" in matches:
+            for generic in ("net_capital", "regulatory_net_assets"):
+                if generic in matches:
+                    matches.remove(generic)
+        if "net_capital_to_liabilities" in matches and "net_capital" in matches:
+            matches.remove("net_capital")
+        if "margin_financing_to_net_capital" in matches and "net_capital" in matches:
+            matches.remove("net_capital")
+        if (
+            "proprietary_equity_securities_to_net_capital" in matches
+            and "net_capital" in matches
+        ):
+            matches.remove("net_capital")
+        if (
+            "proprietary_non_equity_securities_to_net_capital" in matches
+            and "net_capital" in matches
+        ):
+            matches.remove("net_capital")
         if "regulatory_net_assets" in matches and "net_assets_to_liabilities" in matches:
             matches.remove("regulatory_net_assets")
         return matches
@@ -916,7 +1080,7 @@ class BrokerRiskControlPdfFactParser:
         match = matches[0]
         value_text = match.group("value")
         try:
-            value = float(value_text.replace(",", ""))
+            value = float(self._normalize_number_text(value_text))
         except ValueError:
             return None
         return {
@@ -924,6 +1088,9 @@ class BrokerRiskControlPdfFactParser:
             "value_text": value_text,
             "percent": bool(match.group("percent")),
         }
+
+    def _normalize_number_text(self, value_text: str) -> str:
+        return re.sub(r"\s+", "", str(value_text or "")).replace(",", "")
 
     def _label_match_end(self, line: str, canonical_name: Optional[str]) -> int:
         if not canonical_name:
@@ -993,6 +1160,7 @@ class BrokerRiskControlSyncResult:
     filtered_announcements: int = 0
     errors: List[str] = field(default_factory=list)
     parse_failure_details: List[Dict[str, Any]] = field(default_factory=list)
+    report_summaries: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -1013,6 +1181,7 @@ class BrokerRiskControlSyncResult:
             "filtered_announcements": self.filtered_announcements,
             "errors": list(self.errors),
             "parse_failure_details": list(self.parse_failure_details),
+            "report_summaries": list(self.report_summaries),
         }
 
 
@@ -1033,6 +1202,8 @@ class BrokerRiskControlReportSyncService:
         source_profile: str = BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
         allow_non_broker_validation_override: bool = False,
         archive_root: Optional[str | Path] = None,
+        force_reparse_existing: bool = False,
+        replace_existing_facts: bool = False,
     ) -> None:
         self.storage = storage
         self.scanner = scanner or CninfoAnnouncementScanner()
@@ -1046,6 +1217,8 @@ class BrokerRiskControlReportSyncService:
         self.source_profile = source_profile
         self.allow_non_broker_validation_override = allow_non_broker_validation_override
         self.archive_root = None if archive_root is None else Path(archive_root)
+        self.force_reparse_existing = bool(force_reparse_existing)
+        self.replace_existing_facts = bool(replace_existing_facts)
 
     def backfill(
         self,
@@ -1259,7 +1432,7 @@ class BrokerRiskControlReportSyncService:
             content_hash,
             archive_path=archive_path,
         )
-        if self._unchanged_manifest_exists(manifest, content_hash):
+        if not self.force_reparse_existing and self._unchanged_manifest_exists(manifest, content_hash):
             result.unchanged_reports += 1
             LOGGER.info(
                 "broker risk-control report unchanged: instrument_id=%s symbol=%s report_period=%s announcement_id=%s content_hash=%s",
@@ -1322,6 +1495,14 @@ class BrokerRiskControlReportSyncService:
             return
         result.reports_parsed += 1
         result.facts_parsed += len(parsed.numeric_facts)
+        result.report_summaries.append(
+            self._parsed_report_summary(
+                record,
+                instrument,
+                report_period,
+                parsed,
+            )
+        )
         LOGGER.info(
             "broker risk-control report parsed: instrument_id=%s symbol=%s report_period=%s announcement_id=%s facts=%s diagnostics_keys=%s",
             instrument.get("instrument_id"),
@@ -1363,11 +1544,35 @@ class BrokerRiskControlReportSyncService:
             parsed_manifest,
             ingestion_run_id=ingestion_run_id,
         )
-        result.facts_written += self.storage.upsert_financial_numeric_facts(
-            parsed.numeric_facts,
-            ingestion_run_id=ingestion_run_id,
-            tier=tier,
-        )
+        if self.replace_existing_facts and hasattr(
+            self.storage,
+            "replace_financial_numeric_facts_for_source_file",
+        ):
+            replace_result = self.storage.replace_financial_numeric_facts_for_source_file(
+                source_file_id,
+                parsed.numeric_facts,
+                ingestion_run_id=ingestion_run_id,
+                tier=tier,
+                parser_version=self.parser.parser_version,
+                statement_family=BROKER_RISK_CONTROL_STATEMENT_FAMILY,
+            )
+            result.facts_written += int(replace_result.get("inserted") or 0)
+            LOGGER.info(
+                "broker risk-control report facts replaced: instrument_id=%s symbol=%s report_period=%s announcement_id=%s deleted=%s inserted=%s tier=%s",
+                instrument.get("instrument_id"),
+                instrument.get("symbol"),
+                report_period,
+                record.announcement_id,
+                replace_result.get("deleted"),
+                replace_result.get("inserted"),
+                tier,
+            )
+        else:
+            result.facts_written += self.storage.upsert_financial_numeric_facts(
+                parsed.numeric_facts,
+                ingestion_run_id=ingestion_run_id,
+                tier=tier,
+            )
         LOGGER.info(
             "broker risk-control report write done: instrument_id=%s symbol=%s report_period=%s announcement_id=%s facts=%s tier=%s",
             instrument.get("instrument_id"),
@@ -1418,6 +1623,42 @@ class BrokerRiskControlReportSyncService:
             "announcement_time": record.announcement_time,
             "adjunct_url": record.adjunct_url,
             "diagnostics": diagnostics or {},
+        }
+
+    def _parsed_report_summary(
+        self,
+        record: CninfoAnnouncementRecord,
+        instrument: Dict[str, Any],
+        report_period: str,
+        parsed: BrokerRiskControlParseResult,
+    ) -> Dict[str, Any]:
+        facts_by_canonical = {
+            str(fact.canonical_fact_name or fact.fact_name): fact
+            for fact in parsed.numeric_facts
+        }
+        net_capital = facts_by_canonical.get("net_capital")
+        return {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "report_period": report_period,
+            "announcement_id": record.announcement_id,
+            "title": record.title,
+            "fact_count": len(parsed.numeric_facts),
+            "parse_status": parsed.diagnostics.get("parse_status"),
+            "matched_canonical_facts": parsed.diagnostics.get("matched_canonical_facts")
+            or [],
+            "missing_required_facts": parsed.diagnostics.get("missing_required_facts")
+            or [],
+            "net_capital": None
+            if net_capital is None
+            else {
+                "fact_value": net_capital.fact_value,
+                "value_text": net_capital.value_text,
+                "unit": net_capital.unit,
+                "unit_detection": net_capital.raw_fact_json.get("unit_detection"),
+                "line_index": net_capital.raw_fact_json.get("line_index"),
+            },
         }
 
     def _build_manifest(

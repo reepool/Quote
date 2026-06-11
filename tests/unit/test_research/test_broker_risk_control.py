@@ -49,18 +49,18 @@ def _risk_control_text(unit="万元"):
     证券公司年度风险控制指标相关情况报告
     口径：母公司
     单位：人民币{unit}
-    核心净资本 2,500.50
-    附属净资本 300.00
-    净资本 2,800.50
-    净资产 5,000.00
-    各项风险资本准备之和 900.00
+    核心净资本 250,050.00
+    附属净资本 30,000.00
+    净资本 280,050.00
+    净资产 500,000.00
+    各项风险资本准备之和 90,000.00
     风险覆盖率 311.17%
     资本杠杆率 18.20%
     流动性覆盖率 245.00%
     净稳定资金率 150.00%
     自营权益类证券及其衍生品/净资本 42.00%
     融资（含融券）的金额/净资本 80.00%
-    经纪业务净收入 120.00
+    经纪业务净收入 120,000.00
     """
 
 
@@ -80,8 +80,8 @@ def test_broker_risk_control_parser_normalizes_money_and_ratios():
     )
 
     facts = {item.canonical_fact_name: item for item in result.numeric_facts}
-    assert facts["net_capital"].fact_value == 28_005_000.0
-    assert facts["core_net_capital"].fact_value == 25_005_000.0
+    assert facts["net_capital"].fact_value == 2_800_500_000.0
+    assert facts["core_net_capital"].fact_value == 2_500_500_000.0
     assert facts["risk_coverage_ratio"].fact_value == pytest.approx(3.1117)
     assert facts["capital_leverage_ratio"].fact_value == pytest.approx(0.182)
     assert facts["broker_operational_risk_brokerage_net_revenue"].canonical_statement_family == "regulatory_risk_control"
@@ -124,8 +124,8 @@ def test_broker_annual_report_parser_uses_current_period_column():
         母公司的净资本及风险控制指标
         单位：人民币万元
         项目 本期末 上年末 监管标准
-        净资本 2,800.50 2,700.10 2,000.00
-        核心净资本 2,500.50 2,300.00 -
+        净资本 280,050.00 270,010.00 200,000.00
+        核心净资本 250,050.00 230,000.00 -
         风险覆盖率 311.17% 300.00% 100.00%
         资本杠杆率 18.20% 17.50% 8.00%
         流动性覆盖率 245.00% 230.00% 100.00%
@@ -142,14 +142,112 @@ def test_broker_annual_report_parser_uses_current_period_column():
     )
 
     facts = {item.canonical_fact_name: item for item in result.numeric_facts}
-    assert facts["net_capital"].fact_value == 28_005_000.0
-    assert facts["core_net_capital"].fact_value == 25_005_000.0
+    assert facts["net_capital"].fact_value == 2_800_500_000.0
+    assert facts["core_net_capital"].fact_value == 2_500_500_000.0
     assert facts["risk_coverage_ratio"].fact_value == pytest.approx(3.1117)
     assert facts["liquidity_coverage_ratio"].raw_fact_json["source_profile"] == (
         BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE
     )
     assert result.diagnostics["missing_required_facts"] == []
     assert result.diagnostics["report_scope"] == "parent_company"
+
+
+def test_broker_annual_report_parser_treats_large_raw_money_as_absolute_yuan():
+    parser = BrokerRiskControlPdfFactParser(
+        parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+    )
+
+    result = parser.parse(
+        """
+        资产负债表
+        单位：人民币万元
+        母公司的净资本及风险控制指标
+        项目 本期末 上年末
+        净资本 158,534,166,312.57 142,486,255,992.89
+        净资产 246,323,147,367.56 236,948,181,754.85
+        风险覆盖率 210.25% 205.00%
+        """,
+        source_file_id="annual-600030-2025",
+        instrument_id="600030.SH",
+        symbol="600030",
+        exchange="SSE",
+        report_period="2025-12-31",
+        report_type="annual",
+        source="cninfo",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    facts = {item.canonical_fact_name: item for item in result.numeric_facts}
+    assert facts["net_capital"].fact_value == 158_534_166_312.57
+    assert facts["net_capital"].unit == "元"
+    assert facts["net_capital"].raw_fact_json["unit_detection"] == "absolute_yuan_value"
+
+
+def test_broker_annual_report_parser_handles_pdf_split_number_spaces():
+    parser = BrokerRiskControlPdfFactParser(
+        parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+    )
+
+    result = parser.parse(
+        """
+        母公司净资本及有关风险控制指标
+        单位：万元
+        项目 本期末 上年末 增减
+        核心净资本 5,658, 173.82 5,476,012.73 3.33% - -
+        附属净资本 2,829,086.91 2,738,006.36 3.33% - -
+        净资本 8,487 ,260.73 8,214,019.09 3.33% - -
+        净资产 10,973, 189.60 10,757 ,788.34 2.00% - -
+        净资本 / 净资产 77 .35% 76.35%
+        净资本 / 负债 31.81% 30.25%
+        """,
+        source_file_id="annual-002736-2024h1",
+        instrument_id="002736.SZ",
+        symbol="002736",
+        exchange="SZSE",
+        report_period="2024-06-30",
+        report_type="semiannual",
+        source="cninfo",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    facts = {item.canonical_fact_name: item for item in result.numeric_facts}
+    assert facts["core_net_capital"].fact_value == 56_581_738_200.0
+    assert facts["net_capital"].fact_value == 84_872_607_300.0
+    assert facts["regulatory_net_assets"].fact_value == 109_731_896_000.0
+    assert facts["net_capital_to_net_assets"].fact_value == pytest.approx(0.7735)
+    assert result.diagnostics["missing_required_facts"] == []
+
+
+def test_broker_annual_report_parser_rejects_implausible_tiny_net_capital():
+    parser = BrokerRiskControlPdfFactParser(
+        parser_version=BROKER_ANNUAL_REPORT_RISK_CONTROL_PARSER_VERSION
+    )
+
+    result = parser.parse(
+        """
+        母公司的净资本及风险控制指标
+        单位：人民币元
+        项目 本期末 上年末
+        净资本 2025
+        风险覆盖率 210.25%
+        """,
+        source_file_id="annual-002945-2025",
+        instrument_id="002945.SZ",
+        symbol="002945",
+        exchange="SZSE",
+        report_period="2025-12-31",
+        report_type="annual",
+        source="cninfo",
+        source_profile=BROKER_ANNUAL_REPORT_RISK_CONTROL_SOURCE_PROFILE,
+    )
+
+    facts = {item.canonical_fact_name: item for item in result.numeric_facts}
+    assert "net_capital" not in facts
+    assert result.diagnostics["missing_required_facts"] == ["net_capital"]
+    assert any(
+        row.get("reason") == "money_value_out_of_plausible_range"
+        for row in result.diagnostics["ambiguous_rows"]
+    )
 
 
 def test_broker_annual_report_parser_recovers_garbled_fixed_order_table():
@@ -245,6 +343,53 @@ def test_broker_risk_control_facts_write_and_query_hot_history(tmp_path):
     assert historical[0]["canonical_fact_name"] == "net_capital"
     assert historical[0]["physical_table"] == "financial_numeric_facts_history"
     assert historical[0]["raw_fact"]["source_profile"] == "broker_risk_control_report"
+
+
+def test_broker_risk_control_repair_replace_removes_stale_source_file_facts(tmp_path):
+    storage = _build_storage_manager(tmp_path)
+    parser = BrokerRiskControlPdfFactParser()
+    manifest = FinancialSourceFileManifest(
+        source="cninfo",
+        source_mode="direct",
+        instrument_id="600030.SH",
+        symbol="600030",
+        exchange="SSE",
+        report_period="2025-12-31",
+        report_type="annual_risk_control",
+        filing_id="risk-2025",
+        source_url="https://example.test/risk.pdf",
+        content_hash="hash-risk-2025",
+        parser_version=BROKER_RISK_CONTROL_PARSER_VERSION,
+        status="downloaded",
+        metadata_json={"artifact_kind": BROKER_RISK_CONTROL_ARTIFACT_KIND},
+    )
+    source_file_id = storage.upsert_financial_source_file_manifest(manifest)
+    parsed = parser.parse(
+        _risk_control_text(),
+        source_file_id=source_file_id,
+        instrument_id="600030.SH",
+        symbol="600030",
+        exchange="SSE",
+        report_period="2025-12-31",
+        source="cninfo",
+    )
+    storage.upsert_financial_numeric_facts(parsed.numeric_facts, tier="history")
+
+    replace_result = storage.replace_financial_numeric_facts_for_source_file(
+        source_file_id,
+        [],
+        tier="history",
+        parser_version=BROKER_RISK_CONTROL_PARSER_VERSION,
+        statement_family="regulatory_risk_control",
+    )
+
+    assert replace_result["deleted"] == len(parsed.numeric_facts)
+    assert replace_result["inserted"] == 0
+    assert storage.get_financial_numeric_facts(
+        "600030.SH",
+        include_history=True,
+        canonical_fact_name="net_capital",
+    ) == []
 
 
 @dataclass

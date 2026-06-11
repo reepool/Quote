@@ -273,7 +273,8 @@ Beta API 调用约定：
   - L1 本地核心层：以新浪和同花顺在 bank/nonbank profile 下通过审计的严格语义交集为准，提供高频、本地、统一单位的财务事实服务；同花顺因速度和长表结构暂定为候选主更新源，新浪作为互备和中文语义校验源。
   - L2 官方摘要校验层：CNInfo data20 只承担官方摘要大项校验，字段远少于新浪/同花顺/东财，单位为 `CNY_10K`，不能被当作完整三表源。
   - L3 远程扩展层：东财字段最宽但较慢，默认不写入本地核心层，仅当 AI/研究请求需要 L1 不覆盖字段时按需调用，并转换成同一 canonical schema、单位和口径后返回。
-- 证券行业补充层：`use-annual-report-broker-risk-control-source` 将上市证券公司正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表作为证券监管事实主源，独立《风险控制指标报告》仅作为补充、校验或非年报/半年报周期补源。证券公司 universe 不能只依赖申万“证券Ⅲ”，必须通过 CSRC 证券公司名录/证券经营机构信息公示与显式 `listed_broker_dealer_scope` 上市主体映射确认。该层仍写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。历史回补使用显式 CLI 写 `history` tier；日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务写 `hot` tier，独立任务本身为 `manual_only=true`，可通过 `/run` 手工验证但不单独注册 cron。
+- 证券行业补充层：`use-annual-report-broker-risk-control-source` 将上市证券公司正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表作为证券监管事实主源，独立《风险控制指标报告》仅作为主源缺口补充、校验或非年报/半年报周期补源。证券公司 universe 不能只依赖申万“证券Ⅲ”，必须通过 CSRC 证券公司名录/证券经营机构信息公示与显式 `listed_broker_dealer_scope` 上市主体映射确认。该层仍写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。历史回补使用显式 CLI 写 `history` tier；日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务写 `hot` tier，独立任务本身为 `manual_only=true`，可通过 `/run` 手工验证但不单独注册 cron。独立风控公告补源必须通过 `--include-standalone-supplement` 显式开启，并且只解析主源本轮已发现但缺少 `net_capital` 的同一 `instrument_id + report_period`，不得覆盖年报/半年报主源已给出的净资本事实。
+- 调度编排架构缺口：当前券商后置任务的 job id 与开关已经配置化，但后置执行逻辑仍在 `ScheduledTasks.financial_disclosure_incremental_sync` 内定制。后续应新增配置驱动的 task dependency DAG，统一支持 `pre_success / post_success / post_always`、并行后置、串行后置、参数继承、超时和失败策略。这样未来其他特殊行业财务补充任务可以通过配置声明“后置于财务日更”或“前置于某任务”，而不是继续在财务日更函数内追加硬编码分支。
 
 #### 4.5.1 下一阶段财务字段映射原则
 
@@ -560,7 +561,8 @@ technical readiness 接口会聚合：
     > /tmp/broker_risk_control_all_12q_write.log 2>&1
   ```
 
-  不带 `--write` 时为 dry-run；可用 `--tier hot|history` 显式覆盖，历史回补默认 `history`，生产日更入口默认 `hot`。
+  不带 `--write` 时为 dry-run；可用 `--tier hot|history` 显式覆盖，历史回补默认 `history`，生产日更入口默认 `hot`。如需在主源缺 `net_capital` 时尝试独立《风险控制指标报告》补源，追加 `--include-standalone-supplement`；该模式先解析年报/半年报主源，再按主源缺口过滤独立公告候选，保持字段、单位和 canonical 写入路径一致。
+  解析质量门要求：金额字段必须有明确单位或可判定为绝对元值，关键监管金额需处于合理区间；PDF 抽取中的拆分数字（例如 `7 ,968,303.78`、`37 .48%`）必须先规范化再入库；完整比率标签优先于基础金额标签，避免 `净资本/净资产` 被误判为 `净资本` 和 `净资产` 的歧义行。`2026-06-11` targeted repair 以 `--repair-existing --write` 重放 11 家券商本地归档 PDF，67 份报告解析并替换写入 `966` 条事实，`net_capital` 覆盖 `60/66` 个目标 instrument-period；剩余缺口为 `002670.SZ` 五期和 `601211.SH 2023-06-30`，均为报告内未披露公司自身净资本表，不应由 parser 伪造。同日对 `002670.SZ`、`601211.SH` 做 CNInfo 独立风控公告补源探测，“风险控制指标”未命中，“风险控制/净资本”只命中董事会风控委员会规则等治理文件，未发现可补齐这 6 个缺口的监管指标表。
 
 #### Stage G：估值基线
 
