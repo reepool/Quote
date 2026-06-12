@@ -7914,6 +7914,9 @@ class DataManager:
                 exchange_stats = {}
             instrument_master_sync = update_results.get('instrument_master_sync')
             instrument_master_governance = update_results.get('instrument_master_governance') or instrument_master_sync
+            catchup_stats = update_results.get('catchup_stats')
+            if not isinstance(catchup_stats, dict):
+                catchup_stats = {}
 
             report = {
                 'summary': {
@@ -7929,6 +7932,7 @@ class DataManager:
                 'update_results': exchange_stats,
                 'instrument_master_sync': instrument_master_sync,
                 'instrument_master_governance': instrument_master_governance,
+                'catchup_stats': catchup_stats,
                 'errors': []
             }
 
@@ -7962,7 +7966,8 @@ class DataManager:
                                 'success_count': success_count,
                                 'failure_count': stats.get('failure_count', 0),
                                 'total_count': total_count,
-                                'quotes_count': quotes_count
+                                'quotes_count': quotes_count,
+                                'catchup_stats': stats.get('catchup_stats', {}),
                             }
                             report['summary']['total_instruments_checked'] += total_count
                             report['summary']['updated_instruments'] += success_count
@@ -9671,6 +9676,119 @@ class DataManager:
             result['reason'] = 'historical_backfill_current_master_sync_skipped'
         return result
 
+    def _get_daily_update_catchup_config(self) -> Dict[str, Any]:
+        """Return bounded catch-up settings for normal daily quote updates."""
+        defaults = {
+            'enabled': True,
+            'exchanges': ['SSE', 'SZSE', 'BSE'],
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+            'sample_limit': 10,
+        }
+        raw = self.data_config.get('daily_update_catchup', {})
+        if not isinstance(raw, dict):
+            raw = {}
+        cfg = {**defaults, **raw}
+        try:
+            cfg['new_instrument_catchup_days'] = max(
+                0,
+                int(cfg.get('new_instrument_catchup_days', defaults['new_instrument_catchup_days'])),
+            )
+        except (TypeError, ValueError):
+            cfg['new_instrument_catchup_days'] = defaults['new_instrument_catchup_days']
+        try:
+            cfg['short_gap_catchup_days'] = max(
+                0,
+                int(cfg.get('short_gap_catchup_days', defaults['short_gap_catchup_days'])),
+            )
+        except (TypeError, ValueError):
+            cfg['short_gap_catchup_days'] = defaults['short_gap_catchup_days']
+        try:
+            cfg['sample_limit'] = max(0, int(cfg.get('sample_limit', defaults['sample_limit'])))
+        except (TypeError, ValueError):
+            cfg['sample_limit'] = defaults['sample_limit']
+        cfg['exchanges'] = {
+            str(exchange).strip().upper()
+            for exchange in cfg.get('exchanges', defaults['exchanges'])
+            if str(exchange).strip()
+        }
+        cfg['enabled'] = bool(cfg.get('enabled', True))
+        return cfg
+
+    @staticmethod
+    def _coerce_date(value: Any) -> Optional[date]:
+        """Normalize common DB/config date values to ``date``."""
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        try:
+            return pd.to_datetime(value).date()
+        except Exception:
+            return None
+
+    def _resolve_daily_update_fetch_window(
+        self,
+        *,
+        exchange: str,
+        target_date: date,
+        latest_quote_date: Optional[datetime],
+        listed_date: Optional[Any],
+        catchup_config: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Resolve the per-instrument daily quote fetch window and catch-up reason."""
+        exchange_code = str(exchange or '').upper()
+        is_a_stock = exchange_code in ('SSE', 'SZSE', 'BSE')
+        normal_start = target_date - timedelta(days=1)
+        if not is_a_stock:
+            normal_start = DateUtils.get_previous_trading_day(exchange_code, target_date)
+
+        fetch_start = normal_start
+        reason = 'normal_daily_window'
+        capped = False
+        skipped_reason = None
+        listed = self._coerce_date(listed_date)
+        latest = self._coerce_date(latest_quote_date)
+
+        catchup_enabled = (
+            catchup_config.get('enabled', True)
+            and exchange_code in catchup_config.get('exchanges', set())
+        )
+        if catchup_enabled and latest is None:
+            if listed and listed <= target_date:
+                lower_bound = target_date - timedelta(
+                    days=int(catchup_config.get('new_instrument_catchup_days', 10))
+                )
+                fetch_start = max(listed, lower_bound)
+                reason = 'new_instrument_catchup'
+                capped = listed < lower_bound
+            elif listed and listed > target_date:
+                skipped_reason = 'listed_after_target_date'
+            else:
+                skipped_reason = 'missing_listed_date'
+        elif catchup_enabled and latest is not None and latest < normal_start:
+            lower_bound = target_date - timedelta(
+                days=int(catchup_config.get('short_gap_catchup_days', 5))
+            )
+            fetch_start = max(latest, lower_bound)
+            reason = 'short_gap_catchup'
+            capped = latest < lower_bound
+
+        if listed and fetch_start < listed:
+            fetch_start = listed
+
+        return {
+            'fetch_start_date': fetch_start,
+            'end_date': target_date,
+            'reason': reason,
+            'capped': capped,
+            'listed_date': listed,
+            'latest_quote_date': latest,
+            'skipped_reason': skipped_reason,
+        }
+
     async def _ensure_research_job_instrument_master_governance(
         self,
         *,
@@ -10523,7 +10641,15 @@ class DataManager:
                 'success_count': 0,
                 'failure_count': 0,
                 'total_quotes_added': 0,
-                'exchange_stats': {}
+                'exchange_stats': {},
+                'catchup_stats': {
+                    'new_instrument_count': 0,
+                    'short_gap_count': 0,
+                    'capped_count': 0,
+                    'skipped_missing_listed_date': 0,
+                    'catchup_quotes_added': 0,
+                    'samples': [],
+                },
             }
             instrument_master_sync = await self._maybe_sync_instrument_master_before_daily_update(
                 exchanges,
@@ -10531,6 +10657,18 @@ class DataManager:
             )
             update_results['instrument_master_sync'] = instrument_master_sync
             update_results['instrument_master_governance'] = instrument_master_sync
+            catchup_config = self._get_daily_update_catchup_config()
+            catchup_sample_limit = int(catchup_config.get('sample_limit', 10))
+
+            def _record_catchup_sample(exchange_result: Dict[str, Any], sample: Dict[str, Any]) -> None:
+                if catchup_sample_limit <= 0:
+                    return
+                global_samples = update_results['catchup_stats']['samples']
+                if len(global_samples) < catchup_sample_limit:
+                    global_samples.append(sample)
+                exchange_samples = exchange_result['catchup_stats']['samples']
+                if len(exchange_samples) < catchup_sample_limit:
+                    exchange_samples.append(sample)
 
             for exchange in exchanges:
                 try:
@@ -10547,7 +10685,15 @@ class DataManager:
                         'success_count': 0,
                         'failure_count': 0,
                         'quotes_added': 0,
-                        'total_instruments': total_instruments
+                        'total_instruments': total_instruments,
+                        'catchup_stats': {
+                            'new_instrument_count': 0,
+                            'short_gap_count': 0,
+                            'capped_count': 0,
+                            'skipped_missing_listed_date': 0,
+                            'catchup_quotes_added': 0,
+                            'samples': [],
+                        },
                     }
 
                     last_progress_log = datetime.now()
@@ -10570,16 +10716,27 @@ class DataManager:
                             # A 股沿用 calendar-day 锚点；
                             # 港股/美股改为前一交易日锚点，仅将 target_date 作为因子业务窗口。
                             is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
-                            fetch_start_date = target_date - timedelta(days=1)
+                            window = self._resolve_daily_update_fetch_window(
+                                exchange=exchange,
+                                target_date=target_date,
+                                latest_quote_date=latest_date,
+                                listed_date=instrument.get('listed_date'),
+                                catchup_config=catchup_config,
+                            )
+                            fetch_start_date = window['fetch_start_date']
                             factor_start_date = fetch_start_date
                             if not is_a_stock:
-                                fetch_start_date = DateUtils.get_previous_trading_day(
-                                    exchange, target_date
-                                )
                                 factor_start_date = target_date
 
                             end_date = target_date
                             data = None  # 初始化，供后续复权因子收集判断
+                            is_catchup = window['reason'] in (
+                                'new_instrument_catchup',
+                                'short_gap_catchup',
+                            )
+                            if window.get('skipped_reason') == 'missing_listed_date':
+                                exchange_result['catchup_stats']['skipped_missing_listed_date'] += 1
+                                update_results['catchup_stats']['skipped_missing_listed_date'] += 1
                             
                             if should_update:
                                 if per_instrument_timeout_sec:
@@ -10610,7 +10767,39 @@ class DataManager:
                                     await self.db_ops.save_daily_quotes(data)
                                     exchange_result['quotes_added'] += len(data)
                                     update_results['total_quotes_added'] += len(data)
+                                    if is_catchup:
+                                        exchange_result['catchup_stats']['catchup_quotes_added'] += len(data)
+                                        update_results['catchup_stats']['catchup_quotes_added'] += len(data)
                                     dm_logger.debug(f"[DataManager] Updated {len(data)} records for {instrument['symbol']}")
+
+                                if is_catchup:
+                                    counter_name = (
+                                        'new_instrument_count'
+                                        if window['reason'] == 'new_instrument_catchup'
+                                        else 'short_gap_count'
+                                    )
+                                    exchange_result['catchup_stats'][counter_name] += 1
+                                    update_results['catchup_stats'][counter_name] += 1
+                                    if window.get('capped'):
+                                        exchange_result['catchup_stats']['capped_count'] += 1
+                                        update_results['catchup_stats']['capped_count'] += 1
+                                    _record_catchup_sample(
+                                        exchange_result,
+                                        {
+                                            'instrument_id': instrument.get('instrument_id'),
+                                            'symbol': instrument.get('symbol'),
+                                            'exchange': exchange,
+                                            'reason': window['reason'],
+                                            'listed_date': window['listed_date'].isoformat()
+                                            if window.get('listed_date') else None,
+                                            'latest_quote_date': window['latest_quote_date'].isoformat()
+                                            if window.get('latest_quote_date') else None,
+                                            'fetch_start_date': fetch_start_date.isoformat(),
+                                            'end_date': end_date.isoformat(),
+                                            'capped': bool(window.get('capped')),
+                                            'quotes_added': len(data or []),
+                                        },
+                                    )
 
                                 exchange_result['success_count'] += 1
                                 update_results['success_count'] += 1

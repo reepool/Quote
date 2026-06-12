@@ -396,6 +396,28 @@
 - **`retry_times`**: `int` (默认: `3`) —— *遭遇各类异常时总体默认的尝试拉取重放拦截次数*
 - **`retry_interval_seconds`**: `int` (默认: `5`) —— *下载出现报错异常时候的基础退坡缓冲等待期（秒）*
 
+### data_config.daily_update_catchup
+
+> 普通行情日更的小窗口追补配置。该配置接受新股主数据或行情源 T+1/T+2 滞后，但要求标的进入本地主表后，日更自动补齐上市日至当前日附近的小范围缺口，避免首日行情永久缺失。
+
+```json
+{
+  "daily_update_catchup": {
+    "enabled": true,
+    "exchanges": ["SSE", "SZSE", "BSE"],
+    "new_instrument_catchup_days": 10,
+    "short_gap_catchup_days": 5,
+    "sample_limit": 10
+  }
+}
+```
+
+- **`enabled`**: 是否启用普通日更追补逻辑。
+- **`exchanges`**: 启用追补的市场，默认覆盖 A 股 `SSE/SZSE/BSE`。
+- **`new_instrument_catchup_days`**: 对本地还没有任何行情的标的，从 `max(listed_date, target_date - N days)` 开始追补；避免新股迟到入库后漏掉上市首日行情。
+- **`short_gap_catchup_days`**: 对已有行情但最新日期落后普通日更窗口的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。
+- **`sample_limit`**: 日更报告中保留的追补样例数量。追补窗口被截断或缺少 `listed_date` 时会在报告中暴露，超过窗口的大缺口仍交给 `/backfill` 或 `find_gap_and_repair`。
+
 ### data_config.instrument_master_sync
 
 > A 股证券主数据同步底层配置。普通日更和通用主数据治理最终都复用这套 `sync_instrument_master()` 源优先级与写入规则。

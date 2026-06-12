@@ -264,6 +264,7 @@ restart_system - 重启系统服务
 - **功能**: 自动更新当日股票数据
 - **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更默认命中 `force_refresh_job_names`，会先强制刷新 `SSE/SZSE/BSE` 股票主数据，再重新读取 active/tradable 股票池抓取行情
 - **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
+- **行情追补**: 普通 A 股日更会对本地无行情的新股和最近短缺口执行 `data_config.daily_update_catchup` 小窗口追补。主数据或行情源晚一天可接受，但标的进入主表后，上市日至目标日附近的缺口会自动尝试补齐；超出窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 兜底。
 
 ### 1.1 研究/财务任务的主数据治理
 
@@ -359,7 +360,7 @@ restart_system - 重启系统服务
 /backfill 2026-04-09 2026-05-21 SSE SZSE BSE  # \u4ee5\u533a\u95f4\u6a21\u5f0f\u8865\u5145 A \u80a1\u7f3a\u53e3
 ```
 
-> A 股普通日更已经会先刷新股票主数据。若新股因为历史股票池滞后漏掉了近几天日 K，先确认主数据同步完成，再执行 `/backfill <开始日期> <结束日期> SSE SZSE BSE` 即可。单日 `/backfill` 仍走 `daily_data_update(target_date=...)` 的补数模式；时间段 `/backfill` 走区间补数路径，每个交易所只读取一次 active 股票池、每个品种只请求一次连续日期范围，并默认跳过 TDX Phase 2.5 审计。
+> A 股普通日更已经会先刷新股票主数据，并对本地无行情的新股和最近短缺口自动做小窗口追补。若报告显示追补窗口被截断、缺少上市日，或缺口超出 `daily_update_catchup` 配置窗口，再执行 `/backfill <开始日期> <结束日期> SSE SZSE BSE`。单日 `/backfill` 仍走 `daily_data_update(target_date=...)` 的补数模式；时间段 `/backfill` 走区间补数路径，每个交易所只读取一次 active 股票池、每个品种只请求一次连续日期范围，并默认跳过 TDX Phase 2.5 审计。
 
 ### \u65b9\u5f0f\u4e8c\uff1a`/run daily_data_update <\u65e5\u671f>`
 

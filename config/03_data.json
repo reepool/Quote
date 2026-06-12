@@ -10,6 +10,17 @@
     "max_concurrent_downloads": 1,
     "retry_times": 3,
     "retry_interval_seconds": 5,
+    "daily_update_catchup": {
+      "enabled": true,
+      "exchanges": [
+        "SSE",
+        "SZSE",
+        "BSE"
+      ],
+      "new_instrument_catchup_days": 10,
+      "short_gap_catchup_days": 5,
+      "sample_limit": 10
+    },
     "instrument_master_sync": {
       "enabled": true,
       "run_before_daily_update": true,

@@ -70,6 +70,12 @@
             "condition": "not non_trading_day and instrument_master_sync_summary"
           },
           {
+            "name": "daily_catchup",
+            "type": "static",
+            "content": "*行情追补*\n{daily_catchup_summary}",
+            "condition": "not non_trading_day and daily_catchup_summary"
+          },
+          {
             "name": "non_trading_day_info",
             "type": "static",
             "content": "🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}",

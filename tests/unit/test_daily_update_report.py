@@ -1,5 +1,5 @@
-from datetime import date
-from unittest.mock import Mock, patch
+from datetime import date, datetime
+from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 import pytest
 
@@ -135,3 +135,177 @@ def test_report_engine_formats_instrument_master_sync_warnings():
     assert '新增: 14，停用: 1' in summary
     assert 'BSE 状态=warning 活跃=314 +14/-0' in summary
     assert 'master data freshness exceeds 48h' in summary
+
+
+def test_daily_update_new_instrument_catchup_window_uses_listed_date():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='BSE',
+        target_date=date(2026, 6, 15),
+        latest_quote_date=None,
+        listed_date=datetime(2026, 6, 12),
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'new_instrument_catchup'
+    assert window['fetch_start_date'] == date(2026, 6, 12)
+    assert not window['capped']
+
+
+def test_daily_update_short_gap_catchup_window_is_capped():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='BSE',
+        target_date=date(2026, 6, 15),
+        latest_quote_date=datetime(2026, 6, 1),
+        listed_date=datetime(2026, 1, 1),
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'short_gap_catchup'
+    assert window['fetch_start_date'] == date(2026, 6, 10)
+    assert window['capped']
+
+
+@pytest.mark.asyncio
+async def test_generate_daily_update_report_includes_catchup_stats():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    catchup_stats = {
+        'new_instrument_count': 1,
+        'short_gap_count': 1,
+        'capped_count': 1,
+        'skipped_missing_listed_date': 0,
+        'catchup_quotes_added': 3,
+        'samples': [
+            {
+                'instrument_id': '920083.BJ',
+                'reason': 'new_instrument_catchup',
+                'fetch_start_date': '2026-06-11',
+                'end_date': '2026-06-15',
+                'quotes_added': 2,
+            }
+        ],
+    }
+    update_results = {
+        'success_count': 1,
+        'failure_count': 0,
+        'total_quotes_added': 3,
+        'catchup_stats': catchup_stats,
+        'exchange_stats': {
+            'BSE': {
+                'success_count': 1,
+                'failure_count': 0,
+                'quotes_added': 3,
+                'total_instruments': 1,
+                'catchup_stats': catchup_stats,
+            }
+        },
+    }
+
+    report = await manager._generate_daily_update_report(
+        ['BSE'],
+        date(2026, 6, 15),
+        update_results,
+    )
+
+    assert report['catchup_stats'] == catchup_stats
+    assert report['exchange_stats']['BSE']['catchup_stats'] == catchup_stats
+
+
+def test_report_engine_formats_daily_catchup_summary():
+    engine = ReportEngine()
+    summary = engine._format_daily_catchup_summary({
+        'new_instrument_count': 1,
+        'short_gap_count': 1,
+        'capped_count': 1,
+        'skipped_missing_listed_date': 0,
+        'catchup_quotes_added': 3,
+        'samples': [
+            {
+                'instrument_id': '920083.BJ',
+                'reason': 'new_instrument_catchup',
+                'fetch_start_date': '2026-06-11',
+                'end_date': '2026-06-15',
+                'quotes_added': 2,
+            }
+        ],
+    })
+
+    assert '新股追补: 1' in summary
+    assert '短缺口追补: 1' in summary
+    assert '920083.BJ' in summary
+
+
+@pytest.mark.asyncio
+async def test_update_daily_data_fetches_new_instrument_from_listed_date():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['daily_update_catchup'] = {
+        'enabled': True,
+        'exchanges': ['SSE', 'SZSE', 'BSE'],
+        'new_instrument_catchup_days': 10,
+        'short_gap_catchup_days': 5,
+        'sample_limit': 10,
+    }
+    manager._maybe_sync_instrument_master_before_daily_update = AsyncMock(
+        return_value={'status': 'success', 'action': 'synced'}
+    )
+    manager._batch_sync_adjustment_factors = AsyncMock(return_value={'synced': 0})
+    manager._generate_daily_update_report = AsyncMock(return_value={})
+    manager.db_ops = Mock()
+    manager.db_ops.get_active_instruments = AsyncMock(return_value=[
+        {
+            'instrument_id': '920083.BJ',
+            'symbol': '920083',
+            'exchange': 'BSE',
+            'type': 'stock',
+            'listed_date': datetime(2026, 6, 12),
+            'source_symbol': '920083',
+        }
+    ])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=None)
+    manager.db_ops.save_daily_quotes = AsyncMock(return_value=True)
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[
+        {
+            'instrument_id': '920083.BJ',
+            'time': datetime(2026, 6, 12),
+            'open': 1,
+            'high': 1,
+            'low': 1,
+            'close': 1,
+            'volume': 1,
+            'amount': 1,
+            'tradestatus': 1,
+            'factor': 1,
+        }
+    ])
+
+    with patch('builtins.open', mock_open()):
+        result = await manager.update_daily_data(
+            exchanges=['BSE'],
+            target_date=date(2026, 6, 15),
+            instrument_types=['stock'],
+            run_factor_audit=False,
+        )
+
+    args = manager.source_factory.get_daily_data.await_args.args
+    assert args[3].date() == date(2026, 6, 12)
+    assert result['catchup_stats']['new_instrument_count'] == 1
+    assert result['catchup_stats']['catchup_quotes_added'] == 1

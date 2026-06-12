@@ -191,16 +191,53 @@ class ReportEngine:
                 'success_rate': success_rate,
                 'exchange_stats': summary.get('exchange_stats', {}),
                 'instrument_master_sync': summary.get('instrument_master_sync', data.get('instrument_master_sync')),
+                'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
             })
 
         data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
             data.get('instrument_master_sync')
+        )
+        data['daily_catchup_summary'] = self._format_daily_catchup_summary(
+            data.get('catchup_stats')
         )
 
         # 确保所有报告都有一个明确的名称
         data['name'] = data.get('name', '每日数据更新报告')
 
         return data
+
+    def _format_daily_catchup_summary(self, catchup_stats: Dict[str, Any]) -> str:
+        """Format bounded daily catch-up diagnostics for operator reports."""
+        if not isinstance(catchup_stats, dict) or not catchup_stats:
+            return ''
+
+        new_count = int(catchup_stats.get('new_instrument_count', 0) or 0)
+        short_gap_count = int(catchup_stats.get('short_gap_count', 0) or 0)
+        capped_count = int(catchup_stats.get('capped_count', 0) or 0)
+        missing_listed = int(catchup_stats.get('skipped_missing_listed_date', 0) or 0)
+        quotes_added = int(catchup_stats.get('catchup_quotes_added', 0) or 0)
+        if not any((new_count, short_gap_count, capped_count, missing_listed, quotes_added)):
+            return ''
+
+        lines = [
+            f"新股追补: {new_count}，短缺口追补: {short_gap_count}，追补行情: {quotes_added}",
+        ]
+        if capped_count or missing_listed:
+            lines.append(f"窗口截断: {capped_count}，缺少上市日: {missing_listed}")
+
+        samples = catchup_stats.get('samples') or []
+        sample_parts = []
+        for sample in samples[:5]:
+            if not isinstance(sample, dict):
+                continue
+            sample_parts.append(
+                f"{sample.get('instrument_id')} {sample.get('reason')} "
+                f"{sample.get('fetch_start_date')}~{sample.get('end_date')} "
+                f"rows={sample.get('quotes_added', 0)}"
+            )
+        if sample_parts:
+            lines.append('样例: ' + '；'.join(sample_parts))
+        return '\n'.join(lines)
 
     def _format_instrument_master_sync_summary(self, sync_result: Dict[str, Any]) -> str:
         """Format master-sync diagnostics for operator reports."""

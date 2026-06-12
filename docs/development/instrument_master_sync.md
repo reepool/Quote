@@ -12,6 +12,8 @@
 
 普通行情日更、研究同步、财务同步和当前快照类任务都应通过这个共享治理入口后再读取 `instruments.is_active` 股票池。行情日更保留 `instrument_master_sync` 报告字段作为兼容字段，同时也会产生同一份 `instrument_master_governance` 结果；研究和财务维护任务使用 `instrument_master_governance` 报告段。最终架构不再保留一套行情专用主数据前置逻辑和另一套研究/财务主数据逻辑。
 
+普通 A 股行情日更接受上游主数据或行情源对新股存在 T+1/T+2 滞后，但不接受标的进入本地主表后首个交易日行情永久缺失。`data_config.daily_update_catchup` 控制小窗口追补：本地无行情的新股从 `max(listed_date, target_date - new_instrument_catchup_days)` 抓到目标日，已有行情但短期落后的标的从 `max(latest_quote_date, target_date - short_gap_catchup_days)` 抓到目标日；窗口截断、缺少上市日和样例会进入日更报告。超过窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 处理，避免普通日更退化成无界历史补数。
+
 需要区分两个概念：
 
 - **前置治理**：任务开始前调用 `ensure_instrument_master_fresh()`。如果本地主数据仍在 `freshness_threshold_hours` 内，且任务没有强制刷新要求，治理结果可以是 `action=reused_fresh_master`，不会重复请求上游。
