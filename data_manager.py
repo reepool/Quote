@@ -3158,7 +3158,9 @@ class DataManager:
 
         def _load_readiness() -> Dict[str, Any]:
             readiness_cfg = module_cfg.get("readiness", {})
-            readiness = storage.validate_financial_statement_readiness(
+            readiness = self._run_financial_storage_call(
+                storage,
+                "validate_financial_statement_readiness",
                 expected_periods=expected_periods,
                 instrument_ids=target_instrument_ids,
                 required_core_facts=list(readiness_cfg.get("required_core_facts", [])),
@@ -4453,7 +4455,9 @@ class DataManager:
         storage = self._require_research_storage()
         normalized_id = convert_to_database_format(instrument_id)
         summary = await asyncio.to_thread(
-            storage.get_financial_summary,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_summary",
             normalized_id,
             include_snapshot=include_snapshot,
         )
@@ -4712,7 +4716,7 @@ class DataManager:
             profile_resolution = await self._resolve_research_financial_statement_profile(
                 storage,
                 instrument_id,
-                instrument=instrument,
+                instrument=instrument or bundle,
             )
             resolved_profile = profile_resolution.get("profile") if profile_resolution else None
         if include_local_core or requested:
@@ -4895,7 +4899,12 @@ class DataManager:
     ) -> Any:
         """Run a financial-domain storage call against the split financial DB when available."""
         method = getattr(storage, method_name)
-        scope_factory = getattr(storage, "financial_database_scope", None)
+        try:
+            inspect.getattr_static(storage, "financial_database_scope")
+        except AttributeError:
+            scope_factory = None
+        else:
+            scope_factory = getattr(storage, "financial_database_scope", None)
         if callable(scope_factory):
             try:
                 scope = scope_factory()
@@ -4920,6 +4929,8 @@ class DataManager:
             instrument_id,
             include_snapshot=False,
         )
+        if isinstance(industry_membership, dict) and not industry_membership.get("instrument_id"):
+            industry_membership = {**industry_membership, "instrument_id": instrument_id}
         company_profile = await asyncio.to_thread(
             storage.get_company_profile,
             instrument_id,
@@ -5242,7 +5253,9 @@ class DataManager:
             return None
 
         financial_bundle = await asyncio.to_thread(
-            storage.get_financial_statement_bundle,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_statement_bundle",
             normalized_id,
             include_statements=False,
         )
@@ -5369,7 +5382,9 @@ class DataManager:
         selected_rows: Dict[str, Dict[str, Any]] = {}
         for canonical_name in BROKER_RISK_CONTROL_CANONICAL_FACTS:
             try:
-                rows = storage.get_financial_numeric_facts(
+                rows = self._run_financial_storage_call(
+                    storage,
+                    "get_financial_numeric_facts",
                     instrument_id,
                     include_history=True,
                     canonical_fact_name=canonical_name,
@@ -5474,7 +5489,9 @@ class DataManager:
         if not hasattr(storage, "get_financial_source_file_manifests"):
             return None
         try:
-            manifests = storage.get_financial_source_file_manifests(
+            manifests = DataManager._run_financial_storage_call(
+                storage,
+                "get_financial_source_file_manifests",
                 instrument_id=instrument_id,
                 report_period=report_period,
                 source=source,
@@ -5720,7 +5737,9 @@ class DataManager:
         if not instrument:
             return None
         financial_bundle = await asyncio.to_thread(
-            storage.get_financial_statement_bundle,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_statement_bundle",
             normalized_id,
             include_statements=False,
         )
@@ -5755,7 +5774,9 @@ class DataManager:
         if not instrument:
             return None
         financial_bundle = await asyncio.to_thread(
-            storage.get_financial_statement_bundle,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_statement_bundle",
             normalized_id,
             include_statements=False,
         )

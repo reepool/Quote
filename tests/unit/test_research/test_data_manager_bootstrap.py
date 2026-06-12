@@ -55,6 +55,49 @@ async def _sync_to_thread(func, /, *args, **kwargs):
     return func(*args, **kwargs)
 
 
+class _SplitFinancialReadStorage:
+    def __init__(self, bundle=None, summary=None):
+        self.in_financial_scope = False
+        self.bundle = bundle or {"instrument_id": "600000.SH", "latest_facts": {}}
+        self.summary = summary or {"instrument_id": "600000.SH"}
+
+    def financial_database_scope(self):
+        storage = self
+
+        class Scope:
+            def __enter__(self):
+                storage.in_financial_scope = True
+
+            def __exit__(self, exc_type, exc, tb):
+                storage.in_financial_scope = False
+
+        return Scope()
+
+    def _require_scope(self):
+        if not self.in_financial_scope:
+            raise RuntimeError("no such table: financial_facts")
+
+    def get_financial_summary(self, instrument_id, **kwargs):
+        self._require_scope()
+        return dict(self.summary, instrument_id=instrument_id)
+
+    def get_financial_statement_bundle(self, instrument_id, **kwargs):
+        self._require_scope()
+        return dict(self.bundle, instrument_id=instrument_id)
+
+    def validate_financial_statement_readiness(self, **kwargs):
+        self._require_scope()
+        return {"ready_for_rollout": True, "blockers": []}
+
+    def get_financial_numeric_facts(self, *args, **kwargs):
+        self._require_scope()
+        return []
+
+    def get_financial_source_file_manifests(self, **kwargs):
+        self._require_scope()
+        return []
+
+
 def test_research_industry_standard_sync_forces_master_governance_refresh(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
 
@@ -1528,6 +1571,22 @@ def test_data_manager_get_research_financial_summary_delegates_to_storage(tmp_pa
     storage.get_financial_summary.assert_called_once_with("600000.SH", include_snapshot=True)
 
 
+def test_data_manager_get_research_financial_summary_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = _SplitFinancialReadStorage(
+        summary={"source": "split_financial_db"}
+    )
+
+    result = _run(manager.get_research_financial_summary("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    assert result["source"] == "split_financial_db"
+
+
 def test_data_manager_get_research_financial_summary_returns_optional_empty_bse_placeholder(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
@@ -2008,6 +2067,31 @@ def test_data_manager_get_research_financial_statements_history_uses_financial_d
 
     assert result["period_count"] == 1
     assert result["report_periods"] == ["2025-12-31"]
+
+
+def test_data_manager_get_research_financial_statements_readiness_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.markets = ["SSE"]
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {
+            "enabled": True,
+            "history": {"baseline_report_period": "2024Q1", "rolling_min_quarters": 1},
+            "storage": {"hot_anchor_policy": {"include_ttm_anchor_period": False}},
+            "readiness": {"required_core_facts": []},
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.research_storage = _SplitFinancialReadStorage()
+    manager._count_research_target_instruments_by_exchange = AsyncMock(return_value=({"SSE": 1}, 1))
+    manager._list_research_target_instrument_ids_by_exchange = AsyncMock(return_value=["600000.SH"])
+
+    result = _run(manager.get_research_financial_statements_readiness())
+
+    assert result["ready_for_rollout"] is True
+    assert result["readiness"]["ready_for_rollout"] is True
 
 
 def test_data_manager_get_research_financial_statements_history_includes_local_core_per_period(tmp_path):
@@ -2687,6 +2771,41 @@ def test_data_manager_get_research_dcf_input_gaps_reports_missing_required_field
     assert missing["capital_expenditure"]["refresh_eligible"] is False
 
 
+def test_data_manager_get_research_dcf_input_gaps_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry": "制造业",
+        }
+    )
+    manager.research_storage = _SplitFinancialReadStorage(
+        bundle={
+            "latest_facts": {
+                "revenue": 1000.0,
+                "operating_profit": 120.0,
+                "data_available_date": "2026-03-31",
+            }
+        }
+    )
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_dcf_input_gaps("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    assert result["ready"] is False
+
+
 def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
@@ -2733,6 +2852,94 @@ def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path
     assert "missing_net_capital" in profiles["broker_excess_capital.v1"]["blockers"]
     assert "missing_shares_outstanding" in profiles["broker_excess_capital.v1"]["blockers"]
     assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+
+
+def test_data_manager_get_research_dcf_readiness_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {"enabled": True, "dcf": {"professional": {"enabled": True}}},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600000.SH",
+            "symbol": "600000",
+            "exchange": "SSE",
+            "industry": "制造业",
+        }
+    )
+    manager.research_storage = _SplitFinancialReadStorage(
+        bundle={
+            "latest_facts": {
+                "revenue": 1000.0,
+                "operating_profit": 120.0,
+                "capital_expenditure": 30.0,
+                "data_available_date": "2026-03-31",
+            }
+        }
+    )
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(manager.get_research_dcf_readiness("600000.SH"))
+
+    assert result["instrument_id"] == "600000.SH"
+    assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+
+
+def test_data_manager_get_research_dcf_valuation_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "dcf": {
+                "beta": {"enabled": False},
+                "professional": {"enabled": True},
+            },
+        },
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_by_id = AsyncMock(
+        return_value={
+            "instrument_id": "600519.SH",
+            "symbol": "600519",
+            "exchange": "SSE",
+            "industry_name": "食品饮料",
+        }
+    )
+    manager.db_ops.get_daily_data = AsyncMock(return_value=pd.DataFrame([{"close": 12.0}]))
+    manager.research_storage = _SplitFinancialReadStorage(
+        bundle={
+            "latest_facts": {
+                "report_period": "2025-12-31",
+                "data_available_date": "2026-03-30",
+                "revenue": 1000.0,
+                "operating_profit": 180.0,
+                "capital_expenditure": 60.0,
+                "shares_outstanding": 10.0,
+            }
+        }
+    )
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        result = _run(
+            manager.get_research_dcf_valuation(
+                "600519.SH",
+                valuation_date="2026-04-18",
+                include_sensitivity=False,
+                include_model_comparison=False,
+            )
+        )
+
+    assert result["instrument_id"] == "600519.SH"
+    assert result["status"] in {"success", "partial"}
 
 
 def test_data_manager_dcf_bounded_cache_hits_and_invalidates_on_price_change(tmp_path):

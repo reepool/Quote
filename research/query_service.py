@@ -4,6 +4,7 @@ Query helpers for research read APIs.
 
 from __future__ import annotations
 
+import inspect
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -33,7 +34,8 @@ class ResearchQueryService:
         *,
         include_snapshot: bool = True,
     ) -> Optional[Dict[str, Any]]:
-        return self.storage.get_financial_summary(
+        return self._run_financial_storage_call(
+            "get_financial_summary",
             instrument_id,
             include_snapshot=include_snapshot,
         )
@@ -44,10 +46,36 @@ class ResearchQueryService:
         *,
         include_statements: bool = True,
     ) -> Optional[Dict[str, Any]]:
-        return self.storage.get_financial_statement_bundle(
+        return self._run_financial_storage_call(
+            "get_financial_statement_bundle",
             instrument_id,
             include_statements=include_statements,
         )
+
+    def _run_financial_storage_call(
+        self,
+        method_name: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        method = getattr(self.storage, method_name)
+        try:
+            inspect.getattr_static(self.storage, "financial_database_scope")
+        except AttributeError:
+            scope_factory = None
+        else:
+            scope_factory = getattr(self.storage, "financial_database_scope", None)
+        if callable(scope_factory):
+            try:
+                scope = scope_factory()
+                enter = getattr(scope, "__enter__")
+                getattr(scope, "__exit__")
+            except (AttributeError, TypeError):
+                scope = None
+            if scope is not None and callable(enter):
+                with scope:
+                    return method(*args, **kwargs)
+        return method(*args, **kwargs)
 
     def get_industry_membership(
         self,
