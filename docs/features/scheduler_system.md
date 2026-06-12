@@ -590,8 +590,6 @@ async def weekly_data_maintenance(self,
       "max_candidates": 500,
       "db_path": "data/financials.db",
       "dry_run": false,
-      "run_broker_risk_control_post_task": false,
-      "broker_risk_control_post_task_job_id": "broker_risk_control_incremental_sync",
       "max_runtime_seconds": 7200
     },
     "dependencies": {

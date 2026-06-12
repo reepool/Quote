@@ -214,9 +214,6 @@ Telegram 和日志至少展示：
 ```json
 {
   "financial_disclosure_incremental_sync": {
-    "parameters": {
-      "run_broker_risk_control_post_task": false
-    },
     "dependencies": {
       "post_success": [
         {
@@ -241,9 +238,9 @@ Telegram 和日志至少展示：
 
 1. 新增通用 dependency executor。
 2. 将 scheduler cron 和 `/run` 手工入口统一包一层依赖执行器。
-3. 保留旧 `run_broker_risk_control_post_task` 参数一个兼容周期，但默认关闭。
-4. 在配置中声明券商专项后置任务。
-5. 删除 `ScheduledTasks.financial_disclosure_incremental_sync()` 内部硬编码 broker 后置逻辑。
+3. 在配置中声明券商专项后置任务。
+4. 删除 `ScheduledTasks.financial_disclosure_incremental_sync()` 内部硬编码 broker 后置逻辑。
+5. 删除旧 `run_broker_risk_control_post_task` / `broker_risk_control_post_task_job_id` 迁移参数，避免配置和代码双轨。
 6. 更新 Telegram 报告，显示券商后置节点状态。
 
 ## 测试要求
@@ -254,7 +251,7 @@ Telegram 和日志至少展示：
 - 串行后置：A 成功后 B 成功再 C；B 失败时 C 不运行。
 - 前置任务：前置成功才运行主任务；前置失败时主任务不运行。
 - 参数继承：父任务运行参数正确传入依赖任务，并允许节点参数覆盖。
-- 手工触发：`/run A` 也执行配置依赖，除非显式 `skip_dependencies`。
+- 手工触发：`/run A` 也执行配置依赖；测试和调试可调用内部 direct executor 的 `include_dependencies=False` 路径跳过依赖展开。
 - 券商迁移回归：`financial_disclosure_incremental_sync` 成功后通过配置触发 `broker_risk_control_incremental_sync`，且原硬编码分支不再需要。
 
 ## 开发顺序

@@ -3080,8 +3080,6 @@ class ScheduledTasks:
         request_interval_seconds: float = 0.2,
         request_timeout_seconds: float = 20.0,
         dry_run: bool = False,
-        run_broker_risk_control_post_task: bool = True,
-        broker_risk_control_post_task_job_id: str = "broker_risk_control_incremental_sync",
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """财务公告驱动增量检查任务。"""
