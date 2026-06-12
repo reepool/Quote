@@ -16,11 +16,13 @@
     "ops": {
       "service_restart": {
         "enabled": false,
+        "mode": "self_exit",
         "service_name": "quote-system.service",
         "systemctl_path": "systemctl",
         "use_sudo": false,
         "delay_seconds": 2,
-        "timeout_seconds": 15
+        "timeout_seconds": 15,
+        "exit_code": 1
       }
     },
     "intervals": {

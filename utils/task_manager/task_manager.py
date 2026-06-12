@@ -4,6 +4,7 @@ Telegram任务管理机器人核心逻辑
 """
 
 import asyncio
+import os
 import shlex
 from typing import Optional, List, Dict, Any
 
@@ -344,27 +345,39 @@ class TaskManagerBot:
                 return
 
             delay_seconds = restart_cfg["delay_seconds"]
-            command = self._build_service_restart_command(restart_cfg)
-            command_display = " ".join(shlex.quote(part) for part in command)
+            if restart_cfg["mode"] == "self_exit":
+                command_display = f"self_exit(exit_code={restart_cfg['exit_code']})"
+            else:
+                command = self._build_service_restart_command(restart_cfg)
+                command_display = " ".join(shlex.quote(part) for part in command)
             await self.send_message(
                 chat_id,
                 (
                     "🔄 *已提交系统服务重启请求*\n\n"
                     f"服务: `{restart_cfg['service_name']}`\n"
+                    f"模式: `{restart_cfg['mode']}`\n"
                     f"延迟: `{delay_seconds}` 秒\n"
                     f"命令: `{command_display}`\n\n"
                     "后续 10-30 秒内 Telegram 交互可能短暂离线。"
                 ),
                 parse_mode='markdown',
             )
-            asyncio.create_task(
-                self._restart_service_after_delay(
-                    chat_id=chat_id,
-                    command=command,
-                    delay_seconds=delay_seconds,
-                    timeout_seconds=restart_cfg["timeout_seconds"],
+            if restart_cfg["mode"] == "self_exit":
+                asyncio.create_task(
+                    self._restart_service_by_self_exit(
+                        delay_seconds=delay_seconds,
+                        exit_code=restart_cfg["exit_code"],
+                    )
                 )
-            )
+            else:
+                asyncio.create_task(
+                    self._restart_service_after_delay(
+                        chat_id=chat_id,
+                        command=command,
+                        delay_seconds=delay_seconds,
+                        timeout_seconds=restart_cfg["timeout_seconds"],
+                    )
+                )
         except Exception as e:
             self.logger.error(f"[TaskManagerBot] 处理系统重启命令失败: {e}")
             await self.send_message(
@@ -376,6 +389,9 @@ class TaskManagerBot:
     def _get_service_restart_config(self) -> Dict[str, Any]:
         """读取并规范化 Telegram 服务重启配置。"""
         cfg = self.config_manager.get_nested('telegram_config.ops.service_restart', {}) or {}
+        mode = str(cfg.get("mode") or "self_exit").strip().lower()
+        if mode not in {"self_exit", "systemctl"}:
+            raise ValueError("invalid service_restart.mode")
         service_name = str(cfg.get("service_name") or "quote-system.service").strip()
         if not service_name or "/" in service_name or service_name.startswith("-"):
             raise ValueError("invalid service_restart.service_name")
@@ -384,11 +400,13 @@ class TaskManagerBot:
             raise ValueError("invalid service_restart.systemctl_path")
         return {
             "enabled": bool(cfg.get("enabled", False)),
+            "mode": mode,
             "service_name": service_name,
             "systemctl_path": systemctl_path,
             "use_sudo": bool(cfg.get("use_sudo", False)),
             "delay_seconds": max(0.0, float(cfg.get("delay_seconds", 2))),
             "timeout_seconds": max(1.0, float(cfg.get("timeout_seconds", 15))),
+            "exit_code": max(1, int(cfg.get("exit_code", 1))),
         }
 
     @staticmethod
@@ -443,6 +461,20 @@ class TaskManagerBot:
                 parse_mode='markdown',
             )
             self.logger.error(f"[TaskManagerBot] 服务重启命令异常: {e}")
+
+    async def _restart_service_by_self_exit(
+        self,
+        *,
+        delay_seconds: float,
+        exit_code: int,
+    ) -> None:
+        """Exit the current process so systemd Restart=on-failure can restart it."""
+        await asyncio.sleep(delay_seconds)
+        self.logger.warning(
+            "[TaskManagerBot] 服务重启进入 self_exit 模式，当前进程即将退出，exit_code=%s",
+            exit_code,
+        )
+        os._exit(exit_code)
 
     async def reload_scheduler_config(self) -> bool:
         """重载调度器配置"""

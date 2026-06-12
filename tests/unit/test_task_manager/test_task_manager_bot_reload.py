@@ -109,6 +109,7 @@ async def test_restart_system_command_submits_fixed_service_restart():
     bot, *_ = _build_task_manager_bot(
         restart_cfg={
             "enabled": True,
+            "mode": "systemctl",
             "service_name": "quote-system.service",
             "systemctl_path": "/bin/systemctl",
             "use_sudo": True,
@@ -133,6 +134,32 @@ async def test_restart_system_command_submits_fixed_service_restart():
     create_task.assert_called_once()
     sent_message = bot.send_message.await_args.args[1]
     assert "已提交系统服务重启请求" in sent_message
+
+
+@pytest.mark.asyncio
+async def test_restart_system_command_submits_self_exit_restart():
+    bot, *_ = _build_task_manager_bot(
+        restart_cfg={
+            "enabled": True,
+            "mode": "self_exit",
+            "service_name": "quote-system.service",
+            "delay_seconds": 0,
+            "exit_code": 1,
+        }
+    )
+    event = SimpleNamespace(chat_id=471105519, sender_id=2, text="/restart_system confirm")
+
+    with patch.object(bot, "_restart_service_by_self_exit", new=AsyncMock()) as self_exit, patch(
+        "utils.task_manager.task_manager.asyncio.create_task",
+        side_effect=lambda coro: coro.close() or Mock(),
+    ) as create_task:
+        await bot.handle_restart_system_command(event)
+
+    self_exit.assert_called_once_with(delay_seconds=0.0, exit_code=1)
+    create_task.assert_called_once()
+    sent_message = bot.send_message.await_args.args[1]
+    assert "模式: `self_exit`" in sent_message
+    assert "self_exit(exit_code=1)" in sent_message
 
 
 def test_task_manager_authorization_accepts_string_config_chat_ids():
