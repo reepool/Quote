@@ -26,6 +26,10 @@ class TestSourceFactoryRouting:
         self.pytdx = _build_source('pytdx_a_stock', ['SSE', 'SZSE', 'BSE'])
         self.baostock = _build_source('baostock_a_stock', ['SSE', 'SZSE'])
         self.akshare = _build_source('akshare_a_stock', ['SSE', 'SZSE', 'BSE'])
+        self.cnindex = _build_source('cnindex_a_stock', ['SSE', 'SZSE'])
+        self.cnindex.instrument_types_supported = ['index']
+        self.csindex = _build_source('csindex_a_stock', ['SSE', 'SZSE'])
+        self.csindex.instrument_types_supported = ['index']
         self.yfinance = _build_source('yfinance_hk_stock', ['HKEX', 'NASDAQ', 'NYSE'])
         self.yfinance.get_adjustment_factors = AsyncMock(return_value=[
             {
@@ -41,10 +45,12 @@ class TestSourceFactoryRouting:
             'pytdx_a_stock': self.pytdx,
             'baostock_a_stock': self.baostock,
             'akshare_a_stock': self.akshare,
+            'cnindex_a_stock': self.cnindex,
+            'csindex_a_stock': self.csindex,
             'yfinance_hk_stock': self.yfinance,
         }
         self.factory.region_sources = {
-            'a_stock': [self.pytdx, self.baostock, self.akshare],
+            'a_stock': [self.pytdx, self.baostock, self.akshare, self.cnindex, self.csindex],
             'hk_stock': [self.yfinance],
         }
         self.factory.source_instances_by_region = {
@@ -52,6 +58,8 @@ class TestSourceFactoryRouting:
                 'pytdx': self.pytdx,
                 'baostock': self.baostock,
                 'akshare': self.akshare,
+                'cnindex': self.cnindex,
+                'csindex': self.csindex,
             },
             'hk_stock': {
                 'yfinance': self.yfinance,
@@ -61,7 +69,7 @@ class TestSourceFactoryRouting:
             'daily': {
                 'SSE': {
                     'stock': ['pytdx', 'baostock', 'akshare'],
-                    'index': ['baostock', 'akshare'],
+                    'index': ['csindex', 'cnindex', 'baostock', 'akshare'],
                 },
             },
             'daily_behavior': {
@@ -91,6 +99,8 @@ class TestSourceFactoryRouting:
         chain = self.factory._get_daily_source_chain('SSE', 'index')
 
         assert [source.name for source in chain] == [
+            'csindex_a_stock',
+            'cnindex_a_stock',
             'baostock_a_stock',
             'akshare_a_stock',
         ]
@@ -131,6 +141,18 @@ class TestSourceFactoryRouting:
             'akshare_a_stock',
         ]
         assert [source.name for source in index_chain] == [
+            'csindex_a_stock',
+            'cnindex_a_stock',
+            'akshare_a_stock',
+        ]
+
+    def test_index_daily_route_preserves_official_first_and_fallback_sources(self):
+        chain = self.factory._get_daily_source_chain('SSE', 'index')
+
+        assert [source.name for source in chain] == [
+            'csindex_a_stock',
+            'cnindex_a_stock',
+            'baostock_a_stock',
             'akshare_a_stock',
         ]
 

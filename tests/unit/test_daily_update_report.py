@@ -275,6 +275,40 @@ def test_report_engine_formats_daily_catchup_summary():
     assert '920083.BJ' in summary
 
 
+def test_report_engine_formats_index_master_governance_summary_concisely():
+    engine = ReportEngine()
+    summary = engine._format_index_master_governance_summary({
+        'status': 'warning',
+        'summary': {
+            'master_rows_saved': 2,
+            'evidence_rows_saved': 2,
+            'active_count': 128,
+            'lifecycle_skip_count': 2,
+            'direct_terminated_count': 1,
+            'inferred_terminated_count': 1,
+            'stale_no_quote_count': 6,
+            'source_usage': {'cnindex': 2},
+            'samples': [
+                {
+                    'instrument_id': f'48005{i}.SZ',
+                    'state': 'calculation_terminated',
+                    'confidence': 'series_inferred',
+                }
+                for i in range(10)
+            ],
+        },
+        'warnings': ['CSIndex full-list endpoint is not enabled'],
+        'errors': [],
+    })
+
+    assert '状态: warning' in summary
+    assert '停编跳过: 2' in summary
+    assert '直接: 1' in summary
+    assert '推断: 1' in summary
+    assert summary.count('calculation_terminated') == 5
+    assert len(summary) < 900
+
+
 def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_table():
     engine = ReportEngine()
     sample = {
@@ -341,6 +375,62 @@ def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_ta
     assert '*行情追补*' in message
 
 
+def test_daily_update_report_renders_index_governance_without_exceeding_message_limit():
+    engine = ReportEngine()
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-06-12',
+            'status': 'success',
+            'update_results': {
+                'success_count': 20,
+                'failure_count': 0,
+                'total_quotes_added': 18,
+                'exchange_stats': {
+                    'SZSE': {
+                        'success_count': 20,
+                        'failure_count': 0,
+                        'quotes_added': 18,
+                        'total_instruments': 20,
+                    }
+                },
+                'index_master_governance': {
+                    'status': 'warning',
+                    'summary': {
+                        'master_rows_saved': 120,
+                        'evidence_rows_saved': 6,
+                        'active_count': 118,
+                        'lifecycle_skip_count': 6,
+                        'direct_terminated_count': 3,
+                        'inferred_terminated_count': 3,
+                        'stale_no_quote_count': 12,
+                        'source_usage': {'cnindex': 120},
+                        'samples': [
+                            {
+                                'instrument_id': f'48005{i}.SZ',
+                                'state': 'calculation_terminated',
+                                'confidence': 'series_inferred',
+                                'evidence_url': 'https://example.test/very/long/evidence/url',
+                            }
+                            for i in range(20)
+                        ],
+                    },
+                    'warnings': ['CSIndex full-list endpoint is not enabled'],
+                    'errors': [],
+                },
+            },
+            'source': 'Quote System',
+            'generated_at': '2026-06-12 21:30:00',
+        },
+        'telegram',
+    )
+
+    assert '*指数主数据治理*' in message
+    assert message.count('calculation_terminated') == 5
+    assert 'very/long/evidence/url' not in message
+    assert len(message) < 4096
+
+
 @pytest.mark.asyncio
 async def test_update_daily_data_fetches_new_instrument_from_listed_date():
     with patch('data_manager.config_manager', _build_config_manager()):
@@ -396,5 +486,10 @@ async def test_update_daily_data_fetches_new_instrument_from_listed_date():
 
     args = manager.source_factory.get_daily_data.await_args.args
     assert args[3].date() == date(2026, 6, 12)
+    manager._maybe_sync_instrument_master_before_daily_update.assert_awaited_once_with(
+        ['BSE'],
+        date(2026, 6, 15),
+        instrument_types=['stock'],
+    )
     assert result['catchup_stats']['new_instrument_count'] == 1
     assert result['catchup_stats']['catchup_quotes_added'] == 1

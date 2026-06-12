@@ -25,6 +25,7 @@ from .akshare_source import AkShareSource
 from .tushare_source import TushareSource
 from .baostock_source import BaostockSource
 from .tdx_source import TdxSource
+from .official_index_source import CNIndexSource, CSIndexSource
 from utils.exchange_utils import exchange_mapper
 
 
@@ -173,6 +174,10 @@ class DataSourceFactory:
             return YFinanceSource(instance_name, rate_limit_config)
         elif source_name == 'tushare':
             return TushareSource(instance_name, rate_limit_config)
+        elif source_name == 'cnindex':
+            return CNIndexSource(instance_name, rate_limit_config, config=source_config)
+        elif source_name == 'csindex':
+            return CSIndexSource(instance_name, rate_limit_config, config=source_config)
         else:
             ds_logger.warning(f"[DataSourceFactory] Unknown source type: {source_name}")
             return None
@@ -234,6 +239,16 @@ class DataSourceFactory:
             if name.startswith(base_name):
                 return source
         return None
+
+    def get_source_instance(
+        self,
+        base_name: str,
+        *,
+        exchange: Optional[str] = None,
+        region: Optional[str] = None,
+    ) -> Optional[BaseDataSource]:
+        """Public wrapper for policy layers that need a configured source."""
+        return self._get_source_instance(base_name, exchange=exchange, region=region)
 
     def _get_source_instance(
         self,

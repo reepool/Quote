@@ -70,6 +70,12 @@
             "condition": "not non_trading_day and instrument_master_sync_summary"
           },
           {
+            "name": "index_master_governance",
+            "type": "static",
+            "content": "*指数主数据治理*\n{index_master_governance_summary}",
+            "condition": "not non_trading_day and index_master_governance_summary"
+          },
+          {
             "name": "daily_catchup",
             "type": "static",
             "content": "*行情追补*\n{daily_catchup_summary}",

@@ -501,7 +501,11 @@ class DatabaseOperations:
     ) -> bool:
         """Return True when a non-authoritative current-list source must not reactivate a row."""
         status = existing_status or ''
-        protected_status = status == 'delisted' or status.startswith('auto_deactivated')
+        protected_status = (
+            status == 'delisted'
+            or status.startswith('auto_deactivated')
+            or status in {'calculation_terminated', 'inactive', 'stale_no_quote'}
+        )
         return protected_status and incoming_delisted_date is None and incoming_source != 'baostock'
 
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
@@ -739,6 +743,66 @@ class DatabaseOperations:
             self.db_logger.error("Failed to mark %s suspended: %s", instrument_id, exc)
             return False
 
+    async def mark_index_lifecycle_state(
+        self,
+        instrument_id: str,
+        *,
+        lifecycle_state: str,
+        source: str,
+        effective_date: Optional[Union[str, date, datetime]] = None,
+        last_quote_date: Optional[Union[str, date, datetime]] = None,
+    ) -> bool:
+        """Apply an official index lifecycle state without deleting history."""
+        if not instrument_id or not lifecycle_state:
+            return False
+
+        excluded_states = {"calculation_terminated", "inactive", "stale_no_quote"}
+
+        def _parse(value: Optional[Union[str, date, datetime]]) -> Optional[datetime]:
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value
+            if isinstance(value, date):
+                return datetime.combine(value, datetime.min.time())
+            if isinstance(value, str) and value.strip():
+                try:
+                    return datetime.fromisoformat(value[:10])
+                except ValueError:
+                    return None
+            return None
+
+        parsed_effective = _parse(effective_date)
+        try:
+            async with self.get_async_session() as session:
+                result = await session.execute(
+                    select(InstrumentDB).filter(InstrumentDB.instrument_id == instrument_id)
+                )
+                record = result.scalar_one_or_none()
+                if record is None:
+                    return False
+
+                record.status = lifecycle_state
+                record.is_active = lifecycle_state not in excluded_states
+                record.trading_status = 0 if lifecycle_state in excluded_states else 1
+                record.source = source
+                # Index publication stops are not stock delistings. Keep the
+                # effective date in index_lifecycle_evidence so the generic
+                # stock delisting guard does not rewrite the semantic status.
+                if lifecycle_state == "active_quote":
+                    record.delisted_date = None
+                record.updated_at = get_shanghai_time()
+                await session.commit()
+                return True
+        except Exception as exc:
+            self.db_logger.error(
+                "Failed to mark index %s lifecycle_state=%s: %s",
+                instrument_id,
+                lifecycle_state,
+                exc,
+            )
+            return False
+
     async def mark_instruments_excluded(
         self,
         instrument_ids: List[str],
@@ -924,6 +988,185 @@ class DatabaseOperations:
         except Exception as exc:
             self.db_logger.error("Failed to save instrument master discrepancies: %s", exc)
             return 0
+
+    async def save_index_lifecycle_evidence(
+        self,
+        rows: List[Dict[str, Any]],
+    ) -> int:
+        """Persist official index lifecycle evidence with audit lineage."""
+        if not rows:
+            return 0
+
+        create_sql = text(
+            """
+            CREATE TABLE IF NOT EXISTS index_lifecycle_evidence (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT,
+                exchange TEXT,
+                lifecycle_state TEXT NOT NULL,
+                event_type TEXT,
+                effective_date TEXT,
+                last_quote_date TEXT,
+                announcement_date TEXT,
+                announcement_title TEXT,
+                evidence_url TEXT,
+                matched_code TEXT,
+                confidence TEXT,
+                source TEXT,
+                parser_version TEXT,
+                raw_snapshot_hash TEXT,
+                diagnostics_json TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(instrument_id, lifecycle_state, event_type, evidence_url, confidence)
+            )
+            """
+        )
+        upsert_sql = text(
+            """
+            INSERT INTO index_lifecycle_evidence (
+                instrument_id, symbol, exchange, lifecycle_state, event_type,
+                effective_date, last_quote_date, announcement_date,
+                announcement_title, evidence_url, matched_code, confidence,
+                source, parser_version, raw_snapshot_hash, diagnostics_json,
+                created_at, updated_at
+            ) VALUES (
+                :instrument_id, :symbol, :exchange, :lifecycle_state, :event_type,
+                :effective_date, :last_quote_date, :announcement_date,
+                :announcement_title, :evidence_url, :matched_code, :confidence,
+                :source, :parser_version, :raw_snapshot_hash, :diagnostics_json,
+                :created_at, :updated_at
+            )
+            ON CONFLICT(instrument_id, lifecycle_state, event_type, evidence_url, confidence)
+            DO UPDATE SET
+                symbol=excluded.symbol,
+                exchange=excluded.exchange,
+                effective_date=excluded.effective_date,
+                last_quote_date=excluded.last_quote_date,
+                announcement_date=excluded.announcement_date,
+                announcement_title=excluded.announcement_title,
+                matched_code=excluded.matched_code,
+                source=excluded.source,
+                parser_version=excluded.parser_version,
+                raw_snapshot_hash=excluded.raw_snapshot_hash,
+                diagnostics_json=excluded.diagnostics_json,
+                updated_at=excluded.updated_at
+            """
+        )
+
+        def _date_text(value: Any) -> Optional[str]:
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value.date().isoformat()
+            if isinstance(value, date):
+                return value.isoformat()
+            text_value = str(value).strip()
+            return text_value[:10] if text_value else None
+
+        now_text = get_shanghai_time().isoformat()
+        saved = 0
+        try:
+            async with self.get_async_session() as session:
+                await session.execute(create_sql)
+                for row in rows:
+                    instrument_id = row.get("instrument_id")
+                    lifecycle_state = row.get("lifecycle_state")
+                    if not instrument_id or not lifecycle_state:
+                        continue
+                    await session.execute(
+                        upsert_sql,
+                        {
+                            "instrument_id": instrument_id,
+                            "symbol": row.get("symbol"),
+                            "exchange": row.get("exchange"),
+                            "lifecycle_state": lifecycle_state,
+                            "event_type": row.get("event_type") or lifecycle_state,
+                            "effective_date": _date_text(row.get("effective_date")),
+                            "last_quote_date": _date_text(row.get("last_quote_date")),
+                            "announcement_date": _date_text(row.get("announcement_date")),
+                            "announcement_title": row.get("announcement_title"),
+                            "evidence_url": row.get("evidence_url"),
+                            "matched_code": row.get("matched_code"),
+                            "confidence": row.get("confidence") or "unknown",
+                            "source": row.get("source"),
+                            "parser_version": row.get("parser_version"),
+                            "raw_snapshot_hash": row.get("raw_snapshot_hash"),
+                            "diagnostics_json": json.dumps(
+                                row.get("diagnostics") or row,
+                                ensure_ascii=False,
+                                default=str,
+                            ),
+                            "created_at": now_text,
+                            "updated_at": now_text,
+                        },
+                    )
+                    saved += 1
+                await session.commit()
+            return saved
+        except Exception as exc:
+            self.db_logger.error("Failed to save index lifecycle evidence: %s", exc)
+            return 0
+
+    async def get_index_lifecycle_evidence(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        states: Optional[List[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Read persisted official index lifecycle evidence."""
+        clauses = ["1=1"]
+        params: Dict[str, Any] = {}
+        if exchanges:
+            placeholders = []
+            for idx, exchange in enumerate(exchanges):
+                key = f"exchange_{idx}"
+                placeholders.append(f":{key}")
+                params[key] = exchange
+            clauses.append(f"exchange IN ({','.join(placeholders)})")
+        if states:
+            placeholders = []
+            for idx, state in enumerate(states):
+                key = f"state_{idx}"
+                placeholders.append(f":{key}")
+                params[key] = state
+            clauses.append(f"lifecycle_state IN ({','.join(placeholders)})")
+
+        create_sql = """
+            CREATE TABLE IF NOT EXISTS index_lifecycle_evidence (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                instrument_id TEXT NOT NULL,
+                symbol TEXT,
+                exchange TEXT,
+                lifecycle_state TEXT NOT NULL,
+                event_type TEXT,
+                effective_date TEXT,
+                last_quote_date TEXT,
+                announcement_date TEXT,
+                announcement_title TEXT,
+                evidence_url TEXT,
+                matched_code TEXT,
+                confidence TEXT,
+                source TEXT,
+                parser_version TEXT,
+                raw_snapshot_hash TEXT,
+                diagnostics_json TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(instrument_id, lifecycle_state, event_type, evidence_url, confidence)
+            )
+        """
+        await self.execute_query(create_sql)
+        return await self.execute_read_query(
+            f"""
+            SELECT *
+            FROM index_lifecycle_evidence
+            WHERE {' AND '.join(clauses)}
+            ORDER BY updated_at DESC, id DESC
+            """,
+            params,
+        )
 
     async def cleanup_ghost_instruments(self, grace_days: int, zombie_grace_days: int = 180) -> int:
         """

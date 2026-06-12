@@ -193,11 +193,18 @@ class ReportEngine:
                     summary.get('exchange_stats', {})
                 ),
                 'instrument_master_sync': summary.get('instrument_master_sync', data.get('instrument_master_sync')),
+                'index_master_governance': summary.get(
+                    'index_master_governance',
+                    data.get('index_master_governance'),
+                ),
                 'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
             })
 
         data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
             data.get('instrument_master_sync')
+        )
+        data['index_master_governance_summary'] = self._format_index_master_governance_summary(
+            data.get('index_master_governance')
         )
         data['daily_catchup_summary'] = self._format_daily_catchup_summary(
             data.get('catchup_stats')
@@ -296,6 +303,60 @@ class ReportEngine:
             lines.append('警告: ' + '；'.join(str(w) for w in warnings[:3]))
         if errors:
             lines.append('错误: ' + '；'.join(str(e) for e in errors[:3]))
+        return '\n'.join(lines)
+
+    def _format_index_master_governance_summary(self, governance: Dict[str, Any]) -> str:
+        """Format concise A-share index governance diagnostics for Telegram reports."""
+        if not isinstance(governance, dict) or not governance:
+            return ''
+
+        status = governance.get('status', 'unknown')
+        reason = governance.get('reason')
+        if status == 'skipped':
+            return f"状态: skipped\n原因: {reason or 'not provided'}"
+
+        summary = governance.get('summary', {}) if isinstance(governance.get('summary'), dict) else {}
+        lines = [
+            f"状态: {status}",
+            (
+                f"主数据写入: {summary.get('master_rows_saved', 0)}，"
+                f"证据写入: {summary.get('evidence_rows_saved', 0)}，"
+                f"活跃指数: {summary.get('active_count', 0)}"
+            ),
+            (
+                f"停编跳过: {summary.get('lifecycle_skip_count', 0)}，"
+                f"直接: {summary.get('direct_terminated_count', 0)}，"
+                f"推断: {summary.get('inferred_terminated_count', 0)}，"
+                f"stale: {summary.get('stale_no_quote_count', 0)}"
+            ),
+        ]
+
+        source_usage = summary.get('source_usage') or {}
+        if source_usage:
+            lines.append(
+                '来源: ' + '；'.join(
+                    f"{source}={count}" for source, count in list(source_usage.items())[:4]
+                )
+            )
+
+        warnings = governance.get('warnings') or []
+        errors = governance.get('errors') or []
+        if warnings:
+            lines.append('警告: ' + '；'.join(str(w) for w in warnings[:2]))
+        if errors:
+            lines.append('错误: ' + '；'.join(str(e) for e in errors[:2]))
+
+        samples = summary.get('samples') or []
+        sample_parts = []
+        for sample in samples[:5]:
+            if not isinstance(sample, dict):
+                continue
+            sample_parts.append(
+                f"{sample.get('instrument_id')} {sample.get('state')} "
+                f"{sample.get('confidence', '')}".strip()
+            )
+        if sample_parts:
+            lines.append('样例: ' + '；'.join(sample_parts))
         return '\n'.join(lines)
 
     def _prepare_gap_report_data(self, data: Dict[str, Any]) -> Dict[str, Any]:

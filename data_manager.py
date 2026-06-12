@@ -7914,6 +7914,9 @@ class DataManager:
                 exchange_stats = {}
             instrument_master_sync = update_results.get('instrument_master_sync')
             instrument_master_governance = update_results.get('instrument_master_governance') or instrument_master_sync
+            index_master_governance = update_results.get('index_master_governance')
+            if not index_master_governance and isinstance(instrument_master_governance, dict):
+                index_master_governance = instrument_master_governance.get('index_master_governance')
             catchup_stats = update_results.get('catchup_stats')
             if not isinstance(catchup_stats, dict):
                 catchup_stats = {}
@@ -7932,6 +7935,7 @@ class DataManager:
                 'update_results': exchange_stats,
                 'instrument_master_sync': instrument_master_sync,
                 'instrument_master_governance': instrument_master_governance,
+                'index_master_governance': index_master_governance,
                 'catchup_stats': catchup_stats,
                 'errors': []
             }
@@ -8004,6 +8008,7 @@ class DataManager:
                 'update_results': update_results.get('exchange_stats', {}),
                 'instrument_master_sync': update_results.get('instrument_master_sync'),
                 'instrument_master_governance': update_results.get('instrument_master_governance'),
+                'index_master_governance': update_results.get('index_master_governance'),
                 'errors': [str(e)]
             }
 
@@ -8068,6 +8073,29 @@ class DataManager:
         raw_config = self.data_config.get('instrument_master_governance')
         if not isinstance(raw_config, dict):
             raw_config = self.config.get_nested('data_config.instrument_master_governance', {})
+        if isinstance(raw_config, dict):
+            defaults.update(raw_config)
+        return defaults
+
+    def _get_index_master_governance_config(self) -> Dict[str, Any]:
+        """Return A-share index master-governance config with conservative defaults."""
+        defaults: Dict[str, Any] = {
+            'enabled': False,
+            'run_before_daily_update': True,
+            'exchanges': ['SSE', 'SZSE'],
+            'official_sources': ['cnindex', 'csindex'],
+            'freshness_threshold_hours': 48,
+            'stale_no_quote_trading_days': 10,
+            'skip_stale_no_quote': True,
+            'write_stale_no_quote': False,
+            'allow_series_inference': True,
+            'sample_limit': 10,
+            'continue_on_failure': True,
+            'timeout_sec': 120,
+        }
+        raw_config = self.data_config.get('index_master_governance')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.index_master_governance', {})
         if isinstance(raw_config, dict):
             defaults.update(raw_config)
         return defaults
@@ -8459,6 +8487,62 @@ class DataManager:
             'inactive_count': max(0, len(all_ids) - len(active_ids)),
             'all_ids': all_ids,
             'active_ids': active_ids,
+            'status_counts': status_counts,
+            'source_counts': source_counts,
+            'freshness': {
+                'oldest_updated_at': updated_values[0] if updated_values else None,
+                'latest_updated_at': updated_values[-1] if updated_values else None,
+            },
+        }
+
+    async def _get_index_master_snapshot(self, exchange: str) -> Dict[str, Any]:
+        """Read a compact index master snapshot for one exchange."""
+        rows = await self.db_ops.execute_read_query(
+            """
+            SELECT instrument_id, symbol, name, exchange, type, status, is_active,
+                   trading_status, listed_date, delisted_date, source, updated_at
+            FROM instruments
+            WHERE exchange = :exchange AND type = 'index'
+            """,
+            {'exchange': exchange},
+        )
+
+        all_ids: Set[str] = set()
+        active_ids: Set[str] = set()
+        rows_by_id: Dict[str, Dict[str, Any]] = {}
+        updated_values: List[str] = []
+        status_counts: Dict[str, int] = {}
+        source_counts: Dict[str, int] = {}
+
+        for row in rows:
+            instrument_id = row.get('instrument_id')
+            if not instrument_id:
+                continue
+            all_ids.add(instrument_id)
+            rows_by_id[instrument_id] = row
+
+            is_active = row.get('is_active')
+            if is_active in (True, 1, '1', 'true', 'True'):
+                active_ids.add(instrument_id)
+
+            status = str(row.get('status') or 'unknown')
+            source = str(row.get('source') or 'unknown')
+            status_counts[status] = status_counts.get(status, 0) + 1
+            source_counts[source] = source_counts.get(source, 0) + 1
+
+            updated_at = row.get('updated_at')
+            if updated_at:
+                updated_values.append(str(updated_at))
+
+        updated_values.sort()
+        return {
+            'exchange': exchange,
+            'total_count': len(all_ids),
+            'active_count': len(active_ids),
+            'inactive_count': max(0, len(all_ids) - len(active_ids)),
+            'all_ids': all_ids,
+            'active_ids': active_ids,
+            'rows_by_id': rows_by_id,
             'status_counts': status_counts,
             'source_counts': source_counts,
             'freshness': {
@@ -9637,10 +9721,413 @@ class DataManager:
         result['elapsed_sec'] = round((finished_at - started_at).total_seconds(), 3)
         return result
 
+    @staticmethod
+    def _date_text(value: Any) -> Optional[str]:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
+        text = str(value).strip()
+        return text[:10] if text else None
+
+    @staticmethod
+    def _date_from_any(value: Any) -> Optional[date]:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        try:
+            return datetime.fromisoformat(str(value)[:10]).date()
+        except Exception:
+            return None
+
+    def _build_index_metadata_rows(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        raw_snapshot_hash: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        metadata_rows: List[Dict[str, Any]] = []
+        for row in rows or []:
+            instrument_id = row.get('instrument_id')
+            if not instrument_id:
+                continue
+            metadata_rows.append({
+                'instrument_id': instrument_id,
+                'exchange': row.get('exchange') or 'SZSE',
+                'product_type': 'index',
+                'research_scope': 'include',
+                'canonical_instrument_id': instrument_id,
+                'is_canonical': True,
+                'counter_currency': row.get('currency') or 'CNY',
+                'official_lifecycle_source': row.get('official_lifecycle_source'),
+                'source_url': row.get('source_url'),
+                'raw_snapshot_hash': raw_snapshot_hash or row.get('raw_snapshot_hash'),
+                'parser_version': row.get('parser_version'),
+                'metadata': row.get('metadata') or {},
+            })
+        return metadata_rows
+
+    async def sync_index_master(
+        self,
+        exchanges: Optional[List[str]] = None,
+        *,
+        target_date: Optional[date] = None,
+        timeout_sec: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Govern A-share index master data and lifecycle states before quote updates."""
+        config = self._get_index_master_governance_config()
+        started_at = get_shanghai_time()
+        configured_exchanges = [str(ex).upper() for ex in (config.get('exchanges') or ['SSE', 'SZSE'])]
+        sync_exchanges = [
+            str(ex).upper()
+            for ex in (exchanges or configured_exchanges)
+            if str(ex).upper() in set(configured_exchanges)
+        ]
+        sample_limit = max(0, int(config.get('sample_limit', 10) or 0))
+        effective_timeout = timeout_sec if timeout_sec is not None else config.get('timeout_sec')
+
+        result: Dict[str, Any] = {
+            'status': 'success',
+            'action': 'index_master_governance',
+            'started_at': started_at.isoformat(),
+            'finished_at': None,
+            'elapsed_sec': 0.0,
+            'source_priority': list(config.get('official_sources') or ['cnindex', 'csindex']),
+            'exchanges': {},
+            'summary': {
+                'exchanges': sync_exchanges,
+                'master_rows_saved': 0,
+                'evidence_rows_saved': 0,
+                'direct_terminated_count': 0,
+                'inferred_terminated_count': 0,
+                'stale_no_quote_count': 0,
+                'stale_no_quote_written_count': 0,
+                'reactivated_count': 0,
+                'lifecycle_skip_count': 0,
+                'active_count': 0,
+                'source_usage': {},
+                'samples': [],
+            },
+            'warnings': [],
+            'errors': [],
+        }
+
+        if not config.get('enabled', False):
+            result.update({
+                'status': 'skipped',
+                'reason': 'disabled_by_config',
+                'finished_at': get_shanghai_time().isoformat(),
+            })
+            return result
+        if not sync_exchanges:
+            result.update({
+                'status': 'skipped',
+                'reason': 'no_supported_exchange_in_update_scope',
+                'finished_at': get_shanghai_time().isoformat(),
+            })
+            return result
+
+        if self.source_factory is None:
+            from data_sources.source_factory import get_data_source_factory
+            self.source_factory = await get_data_source_factory(self.db_ops)
+
+        def _source(base_name: str):
+            if hasattr(self.source_factory, 'get_source_instance'):
+                return self.source_factory.get_source_instance(base_name, region='a_stock')
+            return self.source_factory._get_source_instance(base_name, region='a_stock')
+
+        cnindex_source = _source('cnindex')
+        csindex_source = _source('csindex')
+        if cnindex_source is None:
+            result['warnings'].append('cnindex source unavailable for index governance')
+        if 'SSE' in sync_exchanges and csindex_source is None:
+            result['warnings'].append('csindex source unavailable for SSE/CSI index governance')
+
+        snapshots_before: Dict[str, Dict[str, Any]] = {
+            exchange: await self._get_index_master_snapshot(exchange)
+            for exchange in sync_exchanges
+        }
+
+        official_rows: List[Dict[str, Any]] = []
+        cnindex_snapshot = None
+        if cnindex_source is not None and any(ex in sync_exchanges for ex in ('SZSE', 'SSE')):
+            try:
+                fetch_coro = cnindex_source.get_index_master_snapshot()
+                cnindex_snapshot = (
+                    await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
+                    if effective_timeout else await fetch_coro
+                )
+                official_rows.extend([
+                    row for row in (cnindex_snapshot.rows or [])
+                    if row.get('exchange') in sync_exchanges
+                ])
+                result['summary']['source_usage']['cnindex'] = len(official_rows)
+            except asyncio.TimeoutError:
+                result['warnings'].append(f'cnindex index master fetch timed out after {effective_timeout}s')
+            except Exception as exc:
+                result['warnings'].append(f'cnindex index master fetch failed: {exc}')
+
+        if 'SSE' in sync_exchanges:
+            result['warnings'].append(
+                'CSIndex full-list endpoint is not enabled; SSE/CSI master refresh is diagnostic-only'
+            )
+
+        if official_rows:
+            saved = await self.db_ops.save_instruments_batch(official_rows)
+            if saved:
+                result['summary']['master_rows_saved'] += len(official_rows)
+            metadata_rows = self._build_index_metadata_rows(
+                official_rows,
+                raw_snapshot_hash=getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
+            )
+            result['summary']['metadata_rows_saved'] = await self.db_ops.save_instrument_master_metadata_batch(
+                metadata_rows
+            )
+
+        evidence_rows: List[Dict[str, Any]] = []
+        if cnindex_source is not None:
+            try:
+                fetch_coro = cnindex_source.get_lifecycle_evidence()
+                evidence_rows = (
+                    await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
+                    if effective_timeout else await fetch_coro
+                )
+            except asyncio.TimeoutError:
+                result['warnings'].append(f'cnindex lifecycle evidence fetch timed out after {effective_timeout}s')
+            except Exception as exc:
+                result['warnings'].append(f'cnindex lifecycle evidence fetch failed: {exc}')
+
+        direct_evidence = [
+            row for row in evidence_rows
+            if row.get('exchange') in sync_exchanges
+            and row.get('lifecycle_state') == 'calculation_terminated'
+        ]
+        if direct_evidence:
+            result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
+                direct_evidence
+            )
+
+        direct_applied = 0
+        for row in direct_evidence:
+            ok = await self.db_ops.mark_index_lifecycle_state(
+                row.get('instrument_id'),
+                lifecycle_state='calculation_terminated',
+                source=row.get('source') or 'cnindex_announcement',
+                effective_date=row.get('effective_date'),
+                last_quote_date=row.get('last_quote_date'),
+            )
+            if ok:
+                direct_applied += 1
+                if len(result['summary']['samples']) < sample_limit:
+                    result['summary']['samples'].append({
+                        'instrument_id': row.get('instrument_id'),
+                        'state': 'calculation_terminated',
+                        'confidence': row.get('confidence') or 'direct',
+                        'effective_date': self._date_text(row.get('effective_date')),
+                        'evidence_url': row.get('evidence_url'),
+                    })
+        result['summary']['direct_terminated_count'] = direct_applied
+
+        inferred_rows: List[Dict[str, Any]] = []
+        if config.get('allow_series_inference', True):
+            current_ids: Set[str] = set()
+            for exchange in sync_exchanges:
+                current_ids.update((await self._get_index_master_snapshot(exchange))['all_ids'])
+            for row in direct_evidence:
+                code = str(row.get('matched_code') or row.get('symbol') or '').strip()
+                if len(code) != 6 or not code.startswith('9'):
+                    continue
+                paired_code = '4' + code[1:]
+                paired_id = f'{paired_code}.SZ'
+                if paired_id not in current_ids and not any(item.get('instrument_id') == paired_id for item in official_rows):
+                    continue
+                latest_quote = await self.db_ops.get_latest_quote_date(paired_id)
+                effective_date = self._date_from_any(row.get('effective_date'))
+                latest_date = self._date_from_any(latest_quote)
+                if effective_date is None or latest_date is None:
+                    continue
+                if latest_date > effective_date:
+                    continue
+                inferred_rows.append({
+                    'instrument_id': paired_id,
+                    'symbol': paired_code,
+                    'exchange': 'SZSE',
+                    'lifecycle_state': 'calculation_terminated',
+                    'event_type': 'series_inferred_calculation_terminated',
+                    'effective_date': effective_date,
+                    'last_quote_date': latest_date,
+                    'announcement_date': row.get('announcement_date'),
+                    'announcement_title': row.get('announcement_title'),
+                    'evidence_url': row.get('evidence_url'),
+                    'matched_code': code,
+                    'confidence': 'series_inferred',
+                    'source': 'cnindex_announcement_series_inference',
+                    'parser_version': row.get('parser_version'),
+                    'raw_snapshot_hash': row.get('raw_snapshot_hash'),
+                    'diagnostics': {
+                        'direct_code': code,
+                        'paired_code': paired_code,
+                        'latest_quote_date': latest_date.isoformat(),
+                    },
+                })
+
+        if inferred_rows:
+            result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
+                inferred_rows
+            )
+        inferred_applied = 0
+        for row in inferred_rows:
+            ok = await self.db_ops.mark_index_lifecycle_state(
+                row.get('instrument_id'),
+                lifecycle_state='calculation_terminated',
+                source=row.get('source') or 'cnindex_announcement_series_inference',
+                effective_date=row.get('effective_date'),
+                last_quote_date=row.get('last_quote_date'),
+            )
+            if ok:
+                inferred_applied += 1
+                if len(result['summary']['samples']) < sample_limit:
+                    result['summary']['samples'].append({
+                        'instrument_id': row.get('instrument_id'),
+                        'state': 'calculation_terminated',
+                        'confidence': 'series_inferred',
+                        'effective_date': self._date_text(row.get('effective_date')),
+                        'last_quote_date': self._date_text(row.get('last_quote_date')),
+                    })
+        result['summary']['inferred_terminated_count'] = inferred_applied
+
+        stale_rows: List[Dict[str, Any]] = []
+        stale_days = int(config.get('stale_no_quote_trading_days', 10) or 10)
+        reference_date = target_date or get_shanghai_time().date()
+        cutoff_date = reference_date - timedelta(days=stale_days)
+        for exchange in sync_exchanges:
+            snapshot = await self._get_index_master_snapshot(exchange)
+            for instrument_id in sorted(snapshot['active_ids']):
+                latest_quote = await self.db_ops.get_latest_quote_date(instrument_id)
+                latest_date = self._date_from_any(latest_quote)
+                if latest_date is None or latest_date >= cutoff_date:
+                    continue
+                stale_rows.append({
+                    'instrument_id': instrument_id,
+                    'symbol': (snapshot['rows_by_id'].get(instrument_id) or {}).get('symbol'),
+                    'exchange': exchange,
+                    'lifecycle_state': 'stale_no_quote',
+                    'event_type': 'stale_no_quote',
+                    'last_quote_date': latest_date,
+                    'confidence': 'quote_gap',
+                    'source': 'local_quote_freshness',
+                    'diagnostics': {
+                        'cutoff_date': cutoff_date.isoformat(),
+                        'reference_date': reference_date.isoformat(),
+                    },
+                })
+
+        result['summary']['stale_no_quote_count'] = len(stale_rows)
+        if stale_rows and config.get('write_stale_no_quote', False):
+            result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
+                stale_rows
+            )
+            for row in stale_rows:
+                ok = await self.db_ops.mark_index_lifecycle_state(
+                    row.get('instrument_id'),
+                    lifecycle_state='stale_no_quote',
+                    source='local_quote_freshness',
+                    last_quote_date=row.get('last_quote_date'),
+                )
+                if ok:
+                    result['summary']['stale_no_quote_written_count'] += 1
+        for row in stale_rows[:sample_limit]:
+            if len(result['summary']['samples']) >= sample_limit:
+                break
+            result['summary']['samples'].append({
+                'instrument_id': row.get('instrument_id'),
+                'state': 'stale_no_quote',
+                'confidence': row.get('confidence'),
+                'last_quote_date': self._date_text(row.get('last_quote_date')),
+            })
+
+        reactivated = 0
+        if cnindex_source is not None:
+            stale_marked = await self.db_ops.execute_read_query(
+                """
+                SELECT instrument_id, symbol
+                FROM instruments
+                WHERE type = 'index' AND status = 'stale_no_quote'
+                ORDER BY updated_at ASC
+                LIMIT :limit
+                """,
+                {'limit': sample_limit},
+            )
+            for row in stale_marked:
+                instrument_id = row.get('instrument_id')
+                symbol = row.get('symbol') or instrument_id
+                try:
+                    rows = await cnindex_source.get_daily_data(
+                        instrument_id,
+                        symbol,
+                        datetime.combine(reference_date, datetime.min.time()),
+                        datetime.combine(reference_date, datetime.max.time()),
+                        instrument_type='index',
+                    )
+                except Exception:
+                    rows = []
+                if rows:
+                    ok = await self.db_ops.mark_index_lifecycle_state(
+                        instrument_id,
+                        lifecycle_state='active_quote',
+                        source='cnindex_quote_recheck',
+                        last_quote_date=reference_date,
+                    )
+                    if ok:
+                        reactivated += 1
+        result['summary']['reactivated_count'] = reactivated
+
+        for exchange in sync_exchanges:
+            after = await self._get_index_master_snapshot(exchange)
+            before = snapshots_before.get(exchange, {})
+            result['summary']['active_count'] += int(after.get('active_count', 0) or 0)
+            result['exchanges'][exchange] = {
+                'status': 'success',
+                'before': {
+                    'total_count': before.get('total_count', 0),
+                    'active_count': before.get('active_count', 0),
+                    'status_counts': before.get('status_counts', {}),
+                },
+                'after': {
+                    'total_count': after.get('total_count', 0),
+                    'active_count': after.get('active_count', 0),
+                    'inactive_count': after.get('inactive_count', 0),
+                    'status_counts': after.get('status_counts', {}),
+                    'source_counts': after.get('source_counts', {}),
+                },
+                'warnings': [],
+                'errors': [],
+            }
+
+        result['summary']['lifecycle_skip_count'] = (
+            result['summary']['direct_terminated_count']
+            + result['summary']['inferred_terminated_count']
+            + result['summary']['stale_no_quote_written_count']
+        )
+        if result['warnings']:
+            result['status'] = 'warning'
+        if result['errors']:
+            result['status'] = 'error'
+        finished_at = get_shanghai_time()
+        result['finished_at'] = finished_at.isoformat()
+        result['elapsed_sec'] = round((finished_at - started_at).total_seconds(), 3)
+        return result
+
     async def _maybe_sync_instrument_master_before_daily_update(
         self,
         exchanges: List[str],
         target_date: date,
+        instrument_types: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Compatibility wrapper for daily update master governance."""
         config = self._get_instrument_master_sync_config()
@@ -9674,6 +10161,43 @@ class DataManager:
         )
         if result.get('reason') == 'historical_current_master_governance_skipped':
             result['reason'] = 'historical_backfill_current_master_sync_skipped'
+
+        requested_types = {str(item).lower() for item in (instrument_types or ['stock', 'index'])}
+        index_config = self._get_index_master_governance_config()
+        if (
+            'index' in requested_types
+            and index_config.get('enabled', False)
+            and index_config.get('run_before_daily_update', True)
+            and target_date >= local_today
+        ):
+            try:
+                index_result = await self.sync_index_master(
+                    exchanges,
+                    target_date=target_date,
+                    timeout_sec=index_config.get('timeout_sec'),
+                )
+            except Exception as exc:
+                index_result = {
+                    'status': 'error',
+                    'reason': 'index_master_governance_failed',
+                    'summary': {},
+                    'exchanges': {},
+                    'warnings': [],
+                    'errors': [str(exc)],
+                }
+                if not index_config.get('continue_on_failure', True):
+                    raise
+            result['index_master_governance'] = index_result
+            result.setdefault('warnings', []).extend(
+                f"index: {warning}" for warning in (index_result.get('warnings') or [])
+            )
+            result.setdefault('errors', []).extend(
+                f"index: {error}" for error in (index_result.get('errors') or [])
+            )
+            if index_result.get('status') == 'error':
+                result['status'] = 'error'
+            elif index_result.get('status') == 'warning' and result.get('status') not in ('error',):
+                result['status'] = 'warning'
         return result
 
     def _get_daily_update_catchup_config(self) -> Dict[str, Any]:
@@ -10657,9 +11181,11 @@ class DataManager:
             instrument_master_sync = await self._maybe_sync_instrument_master_before_daily_update(
                 exchanges,
                 target_date,
+                instrument_types=instrument_types,
             )
             update_results['instrument_master_sync'] = instrument_master_sync
             update_results['instrument_master_governance'] = instrument_master_sync
+            update_results['index_master_governance'] = instrument_master_sync.get('index_master_governance')
             catchup_config = self._get_daily_update_catchup_config()
             catchup_sample_limit = int(catchup_config.get('sample_limit', 10))
 

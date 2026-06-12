@@ -39,6 +39,8 @@
 
 A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `daily_data_update` 的前置治理和已接入治理的研究/财务/当前快照任务。`config/05_scheduler.json` 中 `daily_data_update` 为周一至周五 `20:00` 运行，当前默认强制刷新 A 股主数据；若后续从 `force_refresh_job_names` 移除该任务，则是否真实刷新会回到 `freshness_threshold_hours` 控制。HKEX 主数据有独立 `hkex_instrument_master_sync` 任务，但当前配置为 `manual_only=true`。
 
+`daily_data_update.parameters.instrument_types` 当前显式配置为 `["stock", "index"]`。这意味着日更任务会先运行 A 股股票主数据治理，再在读取 active universe 前运行指数主数据治理；手工回补或专项测试如果只传 `["stock"]`，指数治理不会触发。
+
 ## 自动任务策略
 
 当前自动任务按主数据策略分三类：
@@ -50,6 +52,20 @@ A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `d
 | 跳过或无主数据依赖 | `valuation_history_rebuild`, 历史回补、监控、缓存、备份、交易日历、申万指数分析等 | 历史语义或非股票 universe 任务不应强制刷新主数据 |
 
 兼容配置位于 `config/03_data.json` 的 `data_config.instrument_master_sync`；通用治理配置位于 `data_config.instrument_master_governance`。治理配置默认继承同步配置中的超时、新鲜度阈值、历史回补 skip、失败继续和 pytdx 诊断开关。
+
+## A 股指数治理边界
+
+当前 A 股 `sync_instrument_master()` 仍只负责 `stock` 主数据，不能被视为指数生命周期权威来源。指数与股票不同：指数可能被终止计算发布、停发、调整发布渠道或保留在指数列表但停止日线发布，这些状态不应简单映射为股票意义上的 `delisted`。
+
+指数治理实现对应 OpenSpec `add-index-master-governance`，作为独立的 A 股指数主数据治理模块运行：
+
+- 国证指数网作为深证/国证/CNI 指数官方主源，覆盖指数列表、详情、公告和官方日线。
+- 中证指数官网作为中证/SSE/跨市场指数官方主源，覆盖指数基础信息和生命周期证据。
+- BaoStock/AkShare 保留为指数行情 fallback 和差异诊断，不单独决定终止计算发布状态。
+- 日更在请求指数行情前先按生命周期状态过滤 `calculation_terminated`、`inactive`、配置跳过的 `stale_no_quote` 指数。
+- 历史指数行情保留，不删除、不 forward-fill 终止日后的数据。
+
+详细需求见 [index_master_governance.md](/home/python/Quote/docs/development/index_master_governance.md)。
 
 ## 数据源优先级
 

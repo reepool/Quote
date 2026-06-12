@@ -484,6 +484,36 @@
 - **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
 - **`current_job_names`**: 参与前置治理的当前任务清单，用于配置审计和运维可读性；是否真实刷新上游仍取决于 freshness 与 `force_refresh_job_names`。
 
+### data_config.index_master_governance
+
+> A 股指数主数据治理配置。该层复用日更前置治理入口，但生命周期证据、停编状态和官方指数源独立于股票主数据同步，避免把指数停编误当作股票退市。
+
+```json
+{
+  "index_master_governance": {
+    "enabled": true,
+    "run_before_daily_update": true,
+    "exchanges": ["SSE", "SZSE"],
+    "official_sources": ["cnindex", "csindex"],
+    "freshness_threshold_hours": 48,
+    "stale_no_quote_trading_days": 10,
+    "skip_stale_no_quote": true,
+    "write_stale_no_quote": false,
+    "allow_series_inference": true,
+    "sample_limit": 10,
+    "timeout_sec": 120
+  }
+}
+```
+
+- **`enabled`**: 是否启用指数主数据治理。
+- **`run_before_daily_update`**: 普通日更读取 active universe 前是否运行指数治理。
+- **`official_sources`**: 官方源优先级。当前 `cnindex` 覆盖国证/深证指数清单、公告证据和官方日线；`csindex` 先提供中证/SSE 基础信息适配点，完整清单能力未启用时会在报告中降级提示。
+- **`stale_no_quote_trading_days`**: 本地最新行情超过该窗口时进入 stale 诊断。默认只报告，不直接写停用。
+- **`write_stale_no_quote`**: 是否把长期无行情指数写成 `stale_no_quote` 并从日更 universe 排除。默认 `false`，避免仅凭行情缺口误杀临时停发或源异常。
+- **`allow_series_inference`**: 是否允许用官方公告直接代码和全收益/价格指数配对关系做保守推断，例如 `980055` 停编且 `480055` 官方行情止于生效日前后时，将 `480055.SZ` 标记为 `series_inferred`。
+- **`sample_limit`**: Telegram 日报中的指数治理样例数量上限，详细证据保存在 `index_lifecycle_evidence`。
+
 ### 任务前后置依赖配置
 
 任务前后置关系通过 `config/05_scheduler.json` 的 job-level `dependencies` 配置声明，由调度器统一执行。当前券商专项财务任务 `broker_risk_control_incremental_sync` 已作为 `financial_disclosure_incremental_sync` 成功后的 `post_success` 后置节点运行；该任务本身保持 `manual_only=true`，不会单独注册 cron，但允许被依赖执行器触发。详见 `docs/development/scheduler_task_dependency_dag.md` 与 OpenSpec change `configure-scheduler-task-dependency-dag`。
@@ -926,7 +956,7 @@
 当前生产配置的关键路由示例：
 
 - A 股股票日线：`SSE/SZSE stock = pytdx -> baostock -> akshare`
-- A 股指数日线：`SSE/SZSE index = baostock -> akshare`
+- A 股指数日线：`SSE index = csindex -> cnindex -> baostock -> akshare`，`SZSE index = cnindex -> csindex -> baostock -> akshare`；官方源临时不可用或不覆盖的 active 指数继续走 BaoStock/AkShare fallback。
 - 北交所股票日线：`BSE stock = pytdx -> akshare`
 - 港股股票日线：`HKEX stock = akshare -> yfinance`
 - A 股品种列表与交易日历：`baostock`
@@ -1207,6 +1237,7 @@
 - **`misfire_grace_time`**: `int` (默认: `600`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
+- **`parameters.instrument_types`**: `List[str]` —— 普通 A 股日更任务显式传入的品种类型。当前生产配置为 `["stock", "index"]`，因此指数主数据治理会在读取当前指数 universe 前执行；如临时只测股票，可在任务参数中覆盖为 `["stock"]`。
 #### jobs.system_health_check
 
 ```json
@@ -2058,6 +2089,12 @@
 - **`output_format`**: `str` (默认: `telegram`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
 - **`sections`**: `List` (默认: `[{'name': 'header', 'type': 'static', 'content': '📈 *{name}*'}, {'name': 'summary', 'type': 'metrics', 'fields': ['date', 'updated_instruments', 'new_quotes', 'success_rate'], 'title': '更新摘要', 'condition': 'not non_trading_day'}, {'name': 'non_trading_day_info', 'type': 'static', 'content': '🗓️ *非交易日通知*\n\n今天是 {date}，市场未开盘，跳过数据更新。\n\n*交易日历更新情况:*\n{calendar_updates}', 'condition': 'non_trading_day'}, {'name': 'error_info', 'type': 'static', 'content': '❌ *更新失败*\n\n错误信息: {error_message}', 'condition': "status == 'error'"}, {'name': 'status', 'type': 'status', 'data_source': 'status', 'condition': "status != 'error'"}, {'name': 'exchange_stats_title', 'type': 'static', 'content': '*交易所统计*', 'condition': "not non_trading_day and status != 'error'"}, {'name': 'exchange_stats', 'type': 'table', 'data_source': 'exchange_stats'}, {'name': 'footer', 'type': 'static', 'content': '🔄 {source} - {generated_at}'}]`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
+
+日报模板当前还支持以下紧凑诊断段落：
+
+- `instrument_master_sync_summary`：证券主数据同步摘要。
+- `index_master_governance_summary`：指数主数据治理摘要，限制样例数量，不渲染完整证据 URL，避免 Telegram 消息超长。
+- `daily_catchup_summary`：新股和短缺口行情追补摘要。
 #### templates.gap_report
 
 ```json

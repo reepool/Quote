@@ -7,6 +7,19 @@
     "persistent_pids": {
       "scheduler": "log/scheduler.pid",
       "api_server": "log/api_server.pid"
+    },
+    "index_master_governance": {
+      "enabled": true,
+      "run_before_daily_update": true,
+      "exchanges": ["SSE", "SZSE"],
+      "official_sources": ["cnindex", "csindex"],
+      "freshness_threshold_hours": 48,
+      "stale_no_quote_trading_days": 10,
+      "skip_stale_no_quote": true,
+      "write_stale_no_quote": false,
+      "allow_series_inference": true,
+      "sample_limit": 10,
+      "timeout_sec": 120
     }
   },
   "logging_config": {
@@ -259,6 +272,31 @@
       "network_error_retry_interval": 10.0,
       "connection_timeout": 30.0,
       "login_timeout": 30.0
+    },
+    "cnindex": {
+      "enabled": true,
+      "exchanges_supported": ["a_stock"],
+      "instrument_types_supported": ["index"],
+      "timeout_sec": 30,
+      "max_requests_per_minute": 60,
+      "max_requests_per_hour": 1000,
+      "max_requests_per_day": 5000,
+      "index_list_url": "https://www.cnindex.com.cn/index_1020/brochures_1593/201912/P020260506563681367298.xlsx",
+      "notice_root_url": "https://www.cnindex.com.cn/zh_information/notices_news/?act_menu=2",
+      "daily_url": "https://hq.cnindex.com.cn/market/market/getIndexDailyDataWithDataFormat",
+      "termination_announcement_urls": [
+        "https://www.cnindex.com.cn/zh_information/notices_news/2026/202604/P020260414616617547784.pdf"
+      ]
+    },
+    "csindex": {
+      "enabled": true,
+      "exchanges_supported": ["a_stock"],
+      "instrument_types_supported": ["index"],
+      "timeout_sec": 30,
+      "max_requests_per_minute": 60,
+      "max_requests_per_hour": 1000,
+      "max_requests_per_day": 5000,
+      "basic_info_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/{code}"
     }
   },
   "routing": {
@@ -269,6 +307,8 @@
           "akshare"
         ],
         "index": [
+          "csindex",
+          "cnindex",
           "baostock",
           "akshare"
         ]
@@ -279,6 +319,8 @@
           "akshare"
         ],
         "index": [
+          "cnindex",
+          "csindex",
           "baostock",
           "akshare"
         ]
@@ -435,6 +477,10 @@
           "exchanges": [
             "SSE",
             "SZSE"
+          ],
+          "instrument_types": [
+            "stock",
+            "index"
           ],
           "wait_for_market_close": true,
           "market_close_delay_minutes": 15,
@@ -730,6 +776,24 @@
             ],
             "title": "更新摘要",
             "condition": "not non_trading_day"
+          },
+          {
+            "name": "instrument_master_sync",
+            "type": "static",
+            "content": "*证券主数据同步*\n{instrument_master_sync_summary}",
+            "condition": "not non_trading_day and instrument_master_sync_summary"
+          },
+          {
+            "name": "index_master_governance",
+            "type": "static",
+            "content": "*指数主数据治理*\n{index_master_governance_summary}",
+            "condition": "not non_trading_day and index_master_governance_summary"
+          },
+          {
+            "name": "daily_catchup",
+            "type": "static",
+            "content": "*行情追补*\n{daily_catchup_summary}",
+            "condition": "not non_trading_day and daily_catchup_summary"
           },
           {
             "name": "non_trading_day_info",

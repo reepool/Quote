@@ -1,0 +1,16 @@
+{
+  "data": {
+    "indexCode": "000300",
+    "indexShortNameCn": "沪深300",
+    "indexFullNameCn": "沪深300指数",
+    "indexFullNameEn": "CSI 300 Index",
+    "publishDate": "2005-04-08",
+    "publishChannelCn": "行情商",
+    "basicDate": "2004-12-31",
+    "basicIndex": "1000",
+    "indexType": "规模指数",
+    "ric": ".CSI300",
+    "bloombergid": "SHSZ300 Index",
+    "indexCnDesc": "反映沪深市场代表性证券表现"
+  }
+}
