@@ -189,7 +189,9 @@ class ReportEngine:
                 'updated_instruments': summary.get('success_count', 0),
                 'new_quotes': summary.get('total_quotes_added', 0),
                 'success_rate': success_rate,
-                'exchange_stats': summary.get('exchange_stats', {}),
+                'exchange_stats': self._format_daily_exchange_stats_for_table(
+                    summary.get('exchange_stats', {})
+                ),
                 'instrument_master_sync': summary.get('instrument_master_sync', data.get('instrument_master_sync')),
                 'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
             })
@@ -205,6 +207,26 @@ class ReportEngine:
         data['name'] = data.get('name', '每日数据更新报告')
 
         return data
+
+    def _format_daily_exchange_stats_for_table(
+        self,
+        exchange_stats: Dict[str, Any],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Keep the daily Telegram exchange table compact and scalar-only."""
+        if not isinstance(exchange_stats, dict):
+            return {}
+
+        display_stats: Dict[str, Dict[str, Any]] = {}
+        for exchange, stats in exchange_stats.items():
+            if not isinstance(stats, dict):
+                continue
+            display_stats[exchange] = {
+                'success_count': stats.get('success_count', 0),
+                'failure_count': stats.get('failure_count', 0),
+                'quotes_added': stats.get('quotes_added', stats.get('quotes_count', 0)),
+                'total_instruments': stats.get('total_instruments', stats.get('total_count', 0)),
+            }
+        return display_stats
 
     def _format_daily_catchup_summary(self, catchup_stats: Dict[str, Any]) -> str:
         """Format bounded daily catch-up diagnostics for operator reports."""

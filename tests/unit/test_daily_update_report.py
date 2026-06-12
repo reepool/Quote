@@ -181,6 +181,29 @@ def test_daily_update_short_gap_catchup_window_is_capped():
     assert window['capped']
 
 
+def test_daily_update_catchup_skips_non_stock_instruments():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    window = manager._resolve_daily_update_fetch_window(
+        exchange='SSE',
+        target_date=date(2026, 6, 15),
+        latest_quote_date=datetime(2026, 6, 1),
+        listed_date=datetime(2026, 1, 1),
+        instrument_type='index',
+        catchup_config={
+            'enabled': True,
+            'exchanges': {'SSE', 'SZSE', 'BSE'},
+            'new_instrument_catchup_days': 10,
+            'short_gap_catchup_days': 5,
+        },
+    )
+
+    assert window['reason'] == 'normal_daily_window'
+    assert window['fetch_start_date'] == date(2026, 6, 14)
+    assert not window['capped']
+
+
 @pytest.mark.asyncio
 async def test_generate_daily_update_report_includes_catchup_stats():
     with patch('data_manager.config_manager', _build_config_manager()):
@@ -250,6 +273,72 @@ def test_report_engine_formats_daily_catchup_summary():
     assert '新股追补: 1' in summary
     assert '短缺口追补: 1' in summary
     assert '920083.BJ' in summary
+
+
+def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_table():
+    engine = ReportEngine()
+    sample = {
+        'instrument_id': '920083.BJ',
+        'symbol': '920083',
+        'exchange': 'BSE',
+        'reason': 'new_instrument_catchup',
+        'listed_date': '2026-06-11',
+        'latest_quote_date': None,
+        'fetch_start_date': '2026-06-11',
+        'end_date': '2026-06-12',
+        'capped': False,
+        'quotes_added': 2,
+    }
+    catchup_stats = {
+        'new_instrument_count': 1,
+        'short_gap_count': 17,
+        'capped_count': 6,
+        'skipped_missing_listed_date': 0,
+        'catchup_quotes_added': 24,
+        'samples': [sample] * 10,
+    }
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-06-12',
+            'status': 'success',
+            'update_results': {
+                'success_count': 6688,
+                'failure_count': 0,
+                'total_quotes_added': 13348,
+                'catchup_stats': catchup_stats,
+                'exchange_stats': {
+                    'SSE': {
+                        'success_count': 2594,
+                        'failure_count': 0,
+                        'quotes_added': 5186,
+                        'total_instruments': 2594,
+                        'catchup_stats': catchup_stats,
+                    },
+                    'SZSE': {
+                        'success_count': 3774,
+                        'failure_count': 0,
+                        'quotes_added': 7524,
+                        'total_instruments': 3774,
+                        'catchup_stats': catchup_stats,
+                    },
+                    'BSE': {
+                        'success_count': 320,
+                        'failure_count': 0,
+                        'quotes_added': 638,
+                        'total_instruments': 320,
+                        'catchup_stats': catchup_stats,
+                    },
+                },
+            },
+        },
+        'telegram',
+    )
+
+    assert len(message) < 4000
+    assert 'Catchup Stats' not in message
+    assert "'samples':" not in message
+    assert '*行情追补*' in message
 
 
 @pytest.mark.asyncio

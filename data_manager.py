@@ -9736,11 +9736,13 @@ class DataManager:
         target_date: date,
         latest_quote_date: Optional[datetime],
         listed_date: Optional[Any],
+        instrument_type: str = 'stock',
         catchup_config: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Resolve the per-instrument daily quote fetch window and catch-up reason."""
         exchange_code = str(exchange or '').upper()
         is_a_stock = exchange_code in ('SSE', 'SZSE', 'BSE')
+        is_stock = str(instrument_type or '').lower() == 'stock'
         normal_start = target_date - timedelta(days=1)
         if not is_a_stock:
             normal_start = DateUtils.get_previous_trading_day(exchange_code, target_date)
@@ -9755,6 +9757,7 @@ class DataManager:
         catchup_enabled = (
             catchup_config.get('enabled', True)
             and exchange_code in catchup_config.get('exchanges', set())
+            and is_stock
         )
         if catchup_enabled and latest is None:
             if listed and listed <= target_date:
@@ -10721,6 +10724,7 @@ class DataManager:
                                 target_date=target_date,
                                 latest_quote_date=latest_date,
                                 listed_date=instrument.get('listed_date'),
+                                instrument_type=instrument.get('type', 'stock'),
                                 catchup_config=catchup_config,
                             )
                             fetch_start_date = window['fetch_start_date']
