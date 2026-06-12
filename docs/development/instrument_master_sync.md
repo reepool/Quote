@@ -41,6 +41,8 @@ A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `d
 
 `daily_data_update.parameters.instrument_types` 当前显式配置为 `["stock", "index"]`。这意味着日更任务会先运行 A 股股票主数据治理，再在读取 active universe 前运行指数主数据治理；手工回补或专项测试如果只传 `["stock"]`，指数治理不会触发。
 
+非交易日如果需要单独验证指数治理，不应强行跑 `daily_data_update` 去请求周末行情；使用 manual-only 任务 `/run index_master_governance_sync`。该任务只调用 `DataManager.sync_index_master()`，刷新官方指数清单、公告证据和生命周期状态，不下载日更行情。
+
 ## 自动任务策略
 
 当前自动任务按主数据策略分三类：

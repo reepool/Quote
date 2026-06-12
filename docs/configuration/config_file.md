@@ -1238,6 +1238,22 @@
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
 - **`parameters.instrument_types`**: `List[str]` —— 普通 A 股日更任务显式传入的品种类型。当前生产配置为 `["stock", "index"]`，因此指数主数据治理会在读取当前指数 universe 前执行；如临时只测股票，可在任务参数中覆盖为 `["stock"]`。
+#### jobs.index_master_governance_sync
+
+```json
+{
+  "index_master_governance_sync": {
+    "enabled": true,
+    "manual_only": true,
+    "description": "A股指数主数据治理（仅手工触发，不下载日更行情）"
+  }
+}
+```
+
+- **`manual_only`**: `true`，该任务不会注册 cron，只能通过 `/run index_master_governance_sync` 手工触发。
+- **`parameters.exchanges`**: 默认 `["SSE", "SZSE"]`。
+- **`parameters.timeout_sec`**: 单次治理超时秒数，默认 `120`。
+- **用途**: 非交易日或上线前冒烟测试时，只验证官方指数清单、公告证据、生命周期写入和报告摘要，不触发周末/节假日日线行情请求。
 #### jobs.system_health_check
 
 ```json

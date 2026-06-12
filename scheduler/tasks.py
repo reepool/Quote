@@ -943,6 +943,87 @@ class ScheduledTasks:
                 except Exception as notify_error:
                     scheduler_logger.error(
                         f"[Scheduler] Failed to send HKEX master sync failure notification: {notify_error}"
+            )
+            return False
+
+    async def index_master_governance_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        timeout_sec: Optional[int] = None,
+        target_date: Optional[date] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """手工触发 A 股指数主数据治理，不请求日更行情。"""
+        if exchanges is None:
+            exchanges = ["SSE", "SZSE"]
+        if target_date is None:
+            target_date = date.today()
+
+        try:
+            scheduler_logger.info(
+                "[Scheduler] Starting A-share index master governance sync: exchanges=%s target_date=%s timeout=%s",
+                exchanges,
+                target_date,
+                timeout_sec,
+            )
+            result = await data_manager.sync_index_master(
+                exchanges=exchanges,
+                target_date=target_date,
+                timeout_sec=timeout_sec,
+            )
+            summary = result.get("summary") or {}
+            samples = summary.get("samples") or []
+            sample_lines = []
+            for item in samples[:5]:
+                sample_lines.append(
+                    f"- {item.get('instrument_id')}: "
+                    f"{item.get('state')} {item.get('confidence', '')}".strip()
+                )
+            sample_text = "\n".join(sample_lines) if sample_lines else "无"
+
+            content = (
+                "*A 股指数主数据治理*\n\n"
+                f"状态: `{result.get('status')}`\n"
+                f"市场: `{','.join(exchanges)}`\n"
+                f"target_date: `{target_date.isoformat()}`\n"
+                f"主数据写入: `{summary.get('master_rows_saved', 0)}`\n"
+                f"证据写入: `{summary.get('evidence_rows_saved', 0)}`\n"
+                f"活跃指数: `{summary.get('active_count', 0)}`\n"
+                f"停编跳过: `{summary.get('lifecycle_skip_count', 0)}`\n"
+                f"直接: `{summary.get('direct_terminated_count', 0)}`，"
+                f"推断: `{summary.get('inferred_terminated_count', 0)}`，"
+                f"stale: `{summary.get('stale_no_quote_count', 0)}`\n"
+                f"warnings: `{len(result.get('warnings') or [])}`，"
+                f"errors: `{len(result.get('errors') or [])}`\n\n"
+                "样例:\n"
+                f"{sample_text}"
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "A 股指数主数据治理",
+                    "status": result.get("status"),
+                    "content": content,
+                    "result": result,
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                },
+                report_type="maintenance_report",
+                task_name="index_master_governance_sync",
+                job_config=job_config,
+            )
+            return result.get("status") in {"success", "warning", "fresh"}
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] A-share index master governance sync failed: {e}")
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_task_notification(
+                        f"A 股指数主数据治理失败: {e}",
+                        "index_master_governance_sync",
+                        "error",
+                    )
+                except Exception as notify_error:
+                    scheduler_logger.error(
+                        "[Scheduler] Failed to send index governance failure notification: %s",
+                        notify_error,
                     )
             return False
 

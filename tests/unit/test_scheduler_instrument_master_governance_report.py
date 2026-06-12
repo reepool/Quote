@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -95,6 +96,12 @@ def test_manual_only_job_can_omit_trigger():
             "manual_only": True,
             "description": "港股主数据同步/审计",
             "parameters": {"mode": "audit_only"},
+        },
+        "index_master_governance_sync": {
+            "enabled": True,
+            "manual_only": True,
+            "description": "A股指数主数据治理",
+            "parameters": {"exchanges": ["SSE", "SZSE"]},
         }
     }
     scheduler_config.max_instances = 10
@@ -107,6 +114,9 @@ def test_manual_only_job_can_omit_trigger():
     assert "hkex_instrument_master_sync" in jobs
     assert jobs["hkex_instrument_master_sync"].manual_only is True
     assert jobs["hkex_instrument_master_sync"].trigger is None
+    assert "index_master_governance_sync" in jobs
+    assert jobs["index_master_governance_sync"].manual_only is True
+    assert jobs["index_master_governance_sync"].trigger is None
 
 
 @pytest.mark.asyncio
@@ -148,3 +158,50 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
         timeout_sec=60,
     )
     task._send_task_report.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_index_master_governance_sync_manual_task_runs_without_daily_quotes():
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock(return_value=False)
+
+    with patch("scheduler.tasks.data_manager") as dm:
+        dm.sync_index_master = AsyncMock(return_value={
+            "status": "warning",
+            "summary": {
+                "master_rows_saved": 3,
+                "evidence_rows_saved": 2,
+                "active_count": 128,
+                "lifecycle_skip_count": 2,
+                "direct_terminated_count": 1,
+                "inferred_terminated_count": 1,
+                "stale_no_quote_count": 0,
+                "samples": [
+                    {
+                        "instrument_id": "480055.SZ",
+                        "state": "calculation_terminated",
+                        "confidence": "series_inferred",
+                    }
+                ],
+            },
+            "warnings": ["CSIndex full-list endpoint is not enabled"],
+            "errors": [],
+        })
+
+        success = await task.index_master_governance_sync(
+            exchanges=["SZSE"],
+            timeout_sec=120,
+            target_date=date(2026, 6, 13),
+        )
+
+    assert success is True
+    dm.sync_index_master.assert_awaited_once_with(
+        exchanges=["SZSE"],
+        target_date=date(2026, 6, 13),
+        timeout_sec=120,
+    )
+    task._send_task_report.assert_awaited_once()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "A 股指数主数据治理" in report_data["content"]
+    assert "480055.SZ" in report_data["content"]

@@ -487,6 +487,24 @@
           "enable_trading_day_check": true
         }
       },
+      "index_master_governance_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股指数主数据治理（仅手工触发，不下载日更行情）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE"
+          ],
+          "timeout_sec": 120,
+          "max_runtime_seconds": 600
+        }
+      },
       "system_health_check": {
         "enabled": true,
         "description": "系统健康检查",
