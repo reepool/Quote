@@ -274,7 +274,7 @@ Beta API 调用约定：
   - L2 官方摘要校验层：CNInfo data20 只承担官方摘要大项校验，字段远少于新浪/同花顺/东财，单位为 `CNY_10K`，不能被当作完整三表源。
   - L3 远程扩展层：东财字段最宽但较慢，默认不写入本地核心层，仅当 AI/研究请求需要 L1 不覆盖字段时按需调用，并转换成同一 canonical schema、单位和口径后返回。
 - 证券行业补充层：`use-annual-report-broker-risk-control-source` 将上市证券公司正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表作为证券监管事实主源，独立《风险控制指标报告》仅作为主源缺口补充、校验或非年报/半年报周期补源。证券公司 universe 不能只依赖申万“证券Ⅲ”，必须通过 CSRC 证券公司名录/证券经营机构信息公示与显式 `listed_broker_dealer_scope` 上市主体映射确认。该层仍写入同一 `financial_source_files` 与 `financial_numeric_facts_hot/history`，用于补齐 `net_capital` 并采集核心/附属净资本、监管净资产、风险资本准备、风险覆盖率、资本杠杆率、LCR、NSFR、自营/融资占净资本比例等证券监管字段。历史回补使用显式 CLI 写 `history` tier；日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务写 `hot` tier，独立任务本身为 `manual_only=true`，可通过 `/run` 手工验证但不单独注册 cron。独立风控公告补源必须通过 `--include-standalone-supplement` 显式开启，并且只解析主源本轮已发现但缺少 `net_capital` 的同一 `instrument_id + report_period`，不得覆盖年报/半年报主源已给出的净资本事实。
-- 调度编排架构缺口：当前券商后置任务的 job id 与开关已经配置化，但后置执行逻辑仍在 `ScheduledTasks.financial_disclosure_incremental_sync` 内定制。后续应新增配置驱动的 task dependency DAG，统一支持 `pre_success / post_success / post_always`、并行后置、串行后置、参数继承、超时和失败策略。这样未来其他特殊行业财务补充任务可以通过配置声明“后置于财务日更”或“前置于某任务”，而不是继续在财务日更函数内追加硬编码分支。
+- 调度编排架构：券商后置任务已迁移到 `config/05_scheduler.json` 的 job-level `dependencies.post_success` 配置，由通用 scheduler dependency DAG 执行，不再写在 `ScheduledTasks.financial_disclosure_incremental_sync` 内。新增工程文档 `docs/development/scheduler_task_dependency_dag.md` 定义了配置驱动 task dependency DAG，统一支持 `pre_success / post_success / post_always`、并行后置、串行后置、参数继承、超时和失败策略。这样未来其他特殊行业财务补充任务可以通过配置声明“后置于财务日更”或“前置于某任务”，而不是继续在财务日更函数内追加硬编码分支。对应 OpenSpec change 为 `configure-scheduler-task-dependency-dag`。
 
 #### 4.5.1 下一阶段财务字段映射原则
 

@@ -3112,61 +3112,6 @@ class ScheduledTasks:
             )
             status = result.get('status', 'failed')
             success = status in {'success', 'degraded'}
-            broker_post_success = True
-            if success and run_broker_risk_control_post_task:
-                broker_post_result: Dict[str, Any]
-                task_name_post = 'broker_risk_control_incremental_sync'
-                self._active_tasks.add(task_name_post)
-                try:
-                    post_job_cfg = self.config.get_nested(
-                        f'scheduler_config.jobs.{broker_risk_control_post_task_job_id}',
-                        {},
-                    ) or {}
-                    post_params = dict(post_job_cfg.get('parameters') or {})
-                    max_runtime_seconds = post_params.pop('max_runtime_seconds', None)
-                    post_params.setdefault('exchanges', exchanges)
-                    post_params.setdefault('dry_run', dry_run)
-                    broker_runner = getattr(
-                        data_manager,
-                        'run_broker_risk_control_incremental_sync',
-                        None,
-                    )
-                    if broker_runner is None or not asyncio.iscoroutinefunction(broker_runner):
-                        broker_post_result = {
-                            'status': 'unavailable',
-                            'reason': 'data_manager.run_broker_risk_control_incremental_sync is unavailable',
-                        }
-                    elif max_runtime_seconds:
-                        broker_post_result = await asyncio.wait_for(
-                            self._run_broker_risk_control_incremental_sync(**post_params),
-                            timeout=max_runtime_seconds,
-                        )
-                    else:
-                        broker_post_result = await self._run_broker_risk_control_incremental_sync(
-                            **post_params,
-                        )
-                    broker_status = broker_post_result.get('status', 'failed')
-                    broker_post_success = broker_status in {
-                        'success',
-                        'partial',
-                        'scan_only',
-                        'disabled',
-                        'unavailable',
-                    }
-                except Exception as broker_error:
-                    broker_post_success = False
-                    broker_post_result = {
-                        'status': 'failed',
-                        'reason': str(broker_error),
-                    }
-                    scheduler_logger.error(
-                        "[Scheduler] Broker risk-control post task failed: %s",
-                        broker_error,
-                    )
-                finally:
-                    self._active_tasks.discard(task_name_post)
-                result['broker_risk_control_post_task'] = broker_post_result
-                success = success and broker_post_success
             report_data = {
                 'name': '财务公告驱动增量检查报告',
                 'status': 'success' if success else 'error',

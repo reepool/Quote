@@ -1943,25 +1943,17 @@ class TaskManagerHandlers:
                     self.task_manager.logger.error(f"[TaskManagerHandlers] 任务 {job_id} 不在调度器中！可用任务: {available_jobs}")
                     return False
 
-                task_func = getattr(scheduled_tasks, job_id, None)
-                if task_func is None:
+                if getattr(scheduled_tasks, job_id, None) is None:
                     self.task_manager.logger.error(f"[TaskManagerHandlers] 手工任务函数不存在: {job_id}")
                     return False
 
-                params = dict(job_cfg.get('parameters', {}) or {})
-                max_runtime_seconds = params.pop('max_runtime_seconds', None)
-                job_config = self.task_manager.job_config_manager.get_job_config(job_id)
-                params['job_config'] = job_config
                 self.task_manager.logger.info(
-                    f"[TaskManagerHandlers] 直接执行 manual_only 任务: {job_id}, max_runtime_seconds={max_runtime_seconds}"
+                    f"[TaskManagerHandlers] 通过依赖执行器执行 manual_only 任务: {job_id}"
                 )
-                if max_runtime_seconds:
-                    result = await asyncio.wait_for(
-                        task_func(**params),
-                        timeout=max_runtime_seconds,
-                    )
-                else:
-                    result = await task_func(**params)
+                result = await scheduler.execute_job_direct(
+                    job_id,
+                    include_dependencies=True,
+                )
                 self.task_manager.logger.info(f"[TaskManagerHandlers] manual_only 任务执行结果: {job_id}, 成功: {result}")
                 return bool(result)
 

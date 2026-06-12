@@ -462,6 +462,48 @@
 - **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
 - **`current_job_names`**: 参与前置治理的当前任务清单，用于配置审计和运维可读性；是否真实刷新上游仍取决于 freshness 与 `force_refresh_job_names`。
 
+### 任务前后置依赖配置
+
+任务前后置关系通过 `config/05_scheduler.json` 的 job-level `dependencies` 配置声明，由调度器统一执行。当前券商专项财务任务 `broker_risk_control_incremental_sync` 已作为 `financial_disclosure_incremental_sync` 成功后的 `post_success` 后置节点运行；该任务本身保持 `manual_only=true`，不会单独注册 cron，但允许被依赖执行器触发。详见 `docs/development/scheduler_task_dependency_dag.md` 与 OpenSpec change `configure-scheduler-task-dependency-dag`。
+
+配置形态：
+
+```json
+{
+  "scheduler_config": {
+    "jobs": {
+      "financial_disclosure_incremental_sync": {
+        "dependencies": {
+          "post_success": [
+            {
+              "group_id": "financial_industry_supplements",
+              "mode": "parallel",
+              "jobs": [
+                {
+                  "job_id": "broker_risk_control_incremental_sync",
+                  "inherit": ["exchanges", "dry_run"],
+                  "timeout_seconds": 7200,
+                  "failure_policy": "degrade_parent"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+语义要求：
+
+- `pre_success`：前置任务成功后才启动主任务。
+- `post_success`：主任务成功后启动后置任务；主任务失败则不启动。
+- `post_always`：主任务成功或失败后均执行，适合清理和审计。
+- `mode=parallel`：同组任务并行执行。
+- `mode=serial`：同组任务按配置顺序串行执行。
+- `manual_only=true` 任务不注册独立 cron，但可被依赖图自动触发。
+
 ### data_config.hkex_instrument_master_sync
 
 > HKEX 专用主数据策略配置。初始生产配置为 `audit_only`，先暴露官方源、本地库、补充源和行情可得性差异，不写生命周期字段。

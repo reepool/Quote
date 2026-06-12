@@ -730,7 +730,7 @@ Residual Income = Net Income - Cost of Equity * Beginning Book Value
 - 年报/半年报内嵌风控表是证券监管资本和流动性字段主源；独立《风险控制指标报告》只作为补充、交叉校验或 Q1/Q3 等非年报/半年报周期补源。补源必须后置于主源解析，且默认只处理主源本轮已发现但缺少 `net_capital` 的同一 `instrument_id + report_period`，不得覆盖主源已解析出的净资本事实。即使风控表中出现操作风险资本准备使用的业务净收入行，也只能保存为监管口径 P2 字段，不能替代年报分部收入。
 - 监管净资本通常是母公司或监管口径，可能不同于 DCF 使用的合并口径会计权益；模型必须在 lineage 或 warning 中记录 scope 差异。
 - 证券监管事实进入现有财务披露链路：历史回补通过 `scripts/dev_validation/backfill_broker_risk_control_reports.py` 写入 `financial_numeric_facts_history`，日更通过 `broker_risk_control_incremental_sync` 后置于 `financial_disclosure_incremental_sync` 写入 `financial_numeric_facts_hot`。两者都必须使用 `listed_broker_dealer_scope` gate，不得按申万“证券”直接全量套用。
-- 调度要求：券商后置任务当前是配置开关 + 代码编排的过渡方案；后续专业 DCF 数据供给层应推动通用 scheduler dependency DAG，使特殊行业补充任务可通过配置声明前置/后置、并行/串行、参数继承和失败策略。
+- 调度要求：券商后置任务已迁移到通用 scheduler dependency DAG，使特殊行业补充任务可通过配置声明前置/后置、并行/串行、参数继承和失败策略。实现架构见 `docs/development/scheduler_task_dependency_dag.md`：`broker_risk_control_incremental_sync` 作为 `financial_disclosure_incremental_sync` 的 `post_success` 依赖节点配置化触发，不再写在财务日更任务函数内部。
 
 历史 12 个季度正式写库命令：
 

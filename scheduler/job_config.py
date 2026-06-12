@@ -6,7 +6,7 @@ Handles parsing and validation of job configurations from config.json.
 from __future__ import annotations
 
 from typing import Dict, Any, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import time
 
 from apscheduler.triggers.cron import CronTrigger
@@ -14,6 +14,11 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from utils import scheduler_logger
 from utils.config_manager import UnifiedConfigManager
+from .dependencies import (
+    JobDependencyConfig,
+    parse_job_dependency_config,
+    validate_job_dependencies,
+)
 
 
 @dataclass
@@ -28,6 +33,7 @@ class JobConfig:
     misfire_grace_time: int
     coalesce: bool
     parameters: Dict[str, Any]
+    dependencies: JobDependencyConfig = field(default_factory=JobDependencyConfig)
     report: bool = False  # 是否发送报告通知
     pre_run_notify: bool = True  # 任务开始前是否发送 Telegram 通知
 
@@ -93,6 +99,7 @@ class JobConfigManager:
                 misfire_grace_time=job_data.get('misfire_grace_time', scheduler_config.misfire_grace_time),
                 coalesce=job_data.get('coalesce', scheduler_config.coalesce),
                 parameters=job_data.get('parameters', {}),
+                dependencies=parse_job_dependency_config(job_data.get('dependencies')),
                 report=job_data.get('report', False),
                 pre_run_notify=job_data.get('pre_run_notify', True)
             )
@@ -211,6 +218,10 @@ class JobConfigManager:
     def get_all_job_configs(self) -> Dict[str, JobConfig]:
         """获取所有任务配置"""
         return self.job_configs.copy()
+
+    def validate_dependency_configs(self) -> list[str]:
+        """Validate configured scheduler dependency DAGs."""
+        return validate_job_dependencies(self.job_configs)
 
     def is_job_enabled(self, job_id: str) -> bool:
         """检查任务是否启用"""

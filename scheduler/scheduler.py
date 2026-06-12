@@ -24,6 +24,10 @@ from utils.singleton import singleton
 
 from .tasks import scheduled_tasks
 from .job_config import JobConfigManager, job_config_manager
+from .dependencies import SchedulerDependencyExecutor
+
+
+_SCHEDULER_ALREADY_TRACKED_PARAM = "_scheduler_already_tracked"
 
 
 @singleton
@@ -54,6 +58,16 @@ class TaskScheduler:
 
             # 初始化任务配置管理器
             self.job_configs = self.job_config_manager.load_job_configs()
+            dependency_errors = self.job_config_manager.validate_dependency_configs()
+            if dependency_errors:
+                message = "; ".join(dependency_errors)
+                scheduler_logger.error("[Scheduler] Invalid dependency configuration: %s", message)
+                raise ValueError(f"Invalid scheduler dependency configuration: {message}")
+            self.dependency_executor = SchedulerDependencyExecutor(
+                job_configs=self.job_configs,
+                raw_job_runner=self._run_configured_task_raw,
+                logger=scheduler_logger,
+            )
 
             # 初始化任务
             await scheduled_tasks.initialize()
@@ -149,19 +163,29 @@ class TaskScheduler:
                             f"[Scheduler] 发送任务启动通知失败: {job_id}, {notify_err}"
                         )
 
-                # 将 job_config 添加到参数中，如果它存在的话
-                all_parameters = {**parameters, 'job_config': job_config} if job_config else parameters.copy()
-
-                # 调用原函数并传入参数
-                # aiojobs scheduler 会自动处理协程函数的调用
-                max_runtime_seconds = all_parameters.pop('max_runtime_seconds', None)
-                if max_runtime_seconds:
-                    result = await asyncio.wait_for(
-                        func(**all_parameters),
-                        timeout=max_runtime_seconds
+                executor = getattr(self, "dependency_executor", None)
+                if executor is None:
+                    self.dependency_executor = SchedulerDependencyExecutor(
+                        job_configs=self.job_configs,
+                        raw_job_runner=self._run_configured_task_raw,
+                        logger=scheduler_logger,
                     )
-                else:
-                    result = await func(**all_parameters)
+                    executor = self.dependency_executor
+                dependency_result = await executor.run_job(
+                    job_id,
+                    {
+                        **dict(parameters or {}),
+                        _SCHEDULER_ALREADY_TRACKED_PARAM: True,
+                    },
+                    include_dependencies=True,
+                )
+                self._log_dependency_results(job_id, dependency_result.get("dependency_results"))
+                await self._send_dependency_report(
+                    job_id,
+                    dependency_result.get("dependency_results"),
+                    job_config,
+                )
+                result = bool(dependency_result.get("success"))
                 duration = (datetime.now() - start_time).total_seconds()
                 scheduler_logger.info(
                     f"[Scheduler] Task {job_id} completed in {duration:.1f}s (run_id={run_id})"
@@ -193,6 +217,142 @@ class TaskScheduler:
                         self.running_tasks.pop(job_id, None)
 
         return parameterized_task
+
+    async def _run_configured_task_raw(
+        self,
+        job_id: str,
+        parameters: Dict[str, Any],
+        include_dependencies: bool = False,
+    ) -> Any:
+        """Run a single configured task without expanding dependencies."""
+        if include_dependencies:
+            executor = getattr(self, "dependency_executor", None)
+            if executor is None:
+                self.dependency_executor = SchedulerDependencyExecutor(
+                    job_configs=self.job_configs,
+                    raw_job_runner=self._run_configured_task_raw,
+                    logger=scheduler_logger,
+                )
+                executor = self.dependency_executor
+            return await executor.run_job(
+                job_id,
+                parameters,
+                include_dependencies=True,
+            )
+        job_config = self.job_configs.get(job_id)
+        task_func = getattr(scheduled_tasks, job_id, None)
+        if task_func is None:
+            raise ValueError(f"Task function not found: {job_id}")
+        all_parameters = dict(parameters or {})
+        already_tracked = bool(all_parameters.pop(_SCHEDULER_ALREADY_TRACKED_PARAM, False))
+        all_parameters["job_config"] = job_config
+        max_runtime_seconds = all_parameters.pop("max_runtime_seconds", None)
+        run_id = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        tracked_here = False
+        if not already_tracked:
+            max_instances = int(getattr(job_config, "max_instances", 1) or 1)
+            active_runs = self.running_tasks.get(job_id, {})
+            if len(active_runs) >= max_instances:
+                scheduler_logger.warning(
+                    "[Scheduler] Raw task %s skipped because max_instances=%s is already active",
+                    job_id,
+                    max_instances,
+                )
+                return False
+            if job_id not in self.running_tasks:
+                self.running_tasks[job_id] = {}
+            self.running_tasks[job_id][run_id] = datetime.now()
+            tracked_here = True
+        try:
+            if max_runtime_seconds:
+                return await asyncio.wait_for(
+                    task_func(**all_parameters),
+                    timeout=max_runtime_seconds,
+                )
+            return await task_func(**all_parameters)
+        finally:
+            if tracked_here and job_id in self.running_tasks:
+                self.running_tasks[job_id].pop(run_id, None)
+                if not self.running_tasks[job_id]:
+                    self.running_tasks.pop(job_id, None)
+
+    def _log_dependency_results(
+        self,
+        job_id: str,
+        dependency_results: Optional[Dict[str, Any]],
+    ) -> None:
+        if not isinstance(dependency_results, dict):
+            return
+        for phase, groups in dependency_results.items():
+            for group in groups or []:
+                scheduler_logger.info(
+                    "[Scheduler] Dependency group result: parent=%s phase=%s group=%s mode=%s status=%s",
+                    job_id,
+                    phase,
+                    group.get("group_id"),
+                    group.get("mode"),
+                    group.get("status"),
+                )
+                for node in group.get("nodes") or []:
+                    scheduler_logger.info(
+                        "[Scheduler] Dependency node result: parent=%s phase=%s group=%s job=%s status=%s elapsed=%.1fs error=%s",
+                        job_id,
+                        phase,
+                        group.get("group_id"),
+                        node.get("job_id"),
+                        node.get("status"),
+                        float(node.get("elapsed_seconds") or 0),
+                        node.get("error"),
+                    )
+
+    async def _send_dependency_report(
+        self,
+        job_id: str,
+        dependency_results: Optional[Dict[str, Any]],
+        job_config=None,
+    ) -> None:
+        """Send a concise dependency execution summary for configured job reports."""
+        if not getattr(job_config, "report", False):
+            return
+        if not isinstance(dependency_results, dict):
+            return
+        lines = []
+        for phase, groups in dependency_results.items():
+            for group in groups or []:
+                lines.append(
+                    f"- {phase}/{group.get('group_id')} [{group.get('mode')}]: {group.get('status')}"
+                )
+                for node in group.get("nodes") or []:
+                    summary = node.get("summary") or {}
+                    counters = ", ".join(f"{key}={value}" for key, value in summary.items())
+                    inherited = node.get("inherited_parameters") or {}
+                    inherited_text = ", ".join(f"{key}={value}" for key, value in inherited.items()) or "none"
+                    error = node.get("error")
+                    detail = (
+                        f"  - {node.get('job_id')}: {node.get('status')} "
+                        f"({float(node.get('elapsed_seconds') or 0):.1f}s, inherit={inherited_text}"
+                    )
+                    if counters:
+                        detail += f", {counters}"
+                    if error:
+                        detail += f", error={error}"
+                    detail += ")"
+                    lines.append(detail)
+        if not lines:
+            return
+        try:
+            bot = TelegramBot()
+            await bot.send_task_notification(
+                "配置化前后置任务执行结果:\n\n" + "\n".join(lines),
+                task_name=job_id,
+                level="info",
+            )
+        except Exception as notify_err:
+            scheduler_logger.warning(
+                "[Scheduler] Failed to send dependency report for %s: %s",
+                job_id,
+                notify_err,
+            )
 
     async def _add_job_from_config(self, job_config, func) -> bool:
         """从配置添加任务"""
@@ -311,6 +471,46 @@ class TaskScheduler:
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Failed to run job {job_id}: {e}")
+            return False
+
+    async def execute_job_direct(
+        self,
+        job_id: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        *,
+        include_dependencies: bool = True,
+    ) -> bool:
+        """Execute a configured job immediately, including manual-only jobs."""
+        try:
+            job_config = self.job_config_manager.get_job_config(job_id)
+            if job_config is None:
+                scheduler_logger.warning("[Scheduler] Job config not found for direct execution: %s", job_id)
+                return False
+            params = dict(job_config.parameters or {})
+            params.update(dict(parameters or {}))
+            executor = getattr(self, "dependency_executor", None)
+            if executor is None:
+                self.job_configs = self.job_config_manager.get_all_job_configs()
+                self.dependency_executor = SchedulerDependencyExecutor(
+                    job_configs=self.job_configs,
+                    raw_job_runner=self._run_configured_task_raw,
+                    logger=scheduler_logger,
+                )
+                executor = self.dependency_executor
+            dependency_result = await executor.run_job(
+                job_id,
+                params,
+                include_dependencies=include_dependencies,
+            )
+            self._log_dependency_results(job_id, dependency_result.get("dependency_results"))
+            await self._send_dependency_report(
+                job_id,
+                dependency_result.get("dependency_results"),
+                job_config,
+            )
+            return bool(dependency_result.get("success"))
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Failed to execute job directly {job_id}: {e}")
             return False
 
     async def pause_job(self, job_id: str) -> bool:

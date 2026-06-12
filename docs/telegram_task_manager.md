@@ -142,7 +142,7 @@ python3 main.py api --host 0.0.0.0 --port 8000
 
 财务 L1 维护任务分工：
 
-当前实现状态（`2026-06-10`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口，并在成功后自动触发券商专项财务后置任务 `broker_risk_control_incremental_sync`；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。L1 required facts 使用 `net_income_parent / equity_parent` 等精确口径，不再用旧的 `net_income / equity` 泛化字段作为本地核心层准入要求。券商风控事实使用正式年报/半年报内嵌“净资本及风险控制指标”表，按 `listed_broker_dealer_scope` gate 只处理确认上市券商，写入同一财务事实表；源路由统一封装在服务层，Telegram 任务只展示结果，不直接维护各源 fallback 细节。
+当前实现状态（`2026-06-10`）：`financial_l1_full_import` 已作为 `manual_only` 任务接入 `/run`；`financial_disclosure_incremental_sync` 已启用为每日 `21:45` 自动运行，避开港股日更和 A 股日更主窗口，并通过 `config/05_scheduler.json` 的 `dependencies.post_success` 配置在成功后自动触发券商专项财务后置任务 `broker_risk_control_incremental_sync`；`financial_disclosure_reconciliation_sync` 已启用为周日 `09:30` 自动运行。公告筛选已收紧为正式定报、更正/修订、延期披露和定报相关停牌/退市风险公告；补数源路由为 `CNInfo data20 -> THS -> Sina`，其中 CNInfo data20 是官方结构化优先源，THS/Sina 只做缺失、失败或语义不明确字段的补齐。L1 required facts 使用 `net_income_parent / equity_parent` 等精确口径，不再用旧的 `net_income / equity` 泛化字段作为本地核心层准入要求。券商风控事实使用正式年报/半年报内嵌“净资本及风险控制指标”表，按 `listed_broker_dealer_scope` gate 只处理确认上市券商，写入同一财务事实表；源路由统一封装在服务层，Telegram 任务只展示结果和配置化依赖节点摘要，不直接维护各源 fallback 细节。
 
 | 任务 | 触发方式 | 读取范围 | 写入策略 |
 |---|---|---|---|

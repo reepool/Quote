@@ -96,6 +96,7 @@ def test_manual_only_shareholder_shadow_sync_can_run_without_scheduler_job(monke
     task_manager.logger = Mock()
     task_manager.task_scheduler = Mock()
     task_manager.task_scheduler.jobs = {}
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
     task_manager.job_config_manager = Mock()
     task_manager.job_config_manager.get_job_config.return_value = Mock()
 
@@ -122,9 +123,11 @@ def test_manual_only_shareholder_shadow_sync_can_run_without_scheduler_job(monke
     )
 
     assert result is True
-    manual_task.assert_awaited_once()
-    assert manual_task.await_args.kwargs["exchanges"] == ["SSE"]
-    assert "max_runtime_seconds" not in manual_task.await_args.kwargs
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        "shareholder_shadow_sync",
+        include_dependencies=True,
+    )
+    manual_task.assert_not_awaited()
 
 
 def test_shareholder_incremental_sync_task_reports_change_summary(monkeypatch):

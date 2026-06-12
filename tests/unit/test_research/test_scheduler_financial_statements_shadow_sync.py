@@ -190,6 +190,7 @@ def test_manual_only_financial_l1_full_import_can_run_without_scheduler_job(monk
     task_manager.logger = Mock()
     task_manager.task_scheduler = Mock()
     task_manager.task_scheduler.jobs = {}
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
     task_manager.job_config_manager = Mock()
     task_manager.job_config_manager.get_job_config.return_value = Mock()
 
@@ -220,9 +221,11 @@ def test_manual_only_financial_l1_full_import_can_run_without_scheduler_job(monk
     )
 
     assert result is True
-    manual_task.assert_awaited_once()
-    assert manual_task.await_args.kwargs["exchanges"] == ["SSE"]
-    assert "max_runtime_seconds" not in manual_task.await_args.kwargs
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        "financial_l1_full_import",
+        include_dependencies=True,
+    )
+    manual_task.assert_not_awaited()
 
 
 def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeypatch):
@@ -293,7 +296,7 @@ def test_financial_disclosure_incremental_task_reports_pending_delisting(monkeyp
     assert "financial_disclosure_incremental_sync" not in task._active_tasks
 
 
-def test_financial_disclosure_incremental_task_runs_broker_post_task(monkeypatch):
+def test_financial_disclosure_incremental_task_no_longer_runs_broker_post_task(monkeypatch):
     task = ScheduledTasks.__new__(ScheduledTasks)
     task.config = Mock()
     task.config.get_nested.return_value = {
@@ -350,24 +353,7 @@ def test_financial_disclosure_incremental_task_runs_broker_post_task(monkeypatch
     )
 
     assert result is True
-    data_manager.run_broker_risk_control_incremental_sync.assert_awaited_once_with(
-        exchanges=["SSE"],
-        lookback_days=14,
-        overlap_days=3,
-        page_size=None,
-        max_pages=None,
-        per_instrument_page_size=None,
-        per_instrument_max_pages=None,
-        limit_instruments=None,
-        instrument_ids=None,
-        report_period_types=None,
-        source_profile=None,
-        include_standalone_supplement=None,
-        archive_root=None,
-        dry_run=False,
-        scan_only=False,
-    )
+    data_manager.run_broker_risk_control_incremental_sync.assert_not_awaited()
     report_data = task._send_task_report.await_args.kwargs["report_data"]
-    assert "券商风控后置任务" in report_data["content"]
-    assert "写入 12" in report_data["content"]
+    assert "券商风控后置任务" not in report_data["content"]
     assert "broker_risk_control_incremental_sync" not in task._active_tasks

@@ -770,9 +770,28 @@
           "request_interval_seconds": 0.2,
           "request_timeout_seconds": 20.0,
           "dry_run": false,
-          "run_broker_risk_control_post_task": true,
+          "run_broker_risk_control_post_task": false,
           "broker_risk_control_post_task_job_id": "broker_risk_control_incremental_sync",
           "max_runtime_seconds": 7200
+        },
+        "dependencies": {
+          "post_success": [
+            {
+              "group_id": "financial_industry_supplements",
+              "mode": "parallel",
+              "jobs": [
+                {
+                  "job_id": "broker_risk_control_incremental_sync",
+                  "inherit": [
+                    "exchanges",
+                    "dry_run"
+                  ],
+                  "timeout_seconds": 7200,
+                  "failure_policy": "degrade_parent"
+                }
+              ]
+            }
+          ]
         }
       },
       "broker_risk_control_incremental_sync": {
