@@ -1955,6 +1955,61 @@ def test_data_manager_get_research_financial_statements_history_delegates_to_sto
     )
 
 
+def test_data_manager_get_research_financial_statements_history_uses_financial_db_scope(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "financial_statements": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    class SplitFinancialStorage:
+        def __init__(self):
+            self.in_financial_scope = False
+
+        def financial_database_scope(self):
+            storage = self
+
+            class Scope:
+                def __enter__(self):
+                    storage.in_financial_scope = True
+
+                def __exit__(self, exc_type, exc, tb):
+                    storage.in_financial_scope = False
+
+            return Scope()
+
+        def get_financial_statement_bundles(self, instrument_id, **kwargs):
+            if not self.in_financial_scope:
+                raise RuntimeError("no such table: financial_facts")
+            return [
+                {
+                    "instrument_id": instrument_id,
+                    "symbol": "600030",
+                    "exchange": "SSE",
+                    "report_period": "2025-12-31",
+                }
+            ]
+
+    manager.research_storage = SplitFinancialStorage()
+    manager.db_ops = Mock()
+    manager.db_ops.get_instrument_info = AsyncMock(
+        return_value={"instrument_id": "600030.SH", "symbol": "600030", "exchange": "SSE"}
+    )
+
+    result = _run(
+        manager.get_research_financial_statements_history(
+            "600030.SH",
+            include_statements=False,
+            rolling_quarters=12,
+        )
+    )
+
+    assert result["period_count"] == 1
+    assert result["report_periods"] == ["2025-12-31"]
+
+
 def test_data_manager_get_research_financial_statements_history_includes_local_core_per_period(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
@@ -2322,6 +2377,30 @@ def test_data_manager_get_research_financial_statements_exposes_securities_indus
             "source_mode": "direct",
             "fact_value": 100.0,
             "raw_fact": {},
+        },
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+            "fact_name": "净资本",
+            "canonical_fact_name": "net_capital",
+            "source": "cninfo",
+            "source_mode": "direct",
+            "fact_value": 157145566468.97,
+            "raw_fact": {},
+        },
+        {
+            "instrument_id": "600030.SH",
+            "symbol": "600030",
+            "exchange": "SSE",
+            "report_period": "2026-03-31",
+            "fact_name": "风险覆盖率",
+            "canonical_fact_name": "risk_coverage_ratio",
+            "source": "cninfo",
+            "source_mode": "direct",
+            "fact_value": 2.42,
+            "raw_fact": {},
         }
     ]
     manager.research_storage = storage
@@ -2339,10 +2418,13 @@ def test_data_manager_get_research_financial_statements_exposes_securities_indus
     assert industry_pack["profile_pack_status"]["status"] == "approved"
     assert industry_pack["facts"]["balance_sheet.trade_financial_assets"]["fact_value"] == 20.0
     assert industry_pack["facts"]["balance_sheet.agent_trading_security"]["fact_value"] == 100.0
+    assert industry_pack["facts"]["net_capital"]["fact_value"] == 157145566468.97
+    assert industry_pack["facts"]["risk_coverage_ratio"]["fact_value"] == 2.42
     _, kwargs = storage.get_financial_local_core_facts.call_args
     assert kwargs["profile"] == "securities"
     assert "balance_sheet.trade_financial_assets" in kwargs["requested_canonical_facts"]
     assert "balance_sheet.agent_trading_security" not in kwargs["requested_canonical_facts"]
+    assert "net_capital" not in kwargs["requested_canonical_facts"]
 
 
 def test_data_manager_get_research_financial_statements_remote_extension_disabled_by_config(tmp_path):

@@ -4521,7 +4521,9 @@ class DataManager:
 
         normalized_id = convert_to_database_format(instrument_id)
         bundle = await asyncio.to_thread(
-            storage.get_financial_statement_bundle,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_statement_bundle",
             normalized_id,
             include_statements=include_statements,
             report_period=report_period,
@@ -4607,7 +4609,9 @@ class DataManager:
             if str(item).strip()
         ]
         bundles = await asyncio.to_thread(
-            storage.get_financial_statement_bundles,
+            self._run_financial_storage_call,
+            storage,
+            "get_financial_statement_bundles",
             normalized_id,
             include_statements=include_statements,
             report_periods=requested_periods or None,
@@ -4735,7 +4739,9 @@ class DataManager:
                 }
             else:
                 local_core_payload = await asyncio.to_thread(
-                    storage.get_financial_local_core_facts,
+                    self._run_financial_storage_call,
+                    storage,
+                    "get_financial_local_core_facts",
                     instrument_id,
                     report_period=report_period,
                     requested_canonical_facts=requested or None,
@@ -4785,7 +4791,9 @@ class DataManager:
                 industry_local_result = None
                 if industry_requested_facts:
                     industry_local_result = await asyncio.to_thread(
-                        storage.get_financial_local_core_facts,
+                        self._run_financial_storage_call,
+                        storage,
+                        "get_financial_local_core_facts",
                         instrument_id,
                         report_period=report_period,
                         requested_canonical_facts=industry_requested_facts,
@@ -4794,7 +4802,9 @@ class DataManager:
                         include_history=True,
                     )
                 industry_numeric_rows = await asyncio.to_thread(
-                    storage.get_financial_numeric_facts,
+                    self._run_financial_storage_call,
+                    storage,
+                    "get_financial_numeric_facts",
                     instrument_id,
                     report_period=report_period,
                     include_history=True,
@@ -4875,6 +4885,28 @@ class DataManager:
                     allow_remote_extension=True,
                 )
         return result
+
+    @staticmethod
+    def _run_financial_storage_call(
+        storage: Any,
+        method_name: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """Run a financial-domain storage call against the split financial DB when available."""
+        method = getattr(storage, method_name)
+        scope_factory = getattr(storage, "financial_database_scope", None)
+        if callable(scope_factory):
+            try:
+                scope = scope_factory()
+                enter = getattr(scope, "__enter__")
+                getattr(scope, "__exit__")
+            except (AttributeError, TypeError):
+                scope = None
+            if scope is not None and callable(enter):
+                with scope:
+                    return method(*args, **kwargs)
+        return method(*args, **kwargs)
 
     async def _resolve_research_financial_statement_profile(
         self,
