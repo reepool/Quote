@@ -12,6 +12,7 @@ Quote System 提供了功能完整的 Telegram 机器人任务管理界面，允
 - **任务控制** - 启用/禁用/暂停/恢复任务
 - **数据补充** - 指定日期补充缺失的历史数据
 - **配置热重载** - 运行时动态更新任务配置无需重启
+- **受控服务重启** - 管理员二次确认后重启固定 systemd 服务
 - **权限管理** - 基于用户ID的访问控制
 - **实时通知** - 任务执行状态和系统告警通知
 
@@ -43,6 +44,16 @@ Quote System 提供了功能完整的 Telegram 机器人任务管理界面，允
     "retry_delay": 5,
     "auto_reconnect": true,
     "timeout": 30,
+    "ops": {
+      "service_restart": {
+        "enabled": false,
+        "service_name": "quote-system.service",
+        "systemctl_path": "systemctl",
+        "use_sudo": false,
+        "delay_seconds": 2,
+        "timeout_seconds": 15
+      }
+    },
     "intervals": {
       "tg_msg_retry_interval": 3,
       "tg_msg_retry_times": 5,
@@ -57,6 +68,35 @@ Quote System 提供了功能完整的 Telegram 机器人任务管理界面，允
 
 ### 权限配置
 系统只允许配置文件中指定的 `chat_id` 访问任务管理功能。
+
+### 服务重启配置
+
+Telegram 服务重启入口默认关闭；启用后只允许重启配置中的固定 systemd 服务，不支持从 Telegram 传入任意命令：
+
+```json
+{
+  "telegram_config": {
+    "ops": {
+      "service_restart": {
+        "enabled": true,
+        "service_name": "quote-system.service",
+        "systemctl_path": "systemctl",
+        "use_sudo": false,
+        "delay_seconds": 2,
+        "timeout_seconds": 15
+      }
+    }
+  }
+}
+```
+
+如果运行 `quote-system.service` 的用户没有 systemd restart 权限，将 `use_sudo` 设为 `true`，并在 sudoers 中只放行固定命令，例如：
+
+```text
+quoteuser ALL=NOPASSWD: /bin/systemctl restart quote-system.service
+```
+
+不要授予通配符 systemctl 权限，也不要把任意 shell 命令接入 Telegram。
 
 ## 📱 使用指南
 
@@ -81,6 +121,8 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/status` - 查看所有任务状态和下次执行时间
 - `/detail <task_id>` - 查看指定任务的详细信息
 - `/reload_config` - 热重载配置文件
+- `/restart_system` - 显示重启确认提示
+- `/restart_system confirm` - 重启配置中的固定 systemd 服务
 
 #### 任务控制命令
 - `/run <task_id>` - 立即执行指定任务
@@ -124,6 +166,8 @@ python3 main.py api --host 0.0.0.0 --port 8000
 /industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20  # 小样本回补历史申万指数分析指标
 /industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day # 按日补缺申万指数分析历史缺口
 /reload_config                           # 重载任务配置
+/restart_system                          # 显示重启确认提示
+/restart_system confirm                  # 重启 quote-system.service
 ```
 
 申万指数分析历史回补的 CLI 入口为 `scripts/research_ops/industry_index_analysis_backfill.py`。
@@ -197,6 +241,7 @@ audit_factors - 审计自研复权因子
 smart_fill_gaps - 智能补足大段缺口
 find_gap_and_repair - 精确逐日修复缺口
 reload_config - 热重载配置
+restart_system - 重启系统服务
 ```
 
 ## 📋 内置任务列表

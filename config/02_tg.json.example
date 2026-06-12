@@ -13,6 +13,16 @@
     "flood_sleep_threshold": 60,
     "auto_reconnect": true,
     "timeout": 30,
+    "ops": {
+      "service_restart": {
+        "enabled": false,
+        "service_name": "quote-system.service",
+        "systemctl_path": "systemctl",
+        "use_sudo": false,
+        "delay_seconds": 2,
+        "timeout_seconds": 15
+      }
+    },
     "intervals": {
       "tg_msg_retry_interval": 3,
       "tg_msg_retry_times": 5,

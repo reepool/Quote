@@ -4,6 +4,7 @@ Telegram任务管理机器人核心逻辑
 """
 
 import asyncio
+import shlex
 from typing import Optional, List, Dict, Any
 
 from .handlers import TaskManagerHandlers
@@ -77,6 +78,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
             self.telegram_bot.register_command_handler('/find_gap_and_repair', self.handlers.handle_find_gap_and_repair_command)
             self.telegram_bot.register_command_handler('/reload_config', self.handle_reload_config_command)
+            self.telegram_bot.register_command_handler('/restart_system', self.handle_restart_system_command)
 
             # 注册回调查询处理器
             self.telegram_bot.register_callback_handler(self.handlers.handle_callback_query)
@@ -161,6 +163,7 @@ class TaskManagerBot:
             "• `/smart_fill_gaps` - 智能补足大段数据缺口\n"
             "• `/find_gap_and_repair` - 精确逐日检测并修复缺口\n"
             "• `/reload_config` - 重载配置文件\n"
+            "• `/restart_system confirm` - 重启 quote system 服务\n"
             "• `/help` - 查看帮助信息\n\n"
             "*功能说明:*\n"
             "• 📋 查看任务状态 - 查看所有任务的运行状态\n"
@@ -255,6 +258,11 @@ class TaskManagerBot:
         self.logger.debug(f"[TaskManagerBot] 处理配置重载请求，chat_id: {chat_id}")
 
         try:
+            if not self.is_authorized(chat_id):
+                await self.send_message(chat_id, "⛔ *未授权操作*\n\n当前 chat_id 不在管理员白名单中。", parse_mode='markdown')
+                self.logger.warning(f"[TaskManagerBot] 拒绝未授权配置重载请求，chat_id: {chat_id}")
+                return
+
             # 发送开始重载的消息
             start_message = "🔄 *正在重载配置...*\n\n正在重新读取配置文件并更新调度器设置..."
             await self.send_message(chat_id, start_message, parse_mode='markdown')
@@ -295,6 +303,146 @@ class TaskManagerBot:
                 f"请稍后重试或联系管理员。"
             )
             await self.send_message(chat_id, error_message, parse_mode='markdown')
+
+    async def handle_restart_system_command(self, event) -> None:
+        """处理系统服务重启命令。"""
+        chat_id = event.chat_id
+        user_id = event.sender_id if hasattr(event, 'sender_id') else 'Unknown'
+        message_text = event.text if hasattr(event, 'text') else '/restart_system'
+
+        self.logger.info(f"[TaskManagerBot] 收到命令: '{message_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
+
+        try:
+            if not self.is_authorized(chat_id):
+                await self.send_message(chat_id, "⛔ *未授权操作*\n\n当前 chat_id 不在管理员白名单中。", parse_mode='markdown')
+                self.logger.warning(f"[TaskManagerBot] 拒绝未授权服务重启请求，chat_id: {chat_id}")
+                return
+
+            restart_cfg = self._get_service_restart_config()
+            if not restart_cfg["enabled"]:
+                await self.send_message(
+                    chat_id,
+                    "⚠️ *系统重启命令未启用*\n\n请先在 `telegram_config.ops.service_restart.enabled` 中显式启用。",
+                    parse_mode='markdown',
+                )
+                return
+
+            tokens = str(message_text or "").strip().split()
+            if len(tokens) < 2 or tokens[1].lower() != "confirm":
+                service_name = restart_cfg["service_name"]
+                await self.send_message(
+                    chat_id,
+                    (
+                        "⚠️ *确认重启系统服务*\n\n"
+                        f"服务: `{service_name}`\n"
+                        "该操作会短暂中断 API、调度器和 Telegram 交互。\n\n"
+                        "如确认执行，请发送:\n"
+                        "`/restart_system confirm`"
+                    ),
+                    parse_mode='markdown',
+                )
+                return
+
+            delay_seconds = restart_cfg["delay_seconds"]
+            command = self._build_service_restart_command(restart_cfg)
+            command_display = " ".join(shlex.quote(part) for part in command)
+            await self.send_message(
+                chat_id,
+                (
+                    "🔄 *已提交系统服务重启请求*\n\n"
+                    f"服务: `{restart_cfg['service_name']}`\n"
+                    f"延迟: `{delay_seconds}` 秒\n"
+                    f"命令: `{command_display}`\n\n"
+                    "后续 10-30 秒内 Telegram 交互可能短暂离线。"
+                ),
+                parse_mode='markdown',
+            )
+            asyncio.create_task(
+                self._restart_service_after_delay(
+                    chat_id=chat_id,
+                    command=command,
+                    delay_seconds=delay_seconds,
+                    timeout_seconds=restart_cfg["timeout_seconds"],
+                )
+            )
+        except Exception as e:
+            self.logger.error(f"[TaskManagerBot] 处理系统重启命令失败: {e}")
+            await self.send_message(
+                chat_id,
+                f"❌ *系统重启命令异常*\n\n错误信息: `{str(e)}`",
+                parse_mode='markdown',
+            )
+
+    def _get_service_restart_config(self) -> Dict[str, Any]:
+        """读取并规范化 Telegram 服务重启配置。"""
+        cfg = self.config_manager.get_nested('telegram_config.ops.service_restart', {}) or {}
+        service_name = str(cfg.get("service_name") or "quote-system.service").strip()
+        if not service_name or "/" in service_name or service_name.startswith("-"):
+            raise ValueError("invalid service_restart.service_name")
+        systemctl_path = str(cfg.get("systemctl_path") or "systemctl").strip()
+        if not systemctl_path or any(ch in systemctl_path for ch in [";", "&", "|", "\n", "\r"]):
+            raise ValueError("invalid service_restart.systemctl_path")
+        return {
+            "enabled": bool(cfg.get("enabled", False)),
+            "service_name": service_name,
+            "systemctl_path": systemctl_path,
+            "use_sudo": bool(cfg.get("use_sudo", False)),
+            "delay_seconds": max(0.0, float(cfg.get("delay_seconds", 2))),
+            "timeout_seconds": max(1.0, float(cfg.get("timeout_seconds", 15))),
+        }
+
+    @staticmethod
+    def _build_service_restart_command(restart_cfg: Dict[str, Any]) -> List[str]:
+        command = [
+            str(restart_cfg["systemctl_path"]),
+            "restart",
+            str(restart_cfg["service_name"]),
+        ]
+        if restart_cfg.get("use_sudo"):
+            command.insert(0, "sudo")
+        return command
+
+    async def _restart_service_after_delay(
+        self,
+        *,
+        chat_id: int,
+        command: List[str],
+        delay_seconds: float,
+        timeout_seconds: float,
+    ) -> None:
+        """延迟执行固定 systemd restart 命令。成功时当前进程通常会被 systemd 重启。"""
+        await asyncio.sleep(delay_seconds)
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout_seconds)
+            if process.returncode == 0:
+                self.logger.info("[TaskManagerBot] 服务重启命令已成功返回")
+                return
+            output = (stderr or stdout or b"").decode("utf-8", errors="replace").strip()
+            await self.send_message(
+                chat_id,
+                f"❌ *系统服务重启失败*\n\n退出码: `{process.returncode}`\n输出: `{output[:1000]}`",
+                parse_mode='markdown',
+            )
+            self.logger.error(f"[TaskManagerBot] 服务重启命令失败: rc={process.returncode}, output={output}")
+        except asyncio.TimeoutError:
+            await self.send_message(
+                chat_id,
+                f"❌ *系统服务重启超时*\n\n命令在 `{timeout_seconds}` 秒内未返回。",
+                parse_mode='markdown',
+            )
+            self.logger.error("[TaskManagerBot] 服务重启命令超时")
+        except Exception as e:
+            await self.send_message(
+                chat_id,
+                f"❌ *系统服务重启异常*\n\n错误信息: `{str(e)}`",
+                parse_mode='markdown',
+            )
+            self.logger.error(f"[TaskManagerBot] 服务重启命令异常: {e}")
 
     async def reload_scheduler_config(self) -> bool:
         """重载调度器配置"""
@@ -337,17 +485,16 @@ class TaskManagerBot:
         try:
             # 从配置获取授权的chat_id列表
             authorized_chats = self.config_manager.get_nested('telegram_config.chat_id', [])
+            authorized_normalized = {str(item).strip() for item in authorized_chats if str(item).strip()}
 
             # 支持不同格式的chat_id
             if isinstance(chat_id, str):
                 if chat_id.startswith('@'):
-                    return chat_id in authorized_chats
+                    return chat_id in authorized_normalized
                 else:
-                    chat_id = int(chat_id)
+                    return str(int(chat_id)) in authorized_normalized
             else:
-                chat_id = int(chat_id)
-
-            return chat_id in authorized_chats
+                return str(int(chat_id)) in authorized_normalized
 
         except Exception as e:
             self.logger.error(f"[TaskManagerBot] Error checking authorization for {chat_id}: {e}")
