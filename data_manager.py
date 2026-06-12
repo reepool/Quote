@@ -10870,7 +10870,7 @@ class DataManager:
                 except Exception as e:
                     dm_logger.error(f"[DataManager] Failed to update {exchange}: {e}")
                     update_results['failure_count'] += 1
-                    update_results['exchange_results'][exchange] = {'error': str(e)}
+                    update_results['exchange_stats'][exchange] = {'error': str(e)}
                     continue
 
             # 生成并发送详细的更新报告
