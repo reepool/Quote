@@ -13,6 +13,9 @@ from utils.task_manager.models import TaskStatus, TaskStatusInfo
 class TaskManagerFormatters:
     """任务管理器格式化工具类"""
 
+    STATUS_MESSAGE_MAX_CHARS = 3400
+    TASK_DESCRIPTION_MAX_CHARS = 32
+
     @staticmethod
     def format_main_message() -> str:
         """格式化主菜单消息"""
@@ -55,7 +58,8 @@ class TaskManagerFormatters:
     @staticmethod
     def format_task_status_summary(running_tasks: List[Union[TaskStatusInfo, Dict]],
                                  disabled_tasks: List[Union[TaskStatusInfo, Dict]],
-                                 total_tasks: int) -> str:
+                                 total_tasks: int,
+                                 max_chars: int = STATUS_MESSAGE_MAX_CHARS) -> str:
         """格式化任务状态摘要"""
         task_manager_logger.debug(f"[TaskManagerFormatters] Formatting task status summary: "
                                   f"total={total_tasks}, running={len(running_tasks)}, disabled={len(disabled_tasks)}")
@@ -75,15 +79,19 @@ class TaskManagerFormatters:
             else:
                 status_buckets["running"].append(task)
 
-        message = "📊 **任务状态概览**\n\n"
-        message += (
-            f"总计 `{total_tasks}` 个｜"
-            f"已调度 `{len(status_buckets['running'])}`｜"
-            f"手工/暂停 `{len(status_buckets['paused'])}`｜"
-            f"异常 `{len(status_buckets['error'])}`｜"
-            f"禁用 `{len(status_buckets['disabled'])}`\n"
-        )
-        message += "每个任务都提供可复制的任务 ID 和 `/run` 命令。\n\n"
+        lines = [
+            "📊 **任务状态概览**",
+            "",
+            (
+                f"总计 `{total_tasks}` 个｜"
+                f"已调度 `{len(status_buckets['running'])}`｜"
+                f"手工/暂停 `{len(status_buckets['paused'])}`｜"
+                f"异常 `{len(status_buckets['error'])}`｜"
+                f"禁用 `{len(status_buckets['disabled'])}`"
+            ),
+            "复制反引号内命令可直接运行；用 `/detail <任务ID>` 查看完整配置。",
+            "",
+        ]
 
         sections = [
             ("🟢 已调度", status_buckets["running"], True),
@@ -96,16 +104,18 @@ class TaskManagerFormatters:
             if not tasks:
                 continue
             rendered_any = True
-            message += TaskManagerFormatters._format_task_group_section(
-                title,
-                tasks,
-                include_schedule=include_schedule,
+            lines.extend(
+                TaskManagerFormatters._format_task_group_section_lines(
+                    title,
+                    tasks,
+                    include_schedule=include_schedule,
+                )
             )
 
         if not rendered_any:
-            message += "暂无任务"
+            lines.append("暂无任务")
 
-        return message
+        return TaskManagerFormatters._fit_status_message(lines, max_chars=max_chars)
 
     @staticmethod
     def _format_task_group_section(
@@ -114,6 +124,21 @@ class TaskManagerFormatters:
         *,
         include_schedule: bool,
     ) -> str:
+        return "\n".join(
+            TaskManagerFormatters._format_task_group_section_lines(
+                title,
+                tasks,
+                include_schedule=include_schedule,
+            )
+        ) + "\n"
+
+    @staticmethod
+    def _format_task_group_section_lines(
+        title: str,
+        tasks: List[Union[TaskStatusInfo, Dict]],
+        *,
+        include_schedule: bool,
+    ) -> List[str]:
         grouped: Dict[str, List[Union[TaskStatusInfo, Dict]]] = {}
         for task in tasks:
             group = TaskManagerFormatters._task_domain(
@@ -126,16 +151,53 @@ class TaskManagerFormatters:
             lines.append(f"*{group}*")
             for task in sorted(grouped[group], key=TaskManagerFormatters._task_sort_key):
                 lines.append(TaskManagerFormatters._format_task_line(task, include_schedule))
-        return "\n".join(lines) + "\n\n"
+            lines.append("")
+        return lines
 
     @staticmethod
     def _format_task_line(task: Union[TaskStatusInfo, Dict], include_schedule: bool) -> str:
         job_id = TaskManagerFormatters._task_job_id(task)
-        description = TaskManagerFormatters._task_description(task)
+        description = TaskManagerFormatters._shorten_text(
+            TaskManagerFormatters._task_description(task),
+            TaskManagerFormatters.TASK_DESCRIPTION_MAX_CHARS,
+        )
         schedule = TaskManagerFormatters._task_schedule_text(task) if include_schedule else None
         if schedule:
-            return f"• {description}\n  ID: `{job_id}` ｜运行: `/run {job_id}` ｜{schedule}"
-        return f"• {description}\n  ID: `{job_id}` ｜运行: `/run {job_id}`"
+            return f"• {description}：`/run {job_id}`｜{schedule}"
+        return f"• {description}：`/run {job_id}`"
+
+    @staticmethod
+    def _fit_status_message(lines: List[str], *, max_chars: int) -> str:
+        if max_chars <= 0:
+            return "\n".join(lines)
+
+        message = "\n".join(lines).strip()
+        if len(message) <= max_chars:
+            return message
+
+        fitted: List[str] = []
+        omitted_tasks = 0
+        footer_template = "\n\n... 已省略 `{}` 个任务；请用 `/detail <任务ID>` 查看详情，或按任务ID执行 `/run <任务ID>`。"
+        for index, line in enumerate(lines):
+            remaining_task_lines = sum(1 for item in lines[index:] if item.startswith("• "))
+            footer = footer_template.format(remaining_task_lines)
+            candidate = "\n".join(fitted + [line]).strip()
+            if len(candidate) + len(footer) > max_chars:
+                omitted_tasks = remaining_task_lines
+                break
+            fitted.append(line)
+
+        if omitted_tasks:
+            fitted_message = "\n".join(fitted).rstrip()
+            return f"{fitted_message}{footer_template.format(omitted_tasks)}"
+
+        return message[: max_chars - 1].rstrip() + "…"
+
+    @staticmethod
+    def _shorten_text(text: str, max_chars: int) -> str:
+        if max_chars <= 0 or len(text) <= max_chars:
+            return text
+        return text[: max_chars - 1].rstrip() + "…"
 
     @staticmethod
     def _task_job_id(task: Union[TaskStatusInfo, Dict]) -> str:
