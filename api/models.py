@@ -1244,6 +1244,10 @@ class ResearchDcfValuationResponse(BaseModel):
     terminal_value: Optional[float] = Field(None, description="终值现值")
     terminal_value_pct: Optional[float] = Field(None, description="终值占比")
     net_debt_adjustment: Optional[Dict[str, Any]] = Field(None, description="净债务调整")
+    cyclical_model_diagnostics: Optional[Dict[str, Any]] = Field(
+        None,
+        description="周期行业 DCF 商品、利润率和期货诊断",
+    )
     forecast_rows: List[Dict[str, Any]] = Field(
         default_factory=list,
         description="显式预测行",

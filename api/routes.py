@@ -1406,6 +1406,181 @@ async def get_research_dcf_input_gaps(
 
 
 @router.get(
+    "/research/futures/readiness",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_readiness():
+    """读取商品期货行情数据域 readiness。"""
+    try:
+        return await data_manager.get_research_futures_readiness()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures readiness: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/instruments",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_instruments(
+    active_only: bool = Query(True, description="是否只返回启用标的和序列"),
+):
+    """查询本地商品期货标的和连续序列注册表。"""
+    try:
+        return await data_manager.get_research_futures_instruments(
+            active_only=_query_default(active_only, True),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures instruments: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/{series_id}/prices",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_prices(
+    series_id: str,
+    start_date: Optional[date] = Query(None, description="开始日期"),
+    end_date: Optional[date] = Query(None, description="结束日期"),
+    limit: Optional[int] = Query(None, description="最大返回行数", ge=1, le=5000),
+):
+    """查询本地商品期货价格序列，不触发远程同步。"""
+    try:
+        start_value = _query_default(start_date)
+        end_value = _query_default(end_date)
+        result = await data_manager.get_research_futures_prices(
+            series_id,
+            start_date=start_value.isoformat() if start_value else None,
+            end_date=end_value.isoformat() if end_value else None,
+            limit=_query_default(limit),
+        )
+        if result.get("status") == "not_found":
+            raise HTTPException(status_code=404, detail="Research futures series not found")
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures prices: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/{series_id}/cycle-diagnostics",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_cycle_diagnostics(
+    series_id: str,
+    as_of_date: Optional[date] = Query(None, description="诊断日期"),
+):
+    """查询本地商品期货周期诊断。"""
+    try:
+        as_of_value = _query_default(as_of_date)
+        result = await data_manager.get_research_futures_cycle_diagnostics(
+            series_id,
+            as_of_date=as_of_value.isoformat() if as_of_value else None,
+        )
+        if result.get("status") == "not_found":
+            raise HTTPException(status_code=404, detail="Research futures series not found")
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures diagnostics: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/spreads",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_spreads(
+    active_only: bool = Query(True, description="是否只返回启用价差定义"),
+):
+    """查询商品期货价差定义。"""
+    try:
+        return await data_manager.get_research_futures_spreads(
+            active_only=_query_default(active_only, True),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures spreads: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/spreads/{spread_id}/values",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_spread_values(
+    spread_id: str,
+    start_date: Optional[date] = Query(None, description="开始日期"),
+    end_date: Optional[date] = Query(None, description="结束日期"),
+    limit: Optional[int] = Query(None, description="最大返回行数", ge=1, le=5000),
+):
+    """查询商品期货价差时序。"""
+    try:
+        start_value = _query_default(start_date)
+        end_value = _query_default(end_date)
+        return await data_manager.get_research_futures_spread_values(
+            spread_id,
+            start_date=start_value.isoformat() if start_value else None,
+            end_date=end_value.isoformat() if end_value else None,
+            limit=_query_default(limit),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures spread values: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company/{instrument_id}/futures-exposure",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_company_futures_exposure(instrument_id: str):
+    """查询公司级商品期货暴露映射。"""
+    try:
+        return await data_manager.get_research_company_futures_exposure(instrument_id)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research company futures exposure: {str(e)}",
+        )
+
+
+@router.get(
     "/research/company/{instrument_id}/analyst-coverage",
     response_model=ResearchAnalystCoverageResponse,
     tags=["Research"],

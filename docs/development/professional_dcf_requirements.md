@@ -400,6 +400,11 @@ include_model_comparison=true|false
 | 行业 beta | 行业组合 beta | 本地行情 + 行业分类计算 | 第三方行业指数 beta | 必须记录 benchmark 和窗口 |
 | 商品价格 | 估值日或周期均值 | 交易所/官方统计 | AkShare/公开行情源 | 周期行业敏感性使用 |
 
+商品价格和周期景气数据层的独立需求见
+[`commodity_futures_market_data_requirements.md`](commodity_futures_market_data_requirements.md)。
+该数据层负责商品期货历史序列、连续合约、价差、周期诊断、行业/公司暴露映射和
+readiness；DCF 引擎只读取本地已同步结果，不在估值计算中隐式远程拉取行情。
+
 建议本地接口：
 
 ```text

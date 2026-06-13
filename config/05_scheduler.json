@@ -547,6 +547,88 @@
           "note": "Historical backfill can be large; keep disabled by default and run explicit date ranges via ops script or Telegram command."
         }
       },
+      "futures_market_data_sync": {
+        "enabled": true,
+        "description": "商品期货行情日线与连续序列同步（写入 data/futures.db）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 21,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "mode": "direct",
+          "dry_run": false,
+          "max_runtime_seconds": 7200
+        }
+      },
+      "futures_market_data_backfill": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "商品期货行情历史回补（默认禁用，需显式日期范围，写入 data/futures.db）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 21,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "mode": "direct",
+          "dry_run": false,
+          "max_runtime_seconds": 14400,
+          "note": "Historical backfill must be run with explicit start_date/end_date and bounded series_ids."
+        }
+      },
+      "futures_cycle_diagnostics_refresh": {
+        "enabled": true,
+        "description": "商品期货周期分位与景气诊断刷新（只读 data/futures.db 本地行情）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 22,
+          "minute": 10,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "max_runtime_seconds": 3600
+        }
+      },
+      "futures_spread_recompute": {
+        "enabled": true,
+        "description": "商品期货价差重算（只读 data/futures.db 本地行情）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 22,
+          "minute": 20,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "max_runtime_seconds": 3600
+        }
+      },
       "industry_standard_gap_fill": {
         "enabled": false,
         "description": "研究域申万标准行业缺口检测与定向修复",

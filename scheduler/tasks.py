@@ -860,6 +860,40 @@ def _format_industry_index_analysis_scheduler_report(result: Dict[str, Any]) -> 
     )
 
 
+def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
+    """Build an operator-facing report for futures market-data maintenance."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    totals = result.get("totals") or {}
+    series = result.get("series") or []
+    detail_lines = []
+    for item in series[:10]:
+        write_result = item.get("write_result") or {}
+        detail_lines.append(
+            f"{item.get('series_id', 'unknown')}: fetched={item.get('fetched_rows', 0)}, "
+            f"inserted={write_result.get('inserted', 0)}, "
+            f"changed={write_result.get('changed', 0)}, "
+            f"unchanged={write_result.get('unchanged', 0)}, "
+            f"status={item.get('status', 'ok')}"
+        )
+    if not detail_lines:
+        detail_lines.append(result.get("reason") or "无序列明细")
+    return (
+        f"{icon} *商品期货行情数据维护*\n\n"
+        f"结论: *{label}*\n"
+        f"状态: `{status}`\n"
+        f"run_id: `{result.get('run_id', 'N/A')}`\n"
+        f"inserted: `{totals.get('inserted', 0)}`\n"
+        f"changed: `{totals.get('changed', 0)}`\n"
+        f"unchanged: `{totals.get('unchanged', 0)}`\n"
+        f"failed: `{totals.get('failed', 0)}`\n\n"
+        "序列明细:\n"
+        "```text\n"
+        + "\n".join(detail_lines)
+        + "\n```"
+    )
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -2361,6 +2395,158 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('industry_index_analysis_backfill')
+
+    async def futures_market_data_sync(
+        self,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        mode: str = "direct",
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货行情日更任务。"""
+        self._active_tasks.add('futures_market_data_sync')
+        try:
+            result = await data_manager.run_futures_market_data_sync(
+                series_ids=series_ids,
+                start_date=start_date,
+                end_date=end_date,
+                mode=mode,
+                dry_run=dry_run,
+            )
+            status = result.get('status', 'failed')
+            success = status == 'success'
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货行情数据维护报告',
+                    'content': _format_futures_market_data_scheduler_report(result),
+                    'status': 'success' if success else status,
+                    'tasks_completed': len(result.get('series') or []),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': item.get('series_id', 'unknown'),
+                            'status': str((item.get('write_result') or {}).get('inserted', 0)),
+                        }
+                        for item in (result.get('series') or [])
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货行情数据维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures market-data sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货行情数据维护报告',
+                    'content': _format_futures_market_data_scheduler_report({
+                        'status': 'error',
+                        'reason': str(e),
+                        'totals': {},
+                        'series': [],
+                    }),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'futures_market_data_sync', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货行情数据维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('futures_market_data_sync')
+
+    async def futures_market_data_backfill(
+        self,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        mode: str = "direct",
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货行情历史回补任务，要求显式日期范围。"""
+        if not start_date or not end_date:
+            raise ValueError("futures_market_data_backfill requires start_date and end_date")
+        return await self.futures_market_data_sync(
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            mode=mode,
+            dry_run=dry_run,
+            job_config=job_config,
+        )
+
+    async def futures_cycle_diagnostics_refresh(
+        self,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货周期诊断刷新任务。"""
+        self._active_tasks.add('futures_cycle_diagnostics_refresh')
+        try:
+            result = await data_manager.refresh_futures_cycle_diagnostics()
+            success = result.get('status') == 'success'
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货周期诊断刷新报告',
+                    'status': 'success' if success else result.get('status', 'failed'),
+                    'tasks_completed': result.get('series_count', 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'diagnostics_written', 'status': str(result.get('diagnostics_written', 0))}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货周期诊断刷新',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures diagnostics refresh failed: {e}")
+            return False
+        finally:
+            self._active_tasks.discard('futures_cycle_diagnostics_refresh')
+
+    async def futures_spread_recompute(
+        self,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货价差重算任务。"""
+        self._active_tasks.add('futures_spread_recompute')
+        try:
+            result = await data_manager.recompute_futures_spreads()
+            success = result.get('status') == 'success'
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货价差重算报告',
+                    'status': 'success' if success else result.get('status', 'failed'),
+                    'tasks_completed': len(result.get('spreads') or []),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': item.get('spread_id', 'unknown'),
+                            'status': f"values={item.get('values_written', 0)}",
+                        }
+                        for item in (result.get('spreads') or [])
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货价差重算',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures spread recompute failed: {e}")
+            return False
+        finally:
+            self._active_tasks.discard('futures_spread_recompute')
 
     async def industry_standard_gap_fill(
         self,

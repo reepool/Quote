@@ -61,6 +61,13 @@ from api.routes import (
     get_research_financial_statements_history,
     get_research_financial_statements_readiness,
     get_research_financial_summary,
+    get_research_futures_cycle_diagnostics,
+    get_research_futures_instruments,
+    get_research_futures_prices,
+    get_research_futures_readiness,
+    get_research_futures_spread_values,
+    get_research_futures_spreads,
+    get_research_company_futures_exposure,
     get_research_metadata_readiness,
     get_research_official_industry_mapping,
     get_research_official_mapping_override_review,
@@ -2554,6 +2561,121 @@ class TestResearchRoutes:
         response = _run(get_research_dcf_readiness("600000.SH"))
 
         assert response["profiles"][0]["blockers"] == ["missing_capital_expenditure"]
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_readiness_success(self, mock_dm):
+        mock_dm.get_research_futures_readiness = AsyncMock(
+            return_value={
+                "domain": "futures_market_data",
+                "status": "partial",
+                "enabled_series_count": 1,
+                "blockers": [],
+                "warnings": ["CNF.CU.SHFE.main:insufficient_history"],
+            }
+        )
+
+        response = _run(get_research_futures_readiness())
+
+        assert response["domain"] == "futures_market_data"
+        mock_dm.get_research_futures_readiness.assert_awaited_once_with()
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_prices_success(self, mock_dm):
+        mock_dm.get_research_futures_prices = AsyncMock(
+            return_value={
+                "status": "success",
+                "series": {"series_id": "CNF.CU.SHFE.main"},
+                "row_count": 1,
+                "rows": [{"trade_date": "2020-01-02", "close": 1.1}],
+            }
+        )
+
+        response = _run(get_research_futures_prices("CNF.CU.SHFE.main"))
+
+        assert response["rows"][0]["close"] == 1.1
+        mock_dm.get_research_futures_prices.assert_awaited_once()
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_prices_not_found(self, mock_dm):
+        mock_dm.get_research_futures_prices = AsyncMock(
+            return_value={"status": "not_found", "series_id": "missing", "rows": []}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_prices("missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_instruments_success(self, mock_dm):
+        mock_dm.get_research_futures_instruments = AsyncMock(
+            return_value={
+                "status": "success",
+                "instruments": [{"instrument_id": "CNF.CU.SHFE"}],
+                "series": [{"series_id": "CNF.CU.SHFE.main"}],
+            }
+        )
+
+        response = _run(get_research_futures_instruments())
+
+        assert response["series"][0]["series_id"] == "CNF.CU.SHFE.main"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_cycle_diagnostics_success(self, mock_dm):
+        mock_dm.get_research_futures_cycle_diagnostics = AsyncMock(
+            return_value={
+                "status": "success",
+                "series": {"series_id": "CNF.CU.SHFE.main"},
+                "diagnostics": [{"lookback_years": 10, "cycle_state": "high"}],
+            }
+        )
+
+        response = _run(get_research_futures_cycle_diagnostics("CNF.CU.SHFE.main"))
+
+        assert response["diagnostics"][0]["cycle_state"] == "high"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_spreads_success(self, mock_dm):
+        mock_dm.get_research_futures_spreads = AsyncMock(
+            return_value={
+                "status": "success",
+                "spreads": [{"spread_id": "rb_i_j"}],
+            }
+        )
+
+        response = _run(get_research_futures_spreads())
+
+        assert response["spreads"][0]["spread_id"] == "rb_i_j"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_spread_values_success(self, mock_dm):
+        mock_dm.get_research_futures_spread_values = AsyncMock(
+            return_value={
+                "status": "success",
+                "spread_id": "rb_i_j",
+                "row_count": 1,
+                "rows": [{"trade_date": "2020-01-02", "value": 100.0}],
+            }
+        )
+
+        response = _run(get_research_futures_spread_values("rb_i_j"))
+
+        assert response["rows"][0]["value"] == 100.0
+
+    @patch("api.routes.data_manager")
+    def test_get_research_company_futures_exposure_success(self, mock_dm):
+        mock_dm.get_research_company_futures_exposure = AsyncMock(
+            return_value={
+                "status": "missing",
+                "instrument_id": "600000.SH",
+                "mappings": [],
+                "input_gaps": [{"field": "futures_exposure_mapping"}],
+            }
+        )
+
+        response = _run(get_research_company_futures_exposure("600000.SH"))
+
+        assert response["input_gaps"][0]["field"] == "futures_exposure_mapping"
 
     @patch("api.routes.data_manager")
     def test_get_research_technical_summary_success(self, mock_dm):

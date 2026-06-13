@@ -142,6 +142,7 @@ class DataManager:
         self.db_ops = db_ops
         self.source_factory = None
         self.research_storage = None
+        self.futures_storage = None
 
         # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
         # TTL = 1 小时, 适用于 API 高频查询场景
@@ -232,6 +233,7 @@ class DataManager:
                 await self.db_ops.initialize()
 
             self._initialize_research_storage()
+            self._initialize_futures_storage()
 
             if include_data_sources:
                 # 初始化数据源工厂
@@ -295,6 +297,54 @@ class DataManager:
             raise RuntimeError("research storage is not initialized")
 
         return self.research_storage
+
+    def _initialize_futures_storage(self) -> None:
+        """Initialize dedicated futures-domain storage when configured."""
+        if not self.research_config.enabled:
+            return
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        if not module_cfg.get("enabled", False):
+            return
+        try:
+            from research.futures_market_data import (
+                FuturesStorageManager,
+                default_futures_registry,
+            )
+
+            self.futures_storage = FuturesStorageManager(self.research_config)
+            self.futures_storage.initialize()
+            registry = default_futures_registry(module_cfg)
+            self.futures_storage.upsert_instruments_and_series(
+                registry["instruments"],
+                registry["series"],
+            )
+            self.futures_storage.upsert_source_manifests(
+                registry.get("source_manifests", []),
+            )
+            dm_logger.info(
+                "[DataManager] Futures storage initialized: %s",
+                self.futures_storage.db_path,
+            )
+        except Exception as e:
+            dm_logger.warning(
+                "[DataManager] Futures storage initialization failed, continuing "
+                "without futures storage: %s",
+                e,
+            )
+            self.futures_storage = None
+
+    def _require_futures_storage(self):
+        """Return futures storage or raise a structured runtime error."""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research commodity_market_data module is disabled")
+        if self.futures_storage is None:
+            self._initialize_futures_storage()
+        if self.futures_storage is None:
+            raise RuntimeError("futures storage is not initialized")
+        return self.futures_storage
 
     @staticmethod
     def _load_research_storage_state(loader):
@@ -4453,6 +4503,243 @@ class DataManager:
         )
         return self._attach_instrument_master_governance(result, governance)
 
+    async def run_futures_market_data_sync(
+        self,
+        *,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        mode: str = "direct",
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run futures market-data sync into the dedicated futures database."""
+        storage = self._require_futures_storage()
+        from research.futures_market_data import FuturesMarketDataSyncService
+
+        service = FuturesMarketDataSyncService(storage, self.research_config)
+        return await service.sync(
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            mode=mode,
+            dry_run=dry_run,
+        )
+
+    async def refresh_futures_cycle_diagnostics(self) -> Dict[str, Any]:
+        """Refresh persisted futures cycle diagnostics from local bars."""
+        storage = self._require_futures_storage()
+        from research.futures_market_data import FuturesDiagnosticsService
+
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        return await asyncio.to_thread(
+            FuturesDiagnosticsService(storage, module_cfg).refresh_all
+        )
+
+    async def recompute_futures_spreads(self) -> Dict[str, Any]:
+        """Recompute configured futures spreads from local bars."""
+        storage = self._require_futures_storage()
+        from research.futures_market_data import FuturesSpreadService
+
+        return await asyncio.to_thread(FuturesSpreadService(storage).recompute_all)
+
+    async def get_research_futures_readiness(self) -> Dict[str, Any]:
+        """Return futures market-data readiness."""
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        if not self.research_config.enabled:
+            return {
+                "domain": "futures_market_data",
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+                "blockers": ["research_config_disabled"],
+                "warnings": [],
+            }
+        if not module_cfg.get("enabled", False):
+            return {
+                "domain": "futures_market_data",
+                "status": "disabled",
+                "reason": "research commodity_market_data module is disabled",
+                "blockers": ["commodity_market_data_disabled"],
+                "warnings": [],
+            }
+        storage = self._require_futures_storage()
+        from research.futures_market_data import FuturesReadinessService
+
+        return await asyncio.to_thread(
+            FuturesReadinessService(storage, module_cfg).build
+        )
+
+    async def get_research_futures_instruments(
+        self,
+        *,
+        active_only: bool = True,
+    ) -> Dict[str, Any]:
+        """List local futures instruments and series metadata."""
+        storage = self._require_futures_storage()
+        instruments, series = await asyncio.to_thread(
+            lambda: (
+                storage.list_instruments(active_only=active_only),
+                storage.list_series(active_only=active_only),
+            )
+        )
+        return {
+            "status": "success",
+            "instruments": instruments,
+            "series": series,
+        }
+
+    async def get_research_futures_prices(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Read local futures price bars for a series."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            series = storage.get_series(series_id)
+            if not series:
+                return {"status": "not_found", "series_id": series_id, "rows": []}
+            rows = storage.get_price_bars(
+                series_id,
+                start_date=start_date,
+                end_date=end_date,
+                limit=limit,
+            )
+            return {
+                "status": "success",
+                "series": series,
+                "row_count": len(rows),
+                "rows": rows,
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_cycle_diagnostics(
+        self,
+        series_id: str,
+        *,
+        as_of_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Read persisted futures cycle diagnostics for a series."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            series = storage.get_series(series_id)
+            if not series:
+                return {"status": "not_found", "series_id": series_id, "diagnostics": []}
+            diagnostics = storage.get_cycle_diagnostics(series_id, as_of_date=as_of_date)
+            return {
+                "status": "success" if diagnostics else "empty",
+                "series": series,
+                "diagnostics": diagnostics,
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_spreads(
+        self,
+        *,
+        active_only: bool = True,
+    ) -> Dict[str, Any]:
+        """List local futures spread definitions."""
+        storage = self._require_futures_storage()
+        definitions = await asyncio.to_thread(
+            storage.list_spread_definitions,
+            active_only=active_only,
+        )
+        return {
+            "status": "success",
+            "spreads": definitions,
+        }
+
+    async def get_research_futures_spread_values(
+        self,
+        spread_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Read local futures spread values."""
+        storage = self._require_futures_storage()
+        rows = await asyncio.to_thread(
+            storage.get_spread_values,
+            spread_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+        return {
+            "status": "success" if rows else "empty",
+            "spread_id": spread_id,
+            "row_count": len(rows),
+            "rows": rows,
+        }
+
+    async def get_research_company_futures_exposure(
+        self,
+        instrument_id: str,
+    ) -> Dict[str, Any]:
+        """Read local futures exposure mappings for a company/instrument."""
+        storage = self._require_futures_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+
+        def _load() -> Dict[str, Any]:
+            mappings = storage.get_exposure_mappings(
+                scope_type="instrument",
+                scope_id=normalized_id,
+            )
+            if not mappings:
+                return {
+                    "status": "missing",
+                    "instrument_id": normalized_id,
+                    "mappings": [],
+                    "input_gaps": [
+                        {
+                            "field": "futures_exposure_mapping",
+                            "requiredness": "cyclical_dcf_optional_until_mapping_rollout",
+                            "reason": "no_local_futures_exposure_mapping",
+                        }
+                    ],
+                }
+            return {
+                "status": "success",
+                "instrument_id": normalized_id,
+                "mappings": mappings,
+                "input_gaps": [],
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_local_futures_cycle_inputs_for_dcf(
+        self,
+        instrument_id: str,
+    ) -> Dict[str, Any]:
+        """Return local futures exposure and diagnostics for cyclical DCF."""
+        exposure = await self.get_research_company_futures_exposure(instrument_id)
+        if exposure.get("status") != "success":
+            return exposure
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            diagnostics_by_series: Dict[str, Any] = {}
+            for mapping in exposure.get("mappings", []):
+                series_ids = []
+                if mapping.get("revenue_series_id"):
+                    series_ids.append(mapping["revenue_series_id"])
+                series_ids.extend(mapping.get("cost_series_ids") or [])
+                for series_id in sorted(set(series_ids)):
+                    diagnostics_by_series[series_id] = storage.get_cycle_diagnostics(series_id)
+            return {
+                **exposure,
+                "diagnostics_by_series": diagnostics_by_series,
+            }
+
+        return await asyncio.to_thread(_load)
+
     async def get_research_financial_summary(
         self,
         instrument_id: str,
@@ -5341,6 +5628,18 @@ class DataManager:
                         "as_of_date": beta_result.get("as_of_date"),
                     }
 
+        futures_cycle_context = await self._get_dcf_futures_cycle_context(normalized_id)
+        if futures_cycle_context:
+            overrides.setdefault(
+                "commodity_price_assumption",
+                futures_cycle_context.get("commodity_price_assumption"),
+            )
+            overrides.setdefault(
+                "cycle_index_level",
+                futures_cycle_context.get("cycle_index_level"),
+            )
+            overrides["futures_cycle_context"] = futures_cycle_context
+
         cache_key = self._build_dcf_run_cache_key(
             normalized_id,
             financial_bundle,
@@ -5360,8 +5659,59 @@ class DataManager:
             latest_close=latest_close,
             overrides=overrides,
         )
+        if futures_cycle_context:
+            result = deepcopy(result)
+            cyclical_diagnostics = result.setdefault("cyclical_model_diagnostics", {})
+            if isinstance(cyclical_diagnostics, dict):
+                cyclical_diagnostics["futures_market_data"] = futures_cycle_context
         self._store_dcf_run_cache(cache_key, result, module_cfg)
         return result
+
+    async def _get_dcf_futures_cycle_context(
+        self,
+        instrument_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return compact local futures diagnostics for DCF, if configured."""
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        if not module_cfg.get("enabled", False):
+            return None
+        try:
+            payload = await self.get_local_futures_cycle_inputs_for_dcf(instrument_id)
+        except RuntimeError:
+            return None
+        if payload.get("status") != "success":
+            return None
+        diagnostics_by_series = payload.get("diagnostics_by_series") or {}
+        selected_series_id = None
+        selected_diagnostic = None
+        for series_id, diagnostics in diagnostics_by_series.items():
+            if not isinstance(diagnostics, list) or not diagnostics:
+                continue
+            selected_series_id = series_id
+            selected_diagnostic = next(
+                (
+                    item for item in diagnostics
+                    if item.get("lookback_years") == 10 and item.get("percentile") is not None
+                ),
+                None,
+            ) or next(
+                (item for item in diagnostics if item.get("percentile") is not None),
+                diagnostics[0],
+            )
+            break
+        if not selected_diagnostic:
+            return None
+        return {
+            "status": "success",
+            "instrument_id": instrument_id,
+            "selected_series_id": selected_series_id,
+            "commodity_price_assumption": selected_diagnostic.get("latest_price"),
+            "cycle_index_level": selected_diagnostic.get("percentile"),
+            "diagnostic": selected_diagnostic,
+            "exposure_mappings": payload.get("mappings") or [],
+            "diagnostics_by_series": diagnostics_by_series,
+            "source_policy": "local_futures_db_only",
+        }
 
     def _enrich_dcf_bundle_with_broker_risk_control_facts(
         self,

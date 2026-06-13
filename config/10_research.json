@@ -13,6 +13,133 @@
           "BSE"
         ]
       },
+      "commodity_market_data": {
+        "enabled": true,
+        "storage": {
+          "database": "data/futures.db"
+        },
+        "sources": {
+          "preferred_order": [
+            "exchange_official",
+            "akshare_futures"
+          ],
+          "exchange_official": {
+            "enabled": true,
+            "source": "exchange_official",
+            "role": "first_hand_free_source",
+            "daily_interface": "official_daily_contract_bars",
+            "enabled_exchanges": [
+              "SHFE",
+              "INE",
+              "DCE",
+              "CZCE",
+              "GFEX"
+            ],
+            "timeout_seconds": 20,
+            "retry_attempts": 2,
+            "retry_backoff_seconds": 0.5,
+            "request_interval_seconds": 0.05,
+            "parser_version": "official_futures_daily.v1",
+            "fallback_to": "akshare_futures",
+            "interfaces": {
+              "SHFE": "https://www.shfe.com.cn/data/tradedata/future/dailydata/kxYYYYMMDD.dat",
+              "INE": "https://www.ine.cn/data/tradedata/future/dailydata/kxYYYYMMDD.dat",
+              "DCE": "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
+              "CZCE": "http://www.czce.com.cn/cn/DFSStaticFiles/Future/YYYY/YYYYMMDD/FutureDataDaily.txt",
+              "GFEX": "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList"
+            },
+            "note": "Preferred first-hand route for domestic futures daily contract bars. Main-continuous series are constructed locally by open-interest priority; AkShare remains fallback for unsupported, empty, or failed official requests."
+          },
+          "akshare_futures": {
+            "enabled": true,
+            "source": "akshare",
+            "mode_priority": [
+              "direct",
+              "proxy_patch"
+            ],
+            "daily_interface": "futures_zh_daily_sina",
+            "timeout_seconds": 30,
+            "role": "free_aggregator_fallback"
+          }
+        },
+        "coverage": {
+          "target_history_years": 10,
+          "p0_required": true,
+          "min_observation_ratio": 0.7,
+          "max_stale_trading_days": 3
+        },
+        "diagnostics": {
+          "lookback_years": [
+            3,
+            5,
+            10
+          ],
+          "trading_days_per_year": 252,
+          "min_observation_ratio": 0.7,
+          "cycle_state_thresholds": {
+            "extreme_low": 0.1,
+            "low": 0.3,
+            "high": 0.7,
+            "extreme_high": 0.9
+          }
+        },
+        "registry": {
+          "note": "Include the built-in domestic P0 futures universe from the commodity requirements; listed instruments below are explicit overrides/examples.",
+          "include_default_p0_universe": true,
+          "instruments": [
+            {
+              "instrument_id": "CNF.CU.SHFE",
+              "symbol": "CU",
+              "name": "SHFE Copper",
+              "exchange": "SHFE",
+              "category": "nonferrous",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "priority": "P0"
+            },
+            {
+              "instrument_id": "CNF.AL.SHFE",
+              "symbol": "AL",
+              "name": "SHFE Aluminum",
+              "exchange": "SHFE",
+              "category": "nonferrous",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "priority": "P0"
+            },
+            {
+              "instrument_id": "CNF.RB.SHFE",
+              "symbol": "RB",
+              "name": "SHFE Rebar",
+              "exchange": "SHFE",
+              "category": "ferrous",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "priority": "P0"
+            },
+            {
+              "instrument_id": "CNF.I.DCE",
+              "symbol": "I",
+              "name": "DCE Iron Ore",
+              "exchange": "DCE",
+              "category": "ferrous",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "priority": "P0"
+            },
+            {
+              "instrument_id": "CNF.SC.INE",
+              "symbol": "SC",
+              "name": "INE Crude Oil",
+              "exchange": "INE",
+              "category": "energy",
+              "currency": "CNY",
+              "unit": "CNY/barrel",
+              "priority": "P0"
+            }
+          ]
+        }
+      },
       "industry": {
         "enabled": true,
         "optional_empty_exchanges": [
@@ -1161,6 +1288,13 @@
           "note": "Use only when direct access is unstable or the data domain has no cheaper substitute."
         },
         "role": "fallback_for_full_financial_statements_and_sw_industry",
+        "futures_market_data": {
+          "enabled": true,
+          "daily_interface": "futures_zh_daily_sina",
+          "request_timeout_seconds": 20.0,
+          "request_interval_seconds": 0.2,
+          "role": "free_aggregator_fallback_for_futures"
+        },
         "shareholders": {
           "top_holders_request_interval_seconds": 0.2,
           "top_holders_retry_attempts": 2,
