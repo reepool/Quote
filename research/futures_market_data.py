@@ -20,6 +20,23 @@ from utils.date_utils import get_shanghai_time
 
 FUTURES_DIAGNOSTICS_VERSION = "futures_cycle_diagnostics.v1"
 FUTURES_SYNC_VERSION = "futures_market_data_sync.v1"
+FUTURES_CONTINUOUS_CONSTRUCTION_VERSION = "futures_continuous_mapping.v1"
+
+
+FUTURES_CATEGORY_DEFINITIONS: List[Dict[str, str]] = [
+    {"category": "coal", "name": "Coal", "parent_category": "energy"},
+    {"category": "ferrous", "name": "Ferrous Metals", "parent_category": "commodity"},
+    {"category": "nonferrous", "name": "Nonferrous Metals", "parent_category": "commodity"},
+    {"category": "precious_metal", "name": "Precious Metals", "parent_category": "commodity"},
+    {"category": "energy", "name": "Energy", "parent_category": "commodity"},
+    {"category": "chemical", "name": "Chemicals", "parent_category": "commodity"},
+    {"category": "agriculture", "name": "Agriculture", "parent_category": "commodity"},
+    {"category": "rubber", "name": "Rubber", "parent_category": "commodity"},
+    {"category": "new_energy_material", "name": "New Energy Materials", "parent_category": "commodity"},
+    {"category": "building_material", "name": "Building Materials", "parent_category": "commodity"},
+    {"category": "pulp_paper", "name": "Pulp And Paper", "parent_category": "commodity"},
+    {"category": "commodity", "name": "Other Commodity", "parent_category": ""},
+]
 
 
 DEFAULT_P0_FUTURES_INSTRUMENTS: List[Dict[str, str]] = [
@@ -122,6 +139,101 @@ class FuturesBar:
     parser_version: str = FUTURES_SYNC_VERSION
     quality_flag: str = "ok"
     raw_payload_hash: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesCategory:
+    category: str
+    name: str
+    parent_category: str = ""
+    active: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesContract:
+    contract_id: str
+    instrument_id: str
+    exchange: str
+    exchange_contract_code: str
+    contract_month: str = ""
+    listed_date: Optional[str] = None
+    last_trade_date: Optional[str] = None
+    delivery_month: str = ""
+    contract_multiplier: Optional[float] = None
+    tick_size: Optional[float] = None
+    currency: str = "CNY"
+    unit: str = ""
+    active: bool = True
+    source: str = "manual"
+    quality_flag: str = "partial"
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesContractBar:
+    contract_id: str
+    instrument_id: str
+    trade_date: str
+    open: Optional[float]
+    high: Optional[float]
+    low: Optional[float]
+    close: Optional[float]
+    settlement: Optional[float] = None
+    volume: Optional[float] = None
+    open_interest: Optional[float] = None
+    amount: Optional[float] = None
+    currency: str = "CNY"
+    unit: str = ""
+    source: str = "manual"
+    source_mode: str = "manual_import"
+    source_profile: str = "manual_import"
+    source_interface: str = ""
+    parser_version: str = FUTURES_SYNC_VERSION
+    quality_flag: str = "ok"
+    raw_payload_hash: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesTradingCalendarDay:
+    exchange: str
+    trade_date: str
+    is_trading_day: bool
+    timezone: str = "Asia/Shanghai"
+    session_type: str = "day_and_night"
+    source_profile: str = "estimated_calendar"
+    quality_flag: str = "estimated"
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesInstrumentSession:
+    instrument_id: str
+    exchange: str
+    timezone: str = "Asia/Shanghai"
+    has_night_session: bool = True
+    session_rules: Dict[str, Any] = field(default_factory=dict)
+    source_profile: str = "configured"
+    quality_flag: str = "estimated"
+    active: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesContinuousMapping:
+    series_id: str
+    trade_date: str
+    contract_id: str
+    exchange_contract_code: str
+    instrument_id: str
+    construction_method: str
+    construction_version: str = FUTURES_CONTINUOUS_CONSTRUCTION_VERSION
+    selection_open_interest: Optional[float] = None
+    selection_volume: Optional[float] = None
+    source_profile: str = "exchange_official"
+    quality_flag: str = "ok"
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -258,6 +370,51 @@ def _date_key(value: Any) -> str:
     return date.fromisoformat(text[:10]).isoformat()
 
 
+def make_futures_instrument_id(symbol: str, exchange: str, *, namespace: str = "CNF") -> str:
+    symbol_key = str(symbol or "").strip().upper()
+    exchange_key = str(exchange or "").strip().upper()
+    namespace_key = str(namespace or "CNF").strip().upper()
+    if not symbol_key or not exchange_key:
+        raise ValueError("symbol and exchange are required for futures instrument id")
+    return f"{namespace_key}.{symbol_key}.{exchange_key}"
+
+
+def make_futures_contract_id(instrument_id: str, exchange_contract_code: str) -> str:
+    instrument_key = str(instrument_id or "").strip().upper()
+    contract_code = str(exchange_contract_code or "").strip().upper()
+    if not instrument_key or not contract_code:
+        raise ValueError("instrument_id and exchange_contract_code are required for contract id")
+    return f"{instrument_key}.{contract_code}"
+
+
+def make_futures_series_id(instrument_id: str, series_type: str = "main_continuous") -> str:
+    suffix_map = {
+        "main_continuous": "main",
+        "index_continuous": "index",
+        "nearby_continuous": "nearby",
+        "spot": "spot",
+        "benchmark": "benchmark",
+    }
+    instrument_key = str(instrument_id or "").strip().upper()
+    if not instrument_key:
+        raise ValueError("instrument_id is required for series id")
+    suffix = suffix_map.get(str(series_type or "").strip(), str(series_type or "").strip() or "main")
+    return f"{instrument_key}.{suffix}"
+
+
+def infer_contract_month(exchange_contract_code: str) -> str:
+    text = str(exchange_contract_code or "").strip().upper()
+    digits = "".join(ch for ch in text if ch.isdigit())
+    if len(digits) >= 4:
+        year = int(digits[:2])
+        century = 2000 if year < 80 else 1900
+        return f"{century + year:04d}-{digits[2:4]}"
+    if len(digits) == 3:
+        year = int(digits[0])
+        return f"202{year}-{digits[1:3]}"
+    return ""
+
+
 def _hash_payload(value: Any) -> str:
     payload = _json_dumps(value)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -333,6 +490,70 @@ class FuturesStorageManager:
             updated_at TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS futures_instrument_categories (
+            category TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            parent_category TEXT NOT NULL,
+            active INTEGER NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS futures_contracts (
+            contract_id TEXT PRIMARY KEY,
+            instrument_id TEXT NOT NULL,
+            exchange TEXT NOT NULL,
+            exchange_contract_code TEXT NOT NULL,
+            contract_month TEXT NOT NULL,
+            listed_date TEXT,
+            last_trade_date TEXT,
+            delivery_month TEXT NOT NULL,
+            contract_multiplier REAL,
+            tick_size REAL,
+            currency TEXT NOT NULL,
+            unit TEXT NOT NULL,
+            active INTEGER NOT NULL,
+            source TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id)
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_futures_contracts_exchange_code
+        ON futures_contracts(exchange, exchange_contract_code);
+
+        CREATE TABLE IF NOT EXISTS futures_trading_calendar (
+            exchange TEXT NOT NULL,
+            trade_date TEXT NOT NULL,
+            is_trading_day INTEGER NOT NULL,
+            timezone TEXT NOT NULL,
+            session_type TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (exchange, trade_date)
+        );
+
+        CREATE TABLE IF NOT EXISTS futures_instrument_sessions (
+            instrument_id TEXT PRIMARY KEY,
+            exchange TEXT NOT NULL,
+            timezone TEXT NOT NULL,
+            has_night_session INTEGER NOT NULL,
+            session_rules_json TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            active INTEGER NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id)
+        );
+
         CREATE TABLE IF NOT EXISTS futures_series (
             series_id TEXT PRIMARY KEY,
             instrument_id TEXT NOT NULL,
@@ -374,6 +595,40 @@ class FuturesStorageManager:
         CREATE INDEX IF NOT EXISTS idx_futures_source_profile
         ON futures_source_manifests(source_profile, enabled);
 
+        CREATE TABLE IF NOT EXISTS futures_contract_price_bars (
+            contract_id TEXT NOT NULL,
+            instrument_id TEXT NOT NULL,
+            trade_date TEXT NOT NULL,
+            source TEXT NOT NULL,
+            source_mode TEXT NOT NULL,
+            open REAL,
+            high REAL,
+            low REAL,
+            close REAL,
+            settlement REAL,
+            volume REAL,
+            open_interest REAL,
+            amount REAL,
+            currency TEXT NOT NULL,
+            unit TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            source_interface TEXT NOT NULL,
+            parser_version TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            raw_payload_hash TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            ingestion_run_id INTEGER,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (contract_id, trade_date, source, source_mode),
+            FOREIGN KEY (contract_id) REFERENCES futures_contracts(contract_id),
+            FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id),
+            FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_contract_bars_instrument_date
+        ON futures_contract_price_bars(instrument_id, trade_date);
+
         CREATE TABLE IF NOT EXISTS futures_price_bars (
             series_id TEXT NOT NULL,
             trade_date TEXT NOT NULL,
@@ -405,6 +660,30 @@ class FuturesStorageManager:
 
         CREATE INDEX IF NOT EXISTS idx_futures_price_bars_series_date
         ON futures_price_bars(series_id, trade_date);
+
+        CREATE TABLE IF NOT EXISTS futures_continuous_mapping (
+            series_id TEXT NOT NULL,
+            trade_date TEXT NOT NULL,
+            contract_id TEXT NOT NULL,
+            exchange_contract_code TEXT NOT NULL,
+            instrument_id TEXT NOT NULL,
+            construction_method TEXT NOT NULL,
+            construction_version TEXT NOT NULL,
+            selection_open_interest REAL,
+            selection_volume REAL,
+            source_profile TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (series_id, trade_date, construction_version),
+            FOREIGN KEY (series_id) REFERENCES futures_series(series_id),
+            FOREIGN KEY (contract_id) REFERENCES futures_contracts(contract_id),
+            FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_continuous_mapping_contract
+        ON futures_continuous_mapping(contract_id, trade_date);
 
         CREATE TABLE IF NOT EXISTS futures_cycle_diagnostics (
             series_id TEXT NOT NULL,
@@ -543,6 +822,35 @@ class FuturesStorageManager:
                 (status, now, _json_dumps(metadata or {}), now, run_id),
             )
 
+    def upsert_categories(self, categories: Sequence[FuturesCategory]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in categories:
+                conn.execute(
+                    """
+                    INSERT INTO futures_instrument_categories (
+                        category, name, parent_category, active, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(category) DO UPDATE SET
+                        name=excluded.name,
+                        parent_category=excluded.parent_category,
+                        active=excluded.active,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.category,
+                        item.name,
+                        item.parent_category,
+                        1 if item.active else 0,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(categories)
+
     def upsert_instruments_and_series(
         self,
         instruments: Sequence[FuturesInstrument],
@@ -633,6 +941,259 @@ class FuturesStorageManager:
                 )
         return {"instruments": len(instruments), "series": len(series)}
 
+    def upsert_contracts(self, contracts: Sequence[FuturesContract]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in contracts:
+                conn.execute(
+                    """
+                    INSERT INTO futures_contracts (
+                        contract_id, instrument_id, exchange, exchange_contract_code,
+                        contract_month, listed_date, last_trade_date, delivery_month,
+                        contract_multiplier, tick_size, currency, unit, active,
+                        source, quality_flag, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(contract_id) DO UPDATE SET
+                        instrument_id=excluded.instrument_id,
+                        exchange=excluded.exchange,
+                        exchange_contract_code=excluded.exchange_contract_code,
+                        contract_month=excluded.contract_month,
+                        listed_date=COALESCE(excluded.listed_date, futures_contracts.listed_date),
+                        last_trade_date=COALESCE(excluded.last_trade_date, futures_contracts.last_trade_date),
+                        delivery_month=excluded.delivery_month,
+                        contract_multiplier=COALESCE(excluded.contract_multiplier, futures_contracts.contract_multiplier),
+                        tick_size=COALESCE(excluded.tick_size, futures_contracts.tick_size),
+                        currency=excluded.currency,
+                        unit=excluded.unit,
+                        active=excluded.active,
+                        source=excluded.source,
+                        quality_flag=excluded.quality_flag,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.contract_id,
+                        item.instrument_id,
+                        item.exchange,
+                        item.exchange_contract_code,
+                        item.contract_month,
+                        item.listed_date,
+                        item.last_trade_date,
+                        item.delivery_month,
+                        item.contract_multiplier,
+                        item.tick_size,
+                        item.currency,
+                        item.unit,
+                        1 if item.active else 0,
+                        item.source,
+                        item.quality_flag,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(contracts)
+
+    def upsert_contract_price_bars(
+        self,
+        bars: Sequence[FuturesContractBar],
+        *,
+        ingestion_run_id: Optional[int] = None,
+    ) -> Dict[str, int]:
+        inserted = 0
+        changed = 0
+        unchanged = 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for bar in bars:
+                existing = conn.execute(
+                    """
+                    SELECT raw_payload_hash FROM futures_contract_price_bars
+                    WHERE contract_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
+                    """,
+                    (bar.contract_id, bar.trade_date, bar.source, bar.source_mode),
+                ).fetchone()
+                if existing and existing["raw_payload_hash"] == bar.raw_payload_hash:
+                    unchanged += 1
+                    continue
+                if existing:
+                    changed += 1
+                else:
+                    inserted += 1
+                conn.execute(
+                    """
+                    INSERT INTO futures_contract_price_bars (
+                        contract_id, instrument_id, trade_date, source, source_mode,
+                        open, high, low, close, settlement, volume, open_interest,
+                        amount, currency, unit, source_profile, source_interface,
+                        parser_version, quality_flag, raw_payload_hash, metadata_json,
+                        ingestion_run_id, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(contract_id, trade_date, source, source_mode) DO UPDATE SET
+                        instrument_id=excluded.instrument_id,
+                        open=excluded.open,
+                        high=excluded.high,
+                        low=excluded.low,
+                        close=excluded.close,
+                        settlement=excluded.settlement,
+                        volume=excluded.volume,
+                        open_interest=excluded.open_interest,
+                        amount=excluded.amount,
+                        currency=excluded.currency,
+                        unit=excluded.unit,
+                        source_profile=excluded.source_profile,
+                        source_interface=excluded.source_interface,
+                        parser_version=excluded.parser_version,
+                        quality_flag=excluded.quality_flag,
+                        raw_payload_hash=excluded.raw_payload_hash,
+                        metadata_json=excluded.metadata_json,
+                        ingestion_run_id=excluded.ingestion_run_id,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        bar.contract_id,
+                        bar.instrument_id,
+                        bar.trade_date,
+                        bar.source,
+                        bar.source_mode,
+                        bar.open,
+                        bar.high,
+                        bar.low,
+                        bar.close,
+                        bar.settlement,
+                        bar.volume,
+                        bar.open_interest,
+                        bar.amount,
+                        bar.currency,
+                        bar.unit,
+                        bar.source_profile,
+                        bar.source_interface,
+                        bar.parser_version,
+                        bar.quality_flag,
+                        bar.raw_payload_hash,
+                        _json_dumps(bar.metadata),
+                        ingestion_run_id,
+                        now,
+                        now,
+                    ),
+                )
+        return {"inserted": inserted, "changed": changed, "unchanged": unchanged}
+
+    def upsert_trading_calendar(self, days: Sequence[FuturesTradingCalendarDay]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in days:
+                conn.execute(
+                    """
+                    INSERT INTO futures_trading_calendar (
+                        exchange, trade_date, is_trading_day, timezone, session_type,
+                        source_profile, quality_flag, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(exchange, trade_date) DO UPDATE SET
+                        is_trading_day=excluded.is_trading_day,
+                        timezone=excluded.timezone,
+                        session_type=excluded.session_type,
+                        source_profile=excluded.source_profile,
+                        quality_flag=excluded.quality_flag,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.exchange,
+                        item.trade_date,
+                        1 if item.is_trading_day else 0,
+                        item.timezone,
+                        item.session_type,
+                        item.source_profile,
+                        item.quality_flag,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(days)
+
+    def upsert_instrument_sessions(self, sessions: Sequence[FuturesInstrumentSession]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in sessions:
+                conn.execute(
+                    """
+                    INSERT INTO futures_instrument_sessions (
+                        instrument_id, exchange, timezone, has_night_session,
+                        session_rules_json, source_profile, quality_flag, active,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(instrument_id) DO UPDATE SET
+                        exchange=excluded.exchange,
+                        timezone=excluded.timezone,
+                        has_night_session=excluded.has_night_session,
+                        session_rules_json=excluded.session_rules_json,
+                        source_profile=excluded.source_profile,
+                        quality_flag=excluded.quality_flag,
+                        active=excluded.active,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.instrument_id,
+                        item.exchange,
+                        item.timezone,
+                        1 if item.has_night_session else 0,
+                        _json_dumps(item.session_rules),
+                        item.source_profile,
+                        item.quality_flag,
+                        1 if item.active else 0,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(sessions)
+
+    def upsert_continuous_mappings(self, mappings: Sequence[FuturesContinuousMapping]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in mappings:
+                conn.execute(
+                    """
+                    INSERT INTO futures_continuous_mapping (
+                        series_id, trade_date, contract_id, exchange_contract_code,
+                        instrument_id, construction_method, construction_version,
+                        selection_open_interest, selection_volume, source_profile,
+                        quality_flag, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(series_id, trade_date, construction_version) DO UPDATE SET
+                        contract_id=excluded.contract_id,
+                        exchange_contract_code=excluded.exchange_contract_code,
+                        instrument_id=excluded.instrument_id,
+                        construction_method=excluded.construction_method,
+                        selection_open_interest=excluded.selection_open_interest,
+                        selection_volume=excluded.selection_volume,
+                        source_profile=excluded.source_profile,
+                        quality_flag=excluded.quality_flag,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.series_id,
+                        item.trade_date,
+                        item.contract_id,
+                        item.exchange_contract_code,
+                        item.instrument_id,
+                        item.construction_method,
+                        item.construction_version,
+                        item.selection_open_interest,
+                        item.selection_volume,
+                        item.source_profile,
+                        item.quality_flag,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(mappings)
+
     def upsert_source_manifests(self, manifests: Sequence[FuturesSourceManifest]) -> int:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
@@ -691,6 +1252,226 @@ class FuturesStorageManager:
                 """
             ).fetchall()
         return [self._source_manifest_payload(row) for row in rows]
+
+    def list_categories(self, *, active_only: bool = True) -> List[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            where = "WHERE active = 1" if active_only else ""
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_instrument_categories
+                {where}
+                ORDER BY parent_category, category
+                """
+            ).fetchall()
+        return [self._category_payload(row) for row in rows]
+
+    def get_instrument(self, instrument_id: str) -> Optional[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM futures_instruments WHERE instrument_id = ?",
+                (instrument_id,),
+            ).fetchone()
+        return self._instrument_payload(row) if row else None
+
+    def list_contracts(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        exchange: Optional[str] = None,
+        contract_month: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if instrument_id:
+            clauses.append("instrument_id = ?")
+            params.append(instrument_id)
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if contract_month:
+            clauses.append("contract_month = ?")
+            params.append(contract_month)
+        if active_only:
+            clauses.append("active = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_contracts
+                {where}
+                ORDER BY instrument_id, contract_month, exchange_contract_code
+                """,
+                params,
+            ).fetchall()
+        return [self._contract_payload(row) for row in rows]
+
+    def get_contract(self, contract_id: str) -> Optional[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM futures_contracts WHERE contract_id = ?",
+                (contract_id,),
+            ).fetchone()
+        return self._contract_payload(row) if row else None
+
+    def get_contract_price_bars(
+        self,
+        contract_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses = ["contract_id = ?"]
+        params: List[Any] = [contract_id]
+        if start_date:
+            clauses.append("trade_date >= ?")
+            params.append(_date_key(start_date))
+        if end_date:
+            clauses.append("trade_date <= ?")
+            params.append(_date_key(end_date))
+        sql = f"""
+            SELECT * FROM futures_contract_price_bars
+            WHERE {' AND '.join(clauses)}
+            ORDER BY trade_date ASC
+        """
+        if limit:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [self._contract_bar_payload(row) for row in rows]
+
+    def list_calendar_days(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trading_only: bool = False,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if start_date:
+            clauses.append("trade_date >= ?")
+            params.append(_date_key(start_date))
+        if end_date:
+            clauses.append("trade_date <= ?")
+            params.append(_date_key(end_date))
+        if trading_only:
+            clauses.append("is_trading_day = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_trading_calendar
+                {where}
+                ORDER BY exchange, trade_date
+                """,
+                params,
+            ).fetchall()
+        return [self._calendar_payload(row) for row in rows]
+
+    def get_latest_expected_trade_date(
+        self,
+        exchange: str,
+        *,
+        as_of_date: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        cutoff = _date_key(as_of_date or get_shanghai_time().date())
+        with self.get_connection() as conn:
+            row = conn.execute(
+                """
+                SELECT * FROM futures_trading_calendar
+                WHERE exchange = ? AND trade_date <= ? AND is_trading_day = 1
+                ORDER BY trade_date DESC
+                LIMIT 1
+                """,
+                (str(exchange).upper(), cutoff),
+            ).fetchone()
+        return self._calendar_payload(row) if row else None
+
+    def list_continuous_mappings(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses = ["series_id = ?"]
+        params: List[Any] = [series_id]
+        if start_date:
+            clauses.append("trade_date >= ?")
+            params.append(_date_key(start_date))
+        if end_date:
+            clauses.append("trade_date <= ?")
+            params.append(_date_key(end_date))
+        sql = f"""
+            SELECT * FROM futures_continuous_mapping
+            WHERE {' AND '.join(clauses)}
+            ORDER BY trade_date ASC
+        """
+        if limit:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [self._continuous_mapping_payload(row) for row in rows]
+
+    def find_series(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        series_type: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if instrument_id:
+            clauses.append("instrument_id = ?")
+            params.append(instrument_id)
+        if series_type:
+            clauses.append("series_type = ?")
+            params.append(series_type)
+        if source_profile:
+            clauses.append("source_profile = ?")
+            params.append(source_profile)
+        if active_only:
+            clauses.append("active = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_series
+                {where}
+                ORDER BY priority, source_profile, series_id
+                """,
+                params,
+            ).fetchall()
+        return [self._series_payload(row) for row in rows]
+
+    def resolve_default_series(
+        self,
+        instrument_id: str,
+        *,
+        series_type: str = "main_continuous",
+        source_profile: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        candidates = self.find_series(
+            instrument_id=instrument_id,
+            series_type=series_type,
+            source_profile=source_profile,
+            active_only=True,
+        )
+        if candidates:
+            return candidates[0]
+        fallback_id = make_futures_series_id(instrument_id, series_type)
+        return self.get_series(fallback_id)
 
     def upsert_price_bars(
         self,
@@ -1146,6 +1927,48 @@ class FuturesStorageManager:
         return payload
 
     @staticmethod
+    def _category_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["active"] = bool(payload.get("active"))
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _contract_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["active"] = bool(payload.get("active"))
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _contract_bar_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _calendar_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["is_trading_day"] = bool(payload.get("is_trading_day"))
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _session_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["has_night_session"] = bool(payload.get("has_night_session"))
+        payload["active"] = bool(payload.get("active"))
+        payload["session_rules"] = _json_loads(payload.pop("session_rules_json", None), {})
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _continuous_mapping_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
     def _series_payload(row: sqlite3.Row) -> Dict[str, Any]:
         payload = _row_to_dict(row)
         payload["active"] = bool(payload.get("active"))
@@ -1190,6 +2013,17 @@ class FuturesStorageManager:
 def default_futures_registry(module_cfg: Optional[Dict[str, Any]] = None) -> Dict[str, List[Any]]:
     """Build futures instrument and series registry from config or compact defaults."""
     module_cfg = module_cfg or {}
+    categories = [
+        FuturesCategory(
+            category=str(item["category"]),
+            name=str(item["name"]),
+            parent_category=str(item.get("parent_category") or ""),
+            active=True,
+            metadata=dict(item.get("metadata") or {}),
+        )
+        for item in FUTURES_CATEGORY_DEFINITIONS
+    ]
+    category_keys = {item.category for item in categories}
     configured = module_cfg.get("registry", {})
     configured_instruments = configured.get("instruments") or []
     series_cfg = configured.get("series") or []
@@ -1201,7 +2035,7 @@ def default_futures_registry(module_cfg: Optional[Dict[str, Any]] = None) -> Dic
     if not series_cfg:
         series_cfg = [
             {
-                "series_id": f"{item['instrument_id']}.main",
+                "series_id": make_futures_series_id(item["instrument_id"], "main_continuous"),
                 "instrument_id": item["instrument_id"],
                 "symbol": f"{item['symbol']}0",
                 "series_type": "main_continuous",
@@ -1228,7 +2062,14 @@ def default_futures_registry(module_cfg: Optional[Dict[str, Any]] = None) -> Dic
             priority=str(item.get("priority") or "P0"),
             active=bool(item.get("active", True)),
             source_profiles=list(item.get("source_profiles") or ["exchange_official", "akshare_futures"]),
-            metadata=dict(item.get("metadata") or {}),
+            metadata={
+                **dict(item.get("metadata") or {}),
+                **(
+                    {"category_warning": "unknown_managed_category"}
+                    if str(item.get("category") or "commodity") not in category_keys
+                    else {}
+                ),
+            },
         )
         for item in instruments_cfg
     ]
@@ -1252,7 +2093,12 @@ def default_futures_registry(module_cfg: Optional[Dict[str, Any]] = None) -> Dic
         for item in series_cfg
     ]
     manifests = _default_source_manifests(module_cfg)
-    return {"instruments": instruments, "series": series, "source_manifests": manifests}
+    return {
+        "categories": categories,
+        "instruments": instruments,
+        "series": series,
+        "source_manifests": manifests,
+    }
 
 
 def _merge_futures_instruments(
@@ -1550,6 +2396,64 @@ class FuturesSpreadService:
         return values
 
 
+class FuturesCalendarService:
+    """Maintain exchange-level futures trading calendars in local storage."""
+
+    def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
+        self.storage = storage
+        self.module_cfg = module_cfg or {}
+        master_cfg = self.module_cfg.get("master_data", {})
+        calendar_cfg = master_cfg.get("calendar", {}) if isinstance(master_cfg, dict) else {}
+        self.default_timezone = str(calendar_cfg.get("default_timezone") or master_cfg.get("default_timezone") or "Asia/Shanghai")
+        self.source_profile = str(calendar_cfg.get("source_profile") or "estimated_weekday_calendar")
+        self.quality_flag = str(calendar_cfg.get("quality_flag") or "estimated")
+        self.lookback_days = int(calendar_cfg.get("seed_lookback_days") or 370)
+        self.lookahead_days = int(calendar_cfg.get("seed_lookahead_days") or 30)
+
+    def seed_default_calendar(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        exchange_list = [str(item).upper() for item in (exchanges or self._configured_exchanges()) if item]
+        if not exchange_list:
+            return {"status": "empty", "calendar_rows": 0, "exchanges": []}
+        today = get_shanghai_time().date()
+        start = date.fromisoformat(_date_key(start_date)) if start_date else today - timedelta(days=self.lookback_days)
+        end = date.fromisoformat(_date_key(end_date)) if end_date else today + timedelta(days=self.lookahead_days)
+        days: List[FuturesTradingCalendarDay] = []
+        current = start
+        while current <= end:
+            is_weekday = current.weekday() < 5
+            for exchange in exchange_list:
+                days.append(
+                    FuturesTradingCalendarDay(
+                        exchange=exchange,
+                        trade_date=current.isoformat(),
+                        is_trading_day=is_weekday,
+                        timezone=self.default_timezone,
+                        session_type="day_and_night" if is_weekday else "closed",
+                        source_profile=self.source_profile,
+                        quality_flag=self.quality_flag,
+                        metadata={"calendar_rule": "weekday_seed", "generated": True},
+                    )
+                )
+            current += timedelta(days=1)
+        written = self.storage.upsert_trading_calendar(days)
+        return {"status": "success", "calendar_rows": written, "exchanges": sorted(set(exchange_list))}
+
+    def _configured_exchanges(self) -> List[str]:
+        sources_cfg = self.module_cfg.get("sources") or {}
+        official_cfg = sources_cfg.get("exchange_official") or {}
+        configured = official_cfg.get("enabled_exchanges") or []
+        if configured:
+            return [str(item).upper() for item in configured]
+        registry = default_futures_registry(self.module_cfg)
+        return sorted({item.exchange for item in registry["instruments"] if item.exchange})
+
+
 class FuturesReadinessService:
     def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
         self.storage = storage
@@ -1570,6 +2474,11 @@ class FuturesReadinessService:
             bars = self.storage.get_price_bars(item["series_id"])
             latest = bars[-1] if bars else None
             priority = item.get("priority") or "P0"
+            exchange = str(item.get("instrument_id") or "").split(".")[-1].upper()
+            expected_calendar = self.storage.get_latest_expected_trade_date(exchange) if exchange else None
+            expected_trade_date = (
+                expected_calendar.get("trade_date") if expected_calendar else get_shanghai_time().date().isoformat()
+            )
             if priority == "P0":
                 p0_count += 1
             coverage_ratio = min(1.0, len(bars) / max(1, self.target_years * self.trading_days_per_year))
@@ -1583,7 +2492,8 @@ class FuturesReadinessService:
                 item_warnings.append("missing_local_bars")
             else:
                 latest_date = date.fromisoformat(latest["trade_date"])
-                if (today - latest_date).days > self.max_stale_days:
+                expected_date = date.fromisoformat(expected_trade_date)
+                if expected_date > latest_date and (expected_date - latest_date).days > self.max_stale_days:
                     item_warnings.append("stale_latest_bar")
                 if coverage_ratio < 1.0:
                     item_warnings.append("insufficient_history")
@@ -1602,6 +2512,9 @@ class FuturesReadinessService:
                     "fallback_bar_count": fallback_bar_count,
                     "source_profiles": source_profiles,
                     "latest_trade_date": latest.get("trade_date") if latest else None,
+                    "latest_expected_trade_date": expected_trade_date,
+                    "calendar_source_profile": expected_calendar.get("source_profile") if expected_calendar else None,
+                    "calendar_quality_flag": expected_calendar.get("quality_flag") if expected_calendar else "missing_calendar",
                     "history_coverage_ratio": round(coverage_ratio, 4),
                     "warnings": item_warnings,
                 }
@@ -1645,11 +2558,13 @@ class FuturesMarketDataSyncService:
         dry_run: bool = False,
     ) -> Dict[str, Any]:
         registry = default_futures_registry(self.module_cfg)
+        self.storage.upsert_categories(registry.get("categories", []))
         self.storage.upsert_instruments_and_series(
             registry["instruments"],
             registry["series"],
         )
         self.storage.upsert_source_manifests(registry.get("source_manifests", []))
+        FuturesCalendarService(self.storage, self.module_cfg).seed_default_calendar()
         target_series = [
             item for item in registry["series"]
             if item.active and (not series_ids or item.series_id in set(series_ids))
@@ -1696,8 +2611,8 @@ class FuturesMarketDataSyncService:
                 try:
                     if official_enabled and official_provider.supports_series(item):
                         try:
-                            bars = await asyncio.wait_for(
-                                official_provider.fetch_daily_bars(
+                            official_artifacts = await asyncio.wait_for(
+                                official_provider.fetch_daily_artifacts(
                                     item,
                                     start_date=start_date,
                                     end_date=end_date,
@@ -1705,10 +2620,20 @@ class FuturesMarketDataSyncService:
                                 ),
                                 timeout=self._request_timeout_seconds("exchange_official"),
                             )
+                            bars = list(official_artifacts.get("series_bars") or [])
                             official_status = "success" if bars else "empty"
                             if bars:
                                 source_selection["official_success"] += 1
                                 selected_profile = "exchange_official"
+                                if not dry_run:
+                                    self.storage.upsert_contracts(official_artifacts.get("contracts") or [])
+                                    self.storage.upsert_contract_price_bars(
+                                        official_artifacts.get("contract_bars") or [],
+                                        ingestion_run_id=run_id,
+                                    )
+                                    self.storage.upsert_continuous_mappings(
+                                        official_artifacts.get("mappings") or []
+                                    )
                             else:
                                 source_selection["official_failed"] += 1
                                 official_reason = "official provider returned no rows"

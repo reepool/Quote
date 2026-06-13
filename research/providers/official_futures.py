@@ -15,7 +15,12 @@ import requests
 
 from research.futures_market_data import (
     FuturesBar,
+    FuturesContinuousMapping,
+    FuturesContract,
+    FuturesContractBar,
     FuturesSeries,
+    infer_contract_month,
+    make_futures_contract_id,
 )
 from utils.config_manager import ResearchConfig
 from utils.http_transport import HttpTlsConfig, create_requests_session, request_get, request_post
@@ -96,6 +101,22 @@ class OfficialFuturesMarketDataProvider:
             mode,
         )
 
+    async def fetch_daily_artifacts(
+        self,
+        series: FuturesSeries,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        mode: str = "direct",
+    ) -> Dict[str, List[Any]]:
+        return await asyncio.to_thread(
+            self._fetch_daily_artifacts_sync,
+            series,
+            start_date,
+            end_date,
+            mode,
+        )
+
     def _fetch_daily_bars_sync(
         self,
         series: FuturesSeries,
@@ -121,12 +142,44 @@ class OfficialFuturesMarketDataProvider:
             day_key = current.isoformat()
             rows.extend(self._fetch_exchange_contract_bars(session, exchange, day_key, variety=variety))
             current += timedelta(days=1)
-        bars = self._construct_main_series_bars(series, rows, mode=mode)
+        bars = self._build_storage_artifacts(series, rows, mode=mode)["series_bars"]
         if not bars:
             raise OfficialFuturesSourceUnavailable(
                 f"official futures source returned no usable bars for {series.series_id} {start}-{end}"
             )
         return bars
+
+    def _fetch_daily_artifacts_sync(
+        self,
+        series: FuturesSeries,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        mode: str,
+    ) -> Dict[str, List[Any]]:
+        if mode != "direct":
+            raise OfficialFuturesSourceUnavailable(f"official futures source supports direct mode only: {mode}")
+        exchange = _series_exchange(series)
+        if not self.supports_series(series):
+            raise OfficialFuturesSourceUnavailable(f"official futures source unsupported or disabled for {exchange}")
+        variety = _series_variety(series)
+        start = _date_key(start_date or end_date or _today_key())
+        end = _date_key(end_date or start_date or start)
+        if start > end:
+            raise ValueError("start_date must be earlier than or equal to end_date")
+        rows: List[OfficialFuturesContractBar] = []
+        session = create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS)
+        current = date.fromisoformat(start)
+        end_date_obj = date.fromisoformat(end)
+        while current <= end_date_obj:
+            day_key = current.isoformat()
+            rows.extend(self._fetch_exchange_contract_bars(session, exchange, day_key, variety=variety))
+            current += timedelta(days=1)
+        artifacts = self._build_storage_artifacts(series, rows, mode=mode)
+        if not artifacts["series_bars"]:
+            raise OfficialFuturesSourceUnavailable(
+                f"official futures source returned no usable bars for {series.series_id} {start}-{end}"
+            )
+        return artifacts
 
     def _fetch_exchange_contract_bars(
         self,
@@ -238,17 +291,80 @@ class OfficialFuturesMarketDataProvider:
         *,
         mode: str,
     ) -> List[FuturesBar]:
+        return self._build_storage_artifacts(series, rows, mode=mode)["series_bars"]
+
+    def _build_storage_artifacts(
+        self,
+        series: FuturesSeries,
+        rows: Sequence[OfficialFuturesContractBar],
+        *,
+        mode: str,
+    ) -> Dict[str, List[Any]]:
         by_date: Dict[str, List[OfficialFuturesContractBar]] = {}
         for row in rows:
             by_date.setdefault(row.trade_date, []).append(row)
         bars: List[FuturesBar] = []
+        contracts_by_id: Dict[str, FuturesContract] = {}
+        contract_bars: List[FuturesContractBar] = []
+        mappings: List[FuturesContinuousMapping] = []
+        for row in rows:
+            contract_id = make_futures_contract_id(series.instrument_id, row.contract)
+            quality = "ok" if not row.warnings else "partial"
+            contracts_by_id[contract_id] = FuturesContract(
+                contract_id=contract_id,
+                instrument_id=series.instrument_id,
+                exchange=row.exchange,
+                exchange_contract_code=row.contract,
+                contract_month=infer_contract_month(row.contract),
+                delivery_month=infer_contract_month(row.contract),
+                currency=series.currency or "CNY",
+                unit=series.unit,
+                active=True,
+                source=self.source_name,
+                quality_flag=quality,
+                metadata={"variety": row.variety, "warnings": row.warnings},
+            )
+            contract_bars.append(
+                FuturesContractBar(
+                    contract_id=contract_id,
+                    instrument_id=series.instrument_id,
+                    trade_date=row.trade_date,
+                    open=row.open,
+                    high=row.high,
+                    low=row.low,
+                    close=row.close,
+                    settlement=row.settlement,
+                    volume=row.volume,
+                    open_interest=row.open_interest,
+                    amount=row.amount,
+                    currency=series.currency or "CNY",
+                    unit=series.unit,
+                    source=self.source_name,
+                    source_mode=mode,
+                    source_profile="exchange_official",
+                    source_interface=row.source_interface,
+                    parser_version=self.parser_version,
+                    quality_flag=quality,
+                    raw_payload_hash=_hash_payload(
+                        {
+                            "contract_id": contract_id,
+                            "trade_date": row.trade_date,
+                            "raw": row.raw_payload,
+                        }
+                    ),
+                    metadata={"exchange_contract_code": row.contract, "variety": row.variety, "warnings": row.warnings},
+                )
+            )
         for trade_date, date_rows in sorted(by_date.items()):
             selected = _select_main_contract(date_rows)
+            selected_contract_id = make_futures_contract_id(series.instrument_id, selected.contract)
             metadata = {
                 "underlying_contract": selected.contract,
+                "underlying_contract_id": selected_contract_id,
                 "variety": selected.variety,
                 "exchange": selected.exchange,
                 "construction_method": "official_open_interest_main",
+                "construction_version": "futures_continuous_mapping.v1",
                 "selection_open_interest": selected.open_interest,
                 "selection_volume": selected.volume,
                 "warnings": selected.warnings,
@@ -286,7 +402,28 @@ class OfficialFuturesMarketDataProvider:
                     metadata=metadata,
                 )
             )
-        return bars
+            mappings.append(
+                FuturesContinuousMapping(
+                    series_id=series.series_id,
+                    trade_date=trade_date,
+                    contract_id=selected_contract_id,
+                    exchange_contract_code=selected.contract,
+                    instrument_id=series.instrument_id,
+                    construction_method="official_open_interest_main",
+                    construction_version="futures_continuous_mapping.v1",
+                    selection_open_interest=selected.open_interest,
+                    selection_volume=selected.volume,
+                    source_profile="exchange_official",
+                    quality_flag=quality,
+                    metadata={"exchange": selected.exchange, "variety": selected.variety},
+                )
+            )
+        return {
+            "contracts": list(contracts_by_id.values()),
+            "contract_bars": contract_bars,
+            "mappings": mappings,
+            "series_bars": bars,
+        }
 
     def _parse_shfe_payload(
         self,

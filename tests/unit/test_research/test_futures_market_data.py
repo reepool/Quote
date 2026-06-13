@@ -7,12 +7,21 @@ import pytest
 
 from research.futures_market_data import (
     FuturesBar,
+    FuturesCalendarService,
+    FuturesContinuousMapping,
+    FuturesContract,
+    FuturesContractBar,
     FuturesDiagnosticsService,
     FuturesExposureMapping,
     FuturesMarketDataSyncService,
+    FuturesReadinessService,
     FuturesSeries,
     FuturesStorageManager,
     default_futures_registry,
+    infer_contract_month,
+    make_futures_contract_id,
+    make_futures_instrument_id,
+    make_futures_series_id,
 )
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
 from research.providers.official_futures import (
@@ -86,6 +95,66 @@ def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
     ] == 10
 
 
+def test_futures_storage_persists_contract_bars_mapping_and_calendar(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_categories(registry["categories"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+
+    contract = FuturesContract(
+        contract_id="CNF.CU.SHFE.CU2407",
+        instrument_id="CNF.CU.SHFE",
+        exchange="SHFE",
+        exchange_contract_code="CU2407",
+        contract_month="2024-07",
+        currency="CNY",
+        unit="CNY/ton",
+        source="fixture",
+    )
+    contract_bar = FuturesContractBar(
+        contract_id=contract.contract_id,
+        instrument_id=contract.instrument_id,
+        trade_date="2024-06-03",
+        open=10,
+        high=12,
+        low=9,
+        close=11,
+        raw_payload_hash="contract-hash",
+        source="exchange_official",
+        source_mode="direct",
+        source_profile="exchange_official",
+        source_interface="fixture",
+    )
+    mapping = FuturesContinuousMapping(
+        series_id="CNF.CU.SHFE.main",
+        trade_date="2024-06-03",
+        contract_id=contract.contract_id,
+        exchange_contract_code="CU2407",
+        instrument_id=contract.instrument_id,
+        construction_method="official_open_interest_main",
+        selection_open_interest=200,
+        selection_volume=100,
+    )
+
+    storage.upsert_contracts([contract])
+    write_result = storage.upsert_contract_price_bars([contract_bar])
+    storage.upsert_continuous_mappings([mapping])
+    calendar_result = FuturesCalendarService(storage, config.modules["commodity_market_data"]).seed_default_calendar(
+        exchanges=["SHFE"],
+        start_date="2024-06-01",
+        end_date="2024-06-04",
+    )
+
+    assert write_result["inserted"] == 1
+    assert storage.get_contract(contract.contract_id)["exchange_contract_code"] == "CU2407"
+    assert storage.get_contract_price_bars(contract.contract_id)[0]["close"] == 11
+    assert storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]["contract_id"] == contract.contract_id
+    assert calendar_result["calendar_rows"] == 4
+    assert storage.get_latest_expected_trade_date("SHFE", as_of_date="2024-06-04")["trade_date"] == "2024-06-04"
+
+
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["registry"] = {"include_default_p0_universe": True}
@@ -93,8 +162,12 @@ def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
     registry = default_futures_registry(config.modules["commodity_market_data"])
     instrument_ids = {item.instrument_id for item in registry["instruments"]}
     series_ids = {item.series_id for item in registry["series"]}
+    categories = {item.category for item in registry["categories"]}
 
     assert len(instrument_ids) >= 40
+    assert {"ferrous", "nonferrous", "precious_metal", "energy", "chemical", "agriculture"}.issubset(
+        categories
+    )
     assert {
         "CNF.ZC.CZCE",
         "CNF.RB.SHFE",
@@ -105,6 +178,16 @@ def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
         "CNF.FG.CZCE",
     }.issubset(instrument_ids)
     assert "CNF.CU.SHFE.main" in series_ids
+
+
+def test_futures_id_helpers_are_deterministic():
+    assert make_futures_instrument_id("cu", "shfe") == "CNF.CU.SHFE"
+    assert make_futures_instrument_id("cl", "cme", namespace="glf") == "GLF.CL.CME"
+    assert make_futures_contract_id("CNF.CU.SHFE", "cu2407") == "CNF.CU.SHFE.CU2407"
+    assert make_futures_series_id("CNF.CU.SHFE") == "CNF.CU.SHFE.main"
+    assert make_futures_series_id("CNF.CU.SHFE", "index_continuous") == "CNF.CU.SHFE.index"
+    assert infer_contract_month("CU2407") == "2024-07"
+    assert infer_contract_month("TA409") == "2024-09"
 
 
 def test_futures_cycle_diagnostics_marks_ten_year_window_ready(tmp_path):
@@ -147,6 +230,44 @@ def test_futures_cycle_diagnostics_marks_ten_year_window_ready(tmp_path):
     ten_year = next(item for item in diagnostics if item["lookback_years"] == 10)
     assert ten_year["cycle_state"] != "insufficient_history"
     assert ten_year["latest_price"] == 209
+
+
+def test_futures_readiness_uses_trading_calendar_expected_date(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["coverage"]["max_stale_trading_days"] = 0
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_categories(registry["categories"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    FuturesCalendarService(storage, config.modules["commodity_market_data"]).seed_default_calendar(
+        exchanges=["SHFE"],
+        start_date="2024-06-01",
+        end_date="2024-06-03",
+    )
+    storage.upsert_price_bars(
+        [
+            FuturesBar(
+                series_id="CNF.CU.SHFE.main",
+                trade_date="2024-05-31",
+                open=10,
+                high=12,
+                low=9,
+                close=11,
+                raw_payload_hash="calendar-stale",
+                source="exchange_official",
+                source_profile="exchange_official",
+                source_mode="direct",
+            )
+        ]
+    )
+
+    payload = FuturesReadinessService(storage, config.modules["commodity_market_data"]).build()
+    cu_payload = next(item for item in payload["series"] if item["series_id"] == "CNF.CU.SHFE.main")
+
+    assert cu_payload["latest_expected_trade_date"] == "2024-06-03"
+    assert "stale_latest_bar" in cu_payload["warnings"]
+    assert cu_payload["calendar_source_profile"] == "estimated_weekday_calendar"
 
 
 def test_futures_exposure_mapping_returns_structured_rows(tmp_path):
@@ -266,14 +387,20 @@ def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_pat
         exchange="SHFE",
     )
 
-    bars = provider._construct_main_series_bars(series, rows, mode="direct")
+    artifacts = provider._build_storage_artifacts(series, rows, mode="direct")
+    bars = artifacts["series_bars"]
 
     assert len(bars) == 1
+    assert len(artifacts["contracts"]) == 2
+    assert len(artifacts["contract_bars"]) == 2
+    assert len(artifacts["mappings"]) == 1
     assert bars[0].source_profile == "exchange_official"
     assert bars[0].source_interface == "official_shfe_daily_kx_dat"
     assert bars[0].close == 21
     assert bars[0].metadata["underlying_contract"] == "CU2408"
+    assert bars[0].metadata["underlying_contract_id"] == "CNF.CU.SHFE.CU2408"
     assert bars[0].metadata["construction_method"] == "official_open_interest_main"
+    assert artifacts["mappings"][0].contract_id == "CNF.CU.SHFE.CU2408"
 
 
 def test_official_futures_provider_parses_domestic_exchange_fixtures(tmp_path):
@@ -382,8 +509,46 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     storage.initialize()
 
     async def fake_official_fetch(self, series, *, start_date=None, end_date=None, mode="direct"):
-        return [
-            FuturesBar(
+        contract = FuturesContract(
+            contract_id="CNF.CU.SHFE.CU2407",
+            instrument_id=series.instrument_id,
+            exchange="SHFE",
+            exchange_contract_code="CU2407",
+            contract_month="2024-07",
+            currency="CNY",
+            unit="CNY/ton",
+            source="exchange_official",
+        )
+        return {
+            "contracts": [contract],
+            "contract_bars": [
+                FuturesContractBar(
+                    contract_id=contract.contract_id,
+                    instrument_id=series.instrument_id,
+                    trade_date="2024-06-03",
+                    open=10,
+                    high=12,
+                    low=9,
+                    close=11,
+                    raw_payload_hash=f"contract:{series.series_id}:2024-06-03",
+                    source="exchange_official",
+                    source_mode=mode,
+                    source_profile="exchange_official",
+                    source_interface="official_shfe_daily_kx_dat",
+                )
+            ],
+            "mappings": [
+                FuturesContinuousMapping(
+                    series_id=series.series_id,
+                    trade_date="2024-06-03",
+                    contract_id=contract.contract_id,
+                    exchange_contract_code=contract.exchange_contract_code,
+                    instrument_id=series.instrument_id,
+                    construction_method="official_open_interest_main",
+                )
+            ],
+            "series_bars": [
+                FuturesBar(
                 series_id=series.series_id,
                 trade_date="2024-06-03",
                 open=10,
@@ -395,14 +560,15 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
                 source_mode=mode,
                 source_profile="exchange_official",
                 source_interface="official_shfe_daily_kx_dat",
-            )
-        ]
+                )
+            ],
+        }
 
     async def unexpected_fallback(self, series, *, start_date=None, end_date=None, mode="direct"):
         raise AssertionError("fallback provider should not be called when official source succeeds")
 
     monkeypatch.setattr(
-        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_bars",
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_artifacts",
         fake_official_fetch,
     )
     monkeypatch.setattr(
@@ -417,6 +583,9 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     assert result["source_selection"]["official_success"] == 1
     assert result["source_selection"]["fallback_success"] == 0
     assert rows[0]["source_profile"] == "exchange_official"
+    assert storage.get_contract("CNF.CU.SHFE.CU2407")
+    assert storage.get_contract_price_bars("CNF.CU.SHFE.CU2407")[0]["close"] == 11
+    assert storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]["contract_id"] == "CNF.CU.SHFE.CU2407"
 
 
 @pytest.mark.asyncio
@@ -451,7 +620,7 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
         ]
 
     monkeypatch.setattr(
-        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_bars",
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_artifacts",
         failed_official_fetch,
     )
     monkeypatch.setattr(

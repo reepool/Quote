@@ -61,10 +61,19 @@ from api.routes import (
     get_research_financial_statements_history,
     get_research_financial_statements_readiness,
     get_research_financial_summary,
+    get_research_futures_calendar,
+    get_research_futures_contract_prices,
+    get_research_futures_contracts,
     get_research_futures_cycle_diagnostics,
+    get_research_futures_default_prices,
+    get_research_futures_dictionary,
+    get_research_futures_instrument_detail,
     get_research_futures_instruments,
+    get_research_futures_mapping,
     get_research_futures_prices,
     get_research_futures_readiness,
+    get_research_futures_series,
+    get_research_futures_source_manifests,
     get_research_futures_spread_values,
     get_research_futures_spreads,
     get_research_company_futures_exposure,
@@ -2619,6 +2628,271 @@ class TestResearchRoutes:
         response = _run(get_research_futures_instruments())
 
         assert response["series"][0]["series_id"] == "CNF.CU.SHFE.main"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_dictionary_success(self, mock_dm):
+        mock_dm.get_research_futures_dictionary = AsyncMock(
+            return_value={
+                "status": "success",
+                "source_policy": "local_futures_db_only",
+                "categories": [{"category": "nonferrous"}],
+                "exchanges": ["SHFE"],
+                "series_types": ["main_continuous"],
+            }
+        )
+
+        response = _run(get_research_futures_dictionary())
+
+        assert response["categories"][0]["category"] == "nonferrous"
+        mock_dm.get_research_futures_dictionary.assert_awaited_once_with()
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_instrument_detail_success(self, mock_dm):
+        mock_dm.get_research_futures_instrument_detail = AsyncMock(
+            return_value={
+                "status": "success",
+                "instrument": {"instrument_id": "CNF.CU.SHFE"},
+                "series": [{"series_id": "CNF.CU.SHFE.main"}],
+                "contracts": [{"contract_id": "CNF.CU.SHFE.CU2407"}],
+            }
+        )
+
+        response = _run(get_research_futures_instrument_detail("CNF.CU.SHFE"))
+
+        assert response["instrument"]["instrument_id"] == "CNF.CU.SHFE"
+        mock_dm.get_research_futures_instrument_detail.assert_awaited_once_with("CNF.CU.SHFE")
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_instrument_detail_not_found(self, mock_dm):
+        mock_dm.get_research_futures_instrument_detail = AsyncMock(
+            return_value={"status": "not_found", "instrument_id": "missing"}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_instrument_detail("missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_contracts_success(self, mock_dm):
+        mock_dm.get_research_futures_contracts = AsyncMock(
+            return_value={
+                "status": "success",
+                "row_count": 1,
+                "contracts": [{"contract_id": "CNF.CU.SHFE.CU2407"}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_contracts(
+                instrument_id="CNF.CU.SHFE",
+                exchange="SHFE",
+                contract_month="2024-07",
+                active_only=False,
+            )
+        )
+
+        assert response["contracts"][0]["contract_id"] == "CNF.CU.SHFE.CU2407"
+        mock_dm.get_research_futures_contracts.assert_awaited_once_with(
+            instrument_id="CNF.CU.SHFE",
+            exchange="SHFE",
+            contract_month="2024-07",
+            active_only=False,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_contract_prices_success(self, mock_dm):
+        mock_dm.get_research_futures_contract_prices = AsyncMock(
+            return_value={
+                "status": "success",
+                "contract": {"contract_id": "CNF.CU.SHFE.CU2407"},
+                "row_count": 1,
+                "rows": [{"trade_date": "2024-06-03", "close": 11.0}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_contract_prices(
+                "CNF.CU.SHFE.CU2407",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 3),
+                limit=20,
+            )
+        )
+
+        assert response["rows"][0]["close"] == 11.0
+        mock_dm.get_research_futures_contract_prices.assert_awaited_once_with(
+            "CNF.CU.SHFE.CU2407",
+            start_date="2024-06-01",
+            end_date="2024-06-03",
+            limit=20,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_contract_prices_not_found(self, mock_dm):
+        mock_dm.get_research_futures_contract_prices = AsyncMock(
+            return_value={"status": "not_found", "contract_id": "missing", "rows": []}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_contract_prices("missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_series_success(self, mock_dm):
+        mock_dm.get_research_futures_series = AsyncMock(
+            return_value={
+                "status": "success",
+                "row_count": 1,
+                "series": [{"series_id": "CNF.CU.SHFE.main"}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_series(
+                instrument_id="CNF.CU.SHFE",
+                series_type="main_continuous",
+                source_profile="exchange_official",
+                active_only=True,
+            )
+        )
+
+        assert response["series"][0]["series_id"] == "CNF.CU.SHFE.main"
+        mock_dm.get_research_futures_series.assert_awaited_once_with(
+            instrument_id="CNF.CU.SHFE",
+            series_type="main_continuous",
+            source_profile="exchange_official",
+            active_only=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_default_prices_success(self, mock_dm):
+        mock_dm.get_research_futures_default_prices = AsyncMock(
+            return_value={
+                "status": "success",
+                "instrument_id": "CNF.CU.SHFE",
+                "series": {"series_id": "CNF.CU.SHFE.main"},
+                "row_count": 1,
+                "rows": [{"trade_date": "2024-06-03", "close": 11.0}],
+                "mapping": [{"contract_id": "CNF.CU.SHFE.CU2407"}],
+                "source_policy": "local_futures_db_only",
+            }
+        )
+
+        response = _run(
+            get_research_futures_default_prices(
+                instrument_id="CNF.CU.SHFE",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 3),
+                limit=10,
+                include_lineage=True,
+            )
+        )
+
+        assert response["source_policy"] == "local_futures_db_only"
+        assert response["mapping"][0]["contract_id"] == "CNF.CU.SHFE.CU2407"
+        mock_dm.get_research_futures_default_prices.assert_awaited_once_with(
+            instrument_id="CNF.CU.SHFE",
+            series_type=None,
+            source_profile=None,
+            start_date="2024-06-01",
+            end_date="2024-06-03",
+            limit=10,
+            include_lineage=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_default_prices_not_found(self, mock_dm):
+        mock_dm.get_research_futures_default_prices = AsyncMock(
+            return_value={"status": "not_found", "instrument_id": "missing", "rows": []}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_default_prices(instrument_id="missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_mapping_success(self, mock_dm):
+        mock_dm.get_research_futures_mapping = AsyncMock(
+            return_value={
+                "status": "success",
+                "series": {"series_id": "CNF.CU.SHFE.main"},
+                "row_count": 1,
+                "mapping": [{"contract_id": "CNF.CU.SHFE.CU2407"}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_mapping(
+                "CNF.CU.SHFE.main",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 3),
+                limit=5,
+            )
+        )
+
+        assert response["mapping"][0]["contract_id"] == "CNF.CU.SHFE.CU2407"
+        mock_dm.get_research_futures_mapping.assert_awaited_once_with(
+            "CNF.CU.SHFE.main",
+            start_date="2024-06-01",
+            end_date="2024-06-03",
+            limit=5,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_mapping_not_found(self, mock_dm):
+        mock_dm.get_research_futures_mapping = AsyncMock(
+            return_value={"status": "not_found", "series_id": "missing", "mapping": []}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_mapping("missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_calendar_success(self, mock_dm):
+        mock_dm.get_research_futures_calendar = AsyncMock(
+            return_value={
+                "status": "success",
+                "row_count": 1,
+                "calendar": [{"exchange": "SHFE", "trade_date": "2024-06-03", "is_trading_day": 1}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_calendar(
+                exchange="SHFE",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 3),
+                trading_only=True,
+            )
+        )
+
+        assert response["calendar"][0]["exchange"] == "SHFE"
+        mock_dm.get_research_futures_calendar.assert_awaited_once_with(
+            exchange="SHFE",
+            start_date="2024-06-01",
+            end_date="2024-06-03",
+            trading_only=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_source_manifests_success(self, mock_dm):
+        mock_dm.get_research_futures_source_manifests = AsyncMock(
+            return_value={
+                "status": "success",
+                "row_count": 1,
+                "source_manifests": [{"source_profile": "exchange_official"}],
+            }
+        )
+
+        response = _run(get_research_futures_source_manifests(enabled_only=True))
+
+        assert response["source_manifests"][0]["source_profile"] == "exchange_official"
+        mock_dm.get_research_futures_source_manifests.assert_awaited_once_with(enabled_only=True)
 
     @patch("api.routes.data_manager")
     def test_get_research_futures_cycle_diagnostics_success(self, mock_dm):

@@ -68,6 +68,32 @@
           "min_observation_ratio": 0.7,
           "max_stale_trading_days": 3
         },
+        "master_data": {
+          "maintain_contracts": true,
+          "maintain_exchange_calendar": true,
+          "default_research_series_type": "main_continuous",
+          "category_dictionary": "managed_enum",
+          "default_timezone": "Asia/Shanghai",
+          "future_extension_markets": [
+            "CME",
+            "ICE",
+            "LME",
+            "SGX",
+            "EIA",
+            "FRED"
+          ],
+          "calendar": {
+            "source_priority": [
+              "exchange_official",
+              "estimated_weekday_calendar",
+              "manual"
+            ],
+            "source_profile": "estimated_weekday_calendar",
+            "quality_flag": "estimated",
+            "seed_lookback_days": 370,
+            "seed_lookahead_days": 30
+          }
+        },
         "diagnostics": {
           "lookback_years": [
             3,

@@ -307,6 +307,7 @@ class DataManager:
             return
         try:
             from research.futures_market_data import (
+                FuturesCalendarService,
                 FuturesStorageManager,
                 default_futures_registry,
             )
@@ -314,6 +315,7 @@ class DataManager:
             self.futures_storage = FuturesStorageManager(self.research_config)
             self.futures_storage.initialize()
             registry = default_futures_registry(module_cfg)
+            self.futures_storage.upsert_categories(registry.get("categories", []))
             self.futures_storage.upsert_instruments_and_series(
                 registry["instruments"],
                 registry["series"],
@@ -321,6 +323,7 @@ class DataManager:
             self.futures_storage.upsert_source_manifests(
                 registry.get("source_manifests", []),
             )
+            FuturesCalendarService(self.futures_storage, module_cfg).seed_default_calendar()
             dm_logger.info(
                 "[DataManager] Futures storage initialized: %s",
                 self.futures_storage.db_path,
@@ -4586,6 +4589,233 @@ class DataManager:
             "instruments": instruments,
             "series": series,
         }
+
+    async def get_research_futures_dictionary(self) -> Dict[str, Any]:
+        """Return local futures data dictionary and available metadata."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            categories = storage.list_categories(active_only=True)
+            instruments = storage.list_instruments(active_only=True)
+            series = storage.list_series(active_only=True)
+            manifests = storage.list_source_manifests(enabled_only=False)
+            exchanges = sorted({item.get("exchange") for item in instruments if item.get("exchange")})
+            units = sorted({item.get("unit") for item in instruments if item.get("unit")})
+            currencies = sorted({item.get("currency") for item in instruments if item.get("currency")})
+            series_types = sorted({item.get("series_type") for item in series if item.get("series_type")})
+            return {
+                "status": "success",
+                "source_policy": "local_futures_db_only",
+                "categories": categories,
+                "exchanges": exchanges,
+                "units": units,
+                "currencies": currencies,
+                "series_types": series_types,
+                "source_profiles": manifests,
+                "instruments": instruments,
+                "series": series,
+                "warnings": [],
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_instrument_detail(self, instrument_id: str) -> Dict[str, Any]:
+        """Return one local futures root instrument with series/contracts."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            instrument = storage.get_instrument(instrument_id)
+            if not instrument:
+                return {"status": "not_found", "instrument_id": instrument_id}
+            return {
+                "status": "success",
+                "instrument": instrument,
+                "series": storage.find_series(instrument_id=instrument_id, active_only=False),
+                "contracts": storage.list_contracts(instrument_id=instrument_id, active_only=False),
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_contracts(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        exchange: Optional[str] = None,
+        contract_month: Optional[str] = None,
+        active_only: bool = True,
+    ) -> Dict[str, Any]:
+        """List local real futures contracts."""
+        storage = self._require_futures_storage()
+        rows = await asyncio.to_thread(
+            storage.list_contracts,
+            instrument_id=instrument_id,
+            exchange=exchange,
+            contract_month=contract_month,
+            active_only=active_only,
+        )
+        return {"status": "success", "row_count": len(rows), "contracts": rows}
+
+    async def get_research_futures_contract_prices(
+        self,
+        contract_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Read local real-contract daily bars."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            contract = storage.get_contract(contract_id)
+            if not contract:
+                return {"status": "not_found", "contract_id": contract_id, "rows": []}
+            rows = storage.get_contract_price_bars(
+                contract_id,
+                start_date=start_date,
+                end_date=end_date,
+                limit=limit,
+            )
+            return {"status": "success", "contract": contract, "row_count": len(rows), "rows": rows}
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_series(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        series_type: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        active_only: bool = True,
+    ) -> Dict[str, Any]:
+        """List local futures research series."""
+        storage = self._require_futures_storage()
+        rows = await asyncio.to_thread(
+            storage.find_series,
+            instrument_id=instrument_id,
+            series_type=series_type,
+            source_profile=source_profile,
+            active_only=active_only,
+        )
+        return {"status": "success", "row_count": len(rows), "series": rows}
+
+    async def get_research_futures_default_prices(
+        self,
+        *,
+        instrument_id: str,
+        series_type: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+        include_lineage: bool = False,
+    ) -> Dict[str, Any]:
+        """Resolve a root futures instrument to the default local research series."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        default_type = (
+            series_type
+            or module_cfg.get("master_data", {}).get("default_research_series_type")
+            or "main_continuous"
+        )
+
+        def _load() -> Dict[str, Any]:
+            series = storage.resolve_default_series(
+                instrument_id,
+                series_type=default_type,
+                source_profile=source_profile,
+            )
+            if not series:
+                return {
+                    "status": "not_found",
+                    "instrument_id": instrument_id,
+                    "series_type": default_type,
+                    "rows": [],
+                    "input_gaps": [
+                        {
+                            "field": "futures_default_series",
+                            "reason": "no_active_default_futures_series",
+                        }
+                    ],
+                }
+            rows = storage.get_price_bars(
+                series["series_id"],
+                start_date=start_date,
+                end_date=end_date,
+                limit=limit,
+            )
+            payload = {
+                "status": "success",
+                "instrument_id": instrument_id,
+                "series": series,
+                "row_count": len(rows),
+                "rows": rows,
+                "source_policy": "local_futures_db_only",
+            }
+            if include_lineage:
+                payload["mapping"] = storage.list_continuous_mappings(
+                    series["series_id"],
+                    start_date=start_date,
+                    end_date=end_date,
+                    limit=limit,
+                )
+            return payload
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_mapping(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Read continuous-series contract mapping rows."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            series = storage.get_series(series_id)
+            if not series:
+                return {"status": "not_found", "series_id": series_id, "mapping": []}
+            rows = storage.list_continuous_mappings(
+                series_id,
+                start_date=start_date,
+                end_date=end_date,
+                limit=limit,
+            )
+            return {"status": "success", "series": series, "row_count": len(rows), "mapping": rows}
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_calendar(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trading_only: bool = False,
+    ) -> Dict[str, Any]:
+        """Read local futures trading calendar rows."""
+        storage = self._require_futures_storage()
+        rows = await asyncio.to_thread(
+            storage.list_calendar_days,
+            exchange=exchange,
+            start_date=start_date,
+            end_date=end_date,
+            trading_only=trading_only,
+        )
+        return {"status": "success", "row_count": len(rows), "calendar": rows}
+
+    async def get_research_futures_source_manifests(
+        self,
+        *,
+        enabled_only: bool = False,
+    ) -> Dict[str, Any]:
+        """List local futures source manifests."""
+        storage = self._require_futures_storage()
+        rows = await asyncio.to_thread(storage.list_source_manifests, enabled_only=enabled_only)
+        return {"status": "success", "row_count": len(rows), "source_manifests": rows}
 
     async def get_research_futures_prices(
         self,
