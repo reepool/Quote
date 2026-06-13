@@ -9,6 +9,7 @@ from utils.task_manager.task_manager import TaskManagerBot
 def _build_task_manager_bot(*, restart_cfg=None, authorized_chats=None):
     task_scheduler = Mock()
     task_scheduler.load_jobs_from_config = AsyncMock()
+    task_scheduler.running_tasks = {}
     job_config_manager = Mock()
     config_manager = Mock()
 
@@ -102,6 +103,36 @@ async def test_restart_system_command_requires_confirmation():
     create_task.assert_not_called()
     sent_message = bot.send_message.await_args.args[1]
     assert "/restart_system confirm" in sent_message
+
+
+@pytest.mark.asyncio
+async def test_restart_system_command_blocks_when_tasks_are_running():
+    bot, _, task_scheduler, _ = _build_task_manager_bot(
+        restart_cfg={
+            "enabled": True,
+            "mode": "self_exit",
+            "service_name": "quote-system.service",
+            "delay_seconds": 0,
+            "exit_code": 1,
+        }
+    )
+    task_scheduler.running_tasks = {
+        "daily_data_update": {"run-1": object()},
+        "index_master_governance_sync": {"run-2": object()},
+    }
+    event = SimpleNamespace(chat_id=471105519, sender_id=2, text="/restart_system confirm")
+
+    with patch.object(bot, "_restart_service_by_self_exit", new=AsyncMock()) as self_exit, patch(
+        "utils.task_manager.task_manager.asyncio.create_task",
+    ) as create_task:
+        await bot.handle_restart_system_command(event)
+
+    self_exit.assert_not_called()
+    create_task.assert_not_called()
+    sent_message = bot.send_message.await_args.args[1]
+    assert "暂不重启系统服务" in sent_message
+    assert "`daily_data_update`" in sent_message
+    assert "`index_master_governance_sync`" in sent_message
 
 
 @pytest.mark.asyncio

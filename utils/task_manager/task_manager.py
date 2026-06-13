@@ -344,6 +344,30 @@ class TaskManagerBot:
                 )
                 return
 
+            running_tasks = self._get_running_task_summary()
+            if running_tasks:
+                sample_text = "\n".join(
+                    f"• `{item['job_id']}`，运行中实例: `{item['run_count']}`"
+                    for item in running_tasks[:10]
+                )
+                more_count = max(0, len(running_tasks) - 10)
+                more_text = f"\n• ... 另有 `{more_count}` 个任务" if more_count else ""
+                await self.send_message(
+                    chat_id,
+                    (
+                        "⏳ *暂不重启系统服务*\n\n"
+                        "当前仍有任务正在运行。为避免中断数据更新或写库，请等待任务完成后再发送 "
+                        "`/restart_system confirm`。\n\n"
+                        f"*运行中的任务:*\n{sample_text}{more_text}"
+                    ),
+                    parse_mode='markdown',
+                )
+                self.logger.warning(
+                    "[TaskManagerBot] 拒绝系统重启请求，仍有运行中任务: %s",
+                    [item["job_id"] for item in running_tasks],
+                )
+                return
+
             delay_seconds = restart_cfg["delay_seconds"]
             if restart_cfg["mode"] == "self_exit":
                 command_display = f"self_exit(exit_code={restart_cfg['exit_code']})"
@@ -385,6 +409,23 @@ class TaskManagerBot:
                 f"❌ *系统重启命令异常*\n\n错误信息: `{str(e)}`",
                 parse_mode='markdown',
             )
+
+    def _get_running_task_summary(self) -> List[Dict[str, Any]]:
+        """Return currently running scheduler tasks tracked by TaskScheduler."""
+        running_tasks = getattr(self.task_scheduler, "running_tasks", {}) or {}
+        summary: List[Dict[str, Any]] = []
+        for job_id, runs in sorted(running_tasks.items()):
+            if not runs:
+                continue
+            try:
+                run_count = len(runs)
+            except TypeError:
+                run_count = 1
+            summary.append({
+                "job_id": str(job_id),
+                "run_count": run_count,
+            })
+        return summary
 
     def _get_service_restart_config(self) -> Dict[str, Any]:
         """读取并规范化 Telegram 服务重启配置。"""
