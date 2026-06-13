@@ -64,20 +64,7 @@ class TaskManagerFormatters:
         task_manager_logger.debug(f"[TaskManagerFormatters] Formatting task status summary: "
                                   f"total={total_tasks}, running={len(running_tasks)}, disabled={len(disabled_tasks)}")
 
-        enabled_tasks = list(running_tasks or [])
-        disabled = list(disabled_tasks or [])
-        status_buckets = {
-            "running": [],
-            "paused": [],
-            "error": [],
-            "disabled": disabled,
-        }
-        for task in enabled_tasks:
-            status = TaskManagerFormatters._task_status_value(task, default="running")
-            if status in status_buckets:
-                status_buckets[status].append(task)
-            else:
-                status_buckets["running"].append(task)
+        status_buckets = TaskManagerFormatters._bucket_status_tasks(running_tasks, disabled_tasks)
 
         lines = [
             "📊 **任务状态概览**",
@@ -118,6 +105,101 @@ class TaskManagerFormatters:
         return TaskManagerFormatters._fit_status_message(lines, max_chars=max_chars)
 
     @staticmethod
+    def format_task_status_messages(
+        running_tasks: List[Union[TaskStatusInfo, Dict]],
+        disabled_tasks: List[Union[TaskStatusInfo, Dict]],
+        total_tasks: int,
+        max_chars: int = STATUS_MESSAGE_MAX_CHARS,
+    ) -> List[str]:
+        """格式化任务状态消息列表，用于 Telegram 分段发送。"""
+        task_manager_logger.debug(
+            "[TaskManagerFormatters] Formatting paged task status: "
+            f"total={total_tasks}, running={len(running_tasks)}, disabled={len(disabled_tasks)}"
+        )
+        status_buckets = TaskManagerFormatters._bucket_status_tasks(running_tasks, disabled_tasks)
+        overview_lines = [
+            "📊 **任务状态概览**",
+            "",
+            (
+                f"总计 `{total_tasks}` 个｜"
+                f"已调度 `{len(status_buckets['running'])}`｜"
+                f"手工/暂停 `{len(status_buckets['paused'])}`｜"
+                f"异常 `{len(status_buckets['error'])}`｜"
+                f"禁用 `{len(status_buckets['disabled'])}`"
+            ),
+            "复制反引号内命令可直接运行；用 `/detail <任务ID>` 查看完整配置。",
+            "",
+        ]
+
+        messages = [
+            TaskManagerFormatters._format_status_message_page(
+                overview_lines,
+                [
+                    ("🟢 已调度", status_buckets["running"], True),
+                    ("❌ 异常", status_buckets["error"], True),
+                ],
+                max_chars=max_chars,
+            ),
+            TaskManagerFormatters._format_status_message_page(
+                [],
+                [("🟡 手工运行", status_buckets["paused"], True)],
+                max_chars=max_chars,
+                empty_text="暂无手工运行任务",
+            ),
+            TaskManagerFormatters._format_status_message_page(
+                [],
+                [("🔴 已禁用", status_buckets["disabled"], False)],
+                max_chars=max_chars,
+                empty_text="暂无禁用任务",
+            ),
+        ]
+        return [message for message in messages if message]
+
+    @staticmethod
+    def _bucket_status_tasks(
+        running_tasks: List[Union[TaskStatusInfo, Dict]],
+        disabled_tasks: List[Union[TaskStatusInfo, Dict]],
+    ) -> Dict[str, List[Union[TaskStatusInfo, Dict]]]:
+        status_buckets = {
+            "running": [],
+            "paused": [],
+            "error": [],
+            "disabled": list(disabled_tasks or []),
+        }
+        for task in list(running_tasks or []):
+            status = TaskManagerFormatters._task_status_value(task, default="running")
+            if status in status_buckets:
+                status_buckets[status].append(task)
+            else:
+                status_buckets["running"].append(task)
+        return status_buckets
+
+    @staticmethod
+    def _format_status_message_page(
+        prefix_lines: List[str],
+        sections: List[tuple],
+        *,
+        max_chars: int,
+        empty_text: str = "暂无任务",
+    ) -> str:
+        lines = list(prefix_lines)
+        rendered_any = False
+        for title, tasks, include_schedule in sections:
+            if not tasks:
+                continue
+            rendered_any = True
+            lines.extend(
+                TaskManagerFormatters._format_task_group_section_lines(
+                    title,
+                    tasks,
+                    include_schedule=include_schedule,
+                )
+            )
+        if not rendered_any:
+            lines.append(empty_text)
+        return TaskManagerFormatters._fit_status_message(lines, max_chars=max_chars)
+
+    @staticmethod
     def _format_task_group_section(
         title: str,
         tasks: List[Union[TaskStatusInfo, Dict]],
@@ -148,7 +230,7 @@ class TaskManagerFormatters:
 
         lines = [f"**{title}**"]
         for group in TaskManagerFormatters._ordered_task_groups(grouped):
-            lines.append(f"*{group}*")
+            lines.append(f"**{group}**")
             for task in sorted(grouped[group], key=TaskManagerFormatters._task_sort_key):
                 lines.append(TaskManagerFormatters._format_task_line(task, include_schedule))
             lines.append("")

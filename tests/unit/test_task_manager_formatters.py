@@ -64,12 +64,12 @@ def test_status_summary_groups_tasks_by_status_and_domain():
     assert "**🟢 已调度**" in text
     assert "**🟡 手工/暂停**" in text
     assert "**🔴 已禁用**" in text
-    assert "*行情与主数据*" in text
-    assert "*股东与披露*" in text
-    assert "*行业与指数*" in text
-    assert "*研究与风控*" in text
-    assert text.index("*行情与主数据*") < text.index("`/run daily_data_update`")
-    assert text.index("*股东与披露*") < text.index("`/run shareholder_reconciliation_sync`")
+    assert "**行情与主数据**" in text
+    assert "**股东与披露**" in text
+    assert "**行业与指数**" in text
+    assert "**研究与风控**" in text
+    assert text.index("**行情与主数据**") < text.index("`/run daily_data_update`")
+    assert text.index("**股东与披露**") < text.index("`/run shareholder_reconciliation_sync`")
 
 
 def test_status_summary_accepts_task_status_enum():
@@ -87,7 +87,7 @@ def test_status_summary_accepts_task_status_enum():
     )
 
     assert "手工/暂停 `1`" in text
-    assert "*港美市场*" in text
+    assert "**港美市场**" in text
     assert "`/run hkex_instrument_master_sync`" in text
 
 
@@ -111,3 +111,42 @@ def test_status_summary_stays_under_telegram_message_limit():
     assert len(text) <= TaskManagerFormatters.STATUS_MESSAGE_MAX_CHARS
     assert "... 已省略" in text
     assert "`/run financial_disclosure_incremental_sync_00`" in text
+
+
+def test_status_messages_split_by_operational_state():
+    running_tasks = [
+        {
+            "job_id": "daily_data_update",
+            "description": "每日数据更新任务",
+            "next_run": "今天 20:00",
+            "status": "running",
+        },
+        {
+            "job_id": "index_master_governance_sync",
+            "description": "A股指数主数据治理",
+            "next_run": "手工触发",
+            "status": "paused",
+        },
+    ]
+    disabled_tasks = [
+        {
+            "job_id": "technical_snapshot_refresh",
+            "description": "技术快照刷新",
+            "status": "disabled",
+        }
+    ]
+
+    messages = TaskManagerFormatters.format_task_status_messages(
+        running_tasks,
+        disabled_tasks,
+        total_tasks=3,
+    )
+
+    assert len(messages) == 3
+    assert "🟢 已调度" in messages[0]
+    assert "`/run daily_data_update`" in messages[0]
+    assert "🟡 手工运行" in messages[1]
+    assert "`/run index_master_governance_sync`" in messages[1]
+    assert "🔴 已禁用" in messages[2]
+    assert "`/run technical_snapshot_refresh`" in messages[2]
+    assert all(len(message) <= TaskManagerFormatters.STATUS_MESSAGE_MAX_CHARS for message in messages)

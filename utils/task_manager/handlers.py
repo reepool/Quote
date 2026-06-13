@@ -457,30 +457,30 @@ class TaskManagerHandlers:
 
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 获取到任务状态，准备格式化消息")
 
-            command_hint = "\n\n*💡 可用命令:*\n"
+            command_hint = "\n\n**💡 可用命令:**\n"
             command_hint += "• `/run <任务ID>` - 立即执行\n"
             command_hint += "• `/detail <任务ID>` - 查看详情\n"
             command_hint += "• `/help` - 获取更多帮助"
 
             # 格式化状态消息
-            message = TaskManagerFormatters.format_task_status_summary(
+            messages = TaskManagerFormatters.format_task_status_messages(
                 running_tasks,
                 disabled_tasks,
                 total_tasks,
             )
 
-            # 添加命令提示
-            message += command_hint
-
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 发送状态消息到 {chat_id}")
 
             # 发送消息（不使用键盘）
             try:
-                await self.task_manager.send_message(
-                    chat_id,
-                    message,
-                    parse_mode='markdown'
-                )
+                for index, message in enumerate(messages):
+                    if index == len(messages) - 1:
+                        message += command_hint
+                    await self.task_manager.send_message(
+                        chat_id,
+                        message,
+                        parse_mode='markdown'
+                    )
             except Exception as send_error:
                 if "Message was too long" not in str(send_error):
                     raise
@@ -488,17 +488,20 @@ class TaskManagerHandlers:
                 self.task_manager.logger.warning(
                     "[TaskManagerHandlers] 状态消息过长，使用紧凑摘要重试"
                 )
-                compact_message = TaskManagerFormatters.format_task_status_summary(
+                compact_messages = TaskManagerFormatters.format_task_status_messages(
                     running_tasks,
                     disabled_tasks,
                     total_tasks,
                     max_chars=2400,
                 )
-                await self.task_manager.send_message(
-                    chat_id,
-                    compact_message + command_hint,
-                    parse_mode='markdown'
-                )
+                for index, compact_message in enumerate(compact_messages):
+                    if index == len(compact_messages) - 1:
+                        compact_message += command_hint
+                    await self.task_manager.send_message(
+                        chat_id,
+                        compact_message,
+                        parse_mode='markdown'
+                    )
 
             self.task_manager.logger.debug(f"[TaskManagerHandlers] 状态消息发送完成")
 
