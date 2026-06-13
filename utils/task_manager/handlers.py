@@ -462,12 +462,6 @@ class TaskManagerHandlers:
                 running_tasks, disabled_tasks, total_tasks
             )
 
-            # 如果有禁用的任务，也显示它们
-            if disabled_tasks:
-                message += "\n\n*🔴 已禁用的任务:*\n"
-                for task in disabled_tasks:
-                    message += f"• `{task.job_id}` - {task.description}\n"
-
             # 添加命令提示
             message += "\n\n*💡 可用命令:*\n"
             message += "• `/run <任务ID>` - 立即执行\n"

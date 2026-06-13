@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional, Union
 from datetime import datetime
 from utils import task_manager_logger
 from utils.date_utils import DateUtils
-from utils.task_manager.models import TaskStatusInfo
+from utils.task_manager.models import TaskStatus, TaskStatusInfo
 
 
 class TaskManagerFormatters:
@@ -60,50 +60,162 @@ class TaskManagerFormatters:
         task_manager_logger.debug(f"[TaskManagerFormatters] Formatting task status summary: "
                                   f"total={total_tasks}, running={len(running_tasks)}, disabled={len(disabled_tasks)}")
 
+        enabled_tasks = list(running_tasks or [])
+        disabled = list(disabled_tasks or [])
+        status_buckets = {
+            "running": [],
+            "paused": [],
+            "error": [],
+            "disabled": disabled,
+        }
+        for task in enabled_tasks:
+            status = TaskManagerFormatters._task_status_value(task, default="running")
+            if status in status_buckets:
+                status_buckets[status].append(task)
+            else:
+                status_buckets["running"].append(task)
+
         message = "📊 **任务状态概览**\n\n"
+        message += (
+            f"总计 `{total_tasks}` 个｜"
+            f"已调度 `{len(status_buckets['running'])}`｜"
+            f"手工/暂停 `{len(status_buckets['paused'])}`｜"
+            f"异常 `{len(status_buckets['error'])}`｜"
+            f"禁用 `{len(status_buckets['disabled'])}`\n"
+        )
+        message += "每个任务都提供可复制的任务 ID 和 `/run` 命令。\n\n"
 
-        # 统计信息
-        enabled_count = len(running_tasks)
-        disabled_count = len(disabled_tasks)
+        sections = [
+            ("🟢 已调度", status_buckets["running"], True),
+            ("🟡 手工/暂停", status_buckets["paused"], True),
+            ("❌ 异常", status_buckets["error"], True),
+            ("🔴 已禁用", status_buckets["disabled"], False),
+        ]
+        rendered_any = False
+        for title, tasks, include_schedule in sections:
+            if not tasks:
+                continue
+            rendered_any = True
+            message += TaskManagerFormatters._format_task_group_section(
+                title,
+                tasks,
+                include_schedule=include_schedule,
+            )
 
-        message += f"• 总任务数：{total_tasks}\n"
-        message += f"• 运行中：{enabled_count}\n"
-        message += f"• 已禁用：{disabled_count}\n\n"
-
-        # 运行中的任务
-        if running_tasks:
-            message += "**🟢 运行中的任务：**\n"
-            for task in running_tasks:  # 显示所有任务
-                if hasattr(task, 'job_id'):  # TaskStatusInfo对象
-                    job_id = task.job_id
-                    description = task.description
-                    # 使用新的时间格式化函数
-                    next_run = DateUtils.get_task_status_display(
-                        task.next_run_time,
-                        str(task.status) if hasattr(task, 'status') and task.status else 'unknown'
-                    )
-                else:  # 字典对象
-                    job_id = task.get('job_id', 'N/A')
-                    description = task.get('description', '未知任务')
-                    next_run = task.get('next_run', '未安排')
-                message += f"• {description} - `{job_id}` - {next_run}\n"
-
-        # 禁用的任务
-        if disabled_tasks:
-            message += f"\n**🔴 已禁用的任务：**\n"
-            for task in disabled_tasks:  # 显示所有禁用任务
-                if hasattr(task, 'job_id'):  # TaskStatusInfo对象
-                    job_id = task.job_id
-                    description = task.description
-                else:  # 字典对象
-                    job_id = task.get('job_id', 'N/A')
-                    description = task.get('description', '未知任务')
-                message += f"• {description} - `{job_id}`\n"
-
-        if not running_tasks and not disabled_tasks:
+        if not rendered_any:
             message += "暂无任务"
 
         return message
+
+    @staticmethod
+    def _format_task_group_section(
+        title: str,
+        tasks: List[Union[TaskStatusInfo, Dict]],
+        *,
+        include_schedule: bool,
+    ) -> str:
+        grouped: Dict[str, List[Union[TaskStatusInfo, Dict]]] = {}
+        for task in tasks:
+            group = TaskManagerFormatters._task_domain(
+                TaskManagerFormatters._task_job_id(task)
+            )
+            grouped.setdefault(group, []).append(task)
+
+        lines = [f"**{title}**"]
+        for group in TaskManagerFormatters._ordered_task_groups(grouped):
+            lines.append(f"*{group}*")
+            for task in sorted(grouped[group], key=TaskManagerFormatters._task_sort_key):
+                lines.append(TaskManagerFormatters._format_task_line(task, include_schedule))
+        return "\n".join(lines) + "\n\n"
+
+    @staticmethod
+    def _format_task_line(task: Union[TaskStatusInfo, Dict], include_schedule: bool) -> str:
+        job_id = TaskManagerFormatters._task_job_id(task)
+        description = TaskManagerFormatters._task_description(task)
+        schedule = TaskManagerFormatters._task_schedule_text(task) if include_schedule else None
+        if schedule:
+            return f"• {description}\n  ID: `{job_id}` ｜运行: `/run {job_id}` ｜{schedule}"
+        return f"• {description}\n  ID: `{job_id}` ｜运行: `/run {job_id}`"
+
+    @staticmethod
+    def _task_job_id(task: Union[TaskStatusInfo, Dict]) -> str:
+        if hasattr(task, "job_id"):
+            return str(getattr(task, "job_id") or "N/A")
+        return str(task.get("job_id", "N/A"))
+
+    @staticmethod
+    def _task_description(task: Union[TaskStatusInfo, Dict]) -> str:
+        if hasattr(task, "description"):
+            return str(getattr(task, "description") or "未知任务")
+        return str(task.get("description", "未知任务"))
+
+    @staticmethod
+    def _task_status_value(task: Union[TaskStatusInfo, Dict], default: str = "unknown") -> str:
+        status = getattr(task, "status", None) if hasattr(task, "status") else task.get("status")
+        if isinstance(status, TaskStatus):
+            return status.value
+        if status:
+            return str(status).replace("TaskStatus.", "").lower()
+        return default
+
+    @staticmethod
+    def _task_schedule_text(task: Union[TaskStatusInfo, Dict]) -> str:
+        if hasattr(task, "job_id"):
+            trigger_info = getattr(task, "trigger_info", None)
+            if trigger_info and getattr(trigger_info, "trigger_type", "") == "manual":
+                return "触发: 手工"
+            status = TaskManagerFormatters._task_status_value(task, default="unknown")
+            next_run = DateUtils.get_task_status_display(
+                getattr(task, "next_run_time", None),
+                status,
+            )
+            return f"下次: {next_run}"
+        return f"下次: {task.get('next_run', '未安排')}"
+
+    @staticmethod
+    def _task_sort_key(task: Union[TaskStatusInfo, Dict]) -> tuple:
+        return (
+            TaskManagerFormatters._task_description(task),
+            TaskManagerFormatters._task_job_id(task),
+        )
+
+    @staticmethod
+    def _ordered_task_groups(grouped: Dict[str, List[Union[TaskStatusInfo, Dict]]]) -> List[str]:
+        preferred = [
+            "行情与主数据",
+            "港美市场",
+            "行业与指数",
+            "股东与披露",
+            "财务与估值",
+            "研究与风控",
+            "数据质量与维护",
+            "系统运维",
+            "其他",
+        ]
+        return [group for group in preferred if group in grouped] + sorted(
+            group for group in grouped if group not in preferred
+        )
+
+    @staticmethod
+    def _task_domain(job_id: str) -> str:
+        job_id = job_id.lower()
+        if any(key in job_id for key in ("industry", "index")):
+            return "行业与指数"
+        if any(key in job_id for key in ("daily_data", "master_governance", "instrument_master", "calendar")):
+            if job_id.startswith(("hk_", "us_")) or "hkex" in job_id:
+                return "港美市场"
+            return "行情与主数据"
+        if any(key in job_id for key in ("shareholder", "disclosure", "broker_risk")):
+            return "股东与披露"
+        if any(key in job_id for key in ("financial", "valuation")):
+            return "财务与估值"
+        if any(key in job_id for key in ("company_profile", "analyst", "research", "sentiment", "technical", "risk")):
+            return "研究与风控"
+        if any(key in job_id for key in ("gap", "maintenance", "cleanup", "backup", "cache", "integrity")):
+            return "数据质量与维护"
+        if any(key in job_id for key in ("health", "dependency", "system")):
+            return "系统运维"
+        return "其他"
 
     @staticmethod
     def format_loading_message(action: str) -> str:
