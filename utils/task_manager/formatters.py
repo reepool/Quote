@@ -86,7 +86,7 @@ class TaskManagerFormatters:
                     job_id = task.get('job_id', 'N/A')
                     description = task.get('description', '未知任务')
                     next_run = task.get('next_run', '未安排')
-                message += f"• {description} ({job_id}) - {next_run}\n"
+                message += f"• {description} - `{job_id}` - {next_run}\n"
 
         # 禁用的任务
         if disabled_tasks:
@@ -98,7 +98,7 @@ class TaskManagerFormatters:
                 else:  # 字典对象
                     job_id = task.get('job_id', 'N/A')
                     description = task.get('description', '未知任务')
-                message += f"• {description} ({job_id})\n"
+                message += f"• {description} - `{job_id}`\n"
 
         if not running_tasks and not disabled_tasks:
             message += "暂无任务"
