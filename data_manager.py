@@ -23,7 +23,7 @@ from calendar import monthrange
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta, timezone
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import pandas as pd
 
@@ -49,6 +49,14 @@ from research.financial_industry_fact_packs import (
     INDUSTRY_FACT_PACK_VERSION,
     build_industry_pack_payload,
     get_local_core_industry_canonical_facts,
+)
+from instrument_master_governance import (
+    AShareIndexPolicy,
+    AShareStockPolicy,
+    HKEXInstrumentPolicy,
+    MasterGovernanceOrchestrator,
+    MasterGovernanceRequirement,
+    PolicyRegistry,
 )
 
 
@@ -8077,6 +8085,261 @@ class DataManager:
             defaults.update(raw_config)
         return defaults
 
+    def _get_master_governance_config(self) -> Dict[str, Any]:
+        """Return modular master-governance config with legacy-compatible defaults."""
+        legacy = self._get_instrument_master_governance_config()
+        index_config = self._get_index_master_governance_config()
+        hkex_config = self._get_hkex_instrument_master_sync_config()
+        defaults: Dict[str, Any] = {
+            'enabled': legacy.get('enabled', True),
+            'policies': {
+                'a_share_stock': {'enabled': legacy.get('enabled', True)},
+                'a_share_index': {'enabled': index_config.get('enabled', False)},
+                'hkex_instrument': {'enabled': hkex_config.get('enabled', False)},
+            },
+            'job_requirements': {},
+        }
+        raw_config = self.data_config.get('master_governance')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.master_governance', {})
+        if isinstance(raw_config, dict):
+            merged = dict(defaults)
+            merged.update({k: v for k, v in raw_config.items() if k not in {'policies', 'job_requirements'}})
+            policies = dict(defaults['policies'])
+            for scope, scope_config in (raw_config.get('policies') or {}).items():
+                if isinstance(scope_config, dict):
+                    policies[str(scope)] = {**policies.get(str(scope), {}), **scope_config}
+            merged['policies'] = policies
+            merged['job_requirements'] = raw_config.get('job_requirements') or {}
+            return merged
+        return defaults
+
+    def _build_master_governance_orchestrator(self) -> MasterGovernanceOrchestrator:
+        """Create a modular governance orchestrator bound to this DataManager."""
+        legacy_config = self._get_instrument_master_governance_config()
+        index_config = self._get_index_master_governance_config()
+        hkex_config = self._get_hkex_instrument_master_sync_config()
+        registry = PolicyRegistry([
+            AShareStockPolicy(self, legacy_config),
+            AShareIndexPolicy(self, index_config),
+            HKEXInstrumentPolicy(self, hkex_config),
+        ])
+        modular_config = self._get_master_governance_config()
+        return MasterGovernanceOrchestrator(
+            registry=registry,
+            policy_config=modular_config.get('policies') or {},
+        )
+
+    def _build_master_governance_requirements(
+        self,
+        *,
+        job_name: str,
+        exchanges: Optional[List[str]],
+        instrument_types: Optional[List[str]] = None,
+        job_type: str = 'current',
+        target_date: Optional[date] = None,
+        force_refresh: bool = False,
+        include_pytdx_validation: Optional[bool] = None,
+        timeout_sec: Optional[int] = None,
+        freshness_threshold_hours: Optional[float] = None,
+        continue_on_failure: Optional[bool] = None,
+    ) -> List[MasterGovernanceRequirement]:
+        """Resolve explicit modular requirements, falling back to legacy policy."""
+        modular_config = self._get_master_governance_config()
+        legacy_config = self._get_instrument_master_governance_config()
+        if not modular_config.get('enabled', True):
+            return []
+
+        default_continue = (
+            continue_on_failure
+            if continue_on_failure is not None
+            else legacy_config.get('continue_on_failure', True)
+        )
+        configured_requirements = (
+            (modular_config.get('job_requirements') or {}).get(job_name)
+        )
+        resolved_runtime_exchanges = self._resolve_master_governance_exchanges(exchanges)
+        requested_runtime_types = {
+            str(item).lower()
+            for item in (instrument_types or [])
+            if str(item).strip()
+        }
+        local_today = get_shanghai_time().date()
+        historical_job = job_type in {'historical', 'backfill', 'point_in_time'}
+        if target_date is not None and target_date < local_today:
+            historical_job = True
+        if configured_requirements:
+            requirements: List[MasterGovernanceRequirement] = []
+            for raw in configured_requirements:
+                requirement = MasterGovernanceRequirement.from_config(
+                    raw,
+                    job_name=job_name,
+                    job_type=job_type,
+                    target_date=target_date,
+                    default_continue_on_error=default_continue,
+                )
+                if requested_runtime_types and not (
+                    set(requirement.instrument_types) & requested_runtime_types
+                ):
+                    continue
+                if resolved_runtime_exchanges:
+                    scoped = [
+                        exchange for exchange in requirement.exchanges
+                        if exchange in set(resolved_runtime_exchanges)
+                    ]
+                    if not scoped:
+                        continue
+                    requirement = replace(requirement, exchanges=scoped)
+                if historical_job and legacy_config.get('skip_for_backfill', True) and not force_refresh:
+                    requirement = replace(requirement, mode='skip_for_backfill')
+                elif force_refresh:
+                    requirement = replace(requirement, mode='force_refresh')
+                if timeout_sec is not None:
+                    requirement = replace(requirement, timeout_sec=timeout_sec)
+                requirements.append(requirement)
+            return requirements
+
+        resolved_exchanges = resolved_runtime_exchanges
+        requested_types = {
+            str(item).lower()
+            for item in (instrument_types or ['stock'])
+            if str(item).strip()
+        }
+
+        def _mode(default_force: bool = False) -> str:
+            if historical_job and legacy_config.get('skip_for_backfill', True) and not force_refresh:
+                return 'skip_for_backfill'
+            return 'force_refresh' if (force_refresh or default_force) else 'freshness_gated'
+
+        force_refresh_job_names = self._get_instrument_master_force_refresh_job_names()
+        default_force = job_name in force_refresh_job_names and not historical_job
+        requirements = []
+        a_share_exchanges = [ex for ex in resolved_exchanges if ex in ('SSE', 'SZSE', 'BSE')]
+        if a_share_exchanges and ('stock' in requested_types or not requested_types):
+            requirements.append(MasterGovernanceRequirement(
+                scope='a_share_stock',
+                exchanges=a_share_exchanges,
+                instrument_types=['stock'],
+                mode=_mode(default_force),
+                target_date=target_date,
+                job_name=job_name,
+                job_type=job_type,
+                continue_on_error=bool(default_continue),
+                timeout_sec=timeout_sec if timeout_sec is not None else legacy_config.get('timeout_sec'),
+                freshness_threshold_hours=(
+                    freshness_threshold_hours
+                    if freshness_threshold_hours is not None
+                    else legacy_config.get('freshness_threshold_hours')
+                ),
+                include_pytdx_validation=(
+                    include_pytdx_validation
+                    if include_pytdx_validation is not None
+                    else legacy_config.get('pytdx_validation_enabled', False)
+                ),
+                legacy_fallback=True,
+            ))
+
+        index_config = self._get_index_master_governance_config()
+        index_exchanges = [ex for ex in resolved_exchanges if ex in ('SSE', 'SZSE')]
+        if (
+            index_exchanges
+            and 'index' in requested_types
+            and index_config.get('enabled', False)
+            and index_config.get('run_before_daily_update', True)
+        ):
+            requirements.append(MasterGovernanceRequirement(
+                scope='a_share_index',
+                exchanges=index_exchanges,
+                instrument_types=['index'],
+                mode=_mode(False),
+                target_date=target_date,
+                job_name=job_name,
+                job_type=job_type,
+                continue_on_error=bool(index_config.get('continue_on_failure', default_continue)),
+                timeout_sec=index_config.get('timeout_sec'),
+                freshness_threshold_hours=index_config.get('freshness_threshold_hours'),
+                legacy_fallback=True,
+            ))
+
+        hkex_config = self._get_hkex_instrument_master_sync_config()
+        if 'HKEX' in resolved_exchanges and hkex_config.get('enabled', False):
+            requirements.append(MasterGovernanceRequirement(
+                scope='hkex_instrument',
+                exchanges=['HKEX'],
+                instrument_types=['stock'],
+                mode='audit_only' if job_name == 'hk_daily_data_update' else _mode(False),
+                target_date=target_date,
+                job_name=job_name,
+                job_type=job_type,
+                continue_on_error=bool(hkex_config.get('continue_on_failure', default_continue)),
+                timeout_sec=timeout_sec if timeout_sec is not None else hkex_config.get('timeout_sec'),
+                legacy_fallback=True,
+                options={'mode': hkex_config.get('mode', 'audit_only')},
+            ))
+        return requirements
+
+    async def run_master_governance(
+        self,
+        requirements: List[MasterGovernanceRequirement],
+    ) -> Dict[str, Any]:
+        """Run modular master governance for explicit requirements."""
+        orchestrator = self._build_master_governance_orchestrator()
+        return await orchestrator.run(requirements)
+
+    async def run_master_governance_for_job(
+        self,
+        *,
+        job_name: str,
+        exchanges: Optional[List[str]] = None,
+        instrument_types: Optional[List[str]] = None,
+        job_type: str = 'current',
+        target_date: Optional[date] = None,
+        force_refresh: bool = False,
+        include_pytdx_validation: Optional[bool] = None,
+        timeout_sec: Optional[int] = None,
+        freshness_threshold_hours: Optional[float] = None,
+        continue_on_failure: Optional[bool] = None,
+    ) -> Dict[str, Any]:
+        """Resolve and run master governance requirements for a business job."""
+        requirements = self._build_master_governance_requirements(
+            job_name=job_name,
+            exchanges=exchanges,
+            instrument_types=instrument_types,
+            job_type=job_type,
+            target_date=target_date,
+            force_refresh=force_refresh,
+            include_pytdx_validation=include_pytdx_validation,
+            timeout_sec=timeout_sec,
+            freshness_threshold_hours=freshness_threshold_hours,
+            continue_on_failure=continue_on_failure,
+        )
+        if not requirements:
+            started_at = get_shanghai_time()
+            return {
+                'status': 'skipped',
+                'action': 'skipped',
+                'reason': 'no_master_governance_requirements',
+                'job_name': job_name,
+                'job_type': job_type,
+                'started_at': started_at.isoformat(),
+                'finished_at': get_shanghai_time().isoformat(),
+                'elapsed_sec': 0.0,
+                'summary': {
+                    'exchanges': [],
+                    'added_instruments': 0,
+                    'deactivated_instruments': 0,
+                    'active_count': 0,
+                },
+                'exchanges': {},
+                'children': [],
+                'warnings': [],
+                'errors': [],
+            }
+        result = await self.run_master_governance(requirements)
+        result['job_name'] = job_name
+        result['job_type'] = job_type
+        return result
+
     def _get_index_master_governance_config(self) -> Dict[str, Any]:
         """Return A-share index master-governance config with conservative defaults."""
         default_master_admission = {
@@ -8388,8 +8651,8 @@ class DataManager:
         sync_instrument_master() so quote, research, and financial jobs share
         one master-data implementation.
         """
-        config = self._get_instrument_master_governance_config()
         started_at = get_shanghai_time()
+        config = self._get_instrument_master_governance_config()
 
         if not config.get('enabled', True):
             return {
@@ -8409,41 +8672,23 @@ class DataManager:
             }
 
         resolved_exchanges = self._resolve_master_governance_exchanges(exchanges)
-        supported_set = set(config.get('supported_exchanges') or ['SSE', 'SZSE', 'BSE'])
-        hkex_config = self._get_hkex_instrument_master_sync_config()
-        supported_a_share_exchanges = [
-            ex for ex in resolved_exchanges if ex in supported_set and ex in ('SSE', 'SZSE', 'BSE')
-        ]
-        supported_hkex_exchanges = [
-            ex for ex in resolved_exchanges
-            if ex == 'HKEX' and ex in supported_set and hkex_config.get('enabled', False)
-        ]
-        supported_exchanges = supported_a_share_exchanges + supported_hkex_exchanges
-        unsupported_exchanges = [ex for ex in resolved_exchanges if ex not in supported_exchanges]
-
-        local_today = get_shanghai_time().date()
-        historical_job = job_type in {'historical', 'backfill', 'point_in_time'}
-        if target_date is not None and target_date < local_today:
-            historical_job = True
-        if historical_job and config.get('skip_for_backfill', True) and not force_refresh:
-            return {
-                'status': 'skipped',
-                'action': 'skipped',
-                'reason': 'historical_current_master_governance_skipped',
-                'job_name': job_name,
-                'job_type': job_type,
-                'target_date': target_date.isoformat() if target_date else None,
-                'started_at': started_at.isoformat(),
-                'finished_at': get_shanghai_time().isoformat(),
-                'elapsed_sec': 0.0,
-                'exchanges': {},
-                'unsupported_exchanges': unsupported_exchanges,
-                'summary': {'exchanges': supported_exchanges, 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
-                'warnings': [f"{ex}: unsupported market for instrument master governance" for ex in unsupported_exchanges],
-                'errors': [],
-            }
-
-        if not supported_exchanges:
+        result = await self.run_master_governance_for_job(
+            job_name=job_name,
+            exchanges=resolved_exchanges,
+            instrument_types=['stock'],
+            job_type=job_type,
+            target_date=target_date,
+            force_refresh=force_refresh,
+            include_pytdx_validation=include_pytdx_validation,
+            timeout_sec=timeout_sec,
+            freshness_threshold_hours=freshness_threshold_hours,
+            continue_on_failure=continue_on_failure,
+        )
+        if (
+            result.get('reason') == 'no_master_governance_requirements'
+            and resolved_exchanges
+        ):
+            unsupported_exchanges = list(resolved_exchanges)
             return {
                 'status': 'skipped',
                 'action': 'skipped',
@@ -8459,107 +8704,6 @@ class DataManager:
                 'warnings': [f"{ex}: unsupported market for instrument master governance" for ex in unsupported_exchanges],
                 'errors': [],
             }
-
-        effective_freshness_hours = (
-            freshness_threshold_hours
-            if freshness_threshold_hours is not None
-            else config.get('freshness_threshold_hours')
-        )
-        if config.get('reuse_fresh_master', True) and not force_refresh:
-            try:
-                fresh_result = await self._build_fresh_master_governance_result(
-                    exchanges=supported_exchanges,
-                    freshness_threshold_hours=effective_freshness_hours,
-                    job_name=job_name,
-                    job_type=job_type,
-                    started_at=started_at,
-                    unsupported_exchanges=unsupported_exchanges,
-                )
-            except Exception as exc:
-                dm_logger.warning(
-                    "[DataManager] Instrument master freshness check failed before %s: %s; running sync",
-                    job_name,
-                    exc,
-                )
-                fresh_result = None
-            if fresh_result is not None:
-                return fresh_result
-
-        result: Optional[Dict[str, Any]] = None
-        if supported_a_share_exchanges:
-            result = await self.sync_instrument_master(
-                supported_a_share_exchanges,
-                include_pytdx_validation=(
-                    include_pytdx_validation
-                    if include_pytdx_validation is not None
-                    else config.get('pytdx_validation_enabled', True)
-                ),
-                timeout_sec=timeout_sec if timeout_sec is not None else config.get('timeout_sec'),
-                freshness_threshold_hours=effective_freshness_hours,
-            )
-        if supported_hkex_exchanges:
-            hkex_result = await self.sync_hkex_instrument_master(
-                mode=hkex_config.get('mode', 'audit_only'),
-                timeout_sec=timeout_sec if timeout_sec is not None else hkex_config.get('timeout_sec'),
-            )
-            if result is None:
-                result = hkex_result
-            else:
-                result.setdefault('exchanges', {}).update(hkex_result.get('exchanges') or {})
-                result.setdefault('warnings', []).extend(hkex_result.get('warnings') or [])
-                result.setdefault('errors', []).extend(hkex_result.get('errors') or [])
-                result.setdefault('source_priority', []).extend(
-                    item for item in hkex_result.get('source_priority', [])
-                    if item not in result.get('source_priority', [])
-                )
-                result_summary = result.setdefault('summary', {})
-                hkex_summary = hkex_result.get('summary') or {}
-                result_summary['exchanges'] = supported_exchanges
-                for key in (
-                    'added_instruments',
-                    'deactivated_instruments',
-                    'suspended_instruments',
-                    'reactivated_instruments',
-                    'active_count',
-                    'review_required',
-                ):
-                    result_summary[key] = int(result_summary.get(key, 0) or 0) + int(hkex_summary.get(key, 0) or 0)
-                if hkex_result.get('status') in ('warning', 'error') and result.get('status') == 'success':
-                    result['status'] = hkex_result.get('status')
-        if result is None:
-            result = {
-                'status': 'skipped',
-                'summary': {'exchanges': [], 'added_instruments': 0, 'deactivated_instruments': 0, 'active_count': 0},
-                'exchanges': {},
-                'warnings': [],
-                'errors': [],
-            }
-        result['action'] = 'synced'
-        result['job_name'] = job_name
-        result['job_type'] = job_type
-        result['reason'] = result.get('reason') or 'master_sync_executed'
-        result['unsupported_exchanges'] = unsupported_exchanges
-        if unsupported_exchanges:
-            unsupported_warnings = [
-                f"{ex}: unsupported market for instrument master governance"
-                for ex in unsupported_exchanges
-            ]
-            result.setdefault('warnings', []).extend(unsupported_warnings)
-            if result.get('status') == 'success':
-                result['status'] = 'warning'
-
-        should_continue = (
-            continue_on_failure
-            if continue_on_failure is not None
-            else config.get('continue_on_failure', True)
-        )
-        if result.get('status') == 'error':
-            result['continued_on_failure'] = bool(should_continue)
-            if not should_continue:
-                raise RuntimeError(
-                    f"instrument master governance failed before {job_name}: "
-                    f"{result.get('errors', [])}"
-                )
         return result
 
     async def _get_instrument_master_snapshot(self, exchange: str) -> Dict[str, Any]:
@@ -10294,56 +10438,18 @@ class DataManager:
             and target_date >= local_today
         )
 
-        result = await self.ensure_instrument_master_fresh(
-            exchanges,
+        result = await self.run_master_governance_for_job(
             job_name='daily_data_update',
+            exchanges=exchanges,
+            instrument_types=instrument_types or ['stock', 'index'],
             job_type='current',
             target_date=target_date,
             force_refresh=force_refresh,
             include_pytdx_validation=config.get('pytdx_validation_enabled', True),
-            timeout_sec=config.get('timeout_sec'),
-            freshness_threshold_hours=config.get('freshness_threshold_hours'),
             continue_on_failure=config.get('continue_on_failure', True),
         )
         if result.get('reason') == 'historical_current_master_governance_skipped':
             result['reason'] = 'historical_backfill_current_master_sync_skipped'
-
-        requested_types = {str(item).lower() for item in (instrument_types or ['stock', 'index'])}
-        index_config = self._get_index_master_governance_config()
-        if (
-            'index' in requested_types
-            and index_config.get('enabled', False)
-            and index_config.get('run_before_daily_update', True)
-            and target_date >= local_today
-        ):
-            try:
-                index_result = await self.sync_index_master(
-                    exchanges,
-                    target_date=target_date,
-                    timeout_sec=index_config.get('timeout_sec'),
-                )
-            except Exception as exc:
-                index_result = {
-                    'status': 'error',
-                    'reason': 'index_master_governance_failed',
-                    'summary': {},
-                    'exchanges': {},
-                    'warnings': [],
-                    'errors': [str(exc)],
-                }
-                if not index_config.get('continue_on_failure', True):
-                    raise
-            result['index_master_governance'] = index_result
-            result.setdefault('warnings', []).extend(
-                f"index: {warning}" for warning in (index_result.get('warnings') or [])
-            )
-            result.setdefault('errors', []).extend(
-                f"index: {error}" for error in (index_result.get('errors') or [])
-            )
-            if index_result.get('status') == 'error':
-                result['status'] = 'error'
-            elif index_result.get('status') == 'warning' and result.get('status') not in ('error',):
-                result['status'] = 'warning'
         return result
 
     def _get_daily_update_catchup_config(self) -> Dict[str, Any]:
@@ -10471,13 +10577,13 @@ class DataManager:
     ) -> Dict[str, Any]:
         """Run shared master governance before research jobs resolve universes."""
         force_refresh_job_names = self._get_instrument_master_force_refresh_job_names()
-        kwargs = {
-            'job_name': job_name,
-            'job_type': job_type,
-        }
-        if job_name in force_refresh_job_names:
-            kwargs['force_refresh'] = True
-        return await self.ensure_instrument_master_fresh(exchanges, **kwargs)
+        return await self.run_master_governance_for_job(
+            job_name=job_name,
+            exchanges=exchanges,
+            instrument_types=['stock'],
+            job_type=job_type,
+            force_refresh=job_name in force_refresh_job_names,
+        )
 
     def _attach_instrument_master_governance(
         self,
@@ -10498,9 +10604,10 @@ class DataManager:
     ) -> Dict[str, Any]:
         """Resolve the shared HKEX current research universe after master governance."""
         if governance is None and ensure_governance:
-            governance = await self.ensure_instrument_master_fresh(
-                ['HKEX'],
+            governance = await self.run_master_governance_for_job(
                 job_name='hkex_current_universe_resolver',
+                exchanges=['HKEX'],
+                instrument_types=['stock'],
                 job_type='current',
             )
 

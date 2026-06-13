@@ -14,10 +14,24 @@
 
 普通 A 股行情日更接受上游主数据或行情源对新股存在 T+1/T+2 滞后，但不接受标的进入本地主表后首个交易日行情永久缺失。`data_config.daily_update_catchup` 控制小窗口追补：本地无行情的新股从 `max(listed_date, target_date - new_instrument_catchup_days)` 抓到目标日，已有行情但短期落后的标的从 `max(latest_quote_date, target_date - short_gap_catchup_days)` 抓到目标日；窗口截断、缺少上市日和样例会进入日更报告。超过窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 处理，避免普通日更退化成无界历史补数。
 
+### 模块化治理目标
+
+当前主数据治理已经从单一 `ensure_instrument_master_fresh()` 入口扩展为模块化编排。`instrument_master_governance.py` 提供统一的 `MasterGovernanceRequirement`、policy registry 和 orchestrator；`DataManager.run_master_governance_for_job()` 根据 `data_config.master_governance.job_requirements` 或旧配置 fallback，把业务任务的主数据前置需求分发给对应 policy。
+
+目标模型：
+
+- **治理能力层**：每类主数据治理作为独立 policy，例如 `a_share_stock`、`a_share_index`、`hkex_instrument`，后续可扩展 `fund`、`bond` 等；每个 policy 统一返回 `GovernanceResult`，包含 scope、action、freshness、写入统计、active 统计、warnings/errors 和证据摘要。
+- **编排层**：业务任务声明自己需要哪些主数据 scope，以及策略是 `force_refresh`、`freshness_gated`、`audit_only` 还是 `skip_for_backfill`；编排器根据 target date、任务类型和配置执行相应 policy。
+- **任务层**：Telegram/Scheduler 只保留少量手工运维入口，例如 A 股股票主数据治理、A 股指数主数据治理、HKEX 主数据治理；业务模块内部不通过“执行另一个 scheduler job”来完成前置治理，而是调用编排器。
+
+不建议把所有治理能力都简单变成相互依赖的 scheduler job。Scheduler job 适合作为运维入口，但业务前置治理需要结构化返回值、失败继续策略、历史语义保护和可测试的调用链。直接用任务名代理真实主数据需求，容易再次造成 `force_refresh_job_names/current_job_names` 这类列表难以解释的问题。
+
+OpenSpec `modularize-instrument-master-governance` 的第一阶段实现保持旧接口兼容：`ensure_instrument_master_fresh()` 仍可被旧调用方使用，但内部通过模块化编排器执行；`daily_data_update` 已声明 `a_share_stock` 与 `a_share_index` requirements；HKEX 当前 universe resolver 和手工 HKEX/指数治理任务也复用同一 policy contract。后续新增基金、债券等主数据治理时，应新增 policy 和 per-job requirement，而不是继续扩展任务名列表。
+
 需要区分两个概念：
 
-- **前置治理**：任务开始前调用 `ensure_instrument_master_fresh()`。如果本地主数据仍在 `freshness_threshold_hours` 内，且任务没有强制刷新要求，治理结果可以是 `action=reused_fresh_master`，不会重复请求上游。
-- **强制刷新**：任务名命中 `instrument_master_governance.force_refresh_job_names` 时，即使本地主数据仍在 freshness 窗口内，也会跳过本地新鲜状态复用并执行实际主数据同步。
+- **前置治理**：任务开始前调用 `run_master_governance_for_job()` 或兼容入口 `ensure_instrument_master_fresh()`。如果本地主数据仍在 `freshness_threshold_hours` 内，且 requirement 没有强制刷新要求，治理结果可以是 `action=reused_fresh_master`，不会重复请求上游。
+- **强制刷新**：新配置中 requirement 使用 `mode=force_refresh` 时会跳过本地新鲜状态复用并执行实际主数据同步。旧配置中任务名命中 `instrument_master_governance.force_refresh_job_names` 时，会通过 legacy fallback 转换为相同语义。
 
 因此，`force_refresh_job_names` 不是“哪些任务有主数据前置”的列表，而是“哪些已接入前置治理的当前任务必须强制拉取上游主数据”的策略列表。当前默认包含：
 

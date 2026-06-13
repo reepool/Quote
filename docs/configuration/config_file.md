@@ -484,6 +484,56 @@
 - **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
 - **`current_job_names`**: 参与前置治理的当前任务清单，用于配置审计和运维可读性；是否真实刷新上游仍取决于 freshness 与 `force_refresh_job_names`。
 
+### data_config.master_governance（规划迁移）
+
+> 模块化主数据治理的目标配置形态。OpenSpec `modularize-instrument-master-governance` 会把“任务名是否命中列表”迁移为“业务任务声明需要哪些主数据 scope”。迁移完成前，`instrument_master_governance` 仍作为兼容配置；同一任务同时存在新旧配置时，应以 `master_governance.job_requirements` 为准。
+
+```json
+{
+  "master_governance": {
+    "enabled": true,
+    "policies": {
+      "a_share_stock": {"enabled": true},
+      "a_share_index": {"enabled": true},
+      "hkex_instrument": {"enabled": true}
+    },
+    "job_requirements": {
+      "daily_data_update": [
+        {
+          "scope": "a_share_stock",
+          "mode": "force_refresh",
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "instrument_types": ["stock"],
+          "continue_on_error": true
+        },
+        {
+          "scope": "a_share_index",
+          "mode": "freshness_gated",
+          "exchanges": ["SSE", "SZSE"],
+          "instrument_types": ["index"],
+          "continue_on_error": true
+        }
+      ],
+      "hk_daily_data_update": [
+        {
+          "scope": "hkex_instrument",
+          "mode": "freshness_gated",
+          "exchanges": ["HKEX"],
+          "instrument_types": ["stock"],
+          "continue_on_error": true
+        }
+      ]
+    }
+  }
+}
+```
+
+- **`policies`**: 可用治理能力，而不是 scheduler job 清单。第一阶段包括 `a_share_stock`、`a_share_index`、`hkex_instrument`。
+- **`job_requirements`**: 业务任务的主数据前置需求。一个任务可以声明多个 scope，例如 A 股普通日更同时需要股票和指数主数据。
+- **`scope`**: 治理能力标识。`a_share_stock` 包含 `SSE/SZSE/BSE` 股票；BSE 不需要独立 scheduler 任务才能被纳入 A 股股票治理。
+- **`mode`**: 执行策略。`force_refresh` 强制拉取上游；`freshness_gated` 在本地新鲜时复用；`audit_only` 只审计；`skip_for_backfill` 用于历史回补跳过当前主数据刷新。
+- **迁移优先级**: 新配置存在时使用新配置；缺失时回退到 `instrument_master_governance.force_refresh_job_names/current_job_names`，并在治理结果中标记 legacy fallback。
+
 ### data_config.index_master_governance
 
 > A 股指数主数据治理配置。该层复用日更前置治理入口，但生命周期证据、停编状态和官方指数源独立于股票主数据同步，避免把指数停编误当作股票退市。

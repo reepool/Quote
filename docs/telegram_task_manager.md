@@ -262,7 +262,7 @@ restart_system - 重启系统服务
 ### 1. 每日数据更新 (daily_data_update)
 - **执行时间**: 每周一至周五 20:00
 - **功能**: 自动更新当日股票数据
-- **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更默认命中 `force_refresh_job_names`，会先强制刷新 `SSE/SZSE/BSE` 股票主数据，再重新读取 active/tradable 股票池抓取行情
+- **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更通过 `master_governance.job_requirements` 声明 `a_share_stock` 与 `a_share_index` 前置治理，默认强制刷新 `SSE/SZSE/BSE` 股票主数据，并在读取 active/tradable universe 前执行指数生命周期治理
 - **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
 - **行情追补**: 普通 A 股日更会对本地无行情的新股和最近短缺口执行 `data_config.daily_update_catchup` 小窗口追补。主数据或行情源晚一天可接受，但标的进入主表后，上市日至目标日附近的缺口会自动尝试补齐；超出窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 兜底。
 
@@ -270,7 +270,7 @@ restart_system - 重启系统服务
 
 通过 `/run` 手工触发或由 scheduler 自动执行的当前研究、财务和快照类任务，在解析 active 股票池前会先经过同一个证券主数据治理入口。包括公司画像、行业、严格申万、股东、财务摘要、完整财报、分析师预测、研报、舆情事件、技术快照和风险快照等任务。
 
-`force_refresh_job_names` 是强制刷新策略列表，不是“接入治理的任务列表”。当前默认强制刷新的自动任务是 `daily_data_update` 和 `industry_standard_sync`；其他已接入治理的当前任务通常采用 freshness-gated 策略，即本地主数据过期时才触发 BaoStock/AkShare 主数据同步。
+`master_governance.job_requirements` 是新的主数据前置需求配置；旧 `force_refresh_job_names` 仅作为迁移期 fallback 的强制刷新策略列表，不是“接入治理的任务列表”。当前默认强制刷新的自动任务是 `daily_data_update` 和 `industry_standard_sync`；其他已接入治理的当前任务通常采用 freshness-gated 策略，即本地主数据过期时才触发 BaoStock/AkShare 主数据同步。
 
 维护报告会显示“证券主数据治理”段落：
 
@@ -280,6 +280,8 @@ restart_system - 重启系统服务
 - `warning/error` 会单独显示，即使业务任务本身成功；例如 BSE 只有 AkShare fallback 数据时会继续提示退市日期不具权威性。
 
 历史估值回补和行情 `/backfill` 默认不使用当前股票主数据刷新替代历史时点股票池；如需强制刷新，应通过代码入口显式传入 force refresh，并保留报告证据。
+
+`/run index_master_governance_sync` 与 `/run hkex_instrument_master_sync` 是手工运维入口，不是业务任务内部依赖边界。它们现在也通过模块化 policy contract 执行，报告仍保留各自的市场专项字段。
 
 ### 2. 系统健康检查 (system_health_check)
 - **执行时间**: 每小时执行一次

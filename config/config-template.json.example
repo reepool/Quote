@@ -155,6 +155,38 @@
     "max_concurrent_downloads": 1,
     "retry_times": 3,
     "retry_interval_seconds": 5,
+    "master_governance": {
+      "enabled": true,
+      "policies": {
+        "a_share_stock": {
+          "enabled": true
+        },
+        "a_share_index": {
+          "enabled": true
+        },
+        "hkex_instrument": {
+          "enabled": false
+        }
+      },
+      "job_requirements": {
+        "daily_data_update": [
+          {
+            "scope": "a_share_stock",
+            "mode": "force_refresh",
+            "exchanges": ["SSE", "SZSE", "BSE"],
+            "instrument_types": ["stock"],
+            "continue_on_error": true
+          },
+          {
+            "scope": "a_share_index",
+            "mode": "freshness_gated",
+            "exchanges": ["SSE", "SZSE"],
+            "instrument_types": ["index"],
+            "continue_on_error": true
+          }
+        ]
+      }
+    },
     "default_start_years": {
       "SSE": 1990,
       "SZSE": 1990,

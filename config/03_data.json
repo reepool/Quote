@@ -74,6 +74,62 @@
         "valuation_input_sync"
       ]
     },
+    "master_governance": {
+      "enabled": true,
+      "policies": {
+        "a_share_stock": {
+          "enabled": true
+        },
+        "a_share_index": {
+          "enabled": true
+        },
+        "hkex_instrument": {
+          "enabled": true
+        }
+      },
+      "job_requirements": {
+        "daily_data_update": [
+          {
+            "scope": "a_share_stock",
+            "mode": "force_refresh",
+            "exchanges": [
+              "SSE",
+              "SZSE",
+              "BSE"
+            ],
+            "instrument_types": [
+              "stock"
+            ],
+            "continue_on_error": true
+          },
+          {
+            "scope": "a_share_index",
+            "mode": "freshness_gated",
+            "exchanges": [
+              "SSE",
+              "SZSE"
+            ],
+            "instrument_types": [
+              "index"
+            ],
+            "continue_on_error": true
+          }
+        ],
+        "hk_daily_data_update": [
+          {
+            "scope": "hkex_instrument",
+            "mode": "audit_only",
+            "exchanges": [
+              "HKEX"
+            ],
+            "instrument_types": [
+              "stock"
+            ],
+            "continue_on_error": true
+          }
+        ]
+      }
+    },
     "index_master_governance": {
       "enabled": true,
       "run_before_daily_update": true,

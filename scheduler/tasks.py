@@ -17,6 +17,7 @@ _install_akshare_proxy_patch(required=False)
 from utils import scheduler_logger, config_manager, TelegramBot
 from .job_config import JobConfig
 from data_manager import data_manager
+from instrument_master_governance import MasterGovernanceRequirement
 from utils.date_utils import DateUtils
 from utils.cache import cache_manager
 
@@ -105,6 +106,21 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
             f"待复核: {summary.get('review_required', 0)}，"
             f"活跃合计: {summary.get('active_count', 0)}"
         )
+
+    children = governance.get("children")
+    if isinstance(children, list) and children:
+        child_lines = []
+        for child in children[:4]:
+            if not isinstance(child, dict):
+                continue
+            child_summary = child.get("summary") or {}
+            child_lines.append(
+                f"{child.get('scope', 'unknown')}={child.get('status', 'unknown')}"
+                f"/{child.get('action') or child.get('reason') or 'unknown'}"
+                f"(active={child_summary.get('active_count', 0)})"
+            )
+        if child_lines:
+            lines.append("策略: " + "；".join(child_lines))
 
     exchanges = governance.get("exchanges")
     if isinstance(exchanges, dict) and "HKEX" in exchanges:
@@ -882,10 +898,18 @@ class ScheduledTasks:
                 mode,
                 timeout_sec,
             )
-            result = await data_manager.sync_hkex_instrument_master(
-                mode=mode,
-                timeout_sec=timeout_sec,
-            )
+            result = await data_manager.run_master_governance([
+                MasterGovernanceRequirement(
+                    scope="hkex_instrument",
+                    exchanges=["HKEX"],
+                    instrument_types=["stock"],
+                    mode="audit_only" if mode == "audit_only" else "force_refresh",
+                    job_name="hkex_instrument_master_sync",
+                    job_type="manual",
+                    timeout_sec=timeout_sec,
+                    options={"mode": mode},
+                )
+            ])
             hkex = (result.get("exchanges") or {}).get("HKEX", {})
             summary = result.get("summary") or {}
             source_usage = hkex.get("source_usage") or {}
@@ -966,11 +990,18 @@ class ScheduledTasks:
                 target_date,
                 timeout_sec,
             )
-            result = await data_manager.sync_index_master(
-                exchanges=exchanges,
-                target_date=target_date,
-                timeout_sec=timeout_sec,
-            )
+            result = await data_manager.run_master_governance([
+                MasterGovernanceRequirement(
+                    scope="a_share_index",
+                    exchanges=exchanges,
+                    instrument_types=["index"],
+                    mode="force_refresh",
+                    target_date=target_date,
+                    job_name="index_master_governance_sync",
+                    job_type="manual",
+                    timeout_sec=timeout_sec,
+                )
+            ])
             summary = result.get("summary") or {}
             samples = summary.get("samples") or []
             sample_lines = []
