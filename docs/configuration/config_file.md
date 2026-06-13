@@ -484,9 +484,9 @@
 - **`supported_exchanges`**: 已启用主数据策略的市场；`SSE/SZSE/BSE` 走 A 股既有策略，`HKEX` 走港股专用策略，不复用 A 股 `sync_instrument_master()` 规则。
 - **`current_job_names`**: 参与前置治理的当前任务清单，用于配置审计和运维可读性；是否真实刷新上游仍取决于 freshness 与 `force_refresh_job_names`。
 
-### data_config.master_governance（规划迁移）
+### data_config.master_governance（模块化配置）
 
-> 模块化主数据治理的目标配置形态。OpenSpec `modularize-instrument-master-governance` 会把“任务名是否命中列表”迁移为“业务任务声明需要哪些主数据 scope”。迁移完成前，`instrument_master_governance` 仍作为兼容配置；同一任务同时存在新旧配置时，应以 `master_governance.job_requirements` 为准。
+> 模块化主数据治理的当前配置形态。业务任务通过 `job_requirements` 声明需要哪些主数据 scope；`instrument_master_governance` 保留为兼容配置。同一任务同时存在新旧配置时，以 `master_governance.job_requirements` 为准。
 
 ```json
 {
@@ -532,7 +532,7 @@
 - **`job_requirements`**: 业务任务的主数据前置需求。一个任务可以声明多个 scope，例如 A 股普通日更同时需要股票和指数主数据。
 - **`scope`**: 治理能力标识。`a_share_stock` 包含 `SSE/SZSE/BSE` 股票；BSE 不需要独立 scheduler 任务才能被纳入 A 股股票治理。
 - **`mode`**: 执行策略。`force_refresh` 强制拉取上游；`freshness_gated` 在本地新鲜时复用；`audit_only` 只审计；`skip_for_backfill` 用于历史回补跳过当前主数据刷新。
-- **迁移优先级**: 新配置存在时使用新配置；缺失时回退到 `instrument_master_governance.force_refresh_job_names/current_job_names`，并在治理结果中标记 legacy fallback。
+- **兼容优先级**: 新配置存在时使用新配置；缺失时回退到 `instrument_master_governance.force_refresh_job_names/current_job_names`，并在治理结果中标记 legacy fallback。
 
 ### data_config.index_master_governance
 

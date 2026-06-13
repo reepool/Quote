@@ -189,6 +189,44 @@ async def test_a_share_stock_adapter_preserves_bse_and_fallback_warnings():
 
 
 @pytest.mark.asyncio
+async def test_a_share_stock_adapter_syncs_when_freshness_check_fails():
+    manager = Mock()
+    manager._build_fresh_master_governance_result = AsyncMock(
+        side_effect=RuntimeError("freshness read failed")
+    )
+    manager.sync_instrument_master = AsyncMock(return_value={
+        "status": "success",
+        "summary": {"exchanges": ["SSE"], "active_count": 2314},
+        "exchanges": {"SSE": {"status": "success"}},
+        "warnings": [],
+        "errors": [],
+    })
+    policy = AShareStockPolicy(manager, {
+        "reuse_fresh_master": True,
+        "pytdx_validation_enabled": False,
+        "timeout_sec": 30,
+        "freshness_threshold_hours": 48,
+    })
+
+    result = await policy.execute(MasterGovernanceRequirement(
+        scope="a_share_stock",
+        exchanges=["SSE"],
+        instrument_types=["stock"],
+        mode="freshness_gated",
+        job_name="financial_summary_shadow_sync",
+    ))
+
+    assert result["status"] == "success"
+    assert result["action"] == "synced"
+    manager.sync_instrument_master.assert_awaited_once_with(
+        ["SSE"],
+        include_pytdx_validation=False,
+        timeout_sec=30,
+        freshness_threshold_hours=48,
+    )
+
+
+@pytest.mark.asyncio
 async def test_index_adapter_preserves_lifecycle_summary_and_samples():
     manager = Mock()
     manager.sync_index_master = AsyncMock(return_value={
@@ -246,6 +284,24 @@ async def test_hkex_adapter_maps_modes_without_changing_official_sync():
         mode="audit_only",
         timeout_sec=60,
     )
+
+
+@pytest.mark.asyncio
+async def test_hkex_adapter_rejects_unsupported_mode_without_writes():
+    manager = Mock()
+    manager.sync_hkex_instrument_master = AsyncMock()
+    policy = HKEXInstrumentPolicy(manager, {"mode": "unexpected_write_mode", "timeout_sec": 60})
+
+    result = await policy.execute(MasterGovernanceRequirement(
+        scope="hkex_instrument",
+        exchanges=["HKEX"],
+        instrument_types=["stock"],
+        mode="force_refresh",
+    ))
+
+    assert result["status"] == "error"
+    assert result["reason"] == "unsupported_hkex_governance_mode"
+    manager.sync_hkex_instrument_master.assert_not_awaited()
 
 
 @pytest.mark.asyncio

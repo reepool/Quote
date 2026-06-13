@@ -126,7 +126,7 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
-        dm.sync_hkex_instrument_master = AsyncMock(return_value={
+        dm.run_master_governance = AsyncMock(return_value={
             "status": "success",
             "mode": "audit_only",
             "summary": {"active_count": 3020, "review_required": 1},
@@ -153,10 +153,12 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
         success = await task.hkex_instrument_master_sync(mode="audit_only", timeout_sec=60)
 
     assert success is True
-    dm.sync_hkex_instrument_master.assert_awaited_once_with(
-        mode="audit_only",
-        timeout_sec=60,
-    )
+    requirement = dm.run_master_governance.await_args.args[0][0]
+    assert requirement.scope == "hkex_instrument"
+    assert requirement.exchanges == ["HKEX"]
+    assert requirement.mode == "audit_only"
+    assert requirement.options == {"mode": "audit_only"}
+    assert requirement.timeout_sec == 60
     task._send_task_report.assert_awaited_once()
 
 
@@ -167,7 +169,7 @@ async def test_index_master_governance_sync_manual_task_runs_without_daily_quote
     task._send_task_report = AsyncMock(return_value=False)
 
     with patch("scheduler.tasks.data_manager") as dm:
-        dm.sync_index_master = AsyncMock(return_value={
+        dm.run_master_governance = AsyncMock(return_value={
             "status": "warning",
             "summary": {
                 "master_rows_saved": 3,
@@ -193,14 +195,15 @@ async def test_index_master_governance_sync_manual_task_runs_without_daily_quote
             exchanges=["SZSE"],
             timeout_sec=120,
             target_date=date(2026, 6, 13),
-        )
+    )
 
     assert success is True
-    dm.sync_index_master.assert_awaited_once_with(
-        exchanges=["SZSE"],
-        target_date=date(2026, 6, 13),
-        timeout_sec=120,
-    )
+    requirement = dm.run_master_governance.await_args.args[0][0]
+    assert requirement.scope == "a_share_index"
+    assert requirement.exchanges == ["SZSE"]
+    assert requirement.mode == "force_refresh"
+    assert requirement.target_date == date(2026, 6, 13)
+    assert requirement.timeout_sec == 120
     task._send_task_report.assert_awaited_once()
     report_data = task._send_task_report.await_args.kwargs["report_data"]
     assert "A 股指数主数据治理" in report_data["content"]

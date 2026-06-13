@@ -55,7 +55,7 @@ A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `d
 
 `daily_data_update.parameters.instrument_types` 当前显式配置为 `["stock", "index"]`。这意味着日更任务会先运行 A 股股票主数据治理，再在读取 active universe 前运行指数主数据治理；手工回补或专项测试如果只传 `["stock"]`，指数治理不会触发。
 
-非交易日如果需要单独验证指数治理，不应强行跑 `daily_data_update` 去请求周末行情；使用 manual-only 任务 `/run index_master_governance_sync`。该任务只调用 `DataManager.sync_index_master()`，刷新官方指数清单、公告证据和生命周期状态，不下载日更行情。
+非交易日如果需要单独验证指数治理，不应强行跑 `daily_data_update` 去请求周末行情；使用 manual-only 任务 `/run index_master_governance_sync`。该任务通过 `a_share_index` policy contract 调用底层 `DataManager.sync_index_master()`，刷新官方指数清单、公告证据和生命周期状态，不下载日更行情。
 
 ## 自动任务策略
 
@@ -67,7 +67,7 @@ A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `d
 | 前置治理，freshness-gated | `shareholder_incremental_sync`, `financial_disclosure_incremental_sync`, `financial_disclosure_reconciliation_sync`, `valuation_input_sync`, 以及已接入治理的研究/财务/当前快照任务 | 主数据过期时自动刷新；新鲜时复用本地状态 |
 | 跳过或无主数据依赖 | `valuation_history_rebuild`, 历史回补、监控、缓存、备份、交易日历、申万指数分析等 | 历史语义或非股票 universe 任务不应强制刷新主数据 |
 
-兼容配置位于 `config/03_data.json` 的 `data_config.instrument_master_sync`；通用治理配置位于 `data_config.instrument_master_governance`。治理配置默认继承同步配置中的超时、新鲜度阈值、历史回补 skip、失败继续和 pytdx 诊断开关。
+模块化配置位于 `config/03_data.json` 的 `data_config.master_governance`；兼容配置位于 `data_config.instrument_master_governance` 和 `data_config.instrument_master_sync`。新式 `job_requirements` 存在时优先生效；缺失时才回退到旧任务名列表，并继承同步配置中的超时、新鲜度阈值、历史回补 skip、失败继续和 pytdx 诊断开关。
 
 ## A 股指数治理边界
 

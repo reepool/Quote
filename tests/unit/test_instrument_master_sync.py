@@ -55,7 +55,7 @@ async def test_daily_update_master_governance_honors_force_refresh_job_names():
     manager._get_instrument_master_force_refresh_job_names = Mock(
         return_value={'daily_data_update'}
     )
-    manager.ensure_instrument_master_fresh = AsyncMock(
+    manager.run_master_governance_for_job = AsyncMock(
         return_value={'status': 'success', 'action': 'synced'}
     )
     target_date = date.today()
@@ -66,15 +66,14 @@ async def test_daily_update_master_governance_honors_force_refresh_job_names():
     )
 
     assert result['status'] == 'success'
-    manager.ensure_instrument_master_fresh.assert_awaited_once_with(
-        ['SSE', 'SZSE'],
+    manager.run_master_governance_for_job.assert_awaited_once_with(
         job_name='daily_data_update',
+        exchanges=['SSE', 'SZSE'],
+        instrument_types=['stock', 'index'],
         job_type='current',
         target_date=target_date,
         force_refresh=True,
         include_pytdx_validation=False,
-        timeout_sec=30,
-        freshness_threshold_hours=48,
         continue_on_failure=True,
     )
 

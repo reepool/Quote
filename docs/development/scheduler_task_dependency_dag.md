@@ -79,6 +79,8 @@
 
 前置示例：
 
+> 注意：证券主数据治理不应再用 scheduler dependency node 表达。当前业务任务应通过 `data_config.master_governance.job_requirements` 声明主数据 scope，并在任务内部调用治理编排器；下面示例只用于普通任务依赖。
+
 ```json
 {
   "dependencies": {
@@ -87,7 +89,7 @@
         "group_id": "preflight",
         "mode": "serial",
         "jobs": [
-          {"job_id": "instrument_master_governance", "failure_policy": "fail_parent"}
+          {"job_id": "some_preflight_check", "failure_policy": "fail_parent"}
         ]
       }
     ]

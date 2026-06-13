@@ -9,6 +9,7 @@ request/result shape.
 from __future__ import annotations
 
 import inspect
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence
@@ -16,7 +17,10 @@ from typing import Any, Dict, Iterable, List, Optional, Protocol, Sequence
 from utils.date_utils import get_shanghai_time
 
 
+logger = logging.getLogger(__name__)
+
 SUPPORTED_MODES = {"force_refresh", "freshness_gated", "audit_only", "skip_for_backfill"}
+SUPPORTED_HKEX_WRITE_MODES = {"audit_only", "safe_write", "lifecycle_write"}
 
 SCOPE_EXCHANGES = {
     "a_share_stock": {"SSE", "SZSE", "BSE"},
@@ -310,14 +314,22 @@ class AShareStockPolicy:
             else self.config.get("freshness_threshold_hours")
         )
         if requirement.mode == "freshness_gated" and self.config.get("reuse_fresh_master", True):
-            fresh = await self.manager._build_fresh_master_governance_result(
-                exchanges=exchanges,
-                freshness_threshold_hours=freshness_hours,
-                job_name=requirement.job_name,
-                job_type=requirement.job_type,
-                started_at=started_at,
-                unsupported_exchanges=[],
-            )
+            try:
+                fresh = await self.manager._build_fresh_master_governance_result(
+                    exchanges=exchanges,
+                    freshness_threshold_hours=freshness_hours,
+                    job_name=requirement.job_name,
+                    job_type=requirement.job_type,
+                    started_at=started_at,
+                    unsupported_exchanges=[],
+                )
+            except Exception as exc:
+                logger.warning(
+                    "A-share stock master freshness check failed before %s: %s; running sync",
+                    requirement.job_name,
+                    exc,
+                )
+                fresh = None
             if fresh is not None:
                 return fresh
 
@@ -374,7 +386,17 @@ class HKEXInstrumentPolicy:
         if requirement.mode == "audit_only":
             mode = "audit_only"
         else:
-            mode = str(requirement.options.get("mode") or self.config.get("mode", "audit_only"))
+            mode = str(
+                requirement.options.get("mode") or self.config.get("mode", "audit_only")
+            ).strip().lower()
+        if mode not in SUPPORTED_HKEX_WRITE_MODES:
+            return _child_result(
+                requirement,
+                status="error",
+                action="unsupported",
+                reason="unsupported_hkex_governance_mode",
+                errors=[f"unsupported HKEX governance mode: {mode}"],
+            )
         result = await self.manager.sync_hkex_instrument_master(
             mode=mode,
             timeout_sec=(
