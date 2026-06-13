@@ -714,11 +714,20 @@
               },
               "cyclical_fcff_midcycle.v1": {
                 "candidate_type": "industry",
-                "implementation_status": "guardrail",
+                "implementation_status": "implemented",
                 "required_fields": [
                   "revenue",
                   "operating_profit",
-                  "commodity_price_assumption"
+                  "capital_expenditure"
+                ],
+                "optional_fields": [
+                  "commodity_price_assumption",
+                  "cycle_index_level",
+                  "midcycle_operating_margin",
+                  "depreciation_and_amortization",
+                  "change_in_working_capital",
+                  "production_volume",
+                  "unit_cost"
                 ]
               },
               "utility_fcfe_or_ddm.v1": {

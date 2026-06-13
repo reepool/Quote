@@ -103,9 +103,17 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
         },
         "cyclical_fcff_midcycle.v1": {
             "candidate_type": "industry",
-            "implementation_status": "guardrail",
-            "required_fields": ["revenue", "operating_profit", "commodity_price_assumption"],
-            "optional_fields": ["production_volume", "unit_cost"],
+            "implementation_status": "implemented",
+            "required_fields": ["revenue", "operating_profit", "capital_expenditure"],
+            "optional_fields": [
+                "commodity_price_assumption",
+                "cycle_index_level",
+                "midcycle_operating_margin",
+                "depreciation_and_amortization",
+                "change_in_working_capital",
+                "production_volume",
+                "unit_cost",
+            ],
             "supported_company_types": ["cyclical"],
         },
         "utility_fcfe_or_ddm.v1": {
@@ -445,6 +453,7 @@ class ProfessionalDcfEngine:
                 "reit_ffo_affo_ddm.v1",
                 "bank_residual_income.v1",
                 "broker_excess_capital.v1",
+                "cyclical_fcff_midcycle.v1",
             }
             and selector.get("include_model_comparison")
             and not (special_guardrail and not research_mode)
@@ -487,6 +496,15 @@ class ProfessionalDcfEngine:
 
         if model_profile == "broker_excess_capital.v1":
             return self._run_broker_excess_capital(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                research_mode=research_mode,
+            )
+
+        if model_profile == "cyclical_fcff_midcycle.v1":
+            return self._run_cyclical_midcycle_fcff(
                 instrument=instrument,
                 bundle=bundle,
                 overrides=overrides,
@@ -1120,6 +1138,264 @@ class ProfessionalDcfEngine:
                     instrument=instrument,
                     financial_bundle=facts,
                     model_profile="nonfinancial_fcff.v1",
+                )["missing_fields"],
+            },
+            "warnings": warnings,
+            "lineage": bundle.lineage if bool(overrides.get("include_lineage", True)) else None,
+            "model_comparison": None,
+            "workbook": None,
+        }
+        if selector.get("include_model_comparison"):
+            result["model_comparison"] = self._model_comparison(result, selector)
+        result["workbook"] = self._workbook_metadata(overrides, result)
+        return result
+
+    def _run_cyclical_midcycle_fcff(
+        self,
+        *,
+        instrument: Dict[str, Any],
+        bundle: DcfInputBundle,
+        overrides: Dict[str, Any],
+        selector: Dict[str, Any],
+        research_mode: bool,
+    ) -> Dict[str, Any]:
+        facts = bundle.financial_facts
+        projection_years = int(overrides.get("projection_years", self.parameters.get("projection_years", 5)))
+        terminal_growth = float(overrides.get("terminal_growth", self.parameters.get("terminal_growth", 0.03)))
+        terminal_method = str(overrides.get("terminal_method") or "gordon_growth")
+        if terminal_method not in {"gordon_growth", "perpetual_growth"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_terminal_method",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_terminal_method:{terminal_method}"],
+            )
+        scenario_set = str(overrides.get("scenario_set") or "standard")
+        if scenario_set not in {"standard", "downside_only"}:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="unsupported_scenario_set",
+                research_mode=research_mode,
+                extra_blockers=[f"unsupported_scenario_set:{scenario_set}"],
+            )
+        assumption_blockers = [blocker for blocker in bundle.blockers if blocker.startswith("assumption_")]
+        if assumption_blockers:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="partial" if research_mode else "unavailable",
+                missing_reason=assumption_blockers[0],
+                research_mode=research_mode,
+            )
+        wacc_payload = self._build_wacc(bundle, overrides)
+        wacc = wacc_payload["wacc"]
+        if wacc <= terminal_growth:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="invalid_parameters",
+                missing_reason="wacc_must_exceed_terminal_growth",
+                research_mode=research_mode,
+            )
+
+        revenue = self._safe_float(facts.get("revenue"))
+        operating_profit = self._safe_float(facts.get("operating_profit"))
+        capex = self._safe_float(facts.get("capital_expenditure"))
+        if capex is None:
+            capex = self._safe_float(overrides.get("capital_expenditure"))
+        blockers = [
+            f"{field_name}_required"
+            for field_name, value in (
+                ("revenue", revenue),
+                ("operating_profit", operating_profit),
+                ("capital_expenditure", capex),
+            )
+            if value is None
+        ]
+        if blockers and not research_mode:
+            return self._unavailable_result(
+                instrument=instrument,
+                bundle=bundle,
+                overrides=overrides,
+                selector=selector,
+                status="unavailable",
+                missing_reason="cyclical_core_inputs_missing",
+                research_mode=research_mode,
+                extra_blockers=["cyclical_core_inputs_missing", *blockers],
+            )
+
+        revenue = revenue or 0.0
+        operating_profit = operating_profit or 0.0
+        capex = abs(capex or 0.0)
+        depreciation = self._safe_float(facts.get("depreciation_and_amortization")) or float(
+            overrides.get("depreciation_and_amortization", capex * 0.7)
+        )
+        nwc_change = self._safe_float(facts.get("change_in_working_capital")) or float(
+            overrides.get("change_in_working_capital", 0.0)
+        )
+        tax_rate = float(overrides.get("tax_rate", self.parameters.get("tax_rate", 0.25)))
+        revenue_growth = float(overrides.get("growth_rate", self.parameters.get("cyclical_midcycle_growth_rate", self.parameters.get("base_growth_rate", 0.08))))
+        reported_margin = operating_profit / revenue if revenue else None
+        margin_payload = self._normalize_cyclical_operating_margin(
+            reported_margin=reported_margin,
+            facts=facts,
+            overrides=overrides,
+        )
+        operating_margin = margin_payload["normalized_operating_margin"]
+        capex_to_sales = capex / revenue if revenue else float(overrides.get("capex_to_sales", 0.04))
+        da_to_sales = depreciation / revenue if revenue else float(overrides.get("depreciation_to_sales", 0.03))
+        nwc_to_sales = nwc_change / revenue if revenue else float(overrides.get("working_capital_to_sales", 0.0))
+        cycle_inputs = {
+            "commodity_price_assumption": self._safe_float(
+                facts.get("commodity_price_assumption") or overrides.get("commodity_price_assumption")
+            ),
+            "cycle_index_level": self._safe_float(facts.get("cycle_index_level") or overrides.get("cycle_index_level")),
+            "production_volume": self._safe_float(facts.get("production_volume") or overrides.get("production_volume")),
+            "unit_cost": self._safe_float(facts.get("unit_cost") or overrides.get("unit_cost")),
+        }
+        missing_cycle_inputs = [
+            field_name
+            for field_name in ("commodity_price_assumption", "cycle_index_level")
+            if cycle_inputs.get(field_name) is None
+        ]
+
+        scenario_specs = self._scenario_specs(scenario_set, revenue_growth, overrides)
+        scenarios = [
+            self._project_fcff_scenario(
+                scenario=scenario_name,
+                starting_revenue=revenue,
+                growth_rate=growth_rate,
+                operating_margin=operating_margin,
+                tax_rate=tax_rate,
+                depreciation_to_sales=da_to_sales,
+                capex_to_sales=capex_to_sales,
+                working_capital_to_sales=nwc_to_sales,
+                discount_rate=wacc,
+                terminal_growth=terminal_growth,
+                projection_years=projection_years,
+                latest_close=bundle.latest_close,
+                shares_outstanding=self._safe_positive_float(facts.get("shares_outstanding")),
+                net_debt_bridge=self._net_debt_bridge(facts),
+            )
+            for scenario_name, growth_rate in scenario_specs
+        ]
+        base_scenario = next(item for item in scenarios if item["scenario"] == "base")
+        sensitivity = self._build_sensitivity(
+            starting_revenue=revenue,
+            operating_margin=operating_margin,
+            tax_rate=tax_rate,
+            depreciation_to_sales=da_to_sales,
+            capex_to_sales=capex_to_sales,
+            working_capital_to_sales=nwc_to_sales,
+            terminal_growth=terminal_growth,
+            projection_years=projection_years,
+            latest_close=bundle.latest_close,
+            shares_outstanding=self._safe_positive_float(facts.get("shares_outstanding")),
+            net_debt_bridge=self._net_debt_bridge(facts),
+            base_growth=revenue_growth,
+            base_wacc=wacc,
+        )
+
+        warnings = list(bundle.warnings)
+        warnings.extend(
+            warning
+            for candidate in selector.get("candidates", [])
+            for warning in candidate.get("warnings", [])
+        )
+        warnings.extend(margin_payload["warnings"])
+        if missing_cycle_inputs:
+            warnings.append("cyclical_cycle_inputs_missing")
+        if not bool(overrides.get("include_sensitivity", True)):
+            warnings.append("sensitivity_suppressed_by_request")
+        if not bool(overrides.get("include_forecast_rows", True)):
+            warnings.append("forecast_rows_suppressed_by_request")
+        if not bool(overrides.get("include_lineage", True)):
+            warnings.append("lineage_suppressed_by_request")
+        if base_scenario.get("terminal_value_pct") is not None and base_scenario["terminal_value_pct"] > float(
+            self.parameters.get("terminal_value_warning_threshold", 0.8)
+        ):
+            warnings.append("terminal_value_dominant")
+        if wacc_payload.get("discount_rate_override"):
+            warnings.append("discount_rate_override_used")
+        if blockers:
+            warnings.append("research_mode_cyclical_core_inputs_incomplete")
+
+        result = {
+            "instrument_id": instrument.get("instrument_id"),
+            "symbol": instrument.get("symbol"),
+            "exchange": instrument.get("exchange"),
+            "calc_method": "professional_dcf_cyclical_midcycle_fcff",
+            "calc_version": "cyclical_fcff_midcycle.v1",
+            "parameter_hash": self._build_parameter_hash(overrides),
+            "input_hash": bundle.input_hash,
+            "status": "partial" if research_mode and blockers else "success",
+            "missing_reason": "cyclical_core_inputs_missing" if blockers else None,
+            "model_profile": "cyclical_fcff_midcycle.v1",
+            "model_strategy": selector.get("model_strategy"),
+            "recommended_model": selector.get("recommended_model"),
+            "selection_confidence": selector.get("selection_confidence"),
+            "selection_policy": selector.get("selection_policy"),
+            "score_gap": selector.get("score_gap"),
+            "model_suitability_candidates": selector.get("candidates", []),
+            "selected_cash_flow_model": "midcycle_fcff",
+            "cash_flow_model_selection": {
+                "selected_cash_flow_model": "midcycle_fcff",
+                "candidate_models": ["midcycle_fcff"],
+                "selection_reasons": ["cyclical_industry_profile", margin_payload["normalization_source"]],
+                "rejected_models": ["latest_margin_fcff", "fcfe"],
+                "input_gap_by_model": {"midcycle_fcff": blockers},
+                "confidence": selector.get("selection_confidence"),
+                "warnings": warnings,
+            },
+            "readiness": self._readiness_payload(blockers, warnings, selector),
+            "assumptions": {"wacc": wacc_payload, **bundle.assumptions},
+            "valuation_date": bundle.valuation_date,
+            "data_available_cutoff": bundle.data_available_cutoff,
+            "base_cash_flow": base_scenario.get("fcff"),
+            "base_cash_flow_source": "midcycle_fcff",
+            "projection_years": projection_years,
+            "shares_outstanding": self._safe_positive_float(facts.get("shares_outstanding")),
+            "latest_close": bundle.latest_close,
+            "beta": bundle.beta_context.get("beta"),
+            "beta_source": bundle.beta_context.get("beta_source"),
+            "beta_benchmark": bundle.beta_context.get("beta_benchmark"),
+            "enterprise_value": base_scenario.get("enterprise_value"),
+            "equity_value": base_scenario.get("equity_value"),
+            "terminal_value": base_scenario.get("terminal_value"),
+            "terminal_value_pct": base_scenario.get("terminal_value_pct"),
+            "net_debt_adjustment": self._net_debt_bridge(facts),
+            "cyclical_model_diagnostics": {
+                **margin_payload,
+                "cycle_inputs": cycle_inputs,
+                "missing_cycle_inputs": missing_cycle_inputs,
+                "capex_to_sales": capex_to_sales,
+                "depreciation_to_sales": da_to_sales,
+                "working_capital_to_sales": nwc_to_sales,
+            },
+            "forecast_rows": base_scenario.get("forecast_rows", [])
+            if bool(overrides.get("include_forecast_rows", True))
+            else [],
+            "scenarios": scenarios,
+            "sensitivity": sensitivity if bool(overrides.get("include_sensitivity", True)) else [],
+            "diagnostics": {
+                "blockers": blockers,
+                "warnings": warnings,
+                "input_gaps": self.build_input_gaps(
+                    instrument=instrument,
+                    financial_bundle=facts,
+                    model_profile="cyclical_fcff_midcycle.v1",
                 )["missing_fields"],
             },
             "warnings": warnings,
@@ -2453,6 +2729,61 @@ class ProfessionalDcfEngine:
             ],
         }
 
+    def _normalize_cyclical_operating_margin(
+        self,
+        *,
+        reported_margin: Optional[float],
+        facts: Dict[str, Any],
+        overrides: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        warnings: List[str] = []
+        floor = float(
+            overrides.get(
+                "cyclical_midcycle_margin_floor",
+                self.parameters.get("cyclical_midcycle_margin_floor", 0.04),
+            )
+        )
+        cap = float(
+            overrides.get(
+                "cyclical_midcycle_margin_cap",
+                self.parameters.get("cyclical_midcycle_margin_cap", 0.18),
+            )
+        )
+        explicit_margin = self._safe_float(
+            overrides.get("midcycle_operating_margin") or facts.get("midcycle_operating_margin")
+        )
+        if explicit_margin is not None:
+            normalized_margin = explicit_margin
+            source = "explicit_midcycle_operating_margin"
+        elif reported_margin is None:
+            normalized_margin = float(
+                overrides.get(
+                    "cyclical_default_midcycle_margin",
+                    self.parameters.get("cyclical_default_midcycle_margin", 0.10),
+                )
+            )
+            source = "configured_default_midcycle_margin"
+            warnings.append("cyclical_reported_margin_missing_default_used")
+        else:
+            normalized_margin = reported_margin
+            source = "reported_margin_clamped_to_midcycle_band"
+
+        if normalized_margin > cap:
+            normalized_margin = cap
+            warnings.append("cyclical_peak_margin_capped_to_midcycle")
+        if normalized_margin < floor:
+            normalized_margin = floor
+            warnings.append("cyclical_trough_margin_lifted_to_midcycle_floor")
+
+        return {
+            "reported_operating_margin": reported_margin,
+            "normalized_operating_margin": normalized_margin,
+            "normalization_source": source,
+            "midcycle_margin_floor": floor,
+            "midcycle_margin_cap": cap,
+            "warnings": warnings,
+        }
+
     def _build_wacc(
         self,
         bundle: DcfInputBundle,
@@ -3369,6 +3700,7 @@ class ProfessionalDcfEngine:
             "diagnostics": result.get("diagnostics"),
             "financial_model_diagnostics": result.get("financial_model_diagnostics"),
             "broker_model_diagnostics": result.get("broker_model_diagnostics"),
+            "cyclical_model_diagnostics": result.get("cyclical_model_diagnostics"),
         }
 
     def _workbook_metadata(
@@ -3434,6 +3766,10 @@ class ProfessionalDcfEngine:
             "index_level": "exchange_or_index_provider",
             "leverage_ratio": "broker_annual_report",
             "commodity_price_assumption": "commodity_exchange_or_industry_dataset",
+            "cycle_index_level": "commodity_exchange_or_industry_dataset",
+            "midcycle_operating_margin": "analyst_override_or_historical_cycle_dataset",
+            "production_volume": "annual_report_or_industry_dataset",
+            "unit_cost": "annual_report_or_industry_dataset",
             "rental_income": "reit_report_or_property_dataset",
             "ffo": "reit_report_or_adjusted_cash_flow_statement",
             "segment_assets": "annual_report_segment_note",

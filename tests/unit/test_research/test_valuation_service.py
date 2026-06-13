@@ -1014,6 +1014,101 @@ def test_valuation_service_dcf_broker_derives_and_caps_peak_roe():
     assert "broker_market_cycle_inputs_missing" in result["warnings"]
 
 
+def test_valuation_service_dcf_cyclical_defaults_to_midcycle_model():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "industry_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 240.0,
+            "capital_expenditure": 80.0,
+            "commodity_price_assumption": 780.0,
+            "cycle_index_level": 105.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "success"
+    assert result["model_profile"] == "cyclical_fcff_midcycle.v1"
+    assert result["calc_method"] == "professional_dcf_cyclical_midcycle_fcff"
+    assert result["base_cash_flow_source"] == "midcycle_fcff"
+    assert result["enterprise_value"] is not None
+    assert result["cyclical_model_diagnostics"]["reported_operating_margin"] == 0.24
+    assert result["cyclical_model_diagnostics"]["normalized_operating_margin"] == 0.18
+    assert "cyclical_peak_margin_capped_to_midcycle" in result["warnings"]
+
+
+def test_valuation_service_dcf_cyclical_missing_core_inputs_fails_closed():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "industry_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 240.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-04-18"},
+    )
+
+    assert result["status"] == "unavailable"
+    assert result["model_profile"] == "cyclical_fcff_midcycle.v1"
+    assert result["missing_reason"] == "cyclical_core_inputs_missing"
+    assert "capital_expenditure_required" in result["readiness"]["blockers"]
+
+
+def test_valuation_service_dcf_cyclical_comparison_preserves_diagnostics():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "industry_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 20.0,
+            "capital_expenditure": 80.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "model_strategy": "compare",
+            "include_model_comparison": True,
+        },
+    )
+
+    assert result["status"] == "success"
+    assert result["cyclical_model_diagnostics"]["normalized_operating_margin"] == 0.04
+    assert "cyclical_trough_margin_lifted_to_midcycle_floor" in result["warnings"]
+    assert "cyclical_cycle_inputs_missing" in result["warnings"]
+    comparison = result["model_comparison"]["industry_model_result"]
+    assert comparison["model_profile"] == "cyclical_fcff_midcycle.v1"
+    assert comparison["cyclical_model_diagnostics"]["normalized_operating_margin"] == 0.04
+
+
 def test_valuation_service_dcf_model_comparison_for_close_scores():
     service = ResearchValuationService()
 

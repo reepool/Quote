@@ -1294,6 +1294,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现轻量 `utility_fcfe_or_ddm.v1` / `reit_ffo_affo_ddm.v1`：公用事业/基础设施、REIT/类 REIT 在本地分红率、股本、FCFE 或 AFFO/FFO 输入充足时可输出 DDM/分派估值；缺少分派现金流时 fail closed。
 - 已实现 `bank_residual_income.v1`：银行默认不走通用 FCFF，在净资产、净利润、股本和 cost of equity 假设充足时使用 book equity + PV residual income 直接估算股权价值，并输出 implied P/B、资本充足率诊断和可选 DDM cross-check。
 - 已实现 `broker_excess_capital.v1`：证券公司默认不走通用 FCFF，在净利润、净资产、净资本、股本和 cost of equity 假设充足时使用归一化 ROE residual income + excess capital 直接估算股权价值，并输出 implied P/B、normalized ROE、excess capital 和市场周期输入诊断。
+- 已实现 `cyclical_fcff_midcycle.v1`：资源周期行业默认不直接外推最新景气利润，在收入、经营利润、资本开支和折现假设充足时使用 mid-cycle operating margin 归一化 FCFF，并输出 reported/normalized margin、cap/floor 和周期输入缺口诊断。
 - 已实现模型 profile registry、行业/公司特性双候选 scoring、`model_strategy=auto|industry|characteristic|compare`、接近分数模型对比，以及 FCFE/FCFF adapter 输出。
 - 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。
 - 已实现显式 assumption refresh 入口，当前为本地优先 source policy/diagnostics，不在 DCF 计算路径隐式联网。
@@ -1301,13 +1302,13 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现进程内 bounded DCF run cache：按输入 hash、参数 hash、最新收盘价和 TTL 控制复用，不写入 `valuation_history`。
 - 已完成 DCF contract hardening：`compare` 返回行业/公司特性候选 result object，未实现模型 fail closed；显式 `fcfe` 不再伪装为成功 FCFF；`scenario_set / terminal_method / include_* / workbook_style / cash_flow_model` 参数具备明确语义；假设缺失和 fallback 进入结构化 blocker/warning；REST workbook metadata 不暴露本地 artifact path。
 - 已实现 `data_available_date <= valuation_date` 过滤 blocker，避免财务事实未来函数；缺失可得日默认在生产路径 fail closed。
-- 保险、地产、周期、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
+- 保险、地产、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
 
 - 真实主备外部数据源刷新 adapter 和生产级联网刷新调度。
 - 跨进程 saved-run audit 表和可检索历史运行视图。
-- 保险、地产 NAV、周期 mid-cycle、控股公司等特殊行业/类型完整实算模型；证券模型后续仍需扩展更细的市场周期、两融、投行、资管和自营分部驱动。
+- 保险、地产 NAV、控股公司等特殊行业/类型完整实算模型；证券模型后续仍需扩展更细的市场周期、两融、投行、资管和自营分部驱动；周期模型后续仍需接入更稳定的商品价格/行业景气指数主备源。
 - 已实现 OpenSpec change `use-annual-report-broker-risk-control-source` 的核心链路：正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表为主源，CSRC 名录 + `listed_broker_dealer_scope` 作为上市券商主体 gate，解析结果写入现有财务事实表；独立《风险控制指标报告》保留为补充/校验源。历史回补使用显式 CLI，日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务。经纪、投行、资管、自营收入仍归年报分部/附注解析，不从监管风控表推断。
 - 覆盖所有代表性行业/公司类型的大样本 fixture 与集成验证。
 

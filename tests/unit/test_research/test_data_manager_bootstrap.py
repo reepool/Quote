@@ -2729,6 +2729,8 @@ def test_data_manager_get_research_dcf_model_profiles_returns_registry(tmp_path)
     assert profiles["broker_excess_capital.v1"]["implementation_status"] == "implemented"
     assert "net_capital" in profiles["broker_excess_capital.v1"]["required_fields"]
     assert "shares_outstanding" in profiles["broker_excess_capital.v1"]["required_fields"]
+    assert profiles["cyclical_fcff_midcycle.v1"]["implementation_status"] == "implemented"
+    assert "capital_expenditure" in profiles["cyclical_fcff_midcycle.v1"]["required_fields"]
 
 
 def test_data_manager_get_research_dcf_input_gaps_reports_missing_required_fields(tmp_path):
@@ -2851,7 +2853,8 @@ def test_data_manager_get_research_dcf_readiness_reports_profile_status(tmp_path
     assert "missing_net_income" in profiles["broker_excess_capital.v1"]["blockers"]
     assert "missing_net_capital" in profiles["broker_excess_capital.v1"]["blockers"]
     assert "missing_shares_outstanding" in profiles["broker_excess_capital.v1"]["blockers"]
-    assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+    assert profiles["cyclical_fcff_midcycle.v1"]["ready"] is True
+    assert result["coverage_diagnostics"]["ready_profile_count"] == 2
 
 
 def test_data_manager_get_research_dcf_readiness_uses_financial_db_scope(tmp_path):
@@ -2887,7 +2890,9 @@ def test_data_manager_get_research_dcf_readiness_uses_financial_db_scope(tmp_pat
         result = _run(manager.get_research_dcf_readiness("600000.SH"))
 
     assert result["instrument_id"] == "600000.SH"
-    assert result["coverage_diagnostics"]["ready_profile_count"] == 1
+    profiles = {item["model_profile"]: item for item in result["profiles"]}
+    assert profiles["cyclical_fcff_midcycle.v1"]["ready"] is True
+    assert result["coverage_diagnostics"]["ready_profile_count"] == 2
 
 
 def test_data_manager_get_research_dcf_valuation_uses_financial_db_scope(tmp_path):
