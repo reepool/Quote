@@ -500,6 +500,20 @@
     "skip_stale_no_quote": true,
     "write_stale_no_quote": false,
     "allow_series_inference": true,
+    "master_admission": {
+      "canonical_key": "instrument_id",
+      "duplicate_key_policy": "skip_ambiguous",
+      "ambiguous_duplicate_action": "skip",
+      "collapse_identical_duplicates": true,
+      "conflict_signature_fields": [
+        "name",
+        "market",
+        "industry",
+        "sector",
+        "metadata.cni_code",
+        "metadata.full_name"
+      ]
+    },
     "sample_limit": 10,
     "timeout_sec": 120
   }
@@ -512,6 +526,7 @@
 - **`stale_no_quote_trading_days`**: 本地最新行情超过该窗口时进入 stale 诊断。默认只报告，不直接写停用。
 - **`write_stale_no_quote`**: 是否把长期无行情指数写成 `stale_no_quote` 并从日更 universe 排除。默认 `false`，避免仅凭行情缺口误杀临时停发或源异常。
 - **`allow_series_inference`**: 是否允许用官方公告直接代码和全收益/价格指数配对关系做保守推断，例如 `980055` 停编且 `480055` 官方行情止于生效日前后时，将 `480055.SZ` 标记为 `series_inferred`。
+- **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义，按 `ambiguous_duplicate_action=skip` 跳过，不把多个不同指数压成一个本地主键。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
 - **`sample_limit`**: Telegram 日报中的指数治理样例数量上限，详细证据保存在 `index_lifecycle_evidence`。
 
 ### 任务前后置依赖配置

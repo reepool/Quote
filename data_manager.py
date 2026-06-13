@@ -8079,6 +8079,20 @@ class DataManager:
 
     def _get_index_master_governance_config(self) -> Dict[str, Any]:
         """Return A-share index master-governance config with conservative defaults."""
+        default_master_admission = {
+            'canonical_key': 'instrument_id',
+            'duplicate_key_policy': 'skip_ambiguous',
+            'ambiguous_duplicate_action': 'skip',
+            'collapse_identical_duplicates': True,
+            'conflict_signature_fields': [
+                'name',
+                'market',
+                'industry',
+                'sector',
+                'metadata.cni_code',
+                'metadata.full_name',
+            ],
+        }
         defaults: Dict[str, Any] = {
             'enabled': False,
             'run_before_daily_update': True,
@@ -8092,13 +8106,119 @@ class DataManager:
             'sample_limit': 10,
             'continue_on_failure': True,
             'timeout_sec': 120,
+            'master_admission': default_master_admission,
         }
         raw_config = self.data_config.get('index_master_governance')
         if not isinstance(raw_config, dict):
             raw_config = self.config.get_nested('data_config.index_master_governance', {})
         if isinstance(raw_config, dict):
+            raw_admission = raw_config.get('master_admission')
             defaults.update(raw_config)
+            if isinstance(raw_admission, dict):
+                defaults['master_admission'] = {
+                    **default_master_admission,
+                    **raw_admission,
+                }
         return defaults
+
+    @staticmethod
+    def _get_nested_mapping_value(row: Dict[str, Any], path: str) -> Any:
+        value: Any = row
+        for part in str(path).split('.'):
+            if isinstance(value, dict):
+                value = value.get(part)
+            else:
+                return None
+        return value
+
+    def _apply_index_master_admission_rules(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        config: Dict[str, Any],
+        sample_limit: int,
+    ) -> Dict[str, Any]:
+        """Apply configurable master-data admission rules before writing instruments."""
+        admission = config.get('master_admission') or {}
+        canonical_key = admission.get('canonical_key') or 'instrument_id'
+        duplicate_policy = str(admission.get('duplicate_key_policy') or 'skip_ambiguous').lower()
+        ambiguous_action = str(admission.get('ambiguous_duplicate_action') or 'skip').lower()
+        collapse_identical = bool(admission.get('collapse_identical_duplicates', True))
+        signature_fields = admission.get('conflict_signature_fields') or [
+            'name',
+            'market',
+            'industry',
+            'sector',
+            'metadata.cni_code',
+            'metadata.full_name',
+        ]
+
+        rows_by_key: Dict[str, List[Dict[str, Any]]] = {}
+        missing_key_count = 0
+        for row in rows or []:
+            key = self._get_nested_mapping_value(row, canonical_key)
+            if not key:
+                missing_key_count += 1
+                continue
+            rows_by_key.setdefault(str(key), []).append(row)
+
+        admitted_rows: List[Dict[str, Any]] = []
+        ambiguous_groups: List[Dict[str, Any]] = []
+        collapsed_duplicate_rows = 0
+        forced_kept_groups = 0
+
+        for key, rows_for_key in rows_by_key.items():
+            if len(rows_for_key) == 1:
+                admitted_rows.append(rows_for_key[0])
+                continue
+
+            signatures = {
+                tuple(
+                    str(self._get_nested_mapping_value(row, field) or '')
+                    for field in signature_fields
+                )
+                for row in rows_for_key
+            }
+            if collapse_identical and len(signatures) == 1:
+                admitted_rows.append(rows_for_key[-1])
+                collapsed_duplicate_rows += len(rows_for_key) - 1
+                continue
+
+            if duplicate_policy in {'keep_first', 'first'}:
+                admitted_rows.append(rows_for_key[0])
+                forced_kept_groups += 1
+                continue
+            if duplicate_policy in {'keep_last', 'last'}:
+                admitted_rows.append(rows_for_key[-1])
+                forced_kept_groups += 1
+                continue
+
+            ambiguous_groups.append({
+                'key': key,
+                'row_count': len(rows_for_key),
+                'samples': [
+                    {
+                        'instrument_id': row.get('instrument_id'),
+                        'symbol': row.get('symbol'),
+                        'name': row.get('name'),
+                        'market': row.get('market'),
+                        'industry': row.get('industry'),
+                        'cni_code': (row.get('metadata') or {}).get('cni_code'),
+                    }
+                    for row in rows_for_key[:max(1, min(sample_limit or 5, 5))]
+                ],
+            })
+            if ambiguous_action != 'skip':
+                # Conservative fallback: unsupported ambiguous actions do not write unclear master rows.
+                continue
+
+        return {
+            'rows': admitted_rows,
+            'missing_key_count': missing_key_count,
+            'ambiguous_groups': ambiguous_groups,
+            'collapsed_duplicate_rows': collapsed_duplicate_rows,
+            'forced_kept_groups': forced_kept_groups,
+        }
 
     def _get_instrument_master_force_refresh_job_names(self) -> set[str]:
         """Return job names that must bypass local master freshness reuse."""
@@ -9810,6 +9930,8 @@ class DataManager:
                 'reactivated_count': 0,
                 'lifecycle_skip_count': 0,
                 'active_count': 0,
+                'ambiguous_master_duplicate_groups_skipped': 0,
+                'collapsed_duplicate_master_rows': 0,
                 'source_usage': {},
                 'samples': [],
             },
@@ -9878,29 +10000,40 @@ class DataManager:
             )
 
         if official_rows:
-            unique_official_rows = {
-                row.get('instrument_id'): row
-                for row in official_rows
-                if row.get('instrument_id')
-            }
-            duplicate_count = len(official_rows) - len(unique_official_rows)
-            if duplicate_count:
-                result['warnings'].append(
-                    f'cnindex index master snapshot contains {duplicate_count} duplicate instrument_id rows; last row kept'
-                )
-            official_rows = list(unique_official_rows.values())
-            saved = await self.db_ops.save_instruments_batch(official_rows)
-            if saved:
-                result['summary']['master_rows_saved'] += len(official_rows)
-            else:
-                result['warnings'].append('cnindex index master rows were not saved')
-            metadata_rows = self._build_index_metadata_rows(
+            admission_result = self._apply_index_master_admission_rules(
                 official_rows,
-                raw_snapshot_hash=getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
+                config=config,
+                sample_limit=sample_limit,
             )
-            result['summary']['metadata_rows_saved'] = await self.db_ops.save_instrument_master_metadata_batch(
-                metadata_rows
-            )
+            ambiguous_groups = admission_result['ambiguous_groups']
+            if admission_result['missing_key_count']:
+                result['warnings'].append(
+                    f"cnindex index master snapshot has {admission_result['missing_key_count']} rows missing admission key"
+                )
+            if admission_result['collapsed_duplicate_rows']:
+                result['summary']['collapsed_duplicate_master_rows'] += admission_result['collapsed_duplicate_rows']
+            if ambiguous_groups:
+                result['summary']['ambiguous_master_duplicate_groups_skipped'] += len(ambiguous_groups)
+                sample_ids = ','.join(
+                    sorted(str(group['key']) for group in ambiguous_groups)[:sample_limit or 5]
+                )
+                result['warnings'].append(
+                    f'cnindex index master admission skipped {len(ambiguous_groups)} ambiguous duplicate key groups by rule: {sample_ids}'
+                )
+            official_rows = admission_result['rows']
+            if official_rows:
+                saved = await self.db_ops.save_instruments_batch(official_rows)
+                if saved:
+                    result['summary']['master_rows_saved'] += len(official_rows)
+                else:
+                    result['warnings'].append('cnindex index master rows were not saved')
+                metadata_rows = self._build_index_metadata_rows(
+                    official_rows,
+                    raw_snapshot_hash=getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
+                )
+                result['summary']['metadata_rows_saved'] = await self.db_ops.save_instrument_master_metadata_batch(
+                    metadata_rows
+                )
 
         evidence_rows: List[Dict[str, Any]] = []
         if cnindex_source is not None:

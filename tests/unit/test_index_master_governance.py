@@ -20,6 +20,20 @@ def _build_config_manager() -> Mock:
                 'exchanges': ['SZSE'],
                 'official_sources': ['cnindex'],
                 'allow_series_inference': True,
+                'master_admission': {
+                    'canonical_key': 'instrument_id',
+                    'duplicate_key_policy': 'skip_ambiguous',
+                    'ambiguous_duplicate_action': 'skip',
+                    'collapse_identical_duplicates': True,
+                    'conflict_signature_fields': [
+                        'name',
+                        'market',
+                        'industry',
+                        'sector',
+                        'metadata.cni_code',
+                        'metadata.full_name',
+                    ],
+                },
                 'write_stale_no_quote': False,
                 'sample_limit': 10,
                 'timeout_sec': 30,
@@ -220,7 +234,7 @@ class DuplicateCNIndexSource(FakeCNIndexSource):
 
 
 @pytest.mark.asyncio
-async def test_index_governance_deduplicates_official_master_rows_before_save():
+async def test_index_governance_skips_ambiguous_duplicate_official_master_rows():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()
     manager.db_ops = FakeIndexDbOps()
@@ -230,6 +244,7 @@ async def test_index_governance_deduplicates_official_master_rows_before_save():
     result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
 
     written_batch = manager.db_ops.saved_instrument_batches[0]
-    assert [row['instrument_id'] for row in written_batch].count('980055.SZ') == 1
-    assert result['summary']['master_rows_saved'] == 2
-    assert any('duplicate instrument_id rows' in warning for warning in result['warnings'])
+    assert '980055.SZ' not in [row['instrument_id'] for row in written_batch]
+    assert result['summary']['master_rows_saved'] == 1
+    assert result['summary']['ambiguous_master_duplicate_groups_skipped'] == 1
+    assert any('ambiguous duplicate key groups by rule' in warning for warning in result['warnings'])

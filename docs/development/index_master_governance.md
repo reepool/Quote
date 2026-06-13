@@ -68,6 +68,19 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 4. 写入行情时保持幂等 upsert，不删除历史数据。
 5. 终止日之后不得 forward-fill 指数行情。
 
+## 主数据准入规则
+
+官方指数列表进入 `instruments` 前必须通过准入规则。准入规则由 `data_config.index_master_governance.master_admission` 配置驱动，不在代码中硬编码具体指数代码。
+
+默认规则：
+
+- 使用 `instrument_id` 作为本地主数据 canonical key。
+- 如果同一个 canonical key 只出现一次，允许写入主表。
+- 如果同一个 canonical key 出现多次，但名称、指数系列、类别、`.CNI`、全称等冲突签名完全一致，视为重复行，可合并。
+- 如果同一个 canonical key 出现多次且冲突签名不同，视为官方代码命名空间歧义，默认跳过该组，并在治理报告 warning 中暴露样例。
+
+这类歧义常见于不重要或当前行情不可得的债券指数，例如官方列表中同一 6 位代码同时对应不同 `.CNI` 和不同指数全称。系统不应把它们强行压成一个 `instrument_id`，否则会污染生命周期、行情和研究引用。若后续确需覆盖这类 metadata-only 指数，应单独设计官方身份键，例如 `source + .CNI`，而不是复用行情型 `<指数代码>.SZ`。
+
 ## 报告要求
 
 日更报告应新增或扩展指数治理段落：

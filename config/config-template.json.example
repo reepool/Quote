@@ -18,6 +18,20 @@
       "skip_stale_no_quote": true,
       "write_stale_no_quote": false,
       "allow_series_inference": true,
+      "master_admission": {
+        "canonical_key": "instrument_id",
+        "duplicate_key_policy": "skip_ambiguous",
+        "ambiguous_duplicate_action": "skip",
+        "collapse_identical_duplicates": true,
+        "conflict_signature_fields": [
+          "name",
+          "market",
+          "industry",
+          "sector",
+          "metadata.cni_code",
+          "metadata.full_name"
+        ]
+      },
       "sample_limit": 10,
       "timeout_sec": 120
     }
