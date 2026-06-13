@@ -676,6 +676,13 @@ class TaskManagerHandlers:
                             'run_date': str(getattr(trigger_obj, 'run_date', None)),
                             'timezone': str(getattr(trigger_obj, 'timezone', 'Asia/Shanghai'))
                         }
+                    elif trigger_obj is None and getattr(job_config, 'manual_only', False):
+                        self.task_manager.logger.debug(f"[TaskManagerHandlers] 任务 {job_id}: manual_only任务无Trigger")
+                        trigger_dict = {
+                            'type': 'manual_only',
+                            'classname': 'NoneType',
+                            'repr': 'manual_only'
+                        }
                     else:
                         self.task_manager.logger.warning(f"[TaskManagerHandlers] 任务 {job_id}: 未知的Trigger类型: {type(trigger_obj).__name__}")
                         trigger_dict = {

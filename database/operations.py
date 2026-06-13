@@ -511,6 +511,26 @@ class DatabaseOperations:
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""
         try:
+            unique_instruments: Dict[str, Dict[str, Any]] = {}
+            duplicate_count = 0
+            for instrument in instruments or []:
+                instrument_id = instrument.get('instrument_id')
+                if not instrument_id:
+                    duplicate_count += 1
+                    continue
+                if instrument_id in unique_instruments:
+                    duplicate_count += 1
+                unique_instruments[instrument_id] = instrument
+
+            if duplicate_count:
+                self.db_logger.warning(
+                    "Deduplicated %s duplicate/invalid instrument rows before batch save",
+                    duplicate_count,
+                )
+            instruments = list(unique_instruments.values())
+            if not instruments:
+                return False
+
             async with self.get_async_session() as session:
                 upserted_count = 0
                 for instrument_data in instruments:

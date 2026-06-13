@@ -48,6 +48,7 @@ class FakeIndexDbOps:
         self.latest_quotes = {'480055.SZ': datetime(2026, 5, 13)}
         self.evidence_rows = []
         self.saved_metadata_count = 0
+        self.saved_instrument_batches = []
 
     async def execute_read_query(self, query, params=None):
         if "status = 'stale_no_quote'" in query:
@@ -60,6 +61,7 @@ class FakeIndexDbOps:
         ]
 
     async def save_instruments_batch(self, rows):
+        self.saved_instrument_batches.append(list(rows))
         for row in rows:
             instrument_id = row['instrument_id']
             existing = self.rows.get(instrument_id, {})
@@ -205,3 +207,29 @@ async def test_index_governance_applies_direct_and_series_inferred_termination()
         tradable_only=True,
     )
     assert any(row['confidence'] == 'series_inferred' for row in manager.db_ops.evidence_rows)
+
+
+class DuplicateCNIndexSource(FakeCNIndexSource):
+    async def get_index_master_snapshot(self):
+        snapshot = await super().get_index_master_snapshot()
+        snapshot.rows.append({
+            **snapshot.rows[0],
+            'name': '规模因子-重复行',
+        })
+        return snapshot
+
+
+@pytest.mark.asyncio
+async def test_index_governance_deduplicates_official_master_rows_before_save():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.source_factory = FakeSourceFactory()
+    manager.source_factory.cnindex = DuplicateCNIndexSource()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
+
+    written_batch = manager.db_ops.saved_instrument_batches[0]
+    assert [row['instrument_id'] for row in written_batch].count('980055.SZ') == 1
+    assert result['summary']['master_rows_saved'] == 2
+    assert any('duplicate instrument_id rows' in warning for warning in result['warnings'])

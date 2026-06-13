@@ -9878,9 +9878,22 @@ class DataManager:
             )
 
         if official_rows:
+            unique_official_rows = {
+                row.get('instrument_id'): row
+                for row in official_rows
+                if row.get('instrument_id')
+            }
+            duplicate_count = len(official_rows) - len(unique_official_rows)
+            if duplicate_count:
+                result['warnings'].append(
+                    f'cnindex index master snapshot contains {duplicate_count} duplicate instrument_id rows; last row kept'
+                )
+            official_rows = list(unique_official_rows.values())
             saved = await self.db_ops.save_instruments_batch(official_rows)
             if saved:
                 result['summary']['master_rows_saved'] += len(official_rows)
+            else:
+                result['warnings'].append('cnindex index master rows were not saved')
             metadata_rows = self._build_index_metadata_rows(
                 official_rows,
                 raw_snapshot_hash=getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
