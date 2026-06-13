@@ -23,7 +23,7 @@ from calendar import monthrange
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
 from datetime import datetime, date, timedelta, timezone
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 
 import pandas as pd
 
@@ -307,7 +307,7 @@ class DataManager:
             return
         try:
             from research.futures_market_data import (
-                FuturesCalendarService,
+                FuturesTradingDayGovernanceService,
                 FuturesStorageManager,
                 default_futures_registry,
             )
@@ -323,7 +323,12 @@ class DataManager:
             self.futures_storage.upsert_source_manifests(
                 registry.get("source_manifests", []),
             )
-            FuturesCalendarService(self.futures_storage, module_cfg).seed_default_calendar()
+            calendar_cfg = (module_cfg.get("master_data") or {}).get("calendar") or {}
+            if calendar_cfg.get("seed_on_initialize", False):
+                FuturesTradingDayGovernanceService(
+                    self.futures_storage,
+                    module_cfg,
+                ).bootstrap_estimated_calendar()
             dm_logger.info(
                 "[DataManager] Futures storage initialized: %s",
                 self.futures_storage.db_path,
@@ -4528,6 +4533,83 @@ class DataManager:
             dry_run=dry_run,
         )
 
+    async def run_futures_trading_day_governance(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Refresh and validate local futures trading-day governance state."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        from research.futures_market_data import FuturesTradingDayGovernanceService
+
+        def _run() -> Dict[str, Any]:
+            service = FuturesTradingDayGovernanceService(storage, module_cfg)
+            seed_result = service.bootstrap_estimated_calendar(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            expansion = service.expand_target_dates(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                purpose="trading_day_governance",
+                dry_run=dry_run,
+            )
+            gate = service.validate_quality_gate(
+                expansion,
+                dry_run=dry_run,
+                purpose="sync",
+            )
+            readiness = service.readiness(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            return {
+                "status": "blocked" if gate.get("status") == "blocked" else readiness.get("status", "success"),
+                "domain": "futures_trading_day_governance",
+                "seed_result": seed_result,
+                "target_date_expansion": gate,
+                "readiness": readiness,
+                "dry_run": dry_run,
+            }
+
+        return await asyncio.to_thread(_run)
+
+    async def run_futures_official_calendar_backfill(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        max_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Backfill futures exchange calendars from official daily evidence only."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        from research.futures_market_data import FuturesOfficialCalendarBackfillService
+
+        def _run() -> Dict[str, Any]:
+            return FuturesOfficialCalendarBackfillService(
+                storage,
+                self.research_config,
+                module_cfg,
+            ).run(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+
+        return await asyncio.to_thread(_run)
+
     async def refresh_futures_cycle_diagnostics(self) -> Dict[str, Any]:
         """Refresh persisted futures cycle diagnostics from local bars."""
         storage = self._require_futures_storage()
@@ -4595,10 +4677,18 @@ class DataManager:
         storage = self._require_futures_storage()
 
         def _load() -> Dict[str, Any]:
+            from research.futures_market_data import default_futures_calendar_source_profiles
+
             categories = storage.list_categories(active_only=True)
             instruments = storage.list_instruments(active_only=True)
             series = storage.list_series(active_only=True)
             manifests = storage.list_source_manifests(enabled_only=False)
+            calendar_source_profiles = [
+                asdict(item) if hasattr(item, "__dataclass_fields__") else item
+                for item in default_futures_calendar_source_profiles(
+                    self.research_config.modules.get("commodity_market_data", {})
+                )
+            ]
             exchanges = sorted({item.get("exchange") for item in instruments if item.get("exchange")})
             units = sorted({item.get("unit") for item in instruments if item.get("unit")})
             currencies = sorted({item.get("currency") for item in instruments if item.get("currency")})
@@ -4612,6 +4702,7 @@ class DataManager:
                 "currencies": currencies,
                 "series_types": series_types,
                 "source_profiles": manifests,
+                "calendar_source_profiles": calendar_source_profiles,
                 "instruments": instruments,
                 "series": series,
                 "warnings": [],
@@ -4792,12 +4883,23 @@ class DataManager:
         self,
         *,
         exchange: Optional[str] = None,
+        instrument_id: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         trading_only: bool = False,
     ) -> Dict[str, Any]:
         """Read local futures trading calendar rows."""
         storage = self._require_futures_storage()
+        if instrument_id:
+            instrument = await asyncio.to_thread(storage.get_instrument, instrument_id)
+            if not instrument:
+                return {
+                    "status": "not_found",
+                    "instrument_id": instrument_id,
+                    "calendar": [],
+                    "row_count": 0,
+                }
+            exchange = str(instrument.get("exchange") or exchange or "").upper() or exchange
         rows = await asyncio.to_thread(
             storage.list_calendar_days,
             exchange=exchange,
@@ -4806,6 +4908,91 @@ class DataManager:
             trading_only=trading_only,
         )
         return {"status": "success", "row_count": len(rows), "calendar": rows}
+
+    async def get_research_futures_trading_day_governance(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return futures trading-day governance readiness."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        from research.futures_market_data import FuturesTradingDayGovernanceService
+
+        exchanges = [exchange] if exchange else None
+        return await asyncio.to_thread(
+            FuturesTradingDayGovernanceService(storage, module_cfg).readiness,
+            exchanges=exchanges,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+    async def get_research_futures_calendar_evidence(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        parse_status: Optional[str] = None,
+        review_status: Optional[str] = "review_required",
+        limit: Optional[int] = 100,
+    ) -> Dict[str, Any]:
+        """Return futures calendar notices and manual-review records."""
+        storage = self._require_futures_storage()
+
+        def _load() -> Dict[str, Any]:
+            notices = storage.list_calendar_notices(
+                exchange=exchange,
+                parse_status=parse_status,
+                limit=limit,
+            )
+            reviews = storage.list_manual_calendar_reviews(
+                status=review_status,
+                exchange=exchange,
+                limit=limit,
+            )
+            return {
+                "status": "success",
+                "source_policy": "local_futures_db_only",
+                "notices": notices,
+                "manual_reviews": reviews,
+                "notice_count": len(notices),
+                "manual_review_count": len(reviews),
+            }
+
+        return await asyncio.to_thread(_load)
+
+    async def get_research_futures_target_dates(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        instrument_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        purpose: str = "api",
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        """Resolve governed futures target trading dates without provider calls."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        from research.futures_market_data import FuturesTradingDayGovernanceService
+
+        def _load() -> Dict[str, Any]:
+            service = FuturesTradingDayGovernanceService(storage, module_cfg)
+            return service.validate_quality_gate(
+                service.expand_target_dates(
+                    exchanges=[exchange] if exchange else None,
+                    instrument_ids=[instrument_id] if instrument_id else None,
+                    start_date=start_date,
+                    end_date=end_date,
+                    purpose=purpose,
+                    dry_run=dry_run,
+                ),
+                dry_run=dry_run,
+                purpose=purpose,
+            )
+
+        return await asyncio.to_thread(_load)
 
     async def get_research_futures_source_manifests(
         self,

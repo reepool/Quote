@@ -8,15 +8,20 @@ import pytest
 from research.futures_market_data import (
     FuturesBar,
     FuturesCalendarService,
+    FuturesCalendarNotice,
     FuturesContinuousMapping,
     FuturesContract,
     FuturesContractBar,
     FuturesDiagnosticsService,
     FuturesExposureMapping,
+    FuturesInstrumentCalendarOverride,
+    FuturesManualCalendarReview,
     FuturesMarketDataSyncService,
+    FuturesOfficialCalendarBackfillService,
     FuturesReadinessService,
     FuturesSeries,
     FuturesStorageManager,
+    FuturesTradingDayGovernanceService,
     default_futures_registry,
     infer_contract_month,
     make_futures_contract_id,
@@ -24,7 +29,9 @@ from research.futures_market_data import (
     make_futures_series_id,
 )
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
+from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
 from research.providers.official_futures import (
+    OfficialFuturesDailyProbeResult,
     OfficialFuturesMarketDataProvider,
     OfficialFuturesSourceUnavailable,
 )
@@ -153,6 +160,245 @@ def test_futures_storage_persists_contract_bars_mapping_and_calendar(tmp_path):
     assert storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]["contract_id"] == contract.contract_id
     assert calendar_result["calendar_rows"] == 4
     assert storage.get_latest_expected_trade_date("SHFE", as_of_date="2024-06-04")["trade_date"] == "2024-06-04"
+
+
+def test_futures_storage_persists_trading_day_governance_tables(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+
+    notice = FuturesCalendarNotice(
+        notice_id="SHFE:notice:2024",
+        exchange="SHFE",
+        source_profile="exchange_official_calendar",
+        notice_type="holiday_notice",
+        title="2024 holiday notice",
+        url="https://www.shfe.com.cn/notice",
+        raw_content_hash="hash",
+        raw_payload={"calendar": [{"trade_date": "2024-06-03", "is_trading_day": True}]},
+        parse_status="parsed",
+        confidence=0.9,
+        derived_changes=[{"trade_date": "2024-06-03"}],
+    )
+    review = FuturesManualCalendarReview(
+        review_id="review-1",
+        status="review_required",
+        decision="pending",
+        reviewer="",
+        reason="fixture ambiguous",
+        evidence_ref=notice.notice_id,
+        scope_type="exchange",
+        exchange="SHFE",
+        trade_dates=["2024-06-03"],
+    )
+    override = FuturesInstrumentCalendarOverride(
+        override_id="override-1",
+        instrument_id="CNF.CU.SHFE",
+        exchange="SHFE",
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+        is_trading_day=True,
+        manual_review_id=review.review_id,
+    )
+
+    assert storage.upsert_calendar_notices([notice]) == 1
+    assert storage.upsert_manual_calendar_reviews([review]) == 1
+    assert storage.upsert_instrument_calendar_overrides([override]) == 1
+
+    assert storage.list_calendar_notices(exchange="SHFE")[0]["raw_payload"]["calendar"][0]["trade_date"] == "2024-06-03"
+    assert storage.list_manual_calendar_reviews(status="review_required")[0]["evidence_ref"] == notice.notice_id
+    assert storage.list_instrument_calendar_overrides(instrument_id="CNF.CU.SHFE")[0]["manual_review_id"] == review.review_id
+
+
+def test_trading_day_governance_expands_dates_and_quality_gates(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["SHFE"],
+        "quality_gates": {
+            "dry_run_min_quality": "estimated",
+            "production_min_quality": "official_parsed",
+        },
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    service = FuturesTradingDayGovernanceService(storage, config.modules["commodity_market_data"])
+    service.bootstrap_estimated_calendar(
+        exchanges=["SHFE"],
+        start_date="2024-06-01",
+        end_date="2024-06-04",
+    )
+
+    dry_run = service.validate_quality_gate(
+        service.expand_target_dates(
+            exchanges=["SHFE"],
+            start_date="2024-06-01",
+            end_date="2024-06-04",
+            dry_run=True,
+        ),
+        dry_run=True,
+    )
+    production = service.validate_quality_gate(
+        service.expand_target_dates(
+            exchanges=["SHFE"],
+            start_date="2024-06-01",
+            end_date="2024-06-04",
+            dry_run=False,
+        ),
+        dry_run=False,
+    )
+
+    assert dry_run["target_dates_by_exchange"]["SHFE"] == ["2024-06-03", "2024-06-04"]
+    assert dry_run["skipped_dates_by_exchange"]["SHFE"] == ["2024-06-01", "2024-06-02"]
+    assert dry_run["production_write_eligible"] is True
+    assert production["status"] == "blocked"
+    assert "calendar_quality_below_threshold:SHFE:estimated<required:official_parsed" in production["blockers"]
+
+
+def test_official_futures_calendar_provider_parses_structured_notice(tmp_path):
+    provider = OfficialFuturesCalendarProvider(_research_config(tmp_path))
+    notice = FuturesCalendarNotice(
+        notice_id="SHFE:calendar:fixture",
+        exchange="SHFE",
+        source_profile="exchange_official_calendar",
+        notice_type="calendar",
+        raw_content_hash="hash",
+        raw_payload={
+            "calendar": [
+                {"trade_date": "2024-06-03", "is_trading_day": True},
+                {"trade_date": "2024-06-08", "is_trading_day": False},
+            ]
+        },
+    )
+
+    parsed = provider.parse_notice(notice)
+
+    assert parsed.review_required is False
+    assert parsed.notice.parse_status == "parsed"
+    assert [item.trade_date for item in parsed.calendar_days] == ["2024-06-03", "2024-06-08"]
+    assert parsed.calendar_days[0].quality_flag == "official_parsed"
+
+
+def test_official_futures_provider_probe_classifies_trading_and_closed(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    monkeypatch.setattr(
+        provider,
+        "_request_exchange_payload",
+        lambda session, exchange, trade_date: {
+            "o_curinstrument": [
+                {
+                    "PRODUCTGROUPID": "cu",
+                    "DELIVERYMONTH": "2407",
+                    "OPENPRICE": "10",
+                    "HIGHESTPRICE": "12",
+                    "LOWESTPRICE": "9",
+                    "CLOSEPRICE": "11",
+                }
+            ]
+        },
+    )
+
+    trading = provider.probe_exchange_trading_day("SHFE", "2024-06-03")
+    assert trading.status == "trading"
+    assert trading.is_trading_day is True
+    assert trading.row_count == 1
+
+    monkeypatch.setattr(provider, "_request_exchange_payload", lambda session, exchange, trade_date: {"o_curinstrument": []})
+    closed = provider.probe_exchange_trading_day("SHFE", "2024-06-08")
+    assert closed.status == "closed"
+    assert closed.is_trading_day is False
+    assert closed.row_count == 0
+
+
+def test_official_futures_provider_probe_keeps_failures_unresolved(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    def _raise(*args, **kwargs):
+        raise OfficialFuturesSourceUnavailable("timeout")
+
+    monkeypatch.setattr(provider, "_request_exchange_payload", _raise)
+
+    result = provider.probe_exchange_trading_day("SHFE", "2024-06-03")
+
+    assert result.status == "unresolved"
+    assert result.is_trading_day is None
+    assert "timeout" in result.failure_reason
+
+
+def test_official_calendar_backfill_writes_verified_rows_and_no_weekday_guess(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["SHFE"],
+        "official_calendar_backfill": {"start_date": "2010-01-01"},
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def _probe(self, exchange, trade_date):
+        if trade_date == "2024-06-03":
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange,
+                trade_date=trade_date,
+                status="trading",
+                is_trading_day=True,
+                row_count=2,
+                source_interface="fixture",
+                evidence_url="https://official.example/20240603",
+                parser_version="fixture.v1",
+                payload_hash="hash-trading",
+            )
+        if trade_date == "2024-06-04":
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange,
+                trade_date=trade_date,
+                status="closed",
+                is_trading_day=False,
+                row_count=0,
+                source_interface="fixture",
+                evidence_url="https://official.example/20240604",
+                parser_version="fixture.v1",
+                payload_hash="hash-closed",
+            )
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="unresolved",
+            is_trading_day=None,
+            row_count=0,
+            source_interface="fixture",
+            evidence_url="https://official.example/20240605",
+            parser_version="fixture.v1",
+            failure_reason="fixture failure",
+        )
+
+    monkeypatch.setattr("research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day", _probe)
+
+    result = FuturesOfficialCalendarBackfillService(storage, config, config.modules["commodity_market_data"]).run(
+        exchanges=["SHFE"],
+        start_date="2024-06-03",
+        end_date="2024-06-05",
+    )
+    rows = storage.list_calendar_days(exchange="SHFE", start_date="2024-06-03", end_date="2024-06-05")
+
+    assert result["status"] == "blocked"
+    assert result["totals"]["rows_written"] == 2
+    assert result["totals"]["unresolved_dates"] == 1
+    assert [row["trade_date"] for row in rows] == ["2024-06-03", "2024-06-04"]
+    assert {row["quality_flag"] for row in rows} == {"backfilled_verified"}
+    assert storage.list_manual_calendar_reviews(status="review_required")[0]["metadata"]["unresolved_count"] == 1
 
 
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
@@ -495,6 +741,55 @@ async def test_futures_market_data_sync_writes_fixture_bars(monkeypatch, tmp_pat
     assert result["totals"]["inserted"] == 1
     assert storage.get_price_bars(series_id)[0]["close"] == 11
     assert storage.get_cycle_diagnostics(series_id)
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_uses_governed_trading_dates(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": False},
+        "akshare_futures": {"enabled": True, "timeout_seconds": 1},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    requested_dates = []
+
+    async def fake_fetch_daily_bars(self, series, *, start_date=None, end_date=None, mode="direct"):
+        requested_dates.append((start_date, end_date))
+        return [
+            FuturesBar(
+                series_id=series.series_id,
+                trade_date=start_date,
+                open=10,
+                high=12,
+                low=9,
+                close=11,
+                raw_payload_hash=f"{series.series_id}:{start_date}",
+                source="akshare",
+                source_mode=mode,
+                source_profile="akshare_futures",
+                source_interface="fixture",
+            )
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.akshare_futures.AkshareFuturesMarketDataProvider.fetch_daily_bars",
+        fake_fetch_daily_bars,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-01",
+        end_date="2024-06-04",
+    )
+
+    assert result["status"] == "success"
+    assert requested_dates == [("2024-06-03", "2024-06-03"), ("2024-06-04", "2024-06-04")]
+    assert result["totals"]["calendar_skipped"] == 2
+    assert result["trading_day_governance"]["skipped_dates_by_exchange"]["SHFE"] == [
+        "2024-06-01",
+        "2024-06-02",
+    ]
 
 
 @pytest.mark.asyncio

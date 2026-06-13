@@ -52,6 +52,21 @@ class OfficialFuturesContractBar:
     warnings: List[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class OfficialFuturesDailyProbeResult:
+    exchange: str
+    trade_date: str
+    status: str
+    is_trading_day: Optional[bool]
+    row_count: int
+    source_interface: str
+    evidence_url: str
+    parser_version: str
+    payload_hash: str = ""
+    failure_reason: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 class OfficialFuturesMarketDataProvider:
     """Fetch and normalize first-hand domestic futures exchange daily bars."""
 
@@ -205,6 +220,89 @@ class OfficialFuturesMarketDataProvider:
         if variety:
             rows = [row for row in rows if row.variety.upper() == variety.upper()]
         return rows
+
+    def probe_exchange_trading_day(self, exchange: str, trade_date: str) -> OfficialFuturesDailyProbeResult:
+        """Classify an exchange/date through the official daily market-data endpoint.
+
+        This is intentionally exchange-level. It lets calendar governance verify
+        a trading day once and later reuse the same source interface for all
+        varieties without issuing per-series duplicate requests.
+        """
+        exchange_key = str(exchange or "").upper()
+        day_key = _date_key(trade_date)
+        if exchange_key not in self.supported_exchanges or exchange_key not in self.enabled_exchanges:
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange_key,
+                trade_date=day_key,
+                status="unresolved",
+                is_trading_day=None,
+                row_count=0,
+                source_interface=_source_interface_for_exchange(exchange_key),
+                evidence_url=_official_daily_url(exchange_key, day_key),
+                parser_version=self.parser_version,
+                failure_reason=f"official futures source unsupported or disabled for {exchange_key}",
+            )
+        session = create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS)
+        try:
+            payload = self._request_exchange_payload(session, exchange_key, day_key)
+            rows = self._parse_exchange_payload(exchange_key, payload, trade_date=day_key)
+            row_count = len(rows)
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange_key,
+                trade_date=day_key,
+                status="trading" if row_count > 0 else "closed",
+                is_trading_day=row_count > 0,
+                row_count=row_count,
+                source_interface=_source_interface_for_exchange(exchange_key),
+                evidence_url=_official_daily_url(exchange_key, day_key),
+                parser_version=self.parser_version,
+                payload_hash=_hash_payload(payload),
+                metadata={"classification_rule": "official_daily_rows" if row_count > 0 else "official_empty_payload"},
+            )
+        except OfficialFuturesSourceUnavailable as exc:
+            if _is_official_closed_response(exc):
+                return OfficialFuturesDailyProbeResult(
+                    exchange=exchange_key,
+                    trade_date=day_key,
+                    status="closed",
+                    is_trading_day=False,
+                    row_count=0,
+                    source_interface=_source_interface_for_exchange(exchange_key),
+                    evidence_url=_official_daily_url(exchange_key, day_key),
+                    parser_version=self.parser_version,
+                    failure_reason=str(exc),
+                    metadata={"classification_rule": "official_no_report_response"},
+                )
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange_key,
+                trade_date=day_key,
+                status="unresolved",
+                is_trading_day=None,
+                row_count=0,
+                source_interface=_source_interface_for_exchange(exchange_key),
+                evidence_url=_official_daily_url(exchange_key, day_key),
+                parser_version=self.parser_version,
+                failure_reason=str(exc),
+            )
+
+    def _parse_exchange_payload(
+        self,
+        exchange: str,
+        payload: Any,
+        *,
+        trade_date: str,
+    ) -> List[OfficialFuturesContractBar]:
+        if exchange == "SHFE":
+            return self._parse_shfe_payload(payload, trade_date=trade_date, exchange="SHFE")
+        if exchange == "INE":
+            return self._parse_shfe_payload(payload, trade_date=trade_date, exchange="INE")
+        if exchange == "DCE":
+            return self._parse_dce_payload(payload, trade_date=trade_date)
+        if exchange == "CZCE":
+            return self._parse_czce_text(str(payload), trade_date=trade_date)
+        if exchange == "GFEX":
+            return self._parse_gfex_payload(payload, trade_date=trade_date)
+        raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")
 
     def _request_exchange_payload(
         self,
@@ -611,6 +709,45 @@ def _series_variety(series: FuturesSeries) -> str:
 def _contract_variety(value: str) -> str:
     match = re.match(r"^([A-Za-z]+)", str(value or "").strip())
     return match.group(1).upper() if match else str(value or "").upper()
+
+
+def _official_daily_url(exchange: str, trade_date: str) -> str:
+    day = _compact_date(trade_date)
+    if exchange == "SHFE":
+        return f"https://www.shfe.com.cn/data/tradedata/future/dailydata/kx{day}.dat"
+    if exchange == "INE":
+        return f"https://www.ine.cn/data/tradedata/future/dailydata/kx{day}.dat"
+    if exchange == "DCE":
+        return "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes"
+    if exchange == "CZCE":
+        return f"http://www.czce.com.cn/cn/DFSStaticFiles/Future/{day[:4]}/{day}/FutureDataDaily.txt"
+    if exchange == "GFEX":
+        return "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList"
+    return ""
+
+
+def _source_interface_for_exchange(exchange: str) -> str:
+    return {
+        "SHFE": "official_shfe_daily_kx_dat",
+        "INE": "official_ine_daily_kx_dat",
+        "DCE": "official_dce_day_quotes",
+        "CZCE": "official_czce_future_data_daily_txt",
+        "GFEX": "official_gfex_ti_day_quotes",
+    }.get(exchange, "official_unknown_daily")
+
+
+def _is_official_closed_response(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return any(
+        marker in text
+        for marker in (
+            "404",
+            "not found",
+            "futuredataDaily.txt".lower(),
+            "no report",
+            "non-trading",
+        )
+    )
 
 
 def _today_key() -> str:

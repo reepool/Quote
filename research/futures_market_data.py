@@ -21,6 +21,19 @@ from utils.date_utils import get_shanghai_time
 FUTURES_DIAGNOSTICS_VERSION = "futures_cycle_diagnostics.v1"
 FUTURES_SYNC_VERSION = "futures_market_data_sync.v1"
 FUTURES_CONTINUOUS_CONSTRUCTION_VERSION = "futures_continuous_mapping.v1"
+FUTURES_TRADING_DAY_GOVERNANCE_VERSION = "futures_trading_day_governance.v1"
+
+
+FUTURES_CALENDAR_QUALITY_RANK: Dict[str, int] = {
+    "conflict": 0,
+    "missing": 0,
+    "estimated_unverified": 1,
+    "estimated": 1,
+    "backfilled_verified": 2,
+    "manual_verified": 3,
+    "official_parsed": 4,
+    "official": 5,
+}
 
 
 FUTURES_CATEGORY_DEFINITIONS: List[Dict[str, str]] = [
@@ -205,6 +218,10 @@ class FuturesTradingCalendarDay:
     session_type: str = "day_and_night"
     source_profile: str = "estimated_calendar"
     quality_flag: str = "estimated"
+    parser_version: str = FUTURES_TRADING_DAY_GOVERNANCE_VERSION
+    evidence_url: str = ""
+    notice_id: str = ""
+    manual_override_id: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -218,6 +235,90 @@ class FuturesInstrumentSession:
     source_profile: str = "configured"
     quality_flag: str = "estimated"
     active: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesCalendarNotice:
+    notice_id: str
+    exchange: str
+    source_profile: str
+    notice_type: str
+    title: str = ""
+    url: str = ""
+    published_at: Optional[str] = None
+    fetched_at: Optional[str] = None
+    raw_content_hash: str = ""
+    raw_payload: Dict[str, Any] = field(default_factory=dict)
+    parser_version: str = FUTURES_TRADING_DAY_GOVERNANCE_VERSION
+    parse_status: str = "raw"
+    confidence: float = 0.0
+    derived_changes: List[Dict[str, Any]] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesManualCalendarReview:
+    review_id: str
+    status: str
+    decision: str
+    reviewer: str
+    reason: str
+    evidence_ref: str
+    scope_type: str
+    scope_id: str = ""
+    exchange: str = ""
+    instrument_id: str = ""
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    trade_dates: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesInstrumentCalendarOverride:
+    override_id: str
+    instrument_id: str
+    exchange: str
+    start_date: str
+    end_date: str
+    is_trading_day: Optional[bool] = None
+    session_type: str = ""
+    source_profile: str = "manual"
+    quality_flag: str = "manual_verified"
+    evidence_ref: str = ""
+    manual_review_id: str = ""
+    reason: str = ""
+    active: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesTargetDateExpansion:
+    expansion_id: str
+    purpose: str
+    exchange: str
+    start_date: str
+    end_date: str
+    target_dates: List[str]
+    skipped_dates: List[str] = field(default_factory=list)
+    quality_summary: Dict[str, Any] = field(default_factory=dict)
+    blockers: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    manual_override_refs: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class FuturesCalendarSourceProfile:
+    source_profile: str
+    source: str
+    exchanges: List[str]
+    role: str
+    priority: int
+    enabled: bool = True
+    parser_version: str = FUTURES_TRADING_DAY_GOVERNANCE_VERSION
+    endpoint_templates: Dict[str, str] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -437,6 +538,7 @@ class FuturesStorageManager:
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             conn.executescript(self._schema_sql())
+            self._migrate_schema(conn)
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
@@ -533,6 +635,10 @@ class FuturesStorageManager:
             session_type TEXT NOT NULL,
             source_profile TEXT NOT NULL,
             quality_flag TEXT NOT NULL,
+            parser_version TEXT NOT NULL DEFAULT 'futures_trading_day_governance.v1',
+            evidence_url TEXT NOT NULL DEFAULT '',
+            notice_id TEXT NOT NULL DEFAULT '',
+            manual_override_id TEXT NOT NULL DEFAULT '',
             metadata_json TEXT NOT NULL,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
@@ -553,6 +659,93 @@ class FuturesStorageManager:
             updated_at TEXT NOT NULL,
             FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id)
         );
+
+        CREATE TABLE IF NOT EXISTS futures_calendar_notices (
+            notice_id TEXT PRIMARY KEY,
+            exchange TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            notice_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            url TEXT NOT NULL,
+            published_at TEXT,
+            fetched_at TEXT,
+            raw_content_hash TEXT NOT NULL,
+            raw_payload_json TEXT NOT NULL,
+            parser_version TEXT NOT NULL,
+            parse_status TEXT NOT NULL,
+            confidence REAL NOT NULL,
+            derived_changes_json TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_calendar_notices_exchange
+        ON futures_calendar_notices(exchange, published_at, parse_status);
+
+        CREATE TABLE IF NOT EXISTS futures_calendar_manual_reviews (
+            review_id TEXT PRIMARY KEY,
+            status TEXT NOT NULL,
+            decision TEXT NOT NULL,
+            reviewer TEXT NOT NULL,
+            reason TEXT NOT NULL,
+            evidence_ref TEXT NOT NULL,
+            scope_type TEXT NOT NULL,
+            scope_id TEXT NOT NULL,
+            exchange TEXT NOT NULL,
+            instrument_id TEXT NOT NULL,
+            start_date TEXT,
+            end_date TEXT,
+            trade_dates_json TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_calendar_reviews_status
+        ON futures_calendar_manual_reviews(status, exchange, start_date, end_date);
+
+        CREATE TABLE IF NOT EXISTS futures_instrument_calendar_overrides (
+            override_id TEXT PRIMARY KEY,
+            instrument_id TEXT NOT NULL,
+            exchange TEXT NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            is_trading_day INTEGER,
+            session_type TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            evidence_ref TEXT NOT NULL,
+            manual_review_id TEXT NOT NULL,
+            reason TEXT NOT NULL,
+            active INTEGER NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (instrument_id) REFERENCES futures_instruments(instrument_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_calendar_overrides_scope
+        ON futures_instrument_calendar_overrides(instrument_id, start_date, end_date, active);
+
+        CREATE TABLE IF NOT EXISTS futures_target_date_expansions (
+            expansion_id TEXT PRIMARY KEY,
+            purpose TEXT NOT NULL,
+            exchange TEXT NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            target_dates_json TEXT NOT NULL,
+            skipped_dates_json TEXT NOT NULL,
+            quality_summary_json TEXT NOT NULL,
+            blockers_json TEXT NOT NULL,
+            warnings_json TEXT NOT NULL,
+            manual_override_refs_json TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_futures_target_expansions_scope
+        ON futures_target_date_expansions(purpose, exchange, start_date, end_date);
 
         CREATE TABLE IF NOT EXISTS futures_series (
             series_id TEXT PRIMARY KEY,
@@ -772,6 +965,23 @@ class FuturesStorageManager:
             created_at TEXT NOT NULL
         );
         """
+
+    @staticmethod
+    def _migrate_schema(conn: sqlite3.Connection) -> None:
+        """Apply additive migrations for older local futures.db files."""
+        existing = {
+            row["name"]
+            for row in conn.execute("PRAGMA table_info(futures_trading_calendar)").fetchall()
+        }
+        calendar_columns = {
+            "parser_version": "TEXT NOT NULL DEFAULT 'futures_trading_day_governance.v1'",
+            "evidence_url": "TEXT NOT NULL DEFAULT ''",
+            "notice_id": "TEXT NOT NULL DEFAULT ''",
+            "manual_override_id": "TEXT NOT NULL DEFAULT ''",
+        }
+        for column, definition in calendar_columns.items():
+            if column not in existing:
+                conn.execute(f"ALTER TABLE futures_trading_calendar ADD COLUMN {column} {definition}")
 
     def start_ingestion_run(
         self,
@@ -1087,14 +1297,19 @@ class FuturesStorageManager:
                     """
                     INSERT INTO futures_trading_calendar (
                         exchange, trade_date, is_trading_day, timezone, session_type,
-                        source_profile, quality_flag, metadata_json, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        source_profile, quality_flag, parser_version, evidence_url,
+                        notice_id, manual_override_id, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(exchange, trade_date) DO UPDATE SET
                         is_trading_day=excluded.is_trading_day,
                         timezone=excluded.timezone,
                         session_type=excluded.session_type,
                         source_profile=excluded.source_profile,
                         quality_flag=excluded.quality_flag,
+                        parser_version=excluded.parser_version,
+                        evidence_url=excluded.evidence_url,
+                        notice_id=excluded.notice_id,
+                        manual_override_id=excluded.manual_override_id,
                         metadata_json=excluded.metadata_json,
                         updated_at=excluded.updated_at
                     """,
@@ -1106,6 +1321,10 @@ class FuturesStorageManager:
                         item.session_type,
                         item.source_profile,
                         item.quality_flag,
+                        item.parser_version,
+                        item.evidence_url,
+                        item.notice_id,
+                        item.manual_override_id,
                         _json_dumps(item.metadata),
                         now,
                         now,
@@ -1150,6 +1369,320 @@ class FuturesStorageManager:
                     ),
                 )
         return len(sessions)
+
+    def upsert_calendar_notices(self, notices: Sequence[FuturesCalendarNotice]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in notices:
+                conn.execute(
+                    """
+                    INSERT INTO futures_calendar_notices (
+                        notice_id, exchange, source_profile, notice_type, title, url,
+                        published_at, fetched_at, raw_content_hash, raw_payload_json,
+                        parser_version, parse_status, confidence, derived_changes_json,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(notice_id) DO UPDATE SET
+                        exchange=excluded.exchange,
+                        source_profile=excluded.source_profile,
+                        notice_type=excluded.notice_type,
+                        title=excluded.title,
+                        url=excluded.url,
+                        published_at=excluded.published_at,
+                        fetched_at=excluded.fetched_at,
+                        raw_content_hash=excluded.raw_content_hash,
+                        raw_payload_json=excluded.raw_payload_json,
+                        parser_version=excluded.parser_version,
+                        parse_status=excluded.parse_status,
+                        confidence=excluded.confidence,
+                        derived_changes_json=excluded.derived_changes_json,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.notice_id,
+                        item.exchange.upper(),
+                        item.source_profile,
+                        item.notice_type,
+                        item.title,
+                        item.url,
+                        item.published_at,
+                        item.fetched_at,
+                        item.raw_content_hash,
+                        _json_dumps(item.raw_payload),
+                        item.parser_version,
+                        item.parse_status,
+                        item.confidence,
+                        _json_dumps(item.derived_changes),
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(notices)
+
+    def list_calendar_notices(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        parse_status: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if parse_status:
+            clauses.append("parse_status = ?")
+            params.append(parse_status)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        sql = f"""
+            SELECT * FROM futures_calendar_notices
+            {where}
+            ORDER BY COALESCE(published_at, fetched_at, created_at) DESC, notice_id
+        """
+        if limit:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [self._calendar_notice_payload(row) for row in rows]
+
+    def upsert_manual_calendar_reviews(self, reviews: Sequence[FuturesManualCalendarReview]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in reviews:
+                conn.execute(
+                    """
+                    INSERT INTO futures_calendar_manual_reviews (
+                        review_id, status, decision, reviewer, reason, evidence_ref,
+                        scope_type, scope_id, exchange, instrument_id, start_date,
+                        end_date, trade_dates_json, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(review_id) DO UPDATE SET
+                        status=excluded.status,
+                        decision=excluded.decision,
+                        reviewer=excluded.reviewer,
+                        reason=excluded.reason,
+                        evidence_ref=excluded.evidence_ref,
+                        scope_type=excluded.scope_type,
+                        scope_id=excluded.scope_id,
+                        exchange=excluded.exchange,
+                        instrument_id=excluded.instrument_id,
+                        start_date=excluded.start_date,
+                        end_date=excluded.end_date,
+                        trade_dates_json=excluded.trade_dates_json,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.review_id,
+                        item.status,
+                        item.decision,
+                        item.reviewer,
+                        item.reason,
+                        item.evidence_ref,
+                        item.scope_type,
+                        item.scope_id,
+                        item.exchange.upper(),
+                        item.instrument_id,
+                        item.start_date,
+                        item.end_date,
+                        _json_dumps(item.trade_dates),
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(reviews)
+
+    def list_manual_calendar_reviews(
+        self,
+        *,
+        status: Optional[str] = None,
+        exchange: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if status:
+            clauses.append("status = ?")
+            params.append(status)
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        sql = f"""
+            SELECT * FROM futures_calendar_manual_reviews
+            {where}
+            ORDER BY updated_at DESC, review_id
+        """
+        if limit:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [self._manual_review_payload(row) for row in rows]
+
+    def upsert_instrument_calendar_overrides(
+        self,
+        overrides: Sequence[FuturesInstrumentCalendarOverride],
+    ) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in overrides:
+                conn.execute(
+                    """
+                    INSERT INTO futures_instrument_calendar_overrides (
+                        override_id, instrument_id, exchange, start_date, end_date,
+                        is_trading_day, session_type, source_profile, quality_flag,
+                        evidence_ref, manual_review_id, reason, active,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(override_id) DO UPDATE SET
+                        instrument_id=excluded.instrument_id,
+                        exchange=excluded.exchange,
+                        start_date=excluded.start_date,
+                        end_date=excluded.end_date,
+                        is_trading_day=excluded.is_trading_day,
+                        session_type=excluded.session_type,
+                        source_profile=excluded.source_profile,
+                        quality_flag=excluded.quality_flag,
+                        evidence_ref=excluded.evidence_ref,
+                        manual_review_id=excluded.manual_review_id,
+                        reason=excluded.reason,
+                        active=excluded.active,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.override_id,
+                        item.instrument_id,
+                        item.exchange.upper(),
+                        _date_key(item.start_date),
+                        _date_key(item.end_date),
+                        None if item.is_trading_day is None else (1 if item.is_trading_day else 0),
+                        item.session_type,
+                        item.source_profile,
+                        item.quality_flag,
+                        item.evidence_ref,
+                        item.manual_review_id,
+                        item.reason,
+                        1 if item.active else 0,
+                        _json_dumps(item.metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return len(overrides)
+
+    def list_instrument_calendar_overrides(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        exchange: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if instrument_id:
+            clauses.append("instrument_id = ?")
+            params.append(instrument_id)
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if start_date:
+            clauses.append("end_date >= ?")
+            params.append(_date_key(start_date))
+        if end_date:
+            clauses.append("start_date <= ?")
+            params.append(_date_key(end_date))
+        if active_only:
+            clauses.append("active = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_instrument_calendar_overrides
+                {where}
+                ORDER BY instrument_id, start_date, end_date, override_id
+                """,
+                params,
+            ).fetchall()
+        return [self._calendar_override_payload(row) for row in rows]
+
+    def save_target_date_expansion(self, expansion: FuturesTargetDateExpansion) -> str:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO futures_target_date_expansions (
+                    expansion_id, purpose, exchange, start_date, end_date,
+                    target_dates_json, skipped_dates_json, quality_summary_json,
+                    blockers_json, warnings_json, manual_override_refs_json,
+                    metadata_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(expansion_id) DO UPDATE SET
+                    purpose=excluded.purpose,
+                    exchange=excluded.exchange,
+                    start_date=excluded.start_date,
+                    end_date=excluded.end_date,
+                    target_dates_json=excluded.target_dates_json,
+                    skipped_dates_json=excluded.skipped_dates_json,
+                    quality_summary_json=excluded.quality_summary_json,
+                    blockers_json=excluded.blockers_json,
+                    warnings_json=excluded.warnings_json,
+                    manual_override_refs_json=excluded.manual_override_refs_json,
+                    metadata_json=excluded.metadata_json
+                """,
+                (
+                    expansion.expansion_id,
+                    expansion.purpose,
+                    expansion.exchange.upper(),
+                    _date_key(expansion.start_date),
+                    _date_key(expansion.end_date),
+                    _json_dumps(expansion.target_dates),
+                    _json_dumps(expansion.skipped_dates),
+                    _json_dumps(expansion.quality_summary),
+                    _json_dumps(expansion.blockers),
+                    _json_dumps(expansion.warnings),
+                    _json_dumps(expansion.manual_override_refs),
+                    _json_dumps(expansion.metadata),
+                    now,
+                ),
+            )
+        return expansion.expansion_id
+
+    def list_target_date_expansions(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        purpose: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if purpose:
+            clauses.append("purpose = ?")
+            params.append(purpose)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        sql = f"""
+            SELECT * FROM futures_target_date_expansions
+            {where}
+            ORDER BY created_at DESC, expansion_id
+        """
+        if limit:
+            sql += " LIMIT ?"
+            params.append(int(limit))
+        with self.get_connection() as conn:
+            rows = conn.execute(sql, params).fetchall()
+        return [self._target_expansion_payload(row) for row in rows]
 
     def upsert_continuous_mappings(self, mappings: Sequence[FuturesContinuousMapping]) -> int:
         now = get_shanghai_time().isoformat()
@@ -1272,6 +1805,39 @@ class FuturesStorageManager:
                 (instrument_id,),
             ).fetchone()
         return self._instrument_payload(row) if row else None
+
+    def get_instrument_session(self, instrument_id: str) -> Optional[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM futures_instrument_sessions WHERE instrument_id = ?",
+                (instrument_id,),
+            ).fetchone()
+        return self._session_payload(row) if row else None
+
+    def list_instrument_sessions(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if active_only:
+            clauses.append("active = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_instrument_sessions
+                {where}
+                ORDER BY exchange, instrument_id
+                """,
+                params,
+            ).fetchall()
+        return [self._session_payload(row) for row in rows]
 
     def list_contracts(
         self,
@@ -1990,6 +2556,42 @@ class FuturesStorageManager:
         return payload
 
     @staticmethod
+    def _calendar_notice_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["raw_payload"] = _json_loads(payload.pop("raw_payload_json", None), {})
+        payload["derived_changes"] = _json_loads(payload.pop("derived_changes_json", None), [])
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _manual_review_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["trade_dates"] = _json_loads(payload.pop("trade_dates_json", None), [])
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _calendar_override_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        raw_flag = payload.get("is_trading_day")
+        payload["is_trading_day"] = None if raw_flag is None else bool(raw_flag)
+        payload["active"] = bool(payload.get("active"))
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
+    def _target_expansion_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["target_dates"] = _json_loads(payload.pop("target_dates_json", None), [])
+        payload["skipped_dates"] = _json_loads(payload.pop("skipped_dates_json", None), [])
+        payload["quality_summary"] = _json_loads(payload.pop("quality_summary_json", None), {})
+        payload["blockers"] = _json_loads(payload.pop("blockers_json", None), [])
+        payload["warnings"] = _json_loads(payload.pop("warnings_json", None), [])
+        payload["manual_override_refs"] = _json_loads(payload.pop("manual_override_refs_json", None), [])
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        return payload
+
+    @staticmethod
     def _diagnostic_payload(row: sqlite3.Row) -> Dict[str, Any]:
         payload = _row_to_dict(row)
         payload["warnings"] = _json_loads(payload.pop("warnings_json", None), [])
@@ -2189,6 +2791,77 @@ def _default_source_manifests(module_cfg: Dict[str, Any]) -> List[FuturesSourceM
     return manifests
 
 
+def default_futures_calendar_source_profiles(module_cfg: Optional[Dict[str, Any]] = None) -> List[FuturesCalendarSourceProfile]:
+    module_cfg = module_cfg or {}
+    governance_cfg = module_cfg.get("trading_day_governance") or {}
+    source_cfg = governance_cfg.get("calendar_sources") or {}
+    default_exchanges = _configured_futures_exchanges(module_cfg)
+    profiles: List[FuturesCalendarSourceProfile] = []
+    official_templates = {
+        "SHFE": "https://www.shfe.com.cn/",
+        "INE": "https://www.ine.cn/",
+        "DCE": "http://www.dce.com.cn/",
+        "CZCE": "http://www.czce.com.cn/",
+        "GFEX": "http://www.gfex.com.cn/",
+    }
+    official_cfg = source_cfg.get("exchange_official_calendar") or {}
+    profiles.append(
+        FuturesCalendarSourceProfile(
+            source_profile="exchange_official_calendar",
+            source=str(official_cfg.get("source") or "exchange_official"),
+            exchanges=list(official_cfg.get("enabled_exchanges") or default_exchanges),
+            role="first_hand_calendar_notice_source",
+            priority=int(official_cfg.get("priority") or 1),
+            enabled=bool(official_cfg.get("enabled", True)),
+            parser_version=str(
+                official_cfg.get("parser_version") or FUTURES_TRADING_DAY_GOVERNANCE_VERSION
+            ),
+            endpoint_templates=dict(official_cfg.get("endpoint_templates") or official_templates),
+            metadata={"source_policy": "official_notice_or_calendar_first"},
+        )
+    )
+    manual_cfg = source_cfg.get("manual_calendar_review") or {}
+    profiles.append(
+        FuturesCalendarSourceProfile(
+            source_profile="manual_calendar_review",
+            source="manual",
+            exchanges=list(manual_cfg.get("enabled_exchanges") or default_exchanges),
+            role="operator_verified_calendar_decision",
+            priority=int(manual_cfg.get("priority") or 50),
+            enabled=bool(manual_cfg.get("enabled", True)),
+            metadata={"requires_evidence": True},
+        )
+    )
+    estimated_cfg = source_cfg.get("estimated_weekday_calendar") or {}
+    profiles.append(
+        FuturesCalendarSourceProfile(
+            source_profile="estimated_weekday_calendar",
+            source="local_seed",
+            exchanges=list(estimated_cfg.get("enabled_exchanges") or default_exchanges),
+            role="development_and_dry_run_fallback",
+            priority=int(estimated_cfg.get("priority") or 100),
+            enabled=bool(estimated_cfg.get("enabled", True)),
+            metadata={"production_quality": False, "calendar_rule": "weekday_seed"},
+        )
+    )
+    return sorted(profiles, key=lambda item: item.priority)
+
+
+def _configured_futures_exchanges(module_cfg: Optional[Dict[str, Any]] = None) -> List[str]:
+    module_cfg = module_cfg or {}
+    governance_cfg = module_cfg.get("trading_day_governance") or {}
+    configured = governance_cfg.get("enabled_exchanges") or []
+    if configured:
+        return sorted({str(item).upper() for item in configured if item})
+    sources_cfg = module_cfg.get("sources") or {}
+    official_cfg = sources_cfg.get("exchange_official") or {}
+    configured = official_cfg.get("enabled_exchanges") or []
+    if configured:
+        return sorted({str(item).upper() for item in configured if item})
+    registry = default_futures_registry(module_cfg)
+    return sorted({item.exchange for item in registry["instruments"] if item.exchange})
+
+
 class FuturesDiagnosticsService:
     """Compute persisted diagnostics from local futures bars."""
 
@@ -2337,6 +3010,13 @@ def _stddev(values: Sequence[float]) -> float:
     return math.sqrt(max(variance, 0.0))
 
 
+def _quality_at_least(actual: str, required: str) -> bool:
+    return FUTURES_CALENDAR_QUALITY_RANK.get(str(actual or "missing"), 0) >= FUTURES_CALENDAR_QUALITY_RANK.get(
+        str(required or "estimated"),
+        1,
+    )
+
+
 class FuturesSpreadService:
     def __init__(self, storage: FuturesStorageManager):
         self.storage = storage
@@ -2445,13 +3125,660 @@ class FuturesCalendarService:
         return {"status": "success", "calendar_rows": written, "exchanges": sorted(set(exchange_list))}
 
     def _configured_exchanges(self) -> List[str]:
-        sources_cfg = self.module_cfg.get("sources") or {}
-        official_cfg = sources_cfg.get("exchange_official") or {}
-        configured = official_cfg.get("enabled_exchanges") or []
-        if configured:
-            return [str(item).upper() for item in configured]
-        registry = default_futures_registry(self.module_cfg)
-        return sorted({item.exchange for item in registry["instruments"] if item.exchange})
+        return _configured_futures_exchanges(self.module_cfg)
+
+
+class FuturesTradingDayGovernanceService:
+    """Govern futures exchange calendars before futures provider requests."""
+
+    def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
+        self.storage = storage
+        self.module_cfg = module_cfg or {}
+        self.governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        master_cfg = self.module_cfg.get("master_data", {})
+        calendar_cfg = master_cfg.get("calendar", {}) if isinstance(master_cfg, dict) else {}
+        self.default_timezone = str(
+            self.governance_cfg.get("default_timezone")
+            or calendar_cfg.get("default_timezone")
+            or master_cfg.get("default_timezone")
+            or "Asia/Shanghai"
+        )
+        self.enabled_exchanges = _configured_futures_exchanges(self.module_cfg)
+        gates = self.governance_cfg.get("quality_gates") or {}
+        self.min_quality_by_mode = {
+            "dry_run": str(gates.get("dry_run_min_quality") or "estimated"),
+            "production": str(gates.get("production_min_quality") or "estimated"),
+            "backfill": str(gates.get("backfill_min_quality") or gates.get("production_min_quality") or "estimated"),
+        }
+        self.allow_manual_override = bool(gates.get("allow_manual_override", True))
+
+    def bootstrap_estimated_calendar(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        return FuturesCalendarService(self.storage, self.module_cfg).seed_default_calendar(
+            exchanges=exchanges,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+    def upsert_official_notice(
+        self,
+        notice: FuturesCalendarNotice,
+        *,
+        derived_days: Optional[Sequence[FuturesTradingCalendarDay]] = None,
+    ) -> Dict[str, Any]:
+        notice_written = self.storage.upsert_calendar_notices([notice])
+        days_written = self.storage.upsert_trading_calendar(list(derived_days or []))
+        review_written = 0
+        if notice.parse_status in {"review_required", "conflict"}:
+            review = self.create_review_required(
+                exchange=notice.exchange,
+                evidence_ref=notice.notice_id,
+                reason=f"calendar notice parse_status={notice.parse_status}",
+                scope_type="exchange",
+                metadata={"notice_title": notice.title, "notice_url": notice.url},
+            )
+            review_written = 1 if review else 0
+        return {
+            "status": "success",
+            "notice_written": notice_written,
+            "calendar_rows_written": days_written,
+            "review_required_written": review_written,
+        }
+
+    def create_review_required(
+        self,
+        *,
+        exchange: str,
+        evidence_ref: str,
+        reason: str,
+        scope_type: str = "exchange",
+        scope_id: str = "",
+        instrument_id: str = "",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        trade_dates: Optional[Sequence[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> FuturesManualCalendarReview:
+        review_payload = {
+            "exchange": str(exchange).upper(),
+            "evidence_ref": evidence_ref,
+            "reason": reason,
+            "scope_type": scope_type,
+            "scope_id": scope_id,
+            "instrument_id": instrument_id,
+            "start_date": start_date,
+            "end_date": end_date,
+            "trade_dates": list(trade_dates or []),
+        }
+        review_id = f"calendar_review:{_hash_payload(review_payload)[:20]}"
+        review = FuturesManualCalendarReview(
+            review_id=review_id,
+            status="review_required",
+            decision="pending",
+            reviewer="",
+            reason=reason,
+            evidence_ref=evidence_ref,
+            scope_type=scope_type,
+            scope_id=scope_id,
+            exchange=str(exchange).upper(),
+            instrument_id=instrument_id,
+            start_date=start_date,
+            end_date=end_date,
+            trade_dates=list(trade_dates or []),
+            metadata=metadata or {},
+        )
+        self.storage.upsert_manual_calendar_reviews([review])
+        return review
+
+    def apply_manual_review_decision(
+        self,
+        review: FuturesManualCalendarReview,
+        *,
+        calendar_days: Optional[Sequence[FuturesTradingCalendarDay]] = None,
+        overrides: Optional[Sequence[FuturesInstrumentCalendarOverride]] = None,
+    ) -> Dict[str, Any]:
+        self.storage.upsert_manual_calendar_reviews([review])
+        days_written = self.storage.upsert_trading_calendar(list(calendar_days or []))
+        overrides_written = self.storage.upsert_instrument_calendar_overrides(list(overrides or []))
+        return {
+            "status": "success",
+            "review_id": review.review_id,
+            "calendar_rows_written": days_written,
+            "overrides_written": overrides_written,
+        }
+
+    def resolve_instrument_session(self, instrument_id: str) -> Dict[str, Any]:
+        instrument = self.storage.get_instrument(instrument_id)
+        if not instrument:
+            return {"status": "not_found", "instrument_id": instrument_id}
+        session = self.storage.get_instrument_session(instrument_id)
+        overrides = self.storage.list_instrument_calendar_overrides(instrument_id=instrument_id)
+        return {
+            "status": "success",
+            "instrument": instrument,
+            "session": session or self._default_session_for_instrument(instrument),
+            "overrides": overrides,
+        }
+
+    def expand_target_dates(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        purpose: str = "sync",
+        dry_run: bool = False,
+        persist: bool = True,
+    ) -> Dict[str, Any]:
+        exchange_list = self._resolve_exchanges(exchanges=exchanges, instrument_ids=instrument_ids)
+        if not exchange_list:
+            return {
+                "status": "empty",
+                "target_dates_by_exchange": {},
+                "expansions": [],
+                "blockers": ["no_target_exchanges"],
+                "warnings": [],
+            }
+        today = get_shanghai_time().date().isoformat()
+        requested_start = _date_key(start_date) if start_date else None
+        requested_end = _date_key(end_date) if end_date else None
+        range_start = requested_start or requested_end or today
+        range_end = requested_end or requested_start or range_start
+        if range_start > range_end:
+            raise ValueError("start_date must be earlier than or equal to end_date")
+        all_blockers: List[str] = []
+        all_warnings: List[str] = []
+        expansions: List[Dict[str, Any]] = []
+        target_dates_by_exchange: Dict[str, List[str]] = {}
+        skipped_dates_by_exchange: Dict[str, List[str]] = {}
+        for exchange in exchange_list:
+            exchange_start = range_start
+            exchange_end = range_end
+            if not requested_start and not requested_end:
+                latest = self.storage.get_latest_expected_trade_date(exchange, as_of_date=today)
+                if latest and latest.get("trade_date"):
+                    exchange_start = exchange_end = latest["trade_date"]
+            expansion = self._expand_exchange_dates(
+                exchange,
+                start_date=exchange_start,
+                end_date=exchange_end,
+                purpose=purpose,
+                dry_run=dry_run,
+            )
+            if persist:
+                self.storage.save_target_date_expansion(expansion)
+            target_dates_by_exchange[exchange] = list(expansion.target_dates)
+            skipped_dates_by_exchange[exchange] = list(expansion.skipped_dates)
+            all_blockers.extend(expansion.blockers)
+            all_warnings.extend(expansion.warnings)
+            expansions.append(asdict(expansion))
+        status = "blocked" if all_blockers else ("warning" if all_warnings else "success")
+        return {
+            "status": status,
+            "purpose": purpose,
+            "start_date": range_start,
+            "end_date": range_end,
+            "exchanges": exchange_list,
+            "target_dates_by_exchange": target_dates_by_exchange,
+            "skipped_dates_by_exchange": skipped_dates_by_exchange,
+            "target_date_count": sum(len(items) for items in target_dates_by_exchange.values()),
+            "skipped_date_count": sum(len(items) for items in skipped_dates_by_exchange.values()),
+            "blockers": sorted(set(all_blockers)),
+            "warnings": sorted(set(all_warnings)),
+            "expansions": expansions,
+        }
+
+    def validate_quality_gate(
+        self,
+        expansion_result: Dict[str, Any],
+        *,
+        dry_run: bool = False,
+        purpose: str = "sync",
+    ) -> Dict[str, Any]:
+        threshold = self._min_quality_for(purpose=purpose, dry_run=dry_run)
+        blockers = list(expansion_result.get("blockers") or [])
+        warnings = list(expansion_result.get("warnings") or [])
+        for expansion in expansion_result.get("expansions") or []:
+            summary = expansion.get("quality_summary") or {}
+            lowest = str(summary.get("lowest_quality") or "missing")
+            if not _quality_at_least(lowest, threshold):
+                issue = (
+                    f"calendar_quality_below_threshold:"
+                    f"{expansion.get('exchange')}:{lowest}<required:{threshold}"
+                )
+                if dry_run:
+                    warnings.append(issue)
+                else:
+                    blockers.append(issue)
+        return {
+            **expansion_result,
+            "status": "blocked" if blockers else ("warning" if warnings else "success"),
+            "minimum_quality": threshold,
+            "production_write_eligible": not blockers,
+            "blockers": sorted(set(blockers)),
+            "warnings": sorted(set(warnings)),
+        }
+
+    def readiness(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        exchange_list = self._resolve_exchanges(exchanges=exchanges, instrument_ids=None)
+        rows = self.storage.list_calendar_days(
+            start_date=start_date,
+            end_date=end_date,
+        )
+        by_exchange: Dict[str, Dict[str, Any]] = {
+            exchange: {
+                "exchange": exchange,
+                "calendar_rows": 0,
+                "trading_days": 0,
+                "latest_governed_date": None,
+                "latest_official_date": None,
+                "quality_distribution": {},
+                "unresolved_conflicts": 0,
+                "review_required_count": 0,
+                "production_write_eligible": True,
+                "blockers": [],
+                "warnings": [],
+            }
+            for exchange in exchange_list
+        }
+        for row in rows:
+            exchange = str(row.get("exchange") or "").upper()
+            if exchange not in by_exchange:
+                continue
+            item = by_exchange[exchange]
+            item["calendar_rows"] += 1
+            if row.get("is_trading_day"):
+                item["trading_days"] += 1
+            trade_date = row.get("trade_date")
+            if trade_date and (not item["latest_governed_date"] or trade_date > item["latest_governed_date"]):
+                item["latest_governed_date"] = trade_date
+            quality = str(row.get("quality_flag") or "missing")
+            item["quality_distribution"][quality] = item["quality_distribution"].get(quality, 0) + 1
+            if quality in {"official", "official_parsed"} and trade_date:
+                if not item["latest_official_date"] or trade_date > item["latest_official_date"]:
+                    item["latest_official_date"] = trade_date
+            if quality == "conflict":
+                item["unresolved_conflicts"] += 1
+        reviews = self.storage.list_manual_calendar_reviews(status="review_required")
+        for review in reviews:
+            exchange = str(review.get("exchange") or "").upper()
+            if exchange in by_exchange:
+                by_exchange[exchange]["review_required_count"] += 1
+        threshold = self._min_quality_for(purpose="sync", dry_run=False)
+        for exchange, item in by_exchange.items():
+            if item["calendar_rows"] == 0:
+                item["blockers"].append(f"missing_calendar:{exchange}")
+            if item["unresolved_conflicts"]:
+                item["blockers"].append(f"calendar_conflict:{exchange}")
+            if item["review_required_count"]:
+                item["warnings"].append(f"calendar_review_required:{exchange}")
+            qualities = item["quality_distribution"]
+            if qualities:
+                lowest = min(qualities, key=lambda quality: FUTURES_CALENDAR_QUALITY_RANK.get(quality, 0))
+                item["lowest_quality"] = lowest
+                if not _quality_at_least(lowest, threshold):
+                    item["production_write_eligible"] = False
+                    item["warnings"].append(f"calendar_quality_below_production_threshold:{lowest}<required:{threshold}")
+            else:
+                item["lowest_quality"] = "missing"
+                item["production_write_eligible"] = False
+            if item["blockers"]:
+                item["production_write_eligible"] = False
+        blockers = [
+            blocker
+            for item in by_exchange.values()
+            for blocker in item["blockers"]
+        ]
+        warnings = [
+            warning
+            for item in by_exchange.values()
+            for warning in item["warnings"]
+        ]
+        return {
+            "domain": "futures_trading_day_governance",
+            "status": "blocked" if blockers else ("warning" if warnings else "success"),
+            "exchanges": list(by_exchange.values()),
+            "blockers": sorted(set(blockers)),
+            "warnings": sorted(set(warnings)),
+            "minimum_production_quality": threshold,
+        }
+
+    def _expand_exchange_dates(
+        self,
+        exchange: str,
+        *,
+        start_date: str,
+        end_date: str,
+        purpose: str,
+        dry_run: bool,
+    ) -> FuturesTargetDateExpansion:
+        exchange = exchange.upper()
+        rows = self.storage.list_calendar_days(exchange=exchange, start_date=start_date, end_date=end_date)
+        row_map = {row["trade_date"]: row for row in rows}
+        target_dates: List[str] = []
+        skipped_dates: List[str] = []
+        warnings: List[str] = []
+        blockers: List[str] = []
+        qualities: Dict[str, int] = {}
+        current = date.fromisoformat(start_date)
+        end = date.fromisoformat(end_date)
+        while current <= end:
+            key = current.isoformat()
+            row = row_map.get(key)
+            if not row:
+                blockers.append(f"missing_calendar:{exchange}:{key}")
+                current += timedelta(days=1)
+                continue
+            quality = str(row.get("quality_flag") or "missing")
+            qualities[quality] = qualities.get(quality, 0) + 1
+            if quality == "conflict":
+                blockers.append(f"calendar_conflict:{exchange}:{key}")
+            if quality == "estimated":
+                warnings.append(f"estimated_calendar:{exchange}:{key}")
+            if row.get("is_trading_day"):
+                target_dates.append(key)
+            else:
+                skipped_dates.append(key)
+            current += timedelta(days=1)
+        lowest_quality = (
+            min(qualities, key=lambda item: FUTURES_CALENDAR_QUALITY_RANK.get(item, 0))
+            if qualities
+            else "missing"
+        )
+        quality_summary = {
+            "quality_distribution": qualities,
+            "lowest_quality": lowest_quality,
+            "estimated_calendar_used": bool(qualities.get("estimated") or qualities.get("estimated_unverified")),
+        }
+        expansion_id = _hash_payload(
+            {
+                "purpose": purpose,
+                "exchange": exchange,
+                "start_date": start_date,
+                "end_date": end_date,
+                "targets": target_dates,
+                "skips": skipped_dates,
+                "dry_run": dry_run,
+            }
+        )[:24]
+        return FuturesTargetDateExpansion(
+            expansion_id=expansion_id,
+            purpose=purpose,
+            exchange=exchange,
+            start_date=start_date,
+            end_date=end_date,
+            target_dates=target_dates,
+            skipped_dates=skipped_dates,
+            quality_summary=quality_summary,
+            blockers=blockers,
+            warnings=warnings,
+            metadata={"dry_run": dry_run, "parser_version": FUTURES_TRADING_DAY_GOVERNANCE_VERSION},
+        )
+
+    def _resolve_exchanges(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]],
+        instrument_ids: Optional[Sequence[str]],
+    ) -> List[str]:
+        result = {str(item).upper() for item in (exchanges or []) if item}
+        for instrument_id in instrument_ids or []:
+            instrument = self.storage.get_instrument(instrument_id)
+            if instrument and instrument.get("exchange"):
+                result.add(str(instrument["exchange"]).upper())
+        if not result:
+            result = set(self.enabled_exchanges)
+        return sorted(result)
+
+    def _default_session_for_instrument(self, instrument: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "instrument_id": instrument["instrument_id"],
+            "exchange": instrument.get("exchange"),
+            "timezone": self.default_timezone,
+            "has_night_session": True,
+            "session_rules": {
+                "day_session": ["09:00-10:15", "10:30-11:30", "13:30-15:00"],
+                "night_session": "exchange_or_product_specific",
+                "trade_date_attribution": "night_session_belongs_to_next_trade_date",
+            },
+            "source_profile": "configured_default",
+            "quality_flag": "estimated",
+            "active": True,
+            "metadata": {"fallback": True},
+        }
+
+    def _min_quality_for(self, *, purpose: str, dry_run: bool) -> str:
+        if dry_run:
+            return self.min_quality_by_mode["dry_run"]
+        purpose_key = "backfill" if "backfill" in str(purpose or "") else "production"
+        return self.min_quality_by_mode.get(purpose_key) or self.min_quality_by_mode["production"]
+
+
+class FuturesOfficialCalendarBackfillService:
+    """Backfill exchange calendars from official daily market-data evidence."""
+
+    default_start_date = "2010-01-01"
+    source_profile = "exchange_official_daily_probe"
+
+    def __init__(
+        self,
+        storage: FuturesStorageManager,
+        research_config: ResearchConfig,
+        module_cfg: Optional[Dict[str, Any]] = None,
+    ):
+        self.storage = storage
+        self.research_config = research_config
+        self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+        governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
+        master_cfg = self.module_cfg.get("master_data", {}) if isinstance(self.module_cfg.get("master_data", {}), dict) else {}
+        self.start_date = str(backfill_cfg.get("start_date") or self.default_start_date)
+        self.default_timezone = str(
+            backfill_cfg.get("timezone")
+            or governance_cfg.get("default_timezone")
+            or master_cfg.get("default_timezone")
+            or "Asia/Shanghai"
+        )
+        self.enabled_exchanges = [
+            exchange
+            for exchange in _configured_futures_exchanges(self.module_cfg)
+            if exchange in {"SHFE", "INE", "DCE", "CZCE", "GFEX"}
+        ]
+
+    def run(
+        self,
+        *,
+        exchanges: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        max_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        from research.providers.official_futures import OfficialFuturesMarketDataProvider
+
+        exchange_list = self._resolve_exchanges(exchanges)
+        start = _date_key(start_date or self.start_date)
+        requested_end = _date_key(end_date or get_shanghai_time().date())
+        if start > requested_end:
+            raise ValueError("start_date must be earlier than or equal to end_date")
+
+        today = get_shanghai_time().date().isoformat()
+        probe_end = min(requested_end, today)
+        future_unresolved_per_exchange = (
+            _date_range_count(max(start, _next_date(today)), requested_end)
+            if requested_end > today
+            else 0
+        )
+        provider = OfficialFuturesMarketDataProvider(self.research_config)
+        governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
+
+        exchange_results: List[Dict[str, Any]] = []
+        total_written = 0
+        total_trading = 0
+        total_closed = 0
+        total_unresolved = 0
+        total_requests = 0
+        max_total_days = int(max_days) if max_days else None
+
+        for exchange in exchange_list:
+            result: Dict[str, Any] = {
+                "exchange": exchange,
+                "start_date": start,
+                "end_date": requested_end,
+                "probe_end_date": probe_end if start <= probe_end else None,
+                "rows_written": 0,
+                "trading_days": 0,
+                "closed_days": 0,
+                "unresolved_dates": 0,
+                "future_dates_unresolved": future_unresolved_per_exchange,
+                "request_count": 0,
+                "latest_verified_date": None,
+                "failure_samples": [],
+            }
+            calendar_days: List[FuturesTradingCalendarDay] = []
+            unresolved_dates: List[str] = []
+            if start <= probe_end:
+                current = date.fromisoformat(start)
+                end_obj = date.fromisoformat(probe_end)
+                while current <= end_obj:
+                    key = current.isoformat()
+                    if max_total_days is not None and total_requests >= max_total_days:
+                        remaining = _date_range_count(key, probe_end)
+                        result["unresolved_dates"] += remaining
+                        unresolved_dates.append(key)
+                        result["truncated"] = True
+                        result["failure_samples"].append(
+                            {
+                                "trade_date": key,
+                                "remaining_dates": remaining,
+                                "reason": "max_days_limit_reached",
+                            }
+                        )
+                        break
+                    probe = provider.probe_exchange_trading_day(exchange, key)
+                    result["request_count"] += 1
+                    total_requests += 1
+                    if probe.status in {"trading", "closed"} and probe.is_trading_day is not None:
+                        if probe.is_trading_day:
+                            result["trading_days"] += 1
+                            total_trading += 1
+                        else:
+                            result["closed_days"] += 1
+                            total_closed += 1
+                        result["latest_verified_date"] = key
+                        calendar_days.append(
+                            FuturesTradingCalendarDay(
+                                exchange=exchange,
+                                trade_date=key,
+                                is_trading_day=bool(probe.is_trading_day),
+                                timezone=self.default_timezone,
+                                session_type="day_and_night" if probe.is_trading_day else "closed",
+                                source_profile=self.source_profile,
+                                quality_flag="backfilled_verified",
+                                parser_version=probe.parser_version,
+                                evidence_url=probe.evidence_url,
+                                metadata={
+                                    "classification_status": probe.status,
+                                    "classification_rule": probe.metadata.get("classification_rule"),
+                                    "source_interface": probe.source_interface,
+                                    "row_count": probe.row_count,
+                                    "payload_hash": probe.payload_hash,
+                                    "failure_reason": probe.failure_reason,
+                                    "verified_by": "official_exchange_daily_market_data",
+                                },
+                            )
+                        )
+                    else:
+                        unresolved_dates.append(key)
+                        result["unresolved_dates"] += 1
+                        if len(result["failure_samples"]) < 20:
+                            result["failure_samples"].append(
+                                {"trade_date": key, "reason": probe.failure_reason or probe.status}
+                            )
+                    current += timedelta(days=1)
+            if requested_end > today:
+                result["future_note"] = "future dates require official notice evidence and were not weekday-filled"
+            if calendar_days and not dry_run:
+                result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
+                total_written += int(result["rows_written"])
+            if unresolved_dates and not dry_run:
+                governance.create_review_required(
+                    exchange=exchange,
+                    evidence_ref=f"{self.source_profile}:{exchange}:{start}:{probe_end}",
+                    reason="official calendar backfill unresolved dates",
+                    scope_type="exchange",
+                    scope_id=exchange,
+                    start_date=start,
+                    end_date=probe_end,
+                    trade_dates=unresolved_dates[:200],
+                    metadata={
+                        "unresolved_count": len(unresolved_dates),
+                        "failure_samples": result["failure_samples"],
+                        "source_profile": self.source_profile,
+                    },
+                )
+            total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
+            exchange_results.append(result)
+
+        return {
+            "status": "success" if total_unresolved == 0 else "blocked",
+            "domain": "futures_official_trading_calendar_backfill",
+            "source_profile": self.source_profile,
+            "quality_flag": "backfilled_verified",
+            "start_date": start,
+            "end_date": requested_end,
+            "probe_end_date": probe_end if start <= probe_end else None,
+            "dry_run": dry_run,
+            "exchanges": exchange_results,
+            "totals": {
+                "rows_written": total_written,
+                "trading_days": total_trading,
+                "closed_days": total_closed,
+                "unresolved_dates": total_unresolved,
+                "request_count": total_requests,
+                "future_dates_unresolved": future_unresolved_per_exchange * len(exchange_list),
+            },
+            "warnings": (
+                ["future_dates_require_official_notice_evidence"]
+                if requested_end > today
+                else []
+            ),
+            "blockers": ["unresolved_official_calendar_dates"] if total_unresolved else [],
+        }
+
+    def _resolve_exchanges(self, exchanges: Optional[Sequence[str]]) -> List[str]:
+        if exchanges:
+            requested = [str(exchange).upper() for exchange in exchanges if str(exchange).strip()]
+        else:
+            requested = list(self.enabled_exchanges)
+        unsupported = [exchange for exchange in requested if exchange not in self.enabled_exchanges]
+        if unsupported:
+            raise ValueError(f"unsupported futures official calendar exchanges: {', '.join(unsupported)}")
+        return requested
+
+
+def _next_date(value: str) -> str:
+    return (date.fromisoformat(_date_key(value)) + timedelta(days=1)).isoformat()
+
+
+def _date_range_count(start_date: str, end_date: str) -> int:
+    start = date.fromisoformat(_date_key(start_date))
+    end = date.fromisoformat(_date_key(end_date))
+    if start > end:
+        return 0
+    return (end - start).days + 1
 
 
 class FuturesReadinessService:
@@ -2564,11 +3891,36 @@ class FuturesMarketDataSyncService:
             registry["series"],
         )
         self.storage.upsert_source_manifests(registry.get("source_manifests", []))
-        FuturesCalendarService(self.storage, self.module_cfg).seed_default_calendar()
+        governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
         target_series = [
             item for item in registry["series"]
             if item.active and (not series_ids or item.series_id in set(series_ids))
         ]
+        target_exchanges = sorted(
+            {
+                str(item.instrument_id).split(".")[-1].upper()
+                for item in target_series
+                if item.instrument_id
+            }
+        )
+        governance.bootstrap_estimated_calendar(
+            exchanges=target_exchanges,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        purpose = "backfill" if start_date and end_date else "sync"
+        calendar_expansion = governance.expand_target_dates(
+            exchanges=target_exchanges,
+            start_date=start_date,
+            end_date=end_date,
+            purpose=purpose,
+            dry_run=dry_run,
+        )
+        calendar_gate = governance.validate_quality_gate(
+            calendar_expansion,
+            dry_run=dry_run,
+            purpose=purpose,
+        )
         run_id = self.storage.start_ingestion_run(
             job_name="futures_market_data_sync",
             source="futures_source_router",
@@ -2579,9 +3931,43 @@ class FuturesMarketDataSyncService:
                 "end_date": end_date,
                 "preferred_order": self.module_cfg.get("sources", {}).get("preferred_order")
                 or ["exchange_official", "akshare_futures"],
+                "trading_day_governance": {
+                    "status": calendar_gate.get("status"),
+                    "minimum_quality": calendar_gate.get("minimum_quality"),
+                    "target_date_count": calendar_gate.get("target_date_count"),
+                    "skipped_date_count": calendar_gate.get("skipped_date_count"),
+                    "blockers": calendar_gate.get("blockers") or [],
+                    "warnings": calendar_gate.get("warnings") or [],
+                },
             },
         )
-        totals = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
+        if calendar_gate.get("status") == "blocked" and not dry_run:
+            result = {
+                "status": "blocked",
+                "run_id": run_id,
+                "totals": {
+                    "inserted": 0,
+                    "changed": 0,
+                    "unchanged": 0,
+                    "failed": 0,
+                    "calendar_skipped": calendar_gate.get("skipped_date_count", 0),
+                    "provider_empty_on_trading_day": 0,
+                },
+                "source_selection": {},
+                "trading_day_governance": calendar_gate,
+                "series": [],
+                "reason": "; ".join(calendar_gate.get("blockers") or ["trading_day_governance_blocked"]),
+            }
+            self.storage.finish_ingestion_run(run_id, status="blocked", metadata=result)
+            return result
+        totals = {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+            "calendar_skipped": calendar_gate.get("skipped_date_count", 0),
+            "provider_empty_on_trading_day": 0,
+        }
         source_selection = {
             "official_success": 0,
             "official_failed": 0,
@@ -2601,93 +3987,157 @@ class FuturesMarketDataSyncService:
             fallback_provider = AkshareFuturesMarketDataProvider(self.research_config)
             official_enabled = self._source_enabled("exchange_official", default=False)
             fallback_enabled = self._source_enabled("akshare_futures", default=True)
+            target_dates_by_exchange = calendar_gate.get("target_dates_by_exchange") or {}
             for item in target_series:
                 bars: List[FuturesBar] = []
+                contracts: List[FuturesContract] = []
+                contract_bars: List[FuturesContractBar] = []
+                mappings: List[FuturesContinuousMapping] = []
                 selected_profile: Optional[str] = None
                 official_status = "disabled"
                 official_reason = ""
                 fallback_status = "not_attempted"
                 fallback_reason = ""
+                exchange = str(item.instrument_id).split(".")[-1].upper()
+                target_dates = list(target_dates_by_exchange.get(exchange) or [])
+                date_results: List[Dict[str, Any]] = []
+                if not target_dates:
+                    series_results.append(
+                        {
+                            "series_id": item.series_id,
+                            "status": "calendar_skip",
+                            "source_profile": None,
+                            "fetched_rows": 0,
+                            "write_result": {"inserted": 0, "changed": 0, "unchanged": 0},
+                            "calendar": {
+                                "exchange": exchange,
+                                "target_dates": [],
+                                "reason": "no_governed_trading_dates",
+                            },
+                        }
+                    )
+                    continue
                 try:
-                    if official_enabled and official_provider.supports_series(item):
-                        try:
-                            official_artifacts = await asyncio.wait_for(
-                                official_provider.fetch_daily_artifacts(
-                                    item,
-                                    start_date=start_date,
-                                    end_date=end_date,
-                                    mode=mode,
-                                ),
-                                timeout=self._request_timeout_seconds("exchange_official"),
-                            )
-                            bars = list(official_artifacts.get("series_bars") or [])
-                            official_status = "success" if bars else "empty"
-                            if bars:
-                                source_selection["official_success"] += 1
-                                selected_profile = "exchange_official"
-                                if not dry_run:
-                                    self.storage.upsert_contracts(official_artifacts.get("contracts") or [])
-                                    self.storage.upsert_contract_price_bars(
-                                        official_artifacts.get("contract_bars") or [],
-                                        ingestion_run_id=run_id,
-                                    )
-                                    self.storage.upsert_continuous_mappings(
-                                        official_artifacts.get("mappings") or []
-                                    )
-                            else:
-                                source_selection["official_failed"] += 1
-                                official_reason = "official provider returned no rows"
-                        except OfficialFuturesSourceUnavailable as exc:
-                            official_status = "unavailable"
-                            official_reason = str(exc)
-                            source_selection["official_failed"] += 1
-                        except Exception as exc:
-                            official_status = "failed"
-                            official_reason = str(exc)
-                            source_selection["official_failed"] += 1
-                    elif official_enabled:
-                        official_status = "unsupported"
-                        official_reason = f"official source unsupported for {item.instrument_id}"
+                    for target_date in target_dates:
+                        day_bars: List[FuturesBar] = []
+                        day_official_status = "disabled"
+                        day_official_reason = ""
+                        day_fallback_status = "not_attempted"
+                        day_fallback_reason = ""
+                        if official_enabled and official_provider.supports_series(item):
+                            try:
+                                official_artifacts = await asyncio.wait_for(
+                                    official_provider.fetch_daily_artifacts(
+                                        item,
+                                        start_date=target_date,
+                                        end_date=target_date,
+                                        mode=mode,
+                                    ),
+                                    timeout=self._request_timeout_seconds("exchange_official"),
+                                )
+                                day_bars = list(official_artifacts.get("series_bars") or [])
+                                day_official_status = "success" if day_bars else "empty"
+                                if day_bars:
+                                    contracts.extend(official_artifacts.get("contracts") or [])
+                                    contract_bars.extend(official_artifacts.get("contract_bars") or [])
+                                    mappings.extend(official_artifacts.get("mappings") or [])
+                                    selected_profile = "exchange_official"
+                                else:
+                                    day_official_reason = "official provider returned no rows"
+                            except OfficialFuturesSourceUnavailable as exc:
+                                day_official_status = "unavailable"
+                                day_official_reason = str(exc)
+                            except Exception as exc:
+                                day_official_status = "failed"
+                                day_official_reason = str(exc)
+                        elif official_enabled:
+                            day_official_status = "unsupported"
+                            day_official_reason = f"official source unsupported for {item.instrument_id}"
+                        else:
+                            day_official_status = "disabled"
+
+                        if not day_bars and fallback_enabled:
+                            try:
+                                day_bars = await asyncio.wait_for(
+                                    fallback_provider.fetch_daily_bars(
+                                        item,
+                                        start_date=target_date,
+                                        end_date=target_date,
+                                        mode=mode,
+                                    ),
+                                    timeout=self._request_timeout_seconds("akshare_futures"),
+                                )
+                                day_fallback_status = "success" if day_bars else "empty"
+                                if day_bars:
+                                    selected_profile = selected_profile or "akshare_futures"
+                                else:
+                                    day_fallback_reason = "AkShare provider returned no rows"
+                            except Exception as exc:
+                                day_fallback_status = "failed"
+                                day_fallback_reason = str(exc)
+                        elif not day_bars:
+                            day_fallback_status = "disabled"
+                        if day_bars:
+                            bars.extend(day_bars)
+                        else:
+                            totals["provider_empty_on_trading_day"] += 1
+                        date_results.append(
+                            {
+                                "trade_date": target_date,
+                                "fetched_rows": len(day_bars),
+                                "official_status": day_official_status,
+                                "official_reason": day_official_reason,
+                                "fallback_status": day_fallback_status,
+                                "fallback_reason": day_fallback_reason,
+                            }
+                        )
+                    if any(item.get("official_status") == "success" for item in date_results):
+                        source_selection["official_success"] += 1
+                        official_status = "success"
+                    elif any(item.get("official_status") == "unsupported" for item in date_results):
                         source_selection["official_unsupported"] += 1
+                        official_status = "unsupported"
+                        official_reason = "official source unsupported for one or more target dates"
+                    elif any(item.get("official_status") in {"failed", "unavailable", "empty"} for item in date_results):
+                        source_selection["official_failed"] += 1
+                        official_statuses = {item.get("official_status") for item in date_results}
+                        official_status = "unavailable" if official_statuses == {"unavailable"} else "failed"
+                        official_reason = "; ".join(
+                            item.get("official_reason") or item.get("official_status") or ""
+                            for item in date_results
+                            if item.get("official_status") in {"failed", "unavailable", "empty"}
+                        )[:500]
+                    if any(item.get("fallback_status") == "success" for item in date_results):
+                        source_selection["fallback_success"] += 1
+                        fallback_status = "success"
+                    elif any(item.get("fallback_status") in {"failed", "empty"} for item in date_results):
+                        source_selection["fallback_failed"] += 1
+                        fallback_status = "failed"
+                        fallback_reason = "; ".join(
+                            item.get("fallback_reason") or item.get("fallback_status") or ""
+                            for item in date_results
+                            if item.get("fallback_status") in {"failed", "empty"}
+                        )[:500]
                     else:
-                        official_status = "disabled"
-
-                    if not bars and fallback_enabled:
-                        try:
-                            bars = await asyncio.wait_for(
-                                fallback_provider.fetch_daily_bars(
-                                    item,
-                                    start_date=start_date,
-                                    end_date=end_date,
-                                    mode=mode,
-                                ),
-                                timeout=self._request_timeout_seconds("akshare_futures"),
-                            )
-                            fallback_status = "success" if bars else "empty"
-                            if bars:
-                                source_selection["fallback_success"] += 1
-                                selected_profile = "akshare_futures"
-                            else:
-                                source_selection["fallback_failed"] += 1
-                                fallback_reason = "AkShare provider returned no rows"
-                        except Exception as exc:
-                            fallback_status = "failed"
-                            fallback_reason = str(exc)
-                            source_selection["fallback_failed"] += 1
-                    elif not bars:
-                        fallback_status = "disabled"
-
+                        fallback_status = date_results[-1].get("fallback_status") if date_results else "not_attempted"
                     if not bars:
                         raise RuntimeError(
                             "; ".join(
-                                item
-                                for item in [
+                                part
+                                for part in [
                                     f"official={official_status}:{official_reason}" if official_reason else f"official={official_status}",
                                     f"fallback={fallback_status}:{fallback_reason}" if fallback_reason else f"fallback={fallback_status}",
                                 ]
-                                if item
+                                if part
                             )
                         )
+                    if not dry_run and contracts:
+                        self.storage.upsert_contracts(contracts)
+                        self.storage.upsert_contract_price_bars(
+                            contract_bars,
+                            ingestion_run_id=run_id,
+                        )
+                        self.storage.upsert_continuous_mappings(mappings)
                     write_result = {"inserted": 0, "changed": 0, "unchanged": len(bars)}
                     if not dry_run:
                         write_result = self.storage.upsert_price_bars(bars, ingestion_run_id=run_id)
@@ -2696,13 +4146,15 @@ class FuturesMarketDataSyncService:
                     series_results.append(
                         {
                             "series_id": item.series_id,
-                            "status": "success",
+                            "status": "success" if len(bars) == len(target_dates) else "partial",
                             "source_profile": selected_profile,
                             "official_status": official_status,
                             "official_reason": official_reason,
                             "fallback_status": fallback_status,
                             "fallback_reason": fallback_reason,
                             "fetched_rows": len(bars),
+                            "target_trade_dates": target_dates,
+                            "date_results": date_results,
                             "write_result": write_result,
                         }
                     )
@@ -2717,6 +4169,8 @@ class FuturesMarketDataSyncService:
                             "official_reason": official_reason,
                             "fallback_status": fallback_status,
                             "fallback_reason": fallback_reason,
+                            "target_trade_dates": target_dates,
+                            "date_results": date_results,
                             "reason": str(exc),
                         }
                     )
@@ -2728,6 +4182,7 @@ class FuturesMarketDataSyncService:
                 "run_id": run_id,
                 "totals": totals,
                 "source_selection": source_selection,
+                "trading_day_governance": calendar_gate,
                 "series": series_results,
             }
             self.storage.finish_ingestion_run(run_id, status=status, metadata=result)

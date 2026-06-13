@@ -90,8 +90,62 @@
             ],
             "source_profile": "estimated_weekday_calendar",
             "quality_flag": "estimated",
+            "seed_on_initialize": false,
             "seed_lookback_days": 370,
             "seed_lookahead_days": 30
+          }
+        },
+        "trading_day_governance": {
+          "enabled": true,
+          "enabled_exchanges": [
+            "SHFE",
+            "INE",
+            "DCE",
+            "CZCE",
+            "GFEX"
+          ],
+          "default_timezone": "Asia/Shanghai",
+          "calendar_sources": {
+            "exchange_official_calendar": {
+              "enabled": true,
+              "source": "exchange_official",
+              "priority": 1,
+              "parser_version": "futures_trading_day_governance.v1",
+              "timeout_seconds": 20,
+              "endpoint_templates": {
+                "SHFE": "https://www.shfe.com.cn/",
+                "INE": "https://www.ine.cn/",
+                "DCE": "http://www.dce.com.cn/",
+                "CZCE": "http://www.czce.com.cn/",
+                "GFEX": "http://www.gfex.com.cn/"
+              }
+            },
+            "manual_calendar_review": {
+              "enabled": true,
+              "priority": 50
+            },
+            "estimated_weekday_calendar": {
+              "enabled": true,
+              "priority": 100
+            }
+          },
+          "quality_gates": {
+            "dry_run_min_quality": "estimated",
+            "production_min_quality": "backfilled_verified",
+            "backfill_min_quality": "backfilled_verified",
+            "allow_manual_override": true
+          },
+          "manual_review": {
+            "required_on_conflict": true,
+            "required_on_unparsed_notice": true
+          },
+          "official_calendar_backfill": {
+            "enabled": true,
+            "start_date": "2010-01-01",
+            "source_profile": "exchange_official_daily_probe",
+            "quality_flag": "backfilled_verified",
+            "future_policy": "official_notice_only",
+            "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
           }
         },
         "diagnostics": {

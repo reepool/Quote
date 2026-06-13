@@ -547,9 +547,52 @@
           "note": "Historical backfill can be large; keep disabled by default and run explicit date ranges via ops script or Telegram command."
         }
       },
+      "futures_trading_day_governance": {
+        "enabled": true,
+        "description": "商品期货交易日治理前置任务（维护交易所日历、公告证据、人工复核状态和目标交易日集合）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 21,
+          "minute": 20,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "dry_run": false,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "futures_official_calendar_backfill": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "商品期货官方交易日历历史回填（从官方日行情接口验证交易/休市；只写 data/futures.db 日历，不写行情）",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 20,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "2010-01-01",
+          "dry_run": false,
+          "max_runtime_seconds": 14400,
+          "note": "Run bounded exchange/date slices first. Future dates are not weekday-filled; they require official notice evidence."
+        }
+      },
       "futures_market_data_sync": {
         "enabled": true,
-        "description": "商品期货行情日线与连续序列同步（写入 data/futures.db）",
+        "description": "商品期货行情日线与连续序列同步（写入 data/futures.db；依赖 futures_trading_day_governance）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -565,6 +608,7 @@
         "parameters": {
           "mode": "direct",
           "dry_run": false,
+          "requires_trading_day_governance": true,
           "max_runtime_seconds": 7200
         }
       },
@@ -587,6 +631,7 @@
         "parameters": {
           "mode": "direct",
           "dry_run": false,
+          "requires_trading_day_governance": true,
           "max_runtime_seconds": 14400,
           "note": "Historical backfill must be run with explicit start_date/end_date and bounded series_ids."
         }

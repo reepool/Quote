@@ -62,6 +62,7 @@ from api.routes import (
     get_research_financial_statements_readiness,
     get_research_financial_summary,
     get_research_futures_calendar,
+    get_research_futures_calendar_evidence,
     get_research_futures_contract_prices,
     get_research_futures_contracts,
     get_research_futures_cycle_diagnostics,
@@ -76,7 +77,10 @@ from api.routes import (
     get_research_futures_source_manifests,
     get_research_futures_spread_values,
     get_research_futures_spreads,
+    get_research_futures_target_dates,
+    get_research_futures_trading_day_governance,
     get_research_company_futures_exposure,
+    run_research_futures_official_calendar_backfill,
     get_research_metadata_readiness,
     get_research_official_industry_mapping,
     get_research_official_mapping_override_review,
@@ -2865,6 +2869,7 @@ class TestResearchRoutes:
         response = _run(
             get_research_futures_calendar(
                 exchange="SHFE",
+                instrument_id="CNF.CU.SHFE",
                 start_date=date(2024, 6, 1),
                 end_date=date(2024, 6, 3),
                 trading_only=True,
@@ -2874,9 +2879,125 @@ class TestResearchRoutes:
         assert response["calendar"][0]["exchange"] == "SHFE"
         mock_dm.get_research_futures_calendar.assert_awaited_once_with(
             exchange="SHFE",
+            instrument_id="CNF.CU.SHFE",
             start_date="2024-06-01",
             end_date="2024-06-03",
             trading_only=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_calendar_instrument_not_found(self, mock_dm):
+        mock_dm.get_research_futures_calendar = AsyncMock(
+            return_value={"status": "not_found", "instrument_id": "missing", "calendar": []}
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            _run(get_research_futures_calendar(instrument_id="missing"))
+
+        assert exc_info.value.status_code == 404
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_trading_day_governance_success(self, mock_dm):
+        mock_dm.get_research_futures_trading_day_governance = AsyncMock(
+            return_value={
+                "domain": "futures_trading_day_governance",
+                "status": "warning",
+                "exchanges": [{"exchange": "SHFE"}],
+            }
+        )
+
+        response = _run(
+            get_research_futures_trading_day_governance(
+                exchange="SHFE",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 4),
+            )
+        )
+
+        assert response["domain"] == "futures_trading_day_governance"
+        mock_dm.get_research_futures_trading_day_governance.assert_awaited_once_with(
+            exchange="SHFE",
+            start_date="2024-06-01",
+            end_date="2024-06-04",
+        )
+
+    @patch("api.routes.data_manager")
+    def test_run_research_futures_official_calendar_backfill_success(self, mock_dm):
+        mock_dm.run_futures_official_calendar_backfill = AsyncMock(
+            return_value={
+                "domain": "futures_official_trading_calendar_backfill",
+                "status": "success",
+                "totals": {"rows_written": 2},
+            }
+        )
+
+        response = _run(
+            run_research_futures_official_calendar_backfill(
+                exchange="SHFE",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 4),
+                dry_run=True,
+                max_days=4,
+            )
+        )
+
+        assert response["domain"] == "futures_official_trading_calendar_backfill"
+        mock_dm.run_futures_official_calendar_backfill.assert_awaited_once_with(
+            exchanges=["SHFE"],
+            start_date="2024-06-01",
+            end_date="2024-06-04",
+            dry_run=True,
+            max_days=4,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_calendar_evidence_success(self, mock_dm):
+        mock_dm.get_research_futures_calendar_evidence = AsyncMock(
+            return_value={"status": "success", "notice_count": 1, "manual_review_count": 0}
+        )
+
+        response = _run(
+            get_research_futures_calendar_evidence(
+                exchange="SHFE",
+                parse_status="parsed",
+                review_status="review_required",
+                limit=10,
+            )
+        )
+
+        assert response["notice_count"] == 1
+        mock_dm.get_research_futures_calendar_evidence.assert_awaited_once_with(
+            exchange="SHFE",
+            parse_status="parsed",
+            review_status="review_required",
+            limit=10,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_futures_target_dates_success(self, mock_dm):
+        mock_dm.get_research_futures_target_dates = AsyncMock(
+            return_value={"status": "success", "target_dates_by_exchange": {"SHFE": ["2024-06-03"]}}
+        )
+
+        response = _run(
+            get_research_futures_target_dates(
+                exchange="SHFE",
+                instrument_id="CNF.CU.SHFE",
+                start_date=date(2024, 6, 1),
+                end_date=date(2024, 6, 3),
+                purpose="dry_run",
+                dry_run=True,
+            )
+        )
+
+        assert response["target_dates_by_exchange"]["SHFE"] == ["2024-06-03"]
+        mock_dm.get_research_futures_target_dates.assert_awaited_once_with(
+            exchange="SHFE",
+            instrument_id="CNF.CU.SHFE",
+            start_date="2024-06-01",
+            end_date="2024-06-03",
+            purpose="dry_run",
+            dry_run=True,
         )
 
     @patch("api.routes.data_manager")

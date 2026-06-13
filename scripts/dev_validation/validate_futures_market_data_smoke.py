@@ -201,6 +201,10 @@ async def async_main(argv: Optional[Sequence[str]] = None) -> int:
     storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
     storage.upsert_source_manifests(registry.get("source_manifests", []))
     calendar_result = FuturesCalendarService(storage, module_cfg).seed_default_calendar()
+    if any(item.lower() == "all" for item in series_ids):
+        series_ids = [item.series_id for item in registry["series"] if item.active]
+    if not series_ids:
+        raise ValueError("no futures series selected; pass --series-ids all or explicit series ids")
 
     fixture_result: Dict[str, Any] = {}
     if args.offline_fixture:

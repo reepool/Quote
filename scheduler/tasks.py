@@ -864,7 +864,41 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
+    if result.get("domain") == "futures_official_trading_calendar_backfill":
+        totals = result.get("totals") or {}
+        detail_lines = []
+        for item in (result.get("exchanges") or [])[:10]:
+            detail_lines.append(
+                f"{item.get('exchange', 'unknown')}: written={item.get('rows_written', 0)}, "
+                f"trading={item.get('trading_days', 0)}, "
+                f"closed={item.get('closed_days', 0)}, "
+                f"unresolved={item.get('unresolved_dates', 0)}, "
+                f"future_unresolved={item.get('future_dates_unresolved', 0)}, "
+                f"latest={item.get('latest_verified_date') or 'N/A'}"
+            )
+        if not detail_lines:
+            detail_lines.append(result.get("reason") or "无交易所明细")
+        return (
+            f"{icon} *商品期货官方交易日历回填*\n\n"
+            f"结论: *{label}*\n"
+            f"状态: `{status}`\n"
+            f"source_profile: `{result.get('source_profile', 'N/A')}`\n"
+            f"quality_flag: `{result.get('quality_flag', 'N/A')}`\n"
+            f"range: `{result.get('start_date', 'N/A')}` 至 `{result.get('end_date', 'N/A')}`\n"
+            f"probe_end: `{result.get('probe_end_date', 'N/A')}`\n"
+            f"dry_run: `{result.get('dry_run', False)}`\n\n"
+            f"rows_written: `{totals.get('rows_written', 0)}`\n"
+            f"trading_days: `{totals.get('trading_days', 0)}`\n"
+            f"closed_days: `{totals.get('closed_days', 0)}`\n"
+            f"unresolved_dates: `{totals.get('unresolved_dates', 0)}`\n"
+            f"request_count: `{totals.get('request_count', 0)}`\n\n"
+            "交易所明细:\n"
+            "```text\n"
+            + "\n".join(detail_lines)
+            + "\n```"
+        )
     totals = result.get("totals") or {}
+    governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
     series = result.get("series") or []
     detail_lines = []
     for item in series[:10]:
@@ -887,6 +921,11 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         f"changed: `{totals.get('changed', 0)}`\n"
         f"unchanged: `{totals.get('unchanged', 0)}`\n"
         f"failed: `{totals.get('failed', 0)}`\n\n"
+        f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
+        f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
+        f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
+        f"target_trade_dates: `{governance.get('target_date_count', 0)}`\n"
+        f"calendar_quality: `{governance.get('minimum_quality', 'N/A')}`\n\n"
         "序列明细:\n"
         "```text\n"
         + "\n".join(detail_lines)
@@ -2403,11 +2442,43 @@ class ScheduledTasks:
         end_date: Optional[str] = None,
         mode: str = "direct",
         dry_run: bool = False,
+        requires_trading_day_governance: bool = True,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货行情日更任务。"""
         self._active_tasks.add('futures_market_data_sync')
         try:
+            if requires_trading_day_governance:
+                governance_result = await data_manager.run_futures_trading_day_governance(
+                    start_date=start_date,
+                    end_date=end_date,
+                    dry_run=dry_run,
+                )
+                governance_status = governance_result.get("status")
+                if governance_status == "blocked" and not dry_run:
+                    await self._send_task_report(
+                        report_data={
+                            'name': '商品期货交易日治理前置检查报告',
+                            'content': _format_futures_market_data_scheduler_report(governance_result),
+                            'status': 'error',
+                            'tasks_completed': 0,
+                            'duration': 'N/A',
+                            'maintenance_tasks': [
+                                {
+                                    'task_name': 'futures_trading_day_governance',
+                                    'status': "; ".join(
+                                        governance_result.get("target_date_expansion", {}).get("blockers") or
+                                        governance_result.get("readiness", {}).get("blockers") or
+                                        ["blocked"]
+                                    ),
+                                }
+                            ],
+                        },
+                        report_type='maintenance_report',
+                        task_name='商品期货交易日治理前置检查',
+                        job_config=job_config,
+                    )
+                    return False
             result = await data_manager.run_futures_market_data_sync(
                 series_ids=series_ids,
                 start_date=start_date,
@@ -2470,6 +2541,7 @@ class ScheduledTasks:
         end_date: Optional[str] = None,
         mode: str = "direct",
         dry_run: bool = False,
+        requires_trading_day_governance: bool = True,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货行情历史回补任务，要求显式日期范围。"""
@@ -2481,8 +2553,137 @@ class ScheduledTasks:
             end_date=end_date,
             mode=mode,
             dry_run=dry_run,
+            requires_trading_day_governance=requires_trading_day_governance,
             job_config=job_config,
         )
+
+    async def futures_trading_day_governance(
+        self,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货交易日治理前置任务。"""
+        self._active_tasks.add('futures_trading_day_governance')
+        try:
+            result = await data_manager.run_futures_trading_day_governance(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货交易日治理报告',
+                    'content': _format_futures_market_data_scheduler_report(result),
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': 1 if success else 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': 'futures_trading_day_governance',
+                            'status': status,
+                        }
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货交易日治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures trading-day governance failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货交易日治理报告',
+                    'content': _format_futures_market_data_scheduler_report({
+                        'status': 'error',
+                        'reason': str(e),
+                        'target_date_expansion': {},
+                    }),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'futures_trading_day_governance', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货交易日治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('futures_trading_day_governance')
+
+    async def futures_official_calendar_backfill(
+        self,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        max_days: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货官方交易日历回填任务；不下载行情价格。"""
+        self._active_tasks.add('futures_official_calendar_backfill')
+        try:
+            result = await data_manager.run_futures_official_calendar_backfill(
+                exchanges=exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货官方交易日历回填报告',
+                    'content': _format_futures_market_data_scheduler_report(result),
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': 1 if success else 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': 'futures_official_calendar_backfill',
+                            'status': status,
+                        }
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货官方交易日历回填',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures official calendar backfill failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货官方交易日历回填报告',
+                    'content': _format_futures_market_data_scheduler_report({
+                        'status': 'error',
+                        'domain': 'futures_official_trading_calendar_backfill',
+                        'reason': str(e),
+                    }),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'futures_official_calendar_backfill', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货官方交易日历回填',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('futures_official_calendar_backfill')
 
     async def futures_cycle_diagnostics_refresh(
         self,

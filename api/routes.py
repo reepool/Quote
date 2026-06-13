@@ -1625,6 +1625,7 @@ async def get_research_futures_default_prices(
 )
 async def get_research_futures_calendar(
     exchange: Optional[str] = Query(None, description="交易所"),
+    instrument_id: Optional[str] = Query(None, description="商品根品种 ID"),
     start_date: Optional[date] = Query(None, description="开始日期"),
     end_date: Optional[date] = Query(None, description="结束日期"),
     trading_only: bool = Query(False, description="是否只返回交易日"),
@@ -1633,18 +1634,148 @@ async def get_research_futures_calendar(
     try:
         start_value = _query_default(start_date)
         end_value = _query_default(end_date)
-        return await data_manager.get_research_futures_calendar(
+        result = await data_manager.get_research_futures_calendar(
             exchange=_query_default(exchange),
+            instrument_id=_query_default(instrument_id),
             start_date=start_value.isoformat() if start_value else None,
             end_date=end_value.isoformat() if end_value else None,
             trading_only=_query_default(trading_only, False),
+        )
+        if result.get("status") == "not_found":
+            raise HTTPException(status_code=404, detail="Research futures instrument not found")
+        return result
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures calendar: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/trading-day-governance",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_trading_day_governance(
+    exchange: Optional[str] = Query(None, description="交易所"),
+    start_date: Optional[date] = Query(None, description="开始日期"),
+    end_date: Optional[date] = Query(None, description="结束日期"),
+):
+    """查询商品期货交易日治理准备度。"""
+    try:
+        start_value = _query_default(start_date)
+        end_value = _query_default(end_date)
+        return await data_manager.get_research_futures_trading_day_governance(
+            exchange=_query_default(exchange),
+            start_date=start_value.isoformat() if start_value else None,
+            end_date=end_value.isoformat() if end_value else None,
         )
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to get research futures calendar: {str(e)}",
+            detail=f"Failed to get research futures trading-day governance: {str(e)}",
+        )
+
+
+@router.post(
+    "/research/futures/calendar/official-backfill",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_futures_official_calendar_backfill(
+    exchange: Optional[str] = Query(None, description="交易所"),
+    start_date: Optional[date] = Query(None, description="开始日期"),
+    end_date: Optional[date] = Query(None, description="结束日期"),
+    dry_run: bool = Query(False, description="是否只演练不落库"),
+    max_days: Optional[int] = Query(None, ge=1, description="最多探测自然日数量"),
+):
+    """执行官方商品期货交易日历回填，不下载行情价格。"""
+    try:
+        exchange_value = _query_default(exchange)
+        start_value = _query_default(start_date)
+        end_value = _query_default(end_date)
+        max_days_value = _query_default(max_days)
+        return await data_manager.run_futures_official_calendar_backfill(
+            exchanges=[exchange_value] if exchange_value else None,
+            start_date=start_value.isoformat() if start_value else None,
+            end_date=end_value.isoformat() if end_value else None,
+            dry_run=dry_run,
+            max_days=max_days_value,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to run research futures official calendar backfill: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/calendar/evidence",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_calendar_evidence(
+    exchange: Optional[str] = Query(None, description="交易所"),
+    parse_status: Optional[str] = Query(None, description="公告解析状态"),
+    review_status: Optional[str] = Query("review_required", description="人工复核状态"),
+    limit: int = Query(100, ge=1, le=1000, description="最大返回数量"),
+):
+    """查询商品期货交易日历公告证据和人工复核项。"""
+    try:
+        return await data_manager.get_research_futures_calendar_evidence(
+            exchange=_query_default(exchange),
+            parse_status=_query_default(parse_status),
+            review_status=_query_default(review_status),
+            limit=_query_default(limit, 100),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures calendar evidence: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/futures/target-dates",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_futures_target_dates(
+    exchange: Optional[str] = Query(None, description="交易所"),
+    instrument_id: Optional[str] = Query(None, description="商品根品种 ID"),
+    start_date: Optional[date] = Query(None, description="开始日期"),
+    end_date: Optional[date] = Query(None, description="结束日期"),
+    purpose: str = Query("api", description="用途"),
+    dry_run: bool = Query(True, description="是否按 dry-run 质量门禁解析"),
+):
+    """解析商品期货 governed target trading dates，不触发 provider 请求。"""
+    try:
+        start_value = _query_default(start_date)
+        end_value = _query_default(end_date)
+        return await data_manager.get_research_futures_target_dates(
+            exchange=_query_default(exchange),
+            instrument_id=_query_default(instrument_id),
+            start_date=start_value.isoformat() if start_value else None,
+            end_date=end_value.isoformat() if end_value else None,
+            purpose=_query_default(purpose, "api"),
+            dry_run=_query_default(dry_run, True),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research futures target dates: {str(e)}",
         )
 
 
