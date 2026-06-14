@@ -1186,31 +1186,16 @@ class DatabaseOperations:
                 params[key] = state
             clauses.append(f"lifecycle_state IN ({','.join(placeholders)})")
 
-        create_sql = """
-            CREATE TABLE IF NOT EXISTS index_lifecycle_evidence (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                instrument_id TEXT NOT NULL,
-                symbol TEXT,
-                exchange TEXT,
-                lifecycle_state TEXT NOT NULL,
-                event_type TEXT,
-                effective_date TEXT,
-                last_quote_date TEXT,
-                announcement_date TEXT,
-                announcement_title TEXT,
-                evidence_url TEXT,
-                matched_code TEXT,
-                confidence TEXT,
-                source TEXT,
-                parser_version TEXT,
-                raw_snapshot_hash TEXT,
-                diagnostics_json TEXT,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
-                UNIQUE(instrument_id, lifecycle_state, event_type, evidence_url, confidence)
-            )
-        """
-        await self.execute_query(create_sql)
+        table_exists = await self.execute_read_query(
+            """
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table' AND name = 'index_lifecycle_evidence'
+            """
+        )
+        if not table_exists:
+            return []
+
         return await self.execute_read_query(
             f"""
             SELECT *

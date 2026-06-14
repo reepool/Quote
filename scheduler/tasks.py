@@ -1883,6 +1883,15 @@ class ScheduledTasks:
             repaired = 0
             failed = 0
             skipped_known_failures = 0
+            skipped_after_no_data_failures = 0
+            no_data_failures_by_instrument: Dict[str, int] = {}
+            max_no_data_failures_per_instrument = int(
+                self.config.get_nested(
+                    'data_config', 'repair_universe_governance',
+                    'max_no_data_failures_per_instrument',
+                    default=3,
+                ) or 0
+            )
             failure_details = []
             for gap in gaps_to_repair:
                 if skip_failed_segments and data_manager.is_gap_skipped(
@@ -1891,11 +1900,32 @@ class ScheduledTasks:
                     skipped_known_failures += 1
                     continue
 
+                if (
+                    max_no_data_failures_per_instrument > 0
+                    and no_data_failures_by_instrument.get(gap.instrument_id, 0) >= max_no_data_failures_per_instrument
+                ):
+                    skipped_after_no_data_failures += 1
+                    if skip_failed_segments:
+                        await data_manager.record_gap_skip(
+                            gap.instrument_id,
+                            gap.gap_start,
+                            gap.gap_end,
+                            reason='instrument_no_data_failure_limit',
+                        )
+                        skip_set.add(data_manager.build_gap_skip_key(
+                            gap.instrument_id, gap.gap_start, gap.gap_end
+                        ))
+                    continue
+
                 try:
                     success = await data_manager._fill_single_gap(gap)
                     if success:
                         repaired += 1
+                        no_data_failures_by_instrument[gap.instrument_id] = 0
                     else:
+                        no_data_failures_by_instrument[gap.instrument_id] = (
+                            no_data_failures_by_instrument.get(gap.instrument_id, 0) + 1
+                        )
                         if skip_failed_segments:
                             await data_manager.record_gap_skip(
                                 gap.instrument_id, gap.gap_start, gap.gap_end, reason='no_data'
@@ -1955,6 +1985,7 @@ class ScheduledTasks:
                     'repaired_gaps': repaired,
                     'failed_repairs': failed,
                     'skipped_known_failures': skipped_known_failures,
+                    'skipped_after_no_data_failures': skipped_after_no_data_failures,
                     'skipped_by_hkex_guard': hkex_guard_skipped,
                     'lifecycle_skipped_instruments': repair_universe.get('skipped_instrument_count', 0),
                     'lifecycle_skipped_gap_segments': repair_universe.get('skipped_gap_segment_count', 0),

@@ -8379,10 +8379,9 @@ class DataManager:
             and exchange in {'SSE', 'SZSE'}
             and lifecycle_state not in index_states
             and config.get('enable_local_stale_no_quote', True)
-            and latest_quote_date is not None
         ):
             stale_days = int(config.get('stale_no_quote_trading_days', 10) or 10)
-            if requested_end > latest_quote_date + timedelta(days=stale_days):
+            if latest_quote_date is not None and requested_end > latest_quote_date + timedelta(days=stale_days):
                 if end > latest_quote_date:
                     end = latest_quote_date
                 lifecycle_state = 'stale_no_quote'

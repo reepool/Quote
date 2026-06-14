@@ -37,6 +37,7 @@
       ],
       "enable_local_stale_no_quote": true,
       "stale_no_quote_trading_days": 10,
+      "max_no_data_failures_per_instrument": 3,
       "stale_governance_continue_policy": "warn"
     },
     "instrument_master_sync": {

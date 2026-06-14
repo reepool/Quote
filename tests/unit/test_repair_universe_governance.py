@@ -76,6 +76,32 @@ class FakeRepairDbOps:
                 'delisted_date': None,
                 'source_symbol': '399001',
             },
+            '005125.SZ': {
+                'instrument_id': '005125.SZ',
+                'symbol': '005125',
+                'name': 'No local quote index',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'listed_date': datetime(2017, 1, 10),
+                'delisted_date': None,
+                'source_symbol': '005125',
+            },
+            '399999.SZ': {
+                'instrument_id': '399999.SZ',
+                'symbol': '399999',
+                'name': 'New index',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'listed_date': datetime(2026, 6, 9),
+                'delisted_date': None,
+                'source_symbol': '399999',
+            },
             '000001.SZ': {
                 'instrument_id': '000001.SZ',
                 'symbol': '000001',
@@ -141,6 +167,7 @@ async def test_stopped_index_is_skipped_before_gap_detection_source_calendar():
         date(2026, 6, 10),
         date(2026, 6, 10),
         instrument_types=['index'],
+        instrument_ids=['005061.SZ', '399001.SZ'],
         include_diagnostics=True,
     )
 
@@ -150,6 +177,44 @@ async def test_stopped_index_is_skipped_before_gap_detection_source_calendar():
     assert diagnostics['reason_distribution']['index_lifecycle_stale_no_quote'] == 1
     assert diagnostics['samples'][0]['instrument_id'] == '005061.SZ'
     assert manager.source_factory.get_trading_days.await_count == 1
+
+
+@pytest.mark.asyncio
+async def test_old_index_without_local_quotes_is_not_lifecycle_skipped():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_trading_days = AsyncMock(return_value=[date(2026, 6, 10)])
+
+    result = await manager.detect_data_gaps(
+        ['SZSE'],
+        date(2026, 6, 10),
+        date(2026, 6, 10),
+        instrument_types=['index'],
+        instrument_ids=['005125.SZ', '399001.SZ'],
+        include_diagnostics=True,
+    )
+
+    assert {gap.instrument_id for gap in result['gaps']} == {'005125.SZ', '399001.SZ'}
+    diagnostics = result['repair_universe']
+    assert diagnostics['skipped_instrument_count'] == 0
+    assert manager.source_factory.get_trading_days.await_count == 2
+
+
+@pytest.mark.asyncio
+async def test_new_index_without_local_quotes_remains_lifecycle_eligible():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['399999.SZ']],
+        start_date=date(2026, 6, 10),
+        end_date=date(2026, 6, 10),
+        mode='historical_backfill',
+    )
+
+    assert [item['instrument_id'] for item in eligible] == ['399999.SZ']
+    assert diagnostics['skipped_instrument_count'] == 0
 
 
 @pytest.mark.asyncio
