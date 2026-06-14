@@ -265,6 +265,7 @@ restart_system - 重启系统服务
 - **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更通过 `master_governance.job_requirements` 声明 `a_share_stock` 与 `a_share_index` 前置治理，默认强制刷新 `SSE/SZSE/BSE` 股票主数据，并在读取 active/tradable universe 前执行指数生命周期治理
 - **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
 - **行情追补**: 普通 A 股日更会对本地无行情的新股和最近短缺口执行 `data_config.daily_update_catchup` 小窗口追补。主数据或行情源晚一天可接受，但标的进入主表后，上市日至目标日附近的缺口会自动尝试补齐；超出窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 兜底。
+- **历史修复治理**: `/find_gap_and_repair`、月度完整性检查和区间回补会先执行本地 `repair_universe_governance` 过滤；停编指数、退市后窗口和 stale-no-quote 指数会在行情源请求前跳过或裁剪，并在报告的“生命周期过滤”段落中展示数量、原因和样例。该过滤默认不刷新当前主数据；显式刷新必须通过任务参数指定 `force_current_master_refresh=true` 和可选 `current_master_refresh_scopes`。
 
 ### 1.1 研究/财务任务的主数据治理
 

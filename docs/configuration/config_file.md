@@ -418,6 +418,45 @@
 - **`short_gap_catchup_days`**: 对已有行情但最新日期落后普通日更窗口的标的，从 `max(latest_quote_date, target_date - N days)` 开始追补。
 - **`sample_limit`**: 日更报告中保留的追补样例数量。追补窗口被截断或缺少 `listed_date` 时会在报告中暴露，超过窗口的大缺口仍交给 `/backfill` 或 `find_gap_and_repair`。
 
+### data_config.repair_universe_governance
+
+> 历史缺口修复、月度完整性检查和区间回补的本地生命周期过滤配置。该配置只使用本地主数据和本地生命周期证据约束 repair universe，默认不刷新上游当前主数据。
+
+```json
+{
+  "repair_universe_governance": {
+    "enabled": true,
+    "default_mode": "historical_backfill",
+    "sample_limit": 10,
+    "allow_lifecycle_filter_override": true,
+    "max_override_instruments": 50,
+    "max_override_limit": 50,
+    "current_repair_requires_tradable": true,
+    "allow_inactive_pre_lifecycle_history": true,
+    "skip_index_lifecycle_states": [
+      "calculation_terminated",
+      "inactive",
+      "stale_no_quote"
+    ],
+    "enable_local_stale_no_quote": true,
+    "stale_no_quote_trading_days": 10,
+    "stale_governance_continue_policy": "warn"
+  }
+}
+```
+
+- **`enabled`**: 是否在 repair/backfill universe 选择前启用本地生命周期过滤。
+- **`default_mode`**: 默认运行模式。`historical_backfill` 允许在生命周期有效窗口内补历史；`current_repair` 会额外要求 active/tradable；`dry_run` 只输出过滤诊断；`override` 必须有明确边界。
+- **`sample_limit`**: 报告中保留的生命周期跳过样例数量。
+- **`allow_lifecycle_filter_override`**: 是否允许绕过生命周期过滤。开启后仍必须提供 `instrument_ids` 或小范围 `repair_universe_limit`。
+- **`max_override_instruments` / `max_override_limit`**: override 模式的最大标的数或最大 limit，防止全市场绕过过滤后直接打到行情源。
+- **`current_repair_requires_tradable`**: `current_repair` 模式下是否要求 `trading_status=1`。
+- **`allow_inactive_pre_lifecycle_history`**: 历史模式下是否允许有明确 `delisted_date` 或指数生命周期边界的 inactive 标的补边界前历史。
+- **`skip_index_lifecycle_states`**: 指数生命周期状态黑名单；命中后会按 evidence effective/last quote date 裁剪，完全越界则跳过。
+- **`enable_local_stale_no_quote`**: 是否用本地最新行情日期识别长期无行情的 A 股指数，避免停编或失效指数反复触发 CNIndex/CSIndex/BaoStock/AkShare fallback。
+- **`stale_no_quote_trading_days`**: 本地 stale-no-quote 判断阈值，默认与指数主数据治理保持一致。
+- **`stale_governance_continue_policy`**: 本地 lifecycle/evidence 不完整时的继续策略；当前实现以 warning 形式进入 `repair_universe.warnings`。
+
 ### data_config.instrument_master_sync
 
 > A 股证券主数据同步底层配置。普通日更和通用主数据治理最终都复用这套 `sync_instrument_master()` 源优先级与写入规则。

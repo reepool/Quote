@@ -272,6 +272,39 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get active instruments: {e}")
             return []
 
+    async def get_repair_universe_instruments(
+        self,
+        exchange: str = None,
+        instrument_types: Optional[List[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return local instruments for historical repair/backfill governance.
+
+        Unlike ``get_active_instruments()``, this intentionally does not filter
+        on ``is_active``. The repair-universe layer needs inactive rows so it
+        can produce lifecycle skip diagnostics and still allow bounded
+        pre-delisting historical repair where policy permits it.
+        """
+        try:
+            async with self.get_async_session() as session:
+                stmt = select(InstrumentDB)
+
+                if exchange:
+                    stmt = stmt.filter(InstrumentDB.exchange == exchange)
+
+                if instrument_types:
+                    stmt = stmt.filter(InstrumentDB.type.in_(instrument_types))
+
+                stmt = stmt.order_by(InstrumentDB.exchange, InstrumentDB.symbol)
+                result = await session.execute(stmt)
+                return [
+                    self._serialize_instrument_row(instrument)
+                    for instrument in result.scalars().all()
+                ]
+
+        except Exception as e:
+            self.db_logger.error(f"Failed to get repair universe instruments: {e}")
+            return []
+
     async def get_existing_data_dates(self, instrument_id: str, start_date: date, end_date: date) -> List[date]:
         """获取指定品种的已有数据日期"""
         try:

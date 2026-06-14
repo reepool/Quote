@@ -309,6 +309,39 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
     assert len(summary) < 900
 
 
+def test_gap_report_renders_repair_universe_lifecycle_summary():
+    engine = ReportEngine()
+    message = engine.generate(
+        'gap_report',
+        {
+            'status': 'success',
+            'summary': {
+                'total_gaps': 2,
+                'affected_stocks': 1,
+                'severity_distribution': {'low': 2},
+                'lifecycle_skipped_instruments': 3,
+                'lifecycle_skipped_gap_segments': 4,
+            },
+            'repair_universe': {
+                'skipped_instrument_count': 3,
+                'skipped_gap_segment_count': 4,
+                'reason_distribution': {'index_lifecycle_stale_no_quote': 3},
+            },
+            'repair_universe_summary': (
+                "模式: historical_backfill\n"
+                "标的: 输入=10，可修复=7，裁剪=1，生命周期跳过=3\n"
+                "原因: index_lifecycle_stale_no_quote=3"
+            ),
+            'top_affected_stocks': [],
+        },
+        'telegram',
+    )
+
+    assert '*生命周期过滤*' in message
+    assert '生命周期跳过=3' in message
+    assert 'Lifecycle Skipped Instruments' in message
+
+
 def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_table():
     engine = ReportEngine()
     sample = {

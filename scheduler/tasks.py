@@ -179,6 +179,53 @@ def _attach_instrument_master_governance_report(
     return report_data
 
 
+def _format_repair_universe_summary(diagnostics: Optional[Dict[str, Any]]) -> str:
+    """Return a compact report summary for repair-universe lifecycle filtering."""
+    if not isinstance(diagnostics, dict) or not diagnostics:
+        return ""
+
+    reasons = diagnostics.get("reason_distribution") or {}
+    reason_text = "，".join(
+        f"{reason}={count}" for reason, count in list(reasons.items())[:5]
+    ) or "无"
+    samples = diagnostics.get("samples") or []
+    sample_text = "；".join(
+        str(sample.get("instrument_id") or sample.get("symbol") or "unknown")
+        + f"({sample.get('reason', 'unknown')})"
+        for sample in samples[:5]
+        if isinstance(sample, dict)
+    )
+    lines = [
+        f"模式: {diagnostics.get('mode', 'unknown')}",
+        (
+            "标的: "
+            f"输入={diagnostics.get('input_instrument_count', 0)}，"
+            f"可修复={diagnostics.get('eligible_instrument_count', 0)}，"
+            f"裁剪={diagnostics.get('clipped_instrument_count', 0)}，"
+            f"生命周期跳过={diagnostics.get('skipped_instrument_count', 0)}"
+        ),
+        (
+            "缺口跳过: "
+            f"segments={diagnostics.get('skipped_gap_segment_count', 0)}，"
+            f"missing_days={diagnostics.get('skipped_missing_days', 0)}"
+        ),
+        f"原因: {reason_text}",
+    ]
+    current_refresh = diagnostics.get("current_master_refresh")
+    if isinstance(current_refresh, dict) and current_refresh.get("requested"):
+        lines.append(
+            "显式主数据刷新: "
+            f"{current_refresh.get('status', 'unknown')} "
+            f"{current_refresh.get('scopes', [])}"
+        )
+    if sample_text:
+        lines.append(f"样例: {sample_text}")
+    warnings = diagnostics.get("warnings") or []
+    if warnings:
+        lines.append("警告: " + "；".join(str(item) for item in warnings[:3]))
+    return "\n".join(lines)
+
+
 def _format_seconds_for_report(value: Any) -> str:
     """Format elapsed seconds for compact operator reports."""
     try:
@@ -1384,6 +1431,11 @@ class ScheduledTasks:
         progress_log_interval_sec: int = 300,
         instrument_types: Optional[List[str]] = None,
         run_factor_audit: bool = False,
+        repair_universe_mode: str = 'historical_backfill',
+        override_lifecycle_filter: bool = False,
+        repair_universe_limit: Optional[int] = None,
+        force_current_master_refresh: bool = False,
+        current_master_refresh_scopes: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """区间补充日线数据，避免按交易日重复执行完整日更。"""
         self._active_tasks.add('daily_data_backfill_range')
@@ -1431,6 +1483,11 @@ class ScheduledTasks:
                 progress_log_interval_sec=progress_log_interval_sec,
                 instrument_types=instrument_types,
                 run_factor_audit=run_factor_audit,
+                repair_universe_mode=repair_universe_mode,
+                override_lifecycle_filter=override_lifecycle_filter,
+                repair_universe_limit=repair_universe_limit,
+                force_current_master_refresh=force_current_master_refresh,
+                current_master_refresh_scopes=current_master_refresh_scopes,
             )
             update_results['trading_calendar_updates'] = trading_calendar_updates
             scheduler_logger.info("[Scheduler] Range backfill completed successfully")
@@ -1591,6 +1648,11 @@ class ScheduledTasks:
                                         exchanges: Optional[List[str]] = None,
                                         severity_filter: Optional[List[str]] = None,
                                         days_to_check: int = 45,
+                                        repair_universe_mode: str = 'historical_backfill',
+                                        override_lifecycle_filter: bool = False,
+                                        repair_universe_limit: Optional[int] = None,
+                                        force_current_master_refresh: bool = False,
+                                        current_master_refresh_scopes: Optional[List[str]] = None,
                                         job_config: Optional[JobConfig] = None) -> bool:
         """月度数据完整性检查和缺口修复任务"""
         try:
@@ -1622,8 +1684,19 @@ class ScheduledTasks:
                 try:
                     scheduler_logger.info(f"[Scheduler] Checking gaps for {exchange}...")
 
-                    # 使用现有的GAP检测系统
-                    gaps = await data_manager.detect_data_gaps([exchange], start_date, end_date)
+                    # 使用生命周期感知的 GAP 检测系统
+                    gap_result = await data_manager.detect_data_gaps(
+                        [exchange],
+                        start_date,
+                        end_date,
+                        repair_universe_mode=repair_universe_mode,
+                        override_lifecycle_filter=override_lifecycle_filter,
+                        repair_universe_limit=repair_universe_limit,
+                        force_current_master_refresh=force_current_master_refresh,
+                        current_master_refresh_scopes=current_master_refresh_scopes,
+                        include_diagnostics=True,
+                    )
+                    gaps = gap_result['gaps']
                     scheduler_logger.info(f"[Scheduler] Found {len(gaps)} total gaps for {exchange}")
 
                     # 过滤严重程度（如未配置则不过滤）
@@ -1649,7 +1722,19 @@ class ScheduledTasks:
 
             # 任务完成后，重新检测以生成报告
             scheduler_logger.info("[Scheduler] Re-detecting gaps to generate final report...")
-            final_gaps = await data_manager.detect_data_gaps(exchanges, start_date, end_date)
+            final_gap_result = await data_manager.detect_data_gaps(
+                exchanges,
+                start_date,
+                end_date,
+                repair_universe_mode=repair_universe_mode,
+                override_lifecycle_filter=override_lifecycle_filter,
+                repair_universe_limit=repair_universe_limit,
+                force_current_master_refresh=force_current_master_refresh,
+                current_master_refresh_scopes=current_master_refresh_scopes,
+                include_diagnostics=True,
+            )
+            final_gaps = final_gap_result['gaps']
+            repair_universe = final_gap_result.get('repair_universe', {})
 
             # 在发送报告前，先对gaps数据进行统计
             from collections import Counter, defaultdict
@@ -1668,9 +1753,13 @@ class ScheduledTasks:
                 'summary': {
                     'total_gaps': total_gaps,
                     'affected_stocks': affected_stocks_count,
-                    'severity_distribution': severity_distribution
+                    'severity_distribution': severity_distribution,
+                    'lifecycle_skipped_instruments': repair_universe.get('skipped_instrument_count', 0),
+                    'lifecycle_skipped_gap_segments': repair_universe.get('skipped_gap_segment_count', 0),
                 },
-                'top_affected_stocks': top_affected_stocks
+                'top_affected_stocks': top_affected_stocks,
+                'repair_universe': repair_universe,
+                'repair_universe_summary': _format_repair_universe_summary(repair_universe),
             }
 
             # 发送详细的完成通知
@@ -1709,6 +1798,11 @@ class ScheduledTasks:
                                   skip_ttl_days: int = 30,
                                   hkex_max_gap_segments_per_instrument: Optional[int] = 20,
                                   hkex_max_missing_days_per_instrument: Optional[int] = 60,
+                                  repair_universe_mode: str = 'historical_backfill',
+                                  override_lifecycle_filter: bool = False,
+                                  repair_universe_limit: Optional[int] = None,
+                                  force_current_master_refresh: bool = False,
+                                  current_master_refresh_scopes: Optional[List[str]] = None,
                                   job_config: Optional[JobConfig] = None) -> bool:
         """检测数据缺口并修复（复合任务）"""
         self._active_tasks.add('find_gap_and_repair')
@@ -1738,8 +1832,27 @@ class ScheduledTasks:
             scheduler_logger.info(f"[Scheduler] Exchanges: {exchanges}")
             scheduler_logger.info(f"[Scheduler] Date range: {start_date} to {end_date}")
 
-            all_gaps = await data_manager.detect_data_gaps(exchanges, start_date, end_date)
+            gap_result = await data_manager.detect_data_gaps(
+                exchanges,
+                start_date,
+                end_date,
+                repair_universe_mode=repair_universe_mode,
+                override_lifecycle_filter=override_lifecycle_filter,
+                repair_universe_limit=repair_universe_limit,
+                force_current_master_refresh=force_current_master_refresh,
+                current_master_refresh_scopes=current_master_refresh_scopes,
+                include_diagnostics=True,
+            )
+            all_gaps = gap_result['gaps']
+            repair_universe = gap_result.get('repair_universe', {})
             scheduler_logger.info(f"[Scheduler] Detected {len(all_gaps)} gaps")
+            if repair_universe.get('skipped_instrument_count') or repair_universe.get('skipped_gap_segment_count'):
+                scheduler_logger.info(
+                    "[Scheduler] Repair universe lifecycle-skipped instruments=%s gap_segments=%s reasons=%s",
+                    repair_universe.get('skipped_instrument_count', 0),
+                    repair_universe.get('skipped_gap_segment_count', 0),
+                    repair_universe.get('reason_distribution', {}),
+                )
 
             if severity_filter:
                 gaps_to_repair = [gap for gap in all_gaps if gap.severity in severity_filter]
@@ -1842,10 +1955,16 @@ class ScheduledTasks:
                     'repaired_gaps': repaired,
                     'failed_repairs': failed,
                     'skipped_known_failures': skipped_known_failures,
-                    'skipped_by_hkex_guard': hkex_guard_skipped
+                    'skipped_by_hkex_guard': hkex_guard_skipped,
+                    'lifecycle_skipped_instruments': repair_universe.get('skipped_instrument_count', 0),
+                    'lifecycle_skipped_gap_segments': repair_universe.get('skipped_gap_segment_count', 0),
+                    'lifecycle_skipped_missing_days': repair_universe.get('skipped_missing_days', 0),
                 },
                 'failure_details': failure_details[:50],
                 'skipped_instruments': hkex_guard_details[:50],
+                'repair_universe': repair_universe,
+                'repair_universe_summary': _format_repair_universe_summary(repair_universe),
+                'instrument_master_governance': gap_result.get('instrument_master_governance'),
                 'filters': {
                     'exchanges': exchanges,
                     'start_date': start_date.isoformat(),
@@ -1854,7 +1973,12 @@ class ScheduledTasks:
                     'skip_failed_segments': skip_failed_segments,
                     'skip_ttl_days': skip_ttl_days,
                     'hkex_max_gap_segments_per_instrument': hkex_max_gap_segments_per_instrument,
-                    'hkex_max_missing_days_per_instrument': hkex_max_missing_days_per_instrument
+                    'hkex_max_missing_days_per_instrument': hkex_max_missing_days_per_instrument,
+                    'repair_universe_mode': repair_universe_mode,
+                    'override_lifecycle_filter': override_lifecycle_filter,
+                    'repair_universe_limit': repair_universe_limit,
+                    'force_current_master_refresh': force_current_master_refresh,
+                    'current_master_refresh_scopes': current_master_refresh_scopes,
                 }
             }
 

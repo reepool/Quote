@@ -370,6 +370,7 @@ class ReportEngine:
             Dict[str, Any]: 准备好的数据
         """
         summary = data.get('summary', {})
+        repair_universe = data.get('repair_universe') or {}
 
         # 提取关键指标
         data.update({
@@ -377,7 +378,17 @@ class ReportEngine:
             'affected_stocks': summary.get('affected_stocks', 0),
             'severity_distribution': summary.get('severity_distribution', {}),
             'exchange_distribution': summary.get('exchange_distribution', {}),
-            'top_affected_stocks': data.get('top_affected_stocks', [])
+            'top_affected_stocks': data.get('top_affected_stocks', []),
+            'lifecycle_skipped_instruments': (
+                summary.get('lifecycle_skipped_instruments')
+                or repair_universe.get('skipped_instrument_count', 0)
+            ),
+            'lifecycle_skipped_gap_segments': (
+                summary.get('lifecycle_skipped_gap_segments')
+                or repair_universe.get('skipped_gap_segment_count', 0)
+            ),
+            'repair_universe_reason_distribution': repair_universe.get('reason_distribution', {}),
+            'repair_universe_summary': data.get('repair_universe_summary', ''),
         })
 
         return data

@@ -21,6 +21,24 @@
       "short_gap_catchup_days": 5,
       "sample_limit": 10
     },
+    "repair_universe_governance": {
+      "enabled": true,
+      "default_mode": "historical_backfill",
+      "sample_limit": 10,
+      "allow_lifecycle_filter_override": true,
+      "max_override_instruments": 50,
+      "max_override_limit": 50,
+      "current_repair_requires_tradable": true,
+      "allow_inactive_pre_lifecycle_history": true,
+      "skip_index_lifecycle_states": [
+        "calculation_terminated",
+        "inactive",
+        "stale_no_quote"
+      ],
+      "enable_local_stale_no_quote": true,
+      "stale_no_quote_trading_days": 10,
+      "stale_governance_continue_policy": "warn"
+    },
     "instrument_master_sync": {
       "enabled": true,
       "run_before_daily_update": true,

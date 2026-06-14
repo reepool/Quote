@@ -155,6 +155,24 @@
     "max_concurrent_downloads": 1,
     "retry_times": 3,
     "retry_interval_seconds": 5,
+    "repair_universe_governance": {
+      "enabled": true,
+      "default_mode": "historical_backfill",
+      "sample_limit": 10,
+      "allow_lifecycle_filter_override": true,
+      "max_override_instruments": 50,
+      "max_override_limit": 50,
+      "current_repair_requires_tradable": true,
+      "allow_inactive_pre_lifecycle_history": true,
+      "skip_index_lifecycle_states": [
+        "calculation_terminated",
+        "inactive",
+        "stale_no_quote"
+      ],
+      "enable_local_stale_no_quote": true,
+      "stale_no_quote_trading_days": 10,
+      "stale_governance_continue_policy": "warn"
+    },
     "master_governance": {
       "enabled": true,
       "policies": {
@@ -631,6 +649,9 @@
             "high",
             "critical"
           ],
+          "repair_universe_mode": "historical_backfill",
+          "override_lifecycle_filter": false,
+          "force_current_master_refresh": false,
           "days_to_check": 45
         }
       },
@@ -912,10 +933,18 @@
             "fields": [
               "total_gaps",
               "affected_stocks",
-              "severity_distribution"
+              "severity_distribution",
+              "lifecycle_skipped_instruments",
+              "lifecycle_skipped_gap_segments"
             ],
             "title": "缺口摘要",
             "condition": "status != 'error'"
+          },
+          {
+            "name": "repair_universe_summary",
+            "type": "static",
+            "content": "*生命周期过滤*\n{repair_universe_summary}",
+            "condition": "status != 'error' and repair_universe_summary"
           },
           {
             "name": "error_info",

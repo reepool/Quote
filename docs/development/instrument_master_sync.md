@@ -14,6 +14,10 @@
 
 普通 A 股行情日更接受上游主数据或行情源对新股存在 T+1/T+2 滞后，但不接受标的进入本地主表后首个交易日行情永久缺失。`data_config.daily_update_catchup` 控制小窗口追补：本地无行情的新股从 `max(listed_date, target_date - new_instrument_catchup_days)` 抓到目标日，已有行情但短期落后的标的从 `max(latest_quote_date, target_date - short_gap_catchup_days)` 抓到目标日；窗口截断、缺少上市日和样例会进入日更报告。超过窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 处理，避免普通日更退化成无界历史补数。
 
+历史缺口修复和区间回补现在使用 `data_config.repair_universe_governance` 做本地主数据生命周期过滤。该过滤不是上游主数据强制刷新：默认只读取本地 `instruments`、指数生命周期证据和本地最新行情日期，在 `detect_data_gaps()`、`fill_data_gaps()`、`find_gap_and_repair`、月度完整性检查和 `daily_data_backfill_range` 发起行情源请求前排除或裁剪无效窗口。典型跳过包括 `calculation_terminated/inactive/stale_no_quote` 指数、请求区间完全晚于 `delisted_date` 的品种、以及本地指数行情长期陈旧且命中 stale-no-quote 策略的停编候选。报告会把这些计入 `repair_universe`，与 source empty、timeout、失败跳表分开。
+
+历史任务默认仍保持 `skip_for_backfill` 语义，不会因为启用 repair universe 过滤而刷新 BaoStock、CNIndex、CSIndex 或 HKEX 当前主数据。如果运维人员要在修复前刷新当前主数据，必须显式传入 `force_current_master_refresh=true`，并可用 `current_master_refresh_scopes` 限定到如 `a_share_index` 的单一治理 scope；报告会标记这是 operator-requested historical repair refresh。绕过生命周期过滤只允许 `override_lifecycle_filter=true` 且带明确 `instrument_ids` 或小范围 `repair_universe_limit`，用于取证式修复，避免再次触发全市场无界源请求。
+
 ### 模块化治理目标
 
 当前主数据治理已经从单一 `ensure_instrument_master_fresh()` 入口扩展为模块化编排。`instrument_master_governance.py` 提供统一的 `MasterGovernanceRequirement`、policy registry 和 orchestrator；`DataManager.run_master_governance_for_job()` 根据 `data_config.master_governance.job_requirements` 或旧配置 fallback，把业务任务的主数据前置需求分发给对应 policy。

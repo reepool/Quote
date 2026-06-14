@@ -134,10 +134,18 @@
             "fields": [
               "total_gaps",
               "affected_stocks",
-              "severity_distribution"
+              "severity_distribution",
+              "lifecycle_skipped_instruments",
+              "lifecycle_skipped_gap_segments"
             ],
             "title": "缺口摘要",
             "condition": "status != 'error'"
+          },
+          {
+            "name": "repair_universe_summary",
+            "type": "static",
+            "content": "*生命周期过滤*\n{repair_universe_summary}",
+            "condition": "status != 'error' and repair_universe_summary"
           },
           {
             "name": "error_info",

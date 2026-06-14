@@ -14,6 +14,7 @@ from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshar
 _install_akshare_proxy_patch(required=False)
 
 import asyncio
+from collections import Counter
 from copy import deepcopy
 import hashlib
 import inspect
@@ -8023,25 +8024,712 @@ class DataManager:
         except Exception as e:
             dm_logger.error(f"Post-download analysis failed: {e}")
 
-    async def detect_data_gaps(self, exchanges: List[str],
-                             start_date: date, end_date: date) -> List[DataGapInfo]:
+    def _get_repair_universe_governance_config(self) -> Dict[str, Any]:
+        """Return local lifecycle-filter policy for historical repair/backfill."""
+        index_config = self._get_index_master_governance_config()
+        defaults: Dict[str, Any] = {
+            'enabled': True,
+            'default_mode': 'historical_backfill',
+            'sample_limit': 10,
+            'allow_lifecycle_filter_override': True,
+            'max_override_instruments': 50,
+            'max_override_limit': 50,
+            'current_repair_requires_tradable': True,
+            'allow_inactive_pre_lifecycle_history': True,
+            'skip_index_lifecycle_states': [
+                'calculation_terminated',
+                'inactive',
+                'stale_no_quote',
+            ],
+            'enable_local_stale_no_quote': bool(index_config.get('skip_stale_no_quote', True)),
+            'stale_no_quote_trading_days': int(
+                index_config.get('stale_no_quote_trading_days', 10) or 10
+            ),
+            'stale_governance_continue_policy': 'warn',
+        }
+        raw_config = self.data_config.get('repair_universe_governance')
+        if not isinstance(raw_config, dict):
+            raw_config = self.config.get_nested('data_config.repair_universe_governance', {})
+        if isinstance(raw_config, dict):
+            defaults.update(raw_config)
+        defaults['skip_index_lifecycle_states'] = {
+            str(item).lower()
+            for item in defaults.get('skip_index_lifecycle_states', [])
+            if str(item).strip()
+        }
+        return defaults
+
+    @staticmethod
+    def _normalize_repair_universe_mode(mode: Optional[str], *, dry_run: bool = False) -> str:
+        """Normalize repair-universe execution mode names."""
+        if dry_run:
+            return 'dry_run'
+        normalized = str(mode or 'historical_backfill').strip().lower()
+        aliases = {
+            'current': 'current_repair',
+            'repair': 'current_repair',
+            'historical': 'historical_backfill',
+            'backfill': 'historical_backfill',
+            'forensic': 'override',
+        }
+        normalized = aliases.get(normalized, normalized)
+        allowed = {'current_repair', 'historical_backfill', 'dry_run', 'override'}
+        if normalized not in allowed:
+            raise ValueError(f"Unsupported repair universe mode: {mode}")
+        return normalized
+
+    def _build_repair_universe_diagnostics(
+        self,
+        *,
+        mode: str,
+        start_date: Optional[date],
+        end_date: Optional[date],
+        override_lifecycle_filter: bool = False,
+        enabled: bool = True,
+    ) -> Dict[str, Any]:
+        """Create the structured diagnostics payload used by repair jobs."""
+        return {
+            'enabled': enabled,
+            'mode': mode,
+            'start_date': start_date.isoformat() if start_date else None,
+            'end_date': end_date.isoformat() if end_date else None,
+            'override_lifecycle_filter': bool(override_lifecycle_filter),
+            'input_instrument_count': 0,
+            'eligible_instrument_count': 0,
+            'clipped_instrument_count': 0,
+            'skipped_instrument_count': 0,
+            'skipped_gap_segment_count': 0,
+            'skipped_missing_days': 0,
+            'reason_distribution': {},
+            'samples': [],
+            'warnings': [],
+            'errors': [],
+            'current_master_refresh': {
+                'requested': False,
+                'status': 'not_requested',
+                'scopes': [],
+                'operator_requested': False,
+            },
+        }
+
+    def _record_repair_universe_skip(
+        self,
+        diagnostics: Dict[str, Any],
+        *,
+        reason: str,
+        instrument: Optional[Dict[str, Any]] = None,
+        gap: Optional[DataGapInfo] = None,
+        gap_segments: int = 0,
+        missing_days: int = 0,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        detail: Optional[str] = None,
+    ) -> None:
+        """Append one bounded lifecycle-skip diagnostic."""
+        reason = str(reason or 'unknown')
+        distribution = Counter(diagnostics.get('reason_distribution') or {})
+        distribution[reason] += max(1, int(gap_segments or 1))
+        diagnostics['reason_distribution'] = dict(distribution)
+        if gap_segments:
+            diagnostics['skipped_gap_segment_count'] += int(gap_segments)
+        if missing_days:
+            diagnostics['skipped_missing_days'] += int(missing_days)
+
+        sample_limit = int(self._get_repair_universe_governance_config().get('sample_limit', 10) or 0)
+        if sample_limit <= 0 or len(diagnostics.get('samples') or []) >= sample_limit:
+            return
+
+        source = instrument or {}
+        sample = {
+            'instrument_id': (
+                getattr(gap, 'instrument_id', None)
+                or source.get('instrument_id')
+            ),
+            'symbol': getattr(gap, 'symbol', None) or source.get('symbol'),
+            'exchange': getattr(gap, 'exchange', None) or source.get('exchange'),
+            'type': source.get('type'),
+            'status': source.get('status'),
+            'reason': reason,
+            'start_date': start_date.isoformat() if start_date else None,
+            'end_date': end_date.isoformat() if end_date else None,
+        }
+        if gap is not None:
+            sample.update({
+                'gap_start': gap.gap_start.isoformat(),
+                'gap_end': gap.gap_end.isoformat(),
+                'gap_days': gap.gap_days,
+            })
+        if detail:
+            sample['detail'] = detail
+        diagnostics.setdefault('samples', []).append(sample)
+
+    def _validate_repair_universe_override(
+        self,
+        *,
+        override_lifecycle_filter: bool,
+        instrument_ids: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Reject broad lifecycle-filter overrides before quote source calls."""
+        if not override_lifecycle_filter:
+            return
+
+        config = config or self._get_repair_universe_governance_config()
+        if not config.get('allow_lifecycle_filter_override', True):
+            raise ValueError("repair universe lifecycle-filter override is disabled by config")
+
+        max_instruments = int(config.get('max_override_instruments', 50) or 50)
+        max_limit = int(config.get('max_override_limit', max_instruments) or max_instruments)
+        bounded_ids = [item for item in (instrument_ids or []) if str(item).strip()]
+        if bounded_ids:
+            if len(set(bounded_ids)) > max_instruments:
+                raise ValueError(
+                    f"repair universe override target set is too broad: "
+                    f"{len(set(bounded_ids))}>{max_instruments}"
+                )
+            return
+
+        if limit is not None and 0 < int(limit) <= max_limit:
+            return
+
+        raise ValueError(
+            "repair universe lifecycle-filter override requires explicit "
+            "instrument_ids or a small repair_universe_limit"
+        )
+
+    @staticmethod
+    def _instrument_types_for_governance_scopes(
+        scopes: Optional[List[str]],
+        fallback: List[str],
+    ) -> List[str]:
+        """Map explicit governance scopes to instrument types for refresh calls."""
+        if not scopes:
+            return fallback
+        mapped: Set[str] = set()
+        for scope in scopes:
+            normalized = str(scope or '').strip().lower()
+            if normalized == 'a_share_index':
+                mapped.add('index')
+            elif normalized in {'a_share_stock', 'hkex_instrument'}:
+                mapped.add('stock')
+        return sorted(mapped) or fallback
+
+    async def _run_repair_current_master_refresh(
+        self,
+        *,
+        job_name: str,
+        exchanges: List[str],
+        instrument_types: List[str],
+        target_date: date,
+        scopes: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        """Run operator-requested current master refresh for repair workflows."""
+        requirements = self._build_master_governance_requirements(
+            job_name=job_name,
+            exchanges=exchanges,
+            instrument_types=instrument_types,
+            job_type='historical',
+            target_date=target_date,
+            force_refresh=True,
+        )
+        requested_scopes = {
+            str(scope).strip()
+            for scope in (scopes or [])
+            if str(scope).strip()
+        }
+        if requested_scopes:
+            requirements = [
+                requirement
+                for requirement in requirements
+                if requirement.scope in requested_scopes
+            ]
+        if not requirements:
+            started_at = get_shanghai_time()
+            return {
+                'status': 'skipped',
+                'action': 'skipped',
+                'reason': 'no_requested_master_governance_scope',
+                'job_name': job_name,
+                'job_type': 'historical',
+                'started_at': started_at.isoformat(),
+                'finished_at': get_shanghai_time().isoformat(),
+                'elapsed_sec': 0.0,
+                'summary': {'exchanges': [], 'active_count': 0},
+                'exchanges': {},
+                'children': [],
+                'warnings': [],
+                'errors': [],
+            }
+        result = await self.run_master_governance(requirements)
+        result['job_name'] = job_name
+        result['job_type'] = 'historical'
+        result['operator_requested_for_historical_repair'] = True
+        return result
+
+    async def _load_index_lifecycle_evidence_by_instrument(
+        self,
+        exchanges: List[str],
+        states: List[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Read latest local index lifecycle evidence, when the DB supports it."""
+        if not hasattr(self.db_ops, 'get_index_lifecycle_evidence'):
+            return {}
+        try:
+            rows = await self.db_ops.get_index_lifecycle_evidence(
+                exchanges=exchanges,
+                states=states,
+            )
+        except Exception as exc:
+            dm_logger.warning("[DataManager] Failed to load index lifecycle evidence: %s", exc)
+            return {}
+
+        evidence_by_id: Dict[str, Dict[str, Any]] = {}
+        for row in rows or []:
+            instrument_id = row.get('instrument_id')
+            if instrument_id and instrument_id not in evidence_by_id:
+                evidence_by_id[instrument_id] = row
+        return evidence_by_id
+
+    def _resolve_repair_window_for_instrument(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        start_date: Optional[date],
+        end_date: date,
+        mode: str,
+        config: Dict[str, Any],
+        lifecycle_evidence: Optional[Dict[str, Any]] = None,
+        latest_quote_date: Optional[date] = None,
+        override_lifecycle_filter: bool = False,
+    ) -> Dict[str, Any]:
+        """Return lifecycle-aware repair window for one local instrument row."""
+        requested_start = start_date
+        requested_end = end_date
+        if override_lifecycle_filter:
+            return {
+                'eligible': True,
+                'start_date': requested_start,
+                'end_date': requested_end,
+                'reason': 'override',
+                'clipped': False,
+            }
+
+        start = requested_start
+        end = requested_end
+        status = str(instrument.get('status') or '').strip().lower()
+        instrument_type = str(instrument.get('type') or '').strip().lower()
+        exchange = str(instrument.get('exchange') or '').strip().upper()
+        is_active = instrument.get('is_active')
+        trading_status = instrument.get('trading_status')
+        listed = self._date_from_any(instrument.get('listed_date'))
+        delisted = self._date_from_any(instrument.get('delisted_date'))
+
+        if start is None:
+            start = listed
+        elif listed and start < listed:
+            start = listed
+
+        if start is None:
+            return {
+                'eligible': False,
+                'reason': 'missing_lifecycle_start',
+                'start_date': None,
+                'end_date': end,
+                'clipped': False,
+            }
+
+        if listed and listed > requested_end:
+            return {
+                'eligible': False,
+                'reason': 'before_listed_date',
+                'start_date': start,
+                'end_date': end,
+                'clipped': True,
+            }
+
+        if delisted and end > delisted:
+            end = delisted
+
+        index_states = set(config.get('skip_index_lifecycle_states') or set())
+        evidence = lifecycle_evidence or {}
+        evidence_state = str(evidence.get('lifecycle_state') or '').strip().lower()
+        lifecycle_state = evidence_state or status
+        index_lifecycle_boundary = (
+            self._date_from_any(evidence.get('effective_date'))
+            or self._date_from_any(evidence.get('last_quote_date'))
+            or delisted
+        )
+
+        if instrument_type == 'index' and lifecycle_state in index_states:
+            if index_lifecycle_boundary:
+                if end > index_lifecycle_boundary:
+                    end = index_lifecycle_boundary
+            else:
+                return {
+                    'eligible': False,
+                    'reason': f'index_lifecycle_{lifecycle_state}',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
+
+        if (
+            instrument_type == 'index'
+            and exchange in {'SSE', 'SZSE'}
+            and lifecycle_state not in index_states
+            and config.get('enable_local_stale_no_quote', True)
+            and latest_quote_date is not None
+        ):
+            stale_days = int(config.get('stale_no_quote_trading_days', 10) or 10)
+            if requested_end > latest_quote_date + timedelta(days=stale_days):
+                if end > latest_quote_date:
+                    end = latest_quote_date
+                lifecycle_state = 'stale_no_quote'
+
+        if mode == 'current_repair':
+            if is_active in (False, 0, '0'):
+                return {
+                    'eligible': False,
+                    'reason': 'inactive_master_status',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
+            if (
+                config.get('current_repair_requires_tradable', True)
+                and trading_status not in (None, 1, True, '1')
+            ):
+                return {
+                    'eligible': False,
+                    'reason': 'non_tradable_master_status',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
+
+        if mode in {'historical_backfill', 'dry_run'}:
+            inactive_without_boundary = (
+                is_active in (False, 0, '0')
+                and not delisted
+                and not index_lifecycle_boundary
+                and status not in {'active', 'active_quote'}
+            )
+            if inactive_without_boundary:
+                return {
+                    'eligible': False,
+                    'reason': 'inactive_without_lifecycle_boundary',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
+
+        if start > end:
+            if listed and listed > requested_end:
+                reason = 'before_listed_date'
+            elif delisted and requested_start and requested_start > delisted:
+                reason = 'after_delisted_date'
+            elif instrument_type == 'index' and lifecycle_state in index_states | {'stale_no_quote'}:
+                reason = f'index_lifecycle_{lifecycle_state}'
+            else:
+                reason = 'outside_lifecycle_window'
+            return {
+                'eligible': False,
+                'reason': reason,
+                'start_date': start,
+                'end_date': end,
+                'clipped': True,
+            }
+
+        return {
+            'eligible': True,
+            'start_date': start,
+            'end_date': end,
+            'reason': lifecycle_state if lifecycle_state else 'eligible',
+            'clipped': start != requested_start or end != requested_end,
+        }
+
+    async def filter_repair_universe(
+        self,
+        instruments: List[Dict[str, Any]],
+        *,
+        start_date: Optional[date],
+        end_date: date,
+        mode: Optional[str] = None,
+        instrument_ids: Optional[List[str]] = None,
+        override_lifecycle_filter: bool = False,
+        limit: Optional[int] = None,
+        dry_run: bool = False,
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+        """Filter and clip local repair/backfill instruments by lifecycle state."""
+        config = self._get_repair_universe_governance_config()
+        normalized_mode = self._normalize_repair_universe_mode(
+            mode or config.get('default_mode'),
+            dry_run=dry_run,
+        )
+        override_lifecycle_filter = (
+            bool(override_lifecycle_filter) or normalized_mode == 'override'
+        )
+        self._validate_repair_universe_override(
+            override_lifecycle_filter=override_lifecycle_filter,
+            instrument_ids=instrument_ids,
+            limit=limit,
+            config=config,
+        )
+
+        diagnostics = self._build_repair_universe_diagnostics(
+            mode=normalized_mode,
+            start_date=start_date,
+            end_date=end_date,
+            override_lifecycle_filter=override_lifecycle_filter,
+            enabled=bool(config.get('enabled', True)),
+        )
+        diagnostics['input_instrument_count'] = len(instruments or [])
+
+        if not config.get('enabled', True):
+            eligible = [dict(item) for item in (instruments or [])]
+            diagnostics['eligible_instrument_count'] = len(eligible)
+            return eligible, diagnostics
+
+        if instrument_ids:
+            requested_ids = {str(item).strip() for item in instrument_ids if str(item).strip()}
+            instruments = [
+                item for item in (instruments or [])
+                if item.get('instrument_id') in requested_ids
+            ]
+
+        if limit is not None and int(limit) > 0:
+            instruments = list(instruments or [])[:int(limit)]
+
+        states = list(config.get('skip_index_lifecycle_states') or [])
+        exchanges = sorted({
+            str(item.get('exchange')).upper()
+            for item in (instruments or [])
+            if item.get('exchange')
+        })
+        evidence_by_id = await self._load_index_lifecycle_evidence_by_instrument(
+            exchanges,
+            states,
+        )
+
+        eligible: List[Dict[str, Any]] = []
+        stale_checked = 0
+        for instrument in instruments or []:
+            latest_quote_date = None
+            instrument_type = str(instrument.get('type') or '').lower()
+            exchange = str(instrument.get('exchange') or '').upper()
+            if (
+                instrument_type == 'index'
+                and exchange in {'SSE', 'SZSE'}
+                and config.get('enable_local_stale_no_quote', True)
+            ):
+                try:
+                    latest_quote_date = self._date_from_any(
+                        await self.db_ops.get_latest_quote_date(instrument.get('instrument_id'))
+                    )
+                    stale_checked += 1
+                except Exception as exc:
+                    diagnostics['warnings'].append(
+                        f"latest quote lookup failed for {instrument.get('instrument_id')}: {exc}"
+                    )
+
+            window = self._resolve_repair_window_for_instrument(
+                instrument,
+                start_date=start_date,
+                end_date=end_date,
+                mode=normalized_mode,
+                config=config,
+                lifecycle_evidence=evidence_by_id.get(instrument.get('instrument_id')),
+                latest_quote_date=latest_quote_date,
+                override_lifecycle_filter=override_lifecycle_filter,
+            )
+            if not window.get('eligible'):
+                diagnostics['skipped_instrument_count'] += 1
+                self._record_repair_universe_skip(
+                    diagnostics,
+                    reason=window.get('reason', 'outside_lifecycle_window'),
+                    instrument=instrument,
+                    start_date=window.get('start_date'),
+                    end_date=window.get('end_date'),
+                )
+                continue
+
+            item = dict(instrument)
+            item['_repair_start_date'] = window.get('start_date')
+            item['_repair_end_date'] = window.get('end_date')
+            item['_repair_universe_reason'] = window.get('reason')
+            item['_repair_universe_clipped'] = bool(window.get('clipped'))
+            if window.get('clipped'):
+                diagnostics['clipped_instrument_count'] += 1
+            eligible.append(item)
+
+        if (
+            stale_checked == 0
+            and any(str(item.get('type') or '').lower() == 'index' for item in instruments or [])
+        ):
+            diagnostics['warnings'].append(
+                'index lifecycle stale-no-quote diagnostics were not evaluated for this universe'
+            )
+
+        diagnostics['eligible_instrument_count'] = len(eligible)
+        return eligible, diagnostics
+
+    async def _is_gap_lifecycle_eligible(
+        self,
+        gap: DataGapInfo,
+        instrument: Dict[str, Any],
+        *,
+        mode: str = 'historical_backfill',
+        override_lifecycle_filter: bool = False,
+    ) -> Tuple[bool, Optional[date], Optional[date], str]:
+        """Re-check one persisted gap before source routing."""
+        config = self._get_repair_universe_governance_config()
+        evidence_by_id = await self._load_index_lifecycle_evidence_by_instrument(
+            [gap.exchange],
+            list(config.get('skip_index_lifecycle_states') or []),
+        )
+        latest_quote_date = None
+        if (
+            str(instrument.get('type') or '').lower() == 'index'
+            and str(instrument.get('exchange') or gap.exchange).upper() in {'SSE', 'SZSE'}
+            and config.get('enable_local_stale_no_quote', True)
+        ):
+            try:
+                latest_quote_date = self._date_from_any(
+                    await self.db_ops.get_latest_quote_date(instrument.get('instrument_id'))
+                )
+            except Exception:
+                latest_quote_date = None
+
+        window = self._resolve_repair_window_for_instrument(
+            instrument,
+            start_date=gap.gap_start,
+            end_date=gap.gap_end,
+            mode=self._normalize_repair_universe_mode(mode),
+            config=config,
+            lifecycle_evidence=evidence_by_id.get(instrument.get('instrument_id')),
+            latest_quote_date=latest_quote_date,
+            override_lifecycle_filter=override_lifecycle_filter,
+        )
+        return (
+            bool(window.get('eligible')),
+            window.get('start_date'),
+            window.get('end_date'),
+            str(window.get('reason') or 'outside_lifecycle_window'),
+        )
+
+    async def detect_data_gaps(
+        self,
+        exchanges: List[str],
+        start_date: date,
+        end_date: date,
+        *,
+        instrument_types: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        repair_universe_mode: Optional[str] = None,
+        override_lifecycle_filter: bool = False,
+        repair_universe_limit: Optional[int] = None,
+        dry_run: bool = False,
+        force_current_master_refresh: bool = False,
+        current_master_refresh_scopes: Optional[List[str]] = None,
+        include_diagnostics: bool = False,
+    ) -> Union[List[DataGapInfo], Dict[str, Any]]:
         """检测数据缺口"""
         gaps = []
+        mode = self._normalize_repair_universe_mode(repair_universe_mode, dry_run=dry_run)
+        merged_diagnostics = self._build_repair_universe_diagnostics(
+            mode=mode,
+            start_date=start_date,
+            end_date=end_date,
+            override_lifecycle_filter=override_lifecycle_filter or mode == 'override',
+        )
+        governance_result: Optional[Dict[str, Any]] = None
+
+        if force_current_master_refresh:
+            refresh_types = self._instrument_types_for_governance_scopes(
+                current_master_refresh_scopes,
+                instrument_types or self.data_config.get('instrument_types', ['stock', 'index']),
+            )
+            governance_result = await self._run_repair_current_master_refresh(
+                job_name='historical_repair_universe',
+                exchanges=exchanges,
+                instrument_types=refresh_types,
+                target_date=end_date,
+                scopes=current_master_refresh_scopes,
+            )
+            scopes = current_master_refresh_scopes or [
+                child.get('scope')
+                for child in (governance_result.get('children') or [])
+                if isinstance(child, dict) and child.get('scope')
+            ]
+            merged_diagnostics['current_master_refresh'] = {
+                'requested': True,
+                'status': governance_result.get('status'),
+                'scopes': scopes,
+                'operator_requested': True,
+            }
 
         for exchange in exchanges:
             try:
-                # 获取交易所的所有活跃股票
-                instruments = await self.db_ops.get_active_instruments(exchange)
+                # Repair/backfill needs local inactive rows too, so lifecycle
+                # filtering can decide and report rather than silently dropping.
+                if hasattr(self.db_ops, 'get_repair_universe_instruments'):
+                    instruments = await self.db_ops.get_repair_universe_instruments(
+                        exchange,
+                        instrument_types=instrument_types,
+                    )
+                else:
+                    instruments = await self.db_ops.get_active_instruments(
+                        exchange,
+                        instrument_types=instrument_types,
+                    )
+                filtered_instruments, diagnostics = await self.filter_repair_universe(
+                    instruments,
+                    start_date=start_date,
+                    end_date=end_date,
+                    mode=mode,
+                    instrument_ids=instrument_ids,
+                    override_lifecycle_filter=override_lifecycle_filter,
+                    limit=repair_universe_limit,
+                    dry_run=dry_run,
+                )
+                for key in ('input_instrument_count', 'eligible_instrument_count',
+                            'clipped_instrument_count', 'skipped_instrument_count',
+                            'skipped_gap_segment_count', 'skipped_missing_days'):
+                    merged_diagnostics[key] += int(diagnostics.get(key, 0) or 0)
+                merged_counter = Counter(merged_diagnostics.get('reason_distribution') or {})
+                merged_counter.update(diagnostics.get('reason_distribution') or {})
+                merged_diagnostics['reason_distribution'] = dict(merged_counter)
+                sample_limit = int(
+                    self._get_repair_universe_governance_config().get('sample_limit', 10) or 0
+                )
+                if sample_limit > 0:
+                    merged_diagnostics['samples'].extend(
+                        diagnostics.get('samples', [])[
+                            : max(0, sample_limit - len(merged_diagnostics.get('samples') or []))
+                        ]
+                    )
+                merged_diagnostics['warnings'].extend(diagnostics.get('warnings') or [])
+                merged_diagnostics['errors'].extend(diagnostics.get('errors') or [])
 
-                for instrument in instruments:
+                for instrument in filtered_instruments:
                     instrument_gaps = await self._detect_instrument_gaps(
-                        instrument, start_date, end_date
+                        instrument,
+                        instrument.get('_repair_start_date') or start_date,
+                        instrument.get('_repair_end_date') or end_date,
                     )
                     gaps.extend(instrument_gaps)
 
             except Exception as e:
                 dm_logger.error(f"Failed to detect gaps for {exchange}: {e}")
+                merged_diagnostics['errors'].append(f"{exchange}: {e}")
 
+        if include_diagnostics:
+            return {
+                'gaps': gaps,
+                'repair_universe': merged_diagnostics,
+                'instrument_master_governance': governance_result,
+            }
         return gaps
 
     async def _detect_instrument_gaps(self, instrument: Dict,
@@ -8304,7 +8992,11 @@ class DataManager:
         instrument_ids: Optional[List[str]] = None,
         gap_type_filter: Optional[List[str]] = None,
         max_gap_days: Optional[int] = None,
-        dry_run: bool = False
+        dry_run: bool = False,
+        repair_universe_mode: Optional[str] = None,
+        override_lifecycle_filter: bool = False,
+        repair_universe_limit: Optional[int] = None,
+        force_current_master_refresh: bool = False,
     ):
         """填补数据缺口"""
         try:
@@ -8316,13 +9008,23 @@ class DataManager:
             exchanges = [exchange] if exchange else ['SSE', 'SZSE', 'BSE']
 
             # 获取需要填补的缺口
-            gaps = await self.detect_data_gaps(exchanges, start_date, end_date)
+            gap_result = await self.detect_data_gaps(
+                exchanges,
+                start_date,
+                end_date,
+                instrument_ids=instrument_ids,
+                repair_universe_mode=repair_universe_mode,
+                override_lifecycle_filter=override_lifecycle_filter,
+                repair_universe_limit=repair_universe_limit,
+                dry_run=dry_run,
+                force_current_master_refresh=force_current_master_refresh,
+                include_diagnostics=True,
+            )
+            gaps = gap_result['gaps']
 
             # 过滤严重程度
             if severity_filter:
                 gaps = [g for g in gaps if g.severity in severity_filter]
-            if instrument_ids:
-                gaps = [g for g in gaps if g.instrument_id in instrument_ids]
             if gap_type_filter:
                 gaps = [g for g in gaps if g.gap_type in gap_type_filter]
             if max_gap_days is not None:
@@ -8344,8 +9046,26 @@ class DataManager:
                 except Exception as e:
                     dm_logger.error(f"Failed to fill gap for {gap.instrument_id}: {e}")
 
+            return {
+                'status': 'success',
+                'dry_run': dry_run,
+                'gaps_detected': len(gap_result['gaps']),
+                'gaps_selected': len(gaps),
+                'filled_count': filled_count,
+                'repair_universe': gap_result.get('repair_universe', {}),
+                'instrument_master_governance': gap_result.get('instrument_master_governance'),
+            }
+
         except Exception as e:
             dm_logger.error(f"Data gap filling failed: {e}")
+            return {
+                'status': 'error',
+                'error': str(e),
+                'dry_run': dry_run,
+                'gaps_detected': 0,
+                'gaps_selected': 0,
+                'filled_count': 0,
+            }
 
     async def _fill_single_gap(self, gap: DataGapInfo) -> bool:
         """填补单个数据缺口"""
@@ -8370,8 +9090,25 @@ class DataManager:
                 )
                 return False
 
-            start_date = datetime.combine(gap.gap_start, datetime.min.time())
-            end_date = datetime.combine(gap.gap_end, datetime.max.time())
+            eligible, clipped_start, clipped_end, lifecycle_reason = await self._is_gap_lifecycle_eligible(
+                gap,
+                instrument,
+                mode='historical_backfill',
+            )
+            if not eligible:
+                dm_logger.info(
+                    "[DataManager] Gap fill lifecycle-skipped: %s %s~%s reason=%s",
+                    gap.instrument_id,
+                    gap.gap_start,
+                    gap.gap_end,
+                    lifecycle_reason,
+                )
+                return False
+
+            effective_gap_start = clipped_start or gap.gap_start
+            effective_gap_end = clipped_end or gap.gap_end
+            start_date = datetime.combine(effective_gap_start, datetime.min.time())
+            end_date = datetime.combine(effective_gap_end, datetime.max.time())
 
             # 从数据源获取缺失数据
             source_instrument_id = gap.instrument_id
@@ -8391,14 +9128,14 @@ class DataManager:
             if data:
                 dm_logger.info(
                     f"[DataManager] Gap fill data fetched: {gap.instrument_id} "
-                    f"{gap.gap_start} to {gap.gap_end}, rows={len(data)}"
+                    f"{effective_gap_start} to {effective_gap_end}, rows={len(data)}"
                 )
                 # 保存数据
                 for quote in data:
                     quote['instrument_id'] = instrument.get('instrument_id')
                 success = await self.db_ops.save_daily_quotes(data)
                 if success:
-                    dm_logger.info(f"Filled gap for {gap.symbol}: {gap.gap_start} to {gap.gap_end}")
+                    dm_logger.info(f"Filled gap for {gap.symbol}: {effective_gap_start} to {effective_gap_end}")
 
                     # 同步复权因子（仅限股票, 与 update_daily_data 逻辑保持一致）
                     if instrument.get('type', 'stock') == 'stock':
@@ -8421,12 +9158,12 @@ class DataManager:
                     return True
                 dm_logger.warning(
                     f"[DataManager] Gap fill save failed: {gap.instrument_id} "
-                    f"{gap.gap_start} to {gap.gap_end}"
+                    f"{effective_gap_start} to {effective_gap_end}"
                 )
             else:
                 dm_logger.warning(
                     f"[DataManager] Gap fill returned no data: {gap.instrument_id} "
-                    f"{gap.gap_start} to {gap.gap_end}"
+                    f"{effective_gap_start} to {effective_gap_end}"
                 )
 
             return False
@@ -12465,6 +13202,11 @@ class DataManager:
         progress_log_interval_sec: int = 300,
         instrument_types: Optional[List[str]] = None,
         run_factor_audit: bool = False,
+        repair_universe_mode: str = 'historical_backfill',
+        override_lifecycle_filter: bool = False,
+        repair_universe_limit: Optional[int] = None,
+        force_current_master_refresh: bool = False,
+        current_master_refresh_scopes: Optional[List[str]] = None,
     ) -> dict:
         """补充一个日期区间的日线数据。
 
@@ -12515,7 +13257,38 @@ class DataManager:
                 'warnings': [],
                 'errors': [],
             },
+            'repair_universe': self._build_repair_universe_diagnostics(
+                mode=self._normalize_repair_universe_mode(repair_universe_mode),
+                start_date=start_date,
+                end_date=end_date,
+                override_lifecycle_filter=override_lifecycle_filter,
+            ),
         }
+
+        if force_current_master_refresh:
+            refresh_types = self._instrument_types_for_governance_scopes(
+                current_master_refresh_scopes,
+                instrument_types or self.data_config.get('instrument_types', ['stock', 'index']),
+            )
+            governance = await self._run_repair_current_master_refresh(
+                job_name='daily_data_backfill_range',
+                exchanges=exchanges,
+                instrument_types=refresh_types,
+                target_date=end_date,
+                scopes=current_master_refresh_scopes,
+            )
+            update_results['instrument_master_sync'] = governance
+            update_results['instrument_master_governance'] = governance
+            update_results['repair_universe']['current_master_refresh'] = {
+                'requested': True,
+                'status': governance.get('status'),
+                'scopes': current_master_refresh_scopes or [
+                    child.get('scope')
+                    for child in (governance.get('children') or [])
+                    if isinstance(child, dict) and child.get('scope')
+                ],
+                'operator_requested': True,
+            }
 
         for exchange in exchanges:
             try:
@@ -12523,18 +13296,53 @@ class DataManager:
                     "[DataManager] Range backfill updating %s, types=%s, range=%s~%s",
                     exchange, instrument_types, start_date, end_date
                 )
-                instruments = await self.db_ops.get_active_instruments(
-                    exchange,
-                    instrument_types=instrument_types,
-                    tradable_only=True,
+                if hasattr(self.db_ops, 'get_repair_universe_instruments'):
+                    raw_instruments = await self.db_ops.get_repair_universe_instruments(
+                        exchange,
+                        instrument_types=instrument_types,
+                    )
+                else:
+                    raw_instruments = await self.db_ops.get_active_instruments(
+                        exchange,
+                        instrument_types=instrument_types,
+                        tradable_only=True,
+                    )
+                instruments, repair_diag = await self.filter_repair_universe(
+                    raw_instruments,
+                    start_date=start_date,
+                    end_date=end_date,
+                    mode=repair_universe_mode,
+                    override_lifecycle_filter=override_lifecycle_filter,
+                    limit=repair_universe_limit,
                 )
+                for key in ('input_instrument_count', 'eligible_instrument_count',
+                            'clipped_instrument_count', 'skipped_instrument_count',
+                            'skipped_gap_segment_count', 'skipped_missing_days'):
+                    update_results['repair_universe'][key] += int(repair_diag.get(key, 0) or 0)
+                merged_counter = Counter(update_results['repair_universe'].get('reason_distribution') or {})
+                merged_counter.update(repair_diag.get('reason_distribution') or {})
+                update_results['repair_universe']['reason_distribution'] = dict(merged_counter)
+                sample_limit = int(
+                    self._get_repair_universe_governance_config().get('sample_limit', 10) or 0
+                )
+                if sample_limit > 0:
+                    update_results['repair_universe']['samples'].extend(
+                        repair_diag.get('samples', [])[
+                            : max(0, sample_limit - len(update_results['repair_universe'].get('samples') or []))
+                        ]
+                    )
+                update_results['repair_universe']['warnings'].extend(repair_diag.get('warnings') or [])
+                update_results['repair_universe']['errors'].extend(repair_diag.get('errors') or [])
+
                 total_instruments = len(instruments)
                 exchange_result = {
                     'success_count': 0,
                     'failure_count': 0,
                     'quotes_added': 0,
+                    'raw_total_instruments': len(raw_instruments),
                     'total_instruments': total_instruments,
                     'skipped_not_listed': 0,
+                    'repair_universe': repair_diag,
                 }
 
                 is_a_stock = exchange in ('SSE', 'SZSE', 'BSE')
@@ -12555,9 +13363,14 @@ class DataManager:
                             continue
 
                         query_start = range_fetch_start
+                        repair_start = _to_date(instrument.get('_repair_start_date'))
+                        repair_end = _to_date(instrument.get('_repair_end_date')) or end_date
                         if listed_date and listed_date > query_start:
                             query_start = listed_date
-                        if query_start > end_date:
+                        if repair_start and repair_start > query_start:
+                            query_start = repair_start
+                        query_end = min(end_date, repair_end)
+                        if query_start > query_end:
                             exchange_result['skipped_not_listed'] += 1
                             continue
 
@@ -12567,7 +13380,7 @@ class DataManager:
                                 instrument['instrument_id'],
                                 instrument['symbol'],
                                 datetime.combine(query_start, datetime.min.time()),
-                                datetime.combine(end_date, datetime.max.time()),
+                                datetime.combine(query_end, datetime.max.time()),
                                 instrument_type=instrument.get('type', 'stock'),
                                 source_symbol=instrument.get('source_symbol', ''),
                             )
@@ -12593,8 +13406,8 @@ class DataManager:
                                 stocks_needing_factors.append({
                                     'instrument_id': instrument['instrument_id'],
                                     'symbol': instrument['symbol'],
-                                    'start_date': start_date,
-                                    'end_date': end_date,
+                                    'start_date': query_start,
+                                    'end_date': query_end,
                                 })
 
                         now = datetime.now()
