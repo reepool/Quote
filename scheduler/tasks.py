@@ -1891,6 +1891,12 @@ class ScheduledTasks:
                     default=3,
                 ) or 0
             )
+            max_index_no_data_failures_per_instrument = int(
+                self.config.get_nested(
+                    'data_config.repair_universe_governance.max_index_no_data_failures_per_instrument',
+                    default=1,
+                ) or 0
+            )
             failure_details = []
             for gap in gaps_to_repair:
                 if skip_failed_segments and data_manager.is_gap_skipped(
@@ -1899,9 +1905,12 @@ class ScheduledTasks:
                     skipped_known_failures += 1
                     continue
 
+                no_data_failure_limit = max_no_data_failures_per_instrument
+                if str(getattr(gap, 'instrument_type', '') or '').lower() == 'index':
+                    no_data_failure_limit = max_index_no_data_failures_per_instrument
                 if (
-                    max_no_data_failures_per_instrument > 0
-                    and no_data_failures_by_instrument.get(gap.instrument_id, 0) >= max_no_data_failures_per_instrument
+                    no_data_failure_limit > 0
+                    and no_data_failures_by_instrument.get(gap.instrument_id, 0) >= no_data_failure_limit
                 ):
                     skipped_after_no_data_failures += 1
                     if skip_failed_segments:

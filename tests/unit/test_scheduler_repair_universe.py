@@ -45,6 +45,7 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
     task.config = Mock()
     task.config.get_nested.side_effect = lambda *args, default=None: (
         2 if args == ('data_config.repair_universe_governance.max_no_data_failures_per_instrument',)
+        else 1 if args == ('data_config.repair_universe_governance.max_index_no_data_failures_per_instrument',)
         else default
     )
     task._send_task_report = AsyncMock()
@@ -61,6 +62,7 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
             severity='low',
             recommendation='test',
             missing_dates=[date(2026, 1, idx + 1)],
+            instrument_type='index',
         )
         for idx in range(5)
     ]
@@ -95,8 +97,8 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
         skip_failed_segments=True,
     ) is False
 
-    assert fake_manager._fill_single_gap.await_count == 2
+    assert fake_manager._fill_single_gap.await_count == 1
     assert fake_manager.record_gap_skip.await_count == 5
     report_data = task._send_task_report.await_args.kwargs['report_data']
-    assert report_data['summary']['failed_repairs'] == 2
-    assert report_data['summary']['skipped_after_no_data_failures'] == 3
+    assert report_data['summary']['failed_repairs'] == 1
+    assert report_data['summary']['skipped_after_no_data_failures'] == 4

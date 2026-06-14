@@ -123,6 +123,7 @@ class DataGapInfo:
     severity: str  # 'low', 'medium', 'high', 'critical'
     recommendation: str
     missing_dates: List['date'] = field(default_factory=list)  # 具体的缺失日期列表
+    instrument_type: Optional[str] = None
 
 
 class DataManager:
@@ -8800,7 +8801,8 @@ class DataManager:
                         gap_type='missing_data',
                         severity=self._assess_gap_severity(gap_days),
                         recommendation=self._get_gap_recommendation(gap_days),
-                        missing_dates=gap_missing_dates
+                        missing_dates=gap_missing_dates,
+                        instrument_type=instrument.get('type'),
                     ))
 
         except Exception as e:
