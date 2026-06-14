@@ -1290,7 +1290,7 @@ class ScheduledTasks:
             # 使用配置参数或默认值
             if exchanges is None:
                 exchanges = self.config.get_nested(
-                    'data_config', 'market_presets', 'a_shares',
+                    'data_config.market_presets.a_shares',
                     default=['SSE', 'SZSE', 'BSE']
                 )
 
@@ -1442,7 +1442,7 @@ class ScheduledTasks:
         try:
             if exchanges is None:
                 exchanges = self.config.get_nested(
-                    'data_config', 'market_presets', 'a_shares',
+                    'data_config.market_presets.a_shares',
                     default=['SSE', 'SZSE', 'BSE']
                 )
 
@@ -1661,7 +1661,7 @@ class ScheduledTasks:
             # 使用配置参数
             if exchanges is None:
                 exchanges = self.config.get_nested(
-                    'data_config', 'market_presets', 'a_shares',
+                    'data_config.market_presets.a_shares',
                     default=['SSE', 'SZSE', 'BSE']
                 )
 
@@ -1811,7 +1811,7 @@ class ScheduledTasks:
 
             if exchanges is None:
                 exchanges = self.config.get_nested(
-                    'data_config', 'market_presets', 'a_shares',
+                    'data_config.market_presets.a_shares',
                     default=['SSE', 'SZSE', 'BSE']
                 )
 
@@ -1887,8 +1887,7 @@ class ScheduledTasks:
             no_data_failures_by_instrument: Dict[str, int] = {}
             max_no_data_failures_per_instrument = int(
                 self.config.get_nested(
-                    'data_config', 'repair_universe_governance',
-                    'max_no_data_failures_per_instrument',
+                    'data_config.repair_universe_governance.max_no_data_failures_per_instrument',
                     default=3,
                 ) or 0
             )
@@ -5045,7 +5044,7 @@ class ScheduledTasks:
             # 使用配置参数或默认值
             if exchanges is None:
                 exchanges = self.config.get_nested(
-                    'data_config', 'market_presets', 'a_shares',
+                    'data_config.market_presets.a_shares',
                     default=['SSE', 'SZSE', 'BSE']
                 )
 

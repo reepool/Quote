@@ -44,7 +44,7 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
     task = ScheduledTasks()
     task.config = Mock()
     task.config.get_nested.side_effect = lambda *args, default=None: (
-        2 if args == ('data_config', 'repair_universe_governance', 'max_no_data_failures_per_instrument')
+        2 if args == ('data_config.repair_universe_governance.max_no_data_failures_per_instrument',)
         else default
     )
     task._send_task_report = AsyncMock()

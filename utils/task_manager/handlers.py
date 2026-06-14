@@ -1313,9 +1313,7 @@ class TaskManagerHandlers:
         try:
             from utils import config_manager
             exchanges = config_manager.get_nested(
-                'data_config',
-                'market_presets',
-                'a_shares',
+                'data_config.market_presets.a_shares',
                 default=['SSE', 'SZSE', 'BSE'],
             )
             if isinstance(exchanges, list) and exchanges:
