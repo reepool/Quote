@@ -8,6 +8,7 @@ import asyncio
 import json
 import os
 import sys
+import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -79,6 +80,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--output-path", type=Path, default=None)
     return parser
+
+
+def write_failure_report(args: argparse.Namespace, exc: Exception) -> Dict[str, Any]:
+    """Persist a JSON failure report for early smoke failures."""
+    failure_payload = {
+        "status": "failed",
+        "db_path": args.db_path,
+        "series_ids": _csv(args.series_ids),
+        "start_date": args.start_date,
+        "end_date": args.end_date,
+        "mode": args.mode,
+        "official_enabled": not args.disable_official,
+        "fallback_enabled": not args.disable_fallback,
+        "timeout_seconds": args.timeout_seconds,
+        "exception_type": type(exc).__name__,
+        "exception": str(exc),
+        "traceback": traceback.format_exc(limit=20),
+    }
+    output = json.dumps(json_ready(failure_payload), ensure_ascii=False, indent=2, sort_keys=True)
+    if args.output_path:
+        args.output_path.parent.mkdir(parents=True, exist_ok=True)
+        args.output_path.write_text(output + "\n", encoding="utf-8")
+    print(output)
+    return failure_payload
 
 
 def _seed_offline_fixture(storage: FuturesStorageManager, series_id: str, trade_date: str) -> Dict[str, Any]:
@@ -302,6 +327,10 @@ def main() -> int:
     asyncio.set_event_loop(loop)
     try:
         code = loop.run_until_complete(async_main())
+    except Exception as exc:
+        args = build_parser().parse_args()
+        write_failure_report(args, exc)
+        code = 1
     finally:
         sys.stdout.flush()
         sys.stderr.flush()

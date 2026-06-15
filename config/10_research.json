@@ -158,6 +158,13 @@
             "source_profile": "exchange_official_daily_probe",
             "quality_flag": "backfilled_verified",
             "future_policy": "official_notice_only",
+            "empty_payload_closed_start_dates": {
+              "SHFE": "2010-01-01",
+              "INE": "2010-01-01",
+              "DCE": "2010-01-01",
+              "CZCE": "2010-01-01",
+              "GFEX": "2010-01-01"
+            },
             "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
           }
         },

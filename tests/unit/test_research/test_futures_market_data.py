@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import date, timedelta
 import pandas as pd
 import pytest
@@ -32,9 +33,11 @@ from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
 from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
 from research.providers.official_futures import (
     DceOfficialBrowserClient,
+    OfficialFuturesContractBar,
     OfficialFuturesDailyProbeResult,
     OfficialFuturesMarketDataProvider,
     OfficialFuturesSourceUnavailable,
+    classify_official_futures_failure,
 )
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
 
@@ -315,6 +318,27 @@ def test_official_futures_provider_probe_classifies_trading_and_closed(monkeypat
     assert closed.status == "closed"
     assert closed.is_trading_day is False
     assert closed.row_count == 0
+
+
+def test_official_futures_provider_probe_does_not_close_old_empty_payload(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "official_calendar_backfill": {
+            "empty_payload_closed_start_dates": {"SHFE": "2010-01-01"}
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    monkeypatch.setattr(provider, "_request_exchange_payload", lambda session, exchange, trade_date: {"o_curinstrument": []})
+
+    result = provider.probe_exchange_trading_day("SHFE", "2000-01-04")
+
+    assert result.status == "unresolved"
+    assert result.is_trading_day is None
+    assert "before reliable empty-closed start date" in result.failure_reason
 
 
 def test_official_futures_provider_probe_keeps_failures_unresolved(monkeypatch, tmp_path):
@@ -828,6 +852,69 @@ def test_dce_browser_client_resolves_chrome_path_precedence(monkeypatch):
     assert DceOfficialBrowserClient({"browser_executable_path": "/cfg/chrome"}).browser_executable_path == "/cfg/chrome"
 
 
+def test_official_futures_failure_classification_marks_network_and_antibot():
+    network = classify_official_futures_failure("[Errno 101] Network is unreachable")
+    assert network.category == "network_unreachable"
+    assert network.suspected_local_ip_risk_control is True
+
+    antibot = classify_official_futures_failure("HTTP 403 Forbidden access denied by WAF")
+    assert antibot.category == "possible_anti_bot_or_ip_risk_control"
+    assert antibot.suspected_local_ip_risk_control is True
+
+
+def test_futures_smoke_writes_failure_report_on_exception(tmp_path):
+    from scripts.dev_validation.validate_futures_market_data_smoke import build_parser, write_failure_report
+
+    output_path = tmp_path / "smoke_failure.json"
+    args = build_parser().parse_args(
+        [
+            "--series-ids",
+            "CNF.CU.SHFE.main",
+            "--start-date",
+            "bad-date",
+            "--end-date",
+            "2024-06-03",
+            "--db-path",
+            str(tmp_path / "smoke.db"),
+            "--output-path",
+            str(output_path),
+        ]
+    )
+    write_failure_report(args, ValueError("bad date fixture"))
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["status"] == "failed"
+    assert payload["exception_type"] == "ValueError"
+    assert payload["start_date"] == "bad-date"
+
+
+def _official_contract_row(
+    *,
+    exchange: str = "SHFE",
+    trade_date: str = "2024-06-03",
+    variety: str = "CU",
+    contract: str = "CU2407",
+    close: float = 11,
+    open_interest: float = 200,
+) -> OfficialFuturesContractBar:
+    return OfficialFuturesContractBar(
+        exchange=exchange,
+        trade_date=trade_date,
+        variety=variety,
+        contract=contract,
+        open=10,
+        high=12,
+        low=9,
+        close=close,
+        settlement=10.5,
+        volume=100,
+        open_interest=open_interest,
+        amount=1234,
+        source_interface="official_shfe_daily_kx_dat",
+        raw_payload={"contract": contract},
+    )
+
+
 @pytest.mark.asyncio
 async def test_futures_market_data_sync_writes_fixture_bars(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
@@ -925,67 +1012,14 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     storage = FuturesStorageManager(config)
     storage.initialize()
 
-    async def fake_official_fetch(self, series, *, start_date=None, end_date=None, mode="direct"):
-        contract = FuturesContract(
-            contract_id="CNF.CU.SHFE.CU2407",
-            instrument_id=series.instrument_id,
-            exchange="SHFE",
-            exchange_contract_code="CU2407",
-            contract_month="2024-07",
-            currency="CNY",
-            unit="CNY/ton",
-            source="exchange_official",
-        )
-        return {
-            "contracts": [contract],
-            "contract_bars": [
-                FuturesContractBar(
-                    contract_id=contract.contract_id,
-                    instrument_id=series.instrument_id,
-                    trade_date="2024-06-03",
-                    open=10,
-                    high=12,
-                    low=9,
-                    close=11,
-                    raw_payload_hash=f"contract:{series.series_id}:2024-06-03",
-                    source="exchange_official",
-                    source_mode=mode,
-                    source_profile="exchange_official",
-                    source_interface="official_shfe_daily_kx_dat",
-                )
-            ],
-            "mappings": [
-                FuturesContinuousMapping(
-                    series_id=series.series_id,
-                    trade_date="2024-06-03",
-                    contract_id=contract.contract_id,
-                    exchange_contract_code=contract.exchange_contract_code,
-                    instrument_id=series.instrument_id,
-                    construction_method="official_open_interest_main",
-                )
-            ],
-            "series_bars": [
-                FuturesBar(
-                series_id=series.series_id,
-                trade_date="2024-06-03",
-                open=10,
-                high=12,
-                low=9,
-                close=11,
-                raw_payload_hash=f"official:{series.series_id}:2024-06-03",
-                source="exchange_official",
-                source_mode=mode,
-                source_profile="exchange_official",
-                source_interface="official_shfe_daily_kx_dat",
-                )
-            ],
-        }
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [_official_contract_row(exchange=exchange, trade_date=trade_date)]
 
     async def unexpected_fallback(self, series, *, start_date=None, end_date=None, mode="direct"):
         raise AssertionError("fallback provider should not be called when official source succeeds")
 
     monkeypatch.setattr(
-        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_artifacts",
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
         fake_official_fetch,
     )
     monkeypatch.setattr(
@@ -999,6 +1033,8 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     assert result["status"] == "success"
     assert result["source_selection"]["official_success"] == 1
     assert result["source_selection"]["fallback_success"] == 0
+    assert result["official_fanout"]["exchange_payload_requests"] == 1
+    assert result["official_fanout"]["series_artifacts_built"] == 1
     assert rows[0]["source_profile"] == "exchange_official"
     assert storage.get_contract("CNF.CU.SHFE.CU2407")
     assert storage.get_contract_price_bars("CNF.CU.SHFE.CU2407")[0]["close"] == 11
@@ -1016,7 +1052,7 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
     storage = FuturesStorageManager(config)
     storage.initialize()
 
-    async def failed_official_fetch(self, series, *, start_date=None, end_date=None, mode="direct"):
+    async def failed_official_fetch(self, exchange, trade_date, *, mode="direct"):
         raise OfficialFuturesSourceUnavailable("official fixture unavailable")
 
     async def fake_fallback_fetch(self, series, *, start_date=None, end_date=None, mode="direct"):
@@ -1037,7 +1073,7 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
         ]
 
     monkeypatch.setattr(
-        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_daily_artifacts",
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
         failed_official_fetch,
     )
     monkeypatch.setattr(
@@ -1051,8 +1087,144 @@ async def test_futures_market_data_sync_falls_back_after_official_unavailable(mo
     assert result["status"] == "success"
     assert result["source_selection"]["official_failed"] == 1
     assert result["source_selection"]["fallback_success"] == 1
+    assert result["official_fanout"]["exchange_payload_requests"] == 1
+    assert result["official_fanout"]["fallback_attempts"] == 1
     assert result["series"][0]["official_status"] == "unavailable"
     assert rows[0]["source_profile"] == "akshare_futures"
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_fans_out_one_exchange_payload(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "preferred_order": ["exchange_official", "akshare_futures"],
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"], "timeout_seconds": 1},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    calls = []
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        calls.append((exchange, trade_date))
+        return [
+            _official_contract_row(exchange=exchange, trade_date=trade_date, variety="CU", contract="CU2407", close=11),
+            _official_contract_row(exchange=exchange, trade_date=trade_date, variety="AL", contract="AL2407", close=21),
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main", "CNF.AL.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+    )
+
+    assert result["status"] == "success"
+    assert calls == [("SHFE", "2024-06-03")]
+    assert result["official_fanout"]["exchange_payload_requests"] == 1
+    assert result["official_fanout"]["exchange_payload_cache_hits"] == 1
+    assert result["official_fanout"]["series_artifacts_built"] == 2
+    assert storage.get_price_bars("CNF.CU.SHFE.main")[0]["close"] == 11
+    assert storage.get_price_bars("CNF.AL.SHFE.main")[0]["close"] == 21
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_falls_back_after_official_empty(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "preferred_order": ["exchange_official", "akshare_futures"],
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"], "timeout_seconds": 1},
+        "akshare_futures": {"enabled": True, "timeout_seconds": 1},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [_official_contract_row(exchange=exchange, trade_date=trade_date, variety="CU", contract="CU2407")]
+
+    async def fake_fallback_fetch(self, series, *, start_date=None, end_date=None, mode="direct"):
+        return [
+            FuturesBar(
+                series_id=series.series_id,
+                trade_date=start_date,
+                open=20,
+                high=22,
+                low=19,
+                close=21,
+                raw_payload_hash=f"akshare:{series.series_id}:{start_date}",
+                source="akshare",
+                source_mode=mode,
+                source_profile="akshare_futures",
+                source_interface="futures_zh_daily_sina",
+            )
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+    monkeypatch.setattr(
+        "research.providers.akshare_futures.AkshareFuturesMarketDataProvider.fetch_daily_bars",
+        fake_fallback_fetch,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.AL.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+    )
+
+    assert result["status"] == "success"
+    assert result["series"][0]["official_status"] == "failed"
+    assert result["series"][0]["date_results"][0]["official_status"] == "empty"
+    assert result["source_selection"]["fallback_success"] == 1
+    assert result["official_fanout"]["official_empty"] == 1
+    assert result["official_fanout"]["fallback_attempts"] == 1
+    assert storage.get_price_bars("CNF.AL.SHFE.main")[0]["source_profile"] == "akshare_futures"
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "preferred_order": ["exchange_official", "akshare_futures"],
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"], "timeout_seconds": 1},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [_official_contract_row(exchange=exchange, trade_date=trade_date)]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["totals"]["inserted"] == 0
+    assert result["totals"]["changed"] == 0
+    assert result["totals"]["unchanged"] == 0
+    assert result["totals"]["would_write_price_bars"] == 1
+    assert result["series"][0]["write_result"] == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 0,
+        "would_write_rows": 1,
+    }
+    assert storage.get_price_bars("CNF.CU.SHFE.main") == []
 
 
 @pytest.mark.asyncio

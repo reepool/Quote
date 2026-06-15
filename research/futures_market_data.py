@@ -3972,6 +3972,8 @@ class FuturesMarketDataSyncService:
             "failed": 0,
             "calendar_skipped": calendar_gate.get("skipped_date_count", 0),
             "provider_empty_on_trading_day": 0,
+            "fetched_rows": 0,
+            "would_write_price_bars": 0,
         }
         source_selection = {
             "official_success": 0,
@@ -3993,6 +3995,15 @@ class FuturesMarketDataSyncService:
             official_enabled = self._source_enabled("exchange_official", default=False)
             fallback_enabled = self._source_enabled("akshare_futures", default=True)
             target_dates_by_exchange = calendar_gate.get("target_dates_by_exchange") or {}
+            official_exchange_cache: Dict[tuple[str, str], List[Any]] = {}
+            official_exchange_errors: Dict[tuple[str, str], Dict[str, str]] = {}
+            fanout_diagnostics = {
+                "exchange_payload_requests": 0,
+                "exchange_payload_cache_hits": 0,
+                "series_artifacts_built": 0,
+                "official_empty": 0,
+                "fallback_attempts": 0,
+            }
             for item in target_series:
                 bars: List[FuturesBar] = []
                 contracts: List[FuturesContract] = []
@@ -4030,31 +4041,67 @@ class FuturesMarketDataSyncService:
                         day_fallback_status = "not_attempted"
                         day_fallback_reason = ""
                         if official_enabled and official_provider.supports_series(item):
-                            try:
-                                official_artifacts = await asyncio.wait_for(
-                                    official_provider.fetch_daily_artifacts(
+                            cache_key = (exchange, target_date)
+                            if cache_key in official_exchange_cache:
+                                fanout_diagnostics["exchange_payload_cache_hits"] += 1
+                                exchange_rows = official_exchange_cache[cache_key]
+                            elif cache_key in official_exchange_errors:
+                                fanout_diagnostics["exchange_payload_cache_hits"] += 1
+                                error_payload = official_exchange_errors[cache_key]
+                                day_official_status = error_payload.get("status") or "failed"
+                                day_official_reason = error_payload.get("reason") or day_official_status
+                                exchange_rows = None
+                            else:
+                                exchange_rows = None
+                                try:
+                                    fanout_diagnostics["exchange_payload_requests"] += 1
+                                    exchange_rows = await asyncio.wait_for(
+                                        official_provider.fetch_exchange_contract_bars(
+                                            exchange,
+                                            target_date,
+                                            mode=mode,
+                                        ),
+                                        timeout=self._request_timeout_seconds("exchange_official"),
+                                    )
+                                    official_exchange_cache[cache_key] = list(exchange_rows)
+                                except OfficialFuturesSourceUnavailable as exc:
+                                    day_official_status = "unavailable"
+                                    day_official_reason = str(exc)
+                                    official_exchange_errors[cache_key] = {
+                                        "status": day_official_status,
+                                        "reason": day_official_reason,
+                                    }
+                                except Exception as exc:
+                                    day_official_status = "failed"
+                                    day_official_reason = str(exc)
+                                    official_exchange_errors[cache_key] = {
+                                        "status": day_official_status,
+                                        "reason": day_official_reason,
+                                    }
+                            if exchange_rows is not None:
+                                try:
+                                    official_artifacts = official_provider.build_series_artifacts_from_contract_rows(
                                         item,
-                                        start_date=target_date,
-                                        end_date=target_date,
+                                        exchange_rows,
                                         mode=mode,
-                                    ),
-                                    timeout=self._request_timeout_seconds("exchange_official"),
-                                )
-                                day_bars = list(official_artifacts.get("series_bars") or [])
-                                day_official_status = "success" if day_bars else "empty"
-                                if day_bars:
-                                    contracts.extend(official_artifacts.get("contracts") or [])
-                                    contract_bars.extend(official_artifacts.get("contract_bars") or [])
-                                    mappings.extend(official_artifacts.get("mappings") or [])
-                                    selected_profile = "exchange_official"
-                                else:
-                                    day_official_reason = "official provider returned no rows"
-                            except OfficialFuturesSourceUnavailable as exc:
-                                day_official_status = "unavailable"
-                                day_official_reason = str(exc)
-                            except Exception as exc:
-                                day_official_status = "failed"
-                                day_official_reason = str(exc)
+                                    )
+                                    day_bars = list(official_artifacts.get("series_bars") or [])
+                                    day_official_status = "success" if day_bars else "empty"
+                                    if day_bars:
+                                        fanout_diagnostics["series_artifacts_built"] += 1
+                                        contracts.extend(official_artifacts.get("contracts") or [])
+                                        contract_bars.extend(official_artifacts.get("contract_bars") or [])
+                                        mappings.extend(official_artifacts.get("mappings") or [])
+                                        selected_profile = "exchange_official"
+                                    else:
+                                        fanout_diagnostics["official_empty"] += 1
+                                        day_official_reason = "official provider returned no rows for series"
+                                except OfficialFuturesSourceUnavailable as exc:
+                                    day_official_status = "unavailable"
+                                    day_official_reason = str(exc)
+                                except Exception as exc:
+                                    day_official_status = "failed"
+                                    day_official_reason = str(exc)
                         elif official_enabled:
                             day_official_status = "unsupported"
                             day_official_reason = f"official source unsupported for {item.instrument_id}"
@@ -4063,6 +4110,7 @@ class FuturesMarketDataSyncService:
 
                         if not day_bars and fallback_enabled:
                             try:
+                                fanout_diagnostics["fallback_attempts"] += 1
                                 day_bars = await asyncio.wait_for(
                                     fallback_provider.fetch_daily_bars(
                                         item,
@@ -4084,6 +4132,7 @@ class FuturesMarketDataSyncService:
                             day_fallback_status = "disabled"
                         if day_bars:
                             bars.extend(day_bars)
+                            totals["fetched_rows"] += len(day_bars)
                         else:
                             totals["provider_empty_on_trading_day"] += 1
                         date_results.append(
@@ -4143,7 +4192,9 @@ class FuturesMarketDataSyncService:
                             ingestion_run_id=run_id,
                         )
                         self.storage.upsert_continuous_mappings(mappings)
-                    write_result = {"inserted": 0, "changed": 0, "unchanged": len(bars)}
+                    write_result = {"inserted": 0, "changed": 0, "unchanged": 0, "would_write_rows": len(bars)}
+                    if dry_run:
+                        totals["would_write_price_bars"] += len(bars)
                     if not dry_run:
                         write_result = self.storage.upsert_price_bars(bars, ingestion_run_id=run_id)
                     for key in ("inserted", "changed", "unchanged"):
@@ -4187,12 +4238,20 @@ class FuturesMarketDataSyncService:
                 "run_id": run_id,
                 "totals": totals,
                 "source_selection": source_selection,
+                "official_fanout": fanout_diagnostics,
                 "trading_day_governance": calendar_gate,
                 "series": series_results,
             }
+            close = getattr(official_provider, "close", None)
+            if callable(close):
+                await asyncio.to_thread(close)
             self.storage.finish_ingestion_run(run_id, status=status, metadata=result)
             return result
         except Exception as exc:
+            if "official_provider" in locals():
+                close = getattr(official_provider, "close", None)
+                if callable(close):
+                    await asyncio.to_thread(close)
             self.storage.finish_ingestion_run(run_id, status="failed", metadata={"reason": str(exc)})
             raise
 
