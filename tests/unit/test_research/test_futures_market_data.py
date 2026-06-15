@@ -31,6 +31,7 @@ from research.futures_market_data import (
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
 from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
 from research.providers.official_futures import (
+    DceOfficialBrowserClient,
     OfficialFuturesDailyProbeResult,
     OfficialFuturesMarketDataProvider,
     OfficialFuturesSourceUnavailable,
@@ -671,6 +672,25 @@ def test_official_futures_provider_parses_domestic_exchange_fixtures(tmp_path):
         },
         trade_date="2024-06-03",
     )
+    dce_closed = provider._parse_dce_payload(
+        {
+            "data": [
+                {
+                    "variety": "总计",
+                    "contractId": None,
+                    "open": None,
+                    "high": None,
+                    "low": None,
+                    "close": None,
+                    "clearPrice": None,
+                    "volumn": 0,
+                    "openInterest": 0,
+                    "turnover": None,
+                }
+            ]
+        },
+        trade_date="2024-06-08",
+    )
     gfex = provider._parse_gfex_payload(
         {
             "data": [
@@ -699,11 +719,113 @@ def test_official_futures_provider_parses_domestic_exchange_fixtures(tmp_path):
 
     assert dce[0].contract == "I2409"
     assert dce[0].source_interface == "official_dce_day_quotes"
+    assert dce_closed == []
     assert gfex[0].contract == "SI2409"
     assert gfex[0].source_interface == "official_gfex_ti_day_quotes"
     assert czce[0].contract == "TA409"
     assert czce[0].volume == 123
     assert czce[0].source_interface == "official_czce_future_data_daily_txt"
+
+
+def test_official_futures_provider_dce_direct_uses_futures_trade_type(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "dce_browser": {"enabled": False},
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    captured = {}
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"success": True, "data": []}
+
+    def fake_post(url, *, session, tls_config, json, timeout):
+        captured["url"] = url
+        captured["json"] = json
+        return Response()
+
+    monkeypatch.setattr("research.providers.official_futures.request_post", fake_post)
+
+    payload = provider._request_exchange_payload(None, "DCE", "2024-06-03")
+
+    assert payload["data"] == []
+    assert captured["json"]["tradeType"] == "0"
+    assert captured["json"]["statisticsType"] == 0
+    assert captured["json"]["lang"] is None
+
+
+def test_official_futures_provider_dce_uses_browser_client(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "dce_browser": {"enabled": True, "settle_seconds": 0},
+        }
+    }
+    calls = []
+
+    class FakeDceBrowserClient:
+        def __init__(self, cfg):
+            calls.append(("init", cfg))
+            self.closed = False
+
+        def fetch_day_quotes_payload(self, trade_date):
+            calls.append(("fetch", trade_date))
+            return {
+                "success": True,
+                "data": [
+                    {
+                        "variety": "铁矿石",
+                        "contractId": "i2409",
+                        "open": "800",
+                        "high": "810",
+                        "low": "790",
+                        "close": "805",
+                        "clearPrice": "803",
+                        "volumn": "1000",
+                        "openInterest": "2000",
+                        "turnover": "123456",
+                    }
+                ],
+            }
+
+        def close(self):
+            calls.append(("close", None))
+            self.closed = True
+
+    monkeypatch.setattr("research.providers.official_futures.DceOfficialBrowserClient", FakeDceBrowserClient)
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    result = provider.probe_exchange_trading_day("DCE", "2024-06-03")
+    provider.close()
+
+    assert result.status == "trading"
+    assert result.is_trading_day is True
+    assert result.row_count == 1
+    assert calls == [
+        ("init", {"enabled": True, "settle_seconds": 0}),
+        ("fetch", "20240603"),
+        ("close", None),
+    ]
+
+
+def test_dce_browser_client_resolves_chrome_path_precedence(monkeypatch):
+    monkeypatch.setattr("research.providers.official_futures._default_dce_chrome_path", lambda: "/opt/google/chrome/chrome")
+    monkeypatch.delenv("QUOTE_DCE_CHROME_PATH", raising=False)
+
+    assert DceOfficialBrowserClient({}).browser_executable_path == "/opt/google/chrome/chrome"
+
+    monkeypatch.setenv("QUOTE_DCE_CHROME_PATH", "/env/chrome")
+    assert DceOfficialBrowserClient({}).browser_executable_path == "/env/chrome"
+    assert DceOfficialBrowserClient({"browser_executable_path": "/cfg/chrome"}).browser_executable_path == "/cfg/chrome"
 
 
 @pytest.mark.asyncio

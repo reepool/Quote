@@ -3632,105 +3632,110 @@ class FuturesOfficialCalendarBackfillService:
         total_requests = 0
         max_total_days = int(max_days) if max_days else None
 
-        for exchange in exchange_list:
-            result: Dict[str, Any] = {
-                "exchange": exchange,
-                "start_date": start,
-                "end_date": requested_end,
-                "probe_end_date": probe_end if start <= probe_end else None,
-                "rows_written": 0,
-                "trading_days": 0,
-                "closed_days": 0,
-                "unresolved_dates": 0,
-                "future_dates_unresolved": future_unresolved_per_exchange,
-                "request_count": 0,
-                "latest_verified_date": None,
-                "failure_samples": [],
-            }
-            calendar_days: List[FuturesTradingCalendarDay] = []
-            unresolved_dates: List[str] = []
-            if start <= probe_end:
-                current = date.fromisoformat(start)
-                end_obj = date.fromisoformat(probe_end)
-                while current <= end_obj:
-                    key = current.isoformat()
-                    if max_total_days is not None and total_requests >= max_total_days:
-                        remaining = _date_range_count(key, probe_end)
-                        result["unresolved_dates"] += remaining
-                        unresolved_dates.append(key)
-                        result["truncated"] = True
-                        result["failure_samples"].append(
-                            {
-                                "trade_date": key,
-                                "remaining_dates": remaining,
-                                "reason": "max_days_limit_reached",
-                            }
-                        )
-                        break
-                    probe = provider.probe_exchange_trading_day(exchange, key)
-                    result["request_count"] += 1
-                    total_requests += 1
-                    if probe.status in {"trading", "closed"} and probe.is_trading_day is not None:
-                        if probe.is_trading_day:
-                            result["trading_days"] += 1
-                            total_trading += 1
-                        else:
-                            result["closed_days"] += 1
-                            total_closed += 1
-                        result["latest_verified_date"] = key
-                        calendar_days.append(
-                            FuturesTradingCalendarDay(
-                                exchange=exchange,
-                                trade_date=key,
-                                is_trading_day=bool(probe.is_trading_day),
-                                timezone=self.default_timezone,
-                                session_type="day_and_night" if probe.is_trading_day else "closed",
-                                source_profile=self.source_profile,
-                                quality_flag="backfilled_verified",
-                                parser_version=probe.parser_version,
-                                evidence_url=probe.evidence_url,
-                                metadata={
-                                    "classification_status": probe.status,
-                                    "classification_rule": probe.metadata.get("classification_rule"),
-                                    "source_interface": probe.source_interface,
-                                    "row_count": probe.row_count,
-                                    "payload_hash": probe.payload_hash,
-                                    "failure_reason": probe.failure_reason,
-                                    "verified_by": "official_exchange_daily_market_data",
-                                },
-                            )
-                        )
-                    else:
-                        unresolved_dates.append(key)
-                        result["unresolved_dates"] += 1
-                        if len(result["failure_samples"]) < 20:
+        try:
+            for exchange in exchange_list:
+                result: Dict[str, Any] = {
+                    "exchange": exchange,
+                    "start_date": start,
+                    "end_date": requested_end,
+                    "probe_end_date": probe_end if start <= probe_end else None,
+                    "rows_written": 0,
+                    "trading_days": 0,
+                    "closed_days": 0,
+                    "unresolved_dates": 0,
+                    "future_dates_unresolved": future_unresolved_per_exchange,
+                    "request_count": 0,
+                    "latest_verified_date": None,
+                    "failure_samples": [],
+                }
+                calendar_days: List[FuturesTradingCalendarDay] = []
+                unresolved_dates: List[str] = []
+                if start <= probe_end:
+                    current = date.fromisoformat(start)
+                    end_obj = date.fromisoformat(probe_end)
+                    while current <= end_obj:
+                        key = current.isoformat()
+                        if max_total_days is not None and total_requests >= max_total_days:
+                            remaining = _date_range_count(key, probe_end)
+                            result["unresolved_dates"] += remaining
+                            unresolved_dates.append(key)
+                            result["truncated"] = True
                             result["failure_samples"].append(
-                                {"trade_date": key, "reason": probe.failure_reason or probe.status}
+                                {
+                                    "trade_date": key,
+                                    "remaining_dates": remaining,
+                                    "reason": "max_days_limit_reached",
+                                }
                             )
-                    current += timedelta(days=1)
-            if requested_end > today:
-                result["future_note"] = "future dates require official notice evidence and were not weekday-filled"
-            if calendar_days and not dry_run:
-                result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
-                total_written += int(result["rows_written"])
-            if unresolved_dates and not dry_run:
-                governance.create_review_required(
-                    exchange=exchange,
-                    evidence_ref=f"{self.source_profile}:{exchange}:{start}:{probe_end}",
-                    reason="official calendar backfill unresolved dates",
-                    scope_type="exchange",
-                    scope_id=exchange,
-                    start_date=start,
-                    end_date=probe_end,
-                    trade_dates=unresolved_dates[:200],
-                    metadata={
-                        "unresolved_count": len(unresolved_dates),
-                        "failure_samples": result["failure_samples"],
-                        "source_profile": self.source_profile,
-                    },
-                )
-            total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
-            exchange_results.append(result)
+                            break
+                        probe = provider.probe_exchange_trading_day(exchange, key)
+                        result["request_count"] += 1
+                        total_requests += 1
+                        if probe.status in {"trading", "closed"} and probe.is_trading_day is not None:
+                            if probe.is_trading_day:
+                                result["trading_days"] += 1
+                                total_trading += 1
+                            else:
+                                result["closed_days"] += 1
+                                total_closed += 1
+                            result["latest_verified_date"] = key
+                            calendar_days.append(
+                                FuturesTradingCalendarDay(
+                                    exchange=exchange,
+                                    trade_date=key,
+                                    is_trading_day=bool(probe.is_trading_day),
+                                    timezone=self.default_timezone,
+                                    session_type="day_and_night" if probe.is_trading_day else "closed",
+                                    source_profile=self.source_profile,
+                                    quality_flag="backfilled_verified",
+                                    parser_version=probe.parser_version,
+                                    evidence_url=probe.evidence_url,
+                                    metadata={
+                                        "classification_status": probe.status,
+                                        "classification_rule": probe.metadata.get("classification_rule"),
+                                        "source_interface": probe.source_interface,
+                                        "row_count": probe.row_count,
+                                        "payload_hash": probe.payload_hash,
+                                        "failure_reason": probe.failure_reason,
+                                        "verified_by": "official_exchange_daily_market_data",
+                                    },
+                                )
+                            )
+                        else:
+                            unresolved_dates.append(key)
+                            result["unresolved_dates"] += 1
+                            if len(result["failure_samples"]) < 20:
+                                result["failure_samples"].append(
+                                    {"trade_date": key, "reason": probe.failure_reason or probe.status}
+                                )
+                        current += timedelta(days=1)
+                if requested_end > today:
+                    result["future_note"] = "future dates require official notice evidence and were not weekday-filled"
+                if calendar_days and not dry_run:
+                    result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
+                    total_written += int(result["rows_written"])
+                if unresolved_dates and not dry_run:
+                    governance.create_review_required(
+                        exchange=exchange,
+                        evidence_ref=f"{self.source_profile}:{exchange}:{start}:{probe_end}",
+                        reason="official calendar backfill unresolved dates",
+                        scope_type="exchange",
+                        scope_id=exchange,
+                        start_date=start,
+                        end_date=probe_end,
+                        trade_dates=unresolved_dates[:200],
+                        metadata={
+                            "unresolved_count": len(unresolved_dates),
+                            "failure_samples": result["failure_samples"],
+                            "source_profile": self.source_profile,
+                        },
+                    )
+                total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
+                exchange_results.append(result)
+        finally:
+            close = getattr(provider, "close", None)
+            if callable(close):
+                close()
 
         return {
             "status": "success" if total_unresolved == 0 else "blocked",

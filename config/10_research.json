@@ -48,6 +48,19 @@
               "CZCE": "http://www.czce.com.cn/cn/DFSStaticFiles/Future/YYYY/YYYYMMDD/FutureDataDaily.txt",
               "GFEX": "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList"
             },
+            "dce_browser": {
+              "enabled": true,
+              "bootstrap_page": "http://www.dce.com.cn/dce/channel/list/168.html",
+              "requires_real_chrome": true,
+              "browser_executable_path": "",
+              "env_browser_executable_path": "QUOTE_DCE_CHROME_PATH",
+              "headless": false,
+              "virtual_display": "auto",
+              "settle_seconds": 9,
+              "retry_attempts": 3,
+              "retry_backoff_seconds": 2,
+              "note": "DCE official JSON endpoints require a real headed Chrome session so the site JavaScript can attach the dynamic Riversafe token to in-page fetch calls. In headless/server environments use Xvfb or set QUOTE_DCE_CHROME_PATH to a real Chrome binary."
+            },
             "note": "Preferred first-hand route for domestic futures daily contract bars. Main-continuous series are constructed locally by open-interest priority; AkShare remains fallback for unsupported, empty, or failed official requests."
           },
           "akshare_futures": {

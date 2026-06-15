@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import re
 import time
 from dataclasses import dataclass, field
@@ -31,6 +32,171 @@ OFFICIAL_FUTURES_PARSER_VERSION = "official_futures_daily.v1"
 
 class OfficialFuturesSourceUnavailable(RuntimeError):
     """Raised when an official source is unsupported, empty, or failed."""
+
+
+class DceOfficialBrowserClient:
+    """Browser-assisted DCE official API client.
+
+    DCE's public JSON endpoints are protected by a JavaScript challenge that
+    attaches a dynamic token to in-page fetch calls. Static HTTP clients and
+    headless browser modes currently fail in live probes, so this client keeps
+    the browser requirement isolated from the normal parser/storage layer.
+    """
+
+    base_url = "http://www.dce.com.cn"
+    bootstrap_page = "http://www.dce.com.cn/dce/channel/list/168.html"
+
+    def __init__(self, config: Optional[Mapping[str, Any]] = None):
+        cfg = dict(config or {})
+        self.bootstrap_page = str(cfg.get("bootstrap_page") or self.bootstrap_page)
+        self.browser_executable_path = str(
+            cfg.get("browser_executable_path")
+            or os.environ.get("QUOTE_DCE_CHROME_PATH")
+            or _default_dce_chrome_path()
+            or ""
+        ).strip()
+        self.headless = bool(cfg.get("headless", False))
+        self.settle_seconds = max(0.0, float(cfg.get("settle_seconds", 9)))
+        self.timeout_seconds = max(1.0, float(cfg.get("timeout_seconds", 30)))
+        self.retry_attempts = max(1, int(cfg.get("retry_attempts", 3)))
+        self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
+        self.virtual_display = cfg.get("virtual_display", "auto")
+        self.display_size = tuple(cfg.get("display_size") or (1920, 1080))
+        self.browser_args = list(
+            cfg.get("browser_args")
+            or ["--no-sandbox", "--disable-dev-shm-usage", "--window-size=1920,1080"]
+        )
+        self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._browser: Any = None
+        self._page: Any = None
+        self._display: Any = None
+
+    def fetch_day_quotes_payload(self, trade_date: str) -> Mapping[str, Any]:
+        body = {
+            "varietyId": "all",
+            "tradeDate": _compact_date(trade_date),
+            "tradeType": "0",
+            "contractId": "",
+            "lang": None,
+            "optionSeries": "",
+            "statisticsType": 0,
+        }
+        return self._run(self._api("POST", "/dcereport/publicweb/dailystat/dayQuotes", body))
+
+    def close(self) -> None:
+        if self._loop is None:
+            return
+        try:
+            self._run(self._stop())
+        finally:
+            self._loop.close()
+            self._loop = None
+            self._browser = None
+            self._page = None
+            self._display = None
+
+    def _run(self, coro: Any) -> Any:
+        if self._loop is None:
+            self._loop = asyncio.new_event_loop()
+        return self._loop.run_until_complete(coro)
+
+    async def _ensure_started(self) -> None:
+        if self._page is not None:
+            return
+        try:
+            import nodriver as uc
+        except Exception as exc:  # pragma: no cover - optional dependency path
+            raise OfficialFuturesSourceUnavailable(
+                "DCE official browser client requires optional dependency nodriver"
+            ) from exc
+        self._start_virtual_display_if_needed()
+        kwargs: Dict[str, Any] = {
+            "headless": self.headless,
+            "browser_args": self.browser_args,
+            "sandbox": False,
+            "lang": "zh-CN",
+        }
+        if self.browser_executable_path:
+            kwargs["browser_executable_path"] = self.browser_executable_path
+        try:
+            self._browser = await uc.start(**kwargs)
+            self._page = await self._browser.get(self.bootstrap_page)
+            await self._page.sleep(self.settle_seconds)
+            await self._api("GET", "/dcereport/publicweb/maxTradeDate")
+        except Exception as exc:
+            await self._stop()
+            raise OfficialFuturesSourceUnavailable(
+                "official DCE browser session failed; install real Chrome or set "
+                f"QUOTE_DCE_CHROME_PATH/browser_executable_path: {exc}"
+            ) from exc
+
+    async def _api(self, method: str, path: str, body: Optional[Mapping[str, Any]] = None) -> Mapping[str, Any]:
+        await self._ensure_started()
+        body_js = json.dumps(body, ensure_ascii=False) if body is not None else "null"
+        script = f"""
+        (async () => {{
+          const opt = {{ method: {method!r}, credentials: 'include' }};
+          const body = {body_js};
+          if (body !== null) {{
+            opt.headers = {{ 'Content-Type': 'application/json' }};
+            opt.body = JSON.stringify(body);
+          }}
+          try {{
+            const r = await fetch({path!r}, opt);
+            const text = await r.text();
+            return JSON.stringify({{status: r.status, ok: r.ok, text}});
+          }} catch (e) {{
+            return JSON.stringify({{status: -1, ok: false, text: String(e)}});
+          }}
+        }})()
+        """
+        last_error = ""
+        for attempt in range(1, self.retry_attempts + 1):
+            raw_result = await self._page.evaluate(script, await_promise=True, return_by_value=True)
+            response = json.loads(raw_result if isinstance(raw_result, str) else str(raw_result))
+            text = str(response.get("text") or "")
+            if int(response.get("status") or -1) == 200:
+                try:
+                    payload = json.loads(text)
+                except json.JSONDecodeError as exc:
+                    raise OfficialFuturesSourceUnavailable(
+                        f"official DCE {path} returned non-JSON payload: {text[:200]}"
+                    ) from exc
+                if payload.get("success") is True:
+                    return payload
+                raise OfficialFuturesSourceUnavailable(
+                    f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
+                )
+            last_error = f"HTTP {response.get('status')}: {text[:200]}"
+            if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
+                await self._page.sleep(self.retry_backoff_seconds)
+        raise OfficialFuturesSourceUnavailable(f"official DCE {path} request failed: {last_error}")
+
+    async def _stop(self) -> None:
+        if self._browser is not None:
+            self._browser.stop()
+        self._browser = None
+        self._page = None
+        if self._display is not None:
+            self._display.stop()
+        self._display = None
+
+    def _start_virtual_display_if_needed(self) -> None:
+        if self._display is not None:
+            return
+        use_display = self.virtual_display
+        if str(use_display).lower() == "auto":
+            use_display = not bool(os.environ.get("DISPLAY"))
+        if not use_display:
+            return
+        try:
+            from pyvirtualdisplay import Display
+        except Exception as exc:  # pragma: no cover - optional dependency path
+            raise OfficialFuturesSourceUnavailable(
+                "DCE official browser client needs pyvirtualdisplay when no DISPLAY is available"
+            ) from exc
+        self._display = Display(visible=False, size=self.display_size)
+        self._display.start()
 
 
 @dataclass(frozen=True)
@@ -89,12 +255,15 @@ class OfficialFuturesMarketDataProvider:
         self.retry_attempts = max(1, int(self.source_cfg.get("retry_attempts", 2)))
         self.retry_backoff_seconds = max(0.0, float(self.source_cfg.get("retry_backoff_seconds", 0.5)))
         self.request_interval_seconds = max(0.0, float(self.source_cfg.get("request_interval_seconds", 0.0)))
+        self.dce_browser_cfg = self.source_cfg.get("dce_browser", {}) if isinstance(self.source_cfg.get("dce_browser", {}), dict) else {}
+        self.dce_browser_enabled = bool(self.dce_browser_cfg.get("enabled", True))
         self.enabled_exchanges = {
             str(item).upper()
             for item in self.source_cfg.get("enabled_exchanges", sorted(self.supported_exchanges))
         }
         self.tls_config = HttpTlsConfig(source_name=self.source_name)
         self._last_request_started_at = 0.0
+        self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
 
     def supports_series(self, series: FuturesSeries) -> bool:
         exchange = _series_exchange(series)
@@ -333,23 +502,9 @@ class OfficialFuturesMarketDataProvider:
                     response.raise_for_status()
                     return response.json()
                 if exchange == "DCE":
-                    response = request_post(
-                        "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
-                        session=session,
-                        tls_config=self.tls_config,
-                        json={
-                            "contractId": "",
-                            "lang": "zh",
-                            "optionSeries": "",
-                            "statisticsType": "0",
-                            "tradeDate": _compact_date(trade_date),
-                            "tradeType": "1",
-                            "varietyId": "all",
-                        },
-                        timeout=self.timeout_seconds,
-                    )
-                    response.raise_for_status()
-                    return response.json()
+                    if self.dce_browser_enabled:
+                        return self._get_dce_browser_client().fetch_day_quotes_payload(_compact_date(trade_date))
+                    return self._request_dce_payload_direct(session, trade_date)
                 if exchange == "CZCE":
                     day = _compact_date(trade_date)
                     response = request_get(
@@ -381,6 +536,35 @@ class OfficialFuturesMarketDataProvider:
         raise OfficialFuturesSourceUnavailable(
             f"official {exchange} request failed for {trade_date}: {last_error}"
         )
+
+    def _request_dce_payload_direct(self, session: requests.Session, trade_date: str) -> Any:
+        response = request_post(
+            "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
+            session=session,
+            tls_config=self.tls_config,
+            json={
+                "contractId": "",
+                "lang": None,
+                "optionSeries": "",
+                "statisticsType": 0,
+                "tradeDate": _compact_date(trade_date),
+                "tradeType": "0",
+                "varietyId": "all",
+            },
+            timeout=self.timeout_seconds,
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def _get_dce_browser_client(self) -> "DceOfficialBrowserClient":
+        if self._dce_browser_client is None:
+            self._dce_browser_client = DceOfficialBrowserClient(self.dce_browser_cfg)
+        return self._dce_browser_client
+
+    def close(self) -> None:
+        if self._dce_browser_client is not None:
+            self._dce_browser_client.close()
+            self._dce_browser_client = None
 
     def _construct_main_series_bars(
         self,
@@ -734,6 +918,16 @@ def _source_interface_for_exchange(exchange: str) -> str:
         "CZCE": "official_czce_future_data_daily_txt",
         "GFEX": "official_gfex_ti_day_quotes",
     }.get(exchange, "official_unknown_daily")
+
+
+def _default_dce_chrome_path() -> str:
+    for path in (
+        "/opt/google/chrome/chrome",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    ):
+        if os.path.exists(path):
+            return path
+    return ""
 
 
 def _is_official_closed_response(exc: Exception) -> bool:

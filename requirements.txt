@@ -30,6 +30,8 @@ akshare-proxy-patch==0.2.13
 aiohttp>=3.11.13
 baostock
 telethon
+nodriver==0.50.3
+pyvirtualdisplay==3.0
 
 # Date and Time
 python-dateutil==2.9.0.post0
