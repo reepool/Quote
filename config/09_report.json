@@ -58,7 +58,8 @@
               "date",
               "updated_instruments",
               "new_quotes",
-              "success_rate"
+              "success_rate",
+              "summary_note"
             ],
             "title": "更新摘要",
             "condition": "not non_trading_day"
@@ -446,6 +447,7 @@
         "success_rate": "成功率",
         "updated_instruments": "更新股票",
         "new_quotes": "新增行情",
+        "summary_note": "备注",
         "total_gaps": "总缺口数",
         "affected_stocks": "受影响股票",
         "backup_file": "备份文件",

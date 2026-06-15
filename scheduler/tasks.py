@@ -1381,7 +1381,25 @@ class ScheduledTasks:
             # 判断更新状态
             success_count = update_results.get('success_count', 0)
             failure_count = update_results.get('failure_count', 0)
-            is_successful = failure_count == 0 and success_count > 0
+            total_quotes_added = update_results.get('total_quotes_added', 0)
+            exchange_stats = update_results.get('exchange_stats') or {}
+            total_instruments = sum(
+                int(stats.get('total_instruments', stats.get('total_count', 0)) or 0)
+                for stats in exchange_stats.values()
+                if isinstance(stats, dict) and 'error' not in stats
+            )
+            no_op = (
+                failure_count == 0
+                and success_count == 0
+                and total_quotes_added == 0
+                and total_instruments > 0
+            )
+            if no_op:
+                update_results['no_op'] = True
+                update_results['no_op_reason'] = 'target_date_already_covered'
+                update_results['summary_note'] = '目标日期已覆盖，无新增行情'
+                update_results['success_rate'] = 100.0
+            is_successful = failure_count == 0 and (success_count > 0 or no_op)
 
             report_data = {
                 'name': '每日数据更新报告',

@@ -9501,7 +9501,26 @@ class DataManager:
             # 计算总体成功率
             total_checked = report['summary']['total_instruments_checked']
             total_updated = report['summary']['updated_instruments']
-            report['summary']['success_rate'] = (total_updated / total_checked * 100) if total_checked > 0 else 100.0
+            failure_count = sum(
+                int(stats.get('failure_count', 0) or 0)
+                for stats in report['exchange_stats'].values()
+                if isinstance(stats, dict) and 'error' not in stats
+            )
+            no_op = (
+                total_checked > 0
+                and total_updated == 0
+                and report['summary']['new_quotes_added'] == 0
+                and failure_count == 0
+                and not report['errors']
+            )
+            if no_op:
+                report['summary']['success_rate'] = 100.0
+                report['summary']['no_op'] = True
+                report['summary']['no_op_reason'] = 'target_date_already_covered'
+                report['summary']['summary_note'] = '目标日期已覆盖，无新增行情'
+            else:
+                report['summary']['success_rate'] = (total_updated / total_checked * 100) if total_checked > 0 else 100.0
+                report['summary']['no_op'] = False
 
             return report
 

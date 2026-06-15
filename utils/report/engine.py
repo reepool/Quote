@@ -196,6 +196,7 @@ class ReportEngine:
                 'updated_instruments': summary.get('success_count', 0),
                 'new_quotes': summary.get('total_quotes_added', 0),
                 'success_rate': success_rate,
+                'summary_note': summary.get('summary_note'),
                 'exchange_stats': self._format_daily_exchange_stats_for_table(
                     summary.get('exchange_stats', {})
                 ),

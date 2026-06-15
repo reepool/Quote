@@ -80,6 +80,43 @@ async def test_generate_daily_update_report_supports_legacy_flat_payload():
 
 
 @pytest.mark.asyncio
+async def test_generate_daily_update_report_marks_idempotent_noop_as_successful():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    update_results = {
+        'exchange_stats': {
+            'SSE': {
+                'success_count': 0,
+                'failure_count': 0,
+                'quotes_added': 0,
+                'total_instruments': 2594,
+            },
+            'SZSE': {
+                'success_count': 0,
+                'failure_count': 0,
+                'quotes_added': 0,
+                'total_instruments': 3281,
+            },
+        }
+    }
+
+    report = await manager._generate_daily_update_report(
+        ['SSE', 'SZSE'],
+        date(2026, 6, 15),
+        update_results,
+    )
+
+    assert report['summary']['total_instruments_checked'] == 5875
+    assert report['summary']['updated_instruments'] == 0
+    assert report['summary']['new_quotes_added'] == 0
+    assert report['summary']['success_rate'] == 100.0
+    assert report['summary']['no_op'] is True
+    assert report['summary']['no_op_reason'] == 'target_date_already_covered'
+    assert report['summary']['summary_note'] == '目标日期已覆盖，无新增行情'
+
+
+@pytest.mark.asyncio
 async def test_generate_daily_update_report_includes_instrument_master_sync_payload():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()
@@ -408,6 +445,37 @@ def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_ta
     assert 'Catchup Stats' not in message
     assert "'samples':" not in message
     assert '*行情追补*' in message
+
+
+def test_daily_update_report_renders_idempotent_noop_note_as_success():
+    engine = ReportEngine()
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-06-15',
+            'status': 'success',
+            'update_results': {
+                'success_count': 0,
+                'failure_count': 0,
+                'total_quotes_added': 0,
+                'success_rate': 100.0,
+                'summary_note': '目标日期已覆盖，无新增行情',
+                'exchange_stats': {
+                    'SSE': {
+                        'success_count': 0,
+                        'failure_count': 0,
+                        'quotes_added': 0,
+                        'total_instruments': 2594,
+                    },
+                },
+            },
+        },
+        'telegram',
+    )
+
+    assert '成功率: 100.0%' in message
+    assert '备注: 目标日期已覆盖，无新增行情' in message
+    assert '任务执行状态: ✅ success' in message
 
 
 def test_daily_update_report_renders_index_governance_without_exceeding_message_limit():
