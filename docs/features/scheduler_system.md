@@ -204,7 +204,7 @@ async def trading_calendar_update(self,
       "backup_database": true,
       "cleanup_old_logs": true,
       "log_retention_days": 30,
-      "cleanup_ghost_stocks": true,
+      "cleanup_ghost_stocks": false,
       "ghost_stock_grace_days": 14,
       "zombie_stock_grace_days": 30,
       "sync_adjustment_factors": true,
@@ -221,7 +221,7 @@ async def trading_calendar_update(self,
 #### 维护任务
 1. **数据库备份**：自动备份数据库
 2. **日志清理**：清理过期日志文件
-3. **清理幽灵股/僵尸股**：自动侦测并停用长期无行情或无交易的无效标的，减少后续同步扫描量
+3. **幽灵/僵尸标的清理**：已废弃并默认跳过。标的生命周期必须由 A 股/HKEX 等交易所专用主数据治理写入，周维护不再用“最后行情日期超过阈值”的通用规则直接停用主数据
 4. **复权因子周度同步**：按 `factor_sync_exchanges` 和 `routing.factor.<exchange>.maintenance_sync_enabled` 执行周度因子同步；港股因子默认放在该阶段执行
 5. **数据完整性检查**：验证维护写入后的最终数据一致性
 6. **数据库优化**：在维护写入完成后执行 VACUUM 和 ANALYZE
@@ -234,7 +234,7 @@ async def weekly_data_maintenance(self,
                                 log_retention_days: int = 30,
                                 optimize_database: bool = True,
                                 validate_data_integrity: bool = True,
-                                cleanup_ghost_stocks: bool = True,
+                                cleanup_ghost_stocks: bool = False,
                                 ghost_stock_grace_days: int = 14,
                                 zombie_stock_grace_days: int = 30,
                                 sync_adjustment_factors: bool = True,
@@ -1053,6 +1053,7 @@ python -c "from scheduler.scheduler import task_scheduler; import asyncio; async
 - 🌐 港股复权因子默认纳入周维护同步，日更继续保持关闭
 - 🧱 周维护顺序调整为“前置备份 -> 清理 -> 因子同步 -> 校验 -> 优化”，数据库优化移到所有写入动作之后
 - ⏱️ 周维护超时预算上调到 `18000` 秒，覆盖港股因子扫描窗口
+- 🛑 周维护不再执行通用 ghost/zombie 主数据停用；生命周期状态统一交由交易所主数据治理判定
 
 ### v2.4.2 (2026-04-09)
 - ✨ 调度器 `weekly_data_maintenance` 任务新增死股/仙股智能封禁模块，优化庞大数据集运行效率

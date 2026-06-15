@@ -292,7 +292,7 @@ restart_system - 重启系统服务
 
 ### 3. 每周数据维护 (weekly_data_maintenance)
 - **执行时间**: 每周日 02:00
-- **功能**: 维护前数据库备份、日志清理、幽灵/僵尸标的清理、周度复权因子同步、完整性验证、数据库优化
+- **功能**: 维护前数据库备份、日志清理、周度复权因子同步、完整性验证、数据库优化。通用幽灵/僵尸标的自动停用已废弃，生命周期由交易所主数据治理任务写入
 - **港股因子**: `routing.factor.HKEX.maintenance_sync_enabled=true` 时由本任务周度同步，日更仍由 `routing.factor.HKEX.daily_sync_enabled=false` 控制为跳过
 
 ### 4. 行情依赖版本检查 (market_dependency_version_check)

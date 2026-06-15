@@ -20,9 +20,6 @@ async def test_weekly_maintenance_factor_sync_config_and_order(monkeypatch):
         order.append(name)
         return result
 
-    async def cleanup_ghost_side_effect(**_):
-        return await record("cleanup_ghost", 2)
-
     async def factor_sync_side_effect(**_):
         return await record(
             "factor_sync",
@@ -32,9 +29,7 @@ async def test_weekly_maintenance_factor_sync_config_and_order(monkeypatch):
     data_manager = Mock()
     data_manager.db_ops = Mock()
     data_manager.db_ops.get_database_statistics = AsyncMock(return_value={})
-    data_manager.db_ops.cleanup_ghost_instruments = AsyncMock(
-        side_effect=cleanup_ghost_side_effect
-    )
+    data_manager.db_ops.cleanup_ghost_instruments = AsyncMock(return_value=2)
     data_manager.sync_all_adjustment_factors = AsyncMock(
         side_effect=factor_sync_side_effect
     )
@@ -82,8 +77,8 @@ async def test_weekly_maintenance_factor_sync_config_and_order(monkeypatch):
     )
     assert order == [
         "cleanup_logs",
-        "cleanup_ghost",
         "factor_sync",
         "validate",
         "optimize",
     ]
+    data_manager.db_ops.cleanup_ghost_instruments.assert_not_awaited()

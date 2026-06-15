@@ -104,7 +104,7 @@ class TestDailyFactorSyncPolicy:
             )
         )
         manager.db_ops = Mock()
-        manager.db_ops.get_instruments = AsyncMock(return_value=[{
+        manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
             'instrument_id': '00001.HK',
             'symbol': '00001',
             'type': 'stock',
@@ -114,4 +114,29 @@ class TestDailyFactorSyncPolicy:
 
         assert result['HKEX']['skipped'] is True
         assert result['HKEX']['reason'] == 'maintenance_sync_disabled'
-        manager.db_ops.get_instruments.assert_not_awaited()
+        manager.db_ops.get_instruments_list.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_weekly_sync_uses_existing_instruments_list_api(self):
+        manager = DataManager()
+        manager.config = Mock()
+        manager.config.get_nested = Mock(return_value=True)
+        manager.db_ops = Mock()
+        manager.db_ops.get_instruments_list = AsyncMock(return_value=[{
+            'instrument_id': '00001.HK',
+            'symbol': '00001',
+            'type': 'stock',
+        }])
+        manager._batch_sync_adjustment_factors = AsyncMock(
+            return_value={'synced': 1, 'skipped': 0, 'failed': 0}
+        )
+
+        result = await manager.sync_all_adjustment_factors(exchanges=['HKEX'], days_back=7)
+
+        manager.db_ops.get_instruments_list.assert_awaited_once_with(
+            exchange='HKEX',
+            type='stock',
+            is_active=True,
+        )
+        manager._batch_sync_adjustment_factors.assert_awaited_once()
+        assert result['HKEX']['synced'] == 1

@@ -1396,7 +1396,7 @@
       "backup_database": true,
       "cleanup_old_logs": true,
       "log_retention_days": 30,
-      "cleanup_ghost_stocks": true,
+      "cleanup_ghost_stocks": false,
       "ghost_stock_grace_days": 14,
       "zombie_stock_grace_days": 30,
       "sync_adjustment_factors": true,
@@ -1419,6 +1419,7 @@
 - **`misfire_grace_time`**: `int` (默认: `1800`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
+- **`parameters.cleanup_ghost_stocks`**: `bool` (当前生产默认: `False`) —— *兼容旧配置的废弃开关。周维护不再自动按“长期无行情”停用主数据；生命周期应由交易所主数据治理任务写入*
 - **`parameters.sync_adjustment_factors`**: `bool` (默认: `True`) —— *是否在周维护中执行复权因子周度同步*
 - **`parameters.factor_sync_exchanges`**: `List[str] | null` (默认: `null`) —— *周度因子同步的交易所范围；设为 `["SSE","SZSE","BSE","HKEX"]` 可显式纳入港股，设为 `null` 则使用系统默认启用市场*
 - **`parameters.factor_sync_days_back`**: `int` (默认: `7`) —— *周度因子同步的回看天数*

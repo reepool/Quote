@@ -12847,10 +12847,11 @@ class DataManager:
                     }
                     continue
 
-                instruments = await self.db_ops.get_instruments(
-                    exchange=exchange, is_active=True
+                instruments = await self.db_ops.get_instruments_list(
+                    exchange=exchange,
+                    type='stock',
+                    is_active=True,
                 )
-                # 仅筛选股票类型
                 stocks = [
                     {
                         'instrument_id': inst['instrument_id'],
@@ -12859,7 +12860,6 @@ class DataManager:
                         'end_date': end_date,
                     }
                     for inst in instruments
-                    if inst.get('type', 'stock') == 'stock'
                 ]
 
                 if not stocks:

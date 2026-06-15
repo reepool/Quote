@@ -222,7 +222,7 @@
           "backup_database": true,
           "cleanup_old_logs": true,
           "log_retention_days": 30,
-          "cleanup_ghost_stocks": true,
+          "cleanup_ghost_stocks": false,
           "ghost_stock_grace_days": 14,
           "zombie_stock_grace_days": 30,
           "sync_adjustment_factors": true,

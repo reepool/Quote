@@ -1532,7 +1532,7 @@ class ScheduledTasks:
                                   log_retention_days: int = 30,
                                   optimize_database: bool = True,
                                   validate_data_integrity: bool = True,
-                                  cleanup_ghost_stocks: bool = True,
+                                  cleanup_ghost_stocks: bool = False,
                                   ghost_stock_grace_days: int = 14,
                                   zombie_stock_grace_days: int = 30,
                                   sync_adjustment_factors: bool = True,
@@ -1565,17 +1565,11 @@ class ScheduledTasks:
             if cleanup_old_logs:
                 await self._cleanup_old_logs(log_retention_days)
 
-            # 清理幽灵股 + 僵尸股 (长期无数据/无交易死标的)
             if cleanup_ghost_stocks:
-                try:
-                    scheduler_logger.info(f"[Scheduler] Starting ghost/zombie instruments cleanup (ghost_grace={ghost_stock_grace_days}, zombie_grace={zombie_stock_grace_days})...")
-                    cleaned_count = await data_manager.db_ops.cleanup_ghost_instruments(
-                        grace_days=ghost_stock_grace_days,
-                        zombie_grace_days=zombie_stock_grace_days
-                    )
-                    scheduler_logger.info(f"[Scheduler] Ghost/zombie instruments cleanup finished. Deactivated: {cleaned_count}")
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Ghost/zombie instruments cleanup failed: {e}")
+                scheduler_logger.warning(
+                    "[Scheduler] Ghost/zombie instruments cleanup is deprecated and skipped. "
+                    "Lifecycle changes must be handled by exchange-specific master governance."
+                )
 
             # 周度复权因子同步（兜底校验，防止每日精准筛选遗漏）
             factor_sync_status = '成功'
@@ -1620,7 +1614,7 @@ class ScheduledTasks:
                 'maintenance_tasks': [
                     {'task_name': '数据库备份', 'status': '成功' if backup_database else '跳过'},
                     {'task_name': '日志清理', 'status': '成功' if cleanup_old_logs else '跳过'},
-                    {'task_name': '幽灵/僵尸标的清理', 'status': '成功' if cleanup_ghost_stocks else '跳过'},
+                    {'task_name': '幽灵/僵尸标的清理', 'status': '已废弃，跳过'},
                     {'task_name': '复权因子周度同步', 'status': factor_summary},
                     {'task_name': '数据完整性验证', 'status': '成功' if validate_data_integrity else '跳过'},
                     {'task_name': '数据库优化', 'status': '成功' if optimize_database else '跳过'},
