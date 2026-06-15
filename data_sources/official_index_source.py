@@ -64,9 +64,19 @@ def normalize_index_code(value: Any) -> str:
     return digits.zfill(6) if digits else ""
 
 
-def cnindex_instrument_id(code: Any) -> str:
+def cnindex_metadata_instrument_id(code: Any, *, cni_code: Any = "") -> str:
+    cni_text = _text(cni_code).upper()
+    if cni_text:
+        return cni_text
     normalized = normalize_index_code(code)
-    return f"{normalized}.SZ" if normalized else ""
+    return f"CNI{normalized}.SZ" if normalized else ""
+
+
+def cnindex_instrument_id(code: Any, *, quote_code: Any = "", cni_code: Any = "") -> str:
+    quote_symbol = normalize_index_code(quote_code)
+    if quote_symbol:
+        return f"{quote_symbol}.SZ"
+    return cnindex_metadata_instrument_id(code, cni_code=cni_code)
 
 
 def csindex_instrument_id(code: Any) -> str:
@@ -213,20 +223,27 @@ class CNIndexSource(BaseDataSource):
             full_name = _text(row.get("指数全称"))
             short_name = _text(row.get("指数简称")) or full_name or code
             price_return_type = _text(row.get("价格收益"))
+            szse_quote_code = normalize_index_code(row.get("深交所行情代码"))
+            cni_code = _text(row.get(".CNI"))
+            metadata_only = not bool(szse_quote_code)
             rows.append(
                 {
-                    "instrument_id": cnindex_instrument_id(code),
-                    "symbol": code,
+                    "instrument_id": cnindex_instrument_id(
+                        code,
+                        quote_code=szse_quote_code,
+                        cni_code=cni_code,
+                    ),
+                    "symbol": szse_quote_code or code,
                     "name": short_name,
                     "exchange": "SZSE",
                     "type": "index",
                     "currency": "CNY",
                     "listed_date": _date_value(row.get("发布日期")),
                     "delisted_date": None,
-                    "status": "active",
-                    "is_active": True,
+                    "status": "metadata_only" if metadata_only else "active",
+                    "is_active": not metadata_only,
                     "is_st": False,
-                    "trading_status": 1,
+                    "trading_status": 0 if metadata_only else 1,
                     "source": "cnindex",
                     "source_symbol": code,
                     "market": _text(row.get("指数系列")),
@@ -239,7 +256,7 @@ class CNIndexSource(BaseDataSource):
                         "full_name": full_name,
                         "english_name": _text(row.get("英文名称")),
                         "publisher": _text(row.get("发布渠道")),
-                        "szse_quote_code": _text(row.get("深交所行情代码")),
+                        "szse_quote_code": szse_quote_code,
                         "ric": _text(row.get("RIC")),
                         "bloomberg": _text(row.get("BLOOMBERG")),
                         "cni_code": _text(row.get(".CNI")),
@@ -532,4 +549,3 @@ class CSIndexSource(BaseDataSource):
 
     async def get_latest_daily_data(self, instrument_id: str, symbol: str) -> Dict[str, Any]:
         return {}
-

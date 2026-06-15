@@ -36,10 +36,41 @@ def test_cnindex_index_list_excel_parses_master_rows():
         source_url="https://example.test/cnindex.xlsx",
     )
 
-    assert snapshot.rows[0]["instrument_id"] == "980055.SZ"
+    assert snapshot.rows[0]["instrument_id"] == "CNI980055.SZ"
     assert snapshot.rows[0]["type"] == "index"
+    assert snapshot.rows[0]["status"] == "metadata_only"
+    assert snapshot.rows[0]["is_active"] is False
     assert snapshot.rows[0]["metadata"]["price_return_type"] == "价格指数"
     assert snapshot.diagnostics["row_count"] == 1
+
+
+def test_cnindex_index_list_uses_szse_quote_code_for_quotable_rows():
+    frame = pd.DataFrame([
+        {
+            "指数代码": "399001",
+            "指数简称": "深证成指",
+            "指数全称": "深证成份指数",
+            "发布日期": "1995-01-23",
+            "深交所行情代码": "399001",
+            "价格收益": "价格指数",
+            "指数系列": "深证系列",
+            "指数类别": "规模指数",
+            "资产类别": "股票",
+        }
+    ])
+    raw = BytesIO()
+    frame.to_excel(raw, index=False)
+
+    snapshot = CNIndexSource.parse_index_list_excel(
+        raw.getvalue(),
+        source_url="https://example.test/cnindex.xlsx",
+    )
+
+    assert snapshot.rows[0]["instrument_id"] == "399001.SZ"
+    assert snapshot.rows[0]["symbol"] == "399001"
+    assert snapshot.rows[0]["source_symbol"] == "399001"
+    assert snapshot.rows[0]["status"] == "active"
+    assert snapshot.rows[0]["is_active"] is True
 
 
 def test_cnindex_termination_announcement_parses_direct_codes():
@@ -53,9 +84,9 @@ def test_cnindex_termination_announcement_parses_direct_codes():
     )
 
     assert {row["instrument_id"] for row in rows} == {
-        "980055.SZ",
-        "980056.SZ",
-        "980057.SZ",
+        "CNI980055.SZ",
+        "CNI980056.SZ",
+        "CNI980057.SZ",
     }
     assert {row["confidence"] for row in rows} == {"direct"}
     assert {row["effective_date"] for row in rows} == {date(2026, 5, 14)}

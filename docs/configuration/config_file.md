@@ -619,6 +619,7 @@
 - **`stale_no_quote_trading_days`**: 本地最新行情超过该窗口时进入 stale 诊断。默认只报告，不直接写停用。
 - **`write_stale_no_quote`**: 是否把长期无行情指数写成 `stale_no_quote` 并从日更 universe 排除。默认 `false`，避免仅凭行情缺口误杀临时停发或源异常。
 - **`allow_series_inference`**: 是否允许用官方公告直接代码和全收益/价格指数配对关系做保守推断，例如 `980055` 停编且 `480055` 官方行情止于生效日前后时，将 `480055.SZ` 标记为 `series_inferred`。
+- **CNIndex 主键语义**: `指数代码` 不是本地行情主键。只有官方列表提供 `深交所行情代码` 时，指数才写入行情型 `<行情代码>.SZ` 并参与日更；没有行情代码的 CNIndex 行写为 `.CNI` 或 `CNI<指数代码>.SZ` metadata-only 身份，保留主数据但不触发每日行情空抓，也不得覆盖同代码股票。治理前快照中同源、同 6 位代码的遗留行情型 key 会被标记为 `metadata_only` 并从日更 universe 排除。
 - **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义，按 `ambiguous_duplicate_action=skip` 跳过，不把多个不同指数压成一个本地主键。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
 - **`sample_limit`**: Telegram 日报中的指数治理样例数量上限，详细证据保存在 `index_lifecycle_evidence`。
 

@@ -181,8 +181,15 @@ class ReportEngine:
             data['calendar_updates'] = '\n'.join(formatted_calendar_updates) if formatted_calendar_updates else '无更新'
         else: # 正常交易日更新报告
             summary = data.get('update_results', {})
-            total_checked = summary.get('success_count', 0) + summary.get('failure_count', 0)
-            success_rate = (summary.get('success_count', 0) / total_checked * 100) if total_checked > 0 else 0
+            success_rate = summary.get('success_rate')
+            if success_rate is None:
+                total_checked = summary.get('total_instruments_checked', 0)
+                if not total_checked:
+                    total_checked = summary.get('success_count', 0) + summary.get('failure_count', 0)
+                success_rate = (
+                    summary.get('success_count', 0) / total_checked * 100
+                    if total_checked > 0 else 0
+                )
 
             data.update({
                 'date': data.get('date', ''),
@@ -327,6 +334,7 @@ class ReportEngine:
                 f"停编跳过: {summary.get('lifecycle_skip_count', 0)}，"
                 f"直接: {summary.get('direct_terminated_count', 0)}，"
                 f"推断: {summary.get('inferred_terminated_count', 0)}，"
+                f"metadata-only: {summary.get('metadata_only_legacy_deactivated_count', 0)}，"
                 f"stale: {summary.get('stale_no_quote_count', 0)}"
             ),
         ]

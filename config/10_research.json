@@ -154,16 +154,23 @@
           },
           "official_calendar_backfill": {
             "enabled": true,
-            "start_date": "2010-01-01",
+            "start_date": "2000-06-01",
             "source_profile": "exchange_official_daily_probe",
             "quality_flag": "backfilled_verified",
             "future_policy": "official_notice_only",
+            "exchange_start_dates": {
+              "SHFE": "2002-01-07",
+              "INE": "2018-03-26",
+              "DCE": "2000-06-01",
+              "CZCE": "2015-10-15",
+              "GFEX": "2099-12-31"
+            },
             "empty_payload_closed_start_dates": {
-              "SHFE": "2010-01-01",
-              "INE": "2010-01-01",
-              "DCE": "2010-01-01",
-              "CZCE": "2010-01-01",
-              "GFEX": "2010-01-01"
+              "SHFE": "2002-01-07",
+              "INE": "2018-03-26",
+              "DCE": "2000-06-01",
+              "CZCE": "2015-10-15",
+              "GFEX": "2099-12-31"
             },
             "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
           }

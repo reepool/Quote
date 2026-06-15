@@ -341,6 +341,30 @@ def test_official_futures_provider_probe_does_not_close_old_empty_payload(monkey
     assert "before reliable empty-closed start date" in result.failure_reason
 
 
+def test_official_futures_provider_probe_does_not_close_old_no_report(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
+    }
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "official_calendar_backfill": {
+            "empty_payload_closed_start_dates": {"SHFE": "2010-01-01"}
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    def _raise(*args, **kwargs):
+        raise OfficialFuturesSourceUnavailable("404 Client Error: Not Found")
+
+    monkeypatch.setattr(provider, "_request_exchange_payload", _raise)
+
+    result = provider.probe_exchange_trading_day("SHFE", "2000-01-04")
+
+    assert result.status == "unresolved"
+    assert result.is_trading_day is None
+    assert result.metadata["classification_rule"] == "official_no_report_before_reliable_history_start"
+
+
 def test_official_futures_provider_probe_keeps_failures_unresolved(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
@@ -860,6 +884,16 @@ def test_official_futures_failure_classification_marks_network_and_antibot():
     antibot = classify_official_futures_failure("HTTP 403 Forbidden access denied by WAF")
     assert antibot.category == "possible_anti_bot_or_ip_risk_control"
     assert antibot.suspected_local_ip_risk_control is True
+
+    challenge = classify_official_futures_failure("567 Server Error: Unknown Status for url")
+    assert challenge.category == "possible_anti_bot_or_ip_risk_control"
+    assert challenge.suspected_local_ip_risk_control is True
+
+    no_report = classify_official_futures_failure(
+        "404 Client Error: Not Found for url: https://example.test/kx20140315.dat"
+    )
+    assert no_report.category == "official_not_found_or_no_report"
+    assert no_report.suspected_local_ip_risk_control is False
 
 
 def test_futures_smoke_writes_failure_report_on_exception(tmp_path):

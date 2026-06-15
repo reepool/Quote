@@ -554,7 +554,7 @@
         }
       },
       "futures_trading_day_governance": {
-        "enabled": true,
+        "enabled": false,
         "description": "商品期货交易日治理前置任务（维护交易所日历、公告证据、人工复核状态和目标交易日集合）",
         "report": true,
         "pre_run_notify": false,
@@ -597,7 +597,7 @@
         }
       },
       "futures_market_data_sync": {
-        "enabled": true,
+        "enabled": false,
         "description": "商品期货行情日线与连续序列同步（写入 data/futures.db；依赖 futures_trading_day_governance）",
         "report": true,
         "pre_run_notify": false,
@@ -643,7 +643,7 @@
         }
       },
       "futures_cycle_diagnostics_refresh": {
-        "enabled": true,
+        "enabled": false,
         "description": "商品期货周期分位与景气诊断刷新（只读 data/futures.db 本地行情）",
         "report": true,
         "pre_run_notify": false,
@@ -662,7 +662,7 @@
         }
       },
       "futures_spread_recompute": {
-        "enabled": true,
+        "enabled": false,
         "description": "商品期货价差重算（只读 data/futures.db 本地行情）",
         "report": true,
         "pre_run_notify": false,

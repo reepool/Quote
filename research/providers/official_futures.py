@@ -535,6 +535,27 @@ class OfficialFuturesMarketDataProvider:
         except OfficialFuturesSourceUnavailable as exc:
             classification = classify_official_futures_failure(exc)
             if _is_official_closed_response(exc):
+                if not self._can_treat_empty_payload_as_closed(exchange_key, day_key):
+                    return OfficialFuturesDailyProbeResult(
+                        exchange=exchange_key,
+                        trade_date=day_key,
+                        status="unresolved",
+                        is_trading_day=None,
+                        row_count=0,
+                        source_interface=_source_interface_for_exchange(exchange_key),
+                        evidence_url=_official_daily_url(exchange_key, day_key),
+                        parser_version=self.parser_version,
+                        failure_reason=(
+                            "official no-report response before reliable empty-closed start date "
+                            f"{self.empty_payload_closed_start_dates.get(exchange_key)}: {exc}"
+                        ),
+                        metadata={
+                            "classification_rule": "official_no_report_before_reliable_history_start",
+                            "empty_payload_closed_start_date": self.empty_payload_closed_start_dates.get(exchange_key),
+                            "failure_category": classification.category,
+                            "suspected_local_ip_risk_control": classification.suspected_local_ip_risk_control,
+                        },
+                    )
                 return OfficialFuturesDailyProbeResult(
                     exchange=exchange_key,
                     trade_date=day_key,
@@ -1088,7 +1109,15 @@ def classify_official_futures_failure(error: Any, *, payload_text: str = "") -> 
             summary="official endpoint returned anti-bot/risk-control evidence",
             evidence=evidence,
         )
-    if "http" in lowered and any(code in lowered for code in (" 403", "403", " 429", "429")):
+    if "567 server error" in lowered or "unknown status" in lowered:
+        return OfficialFuturesFailureClassification(
+            category="possible_anti_bot_or_ip_risk_control",
+            is_retryable=True,
+            suspected_local_ip_risk_control=True,
+            summary="official endpoint returned non-standard HTTP 567/unknown status, likely a risk-control or challenge page",
+            evidence=evidence,
+        )
+    if "http" in lowered and re.search(r"\b(403|429)\b", lowered):
         return OfficialFuturesFailureClassification(
             category="possible_anti_bot_or_ip_risk_control",
             is_retryable=True,

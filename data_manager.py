@@ -11576,6 +11576,7 @@ class DataManager:
                 'inferred_terminated_count': 0,
                 'stale_no_quote_count': 0,
                 'stale_no_quote_written_count': 0,
+                'metadata_only_legacy_deactivated_count': 0,
                 'reactivated_count': 0,
                 'lifecycle_skip_count': 0,
                 'active_count': 0,
@@ -11683,6 +11684,68 @@ class DataManager:
                 result['summary']['metadata_rows_saved'] = await self.db_ops.save_instrument_master_metadata_batch(
                     metadata_rows
                 )
+                legacy_metadata_only_rows: List[Dict[str, Any]] = []
+                for row in official_rows:
+                    if str(row.get('exchange') or '').upper() != 'SZSE':
+                        continue
+                    if str(row.get('source') or '').lower() != 'cnindex':
+                        continue
+                    metadata = row.get('metadata') or {}
+                    if metadata.get('szse_quote_code'):
+                        continue
+                    code = str(row.get('source_symbol') or row.get('symbol') or '').strip()
+                    if len(code) != 6 or not code.isdigit():
+                        continue
+                    legacy_id = f'{code}.SZ'
+                    if legacy_id == row.get('instrument_id'):
+                        continue
+                    before_row = (
+                        snapshots_before.get('SZSE', {})
+                        .get('rows_by_id', {})
+                        .get(legacy_id)
+                    )
+                    if not before_row:
+                        continue
+                    if str(before_row.get('source') or '').lower() != 'cnindex':
+                        continue
+                    legacy_metadata_only_rows.append({
+                        'instrument_id': legacy_id,
+                        'symbol': code,
+                        'exchange': 'SZSE',
+                        'lifecycle_state': 'metadata_only',
+                        'event_type': 'cnindex_metadata_only_identity',
+                        'confidence': 'official_master_metadata_only',
+                        'source': 'cnindex_index_list',
+                        'parser_version': row.get('parser_version'),
+                        'raw_snapshot_hash': getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
+                        'diagnostics': {
+                            'canonical_metadata_instrument_id': row.get('instrument_id'),
+                            'name': row.get('name'),
+                            'market': row.get('market'),
+                            'industry': row.get('industry'),
+                            'sector': row.get('sector'),
+                            'cni_code': metadata.get('cni_code'),
+                        },
+                    })
+                if legacy_metadata_only_rows:
+                    result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
+                        legacy_metadata_only_rows
+                    )
+                    for row in legacy_metadata_only_rows:
+                        ok = await self.db_ops.mark_index_lifecycle_state(
+                            row.get('instrument_id'),
+                            lifecycle_state='metadata_only',
+                            source='cnindex_index_list',
+                        )
+                        if ok:
+                            result['summary']['metadata_only_legacy_deactivated_count'] += 1
+                            if len(result['summary']['samples']) < sample_limit:
+                                result['summary']['samples'].append({
+                                    'instrument_id': row.get('instrument_id'),
+                                    'state': 'metadata_only',
+                                    'confidence': row.get('confidence'),
+                                    'canonical_metadata_instrument_id': row.get('diagnostics', {}).get('canonical_metadata_instrument_id'),
+                                })
 
         evidence_rows: List[Dict[str, Any]] = []
         if cnindex_source is not None:
@@ -11908,6 +11971,7 @@ class DataManager:
             result['summary']['direct_terminated_count']
             + result['summary']['inferred_terminated_count']
             + result['summary']['stale_no_quote_written_count']
+            + result['summary']['metadata_only_legacy_deactivated_count']
         )
         if result['warnings']:
             result['status'] = 'warning'

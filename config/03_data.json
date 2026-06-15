@@ -33,6 +33,7 @@
       "skip_index_lifecycle_states": [
         "calculation_terminated",
         "inactive",
+        "metadata_only",
         "stale_no_quote"
       ],
       "enable_local_stale_no_quote": true,

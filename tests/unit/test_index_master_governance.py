@@ -117,6 +117,8 @@ class FakeIndexDbOps:
         row = self.rows.get(instrument_id)
         if row is None:
             return False
+        if row.get('type') != 'index':
+            return False
         row['status'] = lifecycle_state
         row['source'] = source
         row['is_active'] = lifecycle_state == 'active_quote'
@@ -138,19 +140,20 @@ class FakeCNIndexSource:
         return SimpleNamespace(
             rows=[
                 {
-                    'instrument_id': '980055.SZ',
+                    'instrument_id': 'CNI980055.SZ',
                     'symbol': '980055',
                     'name': '规模因子',
                     'exchange': 'SZSE',
                     'type': 'index',
                     'currency': 'CNY',
-                    'status': 'active',
-                    'is_active': True,
-                    'trading_status': 1,
+                    'status': 'metadata_only',
+                    'is_active': False,
+                    'trading_status': 0,
                     'source': 'cnindex',
+                    'source_symbol': '980055',
                     'source_url': 'https://example.test/list.xlsx',
                     'parser_version': 'test',
-                    'metadata': {},
+                    'metadata': {'cni_code': 'CNI980055.SZ', 'szse_quote_code': ''},
                 },
                 {
                     'instrument_id': '480055.SZ',
@@ -163,9 +166,10 @@ class FakeCNIndexSource:
                     'is_active': True,
                     'trading_status': 1,
                     'source': 'cnindex',
+                    'source_symbol': '480055',
                     'source_url': 'https://example.test/list.xlsx',
                     'parser_version': 'test',
-                    'metadata': {},
+                    'metadata': {'szse_quote_code': '480055'},
                 },
             ],
             raw_snapshot_hash='hash',
@@ -174,7 +178,7 @@ class FakeCNIndexSource:
     async def get_lifecycle_evidence(self):
         return [
             {
-                'instrument_id': '980055.SZ',
+                'instrument_id': 'CNI980055.SZ',
                 'symbol': '980055',
                 'exchange': 'SZSE',
                 'lifecycle_state': 'calculation_terminated',
@@ -213,7 +217,7 @@ async def test_index_governance_applies_direct_and_series_inferred_termination()
     assert result['summary']['direct_terminated_count'] == 1
     assert result['summary']['inferred_terminated_count'] == 1
     assert result['summary']['lifecycle_skip_count'] == 2
-    assert manager.db_ops.rows['980055.SZ']['status'] == 'calculation_terminated'
+    assert manager.db_ops.rows['CNI980055.SZ']['status'] == 'calculation_terminated'
     assert manager.db_ops.rows['480055.SZ']['status'] == 'calculation_terminated'
     assert not await manager.db_ops.get_active_instruments(
         'SZSE',
@@ -244,7 +248,72 @@ async def test_index_governance_skips_ambiguous_duplicate_official_master_rows()
     result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
 
     written_batch = manager.db_ops.saved_instrument_batches[0]
-    assert '980055.SZ' not in [row['instrument_id'] for row in written_batch]
+    assert 'CNI980055.SZ' not in [row['instrument_id'] for row in written_batch]
     assert result['summary']['master_rows_saved'] == 1
     assert result['summary']['ambiguous_master_duplicate_groups_skipped'] == 1
     assert any('ambiguous duplicate key groups by rule' in warning for warning in result['warnings'])
+
+
+class LegacyMetadataOnlyCNIndexSource(FakeCNIndexSource):
+    async def get_index_master_snapshot(self):
+        return SimpleNamespace(
+            rows=[
+                {
+                    'instrument_id': 'CNB00001.CNI',
+                    'symbol': '000001',
+                    'name': '国证利率',
+                    'exchange': 'SZSE',
+                    'type': 'index',
+                    'currency': 'CNY',
+                    'status': 'metadata_only',
+                    'is_active': False,
+                    'trading_status': 0,
+                    'source': 'cnindex',
+                    'source_symbol': '000001',
+                    'source_url': 'https://example.test/list.xlsx',
+                    'parser_version': 'test',
+                    'metadata': {
+                        'cni_code': 'CNB00001.CNI',
+                        'szse_quote_code': '',
+                    },
+                }
+            ],
+            raw_snapshot_hash='hash',
+        )
+
+    async def get_lifecycle_evidence(self):
+        return []
+
+
+@pytest.mark.asyncio
+async def test_index_governance_deactivates_legacy_cnindex_metadata_only_quote_key():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.rows['000001.SZ'] = {
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'name': '国证利率',
+        'exchange': 'SZSE',
+        'type': 'index',
+        'status': 'active',
+        'is_active': True,
+        'trading_status': 1,
+        'source': 'cnindex',
+        'updated_at': '2026-06-10T20:00:00',
+    }
+    manager.source_factory = FakeSourceFactory()
+    manager.source_factory.cnindex = LegacyMetadataOnlyCNIndexSource()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
+
+    assert result['summary']['metadata_only_legacy_deactivated_count'] == 1
+    assert result['summary']['lifecycle_skip_count'] == 1
+    assert manager.db_ops.rows['000001.SZ']['status'] == 'metadata_only'
+    assert manager.db_ops.rows['000001.SZ']['is_active'] is False
+    assert manager.db_ops.rows['CNB00001.CNI']['status'] == 'metadata_only'
+    assert any(
+        row['event_type'] == 'cnindex_metadata_only_identity'
+        and row['instrument_id'] == '000001.SZ'
+        for row in manager.db_ops.evidence_rows
+    )

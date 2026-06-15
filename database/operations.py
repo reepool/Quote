@@ -601,6 +601,22 @@ class DatabaseOperations:
                         existing = result.scalar_one_or_none()
 
                         if existing:
+                            existing_type = getattr(existing, 'type', None)
+                            incoming_type = processed_data.get('type')
+                            if existing_type and incoming_type and existing_type != incoming_type:
+                                incoming_source = processed_data.get('source')
+                                # A-share stocks and CNIndex metadata can share six-digit codes.
+                                # Never let an index row overwrite an existing stock row; allow the
+                                # stock master refresh to repair older polluted rows in the reverse case.
+                                if existing_type == 'stock' and incoming_type == 'index':
+                                    self.db_logger.warning(
+                                        "Skipped instrument type collision for %s: existing=%s incoming=%s source=%s",
+                                        processed_data.get('instrument_id'),
+                                        existing_type,
+                                        incoming_type,
+                                        incoming_source,
+                                    )
+                                    continue
                             # 更新现有记录
                             for key, value in processed_data.items():
                                 # 防线 A: 保护已有的退市日期不被空值覆盖
@@ -809,7 +825,7 @@ class DatabaseOperations:
         if not instrument_id or not lifecycle_state:
             return False
 
-        excluded_states = {"calculation_terminated", "inactive", "stale_no_quote"}
+        excluded_states = {"calculation_terminated", "inactive", "metadata_only", "stale_no_quote"}
 
         def _parse(value: Optional[Union[str, date, datetime]]) -> Optional[datetime]:
             if value is None:
@@ -833,6 +849,14 @@ class DatabaseOperations:
                 )
                 record = result.scalar_one_or_none()
                 if record is None:
+                    return False
+                if getattr(record, 'type', None) != 'index':
+                    self.db_logger.warning(
+                        "Skipped non-index lifecycle update for %s: type=%s state=%s",
+                        instrument_id,
+                        getattr(record, 'type', None),
+                        lifecycle_state,
+                    )
                     return False
 
                 record.status = lifecycle_state

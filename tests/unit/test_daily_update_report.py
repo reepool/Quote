@@ -286,6 +286,7 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
             'lifecycle_skip_count': 2,
             'direct_terminated_count': 1,
             'inferred_terminated_count': 1,
+            'metadata_only_legacy_deactivated_count': 1,
             'stale_no_quote_count': 6,
             'source_usage': {'cnindex': 2},
             'samples': [
@@ -305,6 +306,7 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
     assert '停编跳过: 2' in summary
     assert '直接: 1' in summary
     assert '推断: 1' in summary
+    assert 'metadata-only: 1' in summary
     assert summary.count('calculation_terminated') == 5
     assert len(summary) < 900
 

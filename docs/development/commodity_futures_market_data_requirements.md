@@ -649,7 +649,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 | 任务 | 默认状态 | 频率 | 说明 |
 |---|---|---|---|
-| `futures_official_calendar_backfill` | disabled/manual | 手工或周末 | 支持从 `2000-01-01` 起按交易所官方日行情接口验证交易日/非交易日，只写 `futures_trading_calendar`，不写行情价格；早于官方日行情可靠覆盖起点的空 payload 记为 unresolved，不写为休市；未知未来不使用 weekday 猜测 |
+| `futures_official_calendar_backfill` | disabled/manual | 手工或周末 | 按交易所官方日行情可靠覆盖起点验证交易日/非交易日，只写 `futures_trading_calendar`，不写行情价格；早于官方日行情可靠覆盖起点的空 payload 记为 unresolved，不写为休市；未知未来不使用 weekday 猜测 |
 | `futures_trading_day_governance` | enabled | 日更前、回补前 | 维护交易所/品种交易日历、休市公告、交易时段和目标交易日集合，是商品数据同步前置任务 |
 | `futures_market_data_sync` | enabled | 交易日晚间 | 同步 P0 商品期货最新日线和连续序列，当前实现任务名 |
 | `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用 |
@@ -659,6 +659,36 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | `futures_source_version_check` | 待后续拆分 | 每日中午 | 检查 AKShare 等依赖版本，复用现有依赖检查机制 |
 
 商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再做主数据治理和数据字典检查，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；如果交易日治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记日历风险。
+
+### 10.1.1 官方交易日历可靠起点
+
+截至 2026-06-15 的官方接口实测结论：
+
+| 交易所 | 当前可靠起点 | 官方接口状态 | 说明 |
+|---|---:|---|---|
+| DCE | 2000-06-01 | 可解析，需 Chrome/nodriver | 2000-01 和 2000-03 样本为空，2000-06-01 起连续样本可解析 |
+| SHFE | 2002-01-07 | 可解析，但本机 IP 可能被限流 | 2000-2001 官方文件不可用；2026-06-15 本机在 2017 段出现连接超时，应暂停大批量请求或换网络继续 |
+| INE | 2018-03-26 | 可解析，但与 SHFE 同属上期系域名，可能同受网络限流影响 | 2018-03-26 为原油期货上市首日，之前样本为空 |
+| CZCE | 2015-10-15 | 当前静态文件接口可解析 | 当前接口无法证明 2015-10-15 之前的官方日历，需要另找旧版官方归档源 |
+| GFEX | 待打通 | 当前 HTTP 接口返回 567/HTML challenge | 不能作为交易日/休市证据；需实现 GFEX 浏览器挑战处理或找到新的官方公开接口 |
+
+生产落库必须按交易所分批执行并复核，不允许一次性以 `2000-01-01` 跑全交易所。推荐命令：
+
+```bash
+PYTHONPATH=/home/python/Quote LD_LIBRARY_PATH=/home/python/miniconda3/envs/Quote/lib \
+/home/python/miniconda3/envs/Quote/bin/python scripts/dev_validation/backfill_futures_official_calendar.py \
+  --exchanges SHFE \
+  --end-date 2026-06-15 \
+  --chunk-years 1 \
+  --official-timeout-seconds 12 \
+  --official-retry-attempts 2 \
+  --official-retry-backoff-seconds 0.2 \
+  --write \
+  --replace-exchange-calendar \
+  --output-path /tmp/quote_futures_calendar_shfe_write.json
+```
+
+不传 `--start-date` 时，脚本使用 `config/10_research.json` 中的 `exchange_start_dates`；如需从断点续跑，可显式传入 `--start-date`。
 
 ### 10.2 回补策略
 

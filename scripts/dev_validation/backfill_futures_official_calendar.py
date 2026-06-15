@@ -7,6 +7,7 @@ import argparse
 import json
 import sqlite3
 import sys
+import shutil
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
@@ -37,7 +38,15 @@ def build_parser() -> argparse.ArgumentParser:
             "Defaults to dry-run; pass --write to persist into futures.db."
         )
     )
-    parser.add_argument("--start-date", default="2000-01-01")
+    parser.add_argument(
+        "--start-date",
+        default=None,
+        help=(
+            "Override all exchange starts. If omitted, uses "
+            "trading_day_governance.official_calendar_backfill.exchange_start_dates "
+            "or empty_payload_closed_start_dates per exchange."
+        ),
+    )
     parser.add_argument(
         "--end-date",
         default=None,
@@ -58,6 +67,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--official-timeout-seconds", type=float, default=None)
     parser.add_argument("--official-retry-attempts", type=int, default=None)
     parser.add_argument("--official-retry-backoff-seconds", type=float, default=None)
+    parser.add_argument(
+        "--replace-exchange-calendar",
+        action="store_true",
+        help="Before writing, delete existing calendar rows for each selected exchange/date range. A db backup is created first.",
+    )
     parser.add_argument("--write", action="store_true", help="Persist calendar rows.")
     parser.add_argument(
         "--output-path",
@@ -98,6 +112,28 @@ def _default_output_path(start_date: str, end_date: str, dry_run: bool) -> Path:
     return Path("/tmp") / f"quote_futures_official_calendar_{start_date}_{end_date}_{suffix}_{stamp}.json"
 
 
+def _configured_exchange_start_dates(
+    module_cfg: Dict[str, Any],
+    exchanges: Sequence[str],
+    fallback_start_date: str,
+) -> Dict[str, str]:
+    governance_cfg = module_cfg.get("trading_day_governance") if isinstance(module_cfg.get("trading_day_governance"), dict) else {}
+    backfill_cfg = (
+        governance_cfg.get("official_calendar_backfill")
+        if isinstance(governance_cfg.get("official_calendar_backfill"), dict)
+        else {}
+    )
+    configured: Dict[str, Any] = {}
+    for key in ("empty_payload_closed_start_dates", "exchange_start_dates"):
+        values = backfill_cfg.get(key)
+        if isinstance(values, dict):
+            configured.update(values)
+    return {
+        exchange: _date_key(configured.get(exchange) or fallback_start_date)
+        for exchange in exchanges
+    }
+
+
 def _calendar_summary(db_path: str) -> List[Dict[str, Any]]:
     path = Path(db_path)
     if not path.exists():
@@ -116,6 +152,27 @@ def _calendar_summary(db_path: str) -> List[Dict[str, Any]]:
             """
         ).fetchall()
     return [dict(row) for row in rows]
+
+
+def _backup_db(db_path: str) -> Optional[str]:
+    path = Path(db_path)
+    if not path.exists():
+        return None
+    backup = path.with_name(f"{path.name}.bak_futures_calendar_{get_shanghai_time().strftime('%Y%m%d_%H%M%S')}")
+    shutil.copy2(path, backup)
+    return str(backup)
+
+
+def _delete_exchange_calendar(db_path: str, exchange: str, start_date: str, end_date: str) -> int:
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.execute(
+            """
+            DELETE FROM futures_trading_calendar
+            WHERE exchange = ? AND trade_date >= ? AND trade_date <= ?
+            """,
+            (exchange, start_date, end_date),
+        )
+        return int(cursor.rowcount if cursor.rowcount is not None else 0)
 
 
 def _rollup_chunks(chunks: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
@@ -142,13 +199,11 @@ def _rollup_chunks(chunks: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
-    start_date = _date_key(args.start_date)
     end_date = _date_key(args.end_date or get_shanghai_time().date().isoformat())
-    if start_date > end_date:
-        raise ValueError("start_date must be earlier than or equal to end_date")
     exchanges = parse_exchanges(args.exchanges) or DEFAULT_EXCHANGES
     dry_run = not args.write
-    output_path = args.output_path or _default_output_path(start_date, end_date, dry_run)
+    start_label = _date_key(args.start_date) if args.start_date else "configured_exchange_starts"
+    output_path = args.output_path or _default_output_path(start_label, end_date, dry_run)
     progress_path = output_path.with_suffix(output_path.suffix + ".jsonl")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -167,6 +222,25 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.official_retry_backoff_seconds is not None:
         official_cfg["retry_backoff_seconds"] = args.official_retry_backoff_seconds
     db_path = str(module_cfg.get("storage", {}).get("database") or "data/futures.db")
+    fallback_start_date = _date_key(
+        args.start_date
+        or module_cfg.get("trading_day_governance", {})
+        .get("official_calendar_backfill", {})
+        .get("start_date")
+        or "2000-01-01"
+    )
+    exchange_start_dates = (
+        {exchange: _date_key(args.start_date) for exchange in exchanges}
+        if args.start_date
+        else _configured_exchange_start_dates(module_cfg, exchanges, fallback_start_date)
+    )
+    invalid_ranges = {
+        exchange: start
+        for exchange, start in exchange_start_dates.items()
+        if start > end_date
+    }
+    if invalid_ranges:
+        raise ValueError(f"exchange start_date must be <= end_date: {invalid_ranges}")
 
     storage = FuturesStorageManager(config, db_path=db_path)
     storage.initialize()
@@ -179,9 +253,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     chunk_results: List[Dict[str, Any]] = []
     chunk_count = 0
     started_at = get_shanghai_time().isoformat()
+    backup_path = None
+    deleted_rows_by_exchange: Dict[str, int] = {}
+    if args.write and args.replace_exchange_calendar:
+        backup_path = _backup_db(db_path)
+        for exchange in exchanges:
+            deleted_rows_by_exchange[exchange] = _delete_exchange_calendar(
+                db_path,
+                exchange,
+                exchange_start_dates[exchange],
+                end_date,
+            )
     with progress_path.open("a", encoding="utf-8") as progress:
         for exchange in exchanges:
-            for chunk_start, chunk_end in _chunk_ranges(start_date, end_date, args.chunk_years):
+            exchange_start = exchange_start_dates[exchange]
+            for chunk_start, chunk_end in _chunk_ranges(exchange_start, end_date, args.chunk_years):
                 chunk_count += 1
                 if args.max_chunks is not None and chunk_count > args.max_chunks:
                     break
@@ -239,11 +325,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "completed_at": get_shanghai_time().isoformat(),
         "db_path": db_path,
         "dry_run": dry_run,
-        "start_date": start_date,
+        "start_date": start_label,
         "end_date": end_date,
         "exchanges": exchanges,
+        "exchange_start_dates": exchange_start_dates,
         "chunk_years": args.chunk_years,
         "progress_path": str(progress_path),
+        "backup_path": backup_path,
+        "deleted_rows_by_exchange": deleted_rows_by_exchange,
         "totals": _rollup_chunks(chunk_results),
         "calendar_summary_after": _calendar_summary(db_path),
         "chunks": chunk_results,
