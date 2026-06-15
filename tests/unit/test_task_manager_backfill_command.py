@@ -11,7 +11,44 @@ def _build_handler() -> tuple[TaskManagerHandlers, Mock]:
     task_manager = Mock()
     task_manager.logger = Mock()
     task_manager.send_message = AsyncMock()
+    task_manager.job_config_manager = Mock()
     return TaskManagerHandlers(task_manager), task_manager
+
+
+@pytest.mark.asyncio
+async def test_run_daily_update_with_date_passes_job_config_for_report():
+    handler, task_manager = _build_handler()
+    target_date = date(2026, 6, 15)
+    job_config = SimpleNamespace(report=True)
+    task_manager.job_config_manager.get_job_config.return_value = job_config
+
+    with patch(
+        'utils.config_manager.config_manager.get_nested',
+        return_value={
+            'parameters': {
+                'exchanges': ['SSE', 'SZSE', 'BSE'],
+                'instrument_types': ['stock', 'index'],
+            },
+        },
+    ), patch(
+        'scheduler.tasks.scheduled_tasks.daily_data_update',
+        new=AsyncMock(return_value=True),
+    ) as run_update:
+        success = await handler._execute_task_direct(
+            chat_id=1,
+            job_id='daily_data_update',
+            target_date=target_date,
+        )
+
+    assert success is True
+    run_update.assert_awaited_once_with(
+        exchanges=['SSE', 'SZSE', 'BSE'],
+        target_date=target_date,
+        wait_for_market_close=False,
+        enable_trading_day_check=False,
+        instrument_types=['stock', 'index'],
+        job_config=job_config,
+    )
 
 
 @pytest.mark.asyncio

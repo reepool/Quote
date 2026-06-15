@@ -1945,13 +1945,18 @@ class TaskManagerHandlers:
                 from utils import config_manager
                 job_cfg = config_manager.get_nested(f'scheduler_config.jobs.{job_id}', {})
                 params = job_cfg.get('parameters', {})
+                job_config = None
+                job_config_manager = getattr(self.task_manager, 'job_config_manager', None)
+                if job_config_manager and hasattr(job_config_manager, 'get_job_config'):
+                    job_config = job_config_manager.get_job_config(job_id)
 
                 success = await scheduled_tasks.daily_data_update(
                     exchanges=params.get('exchanges'),
                     target_date=target_date,
                     wait_for_market_close=False,
                     enable_trading_day_check=False,
-                    instrument_types=params.get('instrument_types')
+                    instrument_types=params.get('instrument_types'),
+                    job_config=job_config,
                 )
                 self.task_manager.logger.info(f"[TaskManagerHandlers] 任务执行结果: {job_id}, 成功: {success}")
                 return success
