@@ -11685,6 +11685,7 @@ class DataManager:
                     metadata_rows
                 )
                 legacy_metadata_only_rows: List[Dict[str, Any]] = []
+                seen_legacy_metadata_ids: Set[str] = set()
                 for row in official_rows:
                     if str(row.get('exchange') or '').upper() != 'SZSE':
                         continue
@@ -11708,6 +11709,7 @@ class DataManager:
                         continue
                     if str(before_row.get('source') or '').lower() != 'cnindex':
                         continue
+                    seen_legacy_metadata_ids.add(legacy_id)
                     legacy_metadata_only_rows.append({
                         'instrument_id': legacy_id,
                         'symbol': code,
@@ -11725,6 +11727,55 @@ class DataManager:
                             'industry': row.get('industry'),
                             'sector': row.get('sector'),
                             'cni_code': metadata.get('cni_code'),
+                        },
+                    })
+                persisted_metadata_only_rows = await self.db_ops.execute_read_query(
+                    """
+                    SELECT i.instrument_id, i.symbol, i.name, i.exchange, i.market,
+                           i.industry, i.sector, i.source, m.metadata_json
+                    FROM instruments i
+                    JOIN instrument_master_metadata m
+                      ON m.instrument_id = i.instrument_id
+                    WHERE i.exchange = 'SZSE'
+                      AND i.type = 'index'
+                      AND i.is_active = 1
+                      AND COALESCE(i.trading_status, 1) = 1
+                      AND lower(COALESCE(i.source, '')) IN ('cnindex', 'cnindex_index_list')
+                      AND i.instrument_id = i.symbol || '.SZ'
+                      AND COALESCE(json_extract(m.metadata_json, '$.metadata.szse_quote_code'), '') = ''
+                      AND COALESCE(json_extract(m.metadata_json, '$.metadata.cni_code'), '') != ''
+                    """
+                )
+                for persisted in persisted_metadata_only_rows or []:
+                    legacy_id = persisted.get('instrument_id')
+                    if not legacy_id or legacy_id in seen_legacy_metadata_ids:
+                        continue
+                    try:
+                        metadata_payload = json.loads(persisted.get('metadata_json') or '{}')
+                    except Exception:
+                        metadata_payload = {}
+                    metadata = metadata_payload.get('metadata') if isinstance(metadata_payload, dict) else {}
+                    if not isinstance(metadata, dict):
+                        metadata = {}
+                    cni_code = metadata.get('cni_code')
+                    seen_legacy_metadata_ids.add(legacy_id)
+                    legacy_metadata_only_rows.append({
+                        'instrument_id': legacy_id,
+                        'symbol': persisted.get('symbol'),
+                        'exchange': persisted.get('exchange') or 'SZSE',
+                        'lifecycle_state': 'metadata_only',
+                        'event_type': 'cnindex_metadata_only_identity',
+                        'confidence': 'official_master_metadata_only',
+                        'source': 'cnindex_index_list',
+                        'parser_version': metadata_payload.get('parser_version') if isinstance(metadata_payload, dict) else None,
+                        'raw_snapshot_hash': metadata_payload.get('raw_snapshot_hash') if isinstance(metadata_payload, dict) else None,
+                        'diagnostics': {
+                            'canonical_metadata_instrument_id': cni_code,
+                            'name': persisted.get('name'),
+                            'market': persisted.get('market') or metadata.get('index_family'),
+                            'industry': persisted.get('industry') or metadata.get('index_category'),
+                            'sector': persisted.get('sector') or metadata.get('coverage_scope'),
+                            'cni_code': cni_code,
                         },
                     })
                 if legacy_metadata_only_rows:

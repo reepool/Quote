@@ -83,7 +83,7 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 
 数据库写入层还必须保护股票主数据优先级：当已有 `stock` 行与传入 `index` 行使用相同 `instrument_id` 时，指数行不得覆盖股票行；反向的股票主数据刷新允许修复历史上被指数污染的股票主键。例如 `000001.SZ` 应始终保留为平安银行，CNIndex 的“国证利率债指数”没有深交所行情代码，应作为 metadata-only 指数保存，而不是占用 `000001.SZ`。
 
-指数主数据治理发现新的 CNIndex metadata-only 身份后，还会把治理前快照中同源、同 6 位代码的遗留行情型 key（如错误的 `000001.SZ` 指数行）标记为 `metadata_only` 并写入生命周期证据；这样旧污染行不会继续进入 `tradable_only` 日更 universe。
+指数主数据治理发现新的 CNIndex metadata-only 身份，或本地已存官方 metadata 已证明 `szse_quote_code` 为空且 `.CNI` 存在时，还会把同源、同 6 位代码的遗留行情型 key（如错误的 `000001.SZ`、`005125.SZ` 指数行）标记为 `metadata_only` 并写入生命周期证据；这样旧污染行不会继续进入 `tradable_only` 日更 universe。
 
 ## 报告要求
 

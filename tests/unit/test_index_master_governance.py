@@ -1,3 +1,4 @@
+import json
 from datetime import date, datetime
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
@@ -62,11 +63,34 @@ class FakeIndexDbOps:
         self.latest_quotes = {'480055.SZ': datetime(2026, 5, 13)}
         self.evidence_rows = []
         self.saved_metadata_count = 0
+        self.metadata_by_id = {}
         self.saved_instrument_batches = []
 
     async def execute_read_query(self, query, params=None):
         if "status = 'stale_no_quote'" in query:
             return []
+        if "instrument_master_metadata" in query:
+            rows = []
+            for instrument_id, row in self.rows.items():
+                metadata = self.metadata_by_id.get(instrument_id)
+                if not metadata:
+                    continue
+                metadata_payload = metadata.get('metadata') or {}
+                if (
+                    row.get('exchange') == 'SZSE'
+                    and row.get('type') == 'index'
+                    and row.get('is_active') is True
+                    and row.get('trading_status') == 1
+                    and row.get('source') in {'cnindex', 'cnindex_index_list'}
+                    and row.get('instrument_id') == f"{row.get('symbol')}.SZ"
+                    and not metadata_payload.get('szse_quote_code')
+                    and metadata_payload.get('cni_code')
+                ):
+                    rows.append({
+                        **row.copy(),
+                        'metadata_json': json.dumps(metadata, ensure_ascii=False),
+                    })
+            return rows
         exchange = (params or {}).get('exchange', 'SZSE')
         return [
             row.copy()
@@ -96,6 +120,8 @@ class FakeIndexDbOps:
 
     async def save_instrument_master_metadata_batch(self, rows):
         self.saved_metadata_count += len(rows)
+        for row in rows:
+            self.metadata_by_id[row['instrument_id']] = row
         return len(rows)
 
     async def save_index_lifecycle_evidence(self, rows):
@@ -315,5 +341,52 @@ async def test_index_governance_deactivates_legacy_cnindex_metadata_only_quote_k
     assert any(
         row['event_type'] == 'cnindex_metadata_only_identity'
         and row['instrument_id'] == '000001.SZ'
+        for row in manager.db_ops.evidence_rows
+    )
+
+
+@pytest.mark.asyncio
+async def test_index_governance_deactivates_persisted_cnindex_metadata_only_quote_key():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.rows['005125.SZ'] = {
+        'instrument_id': '005125.SZ',
+        'symbol': '005125',
+        'name': '中小可选',
+        'exchange': 'SZSE',
+        'type': 'index',
+        'status': 'active',
+        'is_active': True,
+        'trading_status': 1,
+        'source': 'cnindex',
+        'updated_at': '2026-06-10T20:00:00',
+    }
+    manager.db_ops.metadata_by_id['005125.SZ'] = {
+        'instrument_id': '005125.SZ',
+        'exchange': 'SZSE',
+        'parser_version': 'official-index-source-v1',
+        'raw_snapshot_hash': 'hash',
+        'metadata': {
+            'full_name': '中小创新可选消费行业指数',
+            'publisher': '深圳证券交易所',
+            'szse_quote_code': '',
+            'cni_code': 'CN5125.CNI',
+            'index_family': '深证系列',
+            'index_category': '行业指数',
+            'coverage_scope': '深市A股',
+        },
+    }
+    manager.source_factory = FakeSourceFactory()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
+
+    assert result['summary']['metadata_only_legacy_deactivated_count'] == 1
+    assert manager.db_ops.rows['005125.SZ']['status'] == 'metadata_only'
+    assert manager.db_ops.rows['005125.SZ']['is_active'] is False
+    assert any(
+        row['event_type'] == 'cnindex_metadata_only_identity'
+        and row['instrument_id'] == '005125.SZ'
+        and row['diagnostics']['cni_code'] == 'CN5125.CNI'
         for row in manager.db_ops.evidence_rows
     )
