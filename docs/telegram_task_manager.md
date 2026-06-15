@@ -263,7 +263,8 @@ restart_system - 重启系统服务
 - **执行时间**: 每周一至周五 20:00
 - **功能**: 自动更新当日股票数据
 - **特点**: 支持交易日检查、市场收盘等待；普通 A 股日更通过 `master_governance.job_requirements` 声明 `a_share_stock` 与 `a_share_index` 前置治理，默认强制刷新 `SSE/SZSE/BSE` 股票主数据，并在读取 active/tradable universe 前执行指数生命周期治理
-- **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补
+- **主数据报告**: 日更报告包含“证券主数据同步”段落，展示新增、停用、活跃数量和 warnings/errors；该段落来自共享 `instrument_master_governance` 治理入口，但保留日更兼容字段 `instrument_master_sync`；历史补数模式默认跳过当前主数据同步，避免用今天的股票池语义污染历史回补。午夜后重跑前一交易日例外，例如 2026-06-16 00:18 执行 `/run daily_data_update 2026-06-15` 仍属于当前日更重试，应强制运行 A 股股票和指数主数据治理。
+- **无行情指数**: 指数治理会把 CNIndex 官方列表中没有 `深交所行情代码`、只有 `.CNI`/CNI 主数据编号的指数保存为 metadata-only 身份；本地遗留的错误行情型 key（如 `005125.SZ`、`005126.SZ`、`006125.SZ`）会被标记为 `metadata_only` 并从 `tradable_only` 日更 universe 排除。Telegram 报告中的指数主数据治理段会展示 metadata-only 遗留停用数量和少量样例；若日志仍看到这些代码被行情源反复空抓，优先检查当次任务是否跳过了指数前置治理。
 - **行情追补**: 普通 A 股日更会对本地无行情的新股和最近短缺口执行 `data_config.daily_update_catchup` 小窗口追补。主数据或行情源晚一天可接受，但标的进入主表后，上市日至目标日附近的缺口会自动尝试补齐；超出窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 兜底。
 - **历史修复治理**: `/find_gap_and_repair`、月度完整性检查和区间回补会先执行本地 `repair_universe_governance` 过滤；停编指数、退市后窗口和 stale-no-quote 指数会在行情源请求前跳过或裁剪，并在报告的“生命周期过滤”段落中展示数量、原因和样例。该过滤默认不刷新当前主数据；显式刷新必须通过任务参数指定 `force_current_master_refresh=true` 和可选 `current_master_refresh_scopes`。对本地完全没有行情记录但仍为 active 的指数，系统不会直接判定停编，而是在 `/find_gap_and_repair` 中按 `max_index_no_data_failures_per_instrument` 做指数连续无数据失败熔断，避免单次任务反复请求外部源。
 

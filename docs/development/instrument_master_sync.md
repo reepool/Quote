@@ -59,6 +59,14 @@ A 股主数据当前没有独立自动 cron 任务；自动触发主要来自 `d
 
 `daily_data_update.parameters.instrument_types` 当前显式配置为 `["stock", "index"]`。这意味着日更任务会先运行 A 股股票主数据治理，再在读取 active universe 前运行指数主数据治理；手工回补或专项测试如果只传 `["stock"]`，指数治理不会触发。
 
+指数治理会在行情抓取前处理 CNIndex 无行情代码的 metadata-only 身份。官方列表中没有 `深交所行情代码`、但有 `.CNI`/CNI 编码的指数，只保留主数据身份，不进入普通日更行情池；本地旧库中同源、同 6 位代码的错误行情型 key（如 `005125.SZ`、`005126.SZ`、`006125.SZ`）会被标记为 `status=metadata_only,is_active=0,trading_status=0`。这类标记不是停编结论，只是“没有交易所行情代码，不能日更空抓”的 eligibility 结论。
+
+若日志中仍出现大量无行情 CNIndex 代码在普通日更中反复请求行情，应优先确认三点：
+
+1. 当次 `daily_data_update` 是否实际执行了 `a_share_index` 前置治理，而不是被误判为普通历史回补。
+2. `daily_data_update.parameters.instrument_types` 是否包含 `index`。
+3. 这些代码在 `instruments` 中是否仍为 `active`；治理成功后应转为 `metadata_only`，并从 `tradable_only=True` 的日更 universe 排除。
+
 非交易日如果需要单独验证指数治理，不应强行跑 `daily_data_update` 去请求周末行情；使用 manual-only 任务 `/run index_master_governance_sync`。该任务通过 `a_share_index` policy contract 调用底层 `DataManager.sync_index_master()`，刷新官方指数清单、公告证据和生命周期状态，不下载日更行情。
 
 ## 自动任务策略

@@ -85,12 +85,30 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 
 指数主数据治理发现新的 CNIndex metadata-only 身份，或本地已存官方 metadata 已证明 `szse_quote_code` 为空且 `.CNI` 存在时，还会把同源、同 6 位代码的遗留行情型 key（如错误的 `000001.SZ`、`005125.SZ` 指数行）标记为 `metadata_only` 并写入生命周期证据；这样旧污染行不会继续进入 `tradable_only` 日更 universe。
 
+### 无行情指数与 metadata-only 身份
+
+CNIndex 官方列表里同时存在“指数代码”和“深交所行情代码”。只有“深交所行情代码”能证明该指数有交易所行情可拉取；“指数代码”只是官方主数据编号，不能直接拼成 `<指数代码>.SZ` 用作行情主键。系统按以下规则处理：
+
+- 官方列表存在 `深交所行情代码`：写入行情型 `<行情代码>.SZ`，在生命周期为 active 时可以进入日更行情 universe。
+- 官方列表没有 `深交所行情代码`，但存在 `.CNI` 或 CNI 编码：写入 `.CNI` 或 `CNI<指数代码>.SZ` metadata-only 身份，只保留主数据、名称、发布方、类别、`.CNI` 和官方证据，不参与每日行情抓取。
+- 本地遗留的同源、同 6 位代码行情型 key 如果已被官方 metadata 证明 `szse_quote_code` 为空且 `cni_code` 非空，应标记为 `status=metadata_only,is_active=0,trading_status=0`，并写入 `index_lifecycle_evidence.event_type=cnindex_metadata_only_identity`。
+- `metadata_only` 不等于官方终止计算发布。它只说明该官方主数据身份没有交易所行情代码，不能每天去 BaoStock/AkShare/官方行情接口空探；若未来官方新增交易所行情代码，下一次指数治理应以新的官方行情型 key 恢复进入 active quote universe。
+
+典型样例：
+
+- `000001.SZ` 必须是股票“平安银行”。CNIndex 的“国证利率债指数”如果没有深交所行情代码，只能作为 metadata-only 指数身份保存，不能覆盖股票主键。
+- `005125.SZ`、`005126.SZ`、`006125.SZ` 这类本地历史污染行，如果官方 metadata 显示 `szse_quote_code` 为空、`cni_code` 存在，应在指数治理阶段被停用为 `metadata_only`，之后不再出现在普通 A 股日更的 `tradable_only` universe。
+- 日更日志中如果仍出现这类代码反复尝试 cnindex/csindex/BaoStock/AkShare 并返回空，优先检查当次任务是否实际执行了指数主数据治理，以及相关行是否仍为 `active`。
+
+这类治理必须发生在行情抓取之前。普通当前日更和午夜后重跑前一交易日日更都应先执行 A 股股票与指数主数据治理；更早日期的历史回补默认不强制刷新当前主数据，只使用本地已治理后的 universe。
+
 ## 报告要求
 
 日更报告应新增或扩展指数治理段落：
 
 - 指数治理状态、耗时、官方源使用情况。
 - 按生命周期原因统计跳过数量。
+- metadata-only 遗留行情 key 的停用数量，例如 `metadata-only: N` 或 `metadata_only_legacy_deactivated_count`。
 - 样例：指数代码、名称、状态、最后行情日、生效日、证据 URL。
 - 官方源失败或使用缓存/fallback 时的 warning。
 - active 指数因官方源失败而使用 BaoStock/AkShare 的计数。
