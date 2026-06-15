@@ -351,3 +351,50 @@ async def test_daily_update_builds_stock_and_index_requirements_and_skips_histor
     assert {requirement.scope for requirement in requirements} == {"a_share_stock", "a_share_index"}
     assert {requirement.mode for requirement in requirements} == {"skip_for_backfill"}
     assert result["reason"] == "historical_backfill_current_master_sync_skipped"
+
+
+@pytest.mark.asyncio
+async def test_daily_update_yesterday_retry_still_force_refreshes_master_governance():
+    manager = _manager({
+        "master_governance": {
+            "enabled": True,
+            "policies": {
+                "a_share_stock": {"enabled": True},
+                "a_share_index": {"enabled": True},
+            },
+            "job_requirements": {
+                "daily_data_update": [
+                    {
+                        "scope": "a_share_stock",
+                        "mode": "force_refresh",
+                        "exchanges": ["SSE", "SZSE", "BSE"],
+                        "instrument_types": ["stock"],
+                    },
+                    {
+                        "scope": "a_share_index",
+                        "mode": "freshness_gated",
+                        "exchanges": ["SSE", "SZSE"],
+                        "instrument_types": ["index"],
+                    },
+                ]
+            },
+        }
+    })
+    manager.run_master_governance = AsyncMock(return_value={
+        "status": "success",
+        "summary": {},
+        "children": [],
+        "warnings": [],
+        "errors": [],
+    })
+
+    target = date.today() - timedelta(days=1)
+    await manager._maybe_sync_instrument_master_before_daily_update(
+        ["SSE", "SZSE", "BSE"],
+        target,
+        instrument_types=["stock", "index"],
+    )
+
+    requirements = manager.run_master_governance.await_args.args[0]
+    assert {requirement.scope for requirement in requirements} == {"a_share_stock", "a_share_index"}
+    assert {requirement.mode for requirement in requirements} == {"force_refresh"}

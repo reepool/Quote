@@ -12053,9 +12053,10 @@ class DataManager:
             }
 
         local_today = get_shanghai_time().date()
+        current_retry_start = local_today - timedelta(days=1)
         force_refresh = (
             'daily_data_update' in force_refresh_job_names
-            and target_date >= local_today
+            and target_date >= current_retry_start
         )
 
         result = await self.run_master_governance_for_job(
