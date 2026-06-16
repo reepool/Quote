@@ -177,7 +177,35 @@ async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
     assert requirement.scope == "hkex_instrument"
     assert requirement.exchanges == ["HKEX"]
     assert requirement.mode == "audit_only"
-    assert requirement.options == {"mode": "audit_only"}
+    assert requirement.options == {}
+    assert requirement.timeout_sec == 60
+    task._send_task_report.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_hkex_instrument_master_sync_manual_task_passes_lifecycle_write_mode():
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock(return_value=False)
+
+    with patch("scheduler.tasks.data_manager") as dm:
+        dm.run_master_governance = AsyncMock(return_value={
+            "status": "success",
+            "mode": "lifecycle_write",
+            "summary": {"active_count": 3038, "review_required": 0},
+            "exchanges": {"HKEX": {"status": "success"}},
+            "warnings": [],
+            "errors": [],
+        })
+
+        success = await task.hkex_instrument_master_sync(mode="lifecycle_write", timeout_sec=60)
+
+    assert success is True
+    requirement = dm.run_master_governance.await_args.args[0][0]
+    assert requirement.scope == "hkex_instrument"
+    assert requirement.exchanges == ["HKEX"]
+    assert requirement.mode == "lifecycle_write"
+    assert requirement.options == {}
     assert requirement.timeout_sec == 60
     task._send_task_report.assert_awaited_once()
 

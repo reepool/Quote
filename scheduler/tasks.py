@@ -1018,16 +1018,18 @@ class ScheduledTasks:
                 mode,
                 timeout_sec,
             )
+            normalized_mode = str(mode or "audit_only").strip().lower()
+            if normalized_mode not in {"audit_only", "safe_write", "lifecycle_write"}:
+                raise ValueError(f"unsupported HKEX instrument master sync mode: {normalized_mode}")
             result = await data_manager.run_master_governance([
                 MasterGovernanceRequirement(
                     scope="hkex_instrument",
                     exchanges=["HKEX"],
                     instrument_types=["stock"],
-                    mode="audit_only" if mode == "audit_only" else "force_refresh",
+                    mode=normalized_mode,
                     job_name="hkex_instrument_master_sync",
                     job_type="manual",
                     timeout_sec=timeout_sec,
-                    options={"mode": mode},
                 )
             ])
             hkex = (result.get("exchanges") or {}).get("HKEX", {})
