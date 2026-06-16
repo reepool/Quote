@@ -5,7 +5,7 @@
 > 配套配置：[config/10_research.json](/home/python/Quote/config/10_research.json)
 > 财务数据专项文档：[financial_data_system.md](/home/python/Quote/docs/financial_data_system.md)
 > OpenSpec 状态：active change `add-hkex-instrument-master-sync` 已进入实现阶段，用于建设港股专用主数据系统。
-> 当前推进焦点：估值域已完成 `valuation_inputs / valuation_history / relative / percentile / readiness` 主链并进入维护复核；港股主数据底座已提供 audit-only 治理入口，所有后续港股研究模块必须通过 `DataManager.resolve_hkex_current_universe()` 解析 HKEX 当前 universe。
+> 当前推进焦点：估值域已完成 `valuation_inputs / valuation_history / relative / percentile / readiness` 主链并进入维护复核；港股主数据底座已接入统一主数据治理框架，生产日更和手工同步使用 `lifecycle_write` 写入官方生命周期证据，复核诊断仍可使用 `audit_only`；所有后续港股研究模块必须通过 `DataManager.resolve_hkex_current_universe()` 解析 HKEX 当前 universe。
 > 已归档估值 rollout 变更包：`openspec/changes/archive/2026-06-01-prepare-valuation-production-rollout/`
 > 已归档估值历史分位变更包：`openspec/changes/archive/2026-06-01-add-valuation-history-percentile/`
 > 已归档估值 readiness 变更包：`openspec/changes/archive/2026-06-01-add-valuation-readiness-api/`
