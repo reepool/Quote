@@ -714,7 +714,7 @@ async def test_governance_dispatches_hkex_to_hkex_policy_when_enabled():
         'pytdx_validation_enabled': False,
         'supported_exchanges': ['SSE', 'SZSE', 'BSE', 'HKEX'],
     })
-    manager._get_hkex_instrument_master_sync_config = Mock(return_value=_hkex_sync_config("audit_only"))
+    manager._get_hkex_instrument_master_sync_config = Mock(return_value=_hkex_sync_config("lifecycle_write"))
 
     result = await manager.ensure_instrument_master_fresh(
         ['HKEX'],
@@ -725,7 +725,7 @@ async def test_governance_dispatches_hkex_to_hkex_policy_when_enabled():
     assert result['status'] == 'success'
     assert result['action'] == 'synced'
     assert result['exchanges']['HKEX']['status'] == 'success'
-    manager.sync_hkex_instrument_master.assert_awaited_once_with(mode='audit_only', timeout_sec=30)
+    manager.sync_hkex_instrument_master.assert_awaited_once_with(mode='lifecycle_write', timeout_sec=30)
     manager.sync_instrument_master.assert_not_awaited()
 
 

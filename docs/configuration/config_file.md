@@ -560,7 +560,7 @@
       "hk_daily_data_update": [
         {
           "scope": "hkex_instrument",
-          "mode": "freshness_gated",
+          "mode": "lifecycle_write",
           "exchanges": ["HKEX"],
           "instrument_types": ["stock"],
           "continue_on_error": true
@@ -574,7 +574,7 @@
 - **`policies`**: 可用治理能力，而不是 scheduler job 清单。第一阶段包括 `a_share_stock`、`a_share_index`、`hkex_instrument`。
 - **`job_requirements`**: 业务任务的主数据前置需求。一个任务可以声明多个 scope，例如 A 股普通日更同时需要股票和指数主数据。
 - **`scope`**: 治理能力标识。`a_share_stock` 包含 `SSE/SZSE/BSE` 股票；BSE 不需要独立 scheduler 任务才能被纳入 A 股股票治理。
-- **`mode`**: 执行策略。`force_refresh` 强制拉取上游；`freshness_gated` 在本地新鲜时复用；`audit_only` 只审计；`skip_for_backfill` 用于历史回补跳过当前主数据刷新。
+- **`mode`**: 执行策略，按 scope 校验。A 股 stock/index 支持 `force_refresh`、`freshness_gated`、`audit_only`、`skip_for_backfill`；HKEX 支持 `audit_only`、`safe_write`、`lifecycle_write`、`skip_for_backfill`。`safe_write/lifecycle_write` 只允许用于 `hkex_instrument`，不能用于 A 股 scope；`force_refresh/freshness_gated` 也不会覆盖 HKEX 的生命周期写入模式。
 - **兼容优先级**: 新配置存在时使用新配置；缺失时回退到 `instrument_master_governance.force_refresh_job_names/current_job_names`，并在治理结果中标记 legacy fallback。
 
 ### data_config.index_master_governance
@@ -667,13 +667,13 @@
 
 ### data_config.hkex_instrument_master_sync
 
-> HKEX 专用主数据策略配置。初始生产配置为 `audit_only`，先暴露官方源、本地库、补充源和行情可得性差异，不写生命周期字段。
+> HKEX 专用主数据策略配置。当前生产配置为 `lifecycle_write`，由官方 active/delisted/suspension 证据驱动 active/suspended/delisted 状态；`audit_only` 仍用于人工复核 API 和只读诊断。
 
 ```json
 {
   "hkex_instrument_master_sync": {
     "enabled": true,
-    "mode": "audit_only",
+    "mode": "lifecycle_write",
     "timeout_sec": 60,
     "quote_stale_days": 14,
     "official_securities_list_url": "https://www.hkex.com.hk/eng/services/trading/securities/securitieslists/ListOfSecurities.xlsx",

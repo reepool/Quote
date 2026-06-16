@@ -593,6 +593,7 @@ async def test_update_daily_data_fetches_new_instrument_from_listed_date():
         ['BSE'],
         date(2026, 6, 15),
         instrument_types=['stock'],
+        job_name='daily_data_update',
     )
     assert result['catchup_stats']['new_instrument_count'] == 1
     assert result['catchup_stats']['catchup_quotes_added'] == 1

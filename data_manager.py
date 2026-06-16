@@ -58,6 +58,7 @@ from instrument_master_governance import (
     MasterGovernanceOrchestrator,
     MasterGovernanceRequirement,
     PolicyRegistry,
+    SUPPORTED_MODES_BY_SCOPE,
 )
 
 
@@ -9716,7 +9717,7 @@ class DataManager:
                     requirement = replace(requirement, exchanges=scoped)
                 if historical_job and legacy_config.get('skip_for_backfill', True) and not force_refresh:
                     requirement = replace(requirement, mode='skip_for_backfill')
-                elif force_refresh:
+                elif force_refresh and 'force_refresh' in SUPPORTED_MODES_BY_SCOPE.get(requirement.scope, set()):
                     requirement = replace(requirement, mode='force_refresh')
                 if timeout_sec is not None:
                     requirement = replace(requirement, timeout_sec=timeout_sec)
@@ -9787,18 +9788,18 @@ class DataManager:
 
         hkex_config = self._get_hkex_instrument_master_sync_config()
         if 'HKEX' in resolved_exchanges and hkex_config.get('enabled', False):
+            hkex_mode = 'skip_for_backfill' if _mode(False) == 'skip_for_backfill' else hkex_config.get('mode', 'audit_only')
             requirements.append(MasterGovernanceRequirement(
                 scope='hkex_instrument',
                 exchanges=['HKEX'],
                 instrument_types=['stock'],
-                mode='audit_only' if job_name == 'hk_daily_data_update' else _mode(False),
+                mode=hkex_mode,
                 target_date=target_date,
                 job_name=job_name,
                 job_type=job_type,
                 continue_on_error=bool(hkex_config.get('continue_on_failure', default_continue)),
                 timeout_sec=timeout_sec if timeout_sec is not None else hkex_config.get('timeout_sec'),
                 legacy_fallback=True,
-                options={'mode': hkex_config.get('mode', 'audit_only')},
             ))
         return requirements
 
@@ -12057,6 +12058,7 @@ class DataManager:
         exchanges: List[str],
         target_date: date,
         instrument_types: Optional[List[str]] = None,
+        job_name: str = 'daily_data_update',
     ) -> Dict[str, Any]:
         """Compatibility wrapper for daily update master governance."""
         config = self._get_instrument_master_sync_config()
@@ -12079,7 +12081,7 @@ class DataManager:
         )
 
         result = await self.run_master_governance_for_job(
-            job_name='daily_data_update',
+            job_name=job_name,
             exchanges=exchanges,
             instrument_types=instrument_types or ['stock', 'index'],
             job_type='current',
@@ -13042,7 +13044,8 @@ class DataManager:
                                progress_log_every: int = 200,
                                progress_log_interval_sec: int = 300,
                                instrument_types: Optional[List[str]] = None,
-                               run_factor_audit: bool = True) -> Optional[dict]:
+                               run_factor_audit: bool = True,
+                               master_governance_job_name: str = 'daily_data_update') -> Optional[dict]:
         """每日数据更新"""
         try:
             dm_logger.info(f"[DataManager] Starting daily data update for exchanges: {exchanges}")
@@ -13075,6 +13078,7 @@ class DataManager:
                 exchanges,
                 target_date,
                 instrument_types=instrument_types,
+                job_name=master_governance_job_name,
             )
             update_results['instrument_master_sync'] = instrument_master_sync
             update_results['instrument_master_governance'] = instrument_master_sync

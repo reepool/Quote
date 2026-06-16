@@ -40,7 +40,7 @@
 | `shareholder_reconciliation_sync` | 股东周期复核 | 周六 `12:30` | 预留 5 小时，避开备份和申万任务 |
 | `quarterly_cleanup` | 季度清理 | 季度最后一天 `14:30` | 避开凌晨维护/备份窗口 |
 | `find_gap_and_repair` | 缺口修复 | 周日 `15:00` | 周维护完成后执行，预留 4 小时 |
-| `hk_daily_data_update` | 港股行情 | 周一至周五 `17:30` | 港股收盘后执行，前置 HKEX 主数据治理但不强制 lifecycle 写入 |
+| `hk_daily_data_update` | 港股行情 | 周一至周五 `17:30` | 港股收盘后执行，前置 HKEX 主数据 `lifecycle_write` 治理 |
 | `industry_standard_sync` | 申万分类 | 每日 `19:15` | 收盘后强制刷新 A 股主数据，再维护申万分类/归属基础层 |
 | `daily_data_update` | A 股行情 | 周一至周五 `20:00` | 强制刷新 A 股主数据，再读取 tradable universe 做行情日更 |
 

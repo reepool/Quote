@@ -120,6 +120,26 @@ def test_manual_only_job_can_omit_trigger():
 
 
 @pytest.mark.asyncio
+async def test_hk_daily_data_update_passes_hkex_master_governance_job_name():
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.daily_data_update = AsyncMock(return_value=True)
+
+    success = await task.hk_daily_data_update(exchanges=["HKEX"])
+
+    assert success is True
+    task.daily_data_update.assert_awaited_once_with(
+        exchanges=["HKEX"],
+        wait_for_market_close=False,
+        enable_trading_day_check=True,
+        per_instrument_timeout_sec=None,
+        progress_log_every=200,
+        progress_log_interval_sec=300,
+        master_governance_job_name="hk_daily_data_update",
+        job_config=None,
+    )
+
+
+@pytest.mark.asyncio
 async def test_hkex_instrument_master_sync_manual_task_runs_audit_and_reports():
     task = ScheduledTasks()
     task.telegram_enabled = False

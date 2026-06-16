@@ -139,7 +139,7 @@
         "hk_daily_data_update": [
           {
             "scope": "hkex_instrument",
-            "mode": "audit_only",
+            "mode": "lifecycle_write",
             "exchanges": [
               "HKEX"
             ],

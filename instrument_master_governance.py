@@ -19,8 +19,11 @@ from utils.date_utils import get_shanghai_time
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_MODES = {"force_refresh", "freshness_gated", "audit_only", "skip_for_backfill"}
-SUPPORTED_HKEX_WRITE_MODES = {"audit_only", "safe_write", "lifecycle_write"}
+SUPPORTED_MODES_BY_SCOPE = {
+    "a_share_stock": {"force_refresh", "freshness_gated", "audit_only", "skip_for_backfill"},
+    "a_share_index": {"force_refresh", "freshness_gated", "audit_only", "skip_for_backfill"},
+    "hkex_instrument": {"audit_only", "safe_write", "lifecycle_write", "skip_for_backfill"},
+}
 
 SCOPE_EXCHANGES = {
     "a_share_stock": {"SSE", "SZSE", "BSE"},
@@ -130,8 +133,9 @@ class MasterGovernanceRequirement:
     def validate(self) -> None:
         if self.scope not in SCOPE_EXCHANGES:
             raise ValueError(f"unsupported master governance scope: {self.scope}")
-        if self.mode not in SUPPORTED_MODES:
-            raise ValueError(f"unsupported master governance mode: {self.mode}")
+        supported_modes = SUPPORTED_MODES_BY_SCOPE.get(self.scope, set())
+        if self.mode not in supported_modes:
+            raise ValueError(f"unsupported master governance mode for {self.scope}: {self.mode}")
 
         supported_exchanges = SCOPE_EXCHANGES[self.scope]
         unsupported_exchanges = sorted(set(self.exchanges) - supported_exchanges)
@@ -383,13 +387,8 @@ class HKEXInstrumentPolicy:
         self.config = config
 
     async def execute(self, requirement: MasterGovernanceRequirement) -> Dict[str, Any]:
-        if requirement.mode == "audit_only":
-            mode = "audit_only"
-        else:
-            mode = str(
-                requirement.options.get("mode") or self.config.get("mode", "audit_only")
-            ).strip().lower()
-        if mode not in SUPPORTED_HKEX_WRITE_MODES:
+        mode = str(requirement.mode or "").strip().lower()
+        if mode not in SUPPORTED_MODES_BY_SCOPE["hkex_instrument"]:
             return _child_result(
                 requirement,
                 status="error",

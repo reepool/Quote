@@ -92,12 +92,96 @@ def test_requirement_validation_rejects_invalid_scope_and_exchange():
         ).validate()
 
 
+def test_requirement_validation_uses_scope_specific_modes():
+    MasterGovernanceRequirement(
+        scope="hkex_instrument",
+        exchanges=["HKEX"],
+        instrument_types=["stock"],
+        mode="lifecycle_write",
+    ).validate()
+
+    with pytest.raises(
+        ValueError,
+        match="unsupported master governance mode for a_share_stock: lifecycle_write",
+    ):
+        MasterGovernanceRequirement(
+            scope="a_share_stock",
+            exchanges=["SSE"],
+            instrument_types=["stock"],
+            mode="lifecycle_write",
+        ).validate()
+
+    with pytest.raises(
+        ValueError,
+        match="unsupported master governance mode for hkex_instrument: force_refresh",
+    ):
+        MasterGovernanceRequirement(
+            scope="hkex_instrument",
+            exchanges=["HKEX"],
+            instrument_types=["stock"],
+            mode="force_refresh",
+        ).validate()
+
+
 def test_requirement_from_config_rejects_unknown_keys():
     with pytest.raises(ValueError, match="unknown master governance requirement keys"):
         MasterGovernanceRequirement.from_config(
             {"scope": "a_share_stock", "unexpected": True},
             job_name="daily_data_update",
         )
+
+
+def test_hkex_requirement_keeps_lifecycle_mode_under_force_refresh_override():
+    manager = _manager({
+        "master_governance": {
+            "enabled": True,
+            "policies": {"hkex_instrument": {"enabled": True}},
+            "job_requirements": {
+                "hk_daily_data_update": [
+                    {
+                        "scope": "hkex_instrument",
+                        "mode": "lifecycle_write",
+                        "exchanges": ["HKEX"],
+                        "instrument_types": ["stock"],
+                    },
+                ]
+            },
+        }
+    })
+
+    requirements = manager._build_master_governance_requirements(
+        job_name="hk_daily_data_update",
+        exchanges=["HKEX"],
+        instrument_types=["stock"],
+        force_refresh=True,
+    )
+
+    assert len(requirements) == 1
+    assert requirements[0].scope == "hkex_instrument"
+    assert requirements[0].mode == "lifecycle_write"
+    assert requirements[0].options == {}
+
+
+def test_hkex_legacy_requirement_uses_hkex_config_mode_without_options_duplication():
+    manager = _manager({
+        "hkex_instrument_master_sync": {
+            "enabled": True,
+            "mode": "safe_write",
+            "timeout_sec": 60,
+        },
+    })
+
+    requirements = manager._build_master_governance_requirements(
+        job_name="ad_hoc_hk_update",
+        exchanges=["HKEX"],
+        instrument_types=["stock"],
+        force_refresh=True,
+    )
+
+    assert len(requirements) == 1
+    assert requirements[0].scope == "hkex_instrument"
+    assert requirements[0].mode == "safe_write"
+    assert requirements[0].options == {}
 
 
 @pytest.mark.asyncio
@@ -261,7 +345,7 @@ async def test_index_adapter_preserves_lifecycle_summary_and_samples():
 
 
 @pytest.mark.asyncio
-async def test_hkex_adapter_maps_modes_without_changing_official_sync():
+async def test_hkex_adapter_respects_explicit_audit_only_mode():
     manager = Mock()
     manager.sync_hkex_instrument_master = AsyncMock(return_value={
         "status": "success",
@@ -282,6 +366,32 @@ async def test_hkex_adapter_maps_modes_without_changing_official_sync():
 
     manager.sync_hkex_instrument_master.assert_awaited_once_with(
         mode="audit_only",
+        timeout_sec=60,
+    )
+
+
+@pytest.mark.asyncio
+async def test_hkex_adapter_uses_explicit_lifecycle_write_mode():
+    manager = Mock()
+    manager.sync_hkex_instrument_master = AsyncMock(return_value={
+        "status": "success",
+        "mode": "lifecycle_write",
+        "summary": {"active_count": 3000},
+        "exchanges": {"HKEX": {"status": "success"}},
+        "warnings": [],
+        "errors": [],
+    })
+    policy = HKEXInstrumentPolicy(manager, {"mode": "audit_only", "timeout_sec": 60})
+
+    await policy.execute(MasterGovernanceRequirement(
+        scope="hkex_instrument",
+        exchanges=["HKEX"],
+        instrument_types=["stock"],
+        mode="lifecycle_write",
+    ))
+
+    manager.sync_hkex_instrument_master.assert_awaited_once_with(
+        mode="lifecycle_write",
         timeout_sec=60,
     )
 

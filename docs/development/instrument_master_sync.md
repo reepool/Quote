@@ -25,7 +25,7 @@
 目标模型：
 
 - **治理能力层**：每类主数据治理作为独立 policy，例如 `a_share_stock`、`a_share_index`、`hkex_instrument`，后续可扩展 `fund`、`bond` 等；每个 policy 统一返回 `GovernanceResult`，包含 scope、action、freshness、写入统计、active 统计、warnings/errors 和证据摘要。
-- **编排层**：业务任务声明自己需要哪些主数据 scope，以及策略是 `force_refresh`、`freshness_gated`、`audit_only` 还是 `skip_for_backfill`；编排器根据 target date、任务类型和配置执行相应 policy。
+- **编排层**：业务任务声明自己需要哪些主数据 scope，以及该 scope 支持的治理策略；A 股 stock/index 支持 `force_refresh`、`freshness_gated`、`audit_only`、`skip_for_backfill`，HKEX 支持 `audit_only`、`safe_write`、`lifecycle_write`、`skip_for_backfill`。编排器按 scope-specific mode 能力矩阵校验，避免把 HKEX 生命周期写入模式藏在 `options.mode` 或把 A 股强制刷新语义误套到 HKEX。
 - **任务层**：Telegram/Scheduler 只保留少量手工运维入口，例如 A 股股票主数据治理、A 股指数主数据治理、HKEX 主数据治理；业务模块内部不通过“执行另一个 scheduler job”来完成前置治理，而是调用编排器。
 
 不建议把所有治理能力都简单变成相互依赖的 scheduler job。Scheduler job 适合作为运维入口，但业务前置治理需要结构化返回值、失败继续策略、历史语义保护和可测试的调用链。直接用任务名代理真实主数据需求，容易再次造成 `force_refresh_job_names/current_job_names` 这类列表难以解释的问题。
@@ -213,23 +213,23 @@ HKEX 主数据已通过 `DataManager.sync_hkex_instrument_master()` 接入共享
 手工主数据任务：
 
 - `config/05_scheduler.json` 中的 `hkex_instrument_master_sync` 是 `manual_only=true`，没有自动运行时间。
-- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=safe_write, timeout_sec=60`；会写入安全新增/metadata 候选，但不会写退市、复牌、停牌生命周期字段。
+- Telegram 可用 `/run hkex_instrument_master_sync` 手工触发，默认参数为 `mode=lifecycle_write, timeout_sec=60`；会写入安全新增/metadata 候选，并按官方/人工证据写退市、复牌、停牌生命周期字段。
 - `lifecycle_write` 是更高权限模式，会先执行 `safe_write` 能做的安全写入，再按官方/人工证据改写退市、复牌和停牌状态；它不是和 `safe_write` 并列同时打开的第二个开关。
-- `config/03_data.json` 的 HKEX governance 默认仍保持 `audit_only`，所以自动港股行情日更的前置治理暂时不写库；当前只启用手工任务写入。
+- `config/03_data.json` 的 `hk_daily_data_update` 前置 HKEX governance 已切到 `lifecycle_write`；港股日更读取 universe 前会先用 HKEX 官方证据修正 active/suspended/delisted 状态。
 - 本地直接调用可用：
 
 ```bash
 /home/python/miniconda3/envs/Quote/bin/python -c 'exec("""import asyncio
 from scheduler.tasks import scheduled_tasks
 async def main():
-    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="safe_write", timeout_sec=60)
+    ok = await scheduled_tasks.hkex_instrument_master_sync(mode="lifecycle_write", timeout_sec=60)
     print({"success": ok})
 asyncio.run(main())
 """)'
 ```
 
-- 未来需要自动运行时，把 `manual_only` 改为 `false` 并补充 `trigger`；切换到 `lifecycle_write` 前必须先复核报告中的退市、复活和停牌候选样本。
-- `lifecycle_write` 上线前必须先在复制库运行 `scripts/dev_validation/validate_hkex_lifecycle_write_on_copy.py`。通过条件是：source evidence policy 全部满足、`review_required=0`、停牌样本来自结构化 PDF/人工证据、复活样本在主 active 源中、退市样本在官方 delisted 源中、excluded 产品同步后无 active/tradable 残留、日更读取 `tradable_only=True` 可跳过 `trading_status=0` 标的。
+- 独立 `hkex_instrument_master_sync` 仍为 `manual_only=true`，没有自动 cron；自动写入来自港股日更前置治理，不通过调度器另启一个 cron 任务。
+- `lifecycle_write` 上线前已在复制库运行 `scripts/dev_validation/validate_hkex_lifecycle_write_on_copy.py`。通过条件是：source evidence policy 全部满足、`review_required=0`、停牌样本来自结构化 PDF/人工证据、复活样本在主 active 源中、退市样本在官方 delisted 源中、excluded 产品同步后无 active/tradable 残留、日更读取 `tradable_only=True` 可跳过 `trading_status=0` 标的。
 
 当前生产配置的官方源：
 
@@ -254,7 +254,14 @@ asyncio.run(main())
 - 复制库运行后：HKEX `total=4649`、`active=3034`、`tradable_stock=2960`，状态分布为 `active=2960`、`suspended=74`、`delisted=113`、`excluded=1435`、`auto_deactivated_no_data=46`、`auto_deactivated_zombie=21`；`excluded_active_or_tradable=0`。
 - lifecycle diff 合计 `282`：`suspended=74`、`delisted=113`、`reactivated=53`、`excluded=42`。这些变化只发生在复制库，用于证明 gate 规则和写入路径符合预期。
 - 本次 gate 前发现并修复三个上线风险：PDF parser 曾把说明文字数字误解析为停牌代码；HKEXnews active fallback 曾覆盖主源 XLSX 的产品分类字段；metadata 标为 exclude 的历史落库标的曾未同步改写 `instruments.status/trading_status`。
-- 当前生产配置仍未切到 lifecycle：`config/05_scheduler.json` 的手工任务仍为 `mode=safe_write`，`config/03_data.json` 的自动 HKEX governance 仍为 `mode=audit_only`。
+- 当前生产配置已切到 lifecycle：`config/05_scheduler.json` 的手工任务为 `mode=lifecycle_write`，`config/03_data.json` 的自动 HKEX governance 也为 `mode=lifecycle_write`。
+
+2026-06-16 HKEX 生产手工 lifecycle-write 复核：
+
+- Telegram 报告状态 `success`，`mode=lifecycle_write`，`warnings=0`，`errors=0`，`review_required=0`。
+- source usage：`hkex_securities_list=17885`、`hkexnews_active_list=18035`、`hkexnews_delisted_list=864`、`hkexnews_suspension_report=12`。
+- 报告口径：`active_count=3038`，`safe_write候选=2841`，`可复活候选=41`，`可停牌候选=74`，`官方停牌证据=74`。
+- 本地库复核：HKEX stock 状态分布为 `active=2964`、`suspended=74`、`delisted=113`、`excluded=1435`、`auto_deactivated_no_data=46`、`auto_deactivated_zombie=21`；`instrument_master_metadata` 最新更新时间为 `2026-06-16T08:07:00+08:00`。
 
 2026-06-03 HKEX live audit-only 验证：
 
