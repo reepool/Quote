@@ -255,6 +255,12 @@ class OfficialFuturesMarketDataProvider:
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0 Safari/537.36"
         )
     }
+    GFEX_AJAX_HEADERS = {
+        **DEFAULT_HEADERS,
+        "Referer": "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml",
+        "Origin": "http://www.gfex.com.cn",
+        "X-Requested-With": "XMLHttpRequest",
+    }
 
     def __init__(self, research_config: ResearchConfig):
         self.research_config = research_config
@@ -659,13 +665,18 @@ class OfficialFuturesMarketDataProvider:
                     response.encoding = response.apparent_encoding or response.encoding
                     return response.text
                 if exchange == "GFEX":
-                    response = request_post(
-                        "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList",
-                        session=session,
+                    with create_requests_session(
                         tls_config=self.tls_config,
-                        data={"trade_date": _compact_date(trade_date), "trade_type": "0"},
-                        timeout=self.timeout_seconds,
-                    )
+                        headers=self.GFEX_AJAX_HEADERS,
+                    ) as gfex_session:
+                        response = request_post(
+                            "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList",
+                            session=gfex_session,
+                            tls_config=self.tls_config,
+                            data={"trade_date": _compact_date(trade_date), "trade_type": "0", "variety": ""},
+                            headers=self.GFEX_AJAX_HEADERS,
+                            timeout=self.timeout_seconds,
+                        )
                     response.raise_for_status()
                     return response.json()
                 raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")

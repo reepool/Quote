@@ -809,6 +809,43 @@ def test_official_futures_provider_dce_direct_uses_futures_trade_type(monkeypatc
     assert captured["json"]["lang"] is None
 
 
+def test_official_futures_provider_gfex_uses_ajax_headers(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["GFEX"],
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    captured = {}
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"code": "0", "data": []}
+
+    def fake_post(url, *, session, tls_config, data, headers, timeout):
+        captured["url"] = url
+        captured["data"] = data
+        captured["headers"] = headers
+        captured["session_headers"] = dict(session.headers)
+        return Response()
+
+    monkeypatch.setattr("research.providers.official_futures.request_post", fake_post)
+
+    payload = provider._request_exchange_payload(None, "GFEX", "2024-06-12")
+
+    assert payload["data"] == []
+    assert captured["url"].endswith("/u/interfacesWebTiDayQuotes/loadList")
+    assert captured["data"] == {"trade_date": "20240612", "trade_type": "0", "variety": ""}
+    assert captured["headers"]["X-Requested-With"] == "XMLHttpRequest"
+    assert captured["headers"]["Origin"] == "http://www.gfex.com.cn"
+    assert captured["session_headers"]["Referer"] == "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml"
+
+
 def test_official_futures_provider_dce_uses_browser_client(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {

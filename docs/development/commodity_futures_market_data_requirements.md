@@ -670,7 +670,14 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | SHFE | 2002-01-07 | 可解析，但本机 IP 可能被限流 | 2000-2001 官方文件不可用；2026-06-15 本机在 2017 段出现连接超时，应暂停大批量请求或换网络继续 |
 | INE | 2018-03-26 | 可解析，但与 SHFE 同属上期系域名，可能同受网络限流影响 | 2018-03-26 为原油期货上市首日，之前样本为空 |
 | CZCE | 2015-10-15 | 当前静态文件接口可解析 | 当前接口无法证明 2015-10-15 之前的官方日历，需要另找旧版官方归档源 |
-| GFEX | 待打通 | 当前 HTTP 接口返回 567/HTML challenge | 不能作为交易日/休市证据；需实现 GFEX 浏览器挑战处理或找到新的官方公开接口 |
+| GFEX | 2022-12-22 | 可解析，需模拟官网 AJAX 请求头；存在频控/风控 | 官网页面 `hqsj_tjsj.shtml` 的前端 JS 暴露 `POST /u/interfacesWebTiDayQuotes/loadList`。实测 2022-12-19 至 2022-12-21 为空，2022-12-22 起工业硅日行情可解析；连续快速请求后可能返回 567/HTML challenge，因此全量落库必须低频、可断点，必要时走手动代理通路 |
+
+补充验证结论：
+
+- GFEX 官方日行情接口必须带 `Referer: http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml`、`Origin: http://www.gfex.com.cn`、`X-Requested-With: XMLHttpRequest`，否则容易返回 HTML challenge。
+- GFEX 同一页面还暴露 `POST /u/interfacesWebTpTradingCalendar/loadList`，返回的是交易/合约事件日历，不能单独证明全量交易日和休市日，但可作为交易日治理的辅助证据。
+- SHFE/INE 当前小样本直连、`akshare_proxy_patch.install_patch()` 和手动授权代理均可返回官方 JSON。若本机 IP 再次被限流，优先用 `scripts/dev_validation/probe_futures_proxy_patch_access.py` 复核代理可用性，再决定是否将代理通路纳入批量落库进程。
+- AkShare 本地期货模块使用 `akshare.futures.cons.get_calendar()` 的通用交易日历，当前覆盖 `19901219` 至 `20261231`，来源为新浪/本地包内 `calendar.json`。它不是交易所级官方日历，不区分 SHFE、INE、DCE、CZCE、GFEX，只能作为备查或低质量兜底，不能替代官方交易日治理。
 
 生产落库必须按交易所分批执行并复核，不允许一次性以 `2000-01-01` 跑全交易所。推荐命令：
 
