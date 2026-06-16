@@ -404,7 +404,10 @@
       "max_requests_per_minute": 60,
       "max_requests_per_hour": 1000,
       "max_requests_per_day": 5000,
-      "basic_info_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/{code}"
+      "basic_info_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/{code}",
+      "fuzzy_search_url": "https://www.csindex.com.cn/csindex-home/indexInfo/index-fuzzy-search",
+      "daily_url": "https://www.csindex.com.cn/csindex-home/perf/index-perf",
+      "list_page_size": 1000
     }
   },
   "routing": {
@@ -417,7 +420,6 @@
         ],
         "index": [
           "csindex",
-          "cnindex",
           "baostock",
           "akshare"
         ]
@@ -430,7 +432,6 @@
         ],
         "index": [
           "cnindex",
-          "csindex",
           "baostock",
           "akshare"
         ]
@@ -457,7 +458,8 @@
           "skip_backup_on_empty_short_range": true
         },
         "index": {
-          "skip_backup_on_empty_short_range": false
+          "skip_backup_on_empty_short_range": false,
+          "require_end_date_coverage": true
         }
       }
     },

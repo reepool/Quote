@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, date
@@ -435,14 +436,11 @@ class CNIndexSource(BaseDataSource):
 
 
 class CSIndexSource(BaseDataSource):
-    """Official CSIndex source for CSI/SSE index basic information.
-
-    Daily quote support is intentionally conservative in the first release: the
-    adapter exposes official basic-info evidence and returns empty quote results
-    with diagnostics so routing can fall back to BaoStock/AkShare.
-    """
+    """Official CSIndex source for CSI/SSE index metadata and daily quotes."""
 
     DEFAULT_BASIC_INFO_URL = "https://www.csindex.com.cn/csindex-home/indexInfo/index-basic-info/{code}"
+    DEFAULT_FUZZY_SEARCH_URL = "https://www.csindex.com.cn/csindex-home/indexInfo/index-fuzzy-search"
+    DEFAULT_DAILY_URL = "https://www.csindex.com.cn/csindex-home/perf/index-perf"
 
     def __init__(
         self,
@@ -461,6 +459,9 @@ class CSIndexSource(BaseDataSource):
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         )
         self.basic_info_url = self.source_config.get("basic_info_url") or self.DEFAULT_BASIC_INFO_URL
+        self.fuzzy_search_url = self.source_config.get("fuzzy_search_url") or self.DEFAULT_FUZZY_SEARCH_URL
+        self.daily_url = self.source_config.get("daily_url") or self.DEFAULT_DAILY_URL
+        self.list_page_size = int(self.source_config.get("list_page_size", 1000))
 
     async def _initialize_impl(self):
         self.is_initialized = True
@@ -519,18 +520,148 @@ class CSIndexSource(BaseDataSource):
             return {}
         url = self.basic_info_url.format(code=normalized)
         raw = await asyncio.to_thread(self._fetch_bytes, url)
-        import json
 
         payload = json.loads(raw.decode("utf-8", errors="ignore"))
         return self.parse_basic_info(payload, source_url=url)
+
+    @staticmethod
+    def parse_fuzzy_search_response(payload: Dict[str, Any], *, source_url: str) -> OfficialIndexSnapshot:
+        data = payload.get("data") if isinstance(payload, dict) else []
+        rows: List[Dict[str, Any]] = []
+        for item in data or []:
+            if not isinstance(item, dict):
+                continue
+            code = normalize_index_code(item.get("indexCode"))
+            if not code:
+                continue
+            rows.append(
+                {
+                    "instrument_id": csindex_instrument_id(code),
+                    "symbol": code,
+                    "name": _text(item.get("indexName") or code),
+                    "exchange": "SSE",
+                    "type": "index",
+                    "currency": "CNY",
+                    "listed_date": None,
+                    "delisted_date": None,
+                    "status": "active",
+                    "is_active": True,
+                    "is_st": False,
+                    "trading_status": 1,
+                    "source": "csindex",
+                    "source_symbol": code,
+                    "official_lifecycle_source": "csindex_fuzzy_search",
+                    "source_url": source_url,
+                    "parser_version": OFFICIAL_INDEX_PARSER_VERSION,
+                    "metadata": {
+                        "english_name": _text(item.get("indexNameEn")),
+                        "publisher": "CSIndex",
+                    },
+                }
+            )
+        return OfficialIndexSnapshot(
+            source="csindex_fuzzy_search",
+            source_url=source_url,
+            parser_version=OFFICIAL_INDEX_PARSER_VERSION,
+            raw_snapshot_hash=_snapshot_hash(json.dumps(payload, ensure_ascii=False, sort_keys=True)),
+            rows=rows,
+            diagnostics={
+                "row_count": len(rows),
+                "total": payload.get("total") if isinstance(payload, dict) else None,
+                "page_size": payload.get("pageSize") if isinstance(payload, dict) else None,
+                "current_page": payload.get("currentPage") if isinstance(payload, dict) else None,
+            },
+        )
+
+    async def get_index_master_snapshot(self) -> OfficialIndexSnapshot:
+        page_size = max(1, min(self.list_page_size, 1000))
+        page_num = 1
+        rows_by_id: Dict[str, Dict[str, Any]] = {}
+        diagnostics: Dict[str, Any] = {"pages": 0, "total": None}
+        payload_hash_parts: List[str] = []
+
+        while True:
+            url = f"{self.fuzzy_search_url}?searchInput=&pageNum={page_num}&pageSize={page_size}"
+            raw = await asyncio.to_thread(self._fetch_bytes, url)
+            payload = json.loads(raw.decode("utf-8", errors="ignore"))
+            snapshot = self.parse_fuzzy_search_response(payload, source_url=url)
+            added = 0
+            for row in snapshot.rows:
+                key = row.get("instrument_id")
+                if key and key not in rows_by_id:
+                    rows_by_id[key] = row
+                    added += 1
+            payload_hash_parts.append(snapshot.raw_snapshot_hash)
+            diagnostics["pages"] = page_num
+            diagnostics["total"] = snapshot.diagnostics.get("total")
+            total = snapshot.diagnostics.get("total")
+            if not snapshot.rows:
+                break
+            if total is None or len(rows_by_id) >= int(total):
+                break
+            if added == 0:
+                break
+            page_num += 1
+
+        rows = list(rows_by_id.values())
+        return OfficialIndexSnapshot(
+            source="csindex_fuzzy_search",
+            source_url=self.fuzzy_search_url,
+            parser_version=OFFICIAL_INDEX_PARSER_VERSION,
+            raw_snapshot_hash=_snapshot_hash("|".join(payload_hash_parts)),
+            rows=rows,
+            diagnostics={**diagnostics, "row_count": len(rows)},
+        )
 
     async def get_instrument_list(
         self,
         exchange: str = None,
         instrument_types: List[str] = None,
     ) -> List[Dict[str, Any]]:
-        # CSIndex does not expose a cheap full-list endpoint in the first release.
-        return []
+        if exchange and exchange.upper() not in ("SSE", "SZSE"):
+            return []
+        if instrument_types and "index" not in {str(item).lower() for item in instrument_types}:
+            return []
+        snapshot = await self.get_index_master_snapshot()
+        return snapshot.rows
+
+    @staticmethod
+    def parse_daily_response(
+        payload: Dict[str, Any],
+        *,
+        instrument_id: str,
+        source_symbol: str,
+    ) -> List[Dict[str, Any]]:
+        rows = payload.get("data") if isinstance(payload, dict) else []
+        normalized: List[Dict[str, Any]] = []
+        for row in rows or []:
+            if not isinstance(row, dict):
+                continue
+            try:
+                normalized.append(
+                    {
+                        "instrument_id": instrument_id,
+                        "time": pd.to_datetime(row.get("tradeDate"), format="%Y%m%d").to_pydatetime(),
+                        "open": float(row.get("open")),
+                        "high": float(row.get("high")),
+                        "low": float(row.get("low")),
+                        "close": float(row.get("close")),
+                        "volume": int(float(row.get("tradingVol") or 0)),
+                        "amount": float(row.get("tradingValue") or 0) * 100000000,
+                        "change": float(row.get("change") or 0),
+                        "pct_change": float(row.get("changePct") or 0),
+                        "tradestatus": 1,
+                        "factor": 1.0,
+                        "adjustment_type": "none",
+                        "is_complete": True,
+                        "quality_score": 0.97,
+                        "source": "csindex",
+                        "batch_id": f"csindex_{source_symbol}",
+                    }
+                )
+            except Exception:
+                continue
+        return sorted(normalized, key=lambda item: item["time"])
 
     async def get_daily_data(
         self,
@@ -541,11 +672,26 @@ class CSIndexSource(BaseDataSource):
         instrument_type: str = "stock",
         source_symbol: str = "",
     ) -> List[Dict[str, Any]]:
-        ds_logger.info(
-            "[csindex] official quote endpoint not enabled for %s; falling back",
-            symbol,
+        if (instrument_type or "stock").lower() != "index":
+            return []
+        code = normalize_index_code(source_symbol or symbol or instrument_id)
+        if not code:
+            return []
+        url = (
+            f"{self.daily_url}?indexCode={code}"
+            f"&startDate={start_date.strftime('%Y%m%d')}"
+            f"&endDate={end_date.strftime('%Y%m%d')}"
         )
-        return []
+        raw = await asyncio.to_thread(self._fetch_bytes, url)
+        payload = json.loads(raw.decode("utf-8", errors="ignore"))
+        return self.parse_daily_response(payload, instrument_id=instrument_id, source_symbol=code)
 
     async def get_latest_daily_data(self, instrument_id: str, symbol: str) -> Dict[str, Any]:
-        return {}
+        rows = await self.get_daily_data(
+            instrument_id,
+            symbol,
+            datetime.combine(date.today(), datetime.min.time()),
+            datetime.combine(date.today(), datetime.max.time()),
+            instrument_type="index",
+        )
+        return rows[-1] if rows else {}

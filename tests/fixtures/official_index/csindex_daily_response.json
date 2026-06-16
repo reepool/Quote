@@ -1,0 +1,35 @@
+{
+  "code": "200",
+  "msg": "Success",
+  "data": [
+    {
+      "tradeDate": "20260615",
+      "indexCode": "000300",
+      "indexNameCn": "沪深300",
+      "indexNameEn": "CSI 300",
+      "open": 4829.29,
+      "high": 4892.55,
+      "low": 4803.18,
+      "close": 4891.71,
+      "change": 114.39,
+      "changePct": 2.39,
+      "tradingVol": 33131607600,
+      "tradingValue": 9141.46
+    },
+    {
+      "tradeDate": "20260616",
+      "indexCode": "000300",
+      "indexNameCn": "沪深300",
+      "indexNameEn": "CSI 300",
+      "open": 4894.88,
+      "high": 4908.28,
+      "low": 4866.06,
+      "close": 4884.23,
+      "change": -7.48,
+      "changePct": -0.15,
+      "tradingVol": 28258474300,
+      "tradingValue": 8572.03
+    }
+  ],
+  "success": true
+}

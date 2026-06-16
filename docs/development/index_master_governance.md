@@ -20,11 +20,11 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 | 来源 | 定位 | 主要用途 |
 |---|---|---|
 | 国证指数网 `CNIndex` | 深证/国证/CNI 指数官方主源 | 指数列表、详情、公告、PDF 证据、官方日线 |
-| 中证指数官网 `CSIndex` | 中证/SSE/跨市场指数官方主源 | 指数基础信息、发布渠道、生命周期公告或详情 |
+| 中证指数官网 `CSIndex` | 中证/SSE/跨市场指数官方主源 | 指数搜索列表、基础信息、官方日线、发布渠道、生命周期公告或详情 |
 | BaoStock | 备源/补充源 | 既有指数日线、部分指数基础字段、交叉验证 |
 | AkShare | 备源/补充源 | 指数行情 fallback、当前列表候选和差异预警 |
 
-官方源优先级只适用于其覆盖的指数族。未覆盖或官方接口临时不可用时，生命周期为 active 的指数仍可继续走 BaoStock/AkShare fallback；不能因为主源为空就直接跳过 active 指数。
+官方源优先级只适用于其覆盖的指数族。未覆盖、官方接口临时不可用、或官方源只返回到请求区间内最后一个交易日前时，生命周期为 active 的指数仍可继续走 BaoStock/AkShare fallback；不能因为主源为空或返回了 stale 非空结果就直接跳过 active 指数。
 
 ## 生命周期状态
 
@@ -65,8 +65,24 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
    - 官方源支持该指数族时，官方源优先。
    - 官方源临时失败或不支持时，继续 BaoStock/AkShare fallback。
    - active 指数主源短区间空结果不能直接跳过 fallback。
+   - active 指数主源返回非空但最新行情日小于请求区间内最后一个交易日时，判定为 stale 结果并继续 fallback。
 4. 写入行情时保持幂等 upsert，不删除历史数据。
 5. 终止日之后不得 forward-fill 指数行情。
+
+当前官方行情源日期格式不同，不能混用：
+
+- `CNIndex` 日线接口使用 `YYYY-MM-DD`，例如 `startDate=2026-06-10&endDate=2026-06-16`。
+- `CSIndex` 日线接口使用 `YYYYMMDD`，例如 `startDate=20260610&endDate=20260616`。
+
+生产日线路由按指数族减少无效探测：
+
+- `SSE index = csindex -> baostock -> akshare`。CSIndex 覆盖上证、中证和跨市场指数的官方代码体系，例如 `000300`。
+- `SZSE index = cnindex -> baostock -> akshare`。CNIndex 覆盖深证/国证指数的官方代码体系，例如 `399001`、`399006`。
+- BaoStock/AkShare 只作 fallback 和差异诊断，不作为生命周期最高证据。
+
+覆盖校验必须使用交易日历，而不是简单比较原始 `end_date`。例如手工在第二天重跑前一交易日、或请求区间结束在周末/节假日时，只要求覆盖 `[start_date,end_date]` 内最后一个交易日；如果区间内没有交易日，则不做 stale 拦截。
+
+已验证的运行特征：CSIndex/CNIndex 官网日线接口小样本响应通常在 0.1-0.3 秒量级；BaoStock 登录和单指数查询显著慢，且可能在网络波动时长时间阻塞。因此官方源可用且覆盖该指数族时应优先用官网作为主源。
 
 ## 主数据准入规则
 

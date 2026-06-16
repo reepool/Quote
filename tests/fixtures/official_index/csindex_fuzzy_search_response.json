@@ -1,0 +1,20 @@
+{
+  "code": "200",
+  "msg": "Success",
+  "data": [
+    {
+      "indexCode": "000001",
+      "indexName": "上证指数",
+      "indexNameEn": "SSE Index"
+    },
+    {
+      "indexCode": "000300",
+      "indexName": "沪深300",
+      "indexNameEn": "CSI 300"
+    }
+  ],
+  "total": 2,
+  "pageSize": 20,
+  "currentPage": 1,
+  "success": true
+}

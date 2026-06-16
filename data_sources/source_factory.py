@@ -857,6 +857,81 @@ class DataSourceFactory:
         ds_logger.debug(f"[DataSourceFactory] Daily data validation passed for {symbol}")
         return True
 
+    @staticmethod
+    def _quote_date(value: Any) -> Optional[date]:
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str) and value:
+            try:
+                return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
+            except ValueError:
+                try:
+                    return datetime.strptime(value[:10], "%Y-%m-%d").date()
+                except ValueError:
+                    return None
+        return None
+
+    async def _validate_daily_date_coverage(
+        self,
+        data: List[Dict[str, Any]],
+        *,
+        exchange: str,
+        instrument_type: str,
+        start_date: datetime,
+        end_date: datetime,
+        source_name: str,
+        symbol: str,
+    ) -> bool:
+        """Validate that index daily data covers the expected trading day."""
+        route_cfg = self._get_daily_route_config(exchange, instrument_type)
+        require_end_date_coverage = bool(
+            route_cfg.get(
+                "require_end_date_coverage",
+                (instrument_type or "stock").lower() == "index",
+            )
+        )
+        if not require_end_date_coverage or not end_date:
+            return True
+
+        requested_start = start_date.date() if start_date else end_date.date()
+        requested_end = end_date.date()
+        trading_days = await self.get_trading_days(exchange, requested_start, requested_end)
+        if not trading_days:
+            ds_logger.debug(
+                "[DataSourceFactory] No trading day in %s~%s for %s; skip end-date coverage check for %s",
+                requested_start,
+                requested_end,
+                exchange,
+                symbol,
+            )
+            return True
+
+        expected_date = max(trading_days)
+        quote_dates = [self._quote_date(item.get("time")) for item in data or []]
+        quote_dates = [item for item in quote_dates if item is not None]
+        if not quote_dates:
+            ds_logger.warning(
+                "[DataSourceFactory] %s returned no parseable quote dates for %s",
+                source_name,
+                symbol,
+            )
+            return False
+
+        latest_date = max(quote_dates)
+        if latest_date < expected_date:
+            ds_logger.warning(
+                "[DataSourceFactory] Stale %s data from %s for %s: latest=%s < expected_trading_day=%s; trying fallback",
+                instrument_type,
+                source_name,
+                symbol,
+                latest_date,
+                expected_date,
+            )
+            return False
+        return True
+
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
                            start_date: datetime, end_date: datetime,
                            instrument_type: str = 'stock',
@@ -888,7 +963,19 @@ class DataSourceFactory:
                     instrument_id, symbol, start_date, end_date,
                     instrument_type, source_symbol=source_symbol
                 )
-                if data and self._validate_daily_data(data, instrument_id, symbol):
+                if (
+                    data
+                    and self._validate_daily_data(data, instrument_id, symbol)
+                    and await self._validate_daily_date_coverage(
+                        data,
+                        exchange=exchange,
+                        instrument_type=instrument_type,
+                        start_date=start_date,
+                        end_date=end_date,
+                        source_name=primary_source.name,
+                        symbol=symbol,
+                    )
+                ):
                     ds_logger.debug(f"[DataSourceFactory] Got data from {primary_source.name}: {len(data)} quotes")
                     return data
                 elif not data:
@@ -921,7 +1008,19 @@ class DataSourceFactory:
                         instrument_id, symbol, start_date, end_date,
                         instrument_type, source_symbol=source_symbol
                     )
-                    if data and self._validate_daily_data(data, instrument_id, symbol):
+                    if (
+                        data
+                        and self._validate_daily_data(data, instrument_id, symbol)
+                        and await self._validate_daily_date_coverage(
+                            data,
+                            exchange=exchange,
+                            instrument_type=instrument_type,
+                            start_date=start_date,
+                            end_date=end_date,
+                            source_name=backup_source.name,
+                            symbol=symbol,
+                        )
+                    ):
                         ds_logger.info(f"[DataSourceFactory] Got data from backup {backup_source.name}: {len(data)} quotes")
                         return data
                     elif not data:

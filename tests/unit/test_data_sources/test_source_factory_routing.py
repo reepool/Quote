@@ -19,7 +19,9 @@ def _build_source(name: str, supported_exchanges=None):
 @pytest.mark.unit
 class TestSourceFactoryRouting:
     def setup_method(self):
-        self.factory = DataSourceFactory(Mock())
+        db_ops = Mock()
+        db_ops.get_trading_days = AsyncMock(return_value=[datetime(2026, 6, 16).date()])
+        self.factory = DataSourceFactory(db_ops)
         self.factory.config = Mock()
         self.factory.config.get = Mock(return_value={})
 
@@ -69,13 +71,20 @@ class TestSourceFactoryRouting:
             'daily': {
                 'SSE': {
                     'stock': ['pytdx', 'baostock', 'akshare'],
-                    'index': ['csindex', 'cnindex', 'baostock', 'akshare'],
+                    'index': ['csindex', 'baostock', 'akshare'],
+                },
+                'SZSE': {
+                    'stock': ['pytdx', 'baostock', 'akshare'],
+                    'index': ['cnindex', 'baostock', 'akshare'],
                 },
             },
             'daily_behavior': {
                 'default': {
                     'stock': {'skip_backup_on_empty_short_range': True},
-                    'index': {'skip_backup_on_empty_short_range': False},
+                    'index': {
+                        'skip_backup_on_empty_short_range': False,
+                        'require_end_date_coverage': True,
+                    },
                 },
             },
             'instrument_list': {'a_stock': ['baostock']},
@@ -100,7 +109,6 @@ class TestSourceFactoryRouting:
 
         assert [source.name for source in chain] == [
             'csindex_a_stock',
-            'cnindex_a_stock',
             'baostock_a_stock',
             'akshare_a_stock',
         ]
@@ -142,7 +150,6 @@ class TestSourceFactoryRouting:
         ]
         assert [source.name for source in index_chain] == [
             'csindex_a_stock',
-            'cnindex_a_stock',
             'akshare_a_stock',
         ]
 
@@ -151,6 +158,14 @@ class TestSourceFactoryRouting:
 
         assert [source.name for source in chain] == [
             'csindex_a_stock',
+            'baostock_a_stock',
+            'akshare_a_stock',
+        ]
+
+    def test_szse_index_route_uses_cnindex_without_csindex_empty_probe(self):
+        chain = self.factory._get_daily_source_chain('SZSE', 'index')
+
+        assert [source.name for source in chain] == [
             'cnindex_a_stock',
             'baostock_a_stock',
             'akshare_a_stock',
@@ -205,6 +220,71 @@ class TestSourceFactoryRouting:
         self.yfinance.get_adjustment_factors.assert_awaited()
 
     @pytest.mark.asyncio
+    async def test_index_daily_data_falls_back_when_primary_is_stale(self):
+        self.csindex.get_daily_data = AsyncMock(return_value=[
+            {
+                'instrument_id': '000300.SH',
+                'time': datetime(2026, 6, 15),
+                'open': 1.0,
+                'high': 1.1,
+                'low': 0.9,
+                'close': 1.0,
+            }
+        ])
+        self.baostock.get_daily_data = AsyncMock(return_value=[
+            {
+                'instrument_id': '000300.SH',
+                'time': datetime(2026, 6, 16),
+                'open': 2.0,
+                'high': 2.1,
+                'low': 1.9,
+                'close': 2.0,
+            }
+        ])
+
+        rows = await self.factory.get_daily_data(
+            'SSE',
+            '000300.SH',
+            '000300',
+            datetime(2026, 6, 15),
+            datetime(2026, 6, 16),
+            instrument_type='index',
+        )
+
+        assert rows[0]['close'] == 2.0
+        self.csindex.get_daily_data.assert_awaited_once()
+        self.baostock.get_daily_data.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_index_daily_data_uses_last_trading_day_for_coverage(self):
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 6, 15).date(), datetime(2026, 6, 16).date()]
+        )
+        self.csindex.get_daily_data = AsyncMock(return_value=[
+            {
+                'instrument_id': '000300.SH',
+                'time': datetime(2026, 6, 16),
+                'open': 1.0,
+                'high': 1.1,
+                'low': 0.9,
+                'close': 1.0,
+            }
+        ])
+
+        rows = await self.factory.get_daily_data(
+            'SSE',
+            '000300.SH',
+            '000300',
+            datetime(2026, 6, 15),
+            datetime(2026, 6, 17),
+            instrument_type='index',
+        )
+
+        assert rows[0]['close'] == 1.0
+        self.csindex.get_daily_data.assert_awaited_once()
+        self.baostock.get_daily_data.assert_not_awaited()
+
+    @pytest.mark.asyncio
     async def test_get_adjustment_factors_does_not_fall_back_on_empty_list(self):
         self.factory.routing['factor']['HKEX'] = {
             'primary': 'akshare',
@@ -241,6 +321,7 @@ class TestSourceFactoryRouting:
         end_date = datetime(2026, 4, 13)
         expected = [{'instrument_id': '000300.SH', 'time': end_date}]
 
+        self.factory.db_ops.get_trading_days = AsyncMock(return_value=[end_date.date()])
         self.baostock.get_daily_data.return_value = []
         self.pytdx.get_daily_data.return_value = []
         self.akshare.get_daily_data.return_value = expected

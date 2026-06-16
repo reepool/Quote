@@ -4,6 +4,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from data_sources.official_index_source import (
     CNIndexSource,
@@ -120,3 +121,34 @@ def test_csindex_basic_info_parses_master_row():
     assert row["exchange"] == "SSE"
     assert row["type"] == "index"
     assert row["metadata"]["publisher"] == "CSIndex"
+
+
+def test_csindex_fuzzy_search_response_parses_master_rows():
+    payload = json.loads((FIXTURE_DIR / "csindex_fuzzy_search_response.json").read_text())
+
+    snapshot = CSIndexSource.parse_fuzzy_search_response(
+        payload,
+        source_url="https://example.test/index-fuzzy-search",
+    )
+
+    assert [row["instrument_id"] for row in snapshot.rows] == ["000001.SH", "000300.SH"]
+    assert snapshot.rows[0]["name"] == "上证指数"
+    assert snapshot.rows[1]["metadata"]["english_name"] == "CSI 300"
+    assert snapshot.diagnostics["total"] == 2
+
+
+def test_csindex_daily_response_parses_ohlcv():
+    payload = json.loads((FIXTURE_DIR / "csindex_daily_response.json").read_text())
+
+    rows = CSIndexSource.parse_daily_response(
+        payload,
+        instrument_id="000300.SH",
+        source_symbol="000300",
+    )
+
+    assert len(rows) == 2
+    assert rows[-1]["time"].date().isoformat() == "2026-06-16"
+    assert rows[-1]["close"] == 4884.23
+    assert rows[-1]["volume"] == 28258474300
+    assert rows[-1]["amount"] == pytest.approx(857203000000.0)
+    assert rows[-1]["source"] == "csindex"

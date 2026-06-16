@@ -615,7 +615,7 @@
 
 - **`enabled`**: 是否启用指数主数据治理。
 - **`run_before_daily_update`**: 普通日更读取 active universe 前是否运行指数治理。
-- **`official_sources`**: 官方源优先级。当前 `cnindex` 覆盖国证/深证指数清单、公告证据和官方日线；`csindex` 先提供中证/SSE 基础信息适配点，完整清单能力未启用时会在报告中降级提示。
+- **`official_sources`**: 官方源优先级。当前 `cnindex` 覆盖国证/深证指数清单、公告证据和官方日线；`csindex` 覆盖中证/SSE/跨市场指数搜索列表、基础信息和官方日线。两者官方接口日期格式不同：CNIndex 日线使用 `YYYY-MM-DD`，CSIndex 日线使用 `YYYYMMDD`。
 - **`stale_no_quote_trading_days`**: 本地最新行情超过该窗口时进入 stale 诊断。默认只报告，不直接写停用。
 - **`write_stale_no_quote`**: 是否把长期无行情指数写成 `stale_no_quote` 并从日更 universe 排除。默认 `false`，避免仅凭行情缺口误杀临时停发或源异常。
 - **`allow_series_inference`**: 是否允许用官方公告直接代码和全收益/价格指数配对关系做保守推断，例如 `980055` 停编且 `480055` 官方行情止于生效日前后时，将 `480055.SZ` 标记为 `series_inferred`。
@@ -1065,7 +1065,7 @@
 当前生产配置的关键路由示例：
 
 - A 股股票日线：`SSE/SZSE stock = pytdx -> baostock -> akshare`
-- A 股指数日线：`SSE index = csindex -> cnindex -> baostock -> akshare`，`SZSE index = cnindex -> csindex -> baostock -> akshare`；官方源临时不可用或不覆盖的 active 指数继续走 BaoStock/AkShare fallback。
+- A 股指数日线：`SSE index = csindex -> baostock -> akshare`，`SZSE index = cnindex -> baostock -> akshare`；官方源临时不可用、不覆盖、或返回非空但最新行情日小于请求区间内最后一个交易日时，active 指数继续走 BaoStock/AkShare fallback。该覆盖校验使用交易日历，不直接用原始 `end_date`，因此手工重跑历史交易日或区间结束在非交易日时不会误判。BaoStock/AkShare 只作兜底和差异诊断，不作为指数生命周期最高证据。
 - 北交所股票日线：`BSE stock = pytdx -> akshare`
 - 港股股票日线：`HKEX stock = akshare -> yfinance`
 - A 股品种列表与交易日历：`baostock`
