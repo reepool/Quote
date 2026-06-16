@@ -22,6 +22,7 @@ class RateLimitConfig:
     max_requests_per_day: int = 10000
     retry_times: int = 3
     retry_interval: float = 1.0
+    min_interval_seconds: float = 0.0
 
 
 @dataclass
@@ -44,12 +45,19 @@ class RateLimiter:
         self.requests = []  # 存储请求时间戳
         self.lock = asyncio.Lock()
         self.last_reset_time = time.monotonic()
+        self.last_request_time = 0.0
         self.daily_request_count = 0
 
     async def acquire(self):
         """获取请求许可"""
         async with self.lock:
             now = time.monotonic()
+
+            if self.config.min_interval_seconds > 0 and self.last_request_time > 0:
+                interval_wait = self.config.min_interval_seconds - (now - self.last_request_time)
+                if interval_wait > 0:
+                    await asyncio.sleep(interval_wait)
+                    now = time.monotonic()
 
             # 每天重置计数器
             if now - self.last_reset_time > 86400:
@@ -101,6 +109,7 @@ class RateLimiter:
 
             # 记录当前请求
             self.requests.append(now)
+            self.last_request_time = now
             self.daily_request_count += 1
             ds_logger.debug(f"[RateLimiter] Request acquired. Recent: {requests_minute}/min, {requests_hour}/hour, {requests_day}/day")
 

@@ -52,6 +52,7 @@ class DataSourceFactory:
 
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
+        self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
 
     async def initialize(self):
         """初始化所有数据源"""
@@ -376,7 +377,8 @@ class DataSourceFactory:
             max_requests_per_hour=source_config.get('max_requests_per_hour', 500),
             max_requests_per_day=source_config.get('max_requests_per_day', 5000),
             retry_times=source_config.get('retry_times', 3),
-            retry_interval=source_config.get('retry_interval', 2.0)
+            retry_interval=source_config.get('retry_interval', 2.0),
+            min_interval_seconds=source_config.get('min_interval_seconds', 0.0),
         )
 
     def get_available_sources(self) -> List[str]:
@@ -873,6 +875,28 @@ class DataSourceFactory:
                     return None
         return None
 
+    async def _get_expected_daily_coverage_date(
+        self,
+        exchange: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> Optional[date]:
+        requested_start = start_date.date() if start_date else end_date.date()
+        requested_end = end_date.date()
+        cache_key = (exchange.upper(), requested_start, requested_end)
+        if cache_key in self.daily_coverage_date_cache:
+            return self.daily_coverage_date_cache[cache_key]
+
+        trading_days = await self.get_trading_days(exchange, requested_start, requested_end)
+        normalized_days = [
+            self._quote_date(item)
+            for item in trading_days
+        ]
+        normalized_days = [item for item in normalized_days if item is not None]
+        expected_date = max(normalized_days) if normalized_days else None
+        self.daily_coverage_date_cache[cache_key] = expected_date
+        return expected_date
+
     async def _validate_daily_date_coverage(
         self,
         data: List[Dict[str, Any]],
@@ -895,10 +919,10 @@ class DataSourceFactory:
         if not require_end_date_coverage or not end_date:
             return True
 
-        requested_start = start_date.date() if start_date else end_date.date()
-        requested_end = end_date.date()
-        trading_days = await self.get_trading_days(exchange, requested_start, requested_end)
-        if not trading_days:
+        expected_date = await self._get_expected_daily_coverage_date(exchange, start_date, end_date)
+        if expected_date is None:
+            requested_start = start_date.date() if start_date else end_date.date()
+            requested_end = end_date.date()
             ds_logger.debug(
                 "[DataSourceFactory] No trading day in %s~%s for %s; skip end-date coverage check for %s",
                 requested_start,
@@ -908,7 +932,6 @@ class DataSourceFactory:
             )
             return True
 
-        expected_date = max(trading_days)
         quote_dates = [self._quote_date(item.get("time")) for item in data or []]
         quote_dates = [item for item in quote_dates if item is not None]
         if not quote_dates:

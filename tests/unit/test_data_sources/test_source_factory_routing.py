@@ -254,6 +254,7 @@ class TestSourceFactoryRouting:
         assert rows[0]['close'] == 2.0
         self.csindex.get_daily_data.assert_awaited_once()
         self.baostock.get_daily_data.assert_awaited_once()
+        assert self.factory.db_ops.get_trading_days.await_count == 1
 
     @pytest.mark.asyncio
     async def test_index_daily_data_uses_last_trading_day_for_coverage(self):

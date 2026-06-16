@@ -281,6 +281,7 @@ class CNIndexSource(BaseDataSource):
         )
 
     async def get_index_master_snapshot(self) -> OfficialIndexSnapshot:
+        await self.rate_limiter.acquire()
         raw = await asyncio.to_thread(self._fetch_bytes, self.index_list_url)
         return self.parse_index_list_excel(raw, source_url=self.index_list_url)
 
@@ -313,6 +314,7 @@ class CNIndexSource(BaseDataSource):
     async def discover_lifecycle_announcements(self) -> List[Dict[str, Any]]:
         notices: List[Dict[str, Any]] = []
         try:
+            await self.rate_limiter.acquire()
             raw = await asyncio.to_thread(self._fetch_bytes, self.notice_root_url)
             notices.extend(self.parse_notice_page(raw.decode("utf-8", errors="ignore")))
         except Exception as exc:
@@ -335,6 +337,7 @@ class CNIndexSource(BaseDataSource):
             if not url:
                 continue
             try:
+                await self.rate_limiter.acquire()
                 raw_pdf = await asyncio.to_thread(self._fetch_bytes, url)
                 pdf_text = OfficialIndexLifecycleParser.extract_pdf_text(raw_pdf)
                 rows = OfficialIndexLifecycleParser.parse_termination_announcement(
@@ -418,6 +421,7 @@ class CNIndexSource(BaseDataSource):
             f"&endDate={end_date.date().isoformat()}"
             "&frequency=day"
         )
+        await self.rate_limiter.acquire()
         raw = await asyncio.to_thread(self._fetch_bytes, url)
         import json
 
@@ -519,6 +523,7 @@ class CSIndexSource(BaseDataSource):
         if not normalized:
             return {}
         url = self.basic_info_url.format(code=normalized)
+        await self.rate_limiter.acquire()
         raw = await asyncio.to_thread(self._fetch_bytes, url)
 
         payload = json.loads(raw.decode("utf-8", errors="ignore"))
@@ -582,6 +587,7 @@ class CSIndexSource(BaseDataSource):
 
         while True:
             url = f"{self.fuzzy_search_url}?searchInput=&pageNum={page_num}&pageSize={page_size}"
+            await self.rate_limiter.acquire()
             raw = await asyncio.to_thread(self._fetch_bytes, url)
             payload = json.loads(raw.decode("utf-8", errors="ignore"))
             snapshot = self.parse_fuzzy_search_response(payload, source_url=url)
@@ -682,6 +688,7 @@ class CSIndexSource(BaseDataSource):
             f"&startDate={start_date.strftime('%Y%m%d')}"
             f"&endDate={end_date.strftime('%Y%m%d')}"
         )
+        await self.rate_limiter.acquire()
         raw = await asyncio.to_thread(self._fetch_bytes, url)
         payload = json.loads(raw.decode("utf-8", errors="ignore"))
         return self.parse_daily_response(payload, instrument_id=instrument_id, source_symbol=code)

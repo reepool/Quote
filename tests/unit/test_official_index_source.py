@@ -1,7 +1,8 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from io import BytesIO
 from pathlib import Path
+from unittest.mock import AsyncMock
 
 import pandas as pd
 import pytest
@@ -152,3 +153,30 @@ def test_csindex_daily_response_parses_ohlcv():
     assert rows[-1]["volume"] == 28258474300
     assert rows[-1]["amount"] == pytest.approx(857203000000.0)
     assert rows[-1]["source"] == "csindex"
+
+
+@pytest.mark.asyncio
+async def test_csindex_daily_data_uses_official_date_format_and_rate_limiter():
+    payload = (FIXTURE_DIR / "csindex_daily_response.json").read_bytes()
+    source = CSIndexSource("csindex_test")
+    source.rate_limiter.acquire = AsyncMock()
+    requested_urls = []
+
+    def fake_fetch(url: str) -> bytes:
+        requested_urls.append(url)
+        return payload
+
+    source._fetch_bytes = fake_fetch
+
+    rows = await source.get_daily_data(
+        "000300.SH",
+        "000300",
+        datetime(2026, 6, 10),
+        datetime(2026, 6, 16),
+        instrument_type="index",
+    )
+
+    assert rows[-1]["time"].date() == date(2026, 6, 16)
+    assert "startDate=20260610" in requested_urls[0]
+    assert "endDate=20260616" in requested_urls[0]
+    source.rate_limiter.acquire.assert_awaited_once()

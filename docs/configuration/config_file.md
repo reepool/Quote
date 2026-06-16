@@ -893,8 +893,14 @@
 - **`exchanges_supported`**: `List[str]`，该 source 会为哪些 region 实例化，例如 `a_stock`、`hk_stock`、`us_stock`
 - **`instrument_types_supported`**: `List[str]`，可选能力边界；声明后会参与启动期路由校验，例如 `stock`、`index`
 - **`max_requests_per_minute` / `max_requests_per_hour` / `max_requests_per_day`**: 速率限制
+- **`min_interval_seconds`**: 可选平滑限速参数。分钟/小时/日阈值只限制窗口总量，不能阻止任务启动时的短 burst；配置该字段后，同一 source 实例相邻请求会至少间隔指定秒数。官方网页接口建议配置该字段，避免触发反爬。
 - **`retry_times` / `retry_interval`**: 默认重试参数
 - 其余字段如 `token`、`proxy`、`connection_timeout`、`batch_size` 等，属于 source 自身连接参数
+
+官方指数源当前建议限流：
+
+- `cnindex`: `max_requests_per_minute=600`，`min_interval_seconds=0.08`。小样本 24 并发/40 请求未出现 403/429，官网接口稳定性较好，但生产仍用平滑限速避免瞬时冲击。
+- `csindex`: `max_requests_per_minute=180`，`min_interval_seconds=0.3`。实测 8 并发/20 请求正常，12 并发/40 请求触发全量 `403 Forbidden`，存在明确短 burst 风控；生产不应追求极限吞吐。
 
 ### data_sources_config.pytdx
 
