@@ -191,6 +191,19 @@ class ReportEngine:
                     if total_checked > 0 else 0
                 )
 
+            instrument_master_sync = summary.get(
+                'instrument_master_sync',
+                data.get('instrument_master_sync'),
+            )
+            if isinstance(instrument_master_sync, dict):
+                instrument_master_sync = instrument_master_sync.get(
+                    'stock_master_governance',
+                    self._extract_master_governance_child(
+                        instrument_master_sync,
+                        {'a_share_stock', 'hkex_instrument'},
+                    ) or instrument_master_sync,
+                )
+
             data.update({
                 'date': data.get('date', ''),
                 'updated_instruments': summary.get('success_count', 0),
@@ -200,7 +213,7 @@ class ReportEngine:
                 'exchange_stats': self._format_daily_exchange_stats_for_table(
                     summary.get('exchange_stats', {})
                 ),
-                'instrument_master_sync': summary.get('instrument_master_sync', data.get('instrument_master_sync')),
+                'instrument_master_sync': instrument_master_sync,
                 'index_master_governance': summary.get(
                     'index_master_governance',
                     data.get('index_master_governance'),
@@ -242,6 +255,19 @@ class ReportEngine:
                 'total_instruments': stats.get('total_instruments', stats.get('total_count', 0)),
             }
         return display_stats
+
+    @staticmethod
+    def _extract_master_governance_child(
+        governance: Dict[str, Any],
+        scopes: set[str],
+    ) -> Optional[Dict[str, Any]]:
+        """Return a scope-specific child from a merged governance payload."""
+        if not isinstance(governance, dict):
+            return None
+        for child in governance.get('children') or []:
+            if isinstance(child, dict) and child.get('scope') in scopes:
+                return child
+        return None
 
     def _format_daily_catchup_summary(self, catchup_stats: Dict[str, Any]) -> str:
         """Format bounded daily catch-up diagnostics for operator reports."""

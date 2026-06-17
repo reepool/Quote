@@ -461,13 +461,16 @@ def merge_child_results(
         for key in ("index_master_governance", "mode"):
             if key in child:
                 result[key] = child[key]
+        if child.get("scope") in {"a_share_stock", "hkex_instrument"}:
+            result["stock_master_governance"] = child
         result["action"] = child.get("action") or result["action"]
         result["reason"] = child.get("reason") or result["reason"]
     else:
         for child in children:
             if child.get("scope") == "a_share_index":
                 result["index_master_governance"] = child
-                break
+            elif child.get("scope") in {"a_share_stock", "hkex_instrument"}:
+                result["stock_master_governance"] = child
     return result
 
 

@@ -224,6 +224,8 @@ async def test_orchestrator_dispatches_and_merges_policy_results():
     assert result["summary"]["lifecycle_skip_count"] == 1
     assert len(result["children"]) == 2
     assert result["index_master_governance"]["scope"] == "a_share_index"
+    assert result["stock_master_governance"]["scope"] == "a_share_stock"
+    assert result["stock_master_governance"]["summary"]["active_count"] == 2
 
 
 @pytest.mark.asyncio

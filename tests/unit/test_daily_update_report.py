@@ -174,6 +174,83 @@ def test_report_engine_formats_instrument_master_sync_warnings():
     assert 'master data freshness exceeds 48h' in summary
 
 
+def test_daily_update_report_uses_stock_child_for_instrument_master_summary():
+    engine = ReportEngine()
+    merged_governance = {
+        'status': 'warning',
+        'summary': {'active_count': 6196, 'master_rows_saved': 1300},
+        'exchanges': {
+            'SSE': {'status': 'success', 'after': {'active_count': 280}},
+            'SZSE': {'status': 'success', 'after': {'active_count': 388}},
+            'BSE': {'status': 'warning', 'after': {'active_count': 321}},
+        },
+        'index_master_governance': {
+            'status': 'warning',
+            'scope': 'a_share_index',
+            'summary': {'master_rows_saved': 1300, 'active_count': 668},
+            'warnings': ['CSIndex full-list endpoint is not enabled'],
+            'errors': [],
+        },
+    }
+    stock_child = {
+        'status': 'warning',
+        'scope': 'a_share_stock',
+        'summary': {
+            'added_instruments': 0,
+            'deactivated_instruments': 0,
+            'active_count': 5528,
+        },
+        'exchanges': {
+            'SSE': {
+                'status': 'success',
+                'after': {'active_count': 2314},
+                'added_count': 0,
+                'deactivated_count': 0,
+            },
+            'SZSE': {
+                'status': 'success',
+                'after': {'active_count': 2893},
+                'added_count': 0,
+                'deactivated_count': 0,
+            },
+            'BSE': {
+                'status': 'warning',
+                'after': {'active_count': 321},
+                'added_count': 0,
+                'deactivated_count': 0,
+            },
+        },
+        'warnings': ['BSE: BaoStock primary did not contribute rows'],
+        'errors': [],
+    }
+    merged_governance['children'] = [stock_child, merged_governance['index_master_governance']]
+
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-06-17',
+            'status': 'success',
+            'update_results': {
+                'success_count': 6196,
+                'failure_count': 0,
+                'total_quotes_added': 12371,
+                'exchange_stats': {},
+                'instrument_master_sync': merged_governance,
+                'index_master_governance': merged_governance['index_master_governance'],
+            },
+            'source': 'Quote System',
+            'generated_at': '2026-06-17 20:26:03',
+        },
+        'telegram',
+    )
+
+    assert '活跃合计: 5528' in message
+    assert 'SSE 状态=success 活跃=2314 +0/-0' in message
+    assert 'SZSE 状态=success 活跃=2893 +0/-0' in message
+    assert 'SSE 状态=success 活跃=280' not in message
+    assert 'SZSE 状态=success 活跃=388' not in message
+
+
 def test_daily_update_new_instrument_catchup_window_uses_listed_date():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()
