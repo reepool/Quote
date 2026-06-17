@@ -618,6 +618,7 @@ def _merge_summaries(children: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
     }
     samples: List[Dict[str, Any]] = []
     source_usage: Dict[str, int] = {}
+    source_authority: Dict[str, int] = {}
     for child in children:
         child_summary = child.get("summary") or {}
         for exchange in child_summary.get("exchanges") or []:
@@ -650,10 +651,20 @@ def _merge_summaries(children: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
                     source_usage[source] = source_usage.get(source, 0) + int(count or 0)
                 except (TypeError, ValueError):
                     source_usage[source] = source_usage.get(source, 0)
+        if isinstance(child_summary.get("source_authority"), dict):
+            for authority, count in child_summary["source_authority"].items():
+                try:
+                    source_authority[authority] = (
+                        source_authority.get(authority, 0) + int(count or 0)
+                    )
+                except (TypeError, ValueError):
+                    source_authority[authority] = source_authority.get(authority, 0)
     if samples:
         summary["samples"] = samples
     if source_usage:
         summary["source_usage"] = source_usage
+    if source_authority:
+        summary["source_authority"] = source_authority
     return summary
 
 

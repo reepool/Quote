@@ -191,7 +191,12 @@ async def test_orchestrator_dispatches_and_merges_policy_results():
         {
             "status": "success",
             "action": "synced",
-            "summary": {"exchanges": ["SSE"], "active_count": 2, "added_instruments": 1},
+            "summary": {
+                "exchanges": ["SSE"],
+                "active_count": 2,
+                "added_instruments": 1,
+                "source_authority": {"official": 1},
+            },
             "exchanges": {"SSE": {"status": "success"}},
             "warnings": [],
             "errors": [],
@@ -221,6 +226,7 @@ async def test_orchestrator_dispatches_and_merges_policy_results():
     assert result["status"] == "warning"
     assert result["summary"]["active_count"] == 5
     assert result["summary"]["added_instruments"] == 1
+    assert result["summary"]["source_authority"] == {"official": 1}
     assert result["summary"]["lifecycle_skip_count"] == 1
     assert len(result["children"]) == 2
     assert result["index_master_governance"]["scope"] == "a_share_index"
