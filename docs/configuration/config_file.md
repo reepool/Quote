@@ -941,6 +941,40 @@
 
 - **`instrument_types_supported`**: 当前建议包含 `stock` 和 `index`，以支持 A 股指数日线
 
+### data_sources_config.exchange_official
+
+```json
+{
+  "exchange_official": {
+    "enabled": true,
+    "exchanges_supported": ["a_stock"],
+    "instrument_types_supported": ["stock"],
+    "timeout_sec": 30,
+    "parser_version": "a_share_exchange_official_stock_master.v1",
+    "sse": {
+      "current_list_url": "https://query.sse.com.cn/sseQuery/commonQuery.do",
+      "referer": "https://www.sse.com.cn/assortment/stock/list/share/",
+      "sql_id": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
+      "company_status": "2,4,5,7,8"
+    },
+    "szse": {
+      "current_list_url": "https://www.szse.cn/api/report/ShowReport",
+      "catalog_id": "1110",
+      "tab_key": "tab1"
+    },
+    "bse": {
+      "current_list_url": "https://www.bse.cn/nqxxController/nqxxCnzq.do",
+      "typejb": "T",
+      "xxfcbj": "2"
+    }
+  }
+}
+```
+
+- **定位**: A 股股票主数据官方主源，只覆盖 `SSE/SZSE/BSE` 的 `stock` current list 和生命周期正向证据；指数治理仍使用 CNIndex/CSIndex。
+- **`current_list_file`**: 每个市场都支持本地 fixture/缓存文件覆盖 URL，用于离线审计、单元测试或官方接口临时不可用时复现解析。
+- **fallback 语义**: `exchange_official` 成功时，BaoStock/AkShare 只补充非生命周期字段和记录差异；官方源失败或返回不可采信列表时，才按路由顺序让 BaoStock、AkShare 接管。
+
 ### data_sources_config.akshare
 
 ```json
@@ -1034,7 +1068,7 @@
       }
     },
     "instrument_list": {
-      "a_stock": ["baostock"],
+      "a_stock": ["exchange_official", "baostock", "akshare"],
       "hk_stock": ["akshare"],
       "us_stock": ["akshare"]
     },
@@ -1065,7 +1099,7 @@
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.require_end_date_coverage`**: `bool`
   控制非空行情是否必须覆盖请求区间内最后一个交易日。当前指数为 `true`，避免官方源返回前一日 stale 数据却阻断 fallback。
 - **`routing.instrument_list.<region>`**: `List[str]`
-  指定品种列表抓取链，按 region 配置。
+  指定品种列表抓取链，按 region 配置。A 股股票当前为 `exchange_official -> baostock -> akshare`；官方源成功时备源不得并集补入官方 current list 缺失代码，只能补非生命周期字段和写差异诊断。
 - **`routing.calendar.<region>`**: `List[str]`
   指定交易日历抓取链，按 region 配置。
 - **`routing.factor.<exchange>`**: `Object`
@@ -1077,7 +1111,8 @@
 - A 股指数日线：`SSE index = csindex -> baostock -> akshare`，`SZSE index = cnindex -> baostock -> akshare`；官方源临时不可用、不覆盖、或返回非空但最新行情日小于请求区间内最后一个交易日时，active 指数继续走 BaoStock/AkShare fallback。该覆盖校验使用交易日历，不直接用原始 `end_date`，因此手工重跑历史交易日或区间结束在非交易日时不会误判。BaoStock/AkShare 只作兜底和差异诊断，不作为指数生命周期最高证据。
 - 北交所股票日线：`BSE stock = pytdx -> akshare`
 - 港股股票日线：`HKEX stock = akshare -> yfinance`
-- A 股品种列表与交易日历：`baostock`
+- A 股股票品种列表：`exchange_official -> baostock -> akshare`
+- A 股交易日历：`baostock`
 - 港股/美股品种列表与交易日历：`akshare`
 - A 股复权因子主源：`baostock`
 - 港股复权因子主源：`akshare`（生产算法使用 `qfq-factor` 转换为乘法累积因子；`yfinance` 仅作为失败时的少量补位）

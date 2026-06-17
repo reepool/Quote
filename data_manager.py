@@ -10436,6 +10436,98 @@ class DataManager:
             usage[source] = usage.get(source, 0) + 1
         return usage
 
+    def _infer_stock_source_authority(self, instruments: List[Dict[str, Any]]) -> str:
+        authorities = Counter(
+            str(item.get('source_authority') or '')
+            for item in instruments or []
+            if item.get('source_authority')
+        )
+        if authorities:
+            return authorities.most_common(1)[0][0]
+        source_usage = self._summarize_instrument_source_usage(instruments)
+        if any(str(source).endswith('_official') or source == 'exchange_official' for source in source_usage):
+            return 'official'
+        if source_usage.get('baostock'):
+            return 'baostock_fallback'
+        if source_usage.get('akshare'):
+            return 'akshare_fallback'
+        return 'degraded' if instruments else 'degraded'
+
+    def _build_a_share_stock_metadata_rows(
+        self,
+        instruments: List[Dict[str, Any]],
+        *,
+        source_diagnostics: Optional[Dict[str, Any]] = None,
+    ) -> List[Dict[str, Any]]:
+        diagnostics = source_diagnostics or {}
+        rows: List[Dict[str, Any]] = []
+        for instrument in instruments or []:
+            instrument_id = instrument.get('instrument_id')
+            if not instrument_id:
+                continue
+            metadata = instrument.get('metadata') if isinstance(instrument.get('metadata'), dict) else {}
+            rows.append({
+                'instrument_id': instrument_id,
+                'exchange': instrument.get('exchange'),
+                'product_type': 'stock',
+                'research_scope': 'include',
+                'canonical_instrument_id': instrument_id,
+                'is_canonical': True,
+                'counter_currency': instrument.get('currency') or 'CNY',
+                'official_lifecycle_source': instrument.get('official_lifecycle_source'),
+                'source_url': instrument.get('source_url'),
+                'raw_snapshot_hash': instrument.get('raw_snapshot_hash'),
+                'parser_version': instrument.get('parser_version'),
+                'metadata': {
+                    **metadata,
+                    'source_authority': instrument.get('source_authority'),
+                    'selected_source': diagnostics.get('selected_source'),
+                    'selected_source_authority': diagnostics.get('selected_source_authority'),
+                    'fallback_sources': diagnostics.get('fallback_sources') or [],
+                    'fallback_reason': diagnostics.get('fallback_reason'),
+                },
+            })
+        return rows
+
+    def _build_a_share_stock_discrepancy_rows(
+        self,
+        *,
+        exchange: str,
+        before: Dict[str, Any],
+        instruments: List[Dict[str, Any]],
+        source_diagnostics: Optional[Dict[str, Any]] = None,
+    ) -> List[Dict[str, Any]]:
+        diagnostics = source_diagnostics or {}
+        authority = diagnostics.get('selected_source_authority') or self._infer_stock_source_authority(instruments)
+        if authority not in {'official', 'official_with_fallback_fields'}:
+            return []
+
+        official_ids = {
+            item.get('instrument_id')
+            for item in instruments or []
+            if item.get('instrument_id')
+        }
+        rows: List[Dict[str, Any]] = []
+        for instrument_id in sorted((before.get('active_ids') or set()) - official_ids):
+            rows.append({
+                'instrument_id': instrument_id,
+                'reason': 'official_current_list_missing_no_terminal_evidence',
+                'source_authority': authority,
+                'exchange': exchange,
+            })
+            if len(rows) >= 500:
+                break
+        for instrument_id in diagnostics.get('fallback_only_ids') or []:
+            rows.append({
+                'instrument_id': instrument_id,
+                'reason': 'fallback_current_list_only_not_admitted_without_official_evidence',
+                'source_authority': authority,
+                'exchange': exchange,
+            })
+            if len(rows) >= 1000:
+                break
+        return rows
+
     async def _validate_instrument_master_with_pytdx(
         self,
         exchange: str,
@@ -11443,14 +11535,17 @@ class DataManager:
             'started_at': started_at.isoformat(),
             'finished_at': None,
             'elapsed_sec': 0.0,
-            'source_priority': ['baostock', 'akshare', 'pytdx_validation_only'],
+            'source_priority': ['exchange_official', 'baostock', 'akshare', 'pytdx_validation_only'],
             'exchanges': {},
             'summary': {
                 'exchanges': sync_exchanges,
                 'added_instruments': 0,
                 'deactivated_instruments': 0,
                 'bse_delisting_confirmed': 0,
+                'metadata_rows_saved': 0,
+                'discrepancy_rows_saved': 0,
                 'active_count': 0,
+                'source_authority': {},
             },
             'warnings': [],
             'errors': [],
@@ -11467,6 +11562,10 @@ class DataManager:
                 'after': {},
                 'fetched_count': 0,
                 'source_usage': {},
+                'source_authority': None,
+                'source_diagnostics': {},
+                'metadata_rows_saved': 0,
+                'discrepancy_rows_saved': 0,
                 'added_count': 0,
                 'deactivated_count': 0,
                 'added_samples': [],
@@ -11488,6 +11587,17 @@ class DataManager:
                 else:
                     instruments = await fetch_coro
 
+                source_diagnostics = {}
+                if hasattr(self.source_factory, 'get_last_instrument_list_diagnostics'):
+                    source_diagnostics = self.source_factory.get_last_instrument_list_diagnostics(
+                        exchange,
+                        ['stock'],
+                    )
+                source_authority = (
+                    source_diagnostics.get('selected_source_authority')
+                    if isinstance(source_diagnostics, dict) else None
+                ) or self._infer_stock_source_authority(instruments)
+
                 bse_delisting = None
                 if exchange == 'BSE':
                     bse_delisting = await self._sync_bse_delisting_status(
@@ -11499,6 +11609,44 @@ class DataManager:
                 added_ids = sorted(after['all_ids'] - before['all_ids'])
                 deactivated_ids = sorted(before['active_ids'] - after['active_ids'])
                 source_usage = self._summarize_instrument_source_usage(instruments)
+                metadata_rows_saved = 0
+                discrepancy_rows_saved = 0
+                metadata_saver = getattr(self.db_ops, 'save_instrument_master_metadata_batch', None)
+                if instruments and callable(metadata_saver):
+                    maybe_saved = metadata_saver(
+                        self._build_a_share_stock_metadata_rows(
+                            instruments,
+                            source_diagnostics=source_diagnostics,
+                        )
+                    )
+                    if inspect.isawaitable(maybe_saved):
+                        metadata_rows_saved = await maybe_saved
+                    else:
+                        try:
+                            metadata_rows_saved = int(maybe_saved or 0)
+                        except (TypeError, ValueError):
+                            metadata_rows_saved = 0
+
+                discrepancy_rows = self._build_a_share_stock_discrepancy_rows(
+                    exchange=exchange,
+                    before=before,
+                    instruments=instruments or [],
+                    source_diagnostics=source_diagnostics,
+                )
+                discrepancy_saver = getattr(self.db_ops, 'save_instrument_master_discrepancies', None)
+                if discrepancy_rows and callable(discrepancy_saver):
+                    maybe_saved = discrepancy_saver(
+                        discrepancy_rows,
+                        exchange=exchange,
+                        run_id=f"a_share_stock_master:{started_at.isoformat()}",
+                    )
+                    if inspect.isawaitable(maybe_saved):
+                        discrepancy_rows_saved = await maybe_saved
+                    else:
+                        try:
+                            discrepancy_rows_saved = int(maybe_saved or 0)
+                        except (TypeError, ValueError):
+                            discrepancy_rows_saved = 0
 
                 exchange_result.update({
                     'before': {
@@ -11516,6 +11664,10 @@ class DataManager:
                     },
                     'fetched_count': len(instruments or []),
                     'source_usage': source_usage,
+                    'source_authority': source_authority,
+                    'source_diagnostics': source_diagnostics,
+                    'metadata_rows_saved': metadata_rows_saved,
+                    'discrepancy_rows_saved': discrepancy_rows_saved,
                     'added_count': len(added_ids),
                     'deactivated_count': len(deactivated_ids),
                     'added_samples': added_ids[:20],
@@ -11527,8 +11679,10 @@ class DataManager:
                 if not instruments:
                     exchange_result['status'] = 'warning'
                     exchange_result['warnings'].append('empty instrument list from primary route')
-                if source_usage and 'baostock' not in source_usage:
-                    exchange_result['warnings'].append('BaoStock primary did not contribute rows; fallback data is non-authoritative for delisting dates')
+                if source_authority in {'baostock_fallback', 'akshare_fallback', 'degraded'}:
+                    exchange_result['warnings'].append(
+                        f"official exchange source did not provide authoritative rows; source_authority={source_authority}"
+                    )
                     exchange_result['status'] = 'warning'
 
                 if include_pytdx:
@@ -11575,6 +11729,11 @@ class DataManager:
                         exchange_result['errors'].extend(bse_delisting['errors'])
                         exchange_result['status'] = 'error'
                 result['summary']['active_count'] += exchange_result['after'].get('active_count', 0)
+                result['summary']['metadata_rows_saved'] += metadata_rows_saved
+                result['summary']['discrepancy_rows_saved'] += discrepancy_rows_saved
+                if source_authority:
+                    authority_counts = result['summary'].setdefault('source_authority', {})
+                    authority_counts[source_authority] = authority_counts.get(source_authority, 0) + 1
 
             except asyncio.TimeoutError:
                 exchange_result['status'] = 'error'

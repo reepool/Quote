@@ -213,7 +213,8 @@ async def test_hkex_manual_review_evidence_append_uses_configured_json_file(tmp_
 def test_akshare_fallback_cannot_reactivate_existing_delisted_without_delist_date():
     assert DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'akshare', None)
     assert DatabaseOperations._should_preserve_protected_inactive_status('auto_deactivated_zombie', 'akshare', None)
-    assert not DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'baostock', None)
+    assert DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'baostock', None)
+    assert not DatabaseOperations._should_preserve_protected_inactive_status('delisted', 'sse_official', None)
     assert not DatabaseOperations._should_preserve_protected_inactive_status('active', 'akshare', None)
 
 
@@ -258,7 +259,8 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
         freshness_threshold_hours=9999,
     )
 
-    assert result['status'] == 'success'
+    assert result['status'] == 'warning'
+    assert result['exchanges']['SSE']['source_authority'] == 'baostock_fallback'
     assert result['summary']['added_instruments'] == 1
     assert result['summary']['deactivated_instruments'] == 1
     assert result['exchanges']['SSE']['added_samples'] == ['688001.SH']

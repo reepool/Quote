@@ -317,16 +317,26 @@ class ReportEngine:
             f"状态: {status}",
             f"新增: {summary.get('added_instruments', 0)}，停用: {summary.get('deactivated_instruments', 0)}，活跃合计: {summary.get('active_count', 0)}",
         ]
+        source_authority = summary.get('source_authority') or {}
+        if isinstance(source_authority, dict) and source_authority:
+            lines.append(
+                '权威来源: ' + '；'.join(
+                    f"{authority}={count}" for authority, count in list(source_authority.items())[:4]
+                )
+            )
 
         exchange_parts = []
         for exchange, item in (sync_result.get('exchanges') or {}).items():
             if not isinstance(item, dict):
                 continue
             after = item.get('after') if isinstance(item.get('after'), dict) else {}
+            source_diag = item.get('source_diagnostics') if isinstance(item.get('source_diagnostics'), dict) else {}
+            source_text = item.get('source_authority') or source_diag.get('selected_source_authority') or 'unknown'
             exchange_parts.append(
                 f"{exchange} 状态={item.get('status', 'unknown')} "
                 f"活跃={after.get('active_count', 0)} "
-                f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)}"
+                f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)} "
+                f"source={source_text}"
             )
         if exchange_parts:
             lines.append('市场: ' + '；'.join(exchange_parts))

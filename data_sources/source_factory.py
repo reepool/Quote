@@ -26,6 +26,7 @@ from .tushare_source import TushareSource
 from .baostock_source import BaostockSource
 from .tdx_source import TdxSource
 from .official_index_source import CNIndexSource, CSIndexSource
+from .a_share_official_stock_master import AShareOfficialStockMasterSource
 from utils.exchange_utils import exchange_mapper
 
 
@@ -53,6 +54,7 @@ class DataSourceFactory:
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
         self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
+        self.last_instrument_list_diagnostics: Dict[tuple[str, tuple[str, ...]], Dict[str, Any]] = {}
 
     async def initialize(self):
         """初始化所有数据源"""
@@ -179,6 +181,12 @@ class DataSourceFactory:
             return CNIndexSource(instance_name, rate_limit_config, config=source_config)
         elif source_name == 'csindex':
             return CSIndexSource(instance_name, rate_limit_config, config=source_config)
+        elif source_name == 'exchange_official':
+            return AShareOfficialStockMasterSource(
+                instance_name,
+                rate_limit_config,
+                config=source_config,
+            )
         else:
             ds_logger.warning(f"[DataSourceFactory] Unknown source type: {source_name}")
             return None
@@ -285,6 +293,18 @@ class DataSourceFactory:
         if isinstance(value, list):
             return [item for item in value if isinstance(item, str) and item]
         return []
+
+    @staticmethod
+    def _source_base_name(source: BaseDataSource) -> str:
+        name = getattr(source, 'name', '') or ''
+        for suffix in ('_a_stock', '_hk_stock', '_us_stock'):
+            if name.endswith(suffix):
+                return name[:-len(suffix)]
+        return name
+
+    @staticmethod
+    def _is_official_instrument_source(source: Optional[BaseDataSource]) -> bool:
+        return bool(getattr(source, 'is_official_instrument_master_source', False))
 
     def _resolve_route_sources(
         self,
@@ -654,13 +674,33 @@ class DataSourceFactory:
 
         region = self.exchange_mapper.get_region_from_exchange(exchange)
         route_names = self._get_scene_route_names('instrument_list', region) if region else []
-        instrument_source_list = [
-            self._get_source_instance(source_name, region=region)
-            for source_name in route_names
-        ]
-        instrument_source_list = [source for source in instrument_source_list if source is not None]
+        route_label = f"routing.instrument_list.{region or exchange}"
+        instrument_source_list = self._resolve_route_sources(
+            route_names,
+            exchange=exchange,
+            region=region,
+            instrument_type=(instrument_types or ['stock'])[0] if instrument_types else None,
+            route_label=route_label,
+        )
+        diagnostics: Dict[str, Any] = {
+            'exchange': exchange,
+            'region': region,
+            'route': route_names,
+            'attempted_sources': [],
+            'selected_source': None,
+            'selected_source_authority': None,
+            'fallback_reason': None,
+            'fallback_sources': [],
+            'fallback_only_ids': [],
+            'supplemented_fields_count': 0,
+            'source_usage': {},
+            'warnings': [],
+            'errors': [],
+        }
+        diag_key = (exchange, tuple(sorted(instrument_types or [])))
 
         if not instrument_source_list:
+            self.last_instrument_list_diagnostics[diag_key] = diagnostics
             raise ConfigurationError(
                 f"No instrument_list route configured for region: {region or exchange}",
                 ErrorCodes.CONFIG_MISSING_KEY,
@@ -672,6 +712,7 @@ class DataSourceFactory:
         try:
             with LogContext("DataSourceFactory", "get_primary_instruments", exchange=exchange):
                 # 透传 instrument_types（支持该参数的数据源会按类型过滤）
+                diagnostics['attempted_sources'].append(self._source_base_name(primary_source))
                 try:
                     instruments = await primary_source.get_instrument_list(
                         exchange, instrument_types=instrument_types
@@ -685,10 +726,20 @@ class DataSourceFactory:
                             if inst.get('type') in instrument_types
                         ]
 
-                # 第三步：尝试从其他品种源进行并集合并
+                if not instruments or len(instruments) <= 50:
+                    raise ValueError(
+                        f"primary source returned insufficient instruments: {len(instruments or [])}"
+                    )
+
+                primary_is_official = self._is_official_instrument_source(primary_source)
+
+                # 第三步：尝试从其他品种源补充或交叉诊断。
+                # 官方源成功时，备源不得把官方 current list 缺失的代码并集补入 active
+                # universe；只能补充非生命周期字段并记录 fallback-only 候选。
                 for backup_source in backup_sources:
                     try:
                         ds_logger.info(f"[DataSourceFactory] Fetching instruments from backup_source {backup_source.name} for {exchange}...")
+                        diagnostics['attempted_sources'].append(self._source_base_name(backup_source))
                         try:
                             backup_instruments = await backup_source.get_instrument_list(exchange, instrument_types=instrument_types)
                         except TypeError:
@@ -700,28 +751,69 @@ class DataSourceFactory:
                             # 按照 instrument_id 对仪器进行合并，保留 primary 的绝对优先级
                             merged_dict = {inst['instrument_id']: inst for inst in instruments}
                             added_count = 0
+                            supplemented_count = 0
+                            fallback_only_ids = []
                             for b_inst in backup_instruments:
-                                if b_inst['instrument_id'] not in merged_dict:
+                                instrument_id = b_inst.get('instrument_id')
+                                if not instrument_id:
+                                    continue
+                                if instrument_id not in merged_dict:
+                                    if primary_is_official:
+                                        fallback_only_ids.append(instrument_id)
+                                        continue
                                     merged_dict[b_inst['instrument_id']] = b_inst
                                     added_count += 1
+                                elif primary_is_official:
+                                    supplemented_count += self._supplement_official_instrument_fields(
+                                        merged_dict[instrument_id],
+                                        b_inst,
+                                        fallback_source=self._source_base_name(backup_source),
+                                    )
                             instruments = list(merged_dict.values())
-                            ds_logger.info(f"[DataSourceFactory] Successfully merged {added_count} instruments from {backup_source.name}. Total now: {len(instruments)}")
+                            if fallback_only_ids:
+                                diagnostics['fallback_only_ids'].extend(fallback_only_ids[:500])
+                            if supplemented_count:
+                                diagnostics['supplemented_fields_count'] += supplemented_count
+                            if added_count:
+                                diagnostics['fallback_sources'].append(self._source_base_name(backup_source))
+                            ds_logger.info(
+                                f"[DataSourceFactory] Successfully processed {backup_source.name}. "
+                                f"added={added_count}, supplemented={supplemented_count}, "
+                                f"fallback_only={len(fallback_only_ids)}, total={len(instruments)}"
+                            )
                     except Exception as e:
+                        diagnostics['warnings'].append(
+                            f"backup source {self._source_base_name(backup_source)} failed: {e}"
+                        )
                         ds_logger.warning(f"[DataSourceFactory] Failed to get instruments from backup source {backup_source.name}: {e}")
 
                 if instruments and len(instruments) > 50:  # 认为是完整的列表
                     # 验证数据质量
                     if self._validate_instrument_list(instruments, exchange):
+                        selected_base = self._source_base_name(primary_source)
+                        diagnostics['selected_source'] = selected_base
+                        if primary_is_official:
+                            diagnostics['selected_source_authority'] = (
+                                'official_with_fallback_fields'
+                                if diagnostics['supplemented_fields_count'] > 0
+                                else 'official'
+                            )
+                        else:
+                            diagnostics['selected_source_authority'] = selected_base
+                        diagnostics['source_usage'] = self._summarize_instrument_source_usage(instruments)
                         # 保存到缓存
                         await self._save_instruments_cache(exchange, instruments)
+                        self.last_instrument_list_diagnostics[diag_key] = diagnostics
                         ds_logger.info(f"[DataSourceFactory] Got fresh instruments from {primary_source.name}: {len(instruments)} items")
                         return instruments
                     else:
                         ds_logger.warning(f"[DataSourceFactory] Invalid instrument list from {primary_source.name}")
         except Exception as e:
+            diagnostics['errors'].append(f"primary source {self._source_base_name(primary_source)} failed: {e}")
             ds_logger.error(f"[DataSourceFactory] Failed to get instrument list from {primary_source.name}: {e}")
             for backup_source in backup_sources:
                 try:
+                    diagnostics['attempted_sources'].append(self._source_base_name(backup_source))
                     ds_logger.warning(
                         "[DataSourceFactory] Trying backup instrument source %s after primary failure for %s",
                         backup_source.name,
@@ -741,7 +833,20 @@ class DataSourceFactory:
                             ]
 
                     if instruments and len(instruments) > 50 and self._validate_instrument_list(instruments, exchange):
+                        selected_base = self._source_base_name(backup_source)
+                        diagnostics['selected_source'] = selected_base
+                        diagnostics['selected_source_authority'] = (
+                            'baostock_fallback'
+                            if selected_base == 'baostock'
+                            else 'akshare_fallback'
+                            if selected_base == 'akshare'
+                            else f"{selected_base}_fallback"
+                        )
+                        diagnostics['fallback_reason'] = 'primary_source_unavailable_or_invalid'
+                        diagnostics['fallback_sources'].append(selected_base)
+                        diagnostics['source_usage'] = self._summarize_instrument_source_usage(instruments)
                         await self._save_instruments_cache(exchange, instruments)
+                        self.last_instrument_list_diagnostics[diag_key] = diagnostics
                         ds_logger.info(
                             "[DataSourceFactory] Got fresh instruments from backup %s: %s items",
                             backup_source.name,
@@ -757,8 +862,53 @@ class DataSourceFactory:
                     )
 
         # 第四步：如果所有方法都失败，返回空列表
+        diagnostics['selected_source_authority'] = 'degraded'
+        self.last_instrument_list_diagnostics[diag_key] = diagnostics
         ds_logger.error(f"[DataSourceFactory] No valid instrument list available for {exchange}")
         return []
+
+    @staticmethod
+    def _summarize_instrument_source_usage(instruments: List[Dict[str, Any]]) -> Dict[str, int]:
+        usage: Dict[str, int] = {}
+        for instrument in instruments or []:
+            source = str(instrument.get('source') or 'unknown')
+            usage[source] = usage.get(source, 0) + 1
+        return usage
+
+    @staticmethod
+    def _supplement_official_instrument_fields(
+        official_row: Dict[str, Any],
+        fallback_row: Dict[str, Any],
+        *,
+        fallback_source: str,
+    ) -> int:
+        supplementable_fields = ('listed_date', 'industry', 'sector', 'market', 'is_st')
+        changed = 0
+        supplemented_from = official_row.setdefault('fallback_supplemented_from', [])
+        for field in supplementable_fields:
+            current = official_row.get(field)
+            candidate = fallback_row.get(field)
+            if current not in (None, '') or candidate in (None, ''):
+                continue
+            official_row[field] = candidate
+            changed += 1
+        if changed:
+            if fallback_source not in supplemented_from:
+                supplemented_from.append(fallback_source)
+            official_row['source_authority'] = 'official_with_fallback_fields'
+        return changed
+
+    def get_last_instrument_list_diagnostics(
+        self,
+        exchange: str,
+        instrument_types: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
+        return dict(
+            self.last_instrument_list_diagnostics.get(
+                (str(exchange or '').upper(), tuple(sorted(instrument_types or []))),
+                {},
+            )
+        )
 
     async def _get_cached_instruments(self, exchange: str) -> List[Dict[str, Any]]:
         """从缓存获取交易品种列表"""

@@ -539,7 +539,13 @@ class DatabaseOperations:
             or status.startswith('auto_deactivated')
             or status in {'calculation_terminated', 'inactive', 'stale_no_quote'}
         )
-        return protected_status and incoming_delisted_date is None and incoming_source != 'baostock'
+        source = (incoming_source or '').lower()
+        official_source = (
+            source == 'exchange_official'
+            or source.endswith('_official')
+            or source in {'sse_official', 'szse_official', 'bse_official'}
+        )
+        return protected_status and incoming_delisted_date is None and not official_source
 
     async def save_instruments_batch(self, instruments: List[Dict[str, Any]]) -> bool:
         """批量保存交易品种信息"""

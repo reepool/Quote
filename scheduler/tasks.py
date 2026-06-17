@@ -106,6 +106,15 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
             f"待复核: {summary.get('review_required', 0)}，"
             f"活跃合计: {summary.get('active_count', 0)}"
         )
+        source_authority = summary.get("source_authority")
+        if isinstance(source_authority, dict) and source_authority:
+            lines.append(
+                "权威来源: "
+                + "；".join(
+                    f"{authority}={count}"
+                    for authority, count in list(source_authority.items())[:4]
+                )
+            )
 
     children = governance.get("children")
     if isinstance(children, list) and children:
@@ -123,6 +132,18 @@ def _format_instrument_master_governance_summary(governance: Optional[Dict[str, 
             lines.append("策略: " + "；".join(child_lines))
 
     exchanges = governance.get("exchanges")
+    if isinstance(exchanges, dict):
+        a_share_lines = []
+        for exchange in ("SSE", "SZSE", "BSE"):
+            item = exchanges.get(exchange)
+            if not isinstance(item, dict):
+                continue
+            source_diag = item.get("source_diagnostics") if isinstance(item.get("source_diagnostics"), dict) else {}
+            source_authority = item.get("source_authority") or source_diag.get("selected_source_authority")
+            if source_authority:
+                a_share_lines.append(f"{exchange}:{source_authority}")
+        if a_share_lines:
+            lines.append("A股股票源: " + "；".join(a_share_lines))
     if isinstance(exchanges, dict) and "HKEX" in exchanges:
         hkex = exchanges.get("HKEX") or {}
         lines.append(

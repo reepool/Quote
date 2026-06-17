@@ -303,6 +303,59 @@
       "connection_timeout": 30.0,
       "login_timeout": 30.0
     },
+    "exchange_official": {
+      "enabled": true,
+      "exchanges_supported": [
+        "a_stock"
+      ],
+      "instrument_types_supported": [
+        "stock"
+      ],
+      "timeout_sec": 30,
+      "max_requests_per_minute": 180,
+      "max_requests_per_hour": 6000,
+      "max_requests_per_day": 50000,
+      "retry_times": 3,
+      "retry_interval": 2.0,
+      "min_interval_seconds": 0.2,
+      "continue_on_degraded": true,
+      "parser_version": "a_share_exchange_official_stock_master.v1",
+      "sse": {
+        "current_list_url": "https://query.sse.com.cn/sseQuery/commonQuery.do",
+        "current_list_file": "",
+        "referer": "https://www.sse.com.cn/assortment/stock/list/share/",
+        "sql_id": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
+        "company_status": "2,4,5,7,8",
+        "page_size": 10000,
+        "stock_types": [
+          {
+            "label": "main_board_a",
+            "stock_type": "1",
+            "board": "main_board"
+          },
+          {
+            "label": "star_market",
+            "stock_type": "8",
+            "board": "star_market"
+          }
+        ]
+      },
+      "szse": {
+        "current_list_url": "https://www.szse.cn/api/report/ShowReport",
+        "current_list_file": "",
+        "show_type": "xlsx",
+        "catalog_id": "1110",
+        "tab_key": "tab1"
+      },
+      "bse": {
+        "current_list_url": "https://www.bse.cn/nqxxController/nqxxCnzq.do",
+        "current_list_file": "",
+        "typejb": "T",
+        "xxfcbj": "2",
+        "sortfield": "xxzqdm",
+        "sorttype": "asc"
+      }
+    },
     "akshare": {
       "enabled": true,
       "exchanges_supported": [
@@ -467,6 +520,7 @@
     },
     "instrument_list": {
       "a_stock": [
+        "exchange_official",
         "baostock",
         "akshare"
       ],
