@@ -1113,6 +1113,111 @@ class ScheduledTasks:
             )
             return False
 
+    async def a_share_stock_master_sync(
+        self,
+        exchanges: Optional[List[str]] = None,
+        timeout_sec: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """手工触发 A 股股票主数据同步，不请求日更行情。"""
+        if exchanges is None:
+            exchanges = ["SSE", "SZSE", "BSE"]
+
+        normalized_exchanges = [
+            str(exchange).strip().upper()
+            for exchange in exchanges
+            if str(exchange).strip()
+        ]
+        if not normalized_exchanges:
+            raise ValueError("A-share stock master sync requires at least one exchange")
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE", "BSE"})
+        if unsupported:
+            raise ValueError(f"unsupported A-share stock master exchanges: {unsupported}")
+
+        try:
+            scheduler_logger.info(
+                "[Scheduler] Starting A-share stock master sync: exchanges=%s timeout=%s",
+                normalized_exchanges,
+                timeout_sec,
+            )
+            result = await data_manager.run_master_governance([
+                MasterGovernanceRequirement(
+                    scope="a_share_stock",
+                    exchanges=normalized_exchanges,
+                    instrument_types=["stock"],
+                    mode="force_refresh",
+                    job_name="a_share_stock_master_sync",
+                    job_type="manual",
+                    timeout_sec=timeout_sec,
+                )
+            ])
+            summary = result.get("summary") or {}
+            source_authority = summary.get("source_authority") or {}
+            source_authority_text = ", ".join(
+                f"{key}={value}" for key, value in source_authority.items()
+            ) or "无"
+
+            exchange_lines = []
+            exchange_results = result.get("exchanges") or {}
+            for exchange in normalized_exchanges:
+                item = exchange_results.get(exchange) or {}
+                after = item.get("after") if isinstance(item.get("after"), dict) else {}
+                source_usage = item.get("source_usage") or {}
+                source_usage_text = ", ".join(
+                    f"{key}={value}" for key, value in source_usage.items()
+                ) or "无"
+                exchange_lines.append(
+                    f"- {exchange}: {item.get('status', 'unknown')} "
+                    f"active={after.get('active_count', 0)} "
+                    f"+{item.get('added_count', 0)}/-{item.get('deactivated_count', 0)} "
+                    f"authority={item.get('source_authority') or 'unknown'} "
+                    f"sources={source_usage_text}"
+                )
+            exchange_text = "\n".join(exchange_lines) if exchange_lines else "无"
+
+            content = (
+                "*A 股股票主数据同步*\n\n"
+                f"状态: `{result.get('status')}`\n"
+                f"市场: `{','.join(normalized_exchanges)}`\n"
+                "mode: `force_refresh`\n"
+                f"新增: `{summary.get('added_instruments', 0)}`\n"
+                f"停用: `{summary.get('deactivated_instruments', 0)}`\n"
+                f"活跃合计: `{summary.get('active_count', 0)}`\n"
+                f"source_authority: `{source_authority_text}`\n"
+                f"warnings: `{len(result.get('warnings') or [])}`，"
+                f"errors: `{len(result.get('errors') or [])}`\n\n"
+                "市场明细:\n"
+                f"{exchange_text}"
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "A 股股票主数据同步",
+                    "status": result.get("status"),
+                    "content": content,
+                    "result": result,
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                },
+                report_type="maintenance_report",
+                task_name="a_share_stock_master_sync",
+                job_config=job_config,
+            )
+            return result.get("status") in {"success", "warning", "fresh"}
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] A-share stock master sync failed: {e}")
+            if self.telegram_enabled:
+                try:
+                    await self.bot.send_task_notification(
+                        f"A 股股票主数据同步失败: {e}",
+                        "a_share_stock_master_sync",
+                        "error",
+                    )
+                except Exception as notify_error:
+                    scheduler_logger.error(
+                        "[Scheduler] Failed to send A-share stock master sync failure notification: %s",
+                        notify_error,
+                    )
+            return False
+
     async def index_master_governance_sync(
         self,
         exchanges: Optional[List[str]] = None,

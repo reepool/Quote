@@ -591,6 +591,25 @@
           "enable_trading_day_check": true
         }
       },
+      "a_share_stock_master_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股股票主数据同步（仅手工触发，官方源优先，不下载日更行情）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "timeout_sec": 180,
+          "max_runtime_seconds": 600
+        }
+      },
       "index_master_governance_sync": {
         "enabled": true,
         "manual_only": true,

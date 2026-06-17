@@ -284,7 +284,7 @@ restart_system - 重启系统服务
 
 历史估值回补和行情 `/backfill` 默认不使用当前股票主数据刷新替代历史时点股票池；如需强制刷新，应通过代码入口显式传入 force refresh，并保留报告证据。
 
-`/run index_master_governance_sync` 与 `/run hkex_instrument_master_sync` 是手工运维入口，不是业务任务内部依赖边界。它们现在也通过模块化 policy contract 执行，报告仍保留各自的市场专项字段。
+`/run a_share_stock_master_sync`、`/run index_master_governance_sync` 与 `/run hkex_instrument_master_sync` 是手工运维入口，不是业务任务内部依赖边界。它们现在也通过模块化 policy contract 执行，报告仍保留各自的市场专项字段；其中 A 股股票任务只刷新 `SSE/SZSE/BSE` 股票主数据，不下载行情，也不触发指数治理。
 
 ### 2. 系统健康检查 (system_health_check)
 - **执行时间**: 每小时执行一次

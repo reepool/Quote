@@ -84,6 +84,7 @@ SchedulerCore
 - 追补窗口被截断、缺少上市日或追补样例会进入日更报告；超过窗口的大缺口继续由 `/backfill` 或 `find_gap_and_repair` 处理。
 - 历史补数模式默认跳过当前主数据同步，并在报告数据中记录 skip reason；午夜后重跑前一交易日日更视为当前日更重试，仍会强制运行 A 股股票和指数主数据治理，更早日期才按历史回补跳过。
 - 日更报告会包含 `instrument_master_sync` 和行情追补统计，用于暴露新增、停用、主数据新鲜度、`source_authority`、追补窗口和 warnings/errors。若官方源失败而由 BaoStock/AkShare 接管，报告会显示 fallback authority。
+- 如需单独运行 A 股股票主数据治理，使用 manual-only 任务 `/run a_share_stock_master_sync`；该任务只刷新 `SSE/SZSE/BSE` 股票主数据，不下载日更行情，也不运行指数治理。
 
 #### 配置示例
 ```json

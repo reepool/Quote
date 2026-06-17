@@ -97,6 +97,12 @@ def test_manual_only_job_can_omit_trigger():
             "description": "港股主数据同步/审计",
             "parameters": {"mode": "audit_only"},
         },
+        "a_share_stock_master_sync": {
+            "enabled": True,
+            "manual_only": True,
+            "description": "A股股票主数据同步",
+            "parameters": {"exchanges": ["SSE", "SZSE", "BSE"]},
+        },
         "index_master_governance_sync": {
             "enabled": True,
             "manual_only": True,
@@ -114,6 +120,9 @@ def test_manual_only_job_can_omit_trigger():
     assert "hkex_instrument_master_sync" in jobs
     assert jobs["hkex_instrument_master_sync"].manual_only is True
     assert jobs["hkex_instrument_master_sync"].trigger is None
+    assert "a_share_stock_master_sync" in jobs
+    assert jobs["a_share_stock_master_sync"].manual_only is True
+    assert jobs["a_share_stock_master_sync"].trigger is None
     assert "index_master_governance_sync" in jobs
     assert jobs["index_master_governance_sync"].manual_only is True
     assert jobs["index_master_governance_sync"].trigger is None
@@ -208,6 +217,55 @@ async def test_hkex_instrument_master_sync_manual_task_passes_lifecycle_write_mo
     assert requirement.options == {}
     assert requirement.timeout_sec == 60
     task._send_task_report.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_a_share_stock_master_sync_manual_task_runs_without_daily_quotes():
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock(return_value=False)
+
+    with patch("scheduler.tasks.data_manager") as dm:
+        dm.run_master_governance = AsyncMock(return_value={
+            "status": "success",
+            "summary": {
+                "added_instruments": 1,
+                "deactivated_instruments": 0,
+                "active_count": 5528,
+                "source_authority": {"official": 3},
+            },
+            "exchanges": {
+                "SSE": {
+                    "status": "success",
+                    "after": {"active_count": 2314},
+                    "added_count": 1,
+                    "deactivated_count": 0,
+                    "source_authority": "official",
+                    "source_usage": {"sse_official": 2314},
+                },
+            },
+            "warnings": [],
+            "errors": [],
+        })
+
+        success = await task.a_share_stock_master_sync(
+            exchanges=["SSE"],
+            timeout_sec=180,
+        )
+
+    assert success is True
+    requirement = dm.run_master_governance.await_args.args[0][0]
+    assert requirement.scope == "a_share_stock"
+    assert requirement.exchanges == ["SSE"]
+    assert requirement.instrument_types == ["stock"]
+    assert requirement.mode == "force_refresh"
+    assert requirement.job_name == "a_share_stock_master_sync"
+    assert requirement.job_type == "manual"
+    assert requirement.timeout_sec == 180
+    task._send_task_report.assert_awaited_once()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "A 股股票主数据同步" in report_data["content"]
+    assert "sse_official=2314" in report_data["content"]
 
 
 @pytest.mark.asyncio

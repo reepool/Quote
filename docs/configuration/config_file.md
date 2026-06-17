@@ -1391,6 +1391,22 @@
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
 - **`parameters.instrument_types`**: `List[str]` —— 普通 A 股日更任务显式传入的品种类型。当前生产配置为 `["stock", "index"]`，因此指数主数据治理会在读取当前指数 universe 前执行；如临时只测股票，可在任务参数中覆盖为 `["stock"]`。
+#### jobs.a_share_stock_master_sync
+
+```json
+{
+  "a_share_stock_master_sync": {
+    "enabled": true,
+    "manual_only": true,
+    "description": "A股股票主数据同步（仅手工触发，官方源优先，不下载日更行情）"
+  }
+}
+```
+
+- **`manual_only`**: `true`，该任务不会注册 cron，只能通过 `/run a_share_stock_master_sync` 手工触发。
+- **`parameters.exchanges`**: 默认 `["SSE", "SZSE", "BSE"]`。
+- **`parameters.timeout_sec`**: 单次治理超时秒数，默认 `180`。
+- **用途**: 单独验证或修复 A 股股票主数据。该任务按 `exchange_official -> BaoStock -> AkShare` 路由刷新股票主数据和 source authority 报告，不下载日更行情，也不运行指数主数据治理。
 #### jobs.index_master_governance_sync
 
 ```json
