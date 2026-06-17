@@ -155,6 +155,25 @@ def test_csindex_daily_response_parses_ohlcv():
     assert rows[-1]["source"] == "csindex"
 
 
+def test_csindex_daily_response_parses_close_only_rows_as_single_price_quotes():
+    payload = json.loads((FIXTURE_DIR / "csindex_daily_close_only_response.json").read_text())
+
+    rows = CSIndexSource.parse_daily_response(
+        payload,
+        instrument_id="000958.SH",
+        source_symbol="000958",
+    )
+
+    assert len(rows) == 2
+    assert rows[-1]["time"].date() == date(2026, 6, 16)
+    assert rows[-1]["open"] == 2220.86
+    assert rows[-1]["high"] == 2220.86
+    assert rows[-1]["low"] == 2220.86
+    assert rows[-1]["close"] == 2220.86
+    assert rows[-1]["is_complete"] is True
+    assert rows[-1]["quality_score"] == 0.97
+
+
 @pytest.mark.asyncio
 async def test_csindex_daily_data_uses_official_date_format_and_rate_limiter():
     payload = (FIXTURE_DIR / "csindex_daily_response.json").read_bytes()

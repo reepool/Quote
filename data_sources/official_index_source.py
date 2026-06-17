@@ -644,14 +644,21 @@ class CSIndexSource(BaseDataSource):
             if not isinstance(row, dict):
                 continue
             try:
+                close = float(row.get("close"))
+                open_value = row.get("open")
+                high_value = row.get("high")
+                low_value = row.get("low")
+                open_price = float(open_value) if open_value is not None else close
+                high_price = float(high_value) if high_value is not None else max(open_price, close)
+                low_price = float(low_value) if low_value is not None else min(open_price, close)
                 normalized.append(
                     {
                         "instrument_id": instrument_id,
                         "time": pd.to_datetime(row.get("tradeDate"), format="%Y%m%d").to_pydatetime(),
-                        "open": float(row.get("open")),
-                        "high": float(row.get("high")),
-                        "low": float(row.get("low")),
-                        "close": float(row.get("close")),
+                        "open": open_price,
+                        "high": high_price,
+                        "low": low_price,
+                        "close": close,
                         "volume": int(float(row.get("tradingVol") or 0)),
                         "amount": float(row.get("tradingValue") or 0) * 100000000,
                         "change": float(row.get("change") or 0),

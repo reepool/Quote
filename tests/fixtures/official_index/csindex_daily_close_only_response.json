@@ -1,0 +1,35 @@
+{
+  "code": "200",
+  "msg": "Success",
+  "data": [
+    {
+      "tradeDate": "20260615",
+      "indexCode": "000958",
+      "indexNameCn": "创业成长",
+      "indexNameEn": "Innovative & Growing",
+      "open": null,
+      "high": null,
+      "low": null,
+      "close": 2180.3,
+      "change": 120.86,
+      "changePct": 5.87,
+      "tradingVol": 2733451061,
+      "tradingValue": 2319.85
+    },
+    {
+      "tradeDate": "20260616",
+      "indexCode": "000958",
+      "indexNameCn": "创业成长",
+      "indexNameEn": "Innovative & Growing",
+      "open": null,
+      "high": null,
+      "low": null,
+      "close": 2220.86,
+      "change": 40.56,
+      "changePct": 1.86,
+      "tradingVol": 2603284216,
+      "tradingValue": 2244.16
+    }
+  ],
+  "success": true
+}

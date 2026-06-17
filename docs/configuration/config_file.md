@@ -1028,7 +1028,8 @@
           "skip_backup_on_empty_short_range": true
         },
         "index": {
-          "skip_backup_on_empty_short_range": false
+          "skip_backup_on_empty_short_range": false,
+          "require_end_date_coverage": true
         }
       }
     },
@@ -1061,6 +1062,8 @@
   第一个元素是主源，后续元素按顺序作为 fallback。缺失配置时，`DataSourceFactory` 会在启动或调用时抛出明确配置错误，不再按 region 做隐式推断。
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.skip_backup_on_empty_short_range`**: `bool`
   控制短区间查询中“主源空结果是否跳过 fallback”。当前默认行为是 `stock=true`、`index=false`。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.require_end_date_coverage`**: `bool`
+  控制非空行情是否必须覆盖请求区间内最后一个交易日。当前指数为 `true`，避免官方源返回前一日 stale 数据却阻断 fallback。
 - **`routing.instrument_list.<region>`**: `List[str]`
   指定品种列表抓取链，按 region 配置。
 - **`routing.calendar.<region>`**: `List[str]`

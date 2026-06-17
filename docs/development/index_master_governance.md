@@ -73,6 +73,7 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 
 - `CNIndex` 日线接口使用 `YYYY-MM-DD`，例如 `startDate=2026-06-10&endDate=2026-06-16`。
 - `CSIndex` 日线接口使用 `YYYYMMDD`，例如 `startDate=20260610&endDate=20260616`。
+- `CSIndex` 部分指数日线只发布 `close/change/changePct/volume/amount`，`open/high/low` 为 `null`。经与 BaoStock 对照，这类指数常见于单点发布行情，BaoStock 中也表现为 `open=high=low=close`。系统会用 `close` 标准化填充 OHLC，作为完整的单点指数行情写入；这不是合成价格区间，而是该指数当日只有一个官方点位。
 
 生产日线路由按指数族减少无效探测：
 
