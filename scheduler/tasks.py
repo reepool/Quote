@@ -2617,7 +2617,13 @@ class ScheduledTasks:
 
     async def futures_market_data_sync(
         self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
         series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         mode: str = "direct",
@@ -2630,6 +2636,13 @@ class ScheduledTasks:
         try:
             if requires_trading_day_governance:
                 governance_result = await data_manager.run_futures_trading_day_governance(
+                    scope_id=scope_id,
+                    scope_ids=scope_ids,
+                    exchanges=exchanges,
+                    categories=categories,
+                    instrument_ids=instrument_ids,
+                    series_ids=series_ids,
+                    series_types=series_types,
                     start_date=start_date,
                     end_date=end_date,
                     dry_run=dry_run,
@@ -2660,7 +2673,13 @@ class ScheduledTasks:
                     )
                     return False
             result = await data_manager.run_futures_market_data_sync(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
                 series_ids=series_ids,
+                series_types=series_types,
                 start_date=start_date,
                 end_date=end_date,
                 mode=mode,
@@ -2716,7 +2735,13 @@ class ScheduledTasks:
 
     async def futures_market_data_backfill(
         self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
         series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         mode: str = "direct",
@@ -2728,7 +2753,13 @@ class ScheduledTasks:
         if not start_date or not end_date:
             raise ValueError("futures_market_data_backfill requires start_date and end_date")
         return await self.futures_market_data_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
             series_ids=series_ids,
+            series_types=series_types,
             start_date=start_date,
             end_date=end_date,
             mode=mode,
@@ -2739,7 +2770,13 @@ class ScheduledTasks:
 
     async def futures_trading_day_governance(
         self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
         exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         dry_run: bool = False,
@@ -2749,7 +2786,13 @@ class ScheduledTasks:
         self._active_tasks.add('futures_trading_day_governance')
         try:
             result = await data_manager.run_futures_trading_day_governance(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
                 exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
                 start_date=start_date,
                 end_date=end_date,
                 dry_run=dry_run,
@@ -2802,7 +2845,13 @@ class ScheduledTasks:
 
     async def futures_official_calendar_backfill(
         self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
         exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         dry_run: bool = False,
@@ -2813,7 +2862,13 @@ class ScheduledTasks:
         self._active_tasks.add('futures_official_calendar_backfill')
         try:
             result = await data_manager.run_futures_official_calendar_backfill(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
                 exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
                 start_date=start_date,
                 end_date=end_date,
                 dry_run=dry_run,
@@ -2867,12 +2922,27 @@ class ScheduledTasks:
 
     async def futures_cycle_diagnostics_refresh(
         self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货周期诊断刷新任务。"""
         self._active_tasks.add('futures_cycle_diagnostics_refresh')
         try:
-            result = await data_manager.refresh_futures_cycle_diagnostics()
+            result = await data_manager.refresh_futures_cycle_diagnostics(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+            )
             success = result.get('status') == 'success'
             await self._send_task_report(
                 report_data={

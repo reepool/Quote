@@ -21,6 +21,7 @@ if str(ROOT_DIR) not in sys.path:
 from research.futures_market_data import (  # noqa: E402
     FuturesOfficialCalendarBackfillService,
     FuturesStorageManager,
+    FuturesUniverseSelector,
     default_futures_registry,
 )
 from scripts.research_cli_support import json_ready, parse_exchanges  # noqa: E402
@@ -57,6 +58,27 @@ def build_parser() -> argparse.ArgumentParser:
         default=",".join(DEFAULT_EXCHANGES),
         help="Comma-separated exchanges, e.g. SHFE,INE,DCE,CZCE,GFEX.",
     )
+    parser.add_argument("--scope-id", default=None, help="Configured futures download scope id.")
+    parser.add_argument(
+        "--categories",
+        default=None,
+        help="Comma-separated futures categories; supports all.",
+    )
+    parser.add_argument(
+        "--instrument-ids",
+        default=None,
+        help="Comma-separated futures instrument ids.",
+    )
+    parser.add_argument(
+        "--series-ids",
+        default=None,
+        help="Comma-separated futures series ids.",
+    )
+    parser.add_argument(
+        "--series-types",
+        default=None,
+        help="Comma-separated futures series types; defaults to configured main_continuous.",
+    )
     parser.add_argument(
         "--db-path",
         default=None,
@@ -84,6 +106,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _date_key(raw: str) -> str:
     return date.fromisoformat(str(raw)[:10]).isoformat()
+
+
+def _csv(raw: Optional[str]) -> Optional[List[str]]:
+    if not raw:
+        return None
+    values = [item.strip() for item in str(raw).split(",") if item.strip()]
+    return values or None
 
 
 def _add_years(value: date, years: int) -> date:
@@ -200,6 +229,15 @@ def _rollup_chunks(chunks: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     end_date = _date_key(args.end_date or get_shanghai_time().date().isoformat())
+    explicit_scope_requested = any(
+        [
+            args.scope_id,
+            args.categories,
+            args.instrument_ids,
+            args.series_ids,
+            args.series_types,
+        ]
+    )
     exchanges = parse_exchanges(args.exchanges) or DEFAULT_EXCHANGES
     dry_run = not args.write
     start_label = _date_key(args.start_date) if args.start_date else "configured_exchange_starts"
@@ -248,6 +286,29 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     storage.upsert_categories(registry.get("categories", []))
     storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
     storage.upsert_source_manifests(registry.get("source_manifests", []))
+    scope_selection = FuturesUniverseSelector(module_cfg, storage).resolve(
+        scope_id=args.scope_id,
+        exchanges=exchanges if args.exchanges or not explicit_scope_requested else None,
+        categories=_csv(args.categories),
+        instrument_ids=_csv(args.instrument_ids),
+        series_ids=_csv(args.series_ids),
+        series_types=_csv(args.series_types),
+    )
+    if scope_selection.blockers:
+        payload = {
+            "status": "blocked",
+            "domain": "futures_official_trading_calendar_backfill",
+            "dry_run": dry_run,
+            "start_date": start_label,
+            "end_date": end_date,
+            "scope_selection": scope_selection.as_dict(),
+            "blockers": scope_selection.blockers,
+            "warnings": scope_selection.warnings,
+        }
+        output_path.write_text(json.dumps(json_ready(payload), ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(json_ready({"summary_path": str(output_path), "status": "blocked"}), ensure_ascii=False), flush=True)
+        return 1
+    exchanges = scope_selection.exchanges
 
     service = FuturesOfficialCalendarBackfillService(storage, config, module_cfg)
     chunk_results: List[Dict[str, Any]] = []
@@ -274,7 +335,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 chunk_started = get_shanghai_time()
                 try:
                     result = service.run(
+                        scope_id=args.scope_id,
                         exchanges=[exchange],
+                        categories=_csv(args.categories),
+                        instrument_ids=_csv(args.instrument_ids),
+                        series_ids=_csv(args.series_ids),
+                        series_types=_csv(args.series_types),
                         start_date=chunk_start,
                         end_date=chunk_end,
                         dry_run=dry_run,
@@ -328,6 +394,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "start_date": start_label,
         "end_date": end_date,
         "exchanges": exchanges,
+        "scope_selection": scope_selection.as_dict(),
         "exchange_start_dates": exchange_start_dates,
         "chunk_years": args.chunk_years,
         "progress_path": str(progress_path),

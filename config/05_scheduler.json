@@ -569,6 +569,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "scope_ids": [
+            "domestic_all"
+          ],
           "dry_run": false,
           "max_runtime_seconds": 1800
         }
@@ -590,6 +593,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "scope_ids": [
+            "domestic_all"
+          ],
           "start_date": "2010-01-01",
           "dry_run": false,
           "max_runtime_seconds": 14400,
@@ -612,6 +618,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "scope_ids": [
+            "domestic_all"
+          ],
           "mode": "direct",
           "dry_run": false,
           "requires_trading_day_governance": true,
@@ -635,6 +644,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "scope_ids": [
+            "domestic_all"
+          ],
           "mode": "direct",
           "dry_run": false,
           "requires_trading_day_governance": true,
@@ -658,6 +670,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
+          "scope_ids": [
+            "domestic_all"
+          ],
           "max_runtime_seconds": 3600
         }
       },

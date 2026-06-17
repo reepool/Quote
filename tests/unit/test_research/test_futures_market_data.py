@@ -23,6 +23,7 @@ from research.futures_market_data import (
     FuturesSeries,
     FuturesStorageManager,
     FuturesTradingDayGovernanceService,
+    FuturesUniverseSelector,
     default_futures_registry,
     infer_contract_month,
     make_futures_contract_id,
@@ -63,6 +64,123 @@ def _research_config(tmp_path):
         },
         sources={"akshare": {"futures_market_data": {"daily_interface": "futures_zh_daily_sina"}}},
     )
+
+
+def _scope_module_cfg():
+    return {
+        "trading_day_governance": {
+            "enabled_exchanges": ["SHFE", "INE", "DCE", "CZCE", "GFEX"],
+        },
+        "universe": {
+            "default_series_types": ["main_continuous"],
+        },
+        "registry": {
+            "include_default_p0_universe": True,
+            "instruments": [],
+        },
+        "download_scopes": [
+            {
+                "scope_id": "domestic_all",
+                "exchanges": ["all"],
+                "categories": ["all"],
+                "series_types": ["main_continuous"],
+            },
+            {
+                "scope_id": "gfex_all",
+                "exchanges": ["GFEX"],
+                "categories": ["all"],
+                "series_types": ["main_continuous"],
+            },
+            {
+                "scope_id": "shfe_nonferrous_precious",
+                "exchanges": ["SHFE"],
+                "categories": ["nonferrous", "precious_metal"],
+                "series_types": ["main_continuous"],
+            },
+        ],
+    }
+
+
+def test_futures_universe_selector_resolves_all_and_named_scope():
+    selector = FuturesUniverseSelector(_scope_module_cfg())
+
+    domestic = selector.resolve(scope_id="domestic_all")
+    gfex = selector.resolve(scope_id="gfex_all")
+
+    assert domestic.status == "success"
+    assert set(domestic.exchanges) == {"SHFE", "INE", "DCE", "CZCE", "GFEX"}
+    assert "CNF.CU.SHFE.main" in domestic.series_ids
+    assert gfex.exchanges == ["GFEX"]
+    assert gfex.categories == ["new_energy_material"]
+    assert set(gfex.instrument_ids) == {"CNF.LC.GFEX", "CNF.PS.GFEX", "CNF.SI.GFEX"}
+
+
+def test_futures_universe_selector_resolves_exchange_category_instrument_and_series_filters():
+    selector = FuturesUniverseSelector(_scope_module_cfg())
+
+    exchange_only = selector.resolve(exchanges=["INE"])
+    category_only = selector.resolve(categories=["rubber"])
+    instrument_only = selector.resolve(instrument_ids=["CNF.CU.SHFE"])
+    series_only = selector.resolve(series_ids=["CNF.CU.SHFE.main"])
+    filtered_scope = selector.resolve(scope_id="shfe_nonferrous_precious", categories=["precious_metal"])
+
+    assert exchange_only.exchanges == ["INE"]
+    assert set(exchange_only.instrument_ids) == {"CNF.LU.INE", "CNF.NR.INE", "CNF.SC.INE"}
+    assert set(category_only.exchanges) == {"SHFE", "INE"}
+    assert instrument_only.instrument_ids == ["CNF.CU.SHFE"]
+    assert instrument_only.series_ids == ["CNF.CU.SHFE.main"]
+    assert series_only.instrument_ids == ["CNF.CU.SHFE"]
+    assert set(filtered_scope.categories) == {"precious_metal"}
+    assert set(filtered_scope.instrument_ids) == {"CNF.AG.SHFE", "CNF.AU.SHFE"}
+
+
+def test_futures_universe_selector_reports_invalid_and_empty_scopes():
+    selector = FuturesUniverseSelector(_scope_module_cfg())
+
+    invalid = selector.resolve(scope_id="missing_scope", exchanges=["BAD"], categories=["bad_category"])
+    empty = selector.resolve(exchanges=["GFEX"], categories=["coal"])
+
+    assert invalid.status == "blocked"
+    assert "invalid_futures_scope:missing_scope" in invalid.blockers
+    assert empty.status == "blocked"
+    assert empty.blockers == ["empty_futures_download_scope"]
+
+
+def test_futures_calendar_and_price_services_report_scope_blockers_before_requests(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    calendar = FuturesOfficialCalendarBackfillService(storage, config, config.modules["commodity_market_data"]).run(
+        scope_id="missing_scope",
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+        dry_run=True,
+    )
+    readiness = FuturesReadinessService(storage, config.modules["commodity_market_data"]).build(
+        scope_id="missing_scope",
+    )
+    diagnostics = FuturesDiagnosticsService(storage, config.modules["commodity_market_data"]).refresh_all(
+        scope_id="missing_scope",
+    )
+    price = asyncio.run(
+        FuturesMarketDataSyncService(storage, config).sync(
+            scope_id="missing_scope",
+            start_date="2024-06-03",
+            end_date="2024-06-03",
+            dry_run=True,
+        )
+    )
+
+    assert calendar["status"] == "blocked"
+    assert readiness["status"] == "blocked"
+    assert diagnostics["status"] == "blocked"
+    assert price["status"] == "blocked"
+    assert calendar["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
+    assert readiness["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
+    assert diagnostics["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
+    assert price["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
 
 
 def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):

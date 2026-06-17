@@ -132,6 +132,337 @@ class FuturesSeries:
 
 
 @dataclass(frozen=True)
+class FuturesDownloadScope:
+    scope_id: str
+    name: str = ""
+    exchanges: List[str] = field(default_factory=list)
+    categories: List[str] = field(default_factory=list)
+    instrument_ids: List[str] = field(default_factory=list)
+    series_ids: List[str] = field(default_factory=list)
+    series_types: List[str] = field(default_factory=list)
+    enabled: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, payload: Dict[str, Any]) -> "FuturesDownloadScope":
+        return cls(
+            scope_id=str(payload.get("scope_id") or "").strip(),
+            name=str(payload.get("name") or payload.get("description") or ""),
+            exchanges=_normalize_scope_values(payload.get("exchanges"), upper=True),
+            categories=_normalize_scope_values(payload.get("categories")),
+            instrument_ids=_normalize_scope_values(payload.get("instrument_ids"), upper=True),
+            series_ids=_normalize_scope_values(payload.get("series_ids"), upper=True),
+            series_types=_normalize_scope_values(payload.get("series_types")),
+            enabled=bool(payload.get("enabled", True)),
+            metadata=dict(payload.get("metadata") or {}),
+        )
+
+    def as_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class FuturesUniverseSelection:
+    requested: Dict[str, Any]
+    resolved_scope: Dict[str, Any]
+    exchanges: List[str]
+    categories: List[str]
+    instrument_ids: List[str]
+    series_ids: List[str]
+    series_types: List[str]
+    blockers: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+
+    @property
+    def status(self) -> str:
+        return "blocked" if self.blockers else "success"
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "status": self.status,
+            "requested": self.requested,
+            "resolved_scope": self.resolved_scope,
+            "exchanges": self.exchanges,
+            "categories": self.categories,
+            "instrument_ids": self.instrument_ids,
+            "series_ids": self.series_ids,
+            "series_types": self.series_types,
+            "blockers": self.blockers,
+            "warnings": self.warnings,
+        }
+
+
+class FuturesUniverseSelector:
+    """Resolve configured futures download scopes into concrete local targets."""
+
+    def __init__(
+        self,
+        module_cfg: Optional[Dict[str, Any]] = None,
+        storage: Optional["FuturesStorageManager"] = None,
+    ):
+        self.module_cfg = module_cfg or {}
+        self.storage = storage
+        self.registry = default_futures_registry(self.module_cfg)
+        self.instruments = self._load_instruments()
+        self.series = self._load_series()
+        self.scope_map = self._load_scope_map()
+
+    def resolve(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
+        exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
+    ) -> FuturesUniverseSelection:
+        normalized_scope_ids = _normalize_scope_values(scope_ids or scope_id)
+        requested = {
+            "scope_ids": normalized_scope_ids,
+            "exchanges": _normalize_scope_values(exchanges, upper=True),
+            "categories": _normalize_scope_values(categories),
+            "instrument_ids": _normalize_scope_values(instrument_ids, upper=True),
+            "series_ids": _normalize_scope_values(series_ids, upper=True),
+            "series_types": _normalize_scope_values(series_types),
+        }
+        blockers: List[str] = []
+        warnings: List[str] = []
+        selected_series_ids: List[str] = []
+        selected_scope_payloads: List[Dict[str, Any]] = []
+
+        scopes = self._resolve_requested_scopes(normalized_scope_ids, blockers)
+        if scopes:
+            seen: set[str] = set()
+            overlap: set[str] = set()
+            for scope in scopes:
+                selected_scope_payloads.append(scope.as_dict())
+                scope_selection = self._resolve_single_scope(scope, requested, apply_explicit_filters=True)
+                if scope_selection.blockers:
+                    blockers.extend(scope_selection.blockers)
+                for sid in scope_selection.series_ids:
+                    if sid in seen:
+                        overlap.add(sid)
+                    seen.add(sid)
+                    selected_series_ids.append(sid)
+            if overlap:
+                warnings.append(f"overlapping_futures_scopes:{','.join(sorted(overlap)[:20])}")
+        else:
+            base_scope = FuturesDownloadScope(
+                scope_id="explicit" if any(requested.values()) else "all_active",
+                exchanges=requested["exchanges"] or ["all"],
+                categories=requested["categories"] or ["all"],
+                instrument_ids=requested["instrument_ids"],
+                series_ids=requested["series_ids"],
+                series_types=requested["series_types"] or self._default_series_types(),
+            )
+            selected_scope_payloads.append(base_scope.as_dict())
+            scope_selection = self._resolve_single_scope(base_scope, requested, apply_explicit_filters=False)
+            blockers.extend(scope_selection.blockers)
+            selected_series_ids.extend(scope_selection.series_ids)
+
+        selected_series_keys = sorted({item.upper() for item in selected_series_ids})
+        series_by_id = {item.series_id.upper(): item for item in self.series}
+        selected_series = [series_by_id[sid] for sid in selected_series_keys if sid in series_by_id]
+        instrument_by_id = {item.instrument_id.upper(): item for item in self.instruments}
+        selected_instrument_ids = sorted({item.instrument_id.upper() for item in selected_series})
+        selected_instruments = [
+            instrument_by_id[item_id]
+            for item_id in selected_instrument_ids
+            if item_id in instrument_by_id
+        ]
+        resolved_exchanges = sorted({item.exchange.upper() for item in selected_instruments if item.exchange})
+        resolved_categories = sorted({item.category for item in selected_instruments if item.category})
+        resolved_series_types = sorted({item.series_type for item in selected_series if item.series_type})
+        resolved_series_ids = sorted({item.series_id for item in selected_series})
+        if not blockers and not resolved_series_ids:
+            blockers.append("empty_futures_download_scope")
+        return FuturesUniverseSelection(
+            requested=requested,
+            resolved_scope={
+                "scope_ids": normalized_scope_ids,
+                "scopes": selected_scope_payloads,
+            },
+            exchanges=resolved_exchanges,
+            categories=resolved_categories,
+            instrument_ids=selected_instrument_ids,
+            series_ids=resolved_series_ids,
+            series_types=resolved_series_types,
+            blockers=sorted(set(blockers)),
+            warnings=sorted(set(warnings)),
+        )
+
+    def _resolve_requested_scopes(
+        self,
+        scope_ids: Sequence[str],
+        blockers: List[str],
+    ) -> List[FuturesDownloadScope]:
+        scopes: List[FuturesDownloadScope] = []
+        for scope_id in scope_ids:
+            scope = self.scope_map.get(scope_id)
+            if scope is None:
+                blockers.append(f"invalid_futures_scope:{scope_id}")
+                continue
+            if not scope.enabled:
+                blockers.append(f"disabled_futures_scope:{scope_id}")
+                continue
+            scopes.append(scope)
+        return scopes
+
+    def _resolve_single_scope(
+        self,
+        scope: FuturesDownloadScope,
+        requested: Dict[str, List[str]],
+        *,
+        apply_explicit_filters: bool,
+    ) -> FuturesUniverseSelection:
+        blockers: List[str] = []
+        exchange_filter = self._intersect_or_override(
+            scope.exchanges or ["all"],
+            requested["exchanges"],
+            upper=True,
+            apply_explicit_filters=apply_explicit_filters,
+        )
+        category_filter = self._intersect_or_override(
+            scope.categories or ["all"],
+            requested["categories"],
+            apply_explicit_filters=apply_explicit_filters,
+        )
+        instrument_filter = self._intersect_or_override(
+            scope.instrument_ids,
+            requested["instrument_ids"],
+            upper=True,
+            apply_explicit_filters=apply_explicit_filters,
+        )
+        series_filter = self._intersect_or_override(
+            scope.series_ids,
+            requested["series_ids"],
+            upper=True,
+            apply_explicit_filters=apply_explicit_filters,
+        )
+        series_type_filter = self._intersect_or_override(
+            scope.series_types or self._default_series_types(),
+            requested["series_types"],
+            apply_explicit_filters=apply_explicit_filters,
+        )
+        exchanges = self._expand_exchanges(exchange_filter, blockers)
+        categories = self._expand_categories(category_filter, exchanges, blockers)
+
+        instrument_by_id = {item.instrument_id.upper(): item for item in self.instruments}
+        valid_instrument_ids = set(instrument_by_id)
+        invalid_instruments = sorted(set(instrument_filter) - valid_instrument_ids)
+        blockers.extend(f"invalid_futures_instrument:{item}" for item in invalid_instruments)
+
+        selected_instruments = [
+            item for item in self.instruments
+            if item.active
+            and item.exchange.upper() in exchanges
+            and item.category in categories
+            and (not instrument_filter or item.instrument_id.upper() in set(instrument_filter))
+        ]
+        selected_instrument_ids = {item.instrument_id.upper() for item in selected_instruments}
+
+        series_by_id = {item.series_id.upper(): item for item in self.series}
+        valid_series_ids = set(series_by_id)
+        invalid_series = sorted(set(series_filter) - valid_series_ids)
+        blockers.extend(f"invalid_futures_series:{item}" for item in invalid_series)
+
+        selected_series = [
+            item for item in self.series
+            if item.active
+            and item.instrument_id.upper() in selected_instrument_ids
+            and (not series_type_filter or item.series_type in set(series_type_filter))
+            and (not series_filter or item.series_id.upper() in set(series_filter))
+        ]
+        return FuturesUniverseSelection(
+            requested=scope.as_dict(),
+            resolved_scope=scope.as_dict(),
+            exchanges=sorted(exchanges),
+            categories=sorted(categories),
+            instrument_ids=sorted(selected_instrument_ids),
+            series_ids=sorted({item.series_id for item in selected_series}),
+            series_types=sorted({item.series_type for item in selected_series}),
+            blockers=blockers,
+            warnings=[],
+        )
+
+    def _expand_exchanges(self, values: Sequence[str], blockers: List[str]) -> set[str]:
+        configured = set(_configured_futures_exchanges(self.module_cfg))
+        if not values or "all" in {item.lower() for item in values}:
+            return configured
+        requested = {item.upper() for item in values}
+        invalid = sorted(requested - configured)
+        blockers.extend(f"invalid_futures_exchange:{item}" for item in invalid)
+        return requested & configured
+
+    def _expand_categories(
+        self,
+        values: Sequence[str],
+        exchanges: set[str],
+        blockers: List[str],
+    ) -> set[str]:
+        categories_for_exchange = {
+            item.category
+            for item in self.instruments
+            if item.active and item.exchange.upper() in exchanges
+        }
+        all_categories = {item.category for item in self.registry.get("categories", [])}
+        if not values or "all" in {item.lower() for item in values}:
+            return categories_for_exchange
+        requested = set(values)
+        invalid = sorted(requested - all_categories)
+        blockers.extend(f"invalid_futures_category:{item}" for item in invalid)
+        return requested & categories_for_exchange
+
+    def _intersect_or_override(
+        self,
+        base_values: Sequence[str],
+        explicit_values: Sequence[str],
+        *,
+        upper: bool = False,
+        apply_explicit_filters: bool,
+    ) -> List[str]:
+        base = _normalize_scope_values(base_values, upper=upper)
+        explicit = _normalize_scope_values(explicit_values, upper=upper)
+        if not apply_explicit_filters or not explicit:
+            return base
+        if not base or "all" in {item.lower() for item in base}:
+            return explicit
+        if "all" in {item.lower() for item in explicit}:
+            return base
+        return sorted(set(base) & set(explicit))
+
+    def _default_series_types(self) -> List[str]:
+        universe_cfg = self.module_cfg.get("universe") if isinstance(self.module_cfg.get("universe"), dict) else {}
+        values = _normalize_scope_values(universe_cfg.get("default_series_types"))
+        return values or ["main_continuous"]
+
+    def _load_scope_map(self) -> Dict[str, FuturesDownloadScope]:
+        raw_scopes = self.module_cfg.get("download_scopes") or []
+        if isinstance(raw_scopes, dict):
+            raw_scopes = [
+                {"scope_id": key, **value}
+                for key, value in raw_scopes.items()
+                if isinstance(value, dict)
+            ]
+        scopes: Dict[str, FuturesDownloadScope] = {}
+        for payload in raw_scopes:
+            if not isinstance(payload, dict):
+                continue
+            scope = FuturesDownloadScope.from_dict(payload)
+            if scope.scope_id:
+                scopes[scope.scope_id] = scope
+        return scopes
+
+    def _load_instruments(self) -> List[FuturesInstrument]:
+        return list(self.registry.get("instruments") or [])
+
+    def _load_series(self) -> List[FuturesSeries]:
+        return list(self.registry.get("series") or [])
+
+
+@dataclass(frozen=True)
 class FuturesBar:
     series_id: str
     trade_date: str
@@ -469,6 +800,30 @@ def _date_key(value: Any) -> str:
     if len(text) == 8 and text.isdigit():
         return f"{text[:4]}-{text[4:6]}-{text[6:]}"
     return date.fromisoformat(text[:10]).isoformat()
+
+
+def _normalize_scope_values(value: Any, *, upper: bool = False) -> List[str]:
+    if value is None:
+        return []
+    raw_values: List[Any]
+    if isinstance(value, str):
+        raw_values = [part.strip() for part in value.split(",")]
+    elif isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
+        raw_values = []
+        for item in value:
+            if isinstance(item, str) and "," in item:
+                raw_values.extend(part.strip() for part in item.split(","))
+            else:
+                raw_values.append(item)
+    else:
+        raw_values = [value]
+    normalized: List[str] = []
+    for item in raw_values:
+        text = str(item or "").strip()
+        if not text:
+            continue
+        normalized.append(text.upper() if upper and text.lower() != "all" else text)
+    return sorted(dict.fromkeys(normalized))
 
 
 def make_futures_instrument_id(symbol: str, exchange: str, *, namespace: str = "CNF") -> str:
@@ -2867,6 +3222,7 @@ class FuturesDiagnosticsService:
 
     def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
         self.storage = storage
+        self.module_cfg = module_cfg or {}
         diagnostics_cfg = (module_cfg or {}).get("diagnostics", {})
         self.lookback_years = list(diagnostics_cfg.get("lookback_years") or [3, 5, 10])
         self.min_observation_ratio = float(diagnostics_cfg.get("min_observation_ratio", 0.7))
@@ -2889,11 +3245,46 @@ class FuturesDiagnosticsService:
             "diagnostics_written": written,
         }
 
-    def refresh_all(self) -> Dict[str, Any]:
+    def refresh_all(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
+        exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
+    ) -> Dict[str, Any]:
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            return {
+                "status": "blocked",
+                "scope_selection": scope_selection.as_dict(),
+                "series_count": 0,
+                "diagnostics_written": 0,
+                "blockers": scope_selection.blockers,
+                "warnings": scope_selection.warnings,
+                "series": [],
+            }
+        selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         series = self.storage.list_series(active_only=True)
+        series = [
+            item for item in series
+            if str(item.get("series_id") or "").upper() in selected_series_ids
+        ]
         results = [self.refresh_series(item["series_id"]) for item in series]
         return {
             "status": "success",
+            "scope_selection": scope_selection.as_dict(),
             "series_count": len(series),
             "diagnostics_written": sum(int(item.get("diagnostics_written", 0)) for item in results),
             "series": results,
@@ -3600,7 +3991,13 @@ class FuturesOfficialCalendarBackfillService:
     def run(
         self,
         *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
         exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         dry_run: bool = False,
@@ -3608,7 +4005,38 @@ class FuturesOfficialCalendarBackfillService:
     ) -> Dict[str, Any]:
         from research.providers.official_futures import OfficialFuturesMarketDataProvider
 
-        exchange_list = self._resolve_exchanges(exchanges)
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            return {
+                "status": "blocked",
+                "domain": "futures_official_trading_calendar_backfill",
+                "source_profile": self.source_profile,
+                "quality_flag": "backfilled_verified",
+                "start_date": start_date,
+                "end_date": end_date,
+                "dry_run": dry_run,
+                "scope_selection": scope_selection.as_dict(),
+                "exchanges": [],
+                "totals": {
+                    "rows_written": 0,
+                    "trading_days": 0,
+                    "closed_days": 0,
+                    "unresolved_dates": 0,
+                    "request_count": 0,
+                    "future_dates_unresolved": 0,
+                },
+                "warnings": scope_selection.warnings,
+                "blockers": scope_selection.blockers,
+            }
+        exchange_list = self._resolve_exchanges(scope_selection.exchanges)
         start = _date_key(start_date or self.start_date)
         requested_end = _date_key(end_date or get_shanghai_time().date())
         if start > requested_end:
@@ -3746,6 +4174,7 @@ class FuturesOfficialCalendarBackfillService:
             "end_date": requested_end,
             "probe_end_date": probe_end if start <= probe_end else None,
             "dry_run": dry_run,
+            "scope_selection": scope_selection.as_dict(),
             "exchanges": exchange_results,
             "totals": {
                 "rows_written": total_written,
@@ -3789,13 +4218,51 @@ def _date_range_count(start_date: str, end_date: str) -> int:
 class FuturesReadinessService:
     def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
         self.storage = storage
+        self.module_cfg = module_cfg or {}
         coverage_cfg = (module_cfg or {}).get("coverage", {})
         self.max_stale_days = int(coverage_cfg.get("max_stale_trading_days", 3))
         self.target_years = int(coverage_cfg.get("target_history_years", 10))
         self.trading_days_per_year = int((module_cfg or {}).get("diagnostics", {}).get("trading_days_per_year", 252))
 
-    def build(self) -> Dict[str, Any]:
+    def build(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
+        exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
+    ) -> Dict[str, Any]:
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            return {
+                "domain": "futures_market_data",
+                "status": "blocked",
+                "enabled_series_count": 0,
+                "p0_series_count": 0,
+                "p0_ready_count": 0,
+                "scope_selection": scope_selection.as_dict(),
+                "blockers": scope_selection.blockers,
+                "warnings": scope_selection.warnings,
+                "source_profile_counts": {},
+                "series": [],
+            }
+        selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         series = self.storage.list_series(active_only=True)
+        series = [
+            item for item in series
+            if str(item.get("series_id") or "").upper() in selected_series_ids
+        ]
         blockers: List[str] = []
         warnings: List[str] = []
         series_payloads = []
@@ -3860,6 +4327,7 @@ class FuturesReadinessService:
             "enabled_series_count": len(series),
             "p0_series_count": p0_count,
             "p0_ready_count": p0_ready,
+            "scope_selection": scope_selection.as_dict(),
             "blockers": blockers,
             "warnings": sorted(set(warnings)),
             "source_profile_counts": {
@@ -3883,7 +4351,13 @@ class FuturesMarketDataSyncService:
     async def sync(
         self,
         *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
         series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         mode: str = "direct",
@@ -3896,10 +4370,41 @@ class FuturesMarketDataSyncService:
             registry["series"],
         )
         self.storage.upsert_source_manifests(registry.get("source_manifests", []))
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            result = {
+                "status": "blocked",
+                "run_id": None,
+                "totals": {
+                    "inserted": 0,
+                    "changed": 0,
+                    "unchanged": 0,
+                    "failed": 0,
+                    "calendar_skipped": 0,
+                    "provider_empty_on_trading_day": 0,
+                    "fetched_rows": 0,
+                    "would_write_price_bars": 0,
+                },
+                "source_selection": {},
+                "scope_selection": scope_selection.as_dict(),
+                "trading_day_governance": {},
+                "series": [],
+                "reason": "; ".join(scope_selection.blockers),
+            }
+            return result
         governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
+        selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         target_series = [
             item for item in registry["series"]
-            if item.active and (not series_ids or item.series_id in set(series_ids))
+            if item.active and item.series_id.upper() in selected_series_ids
         ]
         target_exchanges = sorted(
             {
@@ -3931,7 +4436,14 @@ class FuturesMarketDataSyncService:
             source="futures_source_router",
             mode=mode,
             metadata={
+                "scope_selection": scope_selection.as_dict(),
                 "series_ids": series_ids or [],
+                "scope_id": scope_id,
+                "scope_ids": scope_ids or [],
+                "exchanges": exchanges or [],
+                "categories": categories or [],
+                "instrument_ids": instrument_ids or [],
+                "series_types": series_types or [],
                 "start_date": start_date,
                 "end_date": end_date,
                 "preferred_order": self.module_cfg.get("sources", {}).get("preferred_order")
@@ -3959,6 +4471,7 @@ class FuturesMarketDataSyncService:
                     "provider_empty_on_trading_day": 0,
                 },
                 "source_selection": {},
+                "scope_selection": scope_selection.as_dict(),
                 "trading_day_governance": calendar_gate,
                 "series": [],
                 "reason": "; ".join(calendar_gate.get("blockers") or ["trading_day_governance_blocked"]),
@@ -4239,6 +4752,7 @@ class FuturesMarketDataSyncService:
                 "totals": totals,
                 "source_selection": source_selection,
                 "official_fanout": fanout_diagnostics,
+                "scope_selection": scope_selection.as_dict(),
                 "trading_day_governance": calendar_gate,
                 "series": series_results,
             }

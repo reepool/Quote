@@ -35,7 +35,13 @@ def test_futures_trading_day_governance_task_reports_warning_and_clears_active_f
 
     assert result is True
     data_manager.run_futures_trading_day_governance.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
         exchanges=None,
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
         start_date=None,
         end_date=None,
         dry_run=True,
@@ -75,7 +81,13 @@ def test_futures_official_calendar_backfill_task_reports_and_clears_active_flag(
 
     assert result is True
     data_manager.run_futures_official_calendar_backfill.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
         exchanges=["SHFE"],
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
         start_date="2024-06-01",
         end_date="2024-06-03",
         dry_run=False,

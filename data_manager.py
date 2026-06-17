@@ -4517,7 +4517,13 @@ class DataManager:
     async def run_futures_market_data_sync(
         self,
         *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
         series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         mode: str = "direct",
@@ -4529,7 +4535,13 @@ class DataManager:
 
         service = FuturesMarketDataSyncService(storage, self.research_config)
         return await service.sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
             series_ids=series_ids,
+            series_types=series_types,
             start_date=start_date,
             end_date=end_date,
             mode=mode,
@@ -4539,7 +4551,13 @@ class DataManager:
     async def run_futures_trading_day_governance(
         self,
         *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
         exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         dry_run: bool = False,
@@ -4548,16 +4566,40 @@ class DataManager:
         storage = self._require_futures_storage()
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
         from research.futures_market_data import FuturesTradingDayGovernanceService
+        from research.futures_market_data import FuturesUniverseSelector
 
         def _run() -> Dict[str, Any]:
+            scope_selection = FuturesUniverseSelector(module_cfg, storage).resolve(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+            )
+            if scope_selection.blockers:
+                return {
+                    "status": "blocked",
+                    "domain": "futures_trading_day_governance",
+                    "scope_selection": scope_selection.as_dict(),
+                    "seed_result": {},
+                    "target_date_expansion": {
+                        "status": "blocked",
+                        "blockers": scope_selection.blockers,
+                        "warnings": scope_selection.warnings,
+                    },
+                    "readiness": {},
+                    "dry_run": dry_run,
+                }
             service = FuturesTradingDayGovernanceService(storage, module_cfg)
             seed_result = service.bootstrap_estimated_calendar(
-                exchanges=exchanges,
+                exchanges=scope_selection.exchanges,
                 start_date=start_date,
                 end_date=end_date,
             )
             expansion = service.expand_target_dates(
-                exchanges=exchanges,
+                exchanges=scope_selection.exchanges,
                 start_date=start_date,
                 end_date=end_date,
                 purpose="trading_day_governance",
@@ -4569,13 +4611,14 @@ class DataManager:
                 purpose="sync",
             )
             readiness = service.readiness(
-                exchanges=exchanges,
+                exchanges=scope_selection.exchanges,
                 start_date=start_date,
                 end_date=end_date,
             )
             return {
                 "status": "blocked" if gate.get("status") == "blocked" else readiness.get("status", "success"),
                 "domain": "futures_trading_day_governance",
+                "scope_selection": scope_selection.as_dict(),
                 "seed_result": seed_result,
                 "target_date_expansion": gate,
                 "readiness": readiness,
@@ -4587,7 +4630,13 @@ class DataManager:
     async def run_futures_official_calendar_backfill(
         self,
         *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
         exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         dry_run: bool = False,
@@ -4604,7 +4653,13 @@ class DataManager:
                 self.research_config,
                 module_cfg,
             ).run(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
                 exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
                 start_date=start_date,
                 end_date=end_date,
                 dry_run=dry_run,
@@ -4613,14 +4668,31 @@ class DataManager:
 
         return await asyncio.to_thread(_run)
 
-    async def refresh_futures_cycle_diagnostics(self) -> Dict[str, Any]:
+    async def refresh_futures_cycle_diagnostics(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         """Refresh persisted futures cycle diagnostics from local bars."""
         storage = self._require_futures_storage()
         from research.futures_market_data import FuturesDiagnosticsService
 
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
         return await asyncio.to_thread(
-            FuturesDiagnosticsService(storage, module_cfg).refresh_all
+            FuturesDiagnosticsService(storage, module_cfg).refresh_all,
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
         )
 
     async def recompute_futures_spreads(self) -> Dict[str, Any]:
@@ -4630,7 +4702,17 @@ class DataManager:
 
         return await asyncio.to_thread(FuturesSpreadService(storage).recompute_all)
 
-    async def get_research_futures_readiness(self) -> Dict[str, Any]:
+    async def get_research_futures_readiness(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
+    ) -> Dict[str, Any]:
         """Return futures market-data readiness."""
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
         if not self.research_config.enabled:
@@ -4653,7 +4735,14 @@ class DataManager:
         from research.futures_market_data import FuturesReadinessService
 
         return await asyncio.to_thread(
-            FuturesReadinessService(storage, module_cfg).build
+            FuturesReadinessService(storage, module_cfg).build,
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
         )
 
     async def get_research_futures_instruments(

@@ -291,6 +291,7 @@ class UnifiedConfigManager:
     def __init__(self, config_dir: str = "config"):
         self._config_dir = Path(config_dir)
         self._config_data: Dict[str, Any] = {}
+        self._config_warnings: List[str] = []
         self._config_path = self._config_dir / "config.json"
 
         # 类型化配置缓存
@@ -334,6 +335,8 @@ class UnifiedConfigManager:
                         ErrorCodes.CONFIG_INVALID_FORMAT
                     ) from e
 
+            self._config_warnings = []
+            self._apply_independent_futures_config(merged_config)
             self._config_data = merged_config
             config_logger.info(f"Configuration loaded and merged from {len(config_files)} files.")
             # 清除类型化缓存
@@ -370,6 +373,10 @@ class UnifiedConfigManager:
                 return default
 
         return current
+
+    def get_warnings(self) -> List[str]:
+        """Return non-fatal configuration migration and validation warnings."""
+        return list(self._config_warnings)
 
     def set(self, key: str, value: Any) -> None:
         """设置配置值"""
@@ -706,6 +713,67 @@ class UnifiedConfigManager:
                 financial_cfg,
             )
         return modules
+
+    def _apply_independent_futures_config(self, config_data: Dict[str, Any]) -> None:
+        """Mirror standalone futures_config into the legacy research module path.
+
+        Existing callers read research_config.modules["commodity_market_data"].
+        Keep that API stable while allowing the futures domain to live in its own
+        config file. The standalone futures_config wins when duplicated.
+        """
+        futures_cfg = config_data.get("futures_config")
+        if not isinstance(futures_cfg, dict):
+            return
+        research_data = config_data.setdefault("research_config", {})
+        if not isinstance(research_data, dict):
+            self._config_warnings.append("research_config is not a dict; futures_config was not merged")
+            config_logger.warning("research_config is not a dict; futures_config was not merged")
+            return
+        modules = research_data.setdefault("modules", {})
+        if not isinstance(modules, dict):
+            self._config_warnings.append("research_config.modules is not a dict; futures_config was not merged")
+            config_logger.warning("research_config.modules is not a dict; futures_config was not merged")
+            return
+        legacy_cfg = modules.get("commodity_market_data")
+        if isinstance(legacy_cfg, dict) and legacy_cfg:
+            duplicate_paths = self._find_duplicate_config_paths(legacy_cfg, futures_cfg)
+            warning = (
+                "futures_config duplicates research_config.modules.commodity_market_data; "
+                "futures_config values take precedence"
+            )
+            if duplicate_paths:
+                warning = f"{warning}: {', '.join(duplicate_paths[:12])}"
+                if len(duplicate_paths) > 12:
+                    warning = f"{warning}, ..."
+            self._config_warnings.append(warning)
+            config_logger.warning(warning)
+            modules["commodity_market_data"] = self._deep_merge_dict(legacy_cfg, futures_cfg)
+            return
+        modules["commodity_market_data"] = deepcopy(futures_cfg)
+
+    @classmethod
+    def _find_duplicate_config_paths(
+        cls,
+        left: Dict[str, Any],
+        right: Dict[str, Any],
+        *,
+        prefix: str = "",
+    ) -> List[str]:
+        duplicates: List[str] = []
+        for key, value in right.items():
+            if key not in left:
+                continue
+            path = f"{prefix}.{key}" if prefix else str(key)
+            duplicates.append(path)
+            if isinstance(value, dict) and isinstance(left.get(key), dict):
+                duplicates.extend(
+                    cls._find_duplicate_config_paths(
+                        left[key],
+                        value,
+                        prefix=path,
+                    )
+                )
+        return duplicates
 
     @classmethod
     def _deep_merge_dict(

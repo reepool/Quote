@@ -1410,10 +1410,31 @@ async def get_research_dcf_input_gaps(
     response_model=Dict[str, Any],
     tags=["Research"],
 )
-async def get_research_futures_readiness():
+async def get_research_futures_readiness(
+    scope_id: Optional[str] = Query(None, description="期货下载范围 ID"),
+    exchange: Optional[str] = Query(None, description="交易所"),
+    categories: Optional[str] = Query(None, description="逗号分隔商品分类，支持 all"),
+    instrument_ids: Optional[str] = Query(None, description="逗号分隔 instrument_id"),
+    series_ids: Optional[str] = Query(None, description="逗号分隔 series_id"),
+    series_types: Optional[str] = Query(None, description="逗号分隔序列类型"),
+):
     """读取商品期货行情数据域 readiness。"""
     try:
-        return await data_manager.get_research_futures_readiness()
+        def _csv(value: Optional[str]) -> Optional[List[str]]:
+            if not value:
+                return None
+            items = [item.strip() for item in str(value).split(",") if item.strip()]
+            return items or None
+
+        exchange_value = _query_default(exchange)
+        return await data_manager.get_research_futures_readiness(
+            scope_id=_query_default(scope_id),
+            exchanges=[exchange_value] if exchange_value else None,
+            categories=_csv(_query_default(categories)),
+            instrument_ids=_csv(_query_default(instrument_ids)),
+            series_ids=_csv(_query_default(series_ids)),
+            series_types=_csv(_query_default(series_types)),
+        )
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
@@ -1689,7 +1710,12 @@ async def get_research_futures_trading_day_governance(
     tags=["Research"],
 )
 async def run_research_futures_official_calendar_backfill(
+    scope_id: Optional[str] = Query(None, description="期货下载范围 ID"),
     exchange: Optional[str] = Query(None, description="交易所"),
+    categories: Optional[str] = Query(None, description="逗号分隔商品分类，支持 all"),
+    instrument_ids: Optional[str] = Query(None, description="逗号分隔 instrument_id"),
+    series_ids: Optional[str] = Query(None, description="逗号分隔 series_id"),
+    series_types: Optional[str] = Query(None, description="逗号分隔序列类型"),
     start_date: Optional[date] = Query(None, description="开始日期"),
     end_date: Optional[date] = Query(None, description="结束日期"),
     dry_run: bool = Query(False, description="是否只演练不落库"),
@@ -1701,8 +1727,19 @@ async def run_research_futures_official_calendar_backfill(
         start_value = _query_default(start_date)
         end_value = _query_default(end_date)
         max_days_value = _query_default(max_days)
+        def _csv(value: Optional[str]) -> Optional[List[str]]:
+            if not value:
+                return None
+            items = [item.strip() for item in str(value).split(",") if item.strip()]
+            return items or None
+
         return await data_manager.run_futures_official_calendar_backfill(
+            scope_id=_query_default(scope_id),
             exchanges=[exchange_value] if exchange_value else None,
+            categories=_csv(_query_default(categories)),
+            instrument_ids=_csv(_query_default(instrument_ids)),
+            series_ids=_csv(_query_default(series_ids)),
+            series_types=_csv(_query_default(series_types)),
             start_date=start_value.isoformat() if start_value else None,
             end_date=end_value.isoformat() if end_value else None,
             dry_run=dry_run,

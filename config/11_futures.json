@@ -1,0 +1,266 @@
+{
+  "futures_config": {
+    "enabled": true,
+    "storage": {
+      "database": "data/futures.db"
+    },
+    "universe": {
+      "default_scope_id": "domestic_all",
+      "default_series_types": [
+        "main_continuous"
+      ]
+    },
+    "download_scopes": [
+      {
+        "scope_id": "domestic_all",
+        "name": "Domestic futures all configured exchanges",
+        "enabled": true,
+        "exchanges": [
+          "all"
+        ],
+        "categories": [
+          "all"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "gfex_all",
+        "name": "GFEX all categories",
+        "enabled": true,
+        "exchanges": [
+          "GFEX"
+        ],
+        "categories": [
+          "all"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "ine_all",
+        "name": "INE all categories",
+        "enabled": true,
+        "exchanges": [
+          "INE"
+        ],
+        "categories": [
+          "all"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "shfe_nonferrous_precious",
+        "name": "SHFE nonferrous and precious metals",
+        "enabled": true,
+        "exchanges": [
+          "SHFE"
+        ],
+        "categories": [
+          "nonferrous",
+          "precious_metal"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "shfe_energy_rubber_pulp",
+        "name": "SHFE energy, rubber, and pulp",
+        "enabled": true,
+        "exchanges": [
+          "SHFE"
+        ],
+        "categories": [
+          "energy",
+          "rubber",
+          "pulp_paper"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "dce_ferrous_chemical_energy",
+        "name": "DCE ferrous, chemical, and energy",
+        "enabled": true,
+        "exchanges": [
+          "DCE"
+        ],
+        "categories": [
+          "ferrous",
+          "chemical",
+          "energy",
+          "coal"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
+        "scope_id": "czce_chemical_building_coal",
+        "name": "CZCE chemical, building material, and coal",
+        "enabled": true,
+        "exchanges": [
+          "CZCE"
+        ],
+        "categories": [
+          "chemical",
+          "building_material",
+          "coal",
+          "ferrous"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      }
+    ],
+    "sources": {
+      "preferred_order": [
+        "exchange_official",
+        "akshare_futures"
+      ],
+      "exchange_official": {
+        "enabled": true,
+        "source": "exchange_official",
+        "role": "first_hand_free_source",
+        "daily_interface": "official_daily_contract_bars",
+        "enabled_exchanges": [
+          "SHFE",
+          "INE",
+          "DCE",
+          "CZCE",
+          "GFEX"
+        ],
+        "timeout_seconds": 20,
+        "retry_attempts": 2,
+        "retry_backoff_seconds": 0.5,
+        "request_interval_seconds": 0.05,
+        "parser_version": "official_futures_daily.v1",
+        "fallback_to": "akshare_futures",
+        "interfaces": {
+          "SHFE": "https://www.shfe.com.cn/data/tradedata/future/dailydata/kxYYYYMMDD.dat",
+          "INE": "https://www.ine.cn/data/tradedata/future/dailydata/kxYYYYMMDD.dat",
+          "DCE": "http://www.dce.com.cn/dcereport/publicweb/dailystat/dayQuotes",
+          "CZCE": "http://www.czce.com.cn/cn/DFSStaticFiles/Future/YYYY/YYYYMMDD/FutureDataDaily.txt",
+          "GFEX": "http://www.gfex.com.cn/u/interfacesWebTiDayQuotes/loadList"
+        },
+        "dce_browser": {
+          "enabled": true,
+          "bootstrap_page": "http://www.dce.com.cn/dce/channel/list/168.html",
+          "requires_real_chrome": true,
+          "browser_executable_path": "",
+          "env_browser_executable_path": "QUOTE_DCE_CHROME_PATH",
+          "headless": false,
+          "virtual_display": "auto",
+          "settle_seconds": 9,
+          "retry_attempts": 3,
+          "retry_backoff_seconds": 2,
+          "note": "DCE official JSON endpoints require a real headed Chrome session so the site JavaScript can attach the dynamic Riversafe token to in-page fetch calls. In headless/server environments use Xvfb or set QUOTE_DCE_CHROME_PATH to a real Chrome binary."
+        },
+        "note": "Preferred first-hand route for domestic futures daily contract bars. Main-continuous series are constructed locally by open-interest priority; AkShare remains fallback for unsupported, empty, or failed official requests."
+      },
+      "akshare_futures": {
+        "enabled": true,
+        "source": "akshare",
+        "mode_priority": [
+          "direct",
+          "proxy_patch"
+        ],
+        "daily_interface": "futures_zh_daily_sina",
+        "timeout_seconds": 30,
+        "role": "free_aggregator_fallback"
+      }
+    },
+    "coverage": {
+      "target_history_years": 10,
+      "p0_required": true,
+      "min_observation_ratio": 0.7,
+      "max_stale_trading_days": 3
+    },
+    "master_data": {
+      "maintain_contracts": true,
+      "maintain_exchange_calendar": true,
+      "default_research_series_type": "main_continuous",
+      "category_dictionary": "managed_enum",
+      "default_timezone": "Asia/Shanghai",
+      "future_extension_markets": [
+        "CME",
+        "ICE",
+        "LME",
+        "SGX",
+        "EIA",
+        "FRED"
+      ],
+      "calendar": {
+        "source_priority": [
+          "exchange_official",
+          "estimated_weekday_calendar",
+          "manual"
+        ],
+        "source_profile": "estimated_weekday_calendar",
+        "quality_flag": "estimated",
+        "seed_on_initialize": false,
+        "seed_lookback_days": 370,
+        "seed_lookahead_days": 30
+      }
+    },
+    "trading_day_governance": {
+      "enabled": true,
+      "enabled_exchanges": [
+        "SHFE",
+        "INE",
+        "DCE",
+        "CZCE",
+        "GFEX"
+      ],
+      "default_timezone": "Asia/Shanghai",
+      "official_calendar_backfill": {
+        "enabled": true,
+        "start_date": "2000-06-01",
+        "source_profile": "exchange_official_daily_probe",
+        "quality_flag": "backfilled_verified",
+        "future_policy": "official_notice_only",
+        "exchange_start_dates": {
+          "SHFE": "2002-01-07",
+          "INE": "2018-03-26",
+          "DCE": "2000-06-01",
+          "CZCE": "2015-10-15",
+          "GFEX": "2022-12-22"
+        },
+        "empty_payload_closed_start_dates": {
+          "SHFE": "2002-01-07",
+          "INE": "2018-03-26",
+          "DCE": "2000-06-01",
+          "CZCE": "2015-10-15",
+          "GFEX": "2022-12-22"
+        },
+        "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
+      }
+    },
+    "diagnostics": {
+      "lookback_years": [
+        3,
+        5,
+        10
+      ],
+      "trading_days_per_year": 252,
+      "min_observation_ratio": 0.7,
+      "cycle_state_thresholds": {
+        "extreme_low": 0.1,
+        "low": 0.3,
+        "high": 0.7,
+        "extreme_high": 0.9
+      }
+    },
+    "registry": {
+      "note": "Use built-in domestic P0 futures universe by default; add exchange-specific overrides here when governance discovers new products.",
+      "include_default_p0_universe": true,
+      "instruments": []
+    }
+  }
+}
