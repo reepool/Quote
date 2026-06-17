@@ -237,7 +237,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--skip-sync",
         action="store_true",
-        help="Skip valuation_history_rebuild and only query readiness.",
+        help="Skip valuation_history_rebuild and only query readiness; do not use for overwrite rebuild repairs.",
     )
     parser.add_argument(
         "--allow-disabled-module",
