@@ -1770,20 +1770,18 @@ class TaskManagerHandlers:
             "说明：该任务只维护 `data/futures.db` 的交易日历，不下载行情价格。"
         )
         await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
-        asyncio.create_task(
-            self._run_futures_calendar_backfill_task(
-                chat_id=chat_id,
-                scope_id=scope_id,
-                exchanges=exchanges,
-                categories=categories,
-                instrument_ids=instrument_ids,
-                series_ids=series_ids,
-                series_types=series_types,
-                start_date=start_date,
-                end_date=end_date,
-                dry_run=dry_run,
-                max_days=max_days,
-            )
+        await self._run_futures_calendar_backfill_task(
+            chat_id=chat_id,
+            scope_id=scope_id,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+            max_days=max_days,
         )
 
     async def _send_futures_calendar_backfill_usage(self, chat_id: int) -> None:
@@ -1826,6 +1824,17 @@ class TaskManagerHandlers:
     ) -> None:
         try:
             scheduler = self.task_manager.task_scheduler
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 执行期货交易日历手工回填: "
+                "scope_id=%s exchanges=%s categories=%s start=%s end=%s dry_run=%s max_days=%s",
+                scope_id,
+                exchanges,
+                categories,
+                start_date,
+                end_date,
+                dry_run,
+                max_days,
+            )
             result = await scheduler.execute_job_direct(
                 'futures_official_calendar_backfill',
                 parameters={
@@ -1842,6 +1851,10 @@ class TaskManagerHandlers:
                     'max_days': max_days,
                 },
                 include_dependencies=True,
+            )
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 期货交易日历手工回填完成: success=%s",
+                result,
             )
             status_text = '成功' if result else '失败'
             await self.task_manager.send_message(
