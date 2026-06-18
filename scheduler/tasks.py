@@ -1372,15 +1372,33 @@ class ScheduledTasks:
                 scheduler_logger.debug(f"[Scheduler] Task {task_name} report disabled or Telegram not enabled")
                 return False
 
-            # 直接调用 tgbot 的报告发送方法，它会处理报告生成
-            await self.bot.send_report_notification({
-                'report_type': report_type,
-                'task_name': task_name,
-                **report_data  # 将所有报告数据传递下去
-            }, report_type)
+            report_timeout_seconds = int(
+                config_manager.get_nested(
+                    'api_config.report_send_timeout_seconds',
+                    45,
+                )
+                or 45
+            )
+
+            # Notification delivery must not block task lifecycle completion.
+            await asyncio.wait_for(
+                self.bot.send_report_notification({
+                    'report_type': report_type,
+                    'task_name': task_name,
+                    **report_data  # 将所有报告数据传递下去
+                }, report_type),
+                timeout=report_timeout_seconds,
+            )
 
             scheduler_logger.info(f"[Scheduler] Task {task_name} report sent successfully")
             return True
+
+        except asyncio.TimeoutError:
+            scheduler_logger.warning(
+                "[Scheduler] Task %s report send timed out; task result is preserved",
+                task_name,
+            )
+            return False
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Failed to send task report for {task_name}: {e}")

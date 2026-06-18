@@ -4,6 +4,26 @@
     "port": 8000,
     "workers": 1,
     "reload": false,
+    "report_send_timeout_seconds": 45,
+    "rate_limit": {
+      "requests_per_minute": 100,
+      "path_limits": {
+        "/api/v1/quotes/daily": 30
+      }
+    },
+    "resource_protection": {
+      "enabled": true,
+      "reserved_task_connections": 2,
+      "protected_paths": {
+        "/api/v1/quotes/daily": {
+          "active_limit": 2,
+          "queue_limit": 40,
+          "queue_timeout_seconds": 120,
+          "busy_status_code": 503,
+          "retry_after_seconds": 30
+        }
+      }
+    },
     "cors_origins": [
       "*"
     ]

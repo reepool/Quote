@@ -6,6 +6,8 @@ Provides CORS, logging, authentication, and other middleware components.
 import time
 import json
 import re
+import asyncio
+from collections import defaultdict
 from typing import Callable
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
@@ -126,38 +128,149 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """简单的限流中间件"""
+    """Rate-limit and shed expensive API requests before they occupy DB workers."""
 
-    def __init__(self, app, requests_per_minute: int = 60):
+    def __init__(
+        self,
+        app,
+        requests_per_minute: int = 60,
+        path_limits: dict | None = None,
+        concurrency_limits: dict | None = None,
+        protected_paths: dict | None = None,
+    ):
         super().__init__(app)
         self.requests_per_minute = requests_per_minute
+        self.path_limits = {
+            str(path): int(limit)
+            for path, limit in (path_limits or {}).items()
+            if path and int(limit) > 0
+        }
+        self.concurrency_limits = {
+            str(path): int(limit)
+            for path, limit in (concurrency_limits or {}).items()
+            if path and int(limit) > 0
+        }
+        self.protected_paths = self._normalize_protected_paths(
+            protected_paths,
+            self.concurrency_limits,
+        )
         self.request_counts = {}
+        self.active_counts = defaultdict(int)
+        self.queue_counts = defaultdict(int)
+        self.semaphores = {
+            path: asyncio.Semaphore(config["active_limit"])
+            for path, config in self.protected_paths.items()
+        }
+
+    @staticmethod
+    def _normalize_protected_paths(
+        protected_paths: dict | None,
+        legacy_concurrency_limits: dict,
+    ) -> dict:
+        normalized = {}
+        for path, config in (protected_paths or {}).items():
+            if not path or not isinstance(config, dict):
+                continue
+            active_limit = int(config.get("active_limit", 0) or 0)
+            if active_limit <= 0:
+                continue
+            normalized[str(path)] = {
+                "active_limit": active_limit,
+                "queue_limit": max(int(config.get("queue_limit", 0) or 0), 0),
+                "queue_timeout_seconds": max(
+                    float(config.get("queue_timeout_seconds", 0) or 0),
+                    0.0,
+                ),
+                "busy_status_code": int(config.get("busy_status_code", 503) or 503),
+                "retry_after_seconds": int(config.get("retry_after_seconds", 5) or 5),
+            }
+
+        # Backward-compatible path for older concurrency-only configuration.
+        for path, active_limit in legacy_concurrency_limits.items():
+            normalized.setdefault(
+                str(path),
+                {
+                    "active_limit": int(active_limit),
+                    "queue_limit": 0,
+                    "queue_timeout_seconds": 0.0,
+                    "busy_status_code": 503,
+                    "retry_after_seconds": 5,
+                },
+            )
+        return normalized
+
+    def _matched_path_key(self, path: str, limits: dict) -> str | None:
+        """Return the most specific configured prefix matching the request path."""
+        matches = [prefix for prefix in limits if path.startswith(prefix)]
+        if not matches:
+            return None
+        return max(matches, key=len)
+
+    def _rate_limit_for_path(self, path: str) -> tuple[str, int]:
+        path_key = self._matched_path_key(path, self.path_limits)
+        if path_key is None:
+            return "*", self.requests_per_minute
+        return path_key, self.path_limits[path_key]
+
+    def _busy_response(
+        self,
+        *,
+        request_path: str,
+        reason: str,
+        config: dict,
+        current_time: float,
+    ) -> JSONResponse:
+        retry_after = str(config.get("retry_after_seconds", 5))
+        return JSONResponse(
+            status_code=int(config.get("busy_status_code", 503) or 503),
+            content={
+                "error": "Service Busy",
+                "error_code": reason,
+                "timestamp": current_time,
+                "details": {
+                    "message": "This endpoint is temporarily busy. Please wait or retry later.",
+                    "path": request_path,
+                    "active_limit": config.get("active_limit"),
+                    "queue_limit": config.get("queue_limit"),
+                    "queue_timeout_seconds": config.get("queue_timeout_seconds"),
+                },
+            },
+            headers={"Retry-After": retry_after},
+        )
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         client_ip = request.client.host if request.client else "unknown"
+        request_path = normalize_repeated_slashes(request.url.path)
         current_time = time.time()
+        rate_key, requests_per_minute = self._rate_limit_for_path(request_path)
+        request_count_key = (client_ip, rate_key)
 
         # 清理过期的记录
         self.request_counts = {
-            ip: timestamps
-            for ip, timestamps in self.request_counts.items()
+            key: timestamps
+            for key, timestamps in self.request_counts.items()
             if timestamps and current_time - timestamps[-1] < 60
         }
 
         # 检查限流
-        if client_ip not in self.request_counts:
-            self.request_counts[client_ip] = []
+        if request_count_key not in self.request_counts:
+            self.request_counts[request_count_key] = []
 
         # 移除1分钟前的请求记录
         minute_ago = current_time - 60
-        self.request_counts[client_ip] = [
-            timestamp for timestamp in self.request_counts[client_ip]
+        self.request_counts[request_count_key] = [
+            timestamp for timestamp in self.request_counts[request_count_key]
             if timestamp > minute_ago
         ]
 
         # 检查是否超过限制
-        if len(self.request_counts[client_ip]) >= self.requests_per_minute:
-            api_logger.warning(f"[API] Rate limit exceeded for IP: {client_ip}")
+        if len(self.request_counts[request_count_key]) >= requests_per_minute:
+            api_logger.warning(
+                "[API] Rate limit exceeded for IP: %s path=%s limit=%s",
+                client_ip,
+                request_path,
+                requests_per_minute,
+            )
             return JSONResponse(
                 status_code=429,
                 content={
@@ -165,18 +278,121 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "error_code": "RATE_LIMIT_EXCEEDED",
                     "timestamp": current_time,
                     "details": {
-                        "message": f"Too many requests. Limit is {self.requests_per_minute} requests per minute.",
-                        "limit": self.requests_per_minute,
+                        "message": f"Too many requests. Limit is {requests_per_minute} requests per minute.",
+                        "limit": requests_per_minute,
                         "window": "60 seconds"
                     }
                 }
             )
 
         # 记录当前请求
-        self.request_counts[client_ip].append(current_time)
+        self.request_counts[request_count_key].append(current_time)
 
-        response = await call_next(request)
-        return response
+        concurrency_key = self._matched_path_key(request_path, self.protected_paths)
+        protected_config = (
+            self.protected_paths[concurrency_key]
+            if concurrency_key is not None
+            else None
+        )
+        acquired_slot = False
+        if concurrency_key is not None and protected_config is not None:
+            semaphore = self.semaphores[concurrency_key]
+            wait_started_at = None
+            if semaphore.locked():
+                queue_limit = protected_config["queue_limit"]
+                if queue_limit <= 0 or self.queue_counts[concurrency_key] >= queue_limit:
+                    api_logger.warning(
+                        "[API] Admission queue full path=%s active=%s active_limit=%s "
+                        "queue=%s queue_limit=%s client_ip=%s",
+                        request_path,
+                        self.active_counts[concurrency_key],
+                        protected_config["active_limit"],
+                        self.queue_counts[concurrency_key],
+                        queue_limit,
+                        client_ip,
+                    )
+                    return self._busy_response(
+                        request_path=request_path,
+                        reason="ADMISSION_QUEUE_FULL",
+                        config=protected_config,
+                        current_time=current_time,
+                    )
+
+                self.queue_counts[concurrency_key] += 1
+                wait_started_at = time.monotonic()
+                try:
+                    await asyncio.wait_for(
+                        semaphore.acquire(),
+                        timeout=protected_config["queue_timeout_seconds"],
+                    )
+                    acquired_slot = True
+                    waited_seconds = time.monotonic() - wait_started_at
+                    api_logger.info(
+                        "[API] Admission queue released path=%s wait_seconds=%.3f "
+                        "active_limit=%s queue_limit=%s client_ip=%s",
+                        request_path,
+                        waited_seconds,
+                        protected_config["active_limit"],
+                        queue_limit,
+                        client_ip,
+                    )
+                except asyncio.TimeoutError:
+                    waited_seconds = time.monotonic() - wait_started_at
+                    api_logger.warning(
+                        "[API] Admission queue timeout path=%s wait_seconds=%.3f "
+                        "active=%s active_limit=%s queue=%s queue_limit=%s client_ip=%s",
+                        request_path,
+                        waited_seconds,
+                        self.active_counts[concurrency_key],
+                        protected_config["active_limit"],
+                        self.queue_counts[concurrency_key],
+                        queue_limit,
+                        client_ip,
+                    )
+                    return self._busy_response(
+                        request_path=request_path,
+                        reason="ADMISSION_QUEUE_TIMEOUT",
+                        config=protected_config,
+                        current_time=current_time,
+                    )
+                finally:
+                    self.queue_counts[concurrency_key] = max(
+                        self.queue_counts[concurrency_key] - 1,
+                        0,
+                    )
+            else:
+                await semaphore.acquire()
+                acquired_slot = True
+
+            if acquired_slot:
+                self.active_counts[concurrency_key] += 1
+
+            if not acquired_slot:
+                api_logger.warning(
+                    "[API] Admission failed path=%s active=%s active_limit=%s client_ip=%s",
+                    request_path,
+                    self.active_counts[concurrency_key],
+                    protected_config["active_limit"],
+                    client_ip,
+                )
+                return self._busy_response(
+                    request_path=request_path,
+                    reason="ADMISSION_UNAVAILABLE",
+                    config=protected_config,
+                    current_time=current_time,
+                )
+
+        try:
+            response = await call_next(request)
+            return response
+        finally:
+            if (
+                concurrency_key is not None
+                and protected_config is not None
+                and acquired_slot
+            ):
+                self.active_counts[concurrency_key] -= 1
+                self.semaphores[concurrency_key].release()
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -219,12 +435,32 @@ def setup_cors(app):
 
 def setup_middleware(app):
     """设置所有中间件"""
+    api_config = config_manager.get_nested('api_config', {})
+    rate_limit_config = api_config.get('rate_limit', {}) if isinstance(api_config, dict) else {}
+    resource_config = (
+        api_config.get('resource_protection', {}) if isinstance(api_config, dict) else {}
+    )
+    requests_per_minute = int(rate_limit_config.get('requests_per_minute', 100))
+    path_limits = rate_limit_config.get('path_limits', {}) or {}
+    concurrency_limits = rate_limit_config.get('concurrency_limits', {}) or {}
+    protected_paths = (
+        resource_config.get('protected_paths', {}) or {}
+        if resource_config.get('enabled', True)
+        else {}
+    )
+
     # 设置CORS
     setup_cors(app)
 
     # 添加中间件（顺序很重要）
     app.add_middleware(SecurityHeadersMiddleware)
-    app.add_middleware(RateLimitMiddleware, requests_per_minute=100)
+    app.add_middleware(
+        RateLimitMiddleware,
+        requests_per_minute=requests_per_minute,
+        path_limits=path_limits,
+        concurrency_limits=concurrency_limits,
+        protected_paths=protected_paths,
+    )
     app.add_middleware(ErrorHandlingMiddleware)
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(PathNormalizationMiddleware)

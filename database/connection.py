@@ -31,6 +31,13 @@ class DatabaseManager:
     def initialize(self):
         """初始化数据库连接"""
         try:
+            async_pool_config = config_manager.get_nested('database_config.async_pool', {}) or {}
+            async_pool_size = int(async_pool_config.get('pool_size', 2) or 2)
+            async_max_overflow = int(async_pool_config.get('max_overflow', 6) or 6)
+            async_pool_timeout = float(
+                async_pool_config.get('pool_timeout_seconds', 30) or 30
+            )
+
             # 同步连接引擎
             self.sync_engine = create_engine(
                 f"sqlite:///{self.db_path}",
@@ -42,9 +49,16 @@ class DatabaseManager:
             self.async_engine = create_async_engine(
                 f"sqlite+aiosqlite:///{self.db_path}",
                 poolclass=QueuePool,
-                pool_size=1,
-                max_overflow=4,
+                pool_size=async_pool_size,
+                max_overflow=async_max_overflow,
+                pool_timeout=async_pool_timeout,
                 connect_args={"check_same_thread": False}
+            )
+            db_logger.info(
+                "[Database] Async pool configured: pool_size=%s max_overflow=%s pool_timeout=%ss",
+                async_pool_size,
+                async_max_overflow,
+                async_pool_timeout,
             )
 
             # 注册连接层面 PRAGMA 保证每个协程获取到的连接都开启最优特性
