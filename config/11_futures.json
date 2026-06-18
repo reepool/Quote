@@ -153,7 +153,7 @@
           "GFEX": 90
         },
         "batch_pause_seconds_by_exchange": {
-          "GFEX": 20
+          "GFEX": 10
         },
         "parser_version": "official_futures_daily.v1",
         "fallback_to": "akshare_futures",
