@@ -11845,6 +11845,7 @@ class DataManager:
                 'stale_no_quote_count': 0,
                 'stale_no_quote_written_count': 0,
                 'metadata_only_legacy_deactivated_count': 0,
+                'invalid_quote_code_deactivated_count': 0,
                 'reactivated_count': 0,
                 'lifecycle_skip_count': 0,
                 'active_count': 0,
@@ -12064,6 +12065,56 @@ class DataManager:
                                     'state': 'metadata_only',
                                     'confidence': row.get('confidence'),
                                     'canonical_metadata_instrument_id': row.get('diagnostics', {}).get('canonical_metadata_instrument_id'),
+                                })
+                invalid_quote_code_rows: List[Dict[str, Any]] = []
+                for instrument_id, before_row in (
+                    snapshots_before.get('SZSE', {}).get('rows_by_id', {}) or {}
+                ).items():
+                    if str(before_row.get('source') or '').lower() not in {'cnindex', 'cnindex_index_list'}:
+                        continue
+                    if before_row.get('is_active') not in (True, 1, '1', 'true', 'True'):
+                        continue
+                    if before_row.get('trading_status') in (0, '0', False):
+                        continue
+                    if not str(instrument_id).upper().endswith('.SZ'):
+                        continue
+                    quote_symbol = str(instrument_id).rsplit('.', 1)[0]
+                    if len(quote_symbol) == 6 and quote_symbol.isdigit():
+                        continue
+                    invalid_quote_code_rows.append({
+                        'instrument_id': instrument_id,
+                        'symbol': before_row.get('symbol') or quote_symbol,
+                        'exchange': 'SZSE',
+                        'lifecycle_state': 'metadata_only',
+                        'event_type': 'cnindex_invalid_quote_code_identity',
+                        'confidence': 'invalid_exchange_quote_code',
+                        'source': 'cnindex_index_list',
+                        'parser_version': 'official-index-source-v1',
+                        'diagnostics': {
+                            'name': before_row.get('name'),
+                            'source': before_row.get('source'),
+                            'quote_symbol': quote_symbol,
+                            'reason': 'szse_quote_code_must_be_six_digits',
+                        },
+                    })
+                if invalid_quote_code_rows:
+                    result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
+                        invalid_quote_code_rows
+                    )
+                    for row in invalid_quote_code_rows:
+                        ok = await self.db_ops.mark_index_lifecycle_state(
+                            row.get('instrument_id'),
+                            lifecycle_state='metadata_only',
+                            source='cnindex_index_list',
+                        )
+                        if ok:
+                            result['summary']['invalid_quote_code_deactivated_count'] += 1
+                            if len(result['summary']['samples']) < sample_limit:
+                                result['summary']['samples'].append({
+                                    'instrument_id': row.get('instrument_id'),
+                                    'state': 'metadata_only',
+                                    'confidence': row.get('confidence'),
+                                    'reason': row.get('diagnostics', {}).get('reason'),
                                 })
 
         evidence_rows: List[Dict[str, Any]] = []
@@ -12291,6 +12342,7 @@ class DataManager:
             + result['summary']['inferred_terminated_count']
             + result['summary']['stale_no_quote_written_count']
             + result['summary']['metadata_only_legacy_deactivated_count']
+            + result['summary']['invalid_quote_code_deactivated_count']
         )
         if result['warnings']:
             result['status'] = 'warning'

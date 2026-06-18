@@ -390,3 +390,36 @@ async def test_index_governance_deactivates_persisted_cnindex_metadata_only_quot
         and row['diagnostics']['cni_code'] == 'CN5125.CNI'
         for row in manager.db_ops.evidence_rows
     )
+
+
+@pytest.mark.asyncio
+async def test_index_governance_deactivates_cnindex_non_six_digit_quote_key():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.rows['39926401.SZ'] = {
+        'instrument_id': '39926401.SZ',
+        'symbol': '39926401',
+        'name': '创业软件R',
+        'exchange': 'SZSE',
+        'type': 'index',
+        'status': 'active',
+        'is_active': True,
+        'trading_status': 1,
+        'source': 'cnindex',
+        'updated_at': '2026-06-18T20:00:00',
+    }
+    manager.source_factory = FakeSourceFactory()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 18))
+
+    assert result['summary']['invalid_quote_code_deactivated_count'] == 1
+    assert result['summary']['lifecycle_skip_count'] == 3
+    assert manager.db_ops.rows['39926401.SZ']['status'] == 'metadata_only'
+    assert manager.db_ops.rows['39926401.SZ']['is_active'] is False
+    assert any(
+        row['event_type'] == 'cnindex_invalid_quote_code_identity'
+        and row['instrument_id'] == '39926401.SZ'
+        and row['diagnostics']['reason'] == 'szse_quote_code_must_be_six_digits'
+        for row in manager.db_ops.evidence_rows
+    )

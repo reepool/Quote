@@ -372,6 +372,7 @@ class ReportEngine:
                 f"直接: {summary.get('direct_terminated_count', 0)}，"
                 f"推断: {summary.get('inferred_terminated_count', 0)}，"
                 f"metadata-only: {summary.get('metadata_only_legacy_deactivated_count', 0)}，"
+                f"invalid-quote: {summary.get('invalid_quote_code_deactivated_count', 0)}，"
                 f"stale: {summary.get('stale_no_quote_count', 0)}"
             ),
         ]

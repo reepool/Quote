@@ -1294,6 +1294,7 @@ class ScheduledTasks:
                 f"停编跳过: `{summary.get('lifecycle_skip_count', 0)}`\n"
                 f"直接: `{summary.get('direct_terminated_count', 0)}`，"
                 f"推断: `{summary.get('inferred_terminated_count', 0)}`，"
+                f"invalid-quote: `{summary.get('invalid_quote_code_deactivated_count', 0)}`，"
                 f"stale: `{summary.get('stale_no_quote_count', 0)}`\n"
                 f"warnings: `{len(result.get('warnings') or [])}`，"
                 f"errors: `{len(result.get('errors') or [])}`\n\n"

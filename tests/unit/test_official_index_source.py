@@ -75,6 +75,38 @@ def test_cnindex_index_list_uses_szse_quote_code_for_quotable_rows():
     assert snapshot.rows[0]["is_active"] is True
 
 
+def test_cnindex_index_list_rejects_non_six_digit_szse_quote_code():
+    frame = pd.DataFrame([
+        {
+            "指数代码": "399264",
+            "指数简称": "创业软件R",
+            "指数全称": "创业板软件与服务全收益指数",
+            "发布日期": "2022-09-29",
+            "深交所行情代码": "39926401",
+            ".CNI": "39926401.CNI",
+            "价格收益": "全收益指数",
+            "指数系列": "深证系列",
+            "指数类别": "行业指数",
+            "资产类别": "股票",
+        }
+    ])
+    raw = BytesIO()
+    frame.to_excel(raw, index=False)
+
+    snapshot = CNIndexSource.parse_index_list_excel(
+        raw.getvalue(),
+        source_url="https://example.test/cnindex.xlsx",
+    )
+
+    row = snapshot.rows[0]
+    assert row["instrument_id"] == "39926401.CNI"
+    assert row["symbol"] == "399264"
+    assert row["status"] == "metadata_only"
+    assert row["is_active"] is False
+    assert row["metadata"]["szse_quote_code"] == ""
+    assert row["metadata"]["invalid_szse_quote_code"] == "39926401"
+
+
 def test_cnindex_termination_announcement_parses_direct_codes():
     text = (FIXTURE_DIR / "cnindex_alphafocus_termination.txt").read_text()
 

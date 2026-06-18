@@ -79,7 +79,7 @@ SchedulerCore
 - 指数日线使用官方源优先：`SSE index = CSIndex -> BaoStock -> AkShare`，`SZSE index = CNIndex -> BaoStock -> AkShare`；官方源返回非空但未覆盖请求区间内最后一个交易日时继续 fallback。
 - 日更走共享主数据前置治理，并默认命中 `force_refresh_job_names`；当前日更会跳过 freshness 复用并重新拉取上游主数据。`instrument_types` 包含 `index` 时，还会在读取指数 universe 前执行 A 股指数主数据治理。
 - 同步完成后重新读取 active instruments，再开始行情抓取。
-- 指数治理会把 CNIndex 没有 `深交所行情代码` 的官方指数保存为 metadata-only 主数据身份；本地遗留的错误行情型 key 会被标记为 `status=metadata_only,is_active=0,trading_status=0`，因此不会进入 `tradable_only=True` 的普通日更抓取池。
+- 指数治理会把 CNIndex 没有有效 6 位 `深交所行情代码` 的官方指数保存为 metadata-only 主数据身份；本地遗留的错误行情型 key 或非 6 位 `.SZ` key 会被标记为 `status=metadata_only,is_active=0,trading_status=0`，因此不会进入 `tradable_only=True` 的普通日更抓取池。
 - 普通日更允许主数据和行情源存在 T+1/T+2 滞后，但标的进入本地主表后会按 `data_config.daily_update_catchup` 自动执行小窗口追补：本地无行情的新股从 `max(listed_date, target_date - new_instrument_catchup_days)` 抓到目标日，短缺口从 `max(latest_quote_date, target_date - short_gap_catchup_days)` 抓到目标日。
 - 追补窗口被截断、缺少上市日或追补样例会进入日更报告；超过窗口的大缺口继续由 `/backfill` 或 `find_gap_and_repair` 处理。
 - 历史补数模式默认跳过当前主数据同步，并在报告数据中记录 skip reason；午夜后重跑前一交易日日更视为当前日更重试，仍会强制运行 A 股股票和指数主数据治理，更早日期才按历史回补跳过。

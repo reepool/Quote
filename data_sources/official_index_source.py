@@ -65,6 +65,11 @@ def normalize_index_code(value: Any) -> str:
     return digits.zfill(6) if digits else ""
 
 
+def is_exchange_quote_code(value: Any) -> bool:
+    code = normalize_index_code(value)
+    return len(code) == 6 and code.isdigit()
+
+
 def cnindex_metadata_instrument_id(code: Any, *, cni_code: Any = "") -> str:
     cni_text = _text(cni_code).upper()
     if cni_text:
@@ -224,7 +229,8 @@ class CNIndexSource(BaseDataSource):
             full_name = _text(row.get("指数全称"))
             short_name = _text(row.get("指数简称")) or full_name or code
             price_return_type = _text(row.get("价格收益"))
-            szse_quote_code = normalize_index_code(row.get("深交所行情代码"))
+            raw_szse_quote_code = normalize_index_code(row.get("深交所行情代码"))
+            szse_quote_code = raw_szse_quote_code if is_exchange_quote_code(raw_szse_quote_code) else ""
             cni_code = _text(row.get(".CNI"))
             metadata_only = not bool(szse_quote_code)
             rows.append(
@@ -258,6 +264,7 @@ class CNIndexSource(BaseDataSource):
                         "english_name": _text(row.get("英文名称")),
                         "publisher": _text(row.get("发布渠道")),
                         "szse_quote_code": szse_quote_code,
+                        "invalid_szse_quote_code": raw_szse_quote_code if raw_szse_quote_code and not szse_quote_code else "",
                         "ric": _text(row.get("RIC")),
                         "bloomberg": _text(row.get("BLOOMBERG")),
                         "cni_code": _text(row.get(".CNI")),

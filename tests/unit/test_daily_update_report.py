@@ -401,6 +401,7 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
             'direct_terminated_count': 1,
             'inferred_terminated_count': 1,
             'metadata_only_legacy_deactivated_count': 1,
+            'invalid_quote_code_deactivated_count': 1,
             'stale_no_quote_count': 6,
             'source_usage': {'cnindex': 2},
             'samples': [
@@ -421,6 +422,7 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
     assert '直接: 1' in summary
     assert '推断: 1' in summary
     assert 'metadata-only: 1' in summary
+    assert 'invalid-quote: 1' in summary
     assert summary.count('calculation_terminated') == 5
     assert len(summary) < 900
 
