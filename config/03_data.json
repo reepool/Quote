@@ -515,7 +515,7 @@
         "index": {
           "skip_backup_on_empty_short_range": false,
           "require_end_date_coverage": true,
-          "stale_source_circuit_breaker_threshold": 3
+          "stale_source_circuit_breaker_threshold": 5
         }
       }
     },
