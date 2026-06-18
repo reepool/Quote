@@ -6,6 +6,7 @@ Telegram任务管理机器人消息处理器
 import asyncio
 import shlex
 from datetime import datetime
+from types import SimpleNamespace
 from typing import Dict, Any, Optional, List, Tuple
 
 from .models import TaskStatusInfo, TaskStatus, TaskManagerState
@@ -1109,6 +1110,15 @@ class TaskManagerHandlers:
             return
 
         job_id = parts[1]
+        if job_id == 'futures_official_calendar_backfill' and len(parts) > 2:
+            await self.handle_futures_calendar_backfill_command(
+                SimpleNamespace(
+                    chat_id=chat_id,
+                    sender_id=user_id,
+                    text='/futures_calendar_backfill ' + ' '.join(parts[2:]),
+                )
+            )
+            return
 
         # 解析可选的日期参数（第三个参数）
         target_date = None

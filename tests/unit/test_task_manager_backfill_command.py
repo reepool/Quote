@@ -1,3 +1,4 @@
+import asyncio
 from datetime import date
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
@@ -143,6 +144,43 @@ async def test_futures_calendar_backfill_manual_task_passes_direct_parameters():
     )
     sent_message = task_manager.send_message.await_args.args[1]
     assert '期货交易日历手工回填成功' in sent_message
+
+
+@pytest.mark.asyncio
+async def test_run_futures_calendar_backfill_with_args_delegates_to_manual_command():
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/run futures_official_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10',
+    )
+
+    await handler.handle_run_command(event)
+    await asyncio.sleep(0)
+
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        'futures_official_calendar_backfill',
+        parameters={
+            'scope_id': None,
+            'scope_ids': None,
+            'exchanges': ['GFEX'],
+            'categories': None,
+            'instrument_ids': None,
+            'series_ids': None,
+            'series_types': None,
+            'start_date': '2022-12-22',
+            'end_date': '2022-12-31',
+            'dry_run': True,
+            'max_days': 10,
+        },
+        include_dependencies=True,
+    )
+    assert any(
+        '期货交易日历手工回填成功' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
 
 
 @pytest.mark.asyncio
