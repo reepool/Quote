@@ -7458,6 +7458,13 @@ class DataManager:
             except Exception as e:
                 dm_logger.error(f"[DataManager] Error closing data sources: {e}")
 
+        try:
+            db = getattr(self.db_ops, "db", None)
+            if db is not None and hasattr(db, "close_async"):
+                await db.close_async()
+        except Exception as e:
+            dm_logger.error(f"[DataManager] Error closing database connections: {e}")
+
     @log_execution("DataManager", "download_all_historical_data")
     async def download_all_historical_data(self, exchanges: Optional[List[str]] = None,
                                          start_date: Optional[date] = None, end_date: Optional[date] = None,

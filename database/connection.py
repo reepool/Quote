@@ -9,10 +9,30 @@ from utils import db_logger, config_manager
 import aiosqlite
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import StaticPool, QueuePool
+
+
+_db_workload: ContextVar[str] = ContextVar("quote_db_workload", default="task")
+
+
+def get_current_db_workload() -> str:
+    """Return the current DB workload class for async session routing."""
+    return _db_workload.get()
+
+
+@asynccontextmanager
+async def db_workload_context(workload: str):
+    """Temporarily route async DB sessions for the current async context."""
+    normalized = "api" if str(workload).lower() == "api" else "task"
+    token = _db_workload.set(normalized)
+    try:
+        yield
+    finally:
+        _db_workload.reset(token)
 
 
 class DatabaseManager:
@@ -25,17 +45,28 @@ class DatabaseManager:
         db_logger.info(f"[Database] Using database path: {db_path}")
         self.sync_engine = None
         self.async_engine = None
+        self.api_async_engine = None
+        self.task_async_engine = None
         self.SessionLocal = None
         self.AsyncSessionLocal = None
+        self.ApiAsyncSessionLocal = None
+        self.TaskAsyncSessionLocal = None
 
     def initialize(self):
         """初始化数据库连接"""
         try:
-            async_pool_config = config_manager.get_nested('database_config.async_pool', {}) or {}
-            async_pool_size = int(async_pool_config.get('pool_size', 2) or 2)
-            async_max_overflow = int(async_pool_config.get('max_overflow', 6) or 6)
-            async_pool_timeout = float(
-                async_pool_config.get('pool_timeout_seconds', 30) or 30
+            legacy_async_pool_config = (
+                config_manager.get_nested('database_config.async_pool', {}) or {}
+            )
+            task_async_pool_config = (
+                config_manager.get_nested('database_config.task_async_pool', {})
+                or legacy_async_pool_config
+                or {}
+            )
+            api_async_pool_config = (
+                config_manager.get_nested('database_config.api_async_pool', {})
+                or legacy_async_pool_config
+                or {}
             )
 
             # 同步连接引擎
@@ -43,22 +74,6 @@ class DatabaseManager:
                 f"sqlite:///{self.db_path}",
                 poolclass=StaticPool,
                 connect_args={"check_same_thread": False}
-            )
-
-            # 异步连接引擎 (WAL 模式允许读写并行，因此放弃 StaticPool 改用微型 QueuePool)
-            self.async_engine = create_async_engine(
-                f"sqlite+aiosqlite:///{self.db_path}",
-                poolclass=QueuePool,
-                pool_size=async_pool_size,
-                max_overflow=async_max_overflow,
-                pool_timeout=async_pool_timeout,
-                connect_args={"check_same_thread": False}
-            )
-            db_logger.info(
-                "[Database] Async pool configured: pool_size=%s max_overflow=%s pool_timeout=%ss",
-                async_pool_size,
-                async_max_overflow,
-                async_pool_timeout,
             )
 
             # 注册连接层面 PRAGMA 保证每个协程获取到的连接都开启最优特性
@@ -71,7 +86,26 @@ class DatabaseManager:
                 cursor.close()
 
             event.listen(self.sync_engine, 'connect', set_sqlite_pragma)
-            event.listen(self.async_engine.sync_engine, 'connect', set_sqlite_pragma)
+
+            self.task_async_engine = self._create_async_engine(
+                "task",
+                task_async_pool_config,
+                default_pool_size=2,
+                default_max_overflow=0,
+                default_pool_timeout=30,
+                pragma_listener=set_sqlite_pragma,
+            )
+            self.api_async_engine = self._create_async_engine(
+                "api",
+                api_async_pool_config,
+                default_pool_size=2,
+                default_max_overflow=6,
+                default_pool_timeout=30,
+                pragma_listener=set_sqlite_pragma,
+            )
+
+            # Backward-compatible aliases: unclassified internal work uses task pool.
+            self.async_engine = self.task_async_engine
 
             # 创建会话工厂
             self.SessionLocal = sessionmaker(
@@ -80,18 +114,64 @@ class DatabaseManager:
                 bind=self.sync_engine
             )
 
-            self.AsyncSessionLocal = sessionmaker(
+            self.TaskAsyncSessionLocal = sessionmaker(
                 autocommit=False,
                 autoflush=False,
-                bind=self.async_engine,
+                bind=self.task_async_engine,
                 class_=AsyncSession
             )
+            self.ApiAsyncSessionLocal = sessionmaker(
+                autocommit=False,
+                autoflush=False,
+                bind=self.api_async_engine,
+                class_=AsyncSession
+            )
+            self.AsyncSessionLocal = self.TaskAsyncSessionLocal
 
             db_logger.info("[Database] Database connection initialized successfully")
 
         except Exception as e:
             db_logger.error(f"[Database] Failed to initialize database: {e}")
             raise
+
+    def _create_async_engine(
+        self,
+        role: str,
+        pool_config: dict,
+        *,
+        default_pool_size: int,
+        default_max_overflow: int,
+        default_pool_timeout: float,
+        pragma_listener,
+    ):
+        pool_size = int(pool_config.get('pool_size', default_pool_size) or default_pool_size)
+        max_overflow = int(
+            pool_config.get('max_overflow', default_max_overflow) or default_max_overflow
+        )
+        pool_timeout = float(
+            pool_config.get('pool_timeout_seconds', default_pool_timeout)
+            or default_pool_timeout
+        )
+
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{self.db_path}",
+            poolclass=QueuePool,
+            pool_size=pool_size,
+            max_overflow=max_overflow,
+            pool_timeout=pool_timeout,
+            connect_args={"check_same_thread": False}
+        )
+        event.listen(engine.sync_engine, 'connect', pragma_listener)
+        db_logger.info(
+            "[Database] %s async pool configured: pool_size=%s max_overflow=%s "
+            "pool_timeout=%ss capacity=%s",
+            role,
+            pool_size,
+            max_overflow,
+            pool_timeout,
+            pool_size + max_overflow,
+        )
+        return engine
 
     def create_tables(self):
         """创建数据库表"""
@@ -140,11 +220,14 @@ class DatabaseManager:
             raise RuntimeError("Database not initialized")
         return self.SessionLocal()
 
-    def get_async_session(self) -> AsyncSession:
+    def get_async_session(self, workload: str = None) -> AsyncSession:
         """获取异步数据库会话"""
-        if not self.AsyncSessionLocal:
+        if not self.TaskAsyncSessionLocal or not self.ApiAsyncSessionLocal:
             raise RuntimeError("Database not initialized")
-        return self.AsyncSessionLocal()
+        normalized = workload or get_current_db_workload()
+        if str(normalized).lower() == "api":
+            return self.ApiAsyncSessionLocal()
+        return self.TaskAsyncSessionLocal()
 
     @asynccontextmanager
     async def get_async_connection(self) -> AsyncGenerator[aiosqlite.Connection, None]:
@@ -185,8 +268,23 @@ class DatabaseManager:
         try:
             if self.sync_engine:
                 self.sync_engine.dispose()
-            if self.async_engine:
-                self.async_engine.dispose()
+            if self.task_async_engine:
+                self.task_async_engine.sync_engine.dispose()
+            if self.api_async_engine:
+                self.api_async_engine.sync_engine.dispose()
+            db_logger.info("[Database] Database connections closed")
+        except Exception as e:
+            db_logger.error(f"[Database] Error closing database connections: {e}")
+
+    async def close_async(self):
+        """关闭数据库连接（异步入口，优先用于应用退出）。"""
+        try:
+            if self.sync_engine:
+                self.sync_engine.dispose()
+            if self.task_async_engine:
+                await self.task_async_engine.dispose()
+            if self.api_async_engine:
+                await self.api_async_engine.dispose()
             db_logger.info("[Database] Database connections closed")
         except Exception as e:
             db_logger.error(f"[Database] Error closing database connections: {e}")
@@ -199,10 +297,7 @@ db_manager = DatabaseManager()
 @asynccontextmanager
 async def get_async_db():
     """依赖注入：获取异步数据库会话（上下文管理器）"""
-    if not db_manager.AsyncSessionLocal:
-        raise RuntimeError("Database not initialized")
-
-    async with db_manager.AsyncSessionLocal() as session:
+    async with db_manager.get_async_session() as session:
         try:
             yield session
             await session.commit()

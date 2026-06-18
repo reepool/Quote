@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
+from database.connection import db_workload_context
 from utils import api_logger, config_manager
 
 
@@ -383,7 +384,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 )
 
         try:
-            response = await call_next(request)
+            async with db_workload_context("api"):
+                response = await call_next(request)
             return response
         finally:
             if (

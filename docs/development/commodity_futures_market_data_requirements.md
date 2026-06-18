@@ -758,7 +758,7 @@ PYTHONPATH=/home/python/Quote LD_LIBRARY_PATH=/home/python/miniconda3/envs/Quote
 
 运行原则：
 
-- 后台数据任务必须保留数据库通道余量；外部 API 查询不得占满全部异步 DB 连接。
+- 后台数据任务必须使用独立的 task async DB pool；外部 API 查询使用独立的 API async DB pool，不得占用任务侧连接池。
 - API 查询在保护阈值内应排队等待，而不是优先直接拒绝。外部调用方主要可能是 AI 客户端，短时等待可接受，直接断开可能导致调用链不再重试。
 - 排队必须有上限和超时，防止极端请求量造成协程和内存堆积。
 - 任务报告发送必须有超时保护，Telegram 或网络异常不得导致已经完成的数据任务无法释放运行状态。
@@ -768,17 +768,17 @@ PYTHONPATH=/home/python/Quote LD_LIBRARY_PATH=/home/python/miniconda3/envs/Quote
 
 | 项目 | 建议值 | 说明 |
 |---|---:|---|
-| SQLite async pool 总容量 | 约 8 条 | 例如 `pool_size=2`、`max_overflow=6`，保守提升读并发 |
-| 任务保留 DB 容量 | 2 条 | API 并发配置必须给调度和数据任务留下余量 |
-| 全 API 活跃查询并发 | 4 个左右 | 低于 DB 总容量并预留任务通道，默认通过 `/` 规则覆盖所有接口 |
-| 全 API 等待队列 | 40-80 个 | 超出后才拒绝，避免无限堆积 |
+| 任务 async pool 容量 | 2 条 | `task_async_pool.pool_size=2`、`max_overflow=0`，调度和数据任务专用 |
+| API async pool 容量 | 约 8 条 | 例如 `api_async_pool.pool_size=2`、`max_overflow=6`，外部访问专用 |
+| 全 API 活跃查询并发 | 6 个左右 | API 访问独立分池后可适度放宽，默认通过 `/` 规则覆盖所有接口 |
+| 全 API 等待队列 | 80-120 个 | 超出后才拒绝，避免无限堆积 |
 | 高成本路径级限流 | 例如 `/api/v1/quotes/daily` 每分钟 30 次 | 保留对 AI 高频批量查询的单独节流能力 |
 | 队列等待超时 | 120 秒左右 | 让外部 AI 客户端等待，但避免长期占用请求上下文 |
 | 任务报告发送超时 | 45 秒左右 | 报告失败只影响通知，不改变数据任务结果 |
 
 验收标准：
 
-- 在外部 API 并发压力下，调度任务仍能获取 DB 连接并完成任务状态写入。
+- 在外部 API 并发压力下，调度任务仍使用 task async pool 获取 DB 连接并完成任务状态写入。
 - 超过活跃查询并发时，请求优先进入等待队列；只有队列满或等待超时才返回 busy 响应。
 - 日志必须能区分 rate limit、队列等待、队列超时、队列满和报告发送超时。
 - 期货交易日历 dry-run 或 write 任务的成功/失败不得被 Telegram 报告发送异常覆盖。

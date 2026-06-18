@@ -42,7 +42,7 @@ class DatabaseOperations:
                 self.engine = self.db.sync_engine
                 self.async_engine = self.db.async_engine
                 self.SessionLocal = self.db.SessionLocal
-                self.AsyncSessionLocal = self.db.AsyncSessionLocal
+                self.AsyncSessionLocal = self.db.TaskAsyncSessionLocal
                 self.db_logger.info("DatabaseOperations initialized successfully")
             except Exception as e:
                 self.db_logger.error(f"DatabaseOperations initialization failed: {e}")
@@ -60,7 +60,7 @@ class DatabaseOperations:
             self.engine = self.db.sync_engine
             self.async_engine = self.db.async_engine
             self.SessionLocal = self.db.SessionLocal
-            self.AsyncSessionLocal = self.db.AsyncSessionLocal
+            self.AsyncSessionLocal = self.db.TaskAsyncSessionLocal
 
             self.db_logger.info("DatabaseOperations initialized successfully")
         except Exception as e:
@@ -69,7 +69,7 @@ class DatabaseOperations:
 
     def get_async_session(self):
         """Get async database session"""
-        return self.db.AsyncSessionLocal()
+        return self.db.get_async_session()
 
     def get_session(self):
         """Get synchronous database session"""

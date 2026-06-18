@@ -16,8 +16,8 @@
       "reserved_task_connections": 2,
       "protected_paths": {
         "/": {
-          "active_limit": 4,
-          "queue_limit": 80,
+          "active_limit": 6,
+          "queue_limit": 120,
           "queue_timeout_seconds": 120,
           "busy_status_code": 503,
           "retry_after_seconds": 30

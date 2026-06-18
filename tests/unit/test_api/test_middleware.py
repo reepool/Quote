@@ -10,6 +10,7 @@ import pytest
 from fastapi.responses import JSONResponse
 
 from api.middleware import RateLimitMiddleware, normalize_repeated_slashes
+from database.connection import get_current_db_workload
 
 
 @pytest.mark.unit
@@ -115,6 +116,22 @@ async def test_protected_path_waits_for_slot_before_execution():
     assert call_count == 1
     assert middleware.active_counts[path_key] == 0
     assert middleware.queue_counts[path_key] == 0
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_protected_path_marks_backend_execution_as_api_workload():
+    middleware = _protected_middleware(queue_timeout_seconds=0.5)
+
+    async def call_next(request):
+        assert get_current_db_workload() == "api"
+        return JSONResponse({"ok": True})
+
+    assert get_current_db_workload() == "task"
+    response = await middleware.dispatch(_request(), call_next)
+
+    assert response.status_code == 200
+    assert get_current_db_workload() == "task"
 
 
 @pytest.mark.unit

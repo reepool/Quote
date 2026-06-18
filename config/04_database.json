@@ -3,7 +3,12 @@
         "db_path": "data/quotes.db",
         "backup_enabled": false,
         "backup_interval_days": 7,
-        "async_pool": {
+        "task_async_pool": {
+            "pool_size": 2,
+            "max_overflow": 0,
+            "pool_timeout_seconds": 30
+        },
+        "api_async_pool": {
             "pool_size": 2,
             "max_overflow": 6,
             "pool_timeout_seconds": 30
