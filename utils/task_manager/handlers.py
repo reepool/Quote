@@ -4,6 +4,7 @@ Telegram任务管理机器人消息处理器
 """
 
 import asyncio
+import shlex
 from datetime import datetime
 from typing import Dict, Any, Optional, List, Tuple
 
@@ -52,6 +53,7 @@ class TaskManagerHandlers:
         message += "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
         message += "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
         message += "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
+        message += "• `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write] [max_days=N]` - 手工回填期货交易日历\n"
         message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
         message += "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
@@ -107,6 +109,7 @@ class TaskManagerHandlers:
             "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
             "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
             "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
+            "• `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write] [max_days=N]` - 手工回填期货交易日历\n"
             "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
             "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
@@ -135,6 +138,9 @@ class TaskManagerHandlers:
             "• `/industry_index_analysis_sync limit=20` - 小样本同步申万指数分析指标\n\n"
             "• `/industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20` - 小样本回补历史申万指数分析指标\n"
             "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day` - 按日补缺申万指数分析历史缺口\n\n"
+            "*期货交易日历示例：*\n"
+            "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
+            "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`\n\n"
             "*使用示例：*\n"
             "• `/detail trading_calendar_update`\n"
             "• `/run system_health_check`\n"
@@ -150,6 +156,7 @@ class TaskManagerHandlers:
             "• `/industry_index_analysis_sync limit=20`\n"
             "• `/industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20`\n"
             "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day`\n"
+            "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
@@ -1645,6 +1652,210 @@ class TaskManagerHandlers:
                 chunk_frequency=chunk_frequency,
             )
         )
+
+    async def handle_futures_calendar_backfill_command(self, event) -> None:
+        """处理 /futures_calendar_backfill 命令，执行期货官方交易日历手工回填。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/futures_calendar_backfill'
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        try:
+            tokens = shlex.split(command_text.strip())
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *参数错误*\n\n命令解析失败: `{exc}`",
+                parse_mode='markdown',
+            )
+            return
+        args: Dict[str, str] = {}
+        flags = set()
+        for token in tokens[1:]:
+            if '=' in token:
+                key, value = token.split('=', 1)
+                args[key.strip().lower()] = value.strip()
+            else:
+                flags.add(token.strip().lower())
+
+        allowed_keys = {
+            'exchange',
+            'exchanges',
+            'scope',
+            'scope_id',
+            'categories',
+            'instrument_ids',
+            'series_ids',
+            'series_types',
+            'start',
+            'start_date',
+            'end',
+            'end_date',
+            'max_days',
+        }
+        allowed_flags = {'dry_run', 'write'}
+        unknown_keys = sorted(set(args) - allowed_keys)
+        unknown_flags = sorted(flags - allowed_flags)
+        if unknown_keys or unknown_flags:
+            await self._send_futures_calendar_backfill_usage(chat_id)
+            return
+
+        start_date = args.get('start') or args.get('start_date')
+        end_date = args.get('end') or args.get('end_date')
+        if not start_date or not end_date:
+            await self._send_futures_calendar_backfill_usage(chat_id)
+            return
+        if self._parse_date_arg(start_date) is None or self._parse_date_arg(end_date) is None:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start/end` 必须使用 `YYYY-MM-DD` 格式。",
+                parse_mode='markdown',
+            )
+            return
+        if start_date > end_date:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start` 不能晚于 `end`。",
+                parse_mode='markdown',
+            )
+            return
+        if 'dry_run' in flags and 'write' in flags:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`dry_run` 和 `write` 只能二选一。",
+                parse_mode='markdown',
+            )
+            return
+
+        max_days = None
+        if args.get('max_days'):
+            try:
+                max_days = max(1, int(args['max_days']))
+            except ValueError:
+                await self.task_manager.send_message(
+                    chat_id,
+                    "❌ *参数错误*\n\n`max_days=N` 中 N 必须是正整数。",
+                    parse_mode='markdown',
+                )
+                return
+
+        exchanges = self._split_csv_arg(args.get('exchanges') or args.get('exchange'))
+        categories = self._split_csv_arg(args.get('categories'))
+        instrument_ids = self._split_csv_arg(args.get('instrument_ids'))
+        series_ids = self._split_csv_arg(args.get('series_ids'))
+        series_types = self._split_csv_arg(args.get('series_types'))
+        scope_id = args.get('scope_id') or args.get('scope')
+        dry_run = 'write' not in flags
+
+        start_message = (
+            "⏳ *期货官方交易日历手工回填已启动...*\n\n"
+            f"scope_id: `{scope_id}`\n"
+            f"exchanges: `{','.join(exchanges or []) or None}`\n"
+            f"categories: `{','.join(categories or []) or None}`\n"
+            f"start: `{start_date}`\n"
+            f"end: `{end_date}`\n"
+            f"dry_run: `{dry_run}`\n"
+            f"max_days: `{max_days}`\n\n"
+            "说明：该任务只维护 `data/futures.db` 的交易日历，不下载行情价格。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        asyncio.create_task(
+            self._run_futures_calendar_backfill_task(
+                chat_id=chat_id,
+                scope_id=scope_id,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+        )
+
+    async def _send_futures_calendar_backfill_usage(self, chat_id: int) -> None:
+        await self.task_manager.send_message(
+            chat_id,
+            (
+                "❌ *参数错误*\n\n"
+                "用法: `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD "
+                "end=YYYY-MM-DD [dry_run|write] [max_days=N]`\n\n"
+                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`。\n\n"
+                "示例:\n"
+                "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
+                "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`"
+            ),
+            parse_mode='markdown',
+        )
+
+    @staticmethod
+    def _split_csv_arg(value: Optional[str]) -> Optional[List[str]]:
+        if not value:
+            return None
+        items = [item.strip() for item in str(value).replace(';', ',').split(',') if item.strip()]
+        return items or None
+
+    async def _run_futures_calendar_backfill_task(
+        self,
+        *,
+        chat_id: int,
+        scope_id: Optional[str],
+        exchanges: Optional[List[str]],
+        categories: Optional[List[str]],
+        instrument_ids: Optional[List[str]],
+        series_ids: Optional[List[str]],
+        series_types: Optional[List[str]],
+        start_date: str,
+        end_date: str,
+        dry_run: bool,
+        max_days: Optional[int],
+    ) -> None:
+        try:
+            scheduler = self.task_manager.task_scheduler
+            result = await scheduler.execute_job_direct(
+                'futures_official_calendar_backfill',
+                parameters={
+                    'scope_id': scope_id,
+                    'scope_ids': None,
+                    'exchanges': exchanges,
+                    'categories': categories,
+                    'instrument_ids': instrument_ids,
+                    'series_ids': series_ids,
+                    'series_types': series_types,
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'dry_run': dry_run,
+                    'max_days': max_days,
+                },
+                include_dependencies=True,
+            )
+            status_text = '成功' if result else '失败'
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    f"{'✅' if result else '❌'} *期货交易日历手工回填{status_text}*\n\n"
+                    f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"
+                    f"start: `{start_date}`\n"
+                    f"end: `{end_date}`\n"
+                    f"dry_run: `{dry_run}`\n"
+                    f"max_days: `{max_days}`\n\n"
+                    "详细结果以任务报告和日志为准。"
+                ),
+                parse_mode='markdown',
+            )
+        except Exception as exc:
+            self.task_manager.logger.error(
+                f"[TaskManagerHandlers] 期货交易日历手工回填异常: {exc}"
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *期货交易日历手工回填异常*\n\n错误: `{exc}`",
+                parse_mode='markdown',
+            )
 
     async def _run_industry_standard_sync_task(
         self,

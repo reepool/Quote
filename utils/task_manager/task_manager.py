@@ -74,6 +74,7 @@ class TaskManagerBot:
             self.telegram_bot.register_command_handler('/industry_standard_rebuild', self.handlers.handle_industry_standard_rebuild_command)
             self.telegram_bot.register_command_handler('/industry_index_analysis_sync', self.handlers.handle_industry_index_analysis_sync_command)
             self.telegram_bot.register_command_handler('/industry_index_analysis_backfill', self.handlers.handle_industry_index_analysis_backfill_command)
+            self.telegram_bot.register_command_handler('/futures_calendar_backfill', self.handlers.handle_futures_calendar_backfill_command)
             self.telegram_bot.register_command_handler('/audit_factors', self.handlers.handle_audit_factors_command)
             self.telegram_bot.register_command_handler('/hkex_review', self.handlers.handle_hkex_review_command)
             self.telegram_bot.register_command_handler('/smart_fill_gaps', self.handlers.handle_smart_fill_gaps_command)
@@ -161,6 +162,7 @@ class TaskManagerBot:
             "• `/industry_standard_rebuild [force] [drop_source_files]` - 申万官方分类全量重建\n"
             "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
             "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
+            "• `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write] [max_days=N]` - 手工回填期货交易日历\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口\n"
             "• `/find_gap_and_repair` - 精确逐日检测并修复缺口\n"
             "• `/reload_config` - 重载配置文件\n"

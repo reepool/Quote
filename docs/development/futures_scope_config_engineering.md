@@ -246,12 +246,22 @@ sync(
 3. 单个 scope 启用日更。
 4. 多个 scope 串行或分时段启用。
 
+交易日历落库的手工任务使用 `futures_official_calendar_backfill`，该任务配置为
+`enabled=true` 且 `manual_only=true`，因此可由任务管理器触发但不会进入自动调度。
+默认参数保持 `dry_run=true`、`max_days=10`，真实写库必须显式传入 `write`：
+
+```text
+/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10
+/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10
+/futures_calendar_backfill scope=gfex_all start=2022-12-22 end=2022-12-31 dry_run max_days=10
+```
+
 ## 6. 验收标准
 
 - `config/11_futures.json` 可被加载并合并到 `ResearchConfig.modules["commodity_market_data"]`。
 - `exchanges=["all"]` 和 `categories=["all"]` 能展开为确定的目标。
 - `gfex_all` 能解析到 GFEX 三个 P0 instrument 和对应 main series。
-- `domestic_all` 默认 disabled，启用后能解析到当前全部国内 P0 universe。
+- `domestic_all` 能解析到当前全部国内 P0 universe；正式执行应通过手工命令或任务参数进一步限定交易所和日期范围。
 - 交易日历回补脚本支持 `--scope-id`，并只对解析出的交易所运行。
 - 行情同步支持按 `scope_id` 或 `categories` 选择 series。
 - run metadata 和 summary 报告包含 requested/resolved scope。

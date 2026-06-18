@@ -2943,7 +2943,12 @@ class TestResearchRoutes:
 
         assert response["domain"] == "futures_official_trading_calendar_backfill"
         mock_dm.run_futures_official_calendar_backfill.assert_awaited_once_with(
+            scope_id=None,
             exchanges=["SHFE"],
+            categories=None,
+            instrument_ids=None,
+            series_ids=None,
+            series_types=None,
             start_date="2024-06-01",
             end_date="2024-06-04",
             dry_run=True,

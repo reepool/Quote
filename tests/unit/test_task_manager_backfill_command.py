@@ -105,6 +105,47 @@ async def test_backfill_range_rejects_invalid_exchange():
 
 
 @pytest.mark.asyncio
+async def test_futures_calendar_backfill_manual_task_passes_direct_parameters():
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+
+    await handler._run_futures_calendar_backfill_task(
+        chat_id=1,
+        scope_id='gfex_all',
+        exchanges=['GFEX'],
+        categories=['all'],
+        instrument_ids=None,
+        series_ids=None,
+        series_types=['main_continuous'],
+        start_date='2022-12-22',
+        end_date='2022-12-31',
+        dry_run=False,
+        max_days=10,
+    )
+
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        'futures_official_calendar_backfill',
+        parameters={
+            'scope_id': 'gfex_all',
+            'scope_ids': None,
+            'exchanges': ['GFEX'],
+            'categories': ['all'],
+            'instrument_ids': None,
+            'series_ids': None,
+            'series_types': ['main_continuous'],
+            'start_date': '2022-12-22',
+            'end_date': '2022-12-31',
+            'dry_run': False,
+            'max_days': 10,
+        },
+        include_dependencies=True,
+    )
+    sent_message = task_manager.send_message.await_args.args[1]
+    assert '期货交易日历手工回填成功' in sent_message
+
+
+@pytest.mark.asyncio
 async def test_hkex_review_command_appends_manual_evidence():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(
