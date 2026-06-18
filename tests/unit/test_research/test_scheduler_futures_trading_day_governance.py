@@ -1,4 +1,6 @@
 import asyncio
+import json
+from pathlib import Path
 from unittest.mock import AsyncMock
 
 from scheduler.tasks import ScheduledTasks
@@ -94,6 +96,13 @@ def test_futures_official_calendar_backfill_task_reports_and_clears_active_flag(
         max_days=3,
     )
     assert "futures_official_calendar_backfill" not in task._active_tasks
+
+
+def test_futures_official_calendar_backfill_config_has_no_note_runtime_parameter():
+    config = json.loads(Path("config/05_scheduler.json").read_text(encoding="utf-8"))
+    parameters = config["scheduler_config"]["jobs"]["futures_official_calendar_backfill"]["parameters"]
+
+    assert "note" not in parameters
 
 
 def test_futures_market_data_sync_stops_when_governance_blocks_production():

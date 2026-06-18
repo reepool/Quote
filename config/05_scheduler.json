@@ -599,6 +599,7 @@
         "enabled": true,
         "manual_only": true,
         "description": "商品期货官方交易日历历史回填（从官方日行情接口验证交易/休市；只写 data/futures.db 日历，不写行情）",
+        "operator_note": "Manual safety default is dry_run with max_days=10. Use /futures_calendar_backfill ... write for explicit persistence. Future dates are not weekday-filled; they require official notice evidence.",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -618,8 +619,7 @@
           "start_date": "2010-01-01",
           "dry_run": true,
           "max_days": 10,
-          "max_runtime_seconds": 14400,
-          "note": "Manual safety default is dry_run with max_days=10. Use /futures_calendar_backfill ... write for explicit persistence. Future dates are not weekday-filled; they require official notice evidence."
+          "max_runtime_seconds": 14400
         }
       },
       "futures_market_data_sync": {
