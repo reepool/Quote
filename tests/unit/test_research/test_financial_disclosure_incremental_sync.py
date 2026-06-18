@@ -671,6 +671,59 @@ def test_reconciliation_accepts_pre_listing_period_without_source_retry(tmp_path
     assert storage.states[0]["classification"] == "pre_listing_period"
 
 
+def test_reconciliation_converts_pre_listing_pending_state_without_source_retry(tmp_path):
+    storage = _FakeStorage(
+        ready=False,
+        pending_states=[
+            {
+                "instrument_id": "001237.SZ",
+                "symbol": "001237",
+                "exchange": "SZSE",
+                "report_period": "2026-03-31",
+                "announcement_id": "local-gap:001237.SZ:2026-03-31",
+                "status": "pending_recheck",
+                "classification": "periodic_report_available",
+                "selection_reasons": ["pending_recheck"],
+            }
+        ],
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeLifecycleDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    async def _unexpected_import(**kwargs):
+        raise AssertionError("pre-listing pending states must not call source repair")
+
+    service._run_targeted_import = _unexpected_import
+
+    result = _run(
+        service.sync(
+            exchanges=["SZSE"],
+            target_instrument_ids=["001237.SZ"],
+            report_periods=["2026-03-31"],
+            max_candidates=5,
+            dry_run=False,
+            reconciliation=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["accepted_gap_count"] == 1
+    assert result["pending_recheck_count"] == 0
+    assert result["source_routing"]["cninfo_attempts"] == 0
+    assert result["source_routing"]["fallback_attempts"] == 0
+    assert result["report_period_lifecycle_summary"]["pre_listing"] == 1
+    assert storage.states[-1]["status"] == "accepted_disclosure_gap"
+    assert storage.states[-1]["classification"] == "pre_listing_period"
+    assert storage.states[-1]["pending_recheck_until"] is None
+    assert storage.states[-1]["metadata"]["event_count"] == 1
+    assert storage.states[-1]["metadata"]["lifecycle_classification"] == "pre_listing_period"
+    assert "lifecycle:pre_listing_period" in storage.states[-1]["selection_reasons"]
+
+
 def test_reconciliation_reuses_accepted_disclosure_state_without_source_retry(tmp_path):
     storage = _FakeStorage(
         ready=False,

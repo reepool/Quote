@@ -581,11 +581,9 @@ class FinancialDisclosureIncrementalSyncService:
             if instrument is None:
                 continue
             candidate = self._candidate_for_event(instrument, event)
-            is_new = candidate.key not in candidates
-            candidates.setdefault(candidate.key, candidate).events.append(event)
-            candidates[candidate.key].reasons.extend(
-                reason for reason in event.reasons if reason not in candidates[candidate.key].reasons
-            )
+            existing = candidates.setdefault(candidate.key, candidate)
+            if existing is not candidate:
+                self._merge_candidate_event(existing, event)
         with self.storage.financial_database_scope():
             pending_states = self.storage.list_financial_disclosure_event_states(
                 statuses=[
@@ -624,7 +622,9 @@ class FinancialDisclosureIncrementalSyncService:
                 title=state.get("title"),
             )
             candidate = self._candidate_for_event(instrument, event)
-            candidates.setdefault(candidate.key, candidate).events.append(event)
+            existing = candidates.setdefault(candidate.key, candidate)
+            if existing is not candidate:
+                self._merge_candidate_event(existing, event)
         if report_periods:
             for instrument in instruments:
                 for report_period in report_periods:
@@ -802,7 +802,35 @@ class FinancialDisclosureIncrementalSyncService:
         candidate = self._candidate_for_period(instrument, event.report_period)
         candidate.reasons = list(event.reasons)
         candidate.events = [event]
+        if candidate.lifecycle_classification:
+            lifecycle_reason = f"lifecycle:{candidate.lifecycle_classification}"
+            if lifecycle_reason not in candidate.reasons:
+                candidate.reasons.append(lifecycle_reason)
         return candidate
+
+    @staticmethod
+    def _merge_candidate_event(
+        candidate: FinancialDisclosureMaintenanceCandidate,
+        event: FinancialDisclosureEvent,
+    ) -> None:
+        event_key = (
+            event.announcement_id,
+            event.report_period,
+            event.classification,
+        )
+        existing_keys = {
+            (
+                item.announcement_id,
+                item.report_period,
+                item.classification,
+            )
+            for item in candidate.events
+        }
+        if event_key not in existing_keys:
+            candidate.events.append(event)
+        for reason in event.reasons:
+            if reason not in candidate.reasons:
+                candidate.reasons.append(reason)
 
     def _candidate_for_period(
         self,
