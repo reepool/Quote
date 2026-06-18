@@ -143,6 +143,18 @@
         "request_interval_seconds_by_exchange": {
           "GFEX": 0.9
         },
+        "challenge_retry_attempts_by_exchange": {
+          "GFEX": 3
+        },
+        "challenge_backoff_seconds_by_exchange": {
+          "GFEX": 20
+        },
+        "batch_pause_every_requests_by_exchange": {
+          "GFEX": 45
+        },
+        "batch_pause_seconds_by_exchange": {
+          "GFEX": 30
+        },
         "parser_version": "official_futures_daily.v1",
         "fallback_to": "akshare_futures",
         "interfaces": {
@@ -228,6 +240,9 @@
         "source_profile": "exchange_official_daily_probe",
         "quality_flag": "backfilled_verified",
         "future_policy": "official_notice_only",
+        "retry_unresolved_passes": 1,
+        "retry_unresolved_pause_seconds": 60,
+        "progress_log_every": 100,
         "exchange_start_dates": {
           "SHFE": "2002-01-07",
           "INE": "2018-03-26",

@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-from scheduler.tasks import ScheduledTasks
+from scheduler.tasks import ScheduledTasks, _format_futures_market_data_scheduler_report
 
 
 def _run(coro):
@@ -103,6 +103,48 @@ def test_futures_official_calendar_backfill_config_has_no_note_runtime_parameter
     parameters = config["scheduler_config"]["jobs"]["futures_official_calendar_backfill"]["parameters"]
 
     assert "note" not in parameters
+
+
+def test_futures_official_calendar_report_includes_failure_samples():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "blocked",
+            "domain": "futures_official_trading_calendar_backfill",
+            "source_profile": "exchange_official_daily_probe",
+            "quality_flag": "backfilled_verified",
+            "start_date": "2024-01-01",
+            "end_date": "2024-01-12",
+            "probe_end_date": "2024-01-12",
+            "dry_run": True,
+            "totals": {
+                "rows_written": 0,
+                "trading_days": 9,
+                "closed_days": 1,
+                "unresolved_dates": 1,
+                "request_count": 11,
+            },
+            "exchanges": [
+                {
+                    "exchange": "GFEX",
+                    "rows_written": 0,
+                    "trading_days": 9,
+                    "closed_days": 1,
+                    "unresolved_dates": 1,
+                    "future_dates_unresolved": 0,
+                    "latest_verified_date": "2024-01-10",
+                    "failure_samples": [
+                        {
+                            "trade_date": "2024-01-11",
+                            "reason": "gfex_html_challenge http_status=567",
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+
+    assert "失败样本" in report
+    assert "GFEX 2024-01-11: gfex_html_challenge http_status=567" in report
 
 
 def test_futures_market_data_sync_stops_when_governance_blocks_production():

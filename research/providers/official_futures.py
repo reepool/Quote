@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import os
 import re
 import time
@@ -28,6 +29,7 @@ from utils.http_transport import HttpTlsConfig, create_requests_session, request
 
 
 OFFICIAL_FUTURES_PARSER_VERSION = "official_futures_daily.v1"
+logger = logging.getLogger(__name__)
 
 
 class OfficialFuturesSourceUnavailable(RuntimeError):
@@ -278,6 +280,30 @@ class OfficialFuturesMarketDataProvider:
             for exchange, value in interval_by_exchange.items()
             if str(exchange).strip()
         } if isinstance(interval_by_exchange, Mapping) else {}
+        challenge_retry_attempts = self.source_cfg.get("challenge_retry_attempts_by_exchange", {})
+        self.challenge_retry_attempts_by_exchange = {
+            str(exchange).upper(): max(0, int(value))
+            for exchange, value in challenge_retry_attempts.items()
+            if str(exchange).strip()
+        } if isinstance(challenge_retry_attempts, Mapping) else {}
+        challenge_backoff = self.source_cfg.get("challenge_backoff_seconds_by_exchange", {})
+        self.challenge_backoff_seconds_by_exchange = {
+            str(exchange).upper(): max(0.0, float(value))
+            for exchange, value in challenge_backoff.items()
+            if str(exchange).strip()
+        } if isinstance(challenge_backoff, Mapping) else {}
+        batch_pause_every = self.source_cfg.get("batch_pause_every_requests_by_exchange", {})
+        self.batch_pause_every_requests_by_exchange = {
+            str(exchange).upper(): max(0, int(value))
+            for exchange, value in batch_pause_every.items()
+            if str(exchange).strip()
+        } if isinstance(batch_pause_every, Mapping) else {}
+        batch_pause_seconds = self.source_cfg.get("batch_pause_seconds_by_exchange", {})
+        self.batch_pause_seconds_by_exchange = {
+            str(exchange).upper(): max(0.0, float(value))
+            for exchange, value in batch_pause_seconds.items()
+            if str(exchange).strip()
+        } if isinstance(batch_pause_seconds, Mapping) else {}
         empty_closed_defaults = {
             exchange: "2010-01-01"
             for exchange in self.supported_exchanges
@@ -300,6 +326,7 @@ class OfficialFuturesMarketDataProvider:
         }
         self.tls_config = HttpTlsConfig(source_name=self.source_name)
         self._last_request_started_at = 0.0
+        self._request_counts_by_exchange: Dict[str, int] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
 
     def supports_series(self, series: FuturesSeries) -> bool:
@@ -634,7 +661,8 @@ class OfficialFuturesMarketDataProvider:
         trade_date: str,
     ) -> Any:
         last_error: Optional[Exception] = None
-        for attempt in range(1, self.retry_attempts + 1):
+        max_attempts = max(self.retry_attempts, self._challenge_retry_attempts_for_exchange(exchange) + 1)
+        for attempt in range(1, max_attempts + 1):
             self._wait_for_request_slot(exchange)
             try:
                 if exchange == "SHFE":
@@ -683,15 +711,59 @@ class OfficialFuturesMarketDataProvider:
                             headers=self.GFEX_AJAX_HEADERS,
                             timeout=self.timeout_seconds,
                         )
+                    if self._is_challenge_response(response):
+                        logger.warning(
+                            "[OfficialFutures] challenge response exchange=%s trade_date=%s attempt=%s http_status=%s content_type=%s",
+                            exchange,
+                            trade_date,
+                            attempt,
+                            getattr(response, "status_code", None),
+                            (getattr(response, "headers", {}) or {}).get("content-type", ""),
+                        )
+                        raise OfficialFuturesSourceUnavailable(
+                            "gfex_html_challenge "
+                            f"http_status={getattr(response, 'status_code', None)} "
+                            f"content_type={(getattr(response, 'headers', {}) or {}).get('content-type', '')}"
+                        )
                     response.raise_for_status()
                     return response.json()
                 raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")
             except Exception as exc:
                 last_error = exc
+                if self._is_retryable_challenge(exc) and attempt <= self._challenge_retry_attempts_for_exchange(exchange):
+                    backoff = self._challenge_backoff_for_exchange(exchange)
+                    if backoff > 0:
+                        logger.warning(
+                            "[OfficialFutures] challenge retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
+                            exchange,
+                            trade_date,
+                            attempt,
+                            attempt + 1,
+                            backoff * attempt,
+                            exc,
+                        )
+                        time.sleep(backoff * attempt)
+                    continue
                 if attempt >= self.retry_attempts:
                     break
                 if self.retry_backoff_seconds > 0:
+                    logger.warning(
+                        "[OfficialFutures] request retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
+                        exchange,
+                        trade_date,
+                        attempt,
+                        attempt + 1,
+                        self.retry_backoff_seconds * attempt,
+                        exc,
+                    )
                     time.sleep(self.retry_backoff_seconds * attempt)
+        logger.warning(
+            "[OfficialFutures] request failed exchange=%s trade_date=%s attempts=%s error=%s",
+            exchange,
+            trade_date,
+            max_attempts,
+            last_error,
+        )
         raise OfficialFuturesSourceUnavailable(
             f"official {exchange} request failed for {trade_date}: {last_error}"
         )
@@ -1019,16 +1091,52 @@ class OfficialFuturesMarketDataProvider:
             self.request_interval_seconds,
         )
 
+    def _challenge_retry_attempts_for_exchange(self, exchange: str) -> int:
+        return self.challenge_retry_attempts_by_exchange.get(str(exchange or "").upper(), 0)
+
+    def _challenge_backoff_for_exchange(self, exchange: str) -> float:
+        return self.challenge_backoff_seconds_by_exchange.get(str(exchange or "").upper(), 0.0)
+
     def _wait_for_request_slot(self, exchange: str) -> None:
-        interval = self._request_interval_for_exchange(exchange)
+        exchange_key = str(exchange or "").upper()
+        interval = self._request_interval_for_exchange(exchange_key)
         if interval <= 0:
             self._last_request_started_at = time.monotonic()
-            return
-        now = time.monotonic()
-        elapsed = now - self._last_request_started_at
-        if self._last_request_started_at > 0 and elapsed < interval:
-            time.sleep(interval - elapsed)
-        self._last_request_started_at = time.monotonic()
+        else:
+            now = time.monotonic()
+            elapsed = now - self._last_request_started_at
+            if self._last_request_started_at > 0 and elapsed < interval:
+                time.sleep(interval - elapsed)
+            self._last_request_started_at = time.monotonic()
+        count = self._request_counts_by_exchange.get(exchange_key, 0) + 1
+        self._request_counts_by_exchange[exchange_key] = count
+        pause_every = self.batch_pause_every_requests_by_exchange.get(exchange_key, 0)
+        pause_seconds = self.batch_pause_seconds_by_exchange.get(exchange_key, 0.0)
+        if pause_every > 0 and pause_seconds > 0 and count > 1 and (count - 1) % pause_every == 0:
+            logger.info(
+                "[OfficialFutures] batch pause exchange=%s request_count=%s pause_seconds=%s",
+                exchange_key,
+                count - 1,
+                pause_seconds,
+            )
+            time.sleep(pause_seconds)
+            self._last_request_started_at = time.monotonic()
+
+    @staticmethod
+    def _is_challenge_response(response: requests.Response) -> bool:
+        headers = getattr(response, "headers", {}) or {}
+        content_type = headers.get("content-type", "").lower()
+        if getattr(response, "status_code", None) == 567:
+            return True
+        if "html" not in content_type:
+            return False
+        text = getattr(response, "text", "") or ""
+        return text.lstrip().startswith("<!doctype html") or "<html" in text[:200].lower()
+
+    @staticmethod
+    def _is_retryable_challenge(exc: Exception) -> bool:
+        text = str(exc).lower()
+        return "gfex_html_challenge" in text or "http_status=567" in text
 
 
 def _select_main_contract(rows: Sequence[OfficialFuturesContractBar]) -> OfficialFuturesContractBar:

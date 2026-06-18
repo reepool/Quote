@@ -942,10 +942,32 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
                 f"closed={item.get('closed_days', 0)}, "
                 f"unresolved={item.get('unresolved_dates', 0)}, "
                 f"future_unresolved={item.get('future_dates_unresolved', 0)}, "
+                f"retry_passes={item.get('retry_passes_attempted', 0)}, "
+                f"retry_resolved={item.get('retry_dates_resolved', 0)}, "
                 f"latest={item.get('latest_verified_date') or 'N/A'}"
             )
         if not detail_lines:
             detail_lines.append(result.get("reason") or "无交易所明细")
+        failure_lines = []
+        for item in result.get("exchanges") or []:
+            exchange = item.get("exchange", "unknown")
+            for sample in (item.get("failure_samples") or [])[:5]:
+                failure_lines.append(
+                    f"{exchange} {sample.get('trade_date', 'N/A')}: "
+                    f"{sample.get('reason', sample.get('status', 'unresolved'))}"
+                )
+                if len(failure_lines) >= 10:
+                    break
+            if len(failure_lines) >= 10:
+                break
+        failure_text = ""
+        if failure_lines:
+            failure_text = (
+                "\n\n失败样本:\n"
+                "```text\n"
+                + "\n".join(failure_lines)
+                + "\n```"
+            )
         return (
             f"{icon} *商品期货官方交易日历回填*\n\n"
             f"结论: *{label}*\n"
@@ -964,6 +986,7 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
             "```text\n"
             + "\n".join(detail_lines)
             + "\n```"
+            + failure_text
         )
     totals = result.get("totals") or {}
     governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}

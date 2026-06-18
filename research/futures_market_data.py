@@ -5,8 +5,10 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import math
 import sqlite3
+import time
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
@@ -17,6 +19,8 @@ from typing import Any, Dict, Generator, Iterable, List, Optional, Protocol, Seq
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 
+
+logger = logging.getLogger(__name__)
 
 FUTURES_DIAGNOSTICS_VERSION = "futures_cycle_diagnostics.v1"
 FUTURES_SYNC_VERSION = "futures_market_data_sync.v1"
@@ -3976,6 +3980,9 @@ class FuturesOfficialCalendarBackfillService:
         backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
         master_cfg = self.module_cfg.get("master_data", {}) if isinstance(self.module_cfg.get("master_data", {}), dict) else {}
         self.start_date = str(backfill_cfg.get("start_date") or self.default_start_date)
+        self.retry_unresolved_passes = max(0, int(backfill_cfg.get("retry_unresolved_passes", 1)))
+        self.retry_unresolved_pause_seconds = max(0.0, float(backfill_cfg.get("retry_unresolved_pause_seconds", 60)))
+        self.progress_log_every = max(0, int(backfill_cfg.get("progress_log_every", 100)))
         self.default_timezone = str(
             backfill_cfg.get("timezone")
             or governance_cfg.get("default_timezone")
@@ -4062,6 +4069,14 @@ class FuturesOfficialCalendarBackfillService:
 
         try:
             for exchange in exchange_list:
+                logger.info(
+                    "[FuturesOfficialCalendarBackfill] start exchange=%s start=%s end=%s probe_end=%s dry_run=%s",
+                    exchange,
+                    start,
+                    requested_end,
+                    probe_end if start <= probe_end else None,
+                    dry_run,
+                )
                 result: Dict[str, Any] = {
                     "exchange": exchange,
                     "start_date": start,
@@ -4075,9 +4090,11 @@ class FuturesOfficialCalendarBackfillService:
                     "request_count": 0,
                     "latest_verified_date": None,
                     "failure_samples": [],
+                    "retry_passes_attempted": 0,
+                    "retry_dates_resolved": 0,
                 }
-                calendar_days: List[FuturesTradingCalendarDay] = []
-                unresolved_dates: List[str] = []
+                verified_by_date: Dict[str, FuturesTradingCalendarDay] = {}
+                unresolved_reasons: Dict[str, str] = {}
                 if start <= probe_end:
                     current = date.fromisoformat(start)
                     end_obj = date.fromisoformat(probe_end)
@@ -4085,64 +4102,124 @@ class FuturesOfficialCalendarBackfillService:
                         key = current.isoformat()
                         if max_total_days is not None and total_requests >= max_total_days:
                             remaining = _date_range_count(key, probe_end)
-                            result["unresolved_dates"] += remaining
-                            unresolved_dates.append(key)
                             result["truncated"] = True
-                            result["failure_samples"].append(
-                                {
-                                    "trade_date": key,
-                                    "remaining_dates": remaining,
-                                    "reason": "max_days_limit_reached",
-                                }
+                            result["truncated_remaining_dates"] = remaining
+                            unresolved_reasons[key] = f"max_days_limit_reached remaining_dates={remaining}"
+                            logger.warning(
+                                "[FuturesOfficialCalendarBackfill] max_days reached exchange=%s trade_date=%s remaining_dates=%s request_count=%s",
+                                exchange,
+                                key,
+                                remaining,
+                                result["request_count"],
                             )
                             break
                         probe = provider.probe_exchange_trading_day(exchange, key)
                         result["request_count"] += 1
                         total_requests += 1
-                        if probe.status in {"trading", "closed"} and probe.is_trading_day is not None:
-                            if probe.is_trading_day:
-                                result["trading_days"] += 1
-                                total_trading += 1
-                            else:
-                                result["closed_days"] += 1
-                                total_closed += 1
-                            result["latest_verified_date"] = key
-                            calendar_days.append(
-                                FuturesTradingCalendarDay(
-                                    exchange=exchange,
-                                    trade_date=key,
-                                    is_trading_day=bool(probe.is_trading_day),
-                                    timezone=self.default_timezone,
-                                    session_type="day_and_night" if probe.is_trading_day else "closed",
-                                    source_profile=self.source_profile,
-                                    quality_flag="backfilled_verified",
-                                    parser_version=probe.parser_version,
-                                    evidence_url=probe.evidence_url,
-                                    metadata={
-                                        "classification_status": probe.status,
-                                        "classification_rule": probe.metadata.get("classification_rule"),
-                                        "source_interface": probe.source_interface,
-                                        "row_count": probe.row_count,
-                                        "payload_hash": probe.payload_hash,
-                                        "failure_reason": probe.failure_reason,
-                                        "verified_by": "official_exchange_daily_market_data",
-                                    },
-                                )
-                            )
+                        calendar_day = self._calendar_day_from_probe(exchange, key, probe)
+                        if calendar_day:
+                            verified_by_date[key] = calendar_day
                         else:
-                            unresolved_dates.append(key)
-                            result["unresolved_dates"] += 1
-                            if len(result["failure_samples"]) < 20:
-                                result["failure_samples"].append(
-                                    {"trade_date": key, "reason": probe.failure_reason or probe.status}
-                                )
+                            unresolved_reasons[key] = probe.failure_reason or probe.status
+                            logger.warning(
+                                "[FuturesOfficialCalendarBackfill] unresolved exchange=%s trade_date=%s reason=%s category=%s retryable=%s",
+                                exchange,
+                                key,
+                                unresolved_reasons[key],
+                                probe.metadata.get("failure_category"),
+                                probe.metadata.get("is_retryable"),
+                            )
+                        if self.progress_log_every and result["request_count"] % self.progress_log_every == 0:
+                            logger.info(
+                                "[FuturesOfficialCalendarBackfill] progress exchange=%s requests=%s verified=%s unresolved=%s latest=%s",
+                                exchange,
+                                result["request_count"],
+                                len(verified_by_date),
+                                len(unresolved_reasons),
+                                key,
+                            )
                         current += timedelta(days=1)
+                    if unresolved_reasons and not result.get("truncated") and self.retry_unresolved_passes > 0:
+                        for retry_pass in range(1, self.retry_unresolved_passes + 1):
+                            retry_dates = sorted(unresolved_reasons)
+                            if not retry_dates:
+                                break
+                            result["retry_passes_attempted"] = retry_pass
+                            if self.retry_unresolved_pause_seconds > 0:
+                                logger.info(
+                                    "[FuturesOfficialCalendarBackfill] unresolved retry pause exchange=%s pass=%s dates=%s pause_seconds=%s",
+                                    exchange,
+                                    retry_pass,
+                                    len(retry_dates),
+                                    self.retry_unresolved_pause_seconds,
+                                )
+                                time.sleep(self.retry_unresolved_pause_seconds)
+                            logger.warning(
+                                "[FuturesOfficialCalendarBackfill] unresolved retry start exchange=%s pass=%s dates=%s first=%s last=%s",
+                                exchange,
+                                retry_pass,
+                                len(retry_dates),
+                                retry_dates[0],
+                                retry_dates[-1],
+                            )
+                            pass_resolved = 0
+                            for key in retry_dates:
+                                if max_total_days is not None and total_requests >= max_total_days:
+                                    logger.warning(
+                                        "[FuturesOfficialCalendarBackfill] retry stopped by max_days exchange=%s pass=%s trade_date=%s total_requests=%s",
+                                        exchange,
+                                        retry_pass,
+                                        key,
+                                        total_requests,
+                                    )
+                                    break
+                                probe = provider.probe_exchange_trading_day(exchange, key)
+                                result["request_count"] += 1
+                                total_requests += 1
+                                calendar_day = self._calendar_day_from_probe(exchange, key, probe)
+                                if calendar_day:
+                                    verified_by_date[key] = calendar_day
+                                    unresolved_reasons.pop(key, None)
+                                    pass_resolved += 1
+                                    result["retry_dates_resolved"] += 1
+                                else:
+                                    unresolved_reasons[key] = probe.failure_reason or probe.status
+                                    logger.warning(
+                                        "[FuturesOfficialCalendarBackfill] unresolved retry still failed exchange=%s pass=%s trade_date=%s reason=%s category=%s retryable=%s",
+                                        exchange,
+                                        retry_pass,
+                                        key,
+                                        unresolved_reasons[key],
+                                        probe.metadata.get("failure_category"),
+                                        probe.metadata.get("is_retryable"),
+                                    )
+                            logger.warning(
+                                "[FuturesOfficialCalendarBackfill] unresolved retry end exchange=%s pass=%s resolved=%s remaining=%s",
+                                exchange,
+                                retry_pass,
+                                pass_resolved,
+                                len(unresolved_reasons),
+                            )
                 if requested_end > today:
                     result["future_note"] = "future dates require official notice evidence and were not weekday-filled"
+                calendar_days = [verified_by_date[key] for key in sorted(verified_by_date)]
+                result["trading_days"] = sum(1 for item in calendar_days if item.is_trading_day)
+                result["closed_days"] = sum(1 for item in calendar_days if not item.is_trading_day)
+                truncated_extra = 0
+                if result.get("truncated_remaining_dates"):
+                    truncated_extra = max(0, int(result["truncated_remaining_dates"]) - 1)
+                result["unresolved_dates"] = len(unresolved_reasons) + truncated_extra
+                result["latest_verified_date"] = max(verified_by_date) if verified_by_date else None
+                result["failure_samples"] = [
+                    {"trade_date": key, "reason": reason}
+                    for key, reason in sorted(unresolved_reasons.items())[:20]
+                ]
+                total_trading += int(result["trading_days"])
+                total_closed += int(result["closed_days"])
                 if calendar_days and not dry_run:
                     result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
                     total_written += int(result["rows_written"])
-                if unresolved_dates and not dry_run:
+                if unresolved_reasons and not dry_run:
                     governance.create_review_required(
                         exchange=exchange,
                         evidence_ref=f"{self.source_profile}:{exchange}:{start}:{probe_end}",
@@ -4151,14 +4228,27 @@ class FuturesOfficialCalendarBackfillService:
                         scope_id=exchange,
                         start_date=start,
                         end_date=probe_end,
-                        trade_dates=unresolved_dates[:200],
+                        trade_dates=sorted(unresolved_reasons)[:200],
                         metadata={
-                            "unresolved_count": len(unresolved_dates),
+                            "unresolved_count": len(unresolved_reasons),
                             "failure_samples": result["failure_samples"],
                             "source_profile": self.source_profile,
                         },
                     )
                 total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
+                logger.info(
+                    "[FuturesOfficialCalendarBackfill] exchange done exchange=%s status=%s requests=%s trading=%s closed=%s unresolved=%s retry_passes=%s retry_resolved=%s rows_written=%s dry_run=%s",
+                    exchange,
+                    "success" if result["unresolved_dates"] == 0 and result["future_dates_unresolved"] == 0 else "blocked",
+                    result["request_count"],
+                    result["trading_days"],
+                    result["closed_days"],
+                    result["unresolved_dates"],
+                    result["retry_passes_attempted"],
+                    result["retry_dates_resolved"],
+                    result["rows_written"],
+                    dry_run,
+                )
                 exchange_results.append(result)
         finally:
             close = getattr(provider, "close", None)
@@ -4201,6 +4291,35 @@ class FuturesOfficialCalendarBackfillService:
         if unsupported:
             raise ValueError(f"unsupported futures official calendar exchanges: {', '.join(unsupported)}")
         return requested
+
+    def _calendar_day_from_probe(
+        self,
+        exchange: str,
+        trade_date: str,
+        probe: Any,
+    ) -> Optional[FuturesTradingCalendarDay]:
+        if probe.status not in {"trading", "closed"} or probe.is_trading_day is None:
+            return None
+        return FuturesTradingCalendarDay(
+            exchange=exchange,
+            trade_date=trade_date,
+            is_trading_day=bool(probe.is_trading_day),
+            timezone=self.default_timezone,
+            session_type="day_and_night" if probe.is_trading_day else "closed",
+            source_profile=self.source_profile,
+            quality_flag="backfilled_verified",
+            parser_version=probe.parser_version,
+            evidence_url=probe.evidence_url,
+            metadata={
+                "classification_status": probe.status,
+                "classification_rule": probe.metadata.get("classification_rule"),
+                "source_interface": probe.source_interface,
+                "row_count": probe.row_count,
+                "payload_hash": probe.payload_hash,
+                "failure_reason": probe.failure_reason,
+                "verified_by": "official_exchange_daily_market_data",
+            },
+        )
 
 
 def _next_date(value: str) -> str:

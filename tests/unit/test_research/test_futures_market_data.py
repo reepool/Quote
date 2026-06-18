@@ -5,6 +5,7 @@ import json
 from datetime import date, timedelta
 import pandas as pd
 import pytest
+import requests
 
 from research.futures_market_data import (
     FuturesBar,
@@ -506,7 +507,10 @@ def test_official_calendar_backfill_writes_verified_rows_and_no_weekday_guess(mo
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["trading_day_governance"] = {
         "enabled_exchanges": ["SHFE"],
-        "official_calendar_backfill": {"start_date": "2010-01-01"},
+        "official_calendar_backfill": {
+            "start_date": "2010-01-01",
+            "retry_unresolved_pause_seconds": 0,
+        },
     }
     config.modules["commodity_market_data"]["sources"] = {
         "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]}
@@ -566,6 +570,69 @@ def test_official_calendar_backfill_writes_verified_rows_and_no_weekday_guess(mo
     assert [row["trade_date"] for row in rows] == ["2024-06-03", "2024-06-04"]
     assert {row["quality_flag"] for row in rows} == {"backfilled_verified"}
     assert storage.list_manual_calendar_reviews(status="review_required")[0]["metadata"]["unresolved_count"] == 1
+
+
+def test_official_calendar_backfill_retries_unresolved_dates_at_task_end(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["GFEX"],
+        "official_calendar_backfill": {
+            "start_date": "2022-12-22",
+            "retry_unresolved_passes": 1,
+            "retry_unresolved_pause_seconds": 0,
+        },
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["GFEX"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    attempts = {}
+
+    def _probe(self, exchange, trade_date):
+        attempts[trade_date] = attempts.get(trade_date, 0) + 1
+        if trade_date == "2024-06-04" and attempts[trade_date] == 1:
+            return OfficialFuturesDailyProbeResult(
+                exchange=exchange,
+                trade_date=trade_date,
+                status="unresolved",
+                is_trading_day=None,
+                row_count=0,
+                source_interface="fixture",
+                evidence_url="https://official.example/20240604",
+                parser_version="fixture.v1",
+                failure_reason="gfex_html_challenge http_status=567",
+                metadata={"failure_category": "possible_anti_bot_or_ip_risk_control", "is_retryable": True},
+            )
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=2,
+            source_interface="fixture",
+            evidence_url=f"https://official.example/{trade_date.replace('-', '')}",
+            parser_version="fixture.v1",
+            payload_hash=f"hash-{trade_date}",
+        )
+
+    monkeypatch.setattr("research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day", _probe)
+
+    result = FuturesOfficialCalendarBackfillService(storage, config, config.modules["commodity_market_data"]).run(
+        exchanges=["GFEX"],
+        start_date="2024-06-03",
+        end_date="2024-06-05",
+    )
+    rows = storage.list_calendar_days(exchange="GFEX", start_date="2024-06-03", end_date="2024-06-05")
+
+    assert result["status"] == "success"
+    assert result["totals"]["rows_written"] == 3
+    assert result["totals"]["unresolved_dates"] == 0
+    assert result["exchanges"][0]["retry_passes_attempted"] == 1
+    assert result["exchanges"][0]["retry_dates_resolved"] == 1
+    assert attempts["2024-06-04"] == 2
+    assert [row["trade_date"] for row in rows] == ["2024-06-03", "2024-06-04", "2024-06-05"]
+    assert storage.list_manual_calendar_reviews(status="review_required") == []
 
 
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
@@ -972,6 +1039,10 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
             "enabled_exchanges": ["SHFE", "GFEX"],
             "request_interval_seconds": 0.05,
             "request_interval_seconds_by_exchange": {"GFEX": 0.9},
+            "challenge_retry_attempts_by_exchange": {"GFEX": 3},
+            "challenge_backoff_seconds_by_exchange": {"GFEX": 20},
+            "batch_pause_every_requests_by_exchange": {"GFEX": 45},
+            "batch_pause_seconds_by_exchange": {"GFEX": 30},
         }
     }
 
@@ -979,6 +1050,23 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
 
     assert provider._request_interval_for_exchange("GFEX") == 0.9
     assert provider._request_interval_for_exchange("SHFE") == 0.05
+    assert provider._challenge_retry_attempts_for_exchange("GFEX") == 3
+    assert provider._challenge_retry_attempts_for_exchange("SHFE") == 0
+    assert provider._challenge_backoff_for_exchange("GFEX") == 20
+
+
+def test_official_futures_provider_detects_gfex_html_challenge(tmp_path):
+    config = _research_config(tmp_path)
+    provider = OfficialFuturesMarketDataProvider(config)
+    response = requests.Response()
+    response.status_code = 567
+    response.headers["content-type"] = "text/html; charset=UTF-8"
+    response._content = b"<!doctype html><html lang=zh-CN></html>"
+
+    assert provider._is_challenge_response(response) is True
+    assert provider._is_retryable_challenge(
+        OfficialFuturesSourceUnavailable("gfex_html_challenge http_status=567")
+    ) is True
 
 
 def test_official_futures_provider_dce_uses_browser_client(monkeypatch, tmp_path):
