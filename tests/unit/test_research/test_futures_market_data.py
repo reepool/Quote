@@ -964,6 +964,23 @@ def test_official_futures_provider_gfex_uses_ajax_headers(monkeypatch, tmp_path)
     assert captured["session_headers"]["Referer"] == "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml"
 
 
+def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["SHFE", "GFEX"],
+            "request_interval_seconds": 0.05,
+            "request_interval_seconds_by_exchange": {"GFEX": 0.9},
+        }
+    }
+
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    assert provider._request_interval_for_exchange("GFEX") == 0.9
+    assert provider._request_interval_for_exchange("SHFE") == 0.05
+
+
 def test_official_futures_provider_dce_uses_browser_client(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {

@@ -728,8 +728,9 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 补充验证结论：
 
 - GFEX 官方日行情接口必须带 `Referer: http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml`、`Origin: http://www.gfex.com.cn`、`X-Requested-With: XMLHttpRequest`，否则容易返回 HTML challenge。
+- 2026-06-18 GFEX 频控实测：`0.05s`、`0.5s` 间隔约第 11 次请求开始出现 567；`0.75s` 间隔 20 次请求出现少量 567；`0.9s` 和 `1.0s` 间隔 20 次请求未出现 567。试运行配置先采用 GFEX 单独 `request_interval_seconds_by_exchange.GFEX=0.9`，完整回填仍应分批并支持断点；如全量 dry-run 仍出现 567，再上调到 `1.2s` 或切换手动代理补洞。
 - GFEX 同一页面还暴露 `POST /u/interfacesWebTpTradingCalendar/loadList`，返回的是交易/合约事件日历，不能单独证明全量交易日和休市日，但可作为交易日治理的辅助证据。
-- SHFE/INE 当前小样本直连、`akshare_proxy_patch.install_patch()` 和手动授权代理均可返回官方 JSON。若本机 IP 再次被限流，优先用 `scripts/dev_validation/probe_futures_proxy_patch_access.py` 复核代理可用性，再决定是否将代理通路纳入批量落库进程。
+- SHFE/INE 当前小样本直连、`akshare_proxy_patch.install_patch()` 和手动授权代理均可返回官方 JSON。GFEX 当前直连和手动授权代理均可返回官方 JSON；`akshare_proxy_patch.install_patch()` hook 模式在当前 requests 路径存在 `impersonate` 参数兼容问题，且部分 GFEX 请求仍可能返回 HTML challenge。若本机 IP 再次被限流，优先用 `scripts/dev_validation/probe_futures_proxy_patch_access.py` 或 `scripts/dev_validation/probe_gfex_rate_limit_threshold.py` 复核代理可用性，再决定是否将手动代理通路纳入批量落库进程。
 - AkShare 本地期货模块使用 `akshare.futures.cons.get_calendar()` 的通用交易日历，当前覆盖 `19901219` 至 `20261231`，来源为新浪/本地包内 `calendar.json`。它不是交易所级官方日历，不区分 SHFE、INE、DCE、CZCE、GFEX，只能作为备查或低质量兜底，不能替代官方交易日治理。
 
 生产落库必须按交易所分批执行并复核，不允许一次性以 `2000-01-01` 跑全交易所。推荐命令：

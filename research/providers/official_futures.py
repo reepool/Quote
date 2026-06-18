@@ -272,6 +272,12 @@ class OfficialFuturesMarketDataProvider:
         self.retry_attempts = max(1, int(self.source_cfg.get("retry_attempts", 2)))
         self.retry_backoff_seconds = max(0.0, float(self.source_cfg.get("retry_backoff_seconds", 0.5)))
         self.request_interval_seconds = max(0.0, float(self.source_cfg.get("request_interval_seconds", 0.0)))
+        interval_by_exchange = self.source_cfg.get("request_interval_seconds_by_exchange", {})
+        self.request_interval_seconds_by_exchange = {
+            str(exchange).upper(): max(0.0, float(value))
+            for exchange, value in interval_by_exchange.items()
+            if str(exchange).strip()
+        } if isinstance(interval_by_exchange, Mapping) else {}
         empty_closed_defaults = {
             exchange: "2010-01-01"
             for exchange in self.supported_exchanges
@@ -629,7 +635,7 @@ class OfficialFuturesMarketDataProvider:
     ) -> Any:
         last_error: Optional[Exception] = None
         for attempt in range(1, self.retry_attempts + 1):
-            self._wait_for_request_slot()
+            self._wait_for_request_slot(exchange)
             try:
                 if exchange == "SHFE":
                     response = request_get(
@@ -1007,14 +1013,21 @@ class OfficialFuturesMarketDataProvider:
             )
         return parsed
 
-    def _wait_for_request_slot(self) -> None:
-        if self.request_interval_seconds <= 0:
+    def _request_interval_for_exchange(self, exchange: str) -> float:
+        return self.request_interval_seconds_by_exchange.get(
+            str(exchange or "").upper(),
+            self.request_interval_seconds,
+        )
+
+    def _wait_for_request_slot(self, exchange: str) -> None:
+        interval = self._request_interval_for_exchange(exchange)
+        if interval <= 0:
             self._last_request_started_at = time.monotonic()
             return
         now = time.monotonic()
         elapsed = now - self._last_request_started_at
-        if self._last_request_started_at > 0 and elapsed < self.request_interval_seconds:
-            time.sleep(self.request_interval_seconds - elapsed)
+        if self._last_request_started_at > 0 and elapsed < interval:
+            time.sleep(interval - elapsed)
         self._last_request_started_at = time.monotonic()
 
 

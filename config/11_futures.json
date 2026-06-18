@@ -140,6 +140,9 @@
         "retry_attempts": 2,
         "retry_backoff_seconds": 0.5,
         "request_interval_seconds": 0.05,
+        "request_interval_seconds_by_exchange": {
+          "GFEX": 0.9
+        },
         "parser_version": "official_futures_daily.v1",
         "fallback_to": "akshare_futures",
         "interfaces": {
