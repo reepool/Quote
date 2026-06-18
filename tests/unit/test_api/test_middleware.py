@@ -43,6 +43,30 @@ def test_rate_limit_middleware_prefers_specific_path_prefix():
     assert middleware._rate_limit_for_path("/api/v1/health")[1] == 100
 
 
+@pytest.mark.unit
+def test_rate_limit_middleware_root_protected_path_matches_all_api_paths():
+    middleware = RateLimitMiddleware(
+        app=lambda scope, receive, send: None,
+        requests_per_minute=100,
+        protected_paths={
+            "/": {
+                "active_limit": 4,
+                "queue_limit": 80,
+                "queue_timeout_seconds": 120,
+                "busy_status_code": 503,
+                "retry_after_seconds": 30,
+            }
+        },
+    )
+
+    assert middleware._matched_path_key(
+        "/api/v1/health", middleware.protected_paths
+    ) == "/"
+    assert middleware._matched_path_key(
+        "/api/v1/quotes/daily", middleware.protected_paths
+    ) == "/"
+
+
 def _request(path: str = "/api/v1/quotes/daily"):
     return SimpleNamespace(
         client=SimpleNamespace(host="127.0.0.1"),
