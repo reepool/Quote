@@ -4065,10 +4065,15 @@ class FuturesOfficialCalendarBackfillService:
         total_closed = 0
         total_unresolved = 0
         total_requests = 0
+        total_challenges = 0
+        total_challenge_backoff_seconds = 0.0
+        total_batch_pauses = 0
+        total_batch_pause_seconds = 0.0
         max_total_days = int(max_days) if max_days else None
 
         try:
             for exchange in exchange_list:
+                metrics_before = self._provider_metrics_for_exchange(provider, exchange)
                 logger.info(
                     "[FuturesOfficialCalendarBackfill] start exchange=%s start=%s end=%s probe_end=%s dry_run=%s",
                     exchange,
@@ -4092,6 +4097,10 @@ class FuturesOfficialCalendarBackfillService:
                     "failure_samples": [],
                     "retry_passes_attempted": 0,
                     "retry_dates_resolved": 0,
+                    "challenge_count": 0,
+                    "challenge_backoff_seconds": 0.0,
+                    "batch_pause_count": 0,
+                    "batch_pause_seconds": 0.0,
                 }
                 verified_by_date: Dict[str, FuturesTradingCalendarDay] = {}
                 unresolved_reasons: Dict[str, str] = {}
@@ -4216,6 +4225,18 @@ class FuturesOfficialCalendarBackfillService:
                 ]
                 total_trading += int(result["trading_days"])
                 total_closed += int(result["closed_days"])
+                metrics_after = self._provider_metrics_for_exchange(provider, exchange)
+                exchange_metrics = self._metric_delta(metrics_before, metrics_after)
+                result["challenge_count"] = int(exchange_metrics.get("challenge_count", 0))
+                result["challenge_backoff_seconds"] = float(exchange_metrics.get("challenge_backoff_seconds", 0.0))
+                result["batch_pause_count"] = int(exchange_metrics.get("batch_pause_count", 0))
+                result["batch_pause_seconds"] = float(exchange_metrics.get("batch_pause_seconds", 0.0))
+                result["retry_backoff_count"] = int(exchange_metrics.get("retry_backoff_count", 0))
+                result["retry_backoff_seconds"] = float(exchange_metrics.get("retry_backoff_seconds", 0.0))
+                total_challenges += int(result["challenge_count"])
+                total_challenge_backoff_seconds += float(result["challenge_backoff_seconds"])
+                total_batch_pauses += int(result["batch_pause_count"])
+                total_batch_pause_seconds += float(result["batch_pause_seconds"])
                 if calendar_days and not dry_run:
                     result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
                     total_written += int(result["rows_written"])
@@ -4237,7 +4258,7 @@ class FuturesOfficialCalendarBackfillService:
                     )
                 total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
                 logger.info(
-                    "[FuturesOfficialCalendarBackfill] exchange done exchange=%s status=%s requests=%s trading=%s closed=%s unresolved=%s retry_passes=%s retry_resolved=%s rows_written=%s dry_run=%s",
+                    "[FuturesOfficialCalendarBackfill] exchange done exchange=%s status=%s requests=%s trading=%s closed=%s unresolved=%s retry_passes=%s retry_resolved=%s challenges=%s challenge_backoff_seconds=%s batch_pauses=%s batch_pause_seconds=%s rows_written=%s dry_run=%s",
                     exchange,
                     "success" if result["unresolved_dates"] == 0 and result["future_dates_unresolved"] == 0 else "blocked",
                     result["request_count"],
@@ -4246,6 +4267,10 @@ class FuturesOfficialCalendarBackfillService:
                     result["unresolved_dates"],
                     result["retry_passes_attempted"],
                     result["retry_dates_resolved"],
+                    result["challenge_count"],
+                    result["challenge_backoff_seconds"],
+                    result["batch_pause_count"],
+                    result["batch_pause_seconds"],
                     result["rows_written"],
                     dry_run,
                 )
@@ -4273,6 +4298,10 @@ class FuturesOfficialCalendarBackfillService:
                 "unresolved_dates": total_unresolved,
                 "request_count": total_requests,
                 "future_dates_unresolved": future_unresolved_per_exchange * len(exchange_list),
+                "challenge_count": total_challenges,
+                "challenge_backoff_seconds": total_challenge_backoff_seconds,
+                "batch_pause_count": total_batch_pauses,
+                "batch_pause_seconds": total_batch_pause_seconds,
             },
             "warnings": (
                 ["future_dates_require_official_notice_evidence"]
@@ -4291,6 +4320,18 @@ class FuturesOfficialCalendarBackfillService:
         if unsupported:
             raise ValueError(f"unsupported futures official calendar exchanges: {', '.join(unsupported)}")
         return requested
+
+    @staticmethod
+    def _provider_metrics_for_exchange(provider: Any, exchange: str) -> Dict[str, float]:
+        snapshot = getattr(provider, "snapshot_metrics", None)
+        if not callable(snapshot):
+            return {}
+        return dict((snapshot() or {}).get(str(exchange or "").upper(), {}))
+
+    @staticmethod
+    def _metric_delta(before: Dict[str, float], after: Dict[str, float]) -> Dict[str, float]:
+        keys = set(before) | set(after)
+        return {key: float(after.get(key, 0.0)) - float(before.get(key, 0.0)) for key in keys}
 
     def _calendar_day_from_probe(
         self,

@@ -327,6 +327,7 @@ class OfficialFuturesMarketDataProvider:
         self.tls_config = HttpTlsConfig(source_name=self.source_name)
         self._last_request_started_at = 0.0
         self._request_counts_by_exchange: Dict[str, int] = {}
+        self._metrics: Dict[str, Dict[str, float]] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
 
     def supports_series(self, series: FuturesSeries) -> bool:
@@ -712,6 +713,7 @@ class OfficialFuturesMarketDataProvider:
                             timeout=self.timeout_seconds,
                         )
                     if self._is_challenge_response(response):
+                        self._increment_metric(exchange, "challenge_count", 1)
                         logger.warning(
                             "[OfficialFutures] challenge response exchange=%s trade_date=%s attempt=%s http_status=%s content_type=%s",
                             exchange,
@@ -733,6 +735,8 @@ class OfficialFuturesMarketDataProvider:
                 if self._is_retryable_challenge(exc) and attempt <= self._challenge_retry_attempts_for_exchange(exchange):
                     backoff = self._challenge_backoff_for_exchange(exchange)
                     if backoff > 0:
+                        self._increment_metric(exchange, "challenge_backoff_count", 1)
+                        self._increment_metric(exchange, "challenge_backoff_seconds", backoff * attempt)
                         logger.warning(
                             "[OfficialFutures] challenge retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
                             exchange,
@@ -747,6 +751,8 @@ class OfficialFuturesMarketDataProvider:
                 if attempt >= self.retry_attempts:
                     break
                 if self.retry_backoff_seconds > 0:
+                    self._increment_metric(exchange, "retry_backoff_count", 1)
+                    self._increment_metric(exchange, "retry_backoff_seconds", self.retry_backoff_seconds * attempt)
                     logger.warning(
                         "[OfficialFutures] request retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
                         exchange,
@@ -796,6 +802,14 @@ class OfficialFuturesMarketDataProvider:
         if self._dce_browser_client is not None:
             self._dce_browser_client.close()
             self._dce_browser_client = None
+
+    def snapshot_metrics(self) -> Dict[str, Dict[str, float]]:
+        return {exchange: dict(values) for exchange, values in self._metrics.items()}
+
+    def _increment_metric(self, exchange: str, key: str, value: float) -> None:
+        exchange_key = str(exchange or "").upper()
+        metrics = self._metrics.setdefault(exchange_key, {})
+        metrics[key] = metrics.get(key, 0.0) + value
 
     def _construct_main_series_bars(
         self,
@@ -1113,6 +1127,8 @@ class OfficialFuturesMarketDataProvider:
         pause_every = self.batch_pause_every_requests_by_exchange.get(exchange_key, 0)
         pause_seconds = self.batch_pause_seconds_by_exchange.get(exchange_key, 0.0)
         if pause_every > 0 and pause_seconds > 0 and count > 1 and (count - 1) % pause_every == 0:
+            self._increment_metric(exchange_key, "batch_pause_count", 1)
+            self._increment_metric(exchange_key, "batch_pause_seconds", pause_seconds)
             logger.info(
                 "[OfficialFutures] batch pause exchange=%s request_count=%s pause_seconds=%s",
                 exchange_key,

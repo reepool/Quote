@@ -1041,8 +1041,8 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
             "request_interval_seconds_by_exchange": {"GFEX": 0.9},
             "challenge_retry_attempts_by_exchange": {"GFEX": 3},
             "challenge_backoff_seconds_by_exchange": {"GFEX": 20},
-            "batch_pause_every_requests_by_exchange": {"GFEX": 45},
-            "batch_pause_seconds_by_exchange": {"GFEX": 30},
+            "batch_pause_every_requests_by_exchange": {"GFEX": 90},
+            "batch_pause_seconds_by_exchange": {"GFEX": 20},
         }
     }
 
@@ -1053,6 +1053,20 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
     assert provider._challenge_retry_attempts_for_exchange("GFEX") == 3
     assert provider._challenge_retry_attempts_for_exchange("SHFE") == 0
     assert provider._challenge_backoff_for_exchange("GFEX") == 20
+    assert provider.batch_pause_every_requests_by_exchange["GFEX"] == 90
+    assert provider.batch_pause_seconds_by_exchange["GFEX"] == 20
+
+
+def test_official_futures_provider_metrics_snapshot(tmp_path):
+    config = _research_config(tmp_path)
+    provider = OfficialFuturesMarketDataProvider(config)
+
+    provider._increment_metric("GFEX", "challenge_count", 1)
+    provider._increment_metric("GFEX", "batch_pause_seconds", 20)
+
+    snapshot = provider.snapshot_metrics()
+    assert snapshot["GFEX"]["challenge_count"] == 1
+    assert snapshot["GFEX"]["batch_pause_seconds"] == 20
 
 
 def test_official_futures_provider_detects_gfex_html_challenge(tmp_path):

@@ -944,6 +944,10 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
                 f"future_unresolved={item.get('future_dates_unresolved', 0)}, "
                 f"retry_passes={item.get('retry_passes_attempted', 0)}, "
                 f"retry_resolved={item.get('retry_dates_resolved', 0)}, "
+                f"challenges={item.get('challenge_count', 0)}, "
+                f"challenge_sleep={item.get('challenge_backoff_seconds', 0)}, "
+                f"batch_pauses={item.get('batch_pause_count', 0)}, "
+                f"batch_sleep={item.get('batch_pause_seconds', 0)}, "
                 f"latest={item.get('latest_verified_date') or 'N/A'}"
             )
         if not detail_lines:
@@ -982,6 +986,10 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
             f"closed_days: `{totals.get('closed_days', 0)}`\n"
             f"unresolved_dates: `{totals.get('unresolved_dates', 0)}`\n"
             f"request_count: `{totals.get('request_count', 0)}`\n\n"
+            f"challenge_count: `{totals.get('challenge_count', 0)}`\n"
+            f"challenge_backoff_seconds: `{totals.get('challenge_backoff_seconds', 0)}`\n"
+            f"batch_pause_count: `{totals.get('batch_pause_count', 0)}`\n"
+            f"batch_pause_seconds: `{totals.get('batch_pause_seconds', 0)}`\n\n"
             "交易所明细:\n"
             "```text\n"
             + "\n".join(detail_lines)

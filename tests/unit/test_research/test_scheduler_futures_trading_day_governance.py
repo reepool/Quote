@@ -122,6 +122,10 @@ def test_futures_official_calendar_report_includes_failure_samples():
                 "closed_days": 1,
                 "unresolved_dates": 1,
                 "request_count": 11,
+                "challenge_count": 1,
+                "challenge_backoff_seconds": 20,
+                "batch_pause_count": 0,
+                "batch_pause_seconds": 0,
             },
             "exchanges": [
                 {
@@ -131,6 +135,10 @@ def test_futures_official_calendar_report_includes_failure_samples():
                     "closed_days": 1,
                     "unresolved_dates": 1,
                     "future_dates_unresolved": 0,
+                    "challenge_count": 1,
+                    "challenge_backoff_seconds": 20,
+                    "batch_pause_count": 0,
+                    "batch_pause_seconds": 0,
                     "latest_verified_date": "2024-01-10",
                     "failure_samples": [
                         {
@@ -144,6 +152,8 @@ def test_futures_official_calendar_report_includes_failure_samples():
     )
 
     assert "失败样本" in report
+    assert "challenge_count: `1`" in report
+    assert "challenges=1" in report
     assert "GFEX 2024-01-11: gfex_html_challenge http_status=567" in report
 
 

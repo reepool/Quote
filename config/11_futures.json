@@ -150,10 +150,10 @@
           "GFEX": 20
         },
         "batch_pause_every_requests_by_exchange": {
-          "GFEX": 45
+          "GFEX": 90
         },
         "batch_pause_seconds_by_exchange": {
-          "GFEX": 30
+          "GFEX": 20
         },
         "parser_version": "official_futures_daily.v1",
         "fallback_to": "akshare_futures",
