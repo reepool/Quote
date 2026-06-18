@@ -174,6 +174,38 @@ def test_report_engine_formats_instrument_master_sync_warnings():
     assert 'master data freshness exceeds 48h' in summary
 
 
+def test_report_engine_formats_hkex_instrument_master_source_usage():
+    engine = ReportEngine()
+    summary = engine._format_instrument_master_sync_summary({
+        'status': 'success',
+        'summary': {
+            'added_instruments': 1,
+            'deactivated_instruments': 113,
+            'active_count': 3040,
+        },
+        'exchanges': {
+            'HKEX': {
+                'status': 'success',
+                'after': {'active_count': 3040},
+                'added_count': 0,
+                'deactivated_count': 0,
+                'source_usage': {
+                    'hkex_securities_list': 17885,
+                    'hkexnews_active_list': 18035,
+                    'hkexnews_delisted_list': 864,
+                    'akshare_eastmoney_diagnostics_only': 0,
+                },
+            }
+        },
+        'warnings': [],
+        'errors': [],
+    })
+
+    assert 'HKEX 状态=success 活跃=3040 +0/-0' in summary
+    assert 'source=unknown' not in summary
+    assert 'source=hkex_securities_list+hkexnews_active_list+hkexnews_delisted_list' in summary
+
+
 def test_daily_update_report_uses_stock_child_for_instrument_master_summary():
     engine = ReportEngine()
     merged_governance = {

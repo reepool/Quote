@@ -330,8 +330,7 @@ class ReportEngine:
             if not isinstance(item, dict):
                 continue
             after = item.get('after') if isinstance(item.get('after'), dict) else {}
-            source_diag = item.get('source_diagnostics') if isinstance(item.get('source_diagnostics'), dict) else {}
-            source_text = item.get('source_authority') or source_diag.get('selected_source_authority') or 'unknown'
+            source_text = self._format_instrument_master_exchange_source(item)
             exchange_parts.append(
                 f"{exchange} 状态={item.get('status', 'unknown')} "
                 f"活跃={after.get('active_count', 0)} "
@@ -348,6 +347,30 @@ class ReportEngine:
         if errors:
             lines.append('错误: ' + '；'.join(str(e) for e in errors[:3]))
         return '\n'.join(lines)
+
+    def _format_instrument_master_exchange_source(self, item: Dict[str, Any]) -> str:
+        """Return a compact source label for stock master sync exchange reports."""
+        source_diag = item.get('source_diagnostics') if isinstance(item.get('source_diagnostics'), dict) else {}
+        source_text = item.get('source_authority') or source_diag.get('selected_source_authority')
+        if source_text:
+            return str(source_text)
+
+        source_usage = item.get('source_usage')
+        if isinstance(source_usage, dict) and source_usage:
+            active_sources = []
+            for source, count in source_usage.items():
+                if not source:
+                    continue
+                try:
+                    source_count = int(count or 0)
+                except (TypeError, ValueError):
+                    source_count = 0
+                if source_count > 0:
+                    active_sources.append(str(source))
+            if active_sources:
+                return '+'.join(active_sources[:3])
+
+        return 'unknown'
 
     def _format_index_master_governance_summary(self, governance: Dict[str, Any]) -> str:
         """Format concise A-share index governance diagnostics for Telegram reports."""

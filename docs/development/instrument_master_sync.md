@@ -140,7 +140,7 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 - 总体状态、耗时、数据源优先级。
 - 分市场同步前后总数、活跃数、停用数。
 - 新增和停用品种样例。
-- `source_authority`、选中源、fallback 原因、metadata/discrepancy 写入数量。
+- A 股股票显示 `source_authority`、选中源、fallback 原因、metadata/discrepancy 写入数量；HKEX 专项治理没有 A 股式单一 `source_authority`，日报 `source=` 会从 `source_usage` 展示实际参与的官方来源，例如 `hkex_securities_list+hkexnews_active_list+hkexnews_delisted_list`。
 - pytdx 差异诊断。
 - warnings/errors。
 
