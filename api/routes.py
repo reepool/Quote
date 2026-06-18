@@ -3,7 +3,8 @@ API routes for the quote system.
 Defines all REST API endpoints with comprehensive features.
 """
 
-from typing import List, Optional, Dict, Any
+import inspect
+from typing import List, Optional, Dict, Any, Callable
 from datetime import datetime, date, timedelta
 from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
 from fastapi.params import Param
@@ -12,12 +13,22 @@ import pandas as pd
 import io
 
 from data_manager import data_manager
+from database.connection import db_workload_context
 from utils.code_utils import convert_to_database_format
 from utils.validation import QueryValidator, DataValidator
 from utils.date_utils import DateUtils, get_shanghai_time
 from .models import *
 
 router = APIRouter()
+
+
+async def _run_data_task_workload(func: Callable, *args, **kwargs):
+    """Run API-triggered data-production work on the task DB workload."""
+    async with db_workload_context("task"):
+        result = func(*args, **kwargs)
+        if inspect.isawaitable(result):
+            return await result
+        return result
 
 
 def _query_default(value, default=None):
@@ -1733,7 +1744,8 @@ async def run_research_futures_official_calendar_backfill(
             items = [item.strip() for item in str(value).split(",") if item.strip()]
             return items or None
 
-        return await data_manager.run_futures_official_calendar_backfill(
+        return await _run_data_task_workload(
+            data_manager.run_futures_official_calendar_backfill,
             scope_id=_query_default(scope_id),
             exchanges=[exchange_value] if exchange_value else None,
             categories=_csv(_query_default(categories)),
@@ -2570,6 +2582,7 @@ async def update_data(request: QuoteQueryRequest, background_tasks: BackgroundTa
     try:
         # 启动后台任务
         background_tasks.add_task(
+            _run_data_task_workload,
             data_manager.update_daily_data,
             request.exchanges,
             request.start_date
@@ -2592,6 +2605,7 @@ async def download_historical_data(request: BatchDownloadRequest, background_tas
     try:
         # 启动后台任务
         background_tasks.add_task(
+            _run_data_task_workload,
             data_manager.download_all_historical_data,
             request.exchanges,
             request.start_date,
@@ -2713,6 +2727,7 @@ async def fill_data_gaps(request: DataGapFillRequest, background_tasks: Backgrou
     try:
         # 启动后台任务
         background_tasks.add_task(
+            _run_data_task_workload,
             data_manager.fill_data_gaps,
             request.exchange,
             request.severity_filter

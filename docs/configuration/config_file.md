@@ -393,7 +393,7 @@
 - **`api_async_pool.max_overflow`**: `int` (默认: `6`) —— *API 专用异步连接池额外突发连接数*
 - **`api_async_pool.pool_timeout_seconds`**: `float` (默认: `30`) —— *API 等待 API 池连接的最长秒数；通常还会先受 API admission queue 约束*
 
-> API 与任务使用独立异步连接池。FastAPI 请求通过 middleware 标记为 `api` workload，调度器、数据维护和 CLI/手工任务默认使用 `task` workload。该隔离保护的是连接池容量；SQLite 文件级写锁仍需通过短事务和任务串行控制。
+> API 与任务使用独立异步连接池。FastAPI 普通请求通过 middleware 标记为 `api` workload；调度器、数据维护、CLI/手工任务，以及管理 API 触发的数据生产任务默认或显式使用 `task` workload。该隔离保护的是连接池容量；SQLite 文件级写锁仍需通过短事务和任务串行控制。
 ## data_config
 
 ```json

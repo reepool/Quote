@@ -19,7 +19,7 @@
     - **同步操作引擎**: 使用 `StaticPool` 单开连接防冲突，主要用于少量初始化建库和少量同步读写兼容路径。
     - **任务异步引擎**: `task_async_pool` 使用 `aiosqlite + SQLAlchemy QueuePool`，专供调度器、数据维护、历史回补、Telegram 任务收尾等后台任务使用。当前生产建议为 `pool_size=2, max_overflow=0`，形成 2 条任务侧专用异步 DB 通道。
     - **API 异步引擎**: `api_async_pool` 使用独立的 `aiosqlite + SQLAlchemy QueuePool`，专供 FastAPI 外部请求使用。当前生产建议为 `pool_size=2, max_overflow=6`，由 API admission control 控制进入后端的并发请求。
-    - **路由机制**: `api.middleware.RateLimitMiddleware` 在已准入请求进入路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 通过 `DatabaseManager.get_async_session()` 根据上下文选择 API pool 或 task pool。非 API 执行路径默认使用 `task` pool。
+    - **路由机制**: `api.middleware.RateLimitMiddleware` 在已准入请求进入路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 通过 `DatabaseManager.get_async_session()` 根据上下文选择 API pool 或 task pool。非 API 执行路径默认使用 `task` pool；管理 API 触发的数据生产任务通过路由层 helper 显式切回 `task` pool。
 3. **高并发 WAL 机制（ Write-Ahead Logging ）**：
     - 在每一次发起的读/写 Engine 会话启动生命周期（`event.listen` "connect"）时，系统自动挂载以下 PRAGMA 配置：
       ```sql
