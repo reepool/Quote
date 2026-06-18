@@ -435,7 +435,9 @@
           "skip_backup_on_empty_short_range": true
         },
         "index": {
-          "skip_backup_on_empty_short_range": false
+          "skip_backup_on_empty_short_range": false,
+          "require_end_date_coverage": true,
+          "stale_source_circuit_breaker_threshold": 3
         }
       }
     },

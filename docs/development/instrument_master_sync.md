@@ -90,7 +90,7 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 - 国证指数网作为深证/国证/CNI 指数官方主源，覆盖指数列表、详情、公告和官方日线。
 - 中证指数官网作为中证/SSE/跨市场指数官方主源，覆盖指数搜索列表、基础信息、官方日线和生命周期证据。
 - BaoStock/AkShare 保留为指数行情 fallback 和差异诊断，不单独决定终止计算发布状态。
-- 普通指数日更要求行情源覆盖请求区间内最后一个交易日；官方源返回非空但最新行情日仍早于该交易日时，视为 stale 结果并继续 fallback。覆盖判断使用交易日历，不直接使用原始 `end_date`。
+- 普通指数日更要求行情源覆盖请求区间内最后一个交易日；官方源返回非空但最新行情日仍早于该交易日时，视为 stale 结果并继续 fallback。覆盖判断使用交易日历，不直接使用原始 `end_date`。同一进程内同一官方源、交易所、品种类型和目标交易日连续 stale 达到 `routing.daily_behavior.*.index.stale_source_circuit_breaker_threshold` 后，会临时熔断该源并在本轮后续请求直接走 fallback，避免 CNIndex/CSIndex 批量晚更新时重复空耗。
 - 日更在请求指数行情前先按生命周期状态过滤 `calculation_terminated`、`inactive`、配置跳过的 `stale_no_quote` 指数。
 - 历史指数行情保留，不删除、不 forward-fill 终止日后的数据。
 

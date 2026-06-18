@@ -1063,7 +1063,8 @@
         },
         "index": {
           "skip_backup_on_empty_short_range": false,
-          "require_end_date_coverage": true
+          "require_end_date_coverage": true,
+          "stale_source_circuit_breaker_threshold": 3
         }
       }
     },
@@ -1098,6 +1099,8 @@
   控制短区间查询中“主源空结果是否跳过 fallback”。当前默认行为是 `stock=true`、`index=false`。
 - **`routing.daily_behavior.<default|exchange>.<instrument_type>.require_end_date_coverage`**: `bool`
   控制非空行情是否必须覆盖请求区间内最后一个交易日。当前指数为 `true`，避免官方源返回前一日 stale 数据却阻断 fallback。
+- **`routing.daily_behavior.<default|exchange>.<instrument_type>.stale_source_circuit_breaker_threshold`**: `int`
+  控制同一进程、同一交易所、同一品种类型、同一行情源、同一目标交易日连续 stale 后的临时熔断阈值。指数默认 `3`；达到阈值后，本轮后续同 key 请求会跳过该 stale 源并直接走后续 fallback。该熔断只影响当轮行情下载链路，不改写主数据生命周期，也不跨目标交易日复用。
 - **`routing.instrument_list.<region>`**: `List[str]`
   指定品种列表抓取链，按 region 配置。A 股股票当前为 `exchange_official -> baostock -> akshare`；官方源成功时备源不得并集补入官方 current list 缺失代码，只能补非生命周期字段和写差异诊断。
 - **`routing.calendar.<region>`**: `List[str]`

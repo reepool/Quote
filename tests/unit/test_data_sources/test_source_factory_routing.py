@@ -257,6 +257,56 @@ class TestSourceFactoryRouting:
         assert self.factory.db_ops.get_trading_days.await_count == 1
 
     @pytest.mark.asyncio
+    async def test_index_daily_source_stale_breaker_skips_source_after_threshold(self):
+        self.factory.db_ops.get_trading_days = AsyncMock(
+            return_value=[datetime(2026, 6, 17).date(), datetime(2026, 6, 18).date()]
+        )
+
+        async def stale_cnindex(instrument_id, *_args, **_kwargs):
+            return [
+                {
+                    'instrument_id': instrument_id,
+                    'time': datetime(2026, 6, 17),
+                    'open': 1.0,
+                    'high': 1.0,
+                    'low': 1.0,
+                    'close': 1.0,
+                }
+            ]
+
+        async def fresh_akshare(instrument_id, *_args, **_kwargs):
+            return [
+                {
+                    'instrument_id': instrument_id,
+                    'time': datetime(2026, 6, 18),
+                    'open': 2.0,
+                    'high': 2.0,
+                    'low': 2.0,
+                    'close': 2.0,
+                }
+            ]
+
+        self.cnindex.get_daily_data = AsyncMock(side_effect=stale_cnindex)
+        self.baostock.get_daily_data = AsyncMock(return_value=[])
+        self.akshare.get_daily_data = AsyncMock(side_effect=fresh_akshare)
+
+        for symbol in ['399282', '399283', '399284', '399285']:
+            rows = await self.factory.get_daily_data(
+                'SZSE',
+                f'{symbol}.SZ',
+                symbol,
+                datetime(2026, 6, 17),
+                datetime(2026, 6, 18),
+                instrument_type='index',
+            )
+            assert rows[0]['close'] == 2.0
+
+        assert self.cnindex.get_daily_data.await_count == 3
+        assert self.akshare.get_daily_data.await_count == 4
+        breaker_key = ('SZSE', 'index', 'cnindex_a_stock', datetime(2026, 6, 18).date())
+        assert breaker_key in self.factory.daily_stale_source_breakers
+
+    @pytest.mark.asyncio
     async def test_index_daily_data_uses_last_trading_day_for_coverage(self):
         self.factory.db_ops.get_trading_days = AsyncMock(
             return_value=[datetime(2026, 6, 15).date(), datetime(2026, 6, 16).date()]

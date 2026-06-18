@@ -54,6 +54,8 @@ class DataSourceFactory:
         # 交易日历缓存
         self.trading_calendar_cache: Dict[str, Dict[date, bool]] = {}
         self.daily_coverage_date_cache: Dict[tuple[str, date, date], Optional[date]] = {}
+        self.daily_stale_source_counts: Dict[tuple[str, str, str, date], int] = {}
+        self.daily_stale_source_breakers: set[tuple[str, str, str, date]] = set()
         self.last_instrument_list_diagnostics: Dict[tuple[str, tuple[str, ...]], Dict[str, Any]] = {}
 
     async def initialize(self):
@@ -502,6 +504,122 @@ class DataSourceFactory:
 
         route_cfg = self._get_daily_route_config(exchange, instrument_type)
         return bool(route_cfg.get('skip_backup_on_empty_short_range', False))
+
+    def _daily_stale_breaker_threshold(self, exchange: str, instrument_type: str) -> int:
+        """Return per-run stale-source breaker threshold; 0 disables the breaker."""
+        route_cfg = self._get_daily_route_config(exchange, instrument_type)
+        raw_threshold = route_cfg.get(
+            'stale_source_circuit_breaker_threshold',
+            3 if (instrument_type or 'stock').lower() == 'index' else 0,
+        )
+        try:
+            return max(0, int(raw_threshold))
+        except (TypeError, ValueError):
+            return 0
+
+    def _daily_stale_breaker_key(
+        self,
+        exchange: str,
+        instrument_type: str,
+        source_name: str,
+        expected_date: date,
+    ) -> tuple[str, str, str, date]:
+        return (
+            exchange.upper(),
+            (instrument_type or 'stock').lower(),
+            str(source_name),
+            expected_date,
+        )
+
+    def _record_daily_source_coverage_success(
+        self,
+        *,
+        exchange: str,
+        instrument_type: str,
+        source_name: str,
+        expected_date: Optional[date],
+    ) -> None:
+        if expected_date is None:
+            return
+        key = self._daily_stale_breaker_key(exchange, instrument_type, source_name, expected_date)
+        self.daily_stale_source_counts.pop(key, None)
+        self.daily_stale_source_breakers.discard(key)
+
+    def _record_daily_source_stale_result(
+        self,
+        *,
+        exchange: str,
+        instrument_type: str,
+        source_name: str,
+        expected_date: date,
+        symbol: str,
+        latest_date: date,
+    ) -> None:
+        threshold = self._daily_stale_breaker_threshold(exchange, instrument_type)
+        if threshold <= 0:
+            return
+
+        key = self._daily_stale_breaker_key(exchange, instrument_type, source_name, expected_date)
+        count = self.daily_stale_source_counts.get(key, 0) + 1
+        self.daily_stale_source_counts[key] = count
+        if count >= threshold and key not in self.daily_stale_source_breakers:
+            self.daily_stale_source_breakers.add(key)
+            ds_logger.warning(
+                "[DataSourceFactory] Circuit breaker opened for stale %s daily source %s "
+                "on %s/%s expected_trading_day=%s after %s consecutive stale results; "
+                "latest=%s last_symbol=%s",
+                instrument_type,
+                source_name,
+                exchange,
+                instrument_type,
+                expected_date,
+                count,
+                latest_date,
+                symbol,
+            )
+
+    async def _filter_daily_source_chain_for_stale_breaker(
+        self,
+        source_chain: List[BaseDataSource],
+        *,
+        exchange: str,
+        instrument_type: str,
+        start_date: datetime,
+        end_date: datetime,
+        symbol: str,
+    ) -> List[BaseDataSource]:
+        threshold = self._daily_stale_breaker_threshold(exchange, instrument_type)
+        if threshold <= 0 or not source_chain:
+            return source_chain
+
+        expected_date = await self._get_expected_daily_coverage_date(exchange, start_date, end_date)
+        if expected_date is None:
+            return source_chain
+
+        filtered: List[BaseDataSource] = []
+        skipped: List[str] = []
+        for source in source_chain:
+            key = self._daily_stale_breaker_key(
+                exchange,
+                instrument_type,
+                getattr(source, 'name', type(source).__name__),
+                expected_date,
+            )
+            if key in self.daily_stale_source_breakers:
+                skipped.append(getattr(source, 'name', type(source).__name__))
+                continue
+            filtered.append(source)
+
+        if skipped:
+            ds_logger.info(
+                "[DataSourceFactory] Skipping stale daily source(s) for %s/%s %s expected_trading_day=%s: %s",
+                exchange,
+                instrument_type,
+                symbol,
+                expected_date,
+                ", ".join(skipped),
+            )
+        return filtered
 
     def _validate_routing_config(self) -> None:
         """校验统一 routing 配置。"""
@@ -1102,7 +1220,21 @@ class DataSourceFactory:
                 latest_date,
                 expected_date,
             )
+            self._record_daily_source_stale_result(
+                exchange=exchange,
+                instrument_type=instrument_type,
+                source_name=source_name,
+                expected_date=expected_date,
+                symbol=symbol,
+                latest_date=latest_date,
+            )
             return False
+        self._record_daily_source_coverage_success(
+            exchange=exchange,
+            instrument_type=instrument_type,
+            source_name=source_name,
+            expected_date=expected_date,
+        )
         return True
 
     async def get_daily_data(self, exchange: str, instrument_id: str, symbol: str,
@@ -1125,6 +1257,21 @@ class DataSourceFactory:
         source_chain = self._get_daily_source_chain(exchange, instrument_type)
         if not source_chain:
             ds_logger.error(f"[DataSourceFactory] No data source configured for exchange: {exchange}")
+            return []
+        source_chain = await self._filter_daily_source_chain_for_stale_breaker(
+            source_chain,
+            exchange=exchange,
+            instrument_type=instrument_type,
+            start_date=start_date,
+            end_date=end_date,
+            symbol=symbol,
+        )
+        if not source_chain:
+            ds_logger.warning(
+                "[DataSourceFactory] All daily sources are currently blocked by stale coverage circuit breaker for %s %s",
+                exchange,
+                symbol,
+            )
             return []
         primary_source = source_chain[0]
 
