@@ -361,6 +361,10 @@ class UnifiedConfigManager:
         """获取配置值"""
         return self._config_data.get(key, default)
 
+    def get_all(self) -> Dict[str, Any]:
+        """获取完整配置快照。"""
+        return deepcopy(self._config_data)
+
     def get_nested(self, path: str, default: Optional[T] = None) -> Optional[T]:
         """获取嵌套配置值，支持点分隔路径"""
         keys = path.split('.')

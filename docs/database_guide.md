@@ -16,8 +16,10 @@
    - NAS 备份目录继续作为子挂载保留在 `data/PVE-Bak` 与
      `data/QuoteBak`，不要把 NAS 内容复制进本地数据卷。
 2. **连接池设计**：
-    - **同步操作引擎**: 使用 `StaticPool` 单开连接防冲突，主要用于少量初始化建库。
-    - **异步操作引擎**: 引入了 `aiosqlite` 底层驱动配合 SQLAlchemy 的 `QueuePool(pool_size=1, max_overflow=4)`，利用异步协程达到读写的高效排队流通。
+    - **同步操作引擎**: 使用 `StaticPool` 单开连接防冲突，主要用于少量初始化建库和少量同步读写兼容路径。
+    - **任务异步引擎**: `task_async_pool` 使用 `aiosqlite + SQLAlchemy QueuePool`，专供调度器、数据维护、历史回补、Telegram 任务收尾等后台任务使用。当前生产建议为 `pool_size=2, max_overflow=0`，形成 2 条任务侧专用异步 DB 通道。
+    - **API 异步引擎**: `api_async_pool` 使用独立的 `aiosqlite + SQLAlchemy QueuePool`，专供 FastAPI 外部请求使用。当前生产建议为 `pool_size=2, max_overflow=6`，由 API admission control 控制进入后端的并发请求。
+    - **路由机制**: `api.middleware.RateLimitMiddleware` 在已准入请求进入路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 通过 `DatabaseManager.get_async_session()` 根据上下文选择 API pool 或 task pool。非 API 执行路径默认使用 `task` pool。
 3. **高并发 WAL 机制（ Write-Ahead Logging ）**：
     - 在每一次发起的读/写 Engine 会话启动生命周期（`event.listen` "connect"）时，系统自动挂载以下 PRAGMA 配置：
       ```sql
@@ -25,6 +27,12 @@
       PRAGMA synchronous=NORMAL; -- 内存快于刷盘，仅在极低概率停电时会丢失最近几个事务数据，换取10倍写入性能。
       PRAGMA cache_size=-64000; -- 在所有连接通道共享一个 64MB 的 LRU 热数据内存高速缓存。
       ```
+
+4. **读写冲突边界**：
+    - API/task 双池隔离解决的是连接池耗尽和任务饥饿问题，不改变 SQLite 的底层并发模型。
+    - WAL 模式支持一个写者与多个读者并发；API 主要读、任务主要写时，正常短事务不会形成数据库死锁。
+    - 长写事务、`VACUUM`、`ANALYZE`、大批量 DDL/索引维护仍可能造成文件级锁等待，因此写密集维护任务必须继续通过调度器 `max_instances`、任务级互斥和批量提交粒度控制。
+    - 外部 API 请求必须经过 admission control 有界排队；即便 API pool 被占满，task pool 仍保留给后台任务完成状态写入、报告收尾和数据维护。
 
 ---
 

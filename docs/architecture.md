@@ -324,9 +324,18 @@ REPORT_TYPES = {
 
 **技术特性**:
 - **异步操作**: 全异步数据库访问
-- **连接池**: 优化的连接管理
+- **连接池隔离**: API 与后台任务使用独立异步 SQLAlchemy engine/pool，避免外部访问耗尽任务连接
 - **事务支持**: 数据一致性保障
 - **索引优化**: 高性能查询
+
+**API/任务数据库资源隔离**:
+- `database.connection.DatabaseManager` 为 `quotes.db` 创建两套异步连接池：
+  - `task_async_pool`: 调度器、数据维护、历史回补、Telegram 任务收尾等后台任务默认使用，当前生产建议容量为 2 条。
+  - `api_async_pool`: FastAPI 外部请求使用，当前生产建议容量为 `pool_size=2, max_overflow=6`。
+- `api.middleware.RateLimitMiddleware` 在请求进入后端路由前设置 `db_workload_context("api")`；`DatabaseOperations.get_async_session()` 根据当前上下文选择 API pool 或 task pool。
+- 未经过 API middleware 的执行路径默认使用 `task` workload，因此调度器、手工任务和 CLI 任务不会排在 API 连接池之后。
+- `AsyncSessionLocal` 与 `async_engine` 保留为 task pool 的兼容别名；新增代码应优先通过 `DatabaseOperations.get_async_session()` 或 `DatabaseManager.get_async_session()` 获取会话。
+- 该隔离解决的是 async DB 连接池饥饿问题。SQLite 仍然只有一个文件级写者；任务写入和 API 读取在 WAL 模式下一般不会死锁，但写事务过长时读写仍可能互相等待，写密集任务仍应保持任务级串行和短事务。
 
 ### 8. 智能时间工具 (`utils/date_utils.py`) ⭐ v2.3.0
 
@@ -527,7 +536,7 @@ class DataGapManager:
 ### 数据库优化
 - **索引优化**: 关键字段建立索引
 - **批量操作**: 批量插入/更新减少IO
-- **连接池**: 数据库连接池管理
+- **连接池**: API/task 异步连接池分离，保护后台任务连接容量
 - **查询优化**: SQL查询性能优化
 
 ### 资源管理

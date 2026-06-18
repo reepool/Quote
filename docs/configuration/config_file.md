@@ -368,7 +368,17 @@
   "database_config": {
     "db_path": "data/quotes.db",
     "backup_enabled": false,
-    "backup_interval_days": 7
+    "backup_interval_days": 7,
+    "task_async_pool": {
+      "pool_size": 2,
+      "max_overflow": 0,
+      "pool_timeout_seconds": 30
+    },
+    "api_async_pool": {
+      "pool_size": 2,
+      "max_overflow": 6,
+      "pool_timeout_seconds": 30
+    }
   }
 }
 ```
@@ -376,6 +386,14 @@
 - **`db_path`**: `str` (默认: `data/quotes.db`) —— *系统中主数据 SQLite 物理文件存放地点*
 - **`backup_enabled`**: `bool` (默认: `False`) —— *是否开启独立文件定点自动硬备份*
 - **`backup_interval_days`**: `int` (默认: `7`) —— *硬备份循环的默认时长周期*
+- **`task_async_pool.pool_size`**: `int` (默认: `2`) —— *后台任务专用异步连接池基础连接数*
+- **`task_async_pool.max_overflow`**: `int` (默认: `0`) —— *后台任务专用异步连接池额外突发连接数；默认不溢出，保证任务侧容量可控*
+- **`task_async_pool.pool_timeout_seconds`**: `float` (默认: `30`) —— *后台任务等待任务池连接的最长秒数*
+- **`api_async_pool.pool_size`**: `int` (默认: `2`) —— *API 专用异步连接池基础连接数*
+- **`api_async_pool.max_overflow`**: `int` (默认: `6`) —— *API 专用异步连接池额外突发连接数*
+- **`api_async_pool.pool_timeout_seconds`**: `float` (默认: `30`) —— *API 等待 API 池连接的最长秒数；通常还会先受 API admission queue 约束*
+
+> API 与任务使用独立异步连接池。FastAPI 请求通过 middleware 标记为 `api` workload，调度器、数据维护和 CLI/手工任务默认使用 `task` workload。该隔离保护的是连接池容量；SQLite 文件级写锁仍需通过短事务和任务串行控制。
 ## data_config
 
 ```json
@@ -1260,7 +1278,27 @@
   "api_config": {
     "host": "0.0.0.0",
     "port": 8000,
-    "workers": 1
+    "workers": 1,
+    "report_send_timeout_seconds": 45,
+    "rate_limit": {
+      "requests_per_minute": 100,
+      "path_limits": {
+        "/api/v1/quotes/daily": 30
+      }
+    },
+    "resource_protection": {
+      "enabled": true,
+      "reserved_task_connections": 2,
+      "protected_paths": {
+        "/": {
+          "active_limit": 6,
+          "queue_limit": 120,
+          "queue_timeout_seconds": 120,
+          "busy_status_code": 503,
+          "retry_after_seconds": 30
+        }
+      }
+    }
   }
 }
   ...
@@ -1271,6 +1309,17 @@
 - **`workers`**: `int` (默认: `1`) —— *处理请求的多重并行异步负载 UVicorn 虚拟打工节点扩容数*
 - **`reload`**: `bool` (默认: `False`) —— *启用热更新检测探针系统（针对主进程开发过程有效，生产常关闭）*
 - **`cors_origins`**: `List` (默认: `['*']`) —— *网页 AJAX 保护放行的浏览器请求原始域列表（填写特定域名有效避免 CSRF 隐患）*
+- **`report_send_timeout_seconds`**: `float` (默认: `45`) —— *任务报告发送的超时秒数；超时只影响通知，不改变数据任务结果*
+- **`rate_limit.requests_per_minute`**: `int` (默认: `100`) —— *默认每 IP 每分钟请求上限*
+- **`rate_limit.path_limits`**: `dict` —— *路径级请求频率上限，最长前缀匹配；例如 `/api/v1/quotes/daily` 可单独限制高成本行情查询*
+- **`resource_protection.enabled`**: `bool` (默认: `True`) —— *是否启用 API admission control*
+- **`resource_protection.reserved_task_connections`**: `int` (默认: `2`) —— *任务侧连接容量目标；当前生产通过独立 `task_async_pool` 物理保障*
+- **`resource_protection.protected_paths`**: `dict` —— *受保护 API 路径配置，使用最长前缀匹配；根路径 `/` 表示所有 API 请求进入有界排队*
+- **`protected_paths.<path>.active_limit`**: `int` —— *该路径允许进入后端执行的活跃请求数*
+- **`protected_paths.<path>.queue_limit`**: `int` —— *该路径等待队列容量*
+- **`protected_paths.<path>.queue_timeout_seconds`**: `float` —— *等待活跃槽位的最长秒数*
+- **`protected_paths.<path>.busy_status_code`**: `int` —— *队列满或等待超时时返回的 HTTP 状态码，默认 503*
+- **`protected_paths.<path>.retry_after_seconds`**: `int` —— *busy 响应中的 Retry-After 秒数*
 ## scheduler_config
 
 ```json
