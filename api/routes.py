@@ -2576,7 +2576,7 @@ async def get_latest_quotes(
 
 
 # Data Management
-@router.post("/data/update", response_model=SystemStatusResponse, tags=["Data Management"])
+@router.post("/data/update", response_model=TaskStartResponse, tags=["Data Management"])
 async def update_data(request: QuoteQueryRequest, background_tasks: BackgroundTasks):
     """数据更新"""
     try:
@@ -2599,7 +2599,7 @@ async def update_data(request: QuoteQueryRequest, background_tasks: BackgroundTa
         raise HTTPException(status_code=500, detail=f"Failed to start data update: {str(e)}")
 
 
-@router.post("/data/download/historical", response_model=SystemStatusResponse, tags=["Data Management"])
+@router.post("/data/download/historical", response_model=TaskStartResponse, tags=["Data Management"])
 async def download_historical_data(request: BatchDownloadRequest, background_tasks: BackgroundTasks):
     """历史数据下载"""
     try:
@@ -2721,7 +2721,7 @@ async def get_data_gaps(
         raise HTTPException(status_code=500, detail=f"Failed to get data gaps: {str(e)}")
 
 
-@router.post("/gaps/fill", response_model=DataGapFillResponse, tags=["Data Gaps"])
+@router.post("/gaps/fill", response_model=TaskStartResponse, tags=["Data Gaps"])
 async def fill_data_gaps(request: DataGapFillRequest, background_tasks: BackgroundTasks):
     """填补数据缺口"""
     try:
@@ -2729,8 +2729,12 @@ async def fill_data_gaps(request: DataGapFillRequest, background_tasks: Backgrou
         background_tasks.add_task(
             _run_data_task_workload,
             data_manager.fill_data_gaps,
-            request.exchange,
-            request.severity_filter
+            exchange=request.exchange,
+            severity_filter=request.severity_filter,
+            instrument_ids=request.instrument_ids,
+            gap_type_filter=request.gap_type_filter,
+            max_gap_days=request.max_gap_days,
+            dry_run=request.dry_run,
         )
 
         return {
@@ -2740,6 +2744,9 @@ async def fill_data_gaps(request: DataGapFillRequest, background_tasks: Backgrou
                 "task_type": "gap_filling",
                 "exchange": request.exchange,
                 "severity_filter": request.severity_filter,
+                "instrument_ids": request.instrument_ids,
+                "gap_type_filter": request.gap_type_filter,
+                "max_gap_days": request.max_gap_days,
                 "dry_run": request.dry_run
             },
             "timestamp": get_shanghai_time()

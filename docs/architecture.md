@@ -204,6 +204,10 @@ BaseDataSource (抽象基类)
 - **缺口管理**: `/gaps`, `/gaps/fill`
 - **交易日历**: `/calendar/trading`
 
+**后台任务启动接口**:
+- `/api/v1/data/update`、`/api/v1/data/download/historical`、`/api/v1/gaps/fill` 等管理接口只负责提交后台任务，统一返回 `TaskStartResponse`（`success/message/data/timestamp`），不伪装成任务执行结果。
+- 这类接口注册的后台任务必须通过路由层 helper 显式切换到 `task` workload；请求参数中的 dry-run、标的、缺口类型、严重程度等过滤条件必须原样传递给数据任务，避免 API 层返回和实际执行语义不一致。
+
 ### 5. 任务调度系统 (`scheduler/`)
 
 **职责**: 定时任务管理、配置化调度、执行监控

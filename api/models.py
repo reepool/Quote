@@ -357,6 +357,14 @@ class SystemStatusResponse(BaseModel):
     recent_gaps: List[Dict[str, Any]] = Field(default_factory=list)
 
 
+class TaskStartResponse(BaseModel):
+    """后台任务启动响应模型"""
+    success: bool = Field(..., description="是否成功提交后台任务")
+    message: str = Field(..., description="任务启动说明")
+    data: Dict[str, Any] = Field(default_factory=dict, description="任务参数摘要")
+    timestamp: datetime = Field(..., description="任务提交时间")
+
+
 class DownloadProgressResponse(BaseModel):
     """增强下载进度响应模型"""
     batch_id: str = Field(..., description="批次ID")
