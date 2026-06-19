@@ -150,7 +150,7 @@
           "GFEX": 10
         },
         "batch_pause_every_requests_by_exchange": {
-          "GFEX": 90
+          "GFEX": 180
         },
         "batch_pause_seconds_by_exchange": {
           "GFEX": 10
