@@ -1145,6 +1145,16 @@ class TaskManagerHandlers:
                 )
             )
             return
+        if job_id in {'futures_market_data_sync', 'futures_market_data_backfill'} and len(parts) > 2:
+            await self.handle_futures_market_data_command(
+                SimpleNamespace(
+                    chat_id=chat_id,
+                    sender_id=user_id,
+                    text=f'/{job_id} ' + ' '.join(parts[2:]),
+                ),
+                job_id=job_id,
+            )
+            return
 
         # 解析可选的日期参数（第三个参数）
         target_date = None
@@ -2108,12 +2118,238 @@ class TaskManagerHandlers:
             parse_mode='markdown',
         )
 
+    async def handle_futures_market_data_command(self, event, *, job_id: str) -> None:
+        """处理期货行情同步/回补命令。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else f'/{job_id}'
+        self.task_manager.logger.info(
+            "[TaskManagerHandlers] 收到期货行情命令: '%s' | 聊天ID: %s",
+            command_text,
+            chat_id,
+        )
+        try:
+            tokens = shlex.split(command_text.strip())
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *参数错误*\n\n命令解析失败: `{exc}`",
+                parse_mode='markdown',
+            )
+            return
+
+        args: Dict[str, str] = {}
+        flags = set()
+        for token in tokens[1:]:
+            if '=' in token:
+                key, value = token.split('=', 1)
+                args[key.strip().lower()] = value.strip()
+            else:
+                flags.add(token.strip().lower())
+
+        allowed_keys = {
+            'exchange',
+            'exchanges',
+            'scope',
+            'scope_id',
+            'categories',
+            'instrument_ids',
+            'series_ids',
+            'series_types',
+            'start',
+            'start_date',
+            'end',
+            'end_date',
+            'mode',
+            'requires_trading_day_governance',
+            'requires_master_data_governance',
+            'master_governance_max_days',
+        }
+        allowed_flags = {
+            'dry_run',
+            'write',
+            'skip_trading_day_governance',
+            'requires_master_data_governance',
+            'skip_master_data_governance',
+        }
+        if sorted(set(args) - allowed_keys) or sorted(flags - allowed_flags):
+            await self._send_futures_market_data_usage(chat_id, job_id=job_id)
+            return
+        if 'dry_run' in flags and 'write' in flags:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`dry_run` 和 `write` 只能二选一。",
+                parse_mode='markdown',
+            )
+            return
+
+        start_date = args.get('start') or args.get('start_date')
+        end_date = args.get('end') or args.get('end_date')
+        if job_id == 'futures_market_data_backfill' and (not start_date or not end_date):
+            await self._send_futures_market_data_usage(chat_id, job_id=job_id)
+            return
+        if start_date and self._parse_date_arg(start_date) is None:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start` 必须使用 `YYYY-MM-DD` 格式。",
+                parse_mode='markdown',
+            )
+            return
+        if end_date and self._parse_date_arg(end_date) is None:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`end` 必须使用 `YYYY-MM-DD` 格式。",
+                parse_mode='markdown',
+            )
+            return
+        if start_date and end_date and start_date > end_date:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start` 不能晚于 `end`。",
+                parse_mode='markdown',
+            )
+            return
+
+        master_governance_max_days = None
+        if args.get('master_governance_max_days'):
+            try:
+                master_governance_max_days = max(1, int(args['master_governance_max_days']))
+            except ValueError:
+                await self.task_manager.send_message(
+                    chat_id,
+                    "❌ *参数错误*\n\n`master_governance_max_days=N` 中 N 必须是正整数。",
+                    parse_mode='markdown',
+                )
+                return
+
+        mode = args.get('mode') or 'direct'
+        dry_run = 'write' not in flags
+        requires_trading_day_governance = (
+            str(args.get('requires_trading_day_governance', 'true')).lower() not in {'0', 'false', 'no'}
+            and 'skip_trading_day_governance' not in flags
+        )
+        requires_master_data_governance = (
+            str(args.get('requires_master_data_governance', 'false')).lower() in {'1', 'true', 'yes'}
+            or 'requires_master_data_governance' in flags
+        ) and 'skip_master_data_governance' not in flags
+
+        await self._run_futures_market_data_task(
+            chat_id=chat_id,
+            job_id=job_id,
+            scope_id=args.get('scope_id') or args.get('scope'),
+            exchanges=self._split_csv_arg(args.get('exchanges') or args.get('exchange')),
+            categories=self._split_csv_arg(args.get('categories')),
+            instrument_ids=self._split_csv_arg(args.get('instrument_ids')),
+            series_ids=self._split_csv_arg(args.get('series_ids')),
+            series_types=self._split_csv_arg(args.get('series_types')),
+            start_date=start_date,
+            end_date=end_date,
+            mode=mode,
+            dry_run=dry_run,
+            requires_trading_day_governance=requires_trading_day_governance,
+            requires_master_data_governance=requires_master_data_governance,
+            master_governance_max_days=master_governance_max_days,
+        )
+
+    async def _send_futures_market_data_usage(self, chat_id: int, *, job_id: str) -> None:
+        await self.task_manager.send_message(
+            chat_id,
+            (
+                "❌ *参数错误*\n\n"
+                f"用法: `/{job_id} exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write]`\n\n"
+                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`、"
+                "`mode=direct`、`requires_master_data_governance`。\n\n"
+                "示例:\n"
+                f"• `/run {job_id} exchange=GFEX start=2026-06-01 end=2026-06-10 dry_run`\n"
+                f"• `/run {job_id} scope=gfex_all start=2026-06-01 end=2026-06-10 write`"
+            ),
+            parse_mode='markdown',
+        )
+
     @staticmethod
     def _split_csv_arg(value: Optional[str]) -> Optional[List[str]]:
         if not value:
             return None
         items = [item.strip() for item in str(value).replace(';', ',').split(',') if item.strip()]
         return items or None
+
+    async def _run_futures_market_data_task(
+        self,
+        *,
+        chat_id: int,
+        job_id: str,
+        scope_id: Optional[str],
+        exchanges: Optional[List[str]],
+        categories: Optional[List[str]],
+        instrument_ids: Optional[List[str]],
+        series_ids: Optional[List[str]],
+        series_types: Optional[List[str]],
+        start_date: Optional[str],
+        end_date: Optional[str],
+        mode: str,
+        dry_run: bool,
+        requires_trading_day_governance: bool,
+        requires_master_data_governance: bool,
+        master_governance_max_days: Optional[int],
+    ) -> None:
+        try:
+            scheduler = self.task_manager.task_scheduler
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 执行期货行情任务: job_id=%s scope_id=%s exchanges=%s "
+                "categories=%s start=%s end=%s mode=%s dry_run=%s",
+                job_id,
+                scope_id,
+                exchanges,
+                categories,
+                start_date,
+                end_date,
+                mode,
+                dry_run,
+            )
+            result = await scheduler.execute_job_direct(
+                job_id,
+                parameters={
+                    'scope_id': scope_id,
+                    'scope_ids': None,
+                    'exchanges': exchanges,
+                    'categories': categories,
+                    'instrument_ids': instrument_ids,
+                    'series_ids': series_ids,
+                    'series_types': series_types,
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'mode': mode,
+                    'dry_run': dry_run,
+                    'requires_trading_day_governance': requires_trading_day_governance,
+                    'requires_master_data_governance': requires_master_data_governance,
+                    'master_governance_max_days': master_governance_max_days,
+                },
+                include_dependencies=True,
+            )
+            status_text = '成功' if result else '失败'
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    f"{'✅' if result else '❌'} *期货行情任务{status_text}*\n\n"
+                    f"task: `{job_id}`\n"
+                    f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"
+                    f"start: `{start_date}`\n"
+                    f"end: `{end_date}`\n"
+                    f"dry_run: `{dry_run}`\n\n"
+                    "详细结果以任务报告和日志为准。"
+                ),
+                parse_mode='markdown',
+            )
+        except Exception as exc:
+            self.task_manager.logger.error(
+                "[TaskManagerHandlers] 期货行情任务异常: %s",
+                exc,
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *期货行情任务异常*\n\n错误: `{exc}`",
+                parse_mode='markdown',
+            )
 
     async def _run_futures_calendar_backfill_task(
         self,

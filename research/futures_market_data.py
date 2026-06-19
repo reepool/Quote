@@ -5331,7 +5331,8 @@ class FuturesOfficialCalendarBackfillService:
     ) -> Dict[str, Any]:
         from research.providers.official_futures import OfficialFuturesMarketDataProvider
 
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -5702,7 +5703,8 @@ class FuturesReadinessService:
         series_ids: Optional[Sequence[str]] = None,
         series_types: Optional[Sequence[str]] = None,
     ) -> Dict[str, Any]:
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -5867,7 +5869,8 @@ class FuturesMarketDataSyncService:
             registry["series"],
         )
         self.storage.upsert_source_manifests(registry.get("source_manifests", []))
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -5900,7 +5903,7 @@ class FuturesMarketDataSyncService:
         governance = FuturesTradingDayGovernanceService(self.storage, self.module_cfg)
         selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         target_series = [
-            item for item in registry["series"]
+            item for item in universe_selector.series
             if item.active and item.series_id.upper() in selected_series_ids
         ]
         target_exchanges = sorted(

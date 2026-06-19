@@ -1948,6 +1948,76 @@ async def test_futures_market_data_sync_fans_out_one_exchange_payload(monkeypatc
 
 
 @pytest.mark.asyncio
+async def test_futures_market_data_sync_uses_promoted_discovery_series(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "preferred_order": ["exchange_official", "akshare_futures"],
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["GFEX"], "timeout_seconds": 1},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_master_discoveries([
+        FuturesMasterDiscoveryCandidate(
+            discovery_id="GFEX:PT",
+            exchange="GFEX",
+            variety_symbol="PT",
+            candidate_instrument_id="CNF.PT.GFEX",
+            candidate_series_id="CNF.PT.GFEX.main",
+            candidate_name="GFEX Platinum",
+            candidate_category="precious_metal",
+            candidate_currency="CNY",
+            candidate_unit="CNY/gram",
+            first_seen_trade_date="2026-01-02",
+            last_seen_trade_date="2026-01-02",
+            observed_contracts=["PT2606"],
+            confidence_score=0.95,
+            quality_flag="discovered_verified",
+            review_status="none",
+        )
+    ])
+    assert storage.promote_master_discovery("GFEX:PT")["status"] == "success"
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="PT",
+                contract="PT2606",
+                close=280.0,
+            )
+        ]
+
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.PT.GFEX.main"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["scope_selection"]["series_ids"] == ["CNF.PT.GFEX.main"]
+    assert result["series"][0]["series_id"] == "CNF.PT.GFEX.main"
+    assert result["totals"]["would_write_price_bars"] == 1
+
+
+@pytest.mark.asyncio
 async def test_futures_market_data_sync_falls_back_after_official_empty(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["sources"] = {
