@@ -538,13 +538,13 @@ def format_next_run_time(next_run_time, task_status="running") -> str:
 ### 日志查看
 ```bash
 # 查看任务管理器日志
-grep "TaskManager" log/sys.log
+grep "TaskManager" log/task.log
 
 # 查看调度器日志
-grep "Scheduler" log/sys.log
+grep "Scheduler" log/task.log
 
 # 查看Telegram连接日志
-grep "tgbot" log/sys.log
+grep "tgbot" log/task.log
 ```
 
 ## 📈 性能优化

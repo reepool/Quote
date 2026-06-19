@@ -385,7 +385,7 @@ python main.py download --exchanges SSE SZSE --no-resume
 ## 📞 技术支持
 
 如果在使用过程中遇到问题，请：
-1. 查看日志文件 `log/sys.log`
+1. 查看任务日志文件 `log/task.log`
 2. 检查配置文件 `config/config.json`
 3. 参考故障排除文档
 4. 提交 Issue 反馈问题

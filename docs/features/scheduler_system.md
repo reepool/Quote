@@ -1075,7 +1075,7 @@ python -c "from scheduler.scheduler import task_scheduler; import asyncio; async
 
 如果调度系统遇到问题：
 1. 检查任务配置是否正确
-2. 查看调度器日志 `log/scheduler.log`
+2. 查看任务日志 `log/task.log`
 3. 验证系统时间和时区设置
 4. 检查任务依赖的服务状态
 5. 提交问题反馈

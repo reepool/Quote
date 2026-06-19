@@ -58,7 +58,10 @@
   "file_config": {
     "enabled": true,
     "directory": "log",
-    "filename": "sys.log"
+    "filename": "sys.log",
+    "system_filename": "sys.log",
+    "task_filename": "task.log",
+    "access_filename": "access.log"
   }
 }
   ...
@@ -66,7 +69,10 @@
 
 - **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
 - **`directory`**: `str` (默认: `log`) —— *文件写入主目录*
-- **`filename`**: `str` (默认: `sys.log`) —— *日志文件相对名称*
+- **`filename`**: `str` (默认: `sys.log`) —— *旧版单文件配置字段，保留兼容；新日志分流不会把所有日志重新合并到该文件*
+- **`system_filename`**: `str` (默认: `sys.log`) —— *系统生命周期、配置、服务启动停止和基础设施异常日志*
+- **`task_filename`**: `str` (默认: `task.log`) —— *scheduler、Telegram 手工任务、数据同步、数据源诊断和任务报告日志*
+- **`access_filename`**: `str` (默认: `access.log`) —— *HTTP API 客户访问流水日志*
 #### file_config.rotation
 
 ```json

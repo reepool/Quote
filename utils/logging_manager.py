@@ -35,6 +35,9 @@ class LogConfig:
     enable_file: bool = True
     log_directory: Optional[str] = None
     log_filename: str = "sys.log"
+    system_log_filename: str = "sys.log"
+    task_log_filename: str = "task.log"
+    access_log_filename: str = "access.log"
     enable_rotation: bool = True
     rotation_type: str = "size"  # "size" or "time"
 
@@ -60,6 +63,39 @@ class LoggingManager:
         self._loggers: Dict[str, logging.Logger] = {}
         self._config = LogConfig()
         self._metrics = defaultdict(int)
+        self._domain_logger_names = {
+            'system': {
+                'quotesystem',
+                'LoggingManager',
+                'Config',
+                'API',
+                'Monitor',
+                'uvicorn',
+                'uvicorn.error',
+            },
+            'task': {
+                'Scheduler',
+                'TaskManager',
+                'tg_task_manager',
+                'TelegramBot',
+                'DataManager',
+                'DataSource',
+                'Database',
+                'DataOperation',
+                'Report',
+                'Cache',
+                'Validation',
+                'DateUtils',
+                'AkShareSource',
+                'YFinanceSource',
+                'Tushare',
+                'Baostock',
+            },
+            'access': {
+                'API.Access',
+                'uvicorn.access',
+            },
+        }
 
     def configure(self, config: LogConfig = None):
         """配置日志系统"""
@@ -81,14 +117,19 @@ class LoggingManager:
 
         # 清除现有处理器
         self._clear_handlers(root_logger)
+        for logger_name in self._managed_logger_names():
+            managed_logger = logging.getLogger(logger_name)
+            self._clear_handlers(managed_logger)
+            managed_logger.propagate = True
 
         # 添加控制台处理器
         if self._config.enable_console:
             self._add_console_handler(root_logger)
 
-        # 添加文件处理器
+        # 添加分域文件处理器。root 只作为系统兜底，不再是全集日志。
         if self._config.enable_file:
-            self._add_file_handler(root_logger)
+            self._add_file_handler(root_logger, self._config.system_log_filename)
+            self._configure_domain_file_handlers()
 
     def configure_from_config_file(self):
         """从配置文件加载日志配置"""
@@ -118,6 +159,9 @@ class LoggingManager:
                 enable_file=getattr(logging_config.file_config, 'enabled', True) if hasattr(logging_config.file_config, 'enabled') else logging_config.file_config.get('enabled', True) if isinstance(logging_config.file_config, dict) else True,
                 log_directory=log_directory,
                 log_filename=getattr(logging_config.file_config, 'filename', 'sys.log') if hasattr(logging_config.file_config, 'filename') else logging_config.file_config.get('filename', 'sys.log') if isinstance(logging_config.file_config, dict) else 'sys.log',
+                system_log_filename=getattr(logging_config.file_config, 'system_filename', 'sys.log') if hasattr(logging_config.file_config, 'system_filename') else logging_config.file_config.get('system_filename', 'sys.log') if isinstance(logging_config.file_config, dict) else 'sys.log',
+                task_log_filename=getattr(logging_config.file_config, 'task_filename', 'task.log') if hasattr(logging_config.file_config, 'task_filename') else logging_config.file_config.get('task_filename', 'task.log') if isinstance(logging_config.file_config, dict) else 'task.log',
+                access_log_filename=getattr(logging_config.file_config, 'access_filename', 'access.log') if hasattr(logging_config.file_config, 'access_filename') else logging_config.file_config.get('access_filename', 'access.log') if isinstance(logging_config.file_config, dict) else 'access.log',
                 enable_rotation=rotation_config.get('enabled', True) if isinstance(rotation_config, dict) else True,
                 rotation_type=rotation_config.get('type', 'size') if isinstance(rotation_config, dict) else 'size'
             )
@@ -185,9 +229,10 @@ class LoggingManager:
         ))
         logger.addHandler(console_handler)
 
-    def _add_file_handler(self, logger: logging.Logger):
+    def _add_file_handler(self, logger: logging.Logger, filename: Optional[str] = None):
         """添加文件处理器"""
-        log_file_path = Path(self._config.log_directory) / self._config.log_filename
+        log_filename = filename or self._config.log_filename
+        log_file_path = Path(self._config.log_directory) / log_filename
 
         if self._config.rotation_type == "size":
             file_handler = RotatingFileHandler(
@@ -210,6 +255,31 @@ class LoggingManager:
             datefmt=self._config.date_format
         ))
         logger.addHandler(file_handler)
+        return file_handler
+
+    def _managed_logger_names(self) -> set:
+        """Return loggers managed by the domain routing layer."""
+        names = set()
+        for domain_names in self._domain_logger_names.values():
+            names.update(domain_names)
+        names.update(self._loggers.keys())
+        return names
+
+    def _configure_domain_file_handlers(self):
+        """Attach domain-specific file handlers and disable noisy propagation."""
+        domain_filenames = {
+            'system': self._config.system_log_filename,
+            'task': self._config.task_log_filename,
+            'access': self._config.access_log_filename,
+        }
+        for domain, logger_names in self._domain_logger_names.items():
+            filename = domain_filenames[domain]
+            for logger_name in logger_names:
+                domain_logger = logging.getLogger(logger_name)
+                self._add_file_handler(domain_logger, filename)
+                if self._config.enable_console and logger_name != 'uvicorn.access':
+                    self._add_console_handler(domain_logger)
+                domain_logger.propagate = False
 
     def get_logger(self, name: str = None) -> logging.Logger:
         """获取日志记录器"""
@@ -522,6 +592,7 @@ class ModuleLoggers:
     Database = logging_manager.get_logger("Database")
     DataSource = logging_manager.get_logger("DataSource")
     API = logging_manager.get_logger("API")
+    APIAccess = logging_manager.get_logger("API.Access")
     Scheduler = logging_manager.get_logger("Scheduler")
 
     # 服务模块日志器
@@ -584,6 +655,7 @@ dm_logger = ModuleLoggers.DataManager
 db_logger = ModuleLoggers.Database
 ds_logger = ModuleLoggers.DataSource
 api_logger = ModuleLoggers.API
+access_logger = ModuleLoggers.APIAccess
 scheduler_logger = ModuleLoggers.Scheduler
 monitor_logger = ModuleLoggers.Monitor
 config_logger = ModuleLoggers.Config

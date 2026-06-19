@@ -45,6 +45,9 @@ class FileLoggingConfig:
     enabled: bool = True
     directory: str = "log"
     filename: str = "sys.log"
+    system_filename: str = "sys.log"
+    task_filename: str = "task.log"
+    access_filename: str = "access.log"
     rotation: Optional[Dict[str, Any]] = None
 
 @dataclass
@@ -429,6 +432,9 @@ class UnifiedConfigManager:
                     enabled=file_data.get('enabled', True),
                     directory=file_data.get('directory', 'log'),
                     filename=file_data.get('filename', 'sys.log'),
+                    system_filename=file_data.get('system_filename', 'sys.log'),
+                    task_filename=file_data.get('task_filename', 'task.log'),
+                    access_filename=file_data.get('access_filename', 'access.log'),
                     rotation=file_data.get('rotation')
                 )
 

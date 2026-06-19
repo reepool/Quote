@@ -98,7 +98,8 @@ if __name__ == "__main__":
             host=host,
             port=port,
             reload=True,
-            log_level="info"
+            log_level="info",
+            access_log=False
         )
     # 生产模式
     else:
@@ -107,5 +108,6 @@ if __name__ == "__main__":
             host=host,
             port=port,
             workers=workers,
-            log_level="info"
+            log_level="info",
+            access_log=False
         )

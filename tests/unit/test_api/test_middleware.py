@@ -5,11 +5,12 @@ Unit tests for API middleware helpers.
 import asyncio
 import json
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from fastapi.responses import JSONResponse
 
-from api.middleware import RateLimitMiddleware, normalize_repeated_slashes
+from api.middleware import LoggingMiddleware, RateLimitMiddleware, normalize_repeated_slashes
 from database.connection import get_current_db_workload
 
 
@@ -72,6 +73,15 @@ def _request(path: str = "/api/v1/quotes/daily"):
     return SimpleNamespace(
         client=SimpleNamespace(host="127.0.0.1"),
         url=SimpleNamespace(path=path),
+    )
+
+
+def _logging_request(path: str = "/api/v1/quotes/daily"):
+    return SimpleNamespace(
+        method="GET",
+        client=SimpleNamespace(host="127.0.0.1"),
+        headers={"user-agent": "pytest-client"},
+        url=f"http://testserver{path}?symbol=000001",
     )
 
 
@@ -179,3 +189,45 @@ async def test_protected_path_rejects_when_queue_is_full():
     payload = json.loads(response.body)
     assert response.status_code == 503
     assert payload["error_code"] == "ADMISSION_QUEUE_FULL"
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_logging_middleware_uses_access_logger(monkeypatch):
+    access_logger = Mock()
+    monkeypatch.setattr("api.middleware.access_logger", access_logger)
+    middleware = LoggingMiddleware(app=lambda scope, receive, send: None)
+
+    async def call_next(request):
+        return JSONResponse({"ok": True}, status_code=200)
+
+    response = await middleware.dispatch(_logging_request(), call_next)
+
+    assert response.status_code == 200
+    assert "X-Request-ID" in response.headers
+    assert access_logger.info.call_count == 2
+    assert access_logger.error.call_count == 0
+    complete_args = access_logger.info.call_args_list[-1].args
+    assert "request_complete" in complete_args[0]
+    assert "GET" in complete_args
+    assert 200 in complete_args
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_logging_middleware_logs_access_errors(monkeypatch):
+    access_logger = Mock()
+    monkeypatch.setattr("api.middleware.access_logger", access_logger)
+    middleware = LoggingMiddleware(app=lambda scope, receive, send: None)
+
+    async def call_next(request):
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError):
+        await middleware.dispatch(_logging_request(), call_next)
+
+    assert access_logger.info.call_count == 1
+    assert access_logger.error.call_count == 1
+    error_args = access_logger.error.call_args.args
+    assert "request_error" in error_args[0]
+    assert "GET" in error_args

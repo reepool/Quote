@@ -117,7 +117,7 @@ Resume mode: No existing progress found
 
 2. 查看错误日志：
    ```bash
-   tail -100 log/sys.log | grep -i error
+   tail -100 log/task.log | grep -i error
    ```
 
 3. 手动创建进度文件：
@@ -214,7 +214,8 @@ uvicorn.error: [Errno 48] Address already in use
 **解决方案：**
 1. **查看详细错误日志**：
    ```bash
-   tail -100 log/api.log
+   tail -100 log/access.log
+   tail -100 log/sys.log
    ```
 
 2. **检查数据库连接**：
@@ -286,7 +287,7 @@ Job "daily_data_update" raised an exception
 **解决方案：**
 1. **查看详细错误**：
    ```bash
-   grep -A 20 "daily_data_update.*error" log/scheduler.log
+   grep -A 20 "daily_data_update.*error" log/task.log
    ```
 
 2. **检查任务依赖**：
@@ -442,15 +443,18 @@ SSL: CERTIFICATE_VERIFY_FAILED
 
 ### 查看日志
 ```bash
-# 实时查看所有日志
-tail -f log/sys.log
+# 实时查看任务日志
+tail -f log/task.log
 
 # 查看特定类型日志
-grep "ERROR" log/sys.log
-grep "daily_data_update" log/scheduler.log
+grep "ERROR" log/task.log
+grep "daily_data_update" log/task.log
 
-# 查看最近的日志
-tail -n 200 log/api.log
+# 查看最近的 API 访问流水
+tail -n 200 log/access.log
+
+# 查看系统生命周期日志
+tail -n 200 log/sys.log
 ```
 
 ### 检查系统状态
@@ -494,10 +498,10 @@ asyncio.run(test())
 ## 📞 获取帮助
 
 ### 日志文件位置
-- 系统日志：`log/sys.log`
-- API 日志：`log/api.log`
-- 调度器日志：`log/scheduler.log`
-- 错误日志：`log/error.log`
+- 系统生命周期日志：`log/sys.log`
+- 任务执行日志：`log/task.log`
+- API 访问流水：`log/access.log`
+- 错误排查：任务错误优先查 `log/task.log`，启动/配置/基础设施错误查 `log/sys.log`
 
 ### 常用命令
 ```bash

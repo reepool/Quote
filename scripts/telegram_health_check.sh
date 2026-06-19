@@ -1,7 +1,7 @@
 #!/bin/bash
 # Telegram连接健康检查脚本
 
-LOG_FILE="log/sys.log"
+LOG_FILE="log/task.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 echo "[$TIMESTAMP] 开始Telegram连接健康检查..."

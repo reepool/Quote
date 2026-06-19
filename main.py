@@ -125,7 +125,8 @@ class QuoteSystem:
                 port=final_port,
                 workers=api_config.workers,
                 reload=api_config.reload,
-                log_level="info"
+                log_level="info",
+                access_log=False
             )
             server = uvicorn.Server(config)
 
@@ -161,7 +162,8 @@ class QuoteSystem:
                 port=final_port,
                 workers=api_config.workers,
                 reload=api_config.reload,
-                log_level="info"
+                log_level="info",
+                access_log=False
             )
             server = uvicorn.Server(config)
 

@@ -15,7 +15,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from database.connection import db_workload_context
-from utils import api_logger, config_manager
+from utils import access_logger, api_logger, config_manager
 
 
 def normalize_repeated_slashes(path: str) -> str:
@@ -42,32 +42,54 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
+        request_id = str(id(request))
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "unknown")
 
         # 记录请求信息
-        api_logger.info(f"[API] {request.method} {request.url}")
-
-        # 获取客户端IP
-        client_ip = request.client.host if request.client else "unknown"
-
-        # 获取用户代理
-        user_agent = request.headers.get("user-agent", "unknown")
+        access_logger.info(
+            "[ACCESS] request_start method=%s url=%s client_ip=%s user_agent=%r request_id=%s",
+            request.method,
+            request.url,
+            client_ip,
+            user_agent,
+            request_id,
+        )
 
         try:
             response = await call_next(request)
 
             # 记录响应信息
             process_time = time.time() - start_time
-            api_logger.info(f"[API] {request.method} {request.url} - {response.status_code} - {process_time:.3f}s")
+            access_logger.info(
+                "[ACCESS] request_complete method=%s url=%s client_ip=%s "
+                "status_code=%s process_time=%.3fs request_id=%s",
+                request.method,
+                request.url,
+                client_ip,
+                response.status_code,
+                process_time,
+                request_id,
+            )
 
             # 添加处理时间到响应头
             response.headers["X-Process-Time"] = str(process_time)
-            response.headers["X-Request-ID"] = str(id(request))
+            response.headers["X-Request-ID"] = request_id
 
             return response
 
         except Exception as e:
             process_time = time.time() - start_time
-            api_logger.error(f"[API] {request.method} {request.url} - ERROR - {process_time:.3f}s - {str(e)}")
+            access_logger.error(
+                "[ACCESS] request_error method=%s url=%s client_ip=%s "
+                "status_code=ERROR process_time=%.3fs request_id=%s error=%r",
+                request.method,
+                request.url,
+                client_ip,
+                process_time,
+                request_id,
+                str(e),
+            )
             raise
 
 

@@ -208,7 +208,7 @@ health-check:
 
 logs:
 	@echo "Showing logs..."
-	tail -f log/sys.log
+	tail -f log/task.log
 
 # Advanced testing
 test-specific:

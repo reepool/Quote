@@ -13,6 +13,9 @@ DATA_DIR = BASE_DIR / 'data'
 
 # 日志文件路径
 LOG_FILE = LOG_DIR / 'sys.log'
+SYSTEM_LOG_FILE = LOG_DIR / 'sys.log'
+TASK_LOG_FILE = LOG_DIR / 'task.log'
+ACCESS_LOG_FILE = LOG_DIR / 'access.log'
 
 # requirements 文件路径
 REQUIREMENTS_FILE = BASE_DIR / 'requirements.txt'

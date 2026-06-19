@@ -7,6 +7,9 @@
       "enabled": true,
       "directory": "log",
       "filename": "sys.log",
+      "system_filename": "sys.log",
+      "task_filename": "task.log",
+      "access_filename": "access.log",
       "rotation": {
         "enabled": true,
         "type": "size",

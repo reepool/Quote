@@ -519,7 +519,7 @@ python3 main.py download --exchanges SSE SZSE --resume
 curl http://localhost:8000/health
 
 # 查看数据源日志
-grep "DataSource" log/sys.log
+grep "DataSource" log/task.log
 ```
 
 #### 3. 调度器问题
@@ -546,14 +546,20 @@ python3 main.py job --job-id weekly_data_maintenance
 ### 日志管理
 
 ```bash
-# 实时查看日志
-tail -f log/sys.log
+# 实时查看任务日志
+tail -f log/task.log
 
-# 查看错误日志
-grep "ERROR" log/sys.log
+# 查看任务错误日志
+grep "ERROR" log/task.log
 
 # 查看调度器日志
-grep "Scheduler" log/sys.log
+grep "Scheduler" log/task.log
+
+# 查看 API 访问流水
+tail -f log/access.log
+
+# 查看系统生命周期日志
+tail -f log/sys.log
 ```
 
 ## 📚 更新日志

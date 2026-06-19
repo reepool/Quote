@@ -73,10 +73,12 @@ def example_nested_config_access():
 
     # 获取日志配置
     log_level = config_manager.get_nested('logging_config.level', 'INFO')
-    log_file = config_manager.get_nested('logging_config.file_config.filename', 'sys.log')
+    task_log_file = config_manager.get_nested('logging_config.file_config.task_filename', 'task.log')
+    access_log_file = config_manager.get_nested('logging_config.file_config.access_filename', 'access.log')
 
     print(f"日志级别: {log_level}")
-    print(f"日志文件: {log_file}")
+    print(f"任务日志文件: {task_log_file}")
+    print(f"访问日志文件: {access_log_file}")
 
     # 获取数据源配置
     baostock_enabled = config_manager.get_nested('data_sources_config.baostock.enabled', False)

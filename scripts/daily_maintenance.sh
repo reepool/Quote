@@ -176,10 +176,10 @@ show_logs() {
     local lines=${1:-50}
     log_info "显示最新 $lines 行日志..."
 
-    if [ -f "$PROJECT_ROOT/log/sys.log" ]; then
-        tail -n "$lines" "$PROJECT_ROOT/log/sys.log"
+    if [ -f "$PROJECT_ROOT/log/task.log" ]; then
+        tail -n "$lines" "$PROJECT_ROOT/log/task.log"
     else
-        log_warning "日志文件不存在: $PROJECT_ROOT/log/sys.log"
+        log_warning "日志文件不存在: $PROJECT_ROOT/log/task.log"
     fi
 }
 
