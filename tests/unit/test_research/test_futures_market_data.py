@@ -622,6 +622,75 @@ def test_gfex_master_governance_persists_unknown_variety_discovery(monkeypatch, 
     assert storage.list_master_discoveries(exchange="GFEX", variety_symbol="ZZ")
 
 
+def test_gfex_master_governance_uses_promoted_discovery_instruments(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_master_discoveries([
+        FuturesMasterDiscoveryCandidate(
+            discovery_id="GFEX:PT",
+            exchange="GFEX",
+            variety_symbol="PT",
+            candidate_instrument_id="CNF.PT.GFEX",
+            candidate_series_id="CNF.PT.GFEX.main",
+            candidate_name="GFEX Platinum",
+            candidate_category="precious_metal",
+            candidate_currency="CNY",
+            candidate_unit="CNY/gram",
+            first_seen_trade_date="2026-01-02",
+            last_seen_trade_date="2026-01-02",
+            observed_contracts=["PT2606"],
+            confidence_score=0.95,
+            quality_flag="discovered_verified",
+            review_status="none",
+        )
+    ])
+    promotion = storage.promote_master_discovery("GFEX:PT")
+    assert promotion["status"] == "success"
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="PT",
+                contract="PT2606",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["GFEX"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["counts"]["instruments"] == 4
+    assert result["counts"]["contracts_written"] == 1
+    assert storage.list_contracts(exchange="GFEX")[0]["instrument_id"] == "CNF.PT.GFEX"
+
+
 def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
     config = _research_config(tmp_path)
     storage = FuturesStorageManager(config)

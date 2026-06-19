@@ -472,10 +472,53 @@ class FuturesUniverseSelector:
         return scopes
 
     def _load_instruments(self) -> List[FuturesInstrument]:
-        return list(self.registry.get("instruments") or [])
+        instruments_by_id: Dict[str, FuturesInstrument] = {
+            item.instrument_id.upper(): item
+            for item in (self.registry.get("instruments") or [])
+        }
+        if self.storage is not None:
+            for payload in self.storage.list_instruments(active_only=True):
+                item = FuturesInstrument(
+                    instrument_id=str(payload["instrument_id"]),
+                    symbol=str(payload["symbol"]),
+                    name=str(payload.get("name") or payload["symbol"]),
+                    exchange=str(payload.get("exchange") or ""),
+                    category=str(payload.get("category") or "commodity"),
+                    currency=str(payload.get("currency") or "CNY"),
+                    unit=str(payload.get("unit") or ""),
+                    priority=str(payload.get("priority") or "P0"),
+                    active=bool(payload.get("active", True)),
+                    source_profiles=list(payload.get("source_profiles") or []),
+                    metadata=dict(payload.get("metadata") or {}),
+                )
+                instruments_by_id[item.instrument_id.upper()] = item
+        return list(instruments_by_id.values())
 
     def _load_series(self) -> List[FuturesSeries]:
-        return list(self.registry.get("series") or [])
+        series_by_id: Dict[str, FuturesSeries] = {
+            item.series_id.upper(): item
+            for item in (self.registry.get("series") or [])
+        }
+        if self.storage is not None:
+            for payload in self.storage.list_series(active_only=True):
+                item = FuturesSeries(
+                    series_id=str(payload["series_id"]),
+                    instrument_id=str(payload["instrument_id"]),
+                    symbol=str(payload.get("symbol") or ""),
+                    series_type=str(payload.get("series_type") or "main_continuous"),
+                    source_profile=str(payload.get("source_profile") or "akshare_futures"),
+                    source=str(payload.get("source") or "akshare"),
+                    source_mode=str(payload.get("source_mode") or "direct"),
+                    source_interface=str(payload.get("source_interface") or "futures_zh_daily_sina"),
+                    construction_method=str(payload.get("construction_method") or "source_native"),
+                    currency=str(payload.get("currency") or "CNY"),
+                    unit=str(payload.get("unit") or ""),
+                    priority=str(payload.get("priority") or "P0"),
+                    active=bool(payload.get("active", True)),
+                    metadata=dict(payload.get("metadata") or {}),
+                )
+                series_by_id[item.series_id.upper()] = item
+        return list(series_by_id.values())
 
 
 @dataclass(frozen=True)
@@ -3601,7 +3644,8 @@ class FuturesDiagnosticsService:
         series_ids: Optional[Sequence[str]] = None,
         series_types: Optional[Sequence[str]] = None,
     ) -> Dict[str, Any]:
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -4500,7 +4544,8 @@ class FuturesMasterDiscoveryGovernanceService:
         dry_run: bool = True,
         max_days: Optional[int] = None,
     ) -> Dict[str, Any]:
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -4920,7 +4965,8 @@ class FuturesMasterGovernanceService:
         dry_run: bool = True,
         max_days: Optional[int] = None,
     ) -> Dict[str, Any]:
-        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+        universe_selector = FuturesUniverseSelector(self.module_cfg, self.storage)
+        scope_selection = universe_selector.resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             exchanges=exchanges,
@@ -4949,15 +4995,14 @@ class FuturesMasterGovernanceService:
                 dry_run=dry_run,
             )
 
-        registry = default_futures_registry(self.module_cfg)
         selected_instrument_ids = {item.upper() for item in scope_selection.instrument_ids}
         selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         instruments = [
-            item for item in registry["instruments"]
+            item for item in universe_selector.instruments
             if item.instrument_id.upper() in selected_instrument_ids and item.exchange.upper() == "GFEX"
         ]
         series = [
-            item for item in registry["series"]
+            item for item in universe_selector.series
             if item.series_id.upper() in selected_series_ids and item.instrument_id.upper() in selected_instrument_ids
         ]
         if not instruments:
