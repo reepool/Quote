@@ -93,3 +93,30 @@ def test_logging_manager_routes_system_task_and_access_logs(tmp_path):
     assert "access request marker" not in sys_log
     assert "access request marker" not in task_log
     assert logging.getLogger("API.Access").propagate is False
+
+
+def test_known_direct_loggers_are_classified(tmp_path):
+    manager = LoggingManager()
+    manager.configure(
+        LogConfig(
+            level="INFO",
+            enable_console=False,
+            enable_file=True,
+            log_directory=str(tmp_path),
+            system_log_filename="sys.log",
+            task_log_filename="task.log",
+            access_log_filename="access.log",
+        )
+    )
+
+    logging.getLogger("tdx_source").info("direct task logger marker")
+    logging.getLogger("proxy_patch_runtime").info("direct system logger marker")
+    _flush_handlers("", "tdx_source", "proxy_patch_runtime")
+
+    sys_log = (tmp_path / "sys.log").read_text(encoding="utf-8")
+    task_log = (tmp_path / "task.log").read_text(encoding="utf-8")
+
+    assert "direct task logger marker" in task_log
+    assert "direct task logger marker" not in sys_log
+    assert "direct system logger marker" in sys_log
+    assert logging.getLogger("tdx_source").propagate is False
