@@ -702,6 +702,22 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；启用交易所生产日更时还应打开 `requires_master_data_governance`，使主数据治理成为行情写入前置。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
 
+GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
+
+```json
+{
+  "scope_ids": ["gfex_all"],
+  "mode": "direct",
+  "dry_run": false,
+  "requires_trading_day_governance": true,
+  "requires_master_data_governance": true,
+  "master_governance_max_days": 10,
+  "max_runtime_seconds": 7200
+}
+```
+
+该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现 GFEX 合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补如果开启 `requires_master_data_governance=true`，应显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。
+
 手工触发方式：
 
 ```text

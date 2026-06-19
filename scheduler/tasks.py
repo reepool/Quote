@@ -2898,40 +2898,63 @@ class ScheduledTasks:
                     )
                     return False
             if requires_master_data_governance:
-                master_result = await data_manager.run_futures_master_governance(
-                    scope_id=scope_id,
-                    scope_ids=scope_ids,
-                    exchanges=exchanges,
-                    categories=categories,
-                    instrument_ids=instrument_ids,
-                    series_ids=series_ids,
-                    series_types=series_types,
-                    start_date=start_date,
-                    end_date=end_date,
-                    dry_run=dry_run,
-                    max_days=master_governance_max_days,
+                master_start_date = start_date
+                master_end_date = end_date
+                target_dates_by_exchange = (
+                    (governance_result.get("target_date_expansion") or {}).get("target_dates_by_exchange") or {}
+                    if requires_trading_day_governance
+                    else {}
                 )
-                master_status = master_result.get("status")
-                if master_status == "blocked" and not dry_run:
-                    await self._send_task_report(
-                        report_data={
-                            'name': '商品期货主数据治理前置检查报告',
-                            'content': _format_futures_market_data_scheduler_report(master_result),
-                            'status': 'error',
-                            'tasks_completed': 0,
-                            'duration': 'N/A',
-                            'maintenance_tasks': [
-                                {
-                                    'task_name': 'futures_master_governance',
-                                    'status': "; ".join(master_result.get("blockers") or ["blocked"]),
-                                }
-                            ],
-                        },
-                        report_type='maintenance_report',
-                        task_name='商品期货主数据治理前置检查',
-                        job_config=job_config,
+                target_dates = sorted(
+                    {
+                        str(trade_date)
+                        for dates in target_dates_by_exchange.values()
+                        for trade_date in (dates or [])
+                        if trade_date
+                    }
+                )
+                if target_dates and not (master_start_date or master_end_date):
+                    master_start_date = target_dates[0]
+                    master_end_date = target_dates[-1]
+                if not target_dates and requires_trading_day_governance and not (start_date or end_date):
+                    scheduler_logger.info(
+                        "[Scheduler] Futures master governance skipped because trading-day governance returned no target dates"
                     )
-                    return False
+                else:
+                    master_result = await data_manager.run_futures_master_governance(
+                        scope_id=scope_id,
+                        scope_ids=scope_ids,
+                        exchanges=exchanges,
+                        categories=categories,
+                        instrument_ids=instrument_ids,
+                        series_ids=series_ids,
+                        series_types=series_types,
+                        start_date=master_start_date,
+                        end_date=master_end_date,
+                        dry_run=dry_run,
+                        max_days=master_governance_max_days,
+                    )
+                    master_status = master_result.get("status")
+                    if master_status == "blocked" and not dry_run:
+                        await self._send_task_report(
+                            report_data={
+                                'name': '商品期货主数据治理前置检查报告',
+                                'content': _format_futures_market_data_scheduler_report(master_result),
+                                'status': 'error',
+                                'tasks_completed': 0,
+                                'duration': 'N/A',
+                                'maintenance_tasks': [
+                                    {
+                                        'task_name': 'futures_master_governance',
+                                        'status': "; ".join(master_result.get("blockers") or ["blocked"]),
+                                    }
+                                ],
+                            },
+                            report_type='maintenance_report',
+                            task_name='商品期货主数据治理前置检查',
+                            job_config=job_config,
+                        )
+                        return False
             result = await data_manager.run_futures_market_data_sync(
                 scope_id=scope_id,
                 scope_ids=scope_ids,
