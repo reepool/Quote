@@ -1119,6 +1119,15 @@ class TaskManagerHandlers:
                 )
             )
             return
+        if job_id == 'futures_master_governance' and len(parts) > 2:
+            await self.handle_futures_master_governance_command(
+                SimpleNamespace(
+                    chat_id=chat_id,
+                    sender_id=user_id,
+                    text='/futures_master_governance ' + ' '.join(parts[2:]),
+                )
+            )
+            return
 
         # 解析可选的日期参数（第三个参数）
         target_date = None
@@ -1800,6 +1809,147 @@ class TaskManagerHandlers:
             parse_mode='markdown',
         )
 
+    async def handle_futures_master_governance_command(self, event) -> None:
+        """处理 /futures_master_governance 命令，执行期货主数据治理。"""
+        chat_id = event.chat_id
+        command_text = event.text if hasattr(event, 'text') else '/futures_master_governance'
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 收到命令: '{command_text}' | 聊天ID: {chat_id}"
+        )
+
+        try:
+            tokens = shlex.split(command_text.strip())
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *参数错误*\n\n命令解析失败: `{exc}`",
+                parse_mode='markdown',
+            )
+            return
+        args: Dict[str, str] = {}
+        flags = set()
+        for token in tokens[1:]:
+            if '=' in token:
+                key, value = token.split('=', 1)
+                args[key.strip().lower()] = value.strip()
+            else:
+                flags.add(token.strip().lower())
+
+        allowed_keys = {
+            'exchange',
+            'exchanges',
+            'scope',
+            'scope_id',
+            'categories',
+            'instrument_ids',
+            'series_ids',
+            'series_types',
+            'start',
+            'start_date',
+            'end',
+            'end_date',
+            'max_days',
+        }
+        allowed_flags = {'dry_run', 'write'}
+        unknown_keys = sorted(set(args) - allowed_keys)
+        unknown_flags = sorted(flags - allowed_flags)
+        if unknown_keys or unknown_flags:
+            await self._send_futures_master_governance_usage(chat_id)
+            return
+        if 'dry_run' in flags and 'write' in flags:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`dry_run` 和 `write` 只能二选一。",
+                parse_mode='markdown',
+            )
+            return
+
+        start_date = args.get('start') or args.get('start_date')
+        end_date = args.get('end') or args.get('end_date')
+        if start_date and self._parse_date_arg(start_date) is None:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start` 必须使用 `YYYY-MM-DD` 格式。",
+                parse_mode='markdown',
+            )
+            return
+        if end_date and self._parse_date_arg(end_date) is None:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`end` 必须使用 `YYYY-MM-DD` 格式。",
+                parse_mode='markdown',
+            )
+            return
+        if start_date and end_date and start_date > end_date:
+            await self.task_manager.send_message(
+                chat_id,
+                "❌ *参数错误*\n\n`start` 不能晚于 `end`。",
+                parse_mode='markdown',
+            )
+            return
+
+        max_days = None
+        if args.get('max_days'):
+            try:
+                max_days = max(1, int(args['max_days']))
+            except ValueError:
+                await self.task_manager.send_message(
+                    chat_id,
+                    "❌ *参数错误*\n\n`max_days=N` 中 N 必须是正整数。",
+                    parse_mode='markdown',
+                )
+                return
+
+        exchanges = self._split_csv_arg(args.get('exchanges') or args.get('exchange'))
+        categories = self._split_csv_arg(args.get('categories'))
+        instrument_ids = self._split_csv_arg(args.get('instrument_ids'))
+        series_ids = self._split_csv_arg(args.get('series_ids'))
+        series_types = self._split_csv_arg(args.get('series_types'))
+        scope_id = args.get('scope_id') or args.get('scope')
+        dry_run = 'write' not in flags
+
+        start_message = (
+            "⏳ *期货主数据治理已启动...*\n\n"
+            f"scope_id: `{scope_id}`\n"
+            f"exchanges: `{','.join(exchanges or []) or None}`\n"
+            f"categories: `{','.join(categories or []) or None}`\n"
+            f"start: `{start_date}`\n"
+            f"end: `{end_date}`\n"
+            f"dry_run: `{dry_run}`\n"
+            f"max_days: `{max_days}`\n\n"
+            "说明：当前仅支持 GFEX 官方日行情合约发现，写入 `data/futures.db` 主数据表。"
+        )
+        await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
+        await self._run_futures_master_governance_task(
+            chat_id=chat_id,
+            scope_id=scope_id,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+            max_days=max_days,
+        )
+
+    async def _send_futures_master_governance_usage(self, chat_id: int) -> None:
+        await self.task_manager.send_message(
+            chat_id,
+            (
+                "❌ *参数错误*\n\n"
+                "用法: `/futures_master_governance exchange=GFEX [start=YYYY-MM-DD] "
+                "[end=YYYY-MM-DD] [dry_run|write] [max_days=N]`\n\n"
+                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`。\n\n"
+                "示例:\n"
+                "• `/futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
+                "• `/run futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`"
+            ),
+            parse_mode='markdown',
+        )
+
     @staticmethod
     def _split_csv_arg(value: Optional[str]) -> Optional[List[str]]:
         if not value:
@@ -1877,6 +2027,79 @@ class TaskManagerHandlers:
             await self.task_manager.send_message(
                 chat_id,
                 f"❌ *期货交易日历手工回填异常*\n\n错误: `{exc}`",
+                parse_mode='markdown',
+            )
+
+    async def _run_futures_master_governance_task(
+        self,
+        *,
+        chat_id: int,
+        scope_id: Optional[str],
+        exchanges: Optional[List[str]],
+        categories: Optional[List[str]],
+        instrument_ids: Optional[List[str]],
+        series_ids: Optional[List[str]],
+        series_types: Optional[List[str]],
+        start_date: Optional[str],
+        end_date: Optional[str],
+        dry_run: bool,
+        max_days: Optional[int],
+    ) -> None:
+        try:
+            scheduler = self.task_manager.task_scheduler
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 执行期货主数据治理: "
+                "scope_id=%s exchanges=%s categories=%s start=%s end=%s dry_run=%s max_days=%s",
+                scope_id,
+                exchanges,
+                categories,
+                start_date,
+                end_date,
+                dry_run,
+                max_days,
+            )
+            result = await scheduler.execute_job_direct(
+                'futures_master_governance',
+                parameters={
+                    'scope_id': scope_id,
+                    'scope_ids': None,
+                    'exchanges': exchanges,
+                    'categories': categories,
+                    'instrument_ids': instrument_ids,
+                    'series_ids': series_ids,
+                    'series_types': series_types,
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'dry_run': dry_run,
+                    'max_days': max_days,
+                },
+                include_dependencies=True,
+            )
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 期货主数据治理完成: success=%s",
+                result,
+            )
+            status_text = '成功' if result else '失败'
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    f"{'✅' if result else '❌'} *期货主数据治理{status_text}*\n\n"
+                    f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"
+                    f"start: `{start_date}`\n"
+                    f"end: `{end_date}`\n"
+                    f"dry_run: `{dry_run}`\n"
+                    f"max_days: `{max_days}`\n\n"
+                    "详细结果以任务报告和日志为准。"
+                ),
+                parse_mode='markdown',
+            )
+        except Exception as exc:
+            self.task_manager.logger.error(
+                f"[TaskManagerHandlers] 期货主数据治理异常: {exc}"
+            )
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *期货主数据治理异常*\n\n错误: `{exc}`",
                 parse_mode='markdown',
             )
 

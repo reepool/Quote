@@ -692,6 +692,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 |---|---|---|---|
 | `futures_official_calendar_backfill` | enabled/manual_only | 手工触发 | 按交易所官方日行情可靠覆盖起点验证交易日/非交易日，只写 `futures_trading_calendar`，不写行情价格；早于官方日行情可靠覆盖起点的空 payload 记为 unresolved，不写为休市；未知未来不使用 weekday 猜测；配置默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_trading_day_governance` | enabled | 日更前、回补前 | 维护交易所/品种交易日历、休市公告、交易时段和目标交易日集合，是商品数据同步前置任务 |
+| `futures_master_governance` | enabled/manual_only | 手工触发；后续可作为日更前置 | 维护商品根品种、研究序列和真实合约主数据；当前 GFEX 使用官方日行情逐交易日发现合约代码，依赖已验证交易日历，默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_market_data_sync` | enabled | 交易日晚间 | 同步 P0 商品期货最新日线和连续序列，当前实现任务名 |
 | `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用 |
 | `futures_spread_recompute` | enabled | 日更后 | 重算价差和价差诊断 |
@@ -699,7 +700,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | `futures_market_data_readiness` | 可由 API/维护任务生成 | 每日或每周 | 生成覆盖率和缺口摘要 |
 | `futures_source_version_check` | 待后续拆分 | 每日中午 | 检查 AKShare 等依赖版本，复用现有依赖检查机制 |
 
-商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再做主数据治理和数据字典检查，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；如果交易日治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记日历风险。
+商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；启用交易所生产日更时还应打开 `requires_master_data_governance`，使主数据治理成为行情写入前置。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
 
 手工触发方式：
 
@@ -707,6 +708,8 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 /futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10
 /futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10
 /futures_calendar_backfill scope=gfex_all start=2022-12-22 end=2022-12-31 dry_run max_days=10
+/futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10
+/run futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10
 ```
 
 - `dry_run` 是默认安全行为，只探测和报告，不落库。
@@ -728,7 +731,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 补充验证结论：
 
 - GFEX 官方日行情接口必须带 `Referer: http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml`、`Origin: http://www.gfex.com.cn`、`X-Requested-With: XMLHttpRequest`，否则容易返回 HTML challenge。
-- 2026-06-18/19 GFEX 频控实测：`0.05s`、`0.5s` 间隔约第 11 次请求开始出现 567；`0.75s` 间隔 20 次请求出现少量 567；`0.9s` 和 `1.0s` 间隔 20 次小样本曾未出现 567，但 2022-12-22 至 2026-06-18 全段 dry-run 在 `0.9s` 下仍有 130 个 unresolved，后续 200 次复现样本确认失败响应为 `text/html` 的 567 challenge。2026-06-18 全段 dry-run 在 `0.9s`、每 45 次暂停 30 秒、567 退避 20 秒下成功完成，耗时约 35.2 分钟，其中批次暂停占 840 秒；随后优化到每 90 次暂停 20 秒，全段 dry-run 成功，`challenges=11`、批次暂停占 280 秒；继续优化到每 90 次暂停 10 秒、567 退避 20 秒，全段 dry-run 仍成功，`trading_days=843`、`closed_days=432`、`unresolved=0`、`challenges=7`、`challenge_backoff_seconds=140`、`batch_pause_seconds=140`，耗时约 23.8 分钟。进一步优化到每 180 次暂停 10 秒、567 退避 10 秒，2022-12-22 至 2026-06-19 全段 dry-run 仍成功，`trading_days=843`、`closed_days=433`、`unresolved=0`、`challenges=11`、`challenge_backoff_seconds=110`、`batch_pause_seconds=70`。当前试验最优配置为 GFEX 单独 `request_interval_seconds_by_exchange.GFEX=0.9`、`challenge_retry_attempts_by_exchange.GFEX=3`、`challenge_backoff_seconds_by_exchange.GFEX=10`、`batch_pause_every_requests_by_exchange.GFEX=180`、`batch_pause_seconds_by_exchange.GFEX=10`。交易日历任务还必须在首轮扫描结束后对 unresolved 日期执行任务级补传，当前配置为 `retry_unresolved_passes=1`、`retry_unresolved_pause_seconds=60`、`progress_log_every=100`。若 full dry-run 仍留下少量 567 洞，再上调到 `1.2s` 或切换手动代理进行 gap-fill。
+- 2026-06-18/19 GFEX 频控实测：`0.05s`、`0.5s` 间隔约第 11 次请求开始出现 567；`0.75s` 间隔 20 次请求出现少量 567；`0.9s` 和 `1.0s` 间隔 20 次小样本曾未出现 567，但 2022-12-22 至 2026-06-18 全段 dry-run 在 `0.9s` 下仍有 130 个 unresolved，后续 200 次复现样本确认失败响应为 `text/html` 的 567 challenge。2026-06-18 全段 dry-run 在 `0.9s`、每 45 次暂停 30 秒、567 退避 20 秒下成功完成，耗时约 35.2 分钟，其中批次暂停占 840 秒；随后优化到每 90 次暂停 20 秒，全段 dry-run 成功，`challenges=11`、批次暂停占 280 秒；继续优化到每 90 次暂停 10 秒、567 退避 20 秒，全段 dry-run 仍成功，`trading_days=843`、`closed_days=432`、`unresolved=0`、`challenges=7`、`challenge_backoff_seconds=140`、`batch_pause_seconds=140`，耗时约 23.8 分钟。进一步优化到每 180 次暂停 10 秒、567 退避 10 秒，2022-12-22 至 2026-06-19 全段 dry-run 仍成功，`trading_days=843`、`closed_days=433`、`unresolved=0`、`challenges=11`、`challenge_backoff_seconds=110`、`batch_pause_seconds=70`。2026-06-19 使用同一参数正式 `write` 落库成功，写入 `1276` 行，`trading_days=843`、`closed_days=433`、`unresolved=0`、`challenges=12`、`challenge_backoff_seconds=120`、`batch_pause_seconds=70`，库内 `quality_flag=backfilled_verified` 且 `source_profile=exchange_official_daily_probe`。当前 GFEX 固化配置为 `request_interval_seconds_by_exchange.GFEX=0.9`、`challenge_retry_attempts_by_exchange.GFEX=3`、`challenge_backoff_seconds_by_exchange.GFEX=10`、`batch_pause_every_requests_by_exchange.GFEX=180`、`batch_pause_seconds_by_exchange.GFEX=10`。交易日历任务还必须在首轮扫描结束后对 unresolved 日期执行任务级补传，当前配置为 `retry_unresolved_passes=1`、`retry_unresolved_pause_seconds=60`、`progress_log_every=100`。若 full dry-run 仍留下少量 567 洞，再上调到 `1.2s` 或切换手动代理进行 gap-fill。
 - 交易日历回填必须保留关键日志观察点：任务/交易所开始和结束、每 `progress_log_every` 次请求进度、单日 unresolved 原因、GFEX 567 challenge、请求级退避、批次暂停、任务级补传开始/结束和补回数量。Telegram 报告应展示 `retry_passes`、`retry_resolved` 和失败样本，避免 blocked 但无法定位原因。
 - GFEX 同一页面还暴露 `POST /u/interfacesWebTpTradingCalendar/loadList`，返回的是交易/合约事件日历，不能单独证明全量交易日和休市日，但可作为交易日治理的辅助证据。
 - SHFE/INE 当前小样本直连、`akshare_proxy_patch.install_patch()` 和手动授权代理均可返回官方 JSON。GFEX 当前直连和手动授权代理均可返回官方 JSON；`akshare_proxy_patch.install_patch()` hook 模式在当前 requests 路径存在 `impersonate` 参数兼容问题，且部分 GFEX 请求仍可能返回 HTML challenge。若本机 IP 再次被限流，优先用 `scripts/dev_validation/probe_futures_proxy_patch_access.py` 或 `scripts/dev_validation/probe_gfex_rate_limit_threshold.py` 复核代理可用性，再决定是否将手动代理通路纳入批量落库进程。
@@ -738,6 +741,13 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 ```text
 /run futures_official_calendar_backfill exchange=GFEX start=2022-12-22 end=2026-06-19 write
+```
+
+GFEX 主数据治理应在交易日历落库并复核后执行。当前实现先使用静态 P0 根品种种子维护 `CNF.LC.GFEX`、`CNF.SI.GFEX`、`CNF.PS.GFEX` 及其 `main_continuous` 研究序列，再通过 GFEX 官方日行情按已验证交易日发现真实合约，写入 `futures_contracts`。由于官方日行情不能直接提供上市日、最后交易日、交易单位、最小变动价位等完整合约规格，GFEX 合约质量标记为 `official_daily_discovered_partial`，并在 metadata 中保留 `first_observed_trade_date`、`last_observed_trade_date` 和缺失字段说明；后续若找到官方合约规格接口，应在同一主数据治理任务中补齐，不应另建旁路表。
+
+```text
+/run futures_master_governance exchange=GFEX start=2022-12-22 end=2026-06-19 dry_run
+/run futures_master_governance exchange=GFEX start=2022-12-22 end=2026-06-19 write
 ```
 
 SHFE/INE 等长历史或易限流交易所可继续使用分段开发脚本辅助落库：
@@ -875,6 +885,7 @@ warning 示例：
 | `GET /research/futures/{series_id}/mapping` | 查询连续序列每日对应真实合约、换月日期和构造方法 |
 | `GET /research/futures/calendar` | 查询交易日历，支持 `exchange`、`instrument_id`、`start_date`、`end_date` |
 | `POST /research/futures/calendar/official-backfill` | 执行官方交易日历回填；支持 `exchange`、`start_date`、`end_date`、`dry_run`、`max_days`，只写日历不写行情 |
+| `POST /research/futures/master-governance` | 执行商品期货主数据治理；支持 `exchange/scope`、`start_date`、`end_date`、`dry_run`、`max_days`，用于交易所分批上线前置检查 |
 | `GET /research/futures/source-manifests` | 查询数据源、接口、主备优先级、字段口径和覆盖状态 |
 | `GET /research/futures/{series_id}/cycle-diagnostics` | 查询分位数、均值、周期状态 |
 | `GET /research/futures/spreads` | 查询价差定义 |

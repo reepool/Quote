@@ -18,11 +18,13 @@ from research.futures_market_data import (
     FuturesExposureMapping,
     FuturesInstrumentCalendarOverride,
     FuturesManualCalendarReview,
+    FuturesMasterGovernanceService,
     FuturesMarketDataSyncService,
     FuturesOfficialCalendarBackfillService,
     FuturesReadinessService,
     FuturesSeries,
     FuturesStorageManager,
+    FuturesTradingCalendarDay,
     FuturesTradingDayGovernanceService,
     FuturesUniverseSelector,
     default_futures_registry,
@@ -182,6 +184,135 @@ def test_futures_calendar_and_price_services_report_scope_blockers_before_reques
     assert readiness["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
     assert diagnostics["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
     assert price["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
+
+
+def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2022-12-22",
+        end_date="2022-12-22",
+        dry_run=True,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["reason"] == "missing_verified_gfex_trading_calendar_coverage"
+
+
+def test_gfex_master_governance_dry_run_discovers_without_writing(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2022-12-22",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        assert exchange == "GFEX"
+        assert trade_date == "2022-12-22"
+        return [
+            _official_contract_row(
+                exchange="GFEX",
+                trade_date="2022-12-22",
+                variety="LC",
+                contract="LC2301",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2022-12-22",
+        end_date="2022-12-22",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["counts"]["would_write_contracts"] == 1
+    assert result["counts"]["contracts_written"] == 0
+    assert storage.list_contracts(exchange="GFEX") == []
+
+
+def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2022-12-22",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="LC",
+                contract="LC2301",
+            ),
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="SI",
+                contract="SI2301",
+            ),
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2022-12-22",
+        end_date="2022-12-22",
+        dry_run=False,
+    )
+    contracts = storage.list_contracts(exchange="GFEX")
+
+    assert result["status"] == "success"
+    assert result["counts"]["contracts_discovered"] == 2
+    assert result["counts"]["contracts_written"] == 2
+    assert {item["instrument_id"] for item in contracts} == {"CNF.LC.GFEX", "CNF.SI.GFEX"}
+    assert {item["contract_month"] for item in contracts} == {"2023-01"}
+    assert all(item["quality_flag"] == "official_daily_discovered_partial" for item in contracts)
 
 
 def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):

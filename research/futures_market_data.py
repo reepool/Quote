@@ -3560,6 +3560,7 @@ class FuturesTradingDayGovernanceService:
             end_date=end_date,
         )
 
+
     def upsert_official_notice(
         self,
         notice: FuturesCalendarNotice,
@@ -3959,6 +3960,285 @@ class FuturesTradingDayGovernanceService:
             return self.min_quality_by_mode["dry_run"]
         purpose_key = "backfill" if "backfill" in str(purpose or "") else "production"
         return self.min_quality_by_mode.get(purpose_key) or self.min_quality_by_mode["production"]
+
+
+class FuturesMasterGovernanceService:
+    """Govern futures root instruments, series, and contracts before price sync."""
+
+    domain = "futures_master_governance"
+    supported_exchanges = {"GFEX"}
+    source_profile = "exchange_official_daily_contract_discovery"
+
+    def __init__(
+        self,
+        storage: FuturesStorageManager,
+        research_config: ResearchConfig,
+        module_cfg: Optional[Dict[str, Any]] = None,
+    ):
+        self.storage = storage
+        self.research_config = research_config
+        self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+
+    def run(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
+        exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        max_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            return self._blocked(
+                reason="; ".join(scope_selection.blockers),
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+
+        requested_exchanges = sorted({str(item).upper() for item in scope_selection.exchanges})
+        unsupported = [item for item in requested_exchanges if item not in self.supported_exchanges]
+        if unsupported:
+            return self._blocked(
+                reason=f"unsupported_futures_master_governance_exchange: {','.join(unsupported)}",
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+
+        registry = default_futures_registry(self.module_cfg)
+        selected_instrument_ids = {item.upper() for item in scope_selection.instrument_ids}
+        selected_series_ids = {item.upper() for item in scope_selection.series_ids}
+        instruments = [
+            item for item in registry["instruments"]
+            if item.instrument_id.upper() in selected_instrument_ids and item.exchange.upper() == "GFEX"
+        ]
+        series = [
+            item for item in registry["series"]
+            if item.series_id.upper() in selected_series_ids and item.instrument_id.upper() in selected_instrument_ids
+        ]
+        if not instruments:
+            return self._blocked(
+                reason="empty_gfex_master_governance_scope",
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+
+        start = _date_key(start_date or self._default_contract_discovery_start())
+        end = _date_key(end_date or get_shanghai_time().date())
+        verified_days = self._verified_trading_days(exchange="GFEX", start_date=start, end_date=end)
+        if max_days:
+            verified_days = verified_days[: max(1, int(max_days))]
+        if not verified_days:
+            return self._blocked(
+                reason="missing_verified_gfex_trading_calendar_coverage",
+                scope_selection=scope_selection,
+                start_date=start,
+                end_date=end,
+                dry_run=dry_run,
+            )
+
+        result = {
+            "status": "success",
+            "domain": self.domain,
+            "exchange": "GFEX",
+            "source_profile": self.source_profile,
+            "start_date": start,
+            "end_date": end,
+            "dry_run": dry_run,
+            "scope_selection": scope_selection.as_dict(),
+            "calendar": {
+                "verified_trading_days": len(verified_days),
+                "first_trade_date": verified_days[0],
+                "last_trade_date": verified_days[-1],
+                "truncated_by_max_days": bool(max_days),
+            },
+            "counts": {
+                "instruments": len(instruments),
+                "series": len(series),
+                "contracts_discovered": 0,
+                "contracts_written": 0,
+                "official_request_count": 0,
+            },
+            "warnings": [],
+            "blockers": [],
+            "contracts": [],
+        }
+
+        contracts_by_id: Dict[str, FuturesContract] = {}
+        unmapped_varieties: Dict[str, int] = {}
+        try:
+            from research.providers.official_futures import (
+                OfficialFuturesMarketDataProvider,
+                OfficialFuturesSourceUnavailable,
+            )
+
+            provider = OfficialFuturesMarketDataProvider(self.research_config)
+            instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
+            first_seen: Dict[str, str] = {}
+            last_seen: Dict[str, str] = {}
+            for trade_date in verified_days:
+                try:
+                    rows = provider.fetch_exchange_contract_bars_sync("GFEX", trade_date)
+                    result["counts"]["official_request_count"] += 1
+                except OfficialFuturesSourceUnavailable as exc:
+                    result["warnings"].append({
+                        "trade_date": trade_date,
+                        "reason": str(exc),
+                    })
+                    continue
+                for row in rows:
+                    variety = str(row.variety or "").upper()
+                    instrument = instrument_by_symbol.get(variety)
+                    if not instrument:
+                        unmapped_varieties[variety] = unmapped_varieties.get(variety, 0) + 1
+                        continue
+                    contract_code = str(row.contract or "").upper()
+                    contract_id = make_futures_contract_id(instrument.instrument_id, contract_code)
+                    first_seen.setdefault(contract_id, trade_date)
+                    last_seen[contract_id] = trade_date
+                    contracts_by_id[contract_id] = FuturesContract(
+                        contract_id=contract_id,
+                        instrument_id=instrument.instrument_id,
+                        exchange="GFEX",
+                        exchange_contract_code=contract_code,
+                        contract_month=infer_contract_month(contract_code),
+                        delivery_month=infer_contract_month(contract_code),
+                        contract_multiplier=None,
+                        tick_size=None,
+                        currency=instrument.currency,
+                        unit=instrument.unit,
+                        active=True,
+                        source="exchange_official",
+                        quality_flag="official_daily_discovered_partial",
+                        metadata={
+                            "source_profile": self.source_profile,
+                            "source_interface": row.source_interface,
+                            "first_observed_trade_date": first_seen.get(contract_id),
+                            "last_observed_trade_date": last_seen.get(contract_id),
+                            "metadata_limitations": [
+                                "listing_date_not_available_from_daily_quote",
+                                "last_trade_date_not_available_from_daily_quote",
+                                "contract_spec_not_available_from_daily_quote",
+                            ],
+                        },
+                    )
+            for contract_id, item in list(contracts_by_id.items()):
+                metadata = dict(item.metadata)
+                metadata["first_observed_trade_date"] = first_seen.get(contract_id)
+                metadata["last_observed_trade_date"] = last_seen.get(contract_id)
+                contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
+        except Exception as exc:
+            return self._blocked(
+                reason=f"gfex_contract_discovery_failed: {exc}",
+                scope_selection=scope_selection,
+                start_date=start,
+                end_date=end,
+                dry_run=dry_run,
+            )
+
+        contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
+        result["counts"]["contracts_discovered"] = len(contracts)
+        result["contracts"] = [
+            {
+                "contract_id": item.contract_id,
+                "instrument_id": item.instrument_id,
+                "exchange_contract_code": item.exchange_contract_code,
+                "contract_month": item.contract_month,
+                "first_observed_trade_date": item.metadata.get("first_observed_trade_date"),
+                "last_observed_trade_date": item.metadata.get("last_observed_trade_date"),
+            }
+            for item in contracts[:50]
+        ]
+        if unmapped_varieties:
+            result["warnings"].append({
+                "reason": "unmapped_gfex_varieties",
+                "samples": sorted(unmapped_varieties.items())[:20],
+            })
+        if not contracts:
+            result["status"] = "blocked"
+            result["blockers"].append("no_gfex_contracts_discovered")
+            return result
+        if result["warnings"]:
+            result["status"] = "warning"
+
+        if not dry_run:
+            self.storage.upsert_instruments_and_series(instruments, series)
+            result["counts"]["contracts_written"] = self.storage.upsert_contracts(contracts) if contracts else 0
+        else:
+            result["counts"]["would_write_instruments"] = len(instruments)
+            result["counts"]["would_write_series"] = len(series)
+            result["counts"]["would_write_contracts"] = len(contracts)
+        return result
+
+    def _default_contract_discovery_start(self) -> str:
+        governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
+        exchange_starts = backfill_cfg.get("exchange_start_dates") or {}
+        return str(exchange_starts.get("GFEX") or "2022-12-22")
+
+    def _verified_trading_days(self, *, exchange: str, start_date: str, end_date: str) -> List[str]:
+        rows = self.storage.list_calendar_days(
+            exchange=exchange,
+            start_date=start_date,
+            end_date=end_date,
+            trading_only=True,
+        )
+        return [
+            str(row["trade_date"])
+            for row in rows
+            if FUTURES_CALENDAR_QUALITY_RANK.get(str(row.get("quality_flag") or ""), 0)
+            >= FUTURES_CALENDAR_QUALITY_RANK["backfilled_verified"]
+        ]
+
+    def _blocked(
+        self,
+        *,
+        reason: str,
+        scope_selection: FuturesUniverseSelection,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        return {
+            "status": "blocked",
+            "domain": self.domain,
+            "exchange": "GFEX",
+            "source_profile": self.source_profile,
+            "start_date": start_date,
+            "end_date": end_date,
+            "dry_run": dry_run,
+            "scope_selection": scope_selection.as_dict(),
+            "counts": {
+                "instruments": 0,
+                "series": 0,
+                "contracts_discovered": 0,
+                "contracts_written": 0,
+                "official_request_count": 0,
+            },
+            "warnings": [],
+            "blockers": [reason],
+            "reason": reason,
+        }
 
 
 class FuturesOfficialCalendarBackfillService:

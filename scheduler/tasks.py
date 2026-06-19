@@ -932,6 +932,53 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
+    if result.get("domain") == "futures_master_governance":
+        counts = result.get("counts") or {}
+        calendar = result.get("calendar") or {}
+        blockers = result.get("blockers") or []
+        warnings = result.get("warnings") or []
+        detail_lines = []
+        for item in (result.get("contracts") or [])[:10]:
+            detail_lines.append(
+                f"{item.get('contract_id', 'unknown')}: "
+                f"instrument={item.get('instrument_id', 'N/A')}, "
+                f"code={item.get('exchange_contract_code', 'N/A')}, "
+                f"month={item.get('contract_month', 'N/A')}, "
+                f"first={item.get('first_observed_trade_date', 'N/A')}, "
+                f"last={item.get('last_observed_trade_date', 'N/A')}"
+            )
+        if not detail_lines:
+            detail_lines.append(result.get("reason") or "无合约样本")
+        blocker_text = ""
+        if blockers:
+            blocker_text = "\n\n阻塞项:\n```text\n" + "\n".join(map(str, blockers[:10])) + "\n```"
+        warning_text = ""
+        if warnings:
+            warning_text = "\n\n警告:\n```text\n" + "\n".join(map(str, warnings[:10])) + "\n```"
+        return (
+            f"{icon} *商品期货主数据治理*\n\n"
+            f"结论: *{label}*\n"
+            f"状态: `{status}`\n"
+            f"exchange: `{result.get('exchange', 'N/A')}`\n"
+            f"source_profile: `{result.get('source_profile', 'N/A')}`\n"
+            f"range: `{result.get('start_date', 'N/A')}` 至 `{result.get('end_date', 'N/A')}`\n"
+            f"dry_run: `{result.get('dry_run', True)}`\n\n"
+            f"verified_trading_days: `{calendar.get('verified_trading_days', 0)}`\n"
+            f"calendar_first: `{calendar.get('first_trade_date', 'N/A')}`\n"
+            f"calendar_last: `{calendar.get('last_trade_date', 'N/A')}`\n\n"
+            f"instruments: `{counts.get('instruments', 0)}`\n"
+            f"series: `{counts.get('series', 0)}`\n"
+            f"contracts_discovered: `{counts.get('contracts_discovered', 0)}`\n"
+            f"contracts_written: `{counts.get('contracts_written', 0)}`\n"
+            f"would_write_contracts: `{counts.get('would_write_contracts', 0)}`\n"
+            f"official_request_count: `{counts.get('official_request_count', 0)}`\n\n"
+            "合约样本:\n"
+            "```text\n"
+            + "\n".join(detail_lines)
+            + "\n```"
+            + blocker_text
+            + warning_text
+        )
     if result.get("domain") == "futures_official_trading_calendar_backfill":
         totals = result.get("totals") or {}
         detail_lines = []
@@ -2805,6 +2852,8 @@ class ScheduledTasks:
         mode: str = "direct",
         dry_run: bool = False,
         requires_trading_day_governance: bool = True,
+        requires_master_data_governance: bool = False,
+        master_governance_max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货行情日更任务。"""
@@ -2845,6 +2894,41 @@ class ScheduledTasks:
                         },
                         report_type='maintenance_report',
                         task_name='商品期货交易日治理前置检查',
+                        job_config=job_config,
+                    )
+                    return False
+            if requires_master_data_governance:
+                master_result = await data_manager.run_futures_master_governance(
+                    scope_id=scope_id,
+                    scope_ids=scope_ids,
+                    exchanges=exchanges,
+                    categories=categories,
+                    instrument_ids=instrument_ids,
+                    series_ids=series_ids,
+                    series_types=series_types,
+                    start_date=start_date,
+                    end_date=end_date,
+                    dry_run=dry_run,
+                    max_days=master_governance_max_days,
+                )
+                master_status = master_result.get("status")
+                if master_status == "blocked" and not dry_run:
+                    await self._send_task_report(
+                        report_data={
+                            'name': '商品期货主数据治理前置检查报告',
+                            'content': _format_futures_market_data_scheduler_report(master_result),
+                            'status': 'error',
+                            'tasks_completed': 0,
+                            'duration': 'N/A',
+                            'maintenance_tasks': [
+                                {
+                                    'task_name': 'futures_master_governance',
+                                    'status': "; ".join(master_result.get("blockers") or ["blocked"]),
+                                }
+                            ],
+                        },
+                        report_type='maintenance_report',
+                        task_name='商品期货主数据治理前置检查',
                         job_config=job_config,
                     )
                     return False
@@ -2923,6 +3007,8 @@ class ScheduledTasks:
         mode: str = "direct",
         dry_run: bool = False,
         requires_trading_day_governance: bool = True,
+        requires_master_data_governance: bool = False,
+        master_governance_max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货行情历史回补任务，要求显式日期范围。"""
@@ -2941,6 +3027,8 @@ class ScheduledTasks:
             mode=mode,
             dry_run=dry_run,
             requires_trading_day_governance=requires_trading_day_governance,
+            requires_master_data_governance=requires_master_data_governance,
+            master_governance_max_days=master_governance_max_days,
             job_config=job_config,
         )
 
@@ -3095,6 +3183,84 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('futures_official_calendar_backfill')
+
+    async def futures_master_governance(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        max_days: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货主数据治理任务；当前支持 GFEX 官方日行情合约发现。"""
+        self._active_tasks.add('futures_master_governance')
+        try:
+            result = await data_manager.run_futures_master_governance(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货主数据治理报告',
+                    'content': _format_futures_market_data_scheduler_report(result),
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': 1 if success else 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': 'futures_master_governance',
+                            'status': status,
+                        }
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货主数据治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures master governance failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货主数据治理报告',
+                    'content': _format_futures_market_data_scheduler_report({
+                        'status': 'error',
+                        'domain': 'futures_master_governance',
+                        'reason': str(e),
+                        'counts': {},
+                    }),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'futures_master_governance', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货主数据治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('futures_master_governance')
 
     async def futures_cycle_diagnostics_refresh(
         self,

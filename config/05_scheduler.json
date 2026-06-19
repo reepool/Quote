@@ -622,9 +622,39 @@
           "max_runtime_seconds": 14400
         }
       },
+      "futures_master_governance": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "商品期货主数据治理（当前支持 GFEX：官方日行情合约发现，写入 data/futures.db instruments/series/contracts）",
+        "operator_note": "Manual safety default is dry_run with max_days=10. Use /futures_master_governance ... write for explicit persistence after trading calendar coverage is verified.",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 20,
+          "minute": 45,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_ids": [
+            "gfex_all"
+          ],
+          "exchanges": [
+            "GFEX"
+          ],
+          "start_date": "2022-12-22",
+          "dry_run": true,
+          "max_days": 10,
+          "max_runtime_seconds": 14400
+        }
+      },
       "futures_market_data_sync": {
         "enabled": false,
-        "description": "商品期货行情日线与连续序列同步（写入 data/futures.db；依赖 futures_trading_day_governance）",
+        "description": "商品期货行情日线与连续序列同步（写入 data/futures.db；可配置交易日治理和主数据治理前置）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -644,6 +674,8 @@
           "mode": "direct",
           "dry_run": false,
           "requires_trading_day_governance": true,
+          "requires_master_data_governance": false,
+          "master_governance_max_days": 10,
           "max_runtime_seconds": 7200
         }
       },
@@ -670,6 +702,8 @@
           "mode": "direct",
           "dry_run": false,
           "requires_trading_day_governance": true,
+          "requires_master_data_governance": false,
+          "master_governance_max_days": 10,
           "max_runtime_seconds": 14400,
           "note": "Historical backfill must be run with explicit start_date/end_date and bounded series_ids."
         }

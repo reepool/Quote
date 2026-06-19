@@ -4668,6 +4668,47 @@ class DataManager:
 
         return await asyncio.to_thread(_run)
 
+    async def run_futures_master_governance(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        max_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Govern futures instruments, series, and contracts before futures price sync."""
+        storage = self._require_futures_storage()
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        from research.futures_market_data import FuturesMasterGovernanceService
+
+        def _run() -> Dict[str, Any]:
+            return FuturesMasterGovernanceService(
+                storage,
+                self.research_config,
+                module_cfg,
+            ).run(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+
+        return await asyncio.to_thread(_run)
+
     async def refresh_futures_cycle_diagnostics(
         self,
         *,
