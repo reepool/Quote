@@ -2293,7 +2293,6 @@ class TaskManagerHandlers:
         master_governance_max_days: Optional[int],
     ) -> None:
         try:
-            scheduler = self.task_manager.task_scheduler
             self.task_manager.logger.info(
                 "[TaskManagerHandlers] 执行期货行情任务: job_id=%s scope_id=%s exchanges=%s "
                 "categories=%s start=%s end=%s mode=%s dry_run=%s",
@@ -2306,25 +2305,71 @@ class TaskManagerHandlers:
                 mode,
                 dry_run,
             )
-            result = await scheduler.execute_job_direct(
+            if requires_master_data_governance:
+                from data_manager import data_manager
+
+                master_result = await data_manager.run_futures_master_governance(
+                    scope_id=scope_id,
+                    scope_ids=None,
+                    exchanges=exchanges,
+                    categories=categories,
+                    instrument_ids=instrument_ids,
+                    series_ids=series_ids,
+                    series_types=series_types,
+                    start_date=start_date,
+                    end_date=end_date,
+                    dry_run=dry_run,
+                    max_days=master_governance_max_days,
+                )
+                master_status = str(master_result.get('status') or '').lower()
+                if master_status not in {'success', 'warning'}:
+                    self.task_manager.logger.warning(
+                        "[TaskManagerHandlers] 期货行情前置主数据治理未通过: status=%s result=%s",
+                        master_status,
+                        master_result,
+                    )
+                    await self.task_manager.send_message(
+                        chat_id,
+                        (
+                            "❌ *期货行情任务失败*\n\n"
+                            f"task: `{job_id}`\n"
+                            "reason: `master_governance_failed`\n"
+                            f"master_status: `{master_status or 'unknown'}`"
+                        ),
+                        parse_mode='markdown',
+                    )
+                    return
+
+            from data_manager import data_manager
+
+            result_payload = await data_manager.run_futures_market_data_sync(
+                scope_id=scope_id,
+                scope_ids=None,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+                start_date=start_date,
+                end_date=end_date,
+                mode=mode,
+                dry_run=dry_run,
+            )
+            result_status = str(result_payload.get('status') or '').lower()
+            result = result_status in {'success', 'warning', 'degraded', 'partial'}
+            totals = result_payload.get('totals') or {}
+            source_selection = result_payload.get('source_selection') or {}
+            self.task_manager.logger.info(
+                "[TaskManagerHandlers] 期货行情任务完成: job_id=%s success=%s status=%s "
+                "fetched_rows=%s would_write=%s failed=%s official_success=%s official_failed=%s",
                 job_id,
-                parameters={
-                    'scope_id': scope_id,
-                    'scope_ids': None,
-                    'exchanges': exchanges,
-                    'categories': categories,
-                    'instrument_ids': instrument_ids,
-                    'series_ids': series_ids,
-                    'series_types': series_types,
-                    'start_date': start_date,
-                    'end_date': end_date,
-                    'mode': mode,
-                    'dry_run': dry_run,
-                    'requires_trading_day_governance': requires_trading_day_governance,
-                    'requires_master_data_governance': requires_master_data_governance,
-                    'master_governance_max_days': master_governance_max_days,
-                },
-                include_dependencies=True,
+                result,
+                result_status,
+                totals.get('fetched_rows'),
+                totals.get('would_write_price_bars'),
+                totals.get('failed'),
+                source_selection.get('official_success'),
+                source_selection.get('official_failed'),
             )
             status_text = '成功' if result else '失败'
             await self.task_manager.send_message(
@@ -2332,11 +2377,17 @@ class TaskManagerHandlers:
                 (
                     f"{'✅' if result else '❌'} *期货行情任务{status_text}*\n\n"
                     f"task: `{job_id}`\n"
+                    f"status: `{result_status or 'unknown'}`\n"
                     f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"
                     f"start: `{start_date}`\n"
                     f"end: `{end_date}`\n"
-                    f"dry_run: `{dry_run}`\n\n"
-                    "详细结果以任务报告和日志为准。"
+                    f"dry_run: `{dry_run}`\n"
+                    f"fetched_rows: `{totals.get('fetched_rows', 0)}`\n"
+                    f"would_write_price_bars: `{totals.get('would_write_price_bars', 0)}`\n"
+                    f"failed: `{totals.get('failed', 0)}`\n"
+                    f"official_success: `{source_selection.get('official_success', 0)}`\n"
+                    f"official_failed: `{source_selection.get('official_failed', 0)}`\n\n"
+                    "详细结果以任务日志为准。"
                 ),
                 parse_mode='markdown',
             )

@@ -3883,11 +3883,21 @@ class FuturesCalendarService:
         today = get_shanghai_time().date()
         start = date.fromisoformat(_date_key(start_date)) if start_date else today - timedelta(days=self.lookback_days)
         end = date.fromisoformat(_date_key(end_date)) if end_date else today + timedelta(days=self.lookahead_days)
+        existing_by_key: Dict[tuple[str, str], Dict[str, Any]] = {}
+        for row in self.storage.list_calendar_days(
+            start_date=start.isoformat(),
+            end_date=end.isoformat(),
+        ):
+            key = (str(row.get("exchange") or "").upper(), str(row.get("trade_date") or ""))
+            existing_by_key[key] = row
         days: List[FuturesTradingCalendarDay] = []
         current = start
         while current <= end:
             is_weekday = current.weekday() < 5
             for exchange in exchange_list:
+                existing = existing_by_key.get((exchange, current.isoformat()))
+                if existing and str(existing.get("quality_flag") or "") != self.quality_flag:
+                    continue
                 days.append(
                     FuturesTradingCalendarDay(
                         exchange=exchange,

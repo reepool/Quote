@@ -792,6 +792,37 @@ def test_futures_storage_persists_contract_bars_mapping_and_calendar(tmp_path):
     assert storage.get_latest_expected_trade_date("SHFE", as_of_date="2024-06-04")["trade_date"] == "2024-06-04"
 
 
+def test_futures_calendar_seed_does_not_downgrade_verified_days(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-06-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    result = FuturesCalendarService(
+        storage,
+        config.modules["commodity_market_data"],
+    ).seed_default_calendar(
+        exchanges=["GFEX"],
+        start_date="2026-06-02",
+        end_date="2026-06-03",
+    )
+
+    rows = storage.list_calendar_days(exchange="GFEX", start_date="2026-06-02", end_date="2026-06-03")
+    row_by_date = {row["trade_date"]: row for row in rows}
+    assert result["calendar_rows"] == 1
+    assert row_by_date["2026-06-02"]["quality_flag"] == "backfilled_verified"
+    assert row_by_date["2026-06-02"]["source_profile"] == "exchange_official_daily_probe"
+    assert row_by_date["2026-06-03"]["quality_flag"] == "estimated"
+
+
 def test_futures_storage_persists_trading_day_governance_tables(tmp_path):
     config = _research_config(tmp_path)
     storage = FuturesStorageManager(config)
