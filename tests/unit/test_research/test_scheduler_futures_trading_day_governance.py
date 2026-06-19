@@ -198,6 +198,68 @@ def test_futures_master_governance_report_includes_source_pressure_metrics():
     assert "retry_backoff_seconds: `0.5`" in report
 
 
+def test_futures_master_governance_report_compacts_discovery_warnings():
+    warning = {
+        "reason": "unmapped_gfex_varieties",
+        "samples": [("PD", 646), ("PT", 646)],
+        "discovery_candidates": [
+            {
+                "discovery_id": "GFEX:PD",
+                "candidate_instrument_id": "CNF.PD.GFEX",
+                "candidate_name": "GFEX Palladium",
+                "candidate_category": "precious_metal",
+                "candidate_unit": "CNY/gram",
+                "evidence": {"large": "payload" * 500},
+            },
+            {
+                "discovery_id": "GFEX:PT",
+                "candidate_instrument_id": "CNF.PT.GFEX",
+                "candidate_name": "GFEX Platinum",
+                "candidate_category": "precious_metal",
+                "candidate_unit": "CNY/gram",
+                "evidence": {"large": "payload" * 500},
+            },
+        ],
+    }
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "warning",
+            "domain": "futures_master_governance",
+            "exchange": "GFEX",
+            "source_profile": "exchange_official_daily_contract_discovery",
+            "start_date": "2022-12-22",
+            "end_date": "2026-06-19",
+            "dry_run": True,
+            "calendar": {
+                "verified_trading_days": 843,
+                "first_trade_date": "2022-12-22",
+                "last_trade_date": "2026-06-18",
+            },
+            "counts": {
+                "instruments": 3,
+                "series": 3,
+                "contracts_discovered": 114,
+                "contracts_written": 0,
+                "would_write_contracts": 114,
+                "official_request_count": 843,
+                "challenge_count": 7,
+                "challenge_backoff_seconds": 70,
+                "batch_pause_count": 4,
+                "batch_pause_seconds": 40,
+            },
+            "contracts": [],
+            "warnings": [warning],
+            "blockers": [],
+        }
+    )
+
+    assert len(report) < 4096
+    assert "unmapped_gfex_varieties" in report
+    assert "samples=[PD:646, PT:646]" in report
+    assert "CNF.PD.GFEX:GFEX Palladium/precious_metal/CNY/gram" in report
+    assert "payloadpayload" not in report
+
+
 def test_futures_market_data_sync_stops_when_governance_blocks_production():
     task = ScheduledTasks()
 

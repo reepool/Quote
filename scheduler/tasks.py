@@ -932,6 +932,38 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
+
+    def _format_warning_items(warnings: List[Any], *, limit: int = 10) -> List[str]:
+        lines: List[str] = []
+        for item in warnings[:limit]:
+            if not isinstance(item, dict):
+                lines.append(str(item))
+                continue
+            reason = item.get("reason") or "warning"
+            if reason == "unmapped_gfex_varieties":
+                samples = item.get("samples") or []
+                sample_text = ", ".join(f"{symbol}:{count}" for symbol, count in samples[:10])
+                candidates = item.get("discovery_candidates") or []
+                candidate_parts = []
+                for candidate in candidates[:10]:
+                    if not isinstance(candidate, dict):
+                        candidate_parts.append(str(candidate))
+                        continue
+                    candidate_parts.append(
+                        f"{candidate.get('candidate_instrument_id') or candidate.get('discovery_id')}:"
+                        f"{candidate.get('candidate_name') or 'N/A'}/"
+                        f"{candidate.get('candidate_category') or 'N/A'}/"
+                        f"{candidate.get('candidate_unit') or 'N/A'}"
+                    )
+                candidate_text = "; ".join(candidate_parts) if candidate_parts else "none"
+                lines.append(
+                    f"{reason}: samples=[{sample_text}], discovery_candidates=[{candidate_text}]"
+                )
+                continue
+            compact = {key: value for key, value in item.items() if key != "discovery_candidates"}
+            lines.append(str(compact))
+        return lines
+
     if result.get("domain") == "futures_master_discovery_governance":
         counts = result.get("counts") or {}
         blockers = result.get("blockers") or []
@@ -963,7 +995,7 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
             blocker_text = "\n\n阻塞项:\n```text\n" + "\n".join(map(str, blockers[:10])) + "\n```"
         warning_text = ""
         if warnings:
-            warning_text = "\n\n警告:\n```text\n" + "\n".join(map(str, warnings[:10])) + "\n```"
+            warning_text = "\n\n警告:\n```text\n" + "\n".join(_format_warning_items(warnings)) + "\n```"
         promotion_text = ""
         if promotion_lines:
             promotion_text = "\n\nPromotion:\n```text\n" + "\n".join(promotion_lines) + "\n```"
@@ -1010,7 +1042,7 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
             blocker_text = "\n\n阻塞项:\n```text\n" + "\n".join(map(str, blockers[:10])) + "\n```"
         warning_text = ""
         if warnings:
-            warning_text = "\n\n警告:\n```text\n" + "\n".join(map(str, warnings[:10])) + "\n```"
+            warning_text = "\n\n警告:\n```text\n" + "\n".join(_format_warning_items(warnings)) + "\n```"
         return (
             f"{icon} *商品期货主数据治理*\n\n"
             f"结论: *{label}*\n"
