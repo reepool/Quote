@@ -114,8 +114,14 @@ def test_futures_universe_selector_resolves_all_and_named_scope():
     assert set(domestic.exchanges) == {"SHFE", "INE", "DCE", "CZCE", "GFEX"}
     assert "CNF.CU.SHFE.main" in domestic.series_ids
     assert gfex.exchanges == ["GFEX"]
-    assert gfex.categories == ["new_energy_material"]
-    assert set(gfex.instrument_ids) == {"CNF.LC.GFEX", "CNF.PS.GFEX", "CNF.SI.GFEX"}
+    assert set(gfex.categories) == {"new_energy_material", "precious_metal"}
+    assert set(gfex.instrument_ids) == {
+        "CNF.LC.GFEX",
+        "CNF.PD.GFEX",
+        "CNF.PS.GFEX",
+        "CNF.PT.GFEX",
+        "CNF.SI.GFEX",
+    }
 
 
 def test_futures_universe_selector_resolves_exchange_category_instrument_and_series_filters():
@@ -313,6 +319,60 @@ def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
     assert {item["instrument_id"] for item in contracts} == {"CNF.LC.GFEX", "CNF.SI.GFEX"}
     assert {item["contract_month"] for item in contracts} == {"2023-01"}
     assert all(item["quality_flag"] == "official_daily_discovered_partial" for item in contracts)
+
+
+def test_gfex_master_governance_maps_platinum_and_palladium(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2025-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="PT",
+                contract="PT2506",
+            ),
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="PD",
+                contract="PD2506",
+            ),
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2025-01-02",
+        end_date="2025-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["warnings"] == []
+    assert result["counts"]["contracts_discovered"] == 2
+    assert {item["instrument_id"] for item in result["contracts"]} == {"CNF.PT.GFEX", "CNF.PD.GFEX"}
 
 
 def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):

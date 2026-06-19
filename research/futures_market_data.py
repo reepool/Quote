@@ -97,6 +97,8 @@ DEFAULT_P0_FUTURES_INSTRUMENTS: List[Dict[str, str]] = [
     {"instrument_id": "CNF.LC.GFEX", "symbol": "LC", "name": "GFEX Lithium Carbonate", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.SI.GFEX", "symbol": "SI", "name": "GFEX Industrial Silicon", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.PS.GFEX", "symbol": "PS", "name": "GFEX Polysilicon", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
+    {"instrument_id": "CNF.PT.GFEX", "symbol": "PT", "name": "GFEX Platinum", "exchange": "GFEX", "category": "precious_metal", "unit": "CNY/gram"},
+    {"instrument_id": "CNF.PD.GFEX", "symbol": "PD", "name": "GFEX Palladium", "exchange": "GFEX", "category": "precious_metal", "unit": "CNY/gram"},
     {"instrument_id": "CNF.FG.CZCE", "symbol": "FG", "name": "CZCE Glass", "exchange": "CZCE", "category": "building_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.SP.SHFE", "symbol": "SP", "name": "SHFE Pulp", "exchange": "SHFE", "category": "pulp_paper", "unit": "CNY/ton"},
 ]
