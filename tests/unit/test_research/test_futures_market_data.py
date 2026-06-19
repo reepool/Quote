@@ -116,12 +116,10 @@ def test_futures_universe_selector_resolves_all_and_named_scope():
     assert set(domestic.exchanges) == {"SHFE", "INE", "DCE", "CZCE", "GFEX"}
     assert "CNF.CU.SHFE.main" in domestic.series_ids
     assert gfex.exchanges == ["GFEX"]
-    assert set(gfex.categories) == {"new_energy_material", "precious_metal"}
+    assert set(gfex.categories) == {"new_energy_material"}
     assert set(gfex.instrument_ids) == {
         "CNF.LC.GFEX",
-        "CNF.PD.GFEX",
         "CNF.PS.GFEX",
-        "CNF.PT.GFEX",
         "CNF.SI.GFEX",
     }
 
@@ -233,6 +231,10 @@ def test_gfex_master_governance_dry_run_discovers_without_writing(monkeypatch, t
     def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
         assert exchange == "GFEX"
         assert trade_date == "2022-12-22"
+        self._increment_metric("GFEX", "challenge_count", 1)
+        self._increment_metric("GFEX", "challenge_backoff_seconds", 10)
+        self._increment_metric("GFEX", "batch_pause_count", 1)
+        self._increment_metric("GFEX", "batch_pause_seconds", 10)
         return [
             _official_contract_row(
                 exchange="GFEX",
@@ -263,6 +265,10 @@ def test_gfex_master_governance_dry_run_discovers_without_writing(monkeypatch, t
     assert result["counts"]["contracts_discovered"] == 1
     assert result["counts"]["would_write_contracts"] == 1
     assert result["counts"]["contracts_written"] == 0
+    assert result["counts"]["challenge_count"] == 1
+    assert result["counts"]["challenge_backoff_seconds"] == 10
+    assert result["counts"]["batch_pause_count"] == 1
+    assert result["counts"]["batch_pause_seconds"] == 10
     assert storage.list_contracts(exchange="GFEX") == []
 
 
@@ -323,7 +329,7 @@ def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
     assert all(item["quality_flag"] == "official_daily_discovered_partial" for item in contracts)
 
 
-def test_gfex_master_governance_maps_platinum_and_palladium(monkeypatch, tmp_path):
+def test_gfex_master_governance_discovers_platinum_and_palladium_candidates(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())
     storage = FuturesStorageManager(config)
@@ -340,6 +346,12 @@ def test_gfex_master_governance_maps_platinum_and_palladium(monkeypatch, tmp_pat
 
     def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
         return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="LC",
+                contract="LC2506",
+            ),
             _official_contract_row(
                 exchange=exchange,
                 trade_date=trade_date,
@@ -371,10 +383,18 @@ def test_gfex_master_governance_maps_platinum_and_palladium(monkeypatch, tmp_pat
         dry_run=True,
     )
 
-    assert result["status"] == "success"
-    assert result["warnings"] == []
-    assert result["counts"]["contracts_discovered"] == 2
-    assert {item["instrument_id"] for item in result["contracts"]} == {"CNF.PT.GFEX", "CNF.PD.GFEX"}
+    assert result["status"] == "warning"
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["counts"]["master_discovery_candidates"] == 2
+    assert result["counts"]["master_discovery_auto_promoted"] == 2
+    assert {item["instrument_id"] for item in result["contracts"]} == {"CNF.LC.GFEX"}
+    warning = result["warnings"][0]
+    assert warning["reason"] == "unmapped_gfex_varieties"
+    assert dict(warning["samples"]) == {"PD": 1, "PT": 1}
+    assert {
+        item["candidate_instrument_id"]
+        for item in warning["discovery_candidates"]
+    } == {"CNF.PD.GFEX", "CNF.PT.GFEX"}
 
 
 def test_futures_master_discovery_storage_idempotency_and_conflict(tmp_path):

@@ -157,6 +157,47 @@ def test_futures_official_calendar_report_includes_failure_samples():
     assert "GFEX 2024-01-11: gfex_html_challenge http_status=567" in report
 
 
+def test_futures_master_governance_report_includes_source_pressure_metrics():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "success",
+            "domain": "futures_master_governance",
+            "exchange": "GFEX",
+            "source_profile": "exchange_official_daily_contract_discovery",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-10",
+            "dry_run": True,
+            "calendar": {
+                "verified_trading_days": 5,
+                "first_trade_date": "2025-01-02",
+                "last_trade_date": "2025-01-08",
+            },
+            "counts": {
+                "instruments": 3,
+                "series": 3,
+                "contracts_discovered": 6,
+                "contracts_written": 0,
+                "would_write_contracts": 6,
+                "official_request_count": 5,
+                "challenge_count": 2,
+                "challenge_backoff_seconds": 20,
+                "batch_pause_count": 1,
+                "batch_pause_seconds": 10,
+                "retry_backoff_count": 1,
+                "retry_backoff_seconds": 0.5,
+            },
+            "contracts": [],
+            "warnings": [],
+            "blockers": [],
+        }
+    )
+
+    assert "challenge_count: `2`" in report
+    assert "challenge_backoff_seconds: `20`" in report
+    assert "batch_pause_count: `1`" in report
+    assert "retry_backoff_seconds: `0.5`" in report
+
+
 def test_futures_market_data_sync_stops_when_governance_blocks_production():
     task = ScheduledTasks()
 

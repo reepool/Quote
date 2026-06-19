@@ -40,6 +40,18 @@ FUTURES_CALENDAR_QUALITY_RANK: Dict[str, int] = {
 }
 
 
+def _provider_metrics_for_exchange(provider: Any, exchange: str) -> Dict[str, float]:
+    snapshot = getattr(provider, "snapshot_metrics", None)
+    if not callable(snapshot):
+        return {}
+    return dict((snapshot() or {}).get(str(exchange or "").upper(), {}))
+
+
+def _metric_delta(before: Dict[str, float], after: Dict[str, float]) -> Dict[str, float]:
+    keys = set(before) | set(after)
+    return {key: float(after.get(key, 0.0)) - float(before.get(key, 0.0)) for key in keys}
+
+
 FUTURES_CATEGORY_DEFINITIONS: List[Dict[str, str]] = [
     {"category": "coal", "name": "Coal", "parent_category": "energy"},
     {"category": "ferrous", "name": "Ferrous Metals", "parent_category": "commodity"},
@@ -97,8 +109,6 @@ DEFAULT_P0_FUTURES_INSTRUMENTS: List[Dict[str, str]] = [
     {"instrument_id": "CNF.LC.GFEX", "symbol": "LC", "name": "GFEX Lithium Carbonate", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.SI.GFEX", "symbol": "SI", "name": "GFEX Industrial Silicon", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.PS.GFEX", "symbol": "PS", "name": "GFEX Polysilicon", "exchange": "GFEX", "category": "new_energy_material", "unit": "CNY/ton"},
-    {"instrument_id": "CNF.PT.GFEX", "symbol": "PT", "name": "GFEX Platinum", "exchange": "GFEX", "category": "precious_metal", "unit": "CNY/gram"},
-    {"instrument_id": "CNF.PD.GFEX", "symbol": "PD", "name": "GFEX Palladium", "exchange": "GFEX", "category": "precious_metal", "unit": "CNY/gram"},
     {"instrument_id": "CNF.FG.CZCE", "symbol": "FG", "name": "CZCE Glass", "exchange": "CZCE", "category": "building_material", "unit": "CNY/ton"},
     {"instrument_id": "CNF.SP.SHFE", "symbol": "SP", "name": "SHFE Pulp", "exchange": "SHFE", "category": "pulp_paper", "unit": "CNY/ton"},
 ]
@@ -4994,6 +5004,12 @@ class FuturesMasterGovernanceService:
                 "contracts_discovered": 0,
                 "contracts_written": 0,
                 "official_request_count": 0,
+                "challenge_count": 0,
+                "challenge_backoff_seconds": 0.0,
+                "batch_pause_count": 0,
+                "batch_pause_seconds": 0.0,
+                "retry_backoff_count": 0,
+                "retry_backoff_seconds": 0.0,
             },
             "warnings": [],
             "blockers": [],
@@ -5015,6 +5031,7 @@ class FuturesMasterGovernanceService:
             )
 
             provider = OfficialFuturesMarketDataProvider(self.research_config)
+            metrics_before = _provider_metrics_for_exchange(provider, "GFEX")
             instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
             first_seen: Dict[str, str] = {}
             last_seen: Dict[str, str] = {}
@@ -5077,6 +5094,16 @@ class FuturesMasterGovernanceService:
                 metadata["first_observed_trade_date"] = first_seen.get(contract_id)
                 metadata["last_observed_trade_date"] = last_seen.get(contract_id)
                 contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
+            metrics_after = _provider_metrics_for_exchange(provider, "GFEX")
+            source_metrics = _metric_delta(metrics_before, metrics_after)
+            result["counts"]["challenge_count"] = int(source_metrics.get("challenge_count", 0))
+            result["counts"]["challenge_backoff_seconds"] = float(
+                source_metrics.get("challenge_backoff_seconds", 0.0)
+            )
+            result["counts"]["batch_pause_count"] = int(source_metrics.get("batch_pause_count", 0))
+            result["counts"]["batch_pause_seconds"] = float(source_metrics.get("batch_pause_seconds", 0.0))
+            result["counts"]["retry_backoff_count"] = int(source_metrics.get("retry_backoff_count", 0))
+            result["counts"]["retry_backoff_seconds"] = float(source_metrics.get("retry_backoff_seconds", 0.0))
         except Exception as exc:
             return self._blocked(
                 reason=f"gfex_contract_discovery_failed: {exc}",
@@ -5134,6 +5161,21 @@ class FuturesMasterGovernanceService:
             result["counts"]["would_write_instruments"] = len(instruments)
             result["counts"]["would_write_series"] = len(series)
             result["counts"]["would_write_contracts"] = len(contracts)
+        logger.info(
+            "[FuturesMasterGovernance] exchange done exchange=GFEX status=%s requests=%s "
+            "contracts_discovered=%s contracts_written=%s warnings=%s challenges=%s "
+            "challenge_backoff_seconds=%s batch_pauses=%s batch_pause_seconds=%s dry_run=%s",
+            result["status"],
+            result["counts"]["official_request_count"],
+            result["counts"]["contracts_discovered"],
+            result["counts"]["contracts_written"],
+            len(result["warnings"]),
+            result["counts"]["challenge_count"],
+            result["counts"]["challenge_backoff_seconds"],
+            result["counts"]["batch_pause_count"],
+            result["counts"]["batch_pause_seconds"],
+            dry_run,
+        )
         return result
 
     def _default_contract_discovery_start(self) -> str:
@@ -5180,6 +5222,12 @@ class FuturesMasterGovernanceService:
                 "contracts_discovered": 0,
                 "contracts_written": 0,
                 "official_request_count": 0,
+                "challenge_count": 0,
+                "challenge_backoff_seconds": 0.0,
+                "batch_pause_count": 0,
+                "batch_pause_seconds": 0.0,
+                "retry_backoff_count": 0,
+                "retry_backoff_seconds": 0.0,
             },
             "warnings": [],
             "blockers": [reason],
@@ -5299,7 +5347,7 @@ class FuturesOfficialCalendarBackfillService:
 
         try:
             for exchange in exchange_list:
-                metrics_before = self._provider_metrics_for_exchange(provider, exchange)
+                metrics_before = _provider_metrics_for_exchange(provider, exchange)
                 logger.info(
                     "[FuturesOfficialCalendarBackfill] start exchange=%s start=%s end=%s probe_end=%s dry_run=%s",
                     exchange,
@@ -5451,8 +5499,8 @@ class FuturesOfficialCalendarBackfillService:
                 ]
                 total_trading += int(result["trading_days"])
                 total_closed += int(result["closed_days"])
-                metrics_after = self._provider_metrics_for_exchange(provider, exchange)
-                exchange_metrics = self._metric_delta(metrics_before, metrics_after)
+                metrics_after = _provider_metrics_for_exchange(provider, exchange)
+                exchange_metrics = _metric_delta(metrics_before, metrics_after)
                 result["challenge_count"] = int(exchange_metrics.get("challenge_count", 0))
                 result["challenge_backoff_seconds"] = float(exchange_metrics.get("challenge_backoff_seconds", 0.0))
                 result["batch_pause_count"] = int(exchange_metrics.get("batch_pause_count", 0))
@@ -5546,18 +5594,6 @@ class FuturesOfficialCalendarBackfillService:
         if unsupported:
             raise ValueError(f"unsupported futures official calendar exchanges: {', '.join(unsupported)}")
         return requested
-
-    @staticmethod
-    def _provider_metrics_for_exchange(provider: Any, exchange: str) -> Dict[str, float]:
-        snapshot = getattr(provider, "snapshot_metrics", None)
-        if not callable(snapshot):
-            return {}
-        return dict((snapshot() or {}).get(str(exchange or "").upper(), {}))
-
-    @staticmethod
-    def _metric_delta(before: Dict[str, float], after: Dict[str, float]) -> Dict[str, float]:
-        keys = set(before) | set(after)
-        return {key: float(after.get(key, 0.0)) - float(before.get(key, 0.0)) for key in keys}
 
     def _calendar_day_from_probe(
         self,

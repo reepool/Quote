@@ -1028,6 +1028,12 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
             f"contracts_written: `{counts.get('contracts_written', 0)}`\n"
             f"would_write_contracts: `{counts.get('would_write_contracts', 0)}`\n"
             f"official_request_count: `{counts.get('official_request_count', 0)}`\n\n"
+            f"challenge_count: `{counts.get('challenge_count', 0)}`\n"
+            f"challenge_backoff_seconds: `{counts.get('challenge_backoff_seconds', 0)}`\n"
+            f"batch_pause_count: `{counts.get('batch_pause_count', 0)}`\n"
+            f"batch_pause_seconds: `{counts.get('batch_pause_seconds', 0)}`\n"
+            f"retry_backoff_count: `{counts.get('retry_backoff_count', 0)}`\n"
+            f"retry_backoff_seconds: `{counts.get('retry_backoff_seconds', 0)}`\n\n"
             "合约样本:\n"
             "```text\n"
             + "\n".join(detail_lines)
