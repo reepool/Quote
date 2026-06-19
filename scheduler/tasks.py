@@ -1145,6 +1145,7 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         write_result = item.get("write_result") or {}
         detail_lines.append(
             f"{item.get('series_id', 'unknown')}: fetched={item.get('fetched_rows', 0)}, "
+            f"would_write={write_result.get('would_write_rows', 0)}, "
             f"inserted={write_result.get('inserted', 0)}, "
             f"changed={write_result.get('changed', 0)}, "
             f"unchanged={write_result.get('unchanged', 0)}, "

@@ -2391,6 +2391,19 @@ class TaskManagerHandlers:
                 ),
                 parse_mode='markdown',
             )
+            try:
+                from scheduler.tasks import _format_futures_market_data_scheduler_report
+
+                await self.task_manager.send_message(
+                    chat_id,
+                    _format_futures_market_data_scheduler_report(result_payload),
+                    parse_mode='markdown',
+                )
+            except Exception as report_exc:
+                self.task_manager.logger.warning(
+                    "[TaskManagerHandlers] 期货行情详细报告发送失败: %s",
+                    report_exc,
+                )
         except Exception as exc:
             self.task_manager.logger.error(
                 "[TaskManagerHandlers] 期货行情任务异常: %s",
