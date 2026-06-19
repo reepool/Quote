@@ -147,7 +147,7 @@
           "GFEX": 3
         },
         "challenge_backoff_seconds_by_exchange": {
-          "GFEX": 20
+          "GFEX": 10
         },
         "batch_pause_every_requests_by_exchange": {
           "GFEX": 90

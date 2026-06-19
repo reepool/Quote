@@ -1040,9 +1040,9 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
             "request_interval_seconds": 0.05,
             "request_interval_seconds_by_exchange": {"GFEX": 0.9},
             "challenge_retry_attempts_by_exchange": {"GFEX": 3},
-            "challenge_backoff_seconds_by_exchange": {"GFEX": 20},
+            "challenge_backoff_seconds_by_exchange": {"GFEX": 10},
             "batch_pause_every_requests_by_exchange": {"GFEX": 90},
-            "batch_pause_seconds_by_exchange": {"GFEX": 20},
+            "batch_pause_seconds_by_exchange": {"GFEX": 10},
         }
     }
 
@@ -1052,9 +1052,9 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
     assert provider._request_interval_for_exchange("SHFE") == 0.05
     assert provider._challenge_retry_attempts_for_exchange("GFEX") == 3
     assert provider._challenge_retry_attempts_for_exchange("SHFE") == 0
-    assert provider._challenge_backoff_for_exchange("GFEX") == 20
+    assert provider._challenge_backoff_for_exchange("GFEX") == 10
     assert provider.batch_pause_every_requests_by_exchange["GFEX"] == 90
-    assert provider.batch_pause_seconds_by_exchange["GFEX"] == 20
+    assert provider.batch_pause_seconds_by_exchange["GFEX"] == 10
 
 
 def test_official_futures_provider_metrics_snapshot(tmp_path):
