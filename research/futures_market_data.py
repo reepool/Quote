@@ -522,6 +522,32 @@ class FuturesContract:
 
 
 @dataclass(frozen=True)
+class FuturesMasterDiscoveryCandidate:
+    discovery_id: str
+    exchange: str
+    variety_symbol: str
+    candidate_instrument_id: str = ""
+    candidate_series_id: str = ""
+    candidate_name: str = ""
+    candidate_category: str = ""
+    candidate_currency: str = "CNY"
+    candidate_unit: str = ""
+    contract_multiplier: Optional[float] = None
+    tick_size: Optional[float] = None
+    first_seen_trade_date: Optional[str] = None
+    last_seen_trade_date: Optional[str] = None
+    observed_contracts: List[str] = field(default_factory=list)
+    evidence: Dict[str, Any] = field(default_factory=dict)
+    confidence_score: float = 0.0
+    quality_flag: str = "discovered_unverified"
+    review_status: str = "pending"
+    reviewer: str = ""
+    review_notes: str = ""
+    active: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class FuturesContractBar:
     contract_id: str
     instrument_id: str
@@ -1149,6 +1175,39 @@ class FuturesStorageManager:
         CREATE INDEX IF NOT EXISTS idx_futures_source_profile
         ON futures_source_manifests(source_profile, enabled);
 
+        CREATE TABLE IF NOT EXISTS futures_master_discoveries (
+            discovery_id TEXT PRIMARY KEY,
+            exchange TEXT NOT NULL,
+            variety_symbol TEXT NOT NULL,
+            candidate_instrument_id TEXT NOT NULL,
+            candidate_series_id TEXT NOT NULL,
+            candidate_name TEXT NOT NULL,
+            candidate_category TEXT NOT NULL,
+            candidate_currency TEXT NOT NULL,
+            candidate_unit TEXT NOT NULL,
+            contract_multiplier REAL,
+            tick_size REAL,
+            first_seen_trade_date TEXT,
+            last_seen_trade_date TEXT,
+            observed_contracts_json TEXT NOT NULL,
+            evidence_json TEXT NOT NULL,
+            confidence_score REAL NOT NULL,
+            quality_flag TEXT NOT NULL,
+            review_status TEXT NOT NULL,
+            reviewer TEXT NOT NULL,
+            review_notes TEXT NOT NULL,
+            active INTEGER NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_futures_master_discoveries_exchange_symbol
+        ON futures_master_discoveries(exchange, variety_symbol);
+
+        CREATE INDEX IF NOT EXISTS idx_futures_master_discoveries_review
+        ON futures_master_discoveries(review_status, quality_flag, exchange);
+
         CREATE TABLE IF NOT EXISTS futures_contract_price_bars (
             contract_id TEXT NOT NULL,
             instrument_id TEXT NOT NULL,
@@ -1564,6 +1623,267 @@ class FuturesStorageManager:
                     ),
                 )
         return len(contracts)
+
+    def upsert_master_discoveries(self, candidates: Sequence[FuturesMasterDiscoveryCandidate]) -> int:
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in candidates:
+                existing = conn.execute(
+                    "SELECT * FROM futures_master_discoveries WHERE discovery_id = ?",
+                    (item.discovery_id,),
+                ).fetchone()
+                first_seen = item.first_seen_trade_date
+                last_seen = item.last_seen_trade_date
+                observed_contracts = list(dict.fromkeys(item.observed_contracts or []))
+                evidence = dict(item.evidence or {})
+                metadata = dict(item.metadata or {})
+                created_at = now
+                if existing:
+                    existing_payload = self._master_discovery_payload(existing)
+                    created_at = str(existing_payload.get("created_at") or now)
+                    existing_contracts = list(existing_payload.get("observed_contracts") or [])
+                    observed_contracts = list(dict.fromkeys(existing_contracts + observed_contracts))[:200]
+                    existing_first = existing_payload.get("first_seen_trade_date")
+                    existing_last = existing_payload.get("last_seen_trade_date")
+                    if existing_first and first_seen:
+                        first_seen = min(str(existing_first), str(first_seen))
+                    else:
+                        first_seen = first_seen or existing_first
+                    if existing_last and last_seen:
+                        last_seen = max(str(existing_last), str(last_seen))
+                    else:
+                        last_seen = last_seen or existing_last
+                    evidence = {**dict(existing_payload.get("evidence") or {}), **evidence}
+                    metadata = {**dict(existing_payload.get("metadata") or {}), **metadata}
+                    if existing_payload.get("quality_flag") in {"promoted", "rejected"}:
+                        quality_flag = str(existing_payload.get("quality_flag"))
+                        review_status = str(existing_payload.get("review_status") or item.review_status)
+                    else:
+                        conflict_fields = []
+                        for field_name in (
+                            "candidate_instrument_id",
+                            "candidate_name",
+                            "candidate_category",
+                            "candidate_currency",
+                            "candidate_unit",
+                        ):
+                            existing_value = str(existing_payload.get(field_name) or "")
+                            incoming_value = str(getattr(item, field_name) or "")
+                            if existing_value and incoming_value and existing_value != incoming_value:
+                                conflict_fields.append(field_name)
+                        if conflict_fields:
+                            quality_flag = "conflict"
+                            review_status = "pending"
+                            evidence = {
+                                **evidence,
+                                "conflict_fields": conflict_fields,
+                                "conflict_existing_snapshot": {
+                                    field_name: existing_payload.get(field_name)
+                                    for field_name in conflict_fields
+                                },
+                            }
+                        else:
+                            quality_flag = item.quality_flag
+                            review_status = item.review_status
+                else:
+                    quality_flag = item.quality_flag
+                    review_status = item.review_status
+                conn.execute(
+                    """
+                    INSERT INTO futures_master_discoveries (
+                        discovery_id, exchange, variety_symbol, candidate_instrument_id,
+                        candidate_series_id, candidate_name, candidate_category,
+                        candidate_currency, candidate_unit, contract_multiplier,
+                        tick_size, first_seen_trade_date, last_seen_trade_date,
+                        observed_contracts_json, evidence_json, confidence_score,
+                        quality_flag, review_status, reviewer, review_notes,
+                        active, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(discovery_id) DO UPDATE SET
+                        exchange=excluded.exchange,
+                        variety_symbol=excluded.variety_symbol,
+                        candidate_instrument_id=excluded.candidate_instrument_id,
+                        candidate_series_id=excluded.candidate_series_id,
+                        candidate_name=excluded.candidate_name,
+                        candidate_category=excluded.candidate_category,
+                        candidate_currency=excluded.candidate_currency,
+                        candidate_unit=excluded.candidate_unit,
+                        contract_multiplier=COALESCE(excluded.contract_multiplier, futures_master_discoveries.contract_multiplier),
+                        tick_size=COALESCE(excluded.tick_size, futures_master_discoveries.tick_size),
+                        first_seen_trade_date=excluded.first_seen_trade_date,
+                        last_seen_trade_date=excluded.last_seen_trade_date,
+                        observed_contracts_json=excluded.observed_contracts_json,
+                        evidence_json=excluded.evidence_json,
+                        confidence_score=excluded.confidence_score,
+                        quality_flag=excluded.quality_flag,
+                        review_status=excluded.review_status,
+                        reviewer=COALESCE(NULLIF(excluded.reviewer, ''), futures_master_discoveries.reviewer),
+                        review_notes=COALESCE(NULLIF(excluded.review_notes, ''), futures_master_discoveries.review_notes),
+                        active=excluded.active,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.discovery_id,
+                        item.exchange.upper(),
+                        item.variety_symbol.upper(),
+                        item.candidate_instrument_id,
+                        item.candidate_series_id,
+                        item.candidate_name,
+                        item.candidate_category,
+                        item.candidate_currency,
+                        item.candidate_unit,
+                        item.contract_multiplier,
+                        item.tick_size,
+                        first_seen,
+                        last_seen,
+                        _json_dumps(observed_contracts),
+                        _json_dumps(evidence),
+                        float(item.confidence_score or 0.0),
+                        quality_flag,
+                        review_status,
+                        item.reviewer,
+                        item.review_notes,
+                        1 if item.active else 0,
+                        _json_dumps(metadata),
+                        created_at,
+                        now,
+                    ),
+                )
+        return len(candidates)
+
+    def list_master_discoveries(
+        self,
+        *,
+        exchange: Optional[str] = None,
+        variety_symbol: Optional[str] = None,
+        review_status: Optional[str] = None,
+        quality_flag: Optional[str] = None,
+        active_only: bool = True,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if exchange:
+            clauses.append("exchange = ?")
+            params.append(str(exchange).upper())
+        if variety_symbol:
+            clauses.append("variety_symbol = ?")
+            params.append(str(variety_symbol).upper())
+        if review_status:
+            clauses.append("review_status = ?")
+            params.append(review_status)
+        if quality_flag:
+            clauses.append("quality_flag = ?")
+            params.append(quality_flag)
+        if active_only:
+            clauses.append("active = 1")
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM futures_master_discoveries
+                {where}
+                ORDER BY exchange, variety_symbol
+                """,
+                params,
+            ).fetchall()
+        return [self._master_discovery_payload(row) for row in rows]
+
+    def update_master_discovery_review(
+        self,
+        discovery_id: str,
+        *,
+        review_status: str,
+        reviewer: str = "",
+        review_notes: str = "",
+        quality_flag: Optional[str] = None,
+    ) -> int:
+        now = get_shanghai_time().isoformat()
+        assignments = [
+            "review_status = ?",
+            "reviewer = ?",
+            "review_notes = ?",
+            "updated_at = ?",
+        ]
+        params: List[Any] = [review_status, reviewer, review_notes, now]
+        if quality_flag:
+            assignments.insert(0, "quality_flag = ?")
+            params.insert(0, quality_flag)
+        params.append(discovery_id)
+        with self.get_connection() as conn:
+            cur = conn.execute(
+                f"UPDATE futures_master_discoveries SET {', '.join(assignments)} WHERE discovery_id = ?",
+                params,
+            )
+        return int(cur.rowcount or 0)
+
+    def promote_master_discovery(self, discovery_id: str) -> Dict[str, Any]:
+        rows = self.list_master_discoveries(active_only=False)
+        candidate = next((item for item in rows if item.get("discovery_id") == discovery_id), None)
+        if not candidate:
+            return {"status": "not_found", "discovery_id": discovery_id}
+        missing = [
+            field_name for field_name in (
+                "candidate_instrument_id",
+                "variety_symbol",
+                "candidate_name",
+                "exchange",
+                "candidate_category",
+                "candidate_currency",
+                "candidate_unit",
+            )
+            if not candidate.get(field_name)
+        ]
+        if missing:
+            return {"status": "blocked", "discovery_id": discovery_id, "missing_fields": missing}
+        instrument = FuturesInstrument(
+            instrument_id=str(candidate["candidate_instrument_id"]),
+            symbol=str(candidate["variety_symbol"]),
+            name=str(candidate["candidate_name"]),
+            exchange=str(candidate["exchange"]).upper(),
+            category=str(candidate["candidate_category"]),
+            currency=str(candidate["candidate_currency"]),
+            unit=str(candidate["candidate_unit"]),
+            priority="P0",
+            active=True,
+            source_profiles=["exchange_official", "akshare_futures"],
+            metadata={
+                "master_discovery_id": discovery_id,
+                "master_discovery_quality": candidate.get("quality_flag"),
+                "master_discovery_evidence": candidate.get("evidence") or {},
+            },
+        )
+        series = FuturesSeries(
+            series_id=str(candidate.get("candidate_series_id") or make_futures_series_id(instrument.instrument_id)),
+            instrument_id=instrument.instrument_id,
+            symbol=f"{instrument.symbol}0",
+            series_type="main_continuous",
+            source_profile="akshare_futures",
+            source="akshare",
+            source_mode="direct",
+            source_interface="futures_zh_daily_sina",
+            construction_method="source_native",
+            currency=instrument.currency,
+            unit=instrument.unit,
+            priority="P0",
+            active=True,
+            metadata={"master_discovery_id": discovery_id},
+        )
+        write_result = self.upsert_instruments_and_series([instrument], [series])
+        self.update_master_discovery_review(
+            discovery_id,
+            review_status="auto_promoted" if candidate.get("review_status") != "approved" else "approved",
+            quality_flag="promoted",
+            reviewer=str(candidate.get("reviewer") or "system"),
+            review_notes=str(candidate.get("review_notes") or "promoted through futures master discovery governance"),
+        )
+        return {
+            "status": "success",
+            "discovery_id": discovery_id,
+            "instrument_id": instrument.instrument_id,
+            "series_id": series.series_id,
+            "write_result": write_result,
+        }
 
     def upsert_contract_price_bars(
         self,
@@ -2874,6 +3194,15 @@ class FuturesStorageManager:
         return payload
 
     @staticmethod
+    def _master_discovery_payload(row: sqlite3.Row) -> Dict[str, Any]:
+        payload = _row_to_dict(row)
+        payload["observed_contracts"] = _json_loads(payload.pop("observed_contracts_json", None), [])
+        payload["evidence"] = _json_loads(payload.pop("evidence_json", None), {})
+        payload["metadata"] = _json_loads(payload.pop("metadata_json", None), {})
+        payload["active"] = bool(payload.get("active"))
+        return payload
+
+    @staticmethod
     def _calendar_payload(row: sqlite3.Row) -> Dict[str, Any]:
         payload = _row_to_dict(row)
         payload["is_trading_day"] = bool(payload.get("is_trading_day"))
@@ -3964,6 +4293,591 @@ class FuturesTradingDayGovernanceService:
         return self.min_quality_by_mode.get(purpose_key) or self.min_quality_by_mode["production"]
 
 
+class FuturesMasterDiscoveryAdapter(Protocol):
+    """Exchange-specific enrichment adapter for futures master discovery."""
+
+    exchange: str
+
+    def discover_from_daily_rows(
+        self,
+        rows: Sequence[Any],
+        *,
+        trade_date: str,
+        known_symbols: set[str],
+    ) -> List[FuturesMasterDiscoveryCandidate]:
+        ...
+
+    def enrich_candidate(
+        self,
+        candidate: FuturesMasterDiscoveryCandidate,
+    ) -> FuturesMasterDiscoveryCandidate:
+        ...
+
+
+class GfexMasterDiscoveryAdapter:
+    """GFEX discovery adapter.
+
+    The first implementation keeps enrichment conservative. It uses official
+    daily rows as discovery evidence and a configurable product metadata map for
+    fields that must not be guessed, such as category and quote unit.
+    """
+
+    exchange = "GFEX"
+
+    default_known_products: Dict[str, Dict[str, Any]] = {
+        "LC": {
+            "name": "GFEX Lithium Carbonate",
+            "category": "new_energy_material",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+        },
+        "SI": {
+            "name": "GFEX Industrial Silicon",
+            "category": "new_energy_material",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+        },
+        "PS": {
+            "name": "GFEX Polysilicon",
+            "category": "new_energy_material",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+        },
+        "PT": {
+            "name": "GFEX Platinum",
+            "category": "precious_metal",
+            "currency": "CNY",
+            "unit": "CNY/gram",
+        },
+        "PD": {
+            "name": "GFEX Palladium",
+            "category": "precious_metal",
+            "currency": "CNY",
+            "unit": "CNY/gram",
+        },
+    }
+
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        cfg = dict(config or {})
+        configured_products = cfg.get("known_products") or {}
+        self.known_products: Dict[str, Dict[str, Any]] = {
+            symbol.upper(): dict(payload)
+            for symbol, payload in {
+                **self.default_known_products,
+                **dict(configured_products),
+            }.items()
+        }
+        self.official_product_rules = bool(cfg.get("official_product_rules", True))
+        self.official_announcements = bool(cfg.get("official_announcements", True))
+
+    def discover_from_daily_rows(
+        self,
+        rows: Sequence[Any],
+        *,
+        trade_date: str,
+        known_symbols: set[str],
+    ) -> List[FuturesMasterDiscoveryCandidate]:
+        grouped: Dict[str, List[str]] = {}
+        for row in rows:
+            variety = str(getattr(row, "variety", "") or "").strip().upper()
+            contract = str(getattr(row, "contract", "") or "").strip().upper()
+            if not variety or variety in known_symbols:
+                continue
+            if contract:
+                grouped.setdefault(variety, []).append(contract)
+            else:
+                grouped.setdefault(variety, [])
+        candidates: List[FuturesMasterDiscoveryCandidate] = []
+        for variety, contracts in sorted(grouped.items()):
+            instrument_id = make_futures_instrument_id(variety, self.exchange)
+            candidate = FuturesMasterDiscoveryCandidate(
+                discovery_id=f"{self.exchange}:{variety}",
+                exchange=self.exchange,
+                variety_symbol=variety,
+                candidate_instrument_id=instrument_id,
+                candidate_series_id=make_futures_series_id(instrument_id),
+                first_seen_trade_date=trade_date,
+                last_seen_trade_date=trade_date,
+                observed_contracts=list(dict.fromkeys(contracts))[:50],
+                evidence={
+                    "source_profile": FuturesMasterGovernanceService.source_profile,
+                    "source_interface": getattr(rows[0], "source_interface", "") if rows else "",
+                    "observed_trade_dates": [trade_date],
+                    "official_product_rules_enabled": self.official_product_rules,
+                    "official_announcements_enabled": self.official_announcements,
+                    "adapter": "gfex_master_discovery.v1",
+                },
+                metadata={"discovered_from": "official_daily_rows"},
+            )
+            candidates.append(self.enrich_candidate(candidate))
+        return candidates
+
+    def enrich_candidate(
+        self,
+        candidate: FuturesMasterDiscoveryCandidate,
+    ) -> FuturesMasterDiscoveryCandidate:
+        product = self.known_products.get(candidate.variety_symbol.upper())
+        if not product:
+            evidence = {
+                **dict(candidate.evidence or {}),
+                "enrichment_status": "gfex_product_metadata_missing",
+            }
+            return FuturesMasterDiscoveryCandidate(
+                **{
+                    **asdict(candidate),
+                    "evidence": evidence,
+                    "confidence_score": 0.35,
+                    "quality_flag": "discovered_unverified",
+                    "review_status": "pending",
+                }
+            )
+        name = str(product.get("name") or "")
+        category = str(product.get("category") or "")
+        currency = str(product.get("currency") or "CNY")
+        unit = str(product.get("unit") or "")
+        required_complete = bool(name and category and currency and unit)
+        evidence = {
+            **dict(candidate.evidence or {}),
+            "enrichment_status": "configured_gfex_product_metadata",
+            "metadata_source": str(product.get("source_url") or "config/11_futures.json or built_in_seed"),
+        }
+        return FuturesMasterDiscoveryCandidate(
+            **{
+                **asdict(candidate),
+                "candidate_name": name,
+                "candidate_category": category,
+                "candidate_currency": currency,
+                "candidate_unit": unit,
+                "contract_multiplier": _float_or_none(product.get("contract_multiplier")),
+                "tick_size": _float_or_none(product.get("tick_size")),
+                "evidence": evidence,
+                "confidence_score": 0.95 if required_complete else 0.65,
+                "quality_flag": "discovered_verified" if required_complete else "discovered_verified_partial",
+                "review_status": "none" if required_complete else "pending",
+            }
+        )
+
+
+class FuturesMasterDiscoveryGovernanceService:
+    """Discover and govern unknown futures root varieties before promotion."""
+
+    domain = "futures_master_discovery_governance"
+    source_profile = "exchange_official_daily_contract_discovery"
+
+    def __init__(
+        self,
+        storage: FuturesStorageManager,
+        research_config: ResearchConfig,
+        module_cfg: Optional[Dict[str, Any]] = None,
+    ):
+        self.storage = storage
+        self.research_config = research_config
+        self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+        self.discovery_cfg = self._discovery_config()
+
+    def run(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[Sequence[str]] = None,
+        exchanges: Optional[Sequence[str]] = None,
+        categories: Optional[Sequence[str]] = None,
+        instrument_ids: Optional[Sequence[str]] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        series_types: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        max_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        scope_selection = FuturesUniverseSelector(self.module_cfg, self.storage).resolve(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            exchanges=exchanges,
+            categories=categories,
+            instrument_ids=instrument_ids,
+            series_ids=series_ids,
+            series_types=series_types,
+        )
+        if scope_selection.blockers:
+            return self._blocked(
+                reason="; ".join(scope_selection.blockers),
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+        if not bool(self.discovery_cfg.get("enabled", True)):
+            return self._blocked(
+                reason="futures_master_discovery_disabled",
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+
+        exchange_list = sorted({str(item).upper() for item in scope_selection.exchanges})
+        enabled_exchanges = {
+            str(item).upper()
+            for item in (self.discovery_cfg.get("enabled_exchanges") or exchange_list)
+            if item
+        }
+        exchange_list = [exchange for exchange in exchange_list if exchange in enabled_exchanges]
+        if not exchange_list:
+            return self._blocked(
+                reason="empty_enabled_master_discovery_exchange_scope",
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+
+        start = _date_key(start_date or self._default_discovery_start(exchange_list))
+        end = _date_key(end_date or get_shanghai_time().date())
+        all_candidates: Dict[str, FuturesMasterDiscoveryCandidate] = {}
+        warnings: List[Any] = []
+        blockers: List[str] = []
+        request_count = 0
+        by_exchange: Dict[str, Dict[str, Any]] = {}
+        try:
+            from research.providers.official_futures import (
+                OfficialFuturesMarketDataProvider,
+                OfficialFuturesSourceUnavailable,
+            )
+
+            provider = OfficialFuturesMarketDataProvider(self.research_config)
+            for exchange in exchange_list:
+                adapter = self.adapter_for_exchange(exchange)
+                if adapter is None:
+                    warnings.append({
+                        "exchange": exchange,
+                        "reason": "master_discovery_adapter_not_implemented",
+                    })
+                    continue
+                verified_days = self._verified_trading_days(exchange=exchange, start_date=start, end_date=end)
+                if max_days:
+                    verified_days = verified_days[: max(1, int(max_days))]
+                exchange_result = {
+                    "exchange": exchange,
+                    "verified_trading_days": len(verified_days),
+                    "calendar_first": verified_days[0] if verified_days else None,
+                    "calendar_last": verified_days[-1] if verified_days else None,
+                    "candidates_discovered": 0,
+                    "pending_review": 0,
+                    "auto_promoted": 0,
+                }
+                by_exchange[exchange] = exchange_result
+                if not verified_days:
+                    warnings.append({
+                        "exchange": exchange,
+                        "reason": "missing_verified_trading_calendar_coverage",
+                    })
+                    continue
+                known_symbols = self._known_symbols(exchange)
+                for trade_date in verified_days:
+                    try:
+                        rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
+                        request_count += 1
+                    except OfficialFuturesSourceUnavailable as exc:
+                        warnings.append({
+                            "exchange": exchange,
+                            "trade_date": trade_date,
+                            "reason": str(exc),
+                        })
+                        continue
+                    for candidate in adapter.discover_from_daily_rows(
+                        rows,
+                        trade_date=trade_date,
+                        known_symbols=known_symbols,
+                    ):
+                        existing = all_candidates.get(candidate.discovery_id)
+                        all_candidates[candidate.discovery_id] = (
+                            self._merge_candidate(existing, candidate) if existing else candidate
+                        )
+                        exchange_result["candidates_discovered"] = len([
+                            item for item in all_candidates.values() if item.exchange == exchange
+                        ])
+        except Exception as exc:
+            return self._blocked(
+                reason=f"futures_master_discovery_failed: {exc}",
+                scope_selection=scope_selection,
+                start_date=start,
+                end_date=end,
+                dry_run=dry_run,
+            )
+
+        candidates = sorted(all_candidates.values(), key=lambda item: item.discovery_id)
+        written = 0
+        promotion_results: List[Dict[str, Any]] = []
+        auto_promote = bool(self.discovery_cfg.get("auto_promote_high_confidence", True))
+        if not dry_run and candidates:
+            written = self.storage.upsert_master_discoveries(candidates)
+            if auto_promote:
+                for candidate in candidates:
+                    if self._is_auto_promotable(candidate):
+                        promotion = self.storage.promote_master_discovery(candidate.discovery_id)
+                        promotion_results.append(promotion)
+        elif dry_run and auto_promote:
+            for candidate in candidates:
+                if self._is_auto_promotable(candidate):
+                    promotion_results.append({
+                        "status": "would_promote",
+                        "discovery_id": candidate.discovery_id,
+                        "instrument_id": candidate.candidate_instrument_id,
+                        "series_id": candidate.candidate_series_id,
+                    })
+
+        pending = [
+            item for item in candidates
+            if item.review_status in {"pending", "approved"} or item.quality_flag in {"discovered_unverified", "conflict"}
+        ]
+        promoted_count = len([item for item in promotion_results if item.get("status") in {"success", "would_promote"}])
+        for exchange_result in by_exchange.values():
+            exchange = exchange_result["exchange"]
+            exchange_result["pending_review"] = len([item for item in pending if item.exchange == exchange])
+            exchange_result["auto_promoted"] = len([
+                item for item in promotion_results
+                if str(item.get("discovery_id") or "").startswith(f"{exchange}:")
+                and item.get("status") in {"success", "would_promote"}
+            ])
+        strict_blocking = bool(self.discovery_cfg.get("strict_unknown_variety_blocking", False))
+        if strict_blocking and pending:
+            blockers.append("pending_futures_master_discovery_review")
+        status = "blocked" if blockers else ("warning" if warnings or pending else "success")
+        return {
+            "status": status,
+            "domain": self.domain,
+            "source_profile": self.source_profile,
+            "start_date": start,
+            "end_date": end,
+            "dry_run": dry_run,
+            "scope_selection": scope_selection.as_dict(),
+            "counts": {
+                "candidates_discovered": len(candidates),
+                "candidates_written": written,
+                "would_write_candidates": len(candidates) if dry_run else 0,
+                "pending_review": len(pending),
+                "auto_promoted": promoted_count,
+                "official_request_count": request_count,
+            },
+            "exchanges": list(by_exchange.values()),
+            "candidates": [self._candidate_report(item) for item in candidates[:50]],
+            "promotion_results": promotion_results[:50],
+            "warnings": warnings,
+            "blockers": blockers,
+        }
+
+    def adapter_for_exchange(self, exchange: str) -> Optional[FuturesMasterDiscoveryAdapter]:
+        exchange_key = str(exchange or "").upper()
+        adapter_cfg = ((self.discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        if not bool(adapter_cfg.get("enabled", True)):
+            return None
+        if exchange_key == "GFEX":
+            return GfexMasterDiscoveryAdapter(adapter_cfg)
+        return None
+
+    def discover_from_rows(
+        self,
+        *,
+        exchange: str,
+        trade_date: str,
+        rows: Sequence[Any],
+        known_symbols: set[str],
+    ) -> List[FuturesMasterDiscoveryCandidate]:
+        adapter = self.adapter_for_exchange(exchange)
+        if adapter is None:
+            return []
+        return adapter.discover_from_daily_rows(rows, trade_date=trade_date, known_symbols=known_symbols)
+
+    def persist_and_promote(
+        self,
+        candidates: Sequence[FuturesMasterDiscoveryCandidate],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        merged: Dict[str, FuturesMasterDiscoveryCandidate] = {}
+        for candidate in candidates:
+            existing = merged.get(candidate.discovery_id)
+            merged[candidate.discovery_id] = self._merge_candidate(existing, candidate) if existing else candidate
+        items = sorted(merged.values(), key=lambda item: item.discovery_id)
+        written = 0
+        promotions: List[Dict[str, Any]] = []
+        auto_promote = bool(self.discovery_cfg.get("auto_promote_high_confidence", True))
+        if not dry_run and items:
+            written = self.storage.upsert_master_discoveries(items)
+            if auto_promote:
+                for item in items:
+                    if self._is_auto_promotable(item):
+                        promotions.append(self.storage.promote_master_discovery(item.discovery_id))
+        elif dry_run and auto_promote:
+            promotions = [
+                {
+                    "status": "would_promote",
+                    "discovery_id": item.discovery_id,
+                    "instrument_id": item.candidate_instrument_id,
+                    "series_id": item.candidate_series_id,
+                }
+                for item in items
+                if self._is_auto_promotable(item)
+            ]
+        pending = [
+            item for item in items
+            if item.review_status == "pending" or item.quality_flag in {"discovered_unverified", "conflict"}
+        ]
+        return {
+            "status": "warning" if pending else "success",
+            "candidates_discovered": len(items),
+            "candidates_written": written,
+            "would_write_candidates": len(items) if dry_run else 0,
+            "pending_review": len(pending),
+            "auto_promoted": len([item for item in promotions if item.get("status") in {"success", "would_promote"}]),
+            "candidates": [self._candidate_report(item) for item in items[:50]],
+            "promotion_results": promotions[:50],
+        }
+
+    def _discovery_config(self) -> Dict[str, Any]:
+        cfg = self.module_cfg.get("master_data_discovery") or {}
+        if not isinstance(cfg, dict):
+            cfg = {}
+        return {
+            "enabled": cfg.get("enabled", True),
+            "auto_promote_high_confidence": cfg.get("auto_promote_high_confidence", True),
+            "strict_unknown_variety_blocking": cfg.get("strict_unknown_variety_blocking", False),
+            "telegram_review_required": cfg.get("telegram_review_required", True),
+            "enabled_exchanges": cfg.get("enabled_exchanges") or ["GFEX"],
+            "adapters": cfg.get("adapters") or {"GFEX": {"enabled": True}},
+        }
+
+    def _default_discovery_start(self, exchanges: Sequence[str]) -> str:
+        governance_cfg = self.module_cfg.get("trading_day_governance") or {}
+        backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
+        exchange_starts = backfill_cfg.get("exchange_start_dates") or {}
+        starts = [str(exchange_starts.get(exchange) or "2000-01-01") for exchange in exchanges]
+        return min(starts) if starts else "2000-01-01"
+
+    def _verified_trading_days(self, *, exchange: str, start_date: str, end_date: str) -> List[str]:
+        rows = self.storage.list_calendar_days(
+            exchange=exchange,
+            start_date=start_date,
+            end_date=end_date,
+            trading_only=True,
+        )
+        return [
+            str(row["trade_date"])
+            for row in rows
+            if FUTURES_CALENDAR_QUALITY_RANK.get(str(row.get("quality_flag") or ""), 0)
+            >= FUTURES_CALENDAR_QUALITY_RANK["backfilled_verified"]
+        ]
+
+    def _known_symbols(self, exchange: str) -> set[str]:
+        registry = default_futures_registry(self.module_cfg)
+        symbols = {
+            item.symbol.upper()
+            for item in registry["instruments"]
+            if item.exchange.upper() == exchange.upper() and item.active
+        }
+        symbols.update({
+            str(item.get("symbol") or "").upper()
+            for item in self.storage.list_instruments(active_only=True)
+            if str(item.get("exchange") or "").upper() == exchange.upper()
+        })
+        return {item for item in symbols if item}
+
+    def _merge_candidate(
+        self,
+        existing: Optional[FuturesMasterDiscoveryCandidate],
+        incoming: FuturesMasterDiscoveryCandidate,
+    ) -> FuturesMasterDiscoveryCandidate:
+        if not existing:
+            return incoming
+        first_seen = min(
+            [item for item in [existing.first_seen_trade_date, incoming.first_seen_trade_date] if item]
+            or [None]
+        )
+        last_seen = max(
+            [item for item in [existing.last_seen_trade_date, incoming.last_seen_trade_date] if item]
+            or [None]
+        )
+        observed = list(dict.fromkeys(list(existing.observed_contracts) + list(incoming.observed_contracts)))[:200]
+        evidence = {
+            **dict(existing.evidence or {}),
+            **dict(incoming.evidence or {}),
+            "observed_trade_dates": list(dict.fromkeys(
+                list((existing.evidence or {}).get("observed_trade_dates") or [])
+                + list((incoming.evidence or {}).get("observed_trade_dates") or [])
+            ))[:200],
+        }
+        preferred = incoming if incoming.confidence_score >= existing.confidence_score else existing
+        return FuturesMasterDiscoveryCandidate(
+            **{
+                **asdict(preferred),
+                "first_seen_trade_date": first_seen,
+                "last_seen_trade_date": last_seen,
+                "observed_contracts": observed,
+                "evidence": evidence,
+            }
+        )
+
+    def _is_auto_promotable(self, candidate: FuturesMasterDiscoveryCandidate) -> bool:
+        return (
+            candidate.quality_flag == "discovered_verified"
+            and candidate.review_status == "none"
+            and float(candidate.confidence_score or 0.0) >= 0.9
+            and bool(candidate.candidate_instrument_id)
+            and bool(candidate.candidate_name)
+            and bool(candidate.candidate_category)
+            and bool(candidate.candidate_unit)
+        )
+
+    def _candidate_report(self, candidate: FuturesMasterDiscoveryCandidate) -> Dict[str, Any]:
+        return {
+            "discovery_id": candidate.discovery_id,
+            "exchange": candidate.exchange,
+            "variety_symbol": candidate.variety_symbol,
+            "candidate_instrument_id": candidate.candidate_instrument_id,
+            "candidate_series_id": candidate.candidate_series_id,
+            "candidate_name": candidate.candidate_name,
+            "candidate_category": candidate.candidate_category,
+            "candidate_unit": candidate.candidate_unit,
+            "first_seen_trade_date": candidate.first_seen_trade_date,
+            "last_seen_trade_date": candidate.last_seen_trade_date,
+            "observed_contracts": candidate.observed_contracts[:10],
+            "confidence_score": candidate.confidence_score,
+            "quality_flag": candidate.quality_flag,
+            "review_status": candidate.review_status,
+            "evidence": candidate.evidence,
+        }
+
+    def _blocked(
+        self,
+        *,
+        reason: str,
+        scope_selection: FuturesUniverseSelection,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        dry_run: bool,
+    ) -> Dict[str, Any]:
+        return {
+            "status": "blocked",
+            "domain": self.domain,
+            "source_profile": self.source_profile,
+            "start_date": start_date,
+            "end_date": end_date,
+            "dry_run": dry_run,
+            "scope_selection": scope_selection.as_dict(),
+            "counts": {
+                "candidates_discovered": 0,
+                "candidates_written": 0,
+                "pending_review": 0,
+                "auto_promoted": 0,
+                "official_request_count": 0,
+            },
+            "warnings": [],
+            "blockers": [reason],
+            "reason": reason,
+        }
+
+
 class FuturesMasterGovernanceService:
     """Govern futures root instruments, series, and contracts before price sync."""
 
@@ -4088,6 +5002,12 @@ class FuturesMasterGovernanceService:
 
         contracts_by_id: Dict[str, FuturesContract] = {}
         unmapped_varieties: Dict[str, int] = {}
+        discovery_candidates: List[FuturesMasterDiscoveryCandidate] = []
+        discovery_service = FuturesMasterDiscoveryGovernanceService(
+            self.storage,
+            self.research_config,
+            self.module_cfg,
+        )
         try:
             from research.providers.official_futures import (
                 OfficialFuturesMarketDataProvider,
@@ -4108,6 +5028,14 @@ class FuturesMasterGovernanceService:
                         "reason": str(exc),
                     })
                     continue
+                discovery_candidates.extend(
+                    discovery_service.discover_from_rows(
+                        exchange="GFEX",
+                        trade_date=trade_date,
+                        rows=rows,
+                        known_symbols=set(instrument_by_symbol),
+                    )
+                )
                 for row in rows:
                     variety = str(row.variety or "").upper()
                     instrument = instrument_by_symbol.get(variety)
@@ -4172,10 +5100,26 @@ class FuturesMasterGovernanceService:
             for item in contracts[:50]
         ]
         if unmapped_varieties:
+            discovery_result = discovery_service.persist_and_promote(
+                discovery_candidates,
+                dry_run=dry_run,
+            )
+            result["discovery"] = discovery_result
+            result["counts"]["master_discovery_candidates"] = discovery_result.get("candidates_discovered", 0)
+            result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
+            result["counts"]["master_discovery_auto_promoted"] = discovery_result.get("auto_promoted", 0)
             result["warnings"].append({
                 "reason": "unmapped_gfex_varieties",
                 "samples": sorted(unmapped_varieties.items())[:20],
+                "discovery_candidates": discovery_result.get("candidates") or [],
             })
+            if (
+                discovery_service.discovery_cfg.get("strict_unknown_variety_blocking")
+                and discovery_result.get("pending_review")
+            ):
+                result["blockers"].append("pending_futures_master_discovery_review")
+                result["status"] = "blocked"
+                return result
         if not contracts:
             result["status"] = "blocked"
             result["blockers"].append("no_gfex_contracts_discovered")
@@ -4762,6 +5706,19 @@ class FuturesReadinessService:
             )
         if p0_count and p0_ready == 0:
             blockers.append("no_p0_series_ready")
+        pending_discoveries = [
+            item for item in self.storage.list_master_discoveries(active_only=True)
+            if str(item.get("exchange") or "").upper() in {exchange.upper() for exchange in scope_selection.exchanges}
+            and (
+                item.get("review_status") == "pending"
+                or item.get("quality_flag") in {"discovered_unverified", "conflict"}
+            )
+        ]
+        if pending_discoveries:
+            warnings.extend(
+                f"needs_master_review:{item.get('exchange')}:{item.get('variety_symbol')}"
+                for item in pending_discoveries
+            )
         status = "ready" if not blockers and not warnings else ("blocked" if blockers else "partial")
         payload = {
             "domain": "futures_market_data",
@@ -4775,6 +5732,23 @@ class FuturesReadinessService:
             "source_profile_counts": {
                 "exchange_official": sum(item["official_bar_count"] for item in series_payloads),
                 "akshare_futures": sum(item["fallback_bar_count"] for item in series_payloads),
+            },
+            "master_discovery": {
+                "needs_master_review": bool(pending_discoveries),
+                "pending_count": len(pending_discoveries),
+                "pending": [
+                    {
+                        "discovery_id": item.get("discovery_id"),
+                        "exchange": item.get("exchange"),
+                        "variety_symbol": item.get("variety_symbol"),
+                        "candidate_name": item.get("candidate_name"),
+                        "quality_flag": item.get("quality_flag"),
+                        "review_status": item.get("review_status"),
+                        "first_seen_trade_date": item.get("first_seen_trade_date"),
+                        "last_seen_trade_date": item.get("last_seen_trade_date"),
+                    }
+                    for item in pending_discoveries[:50]
+                ],
             },
             "series": series_payloads,
         }

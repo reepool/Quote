@@ -127,6 +127,19 @@ GFEX promotion 规则：
 - evidence URL。
 - 是否已 auto-promoted。
 
+### 7.1 已落地操作入口
+
+当前已实现以下入口：
+
+```text
+/futures_master_discovery_governance exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD dry_run max_days=N
+/run futures_master_discovery_governance exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD write max_days=N
+```
+
+任务默认 `dry_run=true`，只有显式 `write` 才会写入 `futures_master_discoveries`，并在 `auto_promote_high_confidence=true` 时对高置信候选写入 `futures_instruments` 与默认 `main_continuous` 序列。
+
+`futures_master_governance` 已集成 discovery：当 GFEX 官方日行情出现未知 `variety` 时，会先生成 discovery 候选，再保留 `unmapped_gfex_varieties` warning。已知品种合约治理继续执行，不被未知品种默认阻断。
+
 ## 8. 配置建议
 
 放入 `config/11_futures.json`：
@@ -155,6 +168,8 @@ GFEX promotion 规则：
 - `auto_promote_high_confidence=true`：只有官方证据完整时自动写正式主数据。
 - `strict_unknown_variety_blocking=false`：未知品种不会阻断已知品种行情日更。
 - `telegram_review_required=true`：低置信候选发送人工确认通知。
+
+当前 GFEX adapter 使用官方日行情作为发现证据，并通过 `known_products` 配置或内置 GFEX P0 元数据补全名称、分类、币种和报价单位。缺少这些关键字段的候选会保持 `discovered_unverified/pending`，不会自动进入正式主数据。
 
 ## 9. 数据质量边界
 

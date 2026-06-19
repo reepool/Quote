@@ -932,6 +932,62 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
+    if result.get("domain") == "futures_master_discovery_governance":
+        counts = result.get("counts") or {}
+        blockers = result.get("blockers") or []
+        warnings = result.get("warnings") or []
+        detail_lines = []
+        for item in (result.get("candidates") or [])[:12]:
+            detail_lines.append(
+                f"{item.get('discovery_id', 'unknown')}: "
+                f"name={item.get('candidate_name') or 'N/A'}, "
+                f"category={item.get('candidate_category') or 'N/A'}, "
+                f"unit={item.get('candidate_unit') or 'N/A'}, "
+                f"quality={item.get('quality_flag') or 'N/A'}, "
+                f"review={item.get('review_status') or 'N/A'}, "
+                f"first={item.get('first_seen_trade_date') or 'N/A'}, "
+                f"last={item.get('last_seen_trade_date') or 'N/A'}"
+            )
+        if not detail_lines:
+            detail_lines.append(result.get("reason") or "无候选样本")
+        promotion_lines = []
+        for item in (result.get("promotion_results") or [])[:12]:
+            promotion_lines.append(
+                f"{item.get('discovery_id', 'unknown')}: "
+                f"status={item.get('status')}, "
+                f"instrument={item.get('instrument_id', 'N/A')}, "
+                f"series={item.get('series_id', 'N/A')}"
+            )
+        blocker_text = ""
+        if blockers:
+            blocker_text = "\n\n阻塞项:\n```text\n" + "\n".join(map(str, blockers[:10])) + "\n```"
+        warning_text = ""
+        if warnings:
+            warning_text = "\n\n警告:\n```text\n" + "\n".join(map(str, warnings[:10])) + "\n```"
+        promotion_text = ""
+        if promotion_lines:
+            promotion_text = "\n\nPromotion:\n```text\n" + "\n".join(promotion_lines) + "\n```"
+        return (
+            f"{icon} *商品期货主数据发现治理*\n\n"
+            f"结论: *{label}*\n"
+            f"状态: `{status}`\n"
+            f"source_profile: `{result.get('source_profile', 'N/A')}`\n"
+            f"range: `{result.get('start_date', 'N/A')}` 至 `{result.get('end_date', 'N/A')}`\n"
+            f"dry_run: `{result.get('dry_run', True)}`\n\n"
+            f"candidates_discovered: `{counts.get('candidates_discovered', 0)}`\n"
+            f"candidates_written: `{counts.get('candidates_written', 0)}`\n"
+            f"would_write_candidates: `{counts.get('would_write_candidates', 0)}`\n"
+            f"pending_review: `{counts.get('pending_review', 0)}`\n"
+            f"auto_promoted: `{counts.get('auto_promoted', 0)}`\n"
+            f"official_request_count: `{counts.get('official_request_count', 0)}`\n\n"
+            "候选样本:\n"
+            "```text\n"
+            + "\n".join(detail_lines)
+            + "\n```"
+            + promotion_text
+            + blocker_text
+            + warning_text
+        )
     if result.get("domain") == "futures_master_governance":
         counts = result.get("counts") or {}
         calendar = result.get("calendar") or {}
@@ -3284,6 +3340,84 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('futures_master_governance')
+
+    async def futures_master_discovery_governance(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        exchanges: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        series_types: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        max_days: Optional[int] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """商品期货主数据发现治理任务；当前 GFEX adapter 已落地。"""
+        self._active_tasks.add('futures_master_discovery_governance')
+        try:
+            result = await data_manager.run_futures_master_discovery_governance(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                exchanges=exchanges,
+                categories=categories,
+                instrument_ids=instrument_ids,
+                series_ids=series_ids,
+                series_types=series_types,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+                max_days=max_days,
+            )
+            status = result.get('status', 'failed')
+            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货主数据发现治理报告',
+                    'content': _format_futures_market_data_scheduler_report(result),
+                    'status': 'success' if success else 'error',
+                    'tasks_completed': 1 if success else 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {
+                            'task_name': 'futures_master_discovery_governance',
+                            'status': status,
+                        }
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货主数据发现治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Futures master discovery governance failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '商品期货主数据发现治理报告',
+                    'content': _format_futures_market_data_scheduler_report({
+                        'status': 'error',
+                        'domain': 'futures_master_discovery_governance',
+                        'reason': str(e),
+                        'counts': {},
+                    }),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': 'futures_master_discovery_governance', 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name='商品期货主数据发现治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('futures_master_discovery_governance')
 
     async def futures_cycle_diagnostics_refresh(
         self,

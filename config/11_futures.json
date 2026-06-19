@@ -224,6 +224,54 @@
         "seed_lookahead_days": 30
       }
     },
+    "master_data_discovery": {
+      "enabled": true,
+      "auto_promote_high_confidence": true,
+      "strict_unknown_variety_blocking": false,
+      "telegram_review_required": true,
+      "enabled_exchanges": [
+        "GFEX"
+      ],
+      "adapters": {
+        "GFEX": {
+          "enabled": true,
+          "official_product_rules": true,
+          "official_announcements": true,
+          "known_products": {
+            "LC": {
+              "name": "GFEX Lithium Carbonate",
+              "category": "new_energy_material",
+              "currency": "CNY",
+              "unit": "CNY/ton"
+            },
+            "SI": {
+              "name": "GFEX Industrial Silicon",
+              "category": "new_energy_material",
+              "currency": "CNY",
+              "unit": "CNY/ton"
+            },
+            "PS": {
+              "name": "GFEX Polysilicon",
+              "category": "new_energy_material",
+              "currency": "CNY",
+              "unit": "CNY/ton"
+            },
+            "PT": {
+              "name": "GFEX Platinum",
+              "category": "precious_metal",
+              "currency": "CNY",
+              "unit": "CNY/gram"
+            },
+            "PD": {
+              "name": "GFEX Palladium",
+              "category": "precious_metal",
+              "currency": "CNY",
+              "unit": "CNY/gram"
+            }
+          }
+        }
+      }
+    },
     "trading_day_governance": {
       "enabled": true,
       "enabled_exchanges": [

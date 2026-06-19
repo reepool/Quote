@@ -318,6 +318,14 @@ GFEX 落地要求：
 - 使用 GFEX 官方品种规则页或公告补全主数据字段；如果官方页面暂不可稳定解析，则至少持久化候选和 evidence，等待人工确认。
 - `PT/PD` 暴露的问题应作为第一批回归样例：系统应能从未知品种发现走到候选记录、补全、确认/promotion，而不是靠人工修改代码列表。
 
+当前实现状态：
+
+- 已新增 `futures_master_discoveries` 候选表、`FuturesMasterDiscoveryCandidate`、`FuturesMasterDiscoveryAdapter` 和 `FuturesMasterDiscoveryGovernanceService`。
+- 已实现 GFEX adapter：基于官方日行情发现 unknown variety，使用 `config/11_futures.json.master_data_discovery.adapters.GFEX.known_products` 或内置 GFEX P0 元数据补全高置信候选。
+- 已支持 `/futures_master_discovery_governance ...` 与 `/run futures_master_discovery_governance ...` 手工任务；默认 dry-run，显式 `write` 才写库。
+- 已接入 `futures_master_governance`：未知品种不再只停留在 warning，而会形成 discovery 候选；默认不阻断已知品种合约治理。
+- 已接入 readiness：存在 pending/低置信 discovery 时输出 `needs_master_review:<exchange>:<symbol>`。
+
 ### 6.2 合约和连续序列
 
 商品期货必须区分真实合约和连续序列：

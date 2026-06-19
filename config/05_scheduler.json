@@ -652,6 +652,36 @@
           "max_runtime_seconds": 14400
         }
       },
+      "futures_master_discovery_governance": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "商品期货主数据发现治理（发现未知交易品种，写入 futures_master_discoveries，并按配置执行高置信 promotion）",
+        "operator_note": "Manual safety default is dry_run with max_days=10. Use /futures_master_discovery_governance ... write only after reviewing candidate evidence.",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sat",
+          "hour": 20,
+          "minute": 50,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_ids": [
+            "gfex_all"
+          ],
+          "exchanges": [
+            "GFEX"
+          ],
+          "start_date": "2022-12-22",
+          "dry_run": true,
+          "max_days": 10,
+          "max_runtime_seconds": 14400
+        }
+      },
       "futures_market_data_sync": {
         "enabled": false,
         "description": "商品期货行情日线与连续序列同步（写入 data/futures.db；可配置交易日治理和主数据治理前置）",

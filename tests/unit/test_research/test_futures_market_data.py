@@ -18,6 +18,8 @@ from research.futures_market_data import (
     FuturesExposureMapping,
     FuturesInstrumentCalendarOverride,
     FuturesManualCalendarReview,
+    FuturesMasterDiscoveryCandidate,
+    FuturesMasterDiscoveryGovernanceService,
     FuturesMasterGovernanceService,
     FuturesMarketDataSyncService,
     FuturesOfficialCalendarBackfillService,
@@ -373,6 +375,231 @@ def test_gfex_master_governance_maps_platinum_and_palladium(monkeypatch, tmp_pat
     assert result["warnings"] == []
     assert result["counts"]["contracts_discovered"] == 2
     assert {item["instrument_id"] for item in result["contracts"]} == {"CNF.PT.GFEX", "CNF.PD.GFEX"}
+
+
+def test_futures_master_discovery_storage_idempotency_and_conflict(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    first = FuturesMasterDiscoveryCandidate(
+        discovery_id="GFEX:XY",
+        exchange="GFEX",
+        variety_symbol="XY",
+        candidate_instrument_id="CNF.XY.GFEX",
+        candidate_series_id="CNF.XY.GFEX.main",
+        candidate_name="GFEX Test Product",
+        candidate_category="new_energy_material",
+        candidate_unit="CNY/ton",
+        first_seen_trade_date="2026-01-02",
+        last_seen_trade_date="2026-01-02",
+        observed_contracts=["XY2601"],
+        evidence={"source_profile": "fixture"},
+        confidence_score=0.95,
+        quality_flag="discovered_verified",
+        review_status="none",
+    )
+    second = FuturesMasterDiscoveryCandidate(
+        **{
+            **first.__dict__,
+            "last_seen_trade_date": "2026-01-03",
+            "observed_contracts": ["XY2602"],
+        }
+    )
+    conflicting = FuturesMasterDiscoveryCandidate(
+        **{
+            **first.__dict__,
+            "candidate_unit": "CNY/kg",
+            "last_seen_trade_date": "2026-01-04",
+            "observed_contracts": ["XY2603"],
+        }
+    )
+
+    assert storage.upsert_master_discoveries([first]) == 1
+    assert storage.upsert_master_discoveries([second]) == 1
+    row = storage.list_master_discoveries(exchange="GFEX", variety_symbol="XY")[0]
+    assert row["first_seen_trade_date"] == "2026-01-02"
+    assert row["last_seen_trade_date"] == "2026-01-03"
+    assert row["observed_contracts"] == ["XY2601", "XY2602"]
+
+    storage.upsert_master_discoveries([conflicting])
+    conflict = storage.list_master_discoveries(exchange="GFEX", variety_symbol="XY")[0]
+    assert conflict["quality_flag"] == "conflict"
+    assert conflict["review_status"] == "pending"
+    assert "candidate_unit" in conflict["evidence"]["conflict_fields"]
+
+
+def test_futures_master_discovery_governance_auto_promotes_high_confidence(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "enabled_exchanges": ["GFEX"],
+        "adapters": {
+            "GFEX": {
+                "enabled": True,
+                "known_products": {
+                    "XY": {
+                        "name": "GFEX Test Product",
+                        "category": "new_energy_material",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="XY",
+                contract="XY2601",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["counts"]["candidates_discovered"] == 1
+    assert result["counts"]["candidates_written"] == 1
+    assert result["counts"]["auto_promoted"] == 1
+    assert storage.get_instrument("CNF.XY.GFEX")["symbol"] == "XY"
+    assert storage.get_series("CNF.XY.GFEX.main")["instrument_id"] == "CNF.XY.GFEX"
+
+
+def test_futures_master_discovery_pending_review_blocks_readiness_warning(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="ZZ",
+                contract="ZZ2601",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+    readiness = FuturesReadinessService(storage, config.modules["commodity_market_data"]).build(scope_id="gfex_all")
+
+    assert result["status"] == "warning"
+    assert result["counts"]["pending_review"] == 1
+    assert storage.list_master_discoveries(exchange="GFEX", variety_symbol="ZZ")[0]["quality_flag"] == "discovered_unverified"
+    assert readiness["master_discovery"]["needs_master_review"] is True
+    assert "needs_master_review:GFEX:ZZ" in readiness["warnings"]
+
+
+def test_gfex_master_governance_persists_unknown_variety_discovery(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="LC",
+                contract="LC2601",
+            ),
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="ZZ",
+                contract="ZZ2601",
+            ),
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        scope_id="gfex_all",
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+
+    assert result["status"] == "warning"
+    assert result["counts"]["contracts_written"] == 1
+    assert result["counts"]["master_discovery_candidates"] == 1
+    assert storage.list_master_discoveries(exchange="GFEX", variety_symbol="ZZ")
 
 
 def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
