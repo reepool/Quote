@@ -5402,6 +5402,7 @@ class FuturesOfficialCalendarBackfillService:
         total_challenge_backoff_seconds = 0.0
         total_batch_pauses = 0
         total_batch_pause_seconds = 0.0
+        total_truncated_dates = 0
         max_total_days = int(max_days) if max_days else None
 
         try:
@@ -5445,8 +5446,8 @@ class FuturesOfficialCalendarBackfillService:
                         if max_total_days is not None and total_requests >= max_total_days:
                             remaining = _date_range_count(key, probe_end)
                             result["truncated"] = True
+                            result["truncated_from_date"] = key
                             result["truncated_remaining_dates"] = remaining
-                            unresolved_reasons[key] = f"max_days_limit_reached remaining_dates={remaining}"
                             logger.warning(
                                 "[FuturesOfficialCalendarBackfill] max_days reached exchange=%s trade_date=%s remaining_dates=%s request_count=%s",
                                 exchange,
@@ -5547,15 +5548,15 @@ class FuturesOfficialCalendarBackfillService:
                 calendar_days = [verified_by_date[key] for key in sorted(verified_by_date)]
                 result["trading_days"] = sum(1 for item in calendar_days if item.is_trading_day)
                 result["closed_days"] = sum(1 for item in calendar_days if not item.is_trading_day)
-                truncated_extra = 0
-                if result.get("truncated_remaining_dates"):
-                    truncated_extra = max(0, int(result["truncated_remaining_dates"]) - 1)
-                result["unresolved_dates"] = len(unresolved_reasons) + truncated_extra
+                result["unresolved_dates"] = len(unresolved_reasons)
                 result["latest_verified_date"] = max(verified_by_date) if verified_by_date else None
                 result["failure_samples"] = [
                     {"trade_date": key, "reason": reason}
                     for key, reason in sorted(unresolved_reasons.items())[:20]
                 ]
+                truncated_dates = int(result.get("truncated_remaining_dates") or 0)
+                result["truncated_dates"] = truncated_dates
+                total_truncated_dates += truncated_dates
                 total_trading += int(result["trading_days"])
                 total_closed += int(result["closed_days"])
                 metrics_after = _provider_metrics_for_exchange(provider, exchange)
@@ -5589,11 +5590,17 @@ class FuturesOfficialCalendarBackfillService:
                             "source_profile": self.source_profile,
                         },
                     )
+                exchange_status = "success"
+                if result["unresolved_dates"] or result["future_dates_unresolved"]:
+                    exchange_status = "blocked"
+                elif truncated_dates:
+                    exchange_status = "partial"
+                result["status"] = exchange_status
                 total_unresolved += int(result["unresolved_dates"]) + int(result["future_dates_unresolved"])
                 logger.info(
                     "[FuturesOfficialCalendarBackfill] exchange done exchange=%s status=%s requests=%s trading=%s closed=%s unresolved=%s retry_passes=%s retry_resolved=%s challenges=%s challenge_backoff_seconds=%s batch_pauses=%s batch_pause_seconds=%s rows_written=%s dry_run=%s",
                     exchange,
-                    "success" if result["unresolved_dates"] == 0 and result["future_dates_unresolved"] == 0 else "blocked",
+                    exchange_status,
                     result["request_count"],
                     result["trading_days"],
                     result["closed_days"],
@@ -5613,8 +5620,14 @@ class FuturesOfficialCalendarBackfillService:
             if callable(close):
                 close()
 
+        overall_status = "success"
+        if total_unresolved:
+            overall_status = "blocked"
+        elif total_truncated_dates:
+            overall_status = "partial"
+
         return {
-            "status": "success" if total_unresolved == 0 else "blocked",
+            "status": overall_status,
             "domain": "futures_official_trading_calendar_backfill",
             "source_profile": self.source_profile,
             "quality_flag": "backfilled_verified",
@@ -5631,6 +5644,7 @@ class FuturesOfficialCalendarBackfillService:
                 "unresolved_dates": total_unresolved,
                 "request_count": total_requests,
                 "future_dates_unresolved": future_unresolved_per_exchange * len(exchange_list),
+                "truncated_dates": total_truncated_dates,
                 "challenge_count": total_challenges,
                 "challenge_backoff_seconds": total_challenge_backoff_seconds,
                 "batch_pause_count": total_batch_pauses,

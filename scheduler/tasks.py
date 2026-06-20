@@ -77,7 +77,7 @@ def _format_scheduler_status(status: Any) -> tuple[str, str]:
     normalized = status_text.lower()
     if normalized == "success":
         return "✅", "成功"
-    if normalized in {"degraded", "warning"}:
+    if normalized in {"degraded", "warning", "partial"}:
         return "⚠️", "部分完成"
     if normalized in {"skipped", "disabled", "unavailable"}:
         return "ℹ️", "未执行"
@@ -1124,6 +1124,7 @@ def _format_futures_market_data_scheduler_report(
                 f"trading={item.get('trading_days', 0)}, "
                 f"closed={item.get('closed_days', 0)}, "
                 f"unresolved={item.get('unresolved_dates', 0)}, "
+                f"truncated={item.get('truncated_dates', item.get('truncated_remaining_dates', 0))}, "
                 f"future_unresolved={item.get('future_dates_unresolved', 0)}, "
                 f"retry_passes={item.get('retry_passes_attempted', 0)}, "
                 f"retry_resolved={item.get('retry_dates_resolved', 0)}, "
@@ -1168,6 +1169,7 @@ def _format_futures_market_data_scheduler_report(
             f"trading_days: `{totals.get('trading_days', 0)}`\n"
             f"closed_days: `{totals.get('closed_days', 0)}`\n"
             f"unresolved_dates: `{totals.get('unresolved_dates', 0)}`\n"
+            f"truncated_dates: `{totals.get('truncated_dates', 0)}`\n"
             f"request_count: `{totals.get('request_count', 0)}`\n\n"
             f"challenge_count: `{totals.get('challenge_count', 0)}`\n"
             f"challenge_backoff_seconds: `{totals.get('challenge_backoff_seconds', 0)}`\n"
@@ -3288,7 +3290,7 @@ class ScheduledTasks:
                 dry_run=dry_run,
             )
             status = result.get('status', 'failed')
-            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            success = status in {'success', 'warning', 'partial'} or (dry_run and status == 'blocked')
             await self._send_task_report(
                 report_data={
                     'name': '商品期货交易日治理报告',
@@ -3365,7 +3367,7 @@ class ScheduledTasks:
                 max_days=max_days,
             )
             status = result.get('status', 'failed')
-            success = status in {'success', 'warning'} or (dry_run and status == 'blocked')
+            success = status in {'success', 'warning', 'partial'} or (dry_run and status == 'blocked')
             await self._send_task_report(
                 report_data={
                     'name': '商品期货官方交易日历回填报告',

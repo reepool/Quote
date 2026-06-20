@@ -200,6 +200,49 @@ def test_futures_official_calendar_backfill_task_reports_and_clears_active_flag(
     assert "futures_official_calendar_backfill" not in task._active_tasks
 
 
+def test_futures_official_calendar_backfill_task_treats_truncated_partial_as_completed():
+    task = ScheduledTasks()
+
+    from scheduler import tasks as scheduler_tasks_module
+
+    data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(
+        return_value={
+            "status": "partial",
+            "domain": "futures_official_trading_calendar_backfill",
+            "source_profile": "exchange_official_daily_probe",
+            "quality_flag": "backfilled_verified",
+            "start_date": "2000-06-01",
+            "end_date": "2026-06-20",
+            "totals": {
+                "rows_written": 0,
+                "trading_days": 72,
+                "closed_days": 28,
+                "unresolved_dates": 0,
+                "truncated_dates": 9416,
+            },
+            "exchanges": [{"exchange": "DCE", "truncated_dates": 9416}],
+        }
+    )
+    task._send_task_report = AsyncMock(return_value=True)
+
+    result = _run(
+        task.futures_official_calendar_backfill(
+            exchanges=["DCE"],
+            start_date="2000-06-01",
+            end_date="2026-06-20",
+            dry_run=True,
+            max_days=100,
+        )
+    )
+
+    assert result is True
+    assert "futures_official_calendar_backfill" not in task._active_tasks
+    report_call = task._send_task_report.await_args.kwargs["report_data"]
+    assert report_call["status"] == "success"
+    assert "truncated_dates" in report_call["content"]
+
+
 def test_futures_official_calendar_backfill_config_has_no_note_runtime_parameter():
     config = json.loads(Path("config/05_scheduler.json").read_text(encoding="utf-8"))
     parameters = config["scheduler_config"]["jobs"]["futures_official_calendar_backfill"]["parameters"]
@@ -257,6 +300,47 @@ def test_futures_official_calendar_report_includes_failure_samples():
     assert "challenge_count: `1`" in report
     assert "challenges=1" in report
     assert "GFEX 2024-01-11: gfex_html_challenge http_status=567" in report
+
+
+def test_futures_official_calendar_report_separates_truncated_dates_from_failures():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "partial",
+            "domain": "futures_official_trading_calendar_backfill",
+            "source_profile": "exchange_official_daily_probe",
+            "quality_flag": "backfilled_verified",
+            "start_date": "2000-06-01",
+            "end_date": "2026-06-20",
+            "probe_end_date": "2026-06-20",
+            "dry_run": True,
+            "totals": {
+                "rows_written": 0,
+                "trading_days": 72,
+                "closed_days": 28,
+                "unresolved_dates": 0,
+                "truncated_dates": 9416,
+                "request_count": 100,
+            },
+            "exchanges": [
+                {
+                    "exchange": "DCE",
+                    "rows_written": 0,
+                    "trading_days": 72,
+                    "closed_days": 28,
+                    "unresolved_dates": 0,
+                    "truncated_dates": 9416,
+                    "future_dates_unresolved": 0,
+                    "latest_verified_date": "2000-09-08",
+                    "failure_samples": [],
+                }
+            ],
+        }
+    )
+
+    assert "状态: `partial`" in report
+    assert "truncated_dates: `9416`" in report
+    assert "truncated=9416" in report
+    assert "失败样本" not in report
 
 
 def test_futures_master_governance_report_includes_source_pressure_metrics():

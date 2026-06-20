@@ -1279,6 +1279,55 @@ def test_official_calendar_backfill_retries_unresolved_dates_at_task_end(monkeyp
     assert storage.list_manual_calendar_reviews(status="review_required") == []
 
 
+def test_official_calendar_backfill_max_days_reports_partial_not_unresolved(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["DCE"],
+        "official_calendar_backfill": {
+            "start_date": "2000-06-01",
+            "retry_unresolved_passes": 1,
+            "retry_unresolved_pause_seconds": 0,
+        },
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]}
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def _probe(self, exchange, trade_date):
+        return OfficialFuturesDailyProbeResult(
+            exchange=exchange,
+            trade_date=trade_date,
+            status="trading",
+            is_trading_day=True,
+            row_count=2,
+            source_interface="fixture",
+            evidence_url=f"https://official.example/{trade_date.replace('-', '')}",
+            parser_version="fixture.v1",
+            payload_hash=f"hash-{trade_date}",
+        )
+
+    monkeypatch.setattr("research.providers.official_futures.OfficialFuturesMarketDataProvider.probe_exchange_trading_day", _probe)
+
+    result = FuturesOfficialCalendarBackfillService(storage, config, config.modules["commodity_market_data"]).run(
+        exchanges=["DCE"],
+        start_date="2000-06-01",
+        end_date="2000-06-05",
+        dry_run=True,
+        max_days=2,
+    )
+
+    assert result["status"] == "partial"
+    assert result["totals"]["request_count"] == 2
+    assert result["totals"]["unresolved_dates"] == 0
+    assert result["totals"]["truncated_dates"] == 3
+    assert result["exchanges"][0]["status"] == "partial"
+    assert result["exchanges"][0]["truncated_from_date"] == "2000-06-03"
+    assert result["exchanges"][0]["failure_samples"] == []
+    assert storage.list_manual_calendar_reviews(status="review_required") == []
+
+
 def test_default_futures_registry_includes_domestic_p0_universe(tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"]["registry"] = {"include_default_p0_universe": True}
