@@ -64,11 +64,11 @@ def test_status_summary_groups_tasks_by_status_and_domain():
     assert "**🟢 已调度**" in text
     assert "**🟡 手工/暂停**" in text
     assert "**🔴 已禁用**" in text
-    assert "**行情与主数据**" in text
+    assert "**A股行情与主数据**" in text
     assert "**股东与披露**" in text
     assert "**行业与指数**" in text
     assert "**研究与风控**" in text
-    assert text.index("**行情与主数据**") < text.index("`/run daily_data_update`")
+    assert text.index("**A股行情与主数据**") < text.index("`/run daily_data_update`")
     assert text.index("**股东与披露**") < text.index("`/run shareholder_reconciliation_sync`")
 
 
@@ -89,6 +89,42 @@ def test_status_summary_accepts_task_status_enum():
     assert "手工/暂停 `1`" in text
     assert "**港美市场**" in text
     assert "`/run hkex_instrument_master_sync`" in text
+
+
+def test_status_summary_places_commodity_market_between_hk_us_and_industry():
+    running_tasks = [
+        {
+            "job_id": "hk_daily_data_update",
+            "description": "港股每日数据更新任务",
+            "next_run": "周一 21:00",
+            "status": "running",
+        },
+        {
+            "job_id": "futures_market_data_sync",
+            "description": "商品期货行情日线与连续序列同步",
+            "next_run": "周一 21:30",
+            "status": "running",
+        },
+        {
+            "job_id": "industry_standard_sync",
+            "description": "申万官方分类日更同步",
+            "next_run": "周一 22:00",
+            "status": "running",
+        },
+    ]
+
+    text = TaskManagerFormatters.format_task_status_summary(
+        running_tasks,
+        [],
+        total_tasks=3,
+    )
+
+    assert "**港美市场**" in text
+    assert "**大宗商品市场**" in text
+    assert "**行业与指数**" in text
+    assert text.index("**港美市场**") < text.index("**大宗商品市场**")
+    assert text.index("**大宗商品市场**") < text.index("**行业与指数**")
+    assert "`/run futures_market_data_sync`" in text
 
 
 def test_status_summary_stays_under_telegram_message_limit():

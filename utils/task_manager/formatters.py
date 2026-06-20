@@ -326,8 +326,9 @@ class TaskManagerFormatters:
     @staticmethod
     def _ordered_task_groups(grouped: Dict[str, List[Union[TaskStatusInfo, Dict]]]) -> List[str]:
         preferred = [
-            "行情与主数据",
+            "A股行情与主数据",
             "港美市场",
+            "大宗商品市场",
             "行业与指数",
             "股东与披露",
             "财务与估值",
@@ -343,12 +344,14 @@ class TaskManagerFormatters:
     @staticmethod
     def _task_domain(job_id: str) -> str:
         job_id = job_id.lower()
+        if any(key in job_id for key in ("futures", "commodity")):
+            return "大宗商品市场"
         if any(key in job_id for key in ("industry", "index")):
             return "行业与指数"
         if any(key in job_id for key in ("daily_data", "master_governance", "instrument_master", "calendar")):
             if job_id.startswith(("hk_", "us_")) or "hkex" in job_id:
                 return "港美市场"
-            return "行情与主数据"
+            return "A股行情与主数据"
         if any(key in job_id for key in ("shareholder", "disclosure", "broker_risk")):
             return "股东与披露"
         if any(key in job_id for key in ("financial", "valuation")):
