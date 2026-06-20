@@ -1139,6 +1139,30 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         )
     totals = result.get("totals") or {}
     governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
+    actual_calendar_quality = governance.get("lowest_quality")
+    if not actual_calendar_quality:
+        expansion_qualities = []
+        for expansion in governance.get("expansions") or []:
+            summary = expansion.get("quality_summary") or {}
+            quality = summary.get("lowest_quality")
+            if quality:
+                expansion_qualities.append(str(quality))
+        if expansion_qualities:
+            # Show the actual weakest calendar evidence used for the run.  The
+            # configured minimum threshold is reported separately below.
+            actual_calendar_quality = min(
+                expansion_qualities,
+                key=lambda item: {
+                    "missing": 0,
+                    "estimated": 1,
+                    "estimated_unverified": 1,
+                    "manual_override": 2,
+                    "backfilled_verified": 3,
+                    "official": 4,
+                    "official_parsed": 4,
+                }.get(item, 0),
+            )
+    actual_calendar_quality = actual_calendar_quality or "N/A"
     series = result.get("series") or []
     detail_lines = []
     for item in series[:10]:
@@ -1166,7 +1190,8 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
         f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
         f"target_trade_dates: `{governance.get('target_date_count', 0)}`\n"
-        f"calendar_quality: `{governance.get('minimum_quality', 'N/A')}`\n\n"
+        f"calendar_quality: `{actual_calendar_quality}`\n"
+        f"calendar_min_required: `{governance.get('minimum_quality', 'N/A')}`\n\n"
         "序列明细:\n"
         "```text\n"
         + "\n".join(detail_lines)

@@ -14,6 +14,49 @@ def _run(coro):
         loop.close()
 
 
+def test_futures_market_data_report_distinguishes_actual_calendar_quality_from_threshold():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "success",
+            "totals": {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": 0,
+                "calendar_skipped": 433,
+                "provider_empty_on_trading_day": 2044,
+            },
+            "trading_day_governance": {
+                "status": "success",
+                "target_date_count": 843,
+                "skipped_date_count": 433,
+                "minimum_quality": "estimated",
+                "expansions": [
+                    {
+                        "exchange": "GFEX",
+                        "quality_summary": {
+                            "lowest_quality": "backfilled_verified",
+                            "quality_distribution": {"backfilled_verified": 1276},
+                        },
+                    }
+                ],
+            },
+            "series": [
+                {
+                    "series_id": "CNF.SI.GFEX.main",
+                    "fetched_rows": 843,
+                    "write_result": {"would_write_rows": 843},
+                    "status": "success",
+                }
+            ],
+        }
+    )
+
+    assert "calendar_quality: `backfilled_verified`" in report
+    assert "calendar_min_required: `estimated`" in report
+    assert "would_write=843" in report
+
+
 def test_futures_trading_day_governance_task_reports_warning_and_clears_active_flag():
     task = ScheduledTasks()
 
