@@ -3,7 +3,11 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-from scheduler.tasks import ScheduledTasks, _format_futures_market_data_scheduler_report
+from scheduler.tasks import (
+    ScheduledTasks,
+    _format_futures_market_data_scheduler_report,
+    _format_futures_market_data_scheduler_reports,
+)
 
 
 def _run(coro):
@@ -18,6 +22,8 @@ def test_futures_market_data_report_distinguishes_actual_calendar_quality_from_t
     report = _format_futures_market_data_scheduler_report(
         {
             "status": "success",
+            "dry_run": True,
+            "scope_selection": {"exchanges": ["GFEX"]},
             "totals": {
                 "inserted": 0,
                 "changed": 0,
@@ -54,7 +60,60 @@ def test_futures_market_data_report_distinguishes_actual_calendar_quality_from_t
 
     assert "calendar_quality: `backfilled_verified`" in report
     assert "calendar_min_required: `estimated`" in report
+    assert "exchange/scope: `GFEX`" in report
+    assert "dry_run: `True`" in report
     assert "would_write=843" in report
+
+
+def test_futures_market_data_report_splits_series_details_by_exchange():
+    result = {
+        "status": "success",
+        "dry_run": False,
+        "scope_selection": {"exchanges": ["GFEX", "SHFE"]},
+        "totals": {
+            "inserted": 2,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+            "calendar_skipped": 0,
+            "provider_empty_on_trading_day": 0,
+        },
+        "trading_day_governance": {
+            "status": "success",
+            "target_date_count": 1,
+            "minimum_quality": "estimated",
+            "expansions": [
+                {"exchange": "GFEX", "quality_summary": {"lowest_quality": "backfilled_verified"}},
+                {"exchange": "SHFE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
+            ],
+        },
+        "series": [
+            {
+                "series_id": "CNF.SI.GFEX.main",
+                "fetched_rows": 1,
+                "write_result": {"inserted": 1, "would_write_rows": 0},
+                "status": "success",
+            },
+            {
+                "series_id": "CNF.CU.SHFE.main",
+                "fetched_rows": 1,
+                "write_result": {"inserted": 1, "would_write_rows": 0},
+                "status": "success",
+            },
+        ],
+    }
+
+    reports = _format_futures_market_data_scheduler_reports(result)
+
+    assert len(reports) == 3
+    assert "exchange/scope: `GFEX,SHFE`" in reports[0]
+    assert "序列明细已按交易所拆分发送" in reports[0]
+    assert "exchange/scope: `GFEX`" in reports[1]
+    assert "CNF.SI.GFEX.main" in reports[1]
+    assert "CNF.CU.SHFE.main" not in reports[1]
+    assert "exchange/scope: `SHFE`" in reports[2]
+    assert "CNF.CU.SHFE.main" in reports[2]
+    assert "CNF.SI.GFEX.main" not in reports[2]
 
 
 def test_futures_trading_day_governance_task_reports_warning_and_clears_active_flag():

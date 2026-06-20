@@ -6259,6 +6259,7 @@ class FuturesMarketDataSyncService:
             result = {
                 "status": status,
                 "run_id": run_id,
+                "dry_run": dry_run,
                 "totals": totals,
                 "source_selection": source_selection,
                 "official_fanout": fanout_diagnostics,

@@ -928,7 +928,49 @@ def _format_industry_index_analysis_scheduler_report(result: Dict[str, Any]) -> 
     )
 
 
-def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
+def _futures_series_exchange(item: Dict[str, Any]) -> str:
+    series_id = str(item.get("series_id") or "")
+    parts = [part for part in series_id.split(".") if part]
+    if len(parts) >= 4:
+        return parts[-2].upper()
+    instrument_id = str(item.get("instrument_id") or "")
+    parts = [part for part in instrument_id.split(".") if part]
+    if len(parts) >= 3:
+        return parts[-1].upper()
+    return "UNKNOWN"
+
+
+def _futures_result_exchange_label(result: Dict[str, Any]) -> str:
+    scope = result.get("scope_selection") or {}
+    exchanges = scope.get("exchanges") or []
+    if not exchanges:
+        governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
+        exchanges = governance.get("exchanges") or []
+    if not exchanges:
+        governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
+        exchanges = [
+            item.get("exchange")
+            for item in governance.get("expansions") or []
+            if item.get("exchange")
+        ]
+    if not exchanges:
+        exchanges = sorted(
+            {
+                _futures_series_exchange(item)
+                for item in result.get("series") or []
+                if _futures_series_exchange(item) != "UNKNOWN"
+            }
+        )
+    return ",".join(str(item).upper() for item in exchanges if item) or "configured"
+
+
+def _format_futures_market_data_scheduler_report(
+    result: Dict[str, Any],
+    *,
+    series_override: Optional[List[Dict[str, Any]]] = None,
+    exchange_label: Optional[str] = None,
+    include_series_details: bool = True,
+) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
@@ -1163,29 +1205,37 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
                 }.get(item, 0),
             )
     actual_calendar_quality = actual_calendar_quality or "N/A"
-    series = result.get("series") or []
+    series = series_override if series_override is not None else (result.get("series") or [])
     detail_lines = []
-    for item in series[:10]:
-        write_result = item.get("write_result") or {}
-        detail_lines.append(
-            f"{item.get('series_id', 'unknown')}: fetched={item.get('fetched_rows', 0)}, "
-            f"would_write={write_result.get('would_write_rows', 0)}, "
-            f"inserted={write_result.get('inserted', 0)}, "
-            f"changed={write_result.get('changed', 0)}, "
-            f"unchanged={write_result.get('unchanged', 0)}, "
-            f"status={item.get('status', 'ok')}"
-        )
-    if not detail_lines:
-        detail_lines.append(result.get("reason") or "无序列明细")
+    if include_series_details:
+        for item in series[:10]:
+            write_result = item.get("write_result") or {}
+            detail_lines.append(
+                f"{item.get('series_id', 'unknown')}: fetched={item.get('fetched_rows', 0)}, "
+                f"would_write={write_result.get('would_write_rows', 0)}, "
+                f"inserted={write_result.get('inserted', 0)}, "
+                f"changed={write_result.get('changed', 0)}, "
+                f"unchanged={write_result.get('unchanged', 0)}, "
+                f"status={item.get('status', 'ok')}"
+            )
+        if len(series) > 10:
+            detail_lines.append(f"... {len(series) - 10} more series omitted")
+        if not detail_lines:
+            detail_lines.append(result.get("reason") or "无序列明细")
+    else:
+        detail_lines.append("序列明细已按交易所拆分发送。")
+    exchange_scope = exchange_label or _futures_result_exchange_label(result)
     return (
         f"{icon} *商品期货行情数据维护*\n\n"
         f"结论: *{label}*\n"
         f"状态: `{status}`\n"
         f"run_id: `{result.get('run_id', 'N/A')}`\n"
+        f"exchange/scope: `{exchange_scope}`\n"
         f"inserted: `{totals.get('inserted', 0)}`\n"
         f"changed: `{totals.get('changed', 0)}`\n"
         f"unchanged: `{totals.get('unchanged', 0)}`\n"
-        f"failed: `{totals.get('failed', 0)}`\n\n"
+        f"failed: `{totals.get('failed', 0)}`\n"
+        f"dry_run: `{result.get('dry_run', 'N/A')}`\n\n"
         f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
         f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
         f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
@@ -1197,6 +1247,34 @@ def _format_futures_market_data_scheduler_report(result: Dict[str, Any]) -> str:
         + "\n".join(detail_lines)
         + "\n```"
     )
+
+
+def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> List[str]:
+    """Build Telegram-sized futures market-data reports, splitting details by exchange."""
+    if result.get("domain") or not result.get("series"):
+        return [_format_futures_market_data_scheduler_report(result)]
+    series = result.get("series") or []
+    groups: Dict[str, List[Dict[str, Any]]] = {}
+    for item in series:
+        groups.setdefault(_futures_series_exchange(item), []).append(item)
+    if len(groups) <= 1 and len(series) <= 10:
+        return [_format_futures_market_data_scheduler_report(result)]
+    reports = [
+        _format_futures_market_data_scheduler_report(
+            result,
+            include_series_details=False,
+        )
+    ]
+    for exchange in sorted(groups):
+        reports.append(
+            _format_futures_market_data_scheduler_report(
+                result,
+                series_override=groups[exchange],
+                exchange_label=exchange,
+                include_series_details=True,
+            )
+        )
+    return reports
 
 
 class ScheduledTasks:
@@ -3090,25 +3168,30 @@ class ScheduledTasks:
             )
             status = result.get('status', 'failed')
             success = status == 'success'
-            await self._send_task_report(
-                report_data={
-                    'name': '商品期货行情数据维护报告',
-                    'content': _format_futures_market_data_scheduler_report(result),
-                    'status': 'success' if success else status,
-                    'tasks_completed': len(result.get('series') or []),
-                    'duration': 'N/A',
-                    'maintenance_tasks': [
-                        {
-                            'task_name': item.get('series_id', 'unknown'),
-                            'status': str((item.get('write_result') or {}).get('inserted', 0)),
-                        }
-                        for item in (result.get('series') or [])
-                    ],
-                },
-                report_type='maintenance_report',
-                task_name='商品期货行情数据维护',
-                job_config=job_config,
-            )
+            for index, content in enumerate(_format_futures_market_data_scheduler_reports(result), start=1):
+                await self._send_task_report(
+                    report_data={
+                        'name': '商品期货行情数据维护报告',
+                        'content': content,
+                        'status': 'success' if success else status,
+                        'tasks_completed': len(result.get('series') or []),
+                        'duration': 'N/A',
+                        'maintenance_tasks': [
+                            {
+                                'task_name': item.get('series_id', 'unknown'),
+                                'status': str((item.get('write_result') or {}).get('inserted', 0)),
+                            }
+                            for item in (result.get('series') or [])
+                        ],
+                    },
+                    report_type='maintenance_report',
+                    task_name=(
+                        '商品期货行情数据维护'
+                        if index == 1
+                        else f'商品期货行情数据维护明细{index - 1}'
+                    ),
+                    job_config=job_config,
+                )
             return success
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Futures market-data sync failed: {e}")

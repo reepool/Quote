@@ -2258,7 +2258,8 @@ class TaskManagerHandlers:
                 f"用法: `/{job_id} exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write]`\n\n"
                 "可选参数: `scope=gfex_all`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`、"
-                "`mode=direct`、`requires_master_data_governance`。\n\n"
+                "`mode=direct`、`requires_master_data_governance`。\n"
+                "未显式指定 `write` 时默认按 dry-run 执行；正式落库必须带 `write`。\n\n"
                 "示例:\n"
                 f"• `/run {job_id} exchange=GFEX start=2026-06-01 end=2026-06-10 dry_run`\n"
                 f"• `/run {job_id} scope=gfex_all start=2026-06-01 end=2026-06-10 write`"
@@ -2392,13 +2393,14 @@ class TaskManagerHandlers:
                 parse_mode='markdown',
             )
             try:
-                from scheduler.tasks import _format_futures_market_data_scheduler_report
+                from scheduler.tasks import _format_futures_market_data_scheduler_reports
 
-                await self.task_manager.send_message(
-                    chat_id,
-                    _format_futures_market_data_scheduler_report(result_payload),
-                    parse_mode='markdown',
-                )
+                for report_message in _format_futures_market_data_scheduler_reports(result_payload):
+                    await self.task_manager.send_message(
+                        chat_id,
+                        report_message,
+                        parse_mode='markdown',
+                    )
             except Exception as report_exc:
                 self.task_manager.logger.warning(
                     "[TaskManagerHandlers] 期货行情详细报告发送失败: %s",
