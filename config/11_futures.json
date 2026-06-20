@@ -161,7 +161,7 @@
           "GFEX": 180
         },
         "batch_pause_seconds_by_exchange": {
-          "DCE": 60,
+          "DCE": 0,
           "GFEX": 10
         },
         "parser_version": "official_futures_daily.v1",
