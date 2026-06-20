@@ -192,6 +192,112 @@ def test_futures_calendar_and_price_services_report_scope_blockers_before_reques
     assert price["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
 
 
+def test_futures_market_data_production_auto_backfills_estimated_calendar_before_provider(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("provider should not be called when production calendar quality is estimated")
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars",
+        fail_if_called,
+    )
+
+    def fake_calendar_backfill(self, **kwargs):
+        assert kwargs["exchanges"] == ["GFEX"]
+        assert kwargs["start_date"] == "2026-06-20"
+        assert kwargs["end_date"] == "2026-06-20"
+        assert kwargs["dry_run"] is False
+        self.storage.upsert_trading_calendar([
+            FuturesTradingCalendarDay(
+                exchange="GFEX",
+                trade_date="2026-06-20",
+                is_trading_day=False,
+                source_profile="exchange_official_daily_probe",
+                quality_flag="backfilled_verified",
+            )
+        ])
+        return {
+            "status": "success",
+            "totals": {"rows_written": 1, "trading_days": 0, "closed_days": 1, "unresolved_dates": 0},
+            "blockers": [],
+            "warnings": [],
+        }
+
+    monkeypatch.setattr(FuturesOfficialCalendarBackfillService, "run", fake_calendar_backfill)
+
+    result = asyncio.run(
+        FuturesMarketDataSyncService(storage, config).sync(
+            scope_id="gfex_all",
+            start_date="2026-06-20",
+            end_date="2026-06-20",
+            dry_run=False,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert result["totals"]["inserted"] == 0
+    assert result["trading_day_governance"]["minimum_quality"] == "backfilled_verified"
+    assert result["trading_day_governance"]["auto_official_calendar_backfill"]["attempted"] is True
+    assert result["trading_day_governance"]["auto_official_calendar_backfill"]["ranges"] == [
+        {"exchange": "GFEX", "start_date": "2026-06-20", "end_date": "2026-06-20"}
+    ]
+    assert result["trading_day_governance"]["skipped_dates_by_exchange"]["GFEX"] == ["2026-06-20"]
+    assert storage.get_price_bars("CNF.SI.GFEX.main") == []
+
+
+def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("provider should not be called when official calendar repair fails")
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars",
+        fail_if_called,
+    )
+
+    def failed_calendar_backfill(self, **kwargs):
+        return {
+            "status": "blocked",
+            "totals": {"rows_written": 0, "trading_days": 0, "closed_days": 0, "unresolved_dates": 1},
+            "blockers": ["unresolved_official_calendar_dates"],
+            "warnings": [],
+        }
+
+    monkeypatch.setattr(FuturesOfficialCalendarBackfillService, "run", failed_calendar_backfill)
+
+    result = asyncio.run(
+        FuturesMarketDataSyncService(storage, config).sync(
+            scope_id="gfex_all",
+            start_date="2026-06-20",
+            end_date="2026-06-20",
+            dry_run=False,
+        )
+    )
+
+    assert result["status"] == "blocked"
+    assert result["totals"]["inserted"] == 0
+    assert "calendar_quality_below_threshold:GFEX:estimated<required:backfilled_verified" in result["reason"]
+    assert result["trading_day_governance"]["auto_official_calendar_backfill"]["status"] == "blocked"
+
+
 def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())
@@ -1567,6 +1673,56 @@ def test_official_futures_provider_gfex_uses_ajax_headers(monkeypatch, tmp_path)
     assert captured["headers"]["X-Requested-With"] == "XMLHttpRequest"
     assert captured["headers"]["Origin"] == "http://www.gfex.com.cn"
     assert captured["session_headers"]["Referer"] == "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml"
+
+
+def test_official_futures_provider_gfex_challenge_retry_survives_prior_generic_error(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["GFEX"],
+            "retry_attempts": 2,
+            "retry_backoff_seconds": 0,
+            "request_interval_seconds_by_exchange": {"GFEX": 0},
+            "challenge_retry_attempts_by_exchange": {"GFEX": 3},
+            "challenge_backoff_seconds_by_exchange": {"GFEX": 0},
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    calls = {"count": 0}
+
+    class Response:
+        def __init__(self, *, status_code=200, headers=None, payload=None, text=""):
+            self.status_code = status_code
+            self.headers = headers or {}
+            self._payload = payload or {}
+            self.text = text
+
+        def raise_for_status(self):
+            if self.status_code >= 400 and self.status_code != 567:
+                raise requests.HTTPError(f"{self.status_code} error")
+
+        def json(self):
+            return self._payload
+
+    def fake_post(url, *, session, tls_config, data, headers, timeout):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise requests.ConnectionError("connection reset")
+        if calls["count"] == 2:
+            return Response(
+                status_code=567,
+                headers={"content-type": "text/html; charset=UTF-8"},
+                text="<html>challenge</html>",
+            )
+        return Response(status_code=200, payload={"code": "0", "data": [{"variety": "SI"}]})
+
+    monkeypatch.setattr("research.providers.official_futures.request_post", fake_post)
+
+    payload = provider._request_exchange_payload(None, "GFEX", "2023-08-11")
+
+    assert calls["count"] == 3
+    assert payload["data"] == [{"variety": "SI"}]
 
 
 def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_path):

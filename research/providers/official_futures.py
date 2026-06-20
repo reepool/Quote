@@ -662,7 +662,10 @@ class OfficialFuturesMarketDataProvider:
         trade_date: str,
     ) -> Any:
         last_error: Optional[Exception] = None
-        max_attempts = max(self.retry_attempts, self._challenge_retry_attempts_for_exchange(exchange) + 1)
+        challenge_retry_limit = self._challenge_retry_attempts_for_exchange(exchange)
+        max_attempts = self.retry_attempts + challenge_retry_limit + 1
+        generic_failures = 0
+        challenge_retries = 0
         for attempt in range(1, max_attempts + 1):
             self._wait_for_request_slot(exchange)
             try:
@@ -732,37 +735,41 @@ class OfficialFuturesMarketDataProvider:
                 raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")
             except Exception as exc:
                 last_error = exc
-                if self._is_retryable_challenge(exc) and attempt <= self._challenge_retry_attempts_for_exchange(exchange):
+                if self._is_retryable_challenge(exc):
+                    if challenge_retries >= challenge_retry_limit:
+                        break
+                    challenge_retries += 1
                     backoff = self._challenge_backoff_for_exchange(exchange)
                     if backoff > 0:
                         self._increment_metric(exchange, "challenge_backoff_count", 1)
-                        self._increment_metric(exchange, "challenge_backoff_seconds", backoff * attempt)
+                        self._increment_metric(exchange, "challenge_backoff_seconds", backoff * challenge_retries)
                         logger.warning(
                             "[OfficialFutures] challenge retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
                             exchange,
                             trade_date,
                             attempt,
                             attempt + 1,
-                            backoff * attempt,
+                            backoff * challenge_retries,
                             exc,
                         )
-                        time.sleep(backoff * attempt)
+                        time.sleep(backoff * challenge_retries)
                     continue
-                if attempt >= self.retry_attempts:
+                generic_failures += 1
+                if generic_failures >= self.retry_attempts:
                     break
                 if self.retry_backoff_seconds > 0:
                     self._increment_metric(exchange, "retry_backoff_count", 1)
-                    self._increment_metric(exchange, "retry_backoff_seconds", self.retry_backoff_seconds * attempt)
+                    self._increment_metric(exchange, "retry_backoff_seconds", self.retry_backoff_seconds * generic_failures)
                     logger.warning(
                         "[OfficialFutures] request retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
                         exchange,
                         trade_date,
                         attempt,
                         attempt + 1,
-                        self.retry_backoff_seconds * attempt,
+                        self.retry_backoff_seconds * generic_failures,
                         exc,
                     )
-                    time.sleep(self.retry_backoff_seconds * attempt)
+                    time.sleep(self.retry_backoff_seconds * generic_failures)
         logger.warning(
             "[OfficialFutures] request failed exchange=%s trade_date=%s attempts=%s error=%s",
             exchange,

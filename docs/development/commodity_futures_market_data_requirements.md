@@ -418,6 +418,7 @@ GFEX 落地要求：
 - 历史回补任务必须从交易日治理服务获取交易日集合，并在 run metadata 中记录日历来源、质量和目标交易日数量。
 - 全品种 dry-run 必须按交易所分组，用交易日集合驱动请求日期；单个交易日失败应记录到交易所/品种/日期维度，而不是把整批自然日失败混在一起。
 - 如果目标日期的交易日历质量低于配置阈值，例如仍为 `estimated`，生产写入应默认阻断或降级为 dry-run，除非显式人工允许。
+- 启用交易日治理的行情生产写入不得直接使用 `estimated` 或 `estimated_unverified` 日历；如果目标区间存在低质量日历，行情任务必须先按交易所和连续日期段自动触发官方日历回填，重新展开目标交易日并再次执行质量门禁。只有官方日历回填失败、仍无法达到 `backfilled_verified` 或人工验证质量时，生产写入才应阻断。dry-run 可以继续执行，但必须报告实际最低日历质量和风险。
 - 如果官方公告和本地已存日历冲突，系统应保留冲突诊断并要求人工复核，不能自动覆盖生产日历。
 
 对全量下载的影响：
@@ -780,6 +781,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 补充验证结论：
 
 - GFEX 官方日行情接口必须带 `Referer: http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml`、`Origin: http://www.gfex.com.cn`、`X-Requested-With: XMLHttpRequest`，否则容易返回 HTML challenge。
+- GFEX 567/HTML challenge 的重试预算必须独立于普通网络错误重试预算。若同一日期先出现连接重置、再出现 567 challenge，不得因为普通 `retry_attempts` 已耗尽而提前切换 AkShare 备源；只有对应 challenge retry 预算耗尽后才允许判定官方源不可用。
 - 2026-06-18/19 GFEX 频控实测：`0.05s`、`0.5s` 间隔约第 11 次请求开始出现 567；`0.75s` 间隔 20 次请求出现少量 567；`0.9s` 和 `1.0s` 间隔 20 次小样本曾未出现 567，但 2022-12-22 至 2026-06-18 全段 dry-run 在 `0.9s` 下仍有 130 个 unresolved，后续 200 次复现样本确认失败响应为 `text/html` 的 567 challenge。2026-06-18 全段 dry-run 在 `0.9s`、每 45 次暂停 30 秒、567 退避 20 秒下成功完成，耗时约 35.2 分钟，其中批次暂停占 840 秒；随后优化到每 90 次暂停 20 秒，全段 dry-run 成功，`challenges=11`、批次暂停占 280 秒；继续优化到每 90 次暂停 10 秒、567 退避 20 秒，全段 dry-run 仍成功，`trading_days=843`、`closed_days=432`、`unresolved=0`、`challenges=7`、`challenge_backoff_seconds=140`、`batch_pause_seconds=140`，耗时约 23.8 分钟。进一步优化到每 180 次暂停 10 秒、567 退避 10 秒，2022-12-22 至 2026-06-19 全段 dry-run 仍成功，`trading_days=843`、`closed_days=433`、`unresolved=0`、`challenges=11`、`challenge_backoff_seconds=110`、`batch_pause_seconds=70`。2026-06-19 使用同一参数正式 `write` 落库成功，写入 `1276` 行，`trading_days=843`、`closed_days=433`、`unresolved=0`、`challenges=12`、`challenge_backoff_seconds=120`、`batch_pause_seconds=70`，库内 `quality_flag=backfilled_verified` 且 `source_profile=exchange_official_daily_probe`。当前 GFEX 固化配置为 `request_interval_seconds_by_exchange.GFEX=0.9`、`challenge_retry_attempts_by_exchange.GFEX=3`、`challenge_backoff_seconds_by_exchange.GFEX=10`、`batch_pause_every_requests_by_exchange.GFEX=180`、`batch_pause_seconds_by_exchange.GFEX=10`。交易日历任务还必须在首轮扫描结束后对 unresolved 日期执行任务级补传，当前配置为 `retry_unresolved_passes=1`、`retry_unresolved_pause_seconds=60`、`progress_log_every=100`。若 full dry-run 仍留下少量 567 洞，再上调到 `1.2s` 或切换手动代理进行 gap-fill。
 - 交易日历回填必须保留关键日志观察点：任务/交易所开始和结束、每 `progress_log_every` 次请求进度、单日 unresolved 原因、GFEX 567 challenge、请求级退避、批次暂停、任务级补传开始/结束和补回数量。Telegram 报告应展示 `retry_passes`、`retry_resolved` 和失败样本，避免 blocked 但无法定位原因。
 - GFEX 同一页面还暴露 `POST /u/interfacesWebTpTradingCalendar/loadList`，返回的是交易/合约事件日历，不能单独证明全量交易日和休市日，但可作为交易日治理的辅助证据。

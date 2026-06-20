@@ -4131,8 +4131,11 @@ class FuturesTradingDayGovernanceService:
         *,
         dry_run: bool = False,
         purpose: str = "sync",
+        minimum_quality_floor: Optional[str] = None,
     ) -> Dict[str, Any]:
         threshold = self._min_quality_for(purpose=purpose, dry_run=dry_run)
+        if minimum_quality_floor and not _quality_at_least(threshold, minimum_quality_floor):
+            threshold = minimum_quality_floor
         blockers = list(expansion_result.get("blockers") or [])
         warnings = list(expansion_result.get("warnings") or [])
         for expansion in expansion_result.get("expansions") or []:
@@ -5857,6 +5860,103 @@ class FuturesMarketDataSyncService:
         self.research_config = research_config
         self.module_cfg = research_config.modules.get("commodity_market_data", {})
 
+    def _low_quality_calendar_ranges(
+        self,
+        *,
+        exchanges: Sequence[str],
+        start_date: Optional[str],
+        end_date: Optional[str],
+        minimum_quality: str,
+    ) -> List[Dict[str, str]]:
+        if not start_date or not end_date:
+            return []
+        start = date.fromisoformat(_date_key(start_date))
+        end = date.fromisoformat(_date_key(end_date))
+        if start > end:
+            return []
+        ranges: List[Dict[str, str]] = []
+        for exchange in exchanges:
+            rows = self.storage.list_calendar_days(
+                exchange=exchange,
+                start_date=start.isoformat(),
+                end_date=end.isoformat(),
+            )
+            row_map = {str(row.get("trade_date")): row for row in rows}
+            current = start
+            range_start: Optional[str] = None
+            previous_bad: Optional[str] = None
+            while current <= end:
+                key = current.isoformat()
+                row = row_map.get(key)
+                quality = str((row or {}).get("quality_flag") or "missing")
+                is_bad = not _quality_at_least(quality, minimum_quality)
+                if is_bad and range_start is None:
+                    range_start = key
+                if not is_bad and range_start is not None and previous_bad is not None:
+                    ranges.append({"exchange": exchange, "start_date": range_start, "end_date": previous_bad})
+                    range_start = None
+                if is_bad:
+                    previous_bad = key
+                current += timedelta(days=1)
+            if range_start is not None and previous_bad is not None:
+                ranges.append({"exchange": exchange, "start_date": range_start, "end_date": previous_bad})
+        return ranges
+
+    def _auto_backfill_official_calendar(
+        self,
+        *,
+        exchanges: Sequence[str],
+        start_date: Optional[str],
+        end_date: Optional[str],
+        minimum_quality: str,
+    ) -> Dict[str, Any]:
+        ranges = self._low_quality_calendar_ranges(
+            exchanges=exchanges,
+            start_date=start_date,
+            end_date=end_date,
+            minimum_quality=minimum_quality,
+        )
+        if not ranges:
+            return {"attempted": False, "ranges": [], "results": []}
+        service = FuturesOfficialCalendarBackfillService(
+            self.storage,
+            self.research_config,
+            self.module_cfg,
+        )
+        results = []
+        for item in ranges:
+            logger.info(
+                "[FuturesMarketDataSync] auto official calendar backfill exchange=%s start=%s end=%s minimum_quality=%s",
+                item["exchange"],
+                item["start_date"],
+                item["end_date"],
+                minimum_quality,
+            )
+            result = service.run(
+                exchanges=[item["exchange"]],
+                start_date=item["start_date"],
+                end_date=item["end_date"],
+                dry_run=False,
+            )
+            results.append(
+                {
+                    "exchange": item["exchange"],
+                    "start_date": item["start_date"],
+                    "end_date": item["end_date"],
+                    "status": result.get("status"),
+                    "totals": result.get("totals") or {},
+                    "blockers": result.get("blockers") or [],
+                    "warnings": result.get("warnings") or [],
+                }
+            )
+        return {
+            "attempted": True,
+            "minimum_quality": minimum_quality,
+            "ranges": ranges,
+            "results": results,
+            "status": "success" if all(item.get("status") == "success" for item in results) else "blocked",
+        }
+
     async def sync(
         self,
         *,
@@ -5936,11 +6036,46 @@ class FuturesMarketDataSyncService:
             purpose=purpose,
             dry_run=dry_run,
         )
+        enforce_verified_calendar = bool(self.module_cfg.get("trading_day_governance"))
+        minimum_quality_floor = (
+            "backfilled_verified"
+            if (not dry_run and enforce_verified_calendar)
+            else None
+        )
         calendar_gate = governance.validate_quality_gate(
             calendar_expansion,
             dry_run=dry_run,
             purpose=purpose,
+            minimum_quality_floor=minimum_quality_floor,
         )
+        auto_calendar_backfill: Dict[str, Any] = {"attempted": False, "ranges": [], "results": []}
+        if (
+            not dry_run
+            and minimum_quality_floor
+            and calendar_gate.get("status") == "blocked"
+            and start_date
+            and end_date
+        ):
+            auto_calendar_backfill = self._auto_backfill_official_calendar(
+                exchanges=target_exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                minimum_quality=minimum_quality_floor,
+            )
+            calendar_expansion = governance.expand_target_dates(
+                exchanges=target_exchanges,
+                start_date=start_date,
+                end_date=end_date,
+                purpose=purpose,
+                dry_run=dry_run,
+            )
+            calendar_gate = governance.validate_quality_gate(
+                calendar_expansion,
+                dry_run=dry_run,
+                purpose=purpose,
+                minimum_quality_floor=minimum_quality_floor,
+            )
+            calendar_gate["auto_official_calendar_backfill"] = auto_calendar_backfill
         run_id = self.storage.start_ingestion_run(
             job_name="futures_market_data_sync",
             source="futures_source_router",
@@ -5965,6 +6100,7 @@ class FuturesMarketDataSyncService:
                     "skipped_date_count": calendar_gate.get("skipped_date_count"),
                     "blockers": calendar_gate.get("blockers") or [],
                     "warnings": calendar_gate.get("warnings") or [],
+                    "auto_official_calendar_backfill": auto_calendar_backfill,
                 },
             },
         )
