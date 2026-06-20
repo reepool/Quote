@@ -292,6 +292,18 @@ class OfficialFuturesMarketDataProvider:
             for exchange, value in challenge_backoff.items()
             if str(exchange).strip()
         } if isinstance(challenge_backoff, Mapping) else {}
+        rate_limit_retry_attempts = self.source_cfg.get("rate_limit_retry_attempts_by_exchange", {})
+        self.rate_limit_retry_attempts_by_exchange = {
+            str(exchange).upper(): max(0, int(value))
+            for exchange, value in rate_limit_retry_attempts.items()
+            if str(exchange).strip()
+        } if isinstance(rate_limit_retry_attempts, Mapping) else {}
+        rate_limit_backoff = self.source_cfg.get("rate_limit_backoff_seconds_by_exchange", {})
+        self.rate_limit_backoff_seconds_by_exchange = {
+            str(exchange).upper(): max(0.0, float(value))
+            for exchange, value in rate_limit_backoff.items()
+            if str(exchange).strip()
+        } if isinstance(rate_limit_backoff, Mapping) else {}
         batch_pause_every = self.source_cfg.get("batch_pause_every_requests_by_exchange", {})
         self.batch_pause_every_requests_by_exchange = {
             str(exchange).upper(): max(0, int(value))
@@ -663,9 +675,11 @@ class OfficialFuturesMarketDataProvider:
     ) -> Any:
         last_error: Optional[Exception] = None
         challenge_retry_limit = self._challenge_retry_attempts_for_exchange(exchange)
-        max_attempts = self.retry_attempts + challenge_retry_limit + 1
+        rate_limit_retry_limit = self._rate_limit_retry_attempts_for_exchange(exchange)
+        max_attempts = self.retry_attempts + challenge_retry_limit + rate_limit_retry_limit + 1
         generic_failures = 0
         challenge_retries = 0
+        rate_limit_retries = 0
         for attempt in range(1, max_attempts + 1):
             self._wait_for_request_slot(exchange)
             try:
@@ -754,6 +768,26 @@ class OfficialFuturesMarketDataProvider:
                         )
                         time.sleep(backoff * challenge_retries)
                     continue
+                if self._is_retryable_rate_limit(exc):
+                    if rate_limit_retries >= rate_limit_retry_limit:
+                        break
+                    rate_limit_retries += 1
+                    backoff = self._rate_limit_backoff_for_exchange(exchange)
+                    if backoff > 0:
+                        sleep_seconds = backoff * rate_limit_retries
+                        self._increment_metric(exchange, "rate_limit_count", 1)
+                        self._increment_metric(exchange, "rate_limit_backoff_seconds", sleep_seconds)
+                        logger.warning(
+                            "[OfficialFutures] rate-limit retry backoff exchange=%s trade_date=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
+                            exchange,
+                            trade_date,
+                            attempt,
+                            attempt + 1,
+                            sleep_seconds,
+                            exc,
+                        )
+                        time.sleep(sleep_seconds)
+                    continue
                 generic_failures += 1
                 if generic_failures >= self.retry_attempts:
                     break
@@ -798,7 +832,13 @@ class OfficialFuturesMarketDataProvider:
             timeout=self.timeout_seconds,
         )
         response.raise_for_status()
-        return response.json()
+        payload = response.json()
+        if isinstance(payload, Mapping) and payload.get("success") is False:
+            raise OfficialFuturesSourceUnavailable(
+                "official DCE /dcereport/publicweb/dailystat/dayQuotes "
+                f"business failure: {payload.get('msg') or payload.get('code')}"
+            )
+        return payload
 
     def _get_dce_browser_client(self) -> "DceOfficialBrowserClient":
         if self._dce_browser_client is None:
@@ -1118,6 +1158,12 @@ class OfficialFuturesMarketDataProvider:
     def _challenge_backoff_for_exchange(self, exchange: str) -> float:
         return self.challenge_backoff_seconds_by_exchange.get(str(exchange or "").upper(), 0.0)
 
+    def _rate_limit_retry_attempts_for_exchange(self, exchange: str) -> int:
+        return self.rate_limit_retry_attempts_by_exchange.get(str(exchange or "").upper(), 0)
+
+    def _rate_limit_backoff_for_exchange(self, exchange: str) -> float:
+        return self.rate_limit_backoff_seconds_by_exchange.get(str(exchange or "").upper(), 0.0)
+
     def _wait_for_request_slot(self, exchange: str) -> None:
         exchange_key = str(exchange or "").upper()
         interval = self._request_interval_for_exchange(exchange_key)
@@ -1160,6 +1206,11 @@ class OfficialFuturesMarketDataProvider:
     def _is_retryable_challenge(exc: Exception) -> bool:
         text = str(exc).lower()
         return "gfex_html_challenge" in text or "http_status=567" in text
+
+    @staticmethod
+    def _is_retryable_rate_limit(exc: Exception) -> bool:
+        text = str(exc).lower()
+        return "访问过于频繁" in text or "too frequent" in text or "rate limit" in text
 
 
 def _select_main_contract(rows: Sequence[OfficialFuturesContractBar]) -> OfficialFuturesContractBar:

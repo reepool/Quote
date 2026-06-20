@@ -320,6 +320,8 @@ def test_futures_official_calendar_report_separates_truncated_dates_from_failure
                 "unresolved_dates": 0,
                 "truncated_dates": 9416,
                 "request_count": 100,
+                "rate_limit_count": 2,
+                "rate_limit_backoff_seconds": 180,
             },
             "exchanges": [
                 {
@@ -329,6 +331,8 @@ def test_futures_official_calendar_report_separates_truncated_dates_from_failure
                     "closed_days": 28,
                     "unresolved_dates": 0,
                     "truncated_dates": 9416,
+                    "rate_limit_count": 2,
+                    "rate_limit_backoff_seconds": 180,
                     "future_dates_unresolved": 0,
                     "latest_verified_date": "2000-09-08",
                     "failure_samples": [],
@@ -340,6 +344,8 @@ def test_futures_official_calendar_report_separates_truncated_dates_from_failure
     assert "状态: `partial`" in report
     assert "truncated_dates: `9416`" in report
     assert "truncated=9416" in report
+    assert "rate_limit_count: `2`" in report
+    assert "rate_limits=2" in report
     assert "失败样本" not in report
 
 

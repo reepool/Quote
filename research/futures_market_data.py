@@ -5402,6 +5402,8 @@ class FuturesOfficialCalendarBackfillService:
         total_challenge_backoff_seconds = 0.0
         total_batch_pauses = 0
         total_batch_pause_seconds = 0.0
+        total_rate_limits = 0
+        total_rate_limit_backoff_seconds = 0.0
         total_truncated_dates = 0
         max_total_days = int(max_days) if max_days else None
 
@@ -5435,6 +5437,8 @@ class FuturesOfficialCalendarBackfillService:
                     "challenge_backoff_seconds": 0.0,
                     "batch_pause_count": 0,
                     "batch_pause_seconds": 0.0,
+                    "rate_limit_count": 0,
+                    "rate_limit_backoff_seconds": 0.0,
                 }
                 verified_by_date: Dict[str, FuturesTradingCalendarDay] = {}
                 unresolved_reasons: Dict[str, str] = {}
@@ -5567,10 +5571,14 @@ class FuturesOfficialCalendarBackfillService:
                 result["batch_pause_seconds"] = float(exchange_metrics.get("batch_pause_seconds", 0.0))
                 result["retry_backoff_count"] = int(exchange_metrics.get("retry_backoff_count", 0))
                 result["retry_backoff_seconds"] = float(exchange_metrics.get("retry_backoff_seconds", 0.0))
+                result["rate_limit_count"] = int(exchange_metrics.get("rate_limit_count", 0))
+                result["rate_limit_backoff_seconds"] = float(exchange_metrics.get("rate_limit_backoff_seconds", 0.0))
                 total_challenges += int(result["challenge_count"])
                 total_challenge_backoff_seconds += float(result["challenge_backoff_seconds"])
                 total_batch_pauses += int(result["batch_pause_count"])
                 total_batch_pause_seconds += float(result["batch_pause_seconds"])
+                total_rate_limits += int(result["rate_limit_count"])
+                total_rate_limit_backoff_seconds += float(result["rate_limit_backoff_seconds"])
                 if calendar_days and not dry_run:
                     result["rows_written"] = self.storage.upsert_trading_calendar(calendar_days)
                     total_written += int(result["rows_written"])
@@ -5649,6 +5657,8 @@ class FuturesOfficialCalendarBackfillService:
                 "challenge_backoff_seconds": total_challenge_backoff_seconds,
                 "batch_pause_count": total_batch_pauses,
                 "batch_pause_seconds": total_batch_pause_seconds,
+                "rate_limit_count": total_rate_limits,
+                "rate_limit_backoff_seconds": total_rate_limit_backoff_seconds,
             },
             "warnings": (
                 ["future_dates_require_official_notice_evidence"]

@@ -1781,23 +1781,77 @@ def test_official_futures_provider_uses_exchange_specific_request_interval(tmp_p
             "enabled": True,
             "enabled_exchanges": ["SHFE", "GFEX"],
             "request_interval_seconds": 0.05,
-            "request_interval_seconds_by_exchange": {"GFEX": 0.9},
+            "request_interval_seconds_by_exchange": {"DCE": 1.0, "GFEX": 0.9},
             "challenge_retry_attempts_by_exchange": {"GFEX": 3},
             "challenge_backoff_seconds_by_exchange": {"GFEX": 10},
-            "batch_pause_every_requests_by_exchange": {"GFEX": 180},
-            "batch_pause_seconds_by_exchange": {"GFEX": 10},
+            "rate_limit_retry_attempts_by_exchange": {"DCE": 3},
+            "rate_limit_backoff_seconds_by_exchange": {"DCE": 60},
+            "batch_pause_every_requests_by_exchange": {"DCE": 100, "GFEX": 180},
+            "batch_pause_seconds_by_exchange": {"DCE": 60, "GFEX": 10},
         }
     }
 
     provider = OfficialFuturesMarketDataProvider(config)
 
+    assert provider._request_interval_for_exchange("DCE") == 1.0
     assert provider._request_interval_for_exchange("GFEX") == 0.9
     assert provider._request_interval_for_exchange("SHFE") == 0.05
     assert provider._challenge_retry_attempts_for_exchange("GFEX") == 3
     assert provider._challenge_retry_attempts_for_exchange("SHFE") == 0
     assert provider._challenge_backoff_for_exchange("GFEX") == 10
+    assert provider._rate_limit_retry_attempts_for_exchange("DCE") == 3
+    assert provider._rate_limit_backoff_for_exchange("DCE") == 60
+    assert provider.batch_pause_every_requests_by_exchange["DCE"] == 100
+    assert provider.batch_pause_seconds_by_exchange["DCE"] == 60
     assert provider.batch_pause_every_requests_by_exchange["GFEX"] == 180
     assert provider.batch_pause_seconds_by_exchange["GFEX"] == 10
+
+
+def test_official_futures_provider_dce_rate_limit_uses_exchange_backoff(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {
+            "enabled": True,
+            "enabled_exchanges": ["DCE"],
+            "retry_attempts": 2,
+            "retry_backoff_seconds": 0,
+            "request_interval_seconds_by_exchange": {"DCE": 0},
+            "rate_limit_retry_attempts_by_exchange": {"DCE": 2},
+            "rate_limit_backoff_seconds_by_exchange": {"DCE": 60},
+            "dce_browser": {"enabled": False},
+        }
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    calls = {"count": 0}
+    sleeps = []
+
+    class Response:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return self._payload
+
+    def fake_post(url, *, session, tls_config, json, timeout):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            return Response({"success": False, "msg": "访问过于频繁，请稍后访问！"})
+        return Response({"success": True, "data": []})
+
+    monkeypatch.setattr("research.providers.official_futures.request_post", fake_post)
+    monkeypatch.setattr("research.providers.official_futures.time.sleep", lambda seconds: sleeps.append(seconds))
+
+    payload = provider._request_exchange_payload(None, "DCE", "2024-06-03")
+
+    assert payload["success"] is True
+    assert calls["count"] == 2
+    assert sleeps == [60]
+    metrics = provider.snapshot_metrics()["DCE"]
+    assert metrics["rate_limit_count"] == 1
+    assert metrics["rate_limit_backoff_seconds"] == 60
 
 
 def test_official_futures_provider_metrics_snapshot(tmp_path):

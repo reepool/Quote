@@ -141,6 +141,7 @@
         "retry_backoff_seconds": 0.5,
         "request_interval_seconds": 0.05,
         "request_interval_seconds_by_exchange": {
+          "DCE": 1.0,
           "GFEX": 0.9
         },
         "challenge_retry_attempts_by_exchange": {
@@ -149,10 +150,18 @@
         "challenge_backoff_seconds_by_exchange": {
           "GFEX": 10
         },
+        "rate_limit_retry_attempts_by_exchange": {
+          "DCE": 3
+        },
+        "rate_limit_backoff_seconds_by_exchange": {
+          "DCE": 60
+        },
         "batch_pause_every_requests_by_exchange": {
+          "DCE": 100,
           "GFEX": 180
         },
         "batch_pause_seconds_by_exchange": {
+          "DCE": 60,
           "GFEX": 10
         },
         "parser_version": "official_futures_daily.v1",
