@@ -5226,6 +5226,7 @@ class FuturesMasterGovernanceService:
                 "task_retry_passes": 0,
                 "task_retry_resolved": 0,
                 "failed_trade_dates": 0,
+                "auto_promoted_reprocessed_varieties": 0,
             },
             "warnings": [],
             "blockers": [],
@@ -5236,6 +5237,7 @@ class FuturesMasterGovernanceService:
         unmapped_varieties: Dict[str, int] = {}
         discovery_candidates: List[FuturesMasterDiscoveryCandidate] = []
         failed_fetches: Dict[str, str] = {}
+        rows_by_trade_date: Dict[str, Sequence[Any]] = {}
         discovery_service = FuturesMasterDiscoveryGovernanceService(
             self.storage,
             self.research_config,
@@ -5258,20 +5260,28 @@ class FuturesMasterGovernanceService:
                 instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
                 first_seen: Dict[str, str] = {}
                 last_seen: Dict[str, str] = {}
-                def process_rows(trade_date: str, rows: Sequence[Any]) -> None:
-                    discovery_candidates.extend(
-                        discovery_service.discover_from_rows(
-                            exchange=exchange,
-                            trade_date=trade_date,
-                            rows=rows,
-                            known_symbols=set(instrument_by_symbol),
+                def process_rows(
+                    trade_date: str,
+                    rows: Sequence[Any],
+                    *,
+                    collect_discovery: bool = True,
+                    track_unmapped: bool = True,
+                ) -> None:
+                    if collect_discovery:
+                        discovery_candidates.extend(
+                            discovery_service.discover_from_rows(
+                                exchange=exchange,
+                                trade_date=trade_date,
+                                rows=rows,
+                                known_symbols=set(instrument_by_symbol),
+                            )
                         )
-                    )
                     for row in rows:
                         variety = str(row.variety or "").upper()
                         instrument = instrument_by_symbol.get(variety)
                         if not instrument:
-                            unmapped_varieties[variety] = unmapped_varieties.get(variety, 0) + 1
+                            if track_unmapped:
+                                unmapped_varieties[variety] = unmapped_varieties.get(variety, 0) + 1
                             continue
                         contract_code = str(row.contract or "").upper()
                         contract_id = make_futures_contract_id(instrument.instrument_id, contract_code)
@@ -5310,6 +5320,7 @@ class FuturesMasterGovernanceService:
                     except OfficialFuturesSourceUnavailable as exc:
                         failed_fetches[trade_date] = str(exc)
                         continue
+                    rows_by_trade_date[trade_date] = rows
                     process_rows(trade_date, rows)
                 retry_cfg = self._contract_discovery_retry_config()
                 retry_pass_limit = int(retry_cfg["retry_passes"])
@@ -5327,6 +5338,7 @@ class FuturesMasterGovernanceService:
                         except OfficialFuturesSourceUnavailable as exc:
                             failed_fetches[trade_date] = str(exc)
                             continue
+                        rows_by_trade_date[trade_date] = rows
                         process_rows(trade_date, rows)
                         failed_fetches.pop(trade_date, None)
                         result["counts"]["task_retry_resolved"] += 1
@@ -5365,6 +5377,68 @@ class FuturesMasterGovernanceService:
                 for trade_date, reason in sorted(failed_fetches.items())
             )
 
+        if unmapped_varieties:
+            discovery_result = discovery_service.persist_and_promote(
+                discovery_candidates,
+                dry_run=dry_run,
+            )
+            remapped_symbols: set[str] = set()
+            if not dry_run and discovery_result.get("auto_promoted"):
+                refreshed = {
+                    str(item.get("symbol") or "").upper(): item
+                    for item in self.storage.list_instruments(active_only=True)
+                    if str(item.get("exchange") or "").upper() == exchange
+                }
+                for symbol in sorted(unmapped_varieties):
+                    row = refreshed.get(symbol)
+                    if not row:
+                        continue
+                    instrument = FuturesInstrument(
+                        instrument_id=str(row["instrument_id"]),
+                        symbol=str(row["symbol"]),
+                        name=str(row.get("name") or ""),
+                        exchange=str(row.get("exchange") or exchange),
+                        category=str(row.get("category") or ""),
+                        currency=str(row.get("currency") or "CNY"),
+                        unit=str(row.get("unit") or ""),
+                        priority=str(row.get("priority") or "P0"),
+                        active=bool(row.get("active", True)),
+                        source_profiles=_json_loads(row.get("source_profiles_json"), []),
+                        metadata=_json_loads(row.get("metadata_json"), {}),
+                    )
+                    instrument_by_symbol[symbol] = instrument
+                    remapped_symbols.add(symbol)
+                if remapped_symbols:
+                    for trade_date, rows in rows_by_trade_date.items():
+                        process_rows(
+                            trade_date,
+                            rows,
+                            collect_discovery=False,
+                            track_unmapped=False,
+                        )
+                    unmapped_varieties = {
+                        symbol: count
+                        for symbol, count in unmapped_varieties.items()
+                        if symbol not in remapped_symbols
+                    }
+                    result["counts"]["auto_promoted_reprocessed_varieties"] = len(remapped_symbols)
+            result["discovery"] = discovery_result
+            result["counts"]["master_discovery_candidates"] = discovery_result.get("candidates_discovered", 0)
+            result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
+            result["counts"]["master_discovery_auto_promoted"] = discovery_result.get("auto_promoted", 0)
+            if unmapped_varieties:
+                result["warnings"].append({
+                    "reason": f"unmapped_{exchange.lower()}_varieties",
+                    "samples": sorted(unmapped_varieties.items())[:20],
+                    "discovery_candidates": discovery_result.get("candidates") or [],
+                })
+            if (
+                discovery_service.discovery_cfg.get("strict_unknown_variety_blocking")
+                and discovery_result.get("pending_review")
+            ):
+                result["blockers"].append("pending_futures_master_discovery_review")
+                result["status"] = "blocked"
+                return result
         contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
         result["counts"]["contracts_discovered"] = len(contracts)
         result["contracts"] = [
@@ -5378,27 +5452,6 @@ class FuturesMasterGovernanceService:
             }
             for item in contracts[:50]
         ]
-        if unmapped_varieties:
-            discovery_result = discovery_service.persist_and_promote(
-                discovery_candidates,
-                dry_run=dry_run,
-            )
-            result["discovery"] = discovery_result
-            result["counts"]["master_discovery_candidates"] = discovery_result.get("candidates_discovered", 0)
-            result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
-            result["counts"]["master_discovery_auto_promoted"] = discovery_result.get("auto_promoted", 0)
-            result["warnings"].append({
-                "reason": f"unmapped_{exchange.lower()}_varieties",
-                "samples": sorted(unmapped_varieties.items())[:20],
-                "discovery_candidates": discovery_result.get("candidates") or [],
-            })
-            if (
-                discovery_service.discovery_cfg.get("strict_unknown_variety_blocking")
-                and discovery_result.get("pending_review")
-            ):
-                result["blockers"].append("pending_futures_master_discovery_review")
-                result["status"] = "blocked"
-                return result
         if not contracts:
             result["status"] = "blocked"
             result["blockers"].append(f"no_{exchange.lower()}_contracts_discovered")

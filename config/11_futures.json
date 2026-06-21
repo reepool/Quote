@@ -273,7 +273,92 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
-          "known_products": {}
+          "known_products": {
+            "A": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "B": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "BB": {
+              "category": "building_material",
+              "currency": "CNY",
+              "unit": "CNY/sheet",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "BZ": {
+              "category": "chemical",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "C": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "CS": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "FB": {
+              "category": "building_material",
+              "currency": "CNY",
+              "unit": "CNY/cubic_meter",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "JD": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/500kg",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "LG": {
+              "category": "building_material",
+              "currency": "CNY",
+              "unit": "CNY/cubic_meter",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "LH": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "M": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "P": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "RR": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            },
+            "Y": {
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
+            }
+          }
         },
         "CZCE": {
           "enabled": true,
