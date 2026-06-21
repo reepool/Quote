@@ -726,7 +726,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 |---|---|---|---|
 | `futures_official_calendar_backfill` | enabled/manual_only | 手工触发 | 按交易所官方日行情可靠覆盖起点验证交易日/非交易日，只写 `futures_trading_calendar`，不写行情价格；早于官方日行情可靠覆盖起点的空 payload 记为 unresolved，不写为休市；未知未来不使用 weekday 猜测；配置默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_trading_day_governance` | enabled | 日更前、回补前 | 维护交易所/品种交易日历、休市公告、交易时段和目标交易日集合，是商品数据同步前置任务 |
-| `futures_master_governance` | enabled/manual_only | 手工触发；后续可作为日更前置 | 维护商品根品种、研究序列和真实合约主数据；当前 GFEX 使用官方日行情逐交易日发现合约代码，依赖已验证交易日历，默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
+| `futures_master_governance` | enabled/manual_only | 手工触发；后续可作为日更前置 | 维护商品根品种、研究序列和真实合约主数据；按指定交易所使用官方日行情逐交易日发现合约代码，依赖已验证交易日历，默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_market_data_sync` | enabled | 交易日晚间 | 同步 P0 商品期货最新日线和连续序列，当前实现任务名 |
 | `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用 |
 | `futures_spread_recompute` | enabled | 日更后 | 重算价差和价差诊断 |
@@ -759,7 +759,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 /futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10
 /futures_calendar_backfill scope=gfex_all start=2022-12-22 end=2022-12-31 dry_run max_days=10
 /futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10
-/run futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10
+/run futures_master_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run
 ```
 
 - `dry_run` 是默认安全行为，只探测和报告，不落库。

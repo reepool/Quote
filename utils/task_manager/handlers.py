@@ -55,8 +55,8 @@ class TaskManagerHandlers:
         message += "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
         message += "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
         message += "• `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write] [max_days=N]` - 手工回填期货交易日历\n"
-        message += "• `/futures_master_governance exchange=GFEX [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据治理\n"
-        message += "• `/futures_master_discovery_governance exchange=GFEX [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据发现治理\n"
+        message += "• `/futures_master_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据治理\n"
+        message += "• `/futures_master_discovery_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据发现治理\n"
         message += "• `/audit_factors` - 审计自研复权因子 (TDX)\n"
         message += "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
         message += "• `/smart_fill_gaps` - 智能补足大段缺口\n"
@@ -113,8 +113,8 @@ class TaskManagerHandlers:
             "• `/industry_index_analysis_sync [limit=N]` - 申万行业指数分析日频同步\n"
             "• `/industry_index_analysis_backfill start=YYYY-MM-DD end=YYYY-MM-DD [limit=N] [chunk=month|day|quarter|year|none]` - 申万行业指数分析历史回补\n"
             "• `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write] [max_days=N]` - 手工回填期货交易日历\n"
-            "• `/futures_master_governance exchange=GFEX [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据治理\n"
-            "• `/futures_master_discovery_governance exchange=GFEX [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据发现治理\n"
+            "• `/futures_master_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据治理\n"
+            "• `/futures_master_discovery_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] [end=YYYY-MM-DD] [dry_run|write] [max_days=N]` - 期货主数据发现治理\n"
             "• `/hkex_review pending|list|<代码> <active|suspended|delisted> [日期] [原因]` - 港股主数据人工复核\n"
             "• `/smart_fill_gaps` - 智能补足大段数据缺口 (Phase 1)\n"
             "• `/find_gap_and_repair` - 精确逐日修复所有缺口 (Phase 2)\n"
@@ -145,10 +145,11 @@ class TaskManagerHandlers:
             "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day` - 按日补缺申万指数分析历史缺口\n\n"
             "*期货交易日历示例：*\n"
             "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-            "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`\n\n"
+            "• `/futures_calendar_backfill exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`\n\n"
             "*期货主数据治理示例：*\n"
             "• `/futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-            "• `/futures_master_discovery_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n\n"
+            "• `/futures_master_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`\n"
+            "• `/futures_master_discovery_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`\n\n"
             "*使用示例：*\n"
             "• `/detail trading_calendar_update`\n"
             "• `/run system_health_check`\n"
@@ -164,8 +165,8 @@ class TaskManagerHandlers:
             "• `/industry_index_analysis_sync limit=20`\n"
             "• `/industry_index_analysis_backfill start=2024-10-25 end=2024-10-25 limit=20`\n"
             "• `/industry_index_analysis_backfill start=2023-12-01 end=2023-12-29 chunk=day`\n"
-            "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-            "• `/futures_master_discovery_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
+            "• `/futures_calendar_backfill exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`\n"
+            "• `/futures_master_discovery_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`\n"
             "• `/reload_config` - 重载所有任务配置\n\n"
             "💡 *提示：*\n"
             "• 使用 `/status` 可以看到所有任务的当前状态和下次执行时间\n"
@@ -1827,11 +1828,11 @@ class TaskManagerHandlers:
                 "❌ *参数错误*\n\n"
                 "用法: `/futures_calendar_backfill exchange=SHFE start=YYYY-MM-DD "
                 "end=YYYY-MM-DD [dry_run|write] [max_days=N]`\n\n"
-                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`。\n\n"
                 "示例:\n"
                 "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-                "• `/futures_calendar_backfill exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`"
+                "• `/futures_calendar_backfill exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`"
             ),
             parse_mode='markdown',
         )
@@ -1944,7 +1945,7 @@ class TaskManagerHandlers:
             f"end: `{end_date}`\n"
             f"dry_run: `{dry_run}`\n"
             f"max_days: `{max_days}`\n\n"
-            "说明：当前仅支持 GFEX 官方日行情合约发现，写入 `data/futures.db` 主数据表。"
+            "说明：按指定交易所执行官方日行情合约发现；写入 `data/futures.db` 主数据表。"
         )
         await self.task_manager.send_message(chat_id, start_message, parse_mode='markdown')
         await self._run_futures_master_governance_task(
@@ -1966,13 +1967,13 @@ class TaskManagerHandlers:
             chat_id,
             (
                 "❌ *参数错误*\n\n"
-                "用法: `/futures_master_governance exchange=GFEX [start=YYYY-MM-DD] "
+                "用法: `/futures_master_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] "
                 "[end=YYYY-MM-DD] [dry_run|write] [max_days=N]`\n\n"
-                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`。\n\n"
                 "示例:\n"
                 "• `/futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-                "• `/run futures_master_governance exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`"
+                "• `/run futures_master_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`"
             ),
             parse_mode='markdown',
         )
@@ -2107,13 +2108,13 @@ class TaskManagerHandlers:
             chat_id,
             (
                 "❌ *参数错误*\n\n"
-                "用法: `/futures_master_discovery_governance exchange=GFEX [start=YYYY-MM-DD] "
+                "用法: `/futures_master_discovery_governance exchange=<EXCHANGE> [start=YYYY-MM-DD] "
                 "[end=YYYY-MM-DD] [dry_run|write] [max_days=N]`\n\n"
-                "可选参数: `scope=gfex_all`、`categories=all`、"
+                "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`。\n\n"
                 "示例:\n"
                 "• `/futures_master_discovery_governance exchange=GFEX start=2022-12-22 end=2022-12-31 dry_run max_days=10`\n"
-                "• `/run futures_master_discovery_governance exchange=GFEX start=2022-12-22 end=2022-12-31 write max_days=10`"
+                "• `/run futures_master_discovery_governance exchange=DCE start=2000-06-01 end=2026-06-20 dry_run`"
             ),
             parse_mode='markdown',
         )
@@ -2255,14 +2256,14 @@ class TaskManagerHandlers:
             chat_id,
             (
                 "❌ *参数错误*\n\n"
-                f"用法: `/{job_id} exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write]`\n\n"
-                "可选参数: `scope=gfex_all`、`categories=all`、"
+                f"用法: `/{job_id} exchange=<EXCHANGE> start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write]`\n\n"
+                "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`、"
                 "`mode=direct`、`requires_master_data_governance`。\n"
                 "未显式指定 `write` 时默认按 dry-run 执行；正式落库必须带 `write`。\n\n"
                 "示例:\n"
                 f"• `/run {job_id} exchange=GFEX start=2026-06-01 end=2026-06-10 dry_run`\n"
-                f"• `/run {job_id} scope=gfex_all start=2026-06-01 end=2026-06-10 write`"
+                f"• `/run {job_id} exchange=DCE start=2026-06-01 end=2026-06-10 dry_run`"
             ),
             parse_mode='markdown',
         )
