@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from html.parser import HTMLParser
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
+from urllib.parse import urljoin
 
 import requests
 
@@ -61,6 +62,7 @@ class DceOfficialBrowserClient:
         ).strip()
         self.headless = bool(cfg.get("headless", False))
         self.settle_seconds = max(0.0, float(cfg.get("settle_seconds", 9)))
+        self.page_settle_seconds = max(0.0, float(cfg.get("page_settle_seconds", min(self.settle_seconds, 2.0))))
         self.timeout_seconds = max(1.0, float(cfg.get("timeout_seconds", 30)))
         self.retry_attempts = max(1, int(cfg.get("retry_attempts", 3)))
         self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
@@ -195,7 +197,7 @@ class DceOfficialBrowserClient:
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 self._page = await self._browser.get(str(url))
-                await self._page.sleep(self.settle_seconds)
+                await self._page.sleep(self.page_settle_seconds)
                 raw_result = await self._page.evaluate(
                     "document.documentElement ? document.documentElement.outerHTML : ''",
                     return_by_value=True,
@@ -310,6 +312,7 @@ class OfficialFuturesMarketDataProvider:
         "LC": "http://www.gfex.com.cn/gfex/tsl/sspz.shtml",
         "SI": "http://www.gfex.com.cn/gfex/gyeg/sspz.shtml",
     }
+    DCE_LISTED_PRODUCTS_PAGE = "http://www.dce.com.cn/"
 
     def __init__(self, research_config: ResearchConfig):
         self.research_config = research_config
@@ -862,7 +865,11 @@ class OfficialFuturesMarketDataProvider:
             f"official {exchange} request failed for {trade_date}: {last_error}"
         )
 
-    def fetch_exchange_product_specs_sync(self, exchange: str) -> Dict[str, FuturesProductSpec]:
+    def fetch_exchange_product_specs_sync(
+        self,
+        exchange: str,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
         """Fetch exchange-normalized root-product specifications when available."""
         exchange_key = str(exchange or "").upper()
         if exchange_key == "DCE":
@@ -870,7 +877,13 @@ class OfficialFuturesMarketDataProvider:
             payload = self._get_dce_browser_client().fetch_contract_info_payload()
             contract_specs = self._parse_dce_contract_info_payload(payload)
             try:
-                official_pages = self._fetch_dce_product_page_specs()
+                official_pages = self._fetch_dce_product_page_specs(
+                    {
+                        **configured,
+                        **contract_specs,
+                    },
+                    target_symbols=target_symbols,
+                )
             except OfficialFuturesSourceUnavailable as exc:
                 logger.warning("[OfficialFutures] DCE product page specs unavailable: %s", exc)
                 official_pages = {}
@@ -983,16 +996,48 @@ class OfficialFuturesMarketDataProvider:
             logger.warning("[OfficialFutures] GFEX product page spec partial failures=%s", failures)
         return specs
 
-    def _fetch_dce_product_page_specs(self) -> Dict[str, FuturesProductSpec]:
+    def _fetch_dce_product_page_specs(
+        self,
+        target_specs: Optional[Mapping[str, FuturesProductSpec]] = None,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
         discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
         adapter_cfg = ((discovery_cfg.get("adapters") or {}).get("DCE") or {})
         configured_pages = adapter_cfg.get("product_rule_pages") or {}
-        if not isinstance(configured_pages, Mapping) or not configured_pages:
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        page_map = {
+            str(symbol).upper(): str(url)
+            for symbol, url in (configured_pages.items() if isinstance(configured_pages, Mapping) else [])
+            if str(symbol).strip() and str(url).strip()
+            and (not target_symbol_set or str(symbol).upper() in target_symbol_set)
+        }
+        if not target_symbol_set and not page_map:
+            return {}
+        client = self._get_dce_browser_client()
+        discovery_url = str(adapter_cfg.get("listed_products_page") or self.DCE_LISTED_PRODUCTS_PAGE)
+        try:
+            discovery_html = client.fetch_page_html(discovery_url)
+            discovery_targets = {
+                symbol: spec for symbol, spec in (target_specs or {}).items()
+                if not target_symbol_set or str(symbol or spec.symbol or "").upper() in target_symbol_set
+            }
+            for symbol, url in self._discover_dce_product_rule_pages(
+                discovery_html,
+                discovery_targets,
+                base_url=discovery_url,
+            ).items():
+                page_map.setdefault(symbol, url)
+        except Exception as exc:
+            logger.warning("[OfficialFutures] DCE product page auto-discovery unavailable: %s", exc)
+        if not page_map:
             return {}
         specs: Dict[str, FuturesProductSpec] = {}
         failures: Dict[str, str] = {}
-        client = self._get_dce_browser_client()
-        for symbol, url in sorted(configured_pages.items()):
+        for symbol, url in sorted(page_map.items()):
             symbol_key = str(symbol or "").upper().strip()
             if not symbol_key or not str(url or "").strip():
                 continue
@@ -1007,6 +1052,41 @@ class OfficialFuturesMarketDataProvider:
         if failures:
             logger.warning("[OfficialFutures] DCE product page spec partial failures=%s", failures)
         return specs
+
+    def _discover_dce_product_rule_pages(
+        self,
+        html: str,
+        target_specs: Mapping[str, FuturesProductSpec],
+        *,
+        base_url: str,
+    ) -> Dict[str, str]:
+        links = _html_links(html, base_url=base_url)
+        product_links = [
+            item for item in links
+            if _is_dce_product_link_title(item.get("text", ""))
+            and "/dce/channel/list/" in str(item.get("href", ""))
+        ]
+        pages: Dict[str, str] = {}
+        for symbol, spec in target_specs.items():
+            symbol_key = str(symbol or spec.symbol or "").upper()
+            if not symbol_key:
+                continue
+            name = str(spec.name or "").strip()
+            if not name:
+                continue
+            expected = _normalize_dce_product_title(name)
+            if not expected:
+                continue
+            matches = [
+                item for item in product_links
+                if expected and expected in _normalize_dce_product_title(item.get("text", ""))
+            ]
+            if not matches:
+                continue
+            # Prefer the shorter title when duplicate desktop/mobile nav links exist.
+            best = sorted(matches, key=lambda item: (len(str(item.get("text") or "")), str(item.get("href") or "")))[0]
+            pages[symbol_key] = str(best.get("href") or "")
+        return pages
 
     def _request_gfex_product_rule_page(self, session: requests.Session, url: str, symbol: str) -> str:
         last_error: Optional[Exception] = None
@@ -1895,6 +1975,44 @@ def _html_text_chunks(html: str) -> List[str]:
     return parser.texts
 
 
+class _HtmlLinkExtractor(HTMLParser):
+    def __init__(self, *, base_url: str = "") -> None:
+        super().__init__()
+        self.base_url = base_url
+        self.links: List[Dict[str, str]] = []
+        self._current: Optional[Dict[str, str]] = None
+
+    def handle_starttag(self, tag: str, attrs: List[tuple[str, Optional[str]]]) -> None:
+        if tag.lower() != "a":
+            return
+        attr_map = {str(key).lower(): str(value or "") for key, value in attrs}
+        href = attr_map.get("href") or attr_map.get("data-nl-url") or ""
+        self._current = {
+            "href": urljoin(self.base_url, href) if href else "",
+            "text": "",
+        }
+
+    def handle_data(self, data: str) -> None:
+        if self._current is None:
+            return
+        text = re.sub(r"\s+", " ", str(data or "")).strip()
+        if text:
+            self._current["text"] = (self._current.get("text", "") + " " + text).strip()
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() != "a" or self._current is None:
+            return
+        if self._current.get("href") or self._current.get("text"):
+            self.links.append(self._current)
+        self._current = None
+
+
+def _html_links(html: str, *, base_url: str = "") -> List[Dict[str, str]]:
+    parser = _HtmlLinkExtractor(base_url=base_url)
+    parser.feed(str(html or ""))
+    return parser.links
+
+
 def _normalize_label(value: Any) -> str:
     return re.sub(r"[\s：:]+", "", str(value or "").strip())
 
@@ -1947,6 +2065,66 @@ def _normalize_domestic_quote_unit(value: Any) -> str:
     else:
         return ""
     return f"{currency}/{unit}"
+
+
+def _normalize_dce_product_title(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    text = re.sub(r"\s+", "", text)
+    replacements = (
+        ("（", "("),
+        ("）", ")"),
+        ("１", "1"),
+        ("２", "2"),
+        ("３", "3"),
+        ("４", "4"),
+        ("５", "5"),
+        ("６", "6"),
+        ("７", "7"),
+        ("８", "8"),
+        ("９", "9"),
+        ("０", "0"),
+    )
+    for old, new in replacements:
+        text = text.replace(old, new)
+    for token in (
+        "期货/期权",
+        "期货期权",
+        "月均价期货",
+        "月均价",
+        "期货",
+        "期权",
+        "合约",
+        "专区",
+    ):
+        text = text.replace(token, "")
+    text = re.sub(r"[/／()（）,，、·]", "", text)
+    return text.lower()
+
+
+def _is_dce_product_link_title(value: Any) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return False
+    excluded = (
+        "行情",
+        "统计",
+        "参数",
+        "日历",
+        "交割",
+        "业务",
+        "规则",
+        "公告",
+        "指数",
+        "工具",
+        "会员",
+        "新闻",
+        "数据",
+    )
+    if any(token in text for token in excluded):
+        return False
+    return "期货" in text or "期权" in text
 
 
 def _first_number(value: Any) -> Optional[float]:

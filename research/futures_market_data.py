@@ -4880,6 +4880,28 @@ class FuturesMasterDiscoveryGovernanceService:
                         exchange_result["candidates_discovered"] = len([
                             item for item in all_candidates.values() if item.exchange == exchange
                         ])
+            for exchange in exchange_list:
+                target_symbols = sorted({
+                    item.variety_symbol.upper()
+                    for item in all_candidates.values()
+                    if item.exchange == exchange
+                })
+                if not target_symbols:
+                    continue
+                self.load_official_product_specs(
+                    exchange,
+                    provider,
+                    warnings=warnings,
+                    target_symbols=target_symbols,
+                    refresh=True,
+                )
+                adapter = self.adapter_for_exchange(exchange)
+                if adapter is None:
+                    continue
+                for discovery_id, candidate in list(all_candidates.items()):
+                    if candidate.exchange != exchange:
+                        continue
+                    all_candidates[discovery_id] = adapter.enrich_candidate(candidate)
         except Exception as exc:
             return self._blocked(
                 reason=f"futures_master_discovery_failed: {exc}",
@@ -4971,6 +4993,8 @@ class FuturesMasterDiscoveryGovernanceService:
         provider: Any,
         *,
         warnings: Optional[List[Any]] = None,
+        target_symbols: Optional[Sequence[str]] = None,
+        refresh: bool = False,
     ) -> Dict[str, FuturesProductSpec]:
         exchange_key = str(exchange or "").upper()
         enrichment_cfg = self.discovery_cfg.get("official_product_spec_enrichment") or {}
@@ -4985,14 +5009,22 @@ class FuturesMasterDiscoveryGovernanceService:
         if enabled_exchanges and exchange_key not in enabled_exchanges:
             self._product_specs_by_exchange.setdefault(exchange_key, {})
             return {}
-        if exchange_key in self._product_specs_by_exchange:
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        if exchange_key in self._product_specs_by_exchange and not refresh and not target_symbol_set:
             return self._product_specs_by_exchange[exchange_key]
         fetch_specs = getattr(provider, "fetch_exchange_product_specs_sync", None)
         if not callable(fetch_specs):
             self._product_specs_by_exchange[exchange_key] = {}
             return {}
         try:
-            specs = fetch_specs(exchange_key) or {}
+            try:
+                specs = fetch_specs(exchange_key, target_symbols=sorted(target_symbol_set) or None) or {}
+            except TypeError:
+                specs = fetch_specs(exchange_key) or {}
         except Exception as exc:
             logger.warning(
                 "[FuturesMasterDiscovery] official product spec enrichment unavailable exchange=%s error=%s",
@@ -5000,11 +5032,13 @@ class FuturesMasterDiscoveryGovernanceService:
                 exc,
             )
             specs = {}
-        self._product_specs_by_exchange[exchange_key] = {
+        merged_specs = dict(self._product_specs_by_exchange.get(exchange_key) or {})
+        merged_specs.update({
             str(symbol or spec.symbol or "").upper(): spec
             for symbol, spec in specs.items()
             if str(symbol or spec.symbol or "").strip()
-        }
+        })
+        self._product_specs_by_exchange[exchange_key] = merged_specs
         return self._product_specs_by_exchange[exchange_key]
 
     def discover_from_rows(
@@ -5513,6 +5547,20 @@ class FuturesMasterGovernanceService:
                     metadata["first_observed_trade_date"] = first_seen.get(contract_id)
                     metadata["last_observed_trade_date"] = last_seen.get(contract_id)
                     contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
+                if unmapped_varieties and discovery_candidates:
+                    discovery_service.load_official_product_specs(
+                        exchange,
+                        provider,
+                        warnings=result["warnings"],
+                        target_symbols=sorted(unmapped_varieties),
+                        refresh=True,
+                    )
+                    adapter = discovery_service.adapter_for_exchange(exchange)
+                    if adapter is not None:
+                        discovery_candidates = [
+                            adapter.enrich_candidate(candidate)
+                            for candidate in discovery_candidates
+                        ]
                 metrics_after = _provider_metrics_for_exchange(provider, exchange)
                 source_metrics = _metric_delta(metrics_before, metrics_after)
                 result["counts"]["challenge_count"] = int(source_metrics.get("challenge_count", 0))

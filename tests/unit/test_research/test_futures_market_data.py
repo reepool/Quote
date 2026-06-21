@@ -1332,7 +1332,7 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
         "adapters": {
             "DCE": {
                 "enabled": True,
-                "product_rule_pages": {"BZ": "http://www.dce.com.cn/dce/product/bz.html"},
+                "product_rule_pages": {},
                 "known_products": {
                     "BZ": {
                         "name": "DCE Benzene",
@@ -1346,7 +1346,14 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
         },
     }
     config.modules["commodity_market_data"].update(module_cfg)
-    html = """
+    home_html = """
+    <html>
+      <body>
+        <a href="http://www.dce.com.cn/dce/channel/list/7000020.html">纯苯期货/期权</a>
+      </body>
+    </html>
+    """
+    product_html = """
     <html>
       <body>
         <table>
@@ -1376,7 +1383,9 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
             }
 
         def fetch_page_html(self, url):
-            return html
+            if str(url).rstrip("/") == "http://www.dce.com.cn":
+                return home_html
+            return product_html
 
     monkeypatch.setattr(
         OfficialFuturesMarketDataProvider,
@@ -1384,7 +1393,7 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
         lambda self: FakeDceBrowserClient(),
     )
 
-    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("DCE")
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("DCE", target_symbols=["BZ"])
     spec = specs["BZ"]
 
     assert spec.name == "纯苯"

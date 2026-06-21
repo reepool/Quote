@@ -182,6 +182,7 @@
           "headless": false,
           "virtual_display": "auto",
           "settle_seconds": 9,
+          "page_settle_seconds": 2,
           "retry_attempts": 3,
           "retry_backoff_seconds": 2,
           "note": "DCE official JSON endpoints require a real headed Chrome session so the site JavaScript can attach the dynamic Riversafe token to in-page fetch calls. In headless/server environments use Xvfb or set QUOTE_DCE_CHROME_PATH to a real Chrome binary."
@@ -248,7 +249,7 @@
           "DCE",
           "GFEX"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint and can additionally parse configured official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX currently parses official listed-product pages for the same normalized fields and merges governed category metadata."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX currently parses configured official listed-product pages for the same normalized fields and merges governed category metadata."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -274,6 +275,7 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "listed_products_page": "http://www.dce.com.cn/",
           "product_rule_pages": {},
           "known_products": {
             "A": {
