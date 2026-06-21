@@ -5031,6 +5031,13 @@ class FuturesMasterDiscoveryGovernanceService:
                 exchange_key,
                 exc,
             )
+            if warnings is not None:
+                warnings.append({
+                    "exchange": exchange_key,
+                    "reason": "official_product_spec_enrichment_unavailable",
+                    "error": str(exc),
+                    "target_symbols": sorted(target_symbol_set),
+                })
             specs = {}
         merged_specs = dict(self._product_specs_by_exchange.get(exchange_key) or {})
         merged_specs.update({
@@ -5412,8 +5419,12 @@ class FuturesMasterGovernanceService:
                 "truncated_by_max_days": bool(max_days),
             },
             "counts": {
+                "initial_instruments": len(instruments),
+                "initial_series": len(series),
                 "instruments": len(instruments),
                 "series": len(series),
+                "refreshed_instruments": 0,
+                "refreshed_series": 0,
                 "contracts_discovered": 0,
                 "contracts_written": 0,
                 "official_request_count": 0,
@@ -5457,6 +5468,16 @@ class FuturesMasterGovernanceService:
                     provider,
                     warnings=result["warnings"],
                 )
+                instruments, series, refresh_counts = self._refresh_existing_master_data(
+                    exchange=exchange,
+                    instruments=instruments,
+                    series=series,
+                    discovery_service=discovery_service,
+                )
+                result["counts"]["refreshed_instruments"] = refresh_counts["instruments"]
+                result["counts"]["refreshed_series"] = refresh_counts["series"]
+                result["counts"]["instruments"] = len(instruments)
+                result["counts"]["series"] = len(series)
                 instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
                 first_seen: Dict[str, str] = {}
                 last_seen: Dict[str, str] = {}
@@ -5676,7 +5697,27 @@ class FuturesMasterGovernanceService:
         if not dry_run:
             self.storage.upsert_instruments_and_series(instruments, series)
             result["counts"]["contracts_written"] = self.storage.upsert_contracts(contracts) if contracts else 0
+            final_instruments = [
+                item for item in self.storage.list_instruments(active_only=True)
+                if str(item.get("exchange") or "").upper() == exchange
+            ]
+            final_instrument_ids = {
+                str(item.get("instrument_id") or "").upper()
+                for item in final_instruments
+            }
+            final_series = [
+                item for item in self.storage.list_series(active_only=True)
+                if str(item.get("instrument_id") or "").upper() in final_instrument_ids
+            ]
+            result["counts"]["final_instruments"] = len(final_instruments)
+            result["counts"]["final_series"] = len(final_series)
         else:
+            result["counts"]["final_instruments"] = (
+                len(instruments) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
+            )
+            result["counts"]["final_series"] = (
+                len(series) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
+            )
             result["counts"]["would_write_instruments"] = len(instruments)
             result["counts"]["would_write_series"] = len(series)
             result["counts"]["would_write_contracts"] = len(contracts)
@@ -5697,6 +5738,123 @@ class FuturesMasterGovernanceService:
             dry_run,
         )
         return result
+
+    def _refresh_existing_master_data(
+        self,
+        *,
+        exchange: str,
+        instruments: Sequence[FuturesInstrument],
+        series: Sequence[FuturesSeries],
+        discovery_service: FuturesMasterDiscoveryGovernanceService,
+    ) -> tuple[List[FuturesInstrument], List[FuturesSeries], Dict[str, int]]:
+        adapter = discovery_service.adapter_for_exchange(exchange)
+        if adapter is None:
+            return list(instruments), list(series), {"instruments": 0, "series": 0}
+        refreshed_by_id: Dict[str, FuturesInstrument] = {}
+        changed_instrument_ids: set[str] = set()
+        changed_instruments = 0
+        for item in instruments:
+            candidate = FuturesMasterDiscoveryCandidate(
+                discovery_id=f"{exchange}:{item.symbol.upper()}:existing",
+                exchange=exchange,
+                variety_symbol=item.symbol.upper(),
+                candidate_instrument_id=item.instrument_id,
+                candidate_series_id=make_futures_series_id(item.instrument_id),
+                candidate_name=item.name,
+                candidate_category=item.category,
+                candidate_currency=item.currency,
+                candidate_unit=item.unit,
+                first_seen_trade_date=None,
+                last_seen_trade_date=None,
+                observed_contracts=[],
+                evidence={
+                    "source_profile": self.source_profile,
+                    "adapter": "configured_product_master_discovery.v1",
+                    "refresh_target": "existing_futures_instrument",
+                },
+                metadata={"existing_instrument_id": item.instrument_id},
+            )
+            enriched = adapter.enrich_candidate(candidate)
+            if not discovery_service._is_auto_promotable(enriched):
+                refreshed_by_id[item.instrument_id] = item
+                continue
+            core_changed = (
+                (enriched.candidate_name or item.name) != item.name
+                or (enriched.candidate_category or item.category) != item.category
+                or (enriched.candidate_currency or item.currency) != item.currency
+                or (enriched.candidate_unit or item.unit) != item.unit
+            )
+            enrichment_status = str((enriched.evidence or {}).get("enrichment_status") or "")
+            has_official_product_spec = bool((enriched.evidence or {}).get("official_product_spec")) or (
+                enrichment_status.startswith("official_product_spec")
+            )
+            if not core_changed and not has_official_product_spec:
+                refreshed_by_id[item.instrument_id] = item
+                continue
+            metadata = dict(item.metadata or {})
+            metadata["master_governance_evidence"] = enriched.evidence
+            refreshed = FuturesInstrument(
+                instrument_id=item.instrument_id,
+                symbol=item.symbol,
+                name=enriched.candidate_name or item.name,
+                exchange=item.exchange,
+                category=enriched.candidate_category or item.category,
+                currency=enriched.candidate_currency or item.currency,
+                unit=enriched.candidate_unit or item.unit,
+                priority=item.priority,
+                active=item.active,
+                source_profiles=(
+                    sorted(set(list(item.source_profiles or []) + ["exchange_official"]))
+                    if has_official_product_spec
+                    else list(item.source_profiles or [])
+                ),
+                metadata=metadata,
+            )
+            if (
+                refreshed.name != item.name
+                or refreshed.category != item.category
+                or refreshed.currency != item.currency
+                or refreshed.unit != item.unit
+                or refreshed.metadata != item.metadata
+                or refreshed.source_profiles != item.source_profiles
+            ):
+                changed_instruments += 1
+                changed_instrument_ids.add(item.instrument_id)
+            refreshed_by_id[item.instrument_id] = refreshed
+        refreshed_instruments = [refreshed_by_id.get(item.instrument_id, item) for item in instruments]
+        refreshed_series: List[FuturesSeries] = []
+        changed_series = 0
+        for item in series:
+            instrument = refreshed_by_id.get(item.instrument_id)
+            if instrument is None:
+                refreshed_series.append(item)
+                continue
+            metadata = dict(item.metadata or {})
+            if item.instrument_id in changed_instrument_ids:
+                metadata["master_governance_refreshed_from_instrument"] = instrument.instrument_id
+            refreshed = FuturesSeries(
+                series_id=item.series_id,
+                instrument_id=item.instrument_id,
+                symbol=item.symbol,
+                series_type=item.series_type,
+                source_profile=item.source_profile,
+                source=item.source,
+                source_mode=item.source_mode,
+                source_interface=item.source_interface,
+                construction_method=item.construction_method,
+                currency=instrument.currency or item.currency,
+                unit=instrument.unit or item.unit,
+                priority=item.priority,
+                active=item.active,
+                metadata=metadata,
+            )
+            if refreshed.currency != item.currency or refreshed.unit != item.unit or refreshed.metadata != item.metadata:
+                changed_series += 1
+            refreshed_series.append(refreshed)
+        return refreshed_instruments, refreshed_series, {
+            "instruments": changed_instruments,
+            "series": changed_series,
+        }
 
     def _supported_official_exchanges(self) -> set[str]:
         try:

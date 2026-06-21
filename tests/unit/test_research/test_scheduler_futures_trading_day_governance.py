@@ -460,6 +460,12 @@ def test_futures_master_governance_report_includes_source_pressure_metrics():
             "counts": {
                 "instruments": 3,
                 "series": 3,
+                "initial_instruments": 3,
+                "final_instruments": 5,
+                "refreshed_instruments": 2,
+                "initial_series": 3,
+                "final_series": 5,
+                "refreshed_series": 2,
                 "contracts_discovered": 6,
                 "contracts_written": 0,
                 "would_write_contracts": 6,
@@ -478,6 +484,10 @@ def test_futures_master_governance_report_includes_source_pressure_metrics():
     )
 
     assert "challenge_count: `2`" in report
+    assert "final_instruments: `5`" in report
+    assert "refreshed_instruments: `2`" in report
+    assert "final_series: `5`" in report
+    assert "refreshed_series: `2`" in report
     assert "challenge_backoff_seconds: `20`" in report
     assert "batch_pause_count: `1`" in report
     assert "retry_backoff_seconds: `0.5`" in report

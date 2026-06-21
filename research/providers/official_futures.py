@@ -141,13 +141,19 @@ class DceOfficialBrowserClient:
             self._browser = await uc.start(**kwargs)
             self._page = await self._browser.get(self.bootstrap_page)
             await self._page.sleep(self.settle_seconds)
-            await self._api("GET", "/dcereport/publicweb/maxTradeDate")
         except Exception as exc:
             await self._stop()
             raise OfficialFuturesSourceUnavailable(
                 "official DCE browser session failed; install real Chrome or set "
                 f"QUOTE_DCE_CHROME_PATH/browser_executable_path: {exc}"
             ) from exc
+        try:
+            await self._api("GET", "/dcereport/publicweb/maxTradeDate")
+        except Exception as exc:
+            logger.warning(
+                "[OfficialFutures] DCE browser warm-up maxTradeDate failed; continuing with requested API path error=%s",
+                exc,
+            )
 
     async def _api(self, method: str, path: str, body: Optional[Mapping[str, Any]] = None) -> Mapping[str, Any]:
         await self._ensure_started()

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
+import types
 from datetime import date, timedelta
 import pandas as pd
 import pytest
@@ -16,6 +18,7 @@ from research.futures_market_data import (
     FuturesContractBar,
     FuturesDiagnosticsService,
     FuturesExposureMapping,
+    FuturesInstrument,
     FuturesInstrumentCalendarOverride,
     FuturesManualCalendarReview,
     FuturesMasterDiscoveryCandidate,
@@ -484,7 +487,7 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
             )
         ]
 
-    def fake_fetch_exchange_product_specs_sync(self, exchange):
+    def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
         return {
             "BZ": FuturesProductSpec(
                 exchange="DCE",
@@ -599,6 +602,231 @@ def test_dce_master_governance_retries_failed_trade_dates(monkeypatch, tmp_path)
     assert result["counts"]["failed_trade_dates"] == 0
     assert result["warnings"] == []
     assert calls == {"2026-01-02": 2, "2026-01-03": 1}
+
+
+def test_dce_master_governance_reports_product_spec_enrichment_failure(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["DCE"]},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {"DCE": {"enabled": True, "known_products": {}}},
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="I",
+                contract="I2601",
+            )
+        ]
+
+    def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
+        raise OfficialFuturesSourceUnavailable("DCE browser session failed")
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        fake_fetch_exchange_product_specs_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "warning"
+    assert result["counts"]["contracts_discovered"] == 1
+    assert any(
+        warning.get("reason") == "official_product_spec_enrichment_unavailable"
+        and warning.get("exchange") == "DCE"
+        and "DCE browser session failed" in warning.get("error", "")
+        for warning in result["warnings"]
+    )
+
+
+def test_dce_master_governance_refreshes_existing_master_data(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["DCE"]},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {"DCE": {"enabled": True, "known_products": {}}},
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    _seed_dce_iron_ore_master(storage)
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+    before = storage.get_instrument("CNF.I.DCE")
+    assert before["name"] == "DCE Iron Ore"
+    assert before["metadata"] == {}
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="I",
+                contract="I2601",
+                raw_payload={"variety": "铁矿石", "contractId": "I2601"},
+            )
+        ]
+
+    def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
+        assert exchange == "DCE"
+        return {
+            "I": FuturesProductSpec(
+                exchange="DCE",
+                symbol="I",
+                name="铁矿石",
+                currency="CNY",
+                contract_multiplier=100,
+                tick_size=0.5,
+                source_profile="exchange_official_product_spec",
+                source_interface="official_dce_product_rule_page",
+                source_url="https://example.test/dce/i",
+                quality_flag="official_product_spec_verified",
+                field_sources={
+                    "name": {
+                        "source_type": "official_product_rule_page",
+                        "source_interface": "official_dce_product_rule_page",
+                        "source_ref": "https://example.test/dce/i",
+                        "quality_flag": "official_product_spec_verified",
+                    },
+                    "currency": {
+                        "source_type": "governed_rule_metadata",
+                        "source_interface": "config_master_data_discovery",
+                        "quality_flag": "governed_rule_metadata",
+                    },
+                },
+            )
+        }
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        fake_fetch_exchange_product_specs_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+    instrument = storage.get_instrument("CNF.I.DCE")
+    series = storage.get_series("CNF.I.DCE.main")
+
+    assert result["status"] == "success"
+    assert result["counts"]["initial_instruments"] == 9
+    assert result["counts"]["refreshed_instruments"] == 1
+    assert result["counts"]["final_instruments"] == 9
+    assert result["counts"]["contracts_written"] == 1
+    assert instrument["name"] == "铁矿石"
+    assert instrument["unit"] == "CNY/ton"
+    assert instrument["metadata"]["master_governance_evidence"]["field_sources"]["name"]["source_type"] == (
+        "official_product_rule_page"
+    )
+    assert series["unit"] == "CNY/ton"
+    assert series["metadata"]["master_governance_refreshed_from_instrument"] == "CNF.I.DCE"
+
+
+def test_dce_browser_warmup_failure_does_not_block_requested_api(monkeypatch):
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                return json.dumps({
+                    "status": -1,
+                    "ok": False,
+                    "text": "TypeError: Failed to fetch",
+                })
+            assert "/dcereport/publicweb/tradepara/contractInfo" in script
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
+            })
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "retry_attempts": 1,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        payload = client.fetch_contract_info_payload()
+    finally:
+        client.close()
+
+    assert payload == {"success": True, "data": []}
 
 
 def test_master_governance_uses_provider_supported_exchanges(monkeypatch, tmp_path):
@@ -996,7 +1224,7 @@ def test_futures_master_discovery_enriches_dce_official_product_specs_without_gu
             )
         ]
 
-    def fake_fetch_exchange_product_specs_sync(self, exchange):
+    def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
         return {
             "BZ": FuturesProductSpec(
                 exchange="DCE",
@@ -1166,7 +1394,7 @@ def test_futures_master_discovery_promotes_dce_when_product_spec_and_rule_metada
             )
         ]
 
-    def fake_fetch_exchange_product_specs_sync(self, exchange):
+    def fake_fetch_exchange_product_specs_sync(self, exchange, target_symbols=None):
         return {
             "BZ": FuturesProductSpec(
                 exchange="DCE",
@@ -3070,6 +3298,44 @@ def _official_contract_row(
         amount=1234,
         source_interface="official_shfe_daily_kx_dat",
         raw_payload=raw_payload or {"contract": contract},
+    )
+
+
+def _seed_dce_iron_ore_master(storage: FuturesStorageManager) -> None:
+    storage.upsert_instruments_and_series(
+        [
+            FuturesInstrument(
+                instrument_id="CNF.I.DCE",
+                symbol="I",
+                name="DCE Iron Ore",
+                exchange="DCE",
+                category="ferrous",
+                currency="CNY",
+                unit="CNY/ton",
+                priority="P0",
+                active=True,
+                source_profiles=["configured_seed"],
+                metadata={},
+            )
+        ],
+        [
+            FuturesSeries(
+                series_id="CNF.I.DCE.main",
+                instrument_id="CNF.I.DCE",
+                symbol="I.main",
+                series_type="main_continuous",
+                source_profile="exchange_official",
+                source="exchange_official",
+                source_mode="direct",
+                source_interface="official_dce_daily_contract_fanout",
+                construction_method="exchange_main_continuous",
+                currency="CNY",
+                unit="CNY/ton",
+                priority="P0",
+                active=True,
+                metadata={},
+            )
+        ],
     )
 
 
