@@ -625,7 +625,7 @@
       "futures_master_governance": {
         "enabled": true,
         "manual_only": true,
-        "description": "商品期货主数据治理（当前支持 GFEX：官方日行情合约发现，写入 data/futures.db instruments/series/contracts）",
+        "description": "商品期货主数据治理（按单交易所执行官方日行情合约发现，写入 data/futures.db instruments/series/contracts）",
         "operator_note": "Manual safety default is dry_run with max_days=10. Use /futures_master_governance ... write for explicit persistence after trading calendar coverage is verified.",
         "report": true,
         "pre_run_notify": true,
@@ -655,7 +655,7 @@
       "futures_master_discovery_governance": {
         "enabled": true,
         "manual_only": true,
-        "description": "商品期货主数据发现治理（发现未知交易品种，写入 futures_master_discoveries，并按配置执行高置信 promotion）",
+        "description": "商品期货主数据发现治理（按交易所 adapter 发现未知交易品种，写入 futures_master_discoveries，并按配置执行高置信 promotion）",
         "operator_note": "Manual safety default is dry_run with max_days=10. Use /futures_master_discovery_governance ... write only after reviewing candidate evidence.",
         "report": true,
         "pre_run_notify": true,

@@ -510,3 +510,104 @@ def test_futures_market_data_sync_allows_dry_run_with_governance_warning():
 
     assert result is True
     data_manager.run_futures_market_data_sync.assert_awaited_once()
+
+
+def test_futures_market_data_sync_runs_master_governance_per_exchange():
+    task = ScheduledTasks()
+
+    from scheduler import tasks as scheduler_tasks_module
+
+    data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_trading_day_governance = AsyncMock(
+        return_value={
+            "status": "success",
+            "target_date_expansion": {
+                "status": "success",
+                "target_dates_by_exchange": {
+                    "DCE": ["2026-06-19"],
+                    "GFEX": ["2026-06-19"],
+                },
+                "target_date_count": 2,
+                "skipped_date_count": 0,
+            },
+        }
+    )
+    data_manager.run_futures_master_governance = AsyncMock(
+        side_effect=[
+            {"status": "success", "exchange": "DCE", "blockers": []},
+            {"status": "success", "exchange": "GFEX", "blockers": []},
+        ]
+    )
+    data_manager.run_futures_market_data_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "totals": {"inserted": 0, "changed": 0, "unchanged": 2, "failed": 0},
+            "trading_day_governance": {"status": "success", "target_date_count": 2},
+            "scope_selection": {"exchanges": ["DCE", "GFEX"]},
+            "series": [
+                {"series_id": "CNF.I.DCE.main", "status": "success", "fetched_rows": 1},
+                {"series_id": "CNF.SI.GFEX.main", "status": "success", "fetched_rows": 1},
+            ],
+        }
+    )
+    task._send_task_report = AsyncMock(return_value=True)
+
+    result = _run(
+        task.futures_market_data_sync(
+            exchanges=["DCE", "GFEX"],
+            dry_run=False,
+            requires_master_data_governance=True,
+        )
+    )
+
+    assert result is True
+    assert data_manager.run_futures_master_governance.await_count == 2
+    calls = data_manager.run_futures_master_governance.await_args_list
+    assert calls[0].kwargs["exchanges"] == ["DCE"]
+    assert calls[0].kwargs["start_date"] == "2026-06-19"
+    assert calls[0].kwargs["end_date"] == "2026-06-19"
+    assert calls[1].kwargs["exchanges"] == ["GFEX"]
+    data_manager.run_futures_market_data_sync.assert_awaited_once()
+
+
+def test_futures_market_data_sync_blocks_when_one_exchange_master_governance_blocks():
+    task = ScheduledTasks()
+
+    from scheduler import tasks as scheduler_tasks_module
+
+    data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_trading_day_governance = AsyncMock(
+        return_value={
+            "status": "success",
+            "target_date_expansion": {
+                "status": "success",
+                "target_dates_by_exchange": {
+                    "DCE": ["2026-06-19"],
+                    "GFEX": ["2026-06-19"],
+                },
+                "target_date_count": 2,
+                "skipped_date_count": 0,
+            },
+        }
+    )
+    data_manager.run_futures_master_governance = AsyncMock(
+        side_effect=[
+            {"status": "blocked", "exchange": "DCE", "blockers": ["no_dce_contracts_discovered"]},
+            {"status": "success", "exchange": "GFEX", "blockers": []},
+        ]
+    )
+    data_manager.run_futures_market_data_sync = AsyncMock(return_value={"status": "success"})
+    task._send_task_report = AsyncMock(return_value=True)
+
+    result = _run(
+        task.futures_market_data_sync(
+            exchanges=["DCE", "GFEX"],
+            dry_run=False,
+            requires_master_data_governance=True,
+        )
+    )
+
+    assert result is False
+    assert data_manager.run_futures_master_governance.await_count == 2
+    data_manager.run_futures_market_data_sync.assert_not_awaited()
+    assert "futures_market_data_sync" not in task._active_tasks

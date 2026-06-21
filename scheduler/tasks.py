@@ -3120,26 +3120,75 @@ class ScheduledTasks:
                 if target_dates and not (master_start_date or master_end_date):
                     master_start_date = target_dates[0]
                     master_end_date = target_dates[-1]
-                if not target_dates and requires_trading_day_governance and not (start_date or end_date):
+                if not target_dates and requires_trading_day_governance:
                     scheduler_logger.info(
                         "[Scheduler] Futures master governance skipped because trading-day governance returned no target dates"
                     )
                 else:
-                    master_result = await data_manager.run_futures_master_governance(
-                        scope_id=scope_id,
-                        scope_ids=scope_ids,
-                        exchanges=exchanges,
-                        categories=categories,
-                        instrument_ids=instrument_ids,
-                        series_ids=series_ids,
-                        series_types=series_types,
-                        start_date=master_start_date,
-                        end_date=master_end_date,
-                        dry_run=dry_run,
-                        max_days=master_governance_max_days,
-                    )
-                    master_status = master_result.get("status")
-                    if master_status == "blocked" and not dry_run:
+                    master_results = []
+                    exchange_dates = {
+                        str(exchange).upper(): sorted(str(item) for item in dates or [] if item)
+                        for exchange, dates in target_dates_by_exchange.items()
+                        if str(exchange).strip()
+                    }
+                    if exchange_dates:
+                        for exchange, dates in sorted(exchange_dates.items()):
+                            if not dates:
+                                continue
+                            master_results.append(
+                                await data_manager.run_futures_master_governance(
+                                    exchanges=[exchange],
+                                    categories=categories,
+                                    instrument_ids=instrument_ids,
+                                    series_ids=series_ids,
+                                    series_types=series_types,
+                                    start_date=dates[0],
+                                    end_date=dates[-1],
+                                    dry_run=dry_run,
+                                    max_days=master_governance_max_days,
+                                )
+                            )
+                    else:
+                        master_results.append(
+                            await data_manager.run_futures_master_governance(
+                                scope_id=scope_id,
+                                scope_ids=scope_ids,
+                                exchanges=exchanges,
+                                categories=categories,
+                                instrument_ids=instrument_ids,
+                                series_ids=series_ids,
+                                series_types=series_types,
+                                start_date=master_start_date,
+                                end_date=master_end_date,
+                                dry_run=dry_run,
+                                max_days=master_governance_max_days,
+                            )
+                        )
+                    blocked_master_results = [
+                        item for item in master_results
+                        if item.get("status") == "blocked"
+                    ]
+                    if blocked_master_results and not dry_run:
+                        blocker_lines = [
+                            f"{item.get('exchange', 'N/A')}: "
+                            + "; ".join(item.get("blockers") or [item.get("reason") or "blocked"])
+                            for item in blocked_master_results
+                        ]
+                        master_result = {
+                            "status": "blocked",
+                            "domain": "futures_master_governance",
+                            "exchange": ",".join(
+                                str(item.get("exchange") or "N/A") for item in blocked_master_results
+                            ),
+                            "source_profile": "exchange_official_daily_contract_discovery",
+                            "start_date": master_start_date,
+                            "end_date": master_end_date,
+                            "dry_run": dry_run,
+                            "counts": {},
+                            "contracts": [],
+                            "blockers": blocker_lines,
+                            "warnings": [],
+                        }
                         await self._send_task_report(
                             report_data={
                                 'name': '商品期货主数据治理前置检查报告',
@@ -3431,7 +3480,7 @@ class ScheduledTasks:
         max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """商品期货主数据治理任务；当前支持 GFEX 官方日行情合约发现。"""
+        """商品期货主数据治理任务；按交易所执行官方日行情合约发现。"""
         self._active_tasks.add('futures_master_governance')
         try:
             result = await data_manager.run_futures_master_governance(
@@ -3509,7 +3558,7 @@ class ScheduledTasks:
         max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """商品期货主数据发现治理任务；当前 GFEX adapter 已落地。"""
+        """商品期货主数据发现治理任务；按交易所 adapter 发现未知品种。"""
         self._active_tasks.add('futures_master_discovery_governance')
         try:
             result = await data_manager.run_futures_master_discovery_governance(
