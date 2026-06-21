@@ -20,6 +20,7 @@ from research.futures_market_data import (
     FuturesContinuousMapping,
     FuturesContract,
     FuturesContractBar,
+    FuturesProductSpec,
     FuturesSeries,
     infer_contract_month,
     make_futures_contract_id,
@@ -84,6 +85,14 @@ class DceOfficialBrowserClient:
             "statisticsType": 0,
         }
         return self._run(self._api("POST", "/dcereport/publicweb/dailystat/dayQuotes", body))
+
+    def fetch_contract_info_payload(self) -> Mapping[str, Any]:
+        body = {
+            "lang": "zh",
+            "tradeType": "1",
+            "varietyId": "all",
+        }
+        return self._run(self._api("POST", "/dcereport/publicweb/tradepara/contractInfo", body))
 
     def close(self) -> None:
         if self._loop is None:
@@ -815,6 +824,73 @@ class OfficialFuturesMarketDataProvider:
         raise OfficialFuturesSourceUnavailable(
             f"official {exchange} request failed for {trade_date}: {last_error}"
         )
+
+    def fetch_exchange_product_specs_sync(self, exchange: str) -> Dict[str, FuturesProductSpec]:
+        """Fetch exchange-normalized root-product specifications when available."""
+        exchange_key = str(exchange or "").upper()
+        if exchange_key == "DCE":
+            payload = self._get_dce_browser_client().fetch_contract_info_payload()
+            return self._parse_dce_contract_info_payload(payload)
+        raise OfficialFuturesSourceUnavailable(f"unsupported official product spec exchange: {exchange_key}")
+
+    def _parse_dce_contract_info_payload(self, payload: Mapping[str, Any]) -> Dict[str, FuturesProductSpec]:
+        rows = payload.get("data") or []
+        specs: Dict[str, FuturesProductSpec] = {}
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            contract = str(row.get("contractId") or "").strip().upper()
+            symbol = str(row.get("varietyOrder") or "").strip().upper()
+            if not symbol:
+                symbol = _contract_variety(contract)
+            if not symbol:
+                continue
+            name = str(row.get("variety") or "").strip()
+            if "小计" in name or "总计" in name:
+                continue
+            multiplier = _number(row.get("unit"))
+            tick = _number(row.get("tick"))
+            existing = specs.get(symbol)
+            evidence_rows = list((existing.evidence or {}).get("sample_rows") or []) if existing else []
+            if len(evidence_rows) < 3:
+                evidence_rows.append({
+                    key: row.get(key)
+                    for key in (
+                        "contractId",
+                        "variety",
+                        "varietyOrder",
+                        "unit",
+                        "tick",
+                        "startTradeDate",
+                        "endTradeDate",
+                        "endDeliveryDate",
+                    )
+                    if key in row
+                })
+            specs[symbol] = FuturesProductSpec(
+                exchange="DCE",
+                symbol=symbol,
+                name=name or (existing.name if existing else ""),
+                currency="CNY",
+                contract_multiplier=(
+                    multiplier
+                    if multiplier is not None
+                    else (existing.contract_multiplier if existing else None)
+                ),
+                tick_size=tick if tick is not None else (existing.tick_size if existing else None),
+                source_profile="exchange_official_product_spec",
+                source_interface="official_dce_contract_info",
+                source_url="http://www.dce.com.cn/dcereport/publicweb/tradepara/contractInfo",
+                quality_flag="official_product_spec_partial",
+                evidence={
+                    "source_limitations": [
+                        "dce_contract_info_unit_is_contract_trading_unit_not_quote_unit",
+                        "dce_contract_info_does_not_provide_project_category",
+                    ],
+                    "sample_rows": evidence_rows,
+                },
+            )
+        return specs
 
     def _request_dce_payload_direct(self, session: requests.Session, trade_date: str) -> Any:
         response = request_post(

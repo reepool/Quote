@@ -601,6 +601,25 @@ class FuturesMasterDiscoveryCandidate:
 
 
 @dataclass(frozen=True)
+class FuturesProductSpec:
+    """Exchange-normalized futures root-product specification evidence."""
+
+    exchange: str
+    symbol: str
+    name: str = ""
+    category: str = ""
+    currency: str = "CNY"
+    unit: str = ""
+    contract_multiplier: Optional[float] = None
+    tick_size: Optional[float] = None
+    source_profile: str = ""
+    source_interface: str = ""
+    source_url: str = ""
+    quality_flag: str = "official_product_spec_partial"
+    evidence: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class FuturesContractBar:
     contract_id: str
     instrument_id: str
@@ -4413,6 +4432,7 @@ class ConfiguredProductMasterDiscoveryAdapter:
         config: Optional[Dict[str, Any]] = None,
         *,
         built_in_products: Optional[Dict[str, Dict[str, Any]]] = None,
+        product_specs: Optional[Dict[str, FuturesProductSpec]] = None,
     ):
         self.exchange = str(exchange or "").upper()
         cfg = dict(config or {})
@@ -4424,6 +4444,17 @@ class ConfiguredProductMasterDiscoveryAdapter:
                 **dict(configured_products),
             }.items()
         }
+        for symbol, spec in dict(product_specs or {}).items():
+            symbol_key = str(symbol or spec.symbol or "").upper()
+            if not symbol_key:
+                continue
+            spec_payload = asdict(spec)
+            existing = self.known_products.get(symbol_key, {})
+            self.known_products[symbol_key] = {
+                **spec_payload,
+                **{key: value for key, value in existing.items() if value not in (None, "")},
+                "official_product_spec": spec_payload,
+            }
         self.official_product_rules = bool(cfg.get("official_product_rules", True))
         self.official_announcements = bool(cfg.get("official_announcements", True))
 
@@ -4518,11 +4549,38 @@ class ConfiguredProductMasterDiscoveryAdapter:
         currency = str(product.get("currency") or "CNY")
         unit = str(product.get("unit") or "")
         required_complete = bool(name and category and currency and unit)
+        source_payload = product.get("official_product_spec") or {}
+        if source_payload:
+            enrichment_status = (
+                "official_product_spec_complete"
+                if required_complete
+                else "official_product_spec_partial"
+            )
+            metadata_source = str(
+                source_payload.get("source_interface")
+                or source_payload.get("source_url")
+                or "official_product_spec"
+            )
+        else:
+            enrichment_status = "configured_product_metadata"
+            metadata_source = str(product.get("source_url") or "config/11_futures.json or built_in_seed")
         evidence = {
             **dict(candidate.evidence or {}),
-            "enrichment_status": "configured_product_metadata",
-            "metadata_source": str(product.get("source_url") or "config/11_futures.json or built_in_seed"),
+            "enrichment_status": enrichment_status,
+            "metadata_source": metadata_source,
         }
+        if source_payload:
+            evidence["official_product_spec"] = {
+                key: source_payload.get(key)
+                for key in (
+                    "source_profile",
+                    "source_interface",
+                    "source_url",
+                    "quality_flag",
+                    "evidence",
+                )
+                if source_payload.get(key)
+            }
         return FuturesMasterDiscoveryCandidate(
             **{
                 **asdict(candidate),
@@ -4556,6 +4614,7 @@ class FuturesMasterDiscoveryGovernanceService:
         self.research_config = research_config
         self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
         self.discovery_cfg = self._discovery_config()
+        self._product_specs_by_exchange: Dict[str, Dict[str, FuturesProductSpec]] = {}
 
     def run(
         self,
@@ -4622,6 +4681,7 @@ class FuturesMasterDiscoveryGovernanceService:
         blockers: List[str] = []
         request_count = 0
         by_exchange: Dict[str, Dict[str, Any]] = {}
+        provider = None
         try:
             from research.providers.official_futures import (
                 OfficialFuturesMarketDataProvider,
@@ -4630,6 +4690,7 @@ class FuturesMasterDiscoveryGovernanceService:
 
             provider = OfficialFuturesMarketDataProvider(self.research_config)
             for exchange in exchange_list:
+                self.load_official_product_specs(exchange, provider, warnings=warnings)
                 adapter = self.adapter_for_exchange(exchange)
                 if adapter is None:
                     warnings.append({
@@ -4688,6 +4749,9 @@ class FuturesMasterDiscoveryGovernanceService:
                 end_date=end,
                 dry_run=dry_run,
             )
+        finally:
+            if provider is not None:
+                provider.close()
 
         candidates = sorted(all_candidates.values(), key=lambda item: item.discovery_id)
         written = 0
@@ -4759,7 +4823,50 @@ class FuturesMasterDiscoveryGovernanceService:
             exchange_key,
             adapter_cfg,
             built_in_products=self._built_in_discovery_products(exchange_key),
+            product_specs=self._product_specs_by_exchange.get(exchange_key),
         )
+
+    def load_official_product_specs(
+        self,
+        exchange: str,
+        provider: Any,
+        *,
+        warnings: Optional[List[Any]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        exchange_key = str(exchange or "").upper()
+        enrichment_cfg = self.discovery_cfg.get("official_product_spec_enrichment") or {}
+        if not bool(enrichment_cfg.get("enabled", False)):
+            self._product_specs_by_exchange.setdefault(exchange_key, {})
+            return {}
+        enabled_exchanges = {
+            str(item).upper()
+            for item in (enrichment_cfg.get("enabled_exchanges") or [])
+            if str(item).strip()
+        }
+        if enabled_exchanges and exchange_key not in enabled_exchanges:
+            self._product_specs_by_exchange.setdefault(exchange_key, {})
+            return {}
+        if exchange_key in self._product_specs_by_exchange:
+            return self._product_specs_by_exchange[exchange_key]
+        fetch_specs = getattr(provider, "fetch_exchange_product_specs_sync", None)
+        if not callable(fetch_specs):
+            self._product_specs_by_exchange[exchange_key] = {}
+            return {}
+        try:
+            specs = fetch_specs(exchange_key) or {}
+        except Exception as exc:
+            logger.warning(
+                "[FuturesMasterDiscovery] official product spec enrichment unavailable exchange=%s error=%s",
+                exchange_key,
+                exc,
+            )
+            specs = {}
+        self._product_specs_by_exchange[exchange_key] = {
+            str(symbol or spec.symbol or "").upper(): spec
+            for symbol, spec in specs.items()
+            if str(symbol or spec.symbol or "").strip()
+        }
+        return self._product_specs_by_exchange[exchange_key]
 
     def discover_from_rows(
         self,
@@ -4830,6 +4937,7 @@ class FuturesMasterDiscoveryGovernanceService:
             "auto_promote_high_confidence": cfg.get("auto_promote_high_confidence", True),
             "strict_unknown_variety_blocking": cfg.get("strict_unknown_variety_blocking", False),
             "telegram_review_required": cfg.get("telegram_review_required", True),
+            "official_product_spec_enrichment": dict(cfg.get("official_product_spec_enrichment") or {}),
             "enabled_exchanges": cfg.get("enabled_exchanges") or configured_exchanges,
             "adapters": {
                 **{exchange: {"enabled": True} for exchange in configured_exchanges},
@@ -5142,6 +5250,11 @@ class FuturesMasterGovernanceService:
             provider = OfficialFuturesMarketDataProvider(self.research_config)
             try:
                 metrics_before = _provider_metrics_for_exchange(provider, exchange)
+                discovery_service.load_official_product_specs(
+                    exchange,
+                    provider,
+                    warnings=result["warnings"],
+                )
                 instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
                 first_seen: Dict[str, str] = {}
                 last_seen: Dict[str, str] = {}

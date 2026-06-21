@@ -242,6 +242,13 @@
       "auto_promote_high_confidence": true,
       "strict_unknown_variety_blocking": false,
       "telegram_review_required": true,
+      "official_product_spec_enrichment": {
+        "enabled": true,
+        "enabled_exchanges": [
+          "DCE"
+        ],
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE currently uses the official browser-assisted contractInfo endpoint; unit there is contract trading unit, not quote unit."
+      },
       "enabled_exchanges": [
         "SHFE",
         "INE",
