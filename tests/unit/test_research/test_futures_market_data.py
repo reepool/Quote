@@ -1247,7 +1247,7 @@ def test_gfex_governed_product_specs_use_common_enrichment_contract(monkeypatch,
     monkeypatch.setattr(
         OfficialFuturesMarketDataProvider,
         "_fetch_gfex_product_page_specs",
-        lambda self: {},
+        lambda self, target_symbols=None: {},
     )
 
     specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("GFEX")
@@ -1319,6 +1319,80 @@ def test_gfex_official_product_page_specs_merge_with_governed_category(monkeypat
     assert spec.tick_size == 0.2
     assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
     assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
+def test_gfex_official_product_page_specs_auto_discovers_listed_product_page(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "enabled_exchanges": ["GFEX"],
+        "adapters": {
+            "GFEX": {
+                "enabled": True,
+                "listed_products_page": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
+                "product_rule_pages": {},
+                "known_products": {
+                    "ZZ": {
+                        "name": "GFEX Test Product",
+                        "category": "test_category",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                        "source_url": "GFEX governed test rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    listing_html = """
+    <html>
+      <body>
+        <dl class="sspz">
+          <dd><a href="/gfex/zz/sspz.shtml" target="_self" title="测试品种">测试品种</a></dd>
+        </dl>
+      </body>
+    </html>
+    """
+    product_html = """
+    <html>
+      <body>
+        <table>
+          <tr><td>交易品种</td><td>测试品种</td></tr>
+          <tr><td>交易单位</td><td>10吨/手</td></tr>
+          <tr><td>报价单位</td><td>元/吨</td></tr>
+          <tr><td>最小变动价位</td><td>1元/吨</td></tr>
+          <tr><td>交易代码</td><td>ZZ</td></tr>
+        </table>
+      </body>
+    </html>
+    """
+
+    def fake_request(self, session, url, symbol):
+        if symbol == "listed_products":
+            return listing_html
+        if str(url).endswith("/gfex/zz/sspz.shtml"):
+            return product_html
+        raise OfficialFuturesSourceUnavailable(f"unexpected url={url} symbol={symbol}")
+
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "_request_gfex_product_rule_page", fake_request)
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync(
+        "GFEX",
+        target_symbols=["ZZ"],
+    )
+    spec = specs["ZZ"]
+
+    assert spec.name == "测试品种"
+    assert spec.category == "test_category"
+    assert spec.currency == "CNY"
+    assert spec.unit == "CNY/ton"
+    assert spec.contract_multiplier == 10
+    assert spec.tick_size == 1
+    assert spec.source_url == "http://www.gfex.com.cn/gfex/zz/sspz.shtml"
+    assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
 
 
@@ -1434,7 +1508,7 @@ def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatc
     monkeypatch.setattr(
         OfficialFuturesMarketDataProvider,
         "_fetch_gfex_product_page_specs",
-        lambda self: {},
+        lambda self, target_symbols=None: {},
     )
     storage = FuturesStorageManager(config)
     storage.initialize()

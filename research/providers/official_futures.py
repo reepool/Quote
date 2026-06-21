@@ -305,13 +305,7 @@ class OfficialFuturesMarketDataProvider:
         **DEFAULT_HEADERS,
         "Referer": "http://www.gfex.com.cn/gfex/sspz/redirect_firstChannel.shtml",
     }
-    GFEX_PRODUCT_RULE_PAGES = {
-        "PT": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
-        "PD": "http://www.gfex.com.cn/gfex/sspzp/sspz.shtml",
-        "PS": "http://www.gfex.com.cn/gfex/djg/sspz.shtml",
-        "LC": "http://www.gfex.com.cn/gfex/tsl/sspz.shtml",
-        "SI": "http://www.gfex.com.cn/gfex/gyeg/sspz.shtml",
-    }
+    GFEX_LISTED_PRODUCTS_PAGE = "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml"
     DCE_LISTED_PRODUCTS_PAGE = "http://www.dce.com.cn/"
 
     def __init__(self, research_config: ResearchConfig):
@@ -894,7 +888,7 @@ class OfficialFuturesMarketDataProvider:
         if exchange_key == "GFEX":
             configured = self._configured_product_specs(exchange_key)
             try:
-                official_pages = self._fetch_gfex_product_page_specs()
+                official_pages = self._fetch_gfex_product_page_specs(target_symbols=target_symbols)
             except OfficialFuturesSourceUnavailable as exc:
                 logger.warning("[OfficialFutures] GFEX product page specs unavailable: %s", exc)
                 official_pages = {}
@@ -968,21 +962,48 @@ class OfficialFuturesMarketDataProvider:
             )
         return merged
 
-    def _fetch_gfex_product_page_specs(self) -> Dict[str, FuturesProductSpec]:
+    def _fetch_gfex_product_page_specs(
+        self,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
         discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
         adapter_cfg = ((discovery_cfg.get("adapters") or {}).get("GFEX") or {})
         configured_pages = adapter_cfg.get("product_rule_pages") or {}
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
         page_map = {
-            **self.GFEX_PRODUCT_RULE_PAGES,
             **{
                 str(symbol).upper(): str(url)
-                for symbol, url in configured_pages.items()
+                for symbol, url in (configured_pages.items() if isinstance(configured_pages, Mapping) else [])
                 if str(symbol).strip() and str(url).strip()
+                and (not target_symbol_set or str(symbol).upper() in target_symbol_set)
             },
         }
         specs: Dict[str, FuturesProductSpec] = {}
         failures: Dict[str, str] = {}
         with create_requests_session(tls_config=self.tls_config, headers=self.GFEX_PRODUCT_PAGE_HEADERS) as session:
+            if not target_symbol_set or len(page_map) < len(target_symbol_set):
+                discovery_url = str(adapter_cfg.get("listed_products_page") or self.GFEX_LISTED_PRODUCTS_PAGE)
+                try:
+                    discovery_html = self._request_gfex_product_rule_page(
+                        session,
+                        discovery_url,
+                        "listed_products",
+                    )
+                    existing_urls = {str(url).rstrip("/") for url in page_map.values()}
+                    for symbol_hint, url in self._discover_gfex_product_rule_pages(
+                        discovery_html,
+                        base_url=discovery_url,
+                    ).items():
+                        if str(url).rstrip("/") in existing_urls:
+                            continue
+                        page_map.setdefault(symbol_hint, url)
+                        existing_urls.add(str(url).rstrip("/"))
+                except Exception as exc:
+                    logger.warning("[OfficialFutures] GFEX product page auto-discovery unavailable: %s", exc)
             for symbol, url in sorted(page_map.items()):
                 try:
                     html = self._request_gfex_product_rule_page(session, url, symbol)
@@ -995,6 +1016,23 @@ class OfficialFuturesMarketDataProvider:
         if failures:
             logger.warning("[OfficialFutures] GFEX product page spec partial failures=%s", failures)
         return specs
+
+    def _discover_gfex_product_rule_pages(self, html: str, *, base_url: str) -> Dict[str, str]:
+        links = _html_links(html, base_url=base_url)
+        pages: Dict[str, str] = {}
+        for item in links:
+            href = str(item.get("href") or "").strip()
+            title = str(item.get("text") or "").strip()
+            if not href or not title:
+                continue
+            if "redirect_firstchannel" in href.lower():
+                continue
+            if "/gfex/" not in href.lower() or not href.lower().endswith("/sspz.shtml"):
+                continue
+            if title in {"上市品种", "品种/指数"}:
+                continue
+            pages.setdefault(title, href)
+        return pages
 
     def _fetch_dce_product_page_specs(
         self,

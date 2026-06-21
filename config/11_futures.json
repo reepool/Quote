@@ -249,7 +249,7 @@
           "DCE",
           "GFEX"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX currently parses configured official listed-product pages for the same normalized fields and merges governed category metadata."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -404,6 +404,7 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "listed_products_page": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
           "product_rule_pages": {
             "PT": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
             "PD": "http://www.gfex.com.cn/gfex/sspzp/sspz.shtml",
