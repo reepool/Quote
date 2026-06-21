@@ -93,15 +93,17 @@ class FuturesMasterDiscoveryAdapter(Protocol):
 
 上层服务只负责调度、存储、评分和 promotion，不直接写死某个交易所页面结构。
 
-## 6. GFEX 第一阶段落地
+主数据治理任务与 discovery 任务共享官方日行情读取层。对 DCE 等可能出现浏览器会话启动失败或短暂官方接口异常的交易所，首次扫描中失败的交易日应暂存为 retryable 缺口，扫描结束后按 `config/11_futures.json.master_data.contract_discovery_retry` 执行任务级补跑；补跑成功的日期不进入 warning，仍失败的日期才作为 `failed_trade_dates` 和 warning 输出。
 
-GFEX adapter 第一阶段使用：
+## 6. 通用配置型 Adapter 落地
+
+第一阶段 adapter 使用统一的配置型实现，覆盖所有已配置交易所：
 
 - 官方日行情：发现 `variety`、`contract`、首次/最近出现日期。
-- GFEX 官方品种规则页或公告：补全名称、单位、合约乘数、最小变动价位。
+- `config/11_futures.json.master_data_discovery.adapters.<EXCHANGE>.known_products`、默认 P0 主数据种子或交易所特定内置补充元数据：补全名称、单位、合约乘数、最小变动价位。
 - 必要时使用 AkShare/公开资料作为辅助校验，但不能作为唯一生产证据。
 
-GFEX promotion 规则：
+promotion 规则：
 
 - 若官方证据能确认 symbol、exchange、名称、分类、币种、报价单位，则可按配置自动 promotion。
 - 若缺少价格单位或分类，则保留为 `discovered_unverified`，发 Telegram 等待确认。
@@ -132,13 +134,13 @@ GFEX promotion 规则：
 当前已实现以下入口：
 
 ```text
-/futures_master_discovery_governance exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD dry_run max_days=N
-/run futures_master_discovery_governance exchange=GFEX start=YYYY-MM-DD end=YYYY-MM-DD write max_days=N
+/futures_master_discovery_governance exchange=DCE start=YYYY-MM-DD end=YYYY-MM-DD dry_run max_days=N
+/run futures_master_discovery_governance exchange=DCE start=YYYY-MM-DD end=YYYY-MM-DD write max_days=N
 ```
 
 任务默认 `dry_run=true`，只有显式 `write` 才会写入 `futures_master_discoveries`，并在 `auto_promote_high_confidence=true` 时对高置信候选写入 `futures_instruments` 与默认 `main_continuous` 序列。
 
-`futures_master_governance` 已集成 discovery：当 GFEX 官方日行情出现未知 `variety` 时，会先生成 discovery 候选，再保留 `unmapped_gfex_varieties` warning。已知品种合约治理继续执行，不被未知品种默认阻断。
+`futures_master_governance` 已集成 discovery：当任一已启用交易所官方日行情出现未知 `variety` 时，会先生成 discovery 候选，再保留 `unmapped_<exchange>_varieties` warning。已知品种合约治理继续执行，不被未知品种默认阻断。
 
 ## 8. 配置建议
 
@@ -151,8 +153,14 @@ GFEX promotion 规则：
     "auto_promote_high_confidence": true,
     "strict_unknown_variety_blocking": false,
     "telegram_review_required": true,
-    "enabled_exchanges": ["GFEX"],
+    "enabled_exchanges": ["SHFE", "INE", "DCE", "CZCE", "GFEX"],
     "adapters": {
+      "DCE": {
+        "enabled": true,
+        "official_product_rules": true,
+        "official_announcements": true,
+        "known_products": {}
+      },
       "GFEX": {
         "enabled": true,
         "official_product_rules": true,
@@ -169,7 +177,7 @@ GFEX promotion 规则：
 - `strict_unknown_variety_blocking=false`：未知品种不会阻断已知品种行情日更。
 - `telegram_review_required=true`：低置信候选发送人工确认通知。
 
-当前 GFEX adapter 使用官方日行情作为发现证据，并通过 `known_products` 配置或内置 GFEX P0 元数据补全名称、分类、币种和报价单位。缺少这些关键字段的候选会保持 `discovered_unverified/pending`，不会自动进入正式主数据。
+当前通用 adapter 使用官方日行情作为发现证据，并通过 `known_products` 配置、默认 P0 主数据种子或交易所特定内置补充元数据补全名称、分类、币种和报价单位。缺少这些关键字段的候选会保持 `discovered_unverified/pending`，不会自动进入正式主数据。
 
 ## 9. 数据质量边界
 
@@ -187,7 +195,7 @@ GFEX promotion 规则：
 
 1. 建表和 storage API。
 2. 定义 candidate dataclass 和 adapter protocol。
-3. 实现 GFEX adapter 的日行情发现和基础 enrichment。
+3. 实现通用配置型 adapter 的日行情发现和基础 enrichment。
 4. 集成到 `futures_master_governance`。
 5. 增加 Telegram 报告。
 6. 增加 promotion 流程。

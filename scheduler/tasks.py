@@ -982,7 +982,7 @@ def _format_futures_market_data_scheduler_report(
                 lines.append(str(item))
                 continue
             reason = item.get("reason") or "warning"
-            if reason == "unmapped_gfex_varieties":
+            if str(reason).startswith("unmapped_") and str(reason).endswith("_varieties"):
                 samples = item.get("samples") or []
                 sample_text = ", ".join(f"{symbol}:{count}" for symbol, count in samples[:10])
                 candidates = item.get("discovery_candidates") or []
@@ -1107,7 +1107,10 @@ def _format_futures_market_data_scheduler_report(
             f"batch_pause_count: `{counts.get('batch_pause_count', 0)}`\n"
             f"batch_pause_seconds: `{counts.get('batch_pause_seconds', 0)}`\n"
             f"retry_backoff_count: `{counts.get('retry_backoff_count', 0)}`\n"
-            f"retry_backoff_seconds: `{counts.get('retry_backoff_seconds', 0)}`\n\n"
+            f"retry_backoff_seconds: `{counts.get('retry_backoff_seconds', 0)}`\n"
+            f"task_retry_passes: `{counts.get('task_retry_passes', 0)}`\n"
+            f"task_retry_resolved: `{counts.get('task_retry_resolved', 0)}`\n"
+            f"failed_trade_dates: `{counts.get('failed_trade_dates', 0)}`\n\n"
             "合约样本:\n"
             "```text\n"
             + "\n".join(detail_lines)

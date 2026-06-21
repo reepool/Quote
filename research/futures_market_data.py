@@ -4381,35 +4381,8 @@ class FuturesMasterDiscoveryAdapter(Protocol):
         ...
 
 
-class GfexMasterDiscoveryAdapter:
-    """GFEX discovery adapter.
-
-    The first implementation keeps enrichment conservative. It uses official
-    daily rows as discovery evidence and a configurable product metadata map for
-    fields that must not be guessed, such as category and quote unit.
-    """
-
-    exchange = "GFEX"
-
-    default_known_products: Dict[str, Dict[str, Any]] = {
-        "LC": {
-            "name": "GFEX Lithium Carbonate",
-            "category": "new_energy_material",
-            "currency": "CNY",
-            "unit": "CNY/ton",
-        },
-        "SI": {
-            "name": "GFEX Industrial Silicon",
-            "category": "new_energy_material",
-            "currency": "CNY",
-            "unit": "CNY/ton",
-        },
-        "PS": {
-            "name": "GFEX Polysilicon",
-            "category": "new_energy_material",
-            "currency": "CNY",
-            "unit": "CNY/ton",
-        },
+EXTRA_DISCOVERY_KNOWN_PRODUCTS: Dict[str, Dict[str, Dict[str, Any]]] = {
+    "GFEX": {
         "PT": {
             "name": "GFEX Platinum",
             "category": "precious_metal",
@@ -4423,14 +4396,31 @@ class GfexMasterDiscoveryAdapter:
             "unit": "CNY/gram",
         },
     }
+}
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+
+class ConfiguredProductMasterDiscoveryAdapter:
+    """Configured product discovery adapter shared by futures exchanges.
+
+    The adapter never guesses critical master-data fields. It discovers unknown
+    varieties from official daily rows for every enabled exchange, then enriches
+    candidates only from configured or built-in product metadata.
+    """
+
+    def __init__(
+        self,
+        exchange: str,
+        config: Optional[Dict[str, Any]] = None,
+        *,
+        built_in_products: Optional[Dict[str, Dict[str, Any]]] = None,
+    ):
+        self.exchange = str(exchange or "").upper()
         cfg = dict(config or {})
         configured_products = cfg.get("known_products") or {}
         self.known_products: Dict[str, Dict[str, Any]] = {
             symbol.upper(): dict(payload)
             for symbol, payload in {
-                **self.default_known_products,
+                **dict(built_in_products or {}),
                 **dict(configured_products),
             }.items()
         }
@@ -4472,7 +4462,7 @@ class GfexMasterDiscoveryAdapter:
                     "observed_trade_dates": [trade_date],
                     "official_product_rules_enabled": self.official_product_rules,
                     "official_announcements_enabled": self.official_announcements,
-                    "adapter": "gfex_master_discovery.v1",
+                    "adapter": "configured_product_master_discovery.v1",
                 },
                 metadata={"discovered_from": "official_daily_rows"},
             )
@@ -4487,7 +4477,7 @@ class GfexMasterDiscoveryAdapter:
         if not product:
             evidence = {
                 **dict(candidate.evidence or {}),
-                "enrichment_status": "gfex_product_metadata_missing",
+                "enrichment_status": "configured_product_metadata_missing",
             }
             return FuturesMasterDiscoveryCandidate(
                 **{
@@ -4505,7 +4495,7 @@ class GfexMasterDiscoveryAdapter:
         required_complete = bool(name and category and currency and unit)
         evidence = {
             **dict(candidate.evidence or {}),
-            "enrichment_status": "configured_gfex_product_metadata",
+            "enrichment_status": "configured_product_metadata",
             "metadata_source": str(product.get("source_url") or "config/11_futures.json or built_in_seed"),
         }
         return FuturesMasterDiscoveryCandidate(
@@ -4619,7 +4609,7 @@ class FuturesMasterDiscoveryGovernanceService:
                 if adapter is None:
                     warnings.append({
                         "exchange": exchange,
-                        "reason": "master_discovery_adapter_not_implemented",
+                        "reason": "master_discovery_adapter_disabled",
                     })
                     continue
                 verified_days = self._verified_trading_days(exchange=exchange, start_date=start, end_date=end)
@@ -4740,9 +4730,11 @@ class FuturesMasterDiscoveryGovernanceService:
         adapter_cfg = ((self.discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
         if not bool(adapter_cfg.get("enabled", True)):
             return None
-        if exchange_key == "GFEX":
-            return GfexMasterDiscoveryAdapter(adapter_cfg)
-        return None
+        return ConfiguredProductMasterDiscoveryAdapter(
+            exchange_key,
+            adapter_cfg,
+            built_in_products=self._built_in_discovery_products(exchange_key),
+        )
 
     def discover_from_rows(
         self,
@@ -4807,14 +4799,35 @@ class FuturesMasterDiscoveryGovernanceService:
         cfg = self.module_cfg.get("master_data_discovery") or {}
         if not isinstance(cfg, dict):
             cfg = {}
+        configured_exchanges = _configured_futures_exchanges(self.module_cfg)
         return {
             "enabled": cfg.get("enabled", True),
             "auto_promote_high_confidence": cfg.get("auto_promote_high_confidence", True),
             "strict_unknown_variety_blocking": cfg.get("strict_unknown_variety_blocking", False),
             "telegram_review_required": cfg.get("telegram_review_required", True),
-            "enabled_exchanges": cfg.get("enabled_exchanges") or ["GFEX"],
-            "adapters": cfg.get("adapters") or {"GFEX": {"enabled": True}},
+            "enabled_exchanges": cfg.get("enabled_exchanges") or configured_exchanges,
+            "adapters": {
+                **{exchange: {"enabled": True} for exchange in configured_exchanges},
+                **dict(cfg.get("adapters") or {}),
+            },
         }
+
+    def _built_in_discovery_products(self, exchange: str) -> Dict[str, Dict[str, Any]]:
+        exchange_key = str(exchange or "").upper()
+        registry = default_futures_registry(self.module_cfg)
+        products = {
+            item.symbol.upper(): {
+                "name": item.name,
+                "category": item.category,
+                "currency": item.currency,
+                "unit": item.unit,
+                "source_url": "built_in_default_futures_registry",
+            }
+            for item in registry["instruments"]
+            if item.exchange.upper() == exchange_key and item.active
+        }
+        products.update(EXTRA_DISCOVERY_KNOWN_PRODUCTS.get(exchange_key, {}))
+        return products
 
     def _default_discovery_start(self, exchanges: Sequence[str]) -> str:
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}
@@ -5077,6 +5090,9 @@ class FuturesMasterGovernanceService:
                 "batch_pause_seconds": 0.0,
                 "retry_backoff_count": 0,
                 "retry_backoff_seconds": 0.0,
+                "task_retry_passes": 0,
+                "task_retry_resolved": 0,
+                "failed_trade_dates": 0,
             },
             "warnings": [],
             "blockers": [],
@@ -5086,6 +5102,7 @@ class FuturesMasterGovernanceService:
         contracts_by_id: Dict[str, FuturesContract] = {}
         unmapped_varieties: Dict[str, int] = {}
         discovery_candidates: List[FuturesMasterDiscoveryCandidate] = []
+        failed_fetches: Dict[str, str] = {}
         discovery_service = FuturesMasterDiscoveryGovernanceService(
             self.storage,
             self.research_config,
@@ -5103,16 +5120,7 @@ class FuturesMasterGovernanceService:
                 instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
                 first_seen: Dict[str, str] = {}
                 last_seen: Dict[str, str] = {}
-                for trade_date in verified_days:
-                    try:
-                        rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
-                        result["counts"]["official_request_count"] += 1
-                    except OfficialFuturesSourceUnavailable as exc:
-                        result["warnings"].append({
-                            "trade_date": trade_date,
-                            "reason": str(exc),
-                        })
-                        continue
+                def process_rows(trade_date: str, rows: Sequence[Any]) -> None:
                     discovery_candidates.extend(
                         discovery_service.discover_from_rows(
                             exchange=exchange,
@@ -5157,6 +5165,33 @@ class FuturesMasterGovernanceService:
                                 ],
                             },
                         )
+                for trade_date in verified_days:
+                    try:
+                        result["counts"]["official_request_count"] += 1
+                        rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
+                    except OfficialFuturesSourceUnavailable as exc:
+                        failed_fetches[trade_date] = str(exc)
+                        continue
+                    process_rows(trade_date, rows)
+                retry_cfg = self._contract_discovery_retry_config()
+                retry_pass_limit = int(retry_cfg["retry_passes"])
+                retry_pause_seconds = float(retry_cfg["retry_pause_seconds"])
+                for retry_pass in range(1, retry_pass_limit + 1):
+                    if not failed_fetches:
+                        break
+                    if retry_pause_seconds > 0:
+                        time.sleep(retry_pause_seconds)
+                    result["counts"]["task_retry_passes"] = retry_pass
+                    for trade_date in list(failed_fetches):
+                        try:
+                            result["counts"]["official_request_count"] += 1
+                            rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
+                        except OfficialFuturesSourceUnavailable as exc:
+                            failed_fetches[trade_date] = str(exc)
+                            continue
+                        process_rows(trade_date, rows)
+                        failed_fetches.pop(trade_date, None)
+                        result["counts"]["task_retry_resolved"] += 1
                 for contract_id, item in list(contracts_by_id.items()):
                     metadata = dict(item.metadata)
                     metadata["first_observed_trade_date"] = first_seen.get(contract_id)
@@ -5181,6 +5216,15 @@ class FuturesMasterGovernanceService:
                 start_date=start,
                 end_date=end,
                 dry_run=dry_run,
+            )
+        if failed_fetches:
+            result["counts"]["failed_trade_dates"] = len(failed_fetches)
+            result["warnings"].extend(
+                {
+                    "trade_date": trade_date,
+                    "reason": reason,
+                }
+                for trade_date, reason in sorted(failed_fetches.items())
             )
 
         contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
@@ -5248,6 +5292,14 @@ class FuturesMasterGovernanceService:
             dry_run,
         )
         return result
+
+    def _contract_discovery_retry_config(self) -> Dict[str, Any]:
+        master_cfg = self.module_cfg.get("master_data") or {}
+        retry_cfg = master_cfg.get("contract_discovery_retry") or {}
+        return {
+            "retry_passes": max(0, int(retry_cfg.get("retry_passes", 1))),
+            "retry_pause_seconds": max(0.0, float(retry_cfg.get("retry_pause_seconds", 2))),
+        }
 
     def _default_contract_discovery_start(self, exchange: str) -> str:
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}

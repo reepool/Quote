@@ -212,6 +212,10 @@
       "default_research_series_type": "main_continuous",
       "category_dictionary": "managed_enum",
       "default_timezone": "Asia/Shanghai",
+      "contract_discovery_retry": {
+        "retry_passes": 1,
+        "retry_pause_seconds": 2
+      },
       "future_extension_markets": [
         "CME",
         "ICE",
@@ -239,9 +243,37 @@
       "strict_unknown_variety_blocking": false,
       "telegram_review_required": true,
       "enabled_exchanges": [
+        "SHFE",
+        "INE",
+        "DCE",
+        "CZCE",
         "GFEX"
       ],
       "adapters": {
+        "SHFE": {
+          "enabled": true,
+          "official_product_rules": true,
+          "official_announcements": true,
+          "known_products": {}
+        },
+        "INE": {
+          "enabled": true,
+          "official_product_rules": true,
+          "official_announcements": true,
+          "known_products": {}
+        },
+        "DCE": {
+          "enabled": true,
+          "official_product_rules": true,
+          "official_announcements": true,
+          "known_products": {}
+        },
+        "CZCE": {
+          "enabled": true,
+          "official_product_rules": true,
+          "official_announcements": true,
+          "known_products": {}
+        },
         "GFEX": {
           "enabled": true,
           "official_product_rules": true,

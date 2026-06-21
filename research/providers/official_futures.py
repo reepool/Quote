@@ -116,6 +116,7 @@ class DceOfficialBrowserClient:
             "headless": self.headless,
             "browser_args": self.browser_args,
             "sandbox": False,
+            "no_sandbox": True,
             "lang": "zh-CN",
         }
         if self.browser_executable_path:

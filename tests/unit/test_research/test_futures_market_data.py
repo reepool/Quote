@@ -435,6 +435,78 @@ def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path
     assert storage.list_contracts(exchange="DCE") == []
 
 
+def test_dce_master_governance_retries_failed_trade_dates(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data"] = {
+        "contract_discovery_retry": {
+            "retry_passes": 1,
+            "retry_pause_seconds": 0,
+        }
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        ),
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-03",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        ),
+    ])
+    calls = {}
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        calls[trade_date] = calls.get(trade_date, 0) + 1
+        if trade_date == "2026-01-02" and calls[trade_date] == 1:
+            raise OfficialFuturesSourceUnavailable("temporary DCE browser startup failure")
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="I",
+                contract="I2601",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-03",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["counts"]["official_request_count"] == 3
+    assert result["counts"]["task_retry_passes"] == 1
+    assert result["counts"]["task_retry_resolved"] == 1
+    assert result["counts"]["failed_trade_dates"] == 0
+    assert result["warnings"] == []
+    assert calls == {"2026-01-02": 2, "2026-01-03": 1}
+
+
 def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())
@@ -612,20 +684,20 @@ def test_futures_master_discovery_storage_idempotency_and_conflict(tmp_path):
     assert "candidate_unit" in conflict["evidence"]["conflict_fields"]
 
 
-def test_futures_master_discovery_governance_auto_promotes_high_confidence(monkeypatch, tmp_path):
+def test_futures_master_discovery_governance_auto_promotes_dce_high_confidence(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()
     module_cfg["master_data_discovery"] = {
         "enabled": True,
         "auto_promote_high_confidence": True,
-        "enabled_exchanges": ["GFEX"],
+        "enabled_exchanges": ["DCE"],
         "adapters": {
-            "GFEX": {
+            "DCE": {
                 "enabled": True,
                 "known_products": {
                     "XY": {
-                        "name": "GFEX Test Product",
-                        "category": "new_energy_material",
+                        "name": "DCE Test Product",
+                        "category": "chemical",
                         "currency": "CNY",
                         "unit": "CNY/ton",
                     }
@@ -638,7 +710,7 @@ def test_futures_master_discovery_governance_auto_promotes_high_confidence(monke
     storage.initialize()
     storage.upsert_trading_calendar([
         FuturesTradingCalendarDay(
-            exchange="GFEX",
+            exchange="DCE",
             trade_date="2026-01-02",
             is_trading_day=True,
             source_profile="exchange_official_daily_probe",
@@ -667,7 +739,7 @@ def test_futures_master_discovery_governance_auto_promotes_high_confidence(monke
         config,
         config.modules["commodity_market_data"],
     ).run(
-        scope_id="gfex_all",
+        exchanges=["DCE"],
         start_date="2026-01-02",
         end_date="2026-01-02",
         dry_run=False,
@@ -677,8 +749,8 @@ def test_futures_master_discovery_governance_auto_promotes_high_confidence(monke
     assert result["counts"]["candidates_discovered"] == 1
     assert result["counts"]["candidates_written"] == 1
     assert result["counts"]["auto_promoted"] == 1
-    assert storage.get_instrument("CNF.XY.GFEX")["symbol"] == "XY"
-    assert storage.get_series("CNF.XY.GFEX.main")["instrument_id"] == "CNF.XY.GFEX"
+    assert storage.get_instrument("CNF.XY.DCE")["symbol"] == "XY"
+    assert storage.get_series("CNF.XY.DCE.main")["instrument_id"] == "CNF.XY.DCE"
 
 
 def test_futures_master_discovery_pending_review_blocks_readiness_warning(monkeypatch, tmp_path):
