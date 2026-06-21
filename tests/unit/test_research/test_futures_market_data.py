@@ -1141,6 +1141,87 @@ def test_futures_master_discovery_promotes_dce_when_product_spec_and_rule_metada
     assert storage.get_series("CNF.BZ.DCE.main")["instrument_id"] == "CNF.BZ.DCE"
 
 
+def test_futures_master_discovery_preserves_legacy_product_lineage(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": False},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {
+            "DCE": {
+                "enabled": True,
+                "known_products": {
+                    "S": {
+                        "name": "大豆",
+                        "category": "agriculture",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                        "legacy_product": True,
+                        "legacy_product_name": "old yellow soybean",
+                        "successor_family": ["CNF.A.DCE", "CNF.B.DCE"],
+                        "primary_chronological_successor": "CNF.A.DCE",
+                        "oilseed_import_soybean_successor": "CNF.B.DCE",
+                        "lineage_note": "legacy soybean split into A and B successor families",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2002-07-01",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="S",
+                contract="S0209",
+                raw_payload={"variety": "大豆", "contractId": "S0209"},
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2002-07-01",
+        end_date="2002-07-01",
+        dry_run=False,
+    )
+    instrument = storage.get_instrument("CNF.S.DCE")
+    metadata = instrument["metadata"]
+    lineage = metadata["master_discovery_evidence"]["product_lineage"]
+
+    assert result["status"] == "success"
+    assert result["counts"]["auto_promoted"] == 1
+    assert instrument["name"] == "大豆"
+    assert lineage["legacy_product"] is True
+    assert lineage["successor_family"] == ["CNF.A.DCE", "CNF.B.DCE"]
+    assert lineage["primary_chronological_successor"] == "CNF.A.DCE"
+    assert lineage["oilseed_import_soybean_successor"] == "CNF.B.DCE"
+
+
 def test_futures_master_discovery_pending_review_blocks_readiness_warning(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())

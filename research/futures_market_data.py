@@ -4569,6 +4569,21 @@ class ConfiguredProductMasterDiscoveryAdapter:
             "enrichment_status": enrichment_status,
             "metadata_source": metadata_source,
         }
+        lineage_keys = (
+            "legacy_product",
+            "legacy_product_name",
+            "successor_family",
+            "primary_chronological_successor",
+            "oilseed_import_soybean_successor",
+            "lineage_note",
+        )
+        lineage_metadata = {
+            key: product.get(key)
+            for key in lineage_keys
+            if product.get(key) not in (None, "", [])
+        }
+        if lineage_metadata:
+            evidence["product_lineage"] = lineage_metadata
         if source_payload:
             evidence["official_product_spec"] = {
                 key: source_payload.get(key)

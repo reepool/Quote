@@ -352,6 +352,22 @@
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
+            "S": {
+              "name": "大豆",
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "source_url": "DCE official historical dayQuotes rows; legacy soybean root variety not present in current /dcereport/publicweb/tradepara/contractInfo",
+              "legacy_product": true,
+              "legacy_product_name": "old yellow soybean",
+              "successor_family": [
+                "CNF.A.DCE",
+                "CNF.B.DCE"
+              ],
+              "primary_chronological_successor": "CNF.A.DCE",
+              "oilseed_import_soybean_successor": "CNF.B.DCE",
+              "lineage_note": "DCE S was the legacy soybean/yellow soybean root. After DCE split soybean contracts, A became the primary chronological non-GMO yellow soybean No.1 successor and B became the oilseed/import soybean No.2 successor."
+            },
             "Y": {
               "category": "agriculture",
               "currency": "CNY",
