@@ -735,8 +735,8 @@
           "mode": "direct",
           "dry_run": false,
           "requires_trading_day_governance": true,
-          "requires_master_data_governance": false,
-          "master_governance_max_days": 10,
+          "requires_master_data_governance": true,
+          "master_governance_max_days": null,
           "max_runtime_seconds": 14400,
           "note": "Historical backfill must be run with explicit start_date/end_date and bounded series_ids."
         }

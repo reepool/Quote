@@ -245,9 +245,10 @@
       "official_product_spec_enrichment": {
         "enabled": true,
         "enabled_exchanges": [
-          "DCE"
+          "DCE",
+          "GFEX"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE currently uses the official browser-assisted contractInfo endpoint; unit there is contract trading unit, not quote unit."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE currently uses the official browser-assisted contractInfo endpoint; unit there is contract trading unit, not quote unit. GFEX currently parses official listed-product pages for product name, code, quote unit, trading unit, and tick size, then merges governed category metadata where the official page does not expose internal taxonomy."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -400,36 +401,48 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "product_rule_pages": {
+            "PT": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
+            "PD": "http://www.gfex.com.cn/gfex/sspzp/sspz.shtml",
+            "PS": "http://www.gfex.com.cn/gfex/djg/sspz.shtml",
+            "LC": "http://www.gfex.com.cn/gfex/tsl/sspz.shtml",
+            "SI": "http://www.gfex.com.cn/gfex/gyeg/sspz.shtml"
+          },
           "known_products": {
             "LC": {
               "name": "GFEX Lithium Carbonate",
               "category": "new_energy_material",
               "currency": "CNY",
-              "unit": "CNY/ton"
+              "unit": "CNY/ton",
+              "source_url": "GFEX official daily rows and governed product-rule metadata seed"
             },
             "SI": {
               "name": "GFEX Industrial Silicon",
               "category": "new_energy_material",
               "currency": "CNY",
-              "unit": "CNY/ton"
+              "unit": "CNY/ton",
+              "source_url": "GFEX official daily rows and governed product-rule metadata seed"
             },
             "PS": {
               "name": "GFEX Polysilicon",
               "category": "new_energy_material",
               "currency": "CNY",
-              "unit": "CNY/ton"
+              "unit": "CNY/ton",
+              "source_url": "GFEX official daily rows and governed product-rule metadata seed"
             },
             "PT": {
               "name": "GFEX Platinum",
               "category": "precious_metal",
               "currency": "CNY",
-              "unit": "CNY/gram"
+              "unit": "CNY/gram",
+              "source_url": "GFEX official daily rows and governed product-rule metadata seed"
             },
             "PD": {
               "name": "GFEX Palladium",
               "category": "precious_metal",
               "currency": "CNY",
-              "unit": "CNY/gram"
+              "unit": "CNY/gram",
+              "source_url": "GFEX official daily rows and governed product-rule metadata seed"
             }
           }
         }

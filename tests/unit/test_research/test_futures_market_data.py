@@ -1114,6 +1114,10 @@ def test_futures_master_discovery_uses_daily_name_when_known_product_lacks_name(
     assert result["counts"]["auto_promoted"] == 1
     assert row["candidate_name"] == "纯苯"
     assert row["evidence"]["name_source"] == "official_daily_rows"
+    assert row["evidence"]["missing_required_fields"] == []
+    assert row["evidence"]["field_sources"]["name"]["source_type"] == "official_daily_rows"
+    assert row["evidence"]["field_sources"]["category"]["source_type"] == "governed_rule_metadata"
+    assert row["evidence"]["field_sources"]["unit"]["source_type"] == "governed_rule_metadata"
     assert instrument["name"] == "纯苯"
 
 
@@ -1205,12 +1209,195 @@ def test_futures_master_discovery_promotes_dce_when_product_spec_and_rule_metada
     assert row["candidate_name"] == "纯苯"
     assert row["candidate_category"] == "chemical"
     assert row["candidate_unit"] == "CNY/ton"
+    assert row["evidence"]["missing_required_fields"] == []
+    assert row["evidence"]["field_sources"]["name"]["source_type"] == "official_product_spec"
+    assert row["evidence"]["field_sources"]["category"]["source_type"] == "governed_rule_metadata"
+    assert row["evidence"]["field_sources"]["unit"]["source_type"] == "governed_rule_metadata"
     assert row["contract_multiplier"] == 30
     assert row["tick_size"] == 1
     assert row["quality_flag"] == "promoted"
     assert row["review_status"] == "auto_promoted"
     assert instrument["symbol"] == "BZ"
     assert storage.get_series("CNF.BZ.DCE.main")["instrument_id"] == "CNF.BZ.DCE"
+
+
+def test_gfex_governed_product_specs_use_common_enrichment_contract(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "enabled_exchanges": ["GFEX"],
+        "adapters": {
+            "GFEX": {
+                "enabled": True,
+                "known_products": {
+                    "ZZ": {
+                        "name": "GFEX Test Product",
+                        "category": "test_category",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                        "source_url": "GFEX governed test rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "_fetch_gfex_product_page_specs",
+        lambda self: {},
+    )
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("GFEX")
+
+    assert set(specs) == {"ZZ"}
+    assert specs["ZZ"].name == "GFEX Test Product"
+    assert specs["ZZ"].category == "test_category"
+    assert specs["ZZ"].unit == "CNY/ton"
+    assert specs["ZZ"].source_profile == "governed_product_rule_metadata"
+    assert specs["ZZ"].field_sources["name"]["source_type"] == "governed_rule_metadata"
+    assert specs["ZZ"].field_sources["unit"]["source_ref"] == "GFEX governed test rule"
+
+
+def test_gfex_official_product_page_specs_merge_with_governed_category(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "enabled_exchanges": ["GFEX"],
+        "adapters": {
+            "GFEX": {
+                "enabled": True,
+                "product_rule_pages": {"PT": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml"},
+                "known_products": {
+                    "PT": {
+                        "name": "GFEX Platinum",
+                        "category": "precious_metal",
+                        "currency": "CNY",
+                        "unit": "CNY/gram",
+                        "source_url": "GFEX governed platinum rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    html = """
+    <html>
+      <head><meta name="ColumnName" content="铂" /></head>
+      <body>
+        <table>
+          <tr><td>交易品种</td><td>铂</td></tr>
+          <tr><td>交易单位</td><td>1000克/手</td></tr>
+          <tr><td>报价单位</td><td>元（人民币）/克</td></tr>
+          <tr><td>最小变动价位</td><td>0.2元/克</td></tr>
+          <tr><td>交易代码</td><td>PT</td></tr>
+        </table>
+      </body>
+    </html>
+    """
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "_request_gfex_product_rule_page",
+        lambda self, session, url, symbol: html if symbol == "PT" else (_ for _ in ()).throw(
+            OfficialFuturesSourceUnavailable("not part of test")
+        ),
+    )
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("GFEX")
+    spec = specs["PT"]
+
+    assert spec.name == "铂"
+    assert spec.category == "precious_metal"
+    assert spec.currency == "CNY"
+    assert spec.unit == "CNY/gram"
+    assert spec.contract_multiplier == 1000
+    assert spec.tick_size == 0.2
+    assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
+def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["GFEX"]},
+        "enabled_exchanges": ["GFEX"],
+        "adapters": {
+            "GFEX": {
+                "enabled": True,
+                "known_products": {
+                    "ZZ": {
+                        "name": "GFEX Test Product",
+                        "category": "test_category",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                        "source_url": "GFEX governed test rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "_fetch_gfex_product_page_specs",
+        lambda self: {},
+    )
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="GFEX",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="ZZ",
+                contract="ZZ2601",
+                raw_payload={"variety": "测试品种", "varietyOrder": "ZZ", "delivMonth": "2601"},
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["GFEX"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+    row = storage.list_master_discoveries(exchange="GFEX", variety_symbol="ZZ")[0]
+    instrument = storage.get_instrument("CNF.ZZ.GFEX")
+
+    assert result["status"] == "success"
+    assert result["counts"]["auto_promoted"] == 1
+    assert row["evidence"]["missing_required_fields"] == []
+    assert row["evidence"]["field_sources"]["name"]["source_type"] == "governed_rule_metadata"
+    assert instrument["name"] == "GFEX Test Product"
 
 
 def test_futures_master_discovery_preserves_legacy_product_lineage(monkeypatch, tmp_path):

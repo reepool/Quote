@@ -65,6 +65,46 @@ def test_futures_market_data_report_distinguishes_actual_calendar_quality_from_t
     assert "would_write=843" in report
 
 
+def test_futures_market_data_report_includes_master_governance_summary():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "success",
+            "dry_run": False,
+            "scope_selection": {"exchanges": ["GFEX"]},
+            "totals": {
+                "inserted": 1,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": 0,
+                "calendar_skipped": 0,
+                "provider_empty_on_trading_day": 0,
+            },
+            "trading_day_governance": {"status": "success", "target_date_count": 1},
+            "master_data_governance": {
+                "status": "warning",
+                "counts": {
+                    "candidates": 2,
+                    "pending": 1,
+                    "auto_promoted": 1,
+                },
+            },
+            "series": [
+                {
+                    "series_id": "CNF.SI.GFEX.main",
+                    "fetched_rows": 1,
+                    "write_result": {"inserted": 1},
+                    "status": "success",
+                }
+            ],
+        }
+    )
+
+    assert "master_data_governance: `warning`" in report
+    assert "master_discovery_candidates: `2`" in report
+    assert "master_discovery_pending: `1`" in report
+    assert "master_discovery_auto_promoted: `1`" in report
+
+
 def test_futures_market_data_report_splits_series_details_by_exchange():
     result = {
         "status": "success",
@@ -534,8 +574,26 @@ def test_futures_market_data_sync_runs_master_governance_per_exchange():
     )
     data_manager.run_futures_master_governance = AsyncMock(
         side_effect=[
-            {"status": "success", "exchange": "DCE", "blockers": []},
-            {"status": "success", "exchange": "GFEX", "blockers": []},
+            {
+                "status": "success",
+                "exchange": "DCE",
+                "counts": {
+                    "master_discovery_candidates": 1,
+                    "master_discovery_pending_review": 0,
+                    "master_discovery_auto_promoted": 1,
+                },
+                "blockers": [],
+            },
+            {
+                "status": "success",
+                "exchange": "GFEX",
+                "counts": {
+                    "master_discovery_candidates": 2,
+                    "master_discovery_pending_review": 1,
+                    "master_discovery_auto_promoted": 1,
+                },
+                "blockers": [],
+            },
         ]
     )
     data_manager.run_futures_market_data_sync = AsyncMock(
@@ -568,6 +626,10 @@ def test_futures_market_data_sync_runs_master_governance_per_exchange():
     assert calls[0].kwargs["end_date"] == "2026-06-19"
     assert calls[1].kwargs["exchanges"] == ["GFEX"]
     data_manager.run_futures_market_data_sync.assert_awaited_once()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    assert "master_discovery_candidates: `3`" in report_data["content"]
+    assert "master_discovery_pending: `1`" in report_data["content"]
+    assert "master_discovery_auto_promoted: `2`" in report_data["content"]
 
 
 def test_futures_market_data_sync_blocks_when_one_exchange_master_governance_blocks():

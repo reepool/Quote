@@ -964,6 +964,51 @@ def _futures_result_exchange_label(result: Dict[str, Any]) -> str:
     return ",".join(str(item).upper() for item in exchanges if item) or "configured"
 
 
+def _summarize_futures_master_governance_results(results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    counts = {
+        "candidates": 0,
+        "pending": 0,
+        "auto_promoted": 0,
+        "contracts_discovered": 0,
+        "contracts_written": 0,
+    }
+    summaries = []
+    statuses = []
+    for item in results:
+        status = str(item.get("status") or "unknown")
+        statuses.append(status)
+        item_counts = item.get("counts") or {}
+        counts["candidates"] += int(item_counts.get("master_discovery_candidates", 0) or 0)
+        counts["pending"] += int(item_counts.get("master_discovery_pending_review", 0) or 0)
+        counts["auto_promoted"] += int(item_counts.get("master_discovery_auto_promoted", 0) or 0)
+        counts["contracts_discovered"] += int(item_counts.get("contracts_discovered", 0) or 0)
+        counts["contracts_written"] += int(item_counts.get("contracts_written", 0) or 0)
+        summaries.append({
+            "exchange": item.get("exchange"),
+            "status": status,
+            "counts": {
+                "master_discovery_candidates": item_counts.get("master_discovery_candidates", 0),
+                "master_discovery_pending_review": item_counts.get("master_discovery_pending_review", 0),
+                "master_discovery_auto_promoted": item_counts.get("master_discovery_auto_promoted", 0),
+                "contracts_discovered": item_counts.get("contracts_discovered", 0),
+                "contracts_written": item_counts.get("contracts_written", 0),
+            },
+            "blockers": item.get("blockers") or [],
+            "warnings": item.get("warnings") or [],
+        })
+    if any(status == "blocked" for status in statuses):
+        aggregate_status = "blocked"
+    elif any(status in {"warning", "partial"} for status in statuses):
+        aggregate_status = "warning"
+    else:
+        aggregate_status = "success" if statuses else "skipped"
+    return {
+        "status": aggregate_status,
+        "counts": counts,
+        "results": summaries,
+    }
+
+
 def _format_futures_market_data_scheduler_report(
     result: Dict[str, Any],
     *,
@@ -1012,6 +1057,7 @@ def _format_futures_market_data_scheduler_report(
         warnings = result.get("warnings") or []
         detail_lines = []
         for item in (result.get("candidates") or [])[:12]:
+            missing_fields = item.get("missing_required_fields") or []
             detail_lines.append(
                 f"{item.get('discovery_id', 'unknown')}: "
                 f"name={item.get('candidate_name') or 'N/A'}, "
@@ -1019,6 +1065,7 @@ def _format_futures_market_data_scheduler_report(
                 f"unit={item.get('candidate_unit') or 'N/A'}, "
                 f"quality={item.get('quality_flag') or 'N/A'}, "
                 f"review={item.get('review_status') or 'N/A'}, "
+                f"missing={','.join(missing_fields) if missing_fields else 'none'}, "
                 f"first={item.get('first_seen_trade_date') or 'N/A'}, "
                 f"last={item.get('last_seen_trade_date') or 'N/A'}"
             )
@@ -1217,6 +1264,8 @@ def _format_futures_market_data_scheduler_report(
                 }.get(item, 0),
             )
     actual_calendar_quality = actual_calendar_quality or "N/A"
+    master_governance = result.get("master_data_governance") or {}
+    master_counts = master_governance.get("counts") or {}
     series = series_override if series_override is not None else (result.get("series") or [])
     detail_lines = []
     if include_series_details:
@@ -1251,6 +1300,10 @@ def _format_futures_market_data_scheduler_report(
         f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
         f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
         f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
+        f"master_data_governance: `{master_governance.get('status', 'N/A')}`\n"
+        f"master_discovery_candidates: `{master_counts.get('candidates', 0)}`\n"
+        f"master_discovery_pending: `{master_counts.get('pending', 0)}`\n"
+        f"master_discovery_auto_promoted: `{master_counts.get('auto_promoted', 0)}`\n"
         f"target_trade_dates: `{governance.get('target_date_count', 0)}`\n"
         f"calendar_quality: `{actual_calendar_quality}`\n"
         f"calendar_min_required: `{governance.get('minimum_quality', 'N/A')}`\n\n"
@@ -3062,13 +3115,14 @@ class ScheduledTasks:
         mode: str = "direct",
         dry_run: bool = False,
         requires_trading_day_governance: bool = True,
-        requires_master_data_governance: bool = False,
+        requires_master_data_governance: bool = True,
         master_governance_max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """商品期货行情日更任务。"""
         self._active_tasks.add('futures_market_data_sync')
         try:
+            master_results: List[Dict[str, Any]] = []
             if requires_trading_day_governance:
                 governance_result = await data_manager.run_futures_trading_day_governance(
                     scope_id=scope_id,
@@ -3131,7 +3185,6 @@ class ScheduledTasks:
                         "[Scheduler] Futures master governance skipped because trading-day governance returned no target dates"
                     )
                 else:
-                    master_results = []
                     exchange_dates = {
                         str(exchange).upper(): sorted(str(item) for item in dates or [] if item)
                         for exchange, dates in target_dates_by_exchange.items()
@@ -3227,6 +3280,8 @@ class ScheduledTasks:
                 mode=mode,
                 dry_run=dry_run,
             )
+            if master_results:
+                result["master_data_governance"] = _summarize_futures_master_governance_results(master_results)
             status = result.get('status', 'failed')
             success = status == 'success'
             for index, content in enumerate(_format_futures_market_data_scheduler_reports(result), start=1):
@@ -3294,7 +3349,7 @@ class ScheduledTasks:
         mode: str = "direct",
         dry_run: bool = False,
         requires_trading_day_governance: bool = True,
-        requires_master_data_governance: bool = False,
+        requires_master_data_governance: bool = True,
         master_governance_max_days: Optional[int] = None,
         job_config: Optional[JobConfig] = None,
     ) -> bool:

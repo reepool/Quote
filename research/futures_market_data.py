@@ -617,6 +617,7 @@ class FuturesProductSpec:
     source_url: str = ""
     quality_flag: str = "official_product_spec_partial"
     evidence: Dict[str, Any] = field(default_factory=dict)
+    field_sources: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -4437,26 +4438,112 @@ class ConfiguredProductMasterDiscoveryAdapter:
         self.exchange = str(exchange or "").upper()
         cfg = dict(config or {})
         configured_products = cfg.get("known_products") or {}
-        self.known_products: Dict[str, Dict[str, Any]] = {
-            symbol.upper(): dict(payload)
-            for symbol, payload in {
-                **dict(built_in_products or {}),
-                **dict(configured_products),
-            }.items()
-        }
+        self.known_products: Dict[str, Dict[str, Any]] = {}
+        for symbol, payload in dict(built_in_products or {}).items():
+            symbol_key = str(symbol or "").upper()
+            if not symbol_key:
+                continue
+            self.known_products[symbol_key] = self._with_field_sources(
+                dict(payload),
+                source_type="governed_rule_metadata",
+                source_ref=str((payload or {}).get("source_url") or "built_in_default_futures_registry"),
+                quality_flag="governed_rule_seed",
+            )
+        for symbol, payload in dict(configured_products or {}).items():
+            symbol_key = str(symbol or "").upper()
+            if not symbol_key:
+                continue
+            self.known_products[symbol_key] = self._with_field_sources(
+                {
+                    **dict(self.known_products.get(symbol_key) or {}),
+                    **dict(payload or {}),
+                },
+                source_type="governed_rule_metadata",
+                source_ref=str((payload or {}).get("source_url") or "config/11_futures.json"),
+                quality_flag="governed_rule_verified",
+            )
         for symbol, spec in dict(product_specs or {}).items():
             symbol_key = str(symbol or spec.symbol or "").upper()
             if not symbol_key:
                 continue
             spec_payload = asdict(spec)
             existing = self.known_products.get(symbol_key, {})
-            self.known_products[symbol_key] = {
+            existing_field_sources = dict(existing.get("_field_sources") or {})
+            merged = {
                 **spec_payload,
                 **{key: value for key, value in existing.items() if value not in (None, "")},
                 "official_product_spec": spec_payload,
             }
+            field_sources = {}
+            for field_name in (
+                "name",
+                "category",
+                "currency",
+                "unit",
+                "contract_multiplier",
+                "tick_size",
+            ):
+                existing_value = existing.get(field_name)
+                spec_value = spec_payload.get(field_name)
+                if existing_value not in (None, ""):
+                    field_sources[field_name] = existing_field_sources.get(field_name) or self._field_source(
+                        source_type="governed_rule_metadata",
+                        source_ref=str(existing.get("source_url") or "config/11_futures.json"),
+                        quality_flag="governed_rule_verified",
+                    )
+                elif spec_value not in (None, ""):
+                    field_sources[field_name] = (spec.field_sources or {}).get(field_name) or self._field_source(
+                        source_type="official_product_spec",
+                        source_ref=str(spec.source_interface or spec.source_url or "official_product_spec"),
+                        quality_flag=str(spec.quality_flag or "official_product_spec_partial"),
+                    )
+            merged["_field_sources"] = field_sources
+            self.known_products[symbol_key] = merged
         self.official_product_rules = bool(cfg.get("official_product_rules", True))
         self.official_announcements = bool(cfg.get("official_announcements", True))
+
+    @staticmethod
+    def _field_source(
+        *,
+        source_type: str,
+        source_ref: str,
+        quality_flag: str,
+    ) -> Dict[str, str]:
+        return {
+            "source_type": source_type,
+            "source_ref": source_ref,
+            "quality_flag": quality_flag,
+        }
+
+    @classmethod
+    def _with_field_sources(
+        cls,
+        payload: Dict[str, Any],
+        *,
+        source_type: str,
+        source_ref: str,
+        quality_flag: str,
+    ) -> Dict[str, Any]:
+        field_sources = dict(payload.get("_field_sources") or {})
+        for field_name in (
+            "name",
+            "category",
+            "currency",
+            "unit",
+            "contract_multiplier",
+            "tick_size",
+        ):
+            if payload.get(field_name) not in (None, ""):
+                field_sources.setdefault(
+                    field_name,
+                    cls._field_source(
+                        source_type=source_type,
+                        source_ref=source_ref,
+                        quality_flag=quality_flag,
+                    ),
+                )
+        payload["_field_sources"] = field_sources
+        return payload
 
     def discover_from_daily_rows(
         self,
@@ -4556,6 +4643,23 @@ class ConfiguredProductMasterDiscoveryAdapter:
             or ""
         )
         required_complete = bool(name and category and currency and unit)
+        field_sources = dict(product.get("_field_sources") or {})
+        if official_name and not field_sources.get("name"):
+            field_sources["name"] = self._field_source(
+                source_type="official_daily_rows",
+                source_ref=str((candidate.evidence or {}).get("source_interface") or "official_daily_rows"),
+                quality_flag="official_daily_name_evidence",
+            )
+        missing_required_fields = [
+            field_name
+            for field_name, value in (
+                ("name", name),
+                ("category", category),
+                ("currency", currency),
+                ("unit", unit),
+            )
+            if value in (None, "")
+        ]
         if source_payload:
             enrichment_status = (
                 "official_product_spec_complete"
@@ -4574,9 +4678,14 @@ class ConfiguredProductMasterDiscoveryAdapter:
             **dict(candidate.evidence or {}),
             "enrichment_status": enrichment_status,
             "metadata_source": metadata_source,
+            "field_sources": {
+                key: value for key, value in field_sources.items()
+                if key in {"name", "category", "currency", "unit", "contract_multiplier", "tick_size"}
+            },
+            "missing_required_fields": missing_required_fields,
             "name_source": (
-                "configured_product_metadata"
-                if product.get("name")
+                str((field_sources.get("name") or {}).get("source_type") or "")
+                if field_sources.get("name")
                 else "official_product_spec"
                 if isinstance(source_payload, dict) and source_payload.get("name")
                 else "official_daily_rows"
@@ -5070,6 +5179,7 @@ class FuturesMasterDiscoveryGovernanceService:
             and bool(candidate.candidate_instrument_id)
             and bool(candidate.candidate_name)
             and bool(candidate.candidate_category)
+            and bool(candidate.candidate_currency)
             and bool(candidate.candidate_unit)
         )
 
@@ -5089,6 +5199,7 @@ class FuturesMasterDiscoveryGovernanceService:
             "confidence_score": candidate.confidence_score,
             "quality_flag": candidate.quality_flag,
             "review_status": candidate.review_status,
+            "missing_required_fields": (candidate.evidence or {}).get("missing_required_fields") or [],
             "evidence": candidate.evidence,
         }
 

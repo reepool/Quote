@@ -11,6 +11,7 @@ import re
 import time
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from html.parser import HTMLParser
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 import requests
@@ -272,6 +273,17 @@ class OfficialFuturesMarketDataProvider:
         "Referer": "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml",
         "Origin": "http://www.gfex.com.cn",
         "X-Requested-With": "XMLHttpRequest",
+    }
+    GFEX_PRODUCT_PAGE_HEADERS = {
+        **DEFAULT_HEADERS,
+        "Referer": "http://www.gfex.com.cn/gfex/sspz/redirect_firstChannel.shtml",
+    }
+    GFEX_PRODUCT_RULE_PAGES = {
+        "PT": "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml",
+        "PD": "http://www.gfex.com.cn/gfex/sspzp/sspz.shtml",
+        "PS": "http://www.gfex.com.cn/gfex/djg/sspz.shtml",
+        "LC": "http://www.gfex.com.cn/gfex/tsl/sspz.shtml",
+        "SI": "http://www.gfex.com.cn/gfex/gyeg/sspz.shtml",
     }
 
     def __init__(self, research_config: ResearchConfig):
@@ -831,7 +843,260 @@ class OfficialFuturesMarketDataProvider:
         if exchange_key == "DCE":
             payload = self._get_dce_browser_client().fetch_contract_info_payload()
             return self._parse_dce_contract_info_payload(payload)
+        if exchange_key == "GFEX":
+            configured = self._configured_product_specs(exchange_key)
+            try:
+                official_pages = self._fetch_gfex_product_page_specs()
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning("[OfficialFutures] GFEX product page specs unavailable: %s", exc)
+                official_pages = {}
+            specs = self._merge_product_specs(configured, official_pages)
+            if specs:
+                return specs
         raise OfficialFuturesSourceUnavailable(f"unsupported official product spec exchange: {exchange_key}")
+
+    @staticmethod
+    def _merge_product_specs(
+        base: Mapping[str, FuturesProductSpec],
+        override: Mapping[str, FuturesProductSpec],
+    ) -> Dict[str, FuturesProductSpec]:
+        merged: Dict[str, FuturesProductSpec] = {}
+        for symbol in sorted(set(base) | set(override)):
+            left = base.get(symbol)
+            right = override.get(symbol)
+            if left is None and right is not None:
+                merged[symbol] = right
+                continue
+            if right is None and left is not None:
+                merged[symbol] = left
+                continue
+            if left is None or right is None:
+                continue
+            field_sources: Dict[str, Any] = {}
+            for field_name in ("name", "category", "currency", "unit", "contract_multiplier", "tick_size"):
+                right_value = getattr(right, field_name)
+                left_value = getattr(left, field_name)
+                if right_value not in (None, ""):
+                    source = (right.field_sources or {}).get(field_name)
+                    if source:
+                        field_sources[field_name] = source
+                elif left_value not in (None, ""):
+                    source = (left.field_sources or {}).get(field_name)
+                    if source:
+                        field_sources[field_name] = source
+            evidence = {
+                **dict(left.evidence or {}),
+                **dict(right.evidence or {}),
+                "merged_sources": [
+                    item for item in [
+                        left.source_profile,
+                        right.source_profile,
+                    ] if item
+                ],
+            }
+            complete = bool(
+                (right.name or left.name)
+                and (right.category or left.category)
+                and (right.currency or left.currency)
+                and (right.unit or left.unit)
+            )
+            merged[symbol] = FuturesProductSpec(
+                exchange=right.exchange or left.exchange,
+                symbol=symbol,
+                name=right.name or left.name,
+                category=right.category or left.category,
+                currency=right.currency or left.currency or "CNY",
+                unit=right.unit or left.unit,
+                contract_multiplier=right.contract_multiplier
+                if right.contract_multiplier is not None
+                else left.contract_multiplier,
+                tick_size=right.tick_size if right.tick_size is not None else left.tick_size,
+                source_profile=right.source_profile or left.source_profile,
+                source_interface=right.source_interface or left.source_interface,
+                source_url=right.source_url or left.source_url,
+                quality_flag="official_product_spec_complete" if complete else "official_product_spec_partial",
+                evidence=evidence,
+                field_sources=field_sources,
+            )
+        return merged
+
+    def _fetch_gfex_product_page_specs(self) -> Dict[str, FuturesProductSpec]:
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get("GFEX") or {})
+        configured_pages = adapter_cfg.get("product_rule_pages") or {}
+        page_map = {
+            **self.GFEX_PRODUCT_RULE_PAGES,
+            **{
+                str(symbol).upper(): str(url)
+                for symbol, url in configured_pages.items()
+                if str(symbol).strip() and str(url).strip()
+            },
+        }
+        specs: Dict[str, FuturesProductSpec] = {}
+        failures: Dict[str, str] = {}
+        with create_requests_session(tls_config=self.tls_config, headers=self.GFEX_PRODUCT_PAGE_HEADERS) as session:
+            for symbol, url in sorted(page_map.items()):
+                try:
+                    html = self._request_gfex_product_rule_page(session, url, symbol)
+                    spec = self._parse_gfex_product_page_html(html, symbol=symbol, source_url=url)
+                except Exception as exc:
+                    failures[symbol] = str(exc)
+                    continue
+                if spec.symbol:
+                    specs[spec.symbol] = spec
+        if failures:
+            logger.warning("[OfficialFutures] GFEX product page spec partial failures=%s", failures)
+        return specs
+
+    def _request_gfex_product_rule_page(self, session: requests.Session, url: str, symbol: str) -> str:
+        last_error: Optional[Exception] = None
+        challenge_retry_limit = self._challenge_retry_attempts_for_exchange("GFEX")
+        max_attempts = self.retry_attempts + challenge_retry_limit + 1
+        generic_failures = 0
+        challenge_retries = 0
+        for attempt in range(1, max_attempts + 1):
+            self._wait_for_request_slot("GFEX")
+            try:
+                response = request_get(
+                    url,
+                    session=session,
+                    tls_config=self.tls_config,
+                    headers=self.GFEX_PRODUCT_PAGE_HEADERS,
+                    timeout=self.timeout_seconds,
+                )
+                if getattr(response, "status_code", None) == 567:
+                    self._increment_metric("GFEX", "challenge_count", 1)
+                    raise OfficialFuturesSourceUnavailable(
+                        f"gfex_product_page_challenge symbol={symbol} http_status=567"
+                    )
+                response.raise_for_status()
+                response.encoding = response.apparent_encoding or response.encoding
+                return response.text
+            except Exception as exc:
+                last_error = exc
+                if "gfex_product_page_challenge" in str(exc).lower():
+                    if challenge_retries >= challenge_retry_limit:
+                        break
+                    challenge_retries += 1
+                    backoff = self._challenge_backoff_for_exchange("GFEX")
+                    if backoff > 0:
+                        sleep_seconds = backoff * challenge_retries
+                        self._increment_metric("GFEX", "challenge_backoff_count", 1)
+                        self._increment_metric("GFEX", "challenge_backoff_seconds", sleep_seconds)
+                        time.sleep(sleep_seconds)
+                    continue
+                generic_failures += 1
+                if generic_failures >= self.retry_attempts:
+                    break
+                if self.retry_backoff_seconds > 0:
+                    sleep_seconds = self.retry_backoff_seconds * generic_failures
+                    self._increment_metric("GFEX", "retry_backoff_count", 1)
+                    self._increment_metric("GFEX", "retry_backoff_seconds", sleep_seconds)
+                    time.sleep(sleep_seconds)
+        raise OfficialFuturesSourceUnavailable(
+            f"official GFEX product page request failed symbol={symbol} url={url}: {last_error}"
+        )
+
+    def _parse_gfex_product_page_html(self, html: str, *, symbol: str, source_url: str) -> FuturesProductSpec:
+        texts = _html_text_chunks(html)
+        field_map = {
+            "product_name": _field_after_label(texts, ("交易品种",)) or _gfex_meta_content(html, "ColumnName"),
+            "trade_unit": _field_after_label(texts, ("交易单位",)),
+            "quote_unit": _field_after_label(texts, ("报价单位",)),
+            "tick_size": _field_after_label(texts, ("最小变动价位",)),
+            "trade_code": _field_after_label(texts, ("交易代码",)),
+        }
+        product_symbol = str(field_map.get("trade_code") or symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", product_symbol) or str(symbol or "").upper()
+        name = str(field_map.get("product_name") or "").strip()
+        quote_unit_text = str(field_map.get("quote_unit") or "").strip()
+        unit = _normalize_gfex_quote_unit(quote_unit_text)
+        currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
+        multiplier = _first_number(field_map.get("trade_unit"))
+        tick_size = _first_number(field_map.get("tick_size"))
+        source_ref = source_url
+        field_sources = {
+            field_name: {
+                "source_type": "official_product_rule_page",
+                "source_ref": source_ref,
+                "quality_flag": "official_product_rule_page",
+            }
+            for field_name, value in (
+                ("name", name),
+                ("currency", currency),
+                ("unit", unit),
+                ("contract_multiplier", multiplier),
+                ("tick_size", tick_size),
+            )
+            if value not in (None, "")
+        }
+        return FuturesProductSpec(
+            exchange="GFEX",
+            symbol=product_symbol,
+            name=name,
+            currency=currency or "CNY",
+            unit=unit,
+            contract_multiplier=multiplier,
+            tick_size=tick_size,
+            source_profile="exchange_official_product_rule_page",
+            source_interface="official_gfex_product_page",
+            source_url=source_url,
+            quality_flag="official_product_spec_partial",
+            evidence={
+                "field_map": {key: value for key, value in field_map.items() if value},
+                "source_limitations": [
+                    "gfex_product_page_does_not_provide_project_category",
+                ],
+            },
+            field_sources=field_sources,
+        )
+
+    def _configured_product_specs(self, exchange: str) -> Dict[str, FuturesProductSpec]:
+        """Return governed product-rule metadata as normalized spec seed evidence."""
+        exchange_key = str(exchange or "").upper()
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        known_products = adapter_cfg.get("known_products") or {}
+        if not isinstance(known_products, Mapping):
+            return {}
+        specs: Dict[str, FuturesProductSpec] = {}
+        for symbol, payload in known_products.items():
+            if not isinstance(payload, Mapping):
+                continue
+            symbol_key = str(symbol or "").upper()
+            if not symbol_key:
+                continue
+            source_ref = str(payload.get("source_url") or "config/11_futures.json")
+            field_sources = {
+                field_name: {
+                    "source_type": "governed_rule_metadata",
+                    "source_ref": source_ref,
+                    "quality_flag": "governed_rule_verified",
+                }
+                for field_name in ("name", "category", "currency", "unit")
+                if payload.get(field_name) not in (None, "")
+            }
+            specs[symbol_key] = FuturesProductSpec(
+                exchange=exchange_key,
+                symbol=symbol_key,
+                name=str(payload.get("name") or ""),
+                category=str(payload.get("category") or ""),
+                currency=str(payload.get("currency") or "CNY"),
+                unit=str(payload.get("unit") or ""),
+                contract_multiplier=_number(payload.get("contract_multiplier")),
+                tick_size=_number(payload.get("tick_size")),
+                source_profile="governed_product_rule_metadata",
+                source_interface="config_11_futures_master_data_discovery",
+                source_url=source_ref,
+                quality_flag="governed_rule_verified",
+                evidence={
+                    "source_limitations": [
+                        "governed_local_rule_metadata_not_raw_official_payload",
+                    ],
+                },
+                field_sources=field_sources,
+            )
+        return specs
 
     def _parse_dce_contract_info_payload(self, payload: Mapping[str, Any]) -> Dict[str, FuturesProductSpec]:
         rows = payload.get("data") or []
@@ -1498,6 +1763,85 @@ def _number(value: Any) -> Optional[float]:
         return float(text)
     except ValueError:
         return None
+
+
+class _HtmlTextExtractor(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.texts: List[str] = []
+
+    def handle_data(self, data: str) -> None:
+        text = re.sub(r"\s+", " ", str(data or "")).strip()
+        if text:
+            self.texts.append(text)
+
+
+def _html_text_chunks(html: str) -> List[str]:
+    parser = _HtmlTextExtractor()
+    parser.feed(str(html or ""))
+    return parser.texts
+
+
+def _normalize_label(value: Any) -> str:
+    return re.sub(r"[\s：:]+", "", str(value or "").strip())
+
+
+def _field_after_label(texts: Sequence[str], labels: Sequence[str]) -> str:
+    normalized_labels = {_normalize_label(item) for item in labels}
+    for index, text in enumerate(texts):
+        normalized = _normalize_label(text)
+        for label in normalized_labels:
+            if normalized == label:
+                for value in texts[index + 1:]:
+                    candidate = str(value or "").strip()
+                    if candidate and _normalize_label(candidate) not in normalized_labels:
+                        return candidate
+            if normalized.startswith(label) and len(normalized) > len(label):
+                return normalized[len(label):].strip()
+    return ""
+
+
+def _gfex_meta_content(html: str, name: str) -> str:
+    pattern = (
+        r"<meta[^>]+name=[\"']"
+        + re.escape(name)
+        + r"[\"'][^>]+content=[\"']([^\"']+)[\"'][^>]*>"
+    )
+    match = re.search(pattern, str(html or ""), flags=re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+
+def _normalize_gfex_quote_unit(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    if not text:
+        return ""
+    if "美元" in text or "usd" in text:
+        currency = "USD"
+    elif "元" in text or "人民币" in text or "cny" in text:
+        currency = "CNY"
+    else:
+        currency = "CNY"
+    if "千克" in text or "kg" in text:
+        unit = "kg"
+    elif "克" in text or "gram" in text or "/g" in text:
+        unit = "gram"
+    elif "立方米" in text:
+        unit = "cubic_meter"
+    elif "张" in text or "sheet" in text:
+        unit = "sheet"
+    elif "吨" in text or "ton" in text:
+        unit = "ton"
+    else:
+        return ""
+    return f"{currency}/{unit}"
+
+
+def _first_number(value: Any) -> Optional[float]:
+    text = str(value or "").replace(",", "")
+    match = re.search(r"[-+]?\d+(?:\.\d+)?", text)
+    if not match:
+        return None
+    return _number(match.group(0))
 
 
 def _first_text(row: Mapping[str, Any], keys: Iterable[str]) -> str:

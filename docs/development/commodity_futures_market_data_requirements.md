@@ -728,13 +728,13 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | `futures_trading_day_governance` | enabled | 日更前、回补前 | 维护交易所/品种交易日历、休市公告、交易时段和目标交易日集合，是商品数据同步前置任务 |
 | `futures_master_governance` | enabled/manual_only | 手工触发；后续可作为日更前置 | 维护商品根品种、研究序列和真实合约主数据；按指定交易所使用官方日行情逐交易日发现合约代码，依赖已验证交易日历，默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_market_data_sync` | enabled | 交易日晚间 | 同步 P0 商品期货最新日线和连续序列，当前实现任务名 |
-| `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用 |
+| `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用；生产写入默认要求交易日治理和主数据治理前置 |
 | `futures_spread_recompute` | enabled | 日更后 | 重算价差和价差诊断 |
 | `futures_cycle_diagnostics_refresh` | enabled | 日更后 | 重算分位数、均值、周期状态 |
 | `futures_market_data_readiness` | 可由 API/维护任务生成 | 每日或每周 | 生成覆盖率和缺口摘要 |
 | `futures_source_version_check` | 待后续拆分 | 每日中午 | 检查 AKShare 等依赖版本，复用现有依赖检查机制 |
 
-商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；启用交易所生产日更时还应打开 `requires_master_data_governance`，使主数据治理成为行情写入前置。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
+商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；生产写入还应打开 `requires_master_data_governance`，使主数据治理成为行情写入前置。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
 
 GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
 
@@ -750,7 +750,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 }
 ```
 
-该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现 GFEX 合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补如果开启 `requires_master_data_governance=true`，应显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。
+该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现 GFEX 合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补同样应开启 `requires_master_data_governance=true`，显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。
 
 手工触发方式：
 
@@ -797,6 +797,8 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 主数据治理应在交易日历落库并复核后执行。当前 `futures_master_governance` 已抽象为“单交易所 + 官方日行情合约发现”流程：按目标交易所读取已验证交易日历，按 `exchange + trade_date` 请求官方日行情，使用本地/已 promotion 根品种主数据映射真实合约，并写入 `futures_contracts`。GFEX、DCE 复用同一治理流程；后续 SHFE/INE/CZCE 接入时应优先复用该接口，只补交易所 parser 或 discovery/enrichment adapter，不应另建旁路任务。由于官方日行情不能直接提供上市日、最后交易日、交易单位、最小变动价位等完整合约规格，合约质量标记为 `official_daily_discovered_partial`，并在 metadata 中保留 `first_observed_trade_date`、`last_observed_trade_date` 和缺失字段说明。主数据发现层已新增标准化 `FuturesProductSpec` enrichment 接口；DCE 第一阶段通过既有 Chrome/nodriver 会话访问官方 `/dcereport/publicweb/tradepara/contractInfo`，可提取品种名称、合约交易单位和最小变动价位。该接口中的 `unit` 是合约交易单位，不是报价单位，因此不能直接写入 `candidate_unit`；报价单位和分类通过 `config/11_futures.json.master_data_discovery.adapters.DCE.known_products` 的显式规则元数据补齐。对 DCE 这类依赖浏览器会话的官方源，单日请求失败不能立即形成永久缺口，任务应在全段扫描结束后按 `master_data.contract_discovery_retry` 进行任务级补跑，最终报告必须披露 `task_retry_passes`、`task_retry_resolved`、`failed_trade_dates`。
 
 未知品种 discovery 已覆盖所有已配置交易所。当前静态 P0 根品种种子会作为内置 enrichment 元数据，交易所新增品种若未进入 P0 种子，也会在报告中以 `unmapped_<exchange>_varieties` warning 暴露，并生成 discovery 候选；通用 adapter 会优先从官方日行情 raw payload 中提取可用的品种名称证据，再合并交易所规格 enrichment 和 `known_products`。若名称、分类、币种、报价单位等关键字段完整，则可高置信 promotion；若只能拿到名称、合约乘数、tick 等部分字段，则保留 `discovered_verified_partial/pending`，不能写入正式 `futures_instruments`。GFEX 的 `PT`、`PD` 已作为内置补充元数据保留，用于回归验证“正式根品种种子落后时仍能发现并生成候选”的完整链路。DCE 当前已接入官方 `contractInfo` 规格 enrichment，并为 `A/B/BB/BZ/C/CS/FB/JD/LG/LH/M/P/RR/Y` 补充分类与报价单位元数据；全历史 dry-run 发现 2000-2003 年存在旧根品种 `S`（官方日行情名称“大豆”），其是 DCE 早期大豆/黄大豆 legacy soybean 合约代码，后续拆分为 `A` 黄大豆 1 号与 `B` 黄大豆 2 号两条体系。治理上 `CNF.S.DCE` 必须作为独立历史根品种入库，不映射为 `A` 或 `B`，并在 `metadata_json.master_discovery_evidence.product_lineage` 中记录 `successor_family=["CNF.A.DCE","CNF.B.DCE"]`、`primary_chronological_successor="CNF.A.DCE"`、`oilseed_import_soybean_successor="CNF.B.DCE"`。这些候选在官方规格与配置规则都可用时可自动 promotion。`futures_master_governance write` 在同一任务内完成 auto-promotion 后，会复用本轮已抓取的官方日行情 rows 重处理 newly promoted varieties，因此无需额外再跑一遍才能写入这些新品种的真实合约。SHFE、INE、CZCE 后续应按同一 `FuturesProductSpec` 标准接口接入各自官方合约规格或交易参数源。
+
+新增未知品种的长期目标是“尽量自动入库、少人工干预”。所有交易所的 discovery adapter 必须实现统一的产品主数据 enrichment 接口，输出标准化 `name/category/currency/unit` 以及可选的 `contract_multiplier/tick_size/lineage` 证据。字段来源优先级为：交易所官方产品/合约规则接口、官方日行情 raw payload、交易所公告或规则页面解析、已审核本地规则补充、聚合源低质量兜底；不得用不透明猜测直接写正式主数据。日更或回补遇到 unknown variety 时，应先调用 enrichment adapter，若 `name/category/currency/unit` 均达到可信质量，则自动写入 `futures_master_discoveries` 并 promotion 到 `futures_instruments`、`futures_series`，随后复用本轮官方日行情 rows 写入对应真实合约；若仍缺关键字段，则写入 pending review 并在报告中明确列出缺失字段、来源、影响的合约和是否跳过行情写入。第一阶段必须先把 DCE 和 GFEX 做成完整 adapter：DCE 使用官方日行情、`/dcereport/publicweb/tradepara/contractInfo` 和本地规则补充处理分类/单位及 legacy lineage；GFEX 使用官方日行情识别品种名称，并接入官方“上市品种”页面（例如 `http://www.gfex.com.cn/gfex/sspzb/sspz.shtml`）解析交易品种、交易代码、报价单位、交易单位和最小变动价位；项目内部 `category` 仍由已审核治理规则补齐，并在 field-level evidence 中标明为 governed metadata。SHFE、INE、CZCE 后续接入时只新增各自 adapter，不允许绕过统一 discovery/promotion 流程。
 
 ```text
 /run futures_master_governance exchange=GFEX start=2022-12-22 end=2026-06-19 dry_run
