@@ -275,78 +275,91 @@
           "official_announcements": true,
           "known_products": {
             "A": {
+              "name": "豆一",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "B": {
+              "name": "豆二",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "BB": {
+              "name": "胶合板",
               "category": "building_material",
               "currency": "CNY",
               "unit": "CNY/sheet",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "BZ": {
+              "name": "纯苯",
               "category": "chemical",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "C": {
+              "name": "玉米",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "CS": {
+              "name": "玉米淀粉",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "FB": {
+              "name": "纤维板",
               "category": "building_material",
               "currency": "CNY",
               "unit": "CNY/cubic_meter",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "JD": {
+              "name": "鸡蛋",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/500kg",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "LG": {
+              "name": "原木",
               "category": "building_material",
               "currency": "CNY",
               "unit": "CNY/cubic_meter",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "LH": {
+              "name": "生猪",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "M": {
+              "name": "豆粕",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "P": {
+              "name": "棕榈油",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
               "source_url": "DCE official product rules; contract multiplier and tick from /dcereport/publicweb/tradepara/contractInfo"
             },
             "RR": {
+              "name": "粳米",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",
@@ -369,6 +382,7 @@
               "lineage_note": "DCE S was the legacy soybean/yellow soybean root. After DCE split soybean contracts, A became the primary chronological non-GMO yellow soybean No.1 successor and B became the oilseed/import soybean No.2 successor."
             },
             "Y": {
+              "name": "豆油",
               "category": "agriculture",
               "currency": "CNY",
               "unit": "CNY/ton",

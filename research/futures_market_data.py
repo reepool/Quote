@@ -4544,12 +4544,18 @@ class ConfiguredProductMasterDiscoveryAdapter:
                     "review_status": "pending",
                 }
             )
-        name = str(product.get("name") or "")
         category = str(product.get("category") or "")
         currency = str(product.get("currency") or "CNY")
         unit = str(product.get("unit") or "")
-        required_complete = bool(name and category and currency and unit)
         source_payload = product.get("official_product_spec") or {}
+        official_name = str((candidate.metadata or {}).get("official_daily_variety_name") or "").strip()
+        name = str(
+            product.get("name")
+            or (source_payload.get("name") if isinstance(source_payload, dict) else "")
+            or official_name
+            or ""
+        )
+        required_complete = bool(name and category and currency and unit)
         if source_payload:
             enrichment_status = (
                 "official_product_spec_complete"
@@ -4568,6 +4574,15 @@ class ConfiguredProductMasterDiscoveryAdapter:
             **dict(candidate.evidence or {}),
             "enrichment_status": enrichment_status,
             "metadata_source": metadata_source,
+            "name_source": (
+                "configured_product_metadata"
+                if product.get("name")
+                else "official_product_spec"
+                if isinstance(source_payload, dict) and source_payload.get("name")
+                else "official_daily_rows"
+                if official_name
+                else "missing"
+            ),
         }
         lineage_keys = (
             "legacy_product",

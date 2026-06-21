@@ -1045,6 +1045,78 @@ def test_futures_master_discovery_enriches_dce_official_product_specs_without_gu
     assert storage.get_instrument("CNF.BZ.DCE") is None
 
 
+def test_futures_master_discovery_uses_daily_name_when_known_product_lacks_name(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": False},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {
+            "DCE": {
+                "enabled": True,
+                "known_products": {
+                    "BZ": {
+                        "category": "chemical",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="BZ",
+                contract="BZ2601",
+                raw_payload={"variety": "纯苯", "contractId": "BZ2601"},
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+    row = storage.list_master_discoveries(exchange="DCE", variety_symbol="BZ")[0]
+    instrument = storage.get_instrument("CNF.BZ.DCE")
+
+    assert result["status"] == "success"
+    assert result["counts"]["pending_review"] == 0
+    assert result["counts"]["auto_promoted"] == 1
+    assert row["candidate_name"] == "纯苯"
+    assert row["evidence"]["name_source"] == "official_daily_rows"
+    assert instrument["name"] == "纯苯"
+
+
 def test_futures_master_discovery_promotes_dce_when_product_spec_and_rule_metadata_complete(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()
