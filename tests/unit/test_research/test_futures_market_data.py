@@ -378,6 +378,63 @@ def test_gfex_master_governance_dry_run_discovers_without_writing(monkeypatch, t
     assert storage.list_contracts(exchange="GFEX") == []
 
 
+def test_dce_master_governance_dry_run_discovers_contracts(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        assert exchange == "DCE"
+        assert trade_date == "2026-01-02"
+        return [
+            _official_contract_row(
+                exchange="DCE",
+                trade_date="2026-01-02",
+                variety="I",
+                contract="I2601",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["exchange"] == "DCE"
+    assert result["calendar"]["verified_trading_days"] == 1
+    assert result["counts"]["instruments"] == 9
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["counts"]["would_write_contracts"] == 1
+    assert result["contracts"][0]["contract_id"] == "CNF.I.DCE.I2601"
+    assert storage.list_contracts(exchange="DCE") == []
+
+
 def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())

@@ -4950,7 +4950,7 @@ class FuturesMasterGovernanceService:
     """Govern futures root instruments, series, and contracts before price sync."""
 
     domain = "futures_master_governance"
-    supported_exchanges = {"GFEX"}
+    supported_exchanges = {"GFEX", "DCE"}
     source_profile = "exchange_official_daily_contract_discovery"
 
     def __init__(
@@ -4998,6 +4998,15 @@ class FuturesMasterGovernanceService:
             )
 
         requested_exchanges = sorted({str(item).upper() for item in scope_selection.exchanges})
+        if len(requested_exchanges) != 1:
+            return self._blocked(
+                reason=f"futures_master_governance_requires_single_exchange: {','.join(requested_exchanges)}",
+                scope_selection=scope_selection,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+        exchange = requested_exchanges[0]
         unsupported = [item for item in requested_exchanges if item not in self.supported_exchanges]
         if unsupported:
             return self._blocked(
@@ -5012,7 +5021,7 @@ class FuturesMasterGovernanceService:
         selected_series_ids = {item.upper() for item in scope_selection.series_ids}
         instruments = [
             item for item in universe_selector.instruments
-            if item.instrument_id.upper() in selected_instrument_ids and item.exchange.upper() == "GFEX"
+            if item.instrument_id.upper() in selected_instrument_ids and item.exchange.upper() == exchange
         ]
         series = [
             item for item in universe_selector.series
@@ -5020,21 +5029,21 @@ class FuturesMasterGovernanceService:
         ]
         if not instruments:
             return self._blocked(
-                reason="empty_gfex_master_governance_scope",
+                reason=f"empty_{exchange.lower()}_master_governance_scope",
                 scope_selection=scope_selection,
                 start_date=start_date,
                 end_date=end_date,
                 dry_run=dry_run,
             )
 
-        start = _date_key(start_date or self._default_contract_discovery_start())
+        start = _date_key(start_date or self._default_contract_discovery_start(exchange))
         end = _date_key(end_date or get_shanghai_time().date())
-        verified_days = self._verified_trading_days(exchange="GFEX", start_date=start, end_date=end)
+        verified_days = self._verified_trading_days(exchange=exchange, start_date=start, end_date=end)
         if max_days:
             verified_days = verified_days[: max(1, int(max_days))]
         if not verified_days:
             return self._blocked(
-                reason="missing_verified_gfex_trading_calendar_coverage",
+                reason=f"missing_verified_{exchange.lower()}_trading_calendar_coverage",
                 scope_selection=scope_selection,
                 start_date=start,
                 end_date=end,
@@ -5044,7 +5053,7 @@ class FuturesMasterGovernanceService:
         result = {
             "status": "success",
             "domain": self.domain,
-            "exchange": "GFEX",
+            "exchange": exchange,
             "source_profile": self.source_profile,
             "start_date": start,
             "end_date": end,
@@ -5089,82 +5098,85 @@ class FuturesMasterGovernanceService:
             )
 
             provider = OfficialFuturesMarketDataProvider(self.research_config)
-            metrics_before = _provider_metrics_for_exchange(provider, "GFEX")
-            instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
-            first_seen: Dict[str, str] = {}
-            last_seen: Dict[str, str] = {}
-            for trade_date in verified_days:
-                try:
-                    rows = provider.fetch_exchange_contract_bars_sync("GFEX", trade_date)
-                    result["counts"]["official_request_count"] += 1
-                except OfficialFuturesSourceUnavailable as exc:
-                    result["warnings"].append({
-                        "trade_date": trade_date,
-                        "reason": str(exc),
-                    })
-                    continue
-                discovery_candidates.extend(
-                    discovery_service.discover_from_rows(
-                        exchange="GFEX",
-                        trade_date=trade_date,
-                        rows=rows,
-                        known_symbols=set(instrument_by_symbol),
-                    )
-                )
-                for row in rows:
-                    variety = str(row.variety or "").upper()
-                    instrument = instrument_by_symbol.get(variety)
-                    if not instrument:
-                        unmapped_varieties[variety] = unmapped_varieties.get(variety, 0) + 1
+            try:
+                metrics_before = _provider_metrics_for_exchange(provider, exchange)
+                instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
+                first_seen: Dict[str, str] = {}
+                last_seen: Dict[str, str] = {}
+                for trade_date in verified_days:
+                    try:
+                        rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
+                        result["counts"]["official_request_count"] += 1
+                    except OfficialFuturesSourceUnavailable as exc:
+                        result["warnings"].append({
+                            "trade_date": trade_date,
+                            "reason": str(exc),
+                        })
                         continue
-                    contract_code = str(row.contract or "").upper()
-                    contract_id = make_futures_contract_id(instrument.instrument_id, contract_code)
-                    first_seen.setdefault(contract_id, trade_date)
-                    last_seen[contract_id] = trade_date
-                    contracts_by_id[contract_id] = FuturesContract(
-                        contract_id=contract_id,
-                        instrument_id=instrument.instrument_id,
-                        exchange="GFEX",
-                        exchange_contract_code=contract_code,
-                        contract_month=infer_contract_month(contract_code),
-                        delivery_month=infer_contract_month(contract_code),
-                        contract_multiplier=None,
-                        tick_size=None,
-                        currency=instrument.currency,
-                        unit=instrument.unit,
-                        active=True,
-                        source="exchange_official",
-                        quality_flag="official_daily_discovered_partial",
-                        metadata={
-                            "source_profile": self.source_profile,
-                            "source_interface": row.source_interface,
-                            "first_observed_trade_date": first_seen.get(contract_id),
-                            "last_observed_trade_date": last_seen.get(contract_id),
-                            "metadata_limitations": [
-                                "listing_date_not_available_from_daily_quote",
-                                "last_trade_date_not_available_from_daily_quote",
-                                "contract_spec_not_available_from_daily_quote",
-                            ],
-                        },
+                    discovery_candidates.extend(
+                        discovery_service.discover_from_rows(
+                            exchange=exchange,
+                            trade_date=trade_date,
+                            rows=rows,
+                            known_symbols=set(instrument_by_symbol),
+                        )
                     )
-            for contract_id, item in list(contracts_by_id.items()):
-                metadata = dict(item.metadata)
-                metadata["first_observed_trade_date"] = first_seen.get(contract_id)
-                metadata["last_observed_trade_date"] = last_seen.get(contract_id)
-                contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
-            metrics_after = _provider_metrics_for_exchange(provider, "GFEX")
-            source_metrics = _metric_delta(metrics_before, metrics_after)
-            result["counts"]["challenge_count"] = int(source_metrics.get("challenge_count", 0))
-            result["counts"]["challenge_backoff_seconds"] = float(
-                source_metrics.get("challenge_backoff_seconds", 0.0)
-            )
-            result["counts"]["batch_pause_count"] = int(source_metrics.get("batch_pause_count", 0))
-            result["counts"]["batch_pause_seconds"] = float(source_metrics.get("batch_pause_seconds", 0.0))
-            result["counts"]["retry_backoff_count"] = int(source_metrics.get("retry_backoff_count", 0))
-            result["counts"]["retry_backoff_seconds"] = float(source_metrics.get("retry_backoff_seconds", 0.0))
+                    for row in rows:
+                        variety = str(row.variety or "").upper()
+                        instrument = instrument_by_symbol.get(variety)
+                        if not instrument:
+                            unmapped_varieties[variety] = unmapped_varieties.get(variety, 0) + 1
+                            continue
+                        contract_code = str(row.contract or "").upper()
+                        contract_id = make_futures_contract_id(instrument.instrument_id, contract_code)
+                        first_seen.setdefault(contract_id, trade_date)
+                        last_seen[contract_id] = trade_date
+                        contracts_by_id[contract_id] = FuturesContract(
+                            contract_id=contract_id,
+                            instrument_id=instrument.instrument_id,
+                            exchange=exchange,
+                            exchange_contract_code=contract_code,
+                            contract_month=infer_contract_month(contract_code),
+                            delivery_month=infer_contract_month(contract_code),
+                            contract_multiplier=None,
+                            tick_size=None,
+                            currency=instrument.currency,
+                            unit=instrument.unit,
+                            active=True,
+                            source="exchange_official",
+                            quality_flag="official_daily_discovered_partial",
+                            metadata={
+                                "source_profile": self.source_profile,
+                                "source_interface": row.source_interface,
+                                "first_observed_trade_date": first_seen.get(contract_id),
+                                "last_observed_trade_date": last_seen.get(contract_id),
+                                "metadata_limitations": [
+                                    "listing_date_not_available_from_daily_quote",
+                                    "last_trade_date_not_available_from_daily_quote",
+                                    "contract_spec_not_available_from_daily_quote",
+                                ],
+                            },
+                        )
+                for contract_id, item in list(contracts_by_id.items()):
+                    metadata = dict(item.metadata)
+                    metadata["first_observed_trade_date"] = first_seen.get(contract_id)
+                    metadata["last_observed_trade_date"] = last_seen.get(contract_id)
+                    contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
+                metrics_after = _provider_metrics_for_exchange(provider, exchange)
+                source_metrics = _metric_delta(metrics_before, metrics_after)
+                result["counts"]["challenge_count"] = int(source_metrics.get("challenge_count", 0))
+                result["counts"]["challenge_backoff_seconds"] = float(
+                    source_metrics.get("challenge_backoff_seconds", 0.0)
+                )
+                result["counts"]["batch_pause_count"] = int(source_metrics.get("batch_pause_count", 0))
+                result["counts"]["batch_pause_seconds"] = float(source_metrics.get("batch_pause_seconds", 0.0))
+                result["counts"]["retry_backoff_count"] = int(source_metrics.get("retry_backoff_count", 0))
+                result["counts"]["retry_backoff_seconds"] = float(source_metrics.get("retry_backoff_seconds", 0.0))
+            finally:
+                provider.close()
         except Exception as exc:
             return self._blocked(
-                reason=f"gfex_contract_discovery_failed: {exc}",
+                reason=f"{exchange.lower()}_contract_discovery_failed: {exc}",
                 scope_selection=scope_selection,
                 start_date=start,
                 end_date=end,
@@ -5194,7 +5206,7 @@ class FuturesMasterGovernanceService:
             result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
             result["counts"]["master_discovery_auto_promoted"] = discovery_result.get("auto_promoted", 0)
             result["warnings"].append({
-                "reason": "unmapped_gfex_varieties",
+                "reason": f"unmapped_{exchange.lower()}_varieties",
                 "samples": sorted(unmapped_varieties.items())[:20],
                 "discovery_candidates": discovery_result.get("candidates") or [],
             })
@@ -5207,7 +5219,7 @@ class FuturesMasterGovernanceService:
                 return result
         if not contracts:
             result["status"] = "blocked"
-            result["blockers"].append("no_gfex_contracts_discovered")
+            result["blockers"].append(f"no_{exchange.lower()}_contracts_discovered")
             return result
         if result["warnings"]:
             result["status"] = "warning"
@@ -5220,9 +5232,10 @@ class FuturesMasterGovernanceService:
             result["counts"]["would_write_series"] = len(series)
             result["counts"]["would_write_contracts"] = len(contracts)
         logger.info(
-            "[FuturesMasterGovernance] exchange done exchange=GFEX status=%s requests=%s "
+            "[FuturesMasterGovernance] exchange done exchange=%s status=%s requests=%s "
             "contracts_discovered=%s contracts_written=%s warnings=%s challenges=%s "
             "challenge_backoff_seconds=%s batch_pauses=%s batch_pause_seconds=%s dry_run=%s",
+            exchange,
             result["status"],
             result["counts"]["official_request_count"],
             result["counts"]["contracts_discovered"],
@@ -5236,11 +5249,12 @@ class FuturesMasterGovernanceService:
         )
         return result
 
-    def _default_contract_discovery_start(self) -> str:
+    def _default_contract_discovery_start(self, exchange: str) -> str:
         governance_cfg = self.module_cfg.get("trading_day_governance") or {}
         backfill_cfg = governance_cfg.get("official_calendar_backfill") or {}
         exchange_starts = backfill_cfg.get("exchange_start_dates") or {}
-        return str(exchange_starts.get("GFEX") or "2022-12-22")
+        exchange_key = str(exchange or "").upper()
+        return str(exchange_starts.get(exchange_key) or "2000-01-01")
 
     def _verified_trading_days(self, *, exchange: str, start_date: str, end_date: str) -> List[str]:
         rows = self.storage.list_calendar_days(
@@ -5268,7 +5282,7 @@ class FuturesMasterGovernanceService:
         return {
             "status": "blocked",
             "domain": self.domain,
-            "exchange": "GFEX",
+            "exchange": self._blocked_exchange(scope_selection),
             "source_profile": self.source_profile,
             "start_date": start_date,
             "end_date": end_date,
@@ -5291,6 +5305,13 @@ class FuturesMasterGovernanceService:
             "blockers": [reason],
             "reason": reason,
         }
+
+    @staticmethod
+    def _blocked_exchange(scope_selection: FuturesUniverseSelection) -> str:
+        exchanges = sorted({str(item).upper() for item in scope_selection.exchanges if item})
+        if len(exchanges) == 1:
+            return exchanges[0]
+        return ",".join(exchanges) if exchanges else "N/A"
 
 
 class FuturesOfficialCalendarBackfillService:
