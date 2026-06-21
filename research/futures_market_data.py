@@ -4469,11 +4469,11 @@ class ConfiguredProductMasterDiscoveryAdapter:
             spec_payload = asdict(spec)
             existing = self.known_products.get(symbol_key, {})
             existing_field_sources = dict(existing.get("_field_sources") or {})
-            merged = {
-                **spec_payload,
-                **{key: value for key, value in existing.items() if value not in (None, "")},
-                "official_product_spec": spec_payload,
-            }
+            merged = {key: value for key, value in existing.items() if value not in (None, "", [])}
+            for key, value in spec_payload.items():
+                if value not in (None, "", []):
+                    merged[key] = value
+            merged["official_product_spec"] = spec_payload
             field_sources = {}
             for field_name in (
                 "name",
@@ -4485,17 +4485,17 @@ class ConfiguredProductMasterDiscoveryAdapter:
             ):
                 existing_value = existing.get(field_name)
                 spec_value = spec_payload.get(field_name)
-                if existing_value not in (None, ""):
-                    field_sources[field_name] = existing_field_sources.get(field_name) or self._field_source(
-                        source_type="governed_rule_metadata",
-                        source_ref=str(existing.get("source_url") or "config/11_futures.json"),
-                        quality_flag="governed_rule_verified",
-                    )
-                elif spec_value not in (None, ""):
+                if spec_value not in (None, "", []):
                     field_sources[field_name] = (spec.field_sources or {}).get(field_name) or self._field_source(
                         source_type="official_product_spec",
                         source_ref=str(spec.source_interface or spec.source_url or "official_product_spec"),
                         quality_flag=str(spec.quality_flag or "official_product_spec_partial"),
+                    )
+                elif existing_value not in (None, "", []):
+                    field_sources[field_name] = existing_field_sources.get(field_name) or self._field_source(
+                        source_type="governed_rule_metadata",
+                        source_ref=str(existing.get("source_url") or "config/11_futures.json"),
+                        quality_flag="governed_rule_verified",
                     )
             merged["_field_sources"] = field_sources
             self.known_products[symbol_key] = merged
@@ -5184,6 +5184,25 @@ class FuturesMasterDiscoveryGovernanceService:
         )
 
     def _candidate_report(self, candidate: FuturesMasterDiscoveryCandidate) -> Dict[str, Any]:
+        config_path = (
+            "master_data_discovery.adapters."
+            f"{candidate.exchange.upper()}.known_products.{candidate.variety_symbol.upper()}"
+        )
+        suggested_entry = {
+            "name": candidate.candidate_name or "TODO",
+            "category": candidate.candidate_category or "TODO",
+            "currency": candidate.candidate_currency or "CNY",
+            "unit": candidate.candidate_unit or "TODO",
+            "source_url": (
+                (candidate.evidence or {}).get("metadata_source")
+                or (candidate.evidence or {}).get("source_interface")
+                or "TODO official product/rule source"
+            ),
+        }
+        if candidate.contract_multiplier is not None:
+            suggested_entry["contract_multiplier"] = candidate.contract_multiplier
+        if candidate.tick_size is not None:
+            suggested_entry["tick_size"] = candidate.tick_size
         return {
             "discovery_id": candidate.discovery_id,
             "exchange": candidate.exchange,
@@ -5200,6 +5219,12 @@ class FuturesMasterDiscoveryGovernanceService:
             "quality_flag": candidate.quality_flag,
             "review_status": candidate.review_status,
             "missing_required_fields": (candidate.evidence or {}).get("missing_required_fields") or [],
+            "config_update": {
+                "file": "config/11_futures.json",
+                "json_path": config_path,
+                "suggested_entry": suggested_entry,
+                "note": "task writes discovery/master rows to futures.db only; it does not auto-rewrite config files",
+            },
             "evidence": candidate.evidence,
         }
 

@@ -4,6 +4,7 @@ Defines all automated data update and maintenance tasks.
 """
 
 import asyncio
+import json
 import os
 from datetime import datetime, date, timedelta, time
 from typing import List, Dict, Any, Optional
@@ -1056,6 +1057,7 @@ def _format_futures_market_data_scheduler_report(
         blockers = result.get("blockers") or []
         warnings = result.get("warnings") or []
         detail_lines = []
+        config_lines = []
         for item in (result.get("candidates") or [])[:12]:
             missing_fields = item.get("missing_required_fields") or []
             detail_lines.append(
@@ -1069,6 +1071,15 @@ def _format_futures_market_data_scheduler_report(
                 f"first={item.get('first_seen_trade_date') or 'N/A'}, "
                 f"last={item.get('last_seen_trade_date') or 'N/A'}"
             )
+            config_update = item.get("config_update") or {}
+            suggested_entry = config_update.get("suggested_entry") or {}
+            if config_update:
+                config_lines.append(
+                    f"{item.get('discovery_id', 'unknown')}: update "
+                    f"{config_update.get('file', 'config/11_futures.json')} -> "
+                    f"{config_update.get('json_path', 'N/A')} = "
+                    f"{json.dumps(suggested_entry, ensure_ascii=False, sort_keys=True)}"
+                )
         if not detail_lines:
             detail_lines.append(result.get("reason") or "无候选样本")
         promotion_lines = []
@@ -1088,6 +1099,16 @@ def _format_futures_market_data_scheduler_report(
         promotion_text = ""
         if promotion_lines:
             promotion_text = "\n\nPromotion:\n```text\n" + "\n".join(promotion_lines) + "\n```"
+        config_update_text = ""
+        if config_lines:
+            config_update_text = (
+                "\n\n配置维护提示:\n"
+                "当前任务只写入 futures.db，不自动回写配置文件。若确认新增/变更品种应长期纳入治理，"
+                "请按以下建议更新配置：\n"
+                "```text\n"
+                + "\n".join(config_lines[:8])
+                + "\n```"
+            )
         return (
             f"{icon} *商品期货主数据发现治理*\n\n"
             f"结论: *{label}*\n"
@@ -1106,6 +1127,7 @@ def _format_futures_market_data_scheduler_report(
             + "\n".join(detail_lines)
             + "\n```"
             + promotion_text
+            + config_update_text
             + blocker_text
             + warning_text
         )

@@ -95,6 +95,10 @@ class DceOfficialBrowserClient:
         }
         return self._run(self._api("POST", "/dcereport/publicweb/tradepara/contractInfo", body))
 
+    def fetch_page_html(self, url: str) -> str:
+        """Fetch a DCE official page after the site challenge has run in Chrome."""
+        return self._run(self._page_html(url))
+
     def close(self) -> None:
         if self._loop is None:
             return
@@ -184,6 +188,27 @@ class DceOfficialBrowserClient:
             if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
                 await self._page.sleep(self.retry_backoff_seconds)
         raise OfficialFuturesSourceUnavailable(f"official DCE {path} request failed: {last_error}")
+
+    async def _page_html(self, url: str) -> str:
+        await self._ensure_started()
+        last_error = ""
+        for attempt in range(1, self.retry_attempts + 1):
+            try:
+                self._page = await self._browser.get(str(url))
+                await self._page.sleep(self.settle_seconds)
+                raw_result = await self._page.evaluate(
+                    "document.documentElement ? document.documentElement.outerHTML : ''",
+                    return_by_value=True,
+                )
+                html = str(raw_result or "")
+                if "<html" in html[:500].lower() or html.strip():
+                    return html
+                last_error = "empty page html"
+            except Exception as exc:
+                last_error = str(exc)
+            if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
+                await self._page.sleep(self.retry_backoff_seconds)
+        raise OfficialFuturesSourceUnavailable(f"official DCE page html request failed url={url}: {last_error}")
 
     async def _stop(self) -> None:
         if self._browser is not None:
@@ -841,8 +866,18 @@ class OfficialFuturesMarketDataProvider:
         """Fetch exchange-normalized root-product specifications when available."""
         exchange_key = str(exchange or "").upper()
         if exchange_key == "DCE":
+            configured = self._configured_product_specs(exchange_key)
             payload = self._get_dce_browser_client().fetch_contract_info_payload()
-            return self._parse_dce_contract_info_payload(payload)
+            contract_specs = self._parse_dce_contract_info_payload(payload)
+            try:
+                official_pages = self._fetch_dce_product_page_specs()
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning("[OfficialFutures] DCE product page specs unavailable: %s", exc)
+                official_pages = {}
+            specs = self._merge_product_specs(configured, contract_specs)
+            specs = self._merge_product_specs(specs, official_pages)
+            if specs:
+                return specs
         if exchange_key == "GFEX":
             configured = self._configured_product_specs(exchange_key)
             try:
@@ -948,6 +983,31 @@ class OfficialFuturesMarketDataProvider:
             logger.warning("[OfficialFutures] GFEX product page spec partial failures=%s", failures)
         return specs
 
+    def _fetch_dce_product_page_specs(self) -> Dict[str, FuturesProductSpec]:
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get("DCE") or {})
+        configured_pages = adapter_cfg.get("product_rule_pages") or {}
+        if not isinstance(configured_pages, Mapping) or not configured_pages:
+            return {}
+        specs: Dict[str, FuturesProductSpec] = {}
+        failures: Dict[str, str] = {}
+        client = self._get_dce_browser_client()
+        for symbol, url in sorted(configured_pages.items()):
+            symbol_key = str(symbol or "").upper().strip()
+            if not symbol_key or not str(url or "").strip():
+                continue
+            try:
+                html = client.fetch_page_html(str(url))
+                spec = self._parse_dce_product_page_html(html, symbol=symbol_key, source_url=str(url))
+            except Exception as exc:
+                failures[symbol_key] = str(exc)
+                continue
+            if spec.symbol:
+                specs[spec.symbol] = spec
+        if failures:
+            logger.warning("[OfficialFutures] DCE product page spec partial failures=%s", failures)
+        return specs
+
     def _request_gfex_product_rule_page(self, session: requests.Session, url: str, symbol: str) -> str:
         last_error: Optional[Exception] = None
         challenge_retry_limit = self._challenge_retry_attempts_for_exchange("GFEX")
@@ -997,6 +1057,59 @@ class OfficialFuturesMarketDataProvider:
             f"official GFEX product page request failed symbol={symbol} url={url}: {last_error}"
         )
 
+    def _parse_dce_product_page_html(self, html: str, *, symbol: str, source_url: str) -> FuturesProductSpec:
+        texts = _html_text_chunks(html)
+        field_map = {
+            "product_name": _field_after_label(texts, ("交易品种", "品种名称")),
+            "trade_unit": _field_after_label(texts, ("交易单位", "合约单位")),
+            "quote_unit": _field_after_label(texts, ("报价单位",)),
+            "tick_size": _field_after_label(texts, ("最小变动价位", "最小变动单位")),
+            "trade_code": _field_after_label(texts, ("交易代码", "合约代码")),
+        }
+        product_symbol = str(field_map.get("trade_code") or symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", product_symbol) or str(symbol or "").upper()
+        name = str(field_map.get("product_name") or "").strip()
+        quote_unit_text = str(field_map.get("quote_unit") or "").strip()
+        unit = _normalize_domestic_quote_unit(quote_unit_text)
+        currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
+        multiplier = _first_number(field_map.get("trade_unit"))
+        tick_size = _first_number(field_map.get("tick_size"))
+        field_sources = {
+            field_name: {
+                "source_type": "official_product_rule_page",
+                "source_ref": source_url,
+                "quality_flag": "official_product_rule_page",
+            }
+            for field_name, value in (
+                ("name", name),
+                ("currency", currency),
+                ("unit", unit),
+                ("contract_multiplier", multiplier),
+                ("tick_size", tick_size),
+            )
+            if value not in (None, "")
+        }
+        return FuturesProductSpec(
+            exchange="DCE",
+            symbol=product_symbol,
+            name=name,
+            currency=currency or "CNY",
+            unit=unit,
+            contract_multiplier=multiplier,
+            tick_size=tick_size,
+            source_profile="exchange_official_product_rule_page",
+            source_interface="official_dce_product_page",
+            source_url=source_url,
+            quality_flag="official_product_spec_partial",
+            evidence={
+                "field_map": {key: value for key, value in field_map.items() if value},
+                "source_limitations": [
+                    "dce_product_page_does_not_provide_project_category",
+                ],
+            },
+            field_sources=field_sources,
+        )
+
     def _parse_gfex_product_page_html(self, html: str, *, symbol: str, source_url: str) -> FuturesProductSpec:
         texts = _html_text_chunks(html)
         field_map = {
@@ -1010,7 +1123,7 @@ class OfficialFuturesMarketDataProvider:
         product_symbol = re.sub(r"[^A-Z]", "", product_symbol) or str(symbol or "").upper()
         name = str(field_map.get("product_name") or "").strip()
         quote_unit_text = str(field_map.get("quote_unit") or "").strip()
-        unit = _normalize_gfex_quote_unit(quote_unit_text)
+        unit = _normalize_domestic_quote_unit(quote_unit_text)
         currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
         multiplier = _first_number(field_map.get("trade_unit"))
         tick_size = _first_number(field_map.get("tick_size"))
@@ -1811,7 +1924,7 @@ def _gfex_meta_content(html: str, name: str) -> str:
     return match.group(1).strip() if match else ""
 
 
-def _normalize_gfex_quote_unit(value: Any) -> str:
+def _normalize_domestic_quote_unit(value: Any) -> str:
     text = str(value or "").strip().lower()
     if not text:
         return ""

@@ -1322,6 +1322,82 @@ def test_gfex_official_product_page_specs_merge_with_governed_category(monkeypat
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
 
 
+def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["DCE"]},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {
+            "DCE": {
+                "enabled": True,
+                "product_rule_pages": {"BZ": "http://www.dce.com.cn/dce/product/bz.html"},
+                "known_products": {
+                    "BZ": {
+                        "name": "DCE Benzene",
+                        "category": "chemical",
+                        "currency": "CNY",
+                        "unit": "CNY/barrel",
+                        "source_url": "DCE governed benzene rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    html = """
+    <html>
+      <body>
+        <table>
+          <tr><td>交易品种</td><td>纯苯</td></tr>
+          <tr><td>交易单位</td><td>30吨/手</td></tr>
+          <tr><td>报价单位</td><td>元/吨</td></tr>
+          <tr><td>最小变动价位</td><td>1元/吨</td></tr>
+          <tr><td>交易代码</td><td>BZ</td></tr>
+        </table>
+      </body>
+    </html>
+    """
+
+    class FakeDceBrowserClient:
+        def fetch_contract_info_payload(self):
+            return {
+                "success": True,
+                "data": [
+                    {
+                        "contractId": "BZ2601",
+                        "varietyOrder": "BZ",
+                        "variety": "纯苯",
+                        "unit": "30",
+                        "tick": "1",
+                    }
+                ],
+            }
+
+        def fetch_page_html(self, url):
+            return html
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "_get_dce_browser_client",
+        lambda self: FakeDceBrowserClient(),
+    )
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync("DCE")
+    spec = specs["BZ"]
+
+    assert spec.name == "纯苯"
+    assert spec.category == "chemical"
+    assert spec.currency == "CNY"
+    assert spec.unit == "CNY/ton"
+    assert spec.contract_multiplier == 30
+    assert spec.tick_size == 1
+    assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
 def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()

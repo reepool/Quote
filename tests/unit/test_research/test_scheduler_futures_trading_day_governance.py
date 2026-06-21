@@ -105,6 +105,59 @@ def test_futures_market_data_report_includes_master_governance_summary():
     assert "master_discovery_auto_promoted: `1`" in report
 
 
+def test_futures_master_discovery_report_includes_config_update_hint():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "warning",
+            "domain": "futures_master_discovery_governance",
+            "source_profile": "exchange_official_daily_contract_discovery",
+            "start_date": "2026-01-02",
+            "end_date": "2026-01-02",
+            "dry_run": False,
+            "counts": {
+                "candidates_discovered": 1,
+                "candidates_written": 1,
+                "would_write_candidates": 0,
+                "pending_review": 1,
+                "auto_promoted": 0,
+                "official_request_count": 1,
+            },
+            "candidates": [
+                {
+                    "discovery_id": "DCE:BZ",
+                    "candidate_name": "纯苯",
+                    "candidate_category": "chemical",
+                    "candidate_unit": "CNY/ton",
+                    "quality_flag": "discovered_verified",
+                    "review_status": "pending",
+                    "missing_required_fields": [],
+                    "first_seen_trade_date": "2026-01-02",
+                    "last_seen_trade_date": "2026-01-02",
+                    "config_update": {
+                        "file": "config/11_futures.json",
+                        "json_path": "master_data_discovery.adapters.DCE.known_products.BZ",
+                        "suggested_entry": {
+                            "name": "纯苯",
+                            "category": "chemical",
+                            "currency": "CNY",
+                            "unit": "CNY/ton",
+                        },
+                    },
+                }
+            ],
+            "promotion_results": [],
+            "warnings": [],
+            "blockers": [],
+        }
+    )
+
+    assert "配置维护提示" in report
+    assert "当前任务只写入 futures.db，不自动回写配置文件" in report
+    assert "config/11_futures.json" in report
+    assert "master_data_discovery.adapters.DCE.known_products.BZ" in report
+    assert '"unit": "CNY/ton"' in report
+
+
 def test_futures_market_data_report_splits_series_details_by_exchange():
     result = {
         "status": "success",
