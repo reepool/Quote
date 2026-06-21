@@ -4435,11 +4435,16 @@ class ConfiguredProductMasterDiscoveryAdapter:
         known_symbols: set[str],
     ) -> List[FuturesMasterDiscoveryCandidate]:
         grouped: Dict[str, List[str]] = {}
+        names_by_variety: Dict[str, str] = {}
         for row in rows:
             variety = str(getattr(row, "variety", "") or "").strip().upper()
             contract = str(getattr(row, "contract", "") or "").strip().upper()
             if not variety or variety in known_symbols:
                 continue
+            raw_payload = getattr(row, "raw_payload", None)
+            candidate_name = self._name_from_raw_payload(raw_payload)
+            if candidate_name and variety not in names_by_variety:
+                names_by_variety[variety] = candidate_name
             if contract:
                 grouped.setdefault(variety, []).append(contract)
             else:
@@ -4463,11 +4468,25 @@ class ConfiguredProductMasterDiscoveryAdapter:
                     "official_product_rules_enabled": self.official_product_rules,
                     "official_announcements_enabled": self.official_announcements,
                     "adapter": "configured_product_master_discovery.v1",
+                    "official_daily_variety_name": names_by_variety.get(variety, ""),
                 },
-                metadata={"discovered_from": "official_daily_rows"},
+                metadata={
+                    "discovered_from": "official_daily_rows",
+                    "official_daily_variety_name": names_by_variety.get(variety, ""),
+                },
             )
             candidates.append(self.enrich_candidate(candidate))
         return candidates
+
+    @staticmethod
+    def _name_from_raw_payload(raw_payload: Any) -> str:
+        if not isinstance(raw_payload, dict):
+            return ""
+        for key in ("variety", "品种名称", "productName", "product_name", "varietyName", "variety_name"):
+            value = str(raw_payload.get(key) or "").strip()
+            if value and "小计" not in value and "总计" not in value:
+                return value
+        return ""
 
     def enrich_candidate(
         self,
@@ -4475,13 +4494,19 @@ class ConfiguredProductMasterDiscoveryAdapter:
     ) -> FuturesMasterDiscoveryCandidate:
         product = self.known_products.get(candidate.variety_symbol.upper())
         if not product:
+            official_name = str((candidate.metadata or {}).get("official_daily_variety_name") or "").strip()
             evidence = {
                 **dict(candidate.evidence or {}),
-                "enrichment_status": "configured_product_metadata_missing",
+                "enrichment_status": (
+                    "official_daily_name_only"
+                    if official_name
+                    else "configured_product_metadata_missing"
+                ),
             }
             return FuturesMasterDiscoveryCandidate(
                 **{
                     **asdict(candidate),
+                    "candidate_name": official_name,
                     "evidence": evidence,
                     "confidence_score": 0.35,
                     "quality_flag": "discovered_unverified",

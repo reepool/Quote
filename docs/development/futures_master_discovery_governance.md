@@ -99,7 +99,7 @@ class FuturesMasterDiscoveryAdapter(Protocol):
 
 第一阶段 adapter 使用统一的配置型实现，覆盖所有已配置交易所：
 
-- 官方日行情：发现 `variety`、`contract`、首次/最近出现日期。
+- 官方日行情：发现 `variety`、`contract`、首次/最近出现日期，并尽量从 raw payload 提取交易所披露的品种名称。
 - `config/11_futures.json.master_data_discovery.adapters.<EXCHANGE>.known_products`、默认 P0 主数据种子或交易所特定内置补充元数据：补全名称、单位、合约乘数、最小变动价位。
 - 必要时使用 AkShare/公开资料作为辅助校验，但不能作为唯一生产证据。
 

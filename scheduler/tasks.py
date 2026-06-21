@@ -984,10 +984,10 @@ def _format_futures_market_data_scheduler_report(
             reason = item.get("reason") or "warning"
             if str(reason).startswith("unmapped_") and str(reason).endswith("_varieties"):
                 samples = item.get("samples") or []
-                sample_text = ", ".join(f"{symbol}:{count}" for symbol, count in samples[:10])
+                sample_text = ", ".join(f"{symbol}:{count}" for symbol, count in samples[:20])
                 candidates = item.get("discovery_candidates") or []
                 candidate_parts = []
-                for candidate in candidates[:10]:
+                for candidate in candidates[:20]:
                     if not isinstance(candidate, dict):
                         candidate_parts.append(str(candidate))
                         continue
@@ -1101,7 +1101,10 @@ def _format_futures_market_data_scheduler_report(
             f"contracts_discovered: `{counts.get('contracts_discovered', 0)}`\n"
             f"contracts_written: `{counts.get('contracts_written', 0)}`\n"
             f"would_write_contracts: `{counts.get('would_write_contracts', 0)}`\n"
-            f"official_request_count: `{counts.get('official_request_count', 0)}`\n\n"
+            f"official_request_count: `{counts.get('official_request_count', 0)}`\n"
+            f"master_discovery_candidates: `{counts.get('master_discovery_candidates', 0)}`\n"
+            f"master_discovery_pending_review: `{counts.get('master_discovery_pending_review', 0)}`\n"
+            f"master_discovery_auto_promoted: `{counts.get('master_discovery_auto_promoted', 0)}`\n\n"
             f"challenge_count: `{counts.get('challenge_count', 0)}`\n"
             f"challenge_backoff_seconds: `{counts.get('challenge_backoff_seconds', 0)}`\n"
             f"batch_pause_count: `{counts.get('batch_pause_count', 0)}`\n"

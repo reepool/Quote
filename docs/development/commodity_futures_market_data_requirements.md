@@ -796,7 +796,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 
 主数据治理应在交易日历落库并复核后执行。当前 `futures_master_governance` 已抽象为“单交易所 + 官方日行情合约发现”流程：按目标交易所读取已验证交易日历，按 `exchange + trade_date` 请求官方日行情，使用本地/已 promotion 根品种主数据映射真实合约，并写入 `futures_contracts`。GFEX、DCE 复用同一治理流程；后续 SHFE/INE/CZCE 接入时应优先复用该接口，只补交易所 parser 或 discovery adapter，不应另建旁路任务。由于官方日行情不能直接提供上市日、最后交易日、交易单位、最小变动价位等完整合约规格，合约质量标记为 `official_daily_discovered_partial`，并在 metadata 中保留 `first_observed_trade_date`、`last_observed_trade_date` 和缺失字段说明；后续若找到官方合约规格接口，应在同一主数据治理任务中补齐。对 DCE 这类依赖浏览器会话的官方源，单日请求失败不能立即形成永久缺口，任务应在全段扫描结束后按 `master_data.contract_discovery_retry` 进行任务级补跑，最终报告必须披露 `task_retry_passes`、`task_retry_resolved`、`failed_trade_dates`。
 
-未知品种 discovery 已覆盖所有已配置交易所。当前静态 P0 根品种种子会作为内置 enrichment 元数据，交易所新增品种若未进入 P0 种子，也会在报告中以 `unmapped_<exchange>_varieties` warning 暴露，并生成 discovery 候选；若 `known_products` 或内置补充元数据完整，则可高置信 promotion，否则保留 `discovered_unverified/pending` 等待人工确认。GFEX 的 `PT`、`PD` 已作为内置补充元数据保留，用于回归验证“正式根品种种子落后时仍能发现并生成候选”的完整链路。DCE、SHFE、INE、CZCE 后续如出现新品种，应优先在 `config/11_futures.json.master_data_discovery.adapters.<EXCHANGE>.known_products` 补充官方确认后的名称、分类、币种、报价单位、合约乘数和最小变动价位。
+未知品种 discovery 已覆盖所有已配置交易所。当前静态 P0 根品种种子会作为内置 enrichment 元数据，交易所新增品种若未进入 P0 种子，也会在报告中以 `unmapped_<exchange>_varieties` warning 暴露，并生成 discovery 候选；通用 adapter 会优先从官方日行情 raw payload 中提取可用的品种名称证据，若 `known_products` 或内置补充元数据完整，则可高置信 promotion，否则保留 `discovered_unverified/pending` 等待补齐分类、报价单位等关键字段。GFEX 的 `PT`、`PD` 已作为内置补充元数据保留，用于回归验证“正式根品种种子落后时仍能发现并生成候选”的完整链路。DCE、SHFE、INE、CZCE 后续如出现新品种，应优先在 `config/11_futures.json.master_data_discovery.adapters.<EXCHANGE>.known_products` 补充官方确认后的名称、分类、币种、报价单位、合约乘数和最小变动价位。
 
 ```text
 /run futures_master_governance exchange=GFEX start=2022-12-22 end=2026-06-19 dry_run
