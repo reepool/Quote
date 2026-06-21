@@ -4963,7 +4963,6 @@ class FuturesMasterGovernanceService:
     """Govern futures root instruments, series, and contracts before price sync."""
 
     domain = "futures_master_governance"
-    supported_exchanges = {"GFEX", "DCE"}
     source_profile = "exchange_official_daily_contract_discovery"
 
     def __init__(
@@ -5018,9 +5017,10 @@ class FuturesMasterGovernanceService:
                 start_date=start_date,
                 end_date=end_date,
                 dry_run=dry_run,
-            )
+        )
         exchange = requested_exchanges[0]
-        unsupported = [item for item in requested_exchanges if item not in self.supported_exchanges]
+        supported_exchanges = self._supported_official_exchanges()
+        unsupported = [item for item in requested_exchanges if item not in supported_exchanges]
         if unsupported:
             return self._blocked(
                 reason=f"unsupported_futures_master_governance_exchange: {','.join(unsupported)}",
@@ -5292,6 +5292,23 @@ class FuturesMasterGovernanceService:
             dry_run,
         )
         return result
+
+    def _supported_official_exchanges(self) -> set[str]:
+        try:
+            from research.providers.official_futures import OfficialFuturesMarketDataProvider
+
+            supported = {
+                str(item).upper()
+                for item in OfficialFuturesMarketDataProvider.supported_exchanges
+            }
+        except Exception:
+            supported = set(_configured_futures_exchanges(self.module_cfg))
+        source_cfg = (self.module_cfg.get("sources") or {}).get("exchange_official") or {}
+        enabled = source_cfg.get("enabled_exchanges")
+        if enabled:
+            enabled_set = {str(item).upper() for item in enabled if str(item).strip()}
+            supported &= enabled_set
+        return supported
 
     def _contract_discovery_retry_config(self) -> Dict[str, Any]:
         master_cfg = self.module_cfg.get("master_data") or {}

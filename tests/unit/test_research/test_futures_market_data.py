@@ -507,6 +507,59 @@ def test_dce_master_governance_retries_failed_trade_dates(monkeypatch, tmp_path)
     assert calls == {"2026-01-02": 2, "2026-01-03": 1}
 
 
+def test_master_governance_uses_provider_supported_exchanges(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="SHFE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, exchange, trade_date):
+        assert exchange == "SHFE"
+        assert trade_date == "2026-01-02"
+        return [
+            _official_contract_row(
+                exchange="SHFE",
+                trade_date="2026-01-02",
+                variety="CU",
+                contract="CU2601",
+            )
+        ]
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["SHFE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["exchange"] == "SHFE"
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["contracts"][0]["contract_id"] == "CNF.CU.SHFE.CU2601"
+
+
 def test_gfex_master_governance_write_upserts_contracts(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())
