@@ -105,6 +105,36 @@ def test_futures_market_data_report_includes_master_governance_summary():
     assert "master_discovery_auto_promoted: `1`" in report
 
 
+def test_futures_market_data_report_marks_master_governance_not_requested_when_absent():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "success",
+            "dry_run": True,
+            "scope_selection": {"exchanges": ["DCE"]},
+            "totals": {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": 0,
+                "calendar_skipped": 0,
+                "provider_empty_on_trading_day": 0,
+            },
+            "trading_day_governance": {"status": "success", "target_date_count": 1},
+            "series": [
+                {
+                    "series_id": "CNF.I.DCE.main",
+                    "fetched_rows": 1,
+                    "write_result": {"would_write_rows": 1},
+                    "status": "success",
+                }
+            ],
+        }
+    )
+
+    assert "master_data_governance: `not_requested`" in report
+    assert "master_data_governance: `N/A`" not in report
+
+
 def test_futures_master_discovery_report_includes_config_update_hint():
     report = _format_futures_market_data_scheduler_report(
         {

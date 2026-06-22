@@ -1292,7 +1292,12 @@ def _format_futures_market_data_scheduler_report(
                 }.get(item, 0),
             )
     actual_calendar_quality = actual_calendar_quality or "N/A"
-    master_governance = result.get("master_data_governance") or {}
+    master_governance = result.get("master_data_governance")
+    master_governance_status = "not_requested"
+    if isinstance(master_governance, dict):
+        master_governance_status = str(master_governance.get("status") or "unknown")
+    else:
+        master_governance = {}
     master_counts = master_governance.get("counts") or {}
     series = series_override if series_override is not None else (result.get("series") or [])
     detail_lines = []
@@ -1328,7 +1333,7 @@ def _format_futures_market_data_scheduler_report(
         f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
         f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
         f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
-        f"master_data_governance: `{master_governance.get('status', 'N/A')}`\n"
+        f"master_data_governance: `{master_governance_status}`\n"
         f"master_discovery_candidates: `{master_counts.get('candidates', 0)}`\n"
         f"master_discovery_pending: `{master_counts.get('pending', 0)}`\n"
         f"master_discovery_auto_promoted: `{master_counts.get('auto_promoted', 0)}`\n"
