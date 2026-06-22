@@ -488,6 +488,11 @@
         "note": "Historical exchange calendars are verified from official daily market-data endpoints. Future dates are not weekday-filled unless an official notice source explicitly verifies them."
       }
     },
+    "market_data_sync": {
+      "progress_log_every": 250,
+      "heartbeat_every_seconds": 60,
+      "note": "Long-running futures market-data sync/backfill emits stage progress logs and refreshes ingestion_runs.updated_at/metadata.progress at this cadence."
+    },
     "diagnostics": {
       "lookback_years": [
         3,

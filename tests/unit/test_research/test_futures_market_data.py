@@ -3851,10 +3851,17 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    heartbeats = []
+    original_heartbeat = storage.heartbeat_ingestion_run
+
+    def recording_heartbeat(run_id, *, metadata=None):
+        heartbeats.append(metadata or {})
+        return original_heartbeat(run_id, metadata=metadata)
 
     async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
         return [_official_contract_row(exchange=exchange, trade_date=trade_date)]
 
+    monkeypatch.setattr(storage, "heartbeat_ingestion_run", recording_heartbeat)
     monkeypatch.setattr(
         "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
         fake_official_fetch,
@@ -3879,6 +3886,56 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
         "would_write_rows": 1,
     }
     assert storage.get_price_bars("CNF.CU.SHFE.main") == []
+
+
+@pytest.mark.asyncio
+async def test_futures_market_data_sync_heartbeats_progress_metadata(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["market_data_sync"] = {
+        "progress_log_every": 1,
+        "heartbeat_every_seconds": 60,
+    }
+    config.modules["commodity_market_data"]["sources"] = {
+        "preferred_order": ["exchange_official", "akshare_futures"],
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE"], "timeout_seconds": 1},
+        "akshare_futures": {"enabled": False},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    heartbeats = []
+    original_heartbeat = storage.heartbeat_ingestion_run
+
+    def recording_heartbeat(run_id, *, metadata=None):
+        heartbeats.append(metadata or {})
+        return original_heartbeat(run_id, metadata=metadata)
+
+    async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
+        return [_official_contract_row(exchange=exchange, trade_date=trade_date)]
+
+    monkeypatch.setattr(storage, "heartbeat_ingestion_run", recording_heartbeat)
+    monkeypatch.setattr(
+        "research.providers.official_futures.OfficialFuturesMarketDataProvider.fetch_exchange_contract_bars",
+        fake_official_fetch,
+    )
+
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+        dry_run=True,
+    )
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT metadata_json FROM ingestion_runs WHERE id = ?",
+            (result["run_id"],),
+        ).fetchone()
+    metadata = json.loads(row["metadata_json"])
+
+    assert result["status"] == "success"
+    assert any(item.get("progress", {}).get("stage") == "official_payload_fetch" for item in heartbeats)
+    assert metadata["status"] == "success"
+    assert result["official_fanout"]["exchange_payload_requests"] == 1
 
 
 @pytest.mark.asyncio

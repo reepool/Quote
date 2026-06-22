@@ -1525,6 +1525,45 @@ class FuturesStorageManager:
                 (status, now, _json_dumps(metadata or {}), now, run_id),
             )
 
+    def heartbeat_ingestion_run(
+        self,
+        run_id: int,
+        *,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Refresh a long-running ingestion run without changing its status."""
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            if metadata is None:
+                conn.execute(
+                    """
+                    UPDATE ingestion_runs
+                    SET updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (now, run_id),
+                )
+                return
+            row = conn.execute(
+                "SELECT metadata_json FROM ingestion_runs WHERE id = ?",
+                (run_id,),
+            ).fetchone()
+            current: Dict[str, Any] = {}
+            if row is not None:
+                try:
+                    current = json.loads(row["metadata_json"] or "{}")
+                except json.JSONDecodeError:
+                    current = {}
+            current.update(metadata)
+            conn.execute(
+                """
+                UPDATE ingestion_runs
+                SET metadata_json = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (_json_dumps(current), now, run_id),
+            )
+
     def upsert_categories(self, categories: Sequence[FuturesCategory]) -> int:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
@@ -6684,6 +6723,15 @@ class FuturesMarketDataSyncService:
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = research_config.modules.get("commodity_market_data", {})
+        sync_cfg = self.module_cfg.get("market_data_sync", {}) if isinstance(self.module_cfg, dict) else {}
+        try:
+            self.progress_log_every = max(1, int(sync_cfg.get("progress_log_every", 250)))
+        except (TypeError, ValueError):
+            self.progress_log_every = 250
+        try:
+            self.heartbeat_every_seconds = max(5.0, float(sync_cfg.get("heartbeat_every_seconds", 60)))
+        except (TypeError, ValueError):
+            self.heartbeat_every_seconds = 60.0
 
     def _low_quality_calendar_ranges(
         self,
@@ -6933,6 +6981,18 @@ class FuturesMarketDataSyncService:
                 },
             },
         )
+        logger.info(
+            "[FuturesMarketDataSync] started run_id=%s exchanges=%s series=%s start=%s end=%s "
+            "dry_run=%s target_dates=%s calendar_status=%s",
+            run_id,
+            target_exchanges,
+            len(target_series),
+            start_date,
+            end_date,
+            dry_run,
+            calendar_gate.get("target_date_count"),
+            calendar_gate.get("status"),
+        )
         if calendar_gate.get("status") == "blocked" and not dry_run:
             result = {
                 "status": "blocked",
@@ -6992,6 +7052,37 @@ class FuturesMarketDataSyncService:
                 "official_empty": 0,
                 "fallback_attempts": 0,
             }
+            last_heartbeat_ts = time.monotonic()
+            processed_series_count = 0
+
+            def heartbeat(stage: str, extra: Optional[Dict[str, Any]] = None, *, force: bool = False) -> None:
+                nonlocal last_heartbeat_ts
+                now_ts = time.monotonic()
+                if not force and now_ts - last_heartbeat_ts < self.heartbeat_every_seconds:
+                    return
+                payload = {
+                    "progress": {
+                        "stage": stage,
+                        "processed_series": processed_series_count,
+                        "total_series": len(target_series),
+                        "totals": totals,
+                        "source_selection": source_selection,
+                        "official_fanout": fanout_diagnostics,
+                    }
+                }
+                if extra:
+                    payload["progress"].update(extra)
+                try:
+                    self.storage.heartbeat_ingestion_run(run_id, metadata=payload)
+                except Exception as exc:
+                    logger.warning(
+                        "[FuturesMarketDataSync] heartbeat failed run_id=%s stage=%s error=%s",
+                        run_id,
+                        stage,
+                        exc,
+                    )
+                last_heartbeat_ts = now_ts
+
             for item in target_series:
                 bars: List[FuturesBar] = []
                 contracts: List[FuturesContract] = []
@@ -7005,6 +7096,20 @@ class FuturesMarketDataSyncService:
                 exchange = str(item.instrument_id).split(".")[-1].upper()
                 target_dates = list(target_dates_by_exchange.get(exchange) or [])
                 date_results: List[Dict[str, Any]] = []
+                logger.info(
+                    "[FuturesMarketDataSync] series start run_id=%s series=%s exchange=%s "
+                    "target_dates=%s dry_run=%s",
+                    run_id,
+                    item.series_id,
+                    exchange,
+                    len(target_dates),
+                    dry_run,
+                )
+                heartbeat(
+                    "series_start",
+                    {"series_id": item.series_id, "exchange": exchange, "series_target_dates": len(target_dates)},
+                    force=True,
+                )
                 if not target_dates:
                     series_results.append(
                         {
@@ -7019,6 +7124,12 @@ class FuturesMarketDataSyncService:
                                 "reason": "no_governed_trading_dates",
                             },
                         }
+                    )
+                    processed_series_count += 1
+                    logger.info(
+                        "[FuturesMarketDataSync] series skipped run_id=%s series=%s reason=no_governed_trading_dates",
+                        run_id,
+                        item.series_id,
                     )
                     continue
                 lifecycle_skip = _series_lifecycle_exclusion(
@@ -7041,9 +7152,17 @@ class FuturesMarketDataSyncService:
                             "lifecycle": lifecycle_skip,
                         }
                     )
+                    processed_series_count += 1
+                    logger.info(
+                        "[FuturesMarketDataSync] series skipped run_id=%s series=%s reason=lifecycle_skip "
+                        "details=%s",
+                        run_id,
+                        item.series_id,
+                        lifecycle_skip,
+                    )
                     continue
                 try:
-                    for target_date in target_dates:
+                    for date_index, target_date in enumerate(target_dates, start=1):
                         day_bars: List[FuturesBar] = []
                         day_official_status = "disabled"
                         day_official_reason = ""
@@ -7064,6 +7183,33 @@ class FuturesMarketDataSyncService:
                                 exchange_rows = None
                                 try:
                                     fanout_diagnostics["exchange_payload_requests"] += 1
+                                    request_no = fanout_diagnostics["exchange_payload_requests"]
+                                    if request_no == 1 or request_no % self.progress_log_every == 0:
+                                        logger.info(
+                                            "[FuturesMarketDataSync] official payload progress run_id=%s "
+                                            "exchange=%s request=%s trade_date=%s series=%s "
+                                            "series_date_index=%s/%s fetched_rows=%s failed=%s",
+                                            run_id,
+                                            exchange,
+                                            request_no,
+                                            target_date,
+                                            item.series_id,
+                                            date_index,
+                                            len(target_dates),
+                                            totals["fetched_rows"],
+                                            totals["failed"],
+                                        )
+                                        heartbeat(
+                                            "official_payload_fetch",
+                                            {
+                                                "exchange": exchange,
+                                                "trade_date": target_date,
+                                                "series_id": item.series_id,
+                                                "series_date_index": date_index,
+                                                "series_target_dates": len(target_dates),
+                                            },
+                                            force=True,
+                                        )
                                     exchange_rows = await asyncio.wait_for(
                                         official_provider.fetch_exchange_contract_bars(
                                             exchange,
@@ -7080,6 +7226,15 @@ class FuturesMarketDataSyncService:
                                         "status": day_official_status,
                                         "reason": day_official_reason,
                                     }
+                                    logger.warning(
+                                        "[FuturesMarketDataSync] official payload unavailable run_id=%s "
+                                        "exchange=%s trade_date=%s series=%s reason=%s",
+                                        run_id,
+                                        exchange,
+                                        target_date,
+                                        item.series_id,
+                                        exc,
+                                    )
                                 except Exception as exc:
                                     day_official_status = "failed"
                                     day_official_reason = str(exc)
@@ -7087,6 +7242,15 @@ class FuturesMarketDataSyncService:
                                         "status": day_official_status,
                                         "reason": day_official_reason,
                                     }
+                                    logger.warning(
+                                        "[FuturesMarketDataSync] official payload failed run_id=%s "
+                                        "exchange=%s trade_date=%s series=%s error=%s",
+                                        run_id,
+                                        exchange,
+                                        target_date,
+                                        item.series_id,
+                                        exc,
+                                    )
                             if exchange_rows is not None:
                                 try:
                                     official_artifacts = official_provider.build_series_artifacts_from_contract_rows(
@@ -7120,6 +7284,27 @@ class FuturesMarketDataSyncService:
                         if not day_bars and fallback_enabled:
                             try:
                                 fanout_diagnostics["fallback_attempts"] += 1
+                                fallback_no = fanout_diagnostics["fallback_attempts"]
+                                if fallback_no == 1 or fallback_no % self.progress_log_every == 0:
+                                    logger.info(
+                                        "[FuturesMarketDataSync] fallback progress run_id=%s profile=akshare_futures "
+                                        "attempt=%s series=%s trade_date=%s fetched_rows=%s",
+                                        run_id,
+                                        fallback_no,
+                                        item.series_id,
+                                        target_date,
+                                        totals["fetched_rows"],
+                                    )
+                                    heartbeat(
+                                        "fallback_fetch",
+                                        {
+                                            "series_id": item.series_id,
+                                            "exchange": exchange,
+                                            "trade_date": target_date,
+                                            "fallback_attempts": fallback_no,
+                                        },
+                                        force=True,
+                                    )
                                 day_bars = await asyncio.wait_for(
                                     fallback_provider.fetch_daily_bars(
                                         item,
@@ -7137,6 +7322,14 @@ class FuturesMarketDataSyncService:
                             except Exception as exc:
                                 day_fallback_status = "failed"
                                 day_fallback_reason = str(exc)
+                                logger.warning(
+                                    "[FuturesMarketDataSync] fallback failed run_id=%s profile=akshare_futures "
+                                    "series=%s trade_date=%s error=%s",
+                                    run_id,
+                                    item.series_id,
+                                    target_date,
+                                    exc,
+                                )
                         elif not day_bars:
                             day_fallback_status = "disabled"
                         if day_bars:
@@ -7223,6 +7416,25 @@ class FuturesMarketDataSyncService:
                             "write_result": write_result,
                         }
                     )
+                    processed_series_count += 1
+                    logger.info(
+                        "[FuturesMarketDataSync] series done run_id=%s series=%s status=%s "
+                        "fetched=%s target_dates=%s inserted=%s changed=%s unchanged=%s would_write=%s",
+                        run_id,
+                        item.series_id,
+                        "success" if len(bars) == len(target_dates) else "partial",
+                        len(bars),
+                        len(target_dates),
+                        write_result.get("inserted", 0),
+                        write_result.get("changed", 0),
+                        write_result.get("unchanged", 0),
+                        write_result.get("would_write_rows", 0),
+                    )
+                    heartbeat(
+                        "series_done",
+                        {"series_id": item.series_id, "series_fetched_rows": len(bars)},
+                        force=True,
+                    )
                 except Exception as exc:
                     totals["failed"] += 1
                     series_results.append(
@@ -7238,6 +7450,21 @@ class FuturesMarketDataSyncService:
                             "date_results": date_results,
                             "reason": str(exc),
                         }
+                    )
+                    processed_series_count += 1
+                    logger.warning(
+                        "[FuturesMarketDataSync] series failed run_id=%s series=%s exchange=%s "
+                        "target_dates=%s reason=%s",
+                        run_id,
+                        item.series_id,
+                        exchange,
+                        len(target_dates),
+                        exc,
+                    )
+                    heartbeat(
+                        "series_failed",
+                        {"series_id": item.series_id, "exchange": exchange, "reason": str(exc)[:500]},
+                        force=True,
                     )
             status = "success" if totals["failed"] == 0 else "partial"
             if not dry_run:
@@ -7257,6 +7484,23 @@ class FuturesMarketDataSyncService:
             if callable(close):
                 await asyncio.to_thread(close)
             self.storage.finish_ingestion_run(run_id, status=status, metadata=result)
+            logger.info(
+                "[FuturesMarketDataSync] done run_id=%s status=%s dry_run=%s fetched=%s "
+                "would_write=%s inserted=%s changed=%s unchanged=%s failed=%s official_requests=%s "
+                "cache_hits=%s fallback_attempts=%s",
+                run_id,
+                status,
+                dry_run,
+                totals.get("fetched_rows"),
+                totals.get("would_write_price_bars"),
+                totals.get("inserted"),
+                totals.get("changed"),
+                totals.get("unchanged"),
+                totals.get("failed"),
+                fanout_diagnostics.get("exchange_payload_requests"),
+                fanout_diagnostics.get("exchange_payload_cache_hits"),
+                fanout_diagnostics.get("fallback_attempts"),
+            )
             return result
         except Exception as exc:
             if "official_provider" in locals():
@@ -7264,6 +7508,7 @@ class FuturesMarketDataSyncService:
                 if callable(close):
                     await asyncio.to_thread(close)
             self.storage.finish_ingestion_run(run_id, status="failed", metadata={"reason": str(exc)})
+            logger.exception("[FuturesMarketDataSync] failed run_id=%s error=%s", run_id, exc)
             raise
 
     def _source_enabled(self, profile: str, *, default: bool) -> bool:
