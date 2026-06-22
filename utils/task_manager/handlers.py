@@ -2229,7 +2229,7 @@ class TaskManagerHandlers:
             and 'skip_trading_day_governance' not in flags
         )
         requires_master_data_governance = (
-            str(args.get('requires_master_data_governance', 'false')).lower() in {'1', 'true', 'yes'}
+            str(args.get('requires_master_data_governance', 'true')).lower() not in {'0', 'false', 'no'}
             or 'requires_master_data_governance' in flags
         ) and 'skip_master_data_governance' not in flags
 
@@ -2259,7 +2259,8 @@ class TaskManagerHandlers:
                 f"用法: `/{job_id} exchange=<EXCHANGE> start=YYYY-MM-DD end=YYYY-MM-DD [dry_run|write]`\n\n"
                 "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`、"
-                "`mode=direct`、`requires_master_data_governance`。\n"
+                "`mode=direct`、`master_governance_max_days=N`、"
+                "`skip_master_data_governance`。\n"
                 "未显式指定 `write` 时默认按 dry-run 执行；正式落库必须带 `write`。\n\n"
                 "示例:\n"
                 f"• `/run {job_id} exchange=GFEX start=2026-06-01 end=2026-06-10 dry_run`\n"
@@ -2373,6 +2374,22 @@ class TaskManagerHandlers:
                 mode=mode,
                 dry_run=dry_run,
             )
+            if requires_master_data_governance:
+                try:
+                    from scheduler.tasks import _summarize_futures_master_governance_results
+
+                    result_payload["master_data_governance"] = _summarize_futures_master_governance_results(
+                        [master_result]
+                    )
+                except Exception as summary_exc:
+                    self.task_manager.logger.warning(
+                        "[TaskManagerHandlers] 期货行情前置主数据治理摘要生成失败: %s",
+                        summary_exc,
+                    )
+                    result_payload["master_data_governance"] = {
+                        "status": str(master_result.get("status") or "unknown"),
+                        "counts": master_result.get("counts") or {},
+                    }
             result_status = str(result_payload.get('status') or '').lower()
             result = result_status in {'success', 'warning', 'degraded', 'partial'}
             totals = result_payload.get('totals') or {}

@@ -184,6 +184,116 @@ async def test_run_futures_calendar_backfill_with_args_delegates_to_manual_comma
 
 
 @pytest.mark.asyncio
+async def test_run_futures_market_data_backfill_defaults_to_master_governance():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/run futures_market_data_backfill exchange=DCE start=2024-06-21 end=2026-06-20 dry_run',
+    )
+
+    with patch('data_manager.data_manager') as dm:
+        dm.run_futures_master_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'exchange': 'DCE',
+                'counts': {
+                    'master_discovery_candidates': 1,
+                    'master_discovery_pending_review': 0,
+                    'master_discovery_auto_promoted': 1,
+                },
+                'blockers': [],
+            }
+        )
+        dm.run_futures_market_data_sync = AsyncMock(
+            return_value={
+                'status': 'success',
+                'dry_run': True,
+                'totals': {'fetched_rows': 1, 'would_write_price_bars': 1, 'failed': 0},
+                'source_selection': {'official_success': 1, 'official_failed': 0},
+                'trading_day_governance': {'status': 'success', 'target_date_count': 1},
+                'scope_selection': {'exchanges': ['DCE']},
+                'series': [
+                    {
+                        'series_id': 'CNF.I.DCE.main',
+                        'status': 'success',
+                        'fetched_rows': 1,
+                        'write_result': {'would_write_rows': 1},
+                    }
+                ],
+            }
+        )
+
+        await handler.handle_run_command(event)
+
+    dm.run_futures_master_governance.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
+        exchanges=['DCE'],
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
+        start_date='2024-06-21',
+        end_date='2026-06-20',
+        dry_run=True,
+        max_days=None,
+    )
+    dm.run_futures_market_data_sync.assert_awaited_once()
+    assert any(
+        'master_data_governance: `True`' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
+    assert any(
+        'master_data_governance: `success`' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
+
+
+@pytest.mark.asyncio
+async def test_run_futures_market_data_backfill_can_skip_master_governance():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text=(
+            '/run futures_market_data_backfill exchange=DCE '
+            'start=2024-06-21 end=2026-06-20 dry_run skip_master_data_governance'
+        ),
+    )
+
+    with patch('data_manager.data_manager') as dm:
+        dm.run_futures_master_governance = AsyncMock()
+        dm.run_futures_market_data_sync = AsyncMock(
+            return_value={
+                'status': 'success',
+                'dry_run': True,
+                'totals': {'fetched_rows': 1, 'would_write_price_bars': 1, 'failed': 0},
+                'source_selection': {'official_success': 1, 'official_failed': 0},
+                'trading_day_governance': {'status': 'success', 'target_date_count': 1},
+                'scope_selection': {'exchanges': ['DCE']},
+                'series': [
+                    {
+                        'series_id': 'CNF.I.DCE.main',
+                        'status': 'success',
+                        'fetched_rows': 1,
+                        'write_result': {'would_write_rows': 1},
+                    }
+                ],
+            }
+        )
+
+        await handler.handle_run_command(event)
+
+    dm.run_futures_master_governance.assert_not_awaited()
+    dm.run_futures_market_data_sync.assert_awaited_once()
+    assert any(
+        'master_data_governance: `False`' in call.args[1]
+        for call in task_manager.send_message.await_args_list
+    )
+
+
+@pytest.mark.asyncio
 async def test_hkex_review_command_appends_manual_evidence():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(
