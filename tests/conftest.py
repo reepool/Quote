@@ -20,9 +20,29 @@ sys.path.insert(0, str(project_root))
 from database.connection import DatabaseManager
 from database.models import Base
 from utils.config_manager import UnifiedConfigManager
-from utils.logging_manager import LoggingManager
+from utils.logging_manager import LogConfig, LoggingManager
 from utils.cache import CacheManager
 from utils.validation import DataValidator
+
+
+_TEST_LOG_DIR = Path(tempfile.mkdtemp(prefix="quote_pytest_logs_"))
+
+LoggingManager().configure(
+    LogConfig(
+        level=os.getenv("LOG_LEVEL", "WARNING"),
+        enable_console=False,
+        enable_file=True,
+        log_directory=str(_TEST_LOG_DIR),
+        system_log_filename="sys.log",
+        task_log_filename="task.log",
+        access_log_filename="access.log",
+    )
+)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """Remove temporary test logs so pytest never pollutes production log files."""
+    shutil.rmtree(_TEST_LOG_DIR, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")

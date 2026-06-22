@@ -19,7 +19,7 @@ from utils import scheduler_logger, config_manager, TelegramBot
 from .job_config import JobConfig
 from data_manager import data_manager
 from instrument_master_governance import MasterGovernanceRequirement
-from utils.date_utils import DateUtils
+from utils.date_utils import DateUtils, get_shanghai_time
 from utils.cache import cache_manager
 
 
@@ -3157,6 +3157,59 @@ class ScheduledTasks:
         try:
             master_results: List[Dict[str, Any]] = []
             if requires_trading_day_governance:
+                calendar_start_date = start_date or end_date or get_shanghai_time().date().isoformat()
+                calendar_end_date = end_date or start_date or calendar_start_date
+                scheduler_logger.info(
+                    "[Scheduler] Futures official calendar preflight start exchanges=%s scope_id=%s scope_ids=%s start=%s end=%s dry_run=%s",
+                    exchanges,
+                    scope_id,
+                    scope_ids,
+                    calendar_start_date,
+                    calendar_end_date,
+                    dry_run,
+                )
+                calendar_backfill_result = await data_manager.run_futures_official_calendar_backfill(
+                    scope_id=scope_id,
+                    scope_ids=scope_ids,
+                    exchanges=exchanges,
+                    categories=categories,
+                    instrument_ids=instrument_ids,
+                    series_ids=series_ids,
+                    series_types=series_types,
+                    start_date=calendar_start_date,
+                    end_date=calendar_end_date,
+                    dry_run=dry_run,
+                )
+                scheduler_logger.info(
+                    "[Scheduler] Futures official calendar preflight done status=%s exchanges=%s start=%s end=%s totals=%s",
+                    calendar_backfill_result.get("status"),
+                    calendar_backfill_result.get("exchanges") or exchanges,
+                    calendar_start_date,
+                    calendar_end_date,
+                    calendar_backfill_result.get("totals") or {},
+                )
+                if calendar_backfill_result.get("status") == "blocked" and not dry_run:
+                    await self._send_task_report(
+                        report_data={
+                            'name': '商品期货官方交易日历前置回填报告',
+                            'content': _format_futures_market_data_scheduler_report(calendar_backfill_result),
+                            'status': 'error',
+                            'tasks_completed': 0,
+                            'duration': 'N/A',
+                            'maintenance_tasks': [
+                                {
+                                    'task_name': 'futures_official_calendar_backfill',
+                                    'status': "; ".join(
+                                        calendar_backfill_result.get("blockers") or ["blocked"]
+                                    ),
+                                }
+                            ],
+                        },
+                        report_type='maintenance_report',
+                        task_name='商品期货官方交易日历前置回填',
+                        job_config=job_config,
+                    )
+                    return False
                 governance_result = await data_manager.run_futures_trading_day_governance(
                     scope_id=scope_id,
                     scope_ids=scope_ids,

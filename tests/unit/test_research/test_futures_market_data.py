@@ -2427,6 +2427,39 @@ def test_trading_day_governance_expands_dates_and_quality_gates(tmp_path):
     assert "calendar_quality_below_threshold:SHFE:estimated<required:official_parsed" in production["blockers"]
 
 
+def test_trading_day_governance_defaults_block_estimated_in_production(tmp_path):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"]["trading_day_governance"] = {
+        "enabled_exchanges": ["GFEX"],
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    service = FuturesTradingDayGovernanceService(storage, config.modules["commodity_market_data"])
+    service.bootstrap_estimated_calendar(
+        exchanges=["GFEX"],
+        start_date="2026-06-22",
+        end_date="2026-06-22",
+    )
+
+    result = service.validate_quality_gate(
+        service.expand_target_dates(
+            exchanges=["GFEX"],
+            start_date="2026-06-22",
+            end_date="2026-06-22",
+            dry_run=False,
+        ),
+        dry_run=False,
+    )
+
+    assert result["target_dates_by_exchange"]["GFEX"] == ["2026-06-22"]
+    assert result["minimum_quality"] == "backfilled_verified"
+    assert result["status"] == "blocked"
+    assert (
+        "calendar_quality_below_threshold:GFEX:estimated<required:backfilled_verified"
+        in result["blockers"]
+    )
+
+
 def test_official_futures_calendar_provider_parses_structured_notice(tmp_path):
     provider = OfficialFuturesCalendarProvider(_research_config(tmp_path))
     notice = FuturesCalendarNotice(

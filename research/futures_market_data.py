@@ -3998,8 +3998,12 @@ class FuturesTradingDayGovernanceService:
         gates = self.governance_cfg.get("quality_gates") or {}
         self.min_quality_by_mode = {
             "dry_run": str(gates.get("dry_run_min_quality") or "estimated"),
-            "production": str(gates.get("production_min_quality") or "estimated"),
-            "backfill": str(gates.get("backfill_min_quality") or gates.get("production_min_quality") or "estimated"),
+            "production": str(gates.get("production_min_quality") or "backfilled_verified"),
+            "backfill": str(
+                gates.get("backfill_min_quality")
+                or gates.get("production_min_quality")
+                or "backfilled_verified"
+            ),
         }
         self.allow_manual_override = bool(gates.get("allow_manual_override", True))
 

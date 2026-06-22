@@ -463,6 +463,12 @@
         "GFEX"
       ],
       "default_timezone": "Asia/Shanghai",
+      "quality_gates": {
+        "dry_run_min_quality": "estimated",
+        "production_min_quality": "backfilled_verified",
+        "backfill_min_quality": "backfilled_verified",
+        "allow_manual_override": true
+      },
       "official_calendar_backfill": {
         "enabled": true,
         "start_date": "2000-06-01",
