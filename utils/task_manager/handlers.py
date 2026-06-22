@@ -2307,6 +2307,22 @@ class TaskManagerHandlers:
                 mode,
                 dry_run,
             )
+            await self.task_manager.send_message(
+                chat_id,
+                (
+                    "⏳ *期货行情任务已启动...*\n\n"
+                    f"task: `{job_id}`\n"
+                    f"exchange/scope: `{','.join(exchanges or []) or scope_id or 'configured'}`\n"
+                    f"start: `{start_date}`\n"
+                    f"end: `{end_date}`\n"
+                    f"dry_run: `{dry_run}`\n"
+                    f"mode: `{mode}`\n"
+                    f"trading_day_governance: `{requires_trading_day_governance}`\n"
+                    f"master_data_governance: `{requires_master_data_governance}`\n\n"
+                    "任务已接收，完成后将发送结果报告。"
+                ),
+                parse_mode='markdown',
+            )
             if requires_master_data_governance:
                 from data_manager import data_manager
 

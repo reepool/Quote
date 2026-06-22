@@ -736,6 +736,8 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；生产写入还应打开 `requires_master_data_governance`，使主数据治理成为行情写入前置。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
 
+主数据治理还必须维护根品种生命周期。对历史遗留、拆分、退市或长期不再挂牌的品种，不应在行情同步层按具体代码写特殊 skip，而应在 `futures_instruments.metadata.lifecycle` 中记录统一生命周期窗口，例如 `status`、`valid_from`、`valid_to`、`source`、`reason` 和必要的 `lineage`。行情同步只消费该生命周期：目标日期早于 `valid_from` 或晚于 `valid_to` 时，对应连续序列返回 `lifecycle_skip`，不请求官方源或备源。`active` 不直接等同于“当前仍在交易”；为了支持历史回补，历史遗留品种可以继续保留 `active=true` 参与历史研究 universe，但必须通过 lifecycle 阻止下线日之后的数据下载。
+
 GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
 
 ```json

@@ -38,6 +38,7 @@ from research.futures_market_data import (
     make_futures_contract_id,
     make_futures_instrument_id,
     make_futures_series_id,
+    _series_lifecycle_exclusion,
 )
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
 from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
@@ -300,6 +301,55 @@ def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails
     assert result["totals"]["inserted"] == 0
     assert "calendar_quality_below_threshold:GFEX:estimated<required:backfilled_verified" in result["reason"]
     assert result["trading_day_governance"]["auto_official_calendar_backfill"]["status"] == "blocked"
+
+
+def test_futures_market_data_lifecycle_gate_is_generic_not_symbol_specific():
+    instrument = FuturesInstrument(
+        instrument_id="CNF.X.DCE",
+        symbol="X",
+        name="DCE Legacy Test",
+        exchange="DCE",
+        category="agriculture",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+        metadata={
+            "lifecycle": {
+                "status": "inactive",
+                "valid_from": "2000-06-01",
+                "valid_to": "2001-03-29",
+                "source": "unit_test_master_lifecycle",
+            }
+        },
+    )
+    series = FuturesSeries(
+        series_id="CNF.X.DCE.main",
+        instrument_id="CNF.X.DCE",
+        symbol="X0",
+        series_type="main_continuous",
+        source_profile="akshare_futures",
+        source="akshare",
+        source_interface="futures_zh_daily_sina",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+    )
+
+    exclusion = _series_lifecycle_exclusion(
+        series,
+        ["2026-06-16"],
+        {"CNF.X.DCE": instrument},
+    )
+    in_window = _series_lifecycle_exclusion(
+        series,
+        ["2001-03-01"],
+        {"CNF.X.DCE": instrument},
+    )
+
+    assert exclusion is not None
+    assert exclusion["reason"] == "target_window_outside_instrument_lifecycle"
+    assert exclusion["instrument_lifecycle"]["valid_to"] == "2001-03-29"
+    assert in_window is None
 
 
 def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
@@ -1964,10 +2014,14 @@ def test_futures_master_discovery_preserves_legacy_product_lineage(monkeypatch, 
     instrument = storage.get_instrument("CNF.S.DCE")
     metadata = instrument["metadata"]
     lineage = metadata["master_discovery_evidence"]["product_lineage"]
+    lifecycle = metadata["lifecycle"]
 
     assert result["status"] == "success"
     assert result["counts"]["auto_promoted"] == 1
     assert instrument["name"] == "大豆"
+    assert lifecycle["status"] == "legacy_inactive"
+    assert lifecycle["valid_from"] == "2002-07-01"
+    assert lifecycle["valid_to"] == "2002-07-01"
     assert lineage["legacy_product"] is True
     assert lineage["successor_family"] == ["CNF.A.DCE", "CNF.B.DCE"]
     assert lineage["primary_chronological_successor"] == "CNF.A.DCE"

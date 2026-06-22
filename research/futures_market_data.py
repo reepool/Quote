@@ -14,7 +14,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from statistics import median
-from typing import Any, Dict, Generator, Iterable, List, Optional, Protocol, Sequence
+from typing import Any, Dict, Generator, Iterable, List, Mapping, Optional, Protocol, Sequence
 
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
@@ -1920,11 +1920,13 @@ class FuturesStorageManager:
             priority="P0",
             active=True,
             source_profiles=["exchange_official", "akshare_futures"],
-            metadata={
+            metadata=_metadata_with_governed_lifecycle({
                 "master_discovery_id": discovery_id,
                 "master_discovery_quality": candidate.get("quality_flag"),
+                "master_discovery_first_seen_trade_date": candidate.get("first_seen_trade_date"),
+                "master_discovery_last_seen_trade_date": candidate.get("last_seen_trade_date"),
                 "master_discovery_evidence": candidate.get("evidence") or {},
-            },
+            }),
         )
         series = FuturesSeries(
             series_id=str(candidate.get("candidate_series_id") or make_futures_series_id(instrument.instrument_id)),
@@ -5789,10 +5791,28 @@ class FuturesMasterGovernanceService:
                 enrichment_status.startswith("official_product_spec")
             )
             if not core_changed and not has_official_product_spec:
-                refreshed_by_id[item.instrument_id] = item
+                metadata = _metadata_with_governed_lifecycle(dict(item.metadata or {}))
+                refreshed = FuturesInstrument(
+                    instrument_id=item.instrument_id,
+                    symbol=item.symbol,
+                    name=item.name,
+                    exchange=item.exchange,
+                    category=item.category,
+                    currency=item.currency,
+                    unit=item.unit,
+                    priority=item.priority,
+                    active=item.active,
+                    source_profiles=list(item.source_profiles or []),
+                    metadata=metadata,
+                )
+                if refreshed.metadata != item.metadata:
+                    changed_instruments += 1
+                    changed_instrument_ids.add(item.instrument_id)
+                refreshed_by_id[item.instrument_id] = refreshed
                 continue
             metadata = dict(item.metadata or {})
             metadata["master_governance_evidence"] = enriched.evidence
+            metadata = _metadata_with_governed_lifecycle(metadata)
             refreshed = FuturesInstrument(
                 instrument_id=item.instrument_id,
                 symbol=item.symbol,
@@ -6373,6 +6393,134 @@ def _date_range_count(start_date: str, end_date: str) -> int:
     return (end - start).days + 1
 
 
+def _date_key_or_none(value: Any) -> Optional[str]:
+    if value in (None, ""):
+        return None
+    try:
+        return _date_key(str(value))
+    except Exception:
+        return None
+
+
+def _observed_trade_date_window(metadata: Mapping[str, Any]) -> tuple[Optional[str], Optional[str], int]:
+    explicit_first = (
+        _date_key_or_none(metadata.get("master_discovery_first_seen_trade_date"))
+        or _date_key_or_none(metadata.get("first_observed_trade_date"))
+    )
+    explicit_last = (
+        _date_key_or_none(metadata.get("master_discovery_last_seen_trade_date"))
+        or _date_key_or_none(metadata.get("last_observed_trade_date"))
+    )
+    evidence = metadata.get("master_discovery_evidence") or {}
+    raw_dates = (
+        evidence.get("observed_trade_dates")
+        or metadata.get("observed_trade_dates")
+        or []
+    )
+    observed_dates = sorted({
+        date_key
+        for date_key in (_date_key_or_none(item) for item in raw_dates)
+        if date_key
+    })
+    if explicit_first or explicit_last:
+        return (
+            explicit_first or (observed_dates[0] if observed_dates else None),
+            explicit_last or (observed_dates[-1] if observed_dates else None),
+            len(observed_dates),
+        )
+    if not observed_dates:
+        return None, None, 0
+    return observed_dates[0], observed_dates[-1], len(observed_dates)
+
+
+def _instrument_lifecycle_from_metadata(metadata: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
+    """Return governed instrument lifecycle metadata without symbol-specific rules."""
+    lifecycle = metadata.get("lifecycle") or metadata.get("market_lifecycle") or {}
+    if isinstance(lifecycle, Mapping):
+        valid_from = (
+            _date_key_or_none(lifecycle.get("valid_from"))
+            or _date_key_or_none(lifecycle.get("data_available_from"))
+            or _date_key_or_none(lifecycle.get("first_observed_trade_date"))
+        )
+        valid_to = (
+            _date_key_or_none(lifecycle.get("valid_to"))
+            or _date_key_or_none(lifecycle.get("data_available_to"))
+            or _date_key_or_none(lifecycle.get("last_observed_trade_date"))
+        )
+        if valid_from or valid_to:
+            return {
+                "status": str(lifecycle.get("status") or lifecycle.get("lifecycle_status") or "governed"),
+                "valid_from": valid_from,
+                "valid_to": valid_to,
+                "source": str(lifecycle.get("source") or "instrument_master_lifecycle"),
+                "reason": str(lifecycle.get("reason") or ""),
+                "lineage": lifecycle.get("lineage") or {},
+            }
+
+    evidence = metadata.get("master_discovery_evidence") or {}
+    lineage = evidence.get("product_lineage") or metadata.get("product_lineage") or {}
+    first_observed, last_observed, observed_count = _observed_trade_date_window(metadata)
+    if not first_observed:
+        return None
+    if bool(lineage.get("legacy_product") or metadata.get("legacy_product")):
+        return {
+            "status": "legacy_inactive",
+            "valid_from": first_observed,
+            "valid_to": last_observed,
+            "source": "master_discovery_observed_trade_dates",
+            "reason": "legacy_product_successor_lineage",
+            "observed_trade_date_count": observed_count,
+            "lineage": lineage,
+        }
+    return {
+        "status": "observed_active",
+        "valid_from": first_observed,
+        "valid_to": None,
+        "source": "master_discovery_observed_trade_dates",
+        "reason": "first_observed_from_master_governance",
+        "observed_trade_date_count": observed_count,
+        "lineage": lineage,
+    }
+
+
+def _metadata_with_governed_lifecycle(metadata: Mapping[str, Any]) -> Dict[str, Any]:
+    payload = dict(metadata or {})
+    if payload.get("lifecycle"):
+        return payload
+    lifecycle = _instrument_lifecycle_from_metadata(payload)
+    if lifecycle:
+        payload["lifecycle"] = lifecycle
+    return payload
+
+
+def _series_lifecycle_exclusion(
+    series: FuturesSeries,
+    target_dates: Sequence[str],
+    instrument_by_id: Mapping[str, FuturesInstrument],
+) -> Optional[Dict[str, Any]]:
+    if not target_dates:
+        return None
+    instrument = instrument_by_id.get(str(series.instrument_id).upper())
+    if instrument is None:
+        return None
+    lifecycle = _instrument_lifecycle_from_metadata(dict(instrument.metadata or {}))
+    if not lifecycle:
+        return None
+    valid_from = lifecycle.get("valid_from")
+    valid_to = lifecycle.get("valid_to")
+    target_start = _date_key(min(target_dates))
+    target_end = _date_key(max(target_dates))
+    if (valid_from and target_end < valid_from) or (valid_to and target_start > valid_to):
+        return {
+            "status": "lifecycle_skip",
+            "reason": "target_window_outside_instrument_lifecycle",
+            "instrument_lifecycle": lifecycle,
+            "target_start": target_start,
+            "target_end": target_end,
+        }
+    return None
+
+
 class FuturesReadinessService:
     def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
         self.storage = storage
@@ -6693,6 +6841,10 @@ class FuturesMarketDataSyncService:
             item for item in universe_selector.series
             if item.active and item.series_id.upper() in selected_series_ids
         ]
+        instrument_by_id = {
+            item.instrument_id.upper(): item
+            for item in universe_selector.instruments
+        }
         target_exchanges = sorted(
             {
                 str(item.instrument_id).split(".")[-1].upper()
@@ -6866,6 +7018,27 @@ class FuturesMarketDataSyncService:
                                 "target_dates": [],
                                 "reason": "no_governed_trading_dates",
                             },
+                        }
+                    )
+                    continue
+                lifecycle_skip = _series_lifecycle_exclusion(
+                    item,
+                    target_dates,
+                    instrument_by_id,
+                )
+                if lifecycle_skip:
+                    series_results.append(
+                        {
+                            "series_id": item.series_id,
+                            "status": "lifecycle_skip",
+                            "source_profile": None,
+                            "fetched_rows": 0,
+                            "write_result": {"inserted": 0, "changed": 0, "unchanged": 0},
+                            "calendar": {
+                                "exchange": exchange,
+                                "target_dates": target_dates,
+                            },
+                            "lifecycle": lifecycle_skip,
                         }
                     )
                     continue
