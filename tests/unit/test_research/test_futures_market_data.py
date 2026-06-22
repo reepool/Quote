@@ -2465,10 +2465,10 @@ def test_normalize_provider_bars_marks_missing_extended_fields_partial():
     series = FuturesSeries(
         series_id="CNF.LC.GFEX.main",
         instrument_id="CNF.LC.GFEX",
-        series_type="main_continuous",
         symbol="LC0",
-        exchange="GFEX",
-        name="GFEX Lithium Carbonate Main",
+        series_type="main_continuous",
+        source_profile="akshare_futures",
+        source="akshare",
         currency="CNY",
         unit="CNY/ton",
     )
