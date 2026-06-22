@@ -5355,6 +5355,13 @@ class FuturesMasterGovernanceService:
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = module_cfg or research_config.modules.get("commodity_market_data", {})
+        master_cfg = self.module_cfg.get("master_data") if isinstance(self.module_cfg, dict) else {}
+        if not isinstance(master_cfg, dict):
+            master_cfg = {}
+        try:
+            self.progress_log_every = max(1, int(master_cfg.get("progress_log_every", 250)))
+        except (TypeError, ValueError):
+            self.progress_log_every = 250
 
     def run(
         self,
@@ -5443,6 +5450,20 @@ class FuturesMasterGovernanceService:
                 end_date=end,
                 dry_run=dry_run,
             )
+        logger.info(
+            "[FuturesMasterGovernance] start exchange=%s start=%s end=%s dry_run=%s "
+            "verified_trading_days=%s first=%s last=%s instruments=%s series=%s max_days=%s",
+            exchange,
+            start,
+            end,
+            dry_run,
+            len(verified_days),
+            verified_days[0],
+            verified_days[-1],
+            len(instruments),
+            len(series),
+            max_days,
+        )
 
         result = {
             "status": "success",
@@ -5504,6 +5525,12 @@ class FuturesMasterGovernanceService:
             provider = OfficialFuturesMarketDataProvider(self.research_config)
             try:
                 metrics_before = _provider_metrics_for_exchange(provider, exchange)
+                logger.info(
+                    "[FuturesMasterGovernance] product spec enrichment start exchange=%s instruments=%s series=%s",
+                    exchange,
+                    len(instruments),
+                    len(series),
+                )
                 discovery_service.load_official_product_specs(
                     exchange,
                     provider,
@@ -5519,6 +5546,14 @@ class FuturesMasterGovernanceService:
                 result["counts"]["refreshed_series"] = refresh_counts["series"]
                 result["counts"]["instruments"] = len(instruments)
                 result["counts"]["series"] = len(series)
+                logger.info(
+                    "[FuturesMasterGovernance] product spec enrichment done exchange=%s "
+                    "refreshed_instruments=%s refreshed_series=%s warnings=%s",
+                    exchange,
+                    refresh_counts["instruments"],
+                    refresh_counts["series"],
+                    len(result["warnings"]),
+                )
                 instrument_by_symbol = {item.symbol.upper(): item for item in instruments}
                 first_seen: Dict[str, str] = {}
                 last_seen: Dict[str, str] = {}
@@ -5575,15 +5610,38 @@ class FuturesMasterGovernanceService:
                                 ],
                             },
                         )
-                for trade_date in verified_days:
+                for day_index, trade_date in enumerate(verified_days, start=1):
                     try:
                         result["counts"]["official_request_count"] += 1
                         rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
                     except OfficialFuturesSourceUnavailable as exc:
                         failed_fetches[trade_date] = str(exc)
+                        logger.warning(
+                            "[FuturesMasterGovernance] official contract discovery failed exchange=%s "
+                            "trade_date=%s index=%s/%s error=%s",
+                            exchange,
+                            trade_date,
+                            day_index,
+                            len(verified_days),
+                            exc,
+                        )
                         continue
                     rows_by_trade_date[trade_date] = rows
                     process_rows(trade_date, rows)
+                    if day_index == 1 or day_index % self.progress_log_every == 0 or day_index == len(verified_days):
+                        logger.info(
+                            "[FuturesMasterGovernance] progress exchange=%s scanned=%s/%s trade_date=%s "
+                            "contracts=%s unknown_varieties=%s discovery_candidates=%s failed_dates=%s requests=%s",
+                            exchange,
+                            day_index,
+                            len(verified_days),
+                            trade_date,
+                            len(contracts_by_id),
+                            len(unmapped_varieties),
+                            len(discovery_candidates),
+                            len(failed_fetches),
+                            result["counts"]["official_request_count"],
+                        )
                 retry_cfg = self._contract_discovery_retry_config()
                 retry_pass_limit = int(retry_cfg["retry_passes"])
                 retry_pause_seconds = float(retry_cfg["retry_pause_seconds"])
@@ -5591,25 +5649,68 @@ class FuturesMasterGovernanceService:
                     if not failed_fetches:
                         break
                     if retry_pause_seconds > 0:
+                        logger.info(
+                            "[FuturesMasterGovernance] retry pause exchange=%s pass=%s failed_dates=%s pause_seconds=%s",
+                            exchange,
+                            retry_pass,
+                            len(failed_fetches),
+                            retry_pause_seconds,
+                        )
                         time.sleep(retry_pause_seconds)
                     result["counts"]["task_retry_passes"] = retry_pass
-                    for trade_date in list(failed_fetches):
+                    retry_dates = list(failed_fetches)
+                    logger.info(
+                        "[FuturesMasterGovernance] retry start exchange=%s pass=%s dates=%s first=%s last=%s",
+                        exchange,
+                        retry_pass,
+                        len(retry_dates),
+                        retry_dates[0] if retry_dates else None,
+                        retry_dates[-1] if retry_dates else None,
+                    )
+                    pass_resolved = 0
+                    for retry_index, trade_date in enumerate(retry_dates, start=1):
                         try:
                             result["counts"]["official_request_count"] += 1
                             rows = provider.fetch_exchange_contract_bars_sync(exchange, trade_date)
                         except OfficialFuturesSourceUnavailable as exc:
                             failed_fetches[trade_date] = str(exc)
+                            logger.warning(
+                                "[FuturesMasterGovernance] retry failed exchange=%s pass=%s "
+                                "index=%s/%s trade_date=%s error=%s",
+                                exchange,
+                                retry_pass,
+                                retry_index,
+                                len(retry_dates),
+                                trade_date,
+                                exc,
+                            )
                             continue
                         rows_by_trade_date[trade_date] = rows
                         process_rows(trade_date, rows)
                         failed_fetches.pop(trade_date, None)
                         result["counts"]["task_retry_resolved"] += 1
+                        pass_resolved += 1
+                    logger.info(
+                        "[FuturesMasterGovernance] retry end exchange=%s pass=%s resolved=%s remaining=%s requests=%s",
+                        exchange,
+                        retry_pass,
+                        pass_resolved,
+                        len(failed_fetches),
+                        result["counts"]["official_request_count"],
+                    )
                 for contract_id, item in list(contracts_by_id.items()):
                     metadata = dict(item.metadata)
                     metadata["first_observed_trade_date"] = first_seen.get(contract_id)
                     metadata["last_observed_trade_date"] = last_seen.get(contract_id)
                     contracts_by_id[contract_id] = FuturesContract(**{**asdict(item), "metadata": metadata})
                 if unmapped_varieties and discovery_candidates:
+                    logger.info(
+                        "[FuturesMasterGovernance] unknown varieties detected exchange=%s varieties=%s "
+                        "candidates=%s refresh_specs=True",
+                        exchange,
+                        sorted(unmapped_varieties.items())[:20],
+                        len(discovery_candidates),
+                    )
                     discovery_service.load_official_product_specs(
                         exchange,
                         provider,
@@ -5623,6 +5724,11 @@ class FuturesMasterGovernanceService:
                             adapter.enrich_candidate(candidate)
                             for candidate in discovery_candidates
                         ]
+                    logger.info(
+                        "[FuturesMasterGovernance] unknown varieties enrichment done exchange=%s candidates=%s",
+                        exchange,
+                        len(discovery_candidates),
+                    )
                 metrics_after = _provider_metrics_for_exchange(provider, exchange)
                 source_metrics = _metric_delta(metrics_before, metrics_after)
                 result["counts"]["challenge_count"] = int(source_metrics.get("challenge_count", 0))
@@ -5654,6 +5760,14 @@ class FuturesMasterGovernanceService:
             )
 
         if unmapped_varieties:
+            logger.info(
+                "[FuturesMasterGovernance] discovery promotion start exchange=%s dry_run=%s "
+                "unknown_varieties=%s candidates=%s",
+                exchange,
+                dry_run,
+                sorted(unmapped_varieties.items())[:20],
+                len(discovery_candidates),
+            )
             discovery_result = discovery_service.persist_and_promote(
                 discovery_candidates,
                 dry_run=dry_run,
@@ -5698,6 +5812,13 @@ class FuturesMasterGovernanceService:
                         if symbol not in remapped_symbols
                     }
                     result["counts"]["auto_promoted_reprocessed_varieties"] = len(remapped_symbols)
+                    logger.info(
+                        "[FuturesMasterGovernance] auto-promoted varieties reprocessed exchange=%s varieties=%s "
+                        "contracts=%s",
+                        exchange,
+                        sorted(remapped_symbols),
+                        len(contracts_by_id),
+                    )
             result["discovery"] = discovery_result
             result["counts"]["master_discovery_candidates"] = discovery_result.get("candidates_discovered", 0)
             result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
@@ -5714,7 +5835,21 @@ class FuturesMasterGovernanceService:
             ):
                 result["blockers"].append("pending_futures_master_discovery_review")
                 result["status"] = "blocked"
+                logger.warning(
+                    "[FuturesMasterGovernance] blocked by pending discovery review exchange=%s pending=%s",
+                    exchange,
+                    discovery_result.get("pending_review"),
+                )
                 return result
+            logger.info(
+                "[FuturesMasterGovernance] discovery promotion done exchange=%s candidates=%s "
+                "auto_promoted=%s pending_review=%s remaining_unknown=%s",
+                exchange,
+                discovery_result.get("candidates_discovered", 0),
+                discovery_result.get("auto_promoted", 0),
+                discovery_result.get("pending_review", 0),
+                len(unmapped_varieties),
+            )
         contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
         result["counts"]["contracts_discovered"] = len(contracts)
         result["contracts"] = [
@@ -5736,6 +5871,13 @@ class FuturesMasterGovernanceService:
             result["status"] = "warning"
 
         if not dry_run:
+            logger.info(
+                "[FuturesMasterGovernance] write start exchange=%s instruments=%s series=%s contracts=%s",
+                exchange,
+                len(instruments),
+                len(series),
+                len(contracts),
+            )
             self.storage.upsert_instruments_and_series(instruments, series)
             result["counts"]["contracts_written"] = self.storage.upsert_contracts(contracts) if contracts else 0
             final_instruments = [
@@ -5752,6 +5894,14 @@ class FuturesMasterGovernanceService:
             ]
             result["counts"]["final_instruments"] = len(final_instruments)
             result["counts"]["final_series"] = len(final_series)
+            logger.info(
+                "[FuturesMasterGovernance] write done exchange=%s contracts_written=%s "
+                "final_instruments=%s final_series=%s",
+                exchange,
+                result["counts"]["contracts_written"],
+                result["counts"]["final_instruments"],
+                result["counts"]["final_series"],
+            )
         else:
             result["counts"]["final_instruments"] = (
                 len(instruments) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)

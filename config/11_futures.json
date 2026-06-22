@@ -217,6 +217,7 @@
         "retry_passes": 1,
         "retry_pause_seconds": 2
       },
+      "progress_log_every": 250,
       "future_extension_markets": [
         "CME",
         "ICE",
