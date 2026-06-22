@@ -1529,7 +1529,7 @@ class OfficialFuturesMarketDataProvider:
         mappings: List[FuturesContinuousMapping] = []
         for row in rows:
             contract_id = make_futures_contract_id(series.instrument_id, row.contract)
-            quality = "ok" if not row.warnings else "partial"
+            quality = _bar_quality_flag(row)
             contracts_by_id[contract_id] = FuturesContract(
                 contract_id=contract_id,
                 instrument_id=series.instrument_id,
@@ -1590,7 +1590,7 @@ class OfficialFuturesMarketDataProvider:
                 "warnings": selected.warnings,
                 "raw_payload": selected.raw_payload,
             }
-            quality = "ok" if not selected.warnings else "partial"
+            quality = _bar_quality_flag(selected)
             bars.append(
                 FuturesBar(
                     series_id=series.series_id,
@@ -2263,6 +2263,25 @@ def _quality_warnings(row: Mapping[str, Any], *, amount_unit: str) -> List[str]:
             warnings.append("missing_price_field")
             break
     return sorted(set(warnings))
+
+
+def _bar_quality_flag(row: OfficialFuturesContractBar) -> str:
+    material_warnings = {
+        warning
+        for warning in row.warnings
+        if warning not in {"amount_unit_exchange_reported"}
+    }
+    if material_warnings:
+        return "partial"
+    prices = [row.open, row.high, row.low, row.close]
+    if row.close is None:
+        return "missing_close"
+    if all(value is not None for value in prices):
+        open_value, high_value, low_value, close_value = [float(value) for value in prices]
+        if low_value <= open_value <= high_value and low_value <= close_value <= high_value:
+            return "ok"
+        return "ohlc_inconsistent"
+    return "partial"
 
 
 def _hash_payload(value: Any) -> str:

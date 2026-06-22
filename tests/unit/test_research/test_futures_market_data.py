@@ -38,6 +38,7 @@ from research.futures_market_data import (
     make_futures_contract_id,
     make_futures_instrument_id,
     make_futures_series_id,
+    normalize_provider_bars,
     _series_lifecycle_exclusion,
 )
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
@@ -2460,6 +2461,40 @@ def test_trading_day_governance_defaults_block_estimated_in_production(tmp_path)
     )
 
 
+def test_normalize_provider_bars_marks_missing_extended_fields_partial():
+    series = FuturesSeries(
+        series_id="CNF.LC.GFEX.main",
+        instrument_id="CNF.LC.GFEX",
+        series_type="main_continuous",
+        symbol="LC0",
+        exchange="GFEX",
+        name="GFEX Lithium Carbonate Main",
+        currency="CNY",
+        unit="CNY/ton",
+    )
+
+    rows = normalize_provider_bars(
+        [
+            {
+                "trade_date": "2023-08-11",
+                "open": 210000,
+                "high": 211700,
+                "low": 205300,
+                "close": 208800,
+                "volume": 51821,
+            }
+        ],
+        series,
+        source="akshare",
+        source_mode="direct",
+        source_profile="akshare_futures",
+        source_interface="futures_zh_daily_sina",
+        parser_version="fixture",
+    )
+
+    assert rows[0].quality_flag == "partial"
+
+
 def test_official_futures_calendar_provider_parses_structured_notice(tmp_path):
     provider = OfficialFuturesCalendarProvider(_research_config(tmp_path))
     notice = FuturesCalendarNotice(
@@ -3475,6 +3510,7 @@ def _official_contract_row(
     close: float = 11,
     open_interest: float = 200,
     raw_payload: Optional[dict] = None,
+    warnings: Optional[list[str]] = None,
 ) -> OfficialFuturesContractBar:
     return OfficialFuturesContractBar(
         exchange=exchange,
@@ -3491,7 +3527,25 @@ def _official_contract_row(
         amount=1234,
         source_interface="official_shfe_daily_kx_dat",
         raw_payload=raw_payload or {"contract": contract},
+        warnings=list(warnings or []),
     )
+
+
+def _seed_verified_calendar(
+    storage: FuturesStorageManager,
+    *,
+    exchange: str = "SHFE",
+    trade_date: str = "2024-06-03",
+) -> None:
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange=exchange,
+            trade_date=trade_date,
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
 
 
 def _seed_dce_iron_ore_master(storage: FuturesStorageManager) -> None:
@@ -3628,9 +3682,16 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
 
     async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):
-        return [_official_contract_row(exchange=exchange, trade_date=trade_date)]
+        return [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                warnings=["amount_unit_exchange_reported"],
+            )
+        ]
 
     async def unexpected_fallback(self, series, *, start_date=None, end_date=None, mode="direct"):
         raise AssertionError("fallback provider should not be called when official source succeeds")
@@ -3644,7 +3705,11 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
         unexpected_fallback,
     )
 
-    result = await FuturesMarketDataSyncService(storage, config).sync(series_ids=["CNF.CU.SHFE.main"])
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=["CNF.CU.SHFE.main"],
+        start_date="2024-06-03",
+        end_date="2024-06-03",
+    )
     rows = storage.get_price_bars("CNF.CU.SHFE.main")
 
     assert result["status"] == "success"
@@ -3653,9 +3718,14 @@ async def test_futures_market_data_sync_prefers_official_source(monkeypatch, tmp
     assert result["official_fanout"]["exchange_payload_requests"] == 1
     assert result["official_fanout"]["series_artifacts_built"] == 1
     assert rows[0]["source_profile"] == "exchange_official"
+    assert rows[0]["quality_flag"] == "ok"
     assert storage.get_contract("CNF.CU.SHFE.CU2407")
-    assert storage.get_contract_price_bars("CNF.CU.SHFE.CU2407")[0]["close"] == 11
-    assert storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]["contract_id"] == "CNF.CU.SHFE.CU2407"
+    contract_bar = storage.get_contract_price_bars("CNF.CU.SHFE.CU2407")[0]
+    mapping = storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]
+    assert contract_bar["close"] == 11
+    assert contract_bar["quality_flag"] == "ok"
+    assert mapping["contract_id"] == "CNF.CU.SHFE.CU2407"
+    assert mapping["quality_flag"] == "ok"
 
 
 @pytest.mark.asyncio
@@ -3720,6 +3790,7 @@ async def test_futures_market_data_sync_fans_out_one_exchange_payload(monkeypatc
     }
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage)
     calls = []
 
     async def fake_official_fetch(self, exchange, trade_date, *, mode="direct"):

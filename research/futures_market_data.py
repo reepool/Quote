@@ -7708,7 +7708,19 @@ def normalize_provider_bars(
         low = _float_or_none(_first_value(normalized, ["low", "最低", "最低价"]))
         close = _float_or_none(_first_value(normalized, ["close", "收盘", "收盘价"]))
         settlement = _float_or_none(_first_value(normalized, ["settlement", "结算", "结算价"]))
-        quality_flag = _quality_flag(open_price, high, low, close)
+        volume = _float_or_none(_first_value(normalized, ["volume", "成交量"]))
+        open_interest = _float_or_none(_first_value(normalized, ["open_interest", "持仓量"]))
+        amount = _float_or_none(_first_value(normalized, ["amount", "成交额"]))
+        quality_flag = _quality_flag(
+            open_price,
+            high,
+            low,
+            close,
+            settlement=settlement,
+            volume=volume,
+            open_interest=open_interest,
+            amount=amount,
+        )
         bars.append(
             FuturesBar(
                 series_id=series.series_id,
@@ -7718,9 +7730,9 @@ def normalize_provider_bars(
                 low=low,
                 close=close,
                 settlement=settlement,
-                volume=_float_or_none(_first_value(normalized, ["volume", "成交量"])),
-                open_interest=_float_or_none(_first_value(normalized, ["open_interest", "持仓量"])),
-                amount=_float_or_none(_first_value(normalized, ["amount", "成交额"])),
+                volume=volume,
+                open_interest=open_interest,
+                amount=amount,
                 currency=series.currency,
                 unit=series.unit,
                 source=source,
@@ -7744,13 +7756,24 @@ def _first_value(row: Dict[str, Any], names: Sequence[str]) -> Any:
     return None
 
 
-def _quality_flag(open_price: Any, high: Any, low: Any, close: Any) -> str:
+def _quality_flag(
+    open_price: Any,
+    high: Any,
+    low: Any,
+    close: Any,
+    *,
+    settlement: Any = None,
+    volume: Any = None,
+    open_interest: Any = None,
+    amount: Any = None,
+) -> str:
     prices = [_float_or_none(value) for value in (open_price, high, low, close)]
     if prices[3] is None:
         return "missing_close"
     if all(value is not None for value in prices):
         open_value, high_value, low_value, close_value = [float(value) for value in prices]
-        if low_value <= open_value <= high_value and low_value <= close_value <= high_value:
-            return "ok"
-        return "ohlc_inconsistent"
+        if not (low_value <= open_value <= high_value and low_value <= close_value <= high_value):
+            return "ohlc_inconsistent"
+        completeness = [_float_or_none(value) for value in (settlement, volume, open_interest, amount)]
+        return "ok" if all(value is not None for value in completeness) else "partial"
     return "partial"
