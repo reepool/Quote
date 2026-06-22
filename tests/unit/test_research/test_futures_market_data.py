@@ -890,6 +890,51 @@ def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
     assert state["requested_api_calls"] == 2
 
 
+def test_dce_browser_client_rejects_direct_call_inside_running_event_loop(monkeypatch):
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                return json.dumps({
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True}),
+                })
+            assert "/dcereport/publicweb/dailystat/dayQuotes" in script
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": []}),
+            })
+
+    class FakeBrowser:
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            return None
+
+    async def fake_start(**kwargs):
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    async def run_inside_loop():
+        client = DceOfficialBrowserClient({
+            "settle_seconds": 0,
+            "retry_attempts": 1,
+            "browser_executable_path": "/tmp/fake-chrome",
+        })
+        with pytest.raises(OfficialFuturesSourceUnavailable, match="worker thread"):
+            client.fetch_day_quotes_payload("2026-06-17")
+        client.close()
+
+    asyncio.run(run_inside_loop())
+
+
 def test_master_governance_uses_provider_supported_exchanges(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())

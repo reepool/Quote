@@ -141,7 +141,7 @@
         "retry_backoff_seconds": 0.5,
         "request_interval_seconds": 0.05,
         "request_interval_seconds_by_exchange": {
-          "DCE": 1.0,
+          "DCE": 0.8,
           "GFEX": 0.9
         },
         "challenge_retry_attempts_by_exchange": {

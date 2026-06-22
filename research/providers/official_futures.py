@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from html.parser import HTMLParser
@@ -114,6 +115,15 @@ class DceOfficialBrowserClient:
             self._display = None
 
     def _run(self, coro: Any) -> Any:
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass
+        else:
+            coro.close()
+            raise OfficialFuturesSourceUnavailable(
+                "DCE official browser client must be called from a worker thread outside the running asyncio loop"
+            )
         if self._loop is None:
             self._loop = asyncio.new_event_loop()
         return self._loop.run_until_complete(coro)
@@ -425,6 +435,7 @@ class OfficialFuturesMarketDataProvider:
         self._request_counts_by_exchange: Dict[str, int] = {}
         self._metrics: Dict[str, Dict[str, float]] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
+        self._dce_executor: Optional[ThreadPoolExecutor] = None
 
     def supports_series(self, series: FuturesSeries) -> bool:
         exchange = _series_exchange(series)
@@ -470,6 +481,13 @@ class OfficialFuturesMarketDataProvider:
         mode: str = "direct",
     ) -> List[OfficialFuturesContractBar]:
         """Fetch parsed official contract rows once for an exchange/date."""
+        if str(exchange or "").upper() == "DCE" and self.dce_browser_enabled:
+            loop = asyncio.get_running_loop()
+            executor = self._get_dce_executor()
+            return await loop.run_in_executor(
+                executor,
+                lambda: self._fetch_exchange_contract_bars_sync(exchange, trade_date, mode),
+            )
         return await asyncio.to_thread(
             self._fetch_exchange_contract_bars_sync,
             exchange,
@@ -1458,8 +1476,23 @@ class OfficialFuturesMarketDataProvider:
             self._dce_browser_client = DceOfficialBrowserClient(self.dce_browser_cfg)
         return self._dce_browser_client
 
+    def _get_dce_executor(self) -> ThreadPoolExecutor:
+        if self._dce_executor is None:
+            self._dce_executor = ThreadPoolExecutor(
+                max_workers=1,
+                thread_name_prefix="dce-official-provider",
+            )
+        return self._dce_executor
+
     def close(self) -> None:
-        if self._dce_browser_client is not None:
+        if self._dce_executor is not None:
+            if self._dce_browser_client is not None:
+                future = self._dce_executor.submit(self._dce_browser_client.close)
+                future.result(timeout=self.timeout_seconds + 30)
+                self._dce_browser_client = None
+            self._dce_executor.shutdown(wait=True, cancel_futures=False)
+            self._dce_executor = None
+        elif self._dce_browser_client is not None:
             self._dce_browser_client.close()
             self._dce_browser_client = None
 
