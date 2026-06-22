@@ -2295,7 +2295,20 @@ class TaskManagerHandlers:
         requires_master_data_governance: bool,
         master_governance_max_days: Optional[int],
     ) -> None:
+        active_task_name = job_id or 'futures_market_data_backfill'
+        active_tasks = None
         try:
+            try:
+                from scheduler.tasks import scheduled_tasks
+
+                active_tasks = getattr(scheduled_tasks, '_active_tasks', None)
+                if active_tasks is not None:
+                    active_tasks.add(active_task_name)
+            except Exception as active_exc:
+                self.task_manager.logger.warning(
+                    "[TaskManagerHandlers] 期货行情手工任务 active 状态登记失败: %s",
+                    active_exc,
+                )
             self.task_manager.logger.info(
                 "[TaskManagerHandlers] 执行期货行情任务: job_id=%s scope_id=%s exchanges=%s "
                 "categories=%s start=%s end=%s mode=%s dry_run=%s",
@@ -2450,6 +2463,9 @@ class TaskManagerHandlers:
                 f"❌ *期货行情任务异常*\n\n错误: `{exc}`",
                 parse_mode='markdown',
             )
+        finally:
+            if active_tasks is not None:
+                active_tasks.discard(active_task_name)
 
     async def _run_futures_calendar_backfill_task(
         self,

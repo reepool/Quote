@@ -251,6 +251,54 @@ async def test_run_futures_market_data_backfill_defaults_to_master_governance():
 
 
 @pytest.mark.asyncio
+async def test_run_futures_market_data_backfill_registers_scheduler_active_task():
+    handler, task_manager = _build_handler()
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/run futures_market_data_backfill exchange=DCE start=2024-06-21 end=2026-06-20 dry_run',
+    )
+
+    from scheduler.tasks import scheduled_tasks
+
+    scheduled_tasks._active_tasks.discard('futures_market_data_backfill')
+
+    async def _assert_active_during_master_governance(**kwargs):
+        assert 'futures_market_data_backfill' in scheduled_tasks._active_tasks
+        return {
+            'status': 'success',
+            'exchange': 'DCE',
+            'counts': {},
+            'blockers': [],
+        }
+
+    with patch('data_manager.data_manager') as dm:
+        dm.run_futures_master_governance = AsyncMock(side_effect=_assert_active_during_master_governance)
+        dm.run_futures_market_data_sync = AsyncMock(
+            return_value={
+                'status': 'success',
+                'dry_run': True,
+                'totals': {'fetched_rows': 1, 'would_write_price_bars': 1, 'failed': 0},
+                'source_selection': {'official_success': 1, 'official_failed': 0},
+                'trading_day_governance': {'status': 'success', 'target_date_count': 1},
+                'scope_selection': {'exchanges': ['DCE']},
+                'series': [
+                    {
+                        'series_id': 'CNF.I.DCE.main',
+                        'status': 'success',
+                        'fetched_rows': 1,
+                        'write_result': {'would_write_rows': 1},
+                    }
+                ],
+            }
+        )
+
+        await handler.handle_run_command(event)
+
+    assert 'futures_market_data_backfill' not in scheduled_tasks._active_tasks
+
+
+@pytest.mark.asyncio
 async def test_run_futures_market_data_backfill_can_skip_master_governance():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(
