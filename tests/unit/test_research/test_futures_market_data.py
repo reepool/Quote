@@ -829,6 +829,67 @@ def test_dce_browser_warmup_failure_does_not_block_requested_api(monkeypatch):
     assert payload == {"success": True, "data": []}
 
 
+def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
+    state = {"starts": 0, "requested_api_calls": 0}
+
+    class FakePage:
+        async def sleep(self, seconds):
+            return None
+
+        async def evaluate(self, script, await_promise=False, return_by_value=False):
+            if "/dcereport/publicweb/maxTradeDate" in script:
+                return json.dumps({
+                    "status": 200,
+                    "ok": True,
+                    "text": json.dumps({"success": True}),
+                })
+            assert "/dcereport/publicweb/tradepara/contractInfo" in script
+            state["requested_api_calls"] += 1
+            if state["requested_api_calls"] == 1:
+                return json.dumps({
+                    "status": -1,
+                    "ok": False,
+                    "text": "TypeError: Failed to fetch",
+                })
+            return json.dumps({
+                "status": 200,
+                "ok": True,
+                "text": json.dumps({"success": True, "data": [{"varietyOrder": "I"}]}),
+            })
+
+    class FakeBrowser:
+        def __init__(self):
+            self.stopped = False
+
+        async def get(self, url):
+            return FakePage()
+
+        def stop(self):
+            self.stopped = True
+
+    async def fake_start(**kwargs):
+        state["starts"] += 1
+        return FakeBrowser()
+
+    monkeypatch.setitem(sys.modules, "nodriver", types.SimpleNamespace(start=fake_start))
+    monkeypatch.setattr(DceOfficialBrowserClient, "_start_virtual_display_if_needed", lambda self: None)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "retry_attempts": 2,
+        "retry_backoff_seconds": 0,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+    try:
+        payload = client.fetch_contract_info_payload()
+    finally:
+        client.close()
+
+    assert payload == {"success": True, "data": [{"varietyOrder": "I"}]}
+    assert state["starts"] == 2
+    assert state["requested_api_calls"] == 2
+
+
 def test_master_governance_uses_provider_supported_exchanges(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())

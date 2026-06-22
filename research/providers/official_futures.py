@@ -148,15 +148,25 @@ class DceOfficialBrowserClient:
                 f"QUOTE_DCE_CHROME_PATH/browser_executable_path: {exc}"
             ) from exc
         try:
-            await self._api("GET", "/dcereport/publicweb/maxTradeDate")
+            await self._api(
+                "GET",
+                "/dcereport/publicweb/maxTradeDate",
+                allow_session_restart=False,
+            )
         except Exception as exc:
             logger.warning(
                 "[OfficialFutures] DCE browser warm-up maxTradeDate failed; continuing with requested API path error=%s",
                 exc,
             )
 
-    async def _api(self, method: str, path: str, body: Optional[Mapping[str, Any]] = None) -> Mapping[str, Any]:
-        await self._ensure_started()
+    async def _api(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, Any]] = None,
+        *,
+        allow_session_restart: bool = True,
+    ) -> Mapping[str, Any]:
         body_js = json.dumps(body, ensure_ascii=False) if body is not None else "null"
         script = f"""
         (async () => {{
@@ -177,10 +187,12 @@ class DceOfficialBrowserClient:
         """
         last_error = ""
         for attempt in range(1, self.retry_attempts + 1):
+            await self._ensure_started()
             raw_result = await self._page.evaluate(script, await_promise=True, return_by_value=True)
             response = json.loads(raw_result if isinstance(raw_result, str) else str(raw_result))
             text = str(response.get("text") or "")
-            if int(response.get("status") or -1) == 200:
+            status = int(response.get("status") or -1)
+            if status == 200:
                 try:
                     payload = json.loads(text)
                 except json.JSONDecodeError as exc:
@@ -192,10 +204,32 @@ class DceOfficialBrowserClient:
                 raise OfficialFuturesSourceUnavailable(
                     f"official DCE {path} business failure: {payload.get('msg') or payload.get('code')}"
                 )
-            last_error = f"HTTP {response.get('status')}: {text[:200]}"
-            if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
-                await self._page.sleep(self.retry_backoff_seconds)
+            last_error = f"HTTP {status}: {text[:200]}"
+            if attempt < self.retry_attempts:
+                if allow_session_restart and self._is_in_page_fetch_failure(status=status, text=text):
+                    logger.warning(
+                        "[OfficialFutures] DCE in-page fetch failed; restarting browser session path=%s attempt=%s next_attempt=%s error=%s",
+                        path,
+                        attempt,
+                        attempt + 1,
+                        last_error,
+                    )
+                    await self._stop()
+                    if self.retry_backoff_seconds > 0:
+                        await asyncio.sleep(self.retry_backoff_seconds)
+                    continue
+                if self.retry_backoff_seconds > 0:
+                    await asyncio.sleep(self.retry_backoff_seconds)
         raise OfficialFuturesSourceUnavailable(f"official DCE {path} request failed: {last_error}")
+
+    @staticmethod
+    def _is_in_page_fetch_failure(*, status: int, text: str) -> bool:
+        text_lower = str(text or "").lower()
+        return status == -1 and (
+            "failed to fetch" in text_lower
+            or "typeerror" in text_lower
+            or "networkerror" in text_lower
+        )
 
     async def _page_html(self, url: str) -> str:
         await self._ensure_started()
