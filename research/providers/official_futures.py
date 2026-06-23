@@ -857,6 +857,11 @@ class OfficialFuturesMarketDataProvider:
                 raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")
             except Exception as exc:
                 last_error = exc
+                classification = classify_official_futures_failure(exc)
+                if not classification.is_retryable:
+                    raise OfficialFuturesSourceUnavailable(
+                        f"official {exchange} no report for {trade_date}: {exc}"
+                    ) from exc
                 if self._is_retryable_challenge(exc):
                     if challenge_retries >= challenge_retry_limit:
                         break
