@@ -1300,10 +1300,38 @@ def _format_futures_market_data_scheduler_report(
         master_governance = {}
     master_counts = master_governance.get("counts") or {}
     series = series_override if series_override is not None else (result.get("series") or [])
+    lifecycle_skipped_series = 0
+    lifecycle_clipped_series = 0
+    lifecycle_filtered_dates = 0
+    for item in series:
+        lifecycle = item.get("lifecycle") or {}
+        lifecycle_status = str(lifecycle.get("status") or "")
+        if lifecycle_status == "lifecycle_clipped":
+            lifecycle_clipped_series += 1
+        if lifecycle_status == "lifecycle_skip" or item.get("status") == "lifecycle_skip":
+            lifecycle_skipped_series += 1
+        try:
+            original_dates = int(lifecycle.get("original_target_dates") or 0)
+            filtered_dates = int(lifecycle.get("filtered_target_dates") or 0)
+        except (TypeError, ValueError):
+            original_dates = 0
+            filtered_dates = 0
+        if original_dates > filtered_dates:
+            lifecycle_filtered_dates += original_dates - filtered_dates
     detail_lines = []
     if include_series_details:
         for item in series[:10]:
             write_result = item.get("write_result") or {}
+            lifecycle = item.get("lifecycle") or {}
+            lifecycle_text = ""
+            if lifecycle:
+                lifecycle_status = lifecycle.get("status") or "unknown"
+                original_dates = lifecycle.get("original_target_dates")
+                filtered_dates = lifecycle.get("filtered_target_dates")
+                if original_dates is not None and filtered_dates is not None:
+                    lifecycle_text = f", lifecycle={lifecycle_status}({original_dates}->{filtered_dates})"
+                else:
+                    lifecycle_text = f", lifecycle={lifecycle_status}"
             detail_lines.append(
                 f"{item.get('series_id', 'unknown')}: fetched={item.get('fetched_rows', 0)}, "
                 f"would_write={write_result.get('would_write_rows', 0)}, "
@@ -1311,6 +1339,7 @@ def _format_futures_market_data_scheduler_report(
                 f"changed={write_result.get('changed', 0)}, "
                 f"unchanged={write_result.get('unchanged', 0)}, "
                 f"status={item.get('status', 'ok')}"
+                f"{lifecycle_text}"
             )
         if len(series) > 10:
             detail_lines.append(f"... {len(series) - 10} more series omitted")
@@ -1332,6 +1361,9 @@ def _format_futures_market_data_scheduler_report(
         f"dry_run: `{result.get('dry_run', 'N/A')}`\n\n"
         f"calendar_skipped: `{totals.get('calendar_skipped', governance.get('skipped_date_count', 0))}`\n"
         f"provider_empty_on_trading_day: `{totals.get('provider_empty_on_trading_day', 0)}`\n"
+        f"lifecycle_skipped_series: `{lifecycle_skipped_series}`\n"
+        f"lifecycle_clipped_series: `{lifecycle_clipped_series}`\n"
+        f"lifecycle_filtered_dates: `{lifecycle_filtered_dates}`\n"
         f"trading_day_governance: `{governance.get('status', 'N/A')}`\n"
         f"master_data_governance: `{master_governance_status}`\n"
         f"master_discovery_candidates: `{master_counts.get('candidates', 0)}`\n"

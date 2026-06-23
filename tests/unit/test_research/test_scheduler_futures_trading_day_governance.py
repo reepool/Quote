@@ -105,6 +105,59 @@ def test_futures_market_data_report_includes_master_governance_summary():
     assert "master_discovery_auto_promoted: `1`" in report
 
 
+def test_futures_market_data_report_includes_generic_lifecycle_summary():
+    report = _format_futures_market_data_scheduler_report(
+        {
+            "status": "success",
+            "dry_run": True,
+            "scope_selection": {"exchanges": ["DCE"]},
+            "totals": {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": 0,
+                "calendar_skipped": 0,
+                "provider_empty_on_trading_day": 0,
+            },
+            "trading_day_governance": {"status": "success", "target_date_count": 6325},
+            "series": [
+                {
+                    "series_id": "CNF.S.DCE.main",
+                    "fetched_rows": 639,
+                    "write_result": {"would_write_rows": 639},
+                    "status": "success",
+                    "lifecycle": {
+                        "status": "lifecycle_clipped",
+                        "original_target_dates": 6325,
+                        "filtered_target_dates": 639,
+                        "valid_from": "2000-06-01",
+                        "valid_to": "2003-01-15",
+                    },
+                },
+                {
+                    "series_id": "CNF.BZ.DCE.main",
+                    "fetched_rows": 0,
+                    "write_result": {"would_write_rows": 0},
+                    "status": "lifecycle_skip",
+                    "lifecycle": {
+                        "status": "lifecycle_skip",
+                        "original_target_dates": 5,
+                        "filtered_target_dates": 0,
+                        "valid_from": "2025-07-08",
+                    },
+                },
+            ],
+        }
+    )
+
+    assert "lifecycle_skipped_series: `1`" in report
+    assert "lifecycle_clipped_series: `1`" in report
+    assert "lifecycle_filtered_dates: `5691`" in report
+    assert "CNF.S.DCE.main" in report
+    assert "lifecycle=lifecycle_clipped(6325->639)" in report
+    assert "lifecycle=lifecycle_skip(5->0)" in report
+
+
 def test_futures_market_data_report_marks_master_governance_not_requested_when_absent():
     report = _format_futures_market_data_scheduler_report(
         {

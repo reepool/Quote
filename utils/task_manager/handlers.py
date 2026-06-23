@@ -2337,10 +2337,59 @@ class TaskManagerHandlers:
                 ),
                 parse_mode='markdown',
             )
-            if requires_master_data_governance:
-                from data_manager import data_manager
+            from data_manager import data_manager
 
-                master_result = await data_manager.run_futures_master_governance(
+            governance_result: Dict[str, Any] = {}
+            if requires_trading_day_governance:
+                calendar_start_date = start_date or end_date
+                calendar_end_date = end_date or start_date or calendar_start_date
+                self.task_manager.logger.info(
+                    "[TaskManagerHandlers] 期货行情前置官方交易日历回填: job_id=%s scope_id=%s "
+                    "exchanges=%s start=%s end=%s dry_run=%s",
+                    job_id,
+                    scope_id,
+                    exchanges,
+                    calendar_start_date,
+                    calendar_end_date,
+                    dry_run,
+                )
+                calendar_result = await data_manager.run_futures_official_calendar_backfill(
+                    scope_id=scope_id,
+                    scope_ids=None,
+                    exchanges=exchanges,
+                    categories=categories,
+                    instrument_ids=instrument_ids,
+                    series_ids=series_ids,
+                    series_types=series_types,
+                    start_date=calendar_start_date,
+                    end_date=calendar_end_date,
+                    dry_run=dry_run,
+                )
+                calendar_status = str(calendar_result.get('status') or '').lower()
+                if calendar_status == 'blocked' and not dry_run:
+                    await self.task_manager.send_message(
+                        chat_id,
+                        (
+                            "❌ *期货行情任务失败*\n\n"
+                            f"task: `{job_id}`\n"
+                            "reason: `trading_calendar_preflight_failed`\n"
+                            f"calendar_status: `{calendar_status}`"
+                        ),
+                        parse_mode='markdown',
+                    )
+                    return
+
+                self.task_manager.logger.info(
+                    "[TaskManagerHandlers] 期货行情前置交易日治理: job_id=%s scope_id=%s "
+                    "exchanges=%s start=%s end=%s dry_run=%s",
+                    job_id,
+                    scope_id,
+                    exchanges,
+                    start_date,
+                    end_date,
+                    dry_run,
+                )
+                governance_result = await data_manager.run_futures_trading_day_governance(
                     scope_id=scope_id,
                     scope_ids=None,
                     exchanges=exchanges,
@@ -2351,14 +2400,81 @@ class TaskManagerHandlers:
                     start_date=start_date,
                     end_date=end_date,
                     dry_run=dry_run,
-                    max_days=master_governance_max_days,
                 )
-                master_status = str(master_result.get('status') or '').lower()
-                if master_status not in {'success', 'warning'}:
+                governance_status = str(governance_result.get('status') or '').lower()
+                if governance_status == 'blocked' and not dry_run:
+                    await self.task_manager.send_message(
+                        chat_id,
+                        (
+                            "❌ *期货行情任务失败*\n\n"
+                            f"task: `{job_id}`\n"
+                            "reason: `trading_day_governance_failed`\n"
+                            f"governance_status: `{governance_status}`"
+                        ),
+                        parse_mode='markdown',
+                    )
+                    return
+
+            master_results: List[Dict[str, Any]] = []
+            if requires_master_data_governance:
+                target_dates_by_exchange = (
+                    (governance_result.get('target_date_expansion') or {}).get('target_dates_by_exchange') or {}
+                    if requires_trading_day_governance
+                    else {}
+                )
+                exchange_dates = {
+                    str(exchange).upper(): sorted(str(item) for item in dates or [] if item)
+                    for exchange, dates in target_dates_by_exchange.items()
+                    if str(exchange).strip()
+                }
+                if exchange_dates:
+                    for exchange, dates in sorted(exchange_dates.items()):
+                        if not dates:
+                            continue
+                        master_results.append(
+                            await data_manager.run_futures_master_governance(
+                                scope_id=scope_id,
+                                scope_ids=None,
+                                exchanges=[exchange],
+                                categories=categories,
+                                instrument_ids=instrument_ids,
+                                series_ids=series_ids,
+                                series_types=series_types,
+                                start_date=dates[0],
+                                end_date=dates[-1],
+                                dry_run=dry_run,
+                                max_days=master_governance_max_days,
+                            )
+                        )
+                elif requires_trading_day_governance:
+                    self.task_manager.logger.info(
+                        "[TaskManagerHandlers] 期货行情前置主数据治理跳过: trading-day governance returned no target dates"
+                    )
+                else:
+                    master_results.append(
+                        await data_manager.run_futures_master_governance(
+                            scope_id=scope_id,
+                            scope_ids=None,
+                            exchanges=exchanges,
+                            categories=categories,
+                            instrument_ids=instrument_ids,
+                            series_ids=series_ids,
+                            series_types=series_types,
+                            start_date=start_date,
+                            end_date=end_date,
+                            dry_run=dry_run,
+                            max_days=master_governance_max_days,
+                        )
+                    )
+                failed_master = [
+                    item
+                    for item in master_results
+                    if str(item.get('status') or '').lower() not in {'success', 'warning'}
+                ]
+                if failed_master:
                     self.task_manager.logger.warning(
-                        "[TaskManagerHandlers] 期货行情前置主数据治理未通过: status=%s result=%s",
-                        master_status,
-                        master_result,
+                        "[TaskManagerHandlers] 期货行情前置主数据治理未通过: results=%s",
+                        failed_master,
                     )
                     await self.task_manager.send_message(
                         chat_id,
@@ -2366,13 +2482,11 @@ class TaskManagerHandlers:
                             "❌ *期货行情任务失败*\n\n"
                             f"task: `{job_id}`\n"
                             "reason: `master_governance_failed`\n"
-                            f"master_status: `{master_status or 'unknown'}`"
+                            f"master_status: `{str(failed_master[0].get('status') or 'unknown').lower()}`"
                         ),
                         parse_mode='markdown',
                     )
                     return
-
-            from data_manager import data_manager
 
             result_payload = await data_manager.run_futures_market_data_sync(
                 scope_id=scope_id,
@@ -2392,7 +2506,7 @@ class TaskManagerHandlers:
                     from scheduler.tasks import _summarize_futures_master_governance_results
 
                     result_payload["master_data_governance"] = _summarize_futures_master_governance_results(
-                        [master_result]
+                        master_results
                     )
                 except Exception as summary_exc:
                     self.task_manager.logger.warning(

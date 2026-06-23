@@ -193,6 +193,18 @@ async def test_run_futures_market_data_backfill_defaults_to_master_governance():
     )
 
     with patch('data_manager.data_manager') as dm:
+        dm.run_futures_official_calendar_backfill = AsyncMock(return_value={'status': 'success'})
+        dm.run_futures_trading_day_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'target_date_expansion': {
+                    'status': 'success',
+                    'target_dates_by_exchange': {
+                        'DCE': ['2024-06-24', '2026-06-19'],
+                    },
+                },
+            }
+        )
         dm.run_futures_master_governance = AsyncMock(
             return_value={
                 'status': 'success',
@@ -226,7 +238,7 @@ async def test_run_futures_market_data_backfill_defaults_to_master_governance():
 
         await handler.handle_run_command(event)
 
-    dm.run_futures_master_governance.assert_awaited_once_with(
+    dm.run_futures_official_calendar_backfill.assert_awaited_once_with(
         scope_id=None,
         scope_ids=None,
         exchanges=['DCE'],
@@ -236,6 +248,30 @@ async def test_run_futures_market_data_backfill_defaults_to_master_governance():
         series_types=None,
         start_date='2024-06-21',
         end_date='2026-06-20',
+        dry_run=True,
+    )
+    dm.run_futures_trading_day_governance.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
+        exchanges=['DCE'],
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
+        start_date='2024-06-21',
+        end_date='2026-06-20',
+        dry_run=True,
+    )
+    dm.run_futures_master_governance.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
+        exchanges=['DCE'],
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
+        start_date='2024-06-24',
+        end_date='2026-06-19',
         dry_run=True,
         max_days=None,
     )
@@ -273,6 +309,16 @@ async def test_run_futures_market_data_backfill_registers_scheduler_active_task(
         }
 
     with patch('data_manager.data_manager') as dm:
+        dm.run_futures_official_calendar_backfill = AsyncMock(return_value={'status': 'success'})
+        dm.run_futures_trading_day_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'target_date_expansion': {
+                    'status': 'success',
+                    'target_dates_by_exchange': {'DCE': ['2024-06-24']},
+                },
+            }
+        )
         dm.run_futures_master_governance = AsyncMock(side_effect=_assert_active_during_master_governance)
         dm.run_futures_market_data_sync = AsyncMock(
             return_value={
@@ -311,6 +357,16 @@ async def test_run_futures_market_data_backfill_can_skip_master_governance():
     )
 
     with patch('data_manager.data_manager') as dm:
+        dm.run_futures_official_calendar_backfill = AsyncMock(return_value={'status': 'success'})
+        dm.run_futures_trading_day_governance = AsyncMock(
+            return_value={
+                'status': 'success',
+                'target_date_expansion': {
+                    'status': 'success',
+                    'target_dates_by_exchange': {'DCE': ['2024-06-24']},
+                },
+            }
+        )
         dm.run_futures_master_governance = AsyncMock()
         dm.run_futures_market_data_sync = AsyncMock(
             return_value={

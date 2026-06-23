@@ -734,9 +734,13 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | `futures_market_data_readiness` | 可由 API/维护任务生成 | 每日或每周 | 生成覆盖率和缺口摘要 |
 | `futures_source_version_check` | 待后续拆分 | 每日中午 | 检查 AKShare 等依赖版本，复用现有依赖检查机制 |
 
-商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成交易所官方日历落库，再执行 `futures_master_governance` 完成根品种、研究序列和真实合约主数据治理，然后进入全品种 dry-run，最后才执行行情历史回补或日更。其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；行情日更和历史回补默认也会先执行 `futures_master_governance` 作为前置主数据治理，只有专项验证场景才允许显式传入 `skip_master_data_governance` 跳过。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
+商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成任务指定时间段内的交易所官方日历落库，再执行 `futures_trading_day_governance` 生成同一任务时间段内的目标交易日集合，再执行 `futures_master_governance` 完成这些目标交易日范围内的根品种、研究序列和真实合约主数据治理，最后才执行行情历史回补或日更。调度任务和 Telegram 手工任务必须遵循同一前置链路，不允许一条路径只跑主数据治理而绕过交易日治理。
 
-主数据治理还必须维护根品种生命周期。对历史遗留、拆分、退市或长期不再挂牌的品种，不应在行情同步层按具体代码写特殊 skip，而应在 `futures_instruments.metadata.lifecycle` 中记录统一生命周期窗口，例如 `status`、`valid_from`、`valid_to`、`source`、`reason` 和必要的 `lineage`。行情同步只消费该生命周期：目标日期早于 `valid_from` 或晚于 `valid_to` 时，对应连续序列返回 `lifecycle_skip`，不请求官方源或备源。`active` 不直接等同于“当前仍在交易”；为了支持历史回补，历史遗留品种可以继续保留 `active=true` 参与历史研究 universe，但必须通过 lifecycle 阻止下线日之后的数据下载。
+行情日线下载的目标日期必须是三重交集：`任务参数 start/end 时间段` ∩ `期货根品种/研究序列生命周期窗口` ∩ `交易日治理确认的目标交易日`。其中生命周期窗口优先来自 `futures_instruments.metadata.lifecycle`；若主数据治理尚未写入显式 lifecycle，但 `futures_contracts` 已存在合约级 `first_observed_trade_date/last_observed_trade_date`，行情同步可以使用合约观测窗口作为通用裁剪依据。裁剪结果应记录为 `lifecycle_clipped` 或 `lifecycle_skip`，并且不得再对生命周期外日期请求官方源或备源。该规则适用于所有交易所和所有品种，不能为单一交易所或单一历史品种写特殊 skip。
+
+其中 `futures_market_data_sync`、`futures_market_data_backfill` 和全品种 dry-run 必须依赖 `futures_trading_day_governance` 的成功结果；行情日更和历史回补默认也会先执行 `futures_master_governance` 作为前置主数据治理，只有专项验证场景才允许显式传入 `skip_master_data_governance` 跳过。如果交易日治理失败、主数据治理失败或日历质量低于配置阈值，生产写入任务应阻断，dry-run 可以继续但必须显式标记风险。
+
+主数据治理还必须维护根品种生命周期。对历史遗留、拆分、退市或长期不再挂牌的品种，不应在行情同步层按具体代码写特殊 skip，而应在 `futures_instruments.metadata.lifecycle` 中记录统一生命周期窗口，例如 `status`、`valid_from`、`valid_to`、`source`、`reason` 和必要的 `lineage`。行情同步只消费该生命周期或合约观测窗口。`active` 不直接等同于“当前仍在交易”；为了支持历史回补，历史遗留品种可以继续保留 `active=true` 参与历史研究 universe，但必须通过 lifecycle 阻止下线日之后的数据下载。
 
 GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
 
