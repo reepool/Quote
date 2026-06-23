@@ -1965,26 +1965,6 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
             0.1,
             {"energy": ["原油", "/energy/"]},
         ),
-        (
-            "CZCE",
-            "https://www.czce.com.cn/cn/jysj/pz/H770302index_1.htm",
-            '<a href="/cn/sspz/zz/H770302index_1.htm">测试纯碱</a>',
-            """
-            <html><body><table>
-              <tr><td>交易品种</td><td>测试纯碱</td></tr>
-              <tr><td>交易单位</td><td>20吨/手</td></tr>
-              <tr><td>报价单位</td><td>元/吨</td></tr>
-              <tr><td>最小变动价位</td><td>1元/吨</td></tr>
-              <tr><td>交易代码</td><td>ZZ</td></tr>
-            </table></body></html>
-            """,
-            "ZZ",
-            "测试纯碱",
-            "CNY/ton",
-            20,
-            1,
-            {"chemical": ["纯碱", "/sspz/"]},
-        ),
     ],
 )
 def test_remaining_exchange_product_page_specs_use_common_adapter(
@@ -2041,6 +2021,69 @@ def test_remaining_exchange_product_page_specs_use_common_adapter(
     assert spec.category
     assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
     assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
+def test_czce_product_specs_use_official_reference_data_xml(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["CZCE"]},
+        "enabled_exchanges": ["CZCE"],
+        "adapters": {
+            "CZCE": {
+                "enabled": True,
+                "listed_products_page": "https://www.czce.com.cn/",
+                "product_rule_pages": {},
+                "category_rules": {"chemical": ["纯碱", "sa"]},
+                "known_products": {},
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+
+    xml = """<?xml version="1.0" encoding="UTF-8" ?>
+    <Contracts>
+      <Contract>
+        <Name>纯碱期货</Name>
+        <CtrCd>SA607</CtrCd>
+        <PrdCd>SA</PrdCd>
+        <PrdTp>期货</PrdTp>
+        <TrdCcyCd>CNY</TrdCcyCd>
+        <ClrngCcyCd>CNY</ClrngCcyCd>
+        <TckSz>1.00元/吨</TckSz>
+        <TckVal>20.00元</TckVal>
+        <CtrSz>20吨/手</CtrSz>
+        <MsrmntUnt>吨</MsrmntUnt>
+      </Contract>
+    </Contracts>
+    """
+
+    class FakeResponse:
+        status_code = 200
+        text = xml
+
+        def raise_for_status(self):
+            return None
+
+    monkeypatch.setattr("research.providers.official_futures.request_get", lambda *args, **kwargs: FakeResponse())
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync(
+        "CZCE",
+        target_symbols=["SA"],
+    )
+    spec = specs["SA"]
+
+    assert spec.exchange == "CZCE"
+    assert spec.name == "纯碱"
+    assert spec.category == "chemical"
+    assert spec.currency == "CNY"
+    assert spec.unit == "CNY/ton"
+    assert spec.contract_multiplier == 20
+    assert spec.tick_size == 1
+    assert spec.source_interface == "official_czce_reference_data_xml"
+    assert spec.field_sources["name"]["source_type"] == "official_reference_data_xml"
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
 
 
@@ -2120,6 +2163,122 @@ def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatc
     assert row["evidence"]["missing_required_fields"] == []
     assert row["evidence"]["field_sources"]["name"]["source_type"] == "governed_rule_metadata"
     assert instrument["name"] == "GFEX Test Product"
+
+
+@pytest.mark.parametrize(
+    "exchange,symbol,contract,name,category,unit,source_interface",
+    [
+        ("SHFE", "ZZ", "ZZ2601", "测试铜", "nonferrous", "CNY/ton", "official_shfe_product_page"),
+        ("INE", "ZZ", "ZZ2601", "测试原油", "energy", "CNY/barrel", "official_ine_product_page"),
+        ("CZCE", "ZZ", "ZZ2601", "测试纯碱", "chemical", "CNY/ton", "official_czce_reference_data_xml"),
+    ],
+)
+def test_remaining_exchanges_auto_promote_unknown_product_from_product_spec(
+    monkeypatch,
+    tmp_path,
+    exchange,
+    symbol,
+    contract,
+    name,
+    category,
+    unit,
+    source_interface,
+):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": [exchange]},
+        "enabled_exchanges": [exchange],
+        "adapters": {
+            exchange: {
+                "enabled": True,
+                "known_products": {},
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange=exchange,
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    def fake_fetch_exchange_contract_bars_sync(self, request_exchange, trade_date):
+        assert request_exchange == exchange
+        return [
+            _official_contract_row(
+                exchange=request_exchange,
+                trade_date=trade_date,
+                variety=symbol,
+                contract=contract,
+                raw_payload={"variety": name, "contractId": contract},
+            )
+        ]
+
+    def fake_fetch_exchange_product_specs_sync(self, request_exchange, target_symbols=None):
+        assert request_exchange == exchange
+        assert target_symbols is None or symbol in set(target_symbols)
+        return {
+            symbol: FuturesProductSpec(
+                exchange=exchange,
+                symbol=symbol,
+                name=name,
+                category=category,
+                currency="CNY",
+                unit=unit,
+                contract_multiplier=10,
+                tick_size=1,
+                source_profile="exchange_official_product_spec",
+                source_interface=source_interface,
+                source_url="https://example.test/product-spec",
+                field_sources={
+                    "name": {"source_type": "official_product_rule_page"},
+                    "category": {"source_type": "governed_rule_metadata"},
+                    "currency": {"source_type": "official_product_rule_page"},
+                    "unit": {"source_type": "official_product_rule_page"},
+                },
+            )
+        }
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        fake_fetch_exchange_contract_bars_sync,
+    )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        fake_fetch_exchange_product_specs_sync,
+    )
+
+    result = FuturesMasterDiscoveryGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=[exchange],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+
+    row = storage.list_master_discoveries(exchange=exchange, variety_symbol=symbol)[0]
+    instrument = storage.get_instrument(f"CNF.{symbol}.{exchange}")
+
+    assert result["status"] == "success"
+    assert result["counts"]["auto_promoted"] == 1
+    assert row["evidence"]["missing_required_fields"] == []
+    assert row["evidence"]["field_sources"]["unit"]["source_type"] == "official_product_rule_page"
+    assert instrument["name"] == name
+    assert instrument["unit"] == unit
 
 
 def test_futures_master_discovery_preserves_legacy_product_lineage(monkeypatch, tmp_path):

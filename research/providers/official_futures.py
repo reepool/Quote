@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import time
+import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -968,7 +969,17 @@ class OfficialFuturesMarketDataProvider:
             specs = self._merge_product_specs(configured, official_pages)
             if specs:
                 return specs
-        if exchange_key in {"INE", "CZCE"}:
+        if exchange_key == "CZCE":
+            configured = self._configured_product_specs(exchange_key)
+            try:
+                official_pages = self._fetch_czce_reference_data_product_specs(target_symbols=target_symbols)
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning("[OfficialFutures] CZCE reference-data product specs unavailable: %s", exc)
+                official_pages = {}
+            specs = self._merge_product_specs(configured, official_pages)
+            if specs:
+                return specs
+        if exchange_key == "INE":
             configured = self._configured_product_specs(exchange_key)
             try:
                 official_pages = self._fetch_generic_product_page_specs(
@@ -1304,6 +1315,8 @@ class OfficialFuturesMarketDataProvider:
                         exchange=exchange_key,
                         base_url=discovery_url,
                     ).items():
+                        if target_symbol_set and symbol_hint not in target_symbol_set:
+                            continue
                         if str(url).rstrip("/") in existing_urls:
                             continue
                         page_map.setdefault(symbol_hint, url)
@@ -1336,6 +1349,145 @@ class OfficialFuturesMarketDataProvider:
                 specs[spec.symbol.upper()] = spec
         if failures:
             logger.warning("[OfficialFutures] %s product page spec partial failures=%s", exchange_key, failures)
+        return specs
+
+    def _fetch_czce_reference_data_product_specs(
+        self,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        exchange_key = "CZCE"
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        last_error = ""
+        today = date.today()
+        for offset in range(0, 14):
+            ref_date = today - timedelta(days=offset)
+            compact = ref_date.strftime("%Y%m%d")
+            url = (
+                f"http://www.czce.com.cn/cn/DFSStaticFiles/Future/{compact[:4]}/"
+                f"{compact}/FutureDataReferenceData.xml"
+            )
+            try:
+                response = request_get(
+                    url,
+                    tls_config=self.tls_config,
+                    headers=self.DEFAULT_HEADERS,
+                    timeout=self.timeout_seconds,
+                )
+                response.raise_for_status()
+                text = str(response.text or "")
+                if "<Contract>" not in text:
+                    last_error = f"empty/non-reference xml date={compact} status={response.status_code}"
+                    continue
+                specs = self._parse_czce_reference_data_xml(
+                    text,
+                    source_url=url,
+                    adapter_cfg=adapter_cfg,
+                    target_symbols=target_symbol_set,
+                )
+                if specs:
+                    return specs
+                last_error = f"no matching product specs date={compact}"
+            except Exception as exc:
+                last_error = f"{type(exc).__name__}: {exc}"
+                continue
+        raise OfficialFuturesSourceUnavailable(f"official CZCE reference-data product specs unavailable: {last_error}")
+
+    def _parse_czce_reference_data_xml(
+        self,
+        xml_text: str,
+        *,
+        source_url: str,
+        adapter_cfg: Mapping[str, Any],
+        target_symbols: Optional[set[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        target_symbol_set = {str(symbol or "").upper() for symbol in (target_symbols or set()) if str(symbol).strip()}
+        try:
+            root = ET.fromstring(str(xml_text or ""))
+        except ET.ParseError as exc:
+            raise OfficialFuturesSourceUnavailable(f"official CZCE reference-data XML parse failed: {exc}") from exc
+        best_rows: Dict[str, Dict[str, str]] = {}
+        for record in root.findall(".//Contract"):
+            row = {
+                str(child.tag or ""): str(child.text or "").strip()
+                for child in list(record)
+            }
+            symbol = str(row.get("PrdCd") or "").upper()
+            product_type = str(row.get("PrdTp") or "")
+            if not symbol or "期货" not in product_type:
+                continue
+            if target_symbol_set and symbol not in target_symbol_set:
+                continue
+            best_rows.setdefault(symbol, row)
+        specs: Dict[str, FuturesProductSpec] = {}
+        for symbol, row in sorted(best_rows.items()):
+            name = _strip_futures_product_suffix(row.get("Name"))
+            quote_unit_text = str(row.get("TckSz") or "")
+            unit = _normalize_domestic_quote_unit(quote_unit_text)
+            if not unit:
+                unit = _normalize_domestic_quote_unit(row.get("MsrmntUnt"))
+            currency = str(row.get("TrdCcyCd") or row.get("ClrngCcyCd") or "CNY").upper()
+            if unit and "/" in unit:
+                currency = unit.split("/", 1)[0]
+            multiplier = _first_number(row.get("CtrSz"))
+            tick_size = _first_number(row.get("TckSz"))
+            category, category_source = _category_from_adapter_rules(
+                adapter_cfg,
+                symbol=symbol,
+                name=name,
+                source_url=source_url,
+                page_text=" ".join(str(value or "") for value in row.values()),
+            )
+            field_sources = {
+                field_name: {
+                    "source_type": "official_reference_data_xml",
+                    "source_ref": source_url,
+                    "quality_flag": "official_reference_data",
+                }
+                for field_name, value in (
+                    ("name", name),
+                    ("currency", currency),
+                    ("unit", unit),
+                    ("contract_multiplier", multiplier),
+                    ("tick_size", tick_size),
+                )
+                if value not in (None, "")
+            }
+            if category:
+                field_sources["category"] = {
+                    "source_type": "governed_rule_metadata",
+                    "source_ref": category_source,
+                    "quality_flag": "governed_rule_verified",
+                }
+            specs[symbol] = FuturesProductSpec(
+                exchange="CZCE",
+                symbol=symbol,
+                name=name,
+                category=category,
+                currency=currency or "CNY",
+                unit=unit,
+                contract_multiplier=multiplier,
+                tick_size=tick_size,
+                source_profile="exchange_official_reference_data_xml",
+                source_interface="official_czce_reference_data_xml",
+                source_url=source_url,
+                quality_flag="official_product_spec_partial",
+                evidence={
+                    "field_map": {key: value for key, value in row.items() if value},
+                    "source_limitations": [
+                        "czce_reference_data_category_uses_governed_rules"
+                        if category
+                        else "czce_reference_data_does_not_provide_project_category",
+                    ],
+                    "category_rule_source": category_source if category else "",
+                },
+                field_sources=field_sources,
+            )
         return specs
 
     def _discover_dce_product_rule_pages(
@@ -1497,6 +1649,13 @@ class OfficialFuturesMarketDataProvider:
                     )
                     continue
                 if self._is_challenge_response(response) or _looks_like_waf_challenge(getattr(response, "text", "")):
+                    browser_html = self._fetch_product_rule_page_via_browser_if_supported(
+                        exchange_key,
+                        current_url,
+                        symbol,
+                    )
+                    if browser_html:
+                        return browser_html
                     raise OfficialFuturesSourceUnavailable(
                         f"{exchange_key.lower()}_product_page_challenge symbol={symbol}"
                     )
@@ -1527,6 +1686,38 @@ class OfficialFuturesMarketDataProvider:
         raise OfficialFuturesSourceUnavailable(
             f"official {exchange_key} product page request failed symbol={symbol} url={url}: {last_error}"
         )
+
+    def _fetch_product_rule_page_via_browser_if_supported(self, exchange: str, url: str, symbol: str) -> str:
+        exchange_key = str(exchange or "").upper()
+        if exchange_key not in {"INE", "CZCE"}:
+            return ""
+        try:
+            html = self._get_product_page_browser_client().fetch_page_html(str(url or ""))
+        except Exception as exc:
+            logger.warning(
+                "[OfficialFutures] browser product-page fallback failed exchange=%s symbol=%s url=%s error=%s",
+                exchange_key,
+                symbol,
+                url,
+                exc,
+            )
+            return ""
+        if not html or _looks_like_waf_challenge(html):
+            logger.warning(
+                "[OfficialFutures] browser product-page fallback returned challenge/empty exchange=%s symbol=%s url=%s",
+                exchange_key,
+                symbol,
+                url,
+            )
+            return ""
+        logger.info(
+            "[OfficialFutures] browser product-page fallback succeeded exchange=%s symbol=%s url=%s html_len=%s",
+            exchange_key,
+            symbol,
+            url,
+            len(html),
+        )
+        return html
 
     def _parse_dce_product_page_html(self, html: str, *, symbol: str, source_url: str) -> FuturesProductSpec:
         texts = _html_text_chunks(html)
@@ -1948,6 +2139,10 @@ class OfficialFuturesMarketDataProvider:
         if self._dce_browser_client is None:
             self._dce_browser_client = DceOfficialBrowserClient(self.dce_browser_cfg)
         return self._dce_browser_client
+
+    def _get_product_page_browser_client(self) -> "DceOfficialBrowserClient":
+        """Return the browser-assisted official page client used by product-spec adapters."""
+        return self._get_dce_browser_client()
 
     def _get_dce_executor(self) -> ThreadPoolExecutor:
         if self._dce_executor is None:
@@ -2601,6 +2796,15 @@ def _normalize_label(value: Any) -> str:
     return re.sub(r"[\s：:]+", "", str(value or "").strip())
 
 
+def _strip_futures_product_suffix(value: Any) -> str:
+    text = str(value or "").strip()
+    for suffix in ("期货/期权", "期货期权", "期货", "期权"):
+        if text.endswith(suffix):
+            text = text[: -len(suffix)]
+            break
+    return text.strip()
+
+
 def _field_after_label(texts: Sequence[str], labels: Sequence[str]) -> str:
     normalized_labels = {_normalize_label(item) for item in labels}
     for index, text in enumerate(texts):
@@ -2769,6 +2973,9 @@ def _generic_product_symbol_hint(href: str, title: str) -> str:
     match = re.search(r"\b[A-Z]{1,3}\b", title_text)
     if match:
         return match.group(0)
+    path_match = re.search(r"/([A-Z]{1,3})_F/?$", str(href or "").upper())
+    if path_match:
+        return path_match.group(1)
     path_tokens = [
         token
         for token in re.split(r"[/_.-]+", str(href or "").upper())

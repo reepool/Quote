@@ -263,9 +263,11 @@
         "enabled_exchanges": [
           "DCE",
           "GFEX",
-          "SHFE"
+          "SHFE",
+          "INE",
+          "CZCE"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE and CZCE keep configured adapter scaffolding but remain disabled here until each exchange-specific implementation is live-verified."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE uses the same official page family with browser fallback for challenge handling. CZCE uses official FutureDataReferenceData.xml for product name, code, currency, quote unit, trading unit, and tick size."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -433,10 +435,7 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
-          "listed_products_page": [
-            "https://www.czce.com.cn/cn/jysj/pz/H770302index_1.htm",
-            "https://www.czce.com.cn/cn/sspz/H770302index_1.htm"
-          ],
+          "listed_products_page": "https://www.czce.com.cn/",
           "product_rule_pages": {},
           "category_rules": {
             "coal": ["动力煤", "煤", "zc"],
