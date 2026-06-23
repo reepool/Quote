@@ -39,6 +39,7 @@ from research.futures_market_data import (
     make_futures_instrument_id,
     make_futures_series_id,
     normalize_provider_bars,
+    _quality_flag,
     _series_lifecycle_exclusion,
     _series_lifecycle_filter,
 )
@@ -50,6 +51,7 @@ from research.providers.official_futures import (
     OfficialFuturesDailyProbeResult,
     OfficialFuturesMarketDataProvider,
     OfficialFuturesSourceUnavailable,
+    _bar_quality_flag,
     classify_official_futures_failure,
 )
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
@@ -3029,6 +3031,40 @@ def test_akshare_futures_provider_normalizes_fixture(monkeypatch, tmp_path):
     assert bars[0].trade_date == "2020-01-02"
     assert bars[0].quality_flag == "ok"
     assert bars[0].source_interface == "futures_zh_daily_sina"
+
+
+def test_dce_official_zero_ohlc_with_settlement_gets_specific_quality_flag():
+    row = OfficialFuturesContractBar(
+        exchange="DCE",
+        trade_date="2005-05-11",
+        variety="B",
+        contract="B0505",
+        open=0.0,
+        high=0.0,
+        low=0.0,
+        close=2997.0,
+        settlement=2997.0,
+        volume=0.0,
+        open_interest=0.0,
+        amount=0.0,
+        source_interface="official_dce_day_quotes",
+        raw_payload={"open": "0", "high": "0", "low": "0", "close": "2997", "clearPrice": "2997"},
+    )
+
+    assert _bar_quality_flag(row) == "official_zero_ohlc_with_settlement"
+    assert (
+        _quality_flag(
+            row.open,
+            row.high,
+            row.low,
+            row.close,
+            settlement=row.settlement,
+            volume=row.volume,
+            open_interest=row.open_interest,
+            amount=row.amount,
+        )
+        == "official_zero_ohlc_with_settlement"
+    )
 
 
 def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_path):

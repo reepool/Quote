@@ -742,11 +742,12 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 主数据治理还必须维护根品种生命周期。对历史遗留、拆分、退市或长期不再挂牌的品种，不应在行情同步层按具体代码写特殊 skip，而应在 `futures_instruments.metadata.lifecycle` 中记录统一生命周期窗口，例如 `status`、`valid_from`、`valid_to`、`source`、`reason` 和必要的 `lineage`。行情同步只消费该生命周期或合约观测窗口。`active` 不直接等同于“当前仍在交易”；为了支持历史回补，历史遗留品种可以继续保留 `active=true` 参与历史研究 universe，但必须通过 lifecycle 阻止下线日之后的数据下载。
 
-GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
+交易所按“治理完成一个、上线一个”的方式加入日更。GFEX 和 DCE 已完成交易日历治理、主数据治理和历史行情回补验证，调度配置应只打开已上线交易所 scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
 
 ```json
 {
-  "scope_ids": ["gfex_all"],
+  "scope_ids": ["gfex_all", "dce_all"],
+  "exchanges": ["GFEX", "DCE"],
   "mode": "direct",
   "dry_run": false,
   "requires_trading_calendar_backfill": true,
@@ -757,7 +758,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
 }
 ```
 
-该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现 GFEX 合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补默认同样会执行主数据治理，显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。`requires_master_data_governance` 是行情日更/回补命令的前置治理开关，不属于 `futures_master_governance` 自身；手工执行主数据治理时不要传该参数。
+该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX/DCE 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现对应交易所合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补默认同样会执行主数据治理，显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。`requires_master_data_governance` 是行情日更/回补命令的前置治理开关，不属于 `futures_master_governance` 自身；手工执行主数据治理时不要传该参数。DCE 官方历史行情中存在少量开高低和成交字段为 0、但收盘价/结算价有效的交易日，行情质量标记应使用 `official_zero_ohlc_with_settlement`，不应混同为一般 `ohlc_inconsistent`。
 
 手工触发方式：
 

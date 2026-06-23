@@ -2280,6 +2280,16 @@ def _bar_quality_flag(row: OfficialFuturesContractBar) -> str:
         open_value, high_value, low_value, close_value = [float(value) for value in prices]
         if low_value <= open_value <= high_value and low_value <= close_value <= high_value:
             return "ok"
+        settlement_value = _number(row.settlement)
+        if (
+            open_value == 0
+            and high_value == 0
+            and low_value == 0
+            and close_value != 0
+            and settlement_value is not None
+            and settlement_value == close_value
+        ):
+            return "official_zero_ohlc_with_settlement"
         return "ohlc_inconsistent"
     return "partial"
 

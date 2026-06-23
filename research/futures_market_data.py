@@ -7897,6 +7897,16 @@ def _quality_flag(
     if all(value is not None for value in prices):
         open_value, high_value, low_value, close_value = [float(value) for value in prices]
         if not (low_value <= open_value <= high_value and low_value <= close_value <= high_value):
+            settlement_value = _float_or_none(settlement)
+            if (
+                open_value == 0
+                and high_value == 0
+                and low_value == 0
+                and close_value != 0
+                and settlement_value is not None
+                and settlement_value == close_value
+            ):
+                return "official_zero_ohlc_with_settlement"
             return "ohlc_inconsistent"
         completeness = [_float_or_none(value) for value in (settlement, volume, open_interest, amount)]
         return "ok" if all(value is not None for value in completeness) else "partial"

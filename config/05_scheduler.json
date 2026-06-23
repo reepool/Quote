@@ -684,7 +684,7 @@
       },
       "futures_market_data_sync": {
         "enabled": true,
-        "description": "商品期货行情日线与连续序列同步（当前上线 GFEX；写入 data/futures.db；交易日治理和主数据治理作为前置）",
+        "description": "商品期货行情日线与连续序列同步（当前上线 GFEX、DCE；写入 data/futures.db；交易日治理和主数据治理作为前置）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -699,10 +699,12 @@
         "coalesce": true,
         "parameters": {
           "scope_ids": [
-            "gfex_all"
+            "gfex_all",
+            "dce_all"
           ],
           "exchanges": [
-            "GFEX"
+            "GFEX",
+            "DCE"
           ],
           "mode": "direct",
           "dry_run": false,

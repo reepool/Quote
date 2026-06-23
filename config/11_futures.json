@@ -40,6 +40,20 @@
         ]
       },
       {
+        "scope_id": "dce_all",
+        "name": "DCE all categories",
+        "enabled": true,
+        "exchanges": [
+          "DCE"
+        ],
+        "categories": [
+          "all"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
         "scope_id": "ine_all",
         "name": "INE all categories",
         "enabled": true,
