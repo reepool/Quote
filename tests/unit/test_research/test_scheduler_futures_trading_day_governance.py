@@ -644,6 +644,7 @@ def test_futures_market_data_sync_stops_when_governance_blocks_production():
     from scheduler import tasks as scheduler_tasks_module
 
     data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(return_value={"status": "success"})
     data_manager.run_futures_trading_day_governance = AsyncMock(
         return_value={
             "status": "blocked",
@@ -671,6 +672,7 @@ def test_futures_market_data_sync_allows_dry_run_with_governance_warning():
     from scheduler import tasks as scheduler_tasks_module
 
     data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(return_value={"status": "success"})
     data_manager.run_futures_trading_day_governance = AsyncMock(
         return_value={
             "status": "blocked",
@@ -698,12 +700,72 @@ def test_futures_market_data_sync_allows_dry_run_with_governance_warning():
     data_manager.run_futures_market_data_sync.assert_awaited_once()
 
 
+def test_futures_market_data_sync_can_skip_calendar_backfill_only():
+    task = ScheduledTasks()
+
+    from scheduler import tasks as scheduler_tasks_module
+
+    data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_official_calendar_backfill = AsyncMock()
+    data_manager.run_futures_trading_day_governance = AsyncMock(
+        return_value={
+            "status": "success",
+            "target_date_expansion": {
+                "status": "success",
+                "target_dates_by_exchange": {"DCE": ["2026-06-19"]},
+                "target_date_count": 1,
+                "skipped_date_count": 0,
+            },
+        }
+    )
+    data_manager.run_futures_master_governance = AsyncMock()
+    data_manager.run_futures_market_data_sync = AsyncMock(
+        return_value={
+            "status": "success",
+            "totals": {"inserted": 0, "changed": 0, "unchanged": 1, "failed": 0},
+            "trading_day_governance": {"status": "success", "target_date_count": 1},
+            "scope_selection": {"exchanges": ["DCE"]},
+            "series": [{"series_id": "CNF.I.DCE.main", "status": "success", "fetched_rows": 1}],
+        }
+    )
+    task._send_task_report = AsyncMock(return_value=True)
+
+    result = _run(
+        task.futures_market_data_sync(
+            exchanges=["DCE"],
+            start_date="2026-06-19",
+            end_date="2026-06-19",
+            dry_run=True,
+            requires_trading_calendar_backfill=False,
+            requires_trading_day_governance=True,
+            requires_master_data_governance=False,
+        )
+    )
+
+    assert result is True
+    data_manager.run_futures_official_calendar_backfill.assert_not_awaited()
+    data_manager.run_futures_trading_day_governance.assert_awaited_once_with(
+        scope_id=None,
+        scope_ids=None,
+        exchanges=["DCE"],
+        categories=None,
+        instrument_ids=None,
+        series_ids=None,
+        series_types=None,
+        start_date="2026-06-19",
+        end_date="2026-06-19",
+        dry_run=True,
+    )
+    data_manager.run_futures_market_data_sync.assert_awaited_once()
+
+
 def test_futures_market_data_sync_runs_master_governance_per_exchange():
     task = ScheduledTasks()
 
     from scheduler import tasks as scheduler_tasks_module
 
     data_manager = scheduler_tasks_module.data_manager
+    data_manager.run_futures_official_calendar_backfill = AsyncMock(return_value={"status": "success"})
     data_manager.run_futures_trading_day_governance = AsyncMock(
         return_value={
             "status": "success",

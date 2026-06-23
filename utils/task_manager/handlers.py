@@ -2161,6 +2161,7 @@ class TaskManagerHandlers:
             'end',
             'end_date',
             'mode',
+            'requires_trading_calendar_backfill',
             'requires_trading_day_governance',
             'requires_master_data_governance',
             'master_governance_max_days',
@@ -2168,6 +2169,7 @@ class TaskManagerHandlers:
         allowed_flags = {
             'dry_run',
             'write',
+            'skip_trading_calendar_backfill',
             'skip_trading_day_governance',
             'requires_master_data_governance',
             'skip_master_data_governance',
@@ -2228,6 +2230,11 @@ class TaskManagerHandlers:
             str(args.get('requires_trading_day_governance', 'true')).lower() not in {'0', 'false', 'no'}
             and 'skip_trading_day_governance' not in flags
         )
+        requires_trading_calendar_backfill = (
+            requires_trading_day_governance
+            and str(args.get('requires_trading_calendar_backfill', 'true')).lower() not in {'0', 'false', 'no'}
+            and 'skip_trading_calendar_backfill' not in flags
+        )
         requires_master_data_governance = (
             str(args.get('requires_master_data_governance', 'true')).lower() not in {'0', 'false', 'no'}
             or 'requires_master_data_governance' in flags
@@ -2246,6 +2253,7 @@ class TaskManagerHandlers:
             end_date=end_date,
             mode=mode,
             dry_run=dry_run,
+            requires_trading_calendar_backfill=requires_trading_calendar_backfill,
             requires_trading_day_governance=requires_trading_day_governance,
             requires_master_data_governance=requires_master_data_governance,
             master_governance_max_days=master_governance_max_days,
@@ -2260,7 +2268,7 @@ class TaskManagerHandlers:
                 "可选参数: `scope=<scope_id>`、`categories=all`、"
                 "`instrument_ids=CNF.LC.GFEX`、`series_ids=CNF.LC.GFEX.main`、"
                 "`mode=direct`、`master_governance_max_days=N`、"
-                "`skip_master_data_governance`。\n"
+                "`skip_trading_calendar_backfill`、`skip_master_data_governance`。\n"
                 "未显式指定 `write` 时默认按 dry-run 执行；正式落库必须带 `write`。\n\n"
                 "示例:\n"
                 f"• `/run {job_id} exchange=GFEX start=2026-06-01 end=2026-06-10 dry_run`\n"
@@ -2291,6 +2299,7 @@ class TaskManagerHandlers:
         end_date: Optional[str],
         mode: str,
         dry_run: bool,
+        requires_trading_calendar_backfill: bool,
         requires_trading_day_governance: bool,
         requires_master_data_governance: bool,
         master_governance_max_days: Optional[int],
@@ -2331,6 +2340,7 @@ class TaskManagerHandlers:
                     f"end: `{end_date}`\n"
                     f"dry_run: `{dry_run}`\n"
                     f"mode: `{mode}`\n"
+                    f"trading_calendar_backfill: `{requires_trading_calendar_backfill}`\n"
                     f"trading_day_governance: `{requires_trading_day_governance}`\n"
                     f"master_data_governance: `{requires_master_data_governance}`\n\n"
                     "任务已接收，完成后将发送结果报告。"
@@ -2343,41 +2353,52 @@ class TaskManagerHandlers:
             if requires_trading_day_governance:
                 calendar_start_date = start_date or end_date
                 calendar_end_date = end_date or start_date or calendar_start_date
-                self.task_manager.logger.info(
-                    "[TaskManagerHandlers] 期货行情前置官方交易日历回填: job_id=%s scope_id=%s "
-                    "exchanges=%s start=%s end=%s dry_run=%s",
-                    job_id,
-                    scope_id,
-                    exchanges,
-                    calendar_start_date,
-                    calendar_end_date,
-                    dry_run,
-                )
-                calendar_result = await data_manager.run_futures_official_calendar_backfill(
-                    scope_id=scope_id,
-                    scope_ids=None,
-                    exchanges=exchanges,
-                    categories=categories,
-                    instrument_ids=instrument_ids,
-                    series_ids=series_ids,
-                    series_types=series_types,
-                    start_date=calendar_start_date,
-                    end_date=calendar_end_date,
-                    dry_run=dry_run,
-                )
-                calendar_status = str(calendar_result.get('status') or '').lower()
-                if calendar_status == 'blocked' and not dry_run:
-                    await self.task_manager.send_message(
-                        chat_id,
-                        (
-                            "❌ *期货行情任务失败*\n\n"
-                            f"task: `{job_id}`\n"
-                            "reason: `trading_calendar_preflight_failed`\n"
-                            f"calendar_status: `{calendar_status}`"
-                        ),
-                        parse_mode='markdown',
+                if requires_trading_calendar_backfill:
+                    self.task_manager.logger.info(
+                        "[TaskManagerHandlers] 期货行情前置官方交易日历回填: job_id=%s scope_id=%s "
+                        "exchanges=%s start=%s end=%s dry_run=%s",
+                        job_id,
+                        scope_id,
+                        exchanges,
+                        calendar_start_date,
+                        calendar_end_date,
+                        dry_run,
                     )
-                    return
+                    calendar_result = await data_manager.run_futures_official_calendar_backfill(
+                        scope_id=scope_id,
+                        scope_ids=None,
+                        exchanges=exchanges,
+                        categories=categories,
+                        instrument_ids=instrument_ids,
+                        series_ids=series_ids,
+                        series_types=series_types,
+                        start_date=calendar_start_date,
+                        end_date=calendar_end_date,
+                        dry_run=dry_run,
+                    )
+                    calendar_status = str(calendar_result.get('status') or '').lower()
+                    if calendar_status == 'blocked' and not dry_run:
+                        await self.task_manager.send_message(
+                            chat_id,
+                            (
+                                "❌ *期货行情任务失败*\n\n"
+                                f"task: `{job_id}`\n"
+                                "reason: `trading_calendar_preflight_failed`\n"
+                                f"calendar_status: `{calendar_status}`"
+                            ),
+                            parse_mode='markdown',
+                        )
+                        return
+                else:
+                    self.task_manager.logger.info(
+                        "[TaskManagerHandlers] 期货行情前置官方交易日历回填跳过: job_id=%s "
+                        "scope_id=%s exchanges=%s start=%s end=%s",
+                        job_id,
+                        scope_id,
+                        exchanges,
+                        calendar_start_date,
+                        calendar_end_date,
+                    )
 
                 self.task_manager.logger.info(
                     "[TaskManagerHandlers] 期货行情前置交易日治理: job_id=%s scope_id=%s "

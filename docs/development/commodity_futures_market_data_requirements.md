@@ -728,13 +728,13 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 | `futures_trading_day_governance` | enabled | 日更前、回补前 | 维护交易所/品种交易日历、休市公告、交易时段和目标交易日集合，是商品数据同步前置任务 |
 | `futures_master_governance` | enabled/manual_only | 手工触发；后续可作为日更前置 | 维护商品根品种、研究序列和真实合约主数据；按指定交易所使用官方日行情逐交易日发现合约代码，依赖已验证交易日历，默认 `dry_run=true`、`max_days=10`，真实落库必须显式 `write` |
 | `futures_market_data_sync` | enabled | 交易日晚间 | 同步 P0 商品期货最新日线和连续序列，当前实现任务名 |
-| `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用；行情执行默认要求交易日治理和主数据治理前置，可用 `skip_master_data_governance` 在专项验证时显式跳过 |
+| `futures_market_data_backfill` | disabled/manual | 手工或周末 | 历史回补，按品种和日期范围执行，默认禁用；行情执行默认要求官方交易日历回填、交易日治理和主数据治理前置，可用 `skip_trading_calendar_backfill` 复用已落库日历并保留交易日治理，可用 `skip_master_data_governance` 在专项验证时显式跳过主数据治理 |
 | `futures_spread_recompute` | enabled | 日更后 | 重算价差和价差诊断 |
 | `futures_cycle_diagnostics_refresh` | enabled | 日更后 | 重算分位数、均值、周期状态 |
 | `futures_market_data_readiness` | 可由 API/维护任务生成 | 每日或每周 | 生成覆盖率和缺口摘要 |
 | `futures_source_version_check` | 待后续拆分 | 每日中午 | 检查 AKShare 等依赖版本，复用现有依赖检查机制 |
 
-商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成任务指定时间段内的交易所官方日历落库，再执行 `futures_trading_day_governance` 生成同一任务时间段内的目标交易日集合，再执行 `futures_master_governance` 完成这些目标交易日范围内的根品种、研究序列和真实合约主数据治理，最后才执行行情历史回补或日更。调度任务和 Telegram 手工任务必须遵循同一前置链路，不允许一条路径只跑主数据治理而绕过交易日治理。
+商品日更建议安排在 A 股日更和行业日更之后，避免资源竞争。例如 21:30-23:00 区间，`max_instances=1`。正式 dry-run、历史行情回补和生产日更的顺序应为：先执行 `futures_official_calendar_backfill` 完成任务指定时间段内的交易所官方日历落库，再执行 `futures_trading_day_governance` 生成同一任务时间段内的目标交易日集合，再执行 `futures_master_governance` 完成这些目标交易日范围内的根品种、研究序列和真实合约主数据治理，最后才执行行情历史回补或日更。调度任务和 Telegram 手工任务必须遵循同一前置链路，不允许一条路径只跑主数据治理而绕过交易日治理。`futures_official_calendar_backfill` 是“访问官方源并更新/回填日历库”的数据刷新动作；`futures_trading_day_governance` 是“读取已落库日历、校验质量并生成目标交易日集合”的治理动作。长周期历史 dry-run 或回补在确认交易所日历已完整落库后，可以显式传入 `skip_trading_calendar_backfill` 跳过官方日历回填以降低请求压力，但仍应保留交易日治理；`skip_trading_day_governance` 只用于专项诊断，不应作为正常行情回补参数。
 
 行情日线下载的目标日期必须是三重交集：`任务参数 start/end 时间段` ∩ `期货根品种/研究序列生命周期窗口` ∩ `交易日治理确认的目标交易日`。其中生命周期窗口优先来自 `futures_instruments.metadata.lifecycle`；若主数据治理尚未写入显式 lifecycle，但 `futures_contracts` 已存在合约级 `first_observed_trade_date/last_observed_trade_date`，行情同步可以使用合约观测窗口作为通用裁剪依据。裁剪结果应记录为 `lifecycle_clipped` 或 `lifecycle_skip`，并且不得再对生命周期外日期请求官方源或备源。该规则适用于所有交易所和所有品种，不能为单一交易所或单一历史品种写特殊 skip。
 
@@ -749,6 +749,7 @@ GFEX 单交易所上线时，调度配置应只打开 GFEX scope，不应使用 
   "scope_ids": ["gfex_all"],
   "mode": "direct",
   "dry_run": false,
+  "requires_trading_calendar_backfill": true,
   "requires_trading_day_governance": true,
   "requires_master_data_governance": true,
   "master_governance_max_days": 10,
