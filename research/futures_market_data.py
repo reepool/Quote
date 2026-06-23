@@ -2675,6 +2675,45 @@ class FuturesStorageManager:
             ).fetchone()
         return self._contract_payload(row) if row else None
 
+    def get_contract_observed_windows(
+        self,
+        instrument_ids: Sequence[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        normalized_ids = sorted({str(item or "").upper() for item in instrument_ids if str(item or "").strip()})
+        if not normalized_ids:
+            return {}
+        placeholders = ",".join("?" for _ in normalized_ids)
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT
+                    instrument_id,
+                    MIN(COALESCE(listed_date, json_extract(metadata_json, '$.first_observed_trade_date'))) AS valid_from,
+                    MAX(COALESCE(last_trade_date, json_extract(metadata_json, '$.last_observed_trade_date'))) AS valid_to,
+                    COUNT(*) AS contract_count
+                FROM futures_contracts
+                WHERE instrument_id IN ({placeholders})
+                GROUP BY instrument_id
+                """,
+                normalized_ids,
+            ).fetchall()
+        windows: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            valid_from = _date_key_or_none(row["valid_from"])
+            valid_to = _date_key_or_none(row["valid_to"])
+            if not valid_from and not valid_to:
+                continue
+            instrument_id = str(row["instrument_id"] or "").upper()
+            windows[instrument_id] = {
+                "status": "observed_contract_window",
+                "valid_from": valid_from,
+                "valid_to": valid_to,
+                "source": "futures_contracts_observed_window",
+                "reason": "contract_observed_trade_date_window",
+                "contract_count": int(row["contract_count"] or 0),
+            }
+        return windows
+
     def get_contract_price_bars(
         self,
         contract_id: str,
@@ -6714,6 +6753,69 @@ def _series_lifecycle_exclusion(
     return None
 
 
+def _series_lifecycle_filter(
+    series: FuturesSeries,
+    target_dates: Sequence[str],
+    instrument_by_id: Mapping[str, FuturesInstrument],
+    contract_observed_windows: Optional[Mapping[str, Mapping[str, Any]]] = None,
+) -> tuple[List[str], Optional[Dict[str, Any]]]:
+    if not target_dates:
+        return [], None
+    instrument_id = str(series.instrument_id).upper()
+    instrument = instrument_by_id.get(instrument_id)
+    lifecycle = _instrument_lifecycle_from_metadata(dict(instrument.metadata or {})) if instrument else None
+    if not lifecycle and contract_observed_windows:
+        observed_window = contract_observed_windows.get(instrument_id)
+        if observed_window:
+            valid_from = _date_key_or_none(observed_window.get("valid_from"))
+            valid_to = _date_key_or_none(observed_window.get("valid_to"))
+            if valid_from or valid_to:
+                lifecycle = {
+                    "status": str(observed_window.get("status") or "observed_contract_window"),
+                    "valid_from": valid_from,
+                    "valid_to": valid_to,
+                    "source": str(observed_window.get("source") or "futures_contracts_observed_window"),
+                    "reason": str(observed_window.get("reason") or "contract_observed_trade_date_window"),
+                    "contract_count": int(observed_window.get("contract_count") or 0),
+                }
+    if not lifecycle:
+        return list(target_dates), None
+
+    valid_from = lifecycle.get("valid_from")
+    valid_to = lifecycle.get("valid_to")
+    filtered_dates = [
+        item
+        for item in target_dates
+        if (not valid_from or _date_key(item) >= valid_from)
+        and (not valid_to or _date_key(item) <= valid_to)
+    ]
+    target_start = _date_key(min(target_dates))
+    target_end = _date_key(max(target_dates))
+    if not filtered_dates:
+        return [], {
+            "status": "lifecycle_skip",
+            "reason": "target_window_outside_instrument_lifecycle",
+            "instrument_lifecycle": lifecycle,
+            "target_start": target_start,
+            "target_end": target_end,
+            "original_target_dates": len(target_dates),
+            "filtered_target_dates": 0,
+        }
+    if len(filtered_dates) != len(target_dates):
+        return filtered_dates, {
+            "status": "lifecycle_clipped",
+            "reason": "target_window_clipped_to_instrument_lifecycle",
+            "instrument_lifecycle": lifecycle,
+            "target_start": target_start,
+            "target_end": target_end,
+            "filtered_start": filtered_dates[0],
+            "filtered_end": filtered_dates[-1],
+            "original_target_dates": len(target_dates),
+            "filtered_target_dates": len(filtered_dates),
+        }
+    return filtered_dates, None
+
+
 class FuturesReadinessService:
     def __init__(self, storage: FuturesStorageManager, module_cfg: Optional[Dict[str, Any]] = None):
         self.storage = storage
@@ -7047,6 +7149,9 @@ class FuturesMarketDataSyncService:
             item.instrument_id.upper(): item
             for item in universe_selector.instruments
         }
+        contract_observed_windows = self.storage.get_contract_observed_windows(
+            [item.instrument_id for item in target_series]
+        )
         target_exchanges = sorted(
             {
                 str(item.instrument_id).split(".")[-1].upper()
@@ -7248,16 +7353,23 @@ class FuturesMarketDataSyncService:
                 fallback_status = "not_attempted"
                 fallback_reason = ""
                 exchange = str(item.instrument_id).split(".")[-1].upper()
-                target_dates = list(target_dates_by_exchange.get(exchange) or [])
+                original_target_dates = list(target_dates_by_exchange.get(exchange) or [])
+                target_dates, lifecycle_note = _series_lifecycle_filter(
+                    item,
+                    original_target_dates,
+                    instrument_by_id,
+                    contract_observed_windows,
+                )
                 date_results: List[Dict[str, Any]] = []
                 logger.info(
                     "[FuturesMarketDataSync] series start run_id=%s series=%s exchange=%s "
-                    "target_dates=%s dry_run=%s",
+                    "target_dates=%s dry_run=%s lifecycle=%s",
                     run_id,
                     item.series_id,
                     exchange,
                     len(target_dates),
                     dry_run,
+                    lifecycle_note,
                 )
                 heartbeat(
                     "series_start",
@@ -7265,10 +7377,15 @@ class FuturesMarketDataSyncService:
                     force=True,
                 )
                 if not target_dates:
+                    skip_status = (
+                        "lifecycle_skip"
+                        if lifecycle_note and lifecycle_note.get("status") == "lifecycle_skip"
+                        else "calendar_skip"
+                    )
                     series_results.append(
                         {
                             "series_id": item.series_id,
-                            "status": "calendar_skip",
+                            "status": skip_status,
                             "source_profile": None,
                             "fetched_rows": 0,
                             "write_result": {"inserted": 0, "changed": 0, "unchanged": 0},
@@ -7277,13 +7394,16 @@ class FuturesMarketDataSyncService:
                                 "target_dates": [],
                                 "reason": "no_governed_trading_dates",
                             },
+                            "lifecycle": lifecycle_note,
                         }
                     )
                     processed_series_count += 1
                     logger.info(
-                        "[FuturesMarketDataSync] series skipped run_id=%s series=%s reason=no_governed_trading_dates",
+                        "[FuturesMarketDataSync] series skipped run_id=%s series=%s reason=no_governed_trading_dates "
+                        "lifecycle=%s",
                         run_id,
                         item.series_id,
+                        lifecycle_note,
                     )
                     continue
                 lifecycle_skip = _series_lifecycle_exclusion(
@@ -7566,6 +7686,8 @@ class FuturesMarketDataSyncService:
                             "fallback_reason": fallback_reason,
                             "fetched_rows": len(bars),
                             "target_trade_dates": target_dates,
+                            "original_target_trade_date_count": len(original_target_dates),
+                            "lifecycle": lifecycle_note,
                             "date_results": date_results,
                             "write_result": write_result,
                         }
@@ -7601,6 +7723,8 @@ class FuturesMarketDataSyncService:
                             "fallback_status": fallback_status,
                             "fallback_reason": fallback_reason,
                             "target_trade_dates": target_dates,
+                            "original_target_trade_date_count": len(original_target_dates),
+                            "lifecycle": lifecycle_note,
                             "date_results": date_results,
                             "reason": str(exc),
                         }

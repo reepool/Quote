@@ -40,6 +40,7 @@ from research.futures_market_data import (
     make_futures_series_id,
     normalize_provider_bars,
     _series_lifecycle_exclusion,
+    _series_lifecycle_filter,
 )
 from research.providers.akshare_futures import AkshareFuturesMarketDataProvider
 from research.providers.official_futures_calendar import OfficialFuturesCalendarProvider
@@ -351,6 +352,53 @@ def test_futures_market_data_lifecycle_gate_is_generic_not_symbol_specific():
     assert exclusion["reason"] == "target_window_outside_instrument_lifecycle"
     assert exclusion["instrument_lifecycle"]["valid_to"] == "2001-03-29"
     assert in_window is None
+
+
+def test_futures_market_data_lifecycle_filter_uses_contract_observed_window():
+    instrument = FuturesInstrument(
+        instrument_id="CNF.X.DCE",
+        symbol="X",
+        name="DCE Contract Window Test",
+        exchange="DCE",
+        category="agriculture",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+        metadata={},
+    )
+    series = FuturesSeries(
+        series_id="CNF.X.DCE.main",
+        instrument_id="CNF.X.DCE",
+        symbol="X0",
+        series_type="main_continuous",
+        source_profile="akshare_futures",
+        source="akshare",
+        source_interface="futures_zh_daily_sina",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+    )
+
+    filtered, lifecycle = _series_lifecycle_filter(
+        series,
+        ["2000-06-01", "2001-03-01", "2026-06-16"],
+        {"CNF.X.DCE": instrument},
+        {
+            "CNF.X.DCE": {
+                "valid_from": "2000-06-01",
+                "valid_to": "2001-03-29",
+                "source": "unit_test_contract_window",
+                "contract_count": 3,
+            }
+        },
+    )
+
+    assert filtered == ["2000-06-01", "2001-03-01"]
+    assert lifecycle is not None
+    assert lifecycle["status"] == "lifecycle_clipped"
+    assert lifecycle["original_target_dates"] == 3
+    assert lifecycle["filtered_target_dates"] == 2
+    assert lifecycle["instrument_lifecycle"]["source"] == "unit_test_contract_window"
 
 
 def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
