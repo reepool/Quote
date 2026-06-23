@@ -357,6 +357,11 @@ class OfficialFuturesMarketDataProvider:
     }
     GFEX_LISTED_PRODUCTS_PAGE = "http://www.gfex.com.cn/gfex/sspzb/sspz.shtml"
     DCE_LISTED_PRODUCTS_PAGE = "http://www.dce.com.cn/"
+    GENERIC_LISTED_PRODUCTS_PAGES = {
+        "SHFE": "https://www.shfe.com.cn/products/futures/",
+        "INE": "https://www.ine.cn/products/",
+        "CZCE": "https://www.czce.com.cn/cn/jysj/pz/H770302index_1.htm",
+    }
 
     def __init__(self, research_config: ResearchConfig):
         self.research_config = research_config
@@ -953,7 +958,34 @@ class OfficialFuturesMarketDataProvider:
             specs = self._merge_product_specs(configured, official_pages)
             if specs:
                 return specs
-        raise OfficialFuturesSourceUnavailable(f"unsupported official product spec exchange: {exchange_key}")
+        if exchange_key == "SHFE":
+            configured = self._configured_product_specs(exchange_key)
+            try:
+                official_pages = self._fetch_shfe_product_page_specs(target_symbols=target_symbols)
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning("[OfficialFutures] SHFE product page specs unavailable: %s", exc)
+                official_pages = {}
+            specs = self._merge_product_specs(configured, official_pages)
+            if specs:
+                return specs
+        if exchange_key in {"INE", "CZCE"}:
+            configured = self._configured_product_specs(exchange_key)
+            try:
+                official_pages = self._fetch_generic_product_page_specs(
+                    exchange_key,
+                    target_symbols=target_symbols,
+                )
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning(
+                    "[OfficialFutures] %s product page specs unavailable: %s",
+                    exchange_key,
+                    exc,
+                )
+                official_pages = {}
+            specs = self._merge_product_specs(configured, official_pages)
+            if specs:
+                return specs
+        raise OfficialFuturesSourceUnavailable(f"official product spec unavailable for exchange: {exchange_key}")
 
     @staticmethod
     def _merge_product_specs(
@@ -1149,6 +1181,163 @@ class OfficialFuturesMarketDataProvider:
             logger.warning("[OfficialFutures] DCE product page spec partial failures=%s", failures)
         return specs
 
+    def _fetch_shfe_product_page_specs(
+        self,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        exchange_key = "SHFE"
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        configured_pages = adapter_cfg.get("product_rule_pages") or {}
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        page_map = {
+            str(symbol).upper(): str(url)
+            for symbol, url in (configured_pages.items() if isinstance(configured_pages, Mapping) else [])
+            if str(symbol).strip()
+            and str(url).strip()
+            and (not target_symbol_set or str(symbol).upper() in target_symbol_set)
+        }
+        if not target_symbol_set and not page_map:
+            logger.info(
+                "[OfficialFutures] SHFE product page specs require target symbols; skip broad discovery"
+            )
+            return {}
+        listing_pages = _as_string_list(
+            adapter_cfg.get("listed_products_page")
+            or self.GENERIC_LISTED_PRODUCTS_PAGES.get(exchange_key)
+            or ""
+        )
+        failures: Dict[str, str] = {}
+        with create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS) as session:
+            for discovery_url in listing_pages:
+                try:
+                    discovery_html = self._request_exchange_product_rule_page(
+                        session,
+                        exchange_key,
+                        discovery_url,
+                        "listed_products",
+                    )
+                    existing_urls = {str(url).rstrip("/") for url in page_map.values()}
+                    discovered_pages = self._discover_shfe_product_rule_pages(
+                        discovery_html,
+                        base_url=discovery_url,
+                    )
+                    for symbol_hint, url in discovered_pages.items():
+                        if target_symbol_set and symbol_hint not in target_symbol_set:
+                            continue
+                        if str(url).rstrip("/") in existing_urls:
+                            continue
+                        page_map.setdefault(symbol_hint, url)
+                        existing_urls.add(str(url).rstrip("/"))
+                except Exception as exc:
+                    failures[f"{exchange_key}:listed_products:{discovery_url}"] = str(exc)
+            specs: Dict[str, FuturesProductSpec] = {}
+            for symbol_hint, url in sorted(page_map.items()):
+                try:
+                    html = self._request_exchange_product_rule_page(
+                        session,
+                        exchange_key,
+                        url,
+                        symbol_hint,
+                    )
+                    spec = self._parse_shfe_product_page_html(
+                        html,
+                        symbol=str(symbol_hint or ""),
+                        source_url=url,
+                        adapter_cfg=adapter_cfg,
+                    )
+                except Exception as exc:
+                    failures[f"{exchange_key}:{symbol_hint}"] = str(exc)
+                    continue
+                if not spec.symbol:
+                    continue
+                if target_symbol_set and spec.symbol.upper() not in target_symbol_set:
+                    continue
+                specs[spec.symbol.upper()] = spec
+        if failures:
+            logger.warning("[OfficialFutures] SHFE product page spec partial failures=%s", failures)
+        return specs
+
+    def _fetch_generic_product_page_specs(
+        self,
+        exchange: str,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        exchange_key = str(exchange or "").upper()
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        configured_pages = adapter_cfg.get("product_rule_pages") or {}
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        page_map = {
+            str(symbol).upper(): str(url)
+            for symbol, url in (configured_pages.items() if isinstance(configured_pages, Mapping) else [])
+            if str(symbol).strip()
+            and str(url).strip()
+            and (not target_symbol_set or str(symbol).upper() in target_symbol_set)
+        }
+        listing_pages = _as_string_list(
+            adapter_cfg.get("listed_products_page")
+            or self.GENERIC_LISTED_PRODUCTS_PAGES.get(exchange_key)
+            or ""
+        )
+        failures: Dict[str, str] = {}
+        with create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS) as session:
+            for discovery_url in listing_pages:
+                try:
+                    discovery_html = self._request_exchange_product_rule_page(
+                        session,
+                        exchange_key,
+                        discovery_url,
+                        "listed_products",
+                    )
+                    existing_urls = {str(url).rstrip("/") for url in page_map.values()}
+                    for symbol_hint, url in self._discover_generic_product_rule_pages(
+                        discovery_html,
+                        exchange=exchange_key,
+                        base_url=discovery_url,
+                    ).items():
+                        if str(url).rstrip("/") in existing_urls:
+                            continue
+                        page_map.setdefault(symbol_hint, url)
+                        existing_urls.add(str(url).rstrip("/"))
+                except Exception as exc:
+                    failures[f"{exchange_key}:listed_products:{discovery_url}"] = str(exc)
+            specs: Dict[str, FuturesProductSpec] = {}
+            for symbol_hint, url in sorted(page_map.items()):
+                try:
+                    html = self._request_exchange_product_rule_page(
+                        session,
+                        exchange_key,
+                        url,
+                        symbol_hint,
+                    )
+                    spec = self._parse_generic_product_page_html(
+                        html,
+                        exchange=exchange_key,
+                        symbol=str(symbol_hint or ""),
+                        source_url=url,
+                        adapter_cfg=adapter_cfg,
+                    )
+                except Exception as exc:
+                    failures[f"{exchange_key}:{symbol_hint}"] = str(exc)
+                    continue
+                if not spec.symbol:
+                    continue
+                if target_symbol_set and spec.symbol.upper() not in target_symbol_set:
+                    continue
+                specs[spec.symbol.upper()] = spec
+        if failures:
+            logger.warning("[OfficialFutures] %s product page spec partial failures=%s", exchange_key, failures)
+        return specs
+
     def _discover_dce_product_rule_pages(
         self,
         html: str,
@@ -1182,6 +1371,49 @@ class OfficialFuturesMarketDataProvider:
             # Prefer the shorter title when duplicate desktop/mobile nav links exist.
             best = sorted(matches, key=lambda item: (len(str(item.get("text") or "")), str(item.get("href") or "")))[0]
             pages[symbol_key] = str(best.get("href") or "")
+        return pages
+
+    def _discover_generic_product_rule_pages(
+        self,
+        html: str,
+        *,
+        exchange: str,
+        base_url: str,
+    ) -> Dict[str, str]:
+        exchange_key = str(exchange or "").upper()
+        pages: Dict[str, str] = {}
+        for item in _html_links(html, base_url=base_url):
+            href = str(item.get("href") or "").strip()
+            title = str(item.get("text") or "").strip()
+            if not href or not title:
+                continue
+            if not _is_generic_product_link(exchange_key, href, title):
+                continue
+            symbol_hint = _generic_product_symbol_hint(href, title)
+            if not symbol_hint:
+                symbol_hint = f"__PAGE_{len(pages) + 1}__"
+            pages.setdefault(symbol_hint, href)
+        return pages
+
+    def _discover_shfe_product_rule_pages(
+        self,
+        html: str,
+        *,
+        base_url: str,
+    ) -> Dict[str, str]:
+        pages: Dict[str, str] = {}
+        for item in _html_links(html, base_url=base_url):
+            href = str(item.get("href") or "").strip()
+            title = str(item.get("text") or "").strip()
+            if not href or not title:
+                continue
+            match = re.search(r"/products/futures/.*/([a-z]{1,3})_f/?$", href.lower())
+            if not match:
+                continue
+            if any(token in title for token in ("期货", "历史", "附件", "附表", "手册", "规则", "仓库", "数据")):
+                continue
+            symbol_hint = match.group(1).upper()
+            pages.setdefault(symbol_hint, href)
         return pages
 
     def _request_gfex_product_rule_page(self, session: requests.Session, url: str, symbol: str) -> str:
@@ -1233,6 +1465,69 @@ class OfficialFuturesMarketDataProvider:
             f"official GFEX product page request failed symbol={symbol} url={url}: {last_error}"
         )
 
+    def _request_exchange_product_rule_page(
+        self,
+        session: requests.Session,
+        exchange: str,
+        url: str,
+        symbol: str,
+    ) -> str:
+        exchange_key = str(exchange or "").upper()
+        last_error: Optional[Exception] = None
+        current_url = str(url or "")
+        redirect_count = 0
+        generic_failures = 0
+        max_steps = self.retry_attempts + 8
+        for attempt in range(1, max_steps + 1):
+            self._wait_for_request_slot(exchange_key)
+            try:
+                response = request_get(
+                    current_url,
+                    session=session,
+                    tls_config=self.tls_config,
+                    headers=self.DEFAULT_HEADERS,
+                    timeout=self.timeout_seconds,
+                )
+                if _handle_safeline_js_challenge(session, response):
+                    logger.info(
+                        "[OfficialFutures] solved safeline product-page challenge exchange=%s symbol=%s url=%s",
+                        exchange_key,
+                        symbol,
+                        current_url,
+                    )
+                    continue
+                if self._is_challenge_response(response) or _looks_like_waf_challenge(getattr(response, "text", "")):
+                    raise OfficialFuturesSourceUnavailable(
+                        f"{exchange_key.lower()}_product_page_challenge symbol={symbol}"
+                    )
+                response.raise_for_status()
+                response.encoding = response.apparent_encoding or response.encoding
+                refresh_url = _html_meta_refresh_url(response.text, base_url=current_url)
+                if refresh_url and refresh_url != current_url and redirect_count < 5:
+                    redirect_count += 1
+                    current_url = refresh_url
+                    logger.info(
+                        "[OfficialFutures] product-page meta refresh exchange=%s symbol=%s next_url=%s",
+                        exchange_key,
+                        symbol,
+                        current_url,
+                    )
+                    continue
+                return response.text
+            except Exception as exc:
+                last_error = exc
+                generic_failures += 1
+                if generic_failures >= self.retry_attempts:
+                    break
+                if self.retry_backoff_seconds > 0:
+                    sleep_seconds = self.retry_backoff_seconds * generic_failures
+                    self._increment_metric(exchange_key, "retry_backoff_count", 1)
+                    self._increment_metric(exchange_key, "retry_backoff_seconds", sleep_seconds)
+                    time.sleep(sleep_seconds)
+        raise OfficialFuturesSourceUnavailable(
+            f"official {exchange_key} product page request failed symbol={symbol} url={url}: {last_error}"
+        )
+
     def _parse_dce_product_page_html(self, html: str, *, symbol: str, source_url: str) -> FuturesProductSpec:
         texts = _html_text_chunks(html)
         field_map = {
@@ -1242,8 +1537,10 @@ class OfficialFuturesMarketDataProvider:
             "tick_size": _field_after_label(texts, ("最小变动价位", "最小变动单位")),
             "trade_code": _field_after_label(texts, ("交易代码", "合约代码")),
         }
-        product_symbol = str(field_map.get("trade_code") or symbol or "").strip().upper()
-        product_symbol = re.sub(r"[^A-Z]", "", product_symbol) or str(symbol or "").upper()
+        raw_symbol = str(field_map.get("trade_code") or "").strip().upper()
+        if not raw_symbol and not str(symbol or "").startswith("__PAGE_"):
+            raw_symbol = str(symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
         name = str(field_map.get("product_name") or "").strip()
         quote_unit_text = str(field_map.get("quote_unit") or "").strip()
         unit = _normalize_domestic_quote_unit(quote_unit_text)
@@ -1295,8 +1592,10 @@ class OfficialFuturesMarketDataProvider:
             "tick_size": _field_after_label(texts, ("最小变动价位",)),
             "trade_code": _field_after_label(texts, ("交易代码",)),
         }
-        product_symbol = str(field_map.get("trade_code") or symbol or "").strip().upper()
-        product_symbol = re.sub(r"[^A-Z]", "", product_symbol) or str(symbol or "").upper()
+        raw_symbol = str(field_map.get("trade_code") or "").strip().upper()
+        if not raw_symbol and not str(symbol or "").startswith("__PAGE_"):
+            raw_symbol = str(symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
         name = str(field_map.get("product_name") or "").strip()
         quote_unit_text = str(field_map.get("quote_unit") or "").strip()
         unit = _normalize_domestic_quote_unit(quote_unit_text)
@@ -1336,6 +1635,180 @@ class OfficialFuturesMarketDataProvider:
                 "source_limitations": [
                     "gfex_product_page_does_not_provide_project_category",
                 ],
+            },
+            field_sources=field_sources,
+        )
+
+    def _parse_shfe_product_page_html(
+        self,
+        html: str,
+        *,
+        symbol: str,
+        source_url: str,
+        adapter_cfg: Mapping[str, Any],
+    ) -> FuturesProductSpec:
+        texts = _html_text_chunks(html)
+        field_map = {
+            "product_name": _shfe_page_list_value(html, "Product")
+            or _field_after_label(texts, ("交易品种", "品种名称")),
+            "trade_unit": _shfe_page_list_value(html, "ContractSize")
+            or _field_after_label(texts, ("交易单位", "合约单位")),
+            "quote_unit": _shfe_page_list_value(html, "PriceQuotation")
+            or _field_after_label(texts, ("报价单位", "计价单位")),
+            "tick_size": _shfe_page_list_value(html, "MinimumPriceFluctuation")
+            or _field_after_label(texts, ("最小变动价位", "最小变动单位")),
+            "trade_code": _shfe_page_list_value(html, "ContractSymbol")
+            or _field_after_label(texts, ("交易代码", "合约代码")),
+            "listing_exchange": _shfe_page_list_value(html, "ListingExchange"),
+            "data_standard": _shfe_page_list_value(html, "data_standard"),
+        }
+        raw_symbol = str(field_map.get("trade_code") or "").strip().upper()
+        if not raw_symbol and not str(symbol or "").startswith("__PAGE_"):
+            raw_symbol = str(symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
+        name = str(field_map.get("product_name") or "").strip()
+        quote_unit_text = str(field_map.get("quote_unit") or "").strip()
+        unit = _normalize_domestic_quote_unit(quote_unit_text)
+        currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
+        multiplier = _first_number(field_map.get("trade_unit"))
+        tick_size = _first_number(field_map.get("tick_size"))
+        category, category_source = _category_from_adapter_rules(
+            adapter_cfg,
+            symbol=product_symbol,
+            name=name,
+            source_url=source_url,
+            page_text=" ".join(texts[:300]),
+        )
+        field_sources = {
+            field_name: {
+                "source_type": "official_product_rule_page",
+                "source_ref": source_url,
+                "quality_flag": "official_product_rule_page",
+            }
+            for field_name, value in (
+                ("name", name),
+                ("currency", currency),
+                ("unit", unit),
+                ("contract_multiplier", multiplier),
+                ("tick_size", tick_size),
+            )
+            if value not in (None, "")
+        }
+        if category:
+            field_sources["category"] = {
+                "source_type": "governed_rule_metadata",
+                "source_ref": category_source,
+                "quality_flag": "governed_rule_verified",
+            }
+        return FuturesProductSpec(
+            exchange="SHFE",
+            symbol=product_symbol,
+            name=name,
+            category=category,
+            currency=currency or "CNY",
+            unit=unit,
+            contract_multiplier=multiplier,
+            tick_size=tick_size,
+            source_profile="exchange_official_product_rule_page",
+            source_interface="official_shfe_product_page",
+            source_url=source_url,
+            quality_flag="official_product_spec_partial",
+            evidence={
+                "field_map": {key: value for key, value in field_map.items() if value},
+                "source_limitations": [
+                    "shfe_product_page_category_uses_governed_rules"
+                    if category
+                    else "shfe_product_page_does_not_provide_project_category",
+                ],
+                "category_rule_source": category_source if category else "",
+            },
+            field_sources=field_sources,
+        )
+
+    def _parse_generic_product_page_html(
+        self,
+        html: str,
+        *,
+        exchange: str,
+        symbol: str,
+        source_url: str,
+        adapter_cfg: Mapping[str, Any],
+    ) -> FuturesProductSpec:
+        exchange_key = str(exchange or "").upper()
+        texts = _html_text_chunks(html)
+        field_map = {
+            "product_name": _shfe_page_list_value(html, "Product")
+            or _field_after_label(texts, ("交易品种", "品种名称", "合约标的", "标的物")),
+            "trade_unit": _shfe_page_list_value(html, "ContractSize")
+            or _field_after_label(texts, ("交易单位", "合约单位")),
+            "quote_unit": _shfe_page_list_value(html, "PriceQuotation")
+            or _field_after_label(texts, ("报价单位", "计价单位")),
+            "tick_size": _shfe_page_list_value(html, "MinimumPriceFluctuation")
+            or _field_after_label(texts, ("最小变动价位", "最小变动单位", "最小价格波动")),
+            "trade_code": _shfe_page_list_value(html, "ContractSymbol")
+            or _field_after_label(texts, ("交易代码", "合约代码", "品种代码", "代码")),
+            "listing_exchange": _shfe_page_list_value(html, "ListingExchange"),
+            "data_standard": _shfe_page_list_value(html, "data_standard"),
+        }
+        raw_symbol = str(field_map.get("trade_code") or "").strip().upper()
+        if not raw_symbol and not str(symbol or "").startswith("__PAGE_"):
+            raw_symbol = str(symbol or "").strip().upper()
+        product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
+        name = str(field_map.get("product_name") or "").strip()
+        quote_unit_text = str(field_map.get("quote_unit") or "").strip()
+        unit = _normalize_domestic_quote_unit(quote_unit_text)
+        currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
+        multiplier = _first_number(field_map.get("trade_unit"))
+        tick_size = _first_number(field_map.get("tick_size"))
+        category, category_source = _category_from_adapter_rules(
+            adapter_cfg,
+            symbol=product_symbol,
+            name=name,
+            source_url=source_url,
+            page_text=" ".join(texts[:300]),
+        )
+        field_sources = {
+            field_name: {
+                "source_type": "official_product_rule_page",
+                "source_ref": source_url,
+                "quality_flag": "official_product_rule_page",
+            }
+            for field_name, value in (
+                ("name", name),
+                ("currency", currency),
+                ("unit", unit),
+                ("contract_multiplier", multiplier),
+                ("tick_size", tick_size),
+            )
+            if value not in (None, "")
+        }
+        if category:
+            field_sources["category"] = {
+                "source_type": "governed_rule_metadata",
+                "source_ref": category_source,
+                "quality_flag": "governed_rule_verified",
+            }
+        return FuturesProductSpec(
+            exchange=exchange_key,
+            symbol=product_symbol,
+            name=name,
+            category=category,
+            currency=currency or "CNY",
+            unit=unit,
+            contract_multiplier=multiplier,
+            tick_size=tick_size,
+            source_profile="exchange_official_product_rule_page",
+            source_interface=f"official_{exchange_key.lower()}_product_page",
+            source_url=source_url,
+            quality_flag="official_product_spec_partial",
+            evidence={
+                "field_map": {key: value for key, value in field_map.items() if value},
+                "source_limitations": [
+                    f"{exchange_key.lower()}_product_page_category_uses_governed_rules"
+                    if category
+                    else f"{exchange_key.lower()}_product_page_does_not_provide_project_category"
+                ],
+                "category_rule_source": category_source if category else "",
             },
             field_sources=field_sources,
         )
@@ -2153,6 +2626,15 @@ def _gfex_meta_content(html: str, name: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+def _shfe_page_list_value(html: Any, key: str) -> str:
+    text = str(html or "")
+    pattern = r"[\"']" + re.escape(str(key)) + r"[\"']\s*:\s*[\"']([^\"']*)[\"']"
+    match = re.search(pattern, text)
+    if not match:
+        return ""
+    return match.group(1).strip()
+
+
 def _normalize_domestic_quote_unit(value: Any) -> str:
     text = str(value or "").strip().lower()
     if not text:
@@ -2163,7 +2645,9 @@ def _normalize_domestic_quote_unit(value: Any) -> str:
         currency = "CNY"
     else:
         currency = "CNY"
-    if "千克" in text or "kg" in text:
+    if "桶" in text or "barrel" in text or "bbl" in text:
+        unit = "barrel"
+    elif "千克" in text or "kg" in text:
         unit = "kg"
     elif "克" in text or "gram" in text or "/g" in text:
         unit = "gram"
@@ -2236,6 +2720,181 @@ def _is_dce_product_link_title(value: Any) -> bool:
     if any(token in text for token in excluded):
         return False
     return "期货" in text or "期权" in text
+
+
+def _as_string_list(value: Any) -> List[str]:
+    if value in (None, ""):
+        return []
+    if isinstance(value, str):
+        return [value] if value.strip() else []
+    if isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
+        return [str(item) for item in value if str(item or "").strip()]
+    return [str(value)]
+
+
+def _is_generic_product_link(exchange: str, href: str, title: str) -> bool:
+    exchange_key = str(exchange or "").upper()
+    href_l = str(href or "").lower()
+    title_text = str(title or "").strip()
+    if not href_l or not title_text:
+        return False
+    excluded = (
+        "行情",
+        "统计",
+        "公告",
+        "新闻",
+        "规则",
+        "会员",
+        "交割",
+        "结算",
+        "风险",
+        "投资者",
+        "下载",
+        "english",
+        "期权",
+    )
+    if any(token in title_text for token in excluded):
+        return False
+    if href_l.startswith("javascript:") or href_l.startswith("mailto:"):
+        return False
+    if exchange_key in {"SHFE", "INE"}:
+        return bool(re.search(r"/products/futures/.*/[a-z]{1,3}_f/?$", href_l))
+    if exchange_key == "CZCE":
+        return "/cn/sspz/" in href_l or "/cn/jysj/pz/" in href_l
+    return False
+
+
+def _generic_product_symbol_hint(href: str, title: str) -> str:
+    title_text = str(title or "").strip().upper()
+    match = re.search(r"\b[A-Z]{1,3}\b", title_text)
+    if match:
+        return match.group(0)
+    path_tokens = [
+        token
+        for token in re.split(r"[/_.-]+", str(href or "").upper())
+        if token
+    ]
+    for token in reversed(path_tokens):
+        if re.fullmatch(r"[A-Z]{1,3}", token):
+            return token
+    return ""
+
+
+def _category_from_adapter_rules(
+    adapter_cfg: Mapping[str, Any],
+    *,
+    symbol: str,
+    name: str,
+    source_url: str,
+    page_text: str,
+) -> tuple[str, str]:
+    rules = adapter_cfg.get("category_rules") or {}
+    haystack = " ".join(
+        str(item or "")
+        for item in (symbol, name, source_url, page_text)
+    ).lower()
+    if isinstance(rules, Mapping):
+        iterable = [
+            {"category": category, "keywords": keywords}
+            for category, keywords in rules.items()
+        ]
+    elif isinstance(rules, Sequence) and not isinstance(rules, (str, bytes, bytearray)):
+        iterable = [item for item in rules if isinstance(item, Mapping)]
+    else:
+        iterable = []
+    for rule in iterable:
+        category = str(rule.get("category") or "").strip()
+        keywords = rule.get("keywords") or []
+        if isinstance(keywords, str):
+            keywords = [keywords]
+        for keyword in keywords:
+            token = str(keyword or "").strip()
+            if not token:
+                continue
+            token_l = token.lower()
+            if re.fullmatch(r"[a-z]{1,3}", token_l):
+                if str(symbol or "").lower() == token_l or re.search(rf"[/_.-]{re.escape(token_l)}[/_.-]", haystack):
+                    return category, f"config/11_futures.json category_rules keyword={token}"
+                continue
+            if token_l in haystack:
+                return category, f"config/11_futures.json category_rules keyword={token}"
+    return "", ""
+
+
+def _looks_like_waf_challenge(text: Any) -> bool:
+    value = str(text or "")[:5000].lower()
+    return any(
+        token in value
+        for token in (
+            "web 应用防火墙",
+            "safeline_bot_challenge",
+            "js-challenge",
+            "slidercontainer",
+            "captcha",
+        )
+    )
+
+
+def _html_meta_refresh_url(html: Any, *, base_url: str) -> str:
+    text = str(html or "")
+    match = re.search(
+        r"<meta[^>]+http-equiv=[\"']?refresh[\"']?[^>]+content=[\"'][^\"']*url\s*=\s*([^\"'>;]+)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        match = re.search(
+            r"<meta[^>]+content=[\"'][^\"']*url\s*=\s*([^\"'>;]+)[\"'][^>]+http-equiv=[\"']?refresh[\"']?",
+            text,
+            flags=re.IGNORECASE,
+        )
+    if not match:
+        return ""
+    return urljoin(base_url, match.group(1).strip())
+
+
+def _handle_safeline_js_challenge(session: requests.Session, response: requests.Response) -> bool:
+    """Solve Safeline's lightweight JavaScript proof-of-work challenge when present."""
+    text = str(getattr(response, "text", "") or "")
+    if "safeline_bot_challenge" not in text or "safeline_bot_challenge_ans" not in text:
+        return False
+    prefix_match = re.search(r"var\s+prefix\s*=\s*['\"]([^'\"]+)['\"]", text)
+    bits_match = re.search(r"var\s+leading_zero_bit\s*=\s*(\d+)", text)
+    if not prefix_match or not bits_match:
+        return False
+    challenge_cookie = ""
+    try:
+        challenge_cookie = session.cookies.get("safeline_bot_challenge") or ""
+    except Exception:
+        challenge_cookie = ""
+    if not challenge_cookie:
+        for cookie in getattr(response, "cookies", []) or []:
+            if getattr(cookie, "name", "") == "safeline_bot_challenge":
+                challenge_cookie = str(getattr(cookie, "value", "") or "")
+                break
+    if not challenge_cookie:
+        return False
+    prefix = prefix_match.group(1)
+    leading_zero_bit = int(bits_match.group(1))
+    suffix = _find_safeline_pow_suffix(prefix, leading_zero_bit)
+    if suffix is None:
+        return False
+    answer = f"{challenge_cookie}{suffix}"
+    domain = getattr(response, "url", "") or ""
+    session.cookies.set("safeline_bot_challenge_ans", answer, path="/")
+    logger.debug("[OfficialFutures] safeline challenge solved url=%s suffix=%s", domain, suffix)
+    return True
+
+
+def _find_safeline_pow_suffix(prefix: str, leading_zero_bit: int, *, max_attempts: int = 2_000_000) -> Optional[str]:
+    target = "0" * max(0, int(leading_zero_bit))
+    for counter in range(max_attempts):
+        suffix = format(counter, "x")
+        digest = hashlib.sha1(f"{prefix}{suffix}".encode("utf-8")).digest()
+        bits = "".join(f"{byte:08b}" for byte in digest)
+        if bits.startswith(target):
+            return suffix
+    return None
 
 
 def _first_number(value: Any) -> Optional[float]:

@@ -262,9 +262,10 @@
         "enabled": true,
         "enabled_exchanges": [
           "DCE",
-          "GFEX"
+          "GFEX",
+          "SHFE"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE and CZCE keep configured adapter scaffolding but remain disabled here until each exchange-specific implementation is live-verified."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -278,12 +279,31 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "listed_products_page": [
+            "https://www.shfe.com.cn/products/futures/metal/"
+          ],
+          "product_rule_pages": {},
+          "category_rules": {
+            "nonferrous": ["铜", "铝", "氧化铝", "锌", "铅", "镍", "锡", "/metal/", "cu", "al", "ao", "zn", "pb", "ni", "sn"],
+            "precious_metal": ["黄金", "白银", "金", "银", "au", "ag"],
+            "ferrous": ["螺纹钢", "热轧卷板", "不锈钢", "线材", "/steel/", "rb", "hc", "ss", "wr"],
+            "energy": ["燃料油", "石油沥青", "沥青", "fu", "bu"],
+            "rubber": ["天然橡胶", "丁二烯橡胶", "橡胶", "ru", "br"],
+            "pulp_paper": ["纸浆", "sp"]
+          },
           "known_products": {}
         },
         "INE": {
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "listed_products_page": "https://www.ine.cn/products/",
+          "product_rule_pages": {},
+          "category_rules": {
+            "energy": ["原油", "低硫燃料油", "燃料油", "sc", "lu"],
+            "rubber": ["20号胶", "橡胶", "nr"],
+            "nonferrous": ["国际铜", "铜", "bc"]
+          },
           "known_products": {}
         },
         "DCE": {
@@ -413,6 +433,18 @@
           "enabled": true,
           "official_product_rules": true,
           "official_announcements": true,
+          "listed_products_page": [
+            "https://www.czce.com.cn/cn/jysj/pz/H770302index_1.htm",
+            "https://www.czce.com.cn/cn/sspz/H770302index_1.htm"
+          ],
+          "product_rule_pages": {},
+          "category_rules": {
+            "coal": ["动力煤", "煤", "zc"],
+            "ferrous": ["硅铁", "锰硅", "sf", "sm"],
+            "chemical": ["pta", "对二甲苯", "甲醇", "纯碱", "烧碱", "尿素", "px", "ma", "sa", "sh", "ur"],
+            "building_material": ["玻璃", "fg"],
+            "agriculture": ["棉花", "白糖", "菜粕", "菜籽油", "花生", "苹果", "红枣", "cf", "sr", "rm", "oi", "pk", "ap", "cj"]
+          },
           "known_products": {}
         },
         "GFEX": {

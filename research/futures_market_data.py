@@ -4684,7 +4684,17 @@ class ConfiguredProductMasterDiscoveryAdapter:
     def _name_from_raw_payload(raw_payload: Any) -> str:
         if not isinstance(raw_payload, dict):
             return ""
-        for key in ("variety", "品种名称", "productName", "product_name", "varietyName", "variety_name"):
+        for key in (
+            "variety",
+            "品种名称",
+            "productName",
+            "product_name",
+            "varietyName",
+            "variety_name",
+            "PRODUCTNAME",
+            "PRODUCTGROUPNAME",
+            "PRODUCTID",
+        ):
             value = str(raw_payload.get(key) or "").strip()
             if value and "小计" not in value and "总计" not in value:
                 return value
@@ -5574,10 +5584,16 @@ class FuturesMasterGovernanceService:
                     len(instruments),
                     len(series),
                 )
+                existing_root_symbols = sorted({
+                    str(item.symbol or "").upper()
+                    for item in instruments
+                    if str(item.symbol or "").strip()
+                })
                 discovery_service.load_official_product_specs(
                     exchange,
                     provider,
                     warnings=result["warnings"],
+                    target_symbols=existing_root_symbols or None,
                 )
                 instruments, series, refresh_counts = self._refresh_existing_master_data(
                     exchange=exchange,

@@ -1916,6 +1916,134 @@ def test_dce_official_product_page_specs_merge_with_governed_category(monkeypatc
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
 
 
+@pytest.mark.parametrize(
+    "exchange,listing_url,listing_html,product_html,target_symbol,expected_name,expected_unit,expected_multiplier,expected_tick,category_rules",
+    [
+        (
+            "SHFE",
+            "https://www.shfe.com.cn/products/futures/metal/",
+            '<a href="/products/futures/metal/nonferrousmetal/zz_f/">测试铜</a>',
+            """
+            <html><script>
+              let pageList = [{
+                "Product": "测试铜",
+                "ContractSize": "5吨/手",
+                "PriceQuotation": "元（人民币）/吨",
+                "MinimumPriceFluctuation": "10元/吨",
+                "ContractSymbol": "ZZ",
+                "ListingExchange": "上海期货交易所"
+              }]
+            </script></html>
+            """,
+            "ZZ",
+            "测试铜",
+            "CNY/ton",
+            5,
+            10,
+            {"nonferrous": ["铜", "/metal/"]},
+        ),
+        (
+            "INE",
+            "https://www.ine.cn/products/",
+            '<a href="/products/futures/energyandchemical/zz_f/">测试原油</a>',
+            """
+            <html><script>
+              let pageList = [{
+                "Product": "测试原油",
+                "ContractSize": "1000桶/手",
+                "PriceQuotation": "元（人民币）/桶",
+                "MinimumPriceFluctuation": "0.1元/桶",
+                "ContractSymbol": "ZZ",
+                "ListingExchange": "上海国际能源交易中心"
+              }]
+            </script></html>
+            """,
+            "ZZ",
+            "测试原油",
+            "CNY/barrel",
+            1000,
+            0.1,
+            {"energy": ["原油", "/energy/"]},
+        ),
+        (
+            "CZCE",
+            "https://www.czce.com.cn/cn/jysj/pz/H770302index_1.htm",
+            '<a href="/cn/sspz/zz/H770302index_1.htm">测试纯碱</a>',
+            """
+            <html><body><table>
+              <tr><td>交易品种</td><td>测试纯碱</td></tr>
+              <tr><td>交易单位</td><td>20吨/手</td></tr>
+              <tr><td>报价单位</td><td>元/吨</td></tr>
+              <tr><td>最小变动价位</td><td>1元/吨</td></tr>
+              <tr><td>交易代码</td><td>ZZ</td></tr>
+            </table></body></html>
+            """,
+            "ZZ",
+            "测试纯碱",
+            "CNY/ton",
+            20,
+            1,
+            {"chemical": ["纯碱", "/sspz/"]},
+        ),
+    ],
+)
+def test_remaining_exchange_product_page_specs_use_common_adapter(
+    monkeypatch,
+    tmp_path,
+    exchange,
+    listing_url,
+    listing_html,
+    product_html,
+    target_symbol,
+    expected_name,
+    expected_unit,
+    expected_multiplier,
+    expected_tick,
+    category_rules,
+):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": [exchange]},
+        "enabled_exchanges": [exchange],
+        "adapters": {
+            exchange: {
+                "enabled": True,
+                "listed_products_page": listing_url,
+                "product_rule_pages": {},
+                "category_rules": category_rules,
+                "known_products": {},
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+
+    def fake_request(self, session, request_exchange, url, symbol):
+        assert request_exchange == exchange
+        if symbol == "listed_products":
+            return listing_html
+        return product_html
+
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "_request_exchange_product_rule_page", fake_request)
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync(
+        exchange,
+        target_symbols=[target_symbol],
+    )
+    spec = specs[target_symbol]
+
+    assert spec.exchange == exchange
+    assert spec.name == expected_name
+    assert spec.unit == expected_unit
+    assert spec.contract_multiplier == expected_multiplier
+    assert spec.tick_size == expected_tick
+    assert spec.category
+    assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
 def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()
