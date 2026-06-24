@@ -3419,6 +3419,48 @@ def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_pat
     assert artifacts["mappings"][0].contract_id == "CNF.CU.SHFE.CU2408"
 
 
+def test_official_futures_provider_filters_shfe_ine_mixed_payload_by_root_exchange(tmp_path, monkeypatch):
+    config = _research_config(tmp_path)
+    config.modules["commodity_market_data"].update(_scope_module_cfg())
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["SHFE", "INE"]}
+    }
+    config.modules["commodity_market_data"]["master_data_discovery"] = {
+        "enabled": True,
+        "adapters": {
+            "INE": {
+                "enabled": True,
+                "category_rules": {
+                    "energy": ["sc", "lu", "ec"],
+                    "rubber": ["nr"],
+                    "nonferrous": ["bc"],
+                },
+            }
+        },
+    }
+    provider = OfficialFuturesMarketDataProvider(config)
+    payload = {
+        "o_curinstrument": [
+            {"PRODUCTGROUPID": "cu", "DELIVERYMONTH": "2407", "CLOSEPRICE": "11"},
+            {"PRODUCTGROUPID": "sc", "DELIVERYMONTH": "2407", "CLOSEPRICE": "21"},
+            {"PRODUCTGROUPID": "bc", "DELIVERYMONTH": "2407", "CLOSEPRICE": "31"},
+            {"PRODUCTGROUPID": "ec", "DELIVERYMONTH": "2407", "CLOSEPRICE": "41"},
+        ]
+    }
+    monkeypatch.setattr(
+        provider,
+        "_request_exchange_payload",
+        lambda session, exchange, trade_date: payload,
+    )
+
+    shfe_rows = provider._fetch_exchange_contract_bars(object(), "SHFE", "2024-06-03")
+    ine_rows = provider._fetch_exchange_contract_bars(object(), "INE", "2024-06-03")
+
+    assert [row.variety for row in shfe_rows] == ["CU"]
+    assert {row.variety for row in ine_rows} == {"BC", "EC", "SC"}
+    assert {row.exchange for row in ine_rows} == {"INE"}
+
+
 def test_official_futures_provider_parses_domestic_exchange_fixtures(tmp_path):
     provider = OfficialFuturesMarketDataProvider(_research_config(tmp_path))
 

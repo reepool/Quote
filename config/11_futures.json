@@ -282,16 +282,16 @@
           "official_product_rules": true,
           "official_announcements": true,
           "listed_products_page": [
-            "https://www.shfe.com.cn/products/futures/metal/"
+            "https://www.shfe.com.cn/products/futures/"
           ],
           "product_rule_pages": {},
           "category_rules": {
-            "nonferrous": ["铜", "铝", "氧化铝", "锌", "铅", "镍", "锡", "/metal/", "cu", "al", "ao", "zn", "pb", "ni", "sn"],
+            "nonferrous": ["铜", "铝", "氧化铝", "铸造铝合金", "锌", "铅", "镍", "锡", "/metal/", "cu", "al", "ao", "ad", "zn", "pb", "ni", "sn"],
             "precious_metal": ["黄金", "白银", "金", "银", "au", "ag"],
             "ferrous": ["螺纹钢", "热轧卷板", "不锈钢", "线材", "/steel/", "rb", "hc", "ss", "wr"],
             "energy": ["燃料油", "石油沥青", "沥青", "fu", "bu"],
             "rubber": ["天然橡胶", "丁二烯橡胶", "橡胶", "ru", "br"],
-            "pulp_paper": ["纸浆", "sp"]
+            "pulp_paper": ["纸浆", "胶版印刷纸", "sp", "op"]
           },
           "known_products": {}
         },
@@ -302,7 +302,7 @@
           "listed_products_page": "https://www.ine.cn/products/",
           "product_rule_pages": {},
           "category_rules": {
-            "energy": ["原油", "低硫燃料油", "燃料油", "sc", "lu"],
+            "energy": ["原油", "低硫燃料油", "燃料油", "集运指数", "欧线", "sc", "lu", "ec"],
             "rubber": ["20号胶", "橡胶", "nr"],
             "nonferrous": ["国际铜", "铜", "bc"]
           },

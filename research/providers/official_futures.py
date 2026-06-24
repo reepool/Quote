@@ -20,6 +20,7 @@ from urllib.parse import urljoin
 import requests
 
 from research.futures_market_data import (
+    DEFAULT_P0_FUTURES_INSTRUMENTS,
     FuturesBar,
     FuturesContinuousMapping,
     FuturesContract,
@@ -442,6 +443,7 @@ class OfficialFuturesMarketDataProvider:
         self._metrics: Dict[str, Dict[str, float]] = {}
         self._dce_browser_client: Optional[DceOfficialBrowserClient] = None
         self._dce_executor: Optional[ThreadPoolExecutor] = None
+        self._root_symbol_exchange_map: Optional[Dict[str, str]] = None
 
     def supports_series(self, series: FuturesSeries) -> bool:
         exchange = _series_exchange(series)
@@ -632,6 +634,7 @@ class OfficialFuturesMarketDataProvider:
             raise OfficialFuturesSourceUnavailable(f"unsupported official exchange: {exchange}")
         if variety:
             rows = [row for row in rows if row.variety.upper() == variety.upper()]
+        rows = [row for row in rows if str(row.exchange or "").upper() == str(exchange or "").upper()]
         return rows
 
     def probe_exchange_trading_day(self, exchange: str, trade_date: str) -> OfficialFuturesDailyProbeResult:
@@ -1694,7 +1697,7 @@ class OfficialFuturesMarketDataProvider:
 
     def _fetch_product_rule_page_via_browser_if_supported(self, exchange: str, url: str, symbol: str) -> str:
         exchange_key = str(exchange or "").upper()
-        if exchange_key not in {"INE", "CZCE"}:
+        if exchange_key not in {"SHFE", "INE", "CZCE"}:
             return ""
         try:
             html = self._get_product_page_browser_client().fetch_page_html(str(url or ""))
@@ -2326,7 +2329,6 @@ class OfficialFuturesMarketDataProvider:
         exchange: str,
     ) -> List[OfficialFuturesContractBar]:
         rows = payload.get("o_curinstrument") or []
-        interface = "official_ine_daily_kx_dat" if exchange == "INE" else "official_shfe_daily_kx_dat"
         parsed: List[OfficialFuturesContractBar] = []
         for row in rows:
             if not isinstance(row, Mapping):
@@ -2336,10 +2338,16 @@ class OfficialFuturesMarketDataProvider:
             if delivery in {"", "小计", "合计"} or "总计" in product_name:
                 continue
             variety = _first_text(row, ("PRODUCTGROUPID", "PRODUCTID")).split("_")[0].upper()
+            row_exchange = self._exchange_for_root_symbol(variety, default_exchange=exchange)
+            interface = (
+                "official_ine_daily_kx_dat"
+                if row_exchange == "INE"
+                else "official_shfe_daily_kx_dat"
+            )
             contract = f"{variety}{delivery}".upper()
             parsed.append(
                 OfficialFuturesContractBar(
-                    exchange=exchange,
+                    exchange=row_exchange,
                     trade_date=_date_key(trade_date),
                     variety=variety,
                     contract=contract,
@@ -2357,6 +2365,61 @@ class OfficialFuturesMarketDataProvider:
                 )
             )
         return parsed
+
+    def _exchange_for_root_symbol(self, symbol: str, *, default_exchange: str) -> str:
+        symbol_key = str(symbol or "").upper().strip()
+        if not symbol_key:
+            return str(default_exchange or "").upper()
+        return self._root_symbol_exchange_lookup().get(symbol_key, str(default_exchange or "").upper())
+
+    def _root_symbol_exchange_lookup(self) -> Dict[str, str]:
+        """Build a governed root-symbol exchange map from registry and discovery config.
+
+        SHFE and INE official pages share the same data family in practice.
+        The parser therefore needs exchange ownership evidence before daily rows
+        are used by master-data governance or continuous-series construction.
+        """
+        if self._root_symbol_exchange_map is not None:
+            return self._root_symbol_exchange_map
+        exchange_by_symbol: Dict[str, str] = {}
+
+        def add(symbol: Any, exchange: Any) -> None:
+            symbol_key = str(symbol or "").upper().strip()
+            exchange_key = str(exchange or "").upper().strip()
+            if not symbol_key or not exchange_key:
+                return
+            exchange_by_symbol.setdefault(symbol_key, exchange_key)
+
+        for item in DEFAULT_P0_FUTURES_INSTRUMENTS:
+            if not isinstance(item, Mapping):
+                continue
+            add(item.get("symbol"), item.get("exchange"))
+
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapters = discovery_cfg.get("adapters") or {}
+        if isinstance(adapters, Mapping):
+            for exchange, adapter_cfg in adapters.items():
+                exchange_key = str(exchange or "").upper()
+                if not isinstance(adapter_cfg, Mapping):
+                    continue
+                known_products = adapter_cfg.get("known_products") or {}
+                if isinstance(known_products, Mapping):
+                    for symbol in known_products:
+                        add(symbol, exchange_key)
+                product_rule_pages = adapter_cfg.get("product_rule_pages") or {}
+                if isinstance(product_rule_pages, Mapping):
+                    for symbol in product_rule_pages:
+                        add(symbol, exchange_key)
+                category_rules = adapter_cfg.get("category_rules") or {}
+                if isinstance(category_rules, Mapping):
+                    for values in category_rules.values():
+                        for token in _as_string_list(values):
+                            token_key = str(token or "").upper().strip()
+                            if re.fullmatch(r"[A-Z]{1,4}", token_key):
+                                add(token_key, exchange_key)
+
+        self._root_symbol_exchange_map = exchange_by_symbol
+        return exchange_by_symbol
 
     def _parse_dce_payload(
         self,
@@ -3001,10 +3064,13 @@ def _category_from_adapter_rules(
     page_text: str,
 ) -> tuple[str, str]:
     rules = adapter_cfg.get("category_rules") or {}
-    haystack = " ".join(
-        str(item or "")
-        for item in (symbol, name, source_url, page_text)
-    ).lower()
+    # Product pages often include full navigation menus for every listed
+    # contract. Category inference must use the current product identity only,
+    # otherwise unrelated nav text can misclassify new products. Prefer exact
+    # root-symbol rules, then product-name rules, and only then broad URL hints.
+    symbol_l = str(symbol or "").lower()
+    name_l = str(name or "").lower()
+    source_url_l = str(source_url or "").lower()
     if isinstance(rules, Mapping):
         iterable = [
             {"category": category, "keywords": keywords}
@@ -3014,21 +3080,27 @@ def _category_from_adapter_rules(
         iterable = [item for item in rules if isinstance(item, Mapping)]
     else:
         iterable = []
+    normalized_rules: List[tuple[str, List[str]]] = []
     for rule in iterable:
         category = str(rule.get("category") or "").strip()
         keywords = rule.get("keywords") or []
         if isinstance(keywords, str):
             keywords = [keywords]
-        for keyword in keywords:
-            token = str(keyword or "").strip()
-            if not token:
-                continue
+        normalized_rules.append((category, [str(keyword or "").strip() for keyword in keywords]))
+    for category, keywords in normalized_rules:
+        for token in keywords:
             token_l = token.lower()
-            if re.fullmatch(r"[a-z]{1,3}", token_l):
-                if str(symbol or "").lower() == token_l or re.search(rf"[/_.-]{re.escape(token_l)}[/_.-]", haystack):
-                    return category, f"config/11_futures.json category_rules keyword={token}"
-                continue
-            if token_l in haystack:
+            if token_l and re.fullmatch(r"[a-z]{1,4}", token_l) and symbol_l == token_l:
+                return category, f"config/11_futures.json category_rules keyword={token}"
+    for category, keywords in normalized_rules:
+        for token in keywords:
+            token_l = token.lower()
+            if token_l and not re.fullmatch(r"[a-z]{1,4}", token_l) and token_l in name_l:
+                return category, f"config/11_futures.json category_rules keyword={token}"
+    for category, keywords in normalized_rules:
+        for token in keywords:
+            token_l = token.lower()
+            if token_l and not re.fullmatch(r"[a-z]{1,4}", token_l) and token_l in source_url_l:
                 return category, f"config/11_futures.json category_rules keyword={token}"
     return "", ""
 
