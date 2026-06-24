@@ -2338,15 +2338,15 @@ class OfficialFuturesMarketDataProvider:
             if delivery in {"", "小计", "合计"} or "总计" in product_name:
                 continue
             variety = _first_text(row, ("PRODUCTGROUPID", "PRODUCTID")).split("_")[0].upper()
-            if _is_non_futures_shfe_family_row(variety, row):
-                continue
             row_exchange = self._exchange_for_root_symbol(variety, default_exchange=exchange)
+            contract = f"{variety}{delivery}".upper()
+            if not _is_standard_futures_contract_row(row_exchange, variety, contract, row):
+                continue
             interface = (
                 "official_ine_daily_kx_dat"
                 if row_exchange == "INE"
                 else "official_shfe_daily_kx_dat"
             )
-            contract = f"{variety}{delivery}".upper()
             parsed.append(
                 OfficialFuturesContractBar(
                     exchange=row_exchange,
@@ -2438,11 +2438,14 @@ class OfficialFuturesMarketDataProvider:
             contract = str(row.get("contractId") or "").strip().upper()
             if not contract or "小计" in variety_name or "总计" in variety_name:
                 continue
+            variety = _contract_variety(contract)
+            if not _is_standard_futures_contract_row("DCE", variety, contract, row):
+                continue
             parsed.append(
                 OfficialFuturesContractBar(
                     exchange="DCE",
                     trade_date=_date_key(trade_date),
-                    variety=_contract_variety(contract),
+                    variety=variety,
                     contract=contract,
                     open=_number(row.get("open")),
                     high=_number(row.get("high")),
@@ -2475,12 +2478,15 @@ class OfficialFuturesMarketDataProvider:
             delivery = str(row.get("delivMonth") or "").strip()
             if not variety or not delivery or "小计" in variety_text or "总计" in variety_text:
                 continue
+            contract = f"{variety}{delivery}".upper()
+            if not _is_standard_futures_contract_row("GFEX", variety, contract, row):
+                continue
             parsed.append(
                 OfficialFuturesContractBar(
                     exchange="GFEX",
                     trade_date=_date_key(trade_date),
                     variety=variety,
-                    contract=f"{variety}{delivery}",
+                    contract=contract,
                     open=_number(row.get("open")),
                     high=_number(row.get("high")),
                     low=_number(row.get("low")),
@@ -2509,11 +2515,15 @@ class OfficialFuturesMarketDataProvider:
             contract = cells[0].upper()
             if not re.match(r"^[A-Z]{1,3}[0-9]{3,4}$", contract):
                 continue
+            variety = _contract_variety(contract)
+            raw_payload = {"cells": cells}
+            if not _is_standard_futures_contract_row("CZCE", variety, contract, raw_payload):
+                continue
             parsed.append(
                 OfficialFuturesContractBar(
                     exchange="CZCE",
                     trade_date=_date_key(trade_date),
-                    variety=_contract_variety(contract),
+                    variety=variety,
                     contract=contract,
                     open=_number(cells[2]),
                     high=_number(cells[3]),
@@ -2524,7 +2534,7 @@ class OfficialFuturesMarketDataProvider:
                     open_interest=_number(cells[10]),
                     amount=_number(cells[12] if len(cells) > 12 else None),
                     source_interface="official_czce_future_data_daily_txt",
-                    raw_payload={"cells": cells},
+                    raw_payload=raw_payload,
                     warnings=["amount_unit_exchange_reported"],
                 )
             )
@@ -3199,8 +3209,46 @@ def _first_text(row: Mapping[str, Any], keys: Iterable[str]) -> str:
     return ""
 
 
-def _is_non_futures_shfe_family_row(variety: str, row: Mapping[str, Any]) -> bool:
-    """Filter pseudo rows from SHFE/INE daily payloads before futures governance.
+def _is_standard_futures_contract_row(
+    exchange: str,
+    variety: str,
+    contract: str,
+    row: Mapping[str, Any],
+) -> bool:
+    """Return whether a parsed official row is a standard futures contract row.
+
+    Exchange parsers normalize source-specific fields first, then call this
+    gate before emitting `OfficialFuturesContractBar`. The shared contract keeps
+    master-data governance free of exchange-specific pseudo-row handling.
+    """
+    exchange_key = str(exchange or "").upper().strip()
+    variety_key = str(variety or "").upper().strip()
+    contract_key = str(contract or "").upper().strip()
+    if not exchange_key or not variety_key or not contract_key:
+        return False
+    if not re.fullmatch(r"[A-Z]{1,6}[0-9]{3,4}", contract_key):
+        return False
+    row_text = _row_text(
+        row,
+        (
+            "PRODUCTNAME",
+            "PRODUCTGROUPNAME",
+            "INSTRUMENTNAME",
+            "PRODUCTID",
+            "PRODUCTGROUPID",
+            "variety",
+            "contractId",
+        ),
+    )
+    if any(token in row_text for token in ("小计", "合计", "总计", "期转现", "期权", "仓单")):
+        return False
+    if exchange_key in {"SHFE", "INE"} and _is_shfe_family_non_futures_row(variety_key, row):
+        return False
+    return True
+
+
+def _is_shfe_family_non_futures_row(variety: str, row: Mapping[str, Any]) -> bool:
+    """Identify SHFE/INE pseudo rows that are not listed futures contracts.
 
     SHFE-family daily files can include exchange-for-physical rows such as
     AGEFP/AUEFP with product names containing 期转现. They are not listed futures
@@ -3209,17 +3257,21 @@ def _is_non_futures_shfe_family_row(variety: str, row: Mapping[str, Any]) -> boo
     variety_key = str(variety or "").upper().strip()
     if len(variety_key) > 3 and variety_key.endswith("EFP"):
         return True
-    text = " ".join(
-        str(row.get(key) or "")
-        for key in (
+    text = _row_text(
+        row,
+        (
             "PRODUCTNAME",
             "PRODUCTGROUPNAME",
             "INSTRUMENTNAME",
             "PRODUCTID",
             "PRODUCTGROUPID",
-        )
+        ),
     )
     return "期转现" in text
+
+
+def _row_text(row: Mapping[str, Any], keys: Iterable[str]) -> str:
+    return " ".join(str(row.get(key) or "") for key in keys)
 
 
 def _quality_warnings(row: Mapping[str, Any], *, amount_unit: str) -> List[str]:
