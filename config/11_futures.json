@@ -320,7 +320,15 @@
             "rubber": ["20号胶", "橡胶", "nr"],
             "nonferrous": ["国际铜", "铜", "bc"]
           },
-          "known_products": {}
+          "known_products": {
+            "EC": {
+              "name": "集运指数（欧线）",
+              "category": "energy",
+              "currency": "CNY",
+              "unit": "index_point",
+              "source_url": "INE official product page https://www.ine.cn/products/futures/index_f/ec_f/; governed fallback for index quote unit normalization"
+            }
+          }
         },
         "DCE": {
           "enabled": true,

@@ -1027,7 +1027,13 @@ class OfficialFuturesMarketDataProvider:
             for field_name in ("name", "category", "currency", "unit", "contract_multiplier", "tick_size"):
                 right_value = getattr(right, field_name)
                 left_value = getattr(left, field_name)
-                if right_value not in (None, ""):
+                use_left_value = (
+                    field_name == "name"
+                    and right_value not in (None, "")
+                    and left_value not in (None, "")
+                    and _is_low_quality_product_name(right_value)
+                )
+                if right_value not in (None, "") and not use_left_value:
                     source = (right.field_sources or {}).get(field_name)
                     if source:
                         field_sources[field_name] = source
@@ -1054,7 +1060,11 @@ class OfficialFuturesMarketDataProvider:
             merged[symbol] = FuturesProductSpec(
                 exchange=right.exchange or left.exchange,
                 symbol=symbol,
-                name=right.name or left.name,
+                name=(
+                    left.name
+                    if right.name and left.name and _is_low_quality_product_name(right.name)
+                    else right.name or left.name
+                ),
                 category=right.category or left.category,
                 currency=right.currency or left.currency or "CNY",
                 unit=right.unit or left.unit,
@@ -1848,9 +1858,14 @@ class OfficialFuturesMarketDataProvider:
     ) -> FuturesProductSpec:
         texts = _html_text_chunks(html)
         field_map = {
-            "product_name": _shfe_page_list_value(html, "Product")
-            or _field_after_label(texts, ("交易品种", "品种名称")),
+            "product_name": _first_quality_product_name(
+                _shfe_page_list_value(html, "Product"),
+                _shfe_page_list_value(html, "Underlying"),
+                _field_after_label(texts, ("交易品种", "品种名称", "合约标的物", "合约标的", "标的物")),
+                _product_name_from_page_context(texts, source_url=source_url, symbol=symbol),
+            ),
             "trade_unit": _shfe_page_list_value(html, "ContractSize")
+            or _shfe_page_list_value(html, "ContractMultiplier")
             or _field_after_label(texts, ("交易单位", "合约单位")),
             "quote_unit": _shfe_page_list_value(html, "PriceQuotation")
             or _field_after_label(texts, ("报价单位", "计价单位")),
@@ -1866,6 +1881,8 @@ class OfficialFuturesMarketDataProvider:
             raw_symbol = str(symbol or "").strip().upper()
         product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
         name = str(field_map.get("product_name") or "").strip()
+        if _is_low_quality_product_name(name):
+            name = _product_name_from_page_context(texts, source_url=source_url, symbol=product_symbol or symbol)
         quote_unit_text = str(field_map.get("quote_unit") or "").strip()
         unit = _normalize_domestic_quote_unit(quote_unit_text)
         currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
@@ -1936,9 +1953,14 @@ class OfficialFuturesMarketDataProvider:
         exchange_key = str(exchange or "").upper()
         texts = _html_text_chunks(html)
         field_map = {
-            "product_name": _shfe_page_list_value(html, "Product")
-            or _field_after_label(texts, ("交易品种", "品种名称", "合约标的", "标的物")),
+            "product_name": _first_quality_product_name(
+                _shfe_page_list_value(html, "Product"),
+                _shfe_page_list_value(html, "Underlying"),
+                _field_after_label(texts, ("交易品种", "品种名称", "合约标的物", "合约标的", "标的物")),
+                _product_name_from_page_context(texts, source_url=source_url, symbol=symbol),
+            ),
             "trade_unit": _shfe_page_list_value(html, "ContractSize")
+            or _shfe_page_list_value(html, "ContractMultiplier")
             or _field_after_label(texts, ("交易单位", "合约单位")),
             "quote_unit": _shfe_page_list_value(html, "PriceQuotation")
             or _field_after_label(texts, ("报价单位", "计价单位")),
@@ -1954,6 +1976,8 @@ class OfficialFuturesMarketDataProvider:
             raw_symbol = str(symbol or "").strip().upper()
         product_symbol = re.sub(r"[^A-Z]", "", raw_symbol)
         name = str(field_map.get("product_name") or "").strip()
+        if _is_low_quality_product_name(name):
+            name = _product_name_from_page_context(texts, source_url=source_url, symbol=product_symbol or symbol)
         quote_unit_text = str(field_map.get("quote_unit") or "").strip()
         unit = _normalize_domestic_quote_unit(quote_unit_text)
         currency = "CNY" if unit.startswith("CNY/") or "人民币" in quote_unit_text or "元" in quote_unit_text else ""
@@ -2885,6 +2909,55 @@ def _strip_futures_product_suffix(value: Any) -> str:
     return text.strip()
 
 
+def _is_low_quality_product_name(value: Any) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return True
+    normalized = re.sub(r"\s+", "", text)
+    return normalized in {"物", "品种", "合约", "期货"}
+
+
+def _product_name_from_page_context(
+    texts: Sequence[str],
+    *,
+    source_url: str = "",
+    symbol: str = "",
+) -> str:
+    symbol_key = str(symbol or "").upper().strip()
+    url_text = str(source_url or "").lower()
+    candidates: List[str] = []
+    for index, text in enumerate(texts):
+        item = str(text or "").strip()
+        if not item:
+            continue
+        normalized = re.sub(r"\s+", "", item)
+        if not normalized:
+            continue
+        if symbol_key and symbol_key in normalized.upper():
+            candidates.append(item)
+        if normalized in {"指数", "航运指数"} and index + 1 < len(texts):
+            next_item = str(texts[index + 1] or "").strip()
+            if next_item and not _is_low_quality_product_name(next_item):
+                candidates.append(next_item)
+    if "/index_f/" in url_text:
+        for item in candidates:
+            normalized = re.sub(r"\s+", "", item)
+            if len(normalized) >= 2 and normalized not in {"指数", "航运指数"}:
+                return item
+    for item in candidates:
+        if not _is_low_quality_product_name(item):
+            return item
+    return ""
+
+
+def _first_quality_product_name(*values: Any) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text and not _is_low_quality_product_name(text):
+            return text
+    return ""
+
+
 def _field_after_label(texts: Sequence[str], labels: Sequence[str]) -> str:
     normalized_labels = {_normalize_label(item) for item in labels}
     for index, text in enumerate(texts):
@@ -2941,6 +3014,8 @@ def _normalize_domestic_quote_unit(value: Any) -> str:
         unit = "sheet"
     elif "吨" in text or "ton" in text:
         unit = "ton"
+    elif "指数点" in text or re.search(r"(^|[/（(])点($|[）)])", text) or "point" in text:
+        return "index_point"
     else:
         return ""
     return f"{currency}/{unit}"

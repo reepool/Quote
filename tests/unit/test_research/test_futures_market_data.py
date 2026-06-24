@@ -2112,6 +2112,72 @@ def test_remaining_exchange_product_page_specs_use_common_adapter(
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
 
 
+def test_product_specs_merge_governed_name_when_official_name_is_low_quality(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["INE"]},
+        "enabled_exchanges": ["INE"],
+        "adapters": {
+            "INE": {
+                "enabled": True,
+                "listed_products_page": "https://www.ine.cn/products/",
+                "product_rule_pages": {},
+                "category_rules": {"energy": ["集运指数", "欧线", "ec"]},
+                "known_products": {
+                    "EC": {
+                        "name": "集运指数（欧线）",
+                        "category": "energy",
+                        "currency": "CNY",
+                        "unit": "index_point",
+                        "source_url": "INE governed EC test rule",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    listing_html = '<a href="/products/futures/index_f/ec_f/">集运指数（欧线）</a>'
+    product_html = """
+    <html><script>
+      let pageList = [{
+        "Product": "物",
+        "Underlying": "集运指数（欧线）",
+        "ContractMultiplier": "50元/点",
+        "PriceQuotation": "指数点",
+        "MinimumPriceFluctuation": "0.1点",
+        "ContractSymbol": "EC",
+        "ListingExchange": "上海国际能源交易中心"
+      }]
+    </script></html>
+    """
+
+    def fake_request(self, session, request_exchange, url, symbol):
+        assert request_exchange == "INE"
+        if symbol == "listed_products":
+            return listing_html
+        return product_html
+
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "_request_exchange_product_rule_page", fake_request)
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync(
+        "INE",
+        target_symbols=["EC"],
+    )
+    spec = specs["EC"]
+
+    assert spec.name == "集运指数（欧线）"
+    assert spec.category == "energy"
+    assert spec.currency == "CNY"
+    assert spec.unit == "index_point"
+    assert spec.contract_multiplier == 50
+    assert spec.tick_size == 0.1
+    assert spec.field_sources["name"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["unit"]["source_type"] == "official_product_rule_page"
+    assert spec.field_sources["contract_multiplier"]["source_type"] == "official_product_rule_page"
+
+
 def test_czce_product_specs_use_official_reference_data_xml(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()
