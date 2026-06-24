@@ -894,6 +894,51 @@ def _float_or_none(value: Any) -> Optional[float]:
     return number if math.isfinite(number) else None
 
 
+def _contract_spec_metadata(
+    *,
+    contract_multiplier: Optional[float],
+    tick_size: Optional[float],
+    source: str = "",
+    quality_flag: str = "",
+) -> Dict[str, Any]:
+    payload: Dict[str, Any] = {}
+    multiplier = _float_or_none(contract_multiplier)
+    tick = _float_or_none(tick_size)
+    if multiplier is not None:
+        payload["contract_multiplier"] = multiplier
+    if tick is not None:
+        payload["tick_size"] = tick
+    if not payload:
+        return {}
+    if source:
+        payload["source"] = source
+    if quality_flag:
+        payload["quality_flag"] = quality_flag
+    return payload
+
+
+def _contract_spec_from_instrument_metadata(metadata: Mapping[str, Any]) -> Dict[str, Optional[float]]:
+    contract_spec = (metadata or {}).get("contract_spec")
+    if isinstance(contract_spec, Mapping):
+        multiplier = _float_or_none(contract_spec.get("contract_multiplier"))
+        tick = _float_or_none(contract_spec.get("tick_size"))
+        if multiplier is not None or tick is not None:
+            return {
+                "contract_multiplier": multiplier,
+                "tick_size": tick,
+            }
+    evidence = (metadata or {}).get("master_discovery_evidence") or (metadata or {}).get("master_governance_evidence") or {}
+    if isinstance(evidence, Mapping):
+        multiplier = _float_or_none(evidence.get("contract_multiplier"))
+        tick = _float_or_none(evidence.get("tick_size"))
+        if multiplier is not None or tick is not None:
+            return {
+                "contract_multiplier": multiplier,
+                "tick_size": tick,
+            }
+    return {"contract_multiplier": None, "tick_size": None}
+
+
 def _date_key(value: Any) -> str:
     if isinstance(value, datetime):
         return value.date().isoformat()
@@ -1995,6 +2040,21 @@ class FuturesStorageManager:
         ]
         if missing:
             return {"status": "blocked", "discovery_id": discovery_id, "missing_fields": missing}
+        contract_spec = _contract_spec_metadata(
+            contract_multiplier=_float_or_none(candidate.get("contract_multiplier")),
+            tick_size=_float_or_none(candidate.get("tick_size")),
+            source=str(((candidate.get("evidence") or {}).get("metadata_source") if isinstance(candidate.get("evidence"), Mapping) else "") or "master_discovery_evidence"),
+            quality_flag=str(candidate.get("quality_flag") or ""),
+        )
+        metadata = {
+            "master_discovery_id": discovery_id,
+            "master_discovery_quality": candidate.get("quality_flag"),
+            "master_discovery_first_seen_trade_date": candidate.get("first_seen_trade_date"),
+            "master_discovery_last_seen_trade_date": candidate.get("last_seen_trade_date"),
+            "master_discovery_evidence": candidate.get("evidence") or {},
+        }
+        if contract_spec:
+            metadata["contract_spec"] = contract_spec
         instrument = FuturesInstrument(
             instrument_id=str(candidate["candidate_instrument_id"]),
             symbol=str(candidate["variety_symbol"]),
@@ -2006,13 +2066,7 @@ class FuturesStorageManager:
             priority="P0",
             active=True,
             source_profiles=["exchange_official", "akshare_futures"],
-            metadata=_metadata_with_governed_lifecycle({
-                "master_discovery_id": discovery_id,
-                "master_discovery_quality": candidate.get("quality_flag"),
-                "master_discovery_first_seen_trade_date": candidate.get("first_seen_trade_date"),
-                "master_discovery_last_seen_trade_date": candidate.get("last_seen_trade_date"),
-                "master_discovery_evidence": candidate.get("evidence") or {},
-            }),
+            metadata=_metadata_with_governed_lifecycle(metadata),
         )
         series = FuturesSeries(
             series_id=str(candidate.get("candidate_series_id") or make_futures_series_id(instrument.instrument_id)),
@@ -5372,6 +5426,12 @@ class FuturesMasterDiscoveryGovernanceService:
         return FuturesMasterDiscoveryCandidate(
             **{
                 **asdict(preferred),
+                "contract_multiplier": (
+                    incoming.contract_multiplier
+                    if incoming.contract_multiplier is not None
+                    else existing.contract_multiplier
+                ),
+                "tick_size": incoming.tick_size if incoming.tick_size is not None else existing.tick_size,
                 "first_seen_trade_date": first_seen,
                 "last_seen_trade_date": last_seen,
                 "observed_contracts": observed,
@@ -5716,6 +5776,19 @@ class FuturesMasterGovernanceService:
                         contract_id = make_futures_contract_id(instrument.instrument_id, contract_code)
                         first_seen.setdefault(contract_id, trade_date)
                         last_seen[contract_id] = trade_date
+                        contract_spec = _contract_spec_from_instrument_metadata(instrument.metadata or {})
+                        contract_multiplier = contract_spec.get("contract_multiplier")
+                        tick_size = contract_spec.get("tick_size")
+                        metadata_limitations = [
+                            "listing_date_not_available_from_daily_quote",
+                            "last_trade_date_not_available_from_daily_quote",
+                        ]
+                        contract_quality_flag = "official_daily_discovered_with_product_spec"
+                        if contract_multiplier is None and tick_size is None:
+                            metadata_limitations.append("contract_spec_not_available_from_daily_quote")
+                            contract_quality_flag = "official_daily_discovered_partial"
+                        else:
+                            metadata_limitations.append("contract_spec_from_instrument_master")
                         contracts_by_id[contract_id] = FuturesContract(
                             contract_id=contract_id,
                             instrument_id=instrument.instrument_id,
@@ -5723,23 +5796,24 @@ class FuturesMasterGovernanceService:
                             exchange_contract_code=contract_code,
                             contract_month=infer_contract_month(contract_code),
                             delivery_month=infer_contract_month(contract_code),
-                            contract_multiplier=None,
-                            tick_size=None,
+                            contract_multiplier=contract_multiplier,
+                            tick_size=tick_size,
                             currency=instrument.currency,
                             unit=instrument.unit,
                             active=True,
                             source="exchange_official",
-                            quality_flag="official_daily_discovered_partial",
+                            quality_flag=contract_quality_flag,
                             metadata={
                                 "source_profile": self.source_profile,
                                 "source_interface": row.source_interface,
                                 "first_observed_trade_date": first_seen.get(contract_id),
                                 "last_observed_trade_date": last_seen.get(contract_id),
-                                "metadata_limitations": [
-                                    "listing_date_not_available_from_daily_quote",
-                                    "last_trade_date_not_available_from_daily_quote",
-                                    "contract_spec_not_available_from_daily_quote",
-                                ],
+                                "metadata_limitations": metadata_limitations,
+                                "contract_spec_source": (
+                                    "instrument_master_governance"
+                                    if contract_multiplier is not None or tick_size is not None
+                                    else ""
+                                ),
                             },
                         )
                 for day_index, trade_date in enumerate(verified_days, start=1):
@@ -5925,8 +5999,8 @@ class FuturesMasterGovernanceService:
                         unit=str(row.get("unit") or ""),
                         priority=str(row.get("priority") or "P0"),
                         active=bool(row.get("active", True)),
-                        source_profiles=_json_loads(row.get("source_profiles_json"), []),
-                        metadata=_json_loads(row.get("metadata_json"), {}),
+                        source_profiles=list(row.get("source_profiles") or []),
+                        metadata=dict(row.get("metadata") or {}),
                     )
                     instrument_by_symbol[symbol] = instrument
                     remapped_symbols.add(symbol)
@@ -6114,6 +6188,21 @@ class FuturesMasterGovernanceService:
     def _candidate_to_master_rows(
         candidate: FuturesMasterDiscoveryCandidate,
     ) -> tuple[FuturesInstrument, FuturesSeries]:
+        contract_spec = _contract_spec_metadata(
+            contract_multiplier=candidate.contract_multiplier,
+            tick_size=candidate.tick_size,
+            source=str((candidate.evidence or {}).get("metadata_source") or "master_discovery_evidence"),
+            quality_flag=str(candidate.quality_flag or ""),
+        )
+        metadata = {
+            "master_discovery_id": candidate.discovery_id,
+            "master_discovery_quality": candidate.quality_flag,
+            "master_discovery_first_seen_trade_date": candidate.first_seen_trade_date,
+            "master_discovery_last_seen_trade_date": candidate.last_seen_trade_date,
+            "master_discovery_evidence": candidate.evidence or {},
+        }
+        if contract_spec:
+            metadata["contract_spec"] = contract_spec
         instrument = FuturesInstrument(
             instrument_id=candidate.candidate_instrument_id,
             symbol=candidate.variety_symbol,
@@ -6125,13 +6214,7 @@ class FuturesMasterGovernanceService:
             priority="P0",
             active=True,
             source_profiles=["exchange_official", "akshare_futures"],
-            metadata=_metadata_with_governed_lifecycle({
-                "master_discovery_id": candidate.discovery_id,
-                "master_discovery_quality": candidate.quality_flag,
-                "master_discovery_first_seen_trade_date": candidate.first_seen_trade_date,
-                "master_discovery_last_seen_trade_date": candidate.last_seen_trade_date,
-                "master_discovery_evidence": candidate.evidence or {},
-            }),
+            metadata=_metadata_with_governed_lifecycle(metadata),
         )
         series = FuturesSeries(
             series_id=candidate.candidate_series_id or make_futures_series_id(instrument.instrument_id),
@@ -6222,6 +6305,14 @@ class FuturesMasterGovernanceService:
                 continue
             metadata = dict(item.metadata or {})
             metadata["master_governance_evidence"] = enriched.evidence
+            contract_spec = _contract_spec_metadata(
+                contract_multiplier=enriched.contract_multiplier,
+                tick_size=enriched.tick_size,
+                source=str((enriched.evidence or {}).get("metadata_source") or "master_governance_evidence"),
+                quality_flag=str(enriched.quality_flag or ""),
+            )
+            if contract_spec:
+                metadata["contract_spec"] = contract_spec
             metadata = _metadata_with_governed_lifecycle(metadata)
             refreshed = FuturesInstrument(
                 instrument_id=item.instrument_id,

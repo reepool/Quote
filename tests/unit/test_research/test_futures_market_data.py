@@ -630,7 +630,12 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
     assert result["counts"]["contracts_discovered"] == 1
     assert result["counts"]["contracts_written"] == 1
     assert storage.get_instrument("CNF.BZ.DCE")["unit"] == "CNY/ton"
-    assert storage.list_contracts(exchange="DCE")[0]["contract_id"] == "CNF.BZ.DCE.BZ2601"
+    contract = storage.list_contracts(exchange="DCE")[0]
+    assert contract["contract_id"] == "CNF.BZ.DCE.BZ2601"
+    assert contract["contract_multiplier"] == 30
+    assert contract["tick_size"] == 1
+    assert contract["quality_flag"] == "official_daily_discovered_with_product_spec"
+    assert contract["metadata"]["contract_spec_source"] == "instrument_master_governance"
 
 
 def test_master_governance_dry_run_simulates_auto_promoted_unknown_varieties(monkeypatch, tmp_path):
@@ -1288,18 +1293,17 @@ def test_gfex_master_governance_discovers_platinum_and_palladium_candidates(monk
         dry_run=True,
     )
 
-    assert result["status"] == "warning"
-    assert result["counts"]["contracts_discovered"] == 1
+    assert result["status"] == "success"
+    assert result["warnings"] == []
+    assert result["counts"]["contracts_discovered"] == 3
     assert result["counts"]["master_discovery_candidates"] == 2
     assert result["counts"]["master_discovery_auto_promoted"] == 2
-    assert {item["instrument_id"] for item in result["contracts"]} == {"CNF.LC.GFEX"}
-    warning = result["warnings"][0]
-    assert warning["reason"] == "unmapped_gfex_varieties"
-    assert dict(warning["samples"]) == {"PD": 1, "PT": 1}
-    assert {
-        item["candidate_instrument_id"]
-        for item in warning["discovery_candidates"]
-    } == {"CNF.PD.GFEX", "CNF.PT.GFEX"}
+    assert result["counts"]["auto_promoted_reprocessed_varieties"] == 2
+    assert {item["instrument_id"] for item in result["contracts"]} == {
+        "CNF.LC.GFEX",
+        "CNF.PD.GFEX",
+        "CNF.PT.GFEX",
+    }
 
 
 def test_futures_master_discovery_storage_idempotency_and_conflict(tmp_path):
