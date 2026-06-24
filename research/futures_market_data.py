@@ -5882,6 +5882,49 @@ class FuturesMasterGovernanceService:
             result["counts"]["master_discovery_candidates"] = discovery_result.get("candidates_discovered", 0)
             result["counts"]["master_discovery_pending_review"] = discovery_result.get("pending_review", 0)
             result["counts"]["master_discovery_auto_promoted"] = discovery_result.get("auto_promoted", 0)
+            if dry_run and discovery_result.get("auto_promoted"):
+                promotion_ids = {
+                    str(item.get("discovery_id") or "")
+                    for item in discovery_result.get("promotion_results") or []
+                    if item.get("status") == "would_promote"
+                }
+                merged_candidates: Dict[str, FuturesMasterDiscoveryCandidate] = {}
+                for candidate in discovery_candidates:
+                    existing = merged_candidates.get(candidate.discovery_id)
+                    merged_candidates[candidate.discovery_id] = (
+                        discovery_service._merge_candidate(existing, candidate) if existing else candidate
+                    )
+                remapped_symbols: set[str] = set()
+                for discovery_id in sorted(promotion_ids):
+                    candidate = merged_candidates.get(discovery_id)
+                    if candidate is None or not discovery_service._is_auto_promotable(candidate):
+                        continue
+                    instrument, series_item = self._candidate_to_master_rows(candidate)
+                    instrument_by_symbol[instrument.symbol.upper()] = instrument
+                    instruments.append(instrument)
+                    series.append(series_item)
+                    remapped_symbols.add(instrument.symbol.upper())
+                if remapped_symbols:
+                    for trade_date, rows in rows_by_trade_date.items():
+                        process_rows(
+                            trade_date,
+                            rows,
+                            collect_discovery=False,
+                            track_unmapped=False,
+                        )
+                    unmapped_varieties = {
+                        symbol: count
+                        for symbol, count in unmapped_varieties.items()
+                        if symbol not in remapped_symbols
+                    }
+                    result["counts"]["auto_promoted_reprocessed_varieties"] = len(remapped_symbols)
+                    logger.info(
+                        "[FuturesMasterGovernance] dry-run auto-promoted varieties simulated exchange=%s "
+                        "varieties=%s contracts=%s",
+                        exchange,
+                        sorted(remapped_symbols),
+                        len(contracts_by_id),
+                    )
             if unmapped_varieties:
                 result["warnings"].append({
                     "reason": f"unmapped_{exchange.lower()}_varieties",
@@ -5962,11 +6005,16 @@ class FuturesMasterGovernanceService:
                 result["counts"]["final_series"],
             )
         else:
+            simulated_promotions = int(result["counts"].get("auto_promoted_reprocessed_varieties", 0) or 0)
             result["counts"]["final_instruments"] = (
-                len(instruments) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
+                len(instruments)
+                if simulated_promotions
+                else len(instruments) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
             )
             result["counts"]["final_series"] = (
-                len(series) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
+                len(series)
+                if simulated_promotions
+                else len(series) + int(result["counts"].get("master_discovery_auto_promoted", 0) or 0)
             )
             result["counts"]["would_write_instruments"] = len(instruments)
             result["counts"]["would_write_series"] = len(series)
@@ -5988,6 +6036,47 @@ class FuturesMasterGovernanceService:
             dry_run,
         )
         return result
+
+    @staticmethod
+    def _candidate_to_master_rows(
+        candidate: FuturesMasterDiscoveryCandidate,
+    ) -> tuple[FuturesInstrument, FuturesSeries]:
+        instrument = FuturesInstrument(
+            instrument_id=candidate.candidate_instrument_id,
+            symbol=candidate.variety_symbol,
+            name=candidate.candidate_name,
+            exchange=candidate.exchange.upper(),
+            category=candidate.candidate_category,
+            currency=candidate.candidate_currency,
+            unit=candidate.candidate_unit,
+            priority="P0",
+            active=True,
+            source_profiles=["exchange_official", "akshare_futures"],
+            metadata=_metadata_with_governed_lifecycle({
+                "master_discovery_id": candidate.discovery_id,
+                "master_discovery_quality": candidate.quality_flag,
+                "master_discovery_first_seen_trade_date": candidate.first_seen_trade_date,
+                "master_discovery_last_seen_trade_date": candidate.last_seen_trade_date,
+                "master_discovery_evidence": candidate.evidence or {},
+            }),
+        )
+        series = FuturesSeries(
+            series_id=candidate.candidate_series_id or make_futures_series_id(instrument.instrument_id),
+            instrument_id=instrument.instrument_id,
+            symbol=f"{instrument.symbol}0",
+            series_type="main_continuous",
+            source_profile="akshare_futures",
+            source="akshare",
+            source_mode="direct",
+            source_interface="futures_zh_daily_sina",
+            construction_method="source_native",
+            currency=instrument.currency,
+            unit=instrument.unit,
+            priority="P0",
+            active=True,
+            metadata={"master_discovery_id": candidate.discovery_id},
+        )
+        return instrument, series
 
     def _refresh_existing_master_data(
         self,

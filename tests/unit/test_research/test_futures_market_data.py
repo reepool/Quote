@@ -633,6 +633,94 @@ def test_dce_master_governance_reprocesses_auto_promoted_unknown_varieties(monke
     assert storage.list_contracts(exchange="DCE")[0]["contract_id"] == "CNF.BZ.DCE.BZ2601"
 
 
+def test_master_governance_dry_run_simulates_auto_promoted_unknown_varieties(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "auto_promote_high_confidence": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["DCE"]},
+        "enabled_exchanges": ["DCE"],
+        "adapters": {
+            "DCE": {
+                "enabled": True,
+                "known_products": {
+                    "BZ": {
+                        "category": "chemical",
+                        "currency": "CNY",
+                        "unit": "CNY/ton",
+                    }
+                },
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+    config.modules["commodity_market_data"]["sources"] = {
+        "exchange_official": {"enabled": True, "enabled_exchanges": ["DCE"]},
+    }
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    storage.upsert_trading_calendar([
+        FuturesTradingCalendarDay(
+            exchange="DCE",
+            trade_date="2026-01-02",
+            is_trading_day=True,
+            source_profile="exchange_official_daily_probe",
+            quality_flag="backfilled_verified",
+        )
+    ])
+
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_contract_bars_sync",
+        lambda self, exchange, trade_date: [
+            _official_contract_row(
+                exchange=exchange,
+                trade_date=trade_date,
+                variety="BZ",
+                contract="BZ2601",
+                raw_payload={"variety": "纯苯", "contractId": "bz2601"},
+            )
+        ],
+    )
+    monkeypatch.setattr(
+        OfficialFuturesMarketDataProvider,
+        "fetch_exchange_product_specs_sync",
+        lambda self, exchange, target_symbols=None: {
+            "BZ": FuturesProductSpec(
+                exchange="DCE",
+                symbol="BZ",
+                name="纯苯",
+                contract_multiplier=30,
+                tick_size=1,
+                source_profile="exchange_official_product_spec",
+                source_interface="official_dce_contract_info",
+            )
+        },
+    )
+
+    result = FuturesMasterGovernanceService(
+        storage,
+        config,
+        config.modules["commodity_market_data"],
+    ).run(
+        exchanges=["DCE"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["warnings"] == []
+    assert result["counts"]["master_discovery_auto_promoted"] == 1
+    assert result["counts"]["auto_promoted_reprocessed_varieties"] == 1
+    assert result["counts"]["contracts_discovered"] == 1
+    assert result["counts"]["would_write_contracts"] == 1
+    assert result["contracts"][0]["contract_id"] == "CNF.BZ.DCE.BZ2601"
+    assert storage.get_instrument("CNF.BZ.DCE") is None
+    assert storage.list_contracts(exchange="DCE") == []
+
+
 def test_dce_master_governance_retries_failed_trade_dates(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     module_cfg = _scope_module_cfg()
