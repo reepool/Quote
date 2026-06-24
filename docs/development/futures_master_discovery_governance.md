@@ -183,7 +183,7 @@ promotion 规则：
 - `category_rules` 和 `known_products` 等已审核治理元数据，补齐交易所页面通常不提供的项目内部分类。
 - 默认 P0 主数据种子和少量交易所补充元数据，作为低优先级兼容证据。
 
-DCE/GFEX/SHFE/INE/CZCE 使用各自官方产品规格路径。SHFE adapter 已验证官方 Safeline challenge、meta-refresh、`/products/futures/.../<symbol>_f/` 叶子页发现，以及 `pageList` 合约对象字段解析；INE 使用同族页面结构，并在静态 requests 被 challenge 阻断时通过浏览器辅助官方页面 client 获取 HTML；CZCE 使用官方 `FutureDataReferenceData.xml` 解析 `PrdCd/Name/CtrSz/TckSz/MsrmntUnt/TrdCcyCd`。通用产品页 parser 只能作为共享工具：每个交易所仍要单独确认入口页、详情页 URL 规则、字段标签、反爬/WAF 处理、失败报告和 live dry-run 结果。缺少关键字段的候选会保持 `discovered_unverified/pending`，不会自动进入正式主数据；官方页面被 WAF 或挑战阻断时必须写入任务 warning，而不是静默回退。
+DCE/GFEX/SHFE/INE/CZCE 使用各自官方产品规格路径。SHFE adapter 已验证官方 Safeline challenge、meta-refresh、`/products/futures/.../<symbol>_f/` 叶子页发现，以及 `pageList` 合约对象字段解析；INE 使用同族页面结构，并在静态 requests 被 challenge 阻断时通过浏览器辅助官方页面 client 获取 HTML；CZCE 会先通过浏览器辅助页面 client 尝试解开官网首页/上市品种入口的 WAF/challenge，发现 `/cn/sspz/.../H077002...` 官方产品入口并保留 URL、标题和上下文证据，再用官方 `FutureDataReferenceData.xml` 解析 `PrdCd/Name/CtrSz/TckSz/MsrmntUnt/TrdCcyCd` 规格字段。通用产品页 parser 只能作为共享工具：每个交易所仍要单独确认入口页、详情页 URL 规则、字段标签、反爬/WAF 处理、失败报告和 live dry-run 结果。缺少关键字段的候选会保持 `discovered_unverified/pending`，不会自动进入正式主数据；官方页面被 WAF 或挑战阻断时必须写入任务 warning，而不是静默回退。
 
 ## 9. 数据质量边界
 

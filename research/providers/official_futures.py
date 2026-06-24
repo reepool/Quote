@@ -66,6 +66,11 @@ class DceOfficialBrowserClient:
         self.headless = bool(cfg.get("headless", False))
         self.settle_seconds = max(0.0, float(cfg.get("settle_seconds", 9)))
         self.page_settle_seconds = max(0.0, float(cfg.get("page_settle_seconds", min(self.settle_seconds, 2.0))))
+        self.page_challenge_settle_seconds = max(
+            0.0,
+            float(cfg.get("page_challenge_settle_seconds", max(self.settle_seconds, 10.0))),
+        )
+        self.page_challenge_poll_attempts = max(1, int(cfg.get("page_challenge_poll_attempts", 3)))
         self.timeout_seconds = max(1.0, float(cfg.get("timeout_seconds", 30)))
         self.retry_attempts = max(1, int(cfg.get("retry_attempts", 3)))
         self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
@@ -249,15 +254,34 @@ class DceOfficialBrowserClient:
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 self._page = await self._browser.get(str(url))
-                await self._page.sleep(self.page_settle_seconds)
-                raw_result = await self._page.evaluate(
-                    "document.documentElement ? document.documentElement.outerHTML : ''",
-                    return_by_value=True,
-                )
-                html = str(raw_result or "")
-                if "<html" in html[:500].lower() or html.strip():
-                    return html
-                last_error = "empty page html"
+                for poll_attempt in range(1, self.page_challenge_poll_attempts + 1):
+                    sleep_seconds = (
+                        self.page_settle_seconds
+                        if poll_attempt == 1
+                        else self.page_challenge_settle_seconds
+                    )
+                    if sleep_seconds > 0:
+                        await self._page.sleep(sleep_seconds)
+                    raw_result = await self._page.evaluate(
+                        "document.documentElement ? document.documentElement.outerHTML : ''",
+                        return_by_value=True,
+                    )
+                    html = str(raw_result or "")
+                    if not html.strip():
+                        last_error = "empty page html"
+                        continue
+                    if _looks_like_transient_challenge_shell(html):
+                        last_error = "transient WAF/challenge shell"
+                        logger.info(
+                            "[OfficialFutures] browser page still in challenge shell url=%s attempt=%s poll=%s html_len=%s",
+                            url,
+                            attempt,
+                            poll_attempt,
+                            len(html),
+                        )
+                        continue
+                    if "<html" in html[:500].lower() or html.strip():
+                        return html
             except Exception as exc:
                 last_error = str(exc)
             if attempt < self.retry_attempts and self.retry_backoff_seconds > 0:
@@ -980,11 +1004,23 @@ class OfficialFuturesMarketDataProvider:
         if exchange_key == "CZCE":
             configured = self._configured_product_specs(exchange_key)
             try:
-                official_pages = self._fetch_czce_reference_data_product_specs(target_symbols=target_symbols)
+                reference_specs = self._fetch_czce_reference_data_product_specs(target_symbols=target_symbols)
             except OfficialFuturesSourceUnavailable as exc:
                 logger.warning("[OfficialFutures] CZCE reference-data product specs unavailable: %s", exc)
-                official_pages = {}
-            specs = self._merge_product_specs(configured, official_pages)
+                reference_specs = {}
+            try:
+                listed_pages = self._fetch_czce_listed_product_page_specs(
+                    target_specs={
+                        **configured,
+                        **reference_specs,
+                    },
+                    target_symbols=target_symbols,
+                )
+            except OfficialFuturesSourceUnavailable as exc:
+                logger.warning("[OfficialFutures] CZCE listed-product page specs unavailable: %s", exc)
+                listed_pages = {}
+            specs = self._merge_product_specs(configured, listed_pages)
+            specs = self._merge_product_specs(specs, reference_specs)
             if specs:
                 return specs
         if exchange_key == "INE":
@@ -1416,6 +1452,56 @@ class OfficialFuturesMarketDataProvider:
                 continue
         raise OfficialFuturesSourceUnavailable(f"official CZCE reference-data product specs unavailable: {last_error}")
 
+    def _fetch_czce_listed_product_page_specs(
+        self,
+        target_specs: Optional[Mapping[str, FuturesProductSpec]] = None,
+        target_symbols: Optional[Sequence[str]] = None,
+    ) -> Dict[str, FuturesProductSpec]:
+        exchange_key = "CZCE"
+        discovery_cfg = self.module_cfg.get("master_data_discovery") or {}
+        adapter_cfg = ((discovery_cfg.get("adapters") or {}).get(exchange_key) or {})
+        target_symbol_set = {
+            str(symbol or "").upper()
+            for symbol in (target_symbols or [])
+            if str(symbol or "").strip()
+        }
+        targets = {
+            str(symbol or spec.symbol or "").upper(): spec
+            for symbol, spec in (target_specs or {}).items()
+            if str(symbol or spec.symbol or "").strip()
+            and (not target_symbol_set or str(symbol or spec.symbol or "").upper() in target_symbol_set)
+        }
+        if not targets:
+            return {}
+        listing_pages = _as_string_list(
+            adapter_cfg.get("listed_products_page")
+            or self.GENERIC_LISTED_PRODUCTS_PAGES.get(exchange_key)
+            or ""
+        )
+        specs: Dict[str, FuturesProductSpec] = {}
+        failures: Dict[str, str] = {}
+        with create_requests_session(tls_config=self.tls_config, headers=self.DEFAULT_HEADERS) as session:
+            for discovery_url in listing_pages:
+                try:
+                    discovery_html = self._request_exchange_product_rule_page(
+                        session,
+                        exchange_key,
+                        discovery_url,
+                        "listed_products",
+                    )
+                    discovered_pages = self._discover_czce_product_rule_pages(
+                        discovery_html,
+                        targets,
+                        base_url=discovery_url,
+                        adapter_cfg=adapter_cfg,
+                    )
+                    specs.update(discovered_pages)
+                except Exception as exc:
+                    failures[f"{exchange_key}:listed_products:{discovery_url}"] = str(exc)
+        if failures:
+            logger.warning("[OfficialFutures] CZCE listed-product page spec partial failures=%s", failures)
+        return specs
+
     def _parse_czce_reference_data_xml(
         self,
         xml_text: str,
@@ -1501,6 +1587,84 @@ class OfficialFuturesMarketDataProvider:
                         "czce_reference_data_category_uses_governed_rules"
                         if category
                         else "czce_reference_data_does_not_provide_project_category",
+                    ],
+                    "category_rule_source": category_source if category else "",
+                },
+                field_sources=field_sources,
+            )
+        return specs
+
+    def _discover_czce_product_rule_pages(
+        self,
+        html: str,
+        target_specs: Mapping[str, FuturesProductSpec],
+        *,
+        base_url: str,
+        adapter_cfg: Mapping[str, Any],
+    ) -> Dict[str, FuturesProductSpec]:
+        links = _html_links(html, base_url=base_url)
+        product_links = [
+            item for item in links
+            if _is_czce_product_link(item.get("href", ""), item.get("text", ""))
+        ]
+        specs: Dict[str, FuturesProductSpec] = {}
+        for symbol, target in sorted(target_specs.items()):
+            symbol_key = str(symbol or target.symbol or "").upper().strip()
+            if not symbol_key:
+                continue
+            expected_name = _normalize_czce_product_title(target.name)
+            if not expected_name:
+                continue
+            matches = [
+                item for item in product_links
+                if expected_name and expected_name in _normalize_czce_product_title(item.get("text", ""))
+            ]
+            if not matches:
+                continue
+            best = sorted(matches, key=lambda item: (len(str(item.get("text") or "")), str(item.get("href") or "")))[0]
+            href = str(best.get("href") or "")
+            title = _strip_futures_product_suffix(best.get("text"))
+            category, category_source = _category_from_adapter_rules(
+                adapter_cfg,
+                symbol=symbol_key,
+                name=target.name or title,
+                source_url=href,
+                page_text=_czce_listing_context(html, href=href, title=str(best.get("text") or "")),
+            )
+            field_sources = {
+                "name": {
+                    "source_type": "official_product_listing_page",
+                    "source_ref": href,
+                    "quality_flag": "official_product_listing_page",
+                }
+            }
+            if category:
+                field_sources["category"] = {
+                    "source_type": "governed_rule_metadata",
+                    "source_ref": category_source,
+                    "quality_flag": "governed_rule_verified",
+                }
+            specs[symbol_key] = FuturesProductSpec(
+                exchange="CZCE",
+                symbol=symbol_key,
+                name=target.name or title,
+                category=category,
+                currency="",
+                unit="",
+                source_profile="exchange_official_product_listing_page",
+                source_interface="official_czce_listed_products_page",
+                source_url=href,
+                quality_flag="official_product_spec_partial",
+                evidence={
+                    "listed_product_title": str(best.get("text") or ""),
+                    "listed_product_url": href,
+                    "listed_product_context": _czce_listing_context(
+                        html,
+                        href=href,
+                        title=str(best.get("text") or ""),
+                    )[:500],
+                    "source_limitations": [
+                        "czce_listed_product_page_provides_product_entry_not_full_contract_specs",
                     ],
                     "category_rule_source": category_source if category else "",
                 },
@@ -3057,6 +3221,53 @@ def _normalize_dce_product_title(value: Any) -> str:
     return text.lower()
 
 
+def _normalize_czce_product_title(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    text = re.sub(r"\s+", "", text)
+    replacements = (
+        ("（", "("),
+        ("）", ")"),
+        ("１", "1"),
+        ("２", "2"),
+        ("３", "3"),
+        ("０", "0"),
+    )
+    for old, new in replacements:
+        text = text.replace(old, new)
+    aliases = {
+        "瓶片": "瓶级聚酯切片",
+        "短纤": "涤纶短纤",
+        "pta": "精对苯二甲酸",
+        "玻璃": "平板玻璃",
+        "白糖": "白砂糖",
+        "强麦": "优质强筋小麦",
+        "普麦": "普通小麦",
+        "菜粕": "菜籽粕",
+        "菜油": "菜籽油",
+        "早籼": "早籼稻",
+        "晚籼": "晚籼稻",
+        "粳稻": "粳稻谷",
+        "苹果": "鲜苹果",
+        "红枣": "干制红枣",
+        "花生": "花生仁",
+    }
+    for token in (
+        "期货/期权",
+        "期货期权",
+        "期货",
+        "期权",
+        "合约",
+        "品种",
+        "上市",
+    ):
+        text = text.replace(token, "")
+    text = re.sub(r"[/／()（）,，、·]", "", text)
+    normalized = text.lower()
+    return aliases.get(normalized, normalized)
+
+
 def _is_dce_product_link_title(value: Any) -> bool:
     text = str(value or "").strip()
     if not text:
@@ -3079,6 +3290,49 @@ def _is_dce_product_link_title(value: Any) -> bool:
     if any(token in text for token in excluded):
         return False
     return "期货" in text or "期权" in text
+
+
+def _is_czce_product_link(href: Any, title: Any) -> bool:
+    href_l = str(href or "").lower()
+    title_text = str(title or "").strip()
+    if not href_l or not title_text:
+        return False
+    if "/cn/sspz/" not in href_l:
+        return False
+    if "h077002" not in href_l:
+        return False
+    if title_text in {"上市品种", "品种/期权"}:
+        return False
+    excluded = (
+        "业务细则",
+        "交易规则",
+        "交割",
+        "风控",
+        "仓单",
+        "公告",
+        "行情",
+        "统计",
+        "历史",
+        "下载",
+    )
+    if any(token in title_text for token in excluded):
+        return False
+    return "期货" in title_text
+
+
+def _czce_listing_context(html: Any, *, href: str, title: str) -> str:
+    text = str(html or "")
+    needles = [href, title]
+    for needle in needles:
+        if not needle:
+            continue
+        index = text.find(needle)
+        if index < 0:
+            continue
+        start = max(0, index - 3000)
+        end = min(len(text), index + 1000)
+        return re.sub(r"\s+", " ", text[start:end]).strip()
+    return ""
 
 
 def _as_string_list(value: Any) -> List[str]:
@@ -3193,6 +3447,8 @@ def _category_from_adapter_rules(
 
 
 def _looks_like_waf_challenge(text: Any) -> bool:
+    if _looks_like_transient_challenge_shell(text):
+        return True
     value = str(text or "")[:5000].lower()
     return any(
         token in value
@@ -3204,6 +3460,25 @@ def _looks_like_waf_challenge(text: Any) -> bool:
             "captcha",
         )
     )
+
+
+def _looks_like_transient_challenge_shell(text: Any) -> bool:
+    value = str(text or "")
+    if not value.strip():
+        return False
+    value_l = value[:5000].lower()
+    if len(value) > 5000:
+        return False
+    challenge_tokens = (
+        "$_ts",
+        "oaozrcpvukpe",
+        "/b5sapuotxhib/",
+        "web 应用防火墙",
+        "safeline_bot_challenge",
+        "js-challenge",
+        "captcha",
+    )
+    return any(token in value_l for token in challenge_tokens)
 
 
 def _html_meta_refresh_url(html: Any, *, base_url: str) -> str:

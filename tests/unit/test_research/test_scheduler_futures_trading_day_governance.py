@@ -247,12 +247,12 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
         "dry_run": False,
         "scope_selection": {"exchanges": ["GFEX", "SHFE"]},
         "totals": {
-            "inserted": 2,
+            "inserted": 3,
             "changed": 0,
             "unchanged": 0,
-            "failed": 0,
+            "failed": 1,
             "calendar_skipped": 0,
-            "provider_empty_on_trading_day": 0,
+            "provider_empty_on_trading_day": 1,
         },
         "trading_day_governance": {
             "status": "success",
@@ -276,20 +276,34 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
                 "write_result": {"inserted": 1, "would_write_rows": 0},
                 "status": "success",
             },
+            {
+                "series_id": "CNF.BB.DCE.main",
+                "fetched_rows": 0,
+                "write_result": {"inserted": 0, "would_write_rows": 0},
+                "status": "failed",
+                "date_results": [{"trade_date": "2026-06-24", "fetched_rows": 0}],
+            },
         ],
     }
 
     reports = _format_futures_market_data_scheduler_reports(result)
 
-    assert len(reports) == 3
+    assert len(reports) == 4
     assert "exchange/scope: `GFEX,SHFE`" in reports[0]
     assert "序列明细已按交易所拆分发送" in reports[0]
-    assert "exchange/scope: `GFEX`" in reports[1]
-    assert "CNF.SI.GFEX.main" in reports[1]
-    assert "CNF.CU.SHFE.main" not in reports[1]
-    assert "exchange/scope: `SHFE`" in reports[2]
-    assert "CNF.CU.SHFE.main" in reports[2]
-    assert "CNF.SI.GFEX.main" not in reports[2]
+    dce_report = next(report for report in reports if "exchange/scope: `DCE`" in report)
+    gfex_report = next(report for report in reports if "exchange/scope: `GFEX`" in report)
+    shfe_report = next(report for report in reports if "exchange/scope: `SHFE`" in report)
+    assert "failed: `1`" in dce_report
+    assert "provider_empty_on_trading_day: `1`" in dce_report
+    assert "failed: `0`" in gfex_report
+    assert "inserted: `1`" in gfex_report
+    assert "provider_empty_on_trading_day: `0`" in gfex_report
+    assert "CNF.SI.GFEX.main" in gfex_report
+    assert "CNF.CU.SHFE.main" not in gfex_report
+    assert "failed: `0`" in shfe_report
+    assert "CNF.CU.SHFE.main" in shfe_report
+    assert "CNF.SI.GFEX.main" not in shfe_report
 
 
 def test_futures_trading_day_governance_task_reports_warning_and_clears_active_flag():

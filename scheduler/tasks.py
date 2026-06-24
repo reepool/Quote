@@ -1018,7 +1018,43 @@ def _format_futures_market_data_scheduler_report(
     include_series_details: bool = True,
 ) -> str:
     """Build an operator-facing report for futures market-data maintenance."""
+    def _aggregate_series_totals(items: List[Dict[str, Any]]) -> Dict[str, int]:
+        aggregate = {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+            "calendar_skipped": 0,
+            "provider_empty_on_trading_day": 0,
+            "fetched_rows": 0,
+            "would_write_price_bars": 0,
+        }
+        for item in items:
+            status_text = str(item.get("status") or "")
+            if status_text == "failed":
+                aggregate["failed"] += 1
+            if status_text in {"calendar_skip", "lifecycle_skip"}:
+                aggregate["calendar_skipped"] += 1
+            aggregate["fetched_rows"] += int(item.get("fetched_rows") or 0)
+            write_result = item.get("write_result") or {}
+            aggregate["inserted"] += int(write_result.get("inserted") or 0)
+            aggregate["changed"] += int(write_result.get("changed") or 0)
+            aggregate["unchanged"] += int(write_result.get("unchanged") or 0)
+            aggregate["would_write_price_bars"] += int(write_result.get("would_write_rows") or 0)
+            for date_result in item.get("date_results") or []:
+                if int(date_result.get("fetched_rows") or 0) == 0:
+                    aggregate["provider_empty_on_trading_day"] += 1
+        return aggregate
+
+    series = series_override if series_override is not None else (result.get("series") or [])
+    totals = (
+        _aggregate_series_totals(series)
+        if series_override is not None
+        else (result.get("totals") or {})
+    )
     status = result.get("status", "unknown")
+    if series_override is not None:
+        status = "partial" if int(totals.get("failed", 0) or 0) > 0 else "success"
     icon, label = _format_scheduler_status(status)
 
     def _format_warning_items(warnings: List[Any], *, limit: int = 10) -> List[str]:
@@ -1266,7 +1302,6 @@ def _format_futures_market_data_scheduler_report(
             + "\n```"
             + failure_text
         )
-    totals = result.get("totals") or {}
     governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
     actual_calendar_quality = governance.get("lowest_quality")
     if not actual_calendar_quality:
@@ -1299,7 +1334,6 @@ def _format_futures_market_data_scheduler_report(
     else:
         master_governance = {}
     master_counts = master_governance.get("counts") or {}
-    series = series_override if series_override is not None else (result.get("series") or [])
     lifecycle_skipped_series = 0
     lifecycle_clipped_series = 0
     lifecycle_filtered_dates = 0

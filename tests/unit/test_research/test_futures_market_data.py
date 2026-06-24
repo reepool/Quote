@@ -52,6 +52,7 @@ from research.providers.official_futures import (
     OfficialFuturesMarketDataProvider,
     OfficialFuturesSourceUnavailable,
     _bar_quality_flag,
+    _normalize_czce_product_title,
     classify_official_futures_failure,
 )
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
@@ -1082,6 +1083,47 @@ def test_dce_browser_restarts_session_after_in_page_fetch_failure(monkeypatch):
     assert payload == {"success": True, "data": [{"varietyOrder": "I"}]}
     assert state["starts"] == 2
     assert state["requested_api_calls"] == 2
+
+
+def test_dce_browser_page_html_waits_out_transient_challenge_shell(monkeypatch):
+    class FakePage:
+        def __init__(self):
+            self.calls = 0
+            self.sleeps = []
+
+        async def sleep(self, seconds):
+            self.sleeps.append(seconds)
+
+        async def evaluate(self, script, return_by_value=False):
+            self.calls += 1
+            if self.calls == 1:
+                return "<html><script>var $_ts='x';</script><script src='/B5sapuOTxHIB/a.js'></script></html>"
+            return "<html><body>上市品种 棉纱期货</body></html>"
+
+    class FakeBrowser:
+        def __init__(self):
+            self.page = FakePage()
+
+        async def get(self, url):
+            return self.page
+
+    async def fake_ensure_started(self):
+        self._browser = FakeBrowser()
+
+    monkeypatch.setattr(DceOfficialBrowserClient, "_ensure_started", fake_ensure_started)
+
+    client = DceOfficialBrowserClient({
+        "settle_seconds": 0,
+        "page_settle_seconds": 0,
+        "page_challenge_settle_seconds": 0,
+        "page_challenge_poll_attempts": 2,
+        "retry_attempts": 1,
+        "browser_executable_path": "/tmp/fake-chrome",
+    })
+
+    html = asyncio.run(client._page_html("https://www.czce.com.cn/"))
+
+    assert "上市品种" in html
 
 
 def test_dce_browser_client_rejects_direct_call_inside_running_event_loop(monkeypatch):
@@ -2243,6 +2285,85 @@ def test_czce_product_specs_use_official_reference_data_xml(monkeypatch, tmp_pat
     assert spec.source_interface == "official_czce_reference_data_xml"
     assert spec.field_sources["name"]["source_type"] == "official_reference_data_xml"
     assert spec.field_sources["category"]["source_type"] == "governed_rule_metadata"
+
+
+def test_czce_product_specs_merge_official_listing_page_with_reference_xml(monkeypatch, tmp_path):
+    config = _research_config(tmp_path)
+    module_cfg = _scope_module_cfg()
+    module_cfg["master_data_discovery"] = {
+        "enabled": True,
+        "official_product_spec_enrichment": {"enabled": True, "enabled_exchanges": ["CZCE"]},
+        "enabled_exchanges": ["CZCE"],
+        "adapters": {
+            "CZCE": {
+                "enabled": True,
+                "listed_products_page": "https://www.czce.com.cn/",
+                "product_rule_pages": {},
+                "category_rules": {"chemical": ["短纤", "涤纶短纤"]},
+                "known_products": {},
+            }
+        },
+    }
+    config.modules["commodity_market_data"].update(module_cfg)
+
+    xml = """<?xml version="1.0" encoding="UTF-8" ?>
+    <Contracts>
+      <Contract>
+        <Name>涤纶短纤期货</Name>
+        <CtrCd>PF607</CtrCd>
+        <PrdCd>PF</PrdCd>
+        <PrdTp>期货</PrdTp>
+        <TrdCcyCd>CNY</TrdCcyCd>
+        <ClrngCcyCd>CNY</ClrngCcyCd>
+        <TckSz>2.00元/吨</TckSz>
+        <CtrSz>5吨/手</CtrSz>
+        <MsrmntUnt>吨</MsrmntUnt>
+      </Contract>
+    </Contracts>
+    """
+    listing_html = """
+    <html><body>
+      <div>上市品种</div>
+      <a href="/cn/sspz/dxqh/H077002025index_1.htm">短纤期货/期权</a>
+    </body></html>
+    """
+
+    class FakeResponse:
+        status_code = 200
+        text = xml
+
+        def raise_for_status(self):
+            return None
+
+    def fake_request(self, session, request_exchange, url, symbol):
+        assert request_exchange == "CZCE"
+        assert symbol == "listed_products"
+        return listing_html
+
+    monkeypatch.setattr("research.providers.official_futures.request_get", lambda *args, **kwargs: FakeResponse())
+    monkeypatch.setattr(OfficialFuturesMarketDataProvider, "_request_exchange_product_rule_page", fake_request)
+
+    specs = OfficialFuturesMarketDataProvider(config).fetch_exchange_product_specs_sync(
+        "CZCE",
+        target_symbols=["PF"],
+    )
+    spec = specs["PF"]
+
+    assert spec.name == "涤纶短纤"
+    assert spec.category == "chemical"
+    assert spec.unit == "CNY/ton"
+    assert spec.contract_multiplier == 5
+    assert spec.tick_size == 2
+    assert spec.source_interface == "official_czce_reference_data_xml"
+    assert spec.evidence["listed_product_url"].endswith("/cn/sspz/dxqh/H077002025index_1.htm")
+    assert spec.field_sources["name"]["source_type"] == "official_reference_data_xml"
+
+
+def test_czce_product_title_aliases_match_official_listing_titles_to_reference_names():
+    assert _normalize_czce_product_title("玻璃期货/期权") == "平板玻璃"
+    assert _normalize_czce_product_title("白糖期货/期权") == "白砂糖"
+    assert _normalize_czce_product_title("PTA期货/期权") == "精对苯二甲酸"
+    assert _normalize_czce_product_title("瓶片期货/期权") == "瓶级聚酯切片"
 
 
 def test_gfex_master_discovery_auto_promotes_from_common_product_spec(monkeypatch, tmp_path):

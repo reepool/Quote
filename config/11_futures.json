@@ -211,6 +211,8 @@
           "virtual_display": "auto",
           "settle_seconds": 9,
           "page_settle_seconds": 2,
+          "page_challenge_settle_seconds": 10,
+          "page_challenge_poll_attempts": 3,
           "retry_attempts": 3,
           "retry_backoff_seconds": 2,
           "note": "DCE official JSON endpoints require a real headed Chrome session so the site JavaScript can attach the dynamic Riversafe token to in-page fetch calls. In headless/server environments use Xvfb or set QUOTE_DCE_CHROME_PATH to a real Chrome binary."
@@ -281,7 +283,7 @@
           "INE",
           "CZCE"
         ],
-        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE uses the same official page family with browser fallback for challenge handling. CZCE uses official FutureDataReferenceData.xml for product name, code, currency, quote unit, trading unit, and tick size."
+        "note": "Exchange-specific product specification enrichment feeds normalized root-product evidence into the common discovery adapter. DCE uses the official browser-assisted contractInfo endpoint, auto-discovers listed-product page URLs from the DCE homepage, and can parse official listed-product pages for product name, code, quote unit, trading unit, and tick size; category remains governed metadata where the official page does not expose internal taxonomy. GFEX auto-discovers listed-product page URLs from the GFEX listed-products entry page, parses official listed-product pages for the same normalized fields, and merges governed category metadata. SHFE uses official product pages behind Safeline/meta-refresh, discovers product leaf URLs shaped as /products/futures/.../<symbol>_f/, parses the pageList contract object for product name, code, quote unit, trading unit, and tick size, and merges governed category metadata. INE uses the same official page family with browser fallback for challenge handling. CZCE first attempts browser-assisted listed-product page discovery after static WAF/challenge responses, preserves official product entry URL/title/context evidence, and uses official FutureDataReferenceData.xml for product name, code, currency, quote unit, trading unit, and tick size."
       },
       "enabled_exchanges": [
         "SHFE",
@@ -460,13 +462,23 @@
           "listed_products_page": "https://www.czce.com.cn/",
           "product_rule_pages": {},
           "category_rules": {
-            "coal": ["动力煤", "煤", "zc"],
-            "ferrous": ["硅铁", "锰硅", "sf", "sm"],
-            "chemical": ["pta", "对二甲苯", "甲醇", "纯碱", "烧碱", "尿素", "px", "ma", "sa", "sh", "ur"],
-            "building_material": ["玻璃", "fg"],
-            "agriculture": ["棉花", "白糖", "菜粕", "菜籽油", "花生", "苹果", "红枣", "cf", "sr", "rm", "oi", "pk", "ap", "cj"]
+            "coal": ["动力煤", "煤"],
+            "ferrous": ["硅铁", "锰硅"],
+            "chemical": ["pta", "精对苯二甲酸", "对二甲苯", "甲醇", "纯碱", "烧碱", "尿素", "棉纱", "短纤", "涤纶短纤", "丙烯", "聚酯切片", "瓶级聚酯切片"],
+            "building_material": ["玻璃", "平板玻璃"],
+            "agriculture": ["棉花", "白糖", "白砂糖", "菜粕", "菜籽粕", "菜籽油", "花生", "花生仁", "苹果", "鲜苹果", "红枣", "干制红枣", "粳稻", "粳稻谷", "晚籼稻", "小麦", "普通小麦", "强筋小麦", "优质强筋小麦", "早籼稻", "油菜籽"]
           },
-          "known_products": {}
+          "known_products": {
+            "LR": {
+              "name": "晚籼稻",
+              "category": "agriculture",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "contract_multiplier": 20,
+              "tick_size": 1,
+              "source_url": "CZCE governed historical product metadata; current FutureDataReferenceData.xml no longer returns LR"
+            }
+          }
         },
         "GFEX": {
           "enabled": true,
