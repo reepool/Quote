@@ -2668,6 +2668,90 @@ def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
     ] == 10
 
 
+def test_futures_storage_official_price_bar_supersedes_fallback(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    registry = default_futures_registry(config.modules["commodity_market_data"])
+    storage.upsert_instruments_and_series(registry["instruments"], registry["series"])
+    series = next(item for item in registry["series"] if item.series_id == "CNF.CU.SHFE.main")
+
+    fallback_bar = FuturesBar(
+        series_id=series.series_id,
+        trade_date="2020-01-02",
+        open=1.0,
+        high=1.2,
+        low=0.9,
+        close=1.1,
+        raw_payload_hash="fallback",
+        source="akshare",
+        source_mode="direct",
+        source_profile="akshare_futures",
+        source_interface="futures_zh_daily_sina",
+    )
+    official_bar = FuturesBar(
+        series_id=series.series_id,
+        trade_date="2020-01-02",
+        open=1.0,
+        high=1.3,
+        low=0.8,
+        close=1.2,
+        raw_payload_hash="official",
+        source="exchange_official",
+        source_mode="direct",
+        source_profile="exchange_official",
+        source_interface="official_shfe_daily_kx_dat",
+    )
+
+    assert storage.upsert_price_bars([fallback_bar])["inserted"] == 1
+    assert storage.upsert_price_bars([official_bar])["inserted"] == 1
+
+    rows = storage.get_price_bars(series.series_id)
+    assert len(rows) == 1
+    assert rows[0]["source_profile"] == "exchange_official"
+    assert rows[0]["close"] == 1.2
+
+
+def test_futures_storage_preserves_contract_observed_metadata_on_market_data_upsert(tmp_path):
+    config = _research_config(tmp_path)
+    storage = FuturesStorageManager(config)
+    storage.initialize()
+    contract_id = "CNF.CU.SHFE.CU2407"
+    governed_contract = FuturesContract(
+        contract_id=contract_id,
+        instrument_id="CNF.CU.SHFE",
+        exchange="SHFE",
+        exchange_contract_code="CU2407",
+        contract_month="2024-07",
+        currency="CNY",
+        unit="CNY/ton",
+        source="exchange_official",
+        metadata={
+            "first_observed_trade_date": "2023-07-17",
+            "last_observed_trade_date": "2024-07-15",
+        },
+    )
+    market_data_contract = FuturesContract(
+        contract_id=contract_id,
+        instrument_id="CNF.CU.SHFE",
+        exchange="SHFE",
+        exchange_contract_code="CU2407",
+        contract_month="2024-07",
+        currency="CNY",
+        unit="CNY/ton",
+        source="exchange_official",
+        metadata={"variety": "CU"},
+    )
+
+    storage.upsert_contracts([governed_contract])
+    storage.upsert_contracts([market_data_contract])
+
+    payload = storage.get_contract(contract_id)
+    assert payload["metadata"]["first_observed_trade_date"] == "2023-07-17"
+    assert payload["metadata"]["last_observed_trade_date"] == "2024-07-15"
+    assert payload["metadata"]["variety"] == "CU"
+
+
 def test_futures_storage_persists_contract_bars_mapping_and_calendar(tmp_path):
     config = _research_config(tmp_path)
     storage = FuturesStorageManager(config)

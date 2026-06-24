@@ -1687,6 +1687,14 @@ class FuturesStorageManager:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for item in contracts:
+                existing = conn.execute(
+                    "SELECT metadata_json FROM futures_contracts WHERE contract_id = ?",
+                    (item.contract_id,),
+                ).fetchone()
+                metadata = self._merge_contract_metadata(
+                    _json_loads(existing["metadata_json"], {}) if existing else {},
+                    item.metadata,
+                )
                 conn.execute(
                     """
                     INSERT INTO futures_contracts (
@@ -1729,12 +1737,51 @@ class FuturesStorageManager:
                         1 if item.active else 0,
                         item.source,
                         item.quality_flag,
-                        _json_dumps(item.metadata),
+                        _json_dumps(metadata),
                         now,
                         now,
                     ),
                 )
         return len(contracts)
+
+    @staticmethod
+    def _merge_contract_metadata(
+        existing: Mapping[str, Any],
+        incoming: Mapping[str, Any],
+    ) -> Dict[str, Any]:
+        """Merge contract metadata without losing governance observation windows."""
+        merged: Dict[str, Any] = {**dict(existing or {}), **dict(incoming or {})}
+        existing_first = _date_key_or_none((existing or {}).get("first_observed_trade_date"))
+        incoming_first = _date_key_or_none((incoming or {}).get("first_observed_trade_date"))
+        if existing_first and incoming_first:
+            merged["first_observed_trade_date"] = min(existing_first, incoming_first)
+        elif existing_first or incoming_first:
+            merged["first_observed_trade_date"] = existing_first or incoming_first
+        existing_last = _date_key_or_none((existing or {}).get("last_observed_trade_date"))
+        incoming_last = _date_key_or_none((incoming or {}).get("last_observed_trade_date"))
+        if existing_last and incoming_last:
+            merged["last_observed_trade_date"] = max(existing_last, incoming_last)
+        elif existing_last or incoming_last:
+            merged["last_observed_trade_date"] = existing_last or incoming_last
+        observed_dates = sorted(
+            {
+                date_key
+                for date_key in (
+                    _date_key_or_none(item)
+                    for item in list((existing or {}).get("observed_trade_dates") or [])
+                    + list((incoming or {}).get("observed_trade_dates") or [])
+                )
+                if date_key
+            }
+        )
+        if observed_dates:
+            merged["observed_trade_dates"] = observed_dates
+        existing_warnings = list((existing or {}).get("warnings") or [])
+        incoming_warnings = list((incoming or {}).get("warnings") or [])
+        warnings = list(dict.fromkeys([str(item) for item in existing_warnings + incoming_warnings if str(item)]))
+        if warnings:
+            merged["warnings"] = warnings
+        return merged
 
     def upsert_master_discoveries(self, candidates: Sequence[FuturesMasterDiscoveryCandidate]) -> int:
         now = get_shanghai_time().isoformat()
@@ -2885,6 +2932,32 @@ class FuturesStorageManager:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for bar in bars:
+                if str(bar.source_profile or "") == "exchange_official":
+                    conn.execute(
+                        """
+                        DELETE FROM futures_price_bars
+                        WHERE series_id = ?
+                          AND trade_date = ?
+                          AND source_mode = ?
+                          AND source_profile != 'exchange_official'
+                        """,
+                        (bar.series_id, bar.trade_date, bar.source_mode),
+                    )
+                else:
+                    official_existing = conn.execute(
+                        """
+                        SELECT 1 FROM futures_price_bars
+                        WHERE series_id = ?
+                          AND trade_date = ?
+                          AND source_mode = ?
+                          AND source_profile = 'exchange_official'
+                        LIMIT 1
+                        """,
+                        (bar.series_id, bar.trade_date, bar.source_mode),
+                    ).fetchone()
+                    if official_existing:
+                        unchanged += 1
+                        continue
                 existing = conn.execute(
                     """
                     SELECT raw_payload_hash FROM futures_price_bars
