@@ -3485,6 +3485,19 @@ def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_pat
                     "OPENINTEREST": "300",
                     "TURNOVER": "5678",
                 },
+                {
+                    "PRODUCTGROUPID": "AGEFP",
+                    "PRODUCTNAME": "白银期转现",
+                    "DELIVERYMONTH": "2408",
+                    "OPENPRICE": "1",
+                    "HIGHESTPRICE": "1",
+                    "LOWESTPRICE": "1",
+                    "CLOSEPRICE": "1",
+                    "SETTLEMENTPRICE": "1",
+                    "VOLUME": "1",
+                    "OPENINTEREST": "1",
+                    "TURNOVER": "1",
+                },
             ]
         },
         trade_date="2024-06-03",
@@ -3494,6 +3507,7 @@ def test_official_futures_provider_parses_shfe_and_selects_main_contract(tmp_pat
     artifacts = provider._build_storage_artifacts(series, rows, mode="direct")
     bars = artifacts["series_bars"]
 
+    assert {row.variety for row in rows} == {"CU"}
     assert len(bars) == 1
     assert len(artifacts["contracts"]) == 2
     assert len(artifacts["contract_bars"]) == 2

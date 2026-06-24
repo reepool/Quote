@@ -2338,6 +2338,8 @@ class OfficialFuturesMarketDataProvider:
             if delivery in {"", "小计", "合计"} or "总计" in product_name:
                 continue
             variety = _first_text(row, ("PRODUCTGROUPID", "PRODUCTID")).split("_")[0].upper()
+            if _is_non_futures_shfe_family_row(variety, row):
+                continue
             row_exchange = self._exchange_for_root_symbol(variety, default_exchange=exchange)
             interface = (
                 "official_ine_daily_kx_dat"
@@ -3195,6 +3197,29 @@ def _first_text(row: Mapping[str, Any], keys: Iterable[str]) -> str:
         if value not in (None, ""):
             return str(value).strip()
     return ""
+
+
+def _is_non_futures_shfe_family_row(variety: str, row: Mapping[str, Any]) -> bool:
+    """Filter pseudo rows from SHFE/INE daily payloads before futures governance.
+
+    SHFE-family daily files can include exchange-for-physical rows such as
+    AGEFP/AUEFP with product names containing 期转现. They are not listed futures
+    products and must not be promoted into futures instruments.
+    """
+    variety_key = str(variety or "").upper().strip()
+    if len(variety_key) > 3 and variety_key.endswith("EFP"):
+        return True
+    text = " ".join(
+        str(row.get(key) or "")
+        for key in (
+            "PRODUCTNAME",
+            "PRODUCTGROUPNAME",
+            "INSTRUMENTNAME",
+            "PRODUCTID",
+            "PRODUCTGROUPID",
+        )
+    )
+    return "期转现" in text
 
 
 def _quality_warnings(row: Mapping[str, Any], *, amount_unit: str) -> List[str]:
