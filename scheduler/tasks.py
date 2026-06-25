@@ -1302,7 +1302,28 @@ def _format_futures_market_data_scheduler_report(
             + "\n```"
             + failure_text
         )
-    governance = result.get("trading_day_governance") or result.get("target_date_expansion") or {}
+    governance = dict(result.get("trading_day_governance") or result.get("target_date_expansion") or {})
+    if series_override is not None:
+        target_dates_for_series = set()
+        for item in series:
+            for target_date in item.get("target_trade_dates") or []:
+                target_dates_for_series.add(str(target_date))
+            for date_result in item.get("date_results") or []:
+                if date_result.get("trade_date"):
+                    target_dates_for_series.add(str(date_result.get("trade_date")))
+            lifecycle = item.get("lifecycle") or {}
+            if lifecycle.get("target_start") and lifecycle.get("target_end"):
+                if lifecycle.get("target_start") == lifecycle.get("target_end"):
+                    target_dates_for_series.add(str(lifecycle.get("target_start")))
+        if target_dates_for_series:
+            governance["target_date_count"] = len(target_dates_for_series)
+        if exchange_label:
+            matching_expansions = [
+                expansion for expansion in governance.get("expansions") or []
+                if str(expansion.get("exchange") or "").upper() == exchange_label.upper()
+            ]
+            if matching_expansions:
+                governance["expansions"] = matching_expansions
     actual_calendar_quality = governance.get("lowest_quality")
     if not actual_calendar_quality:
         expansion_qualities = []

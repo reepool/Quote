@@ -256,11 +256,12 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
         },
         "trading_day_governance": {
             "status": "success",
-            "target_date_count": 1,
+            "target_date_count": 4,
             "minimum_quality": "estimated",
             "expansions": [
                 {"exchange": "GFEX", "quality_summary": {"lowest_quality": "backfilled_verified"}},
                 {"exchange": "SHFE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
+                {"exchange": "DCE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
             ],
         },
         "series": [
@@ -269,12 +270,14 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
                 "fetched_rows": 1,
                 "write_result": {"inserted": 1, "would_write_rows": 0},
                 "status": "success",
+                "target_trade_dates": ["2026-06-24"],
             },
             {
                 "series_id": "CNF.CU.SHFE.main",
                 "fetched_rows": 1,
                 "write_result": {"inserted": 1, "would_write_rows": 0},
                 "status": "success",
+                "target_trade_dates": ["2026-06-24"],
             },
             {
                 "series_id": "CNF.BB.DCE.main",
@@ -296,9 +299,11 @@ def test_futures_market_data_report_splits_series_details_by_exchange():
     shfe_report = next(report for report in reports if "exchange/scope: `SHFE`" in report)
     assert "failed: `1`" in dce_report
     assert "provider_empty_on_trading_day: `1`" in dce_report
+    assert "target_trade_dates: `1`" in dce_report
     assert "failed: `0`" in gfex_report
     assert "inserted: `1`" in gfex_report
     assert "provider_empty_on_trading_day: `0`" in gfex_report
+    assert "target_trade_dates: `1`" in gfex_report
     assert "CNF.SI.GFEX.main" in gfex_report
     assert "CNF.CU.SHFE.main" not in gfex_report
     assert "failed: `0`" in shfe_report
