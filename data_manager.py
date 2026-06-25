@@ -10130,6 +10130,7 @@ class DataManager:
 
         admitted_rows: List[Dict[str, Any]] = []
         ambiguous_groups: List[Dict[str, Any]] = []
+        handled_ambiguous_groups: List[Dict[str, Any]] = []
         collapsed_duplicate_rows = 0
         forced_kept_groups = 0
 
@@ -10159,6 +10160,16 @@ class DataManager:
                 forced_kept_groups += 1
                 continue
 
+            handled_group = self._classify_index_duplicate_group(
+                key=key,
+                rows_for_key=rows_for_key,
+                sample_limit=sample_limit,
+            )
+            if handled_group.get('handled'):
+                admitted_rows.extend(handled_group.get('rows') or [])
+                handled_ambiguous_groups.append(handled_group)
+                continue
+
             ambiguous_groups.append({
                 'key': key,
                 'row_count': len(rows_for_key),
@@ -10182,9 +10193,220 @@ class DataManager:
             'rows': admitted_rows,
             'missing_key_count': missing_key_count,
             'ambiguous_groups': ambiguous_groups,
+            'handled_ambiguous_groups': handled_ambiguous_groups,
             'collapsed_duplicate_rows': collapsed_duplicate_rows,
             'forced_kept_groups': forced_kept_groups,
         }
+
+    def _classify_index_duplicate_group(
+        self,
+        *,
+        key: str,
+        rows_for_key: List[Dict[str, Any]],
+        sample_limit: int,
+    ) -> Dict[str, Any]:
+        """Classify official index duplicate keys into deterministic outcomes.
+
+        CNIndex publishes multiple identity namespaces. If a duplicate group can be
+        reduced to one quote-capable row or one metadata-only representative, it is
+        handled and should not become an operator warning.
+        """
+        quote_rows = [
+            row for row in rows_for_key
+            if self._is_quote_capable_index_master_row(row)
+        ]
+        metadata_rows = [
+            row for row in rows_for_key
+            if self._is_metadata_only_index_master_row(row)
+        ]
+        sample_rows = [
+            {
+                'instrument_id': row.get('instrument_id'),
+                'symbol': row.get('symbol'),
+                'name': row.get('name'),
+                'source': row.get('source'),
+                'status': row.get('status'),
+                'szse_quote_code': (row.get('metadata') or {}).get('szse_quote_code'),
+                'cni_code': (row.get('metadata') or {}).get('cni_code'),
+            }
+            for row in rows_for_key[:max(1, min(sample_limit or 5, 5))]
+        ]
+        if len(quote_rows) == 1:
+            return {
+                'handled': True,
+                'key': key,
+                'classification': 'single_quote_capable_identity',
+                'row_count': len(rows_for_key),
+                'rows': [quote_rows[0]],
+                'samples': sample_rows,
+            }
+        if not quote_rows and len(metadata_rows) == len(rows_for_key):
+            # Keep one representative metadata row for auditability. The metadata-only
+            # status keeps it out of tradable daily quote universes.
+            return {
+                'handled': True,
+                'key': key,
+                'classification': 'metadata_only_duplicate_identity',
+                'row_count': len(rows_for_key),
+                'rows': [rows_for_key[-1]],
+                'samples': sample_rows,
+            }
+        return {
+            'handled': False,
+            'key': key,
+            'classification': 'unclassified_duplicate_identity',
+            'row_count': len(rows_for_key),
+            'rows': [],
+            'samples': sample_rows,
+        }
+
+    @staticmethod
+    def _is_metadata_only_index_master_row(row: Dict[str, Any]) -> bool:
+        if str(row.get('type') or '').lower() != 'index':
+            return False
+        status = str(row.get('status') or '').lower()
+        if status == 'metadata_only':
+            return True
+        metadata = row.get('metadata') or {}
+        source = str(row.get('source') or '').lower()
+        if source == 'cnindex' and not metadata.get('szse_quote_code'):
+            return True
+        return row.get('is_active') in (False, 0, '0', 'false', 'False') and row.get('trading_status') in (0, '0', False)
+
+    @staticmethod
+    def _is_quote_capable_index_master_row(row: Dict[str, Any]) -> bool:
+        if str(row.get('type') or '').lower() != 'index':
+            return False
+        if str(row.get('status') or '').lower() in {'metadata_only', 'inactive', 'calculation_terminated'}:
+            return False
+        metadata = row.get('metadata') or {}
+        source = str(row.get('source') or '').lower()
+        instrument_id = str(row.get('instrument_id') or '')
+        if source == 'cnindex':
+            quote_code = str(metadata.get('szse_quote_code') or '')
+            return bool(
+                len(quote_code) == 6
+                and quote_code.isdigit()
+                and instrument_id == f'{quote_code}.SZ'
+            )
+        if source == 'csindex':
+            return instrument_id.upper().endswith(('.SH', '.SZ')) and bool(row.get('admission_evidence'))
+        return row.get('is_active') in (True, 1, '1', 'true', 'True')
+
+    def _csindex_has_active_admission(
+        self,
+        row: Dict[str, Any],
+        *,
+        snapshots_before: Dict[str, Dict[str, Any]],
+        config: Dict[str, Any],
+        local_quote_ids: Optional[Set[str]] = None,
+    ) -> tuple[bool, str]:
+        """Return whether a CSIndex full-list row may enter active quote universe."""
+        instrument_id = str(row.get('instrument_id') or '')
+        symbol = str(row.get('symbol') or row.get('source_symbol') or '')
+        exchange = str(row.get('exchange') or 'SSE').upper()
+        snapshot = snapshots_before.get(exchange) or {}
+        if instrument_id in (snapshot.get('all_ids') or set()):
+            return True, 'local_master_identity'
+        if instrument_id in (local_quote_ids or set()):
+            return True, 'local_quote_history'
+
+        admission = config.get('master_admission') or {}
+        whitelist = set(str(item) for item in (
+            config.get('csindex_active_admission_whitelist')
+            or admission.get('csindex_active_admission_whitelist')
+            or []
+        ))
+        if instrument_id in whitelist or symbol in whitelist:
+            return True, 'configured_whitelist'
+
+        metadata = row.get('metadata') or {}
+        evidence = metadata.get('quote_admission_evidence') or row.get('admission_evidence')
+        if evidence in {'official_recent_quote', 'fallback_recent_quote', 'local_quote_history'}:
+            return True, str(evidence)
+        return False, 'reference_only_no_quote_evidence'
+
+    async def _get_existing_quote_instrument_ids(self, instrument_ids: List[str]) -> Set[str]:
+        """Return instrument IDs with any local quote rows, batched for admission checks."""
+        candidate_ids = sorted({str(item) for item in instrument_ids or [] if item})
+        if not candidate_ids:
+            return set()
+        found_ids: Set[str] = set()
+        chunk_size = 500
+        for offset in range(0, len(candidate_ids), chunk_size):
+            chunk = candidate_ids[offset:offset + chunk_size]
+            params = {f'id_{idx}': instrument_id for idx, instrument_id in enumerate(chunk)}
+            placeholders = ','.join(f':id_{idx}' for idx in range(len(chunk)))
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT DISTINCT instrument_id
+                FROM daily_quotes
+                WHERE instrument_id IN ({placeholders})
+                """,
+                params,
+            )
+            for row in rows or []:
+                if row.get('instrument_id'):
+                    found_ids.add(str(row.get('instrument_id')))
+        return found_ids
+
+    async def _filter_index_rows_colliding_with_stock_ids(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        result: Dict[str, Any],
+        sample_limit: int,
+    ) -> List[Dict[str, Any]]:
+        """Drop index upserts that would overwrite existing stock instrument IDs."""
+        candidate_ids = sorted({
+            str(row.get('instrument_id'))
+            for row in rows or []
+            if str(row.get('type') or '').lower() == 'index' and row.get('instrument_id')
+        })
+        if not candidate_ids:
+            return rows
+
+        stock_ids: Set[str] = set()
+        chunk_size = 200
+        for offset in range(0, len(candidate_ids), chunk_size):
+            chunk = candidate_ids[offset:offset + chunk_size]
+            params = {f'id_{idx}': instrument_id for idx, instrument_id in enumerate(chunk)}
+            placeholders = ','.join(f':id_{idx}' for idx in range(len(chunk)))
+            found = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id
+                FROM instruments
+                WHERE type = 'stock'
+                  AND instrument_id IN ({placeholders})
+                """,
+                params,
+            )
+            for row in found or []:
+                if row.get('instrument_id'):
+                    stock_ids.add(str(row.get('instrument_id')))
+
+        if not stock_ids:
+            return rows
+
+        kept: List[Dict[str, Any]] = []
+        summary = result.setdefault('summary', {})
+        summary['stock_collision_index_rows_skipped'] = (
+            int(summary.get('stock_collision_index_rows_skipped', 0) or 0)
+            + len(stock_ids)
+        )
+        for row in rows:
+            instrument_id = str(row.get('instrument_id') or '')
+            if instrument_id in stock_ids and str(row.get('type') or '').lower() == 'index':
+                if len(summary.setdefault('handled_samples', [])) < sample_limit:
+                    summary['handled_samples'].append({
+                        'instrument_id': instrument_id,
+                        'state': 'stock_collision_skipped',
+                        'source': row.get('source'),
+                        'name': row.get('name'),
+                    })
+                continue
+            kept.append(row)
+        return kept
 
     def _get_instrument_master_force_refresh_job_names(self) -> set[str]:
         """Return job names that must bypass local master freshness reuse."""
@@ -11939,9 +12161,14 @@ class DataManager:
                 'lifecycle_skip_count': 0,
                 'active_count': 0,
                 'ambiguous_master_duplicate_groups_skipped': 0,
+                'handled_ambiguous_master_duplicate_groups': 0,
                 'collapsed_duplicate_master_rows': 0,
+                'csindex_active_admitted_count': 0,
+                'csindex_reference_only_count': 0,
+                'stock_collision_index_rows_skipped': 0,
                 'source_usage': {},
                 'samples': [],
+                'handled_samples': [],
             },
             'warnings': [],
             'errors': [],
@@ -12002,10 +12229,51 @@ class DataManager:
             except Exception as exc:
                 result['warnings'].append(f'cnindex index master fetch failed: {exc}')
 
-        if 'SSE' in sync_exchanges:
-            result['warnings'].append(
-                'CSIndex full-list endpoint is not enabled; SSE/CSI master refresh is diagnostic-only'
-            )
+        csindex_snapshot = None
+        if csindex_source is not None and 'SSE' in sync_exchanges:
+            try:
+                fetch_coro = csindex_source.get_index_master_snapshot()
+                csindex_snapshot = (
+                    await asyncio.wait_for(fetch_coro, timeout=effective_timeout)
+                    if effective_timeout else await fetch_coro
+                )
+                csindex_rows = [
+                    row for row in (csindex_snapshot.rows or [])
+                    if row.get('exchange') in sync_exchanges
+                ]
+                result['summary']['source_usage']['csindex'] = len(csindex_rows)
+                csindex_local_quote_ids = await self._get_existing_quote_instrument_ids([
+                    str(row.get('instrument_id') or '')
+                    for row in csindex_rows
+                ])
+                for row in csindex_rows:
+                    admitted, evidence = self._csindex_has_active_admission(
+                        row,
+                        snapshots_before=snapshots_before,
+                        config=config,
+                        local_quote_ids=csindex_local_quote_ids,
+                    )
+                    if not admitted:
+                        result['summary']['csindex_reference_only_count'] += 1
+                        if len(result['summary']['handled_samples']) < sample_limit:
+                            result['summary']['handled_samples'].append({
+                                'instrument_id': row.get('instrument_id'),
+                                'state': 'csindex_reference_only',
+                                'source': 'csindex',
+                                'reason': evidence,
+                            })
+                        continue
+                    admitted_row = dict(row)
+                    admitted_row['admission_evidence'] = evidence
+                    metadata = dict(admitted_row.get('metadata') or {})
+                    metadata['admission_evidence'] = evidence
+                    admitted_row['metadata'] = metadata
+                    official_rows.append(admitted_row)
+                    result['summary']['csindex_active_admitted_count'] += 1
+            except asyncio.TimeoutError:
+                result['warnings'].append(f'csindex index master fetch timed out after {effective_timeout}s')
+            except Exception as exc:
+                result['warnings'].append(f'csindex index master fetch failed: {exc}')
 
         if official_rows:
             admission_result = self._apply_index_master_admission_rules(
@@ -12020,24 +12288,44 @@ class DataManager:
                 )
             if admission_result['collapsed_duplicate_rows']:
                 result['summary']['collapsed_duplicate_master_rows'] += admission_result['collapsed_duplicate_rows']
+            handled_groups = admission_result.get('handled_ambiguous_groups') or []
+            if handled_groups:
+                result['summary']['handled_ambiguous_master_duplicate_groups'] += len(handled_groups)
+                for group in handled_groups[:sample_limit]:
+                    if len(result['summary']['handled_samples']) >= sample_limit:
+                        break
+                    result['summary']['handled_samples'].append({
+                        'instrument_id': group.get('key'),
+                        'state': 'handled_ambiguous_master_duplicate',
+                        'classification': group.get('classification'),
+                        'row_count': group.get('row_count'),
+                    })
             if ambiguous_groups:
                 result['summary']['ambiguous_master_duplicate_groups_skipped'] += len(ambiguous_groups)
                 sample_ids = ','.join(
                     sorted(str(group['key']) for group in ambiguous_groups)[:sample_limit or 5]
                 )
                 result['warnings'].append(
-                    f'cnindex index master admission skipped {len(ambiguous_groups)} ambiguous duplicate key groups by rule: {sample_ids}'
+                    f'index master admission has {len(ambiguous_groups)} unhandled ambiguous duplicate key groups: {sample_ids}'
                 )
             official_rows = admission_result['rows']
+            official_rows = await self._filter_index_rows_colliding_with_stock_ids(
+                official_rows,
+                result=result,
+                sample_limit=sample_limit,
+            )
             if official_rows:
                 saved = await self.db_ops.save_instruments_batch(official_rows)
                 if saved:
                     result['summary']['master_rows_saved'] += len(official_rows)
                 else:
-                    result['warnings'].append('cnindex index master rows were not saved')
+                    result['warnings'].append('index master rows were not saved')
                 metadata_rows = self._build_index_metadata_rows(
                     official_rows,
-                    raw_snapshot_hash=getattr(cnindex_snapshot, 'raw_snapshot_hash', None),
+                    raw_snapshot_hash=(
+                        getattr(cnindex_snapshot, 'raw_snapshot_hash', None)
+                        or getattr(csindex_snapshot, 'raw_snapshot_hash', None)
+                    ),
                 )
                 result['summary']['metadata_rows_saved'] = await self.db_ops.save_instrument_master_metadata_batch(
                     metadata_rows

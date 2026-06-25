@@ -276,7 +276,7 @@ async def test_index_master_governance_sync_manual_task_runs_without_daily_quote
 
     with patch("scheduler.tasks.data_manager") as dm:
         dm.run_master_governance = AsyncMock(return_value={
-            "status": "warning",
+            "status": "success",
             "summary": {
                 "master_rows_saved": 3,
                 "evidence_rows_saved": 2,
@@ -285,6 +285,8 @@ async def test_index_master_governance_sync_manual_task_runs_without_daily_quote
                 "direct_terminated_count": 1,
                 "inferred_terminated_count": 1,
                 "stale_no_quote_count": 0,
+                "handled_ambiguous_master_duplicate_groups": 2,
+                "csindex_reference_only_count": 4,
                 "samples": [
                     {
                         "instrument_id": "480055.SZ",
@@ -293,7 +295,7 @@ async def test_index_master_governance_sync_manual_task_runs_without_daily_quote
                     }
                 ],
             },
-            "warnings": ["CSIndex full-list endpoint is not enabled"],
+            "warnings": [],
             "errors": [],
         })
 

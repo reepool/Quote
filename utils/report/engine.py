@@ -399,6 +399,19 @@ class ReportEngine:
                 f"stale: {summary.get('stale_no_quote_count', 0)}"
             ),
         ]
+        handled_parts = []
+        if summary.get('handled_ambiguous_master_duplicate_groups'):
+            handled_parts.append(f"歧义已处理: {summary.get('handled_ambiguous_master_duplicate_groups')}")
+        if summary.get('ambiguous_master_duplicate_groups_skipped'):
+            handled_parts.append(f"歧义待复核: {summary.get('ambiguous_master_duplicate_groups_skipped')}")
+        if summary.get('csindex_reference_only_count'):
+            handled_parts.append(f"CSIndex reference-only: {summary.get('csindex_reference_only_count')}")
+        if summary.get('csindex_active_admitted_count'):
+            handled_parts.append(f"CSIndex active: {summary.get('csindex_active_admitted_count')}")
+        if summary.get('stock_collision_index_rows_skipped'):
+            handled_parts.append(f"股票主键保护: {summary.get('stock_collision_index_rows_skipped')}")
+        if handled_parts:
+            lines.append('治理处理: ' + '，'.join(handled_parts))
 
         source_usage = summary.get('source_usage') or {}
         if source_usage:
@@ -426,6 +439,17 @@ class ReportEngine:
             )
         if sample_parts:
             lines.append('样例: ' + '；'.join(sample_parts))
+        handled_samples = summary.get('handled_samples') or []
+        handled_parts = []
+        for sample in handled_samples[:5]:
+            if not isinstance(sample, dict):
+                continue
+            handled_parts.append(
+                f"{sample.get('instrument_id')} {sample.get('state')} "
+                f"{sample.get('classification') or sample.get('reason') or sample.get('source') or ''}".strip()
+            )
+        if handled_parts:
+            lines.append('治理样例: ' + '；'.join(handled_parts))
         return '\n'.join(lines)
 
     def _prepare_gap_report_data(self, data: Dict[str, Any]) -> Dict[str, Any]:

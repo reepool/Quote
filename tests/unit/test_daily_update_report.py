@@ -217,10 +217,15 @@ def test_daily_update_report_uses_stock_child_for_instrument_master_summary():
             'BSE': {'status': 'warning', 'after': {'active_count': 321}},
         },
         'index_master_governance': {
-            'status': 'warning',
+            'status': 'success',
             'scope': 'a_share_index',
-            'summary': {'master_rows_saved': 1300, 'active_count': 668},
-            'warnings': ['CSIndex full-list endpoint is not enabled'],
+            'summary': {
+                'master_rows_saved': 1300,
+                'active_count': 668,
+                'handled_ambiguous_master_duplicate_groups': 36,
+                'csindex_reference_only_count': 10,
+            },
+            'warnings': [],
             'errors': [],
         },
     }
@@ -424,7 +429,7 @@ def test_report_engine_formats_daily_catchup_summary():
 def test_report_engine_formats_index_master_governance_summary_concisely():
     engine = ReportEngine()
     summary = engine._format_index_master_governance_summary({
-        'status': 'warning',
+        'status': 'success',
         'summary': {
             'master_rows_saved': 2,
             'evidence_rows_saved': 2,
@@ -435,7 +440,10 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
             'metadata_only_legacy_deactivated_count': 1,
             'invalid_quote_code_deactivated_count': 1,
             'stale_no_quote_count': 6,
-            'source_usage': {'cnindex': 2},
+            'handled_ambiguous_master_duplicate_groups': 3,
+            'csindex_reference_only_count': 4,
+            'csindex_active_admitted_count': 2,
+            'source_usage': {'cnindex': 2, 'csindex': 6},
             'samples': [
                 {
                     'instrument_id': f'48005{i}.SZ',
@@ -444,17 +452,27 @@ def test_report_engine_formats_index_master_governance_summary_concisely():
                 }
                 for i in range(10)
             ],
+            'handled_samples': [
+                {
+                    'instrument_id': '399264.SZ',
+                    'state': 'handled_ambiguous_master_duplicate',
+                    'classification': 'metadata_only_duplicate_identity',
+                }
+            ],
         },
-        'warnings': ['CSIndex full-list endpoint is not enabled'],
+        'warnings': [],
         'errors': [],
     })
 
-    assert '状态: warning' in summary
+    assert '状态: success' in summary
     assert '停编跳过: 2' in summary
     assert '直接: 1' in summary
     assert '推断: 1' in summary
     assert 'metadata-only: 1' in summary
     assert 'invalid-quote: 1' in summary
+    assert '歧义已处理: 3' in summary
+    assert 'CSIndex reference-only: 4' in summary
+    assert '警告:' not in summary
     assert summary.count('calculation_terminated') == 5
     assert len(summary) < 900
 
@@ -609,7 +627,7 @@ def test_daily_update_report_renders_index_governance_without_exceeding_message_
                     }
                 },
                 'index_master_governance': {
-                    'status': 'warning',
+                    'status': 'success',
                     'summary': {
                         'master_rows_saved': 120,
                         'evidence_rows_saved': 6,
@@ -618,7 +636,9 @@ def test_daily_update_report_renders_index_governance_without_exceeding_message_
                         'direct_terminated_count': 3,
                         'inferred_terminated_count': 3,
                         'stale_no_quote_count': 12,
-                        'source_usage': {'cnindex': 120},
+                        'handled_ambiguous_master_duplicate_groups': 36,
+                        'csindex_reference_only_count': 10,
+                        'source_usage': {'cnindex': 120, 'csindex': 10},
                         'samples': [
                             {
                                 'instrument_id': f'48005{i}.SZ',
@@ -629,7 +649,7 @@ def test_daily_update_report_renders_index_governance_without_exceeding_message_
                             for i in range(20)
                         ],
                     },
-                    'warnings': ['CSIndex full-list endpoint is not enabled'],
+                    'warnings': [],
                     'errors': [],
                 },
             },
@@ -641,6 +661,9 @@ def test_daily_update_report_renders_index_governance_without_exceeding_message_
 
     assert '*指数主数据治理*' in message
     assert message.count('calculation_terminated') == 5
+    assert '歧义已处理: 36' in message
+    assert 'CSIndex reference-only: 10' in message
+    assert 'CSIndex full-list endpoint is not enabled' not in message
     assert 'very/long/evidence/url' not in message
     assert len(message) < 4096
 

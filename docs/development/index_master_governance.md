@@ -20,11 +20,13 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 | 来源 | 定位 | 主要用途 |
 |---|---|---|
 | 国证指数网 `CNIndex` | 深证/国证/CNI 指数官方主源 | 指数列表、详情、公告、PDF 证据、官方日线 |
-| 中证指数官网 `CSIndex` | 中证/SSE/跨市场指数官方主源 | 指数搜索列表、基础信息、官方日线、发布渠道、生命周期公告或详情 |
+| 中证指数官网 `CSIndex` | 中证/SSE/跨市场指数官方源 | 指数搜索列表、基础信息、官方日线、发布渠道、生命周期公告或详情 |
 | BaoStock | 备源/补充源 | 既有指数日线、部分指数基础字段、交叉验证 |
 | AkShare | 备源/补充源 | 指数行情 fallback、当前列表候选和差异预警 |
 
 官方源优先级只适用于其覆盖的指数族。未覆盖、官方接口临时不可用、或官方源只返回到请求区间内最后一个交易日前时，生命周期为 active 的指数仍可继续走 BaoStock/AkShare fallback；不能因为主源为空或返回了 stale 非空结果就直接跳过 active 指数。
+
+CSIndex 的官方日线接口仍作为 SSE/CSI 指数行情优先源；但 CSIndex full-list/search snapshot 不应无条件扩充本地 active universe。CSIndex 覆盖指数较多，其中包含低价值、无本地行情证据、已停更或不适合每日下载的身份。主数据治理应把 CSIndex full-list 作为官方 reference/enrichment source：用于校验、补充和治理本地已有或有行情证据的 SSE/CSI 指数；新指数只有在存在本地历史行情、CSIndex 官方近期日线、可信 fallback 近期行情或配置白名单时，才允许进入 active quote universe。否则保留为 reference-only/metadata-only 结果或 evidence，不触发每日空抓。
 
 ## 生命周期状态
 
@@ -81,6 +83,8 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 - `SZSE index = cnindex -> baostock -> akshare`。CNIndex 覆盖深证/国证指数的官方代码体系，例如 `399001`、`399006`。
 - BaoStock/AkShare 只作 fallback 和差异诊断，不作为生命周期最高证据。
 
+注意：这里的路由规则指“对已进入 active quote universe 的指数如何下载日线”，不是“把官方全量列表全部变成 active”。active quote universe 仍由主数据准入、生命周期治理和行情证据共同决定。
+
 覆盖校验必须使用交易日历，而不是简单比较原始 `end_date`。例如手工在第二天重跑前一交易日、或请求区间结束在周末/节假日时，只要求覆盖 `[start_date,end_date]` 内最后一个交易日；如果区间内没有交易日，则不做 stale 拦截。
 
 已验证的运行特征：CSIndex/CNIndex 官网日线接口小样本响应通常在 0.1-0.3 秒量级；BaoStock 登录和单指数查询显著慢，且可能在网络波动时长时间阻塞。因此官方源可用且覆盖该指数族时应优先用官网作为主源。
@@ -96,7 +100,16 @@ A 股日更当前支持 `instrument_type=index`，但主数据前置治理只覆
 - 如果同一个 canonical key 出现多次，但名称、指数系列、类别、`.CNI`、全称等冲突签名完全一致，视为重复行，可合并。
 - 如果同一个 canonical key 出现多次且冲突签名不同，视为官方代码命名空间歧义，默认跳过该组，并在治理报告 warning 中暴露样例。
 
-这类歧义常见于不重要或当前行情不可得的债券指数，例如官方列表中同一 6 位代码同时对应不同 `.CNI` 和不同指数全称。系统不应把它们强行压成一个 `instrument_id`，否则会污染生命周期、行情和研究引用。CNIndex 官方列表中的 `指数代码` 不是本地行情主键：只有存在 6 位纯数字 `深交所行情代码` 的行才写为行情型 `<行情代码>.SZ` 并进入 active quote universe；没有行情代码或行情代码不是 6 位交易所代码的行写为 `.CNI` 或 `CNI<指数代码>.SZ` 这类 metadata-only 身份，保留官方主数据但不参与每日行情抓取。
+这类歧义常见于不重要或当前行情不可得的债券指数，例如官方列表中同一 6 位代码同时对应不同 `.CNI` 和不同指数全称。系统不应把它们强行压成一个 `instrument_id`，否则会污染生命周期、行情和研究引用。CNIndex 官方列表中的 `指数代码` 不是本地行情主键：只有存在 6 位纯数字 `深交所行情代码` 的行才写为行情型 `<行情代码>.SZ` 并进入 active quote universe；没有行情代码或行情代码不是 6 位交易所代码的行写为 `.CNI` 或 `CNI<指数代码>.SZ` 这类 metadata-only 身份，保留官方主数据但不参与每日行情抓取。若同一候选 key 的多行能按“唯一有效行情代码 + 其他 metadata-only 身份”确定性拆分，该组应计入 handled ambiguous summary，不再作为 warning；只有无法分类的新型冲突才保留 warning。
+
+CSIndex full-list 也必须经过 active admission gate。对本地已存在并具备行情身份的 SSE/CSI 指数，CSIndex 可更新名称、发布方、基础信息和官方来源证据；对本地不存在的新 CSIndex 行，必须满足以下条件之一才可写入 active quote universe：
+
+- 本地已有该代码历史行情或同一身份的 active quote 记录。
+- CSIndex 官方日线接口能返回近期有效行情。
+- BaoStock/AkShare 等 fallback 已证明近期有有效行情。
+- 配置白名单明确要求纳入核心指数集合。
+
+未通过上述条件的 CSIndex 行不得仅凭 full-list 存在写为 active `.SH/.SZ` 指数，可保留为 reference-only/metadata-only 结果或 evidence。
 
 数据库写入层还必须保护股票主数据优先级：当已有 `stock` 行与传入 `index` 行使用相同 `instrument_id` 时，指数行不得覆盖股票行；反向的股票主数据刷新允许修复历史上被指数污染的股票主键。例如 `000001.SZ` 应始终保留为平安银行，CNIndex 的“国证利率债指数”没有深交所行情代码，应作为 metadata-only 指数保存，而不是占用 `000001.SZ`。
 
@@ -132,6 +145,20 @@ CNIndex 官方列表里同时存在“指数代码”和“深交所行情代码
 - 样例：指数代码、名称、状态、最后行情日、生效日、证据 URL。
 - 官方源失败或使用缓存/fallback 时的 warning。
 - active 指数因官方源失败而使用 BaoStock/AkShare 的计数。
+
+报告 warning 必须可行动。以下属于正常治理摘要，不应让每日 A 股日更显示 warning：
+
+- CSIndex full-list 以 reference/admission-gated 模式运行，且没有 active universe 污染。
+- CNIndex ambiguous duplicate groups 已按行情代码、metadata-only 或 evidence-only 规则完全分类。
+- `calculation_terminated` 或 `series_inferred` 指数已在行情抓取前从 `tradable_only` universe 排除。
+- metadata-only 或 invalid quote-code 遗留行已成功停用。
+
+以下情况仍应保留 warning 或 error：
+
+- 官方源拉取、解析或写库失败，且影响 active quote eligibility 判断。
+- CNIndex/CSIndex 出现无法按现有规则分类的新型 ambiguous group。
+- metadata-only、invalid quote-code 或 terminated 指数在治理后仍出现在 active/tradable 日更 universe。
+- 治理失败后按 continuation policy 继续使用本地旧 universe。
 
 Telegram 报告必须保持简洁，只展示汇总和少量样例；详细证据进入 JSON 报告，避免消息超长。
 

@@ -639,12 +639,14 @@
 
 - **`enabled`**: 是否启用指数主数据治理。
 - **`run_before_daily_update`**: 普通日更读取 active universe 前是否运行指数治理。
-- **`official_sources`**: 官方源优先级。当前 `cnindex` 覆盖国证/深证指数清单、公告证据和官方日线；`csindex` 覆盖中证/SSE/跨市场指数搜索列表、基础信息和官方日线。两者官方接口日期格式不同：CNIndex 日线使用 `YYYY-MM-DD`，CSIndex 日线使用 `YYYYMMDD`。
+- **`official_sources`**: 官方源优先级。当前 `cnindex` 覆盖国证/深证指数清单、公告证据和官方日线；`csindex` 覆盖中证/SSE/跨市场指数搜索列表、基础信息和官方日线。两者官方接口日期格式不同：CNIndex 日线使用 `YYYY-MM-DD`，CSIndex 日线使用 `YYYYMMDD`。CSIndex 日线可作为 SSE/CSI active 指数的行情优先源，但 CSIndex full-list/search snapshot 只作为 reference/admission-gated 主数据来源：不会仅凭全量列表存在就把所有 CSIndex 行写入 active 日更 universe。
 - **`stale_no_quote_trading_days`**: 本地最新行情超过该窗口时进入 stale 诊断。默认只报告，不直接写停用。
 - **`write_stale_no_quote`**: 是否把长期无行情指数写成 `stale_no_quote` 并从日更 universe 排除。默认 `false`，避免仅凭行情缺口误杀临时停发或源异常。
 - **`allow_series_inference`**: 是否允许用官方公告直接代码和全收益/价格指数配对关系做保守推断，例如 `980055` 停编且 `480055` 官方行情止于生效日前后时，将 `480055.SZ` 标记为 `series_inferred`。
 - **CNIndex 主键语义**: `指数代码` 不是本地行情主键。只有官方列表提供 6 位纯数字 `深交所行情代码` 时，指数才写入行情型 `<行情代码>.SZ` 并参与日更；没有行情代码或行情代码不是 6 位交易所代码的 CNIndex 行写为 `.CNI` 或 `CNI<指数代码>.SZ` metadata-only 身份，保留主数据但不触发每日行情空抓，也不得覆盖同代码股票。治理前快照或本地已存官方 metadata 证明无行情代码时，同源、同 6 位代码的遗留行情型 key 会被标记为 `status=metadata_only,is_active=0,trading_status=0`；同源、非 6 位 `.SZ` key（如 `39926401.SZ`）也会被标记为 metadata-only，并从 `tradable_only` 日更 universe 排除。`metadata_only` 不是停编结论，而是“无有效交易所行情代码”的 eligibility 状态；若官方后续补充合法行情代码，下一次治理应按新的行情型 key 恢复。
-- **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义，按 `ambiguous_duplicate_action=skip` 跳过，不把多个不同指数压成一个本地主键。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
+- **CSIndex 准入语义**: CSIndex full-list/search snapshot 是 SSE/CSI 官方 reference/enrichment source，不是无门槛 active universe 扩容源。新 CSIndex 行只有在存在本地历史行情、官方近期日线、可信 fallback 近期行情或配置白名单时，才进入 active quote universe；否则只作为 reference-only/metadata-only/evidence 结果，不触发每日行情下载。
+- **股票主键保护**: 股票 `instrument_id` 优先级高于指数。指数治理遇到已有 `type=stock` 的相同 `instrument_id` 时不得覆盖股票行，应转入来源命名空间或 evidence-only 结果；股票治理可修复历史上被指数污染的股票主键。
+- **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义。若冲突组可按“唯一有效行情代码 + metadata-only/evidence-only 身份”确定性分类，应计入 handled ambiguous summary；无法分类的新型冲突才按 warning 暴露。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
 - **`sample_limit`**: Telegram 日报中的指数治理样例数量上限，详细证据保存在 `index_lifecycle_evidence`。
 
 ### 任务前后置依赖配置

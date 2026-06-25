@@ -209,7 +209,7 @@ async def test_orchestrator_dispatches_and_merges_policy_results():
             "action": "index_master_governance",
             "summary": {"exchanges": ["SZSE"], "active_count": 3, "lifecycle_skip_count": 1},
             "exchanges": {"SZSE": {"status": "success"}},
-            "warnings": ["CSIndex full-list endpoint is not enabled"],
+            "warnings": ["index master admission has 1 unhandled ambiguous duplicate key groups"],
             "errors": [],
         },
     )

@@ -67,6 +67,20 @@ class FakeIndexDbOps:
         self.saved_instrument_batches = []
 
     async def execute_read_query(self, query, params=None):
+        if "type = 'stock'" in query:
+            ids = set((params or {}).values())
+            return [
+                {'instrument_id': row['instrument_id']}
+                for row in self.rows.values()
+                if row.get('type') == 'stock' and row.get('instrument_id') in ids
+            ]
+        if "FROM daily_quotes" in query:
+            ids = set((params or {}).values())
+            return [
+                {'instrument_id': instrument_id}
+                for instrument_id in self.latest_quotes
+                if instrument_id in ids
+            ]
         if "status = 'stale_no_quote'" in query:
             return []
         if "instrument_master_metadata" in query:
@@ -226,15 +240,22 @@ class FakeCNIndexSource:
 class FakeSourceFactory:
     def __init__(self):
         self.cnindex = FakeCNIndexSource()
+        self.csindex = None
 
     def get_source_instance(self, base_name, *, exchange=None, region=None):
-        return self.cnindex if base_name == 'cnindex' else None
+        if base_name == 'cnindex':
+            return self.cnindex
+        if base_name == 'csindex':
+            return self.csindex
+        return None
 
 
 @pytest.mark.asyncio
 async def test_index_governance_applies_direct_and_series_inferred_termination():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()
+    manager.data_config['index_master_governance']['exchanges'] = ['SSE', 'SZSE']
+    manager.data_config['index_master_governance']['official_sources'] = ['cnindex', 'csindex']
     manager.db_ops = FakeIndexDbOps()
     manager.source_factory = FakeSourceFactory()
 
@@ -274,10 +295,11 @@ async def test_index_governance_skips_ambiguous_duplicate_official_master_rows()
     result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
 
     written_batch = manager.db_ops.saved_instrument_batches[0]
-    assert 'CNI980055.SZ' not in [row['instrument_id'] for row in written_batch]
-    assert result['summary']['master_rows_saved'] == 1
-    assert result['summary']['ambiguous_master_duplicate_groups_skipped'] == 1
-    assert any('ambiguous duplicate key groups by rule' in warning for warning in result['warnings'])
+    assert 'CNI980055.SZ' in [row['instrument_id'] for row in written_batch]
+    assert result['summary']['master_rows_saved'] == 2
+    assert result['summary']['handled_ambiguous_master_duplicate_groups'] == 1
+    assert result['summary']['ambiguous_master_duplicate_groups_skipped'] == 0
+    assert not any('ambiguous duplicate' in warning for warning in result['warnings'])
 
 
 class LegacyMetadataOnlyCNIndexSource(FakeCNIndexSource):
@@ -423,3 +445,144 @@ async def test_index_governance_deactivates_cnindex_non_six_digit_quote_key():
         and row['diagnostics']['reason'] == 'szse_quote_code_must_be_six_digits'
         for row in manager.db_ops.evidence_rows
     )
+
+
+class FakeCSIndexSource:
+    async def get_index_master_snapshot(self):
+        return SimpleNamespace(
+            rows=[
+                {
+                    'instrument_id': '000300.SH',
+                    'symbol': '000300',
+                    'name': '沪深300',
+                    'exchange': 'SSE',
+                    'type': 'index',
+                    'currency': 'CNY',
+                    'status': 'active',
+                    'is_active': True,
+                    'trading_status': 1,
+                    'source': 'csindex',
+                    'source_symbol': '000300',
+                    'source_url': 'https://example.test/csindex',
+                    'parser_version': 'test',
+                    'metadata': {'publisher': 'CSIndex'},
+                },
+                {
+                    'instrument_id': '930001.SH',
+                    'symbol': '930001',
+                    'name': '无行情参考指数',
+                    'exchange': 'SSE',
+                    'type': 'index',
+                    'currency': 'CNY',
+                    'status': 'active',
+                    'is_active': True,
+                    'trading_status': 1,
+                    'source': 'csindex',
+                    'source_symbol': '930001',
+                    'source_url': 'https://example.test/csindex',
+                    'parser_version': 'test',
+                    'metadata': {'publisher': 'CSIndex'},
+                },
+            ],
+            raw_snapshot_hash='cs-hash',
+        )
+
+
+class EmptyCNIndexSource(FakeCNIndexSource):
+    async def get_index_master_snapshot(self):
+        return SimpleNamespace(rows=[], raw_snapshot_hash='empty')
+
+    async def get_lifecycle_evidence(self):
+        return []
+
+
+@pytest.mark.asyncio
+async def test_csindex_reference_only_rows_do_not_expand_active_universe():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['index_master_governance']['exchanges'] = ['SSE', 'SZSE']
+    manager.data_config['index_master_governance']['official_sources'] = ['cnindex', 'csindex']
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.rows = {
+    }
+    manager.db_ops.latest_quotes = {'000300.SH': datetime(2026, 6, 17)}
+    manager.source_factory = FakeSourceFactory()
+    manager.source_factory.cnindex = EmptyCNIndexSource()
+    manager.source_factory.csindex = FakeCSIndexSource()
+
+    result = await manager.sync_index_master(['SSE'], target_date=date(2026, 6, 18))
+
+    saved_ids = [
+        row['instrument_id']
+        for batch in manager.db_ops.saved_instrument_batches
+        for row in batch
+    ]
+    assert '000300.SH' in saved_ids
+    assert '930001.SH' not in saved_ids
+    assert result['summary']['csindex_active_admitted_count'] == 1
+    assert result['summary']['csindex_reference_only_count'] == 1
+    assert not any('diagnostic-only' in warning for warning in result['warnings'])
+
+
+class StockCollisionCNIndexSource(FakeCNIndexSource):
+    async def get_index_master_snapshot(self):
+        return SimpleNamespace(
+            rows=[
+                {
+                    'instrument_id': '000001.SZ',
+                    'symbol': '000001',
+                    'name': '错误指数身份',
+                    'exchange': 'SZSE',
+                    'type': 'index',
+                    'currency': 'CNY',
+                    'status': 'active',
+                    'is_active': True,
+                    'trading_status': 1,
+                    'source': 'cnindex',
+                    'source_symbol': '000001',
+                    'source_url': 'https://example.test/list.xlsx',
+                    'parser_version': 'test',
+                    'metadata': {
+                        'szse_quote_code': '000001',
+                        'cni_code': 'CNB00001.CNI',
+                    },
+                }
+            ],
+            raw_snapshot_hash='hash',
+        )
+
+    async def get_lifecycle_evidence(self):
+        return []
+
+
+@pytest.mark.asyncio
+async def test_index_governance_does_not_overwrite_stock_instrument_id():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.rows['000001.SZ'] = {
+        'instrument_id': '000001.SZ',
+        'symbol': '000001',
+        'name': '平安银行',
+        'exchange': 'SZSE',
+        'type': 'stock',
+        'status': 'active',
+        'is_active': True,
+        'trading_status': 1,
+        'source': 'szse_official',
+        'updated_at': '2026-06-10T20:00:00',
+    }
+    manager.source_factory = FakeSourceFactory()
+    manager.source_factory.cnindex = StockCollisionCNIndexSource()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 18))
+
+    assert manager.db_ops.rows['000001.SZ']['type'] == 'stock'
+    assert manager.db_ops.rows['000001.SZ']['name'] == '平安银行'
+    assert result['summary']['stock_collision_index_rows_skipped'] == 1
+    saved_ids = [
+        row['instrument_id']
+        for batch in manager.db_ops.saved_instrument_batches
+        for row in batch
+    ]
+    assert '000001.SZ' not in saved_ids
