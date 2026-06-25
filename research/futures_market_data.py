@@ -1008,7 +1008,12 @@ def make_futures_series_id(instrument_id: str, series_type: str = "main_continuo
     return f"{instrument_key}.{suffix}"
 
 
-def infer_contract_month(exchange_contract_code: str) -> str:
+def infer_contract_month(
+    exchange_contract_code: str,
+    *,
+    exchange: Optional[str] = None,
+    trade_date: Optional[str] = None,
+) -> str:
     text = str(exchange_contract_code or "").strip().upper()
     digits = "".join(ch for ch in text if ch.isdigit())
     if len(digits) >= 4:
@@ -1017,6 +1022,21 @@ def infer_contract_month(exchange_contract_code: str) -> str:
         return f"{century + year:04d}-{digits[2:4]}"
     if len(digits) == 3:
         year = int(digits[0])
+        if str(exchange or "").strip().upper() == "CZCE" and trade_date:
+            try:
+                parsed_trade_date = date.fromisoformat(str(trade_date)[:10])
+            except ValueError:
+                parsed_trade_date = None
+            if parsed_trade_date:
+                month = int(digits[1:3])
+                candidates = [2000 + year, 2010 + year, 2020 + year]
+                trade_month_index = parsed_trade_date.year * 12 + parsed_trade_date.month
+
+                def _distance(candidate_year: int) -> int:
+                    return abs((candidate_year * 12 + month) - trade_month_index)
+
+                best_year = min(candidates, key=_distance)
+                return f"{best_year:04d}-{digits[1:3]}"
         return f"202{year}-{digits[1:3]}"
     return ""
 
@@ -5794,8 +5814,16 @@ class FuturesMasterGovernanceService:
                             instrument_id=instrument.instrument_id,
                             exchange=exchange,
                             exchange_contract_code=contract_code,
-                            contract_month=infer_contract_month(contract_code),
-                            delivery_month=infer_contract_month(contract_code),
+                            contract_month=infer_contract_month(
+                                contract_code,
+                                exchange=exchange,
+                                trade_date=trade_date,
+                            ),
+                            delivery_month=infer_contract_month(
+                                contract_code,
+                                exchange=exchange,
+                                trade_date=trade_date,
+                            ),
                             contract_multiplier=contract_multiplier,
                             tick_size=tick_size,
                             currency=instrument.currency,

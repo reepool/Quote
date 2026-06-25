@@ -477,6 +477,15 @@
               "contract_multiplier": 20,
               "tick_size": 1,
               "source_url": "CZCE governed historical product metadata; current FutureDataReferenceData.xml no longer returns LR"
+            },
+            "TC": {
+              "name": "动力煤",
+              "category": "coal",
+              "currency": "CNY",
+              "unit": "CNY/ton",
+              "contract_multiplier": 200,
+              "tick_size": 0.2,
+              "source_url": "CZCE governed historical product metadata; current FutureDataReferenceData.xml no longer returns TC"
             }
           }
         },
