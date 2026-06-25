@@ -684,7 +684,7 @@
       },
       "futures_market_data_sync": {
         "enabled": true,
-        "description": "商品期货行情日线与连续序列同步（当前上线 GFEX、DCE、SHFE、INE；写入 data/futures.db；交易日治理和主数据治理作为前置）",
+        "description": "商品期货行情日线与连续序列同步（当前上线 GFEX、DCE、SHFE、INE、CZCE；写入 data/futures.db；交易日治理和主数据治理作为前置）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -702,13 +702,15 @@
             "gfex_all",
             "dce_all",
             "shfe_all",
-            "ine_all"
+            "ine_all",
+            "czce_all"
           ],
           "exchanges": [
             "GFEX",
             "DCE",
             "SHFE",
-            "INE"
+            "INE",
+            "CZCE"
           ],
           "mode": "direct",
           "dry_run": false,

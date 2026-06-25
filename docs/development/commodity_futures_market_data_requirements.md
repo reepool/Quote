@@ -742,12 +742,12 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 主数据治理还必须维护根品种生命周期。对历史遗留、拆分、退市或长期不再挂牌的品种，不应在行情同步层按具体代码写特殊 skip，而应在 `futures_instruments.metadata.lifecycle` 中记录统一生命周期窗口，例如 `status`、`valid_from`、`valid_to`、`source`、`reason` 和必要的 `lineage`。主数据治理在完成真实合约发现后，必须用本轮 `futures_contracts` 的 `first_observed_trade_date/last_observed_trade_date` 反推根品种观测窗口；若某品种最后观测日早于本轮治理扫描终点，应写入 `observed_inactive` 和明确的 `valid_to`，不能继续保留 `observed_active valid_to=null`。行情同步只消费该生命周期或合约观测窗口。`active` 不直接等同于“当前仍在交易”；为了支持历史回补，历史遗留品种可以继续保留 `active=true` 参与历史研究 universe，但必须通过 lifecycle 阻止下线日之后的数据下载。CZCE `TC`、`LR` 这类历史根品种即应由主数据治理写出截至最后观测日的生命周期，而不是在行情回补中临时 skip。
 
-交易所按“治理完成一个、上线一个”的方式加入日更。GFEX、DCE 和 SHFE 已完成交易日历治理、主数据治理和历史行情回补验证，调度配置应只打开已上线交易所 scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
+交易所按“治理完成一个、上线一个”的方式加入日更。GFEX、DCE、SHFE、INE 和 CZCE 已完成交易日历治理、主数据治理和历史行情回补验证，调度配置应只打开已上线交易所 scope，不应使用 `domestic_all`。推荐在 `config/05_scheduler.json` 中把 `futures_market_data_sync.parameters` 调整为：
 
 ```json
 {
-  "scope_ids": ["gfex_all", "dce_all", "shfe_all"],
-  "exchanges": ["GFEX", "DCE", "SHFE"],
+  "scope_ids": ["gfex_all", "dce_all", "shfe_all", "ine_all", "czce_all"],
+  "exchanges": ["GFEX", "DCE", "SHFE", "INE", "CZCE"],
   "mode": "direct",
   "dry_run": false,
   "requires_trading_calendar_backfill": true,
