@@ -1439,6 +1439,77 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
     if result.get("domain") or not result.get("series"):
         return [_format_futures_market_data_scheduler_report(result)]
     series = result.get("series") or []
+    totals = result.get("totals") or {}
+    master_governance = result.get("master_data_governance") or {}
+    master_counts = master_governance.get("counts") if isinstance(master_governance, dict) else {}
+    master_counts = master_counts or {}
+    normal_success = (
+        str(result.get("status") or "") == "success"
+        and not bool(result.get("dry_run"))
+        and int(totals.get("failed") or 0) == 0
+        and int(totals.get("provider_empty_on_trading_day") or 0) == 0
+        and str((result.get("trading_day_governance") or {}).get("status") or "") == "success"
+        and str(master_governance.get("status") or "success") == "success"
+        and int(master_counts.get("pending") or 0) == 0
+    )
+    if normal_success:
+        groups: Dict[str, List[Dict[str, Any]]] = {}
+        for item in series:
+            groups.setdefault(_futures_series_exchange(item), []).append(item)
+
+        lines = []
+        lifecycle_skipped_total = 0
+        for exchange in sorted(groups):
+            exchange_items = groups[exchange]
+            exchange_totals = {
+                "fetched": 0,
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": 0,
+                "lifecycle_skipped": 0,
+            }
+            for item in exchange_items:
+                exchange_totals["fetched"] += int(item.get("fetched_rows") or 0)
+                if str(item.get("status") or "") == "failed":
+                    exchange_totals["failed"] += 1
+                if str(item.get("status") or "") == "lifecycle_skip":
+                    exchange_totals["lifecycle_skipped"] += 1
+                write_result = item.get("write_result") or {}
+                exchange_totals["inserted"] += int(write_result.get("inserted") or 0)
+                exchange_totals["changed"] += int(write_result.get("changed") or 0)
+                exchange_totals["unchanged"] += int(write_result.get("unchanged") or 0)
+            lifecycle_skipped_total += exchange_totals["lifecycle_skipped"]
+            lines.append(
+                f"{exchange}: 写入 {exchange_totals['inserted']}，"
+                f"更新 {exchange_totals['changed']}，"
+                f"不变 {exchange_totals['unchanged']}，"
+                f"获取 {exchange_totals['fetched']}，"
+                f"跳过 {exchange_totals['lifecycle_skipped']}"
+            )
+        if not lines:
+            lines.append("无交易所明细")
+        governance = result.get("trading_day_governance") or {}
+        return [
+            (
+                "✅ *商品期货行情日更*\n\n"
+                f"状态: `success`\n"
+                f"run_id: `{result.get('run_id', 'N/A')}`\n"
+                f"交易所: `{_futures_result_exchange_label(result)}`\n"
+                f"交易日: `{governance.get('target_date_count', 0)}`\n"
+                f"写入: `{totals.get('inserted', 0)}`｜"
+                f"更新: `{totals.get('changed', 0)}`｜"
+                f"不变: `{totals.get('unchanged', 0)}`｜"
+                f"失败: `{totals.get('failed', 0)}`\n"
+                f"新增品种: `{master_counts.get('auto_promoted', 0)}`｜"
+                f"待确认品种: `{master_counts.get('pending', 0)}`｜"
+                f"生命周期跳过: `{lifecycle_skipped_total}`\n\n"
+                "交易所明细:\n"
+                "```text\n"
+                + "\n".join(lines)
+                + "\n```"
+            )
+        ]
     groups: Dict[str, List[Dict[str, Any]]] = {}
     for item in series:
         groups.setdefault(_futures_series_exchange(item), []).append(item)

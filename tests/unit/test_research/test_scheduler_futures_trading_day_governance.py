@@ -241,6 +241,82 @@ def test_futures_master_discovery_report_includes_config_update_hint():
     assert '"unit": "CNY/ton"' in report
 
 
+def test_futures_market_data_report_uses_compact_summary_for_normal_success():
+    result = {
+        "status": "success",
+        "dry_run": False,
+        "run_id": 43,
+        "scope_selection": {"exchanges": ["GFEX", "DCE"]},
+        "totals": {
+            "inserted": 28,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+            "calendar_skipped": 0,
+            "provider_empty_on_trading_day": 0,
+        },
+        "trading_day_governance": {
+            "status": "success",
+            "target_date_count": 2,
+            "minimum_quality": "backfilled_verified",
+            "expansions": [
+                {"exchange": "GFEX", "quality_summary": {"lowest_quality": "backfilled_verified"}},
+                {"exchange": "DCE", "quality_summary": {"lowest_quality": "backfilled_verified"}},
+            ],
+        },
+        "master_data_governance": {
+            "status": "success",
+            "counts": {"auto_promoted": 0, "pending": 0},
+        },
+        "series": [
+            {
+                "series_id": "CNF.SI.GFEX.main",
+                "fetched_rows": 1,
+                "write_result": {"inserted": 1, "changed": 0, "unchanged": 0},
+                "status": "success",
+                "target_trade_dates": ["2026-06-25"],
+            },
+            {
+                "series_id": "CNF.LC.GFEX.main",
+                "fetched_rows": 1,
+                "write_result": {"inserted": 1, "changed": 0, "unchanged": 0},
+                "status": "success",
+                "target_trade_dates": ["2026-06-25"],
+            },
+            {
+                "series_id": "CNF.A.DCE.main",
+                "fetched_rows": 1,
+                "write_result": {"inserted": 1, "changed": 0, "unchanged": 0},
+                "status": "success",
+                "target_trade_dates": ["2026-06-25"],
+            },
+            {
+                "series_id": "CNF.S.DCE.main",
+                "fetched_rows": 0,
+                "write_result": {"inserted": 0, "changed": 0, "unchanged": 0},
+                "status": "lifecycle_skip",
+                "lifecycle": {
+                    "status": "lifecycle_skip",
+                    "original_target_dates": 1,
+                    "filtered_target_dates": 0,
+                },
+            },
+        ],
+    }
+
+    reports = _format_futures_market_data_scheduler_reports(result)
+
+    assert len(reports) == 1
+    assert "*商品期货行情日更*" in reports[0]
+    assert "交易所: `GFEX,DCE`" in reports[0]
+    assert "写入: `28`" in reports[0]
+    assert "新增品种: `0`" in reports[0]
+    assert "生命周期跳过: `1`" in reports[0]
+    assert "GFEX: 写入 2" in reports[0]
+    assert "DCE: 写入 1" in reports[0]
+    assert "CNF.SI.GFEX.main" not in reports[0]
+
+
 def test_futures_market_data_report_splits_series_details_by_exchange():
     result = {
         "status": "success",
