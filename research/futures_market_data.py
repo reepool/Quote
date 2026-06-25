@@ -6031,6 +6031,25 @@ class FuturesMasterGovernanceService:
                         metadata=dict(row.get("metadata") or {}),
                     )
                     instrument_by_symbol[symbol] = instrument
+                    instruments.append(instrument)
+                    series.append(
+                        FuturesSeries(
+                            series_id=make_futures_series_id(instrument.instrument_id),
+                            instrument_id=instrument.instrument_id,
+                            symbol=f"{instrument.symbol}0",
+                            series_type="main_continuous",
+                            source_profile="akshare_futures",
+                            source="akshare",
+                            source_mode="direct",
+                            source_interface="futures_zh_daily_sina",
+                            construction_method="source_native",
+                            currency=instrument.currency,
+                            unit=instrument.unit,
+                            priority=instrument.priority,
+                            active=True,
+                            metadata={"master_discovery_id": instrument.metadata.get("master_discovery_id")},
+                        )
+                    )
                     remapped_symbols.add(symbol)
                 if remapped_symbols:
                     for trade_date, rows in rows_by_trade_date.items():
@@ -6128,6 +6147,39 @@ class FuturesMasterGovernanceService:
                 len(unmapped_varieties),
             )
         contracts = sorted(contracts_by_id.values(), key=lambda item: item.contract_id)
+        observed_windows_by_instrument: Dict[str, Dict[str, Any]] = {}
+        for contract in contracts:
+            instrument_key = str(contract.instrument_id or "").upper()
+            if not instrument_key:
+                continue
+            metadata = dict(contract.metadata or {})
+            first_observed = _date_key_or_none(metadata.get("first_observed_trade_date"))
+            last_observed = _date_key_or_none(metadata.get("last_observed_trade_date"))
+            window = observed_windows_by_instrument.setdefault(
+                instrument_key,
+                {"valid_from": None, "valid_to": None, "contract_count": 0},
+            )
+            if first_observed and (not window["valid_from"] or first_observed < window["valid_from"]):
+                window["valid_from"] = first_observed
+            if last_observed and (not window["valid_to"] or last_observed > window["valid_to"]):
+                window["valid_to"] = last_observed
+            window["contract_count"] = int(window.get("contract_count") or 0) + 1
+        if observed_windows_by_instrument:
+            updated_instruments: Dict[str, FuturesInstrument] = {}
+            for item in instruments:
+                instrument_key = item.instrument_id.upper()
+                window = observed_windows_by_instrument.get(instrument_key)
+                metadata = dict(item.metadata or {})
+                if window:
+                    metadata = _metadata_with_observed_contract_lifecycle(
+                        metadata,
+                        valid_from=window.get("valid_from"),
+                        valid_to=window.get("valid_to"),
+                        governance_end_date=verified_days[-1] if verified_days else end,
+                        contract_count=int(window.get("contract_count") or 0),
+                    )
+                updated_instruments[instrument_key] = FuturesInstrument(**{**asdict(item), "metadata": metadata})
+            instruments = sorted(updated_instruments.values(), key=lambda item: item.instrument_id)
         result["counts"]["contracts_discovered"] = len(contracts)
         result["contracts"] = [
             {
@@ -7022,6 +7074,55 @@ def _metadata_with_governed_lifecycle(metadata: Mapping[str, Any]) -> Dict[str, 
     return payload
 
 
+def _metadata_with_observed_contract_lifecycle(
+    metadata: Mapping[str, Any],
+    *,
+    valid_from: Optional[str],
+    valid_to: Optional[str],
+    governance_end_date: Optional[str],
+    contract_count: int = 0,
+) -> Dict[str, Any]:
+    payload = dict(metadata or {})
+    observed_from = _date_key_or_none(valid_from)
+    observed_to = _date_key_or_none(valid_to)
+    scan_end = _date_key_or_none(governance_end_date)
+    if not observed_from and not observed_to:
+        return _metadata_with_governed_lifecycle(payload)
+
+    existing_lifecycle = payload.get("lifecycle") if isinstance(payload.get("lifecycle"), Mapping) else {}
+    existing_source = str(existing_lifecycle.get("source") or "") if existing_lifecycle else ""
+    existing_valid_to = _date_key_or_none(existing_lifecycle.get("valid_to")) if existing_lifecycle else None
+    if existing_lifecycle and existing_source not in {
+        "master_discovery_observed_trade_dates",
+        "futures_contracts_observed_window",
+    } and existing_valid_to:
+        return payload
+
+    evidence = payload.get("master_discovery_evidence") if isinstance(payload.get("master_discovery_evidence"), Mapping) else {}
+    lineage = evidence.get("product_lineage") or payload.get("product_lineage") or {}
+    legacy = bool(lineage.get("legacy_product") or payload.get("legacy_product"))
+    inactive = bool(observed_to and scan_end and observed_to < scan_end)
+    status = "legacy_inactive" if legacy else ("observed_inactive" if inactive else "observed_active")
+    payload["lifecycle"] = {
+        "status": status,
+        "valid_from": observed_from,
+        "valid_to": observed_to if (inactive or legacy) else None,
+        "source": "futures_contracts_observed_window",
+        "reason": (
+            "legacy_product_successor_lineage"
+            if legacy
+            else (
+                "no_contract_rows_after_last_observed_in_governance_window"
+                if inactive
+                else "observed_through_governance_window"
+            )
+        ),
+        "observed_trade_date_count": int(contract_count or 0),
+        "lineage": lineage,
+    }
+    return payload
+
+
 def _series_lifecycle_exclusion(
     series: FuturesSeries,
     target_dates: Sequence[str],
@@ -7061,20 +7162,42 @@ def _series_lifecycle_filter(
     instrument_id = str(series.instrument_id).upper()
     instrument = instrument_by_id.get(instrument_id)
     lifecycle = _instrument_lifecycle_from_metadata(dict(instrument.metadata or {})) if instrument else None
-    if not lifecycle and contract_observed_windows:
-        observed_window = contract_observed_windows.get(instrument_id)
-        if observed_window:
-            valid_from = _date_key_or_none(observed_window.get("valid_from"))
-            valid_to = _date_key_or_none(observed_window.get("valid_to"))
-            if valid_from or valid_to:
-                lifecycle = {
-                    "status": str(observed_window.get("status") or "observed_contract_window"),
-                    "valid_from": valid_from,
-                    "valid_to": valid_to,
-                    "source": str(observed_window.get("source") or "futures_contracts_observed_window"),
-                    "reason": str(observed_window.get("reason") or "contract_observed_trade_date_window"),
-                    "contract_count": int(observed_window.get("contract_count") or 0),
-                }
+    observed_window = contract_observed_windows.get(instrument_id) if contract_observed_windows else None
+    observed_lifecycle = None
+    if observed_window:
+        valid_from = _date_key_or_none(observed_window.get("valid_from"))
+        valid_to = _date_key_or_none(observed_window.get("valid_to"))
+        if valid_from or valid_to:
+            observed_lifecycle = {
+                "status": str(observed_window.get("status") or "observed_contract_window"),
+                "valid_from": valid_from,
+                "valid_to": valid_to,
+                "source": str(observed_window.get("source") or "futures_contracts_observed_window"),
+                "reason": str(observed_window.get("reason") or "contract_observed_trade_date_window"),
+                "contract_count": int(observed_window.get("contract_count") or 0),
+            }
+    if not lifecycle and observed_lifecycle:
+        lifecycle = observed_lifecycle
+    elif lifecycle and observed_lifecycle:
+        lifecycle_source = str(lifecycle.get("source") or "")
+        lifecycle_status = str(lifecycle.get("status") or "")
+        lifecycle_valid_to = _date_key_or_none(lifecycle.get("valid_to"))
+        observed_valid_to = _date_key_or_none(observed_lifecycle.get("valid_to"))
+        if (
+            not lifecycle_valid_to
+            and observed_valid_to
+            and lifecycle_source == "master_discovery_observed_trade_dates"
+            and lifecycle_status in {"observed_active", "governed"}
+        ):
+            lifecycle = {
+                **lifecycle,
+                "status": "observed_contract_window",
+                "valid_to": observed_valid_to,
+                "source": observed_lifecycle.get("source"),
+                "reason": "contract_observed_window_refines_open_master_lifecycle",
+                "contract_count": observed_lifecycle.get("contract_count", 0),
+                "metadata_lifecycle": lifecycle,
+            }
     if not lifecycle:
         return list(target_dates), None
 

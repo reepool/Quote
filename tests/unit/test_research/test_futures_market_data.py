@@ -39,6 +39,7 @@ from research.futures_market_data import (
     make_futures_instrument_id,
     make_futures_series_id,
     normalize_provider_bars,
+    _metadata_with_observed_contract_lifecycle,
     _quality_flag,
     _series_lifecycle_exclusion,
     _series_lifecycle_filter,
@@ -402,6 +403,91 @@ def test_futures_market_data_lifecycle_filter_uses_contract_observed_window():
     assert lifecycle["original_target_dates"] == 3
     assert lifecycle["filtered_target_dates"] == 2
     assert lifecycle["instrument_lifecycle"]["source"] == "unit_test_contract_window"
+
+
+def test_futures_market_data_lifecycle_filter_refines_open_master_lifecycle_with_contract_window():
+    instrument = FuturesInstrument(
+        instrument_id="CNF.TC.CZCE",
+        symbol="TC",
+        name="CZCE Historical Thermal Coal",
+        exchange="CZCE",
+        category="coal",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+        metadata={
+            "lifecycle": {
+                "status": "observed_active",
+                "valid_from": "2015-10-15",
+                "valid_to": None,
+                "source": "master_discovery_observed_trade_dates",
+                "reason": "first_observed_from_master_governance",
+            }
+        },
+    )
+    series = FuturesSeries(
+        series_id="CNF.TC.CZCE.main",
+        instrument_id="CNF.TC.CZCE",
+        symbol="TC0",
+        series_type="main_continuous",
+        source_profile="exchange_official",
+        source="exchange_official",
+        source_interface="official_czce_future_data_daily_txt",
+        currency="CNY",
+        unit="CNY/ton",
+        active=True,
+    )
+
+    filtered, lifecycle = _series_lifecycle_filter(
+        series,
+        ["2025-06-24", "2025-06-25"],
+        {"CNF.TC.CZCE": instrument},
+        {
+            "CNF.TC.CZCE": {
+                "valid_from": "2015-10-15",
+                "valid_to": "2016-04-08",
+                "source": "futures_contracts_observed_window",
+                "contract_count": 6,
+            }
+        },
+    )
+
+    assert filtered == []
+    assert lifecycle is not None
+    assert lifecycle["status"] == "lifecycle_skip"
+    assert lifecycle["instrument_lifecycle"]["valid_to"] == "2016-04-08"
+    assert lifecycle["instrument_lifecycle"]["metadata_lifecycle"]["valid_to"] is None
+
+
+def test_master_governance_metadata_lifecycle_uses_observed_contract_window():
+    inactive_metadata = _metadata_with_observed_contract_lifecycle(
+        {
+            "master_discovery_id": "CZCE:TC",
+            "master_discovery_first_seen_trade_date": "2015-10-15",
+            "master_discovery_last_seen_trade_date": "2016-04-08",
+        },
+        valid_from="2015-10-15",
+        valid_to="2016-04-08",
+        governance_end_date="2026-06-23",
+        contract_count=6,
+    )
+    active_metadata = _metadata_with_observed_contract_lifecycle(
+        {
+            "master_discovery_id": "CZCE:TA",
+            "master_discovery_first_seen_trade_date": "2015-10-15",
+            "master_discovery_last_seen_trade_date": "2026-06-23",
+        },
+        valid_from="2015-10-15",
+        valid_to="2026-06-23",
+        governance_end_date="2026-06-23",
+        contract_count=120,
+    )
+
+    assert inactive_metadata["lifecycle"]["status"] == "observed_inactive"
+    assert inactive_metadata["lifecycle"]["valid_to"] == "2016-04-08"
+    assert inactive_metadata["lifecycle"]["reason"] == "no_contract_rows_after_last_observed_in_governance_window"
+    assert active_metadata["lifecycle"]["status"] == "observed_active"
+    assert active_metadata["lifecycle"]["valid_to"] is None
 
 
 def test_gfex_master_governance_blocks_without_verified_calendar(tmp_path):
