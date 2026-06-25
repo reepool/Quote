@@ -82,6 +82,20 @@
         ]
       },
       {
+        "scope_id": "czce_all",
+        "name": "CZCE all categories",
+        "enabled": true,
+        "exchanges": [
+          "CZCE"
+        ],
+        "categories": [
+          "all"
+        ],
+        "series_types": [
+          "main_continuous"
+        ]
+      },
+      {
         "scope_id": "shfe_nonferrous_precious",
         "name": "SHFE nonferrous and precious metals",
         "enabled": true,
