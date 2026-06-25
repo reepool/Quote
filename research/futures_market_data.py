@@ -7579,11 +7579,17 @@ class FuturesMarketDataSyncService:
                 if item.instrument_id
             }
         )
-        governance.bootstrap_estimated_calendar(
-            exchanges=target_exchanges,
-            start_date=start_date,
-            end_date=end_date,
+        market_sync_cfg = self.module_cfg.get("market_data_sync") or {}
+        allow_estimated_calendar_bootstrap = bool(
+            market_sync_cfg.get("allow_estimated_calendar_bootstrap")
+            or market_sync_cfg.get("allow_estimated_calendar_bootstrap_on_write")
         )
+        if allow_estimated_calendar_bootstrap:
+            governance.bootstrap_estimated_calendar(
+                exchanges=target_exchanges,
+                start_date=start_date,
+                end_date=end_date,
+            )
         purpose = "backfill" if start_date and end_date else "sync"
         calendar_expansion = governance.expand_target_dates(
             exchanges=target_exchanges,

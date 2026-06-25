@@ -203,7 +203,7 @@ def test_futures_calendar_and_price_services_report_scope_blockers_before_reques
     assert price["scope_selection"]["blockers"] == ["invalid_futures_scope:missing_scope"]
 
 
-def test_futures_market_data_production_auto_backfills_estimated_calendar_before_provider(monkeypatch, tmp_path):
+def test_futures_market_data_production_repairs_missing_calendar_before_provider(monkeypatch, tmp_path):
     config = _research_config(tmp_path)
     config.modules["commodity_market_data"].update(_scope_module_cfg())
     config.modules["commodity_market_data"]["sources"] = {
@@ -263,6 +263,15 @@ def test_futures_market_data_production_auto_backfills_estimated_calendar_before
     ]
     assert result["trading_day_governance"]["skipped_dates_by_exchange"]["GFEX"] == ["2026-06-20"]
     assert storage.get_price_bars("CNF.SI.GFEX.main") == []
+    assert not [
+        row
+        for row in storage.list_calendar_days(
+            exchange="GFEX",
+            start_date="2026-06-20",
+            end_date="2026-06-20",
+        )
+        if row.get("quality_flag") == "estimated"
+    ]
 
 
 def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails(monkeypatch, tmp_path):
@@ -305,7 +314,8 @@ def test_futures_market_data_production_blocks_when_auto_calendar_backfill_fails
 
     assert result["status"] == "blocked"
     assert result["totals"]["inserted"] == 0
-    assert "calendar_quality_below_threshold:GFEX:estimated<required:backfilled_verified" in result["reason"]
+    assert "calendar_quality_below_threshold:GFEX:missing<required:backfilled_verified" in result["reason"]
+    assert "missing_calendar:GFEX:2026-06-20" in result["reason"]
     assert result["trading_day_governance"]["auto_official_calendar_backfill"]["status"] == "blocked"
 
 
