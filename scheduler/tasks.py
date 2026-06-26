@@ -1541,6 +1541,57 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
     return reports
 
 
+def _format_fx_market_data_scheduler_report(result: Dict[str, Any]) -> str:
+    """Return a compact operator report for FX-domain tasks."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    scope = result.get("scope_selection") or {}
+    totals = result.get("totals") or {}
+    counts = result.get("counts") or {}
+    source_results = result.get("source_results") or []
+    blockers = result.get("blockers") or []
+    warnings = result.get("warnings") or []
+    lines = [
+        f"{icon} *外汇数据维护*",
+        "",
+        f"状态: `{status}` ({label})",
+    ]
+    if result.get("domain"):
+        lines.append(f"域: `{result.get('domain')}`")
+    if result.get("run_id") is not None:
+        lines.append(f"run_id: `{result.get('run_id')}`")
+    if scope:
+        resolved = scope.get("series_ids") or []
+        lines.append(f"序列数: `{len(resolved)}`")
+    if totals:
+        lines.append(
+            "写入统计: "
+            f"新增 `{totals.get('inserted', 0)}`｜"
+            f"更新 `{totals.get('updated', 0)}`｜"
+            f"不变 `{totals.get('unchanged', 0)}`｜"
+            f"缺口 `{totals.get('gaps', 0)}`｜"
+            f"失败 `{totals.get('failed', 0)}`"
+        )
+    if counts:
+        lines.append(
+            "主数据: "
+            + "｜".join(f"{key} `{value}`" for key, value in sorted(counts.items()))
+        )
+    if result.get("rows") is not None:
+        lines.append(f"日历行: `{result.get('rows')}`")
+    if source_results:
+        source_lines = [
+            f"{item.get('source_profile')}: {item.get('status')}"
+            for item in source_results[:8]
+        ]
+        lines.extend(["", "来源:", "```text", "\n".join(source_lines), "```"])
+    if blockers:
+        lines.extend(["", "阻断:", "```text", "\n".join(str(item) for item in blockers[:12]), "```"])
+    if warnings:
+        lines.extend(["", "告警:", "```text", "\n".join(str(item) for item in warnings[:12]), "```"])
+    return "\n".join(lines)
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -3631,6 +3682,266 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('futures_market_data_sync')
+
+    async def fx_master_sync(self, job_config: Optional[JobConfig] = None) -> bool:
+        """外汇主数据治理任务。"""
+        self._active_tasks.add('fx_master_sync')
+        try:
+            result = await data_manager.run_fx_master_sync()
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇主数据治理报告',
+                    'content': _format_fx_market_data_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': sum((result.get("counts") or {}).values()),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_master_sync', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇主数据治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] FX master sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇主数据治理报告',
+                    'content': _format_fx_market_data_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_master_sync', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇主数据治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('fx_master_sync')
+
+    async def fx_calendar_governance(
+        self,
+        source_profiles: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """外汇发布日历治理任务。"""
+        self._active_tasks.add('fx_calendar_governance')
+        try:
+            result = await data_manager.run_fx_calendar_governance(
+                source_profiles=source_profiles,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇发布日历治理报告',
+                    'content': _format_fx_market_data_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int(result.get("rows") or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_calendar_governance', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇发布日历治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] FX calendar governance failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇发布日历治理报告',
+                    'content': _format_fx_market_data_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_calendar_governance', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇发布日历治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('fx_calendar_governance')
+
+    async def fx_rate_sync(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """外汇汇率日更任务。"""
+        self._active_tasks.add('fx_rate_sync')
+        try:
+            result = await data_manager.run_fx_rate_sync(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                series_ids=series_ids,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇汇率数据维护报告',
+                    'content': _format_fx_market_data_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': len((result.get("scope_selection") or {}).get("series_ids") or []),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_rate_sync', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇汇率数据维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] FX rate sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇汇率数据维护报告',
+                    'content': _format_fx_market_data_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_rate_sync', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇汇率数据维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('fx_rate_sync')
+
+    async def fx_rate_backfill(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """外汇汇率历史回补任务，要求显式日期范围。"""
+        if not start_date or not end_date:
+            raise ValueError("fx_rate_backfill requires start_date and end_date")
+        return await self.fx_rate_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+            job_config=job_config,
+        )
+
+    async def fx_derivation_sync(
+        self,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """外汇派生汇率同步任务。"""
+        self._active_tasks.add('fx_derivation_sync')
+        try:
+            result = await data_manager.run_fx_derivation_sync(
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") in {"success", "partial"}
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇派生汇率维护报告',
+                    'content': _format_fx_market_data_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int((result.get("totals") or {}).get("inserted", 0)),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_derivation_sync', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇派生汇率维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] FX derivation sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇派生汇率维护报告',
+                    'content': _format_fx_market_data_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_derivation_sync', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇派生汇率维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('fx_derivation_sync')
+
+    async def fx_quality_check(
+        self,
+        as_of_date: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """外汇数据质量检查任务。"""
+        self._active_tasks.add('fx_quality_check')
+        try:
+            result = await data_manager.run_fx_quality_check(as_of_date=as_of_date)
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇数据质量检查报告',
+                    'content': _format_fx_market_data_scheduler_report(result.get("readiness") or result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int(result.get("issues_recorded") or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_quality_check', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇数据质量检查',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] FX quality check failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '外汇数据质量检查报告',
+                    'content': _format_fx_market_data_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'fx_quality_check', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='外汇数据质量检查',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('fx_quality_check')
 
     async def futures_market_data_backfill(
         self,

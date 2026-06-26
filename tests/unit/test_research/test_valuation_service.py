@@ -1528,6 +1528,35 @@ def test_professional_dcf_assumptions_expose_fallback_missing_and_refresh_diagno
     assert refresh["source_results"][0]["timeout_seconds"] == 3
 
 
+def test_professional_dcf_fx_assumption_override_uses_local_fx_lineage():
+    engine = ProfessionalDcfEngine()
+
+    assumptions = engine.get_assumptions(
+        market="SSE",
+        currency="CNY",
+        overrides={
+            "fx_usd_cny": 7.2,
+            "fx_usd_cny_source": "local_fx_db",
+            "fx_usd_cny_quality_flag": "official",
+            "fx_usd_cny_as_of_date": "2026-06-26",
+            "fx_usd_cny_metadata": {
+                "fx_series_id": "FX.USD_CNY.CFETS.MID.DAILY",
+                "conversion_policy": "direct",
+                "source_policy": "local_fx_db_only",
+            },
+        },
+    )
+
+    fx = assumptions["fx_usd_cny"]
+    assert fx["value"] == 7.2
+    assert fx["source"] == "local_fx_db"
+    assert fx["quality_flag"] == "official"
+    assert fx["fallback_used"] is False
+    assert fx["as_of_date"] == "2026-06-26"
+    assert fx["metadata"]["source_policy"] == "local_fx_db_only"
+    assert fx["lineage_hash"]
+
+
 def test_professional_dcf_missing_required_assumption_returns_structured_blocker():
     service = ResearchValuationService(
         {

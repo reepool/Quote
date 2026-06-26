@@ -340,6 +340,7 @@ class UnifiedConfigManager:
 
             self._config_warnings = []
             self._apply_independent_futures_config(merged_config)
+            self._apply_independent_fx_config(merged_config)
             self._config_data = merged_config
             config_logger.info(f"Configuration loaded and merged from {len(config_files)} files.")
             # 清除类型化缓存
@@ -760,6 +761,43 @@ class UnifiedConfigManager:
             modules["commodity_market_data"] = self._deep_merge_dict(legacy_cfg, futures_cfg)
             return
         modules["commodity_market_data"] = deepcopy(futures_cfg)
+
+    def _apply_independent_fx_config(self, config_data: Dict[str, Any]) -> None:
+        """Mirror standalone fx_config into the research module path.
+
+        FX is a research data domain with its own config file and storage, but
+        runtime callers should use research_config.modules["fx_market_data"] just
+        like futures callers use the commodity-market module bridge.
+        """
+        fx_cfg = config_data.get("fx_config")
+        if not isinstance(fx_cfg, dict):
+            return
+        research_data = config_data.setdefault("research_config", {})
+        if not isinstance(research_data, dict):
+            self._config_warnings.append("research_config is not a dict; fx_config was not merged")
+            config_logger.warning("research_config is not a dict; fx_config was not merged")
+            return
+        modules = research_data.setdefault("modules", {})
+        if not isinstance(modules, dict):
+            self._config_warnings.append("research_config.modules is not a dict; fx_config was not merged")
+            config_logger.warning("research_config.modules is not a dict; fx_config was not merged")
+            return
+        legacy_cfg = modules.get("fx_market_data")
+        if isinstance(legacy_cfg, dict) and legacy_cfg:
+            duplicate_paths = self._find_duplicate_config_paths(legacy_cfg, fx_cfg)
+            warning = (
+                "fx_config duplicates research_config.modules.fx_market_data; "
+                "fx_config values take precedence"
+            )
+            if duplicate_paths:
+                warning = f"{warning}: {', '.join(duplicate_paths[:12])}"
+                if len(duplicate_paths) > 12:
+                    warning = f"{warning}, ..."
+            self._config_warnings.append(warning)
+            config_logger.warning(warning)
+            modules["fx_market_data"] = self._deep_merge_dict(legacy_cfg, fx_cfg)
+            return
+        modules["fx_market_data"] = deepcopy(fx_cfg)
 
     @classmethod
     def _find_duplicate_config_paths(

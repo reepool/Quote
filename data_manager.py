@@ -146,6 +146,7 @@ class DataManager:
         self.source_factory = None
         self.research_storage = None
         self.futures_storage = None
+        self.fx_storage = None
 
         # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
         # TTL = 1 小时, 适用于 API 高频查询场景
@@ -237,6 +238,7 @@ class DataManager:
 
             self._initialize_research_storage()
             self._initialize_futures_storage()
+            self._initialize_fx_storage()
 
             if include_data_sources:
                 # 初始化数据源工厂
@@ -356,6 +358,44 @@ class DataManager:
         if self.futures_storage is None:
             raise RuntimeError("futures storage is not initialized")
         return self.futures_storage
+
+    def _initialize_fx_storage(self) -> None:
+        """Initialize dedicated FX-domain storage when configured."""
+        if not self.research_config.enabled:
+            return
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        if not module_cfg.get("enabled", False):
+            return
+        try:
+            from research.fx_market_data import FxMasterDataService, FxStorageManager
+
+            self.fx_storage = FxStorageManager(self.research_config)
+            self.fx_storage.initialize()
+            FxMasterDataService(self.fx_storage, module_cfg).sync()
+            dm_logger.info(
+                "[DataManager] FX storage initialized: %s",
+                self.fx_storage.db_path,
+            )
+        except Exception as e:
+            dm_logger.warning(
+                "[DataManager] FX storage initialization failed, continuing "
+                "without FX storage: %s",
+                e,
+            )
+            self.fx_storage = None
+
+    def _require_fx_storage(self):
+        """Return FX storage or raise a structured runtime error."""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        if not module_cfg.get("enabled", False):
+            raise RuntimeError("research fx_market_data module is disabled")
+        if self.fx_storage is None:
+            self._initialize_fx_storage()
+        if self.fx_storage is None:
+            raise RuntimeError("FX storage is not initialized")
+        return self.fx_storage
 
     @staticmethod
     def _load_research_storage_state(loader):
@@ -4548,6 +4588,234 @@ class DataManager:
             dry_run=dry_run,
         )
 
+    async def run_fx_master_sync(self) -> Dict[str, Any]:
+        """Seed and refresh FX currencies, instruments, series, manifests, and derivations."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxMasterDataService
+
+        return await asyncio.to_thread(FxMasterDataService(storage, module_cfg).sync)
+
+    async def run_fx_calendar_governance(
+        self,
+        *,
+        source_profiles: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Maintain local FX publication/observation calendar governance."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxCalendarGovernanceService
+
+        return await asyncio.to_thread(
+            FxCalendarGovernanceService(storage, module_cfg).run,
+            source_profiles=source_profiles,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def run_fx_rate_sync(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run FX rate sync into the dedicated FX database."""
+        storage = self._require_fx_storage()
+        from research.fx_market_data import FxRateSyncService
+
+        return await asyncio.to_thread(
+            FxRateSyncService(storage, self.research_config).sync,
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def run_fx_rate_backfill(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run FX historical backfill; requires explicit start/end dates."""
+        if not start_date or not end_date:
+            raise ValueError("fx_rate_backfill requires start_date and end_date")
+        return await self.run_fx_rate_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def run_fx_derivation_sync(
+        self,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Generate configured inverse/cross FX derivations from local observations."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxDerivationService
+
+        return await asyncio.to_thread(
+            FxDerivationService(storage, module_cfg).run,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def run_fx_quality_check(
+        self,
+        *,
+        as_of_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Run FX quality checks and persist local issue records."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxQualityService
+
+        return await asyncio.to_thread(
+            FxQualityService(storage, module_cfg).run,
+            as_of_date=as_of_date,
+        )
+
+    async def get_research_fx_readiness(
+        self,
+        *,
+        as_of_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return FX market-data readiness."""
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        if not self.research_config.enabled:
+            return {
+                "enabled": False,
+                "domain": "fx_market_data",
+                "status": "disabled",
+                "as_of_date": as_of_date or get_shanghai_time().date().isoformat(),
+                "reason": "research_config.enabled is false",
+                "blockers": ["research_config_disabled"],
+                "warnings": [],
+                "coverage": {},
+                "source_profiles": {},
+                "quality_issues": [],
+            }
+        if not module_cfg.get("enabled", False):
+            return {
+                "enabled": False,
+                "domain": "fx_market_data",
+                "status": "disabled",
+                "as_of_date": as_of_date or get_shanghai_time().date().isoformat(),
+                "reason": "research fx_market_data module is disabled",
+                "blockers": ["fx_market_data_disabled"],
+                "warnings": [],
+                "coverage": {},
+                "source_profiles": {},
+                "quality_issues": [],
+            }
+        storage = self._require_fx_storage()
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).readiness,
+            as_of_date=as_of_date,
+        )
+
+    async def get_research_fx_dictionary(self) -> Dict[str, Any]:
+        """Return local FX data dictionary and source metadata."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(FxReadService(storage, module_cfg).dictionary)
+
+    async def get_research_fx_series(self, *, active_only: bool = True) -> Dict[str, Any]:
+        """Return local FX series metadata."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).series,
+            active_only=active_only,
+        )
+
+    async def get_research_fx_rates(
+        self,
+        *,
+        series_id: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Return local FX observations for one series."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).rates,
+            series_id=series_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+
+    async def convert_research_fx_rate(
+        self,
+        *,
+        from_currency: str,
+        to_currency: str,
+        amount: float = 1.0,
+        observation_date: Optional[str] = None,
+        max_lag_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Convert an amount through local FX observations only."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).convert,
+            from_currency=from_currency,
+            to_currency=to_currency,
+            amount=amount,
+            observation_date=observation_date,
+            max_lag_days=max_lag_days,
+        )
+
+    async def get_research_fx_indices(
+        self,
+        *,
+        index_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return local FX currency-index metadata."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).indices,
+            index_id=index_id,
+        )
+
     async def run_futures_trading_day_governance(
         self,
         *,
@@ -6317,6 +6585,24 @@ class DataManager:
             )
             overrides["futures_cycle_context"] = futures_cycle_context
 
+        fx_context = await self._get_dcf_fx_context(
+            valuation_date=overrides.get("valuation_date"),
+            research_mode=research_mode,
+        )
+        if fx_context:
+            for assumption_key, assumption in (fx_context.get("assumptions") or {}).items():
+                if assumption.get("value") is None:
+                    continue
+                overrides[assumption_key] = assumption["value"]
+                overrides[f"{assumption_key}_source"] = assumption.get("source")
+                overrides[f"{assumption_key}_quality_flag"] = assumption.get("quality_flag")
+                overrides[f"{assumption_key}_fallback_used"] = assumption.get("fallback_used", False)
+                overrides[f"{assumption_key}_as_of_date"] = assumption.get("as_of_date")
+                overrides[f"{assumption_key}_last_updated_at"] = assumption.get("last_updated_at")
+                overrides[f"{assumption_key}_lineage_hash"] = assumption.get("lineage_hash")
+                overrides[f"{assumption_key}_metadata"] = assumption.get("metadata") or {}
+            overrides["fx_market_data_context"] = fx_context
+
         cache_key = self._build_dcf_run_cache_key(
             normalized_id,
             financial_bundle,
@@ -6341,8 +6627,68 @@ class DataManager:
             cyclical_diagnostics = result.setdefault("cyclical_model_diagnostics", {})
             if isinstance(cyclical_diagnostics, dict):
                 cyclical_diagnostics["futures_market_data"] = futures_cycle_context
+        if fx_context:
+            result = deepcopy(result)
+            result["fx_market_data"] = fx_context
+            if fx_context.get("blockers"):
+                result.setdefault("warnings", [])
+                for blocker in fx_context.get("blockers") or []:
+                    warning = f"fx_market_data_{blocker}"
+                    if warning not in result["warnings"]:
+                        result["warnings"].append(warning)
         self._store_dcf_run_cache(cache_key, result, module_cfg)
         return result
+
+    async def _get_dcf_fx_context(
+        self,
+        *,
+        valuation_date: Optional[str],
+        research_mode: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """Return local FX assumptions for DCF without remote fetches."""
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        if not module_cfg.get("enabled", False):
+            return {
+                "status": "disabled",
+                "source_policy": "local_fx_db_only",
+                "blockers": ["fx_market_data_disabled"],
+                "warnings": [],
+                "assumptions": {},
+                "research_mode": research_mode,
+            }
+        target_date = str(valuation_date or get_shanghai_time().date().isoformat())[:10]
+        quality_cfg = module_cfg.get("quality") or {}
+        max_lag_days = int(quality_cfg.get("max_stale_observation_days") or 5)
+        assumptions: Dict[str, Dict[str, Any]] = {}
+        blockers: List[str] = []
+        warnings: List[str] = []
+        try:
+            storage = self._require_fx_storage()
+            from research.fx_market_data import FxReadService
+            from research.fx_market_data import build_dcf_fx_context_from_local_service
+
+            service = FxReadService(storage, module_cfg)
+            return await asyncio.to_thread(
+                build_dcf_fx_context_from_local_service,
+                service,
+                module_cfg,
+                valuation_date=target_date,
+                research_mode=research_mode,
+            )
+        except Exception as e:
+            blockers.append("fx_market_data_unavailable")
+            warnings.append(str(e))
+        status = "ready" if not blockers else ("research_fallback_required" if research_mode else "blocked")
+        return {
+            "status": status,
+            "valuation_date": target_date,
+            "source_policy": "local_fx_db_only",
+            "max_lag_days": max_lag_days,
+            "assumptions": assumptions,
+            "blockers": blockers,
+            "warnings": warnings,
+            "research_mode": research_mode,
+        }
 
     async def _get_dcf_futures_cycle_context(
         self,

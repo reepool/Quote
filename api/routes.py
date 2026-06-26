@@ -1417,6 +1417,148 @@ async def get_research_dcf_input_gaps(
 
 
 @router.get(
+    "/research/fx/readiness",
+    response_model=ResearchFxReadinessResponse,
+    tags=["Research"],
+)
+async def get_research_fx_readiness(
+    as_of_date: Optional[str] = Query(None, description="readiness 日期，YYYY-MM-DD"),
+):
+    """读取外汇数据域 readiness。"""
+    try:
+        return await data_manager.get_research_fx_readiness(
+            as_of_date=_query_default(as_of_date),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX readiness: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/fx/dictionary",
+    response_model=ResearchFxDictionaryResponse,
+    tags=["Research"],
+)
+async def get_research_fx_dictionary():
+    """读取外汇数据字典、来源和派生规则。"""
+    try:
+        return await data_manager.get_research_fx_dictionary()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX dictionary: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/fx/series",
+    response_model=ResearchFxSeriesResponse,
+    tags=["Research"],
+)
+async def get_research_fx_series(
+    active_only: bool = Query(True, description="是否只返回启用序列"),
+):
+    """读取外汇序列元数据。"""
+    try:
+        return await data_manager.get_research_fx_series(
+            active_only=bool(_query_default(active_only, True)),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX series: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/fx/rates",
+    response_model=ResearchFxRatesResponse,
+    tags=["Research"],
+)
+async def get_research_fx_rates(
+    series_id: str = Query(..., description="FX series_id"),
+    start_date: Optional[str] = Query(None, description="开始日期 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="结束日期 YYYY-MM-DD"),
+    limit: Optional[int] = Query(None, description="最大返回行数", ge=1, le=10000),
+):
+    """读取本地外汇观测值。"""
+    try:
+        return await data_manager.get_research_fx_rates(
+            series_id=str(_query_default(series_id)),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+            limit=_query_default(limit),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX rates: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/fx/convert",
+    response_model=ResearchFxConversionResponse,
+    tags=["Research"],
+)
+async def convert_research_fx_rate(
+    from_currency: str = Query(..., description="源币种"),
+    to_currency: str = Query(..., description="目标币种"),
+    date: Optional[str] = Query(None, description="换算日期 YYYY-MM-DD"),
+    amount: float = Query(1.0, description="源币种金额"),
+    max_lag_days: Optional[int] = Query(None, description="最大允许滞后自然日"),
+):
+    """使用本地外汇数据进行币种换算。"""
+    try:
+        return await data_manager.convert_research_fx_rate(
+            from_currency=str(_query_default(from_currency)),
+            to_currency=str(_query_default(to_currency)),
+            amount=float(_query_default(amount, 1.0)),
+            observation_date=_query_default(date),
+            max_lag_days=_query_default(max_lag_days),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to convert research FX rate: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/fx/indices",
+    response_model=ResearchFxIndicesResponse,
+    tags=["Research"],
+)
+async def get_research_fx_indices(
+    index_id: Optional[str] = Query(None, description="FX index instrument_id"),
+):
+    """读取外汇指数元数据。"""
+    try:
+        return await data_manager.get_research_fx_indices(
+            index_id=_query_default(index_id),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX indices: {str(e)}",
+        )
+
+
+@router.get(
     "/research/futures/readiness",
     response_model=Dict[str, Any],
     tags=["Research"],
@@ -1438,14 +1580,25 @@ async def get_research_futures_readiness(
             return items or None
 
         exchange_value = _query_default(exchange)
-        return await data_manager.get_research_futures_readiness(
-            scope_id=_query_default(scope_id),
-            exchanges=[exchange_value] if exchange_value else None,
-            categories=_csv(_query_default(categories)),
-            instrument_ids=_csv(_query_default(instrument_ids)),
-            series_ids=_csv(_query_default(series_ids)),
-            series_types=_csv(_query_default(series_types)),
-        )
+        kwargs: Dict[str, Any] = {}
+        scope_value = _query_default(scope_id)
+        if scope_value:
+            kwargs["scope_id"] = scope_value
+        if exchange_value:
+            kwargs["exchanges"] = [exchange_value]
+        categories_value = _csv(_query_default(categories))
+        if categories_value:
+            kwargs["categories"] = categories_value
+        instrument_ids_value = _csv(_query_default(instrument_ids))
+        if instrument_ids_value:
+            kwargs["instrument_ids"] = instrument_ids_value
+        series_ids_value = _csv(_query_default(series_ids))
+        if series_ids_value:
+            kwargs["series_ids"] = series_ids_value
+        series_types_value = _csv(_query_default(series_types))
+        if series_types_value:
+            kwargs["series_types"] = series_types_value
+        return await data_manager.get_research_futures_readiness(**kwargs)
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:

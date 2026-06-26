@@ -2287,3 +2287,114 @@ class ResearchTechnicalIndicatorsResponse(BaseModel):
         ...,
         description="技术指标时间序列",
     )
+
+
+class ResearchFxDictionaryResponse(BaseModel):
+    """研究域外汇数据字典响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    currencies: List[Dict[str, Any]] = Field(default_factory=list, description="货币主数据")
+    instruments: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="货币对、指数等外汇工具主数据，包含报价方向和 quote_multiplier",
+    )
+    series: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="外汇序列元数据，包含 source_profile、rate_type 和频率",
+    )
+    source_manifests: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="来源清单、质量标签和门禁状态",
+    )
+    derivations: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="交叉汇率、反向汇率等派生规则和 lineage",
+    )
+    storage: Optional[Dict[str, Any]] = Field(None, description="本地存储信息")
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchFxSeriesResponse(BaseModel):
+    """研究域外汇序列响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    active_only: bool = Field(..., description="是否只返回启用序列")
+    series: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="外汇序列列表，包含 quote_direction、source_profile 和质量策略",
+    )
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchFxRatesResponse(BaseModel):
+    """研究域外汇观测值响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    series_id: str = Field(..., description="外汇序列ID")
+    observations: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="观测值，包含 fx_date、value、source_profile、quality_flag 和 lineage",
+    )
+    count: int = Field(..., description="返回观测值数量")
+    start_date: Optional[str] = Field(None, description="请求起始日期")
+    end_date: Optional[str] = Field(None, description="请求结束日期")
+    limit: Optional[int] = Field(None, description="请求返回上限")
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchFxConversionResponse(BaseModel):
+    """研究域本地外汇换算响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    success: bool = Field(..., description="是否成功换算")
+    from_currency: str = Field(..., description="源币种")
+    to_currency: str = Field(..., description="目标币种")
+    amount: float = Field(..., description="源币种金额")
+    converted_amount: Optional[float] = Field(None, description="目标币种金额")
+    rate: Optional[float] = Field(None, description="换算汇率")
+    fx_date: Optional[str] = Field(None, description="使用的外汇观测日期")
+    conversion_policy: Optional[str] = Field(None, description="直接、反向或派生换算策略")
+    source_profile: Optional[str] = Field(None, description="来源口径")
+    quality_flag: Optional[str] = Field(None, description="质量标记")
+    lineage_hash: Optional[str] = Field(None, description="来源或派生 lineage 哈希")
+    blockers: List[str] = Field(default_factory=list, description="阻断原因")
+    warnings: List[str] = Field(default_factory=list, description="结构化告警")
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchFxIndicesResponse(BaseModel):
+    """研究域外汇指数响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    indices: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="美元指数、贸易加权美元等 currency_index 元数据",
+    )
+    index_id: Optional[str] = Field(None, description="请求的指数ID")
+
+    class Config:
+        extra = "allow"
+
+
+class ResearchFxReadinessResponse(BaseModel):
+    """研究域外汇数据 readiness 响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    as_of_date: str = Field(..., description="readiness 评估日期")
+    status: str = Field(..., description="readiness 状态")
+    blockers: List[str] = Field(default_factory=list, description="阻断原因")
+    warnings: List[str] = Field(default_factory=list, description="告警")
+    coverage: Dict[str, Any] = Field(default_factory=dict, description="覆盖度摘要")
+    source_profiles: Dict[str, Any] = Field(default_factory=dict, description="来源状态")
+    quality_issues: List[Dict[str, Any]] = Field(default_factory=list, description="质量问题")
+
+    class Config:
+        extra = "allow"

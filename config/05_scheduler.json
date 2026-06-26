@@ -572,6 +572,91 @@
           "note": "Historical backfill can be large; keep disabled by default and run explicit date ranges via ops script or Telegram command."
         }
       },
+      "fx_master_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "外汇主数据同步（货币、货币对、序列、来源清单和派生规则，写入 data/fx.db）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "max_runtime_seconds": 600
+        }
+      },
+      "fx_calendar_governance": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "外汇发布日历治理（默认 dry_run，区分预期不发布日和来源缺口）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "dry_run": true,
+          "max_runtime_seconds": 600
+        }
+      },
+      "fx_rate_sync": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "外汇日频汇率同步（默认禁用并 dry_run；未验证 live adapter 会结构化阻断）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_id": "rmb_core",
+          "dry_run": true,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "fx_rate_backfill": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "外汇历史汇率回补（需要显式 start_date/end_date，默认 dry_run）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_id": "rmb_core",
+          "dry_run": true,
+          "max_runtime_seconds": 7200,
+          "note": "Historical FX backfill must be run with explicit start_date/end_date and reviewed source profiles."
+        }
+      },
+      "fx_derivation_sync": {
+        "enabled": false,
+        "manual_only": true,
+        "description": "外汇交叉汇率和反向汇率派生同步（只读本地 data/fx.db 基础序列）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "dry_run": true,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "fx_quality_check": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "外汇质量检查与 readiness 快照（缺失、过期、异常跳变、来源冲突、派生缺口）",
+        "report": true,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "max_runtime_seconds": 600
+        }
+      },
       "futures_trading_day_governance": {
         "enabled": false,
         "description": "商品期货交易日治理前置任务（维护交易所日历、公告证据、人工复核状态和目标交易日集合）",

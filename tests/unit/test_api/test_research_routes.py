@@ -61,6 +61,12 @@ from api.routes import (
     get_research_financial_statements_history,
     get_research_financial_statements_readiness,
     get_research_financial_summary,
+    convert_research_fx_rate,
+    get_research_fx_dictionary,
+    get_research_fx_indices,
+    get_research_fx_rates,
+    get_research_fx_readiness,
+    get_research_fx_series,
     get_research_futures_calendar,
     get_research_futures_calendar_evidence,
     get_research_futures_contract_prices,
@@ -3451,6 +3457,76 @@ class TestResearchRoutes:
             event_types=None,
             limit=50,
             include_details=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_research_fx_routes_success(self, mock_dm):
+        mock_dm.get_research_fx_dictionary = AsyncMock(
+            return_value={"status": "success", "currencies": [{"currency_code": "USD"}]}
+        )
+        mock_dm.get_research_fx_series = AsyncMock(
+            return_value={"status": "success", "series": [{"series_id": "FX.USD_CNY.CFETS.MID.DAILY"}]}
+        )
+        mock_dm.get_research_fx_rates = AsyncMock(
+            return_value={"status": "success", "observations": [{"value": 7.2}]}
+        )
+        mock_dm.convert_research_fx_rate = AsyncMock(
+            return_value={"status": "success", "converted_amount": 720.0}
+        )
+        mock_dm.get_research_fx_indices = AsyncMock(
+            return_value={"status": "success", "series": [{"series_id": "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"}]}
+        )
+        mock_dm.get_research_fx_readiness = AsyncMock(
+            return_value={"status": "blocked", "blockers": ["missing_or_stale_fx_series:FX.USD_CNY.CFETS.MID.DAILY"]}
+        )
+
+        dictionary = _run(get_research_fx_dictionary())
+        series = _run(get_research_fx_series(active_only=True))
+        rates = _run(
+            get_research_fx_rates(
+                series_id="FX.USD_CNY.CFETS.MID.DAILY",
+                start_date="2026-06-01",
+                end_date="2026-06-26",
+                limit=10,
+            )
+        )
+        converted = _run(
+            convert_research_fx_rate(
+                from_currency="USD",
+                to_currency="CNY",
+                date="2026-06-26",
+                amount=100.0,
+                max_lag_days=2,
+            )
+        )
+        indices = _run(get_research_fx_indices(index_id="FXI.USD_TRADE_WEIGHTED"))
+        readiness = _run(get_research_fx_readiness(as_of_date="2026-06-26"))
+
+        assert dictionary["currencies"][0]["currency_code"] == "USD"
+        assert series["series"][0]["series_id"] == "FX.USD_CNY.CFETS.MID.DAILY"
+        assert rates["observations"][0]["value"] == 7.2
+        assert converted["converted_amount"] == 720.0
+        assert indices["series"][0]["series_id"] == "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"
+        assert readiness["status"] == "blocked"
+        mock_dm.get_research_fx_series.assert_awaited_once_with(active_only=True)
+        mock_dm.get_research_fx_rates.assert_awaited_once_with(
+            series_id="FX.USD_CNY.CFETS.MID.DAILY",
+            start_date="2026-06-01",
+            end_date="2026-06-26",
+            limit=10,
+        )
+        mock_dm.convert_research_fx_rate.assert_awaited_once_with(
+            from_currency="USD",
+            to_currency="CNY",
+            amount=100.0,
+            observation_date="2026-06-26",
+            max_lag_days=2,
+        )
+        mock_dm.get_research_fx_indices.assert_awaited_once_with(
+            index_id="FXI.USD_TRADE_WEIGHTED"
+        )
+        mock_dm.get_research_fx_readiness.assert_awaited_once_with(
+            as_of_date="2026-06-26"
         )
 
     @patch("api.routes.data_manager")

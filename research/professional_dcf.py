@@ -683,6 +683,26 @@ class ProfessionalDcfEngine:
                 }
             )
             assumptions["equity_risk_premium"] = self._assumption_to_dict(erp)
+        for fx_key in ("fx_usd_cny", "fx_hkd_cny"):
+            if overrides.get(fx_key) is None:
+                continue
+            fx_assumption = deepcopy(assumptions.get(fx_key, {}))
+            fx_assumption.update(
+                {
+                    "value": float(overrides[fx_key]),
+                    "source": overrides.get(f"{fx_key}_source", "local_fx_db"),
+                    "quality_flag": overrides.get(f"{fx_key}_quality_flag", "local_fx"),
+                    "fallback_used": bool(overrides.get(f"{fx_key}_fallback_used", False)),
+                    "as_of_date": overrides.get(f"{fx_key}_as_of_date") or fx_assumption.get("as_of_date"),
+                    "last_updated_at": overrides.get(f"{fx_key}_last_updated_at") or fx_assumption.get("last_updated_at"),
+                    "lineage_hash": overrides.get(f"{fx_key}_lineage_hash") or fx_assumption.get("lineage_hash"),
+                    "metadata": {
+                        **dict(fx_assumption.get("metadata") or {}),
+                        **dict(overrides.get(f"{fx_key}_metadata") or {}),
+                    },
+                }
+            )
+            assumptions[fx_key] = self._assumption_to_dict(fx_assumption)
 
         return {
             "risk_free_rate": assumptions[risk_key],

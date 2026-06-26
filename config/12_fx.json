@@ -1,0 +1,405 @@
+{
+  "fx_config": {
+    "enabled": true,
+    "storage": {
+      "database": "data/fx.db"
+    },
+    "universe": {
+      "default_scope_id": "rmb_core",
+      "default_frequency": "daily"
+    },
+    "download_scopes": [
+      {
+        "scope_id": "rmb_core",
+        "name": "First-phase RMB FX and dollar-index coverage",
+        "enabled": true,
+        "currencies": [
+          "CNY",
+          "CNH",
+          "USD",
+          "EUR",
+          "JPY"
+        ],
+        "instrument_types": [
+          "currency_pair",
+          "currency_index"
+        ],
+        "market_scopes": [
+          "onshore",
+          "offshore",
+          "global",
+          "derived"
+        ],
+        "series_ids": [
+          "FX.USD_CNY.CFETS.MID.DAILY",
+          "FX.EUR_CNY.CFETS.MID.DAILY",
+          "FX.JPY_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNH.MARKET.SPOT.DAILY",
+          "FX.EUR_CNH.DERIVED.DAILY",
+          "FX.JPY_CNH.DERIVED.DAILY",
+          "FXI.DXY.ICE.DAILY",
+          "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"
+        ],
+        "rate_types": [
+          "mid",
+          "spot",
+          "derived_cross",
+          "index_close"
+        ],
+        "frequencies": [
+          "daily"
+        ]
+      }
+    ],
+    "currencies": [
+      {
+        "currency_code": "CNY",
+        "name": "Chinese Yuan Onshore",
+        "country_or_region": "Mainland China",
+        "currency_type": "fiat",
+        "central_bank": "PBOC",
+        "active": true
+      },
+      {
+        "currency_code": "CNH",
+        "name": "Chinese Yuan Offshore",
+        "country_or_region": "Offshore RMB",
+        "currency_type": "offshore_fiat",
+        "central_bank": "PBOC",
+        "active": true,
+        "metadata": {
+          "primary_market": "Hong Kong offshore RMB market"
+        }
+      },
+      {
+        "currency_code": "USD",
+        "name": "US Dollar",
+        "country_or_region": "United States",
+        "currency_type": "fiat",
+        "central_bank": "Federal Reserve",
+        "active": true
+      },
+      {
+        "currency_code": "EUR",
+        "name": "Euro",
+        "country_or_region": "Euro Area",
+        "currency_type": "fiat",
+        "central_bank": "ECB",
+        "active": true
+      },
+      {
+        "currency_code": "JPY",
+        "name": "Japanese Yen",
+        "country_or_region": "Japan",
+        "currency_type": "fiat",
+        "central_bank": "Bank of Japan",
+        "active": true
+      }
+    ],
+    "instruments": [
+      {
+        "instrument_id": "FX.USD_CNY",
+        "instrument_type": "currency_pair",
+        "base_currency": "USD",
+        "quote_currency": "CNY",
+        "quote_multiplier": 1,
+        "market_scope": "onshore",
+        "category": "rmb",
+        "active": true
+      },
+      {
+        "instrument_id": "FX.EUR_CNY",
+        "instrument_type": "currency_pair",
+        "base_currency": "EUR",
+        "quote_currency": "CNY",
+        "quote_multiplier": 1,
+        "market_scope": "onshore",
+        "category": "rmb",
+        "active": true
+      },
+      {
+        "instrument_id": "FX.JPY_CNY",
+        "instrument_type": "currency_pair",
+        "base_currency": "JPY",
+        "quote_currency": "CNY",
+        "quote_multiplier": 100,
+        "market_scope": "onshore",
+        "category": "rmb",
+        "active": true,
+        "metadata": {
+          "quote_unit_note": "Official RMB fixing is commonly quoted as 100 JPY equals CNY amount."
+        }
+      },
+      {
+        "instrument_id": "FX.USD_CNH",
+        "instrument_type": "currency_pair",
+        "base_currency": "USD",
+        "quote_currency": "CNH",
+        "quote_multiplier": 1,
+        "market_scope": "offshore",
+        "category": "rmb",
+        "active": true
+      },
+      {
+        "instrument_id": "FX.EUR_CNH",
+        "instrument_type": "currency_pair",
+        "base_currency": "EUR",
+        "quote_currency": "CNH",
+        "quote_multiplier": 1,
+        "market_scope": "derived",
+        "category": "cross_rate",
+        "active": true
+      },
+      {
+        "instrument_id": "FX.JPY_CNH",
+        "instrument_type": "currency_pair",
+        "base_currency": "JPY",
+        "quote_currency": "CNH",
+        "quote_multiplier": 100,
+        "market_scope": "derived",
+        "category": "cross_rate",
+        "active": true
+      },
+      {
+        "instrument_id": "FXI.DXY",
+        "instrument_type": "currency_index",
+        "base_currency": "USD",
+        "quote_currency": "",
+        "quote_multiplier": 1,
+        "market_scope": "global",
+        "category": "dollar_index",
+        "active": true
+      },
+      {
+        "instrument_id": "FXI.USD_TRADE_WEIGHTED",
+        "instrument_type": "currency_index",
+        "base_currency": "USD",
+        "quote_currency": "",
+        "quote_multiplier": 1,
+        "market_scope": "global",
+        "category": "dollar_index",
+        "active": true
+      }
+    ],
+    "series": [
+      {
+        "series_id": "FX.USD_CNY.CFETS.MID.DAILY",
+        "instrument_id": "FX.USD_CNY",
+        "source_profile": "cfets_rmb_fixing",
+        "rate_type": "mid",
+        "frequency": "daily",
+        "timezone": "Asia/Shanghai",
+        "publication_lag": "same_day",
+        "quality_policy": "official_required",
+        "active": true
+      },
+      {
+        "series_id": "FX.EUR_CNY.CFETS.MID.DAILY",
+        "instrument_id": "FX.EUR_CNY",
+        "source_profile": "cfets_rmb_fixing",
+        "rate_type": "mid",
+        "frequency": "daily",
+        "timezone": "Asia/Shanghai",
+        "publication_lag": "same_day",
+        "quality_policy": "official_required",
+        "active": true
+      },
+      {
+        "series_id": "FX.JPY_CNY.CFETS.MID.DAILY",
+        "instrument_id": "FX.JPY_CNY",
+        "source_profile": "cfets_rmb_fixing",
+        "rate_type": "mid",
+        "frequency": "daily",
+        "timezone": "Asia/Shanghai",
+        "publication_lag": "same_day",
+        "quality_policy": "official_required",
+        "active": true
+      },
+      {
+        "series_id": "FX.USD_CNH.MARKET.SPOT.DAILY",
+        "instrument_id": "FX.USD_CNH",
+        "source_profile": "cnh_market_aggregated_public",
+        "rate_type": "spot",
+        "frequency": "daily",
+        "timezone": "Asia/Hong_Kong",
+        "publication_lag": "same_day",
+        "quality_policy": "aggregated_public_allowed",
+        "active": true
+      },
+      {
+        "series_id": "FX.EUR_CNH.DERIVED.DAILY",
+        "instrument_id": "FX.EUR_CNH",
+        "source_profile": "fx_derived_cross",
+        "rate_type": "derived_cross",
+        "frequency": "daily",
+        "timezone": "Asia/Hong_Kong",
+        "publication_lag": "same_day",
+        "quality_policy": "derived_from_governed_sources",
+        "active": true
+      },
+      {
+        "series_id": "FX.JPY_CNH.DERIVED.DAILY",
+        "instrument_id": "FX.JPY_CNH",
+        "source_profile": "fx_derived_cross",
+        "rate_type": "derived_cross",
+        "frequency": "daily",
+        "timezone": "Asia/Hong_Kong",
+        "publication_lag": "same_day",
+        "quality_policy": "derived_from_governed_sources",
+        "active": true
+      },
+      {
+        "series_id": "FXI.DXY.ICE.DAILY",
+        "instrument_id": "FXI.DXY",
+        "source_profile": "ice_dxy_official",
+        "rate_type": "index_close",
+        "frequency": "daily",
+        "timezone": "America/New_York",
+        "publication_lag": "same_day",
+        "quality_policy": "official_access_required",
+        "active": false,
+        "metadata": {
+          "disabled_reason": "Free automated historical access and licensing are not verified."
+        }
+      },
+      {
+        "series_id": "FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+        "instrument_id": "FXI.USD_TRADE_WEIGHTED",
+        "source_profile": "fred_trade_weighted_dollar",
+        "rate_type": "index_close",
+        "frequency": "daily",
+        "timezone": "America/New_York",
+        "publication_lag": "next_business_day",
+        "quality_policy": "official_public_dataset",
+        "active": true
+      }
+    ],
+    "sources": {
+      "preferred_order": [
+        "cfets_rmb_fixing",
+        "fred_trade_weighted_dollar",
+        "ecb_reference_rates",
+        "cnh_market_aggregated_public",
+        "manual_verified"
+      ],
+      "cfets_rmb_fixing": {
+        "enabled": true,
+        "source": "cfets",
+        "source_type": "official",
+        "source_mode": "direct",
+        "role": "rmb_fixing_primary",
+        "source_interface": "cfets_or_chinamoney_rmb_fixing",
+        "timeout_seconds": 20,
+        "retry_attempts": 2,
+        "request_interval_seconds": 0.5,
+        "parser_version": "fx_cfets_rmb_fixing.v1",
+        "quality_flag": "official",
+        "note": "Official RMB fixing source profile. Concrete endpoint/parser remains gated by live source validation."
+      },
+      "fred_trade_weighted_dollar": {
+        "enabled": true,
+        "source": "fred",
+        "source_type": "official_public_dataset",
+        "source_mode": "direct",
+        "role": "dollar_index_alternative",
+        "source_interface": "fred_series",
+        "series_code": "DTWEXBGS",
+        "timeout_seconds": 20,
+        "retry_attempts": 2,
+        "parser_version": "fx_fred_series.v1",
+        "quality_flag": "official"
+      },
+      "ecb_reference_rates": {
+        "enabled": false,
+        "source": "ecb",
+        "source_type": "official",
+        "source_mode": "direct",
+        "role": "cross_check",
+        "source_interface": "ecb_euro_reference_rates",
+        "parser_version": "fx_ecb_reference_rates.v1",
+        "quality_flag": "official"
+      },
+      "cnh_market_aggregated_public": {
+        "enabled": true,
+        "source": "aggregated_public",
+        "source_type": "aggregated_public",
+        "source_mode": "direct",
+        "role": "cnh_spot_fallback",
+        "source_interface": "yahoo_or_akshare_cnh_spot",
+        "timeout_seconds": 20,
+        "retry_attempts": 2,
+        "parser_version": "fx_cnh_aggregated_public.v1",
+        "quality_flag": "aggregated_public",
+        "note": "CNH lacks a single free official daily fixing equivalent. Do not label as official."
+      },
+      "ice_dxy_official": {
+        "enabled": false,
+        "source": "ice",
+        "source_type": "official",
+        "source_mode": "manual_or_verified_endpoint",
+        "role": "dxy_official",
+        "source_interface": "ice_us_dollar_index",
+        "parser_version": "fx_ice_dxy.v1",
+        "quality_flag": "official",
+        "disabled_reason": "Free automated historical access and licensing are not verified."
+      },
+      "manual_verified": {
+        "enabled": true,
+        "source": "manual",
+        "source_type": "manual",
+        "source_mode": "file_import",
+        "role": "reviewed_repair",
+        "source_interface": "local_reviewed_file",
+        "parser_version": "fx_manual_import.v1",
+        "quality_flag": "manual_verified"
+      }
+    },
+    "derivations": [
+      {
+        "derived_series_id": "FX.EUR_CNH.DERIVED.DAILY",
+        "source_series_ids": [
+          "FX.EUR_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNH.MARKET.SPOT.DAILY"
+        ],
+        "formula": "EUR_CNH = EUR_CNY / USD_CNY * USD_CNH",
+        "date_policy": "same_date",
+        "max_source_lag_days": 0,
+        "quality_policy": "derived_from_governed_sources",
+        "enabled": true
+      },
+      {
+        "derived_series_id": "FX.JPY_CNH.DERIVED.DAILY",
+        "source_series_ids": [
+          "FX.JPY_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNH.MARKET.SPOT.DAILY"
+        ],
+        "formula": "JPY_CNH = JPY_CNY / USD_CNY * USD_CNH",
+        "date_policy": "same_date",
+        "max_source_lag_days": 0,
+        "quality_policy": "derived_from_governed_sources",
+        "enabled": true
+      }
+    ],
+    "calendar": {
+      "default_timezone": "Asia/Shanghai",
+      "weekend_non_publication": true,
+      "expected_non_publication_quality_flag": "expected_non_publication"
+    },
+    "quality": {
+      "max_stale_observation_days": 5,
+      "abnormal_jump_pct": 0.05,
+      "source_conflict_tolerance_pct": 0.01,
+      "required_first_phase_series": [
+        "FX.USD_CNY.CFETS.MID.DAILY",
+        "FX.EUR_CNY.CFETS.MID.DAILY",
+        "FX.JPY_CNY.CFETS.MID.DAILY",
+        "FX.USD_CNH.MARKET.SPOT.DAILY",
+        "FX.EUR_CNH.DERIVED.DAILY",
+        "FX.JPY_CNH.DERIVED.DAILY",
+        "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"
+      ]
+    }
+  }
+}
