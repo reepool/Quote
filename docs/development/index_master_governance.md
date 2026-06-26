@@ -102,6 +102,8 @@ CSIndex 的官方日线接口仍作为 SSE/CSI 指数行情优先源；但 CSInd
 
 这类歧义常见于不重要或当前行情不可得的债券指数，例如官方列表中同一 6 位代码同时对应不同 `.CNI` 和不同指数全称。系统不应把它们强行压成一个 `instrument_id`，否则会污染生命周期、行情和研究引用。CNIndex 官方列表中的 `指数代码` 不是本地行情主键：只有存在 6 位纯数字 `深交所行情代码` 的行才写为行情型 `<行情代码>.SZ` 并进入 active quote universe；没有行情代码或行情代码不是 6 位交易所代码的行写为 `.CNI` 或 `CNI<指数代码>.SZ` 这类 metadata-only 身份，保留官方主数据但不参与每日行情抓取。若同一候选 key 的多行能按“唯一有效行情代码 + 其他 metadata-only 身份”确定性拆分，该组应计入 handled ambiguous summary，不再作为 warning；只有无法分类的新型冲突才保留 warning。
 
+CNIndex 还会出现同一个 `深交所行情代码` 同时对应价格指数、全收益指数或港币全收益指数的官方变体，例如 `399264.SZ`、`399652.SZ` 和 `988201.SZ`。这不是股票/指数主键冲突，也不是数据源失败，而是官方同一行情代码下的多个收益口径身份。治理层按确定性优先级选择一个 active quote 身份：优先价格指数；若没有价格指数，则优先非港币/CNY 变体；同时保留原始 `source_symbol`，因为 CNIndex 官方日线有时必须用内部指数代码而不是深交所行情代码下载。这类已分类变体计入 handled ambiguous summary，不应进入 warning。
+
 CSIndex full-list 也必须经过 active admission gate。对本地已存在并具备行情身份的 SSE/CSI 指数，CSIndex 可更新名称、发布方、基础信息和官方来源证据；对本地不存在的新 CSIndex 行，必须满足以下条件之一才可写入 active quote universe：
 
 - 本地已有该代码历史行情或同一身份的 active quote 记录。

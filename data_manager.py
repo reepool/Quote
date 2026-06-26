@@ -10253,6 +10253,20 @@ class DataManager:
                 'rows': [quote_rows[0]],
                 'samples': sample_rows,
             }
+        if len(quote_rows) > 1:
+            preferred_row, classification = self._select_preferred_quote_variant(
+                quote_rows,
+                key=key,
+            )
+            if preferred_row is not None:
+                return {
+                    'handled': True,
+                    'key': key,
+                    'classification': classification,
+                    'row_count': len(rows_for_key),
+                    'rows': [preferred_row],
+                    'samples': sample_rows,
+                }
         if not quote_rows and len(metadata_rows) == len(rows_for_key):
             # Keep one representative metadata row for auditability. The metadata-only
             # status keeps it out of tradable daily quote universes.
@@ -10272,6 +10286,55 @@ class DataManager:
             'rows': [],
             'samples': sample_rows,
         }
+
+    @staticmethod
+    def _select_preferred_quote_variant(
+        rows: List[Dict[str, Any]],
+        *,
+        key: str,
+    ) -> tuple[Optional[Dict[str, Any]], str]:
+        """Pick a deterministic quote identity when official variants share one quote code.
+
+        CNIndex can publish price-return, total-return, and HKD variants under the
+        same exchange quote code. The daily quote universe needs one canonical row;
+        source-specific identities remain auditable through metadata/evidence.
+        """
+        if not rows:
+            return None, ''
+
+        def _metadata(row: Dict[str, Any]) -> Dict[str, Any]:
+            return row.get('metadata') or {}
+
+        price_rows = [
+            row for row in rows
+            if str(_metadata(row).get('price_return_type') or '').strip() == '价格指数'
+        ]
+        if len(price_rows) == 1:
+            return price_rows[0], 'preferred_price_return_quote_identity'
+
+        cny_rows = [
+            row for row in rows
+            if '港币' not in str(row.get('name') or '')
+            and '港币' not in str(_metadata(row).get('full_name') or '')
+        ]
+        if len(cny_rows) == 1:
+            return cny_rows[0], 'preferred_non_hkd_quote_identity'
+
+        exact_symbol_rows = [
+            row for row in rows
+            if str(row.get('source_symbol') or row.get('symbol') or '') == str(row.get('symbol') or '')
+        ]
+        if len(exact_symbol_rows) == 1:
+            return exact_symbol_rows[0], 'preferred_exchange_code_quote_identity'
+
+        source_symbol_rows = [
+            row for row in rows
+            if str(row.get('source_symbol') or '') == str(key).split('.')[0]
+        ]
+        if len(source_symbol_rows) == 1:
+            return source_symbol_rows[0], 'preferred_canonical_source_symbol_identity'
+
+        return None, ''
 
     @staticmethod
     def _is_metadata_only_index_master_row(row: Dict[str, Any]) -> bool:

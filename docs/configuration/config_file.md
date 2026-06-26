@@ -646,7 +646,7 @@
 - **CNIndex 主键语义**: `指数代码` 不是本地行情主键。只有官方列表提供 6 位纯数字 `深交所行情代码` 时，指数才写入行情型 `<行情代码>.SZ` 并参与日更；没有行情代码或行情代码不是 6 位交易所代码的 CNIndex 行写为 `.CNI` 或 `CNI<指数代码>.SZ` metadata-only 身份，保留主数据但不触发每日行情空抓，也不得覆盖同代码股票。治理前快照或本地已存官方 metadata 证明无行情代码时，同源、同 6 位代码的遗留行情型 key 会被标记为 `status=metadata_only,is_active=0,trading_status=0`；同源、非 6 位 `.SZ` key（如 `39926401.SZ`）也会被标记为 metadata-only，并从 `tradable_only` 日更 universe 排除。`metadata_only` 不是停编结论，而是“无有效交易所行情代码”的 eligibility 状态；若官方后续补充合法行情代码，下一次治理应按新的行情型 key 恢复。
 - **CSIndex 准入语义**: CSIndex full-list/search snapshot 是 SSE/CSI 官方 reference/enrichment source，不是无门槛 active universe 扩容源。新 CSIndex 行只有在存在本地历史行情、官方近期日线、可信 fallback 近期行情或配置白名单时，才进入 active quote universe；否则只作为 reference-only/metadata-only/evidence 结果，不触发每日行情下载。
 - **股票主键保护**: 股票 `instrument_id` 优先级高于指数。指数治理遇到已有 `type=stock` 的相同 `instrument_id` 时不得覆盖股票行，应转入来源命名空间或 evidence-only 结果；股票治理可修复历史上被指数污染的股票主键。
-- **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义。若冲突组可按“唯一有效行情代码 + metadata-only/evidence-only 身份”确定性分类，应计入 handled ambiguous summary；无法分类的新型冲突才按 warning 暴露。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
+- **`master_admission`**: 官方指数主数据写入 `instruments` 前的准入规则。默认以 `instrument_id` 作为 canonical key；同 key 且冲突签名不同的官方行视为代码命名空间歧义。若冲突组可按“唯一有效行情代码 + metadata-only/evidence-only 身份”确定性分类，应计入 handled ambiguous summary；无法分类的新型冲突才按 warning 暴露。CNIndex 同一行情代码下的价格指数/全收益指数/港币全收益指数变体也属于可处理歧义：治理层优先选择价格指数，其次选择非港币/CNY 变体，并保留原始 `source_symbol` 供官方日线接口使用。`conflict_signature_fields` 支持点路径，例如 `metadata.cni_code`。
 - **`sample_limit`**: Telegram 日报中的指数治理样例数量上限，详细证据保存在 `index_lifecycle_evidence`。
 
 ### 任务前后置依赖配置

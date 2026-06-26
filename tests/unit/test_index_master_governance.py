@@ -555,6 +555,101 @@ class StockCollisionCNIndexSource(FakeCNIndexSource):
         return []
 
 
+class DuplicateQuoteVariantCNIndexSource(FakeCNIndexSource):
+    async def get_index_master_snapshot(self):
+        snapshot = await super().get_index_master_snapshot()
+        snapshot.rows.extend([
+            {
+                'instrument_id': '399264.SZ',
+                'symbol': '399264',
+                'name': '创业软件',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'currency': 'CNY',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'cnindex',
+                'source_symbol': '399264',
+                'source_url': 'https://example.test/list.xlsx',
+                'parser_version': 'test',
+                'metadata': {
+                    'szse_quote_code': '399264',
+                    'cni_code': '399264.SZ',
+                    'full_name': '创业板软件指数',
+                    'price_return_type': '价格指数',
+                },
+            },
+            {
+                'instrument_id': '399264.SZ',
+                'symbol': '399264',
+                'name': '创业软件R',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'currency': 'CNY',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'cnindex',
+                'source_symbol': '39926401',
+                'source_url': 'https://example.test/list.xlsx',
+                'parser_version': 'test',
+                'metadata': {
+                    'szse_quote_code': '399264',
+                    'cni_code': '399264.SZ',
+                    'full_name': '创业板软件全收益指数',
+                    'price_return_type': '收益指数',
+                },
+            },
+            {
+                'instrument_id': '988201.SZ',
+                'symbol': '988201',
+                'name': '湾创100R',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'currency': 'CNY',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'cnindex',
+                'source_symbol': '480001',
+                'source_url': 'https://example.test/list.xlsx',
+                'parser_version': 'test',
+                'metadata': {
+                    'szse_quote_code': '988201',
+                    'cni_code': '480001.CNI',
+                    'full_name': '粤港澳大湾区创新100全收益指数',
+                    'price_return_type': '收益指数',
+                },
+            },
+            {
+                'instrument_id': '988201.SZ',
+                'symbol': '988201',
+                'name': '湾创100R(港币)',
+                'exchange': 'SZSE',
+                'type': 'index',
+                'currency': 'CNY',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'source': 'cnindex',
+                'source_symbol': '480002',
+                'source_url': 'https://example.test/list.xlsx',
+                'parser_version': 'test',
+                'metadata': {
+                    'szse_quote_code': '988201',
+                    'cni_code': '480001.CNI',
+                    'full_name': '粤港澳大湾区创新100全收益指数(港币)',
+                    'price_return_type': '收益指数',
+                },
+            },
+        ])
+        return snapshot
+
+    async def get_lifecycle_evidence(self):
+        return []
+
+
 @pytest.mark.asyncio
 async def test_index_governance_does_not_overwrite_stock_instrument_id():
     with patch('data_manager.config_manager', _build_config_manager()):
@@ -586,3 +681,28 @@ async def test_index_governance_does_not_overwrite_stock_instrument_id():
         for row in batch
     ]
     assert '000001.SZ' not in saved_ids
+
+
+@pytest.mark.asyncio
+async def test_index_governance_handles_duplicate_quote_variants_without_warning():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.db_ops = FakeIndexDbOps()
+    manager.source_factory = FakeSourceFactory()
+    manager.source_factory.cnindex = DuplicateQuoteVariantCNIndexSource()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 18))
+
+    written_rows = [
+        row
+        for batch in manager.db_ops.saved_instrument_batches
+        for row in batch
+    ]
+    by_id = {row['instrument_id']: row for row in written_rows}
+    assert by_id['399264.SZ']['name'] == '创业软件'
+    assert by_id['399264.SZ']['source_symbol'] == '399264'
+    assert by_id['988201.SZ']['name'] == '湾创100R'
+    assert by_id['988201.SZ']['source_symbol'] == '480001'
+    assert result['summary']['handled_ambiguous_master_duplicate_groups'] == 2
+    assert result['summary']['ambiguous_master_duplicate_groups_skipped'] == 0
+    assert not any('unhandled ambiguous' in warning for warning in result['warnings'])
