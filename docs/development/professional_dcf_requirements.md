@@ -4,7 +4,7 @@
 > 适用项目：Quote System / Research Data Engine
 > 文档定位：本报告用于定义后续专业 DCF 专项 OpenSpec、实现设计、测试验收和生产 readiness 标准。当前仓库已有 `SimpleGrowthDcfEngine` 轻量基线；本报告目标是升级为专业、分行业、分类型、可审计、可替换的投行级 DCF 估值框架。
 > 使用边界：系统只输出结构化估值结果、模型假设、敏感性、诊断和 lineage，不输出买卖建议，不替代人工投资决策。
-> 关联文档：周期行业 DCF 所需商品期货数据见 `docs/development/commodity_futures_market_data_requirements.md`；动力煤现货/长协价、LME 铜铝、Brent/WTI、化工现货指数等特殊商品数据见 `docs/development/special_commodity_market_data_requirements.md`。
+> 关联文档：周期行业 DCF 所需商品期货数据见 `docs/development/commodity_futures_market_data_requirements.md`；动力煤现货/长协价、LME 铜铝、Brent/WTI、化工现货指数等特殊商品数据见 `docs/development/special_commodity_market_data_requirements.md`；外汇汇率、美元指数和跨币种换算见 `docs/development/fx_market_data_requirements.md`。
 
 ---
 
