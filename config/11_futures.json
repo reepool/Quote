@@ -279,6 +279,7 @@
         "source_profile": "estimated_weekday_calendar",
         "quality_flag": "estimated",
         "seed_on_initialize": false,
+        "seed_on_governance": false,
         "seed_lookback_days": 370,
         "seed_lookahead_days": 30
       }

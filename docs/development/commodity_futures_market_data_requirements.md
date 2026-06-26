@@ -430,7 +430,7 @@ GFEX 落地要求：
 - 对缺少结构化官方历史日历的长区间，主路径应直接按 `exchange + natural_date` 调用交易所官方日行情接口验证：有可解析合约行则写为交易日；只有在该交易所已进入“空 payload 可判休市”的可靠覆盖区间后，官方确认无报表/空报表才可写为非交易日。早于可靠覆盖起点的空 payload 只能说明该接口可能无历史行情覆盖，必须保留为 unresolved/manual-review，不能误写成休市；网络失败、格式异常或无法分类的日期也不得 weekday 猜测。
 - 官方接口失败必须结构化分类：`network_unreachable`、`dns_failure`、`timeout`、`tls_failure`、`official_not_found_or_no_report`、`possible_anti_bot_or_ip_risk_control`、`unexpected_html_payload` 等。若同一交易所 URL 从其他 IP 可访问、但本机返回网络不可达、403/429、WAF/验证码/瑞数挑战或长期超时，应标记为疑似本机 IP 风控或网络策略问题，暂停生产全量回填，只允许小范围诊断探测。
 - 官方历史日历回填默认范围为 `2010-01-01` 至当前可由官方日行情验证的日期；未来日期只有在官方公告或结构化日历可准确确认时才入库，否则保持未知，不写 estimated。
-- 行情同步、历史回补和日更任务不得为了展开目标日期而自动持久化 weekday estimated 日历。缺少官方日历时应触发官方日历回填或按质量门禁阻断；只有显式启用开发/离线 seed 开关时，才允许写入 `quality_flag=estimated` 的本地候选日历。
+- 行情同步、历史回补、日更任务以及 `futures_trading_day_governance` 前置治理不得为了展开目标日期而自动持久化 weekday estimated 日历。缺少官方日历时应触发官方日历回填或按质量门禁阻断；只有显式启用开发/离线 seed 开关（例如 `master_data.calendar.seed_on_governance=true` 或专项开发配置）时，才允许写入 `quality_flag=estimated` 的本地候选日历。
 - DCE 日历验证必须使用与行情相同的官方浏览器辅助路径：先访问 `http://www.dce.com.cn/dce/channel/list/168.html` 建立瑞数运行环境，再通过页面内 `fetch('/dcereport/publicweb/dailystat/dayQuotes')` 请求 `tradeType="0"` 的期货日行情。有效合约行数大于 0 判定交易日；只有 `contractId=null` 的“总计”行时判定非交易日；HTTP/JS/浏览器启动失败均判为 unresolved，不能回退为 weekday 猜测。
 - 对海外品种，必须使用对应交易所时区和假期，不允许把国内日历套用到 CME、ICE、LME、SGX 等交易所。
 - 后续如接入跨市场价差，应保留各腿本地交易日和统一对齐日，避免把一个市场休市导致的缺口误算为价差变化。

@@ -4593,11 +4593,24 @@ class DataManager:
                     "dry_run": dry_run,
                 }
             service = FuturesTradingDayGovernanceService(storage, module_cfg)
-            seed_result = service.bootstrap_estimated_calendar(
-                exchanges=scope_selection.exchanges,
-                start_date=start_date,
-                end_date=end_date,
+            calendar_cfg = (module_cfg.get("master_data") or {}).get("calendar") or {}
+            governance_cfg = module_cfg.get("trading_day_governance") or {}
+            allow_estimated_bootstrap = bool(
+                calendar_cfg.get("seed_on_governance", False)
+                or governance_cfg.get("allow_estimated_calendar_bootstrap", False)
             )
+            if allow_estimated_bootstrap:
+                seed_result = service.bootstrap_estimated_calendar(
+                    exchanges=scope_selection.exchanges,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
+            else:
+                seed_result = {
+                    "status": "skipped",
+                    "reason": "estimated_calendar_bootstrap_disabled",
+                    "rows_written": 0,
+                }
             expansion = service.expand_target_dates(
                 exchanges=scope_selection.exchanges,
                 start_date=start_date,
