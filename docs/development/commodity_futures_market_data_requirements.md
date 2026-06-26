@@ -764,7 +764,7 @@ DCF 模型应根据行业模板和 analyst override 决定是否采用。
 
 该配置的日更执行顺序为：先由 `futures_trading_day_governance` 根据已落库的 GFEX/DCE/SHFE/INE/CZCE 官方交易日历生成目标交易日；若没有目标交易日，例如休市日，则后续行情同步自然跳过；若存在目标交易日，则 `futures_master_governance` 仅针对这些目标交易日刷新/发现对应交易所合约主数据；最后 `futures_market_data_sync` 以同一目标交易日集合更新日线和连续序列。历史回补默认同样会执行主数据治理，显式传入 `start_date/end_date`，并将 `master_governance_max_days` 设为足够覆盖本次回补窗口或置空，避免只治理窗口前若干天。`requires_master_data_governance` 是行情日更/回补命令的前置治理开关，不属于 `futures_master_governance` 自身；手工执行主数据治理时不要传该参数。DCE 官方历史行情中存在少量开高低和成交字段为 0、但收盘价/结算价有效的交易日，行情质量标记应使用 `official_zero_ohlc_with_settlement`，不应混同为一般 `ohlc_inconsistent`。
 
-日更成功且无异常时，Telegram 报告应采用交易所级摘要：展示覆盖交易所、交易日数量、写入/更新/不变/失败数量、新增品种/待确认品种、生命周期跳过数量，以及每个交易所的写入概览；仅在失败、部分完成、发现待确认品种、provider 空数据或其他异常时才发送 per-series 详细报告，便于排查。
+日更成功且无异常时，Telegram 报告应采用交易所级摘要：展示覆盖交易所、交易日数量、写入/更新/不变/失败数量、新增品种/待确认品种、生命周期跳过数量，以及每个交易所的写入概览；没有新增、更新或变化但全部命中 `unchanged` 的成功日更也应使用同一简洁格式。主数据前置中不影响写入、无 blocker、无待确认品种的非阻塞 warning 不应放大为 per-series 长报告；仅在失败、部分完成、发现待确认品种、provider 空数据、主数据 blocker 或其他实质异常时才发送 per-series 详细报告，便于排查。
 
 手工触发方式：
 

@@ -1443,13 +1443,21 @@ def _format_futures_market_data_scheduler_reports(result: Dict[str, Any]) -> Lis
     master_governance = result.get("master_data_governance") or {}
     master_counts = master_governance.get("counts") if isinstance(master_governance, dict) else {}
     master_counts = master_counts or {}
+    master_status = str(master_governance.get("status") or "success")
+    master_results = master_governance.get("results") if isinstance(master_governance, dict) else []
+    master_has_blockers = any(
+        bool((item or {}).get("blockers"))
+        or str((item or {}).get("status") or "") in {"blocked", "failed"}
+        for item in (master_results or [])
+    )
     normal_success = (
         str(result.get("status") or "") == "success"
         and not bool(result.get("dry_run"))
         and int(totals.get("failed") or 0) == 0
         and int(totals.get("provider_empty_on_trading_day") or 0) == 0
         and str((result.get("trading_day_governance") or {}).get("status") or "") == "success"
-        and str(master_governance.get("status") or "success") == "success"
+        and master_status in {"success", "warning", "skipped"}
+        and not master_has_blockers
         and int(master_counts.get("pending") or 0) == 0
     )
     if normal_success:
@@ -3537,10 +3545,43 @@ class ScheduledTasks:
                 dry_run=dry_run,
             )
             if master_results:
-                result["master_data_governance"] = _summarize_futures_master_governance_results(master_results)
+                master_governance_summary = _summarize_futures_master_governance_results(master_results)
+                result["master_data_governance"] = master_governance_summary
+                try:
+                    run_id = result.get("run_id")
+                    if run_id is not None:
+                        data_manager._require_futures_storage().heartbeat_ingestion_run(
+                            int(run_id),
+                            metadata={"master_data_governance": master_governance_summary},
+                        )
+                except Exception as metadata_error:
+                    scheduler_logger.warning(
+                        "[Scheduler] Failed to persist futures master governance report context "
+                        "run_id=%s error=%s",
+                        result.get("run_id"),
+                        metadata_error,
+                    )
             status = result.get('status', 'failed')
             success = status == 'success'
-            for index, content in enumerate(_format_futures_market_data_scheduler_reports(result), start=1):
+            reports = _format_futures_market_data_scheduler_reports(result)
+            report_mode = (
+                "compact"
+                if len(reports) == 1 and "*商品期货行情日更*" in reports[0]
+                else "detailed"
+            )
+            scheduler_logger.info(
+                "[Scheduler] Futures market-data report prepared run_id=%s status=%s "
+                "report_mode=%s report_count=%s inserted=%s changed=%s unchanged=%s failed=%s",
+                result.get("run_id"),
+                status,
+                report_mode,
+                len(reports),
+                (result.get("totals") or {}).get("inserted", 0),
+                (result.get("totals") or {}).get("changed", 0),
+                (result.get("totals") or {}).get("unchanged", 0),
+                (result.get("totals") or {}).get("failed", 0),
+            )
+            for index, content in enumerate(reports, start=1):
                 await self._send_task_report(
                     report_data={
                         'name': '商品期货行情数据维护报告',

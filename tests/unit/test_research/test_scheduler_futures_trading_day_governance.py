@@ -265,8 +265,22 @@ def test_futures_market_data_report_uses_compact_summary_for_normal_success():
             ],
         },
         "master_data_governance": {
-            "status": "success",
+            "status": "warning",
             "counts": {"auto_promoted": 0, "pending": 0},
+            "results": [
+                {
+                    "exchange": "DCE",
+                    "status": "success",
+                    "blockers": [],
+                    "warnings": [],
+                },
+                {
+                    "exchange": "GFEX",
+                    "status": "warning",
+                    "blockers": [],
+                    "warnings": ["non_blocking_product_spec_warning"],
+                },
+            ],
         },
         "series": [
             {
