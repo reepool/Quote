@@ -5,6 +5,7 @@
 > 文档定位：本说明书用于定义商品期货行情与周期景气数据层的业务需求、数据架构、更新维护、对外服务、验收标准和后续 OpenSpec 拆解边界。本文聚焦商品信息获取、存储、更新维护和对外提供；DCF 估值模型公式、行业估值模板和投资结论不在本会话范围内。
 > 当前 OpenSpec：`add-futures-market-data-module`、`prioritize-official-futures-sources`、`add-futures-master-calendar-dictionary-api`、`add-futures-trading-day-governance`、`backfill-official-futures-trading-calendar`、`add-futures-scope-config`
 > 使用边界：本系统为量化研究和估值输入提供可审计数据，不提供商品交易信号，不替代人工投资判断。
+> 关联文档：交易所期货之外的动力煤现货/长协价、LME 铜铝、Brent/WTI、化工现货指数等特殊商品数据，见 `docs/development/special_commodity_market_data_requirements.md`。
 
 ---
 

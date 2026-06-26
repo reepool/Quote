@@ -618,6 +618,126 @@
         "extreme_high": 0.9
       }
     },
+    "special_commodity_market_data": {
+      "enabled": false,
+      "storage": {
+        "database": "data/futures.db",
+        "table_prefix": "commodity_"
+      },
+      "secrets": {
+        "fred_api_key_env": "FRED_API_KEY",
+        "eia_api_key_env": "EIA_API_KEY",
+        "note": "Do not store API keys in tracked config files. Put values in environment variables or a gitignored local runtime config."
+      },
+      "venues": {
+        "FRED": {
+          "enabled": true,
+          "venue_type": "official_public_api",
+          "requires_api_key": true,
+          "api_key_env": "FRED_API_KEY",
+          "registration_url": "https://fredaccount.stlouisfed.org",
+          "role": "primary",
+          "supported_frequencies": [
+            "daily",
+            "monthly"
+          ]
+        },
+        "EIA": {
+          "enabled": true,
+          "venue_type": "official_public_api",
+          "requires_api_key": true,
+          "api_key_env": "EIA_API_KEY",
+          "registration_url": "https://www.eia.gov/opendata/",
+          "role": "primary_or_validation",
+          "supported_frequencies": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        },
+        "WORLD_BANK": {
+          "enabled": true,
+          "venue_type": "official_public_dataset",
+          "requires_api_key": false,
+          "role": "monthly_benchmark_fallback",
+          "supported_frequencies": [
+            "monthly",
+            "annual"
+          ]
+        },
+        "LME": {
+          "enabled": false,
+          "venue_type": "exchange_official_report",
+          "requires_login": true,
+          "registration_url": "https://www.lme.com/",
+          "role": "official_report_candidate",
+          "supported_frequencies": [
+            "daily",
+            "monthly"
+          ],
+          "note": "Verify free account access, report download stability, and licence boundaries before enabling automated production sync."
+        },
+        "100PPI": {
+          "enabled": true,
+          "venue_type": "public_web_aggregator",
+          "requires_api_key": false,
+          "role": "domestic_spot_basis_enhancement",
+          "supported_frequencies": [
+            "daily"
+          ]
+        }
+      },
+      "download_scopes": [
+        {
+          "scope_id": "fred_energy_oil",
+          "enabled": true,
+          "venues": [
+            "FRED"
+          ],
+          "categories": [
+            "energy"
+          ],
+          "commodity_ids": [
+            "OIL.WTI.SPOT",
+            "OIL.BRENT.SPOT"
+          ],
+          "frequencies": [
+            "daily"
+          ]
+        },
+        {
+          "scope_id": "fred_imf_metals",
+          "enabled": true,
+          "venues": [
+            "FRED"
+          ],
+          "categories": [
+            "nonferrous"
+          ],
+          "commodity_ids": [
+            "METAL.COPPER.IMF",
+            "METAL.ALUMINUM.IMF"
+          ],
+          "frequencies": [
+            "monthly"
+          ]
+        },
+        {
+          "scope_id": "cn_100ppi_chemical",
+          "enabled": false,
+          "venues": [
+            "100PPI"
+          ],
+          "categories": [
+            "chemical"
+          ],
+          "commodity_ids": [],
+          "frequencies": [
+            "daily"
+          ]
+        }
+      ]
+    },
     "registry": {
       "note": "Use built-in domestic P0 futures universe by default; add exchange-specific overrides here when governance discovers new products.",
       "include_default_p0_universe": true,
