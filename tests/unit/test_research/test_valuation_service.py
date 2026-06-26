@@ -1048,6 +1048,90 @@ def test_valuation_service_dcf_cyclical_defaults_to_midcycle_model():
     assert "cyclical_peak_margin_capped_to_midcycle" in result["warnings"]
 
 
+def test_valuation_service_dcf_cyclical_uses_futures_cycle_for_margin_normalization():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "industry_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 160.0,
+            "capital_expenditure": 80.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "futures_cycle_context": {
+                "selected_series_id": "CNF.J.DCE.main",
+                "mapping_scope": "industry",
+                "mapping_scope_id": "煤炭",
+                "commodity_price_assumption": 1932.0,
+                "cycle_index_level": 0.92,
+                "diagnostic": {
+                    "percentile": 0.92,
+                    "mean_price": 2166.82,
+                    "mean_deviation_pct": 0.18,
+                    "cycle_state": "extreme_high",
+                },
+                "source_policy": "local_futures_db_only",
+            },
+        },
+    )
+
+    diagnostics = result["cyclical_model_diagnostics"]
+    assert result["status"] == "success"
+    assert diagnostics["normalization_source"] == "reported_margin_adjusted_by_futures_cycle_to_midcycle_band"
+    assert diagnostics["normalized_operating_margin"] < diagnostics["reported_operating_margin"]
+    assert diagnostics["futures_cycle_percentile"] == 0.92
+    assert diagnostics["futures_cycle_selected_series_id"] == "CNF.J.DCE.main"
+    assert diagnostics["futures_market_data"]["source_policy"] == "local_futures_db_only"
+    assert "cyclical_high_cycle_margin_normalized_with_futures_data" in result["warnings"]
+
+
+def test_valuation_service_dcf_cyclical_explicit_midcycle_margin_overrides_cycle_context():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "industry_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-30",
+            "revenue": 1000.0,
+            "operating_profit": 160.0,
+            "capital_expenditure": 80.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-04-18",
+            "midcycle_operating_margin": 0.09,
+            "futures_cycle_context": {
+                "selected_series_id": "CNF.J.DCE.main",
+                "cycle_index_level": 0.95,
+                "diagnostic": {"percentile": 0.95, "cycle_state": "extreme_high"},
+            },
+        },
+    )
+
+    diagnostics = result["cyclical_model_diagnostics"]
+    assert diagnostics["normalization_source"] == "explicit_midcycle_operating_margin"
+    assert diagnostics["normalized_operating_margin"] == 0.09
+    assert "cyclical_high_cycle_margin_normalized_with_futures_data" not in result["warnings"]
+
+
 def test_valuation_service_dcf_cyclical_missing_core_inputs_fails_closed():
     service = ResearchValuationService()
 

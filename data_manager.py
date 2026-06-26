@@ -5292,43 +5292,32 @@ class DataManager:
         normalized_id = convert_to_database_format(instrument_id)
 
         def _load() -> Dict[str, Any]:
-            mappings = storage.get_exposure_mappings(
-                scope_type="instrument",
-                scope_id=normalized_id,
+            return self._load_futures_exposure_mappings_for_dcf(
+                storage,
+                normalized_id,
+                industry_membership=None,
             )
-            if not mappings:
-                return {
-                    "status": "missing",
-                    "instrument_id": normalized_id,
-                    "mappings": [],
-                    "input_gaps": [
-                        {
-                            "field": "futures_exposure_mapping",
-                            "requiredness": "cyclical_dcf_optional_until_mapping_rollout",
-                            "reason": "no_local_futures_exposure_mapping",
-                        }
-                    ],
-                }
-            return {
-                "status": "success",
-                "instrument_id": normalized_id,
-                "mappings": mappings,
-                "input_gaps": [],
-            }
 
         return await asyncio.to_thread(_load)
 
     async def get_local_futures_cycle_inputs_for_dcf(
         self,
         instrument_id: str,
+        *,
+        industry_membership: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Return local futures exposure and diagnostics for cyclical DCF."""
-        exposure = await self.get_research_company_futures_exposure(instrument_id)
-        if exposure.get("status") != "success":
-            return exposure
         storage = self._require_futures_storage()
+        normalized_id = convert_to_database_format(instrument_id)
 
         def _load() -> Dict[str, Any]:
+            exposure = self._load_futures_exposure_mappings_for_dcf(
+                storage,
+                normalized_id,
+                industry_membership=industry_membership,
+            )
+            if exposure.get("status") != "success":
+                return exposure
             diagnostics_by_series: Dict[str, Any] = {}
             for mapping in exposure.get("mappings", []):
                 series_ids = []
@@ -5343,6 +5332,90 @@ class DataManager:
             }
 
         return await asyncio.to_thread(_load)
+
+    def _load_futures_exposure_mappings_for_dcf(
+        self,
+        storage: Any,
+        instrument_id: str,
+        *,
+        industry_membership: Optional[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        mappings = storage.get_exposure_mappings(
+            scope_type="instrument",
+            scope_id=instrument_id,
+        )
+        if mappings:
+            return {
+                "status": "success",
+                "instrument_id": instrument_id,
+                "mapping_scope": "instrument",
+                "mapping_scope_id": instrument_id,
+                "mappings": mappings,
+                "input_gaps": [],
+            }
+
+        tried_scope_ids: List[str] = []
+        for scope_id in self._dcf_futures_industry_mapping_candidates(industry_membership):
+            tried_scope_ids.append(scope_id)
+            mappings = storage.get_exposure_mappings(
+                scope_type="industry",
+                scope_id=scope_id,
+            )
+            if mappings:
+                return {
+                    "status": "success",
+                    "instrument_id": instrument_id,
+                    "mapping_scope": "industry",
+                    "mapping_scope_id": scope_id,
+                    "mappings": mappings,
+                    "input_gaps": [],
+                }
+
+        return {
+            "status": "missing",
+            "instrument_id": instrument_id,
+            "mapping_scope": None,
+            "mapping_scope_id": None,
+            "mappings": [],
+            "industry_mapping_candidates": tried_scope_ids,
+            "input_gaps": [
+                {
+                    "field": "futures_exposure_mapping",
+                    "requiredness": "cyclical_dcf_optional_until_mapping_rollout",
+                    "reason": "no_local_futures_exposure_mapping",
+                }
+            ],
+        }
+
+    @staticmethod
+    def _dcf_futures_industry_mapping_candidates(
+        industry_membership: Optional[Dict[str, Any]],
+    ) -> List[str]:
+        if not isinstance(industry_membership, dict):
+            return []
+        candidate_fields = (
+            "industry_code",
+            "sw_l3_code",
+            "sw_l2_code",
+            "sw_l1_code",
+            "best_taxonomy_industry_code",
+            "mapped_industry_code",
+            "industry_name",
+            "sw_l3_name",
+            "sw_l2_name",
+            "sw_l1_name",
+            "source_industry_name",
+            "mapped_industry_name",
+        )
+        seen: Set[str] = set()
+        candidates: List[str] = []
+        for field_name in candidate_fields:
+            value = str(industry_membership.get(field_name) or "").strip()
+            if not value or value in seen:
+                continue
+            seen.add(value)
+            candidates.append(value)
+        return candidates
 
     async def get_research_financial_summary(
         self,
@@ -6280,7 +6353,19 @@ class DataManager:
         if not module_cfg.get("enabled", False):
             return None
         try:
-            payload = await self.get_local_futures_cycle_inputs_for_dcf(instrument_id)
+            research_storage = self._require_research_storage()
+            industry_membership = await asyncio.to_thread(
+                research_storage.get_industry_membership,
+                instrument_id,
+                include_snapshot=False,
+            )
+        except Exception:
+            industry_membership = None
+        try:
+            payload = await self.get_local_futures_cycle_inputs_for_dcf(
+                instrument_id,
+                industry_membership=industry_membership,
+            )
         except RuntimeError:
             return None
         if payload.get("status") != "success":
@@ -6305,15 +6390,49 @@ class DataManager:
             break
         if not selected_diagnostic:
             return None
+        selected_mapping = None
+        for mapping in payload.get("mappings") or []:
+            series_ids = [mapping.get("revenue_series_id")]
+            series_ids.extend(mapping.get("cost_series_ids") or [])
+            if selected_series_id in {item for item in series_ids if item}:
+                selected_mapping = mapping
+                break
+        selected_series_diagnostics = diagnostics_by_series.get(selected_series_id) or []
+        diagnostics_summary = {
+            str(item.get("lookback_years")): {
+                "latest_price": item.get("latest_price"),
+                "mean_price": item.get("mean_price"),
+                "median_price": item.get("median_price"),
+                "percentile": item.get("percentile"),
+                "mean_deviation_pct": item.get("mean_deviation_pct"),
+                "cycle_state": item.get("cycle_state"),
+                "as_of_date": item.get("as_of_date"),
+                "history_coverage_ratio": item.get("history_coverage_ratio"),
+                "observation_count": item.get("observation_count"),
+            }
+            for item in selected_series_diagnostics
+            if item.get("lookback_years") is not None
+        }
         return {
             "status": "success",
             "instrument_id": instrument_id,
+            "mapping_scope": payload.get("mapping_scope"),
+            "mapping_scope_id": payload.get("mapping_scope_id"),
             "selected_series_id": selected_series_id,
             "commodity_price_assumption": selected_diagnostic.get("latest_price"),
             "cycle_index_level": selected_diagnostic.get("percentile"),
+            "midcycle_price_candidate": selected_diagnostic.get("mean_price")
+            or selected_diagnostic.get("median_price"),
+            "price_percentile": selected_diagnostic.get("percentile"),
+            "cycle_state": selected_diagnostic.get("cycle_state"),
+            "diagnostic_as_of_date": selected_diagnostic.get("as_of_date"),
+            "diagnostic_lookback_years": selected_diagnostic.get("lookback_years"),
+            "diagnostics_summary": diagnostics_summary,
             "diagnostic": selected_diagnostic,
+            "selected_mapping": selected_mapping,
             "exposure_mappings": payload.get("mappings") or [],
             "diagnostics_by_series": diagnostics_by_series,
+            "input_gaps": payload.get("input_gaps") or [],
             "source_policy": "local_futures_db_only",
         }
 

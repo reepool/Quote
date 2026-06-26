@@ -22,6 +22,9 @@ DEFAULT_PROFESSIONAL_DCF_CONFIG: Dict[str, Any] = {
     "default_model_strategy": "auto",
     "score_gap_threshold": 0.15,
     "terminal_value_warning_threshold": 0.8,
+    "cyclical_peak_percentile_threshold": 0.75,
+    "cyclical_trough_percentile_threshold": 0.25,
+    "cyclical_cycle_margin_adjustment_strength": 0.35,
     "model_profiles": {
         "nonfinancial_fcff.v1": {
             "candidate_type": "industry",
@@ -1380,6 +1383,7 @@ class ProfessionalDcfEngine:
                 **margin_payload,
                 "cycle_inputs": cycle_inputs,
                 "missing_cycle_inputs": missing_cycle_inputs,
+                "futures_market_data": overrides.get("futures_cycle_context"),
                 "capex_to_sales": capex_to_sales,
                 "depreciation_to_sales": da_to_sales,
                 "working_capital_to_sales": nwc_to_sales,
@@ -2749,6 +2753,27 @@ class ProfessionalDcfEngine:
                 self.parameters.get("cyclical_midcycle_margin_cap", 0.18),
             )
         )
+        futures_cycle_context = overrides.get("futures_cycle_context")
+        if not isinstance(futures_cycle_context, dict):
+            futures_cycle_context = {}
+        diagnostic = futures_cycle_context.get("diagnostic")
+        if not isinstance(diagnostic, dict):
+            diagnostic = {}
+        cycle_percentile = self._normalize_cycle_percentile(
+            diagnostic.get("percentile")
+            or futures_cycle_context.get("price_percentile")
+            or facts.get("cycle_index_level")
+            or overrides.get("cycle_index_level")
+        )
+        cycle_state = str(
+            diagnostic.get("cycle_state")
+            or futures_cycle_context.get("cycle_state")
+            or ""
+        ).strip()
+        mean_deviation_pct = self._safe_float(
+            diagnostic.get("mean_deviation_pct")
+            or futures_cycle_context.get("mean_deviation_pct")
+        )
         explicit_margin = self._safe_float(
             overrides.get("midcycle_operating_margin") or facts.get("midcycle_operating_margin")
         )
@@ -2767,6 +2792,31 @@ class ProfessionalDcfEngine:
         else:
             normalized_margin = reported_margin
             source = "reported_margin_clamped_to_midcycle_band"
+            cycle_adjusted = self._cycle_adjusted_margin(
+                reported_margin=reported_margin,
+                floor=floor,
+                cap=cap,
+                cycle_percentile=cycle_percentile,
+                cycle_state=cycle_state,
+                overrides=overrides,
+            )
+            if cycle_adjusted is not None and cycle_adjusted != normalized_margin:
+                normalized_margin = cycle_adjusted
+                source = "reported_margin_adjusted_by_futures_cycle_to_midcycle_band"
+                if cycle_percentile is not None and cycle_percentile >= float(
+                    overrides.get(
+                        "cyclical_peak_percentile_threshold",
+                        self.parameters.get("cyclical_peak_percentile_threshold", 0.75),
+                    )
+                ):
+                    warnings.append("cyclical_high_cycle_margin_normalized_with_futures_data")
+                elif cycle_percentile is not None and cycle_percentile <= float(
+                    overrides.get(
+                        "cyclical_trough_percentile_threshold",
+                        self.parameters.get("cyclical_trough_percentile_threshold", 0.25),
+                    )
+                ):
+                    warnings.append("cyclical_low_cycle_margin_normalized_with_futures_data")
 
         if normalized_margin > cap:
             normalized_margin = cap
@@ -2781,8 +2831,76 @@ class ProfessionalDcfEngine:
             "normalization_source": source,
             "midcycle_margin_floor": floor,
             "midcycle_margin_cap": cap,
+            "futures_cycle_percentile": cycle_percentile,
+            "futures_cycle_state": cycle_state or None,
+            "futures_cycle_mean_deviation_pct": mean_deviation_pct,
+            "futures_cycle_selected_series_id": futures_cycle_context.get("selected_series_id"),
+            "futures_cycle_mapping_scope": futures_cycle_context.get("mapping_scope"),
+            "futures_cycle_mapping_scope_id": futures_cycle_context.get("mapping_scope_id"),
             "warnings": warnings,
         }
+
+    def _cycle_adjusted_margin(
+        self,
+        *,
+        reported_margin: float,
+        floor: float,
+        cap: float,
+        cycle_percentile: Optional[float],
+        cycle_state: str,
+        overrides: Dict[str, Any],
+    ) -> Optional[float]:
+        if cycle_percentile is None:
+            return None
+        high_threshold = float(
+            overrides.get(
+                "cyclical_peak_percentile_threshold",
+                self.parameters.get("cyclical_peak_percentile_threshold", 0.75),
+            )
+        )
+        low_threshold = float(
+            overrides.get(
+                "cyclical_trough_percentile_threshold",
+                self.parameters.get("cyclical_trough_percentile_threshold", 0.25),
+            )
+        )
+        strength = max(
+            0.0,
+            min(
+                1.0,
+                float(
+                    overrides.get(
+                        "cyclical_cycle_margin_adjustment_strength",
+                        self.parameters.get("cyclical_cycle_margin_adjustment_strength", 0.35),
+                    )
+                ),
+            ),
+        )
+        midpoint = (floor + cap) / 2.0
+        state = cycle_state.lower()
+        high_cycle = cycle_percentile >= high_threshold or state in {"high", "extreme_high"}
+        low_cycle = cycle_percentile <= low_threshold or state in {"low", "extreme_low"}
+        if high_cycle and reported_margin > midpoint:
+            distance = reported_margin - midpoint
+            cycle_intensity = 1.0 if high_threshold >= 1.0 else (cycle_percentile - high_threshold) / (1.0 - high_threshold)
+            cycle_intensity = max(0.0, min(1.0, cycle_intensity))
+            return reported_margin - distance * strength * max(cycle_intensity, 0.5)
+        if low_cycle and reported_margin < midpoint:
+            distance = midpoint - reported_margin
+            cycle_intensity = 1.0 if low_threshold <= 0.0 else (low_threshold - cycle_percentile) / low_threshold
+            cycle_intensity = max(0.0, min(1.0, cycle_intensity))
+            return reported_margin + distance * strength * max(cycle_intensity, 0.5)
+        return None
+
+    def _normalize_cycle_percentile(self, value: Any) -> Optional[float]:
+        percentile = self._safe_float(value)
+        if percentile is None:
+            return None
+        if 0.0 <= percentile <= 1.0:
+            return percentile
+        if 1.0 < percentile <= 100.0:
+            return percentile / 100.0
+        return None
 
     def _build_wacc(
         self,

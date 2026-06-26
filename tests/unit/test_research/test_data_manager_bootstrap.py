@@ -2947,6 +2947,85 @@ def test_data_manager_get_research_dcf_valuation_uses_financial_db_scope(tmp_pat
     assert result["status"] in {"success", "partial"}
 
 
+def test_data_manager_dcf_futures_context_falls_back_to_industry_mapping(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "valuation": {
+            "enabled": True,
+            "dcf": {"beta": {"enabled": False}, "professional": {"enabled": True}},
+        },
+        "commodity_market_data": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    research_storage = Mock()
+    research_storage.get_industry_membership.return_value = {
+        "instrument_id": "601088.SH",
+        "industry_code": "煤炭",
+        "industry_name": "煤炭",
+        "sw_l1_name": "煤炭",
+    }
+    futures_storage = Mock()
+
+    def _get_exposure_mappings(*, scope_type, scope_id):
+        if scope_type == "industry" and scope_id == "煤炭":
+            return [
+                {
+                    "mapping_id": "industry-coal-j",
+                    "scope_type": "industry",
+                    "scope_id": "煤炭",
+                    "product_name": "焦煤",
+                    "revenue_series_id": "CNF.JM.DCE.main",
+                    "cost_series_ids": [],
+                    "spread_ids": [],
+                    "direction": "positive",
+                    "transmission_strength": "medium",
+                    "lag_days": 0,
+                    "confidence": "medium",
+                }
+            ]
+        return []
+
+    futures_storage.get_exposure_mappings.side_effect = _get_exposure_mappings
+    futures_storage.get_cycle_diagnostics.return_value = [
+        {
+            "series_id": "CNF.JM.DCE.main",
+            "as_of_date": "2026-06-25",
+            "lookback_years": 10,
+            "latest_price": 1238.5,
+            "mean_price": 1484.98,
+            "median_price": 1318.0,
+            "percentile": 0.3379,
+            "mean_deviation_pct": -0.166,
+            "cycle_state": "normal",
+            "history_coverage_ratio": 1.0,
+            "observation_count": 2427,
+        }
+    ]
+    manager.research_storage = research_storage
+    manager.futures_storage = futures_storage
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        context = _run(manager._get_dcf_futures_cycle_context("601088.SH"))
+
+    assert context["mapping_scope"] == "industry"
+    assert context["mapping_scope_id"] == "煤炭"
+    assert context["selected_series_id"] == "CNF.JM.DCE.main"
+    assert context["commodity_price_assumption"] == 1238.5
+    assert context["midcycle_price_candidate"] == 1484.98
+    assert context["diagnostics_summary"]["10"]["percentile"] == 0.3379
+    futures_storage.get_exposure_mappings.assert_any_call(
+        scope_type="instrument",
+        scope_id="601088.SH",
+    )
+    futures_storage.get_exposure_mappings.assert_any_call(
+        scope_type="industry",
+        scope_id="煤炭",
+    )
+
+
 def test_data_manager_dcf_bounded_cache_hits_and_invalidates_on_price_change(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {
