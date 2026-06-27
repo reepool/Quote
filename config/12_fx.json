@@ -10,6 +10,44 @@
     },
     "download_scopes": [
       {
+        "scope_id": "rmb_onshore_fixing",
+        "name": "Onshore RMB official fixing coverage",
+        "enabled": true,
+        "currencies": [
+          "CNY",
+          "USD",
+          "EUR",
+          "JPY"
+        ],
+        "instrument_types": [
+          "currency_pair"
+        ],
+        "market_scopes": [
+          "onshore"
+        ],
+        "source_profiles": [
+          "cfets_rmb_fixing"
+        ],
+        "series_ids": [
+          "FX.USD_CNY.CFETS.MID.DAILY",
+          "FX.EUR_CNY.CFETS.MID.DAILY",
+          "FX.JPY_CNY.CFETS.MID.DAILY"
+        ],
+        "rate_types": [
+          "mid"
+        ],
+        "frequencies": [
+          "daily"
+        ],
+        "metadata": {
+          "rollout_phase": "phase_1_onshore_rmb",
+          "calendar_source_profiles": [
+            "cfets_rmb_fixing"
+          ],
+          "primary_source_profile": "cfets_rmb_fixing"
+        }
+      },
+      {
         "scope_id": "rmb_core",
         "name": "First-phase RMB FX and dollar-index coverage",
         "enabled": true,

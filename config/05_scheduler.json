@@ -595,7 +595,11 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
+          "source_profiles": [
+            "cfets_rmb_fixing"
+          ],
           "dry_run": true,
+          "note": "Initial rollout default only governs onshore RMB fixing calendar. Expand source_profiles after CNH/FRED rollout validation.",
           "max_runtime_seconds": 600
         }
       },
@@ -609,8 +613,9 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
-          "scope_id": "rmb_core",
+          "scope_id": "rmb_onshore_fixing",
           "dry_run": true,
+          "note": "Initial rollout default only syncs official onshore RMB fixings. Use scope_id=rmb_core explicitly after CNH/FRED validation.",
           "max_runtime_seconds": 1800
         }
       },
@@ -624,10 +629,10 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
-          "scope_id": "rmb_core",
+          "scope_id": "rmb_onshore_fixing",
           "dry_run": true,
           "max_runtime_seconds": 7200,
-          "note": "Historical FX backfill must be run with explicit start_date/end_date and reviewed source profiles."
+          "note": "Historical FX backfill must be run with explicit start_date/end_date and reviewed source profiles. Initial rollout default only backfills official onshore RMB fixings."
         }
       },
       "fx_derivation_sync": {

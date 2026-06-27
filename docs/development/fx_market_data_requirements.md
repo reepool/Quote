@@ -279,6 +279,40 @@ USD/CNH = 1 USD 兑换多少 CNH
 | `fx_derivation_sync` | 生成反向汇率、交叉汇率、目标币种派生 |
 | `fx_quality_check` | 检查缺口、异常跳变、源差异 |
 
+### 8.1.1 在岸人民币优先落库顺序
+
+第一步只落库官方在岸人民币中间价，不同时引入 CNH、FRED、ECB 或 ICE：
+
+| 阶段 | 任务 | 默认范围 | 写入表 | 说明 |
+|---|---|---|---|---|
+| 1 | `fx_master_sync` | 全 FX 字典 | `fx_currencies`、`fx_instruments`、`fx_series`、`fx_source_manifests`、`fx_derivations` | 先写主数据和 source profile，保证后续数据有外键和来源口径 |
+| 2 | `fx_calendar_governance` | `source_profiles=["cfets_rmb_fixing"]` | `fx_calendars` | 生成 CFETS/SAFE 发布日治理记录，区分 `observed`、`missing_expected_observation`、`expected_non_publication` |
+| 3 | `fx_rate_backfill` | `scope_id="rmb_onshore_fixing"` | `fx_observations`、`ingestion_runs` | 显式日期范围历史回补 `USD/CNY`、`EUR/CNY`、`JPY/CNY` |
+| 4 | `fx_rate_sync` | `scope_id="rmb_onshore_fixing"` | `fx_observations`、`ingestion_runs` | 日更当前在岸中间价 |
+| 5 | `fx_quality_check` | 已落库在岸序列 | `fx_quality_issues`、`fx_readiness_snapshots` | 检查缺口、异常跳变、陈旧数据和 readiness |
+
+`rmb_onshore_fixing` scope 只包含：
+
+```text
+FX.USD_CNY.CFETS.MID.DAILY
+FX.EUR_CNY.CFETS.MID.DAILY
+FX.JPY_CNY.CFETS.MID.DAILY
+```
+
+在岸人民币数据源采用 `cfets_rmb_fixing` source profile：
+
+- 最新日优先读取中国货币网 / CFETS 当前官方 JSON。
+- 历史回补读取 SAFE 人民币汇率中间价公开页，经 `akshare.currency_boc_safe` 包装。
+- `USD`、`EUR` 字段按 SAFE 百元报价除以 100 后入库为市场惯例 `1 USD/EUR = x CNY`。
+- `JPY` 保留官方常用的 `100 JPY = x CNY` 报价单位，`quote_multiplier=100`。
+
+日历治理和汇率获取应像股票/期货一样任务化，但外汇日历不是交易所交易日历：
+
+- `fx_calendar_governance` 是发布日 / 观测日治理，不写汇率数值。
+- `fx_rate_backfill` / `fx_rate_sync` 只写汇率观测值，不负责推断发布日规则。
+- 历史回补必须显式传入 `start_date` / `end_date`，避免无边界抓取。
+- 默认调度参数先使用 `rmb_onshore_fixing`，等 CNH 和美元指数链路单独验收后，再显式切换到 `rmb_core`。
+
 ### 8.2 API
 
 建议端点：
@@ -332,4 +366,3 @@ GET /api/v1/research/fx/readiness
 - 所有汇率写入保留 source profile、观测日、发布时间或采集时间、质量标记。
 - DCF/商品模块只能读取本地 FX 数据，不得估值时远程抓取。
 - 禁止使用未来汇率。
-
