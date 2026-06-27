@@ -604,9 +604,9 @@
         }
       },
       "fx_rate_sync": {
-        "enabled": false,
+        "enabled": true,
         "manual_only": true,
-        "description": "外汇日频汇率同步（默认禁用并 dry_run；未验证 live adapter 会结构化阻断）",
+        "description": "外汇日频汇率同步（manual_only，默认 dry_run；未验证 live adapter 会结构化阻断）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -620,9 +620,9 @@
         }
       },
       "fx_rate_backfill": {
-        "enabled": false,
+        "enabled": true,
         "manual_only": true,
-        "description": "外汇历史汇率回补（需要显式 start_date/end_date，默认 dry_run）",
+        "description": "外汇历史汇率回补（manual_only，需要显式 start_date/end_date，默认 dry_run）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
