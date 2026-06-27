@@ -291,6 +291,12 @@ USD/CNH = 1 USD 兑换多少 CNH
 | 4 | `fx_rate_sync` | `scope_id="rmb_onshore_fixing"` | `fx_observations`、`ingestion_runs` | 日更当前在岸中间价 |
 | 5 | `fx_quality_check` | 已落库在岸序列 | `fx_quality_issues`、`fx_readiness_snapshots` | 检查缺口、异常跳变、陈旧数据和 readiness |
 
+调度层应把 `fx_master_sync` 和 `fx_calendar_governance` 配置为 `fx_rate_backfill` / `fx_rate_sync` 的 `pre_success` 前置依赖：
+
+- `fx_master_sync` 先刷新货币、货币对、series 和 source profile，保证回补目标存在。
+- `fx_calendar_governance` 再按本次任务日期范围维护发布日 / 观测日历；历史回补继承 `start_date` / `end_date` / `dry_run`，日更至少继承 `dry_run`。
+- 前置依赖失败时，汇率拉取任务不得启动；避免在主数据或发布日治理缺失时直接写观测值。
+
 `rmb_onshore_fixing` scope 只包含：
 
 ```text
@@ -309,7 +315,7 @@ FX.JPY_CNY.CFETS.MID.DAILY
 日历治理和汇率获取应像股票/期货一样任务化，但外汇日历不是交易所交易日历：
 
 - `fx_calendar_governance` 是发布日 / 观测日治理，不写汇率数值。
-- `fx_rate_backfill` / `fx_rate_sync` 只写汇率观测值，不负责推断发布日规则。
+- `fx_rate_backfill` / `fx_rate_sync` 只写汇率观测值，不负责推断发布日规则；但调度任务必须先执行主数据治理和发布日治理前置依赖。
 - 历史回补必须显式传入 `start_date` / `end_date`，避免无边界抓取。
 - 默认调度参数先使用 `rmb_onshore_fixing`，等 CNH 和美元指数链路单独验收后，再显式切换到 `rmb_core`。
 

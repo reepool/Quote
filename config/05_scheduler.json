@@ -617,6 +617,34 @@
           "dry_run": true,
           "note": "Initial rollout default only syncs official onshore RMB fixings. Use scope_id=rmb_core explicitly after CNH/FRED validation.",
           "max_runtime_seconds": 1800
+        },
+        "dependencies": {
+          "pre_success": [
+            {
+              "group_id": "fx_rate_sync_prerequisites",
+              "mode": "serial",
+              "jobs": [
+                {
+                  "job_id": "fx_master_sync",
+                  "timeout_seconds": 600,
+                  "failure_policy": "fail_parent"
+                },
+                {
+                  "job_id": "fx_calendar_governance",
+                  "inherit": [
+                    "dry_run"
+                  ],
+                  "parameters": {
+                    "source_profiles": [
+                      "cfets_rmb_fixing"
+                    ]
+                  },
+                  "timeout_seconds": 1800,
+                  "failure_policy": "fail_parent"
+                }
+              ]
+            }
+          ]
         }
       },
       "fx_rate_backfill": {
@@ -633,6 +661,36 @@
           "dry_run": true,
           "max_runtime_seconds": 7200,
           "note": "Historical FX backfill must be run with explicit start_date/end_date and reviewed source profiles. Initial rollout default only backfills official onshore RMB fixings."
+        },
+        "dependencies": {
+          "pre_success": [
+            {
+              "group_id": "fx_rate_backfill_prerequisites",
+              "mode": "serial",
+              "jobs": [
+                {
+                  "job_id": "fx_master_sync",
+                  "timeout_seconds": 600,
+                  "failure_policy": "fail_parent"
+                },
+                {
+                  "job_id": "fx_calendar_governance",
+                  "inherit": [
+                    "start_date",
+                    "end_date",
+                    "dry_run"
+                  ],
+                  "parameters": {
+                    "source_profiles": [
+                      "cfets_rmb_fixing"
+                    ]
+                  },
+                  "timeout_seconds": 7200,
+                  "failure_policy": "fail_parent"
+                }
+              ]
+            }
+          ]
         }
       },
       "fx_derivation_sync": {
