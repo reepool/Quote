@@ -323,12 +323,19 @@
         "role": "rmb_fixing_primary",
         "source_interface": "cfets_or_chinamoney_rmb_fixing",
         "endpoint_url": "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json",
+        "safe_historical_enabled": true,
+        "safe_historical_source_interface": "akshare.currency_boc_safe",
+        "safe_historical_url": "https://www.safe.gov.cn/safe/rmbhlzjj/index.html",
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "request_interval_seconds": 0.5,
         "parser_version": "fx_cfets_rmb_fixing.v1",
+        "calendar": {
+          "policy": "china_business_day_configured_holidays",
+          "holiday_dates": []
+        },
         "quality_flag": "official",
-        "note": "Official RMB fixing source profile. Concrete endpoint/parser remains gated by live source validation."
+        "note": "Official RMB fixing source profile. Current endpoint is live-verified for latest daily fixings; historical official endpoint remains separately gated."
       },
       "fred_trade_weighted_dollar": {
         "enabled": true,
@@ -342,6 +349,10 @@
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "parser_version": "fx_fred_series.v1",
+        "calendar": {
+          "policy": "us_business_day_configured_holidays",
+          "holiday_dates": []
+        },
         "quality_flag": "official"
       },
       "ecb_reference_rates": {
@@ -352,6 +363,10 @@
         "role": "cross_check",
         "source_interface": "ecb_euro_reference_rates",
         "parser_version": "fx_ecb_reference_rates.v1",
+        "calendar": {
+          "policy": "euro_business_day_configured_holidays",
+          "holiday_dates": []
+        },
         "quality_flag": "official"
       },
       "cnh_market_aggregated_public": {
@@ -370,6 +385,10 @@
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "parser_version": "fx_cnh_aggregated_public.v1",
+        "calendar": {
+          "policy": "weekday_24x5",
+          "holiday_dates": []
+        },
         "quality_flag": "aggregated_public",
         "note": "CNH lacks a single free official daily fixing equivalent. Do not label as official."
       },
@@ -381,6 +400,10 @@
         "role": "dxy_official",
         "source_interface": "ice_us_dollar_index",
         "parser_version": "fx_ice_dxy.v1",
+        "calendar": {
+          "policy": "us_business_day_configured_holidays",
+          "holiday_dates": []
+        },
         "quality_flag": "official",
         "disabled_reason": "Free automated historical access and licensing are not verified."
       },
@@ -392,6 +415,10 @@
         "role": "reviewed_repair",
         "source_interface": "local_reviewed_file",
         "parser_version": "fx_manual_import.v1",
+        "calendar": {
+          "policy": "manual_import",
+          "holiday_dates": []
+        },
         "quality_flag": "manual_verified"
       }
     },
@@ -425,8 +452,18 @@
     ],
     "calendar": {
       "default_timezone": "Asia/Shanghai",
+      "default_policy": "weekday_except_configured_holidays",
       "weekend_non_publication": true,
-      "expected_non_publication_quality_flag": "expected_non_publication"
+      "expected_non_publication_quality_flag": "expected_non_publication",
+      "source_calendar_policy": "configured_source_policy_plus_local_observation",
+      "holiday_dates": {
+        "cfets_rmb_fixing": [],
+        "fred_trade_weighted_dollar": [],
+        "ecb_reference_rates": [],
+        "cnh_market_aggregated_public": [],
+        "ice_dxy_official": [],
+        "manual_verified": []
+      }
     },
     "quality": {
       "max_stale_observation_days": 5,

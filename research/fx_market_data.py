@@ -1678,6 +1678,15 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             response.raise_for_status()
             payload = response.json()
         except Exception as e:
+            safe_fallback = self._fallback_to_safe_history_after_current_failure(
+                series=series,
+                start_date=start_date,
+                end_date=end_date,
+                warning=f"cfets_current_request_failed:{e}",
+                endpoint=endpoint,
+            )
+            if safe_fallback is not None:
+                return safe_fallback
             return {
                 "observations": [],
                 "warnings": [str(e)],
@@ -1689,6 +1698,15 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
         published_at = str((data or {}).get("lastDate") or "")[:16]
         observation_date = published_at[:10]
         if not observation_date:
+            safe_fallback = self._fallback_to_safe_history_after_current_failure(
+                series=series,
+                start_date=start_date,
+                end_date=end_date,
+                warning="cfets_payload_missing_lastDate",
+                endpoint=endpoint,
+            )
+            if safe_fallback is not None:
+                return safe_fallback
             return {
                 "observations": [],
                 "warnings": ["cfets_payload_missing_lastDate"],
@@ -1698,28 +1716,14 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
         start = _as_date(start_date)
         end = _as_date(end_date)
         obs_dt = _as_date(observation_date)
+        current_in_requested_range = True
+        parser_warnings: List[str] = []
         if start and obs_dt and obs_dt < start:
-            return {
-                "observations": [],
-                "warnings": ["cfets_latest_date_before_requested_start"],
-                "blockers": [],
-                "parser_diagnostics": {
-                    "live_requests_performed": 1,
-                    "endpoint_url": endpoint,
-                    "latest_observation_date": observation_date,
-                },
-            }
+            current_in_requested_range = False
+            parser_warnings.append("cfets_latest_date_before_requested_start")
         if end and obs_dt and obs_dt > end:
-            return {
-                "observations": [],
-                "warnings": ["cfets_latest_date_after_requested_end"],
-                "blockers": [],
-                "parser_diagnostics": {
-                    "live_requests_performed": 1,
-                    "endpoint_url": endpoint,
-                    "latest_observation_date": observation_date,
-                },
-            }
+            current_in_requested_range = False
+            parser_warnings.append("cfets_latest_date_after_requested_end")
         series_map = {item.series_id: item for item in series}
         pair_to_series = {
             "USD/CNY": "FX.USD_CNY.CFETS.MID.DAILY",
@@ -1727,9 +1731,14 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             "100JPY/CNY": "FX.JPY_CNY.CFETS.MID.DAILY",
             "JPY/CNY": "FX.JPY_CNY.CFETS.MID.DAILY",
         }
+        series_terms = {
+            "FX.USD_CNY.CFETS.MID.DAILY": ("USD", "CNY", 1.0),
+            "FX.EUR_CNY.CFETS.MID.DAILY": ("EUR", "CNY", 1.0),
+            "FX.JPY_CNY.CFETS.MID.DAILY": ("JPY", "CNY", 100.0),
+        }
         observations: List[FxObservation] = []
-        parser_warnings: List[str] = []
-        for record in records if isinstance(records, Sequence) else []:
+        current_records_seen = len(records) if isinstance(records, Sequence) else 0
+        for record in records if current_in_requested_range and isinstance(records, Sequence) else []:
             if not isinstance(record, Mapping):
                 continue
             pair = str(record.get("vrtEName") or "").upper()
@@ -1742,14 +1751,22 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             except ValueError:
                 parser_warnings.append(f"cfets_invalid_price:{pair}")
                 continue
+            base_currency, quote_currency, quote_multiplier = series_terms.get(
+                selected.series_id,
+                (
+                    str(selected.metadata.get("base_currency") or "").upper(),
+                    str(selected.metadata.get("quote_currency") or "").upper(),
+                    float(selected.metadata.get("quote_multiplier") or 1.0),
+                ),
+            )
             observations.append(
                 FxObservation(
                     series_id=selected.series_id,
                     observation_date=observation_date,
                     value=value,
-                    base_currency=str(selected.metadata.get("base_currency") or "").upper(),
-                    quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
-                    quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                    base_currency=base_currency,
+                    quote_currency=quote_currency,
+                    quote_multiplier=quote_multiplier,
                     source_profile=self.source_profile,
                     source_url=endpoint,
                     publication_time=published_at,
@@ -1764,6 +1781,17 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
                     },
                 )
             )
+        safe_history = {"observations": [], "warnings": [], "parser_diagnostics": {}}
+        if self._should_fetch_safe_history(start=start, end=end, current_observation_date=obs_dt):
+            safe_history = self._fetch_safe_historical_observations(
+                series=series,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            parser_warnings.extend(safe_history.get("warnings") or [])
+            observations = self._deduplicate_observations(
+                [*observations, *(safe_history.get("observations") or [])]
+            )
         return {
             "observations": observations,
             "warnings": parser_warnings,
@@ -1772,10 +1800,162 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
                 "live_requests_performed": 1,
                 "endpoint_url": endpoint,
                 "latest_observation_date": observation_date,
-                "records_seen": len(records) if isinstance(records, Sequence) else 0,
+                "records_seen": current_records_seen,
+                "observations_parsed": len(observations),
+                "safe_historical_enabled": _coerce_bool(self.source_cfg.get("safe_historical_enabled"), False),
+                "safe_historical": safe_history.get("parser_diagnostics") or {},
+            },
+        }
+
+    def _should_fetch_safe_history(
+        self,
+        *,
+        start: Optional[date],
+        end: Optional[date],
+        current_observation_date: Optional[date],
+    ) -> bool:
+        if not _coerce_bool(self.source_cfg.get("safe_historical_enabled"), False):
+            return False
+        if current_observation_date is None:
+            return bool(start or end)
+        if end and current_observation_date > end:
+            return True
+        if start and start < current_observation_date:
+            return True
+        return False
+
+    def _fetch_safe_historical_observations(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        try:
+            import akshare as ak  # type: ignore
+        except Exception as e:
+            return {
+                "observations": [],
+                "warnings": [f"fx_provider_missing_dependency:akshare:{e}"],
+                "parser_diagnostics": {"live_requests_performed": 0, "source_interface": "akshare.currency_boc_safe"},
+            }
+        try:
+            frame = ak.currency_boc_safe()
+        except Exception as e:
+            return {
+                "observations": [],
+                "warnings": [f"cfets_safe_historical_request_failed:{e}"],
+                "parser_diagnostics": {"live_requests_performed": 1, "source_interface": "akshare.currency_boc_safe"},
+            }
+        start = _as_date(start_date)
+        end = _as_date(end_date)
+        series_map = {item.series_id: item for item in series}
+        column_map = {
+            "美元": ("FX.USD_CNY.CFETS.MID.DAILY", "USD", "CNY", 1.0, 0.01),
+            "欧元": ("FX.EUR_CNY.CFETS.MID.DAILY", "EUR", "CNY", 1.0, 0.01),
+            "日元": ("FX.JPY_CNY.CFETS.MID.DAILY", "JPY", "CNY", 100.0, 1.0),
+        }
+        source_url = str(self.source_cfg.get("safe_historical_url") or "https://www.safe.gov.cn/safe/rmbhlzjj/index.html")
+        observations: List[FxObservation] = []
+        rows_seen = 0
+        for _, row in frame.iterrows():
+            rows_seen += 1
+            obs_date = str(row.get("日期") or "")[:10]
+            if not obs_date:
+                continue
+            obs_dt = _as_date(obs_date)
+            if start and obs_dt and obs_dt < start:
+                continue
+            if end and obs_dt and obs_dt > end:
+                continue
+            for raw_column, (series_id, base_currency, quote_currency, quote_multiplier, scale) in column_map.items():
+                selected = series_map.get(series_id)
+                if selected is None:
+                    continue
+                raw_value = row.get(raw_column)
+                try:
+                    value = round(float(raw_value) * scale, 10)
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(value):
+                    continue
+                observations.append(
+                    FxObservation(
+                        series_id=series_id,
+                        observation_date=obs_date,
+                        value=value,
+                        base_currency=base_currency,
+                        quote_currency=quote_currency,
+                        quote_multiplier=quote_multiplier,
+                        source_profile=self.source_profile,
+                        source_url=source_url,
+                        quality_flag=str(self.source_cfg.get("quality_flag") or "official"),
+                        raw_payload_hash=_hash_payload({"date": obs_date, "column": raw_column, "value": raw_value}),
+                        metadata={
+                            "adapter_type": self.adapter_type,
+                            "parser_version": self.source_cfg.get("parser_version"),
+                            "source_interface": self.source_cfg.get("safe_historical_source_interface") or "akshare.currency_boc_safe",
+                            "source_interface_role": "safe_historical_rmb_fixing",
+                            "raw_column": raw_column,
+                            "raw_value": raw_value,
+                        },
+                    )
+                )
+        return {
+            "observations": observations,
+            "warnings": [],
+            "parser_diagnostics": {
+                "live_requests_performed": 1,
+                "source_interface": "akshare.currency_boc_safe",
+                "source_url": source_url,
+                "rows_seen": rows_seen,
                 "observations_parsed": len(observations),
             },
         }
+
+    def _fallback_to_safe_history_after_current_failure(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+        warning: str,
+        endpoint: str,
+    ) -> Optional[Dict[str, Any]]:
+        if not self._should_fetch_safe_history(
+            start=_as_date(start_date),
+            end=_as_date(end_date),
+            current_observation_date=None,
+        ):
+            return None
+        safe_history = self._fetch_safe_historical_observations(
+            series=series,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        observations = safe_history.get("observations") or []
+        if not observations:
+            return None
+        return {
+            "observations": observations,
+            "warnings": [warning, *(safe_history.get("warnings") or [])],
+            "blockers": [],
+            "parser_diagnostics": {
+                "live_requests_performed": 1,
+                "endpoint_url": endpoint,
+                "current_endpoint_failed": True,
+                "observations_parsed": len(observations),
+                "safe_historical_enabled": True,
+                "safe_historical": safe_history.get("parser_diagnostics") or {},
+            },
+        }
+
+    @staticmethod
+    def _deduplicate_observations(observations: Sequence[FxObservation]) -> List[FxObservation]:
+        deduped: Dict[tuple[str, str], FxObservation] = {}
+        for observation in observations:
+            deduped.setdefault((observation.series_id, observation.observation_date), observation)
+        return list(deduped.values())
 
 
 class FredFxProvider(ConfiguredFxSourceProvider):
@@ -2179,15 +2359,44 @@ class FxCalendarGovernanceService:
         calendar_cfg = self.module_cfg.get("calendar") or {}
         default_timezone = str(calendar_cfg.get("default_timezone") or "Asia/Shanghai")
         rows = 0
+        status_counts: Dict[str, int] = {}
         day = start
         while day <= end:
-            is_weekend = day.weekday() >= 5
             for profile in profiles:
                 source_cfg = sources.get(profile) or {}
+                if not isinstance(source_cfg, Mapping):
+                    source_cfg = {}
                 timezone = str(source_cfg.get("timezone") or default_timezone)
-                is_publication_day = not is_weekend
-                status = "expected" if is_publication_day else "expected_non_publication"
-                quality_flag = "calendar_rule" if is_publication_day else str(calendar_cfg.get("expected_non_publication_quality_flag") or "expected_non_publication")
+                policy = self._calendar_policy(profile, source_cfg, calendar_cfg)
+                observed_rows = self.storage.get_observations(
+                    source_profile=profile,
+                    start_date=day.isoformat(),
+                    end_date=day.isoformat(),
+                )
+                observed_count = len(observed_rows)
+                expected_publication_day, calendar_reason = self._is_expected_publication_day(
+                    day,
+                    profile=profile,
+                    policy=policy,
+                    source_cfg=source_cfg,
+                    calendar_cfg=calendar_cfg,
+                    observed_count=observed_count,
+                )
+                is_publication_day = expected_publication_day or observed_count > 0
+                status = self._publication_status(
+                    expected_publication_day=expected_publication_day,
+                    observed_count=observed_count,
+                )
+                quality_flag = self._calendar_quality_flag(status, calendar_cfg)
+                status_counts[status] = status_counts.get(status, 0) + 1
+                metadata = {
+                    "calendar_version": FX_CALENDAR_VERSION,
+                    "calendar_policy": policy,
+                    "calendar_reason": calendar_reason,
+                    "expected_publication_day": expected_publication_day,
+                    "source_observation_count": observed_count,
+                    "source_observation_series_ids": sorted({str(row.get("series_id") or "") for row in observed_rows if row.get("series_id")}),
+                }
                 if not dry_run:
                     self.storage.upsert_calendar_day(
                         source_profile=profile,
@@ -2196,11 +2405,101 @@ class FxCalendarGovernanceService:
                         timezone=timezone,
                         publication_status=status,
                         quality_flag=quality_flag,
-                        metadata={"calendar_version": FX_CALENDAR_VERSION, "weekend_rule": True},
+                        metadata=metadata,
                     )
                 rows += 1
             day += timedelta(days=1)
-        return {"status": "success", "domain": "fx_calendar_governance", "rows": rows, "dry_run": dry_run, "warnings": []}
+        return {
+            "status": "success",
+            "domain": "fx_calendar_governance",
+            "rows": rows,
+            "status_counts": status_counts,
+            "source_profiles": profiles,
+            "dry_run": dry_run,
+            "warnings": [],
+        }
+
+    def _calendar_policy(
+        self,
+        profile: str,
+        source_cfg: Mapping[str, Any],
+        calendar_cfg: Mapping[str, Any],
+    ) -> str:
+        policy = source_cfg.get("calendar_policy")
+        if isinstance(policy, Mapping):
+            policy = policy.get("policy")
+        if not policy:
+            source_calendar = source_cfg.get("calendar")
+            if isinstance(source_calendar, Mapping):
+                policy = source_calendar.get("policy")
+        if not policy:
+            policy = (calendar_cfg.get("source_policies") or {}).get(profile)
+        return str(policy or calendar_cfg.get("default_policy") or "weekday_except_configured_holidays")
+
+    def _configured_holidays(
+        self,
+        profile: str,
+        source_cfg: Mapping[str, Any],
+        calendar_cfg: Mapping[str, Any],
+    ) -> set[str]:
+        holidays: set[str] = set()
+        global_holidays = calendar_cfg.get("holiday_dates")
+        if isinstance(global_holidays, Mapping):
+            holidays.update(_normalize_values(global_holidays.get(profile)))
+        elif global_holidays:
+            holidays.update(_normalize_values(global_holidays))
+        source_calendar = source_cfg.get("calendar")
+        if isinstance(source_calendar, Mapping):
+            holidays.update(_normalize_values(source_calendar.get("holiday_dates")))
+        holidays.update(_normalize_values(source_cfg.get("holiday_dates")))
+        return holidays
+
+    def _is_expected_publication_day(
+        self,
+        day: date,
+        *,
+        profile: str,
+        policy: str,
+        source_cfg: Mapping[str, Any],
+        calendar_cfg: Mapping[str, Any],
+        observed_count: int,
+    ) -> tuple[bool, str]:
+        normalized_policy = policy.strip().lower()
+        if normalized_policy in {"manual_import", "observed_only"}:
+            return observed_count > 0, "manual_observed_only" if observed_count else "manual_not_scheduled"
+        if day.weekday() >= 5:
+            return False, "weekend"
+        if day.isoformat() in self._configured_holidays(
+            profile,
+            source_cfg,
+            calendar_cfg,
+        ):
+            return False, "configured_holiday"
+        if normalized_policy in {
+            "weekday_24x5",
+            "weekday_except_configured_holidays",
+            "china_business_day_configured_holidays",
+            "us_business_day_configured_holidays",
+            "euro_business_day_configured_holidays",
+        }:
+            return True, "policy_weekday"
+        return True, "default_weekday"
+
+    @staticmethod
+    def _publication_status(*, expected_publication_day: bool, observed_count: int) -> str:
+        if observed_count > 0 and expected_publication_day:
+            return "observed"
+        if observed_count > 0 and not expected_publication_day:
+            return "observed_on_non_publication_day"
+        if expected_publication_day:
+            return "missing_expected_observation"
+        return "expected_non_publication"
+
+    @staticmethod
+    def _calendar_quality_flag(status: str, calendar_cfg: Mapping[str, Any]) -> str:
+        if status == "expected_non_publication":
+            return str(calendar_cfg.get("expected_non_publication_quality_flag") or status)
+        return status
 
 
 class FxDerivationService:

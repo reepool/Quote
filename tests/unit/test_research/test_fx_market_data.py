@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
+
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
 
 from research.fx_market_data import (
     AggregatedPublicFxProvider,
     CfetsRmbFixingProvider,
     FredFxProvider,
+    FxCalendarGovernanceService,
     FxDerivationService,
     FxInstrument,
     FxMasterDataService,
@@ -404,6 +407,75 @@ def test_cfets_live_provider_parses_current_rmb_fixings(tmp_path, monkeypatch):
     assert result.metadata["parser_diagnostics"]["live_requests_performed"] == 1
 
 
+def test_cfets_provider_uses_safe_history_for_prior_rmb_fixings(tmp_path, monkeypatch):
+    import akshare as ak
+    import pandas as pd
+
+    config, storage = _seed_storage(tmp_path)
+    source_cfg = dict(config.modules["fx_market_data"]["sources"]["cfets_rmb_fixing"])
+    source_cfg["safe_historical_enabled"] = True
+    provider = CfetsRmbFixingProvider("cfets_rmb_fixing", source_cfg)
+    payload = {
+        "data": {"lastDate": "2026-06-26 9:15"},
+        "records": [
+            {"vrtEName": "USD/CNY", "price": "6.8166"},
+            {"vrtEName": "EUR/CNY", "price": "7.7405"},
+            {"vrtEName": "100JPY/CNY", "price": "4.2107"},
+        ],
+    }
+    safe_frame = pd.DataFrame(
+        [
+            {"日期": "2026-06-25", "美元": 682.09, "欧元": 773.49, "日元": 4.2124},
+            {"日期": "2026-06-26", "美元": 681.66, "欧元": 774.05, "日元": 4.2107},
+        ]
+    )
+    monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: _FakeResponse(json_payload=payload))
+    monkeypatch.setattr(ak, "currency_boc_safe", lambda: safe_frame)
+
+    result = provider.fetch(
+        series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],
+        start_date="2026-06-25",
+        end_date="2026-06-26",
+        dry_run=False,
+    )
+    by_key = {(item.series_id, item.observation_date): item for item in result.observations}
+
+    assert result.status == "success"
+    assert len(result.observations) == 6
+    assert by_key[("FX.USD_CNY.CFETS.MID.DAILY", "2026-06-25")].value == 6.8209
+    assert by_key[("FX.EUR_CNY.CFETS.MID.DAILY", "2026-06-25")].value == 7.7349
+    assert by_key[("FX.JPY_CNY.CFETS.MID.DAILY", "2026-06-25")].value == 4.2124
+    assert by_key[("FX.USD_CNY.CFETS.MID.DAILY", "2026-06-26")].value == 6.8166
+    assert by_key[("FX.JPY_CNY.CFETS.MID.DAILY", "2026-06-25")].quote_multiplier == 100
+    assert result.metadata["parser_diagnostics"]["safe_historical"]["observations_parsed"] == 6
+
+
+def test_cfets_provider_falls_back_to_safe_history_when_current_endpoint_fails(tmp_path, monkeypatch):
+    import akshare as ak
+    import pandas as pd
+
+    config, storage = _seed_storage(tmp_path)
+    source_cfg = dict(config.modules["fx_market_data"]["sources"]["cfets_rmb_fixing"])
+    source_cfg["safe_historical_enabled"] = True
+    provider = CfetsRmbFixingProvider("cfets_rmb_fixing", source_cfg)
+    safe_frame = pd.DataFrame([{"日期": "2026-06-25", "美元": 682.09, "欧元": 773.49, "日元": 4.2124}])
+    monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("timeout")))
+    monkeypatch.setattr(ak, "currency_boc_safe", lambda: safe_frame)
+
+    result = provider.fetch(
+        series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],
+        start_date="2026-06-25",
+        end_date="2026-06-25",
+        dry_run=False,
+    )
+
+    assert result.status == "success"
+    assert len(result.observations) == 3
+    assert result.blockers == []
+    assert any(item.startswith("cfets_current_request_failed:") for item in result.warnings)
+    assert result.metadata["parser_diagnostics"]["current_endpoint_failed"] is True
+
+
 def test_fred_live_provider_parses_trade_weighted_dollar(tmp_path, monkeypatch):
     config, storage = _seed_storage(tmp_path)
     provider = FredFxProvider(
@@ -472,6 +544,88 @@ def test_yahoo_aggregated_provider_parses_offshore_cnh_spot(tmp_path, monkeypatc
     assert {item.series_id for item in result.observations} == set(source_cfg["symbols"])
     assert {item.quality_flag for item in result.observations} == {"aggregated_public"}
     assert result.metadata["parser_diagnostics"]["live_requests_performed"] == 3
+
+
+def test_fx_calendar_governance_uses_source_policy_and_observations(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FX.USD_CNY.CFETS.MID.DAILY",
+            observation_date="2026-06-26",
+            value=7.2,
+            base_currency="USD",
+            quote_currency="CNY",
+            quote_multiplier=1,
+            source_profile="cfets_rmb_fixing",
+            quality_flag="official",
+        )
+    )
+
+    result = FxCalendarGovernanceService(storage, config.modules["fx_market_data"]).run(
+        source_profiles=["cfets_rmb_fixing", "cnh_market_aggregated_public"],
+        start_date="2026-06-26",
+        end_date="2026-06-27",
+    )
+
+    with storage.get_connection() as conn:
+        rows = {
+            (row["source_profile"], row["calendar_date"]): dict(row)
+            for row in conn.execute(
+                """
+                SELECT source_profile, calendar_date, is_publication_day,
+                       publication_status, quality_flag, metadata_json
+                FROM fx_calendars
+                """
+            ).fetchall()
+        }
+    cfets_publish = rows[("cfets_rmb_fixing", "2026-06-26")]
+    cnh_missing = rows[("cnh_market_aggregated_public", "2026-06-26")]
+    cnh_weekend = rows[("cnh_market_aggregated_public", "2026-06-27")]
+    cfets_metadata = json.loads(cfets_publish["metadata_json"])
+
+    assert result["status"] == "success"
+    assert result["status_counts"] == {
+        "observed": 1,
+        "missing_expected_observation": 1,
+        "expected_non_publication": 2,
+    }
+    assert cfets_publish["publication_status"] == "observed"
+    assert cfets_metadata["source_observation_count"] == 1
+    assert cfets_metadata["source_observation_series_ids"] == ["FX.USD_CNY.CFETS.MID.DAILY"]
+    assert cnh_missing["publication_status"] == "missing_expected_observation"
+    assert cnh_missing["quality_flag"] == "missing_expected_observation"
+    assert cnh_weekend["publication_status"] == "expected_non_publication"
+    assert cnh_weekend["is_publication_day"] == 0
+
+
+def test_fx_calendar_governance_respects_configured_holidays(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    config.modules["fx_market_data"]["sources"]["cfets_rmb_fixing"]["calendar"] = {
+        "policy": "china_business_day_configured_holidays",
+        "holiday_dates": ["2026-06-26"],
+    }
+
+    result = FxCalendarGovernanceService(storage, config.modules["fx_market_data"]).run(
+        source_profiles=["cfets_rmb_fixing"],
+        start_date="2026-06-26",
+        end_date="2026-06-26",
+    )
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT is_publication_day, publication_status, metadata_json
+            FROM fx_calendars
+            WHERE source_profile = ? AND calendar_date = ?
+            """,
+            ("cfets_rmb_fixing", "2026-06-26"),
+        ).fetchone()
+    metadata = json.loads(row["metadata_json"])
+
+    assert result["status_counts"] == {"expected_non_publication": 1}
+    assert row["is_publication_day"] == 0
+    assert row["publication_status"] == "expected_non_publication"
+    assert metadata["calendar_reason"] == "configured_holiday"
 
 
 def test_fx_derivation_inverse_missing_source_gap_and_lag_policy(tmp_path):
