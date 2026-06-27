@@ -247,6 +247,8 @@ class TaskScheduler:
         already_tracked = bool(all_parameters.pop(_SCHEDULER_ALREADY_TRACKED_PARAM, False))
         all_parameters["job_config"] = job_config
         max_runtime_seconds = all_parameters.pop("max_runtime_seconds", None)
+        for metadata_key in ("note", "operator_note", "comment", "comments"):
+            all_parameters.pop(metadata_key, None)
         run_id = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         tracked_here = False
         if not already_tracked:

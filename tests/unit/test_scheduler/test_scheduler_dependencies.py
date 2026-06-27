@@ -348,3 +348,42 @@ def test_raw_configured_dependency_node_respects_running_task_max_instances(monk
             scheduler.job_configs = old_job_configs
         if old_running_tasks is not None:
             scheduler.running_tasks = old_running_tasks
+
+
+def test_raw_configured_task_strips_runtime_metadata(monkeypatch):
+    scheduler = TaskScheduler()
+    job_id = "metadata_probe_task"
+    async_task = Mock()
+
+    async def fake_task(*, dry_run=False, job_config=None):
+        async_task(dry_run=dry_run, job_config=job_config)
+        return True
+
+    monkeypatch.setattr(task_module.scheduled_tasks, job_id, fake_task, raising=False)
+    old_job_configs = getattr(scheduler, "job_configs", None)
+    old_running_tasks = getattr(scheduler, "running_tasks", None)
+    try:
+        scheduler.job_configs = {job_id: FakeJobConfig(job_id=job_id, max_instances=1)}
+        scheduler.running_tasks = {}
+
+        result = asyncio.run(
+            scheduler._run_configured_task_raw(
+                job_id,
+                {
+                    "dry_run": True,
+                    "max_runtime_seconds": 60,
+                    "note": "operator-facing description",
+                },
+                include_dependencies=False,
+            )
+        )
+
+        assert result is True
+        async_task.assert_called_once()
+        assert async_task.call_args.kwargs["dry_run"] is True
+        assert "note" not in async_task.call_args.kwargs
+    finally:
+        if old_job_configs is not None:
+            scheduler.job_configs = old_job_configs
+        if old_running_tasks is not None:
+            scheduler.running_tasks = old_running_tasks

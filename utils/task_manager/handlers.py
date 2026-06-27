@@ -1105,11 +1105,19 @@ class TaskManagerHandlers:
         self.task_manager.logger.info(f"[TaskManagerHandlers] 收到命令: '{command_text}' | 用户ID: {user_id} | 聊天ID: {chat_id}")
 
         # 解析命令参数
-        parts = command_text.strip().split()
+        try:
+            parts = shlex.split(command_text.strip())
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *参数格式错误*\n\n`{exc}`",
+                parse_mode='markdown',
+            )
+            return
         if len(parts) < 2:
             error_message = (
                 "❌ *缺少任务ID*\n\n"
-                "请使用: `/run <task_id> [日期]`\n\n"
+                "请使用: `/run <task_id> [日期|key=value...]`\n\n"
                 "例如:\n"
                 "• `/run system_health_check`\n"
                 "• `/run daily_data_update 2026-03-27`\n\n"
@@ -1159,14 +1167,29 @@ class TaskManagerHandlers:
 
         # 解析可选的日期参数（第三个参数）
         target_date = None
+        runtime_tokens = parts[2:]
         if len(parts) >= 3 and job_id == 'daily_data_update':
             target_date = self._parse_date_arg(parts[2])
             if target_date is None:
                 error_message = f"❌ *日期格式错误*\n\n`{parts[2]}` 不是有效日期。\n\n请使用 `YYYY-MM-DD` 格式，例如: `/run daily_data_update 2026-03-27`"
                 await self.task_manager.send_message(chat_id, error_message, parse_mode='markdown')
                 return
+            runtime_tokens = parts[3:]
 
-        self.task_manager.logger.info(f"[TaskManagerHandlers] 尝试立即执行任务: {job_id}, target_date={target_date}")
+        try:
+            runtime_params = self._parse_run_runtime_parameters(runtime_tokens)
+        except ValueError as exc:
+            await self.task_manager.send_message(
+                chat_id,
+                f"❌ *参数错误*\n\n`{exc}`",
+                parse_mode='markdown',
+            )
+            return
+
+        self.task_manager.logger.info(
+            f"[TaskManagerHandlers] 尝试立即执行任务: {job_id}, "
+            f"target_date={target_date}, runtime_params={runtime_params}"
+        )
 
         try:
             # 验证任务是否存在
@@ -1190,7 +1213,12 @@ class TaskManagerHandlers:
 
             # 执行任务
             self.task_manager.logger.info(f"[TaskManagerHandlers] 开始执行任务: {job_id}")
-            success = await self._execute_task_direct(chat_id, job_id, target_date=target_date)
+            success = await self._execute_task_direct(
+                chat_id,
+                job_id,
+                target_date=target_date,
+                runtime_params=runtime_params,
+            )
 
             if success:
                 success_message = f"✅ *任务执行成功*\n\n任务ID: `{job_id}`{date_info}"
@@ -3103,16 +3131,77 @@ class TaskManagerHandlers:
         except ValueError:
             return None
 
-    async def _execute_task_direct(self, chat_id: int, job_id: str, target_date=None) -> bool:
+    def _parse_run_runtime_parameters(self, tokens: List[str]) -> Dict[str, Any]:
+        """解析 `/run <task_id> key=value` 的通用运行参数。"""
+        list_keys = {
+            'categories',
+            'exchanges',
+            'instrument_ids',
+            'scope_ids',
+            'series_ids',
+            'series_types',
+            'source_profiles',
+        }
+        aliases = {
+            'end': 'end_date',
+            'start': 'start_date',
+        }
+        params: Dict[str, Any] = {}
+        for token in tokens:
+            if '=' not in token:
+                flag = token.strip().lower()
+                if flag == 'dry_run':
+                    params['dry_run'] = True
+                    continue
+                if flag == 'write':
+                    params['dry_run'] = False
+                    continue
+                raise ValueError(f"不支持的参数 `{token}`，请使用 key=value 或 dry_run/write")
+
+            raw_key, raw_value = token.split('=', 1)
+            key = aliases.get(raw_key.strip(), raw_key.strip())
+            if not key:
+                raise ValueError(f"参数名不能为空: `{token}`")
+
+            value_text = raw_value.strip()
+            lowered = value_text.lower()
+            if key in list_keys:
+                value: Any = [item.strip() for item in value_text.split(',') if item.strip()]
+            elif lowered in {'true', 'yes', 'y', '1'}:
+                value = True
+            elif lowered in {'false', 'no', 'n', '0'}:
+                value = False
+            elif lowered in {'none', 'null'}:
+                value = None
+            else:
+                try:
+                    value = int(value_text)
+                except ValueError:
+                    value = value_text
+            params[key] = value
+        return params
+
+    async def _execute_task_direct(
+        self,
+        chat_id: int,
+        job_id: str,
+        target_date=None,
+        runtime_params: Optional[Dict[str, Any]] = None,
+    ) -> bool:
         """直接执行任务，不通过UI交互
 
         Args:
             chat_id: 聊天ID
             job_id: 任务ID
             target_date: 可选，指定补数据日期（仅 daily_data_update 有效）
+            runtime_params: 可选，/run key=value 传入的任务参数覆盖项
         """
         try:
-            self.task_manager.logger.info(f"[TaskManagerHandlers] 直接执行任务: {job_id}, target_date={target_date}")
+            runtime_params = dict(runtime_params or {})
+            self.task_manager.logger.info(
+                f"[TaskManagerHandlers] 直接执行任务: {job_id}, "
+                f"target_date={target_date}, runtime_params={runtime_params}"
+            )
 
             # 如果有 target_date 且是 daily_data_update，直接调用 scheduled_tasks
             if target_date and job_id == 'daily_data_update':
@@ -3157,11 +3246,27 @@ class TaskManagerHandlers:
                 self.task_manager.logger.info(
                     f"[TaskManagerHandlers] 通过依赖执行器执行 manual_only 任务: {job_id}"
                 )
+                if runtime_params:
+                    result = await scheduler.execute_job_direct(
+                        job_id,
+                        parameters=runtime_params,
+                        include_dependencies=True,
+                    )
+                else:
+                    result = await scheduler.execute_job_direct(
+                        job_id,
+                        include_dependencies=True,
+                    )
+                self.task_manager.logger.info(f"[TaskManagerHandlers] manual_only 任务执行结果: {job_id}, 成功: {result}")
+                return bool(result)
+
+            if runtime_params:
                 result = await scheduler.execute_job_direct(
                     job_id,
+                    parameters=runtime_params,
                     include_dependencies=True,
                 )
-                self.task_manager.logger.info(f"[TaskManagerHandlers] manual_only 任务执行结果: {job_id}, 成功: {result}")
+                self.task_manager.logger.info(f"[TaskManagerHandlers] 参数化任务执行结果: {job_id}, 成功: {result}")
                 return bool(result)
 
             success = await scheduler.run_job_now(job_id)

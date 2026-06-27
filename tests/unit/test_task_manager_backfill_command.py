@@ -184,6 +184,46 @@ async def test_run_futures_calendar_backfill_with_args_delegates_to_manual_comma
 
 
 @pytest.mark.asyncio
+async def test_run_configured_task_passes_key_value_overrides(monkeypatch):
+    import utils
+    import scheduler.tasks as task_module
+
+    handler, task_manager = _build_handler()
+    task_manager.task_scheduler = Mock()
+    task_manager.task_scheduler.jobs = {}
+    task_manager.task_scheduler.execute_job_direct = AsyncMock(return_value=True)
+
+    monkeypatch.setattr(
+        utils.config_manager,
+        "get_nested",
+        lambda path, default=None: {
+            "enabled": True,
+            "manual_only": True,
+        }
+        if path == "scheduler_config.jobs.fx_calendar_governance"
+        else default,
+    )
+    monkeypatch.setattr(task_module.scheduled_tasks, "fx_calendar_governance", AsyncMock())
+
+    event = SimpleNamespace(
+        chat_id=1,
+        sender_id=2,
+        text='/run fx_calendar_governance source_profiles=cfets_rmb_fixing dry_run=true',
+    )
+
+    await handler.handle_run_command(event)
+
+    task_manager.task_scheduler.execute_job_direct.assert_awaited_once_with(
+        'fx_calendar_governance',
+        parameters={
+            'source_profiles': ['cfets_rmb_fixing'],
+            'dry_run': True,
+        },
+        include_dependencies=True,
+    )
+
+
+@pytest.mark.asyncio
 async def test_run_futures_market_data_backfill_defaults_to_master_governance():
     handler, task_manager = _build_handler()
     event = SimpleNamespace(
