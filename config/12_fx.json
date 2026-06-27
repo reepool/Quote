@@ -35,6 +35,8 @@
           "FX.EUR_CNY.CFETS.MID.DAILY",
           "FX.JPY_CNY.CFETS.MID.DAILY",
           "FX.USD_CNH.MARKET.SPOT.DAILY",
+          "FX.EUR_CNH.MARKET.SPOT.DAILY",
+          "FX.JPY_CNH.MARKET.SPOT.DAILY",
           "FX.EUR_CNH.DERIVED.DAILY",
           "FX.JPY_CNH.DERIVED.DAILY",
           "FXI.DXY.ICE.DAILY",
@@ -146,9 +148,13 @@
         "base_currency": "EUR",
         "quote_currency": "CNH",
         "quote_multiplier": 1,
-        "market_scope": "derived",
+        "market_scope": "offshore",
         "category": "cross_rate",
-        "active": true
+        "active": true,
+        "metadata": {
+          "direct_market_series": "FX.EUR_CNH.MARKET.SPOT.DAILY",
+          "derived_series": "FX.EUR_CNH.DERIVED.DAILY"
+        }
       },
       {
         "instrument_id": "FX.JPY_CNH",
@@ -156,9 +162,14 @@
         "base_currency": "JPY",
         "quote_currency": "CNH",
         "quote_multiplier": 100,
-        "market_scope": "derived",
+        "market_scope": "offshore",
         "category": "cross_rate",
-        "active": true
+        "active": true,
+        "metadata": {
+          "direct_market_series": "FX.JPY_CNH.MARKET.SPOT.DAILY",
+          "derived_series": "FX.JPY_CNH.DERIVED.DAILY",
+          "quote_unit_note": "Direct and derived JPY/CNH series preserve 100 JPY quote unit."
+        }
       },
       {
         "instrument_id": "FXI.DXY",
@@ -218,6 +229,28 @@
       {
         "series_id": "FX.USD_CNH.MARKET.SPOT.DAILY",
         "instrument_id": "FX.USD_CNH",
+        "source_profile": "cnh_market_aggregated_public",
+        "rate_type": "spot",
+        "frequency": "daily",
+        "timezone": "Asia/Hong_Kong",
+        "publication_lag": "same_day",
+        "quality_policy": "aggregated_public_allowed",
+        "active": true
+      },
+      {
+        "series_id": "FX.EUR_CNH.MARKET.SPOT.DAILY",
+        "instrument_id": "FX.EUR_CNH",
+        "source_profile": "cnh_market_aggregated_public",
+        "rate_type": "spot",
+        "frequency": "daily",
+        "timezone": "Asia/Hong_Kong",
+        "publication_lag": "same_day",
+        "quality_policy": "aggregated_public_allowed",
+        "active": true
+      },
+      {
+        "series_id": "FX.JPY_CNH.MARKET.SPOT.DAILY",
+        "instrument_id": "FX.JPY_CNH",
         "source_profile": "cnh_market_aggregated_public",
         "rate_type": "spot",
         "frequency": "daily",
@@ -289,6 +322,7 @@
         "source_mode": "direct",
         "role": "rmb_fixing_primary",
         "source_interface": "cfets_or_chinamoney_rmb_fixing",
+        "endpoint_url": "https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json",
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "request_interval_seconds": 0.5,
@@ -303,6 +337,7 @@
         "source_mode": "direct",
         "role": "dollar_index_alternative",
         "source_interface": "fred_series",
+        "endpoint_url": "https://fred.stlouisfed.org/graph/fredgraph.csv",
         "series_code": "DTWEXBGS",
         "timeout_seconds": 20,
         "retry_attempts": 2,
@@ -325,7 +360,13 @@
         "source_type": "aggregated_public",
         "source_mode": "direct",
         "role": "cnh_spot_fallback",
-        "source_interface": "yahoo_or_akshare_cnh_spot",
+        "source_interface": "yahoo_chart_fx",
+        "endpoint_url": "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}",
+        "symbols": {
+          "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
+          "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",
+          "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH=X"
+        },
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "parser_version": "fx_cnh_aggregated_public.v1",
@@ -396,6 +437,8 @@
         "FX.EUR_CNY.CFETS.MID.DAILY",
         "FX.JPY_CNY.CFETS.MID.DAILY",
         "FX.USD_CNH.MARKET.SPOT.DAILY",
+        "FX.EUR_CNH.MARKET.SPOT.DAILY",
+        "FX.JPY_CNH.MARKET.SPOT.DAILY",
         "FX.EUR_CNH.DERIVED.DAILY",
         "FX.JPY_CNH.DERIVED.DAILY",
         "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"

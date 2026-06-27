@@ -5,6 +5,7 @@ from utils.config_manager import ResearchConfig, ResearchStorageConfig
 from research.fx_market_data import (
     AggregatedPublicFxProvider,
     CfetsRmbFixingProvider,
+    FredFxProvider,
     FxDerivationService,
     FxInstrument,
     FxMasterDataService,
@@ -19,6 +20,20 @@ from research.fx_market_data import (
     build_dcf_fx_context_from_local_service,
     build_configured_fx_provider,
 )
+
+
+class _FakeResponse:
+    def __init__(self, *, json_payload=None, text="", status_code=200):
+        self._json_payload = json_payload
+        self.text = text
+        self.status_code = status_code
+
+    def json(self):
+        return self._json_payload
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
 
 
 def _module_cfg() -> dict:
@@ -58,6 +73,7 @@ def _module_cfg() -> dict:
                 "source_type": "aggregated_public",
                 "source_mode": "direct",
                 "source_interface": "fixture",
+                "disable_live_fetch": True,
                 "role": "cnh_spot_fallback",
                 "quality_flag": "aggregated_public",
                 "parser_version": "test.v1",
@@ -354,6 +370,108 @@ def test_fx_provider_gates_disabled_missing_dependency_and_unverified_live(tmp_p
     assert disabled["status"] == "success"
     assert disabled["source_results"][0]["status"] == "skipped"
     assert isinstance(provider, AggregatedPublicFxProvider)
+
+
+def test_cfets_live_provider_parses_current_rmb_fixings(tmp_path, monkeypatch):
+    config, storage = _seed_storage(tmp_path)
+    provider = CfetsRmbFixingProvider(
+        "cfets_rmb_fixing",
+        config.modules["fx_market_data"]["sources"]["cfets_rmb_fixing"],
+    )
+    payload = {
+        "data": {"lastDate": "2026-06-26 9:15"},
+        "records": [
+            {"vrtEName": "USD/CNY", "price": "6.8166"},
+            {"vrtEName": "EUR/CNY", "price": "7.7405"},
+            {"vrtEName": "100JPY/CNY", "price": "4.2107"},
+        ],
+    }
+    monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: _FakeResponse(json_payload=payload))
+
+    result = provider.fetch(
+        series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],
+        start_date="2026-06-26",
+        end_date="2026-06-26",
+        dry_run=False,
+    )
+
+    assert result.status == "success"
+    assert len(result.observations) == 3
+    jpy = next(item for item in result.observations if item.series_id == "FX.JPY_CNY.CFETS.MID.DAILY")
+    assert jpy.value == 4.2107
+    assert jpy.quote_multiplier == 100
+    assert jpy.quality_flag == "official"
+    assert result.metadata["parser_diagnostics"]["live_requests_performed"] == 1
+
+
+def test_fred_live_provider_parses_trade_weighted_dollar(tmp_path, monkeypatch):
+    config, storage = _seed_storage(tmp_path)
+    provider = FredFxProvider(
+        "fred_trade_weighted_dollar",
+        config.modules["fx_market_data"]["sources"]["fred_trade_weighted_dollar"],
+    )
+    csv_text = "observation_date,DTWEXBGS\n2026-06-25,120.3336\n2026-06-26,119.6451\n"
+    monkeypatch.setattr(provider, "_http_get", lambda *args, **kwargs: _FakeResponse(text=csv_text))
+
+    result = provider.fetch(
+        series=[FxSeries.from_dict(row) for row in storage.list_series(active_only=True)],
+        start_date="2026-06-26",
+        end_date="2026-06-26",
+        dry_run=False,
+    )
+
+    assert result.status == "success"
+    assert len(result.observations) == 1
+    assert result.observations[0].series_id == "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"
+    assert result.observations[0].value == 119.6451
+    assert result.observations[0].quality_flag == "official"
+
+
+def test_yahoo_aggregated_provider_parses_offshore_cnh_spot(tmp_path, monkeypatch):
+    config, storage = _seed_storage(tmp_path)
+    source_cfg = dict(config.modules["fx_market_data"]["sources"]["cnh_market_aggregated_public"])
+    source_cfg.pop("disable_live_fetch", None)
+    source_cfg["symbols"] = {
+        "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
+        "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",
+        "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH=X",
+    }
+    provider = AggregatedPublicFxProvider("cnh_market_aggregated_public", source_cfg)
+    close_by_symbol = {"USDCNH=X": 7.25, "EURCNH=X": 8.01, "JPYCNH=X": 4.62}
+
+    def _fake_get(url, **kwargs):
+        symbol = url.rsplit("/", 1)[-1]
+        return _FakeResponse(
+            json_payload={
+                "chart": {
+                    "result": [
+                        {
+                            "timestamp": [1782432000],
+                            "indicators": {"quote": [{"close": [close_by_symbol[symbol]]}]},
+                        }
+                    ],
+                    "error": None,
+                }
+            }
+        )
+
+    monkeypatch.setattr(provider, "_http_get", _fake_get)
+
+    result = provider.fetch(
+        series=[
+            FxSeries.from_dict(row)
+            for row in storage.list_series(active_only=True)
+            if row["series_id"] in source_cfg["symbols"]
+        ],
+        start_date="2026-06-26",
+        end_date="2026-06-26",
+        dry_run=False,
+    )
+
+    assert result.status == "success"
+    assert {item.series_id for item in result.observations} == set(source_cfg["symbols"])
+    assert {item.quality_flag for item in result.observations} == {"aggregated_public"}
+    assert result.metadata["parser_diagnostics"]["live_requests_performed"] == 3
 
 
 def test_fx_derivation_inverse_missing_source_gap_and_lag_policy(tmp_path):

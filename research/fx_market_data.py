@@ -3,18 +3,22 @@
 from __future__ import annotations
 
 import hashlib
+import csv
+import io
 import json
 import logging
 import math
 import sqlite3
+import time
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Generator, Iterable, List, Mapping, Optional, Protocol, Sequence
 
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
+from utils.http_transport import request_get, tls_config_from_source_config
 
 
 logger = logging.getLogger(__name__)
@@ -325,8 +329,8 @@ def default_fx_instruments(module_cfg: Optional[Mapping[str, Any]] = None) -> Li
         FxInstrument("FX.EUR_CNY", "currency_pair", "EUR", "CNY", 1.0, "onshore", "rmb"),
         FxInstrument("FX.JPY_CNY", "currency_pair", "JPY", "CNY", 100.0, "onshore", "rmb"),
         FxInstrument("FX.USD_CNH", "currency_pair", "USD", "CNH", 1.0, "offshore", "rmb"),
-        FxInstrument("FX.EUR_CNH", "currency_pair", "EUR", "CNH", 1.0, "derived", "cross_rate"),
-        FxInstrument("FX.JPY_CNH", "currency_pair", "JPY", "CNH", 100.0, "derived", "cross_rate"),
+        FxInstrument("FX.EUR_CNH", "currency_pair", "EUR", "CNH", 1.0, "offshore", "cross_rate"),
+        FxInstrument("FX.JPY_CNH", "currency_pair", "JPY", "CNH", 100.0, "offshore", "cross_rate"),
         FxInstrument("FXI.DXY", "currency_index", "USD", "", 1.0, "global", "dollar_index"),
         FxInstrument("FXI.USD_TRADE_WEIGHTED", "currency_index", "USD", "", 1.0, "global", "dollar_index"),
     ]
@@ -342,6 +346,8 @@ def default_fx_series(module_cfg: Optional[Mapping[str, Any]] = None) -> List[Fx
         FxSeries("FX.EUR_CNY.CFETS.MID.DAILY", "FX.EUR_CNY", "cfets_rmb_fixing", "mid", "daily", "Asia/Shanghai", "same_day", "official_required"),
         FxSeries("FX.JPY_CNY.CFETS.MID.DAILY", "FX.JPY_CNY", "cfets_rmb_fixing", "mid", "daily", "Asia/Shanghai", "same_day", "official_required"),
         FxSeries("FX.USD_CNH.MARKET.SPOT.DAILY", "FX.USD_CNH", "cnh_market_aggregated_public", "spot", "daily", "Asia/Hong_Kong", "same_day", "aggregated_public_allowed"),
+        FxSeries("FX.EUR_CNH.MARKET.SPOT.DAILY", "FX.EUR_CNH", "cnh_market_aggregated_public", "spot", "daily", "Asia/Hong_Kong", "same_day", "aggregated_public_allowed"),
+        FxSeries("FX.JPY_CNH.MARKET.SPOT.DAILY", "FX.JPY_CNH", "cnh_market_aggregated_public", "spot", "daily", "Asia/Hong_Kong", "same_day", "aggregated_public_allowed"),
         FxSeries("FX.EUR_CNH.DERIVED.DAILY", "FX.EUR_CNH", "fx_derived_cross", "derived_cross", "daily", "Asia/Hong_Kong", "same_day", "derived_from_governed_sources"),
         FxSeries("FX.JPY_CNH.DERIVED.DAILY", "FX.JPY_CNH", "fx_derived_cross", "derived_cross", "daily", "Asia/Hong_Kong", "same_day", "derived_from_governed_sources"),
         FxSeries("FXI.DXY.ICE.DAILY", "FXI.DXY", "ice_dxy_official", "index_close", "daily", "America/New_York", "same_day", "official_access_required", active=False),
@@ -1417,37 +1423,88 @@ class ConfiguredFxSourceProvider:
         if gate is not None:
             return gate
         observations = self._parse_configured_observations(series, start_date=start_date, end_date=end_date)
+        diagnostics: Dict[str, Any] = {
+            "configured_observation_count": len(observations),
+            "live_requests_performed": 0,
+        }
+        warnings: List[str] = []
+        blockers: List[str] = []
+        live_fetch_disabled = _coerce_bool(self.source_cfg.get("disable_live_fetch"), False)
         if not observations:
-            blocker = "live_fx_source_adapter_not_verified"
+            if live_fetch_disabled:
+                live_result = {
+                    "observations": [],
+                    "warnings": ["live_fx_source_adapter_not_verified"],
+                    "blockers": [],
+                    "parser_diagnostics": {"live_requests_performed": 0},
+                }
+            else:
+                live_result = self._fetch_live_observations(
+                    series=series,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
+            observations = live_result.get("observations") or []
+            diagnostics.update(live_result.get("parser_diagnostics") or {})
+            warnings.extend(live_result.get("warnings") or [])
+            blockers.extend(live_result.get("blockers") or [])
+        if blockers:
             return FxProviderResult(
-                status="dry_run" if dry_run else "blocked",
+                status="blocked",
                 source_profile=self.source_profile,
-                warnings=[blocker] if dry_run else [],
-                blockers=[] if dry_run else [blocker],
+                warnings=warnings,
+                blockers=blockers,
                 metadata=self._metadata(
                     series=series,
                     start_date=start_date,
                     end_date=end_date,
-                    parser_diagnostics={
-                        "configured_observation_count": 0,
-                        "live_requests_performed": 0,
-                    },
+                    parser_diagnostics=diagnostics,
+                ),
+            )
+        if not observations:
+            warning = "fx_source_returned_no_observations" if self.is_live_verified and not live_fetch_disabled else "live_fx_source_adapter_not_verified"
+            warnings.append(warning)
+            if not dry_run and (not self.is_live_verified or live_fetch_disabled):
+                blockers.append(warning)
+                return FxProviderResult(
+                    status="blocked",
+                    source_profile=self.source_profile,
+                    warnings=warnings,
+                    blockers=blockers,
+                    metadata=self._metadata(
+                        series=series,
+                        start_date=start_date,
+                        end_date=end_date,
+                        parser_diagnostics=diagnostics,
+                    ),
+                )
+            return FxProviderResult(
+                status="dry_run" if dry_run else "success",
+                source_profile=self.source_profile,
+                warnings=warnings,
+                metadata=self._metadata(
+                    series=series,
+                    start_date=start_date,
+                    end_date=end_date,
+                    parser_diagnostics=diagnostics,
                 ),
             )
         return FxProviderResult(
             status="dry_run" if dry_run else "success",
             source_profile=self.source_profile,
             observations=[] if dry_run else observations,
+            warnings=warnings,
             metadata=self._metadata(
                 series=series,
                 start_date=start_date,
                 end_date=end_date,
-                parser_diagnostics={
-                    "configured_observation_count": len(observations),
-                    "live_requests_performed": 0,
-                },
+                parser_diagnostics=diagnostics,
             ),
         )
+
+    @property
+    def is_live_verified(self) -> bool:
+        return _coerce_bool(self.source_cfg.get("live_verified"), False)
 
     def _gate(
         self,
@@ -1539,6 +1596,46 @@ class ConfiguredFxSourceProvider:
             )
         return observations
 
+    def _fetch_live_observations(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        return {
+            "observations": [],
+            "warnings": ["live_fx_source_adapter_not_verified"],
+            "blockers": [],
+            "parser_diagnostics": {"live_requests_performed": 0},
+        }
+
+    def _http_get(
+        self,
+        url: str,
+        *,
+        params: Optional[Mapping[str, Any]] = None,
+    ):
+        timeout = float(self.source_cfg.get("timeout_seconds") or 20)
+        headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "Mozilla/5.0 (X11; Linux x86_64) QuoteSystem/FXMarketData"
+            ),
+            "Accept": "application/json,text/csv,text/plain,*/*",
+        }
+        tls_config = tls_config_from_source_config(self.source_profile, self.source_cfg)
+        return request_get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=timeout,
+            tls_config=tls_config,
+        )
+
+    def _source_url(self, default: str) -> str:
+        return str(self.source_cfg.get("endpoint_url") or default)
+
     def _metadata(
         self,
         *,
@@ -1564,9 +1661,212 @@ class ConfiguredFxSourceProvider:
 class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
     adapter_type = "cfets_rmb_fixing"
 
+    @property
+    def is_live_verified(self) -> bool:
+        return True
+
+    def _fetch_live_observations(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        endpoint = self._source_url("https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json")
+        try:
+            response = self._http_get(endpoint)
+            response.raise_for_status()
+            payload = response.json()
+        except Exception as e:
+            return {
+                "observations": [],
+                "warnings": [str(e)],
+                "blockers": ["fx_provider_request_failed:cfets_rmb_fixing"],
+                "parser_diagnostics": {"live_requests_performed": 1, "endpoint_url": endpoint},
+            }
+        data = payload.get("data") if isinstance(payload, Mapping) else {}
+        records = payload.get("records") if isinstance(payload, Mapping) else []
+        published_at = str((data or {}).get("lastDate") or "")[:16]
+        observation_date = published_at[:10]
+        if not observation_date:
+            return {
+                "observations": [],
+                "warnings": ["cfets_payload_missing_lastDate"],
+                "blockers": ["fx_provider_parser_failed:cfets_rmb_fixing"],
+                "parser_diagnostics": {"live_requests_performed": 1, "endpoint_url": endpoint},
+            }
+        start = _as_date(start_date)
+        end = _as_date(end_date)
+        obs_dt = _as_date(observation_date)
+        if start and obs_dt and obs_dt < start:
+            return {
+                "observations": [],
+                "warnings": ["cfets_latest_date_before_requested_start"],
+                "blockers": [],
+                "parser_diagnostics": {
+                    "live_requests_performed": 1,
+                    "endpoint_url": endpoint,
+                    "latest_observation_date": observation_date,
+                },
+            }
+        if end and obs_dt and obs_dt > end:
+            return {
+                "observations": [],
+                "warnings": ["cfets_latest_date_after_requested_end"],
+                "blockers": [],
+                "parser_diagnostics": {
+                    "live_requests_performed": 1,
+                    "endpoint_url": endpoint,
+                    "latest_observation_date": observation_date,
+                },
+            }
+        series_map = {item.series_id: item for item in series}
+        pair_to_series = {
+            "USD/CNY": "FX.USD_CNY.CFETS.MID.DAILY",
+            "EUR/CNY": "FX.EUR_CNY.CFETS.MID.DAILY",
+            "100JPY/CNY": "FX.JPY_CNY.CFETS.MID.DAILY",
+            "JPY/CNY": "FX.JPY_CNY.CFETS.MID.DAILY",
+        }
+        observations: List[FxObservation] = []
+        parser_warnings: List[str] = []
+        for record in records if isinstance(records, Sequence) else []:
+            if not isinstance(record, Mapping):
+                continue
+            pair = str(record.get("vrtEName") or "").upper()
+            sid = pair_to_series.get(pair)
+            selected = series_map.get(sid or "")
+            if selected is None:
+                continue
+            try:
+                value = float(str(record.get("price") or "").replace(",", ""))
+            except ValueError:
+                parser_warnings.append(f"cfets_invalid_price:{pair}")
+                continue
+            observations.append(
+                FxObservation(
+                    series_id=selected.series_id,
+                    observation_date=observation_date,
+                    value=value,
+                    base_currency=str(selected.metadata.get("base_currency") or "").upper(),
+                    quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
+                    quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                    source_profile=self.source_profile,
+                    source_url=endpoint,
+                    publication_time=published_at,
+                    quality_flag=str(self.source_cfg.get("quality_flag") or "official"),
+                    raw_payload_hash=_hash_payload(record),
+                    metadata={
+                        "adapter_type": self.adapter_type,
+                        "parser_version": self.source_cfg.get("parser_version"),
+                        "source_interface": self.source_cfg.get("source_interface"),
+                        "raw_pair": pair,
+                        "raw_record": dict(record),
+                    },
+                )
+            )
+        return {
+            "observations": observations,
+            "warnings": parser_warnings,
+            "blockers": [],
+            "parser_diagnostics": {
+                "live_requests_performed": 1,
+                "endpoint_url": endpoint,
+                "latest_observation_date": observation_date,
+                "records_seen": len(records) if isinstance(records, Sequence) else 0,
+                "observations_parsed": len(observations),
+            },
+        }
+
 
 class FredFxProvider(ConfiguredFxSourceProvider):
     adapter_type = "fred_series"
+
+    @property
+    def is_live_verified(self) -> bool:
+        return True
+
+    def _fetch_live_observations(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        endpoint = self._source_url("https://fred.stlouisfed.org/graph/fredgraph.csv")
+        series_code = str(self.source_cfg.get("series_code") or "DTWEXBGS")
+        try:
+            response = self._http_get(endpoint, params={"id": series_code})
+            response.raise_for_status()
+            text = response.text
+        except Exception as e:
+            return {
+                "observations": [],
+                "warnings": [str(e)],
+                "blockers": ["fx_provider_request_failed:fred_trade_weighted_dollar"],
+                "parser_diagnostics": {"live_requests_performed": 1, "endpoint_url": endpoint, "series_code": series_code},
+            }
+        selected = next((item for item in series if item.series_id == "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"), None)
+        if selected is None:
+            return {
+                "observations": [],
+                "warnings": ["fred_requested_series_not_selected"],
+                "blockers": [],
+                "parser_diagnostics": {"live_requests_performed": 1, "endpoint_url": endpoint, "series_code": series_code},
+            }
+        start = _as_date(start_date)
+        end = _as_date(end_date)
+        observations: List[FxObservation] = []
+        rows_seen = 0
+        for row in csv.DictReader(io.StringIO(text)):
+            rows_seen += 1
+            obs_date = str(row.get("observation_date") or row.get("DATE") or "")[:10]
+            if not obs_date:
+                continue
+            obs_dt = _as_date(obs_date)
+            if start and obs_dt and obs_dt < start:
+                continue
+            if end and obs_dt and obs_dt > end:
+                continue
+            raw_value = str(row.get(series_code) or row.get("VALUE") or "").strip()
+            if not raw_value or raw_value == ".":
+                continue
+            try:
+                value = float(raw_value)
+            except ValueError:
+                continue
+            observations.append(
+                FxObservation(
+                    series_id=selected.series_id,
+                    observation_date=obs_date,
+                    value=value,
+                    base_currency=str(selected.metadata.get("base_currency") or "USD").upper(),
+                    quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
+                    quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                    source_profile=self.source_profile,
+                    source_url=endpoint,
+                    quality_flag=str(self.source_cfg.get("quality_flag") or "official"),
+                    raw_payload_hash=_hash_payload(row),
+                    metadata={
+                        "adapter_type": self.adapter_type,
+                        "parser_version": self.source_cfg.get("parser_version"),
+                        "source_interface": self.source_cfg.get("source_interface"),
+                        "fred_series_code": series_code,
+                        "raw_row": dict(row),
+                    },
+                )
+            )
+        return {
+            "observations": observations,
+            "warnings": [],
+            "blockers": [],
+            "parser_diagnostics": {
+                "live_requests_performed": 1,
+                "endpoint_url": endpoint,
+                "series_code": series_code,
+                "rows_seen": rows_seen,
+                "observations_parsed": len(observations),
+            },
+        }
 
 
 class EcbReferenceFxProvider(ConfiguredFxSourceProvider):
@@ -1575,6 +1875,113 @@ class EcbReferenceFxProvider(ConfiguredFxSourceProvider):
 
 class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
     adapter_type = "aggregated_public_fx"
+
+    @property
+    def is_live_verified(self) -> bool:
+        return True
+
+    def _fetch_live_observations(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        endpoint_template = self._source_url("https://query1.finance.yahoo.com/v8/finance/chart/{symbol}")
+        symbols = dict(self.source_cfg.get("symbols") or {})
+        defaults = {
+            "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
+            "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",
+            "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH=X",
+        }
+        start_dt = _as_date(start_date) or (get_shanghai_time().date() - timedelta(days=7))
+        end_dt = _as_date(end_date) or get_shanghai_time().date()
+        # Yahoo period2 is exclusive; add one day so the requested end date is included.
+        period1 = int(datetime.combine(start_dt, datetime.min.time(), tzinfo=timezone.utc).timestamp())
+        period2 = int(datetime.combine(end_dt + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc).timestamp())
+        observations: List[FxObservation] = []
+        warnings: List[str] = []
+        blockers: List[str] = []
+        requests_performed = 0
+        for selected in series:
+            symbol = str(symbols.get(selected.series_id) or defaults.get(selected.series_id) or "")
+            if not symbol:
+                warnings.append(f"yahoo_symbol_not_configured:{selected.series_id}")
+                continue
+            url = endpoint_template.format(symbol=symbol)
+            try:
+                response = self._http_get(
+                    url,
+                    params={
+                        "period1": period1,
+                        "period2": period2,
+                        "interval": "1d",
+                        "events": "history",
+                    },
+                )
+                requests_performed += 1
+                if response.status_code == 429:
+                    blockers.append("fx_provider_rate_limited:yahoo_chart")
+                    warnings.append(response.text[:200])
+                    continue
+                response.raise_for_status()
+                payload = response.json()
+            except Exception as e:
+                blockers.append("fx_provider_request_failed:yahoo_chart")
+                warnings.append(str(e))
+                continue
+            chart = (payload.get("chart") or {}) if isinstance(payload, Mapping) else {}
+            errors = chart.get("error")
+            if errors:
+                blockers.append("fx_provider_parser_failed:yahoo_chart")
+                warnings.append(_json_dumps(errors))
+                continue
+            results = chart.get("result") or []
+            if not results:
+                warnings.append(f"yahoo_empty_result:{symbol}")
+                continue
+            result = results[0]
+            timestamps = result.get("timestamp") or []
+            quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
+            close_values = quote.get("close") or []
+            for ts, close_value in zip(timestamps, close_values):
+                if close_value is None:
+                    continue
+                obs_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date().isoformat()
+                obs_dt = _as_date(obs_date)
+                if obs_dt and (obs_dt < start_dt or obs_dt > end_dt):
+                    continue
+                observations.append(
+                    FxObservation(
+                        series_id=selected.series_id,
+                        observation_date=obs_date,
+                        value=float(close_value),
+                        base_currency=str(selected.metadata.get("base_currency") or "").upper(),
+                        quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
+                        quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                        source_profile=self.source_profile,
+                        source_url=url,
+                        quality_flag=str(self.source_cfg.get("quality_flag") or "aggregated_public"),
+                        raw_payload_hash=_hash_payload({"symbol": symbol, "timestamp": ts, "close": close_value}),
+                        metadata={
+                            "adapter_type": self.adapter_type,
+                            "parser_version": self.source_cfg.get("parser_version"),
+                            "source_interface": self.source_cfg.get("source_interface"),
+                            "symbol": symbol,
+                            "provider": "yahoo_finance_chart",
+                        },
+                    )
+                )
+        return {
+            "observations": observations,
+            "warnings": warnings,
+            "blockers": blockers,
+            "parser_diagnostics": {
+                "live_requests_performed": requests_performed,
+                "endpoint_url": endpoint_template,
+                "observations_parsed": len(observations),
+            },
+        }
 
 
 def build_configured_fx_provider(source_profile: str, source_cfg: Mapping[str, Any]) -> FxProvider:
