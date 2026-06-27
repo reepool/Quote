@@ -1324,6 +1324,8 @@ class FxMasterDataService:
         self.module_cfg = module_cfg
 
     def sync(self) -> Dict[str, Any]:
+        started = time.monotonic()
+        logger.info("[FX][master_sync] start")
         counts = {
             "currencies": 0,
             "instruments": 0,
@@ -1351,6 +1353,7 @@ class FxMasterDataService:
             if isinstance(item, Mapping):
                 self.storage.upsert_derivation(item)
                 counts["derivations"] += 1
+        logger.info("[FX][master_sync] complete counts=%s elapsed=%.2fs", counts, time.monotonic() - started)
         return {
             "status": "success",
             "domain": "fx_market_data",
@@ -1421,7 +1424,28 @@ class ConfiguredFxSourceProvider:
     ) -> FxProviderResult:
         gate = self._gate(series=series, start_date=start_date, end_date=end_date, dry_run=dry_run)
         if gate is not None:
+            logger.info(
+                "[FX][provider:%s] gated status=%s dry_run=%s blockers=%s warnings=%s series=%s start=%s end=%s",
+                self.source_profile,
+                gate.status,
+                dry_run,
+                gate.blockers,
+                gate.warnings,
+                [item.series_id for item in series],
+                start_date,
+                end_date,
+            )
             return gate
+        started = time.monotonic()
+        logger.info(
+            "[FX][provider:%s] fetch start adapter=%s dry_run=%s series=%s start=%s end=%s",
+            self.source_profile,
+            self.adapter_type,
+            dry_run,
+            [item.series_id for item in series],
+            start_date,
+            end_date,
+        )
         observations = self._parse_configured_observations(series, start_date=start_date, end_date=end_date)
         diagnostics: Dict[str, Any] = {
             "configured_observation_count": len(observations),
@@ -1466,6 +1490,13 @@ class ConfiguredFxSourceProvider:
             warnings.append(warning)
             if not dry_run and (not self.is_live_verified or live_fetch_disabled):
                 blockers.append(warning)
+                logger.warning(
+                    "[FX][provider:%s] fetch blocked no observations warning=%s diagnostics=%s elapsed=%.2fs",
+                    self.source_profile,
+                    warning,
+                    diagnostics,
+                    time.monotonic() - started,
+                )
                 return FxProviderResult(
                     status="blocked",
                     source_profile=self.source_profile,
@@ -1478,6 +1509,14 @@ class ConfiguredFxSourceProvider:
                         parser_diagnostics=diagnostics,
                     ),
                 )
+            logger.info(
+                "[FX][provider:%s] fetch complete status=%s observations=0 warnings=%s diagnostics=%s elapsed=%.2fs",
+                self.source_profile,
+                "dry_run" if dry_run else "success",
+                warnings,
+                diagnostics,
+                time.monotonic() - started,
+            )
             return FxProviderResult(
                 status="dry_run" if dry_run else "success",
                 source_profile=self.source_profile,
@@ -1489,6 +1528,16 @@ class ConfiguredFxSourceProvider:
                     parser_diagnostics=diagnostics,
                 ),
             )
+        logger.info(
+            "[FX][provider:%s] fetch complete status=%s parsed_observations=%s returned_observations=%s warnings=%s diagnostics=%s elapsed=%.2fs",
+            self.source_profile,
+            "dry_run" if dry_run else "success",
+            len(observations),
+            0 if dry_run else len(observations),
+            warnings,
+            diagnostics,
+            time.monotonic() - started,
+        )
         return FxProviderResult(
             status="dry_run" if dry_run else "success",
             source_profile=self.source_profile,
@@ -1673,11 +1722,24 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
         end_date: Optional[str],
     ) -> Dict[str, Any]:
         endpoint = self._source_url("https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/ccpr.json")
+        logger.info(
+            "[FX][provider:%s] current endpoint request start url=%s start=%s end=%s",
+            self.source_profile,
+            endpoint,
+            start_date,
+            end_date,
+        )
         try:
             response = self._http_get(endpoint)
             response.raise_for_status()
             payload = response.json()
         except Exception as e:
+            logger.warning(
+                "[FX][provider:%s] current endpoint request failed url=%s error=%s",
+                self.source_profile,
+                endpoint,
+                e,
+            )
             safe_fallback = self._fallback_to_safe_history_after_current_failure(
                 series=series,
                 start_date=start_date,
@@ -1783,6 +1845,15 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             )
         safe_history = {"observations": [], "warnings": [], "parser_diagnostics": {}}
         if self._should_fetch_safe_history(start=start, end=end, current_observation_date=obs_dt):
+            logger.info(
+                "[FX][provider:%s] SAFE historical fetch required current_observation_date=%s current_records=%s current_observations=%s start=%s end=%s",
+                self.source_profile,
+                observation_date,
+                current_records_seen,
+                len(observations),
+                start_date,
+                end_date,
+            )
             safe_history = self._fetch_safe_historical_observations(
                 series=series,
                 start_date=start_date,
@@ -1792,6 +1863,14 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
             observations = self._deduplicate_observations(
                 [*observations, *(safe_history.get("observations") or [])]
             )
+        logger.info(
+            "[FX][provider:%s] current endpoint parsed latest=%s records=%s observations=%s warnings=%s",
+            self.source_profile,
+            observation_date,
+            current_records_seen,
+            len(observations),
+            parser_warnings,
+        )
         return {
             "observations": observations,
             "warnings": parser_warnings,
@@ -1831,9 +1910,18 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
         start_date: Optional[str],
         end_date: Optional[str],
     ) -> Dict[str, Any]:
+        started = time.monotonic()
+        logger.info(
+            "[FX][provider:%s] SAFE historical request start interface=akshare.currency_boc_safe start=%s end=%s series=%s",
+            self.source_profile,
+            start_date,
+            end_date,
+            [item.series_id for item in series],
+        )
         try:
             import akshare as ak  # type: ignore
         except Exception as e:
+            logger.error("[FX][provider:%s] SAFE historical dependency missing error=%s", self.source_profile, e)
             return {
                 "observations": [],
                 "warnings": [f"fx_provider_missing_dependency:akshare:{e}"],
@@ -1842,6 +1930,7 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
         try:
             frame = ak.currency_boc_safe()
         except Exception as e:
+            logger.warning("[FX][provider:%s] SAFE historical request failed error=%s", self.source_profile, e)
             return {
                 "observations": [],
                 "warnings": [f"cfets_safe_historical_request_failed:{e}"],
@@ -1901,6 +1990,15 @@ class CfetsRmbFixingProvider(ConfiguredFxSourceProvider):
                         },
                     )
                 )
+        logger.info(
+            "[FX][provider:%s] SAFE historical parsed rows_seen=%s observations=%s start=%s end=%s elapsed=%.2fs",
+            self.source_profile,
+            rows_seen,
+            len(observations),
+            start_date,
+            end_date,
+            time.monotonic() - started,
+        )
         return {
             "observations": observations,
             "warnings": [],
@@ -2254,12 +2352,28 @@ class FxRateSyncService:
         end_date: Optional[str] = None,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
+        started = time.monotonic()
+        logger.info(
+            "[FX][rate_sync] start scope_id=%s scope_ids=%s series_ids=%s start=%s end=%s dry_run=%s",
+            scope_id,
+            list(scope_ids or []),
+            list(series_ids or []),
+            start_date,
+            end_date,
+            dry_run,
+        )
         selection = FxUniverseSelector(self.module_cfg, self.storage).resolve(
             scope_id=scope_id,
             scope_ids=scope_ids,
             series_ids=series_ids,
         )
         if selection.blockers:
+            logger.warning(
+                "[FX][rate_sync] blocked during universe selection blockers=%s warnings=%s requested=%s",
+                selection.blockers,
+                selection.warnings,
+                selection.as_dict().get("requested"),
+            )
             return {
                 "status": "blocked",
                 "domain": "fx_market_data",
@@ -2276,6 +2390,12 @@ class FxRateSyncService:
         by_source: Dict[str, List[FxSeries]] = {}
         for item in selected_series:
             by_source.setdefault(item.source_profile, []).append(item)
+        logger.info(
+            "[FX][rate_sync] universe resolved series=%s sources=%s dry_run=%s",
+            selection.series_ids,
+            {source: [item.series_id for item in group] for source, group in by_source.items()},
+            dry_run,
+        )
         run_id = None
         if not dry_run:
             run_id = self.storage.start_ingestion_run(
@@ -2284,6 +2404,7 @@ class FxRateSyncService:
                 mode="dry_run" if dry_run else "write",
                 metadata={"scope_selection": selection.as_dict(), "start_date": start_date, "end_date": end_date},
             )
+            logger.info("[FX][rate_sync] ingestion run started run_id=%s sources=%s", run_id, sorted(by_source))
         totals = {"inserted": 0, "updated": 0, "unchanged": 0, "failed": 0}
         source_results: List[Dict[str, Any]] = []
         sources_cfg = self.module_cfg.get("sources") or {}
@@ -2291,21 +2412,56 @@ class FxRateSyncService:
         blockers: List[str] = []
         warnings: List[str] = []
         for source_profile, group in sorted(by_source.items()):
+            source_started = time.monotonic()
+            logger.info(
+                "[FX][rate_sync] source start source_profile=%s series=%s start=%s end=%s dry_run=%s",
+                source_profile,
+                [item.series_id for item in group],
+                start_date,
+                end_date,
+                dry_run,
+            )
             provider = self.providers.get(source_profile)
             if provider is None:
                 provider = build_configured_fx_provider(source_profile, sources_cfg.get(source_profile, {}))
             result = provider.fetch(series=group, start_date=start_date, end_date=end_date, dry_run=dry_run)
+            logger.info(
+                "[FX][rate_sync] source fetched source_profile=%s status=%s observations=%s blockers=%s warnings=%s elapsed=%.2fs",
+                source_profile,
+                result.status,
+                len(result.observations),
+                result.blockers,
+                result.warnings,
+                time.monotonic() - source_started,
+            )
             if result.blockers:
                 blockers.extend(result.blockers)
                 status = "blocked"
             warnings.extend(result.warnings)
             write_counts = {"inserted": 0, "updated": 0, "unchanged": 0}
             if result.status == "success" and not dry_run:
-                for observation in result.observations:
+                total_observations = len(result.observations)
+                for index, observation in enumerate(result.observations, start=1):
                     observation = FxObservation(**{**observation.as_dict(), "ingestion_run_id": run_id})
                     outcome = self.storage.upsert_observation(observation)
                     write_counts[outcome] += 1
                     totals[outcome] += 1
+                    if index % 1000 == 0 or index == total_observations:
+                        logger.info(
+                            "[FX][rate_sync] write progress source_profile=%s written=%s/%s write_counts=%s totals=%s",
+                            source_profile,
+                            index,
+                            total_observations,
+                            write_counts,
+                            totals,
+                        )
+            logger.info(
+                "[FX][rate_sync] source complete source_profile=%s status=%s write_counts=%s elapsed=%.2fs",
+                source_profile,
+                result.status,
+                write_counts,
+                time.monotonic() - source_started,
+            )
             source_results.append({
                 "source_profile": source_profile,
                 "status": result.status,
@@ -2321,6 +2477,16 @@ class FxRateSyncService:
                 status=status,
                 metadata={"totals": totals, "source_results": source_results, "blockers": blockers, "warnings": warnings},
             )
+            logger.info("[FX][rate_sync] ingestion run finished run_id=%s status=%s totals=%s", run_id, status, totals)
+        logger.info(
+            "[FX][rate_sync] complete status=%s totals=%s blockers=%s warnings=%s dry_run=%s elapsed=%.2fs",
+            status,
+            totals,
+            blockers,
+            warnings,
+            dry_run,
+            time.monotonic() - started,
+        )
         return {
             "status": status,
             "domain": "fx_market_data",
@@ -2347,6 +2513,7 @@ class FxCalendarGovernanceService:
         end_date: Optional[str] = None,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
+        started_at = time.monotonic()
         sources = self.module_cfg.get("sources") or {}
         profiles = _normalize_values(source_profiles) or [
             key for key, value in sources.items()
@@ -2355,7 +2522,17 @@ class FxCalendarGovernanceService:
         start = _as_date(start_date) or get_shanghai_time().date()
         end = _as_date(end_date) or start
         if end < start:
+            logger.warning("[FX][calendar_governance] blocked invalid date range start=%s end=%s", start_date, end_date)
             return {"status": "blocked", "blockers": ["invalid_date_range"], "warnings": []}
+        total_days = (end - start).days + 1
+        logger.info(
+            "[FX][calendar_governance] start profiles=%s start=%s end=%s days=%s dry_run=%s",
+            profiles,
+            start.isoformat(),
+            end.isoformat(),
+            total_days,
+            dry_run,
+        )
         calendar_cfg = self.module_cfg.get("calendar") or {}
         default_timezone = str(calendar_cfg.get("default_timezone") or "Asia/Shanghai")
         rows = 0
@@ -2408,7 +2585,25 @@ class FxCalendarGovernanceService:
                         metadata=metadata,
                     )
                 rows += 1
+                if rows % 1000 == 0:
+                    logger.info(
+                        "[FX][calendar_governance] progress rows=%s current_date=%s status_counts=%s dry_run=%s",
+                        rows,
+                        day.isoformat(),
+                        status_counts,
+                        dry_run,
+                    )
             day += timedelta(days=1)
+        logger.info(
+            "[FX][calendar_governance] complete rows=%s status_counts=%s profiles=%s start=%s end=%s dry_run=%s elapsed=%.2fs",
+            rows,
+            status_counts,
+            profiles,
+            start.isoformat(),
+            end.isoformat(),
+            dry_run,
+            time.monotonic() - started_at,
+        )
         return {
             "status": "success",
             "domain": "fx_calendar_governance",

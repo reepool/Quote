@@ -316,8 +316,10 @@ FX.JPY_CNY.CFETS.MID.DAILY
 
 - `fx_calendar_governance` 是发布日 / 观测日治理，不写汇率数值。
 - `fx_rate_backfill` / `fx_rate_sync` 只写汇率观测值，不负责推断发布日规则；但调度任务必须先执行主数据治理和发布日治理前置依赖。
+- `fx_rate_backfill` / `fx_rate_sync` 写入成功后，应再执行发布日治理复核，把已写入观测的日期从 `missing_expected_observation` 更新为 `observed`。
 - 历史回补必须显式传入 `start_date` / `end_date`，避免无边界抓取。
 - 默认调度参数先使用 `rmb_onshore_fixing`，等 CNH 和美元指数链路单独验收后，再显式切换到 `rmb_core`。
+- 长耗时任务必须在服务层记录关键阶段日志：任务开始、scope/series 解析、数据源请求开始/完成、解析行数、写入进度、写入统计、ingestion run 开始/结束和异常阻断原因。
 
 ### 8.2 API
 

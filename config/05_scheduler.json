@@ -644,6 +644,27 @@
                 }
               ]
             }
+          ],
+          "post_success": [
+            {
+              "group_id": "fx_rate_sync_calendar_reconcile",
+              "mode": "serial",
+              "jobs": [
+                {
+                  "job_id": "fx_calendar_governance",
+                  "inherit": [
+                    "dry_run"
+                  ],
+                  "parameters": {
+                    "source_profiles": [
+                      "cfets_rmb_fixing"
+                    ]
+                  },
+                  "timeout_seconds": 1800,
+                  "failure_policy": "degrade_parent"
+                }
+              ]
+            }
           ]
         }
       },
@@ -687,6 +708,29 @@
                   },
                   "timeout_seconds": 7200,
                   "failure_policy": "fail_parent"
+                }
+              ]
+            }
+          ],
+          "post_success": [
+            {
+              "group_id": "fx_rate_backfill_calendar_reconcile",
+              "mode": "serial",
+              "jobs": [
+                {
+                  "job_id": "fx_calendar_governance",
+                  "inherit": [
+                    "start_date",
+                    "end_date",
+                    "dry_run"
+                  ],
+                  "parameters": {
+                    "source_profiles": [
+                      "cfets_rmb_fixing"
+                    ]
+                  },
+                  "timeout_seconds": 7200,
+                  "failure_policy": "degrade_parent"
                 }
               ]
             }
