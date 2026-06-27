@@ -2181,12 +2181,23 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
         warnings: List[str] = []
         blockers: List[str] = []
         requests_performed = 0
+        rows_seen = 0
         for selected in series:
             symbol = str(symbols.get(selected.series_id) or defaults.get(selected.series_id) or "")
             if not symbol:
                 warnings.append(f"yahoo_symbol_not_configured:{selected.series_id}")
                 continue
             url = endpoint_template.format(symbol=symbol)
+            quote_multiplier = float(selected.metadata.get("quote_multiplier") or 1.0)
+            logger.info(
+                "[FX][provider:%s] Yahoo chart request start symbol=%s series_id=%s start=%s end=%s multiplier=%s",
+                self.source_profile,
+                symbol,
+                selected.series_id,
+                start_dt.isoformat(),
+                end_dt.isoformat(),
+                quote_multiplier,
+            )
             try:
                 response = self._http_get(
                     url,
@@ -2199,57 +2210,97 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
                 )
                 requests_performed += 1
                 if response.status_code == 429:
+                    logger.warning(
+                        "[FX][provider:%s] Yahoo chart rate limited symbol=%s status=%s",
+                        self.source_profile,
+                        symbol,
+                        response.status_code,
+                    )
                     blockers.append("fx_provider_rate_limited:yahoo_chart")
                     warnings.append(response.text[:200])
                     continue
                 response.raise_for_status()
                 payload = response.json()
             except Exception as e:
+                logger.warning(
+                    "[FX][provider:%s] Yahoo chart request failed symbol=%s error=%s",
+                    self.source_profile,
+                    symbol,
+                    e,
+                )
                 blockers.append("fx_provider_request_failed:yahoo_chart")
                 warnings.append(str(e))
                 continue
             chart = (payload.get("chart") or {}) if isinstance(payload, Mapping) else {}
             errors = chart.get("error")
             if errors:
+                logger.warning(
+                    "[FX][provider:%s] Yahoo chart parser failed symbol=%s error=%s",
+                    self.source_profile,
+                    symbol,
+                    _json_dumps(errors),
+                )
                 blockers.append("fx_provider_parser_failed:yahoo_chart")
                 warnings.append(_json_dumps(errors))
                 continue
             results = chart.get("result") or []
             if not results:
+                logger.info("[FX][provider:%s] Yahoo chart empty result symbol=%s", self.source_profile, symbol)
                 warnings.append(f"yahoo_empty_result:{symbol}")
                 continue
             result = results[0]
             timestamps = result.get("timestamp") or []
             quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
             close_values = quote.get("close") or []
+            parsed_for_symbol = 0
             for ts, close_value in zip(timestamps, close_values):
+                rows_seen += 1
                 if close_value is None:
                     continue
                 obs_date = datetime.fromtimestamp(int(ts), tz=timezone.utc).date().isoformat()
                 obs_dt = _as_date(obs_date)
                 if obs_dt and (obs_dt < start_dt or obs_dt > end_dt):
                     continue
+                normalized_value = float(close_value) * quote_multiplier
                 observations.append(
                     FxObservation(
                         series_id=selected.series_id,
                         observation_date=obs_date,
-                        value=float(close_value),
+                        value=normalized_value,
                         base_currency=str(selected.metadata.get("base_currency") or "").upper(),
                         quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
-                        quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                        quote_multiplier=quote_multiplier,
                         source_profile=self.source_profile,
                         source_url=url,
                         quality_flag=str(self.source_cfg.get("quality_flag") or "aggregated_public"),
-                        raw_payload_hash=_hash_payload({"symbol": symbol, "timestamp": ts, "close": close_value}),
+                        raw_payload_hash=_hash_payload(
+                            {
+                                "symbol": symbol,
+                                "timestamp": ts,
+                                "close": close_value,
+                                "quote_multiplier": quote_multiplier,
+                                "normalized_value": normalized_value,
+                            }
+                        ),
                         metadata={
                             "adapter_type": self.adapter_type,
                             "parser_version": self.source_cfg.get("parser_version"),
                             "source_interface": self.source_cfg.get("source_interface"),
                             "symbol": symbol,
                             "provider": "yahoo_finance_chart",
+                            "source_close_per_1_base": float(close_value),
+                            "quote_unit_policy": "value = source close * configured quote_multiplier",
                         },
                     )
                 )
+                parsed_for_symbol += 1
+            logger.info(
+                "[FX][provider:%s] Yahoo chart parsed symbol=%s rows_seen=%s observations=%s",
+                self.source_profile,
+                symbol,
+                len(timestamps),
+                parsed_for_symbol,
+            )
         return {
             "observations": observations,
             "warnings": warnings,
@@ -2257,6 +2308,7 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
             "parser_diagnostics": {
                 "live_requests_performed": requests_performed,
                 "endpoint_url": endpoint_template,
+                "rows_seen": rows_seen,
                 "observations_parsed": len(observations),
             },
         }

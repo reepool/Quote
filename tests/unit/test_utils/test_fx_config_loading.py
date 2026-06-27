@@ -75,3 +75,20 @@ def test_fx_rate_tasks_have_governance_prerequisites():
     assert [item["job_id"] for item in sync_post] == ["fx_calendar_governance"]
     assert sync_post[0]["inherit"] == ["dry_run"]
     assert sync_post[0]["parameters"]["source_profiles"] == ["cfets_rmb_fixing"]
+
+
+def test_fx_config_has_offshore_rmb_spot_scope():
+    config_path = Path(__file__).resolve().parents[3] / "config" / "12_fx.json"
+    fx_config = json.loads(config_path.read_text(encoding="utf-8"))["fx_config"]
+    scopes = {item["scope_id"]: item for item in fx_config["download_scopes"]}
+
+    offshore_scope = scopes["rmb_offshore_spot"]
+    assert offshore_scope["source_profiles"] == ["cnh_market_aggregated_public"]
+    assert offshore_scope["market_scopes"] == ["offshore"]
+    assert offshore_scope["rate_types"] == ["spot"]
+    assert offshore_scope["series_ids"] == [
+        "FX.USD_CNH.MARKET.SPOT.DAILY",
+        "FX.EUR_CNH.MARKET.SPOT.DAILY",
+        "FX.JPY_CNH.MARKET.SPOT.DAILY",
+    ]
+    assert offshore_scope["metadata"]["calendar_source_profiles"] == ["cnh_market_aggregated_public"]

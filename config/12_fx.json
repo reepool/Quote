@@ -48,6 +48,45 @@
         }
       },
       {
+        "scope_id": "rmb_offshore_spot",
+        "name": "Offshore RMB aggregated-public spot coverage",
+        "enabled": true,
+        "currencies": [
+          "CNH",
+          "USD",
+          "EUR",
+          "JPY"
+        ],
+        "instrument_types": [
+          "currency_pair"
+        ],
+        "market_scopes": [
+          "offshore"
+        ],
+        "source_profiles": [
+          "cnh_market_aggregated_public"
+        ],
+        "series_ids": [
+          "FX.USD_CNH.MARKET.SPOT.DAILY",
+          "FX.EUR_CNH.MARKET.SPOT.DAILY",
+          "FX.JPY_CNH.MARKET.SPOT.DAILY"
+        ],
+        "rate_types": [
+          "spot"
+        ],
+        "frequencies": [
+          "daily"
+        ],
+        "metadata": {
+          "rollout_phase": "phase_1_offshore_rmb",
+          "calendar_source_profiles": [
+            "cnh_market_aggregated_public"
+          ],
+          "primary_source_profile": "cnh_market_aggregated_public",
+          "quality_boundary": "aggregated_public_not_official"
+        }
+      },
+      {
         "scope_id": "rmb_core",
         "name": "First-phase RMB FX and dollar-index coverage",
         "enabled": true,
@@ -428,7 +467,10 @@
           "holiday_dates": []
         },
         "quality_flag": "aggregated_public",
-        "note": "CNH lacks a single free official daily fixing equivalent. Do not label as official."
+        "note": "CNH lacks a single free official daily fixing equivalent. Do not label as official.",
+        "metadata": {
+          "quote_unit_policy": "Yahoo chart FX closes are per 1 base currency unit. Store values normalized to the configured FX series quote_multiplier before writing observations."
+        }
       },
       "ice_dxy_official": {
         "enabled": false,

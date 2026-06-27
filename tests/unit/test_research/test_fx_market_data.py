@@ -543,7 +543,14 @@ def test_yahoo_aggregated_provider_parses_offshore_cnh_spot(tmp_path, monkeypatc
     assert result.status == "success"
     assert {item.series_id for item in result.observations} == set(source_cfg["symbols"])
     assert {item.quality_flag for item in result.observations} == {"aggregated_public"}
+    by_series = {item.series_id: item for item in result.observations}
+    assert by_series["FX.USD_CNH.MARKET.SPOT.DAILY"].value == 7.25
+    assert by_series["FX.EUR_CNH.MARKET.SPOT.DAILY"].value == 8.01
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].quote_multiplier == 100
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].value == 462.0
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].metadata["source_close_per_1_base"] == 4.62
     assert result.metadata["parser_diagnostics"]["live_requests_performed"] == 3
+    assert result.metadata["parser_diagnostics"]["rows_seen"] == 3
 
 
 def test_fx_calendar_governance_uses_source_policy_and_observations(tmp_path):
