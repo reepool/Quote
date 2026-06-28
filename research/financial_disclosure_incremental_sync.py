@@ -1022,6 +1022,7 @@ class FinancialDisclosureIncrementalSyncService:
                     required_core_facts,
                 ),
                 mapping_version=mapping_version,
+                allow_fresh_read=True,
             )
             status = "unchanged" if before.get("ready") else "pending_recheck"
             if after.get("ready") and not before.get("ready"):
@@ -1132,12 +1133,30 @@ class FinancialDisclosureIncrementalSyncService:
         *,
         required_core_facts: Sequence[str],
         mapping_version: str,
+        allow_fresh_read: bool = False,
     ) -> Dict[str, Any]:
-        return self.repair_router.readiness_for_target(
-            self._repair_target_for_candidate(candidate),
+        target = self._repair_target_for_candidate(candidate)
+        readiness = self.repair_router.readiness_for_target(
+            target,
             required_core_facts=required_core_facts,
             mapping_version=mapping_version,
         )
+        if readiness.get("ready") or not allow_fresh_read:
+            return readiness
+        try:
+            fresh_storage = ResearchStorageManager(self.research_config)
+            fresh_router = FinancialMaintenanceRepairRouter(
+                storage=fresh_storage,
+                research_config=self.research_config,
+            )
+            fresh_readiness = fresh_router.readiness_for_target(
+                target,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
+            )
+        except Exception:
+            return readiness
+        return fresh_readiness if fresh_readiness.get("ready") else readiness
 
     def _required_core_facts_for_profile(
         self,

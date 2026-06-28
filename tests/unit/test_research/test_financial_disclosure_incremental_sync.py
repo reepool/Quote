@@ -648,6 +648,54 @@ def test_repair_router_uses_fresh_readiness_after_external_write(tmp_path, monke
     assert result["fallback_attempts"] == 0
 
 
+def test_apply_candidates_uses_fresh_readiness_for_final_status(tmp_path, monkeypatch):
+    current_storage = _FakeStorage(ready=False)
+    fresh_storage = _FakeStorage(ready=True)
+    config = _research_config(tmp_path)
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=current_storage,
+        research_config=config,
+        announcement_scanner=_FakeScanner([]),
+    )
+    candidate = FinancialDisclosureMaintenanceCandidate(
+        instrument_id="601187.SH",
+        symbol="601187",
+        exchange="SSE",
+        report_period="2026-03-31",
+        profile="bank",
+        reasons=["missing_or_incomplete_local_core"],
+    )
+
+    async def _fake_import(**kwargs):
+        return service.repair_router.default_summary()
+
+    service._run_targeted_import = _fake_import
+    monkeypatch.setattr(
+        "research.financial_disclosure_incremental_sync.ResearchStorageManager",
+        lambda research_config: fresh_storage,
+    )
+
+    result = _run(
+        service._apply_candidates(
+            candidates=[candidate],
+            required_core_facts=["total_assets"],
+            mapping_version="test",
+            db_path=tmp_path / "financials.db",
+            request_interval_seconds=0.0,
+            request_timeout_seconds=1.0,
+            pending_recheck_days=5,
+            run_id=1,
+            dry_run=False,
+        )
+    )
+
+    assert result["changed_count"] == 1
+    assert result["blocking_gap_count"] == 0
+    assert result["source_missing_gap_count"] == 0
+    assert current_storage.states[-1]["status"] == "changed"
+
+
 def test_reconciliation_mapping_policy_gap_does_not_retry_sources(tmp_path):
     storage = _FakeStorage(
         ready=False,
