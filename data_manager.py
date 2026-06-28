@@ -9061,8 +9061,15 @@ class DataManager:
             and status == 'active'
             and trading_status in (None, 1, True, '1')
             and listed is None
-            and first_quote_date is not None
         ):
+            if first_quote_date is None:
+                return {
+                    'eligible': False,
+                    'reason': 'hkex_missing_listed_date_no_local_quote',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
             if first_quote_date > requested_end:
                 return {
                     'eligible': False,

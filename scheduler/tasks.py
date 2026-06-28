@@ -2649,6 +2649,7 @@ class ScheduledTasks:
             skipped_known_failures = 0
             skipped_after_no_data_failures = 0
             no_data_failures_by_instrument: Dict[str, int] = {}
+            reportable_gaps = []
             max_no_data_failures_per_instrument = int(
                 self.config.get_nested(
                     'data_config.repair_universe_governance.max_no_data_failures_per_instrument',
@@ -2689,6 +2690,7 @@ class ScheduledTasks:
                         ))
                     continue
 
+                reportable_gaps.append(gap)
                 try:
                     success = await data_manager._fill_single_gap(gap)
                     if success:
@@ -2740,23 +2742,24 @@ class ScheduledTasks:
                 await asyncio.sleep(0.5)
 
             from collections import Counter
-            severity_distribution = dict(Counter(gap.severity for gap in all_gaps))
-            affected_stocks = len({gap.instrument_id for gap in all_gaps})
-            top_affected_stocks = data_manager.get_top_affected_stocks(all_gaps, limit=10)
+            severity_distribution = dict(Counter(gap.severity for gap in reportable_gaps))
+            affected_stocks = len({gap.instrument_id for gap in reportable_gaps})
+            top_affected_stocks = data_manager.get_top_affected_stocks(reportable_gaps, limit=10)
 
             report_data = {
                 'name': '数据缺口检测与修复报告',
                 'status': 'success' if failed == 0 else 'warning',
-                'total_gaps': len(all_gaps),
+                'total_gaps': len(reportable_gaps),
                 'affected_stocks': affected_stocks,
                 'severity_distribution': severity_distribution,
                 'top_affected_stocks': top_affected_stocks,
                 'summary': {
-                    'total_gaps': len(all_gaps),
+                    'total_gaps': len(reportable_gaps),
                     'affected_stocks': affected_stocks,
                     'severity_distribution': severity_distribution,
                     'detected_gaps': len(all_gaps),
                     'candidate_gaps': len(gaps_to_repair),
+                    'reportable_gaps': len(reportable_gaps),
                     'repaired_gaps': repaired,
                     'failed_repairs': failed,
                     'skipped_known_failures': skipped_known_failures,

@@ -269,6 +269,7 @@ restart_system - 重启系统服务
 - **指数官方行情源**: 普通 A 股指数日线按指数族使用官方源优先，`SSE index = CSIndex -> BaoStock -> AkShare`，`SZSE index = CNIndex -> BaoStock -> AkShare`。官方源返回非空但最新行情日早于请求区间内最后一个交易日时会继续 fallback，避免把 stale 数据误判为成功；同一轮同源同目标交易日连续 stale 达到配置阈值后会临时熔断该官方源，后续指数直接走 fallback，降低 CNIndex/CSIndex 批量晚更新时的重复请求。
 - **行情追补**: 普通 A 股日更会对本地无行情的新股和最近短缺口执行 `data_config.daily_update_catchup` 小窗口追补。主数据或行情源晚一天可接受，但标的进入主表后，上市日至目标日附近的缺口会自动尝试补齐；超出窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 兜底。
 - **历史修复治理**: `/find_gap_and_repair`、月度完整性检查和区间回补会先执行本地 `repair_universe_governance` 过滤；停编指数、退市后窗口、stale-no-quote 指数，以及 HKEX `status=suspended,trading_status=0` 且请求区间晚于本地最新行情日的长期停牌股，会在行情源请求前跳过或裁剪。HKEX active/tradable 但缺少 `listed_date` 的当前标的，会用本地首个行情日作为检测起点，避免把上市前或入库前窗口算成缺口。周度 `/find_gap_and_repair` 会在检测前仅对 `hkex_instrument` scope 执行 HKEX lifecycle 前置治理，不触发 A 股全市场刷新。报告的“生命周期过滤”段落会展示数量、原因和样例。对本地完全没有行情记录但仍为 active 的指数，系统不会直接判定停编，而是在 `/find_gap_and_repair` 中按 `max_index_no_data_failures_per_instrument` 做指数连续无数据失败熔断，避免单次任务反复请求外部源。
+- **缺口报告口径**: `/find_gap_and_repair` Telegram 摘要中的 `total_gaps`、`affected_stocks` 和 top 列表按本轮实际进入修复尝试的缺口统计；原始检测量保留在结构化报告的 `summary.detected_gaps`。已命中失败跳表、HKEX guard 或单标的 no-data 熔断的段不会继续占据 top。
 
 ### 1.1 研究/财务任务的主数据治理
 

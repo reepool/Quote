@@ -141,6 +141,19 @@ class FakeRepairDbOps:
                 'delisted_date': None,
                 'source_symbol': '01688',
             },
+            '01191.HK': {
+                'instrument_id': '01191.HK',
+                'symbol': '01191',
+                'name': 'HK stock without listed date or quotes',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'listed_date': None,
+                'delisted_date': None,
+                'source_symbol': '01191',
+            },
         }
         self.latest_quotes = {
             '005061.SZ': datetime(2025, 5, 1),
@@ -371,6 +384,29 @@ async def test_hkex_active_stock_without_listed_date_clips_to_first_local_quote(
     manager.source_factory.get_trading_days.assert_awaited_once()
     args = manager.source_factory.get_trading_days.await_args.args
     assert args[1] == date(2026, 6, 26)
+
+
+@pytest.mark.asyncio
+async def test_hkex_active_stock_without_listed_date_or_local_quote_is_skipped():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_trading_days = AsyncMock(return_value=[date(2026, 6, 10)])
+
+    result = await manager.detect_data_gaps(
+        ['HKEX'],
+        date(2025, 1, 1),
+        date(2026, 6, 10),
+        instrument_types=['stock'],
+        instrument_ids=['01191.HK'],
+        include_diagnostics=True,
+    )
+
+    assert result['gaps'] == []
+    diagnostics = result['repair_universe']
+    assert diagnostics['skipped_instrument_count'] == 1
+    assert diagnostics['reason_distribution']['hkex_missing_listed_date_no_local_quote'] == 1
+    manager.source_factory.get_trading_days.assert_not_awaited()
 
 
 @pytest.mark.asyncio

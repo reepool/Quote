@@ -100,8 +100,10 @@ async def test_find_gap_and_repair_skips_remaining_segments_after_no_data_limit(
     assert fake_manager._fill_single_gap.await_count == 1
     assert fake_manager.record_gap_skip.await_count == 5
     report_data = task._send_task_report.await_args.kwargs['report_data']
-    assert report_data['summary']['total_gaps'] == 5
+    assert report_data['summary']['total_gaps'] == 1
+    assert report_data['summary']['detected_gaps'] == 5
+    assert report_data['summary']['reportable_gaps'] == 1
     assert report_data['summary']['affected_stocks'] == 1
-    assert report_data['summary']['severity_distribution'] == {'low': 5}
+    assert report_data['summary']['severity_distribution'] == {'low': 1}
     assert report_data['summary']['failed_repairs'] == 1
     assert report_data['summary']['skipped_after_no_data_failures'] == 4
