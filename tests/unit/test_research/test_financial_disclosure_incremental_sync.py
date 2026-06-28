@@ -82,6 +82,8 @@ class _FakeStorage:
         pending_states=None,
         missing_fields=None,
         audit_rows=None,
+        industry_memberships=None,
+        company_profiles=None,
     ):
         self.financial_statements = _FakeFinancialStatements(
             ready=ready,
@@ -92,6 +94,8 @@ class _FakeStorage:
         self.deleted_states = []
         self.pending_states = list(pending_states or [])
         self.audit_rows = list(audit_rows or [])
+        self.industry_memberships = dict(industry_memberships or {})
+        self.company_profiles = dict(company_profiles or {})
 
     @contextmanager
     def financial_database_scope(self):
@@ -109,6 +113,12 @@ class _FakeStorage:
             row for row in self.audit_rows
             if not ids or row.get("instrument_id") in ids
         ]
+
+    def get_industry_membership(self, instrument_id, **kwargs):
+        return self.industry_memberships.get(instrument_id)
+
+    def get_company_profile(self, instrument_id, **kwargs):
+        return self.company_profiles.get(instrument_id)
 
     def start_ingestion_run(self, **kwargs):
         return 1
@@ -646,6 +656,38 @@ def test_repair_router_uses_fresh_readiness_after_external_write(tmp_path, monke
     assert result["cninfo_successes"] == 1
     assert result["cninfo_missing_or_ambiguous"] == 0
     assert result["fallback_attempts"] == 0
+
+
+def test_candidate_profile_uses_storage_industry_membership(tmp_path):
+    storage = _FakeStorage(
+        ready=True,
+        industry_memberships={
+            "601187.SH": {
+                "instrument_id": "601187.SH",
+                "taxonomy_system": "sw",
+                "sw_l1_name": "银行",
+                "sw_l2_name": "城商行Ⅱ",
+                "sw_l3_name": "城商行Ⅲ",
+            }
+        },
+    )
+    service = FinancialDisclosureIncrementalSyncService(
+        db_ops=_FakeDbOps(),
+        storage=storage,
+        research_config=_research_config(tmp_path),
+        announcement_scanner=_FakeScanner([]),
+    )
+
+    candidate = service._candidate_for_period(
+        {
+            "instrument_id": "601187.SH",
+            "symbol": "601187",
+            "exchange": "SSE",
+        },
+        "2026-03-31",
+    )
+
+    assert candidate.profile == "bank"
 
 
 def test_apply_candidates_uses_fresh_readiness_for_final_status(tmp_path, monkeypatch):

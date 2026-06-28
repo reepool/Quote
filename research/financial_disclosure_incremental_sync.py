@@ -838,7 +838,13 @@ class FinancialDisclosureIncrementalSyncService:
         report_period: str,
     ) -> FinancialDisclosureMaintenanceCandidate:
         instrument_id = str(instrument.get("instrument_id") or "")
-        resolution = resolve_financial_statement_profile(instrument=instrument)
+        industry_membership = self._load_profile_industry_membership(instrument_id)
+        company_profile = self._load_profile_company_profile(instrument_id)
+        resolution = resolve_financial_statement_profile(
+            industry_membership=industry_membership,
+            company_profile=company_profile,
+            instrument=instrument,
+        )
         return FinancialDisclosureMaintenanceCandidate(
             instrument_id=instrument_id,
             symbol=str(instrument.get("symbol") or instrument_id.split(".")[0]),
@@ -850,6 +856,30 @@ class FinancialDisclosureIncrementalSyncService:
                 report_period,
             ),
         )
+
+    def _load_profile_industry_membership(
+        self,
+        instrument_id: str,
+    ) -> Optional[Mapping[str, Any]]:
+        getter = getattr(self.storage, "get_industry_membership", None)
+        if getter is None or not instrument_id:
+            return None
+        try:
+            return getter(instrument_id, include_snapshot=False)
+        except TypeError:
+            return getter(instrument_id)
+
+    def _load_profile_company_profile(
+        self,
+        instrument_id: str,
+    ) -> Optional[Mapping[str, Any]]:
+        getter = getattr(self.storage, "get_company_profile", None)
+        if getter is None or not instrument_id:
+            return None
+        try:
+            return getter(instrument_id, include_snapshot=False)
+        except TypeError:
+            return getter(instrument_id)
 
     def _load_disclosure_risk_audits_by_instrument(
         self,

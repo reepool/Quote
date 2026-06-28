@@ -608,6 +608,67 @@ def test_upsert_industry_membership_writes_taxonomy_and_membership(tmp_path):
     assert taxonomy_records[0]["is_active"] is True
 
 
+def test_get_industry_membership_deprioritizes_dryrun_seed(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    storage.upsert_industry_membership(
+        IndustrySnapshot(
+            instrument_id="601187.SH",
+            symbol="601187",
+            exchange="SSE",
+            taxonomy_system="sw",
+            taxonomy_version="sw_2021",
+            industry_code="480401",
+            industry_name="城商行Ⅲ",
+            industry_level=3,
+            parent_code="480400",
+            mapping_status="strict",
+            source_classification="shenwan",
+            source_industry_name="城商行Ⅲ",
+            sw_l1_code="480000",
+            sw_l1_name="银行",
+            sw_l2_code="480400",
+            sw_l2_name="城商行Ⅱ",
+            sw_l3_code="480401",
+            sw_l3_name="城商行Ⅲ",
+            source="swsresearch",
+            source_mode="direct",
+            membership_json={"official": True},
+        )
+    )
+    storage.upsert_industry_membership(
+        IndustrySnapshot(
+            instrument_id="601187.SH",
+            symbol="601187",
+            exchange="SSE",
+            taxonomy_system="sw",
+            taxonomy_version="dryrun_l1_local_core",
+            industry_code="340601",
+            industry_name="白酒Ⅲ",
+            industry_level=3,
+            parent_code="340600",
+            mapping_status="strict",
+            source_classification="shenwan",
+            source_industry_name="白酒Ⅲ",
+            sw_l1_code="340000",
+            sw_l1_name="食品饮料",
+            sw_l2_code="340600",
+            sw_l2_name="白酒Ⅱ",
+            sw_l3_code="340601",
+            sw_l3_name="白酒Ⅲ",
+            source="dev_validation",
+            source_mode="seed",
+            membership_json={"financial_statement_profile": "nonbank"},
+        )
+    )
+
+    loaded = storage.get_industry_membership("601187.SH")
+
+    assert loaded is not None
+    assert loaded["sw_l1_name"] == "银行"
+    assert loaded["source"] == "swsresearch"
+
+
 def test_industry_source_file_manifest_round_trip(tmp_path):
     storage, _ = _build_storage_manager(tmp_path)
     storage.initialize()

@@ -6780,6 +6780,11 @@ class ResearchStorageManager:
                         ELSE 1
                     END,
                     CASE
+                        WHEN source = 'dev_validation'
+                            OR taxonomy_version LIKE 'dryrun%' THEN 1
+                        ELSE 0
+                    END,
+                    CASE
                         WHEN taxonomy_system LIKE 'sw%' THEN 0
                         ELSE 1
                     END,
