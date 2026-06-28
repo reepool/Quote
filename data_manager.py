@@ -9044,6 +9044,33 @@ class DataManager:
                     end = latest_quote_date
                 lifecycle_state = 'stale_no_quote'
 
+        if (
+            exchange == 'HKEX'
+            and instrument_type == 'stock'
+            and trading_status in (0, '0', False)
+            and status == 'suspended'
+        ):
+            if latest_quote_date is not None:
+                if requested_start and requested_start > latest_quote_date:
+                    return {
+                        'eligible': False,
+                        'reason': 'hkex_suspended_after_last_quote',
+                        'start_date': start,
+                        'end_date': end,
+                        'clipped': True,
+                    }
+                if end > latest_quote_date:
+                    end = latest_quote_date
+                    lifecycle_state = 'hkex_suspended'
+            else:
+                return {
+                    'eligible': False,
+                    'reason': 'hkex_suspended_no_local_quote',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': False,
+                }
+
         if mode == 'current_repair':
             if is_active in (False, 0, '0'):
                 return {
@@ -9176,9 +9203,17 @@ class DataManager:
             instrument_type = str(instrument.get('type') or '').lower()
             exchange = str(instrument.get('exchange') or '').upper()
             if (
-                instrument_type == 'index'
-                and exchange in {'SSE', 'SZSE'}
-                and config.get('enable_local_stale_no_quote', True)
+                (
+                    instrument_type == 'index'
+                    and exchange in {'SSE', 'SZSE'}
+                    and config.get('enable_local_stale_no_quote', True)
+                )
+                or (
+                    instrument_type == 'stock'
+                    and exchange == 'HKEX'
+                    and str(instrument.get('status') or '').lower() == 'suspended'
+                    and instrument.get('trading_status') in (0, '0', False)
+                )
             ):
                 try:
                     latest_quote_date = self._date_from_any(

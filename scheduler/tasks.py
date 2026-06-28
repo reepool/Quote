@@ -2752,6 +2752,9 @@ class ScheduledTasks:
                 'severity_distribution': severity_distribution,
                 'top_affected_stocks': top_affected_stocks,
                 'summary': {
+                    'total_gaps': len(all_gaps),
+                    'affected_stocks': affected_stocks,
+                    'severity_distribution': severity_distribution,
                     'detected_gaps': len(all_gaps),
                     'candidate_gaps': len(gaps_to_repair),
                     'repaired_gaps': repaired,

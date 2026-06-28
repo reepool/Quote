@@ -579,14 +579,14 @@ class HKEXSuspensionReportProvider:
 
     @staticmethod
     def _is_report_row_start(line: str) -> bool:
-        return re.match(r"^\s*\d{1,3}\s{2,}\S", line or "") is not None
+        return re.match(r"^\s*\d{1,3}\.?\s{2,}\S", line or "") is not None
 
     @staticmethod
     def _extract_report_block(block: List[str]) -> Optional[Dict[str, str]]:
         if not block:
             return None
         first = block[0]
-        match = re.match(r"^\s*\d{1,3}\s{2,}(.+?)\s*$", first)
+        match = re.match(r"^\s*\d{1,3}\.?\s{2,}(.+?)\s*$", first)
         if not match:
             return None
 

@@ -14,7 +14,7 @@
 
 普通 A 股行情日更接受上游主数据或行情源对新股存在 T+1/T+2 滞后，但不接受标的进入本地主表后首个交易日行情永久缺失。`data_config.daily_update_catchup` 控制小窗口追补：本地无行情的新股从 `max(listed_date, target_date - new_instrument_catchup_days)` 抓到目标日，已有行情但短期落后的标的从 `max(latest_quote_date, target_date - short_gap_catchup_days)` 抓到目标日；窗口截断、缺少上市日和样例会进入日更报告。超过窗口的大缺口仍由 `/backfill` 或 `find_gap_and_repair` 处理，避免普通日更退化成无界历史补数。
 
-历史缺口修复和区间回补现在使用 `data_config.repair_universe_governance` 做本地主数据生命周期过滤。该过滤不是上游主数据强制刷新：默认只读取本地 `instruments`、指数生命周期证据和本地最新行情日期，在 `detect_data_gaps()`、`fill_data_gaps()`、`find_gap_and_repair`、月度完整性检查和 `daily_data_backfill_range` 发起行情源请求前排除或裁剪无效窗口。典型跳过包括 `calculation_terminated/inactive/stale_no_quote` 指数、请求区间完全晚于 `delisted_date` 的品种、以及本地指数行情长期陈旧且命中 stale-no-quote 策略的停编候选。报告会把这些计入 `repair_universe`，与 source empty、timeout、失败跳表分开。本地完全没有行情记录的 active 指数不会被直接判定为停编；`find_gap_and_repair` 会先允许有限探测，指数连续无数据失败超过 `max_index_no_data_failures_per_instrument`、其他标的超过 `max_no_data_failures_per_instrument` 后，只在本次任务内跳过同标的后续 gap，并写入 `gap_skip_list` 做 TTL 降噪。
+历史缺口修复和区间回补现在使用 `data_config.repair_universe_governance` 做本地主数据生命周期过滤。该过滤不是上游主数据强制刷新：默认只读取本地 `instruments`、指数生命周期证据和本地最新行情日期，在 `detect_data_gaps()`、`fill_data_gaps()`、`find_gap_and_repair`、月度完整性检查和 `daily_data_backfill_range` 发起行情源请求前排除或裁剪无效窗口。典型跳过包括 `calculation_terminated/inactive/stale_no_quote` 指数、请求区间完全晚于 `delisted_date` 的品种、以及本地指数行情长期陈旧且命中 stale-no-quote 策略的停编候选。HKEX `status=suspended,trading_status=0` 的长期停牌股会按本地最新行情日裁剪历史窗口；若请求区间完全晚于最新行情日，则以 `hkex_suspended_after_last_quote` 计入生命周期跳过，不再把停牌后的无交易状态计为可修复缺口。报告会把这些计入 `repair_universe`，与 source empty、timeout、失败跳表分开。本地完全没有行情记录的 active 指数不会被直接判定为停编；`find_gap_and_repair` 会先允许有限探测，指数连续无数据失败超过 `max_index_no_data_failures_per_instrument`、其他标的超过 `max_no_data_failures_per_instrument` 后，只在本次任务内跳过同标的后续 gap，并写入 `gap_skip_list` 做 TTL 降噪。
 
 历史任务默认仍保持 `skip_for_backfill` 语义，不会因为启用 repair universe 过滤而刷新 `exchange_official`、BaoStock、CNIndex、CSIndex 或 HKEX 当前主数据。如果运维人员要在修复前刷新当前主数据，必须显式传入 `force_current_master_refresh=true`，并可用 `current_master_refresh_scopes` 限定到如 `a_share_index` 的单一治理 scope；报告会标记这是 operator-requested historical repair refresh。绕过生命周期过滤只允许 `override_lifecycle_filter=true` 且带明确 `instrument_ids` 或小范围 `repair_universe_limit`，用于取证式修复，避免再次触发全市场无界源请求。
 
@@ -252,7 +252,7 @@ asyncio.run(main())
 - 辅 active 源：HKEXnews `activestock_sehk_e.json`。
 - delisted 源：HKEXnews `inactivestock_sehk_e.json`。
 - suspension 源：HKEXnews prolonged suspension monthly PDF（Main Board / GEM）；系统通过 `pypdf` 提取文本并解析代码。若运行环境未安装 `pypdf` 或 PDF 格式变化导致解析失败，结果会降级为 warning，不会静默作为停牌证据。
-- PDF 文本解析只接受报告表格行块：行首序号、公司名称中的括号代码、以及同一块内的日期行必须同时存在；说明文字里的普通数字不会被当成港股代码，避免把 `00001.HK`、`00005.HK` 等误标停牌。
+- PDF 文本解析只接受报告表格行块：行首序号（兼容 `4  Name` 与 `4.  Name` 两种格式）、公司名称中的括号代码、以及同一块内的日期行必须同时存在；说明文字里的普通数字不会被当成港股代码，避免把 `00001.HK`、`00005.HK` 等误标停牌。
 - HKEXnews delisted JSON 若不提供真实退市日期，系统只写 `status=delisted,is_active=0,trading_status=0`，不再用同步日伪造 `delisted_date`；精确退市日后续应从 HKEX 交易安排公告或公司公告补录。
 
 研究模块应通过 `DataManager.resolve_hkex_current_universe()` 获取港股当前研究 universe。该 resolver 会复用共享 governance，优先按 metadata 过滤普通股/REIT/ETF 和 canonical counter；metadata 不可用时允许降级回退到本地 active instruments，并在 `readiness='degraded'` 和 warnings 中暴露原因。

@@ -115,10 +115,24 @@ class FakeRepairDbOps:
                 'delisted_date': datetime(2026, 6, 10),
                 'source_symbol': '000001',
             },
+            '00007.HK': {
+                'instrument_id': '00007.HK',
+                'symbol': '00007',
+                'name': 'Suspended HK stock',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'suspended',
+                'is_active': True,
+                'trading_status': 0,
+                'listed_date': datetime(2000, 9, 8),
+                'delisted_date': None,
+                'source_symbol': '00007',
+            },
         }
         self.latest_quotes = {
             '005061.SZ': datetime(2025, 5, 1),
             '399001.SZ': datetime(2026, 6, 13),
+            '00007.HK': datetime(2024, 3, 28),
         }
         self.saved_quotes = []
 
@@ -256,6 +270,48 @@ async def test_lifecycle_window_clips_pre_delisting_history():
     assert len(eligible) == 1
     assert eligible[0]['_repair_start_date'] == date(2026, 6, 1)
     assert eligible[0]['_repair_end_date'] == date(2026, 6, 10)
+    assert eligible[0]['_repair_universe_clipped'] is True
+    assert diagnostics['clipped_instrument_count'] == 1
+
+
+@pytest.mark.asyncio
+async def test_hkex_suspended_stock_after_last_quote_is_skipped_before_gap_detection():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_trading_days = AsyncMock(return_value=[date(2026, 6, 10)])
+
+    result = await manager.detect_data_gaps(
+        ['HKEX'],
+        date(2025, 1, 1),
+        date(2026, 6, 10),
+        instrument_types=['stock'],
+        instrument_ids=['00007.HK'],
+        include_diagnostics=True,
+    )
+
+    assert result['gaps'] == []
+    diagnostics = result['repair_universe']
+    assert diagnostics['skipped_instrument_count'] == 1
+    assert diagnostics['reason_distribution']['hkex_suspended_after_last_quote'] == 1
+    manager.source_factory.get_trading_days.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_hkex_suspended_stock_window_clips_to_latest_local_quote():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['00007.HK']],
+        start_date=date(2024, 3, 1),
+        end_date=date(2025, 1, 31),
+        mode='historical_backfill',
+    )
+
+    assert [item['instrument_id'] for item in eligible] == ['00007.HK']
+    assert eligible[0]['_repair_end_date'] == date(2024, 3, 28)
+    assert eligible[0]['_repair_universe_reason'] == 'hkex_suspended'
     assert eligible[0]['_repair_universe_clipped'] is True
     assert diagnostics['clipped_instrument_count'] == 1
 

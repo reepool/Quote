@@ -144,6 +144,10 @@ def test_suspension_report_text_parser_emits_official_suspended_rows():
         (6623)
         28-Jan-2025 27-Jul-2026 1. Conduct an independent forensic investigation
         Link to HKEXnews
+        4.  Greentech Technology
+        International Limited (195)
+        2-Sep-2024 1-Mar-2026 1. Publish outstanding financial results
+        Link to HKEXnews
         """
     )
 
@@ -153,6 +157,7 @@ def test_suspension_report_text_parser_emits_official_suspended_rows():
     assert by_id["02323.HK"]["status"] == "suspended"
     assert by_id["02323.HK"]["trading_status"] == 0
     assert by_id["06623.HK"]["official_lifecycle_source"] == "hkexnews_suspension_report"
+    assert by_id["00195.HK"]["status"] == "suspended"
 
 
 def test_manual_review_provider_turns_operator_conclusions_into_lifecycle_evidence():
