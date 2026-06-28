@@ -456,3 +456,37 @@ async def test_lifecycle_eligible_gap_still_uses_quote_source():
     assert await manager._fill_single_gap(gap) is True
     manager.source_factory.get_daily_data.assert_awaited_once()
     assert manager.db_ops.saved_quotes[0]['instrument_id'] == '399001.SZ'
+
+
+@pytest.mark.asyncio
+async def test_gap_fill_rejects_data_that_does_not_cover_requested_missing_dates():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[
+        {
+            'instrument_id': '399001.SZ',
+            'time': datetime(2026, 6, 9),
+            'open': 1,
+            'high': 1,
+            'low': 1,
+            'close': 1,
+            'volume': 1,
+        }
+    ])
+
+    gap = DataGapInfo(
+        instrument_id='399001.SZ',
+        symbol='399001',
+        exchange='SZSE',
+        gap_start=date(2026, 6, 10),
+        gap_end=date(2026, 6, 10),
+        gap_days=1,
+        gap_type='missing_data',
+        severity='low',
+        recommendation='test',
+        missing_dates=[date(2026, 6, 10)],
+    )
+
+    assert await manager._fill_single_gap(gap) is False
+    assert manager.db_ops.saved_quotes == []

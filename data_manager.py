@@ -9905,6 +9905,39 @@ class DataManager:
             )
 
             if data:
+                target_dates = {
+                    missing_date
+                    for missing_date in (gap.missing_dates or [])
+                    if effective_gap_start <= missing_date <= effective_gap_end
+                }
+                if not target_dates:
+                    current_date = effective_gap_start
+                    while current_date <= effective_gap_end:
+                        target_dates.add(current_date)
+                        current_date += timedelta(days=1)
+                fetched_dates = {
+                    parsed_date
+                    for quote in data
+                    for parsed_date in [
+                        self._date_from_any(
+                            quote.get('time')
+                            or quote.get('date')
+                            or quote.get('trade_date')
+                        )
+                    ]
+                    if parsed_date is not None
+                }
+                if target_dates and not target_dates.issubset(fetched_dates):
+                    missing_after_fetch = sorted(target_dates - fetched_dates)
+                    dm_logger.warning(
+                        "[DataManager] Gap fill data did not cover requested dates: "
+                        "%s requested=%s fetched=%s still_missing=%s",
+                        gap.instrument_id,
+                        sorted(target_dates),
+                        sorted(fetched_dates),
+                        missing_after_fetch,
+                    )
+                    return False
                 dm_logger.info(
                     f"[DataManager] Gap fill data fetched: {gap.instrument_id} "
                     f"{effective_gap_start} to {effective_gap_end}, rows={len(data)}"
