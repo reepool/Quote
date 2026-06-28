@@ -9056,6 +9056,27 @@ class DataManager:
         )
 
         if (
+            instrument_type == 'index'
+            and exchange in {'SSE', 'SZSE'}
+            and status in {'delisted', 'inactive', 'calculation_terminated'}
+            and delisted is not None
+            and latest_quote_date is not None
+            and latest_quote_date < delisted
+            and delisted - latest_quote_date <= timedelta(days=7)
+        ):
+            if requested_start and requested_start > latest_quote_date:
+                return {
+                    'eligible': False,
+                    'reason': 'index_delisted_after_last_quote',
+                    'start_date': start,
+                    'end_date': latest_quote_date,
+                    'clipped': True,
+                }
+            if end > latest_quote_date:
+                end = latest_quote_date
+                lifecycle_state = 'index_delisted_last_quote'
+
+        if (
             exchange == 'HKEX'
             and instrument_type == 'stock'
             and status == 'active'
@@ -9099,6 +9120,7 @@ class DataManager:
             instrument_type == 'index'
             and exchange in {'SSE', 'SZSE'}
             and lifecycle_state not in index_states
+            and lifecycle_state != 'index_delisted_last_quote'
             and config.get('enable_local_stale_no_quote', True)
         ):
             stale_days = int(config.get('stale_no_quote_trading_days', 10) or 10)
@@ -9947,6 +9969,26 @@ class DataManager:
                     quote['instrument_id'] = instrument.get('instrument_id')
                 success = await self.db_ops.save_daily_quotes(data)
                 if success:
+                    saved_dates = {
+                        self._date_from_any(existing_date)
+                        for existing_date in await self.db_ops.get_existing_data_dates(
+                            instrument.get('instrument_id'),
+                            effective_gap_start,
+                            effective_gap_end,
+                        )
+                    }
+                    saved_dates.discard(None)
+                    if target_dates and not target_dates.issubset(saved_dates):
+                        still_missing = sorted(target_dates - saved_dates)
+                        dm_logger.warning(
+                            "[DataManager] Gap fill save did not persist requested dates: "
+                            "%s requested=%s saved=%s still_missing=%s",
+                            gap.instrument_id,
+                            sorted(target_dates),
+                            sorted(saved_dates),
+                            still_missing,
+                        )
+                        return False
                     dm_logger.info(f"Filled gap for {gap.symbol}: {effective_gap_start} to {effective_gap_end}")
 
                     # 同步复权因子（仅限股票, 与 update_daily_data 逻辑保持一致）
