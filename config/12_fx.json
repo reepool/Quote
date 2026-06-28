@@ -452,16 +452,22 @@
         "source_type": "aggregated_public",
         "source_mode": "direct",
         "role": "cnh_spot_fallback",
-        "source_interface": "yahoo_chart_fx",
+        "source_interface": "akshare.forex_hist_em",
+        "fallback_source_interface": "yahoo_chart_fx_latest",
         "endpoint_url": "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}",
         "symbols": {
+          "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH",
+          "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH",
+          "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH"
+        },
+        "fallback_symbols": {
           "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
           "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",
           "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH=X"
         },
         "timeout_seconds": 20,
         "retry_attempts": 2,
-        "parser_version": "fx_cnh_aggregated_public.v1",
+        "parser_version": "fx_cnh_aggregated_public.v2",
         "calendar": {
           "policy": "weekday_24x5",
           "holiday_dates": []
@@ -469,7 +475,7 @@
         "quality_flag": "aggregated_public",
         "note": "CNH lacks a single free official daily fixing equivalent. Do not label as official.",
         "metadata": {
-          "quote_unit_policy": "Yahoo chart FX closes are per 1 base currency unit. Store values normalized to the configured FX series quote_multiplier before writing observations."
+          "quote_unit_policy": "AkShare Eastmoney JPYCNH is already quoted as 100 JPY equals CNH amount. Yahoo fallback FX closes are per 1 base currency unit and must be normalized to the configured quote_multiplier."
         }
       },
       "ice_dxy_official": {

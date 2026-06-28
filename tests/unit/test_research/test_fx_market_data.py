@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pandas as pd
+
 from utils.config_manager import ResearchConfig, ResearchStorageConfig
 
 from research.fx_market_data import (
@@ -52,6 +54,8 @@ def _module_cfg() -> dict:
                     "FX.EUR_CNY.CFETS.MID.DAILY",
                     "FX.JPY_CNY.CFETS.MID.DAILY",
                     "FX.USD_CNH.MARKET.SPOT.DAILY",
+                    "FX.EUR_CNH.MARKET.SPOT.DAILY",
+                    "FX.JPY_CNH.MARKET.SPOT.DAILY",
                     "FX.EUR_CNH.DERIVED.DAILY",
                     "FX.JPY_CNH.DERIVED.DAILY",
                     "FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
@@ -75,7 +79,7 @@ def _module_cfg() -> dict:
                 "source": "fixture",
                 "source_type": "aggregated_public",
                 "source_mode": "direct",
-                "source_interface": "fixture",
+                "source_interface": "akshare.forex_hist_em",
                 "disable_live_fetch": True,
                 "role": "cnh_spot_fallback",
                 "quality_flag": "aggregated_public",
@@ -499,10 +503,60 @@ def test_fred_live_provider_parses_trade_weighted_dollar(tmp_path, monkeypatch):
     assert result.observations[0].quality_flag == "official"
 
 
+def test_akshare_aggregated_provider_parses_offshore_cnh_history(tmp_path, monkeypatch):
+    config, storage = _seed_storage(tmp_path)
+    source_cfg = dict(config.modules["fx_market_data"]["sources"]["cnh_market_aggregated_public"])
+    source_cfg.pop("disable_live_fetch", None)
+    source_cfg["symbols"] = {
+        "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH",
+        "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH",
+        "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH",
+    }
+    provider = AggregatedPublicFxProvider("cnh_market_aggregated_public", source_cfg)
+    frames = {
+        "USDCNH": pd.DataFrame([
+            {"日期": "2026-06-25", "代码": "USDCNH", "最新价": 7.25},
+            {"日期": "2026-06-26", "代码": "USDCNH", "最新价": 7.26},
+        ]),
+        "EURCNH": pd.DataFrame([
+            {"日期": "2026-06-26", "代码": "EURCNH", "最新价": 8.01},
+        ]),
+        "JPYCNH": pd.DataFrame([
+            {"日期": "2026-06-26", "代码": "JPYCNH", "最新价": 4.62},
+        ]),
+    }
+
+    monkeypatch.setattr(provider, "_akshare_forex_hist_em", lambda _ak, symbol: frames[symbol])
+
+    result = provider.fetch(
+        series=[
+            FxSeries.from_dict(row)
+            for row in storage.list_series(active_only=True)
+            if row["series_id"] in source_cfg["symbols"]
+        ],
+        start_date="2026-06-26",
+        end_date="2026-06-26",
+        dry_run=False,
+    )
+
+    assert result.status == "success"
+    assert {item.series_id for item in result.observations} == set(source_cfg["symbols"])
+    assert len(result.observations) == 3
+    by_series = {item.series_id: item for item in result.observations}
+    assert by_series["FX.USD_CNH.MARKET.SPOT.DAILY"].value == 7.26
+    assert by_series["FX.EUR_CNH.MARKET.SPOT.DAILY"].value == 8.01
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].quote_multiplier == 100
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].value == 4.62
+    assert by_series["FX.JPY_CNH.MARKET.SPOT.DAILY"].metadata["provider"] == "akshare_forex_hist_em"
+    assert result.metadata["parser_diagnostics"]["akshare_requests_performed"] == 3
+    assert result.metadata["parser_diagnostics"]["akshare_rows_seen"] == 4
+
+
 def test_yahoo_aggregated_provider_parses_offshore_cnh_spot(tmp_path, monkeypatch):
     config, storage = _seed_storage(tmp_path)
     source_cfg = dict(config.modules["fx_market_data"]["sources"]["cnh_market_aggregated_public"])
     source_cfg.pop("disable_live_fetch", None)
+    source_cfg["source_interface"] = "yahoo_chart_fx"
     source_cfg["symbols"] = {
         "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
         "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",

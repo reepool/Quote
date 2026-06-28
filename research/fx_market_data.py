@@ -36,6 +36,19 @@ def _hash_payload(value: Any) -> str:
     return hashlib.sha256(_json_dumps(value).encode("utf-8")).hexdigest()
 
 
+def _json_safe_scalar(value: Any) -> Any:
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    if hasattr(value, "item"):
+        try:
+            return value.item()
+        except Exception:
+            pass
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    return value
+
+
 def _row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
     return {key: row[key] for key in row.keys()}
 
@@ -2165,8 +2178,174 @@ class AggregatedPublicFxProvider(ConfiguredFxSourceProvider):
         start_date: Optional[str],
         end_date: Optional[str],
     ) -> Dict[str, Any]:
-        endpoint_template = self._source_url("https://query1.finance.yahoo.com/v8/finance/chart/{symbol}")
+        source_interface = str(self.source_cfg.get("source_interface") or "")
+        if "forex_hist_em" in source_interface:
+            historical_result = self._fetch_akshare_forex_hist_em(
+                series=series,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            if historical_result.get("observations"):
+                return historical_result
+            fallback_result = self._fetch_yahoo_chart_latest(
+                series=series,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            fallback_result["warnings"] = [
+                *(historical_result.get("warnings") or []),
+                "akshare_forex_hist_em_empty_or_failed_yahoo_fallback_used",
+                *(fallback_result.get("warnings") or []),
+            ]
+            fallback_result["blockers"] = [
+                *(historical_result.get("blockers") or []),
+                *(fallback_result.get("blockers") or []),
+            ]
+            diagnostics = {
+                **(historical_result.get("parser_diagnostics") or {}),
+                "fallback": fallback_result.get("parser_diagnostics") or {},
+            }
+            fallback_result["parser_diagnostics"] = diagnostics
+            return fallback_result
+        return self._fetch_yahoo_chart_latest(series=series, start_date=start_date, end_date=end_date)
+
+    def _fetch_akshare_forex_hist_em(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
         symbols = dict(self.source_cfg.get("symbols") or {})
+        defaults = {
+            "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH",
+            "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH",
+            "FX.JPY_CNH.MARKET.SPOT.DAILY": "JPYCNH",
+        }
+        start_dt = _as_date(start_date)
+        end_dt = _as_date(end_date)
+        observations: List[FxObservation] = []
+        warnings: List[str] = []
+        blockers: List[str] = []
+        requests_performed = 0
+        rows_seen = 0
+        try:
+            from research.providers.akshare_support import load_akshare
+
+            ak = load_akshare(mode=str(self.source_cfg.get("akshare_mode") or "direct"))
+        except Exception as e:
+            logger.warning("[FX][provider:%s] akshare forex_hist_em dependency failed error=%s", self.source_profile, e)
+            return {
+                "observations": [],
+                "warnings": [str(e)],
+                "blockers": [],
+                "parser_diagnostics": {
+                    "akshare_requests_performed": 0,
+                    "akshare_rows_seen": 0,
+                    "akshare_observations_parsed": 0,
+                    "akshare_dependency_failed": True,
+                },
+            }
+        for selected in series:
+            symbol = str(symbols.get(selected.series_id) or defaults.get(selected.series_id) or "").upper()
+            if not symbol:
+                warnings.append(f"akshare_symbol_not_configured:{selected.series_id}")
+                continue
+            symbol_started = time.monotonic()
+            logger.info(
+                "[FX][provider:%s] AkShare forex_hist_em request start symbol=%s series_id=%s start=%s end=%s",
+                self.source_profile,
+                symbol,
+                selected.series_id,
+                start_date,
+                end_date,
+            )
+            try:
+                frame = self._akshare_forex_hist_em(ak, symbol)
+                requests_performed += 1
+            except Exception as e:
+                logger.warning(
+                    "[FX][provider:%s] AkShare forex_hist_em request failed symbol=%s error=%s",
+                    self.source_profile,
+                    symbol,
+                    e,
+                )
+                warnings.append(f"akshare_forex_hist_em_failed:{symbol}:{e}")
+                continue
+            rows_seen += int(len(frame))
+            parsed_for_symbol = 0
+            for _, row in frame.iterrows():
+                raw_row = {str(k): _json_safe_scalar(row.get(k)) for k in row.index}
+                obs_date = str(row.get("日期") or row.get("date") or row.get("Date") or "")
+                obs_dt = _as_date(obs_date)
+                if not obs_dt:
+                    continue
+                if start_dt and obs_dt < start_dt:
+                    continue
+                if end_dt and obs_dt > end_dt:
+                    continue
+                close_value = row.get("最新价")
+                if close_value is None:
+                    close_value = row.get("收盘")
+                if close_value is None:
+                    close_value = row.get("Close")
+                if close_value is None:
+                    continue
+                value = float(close_value)
+                observation = FxObservation(
+                    series_id=selected.series_id,
+                    observation_date=obs_dt.isoformat(),
+                    value=value,
+                    base_currency=str(selected.metadata.get("base_currency") or "").upper(),
+                    quote_currency=str(selected.metadata.get("quote_currency") or "").upper(),
+                    quote_multiplier=float(selected.metadata.get("quote_multiplier") or 1.0),
+                    source_profile=self.source_profile,
+                    source_url="akshare.forex_hist_em",
+                    quality_flag=str(self.source_cfg.get("quality_flag") or "aggregated_public"),
+                    raw_payload_hash=_hash_payload({"symbol": symbol, "row": raw_row}),
+                    metadata={
+                        "adapter_type": self.adapter_type,
+                        "parser_version": self.source_cfg.get("parser_version"),
+                        "source_interface": self.source_cfg.get("source_interface"),
+                        "symbol": symbol,
+                        "provider": "akshare_forex_hist_em",
+                        "raw_row": raw_row,
+                        "quote_unit_policy": "value is stored as published by Eastmoney/AkShare; JPYCNH is already per 100 JPY",
+                    },
+                )
+                observations.append(observation)
+                parsed_for_symbol += 1
+            logger.info(
+                "[FX][provider:%s] AkShare forex_hist_em parsed symbol=%s rows_seen=%s observations=%s elapsed=%.2fs",
+                self.source_profile,
+                symbol,
+                len(frame),
+                parsed_for_symbol,
+                time.monotonic() - symbol_started,
+            )
+        return {
+            "observations": observations,
+            "warnings": warnings,
+            "blockers": blockers,
+            "parser_diagnostics": {
+                "akshare_requests_performed": requests_performed,
+                "akshare_rows_seen": rows_seen,
+                "akshare_observations_parsed": len(observations),
+            },
+        }
+
+    def _akshare_forex_hist_em(self, ak: Any, symbol: str):
+        return ak.forex_hist_em(symbol=symbol)
+
+    def _fetch_yahoo_chart_latest(
+        self,
+        *,
+        series: Sequence[FxSeries],
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        endpoint_template = self._source_url("https://query1.finance.yahoo.com/v8/finance/chart/{symbol}")
+        symbols = dict(self.source_cfg.get("fallback_symbols") or self.source_cfg.get("symbols") or {})
         defaults = {
             "FX.USD_CNH.MARKET.SPOT.DAILY": "USDCNH=X",
             "FX.EUR_CNH.MARKET.SPOT.DAILY": "EURCNH=X",

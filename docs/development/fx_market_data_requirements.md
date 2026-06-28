@@ -123,9 +123,9 @@ source venue -> currency/instrument master -> calendar/publication governance
 | `FX.USD_CNY.CFETS.MID.DAILY` | 中间价 | 日频 | 中国外汇交易中心/中国货币网 |
 | `FX.EUR_CNY.CFETS.MID.DAILY` | 中间价 | 日频 | 中国外汇交易中心/中国货币网 |
 | `FX.JPY_CNY.CFETS.MID.DAILY` | 中间价 | 日频 | 中国外汇交易中心/中国货币网，注意 100 JPY 报价单位 |
-| `FX.USD_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 Yahoo chart 聚合源，标记 `aggregated_public` |
-| `FX.EUR_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 Yahoo chart 聚合源，标记 `aggregated_public` |
-| `FX.JPY_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 Yahoo chart 聚合源，写库时归一为 100 JPY 报价单位 |
+| `FX.USD_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 AkShare/东方财富历史行情聚合源，标记 `aggregated_public` |
+| `FX.EUR_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 AkShare/东方财富历史行情聚合源，标记 `aggregated_public` |
+| `FX.JPY_CNH.MARKET.SPOT.DAILY` | 离岸即期 | 日频 | 当前采用 AkShare/东方财富历史行情聚合源，源字段已按 100 JPY 报价 |
 | `FX.EUR_CNH.DERIVED.DAILY` | 派生交叉 | 日频 | `EUR/USD * USD/CNH` 或同等治理路径 |
 | `FX.JPY_CNH.DERIVED.DAILY` | 派生交叉 | 日频 | `JPY/USD * USD/CNH` 或同等治理路径，注意 100 JPY 单位 |
 | `FXI.DXY.ICE.DAILY` | 美元指数 | 日频 | ICE 官方优先，若无法免费自动化则先 disabled |
@@ -327,19 +327,21 @@ FX.JPY_CNY.CFETS.MID.DAILY
 
 ### 8.1.2 离岸人民币 CNH 准备顺序
 
-离岸人民币先单独验收 `USD/CNH`、`EUR/CNH`、`JPY/CNH` 三条 market spot，不使用 `rmb_core` 大范围混跑。当前主数据源为 `cnh_market_aggregated_public`，底层接口为 Yahoo Finance chart API：
+离岸人民币先单独验收 `USD/CNH`、`EUR/CNH`、`JPY/CNH` 三条 market spot，不使用 `rmb_core` 大范围混跑。当前主数据源为 `cnh_market_aggregated_public`，历史回补底层接口为 AkShare `forex_hist_em`（东方财富外汇历史行情）；Yahoo/yfinance chart 只作为最新单点 fallback，不作为全量历史主源：
 
 ```text
-FX.USD_CNH.MARKET.SPOT.DAILY -> USDCNH=X
-FX.EUR_CNH.MARKET.SPOT.DAILY -> EURCNH=X
-FX.JPY_CNH.MARKET.SPOT.DAILY -> JPYCNH=X
+FX.USD_CNH.MARKET.SPOT.DAILY -> USDCNH
+FX.EUR_CNH.MARKET.SPOT.DAILY -> EURCNH
+FX.JPY_CNH.MARKET.SPOT.DAILY -> JPYCNH
 ```
 
 质量边界：
 
 - 该源是免费聚合市场源，`quality_flag=aggregated_public`，不能标记为 official。
-- Yahoo chart 返回值按 `1 base currency` 报价；项目内部 `JPY/CNH` instrument 使用 `quote_multiplier=100`，因此写库前必须将 `JPYCNH=X` 的 close 乘以 100，保存为 `100 JPY = x CNH`。
+- AkShare/东方财富 `JPYCNH` 已按 `100 JPY = x CNH` 报价，写库时直接保存并保留 `quote_multiplier=100`。
+- Yahoo/yfinance fallback 返回值按 `1 base currency` 报价；若使用 fallback，`JPYCNH=X` 必须乘以 100 后再保存。
 - CNH 使用独立 `weekday_24x5` source calendar，不复用 CFETS/SAFE 在岸中间价日历。
+- 全量 CNH 三条 direct spot 的共同起始日期以三条序列共同可用为准；当前接口样本显示 `USD/CNH` 可追溯到 2010-08-23，`EUR/CNH` 与 `JPY/CNH` 从 2025-02-24 起可用，因此三条同时回补的全量 dry-run 起始日暂定 `2025-02-24`。
 
 实施顺序：
 
