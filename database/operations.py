@@ -308,11 +308,21 @@ class DatabaseOperations:
     async def get_existing_data_dates(self, instrument_id: str, start_date: date, end_date: date) -> List[date]:
         """获取指定品种的已有数据日期"""
         try:
+            query_start = (
+                datetime.combine(start_date, datetime.min.time())
+                if isinstance(start_date, date) and not isinstance(start_date, datetime)
+                else start_date
+            )
+            query_end = (
+                datetime.combine(end_date, datetime.max.time())
+                if isinstance(end_date, date) and not isinstance(end_date, datetime)
+                else end_date
+            )
             async with self.get_async_session() as session:
                 stmt = select(DailyQuoteDB.time).filter(
                     DailyQuoteDB.instrument_id == instrument_id,
-                    DailyQuoteDB.time >= start_date,
-                    DailyQuoteDB.time <= end_date
+                    DailyQuoteDB.time >= query_start,
+                    DailyQuoteDB.time <= query_end
                 ).order_by(DailyQuoteDB.time)
 
                 result = await session.execute(stmt)
