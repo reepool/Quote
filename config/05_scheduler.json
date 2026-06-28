@@ -314,7 +314,10 @@
           "hkex_max_missing_days_per_instrument": 60,
           "repair_universe_mode": "historical_backfill",
           "override_lifecycle_filter": false,
-          "force_current_master_refresh": false
+          "force_current_master_refresh": true,
+          "current_master_refresh_scopes": [
+            "hkex_instrument"
+          ]
         }
       },
       "quarterly_cleanup": {

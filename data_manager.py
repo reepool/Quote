@@ -8949,6 +8949,41 @@ class DataManager:
                 evidence_by_id[instrument_id] = row
         return evidence_by_id
 
+    async def _load_first_quote_dates_by_instrument(
+        self,
+        instrument_ids: List[str],
+    ) -> Dict[str, date]:
+        """Return first local quote dates for a bounded instrument set."""
+        unique_ids = [item for item in dict.fromkeys(instrument_ids or []) if item]
+        if not unique_ids or not hasattr(self.db_ops, 'execute_read_query'):
+            return {}
+
+        first_dates: Dict[str, date] = {}
+        chunk_size = 500
+        for offset in range(0, len(unique_ids), chunk_size):
+            chunk = unique_ids[offset: offset + chunk_size]
+            placeholders = ", ".join(f":id_{idx}" for idx in range(len(chunk)))
+            params = {f"id_{idx}": instrument_id for idx, instrument_id in enumerate(chunk)}
+            try:
+                rows = await self.db_ops.execute_read_query(
+                    f"""
+                    SELECT instrument_id, MIN(date(time)) AS first_quote_date
+                    FROM daily_quotes
+                    WHERE instrument_id IN ({placeholders})
+                    GROUP BY instrument_id
+                    """,
+                    params,
+                )
+            except Exception as exc:
+                dm_logger.warning("[DataManager] Failed to load first quote dates: %s", exc)
+                continue
+            for row in rows or []:
+                parsed = self._date_from_any(row.get('first_quote_date'))
+                instrument_id = row.get('instrument_id')
+                if instrument_id and parsed:
+                    first_dates[instrument_id] = parsed
+        return first_dates
+
     def _resolve_repair_window_for_instrument(
         self,
         instrument: Dict[str, Any],
@@ -8959,6 +8994,7 @@ class DataManager:
         config: Dict[str, Any],
         lifecycle_evidence: Optional[Dict[str, Any]] = None,
         latest_quote_date: Optional[date] = None,
+        first_quote_date: Optional[date] = None,
         override_lifecycle_filter: bool = False,
     ) -> Dict[str, Any]:
         """Return lifecycle-aware repair window for one local instrument row."""
@@ -9018,6 +9054,26 @@ class DataManager:
             or self._date_from_any(evidence.get('last_quote_date'))
             or delisted
         )
+
+        if (
+            exchange == 'HKEX'
+            and instrument_type == 'stock'
+            and status == 'active'
+            and trading_status in (None, 1, True, '1')
+            and listed is None
+            and first_quote_date is not None
+        ):
+            if first_quote_date > requested_end:
+                return {
+                    'eligible': False,
+                    'reason': 'hkex_before_local_first_quote',
+                    'start_date': start,
+                    'end_date': end,
+                    'clipped': True,
+                }
+            if start < first_quote_date:
+                start = first_quote_date
+                lifecycle_state = 'hkex_missing_listed_date_local_first_quote'
 
         if instrument_type == 'index' and lifecycle_state in index_states:
             if index_lifecycle_boundary:
@@ -9195,6 +9251,16 @@ class DataManager:
             exchanges,
             states,
         )
+        first_quote_dates_by_id = await self._load_first_quote_dates_by_instrument([
+            item.get('instrument_id')
+            for item in instruments or []
+            if str(item.get('exchange') or '').upper() == 'HKEX'
+            and str(item.get('type') or '').lower() == 'stock'
+            and str(item.get('status') or '').lower() == 'active'
+            and item.get('trading_status') in (None, 1, True, '1')
+            and not self._date_from_any(item.get('listed_date'))
+            and item.get('instrument_id')
+        ])
 
         eligible: List[Dict[str, Any]] = []
         stale_checked = 0
@@ -9233,6 +9299,7 @@ class DataManager:
                 config=config,
                 lifecycle_evidence=evidence_by_id.get(instrument.get('instrument_id')),
                 latest_quote_date=latest_quote_date,
+                first_quote_date=first_quote_dates_by_id.get(instrument.get('instrument_id')),
                 override_lifecycle_filter=override_lifecycle_filter,
             )
             if not window.get('eligible'):
@@ -9281,6 +9348,7 @@ class DataManager:
             list(config.get('skip_index_lifecycle_states') or []),
         )
         latest_quote_date = None
+        first_quote_date = None
         if (
             str(instrument.get('type') or '').lower() == 'index'
             and str(instrument.get('exchange') or gap.exchange).upper() in {'SSE', 'SZSE'}
@@ -9292,6 +9360,16 @@ class DataManager:
                 )
             except Exception:
                 latest_quote_date = None
+        if (
+            str(instrument.get('type') or '').lower() == 'stock'
+            and str(instrument.get('exchange') or gap.exchange).upper() == 'HKEX'
+            and str(instrument.get('status') or '').lower() == 'active'
+            and instrument.get('trading_status') in (None, 1, True, '1')
+            and not self._date_from_any(instrument.get('listed_date'))
+        ):
+            first_quote_date = (
+                await self._load_first_quote_dates_by_instrument([instrument.get('instrument_id')])
+            ).get(instrument.get('instrument_id'))
 
         window = self._resolve_repair_window_for_instrument(
             instrument,
@@ -9301,6 +9379,7 @@ class DataManager:
             config=config,
             lifecycle_evidence=evidence_by_id.get(instrument.get('instrument_id')),
             latest_quote_date=latest_quote_date,
+            first_quote_date=first_quote_date,
             override_lifecycle_filter=override_lifecycle_filter,
         )
         return (

@@ -339,12 +339,12 @@ async def weekly_data_maintenance(self,
 ```
 
 #### 业务逻辑
-1. **生命周期过滤**：先用本地主数据治理状态过滤 repair universe；停编指数、退市后区间、stale-no-quote 指数，以及 HKEX 长期停牌且请求区间晚于本地最新行情日的股票，会在源请求前跳过或裁剪。
+1. **生命周期过滤**：先用本地主数据治理状态过滤 repair universe；停编指数、退市后区间、stale-no-quote 指数、HKEX 长期停牌且请求区间晚于本地最新行情日的股票，以及 HKEX 缺少 `listed_date` 但已有本地首个行情日的新近 active 标的，会在源请求前跳过或裁剪。
 2. **缺口检测**：仅对生命周期有效窗口按交易所与日期范围检测缺口。
 3. **自动修复**：逐个缺口触发补齐；旧 gap 记录在 `_fill_single_gap()` 前还会重新校验生命周期，防止绕过过滤。
 4. **执行记录**：报告检测数量、修复结果、失败跳表数量、HKEX guard 跳过数量，以及 `repair_universe` 生命周期跳过数量、原因分布和样例。
 
-默认 `repair_universe_mode=historical_backfill` 只使用本地状态，不刷新当前主数据。需要运维取证时可显式设置 `force_current_master_refresh=true` 并用 `current_master_refresh_scopes` 限定 scope；需要绕过生命周期过滤时必须同时提供明确标的或小范围 `repair_universe_limit`，否则任务会在请求行情源前失败。
+默认 `repair_universe_mode=historical_backfill` 只使用本地状态，不刷新 A 股当前主数据。周度 `find_gap_and_repair` 会在检测前仅对 `hkex_instrument` scope 执行 HKEX lifecycle 前置治理；需要其他运维取证时可显式设置 `force_current_master_refresh=true` 并用 `current_master_refresh_scopes` 限定 scope；需要绕过生命周期过滤时必须同时提供明确标的或小范围 `repair_universe_limit`，否则任务会在请求行情源前失败。
 
 ### 6.1 研究域申万标准行业缺口修复 (industry_standard_gap_fill)
 

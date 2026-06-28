@@ -128,11 +128,29 @@ class FakeRepairDbOps:
                 'delisted_date': None,
                 'source_symbol': '00007',
             },
+            '01688.HK': {
+                'instrument_id': '01688.HK',
+                'symbol': '01688',
+                'name': 'New HK stock without listed date',
+                'exchange': 'HKEX',
+                'type': 'stock',
+                'status': 'active',
+                'is_active': True,
+                'trading_status': 1,
+                'listed_date': None,
+                'delisted_date': None,
+                'source_symbol': '01688',
+            },
         }
         self.latest_quotes = {
             '005061.SZ': datetime(2025, 5, 1),
             '399001.SZ': datetime(2026, 6, 13),
             '00007.HK': datetime(2024, 3, 28),
+            '01688.HK': datetime(2026, 6, 26),
+        }
+        self.first_quotes = {
+            '00007.HK': datetime(2000, 9, 8),
+            '01688.HK': datetime(2026, 6, 26),
         }
         self.saved_quotes = []
 
@@ -152,6 +170,19 @@ class FakeRepairDbOps:
 
     async def get_latest_quote_date(self, instrument_id):
         return self.latest_quotes.get(instrument_id)
+
+    async def execute_read_query(self, query, params=None):
+        if 'MIN(date(time)) AS first_quote_date' not in query:
+            return []
+        requested_ids = set((params or {}).values())
+        return [
+            {
+                'instrument_id': instrument_id,
+                'first_quote_date': first_quote.date().isoformat(),
+            }
+            for instrument_id, first_quote in self.first_quotes.items()
+            if instrument_id in requested_ids
+        ]
 
     async def get_existing_data_dates(self, instrument_id, start_date, end_date):
         return []
@@ -314,6 +345,32 @@ async def test_hkex_suspended_stock_window_clips_to_latest_local_quote():
     assert eligible[0]['_repair_universe_reason'] == 'hkex_suspended'
     assert eligible[0]['_repair_universe_clipped'] is True
     assert diagnostics['clipped_instrument_count'] == 1
+
+
+@pytest.mark.asyncio
+async def test_hkex_active_stock_without_listed_date_clips_to_first_local_quote():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.source_factory = Mock()
+    manager.source_factory.get_trading_days = AsyncMock(return_value=[date(2026, 6, 26)])
+    manager.db_ops.get_existing_data_dates = AsyncMock(return_value=[date(2026, 6, 26)])
+
+    result = await manager.detect_data_gaps(
+        ['HKEX'],
+        date(2025, 1, 1),
+        date(2026, 6, 28),
+        instrument_types=['stock'],
+        instrument_ids=['01688.HK'],
+        include_diagnostics=True,
+    )
+
+    assert result['gaps'] == []
+    diagnostics = result['repair_universe']
+    assert diagnostics['eligible_instrument_count'] == 1
+    assert diagnostics['clipped_instrument_count'] == 1
+    manager.source_factory.get_trading_days.assert_awaited_once()
+    args = manager.source_factory.get_trading_days.await_args.args
+    assert args[1] == date(2026, 6, 26)
 
 
 @pytest.mark.asyncio
