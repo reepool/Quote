@@ -49,6 +49,28 @@ def test_financial_statements_shadow_sync_task_calls_data_manager_and_clears_act
     assert "financial_statements_shadow_sync" not in task._active_tasks
 
 
+def test_financial_disclosure_report_includes_blocker_samples():
+    text = task_module._format_financial_disclosure_scheduler_report(
+        {
+            "status": "degraded",
+            "db_path": "data/financials.db",
+            "reconciliation": True,
+            "report_periods": ["2026-03-31"],
+            "candidate_count": 1,
+            "blocking_gap_count": 1,
+            "blocker_samples": [
+                {
+                    "instrument_id": "601187.SH",
+                    "report_period": "2026-03-31",
+                    "missing_fields": ["revenue", "equity_parent"],
+                }
+            ],
+        }
+    )
+
+    assert "blocker样本: 601187.SH@2026-03-31:revenue,equity_parent" in text
+
+
 def test_financial_statements_catchup_task_passes_incremental_controls(monkeypatch):
     task = ScheduledTasks.__new__(ScheduledTasks)
     task.config = Mock()

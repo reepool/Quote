@@ -5,6 +5,10 @@ from research.financial_disclosure_incremental_sync import (
     FinancialDisclosureMaintenanceCandidate,
     FinancialDisclosureIncrementalSyncService,
 )
+from research.financial_statement_maintenance_repair import (
+    FinancialMaintenanceRepairRouter,
+    FinancialMaintenanceRepairTarget,
+)
 from research.providers.cninfo_announcements import (
     CninfoAnnouncementRecord,
     CninfoAnnouncementScanResult,
@@ -594,6 +598,53 @@ def test_targeted_import_uses_cninfo_before_fallback(tmp_path):
     assert result["source_order"] == ["cninfo_data20", "ths_report", "sina_report"]
     assert result["cninfo_attempts"] == 1
     assert result["cninfo_successes"] == 1
+    assert result["fallback_attempts"] == 0
+
+
+def test_repair_router_uses_fresh_readiness_after_external_write(tmp_path, monkeypatch):
+    current_storage = _FakeStorage(ready=False)
+    fresh_storage = _FakeStorage(ready=True)
+    config = _research_config(tmp_path)
+    router = FinancialMaintenanceRepairRouter(
+        storage=current_storage,
+        research_config=config,
+    )
+    target = FinancialMaintenanceRepairTarget(
+        instrument_id="601187.SH",
+        symbol="601187",
+        exchange="SSE",
+        report_period="2026-03-31",
+        profile="bank",
+    )
+
+    async def _fake_cninfo(**kwargs):
+        return {
+            "attempts": 1,
+            "batch_successes": 0,
+            "failed_instrument_periods": 1,
+            "errors": ["cninfo_data20:SSE:2026-03-31:degraded:failed=1/1"],
+        }
+
+    router._run_cninfo_data20_import = _fake_cninfo
+    monkeypatch.setattr(
+        "research.financial_statement_maintenance_repair.ResearchStorageManager",
+        lambda research_config: fresh_storage,
+    )
+
+    result = _run(
+        router.repair_targets(
+            targets=[target],
+            required_core_facts=["total_assets"],
+            mapping_version="test",
+            db_path=tmp_path / "financials.db",
+            request_interval_seconds=0.0,
+            request_timeout_seconds=1.0,
+        )
+    )
+
+    assert result["cninfo_attempts"] == 1
+    assert result["cninfo_successes"] == 1
+    assert result["cninfo_missing_or_ambiguous"] == 0
     assert result["fallback_attempts"] == 0
 
 

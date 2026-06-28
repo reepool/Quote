@@ -113,19 +113,15 @@ class FinancialMaintenanceRepairRouter:
                 request_interval_seconds=request_interval_seconds,
                 request_timeout_seconds=request_timeout_seconds,
             )
-            cninfo_ready_successes = sum(
-                1
-                for target in targets
-                if self.readiness_for_target(
-                    target,
-                    required_core_facts=required_core_facts,
-                    mapping_version=mapping_version,
-                ).get("ready")
+            cninfo_ready_keys = self._ready_target_keys(
+                targets,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
             )
             summary.update(
                 {
                     "cninfo_attempts": cninfo_summary.get("attempts", 0),
-                    "cninfo_successes": cninfo_ready_successes,
+                    "cninfo_successes": len(cninfo_ready_keys),
                     "cninfo_batch_successes": cninfo_summary.get(
                         "batch_successes",
                         0,
@@ -136,20 +132,21 @@ class FinancialMaintenanceRepairRouter:
                     ),
                     "cninfo_missing_or_ambiguous": max(
                         0,
-                        int(cninfo_summary.get("attempts", 0)) - cninfo_ready_successes,
+                        int(cninfo_summary.get("attempts", 0)) - len(cninfo_ready_keys),
                     ),
                 }
             )
             summary["errors"].extend(cninfo_summary.get("errors") or [])
 
+        ready_keys_after_cninfo = self._ready_target_keys(
+            targets,
+            required_core_facts=required_core_facts,
+            mapping_version=mapping_version,
+        )
         fallback_targets = [
             target
             for target in targets
-            if not self.readiness_for_target(
-                target,
-                required_core_facts=required_core_facts,
-                mapping_version=mapping_version,
-            ).get("ready")
+            if target.key not in ready_keys_after_cninfo
         ]
         summary["fallback_attempts"] = len(fallback_targets)
         if not fallback_targets or not fallback_sources:
@@ -188,16 +185,67 @@ class FinancialMaintenanceRepairRouter:
                 accepted_source_gaps=accepted_source_gaps,
                 accepted_source_gap_exchanges=(),
             )
-        summary["fallback_successes"] = sum(
-            1
-            for target in fallback_targets
-            if self.readiness_for_target(
+        ready_keys_after_fallback = self._ready_target_keys(
+            fallback_targets,
+            required_core_facts=required_core_facts,
+            mapping_version=mapping_version,
+        )
+        summary["fallback_successes"] = len(ready_keys_after_fallback)
+        return summary
+
+    def _ready_target_keys(
+        self,
+        targets: Sequence[FinancialMaintenanceRepairTarget],
+        *,
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+    ) -> set[Tuple[str, str]]:
+        """Return targets that are ready, using a fresh storage view after writes."""
+        ready = self._ready_target_keys_with_storage(
+            self.storage,
+            targets,
+            required_core_facts=required_core_facts,
+            mapping_version=mapping_version,
+        )
+        if len(ready) == len(targets):
+            return ready
+        try:
+            fresh_storage = ResearchStorageManager(self.research_config)
+            ready |= self._ready_target_keys_with_storage(
+                fresh_storage,
+                targets,
+                required_core_facts=required_core_facts,
+                mapping_version=mapping_version,
+            )
+        except Exception:
+            return ready
+        return ready
+
+    def _ready_target_keys_with_storage(
+        self,
+        storage: ResearchStorageManager,
+        targets: Sequence[FinancialMaintenanceRepairTarget],
+        *,
+        required_core_facts: Sequence[str],
+        mapping_version: str,
+    ) -> set[Tuple[str, str]]:
+        router = (
+            self
+            if storage is self.storage
+            else FinancialMaintenanceRepairRouter(
+                storage=storage,
+                research_config=self.research_config,
+            )
+        )
+        ready: set[Tuple[str, str]] = set()
+        for target in targets:
+            if router.readiness_for_target(
                 target,
                 required_core_facts=required_core_facts,
                 mapping_version=mapping_version,
-            ).get("ready")
-        )
-        return summary
+            ).get("ready"):
+                ready.add(target.key)
+        return ready
 
     async def _run_cninfo_data20_import(
         self,

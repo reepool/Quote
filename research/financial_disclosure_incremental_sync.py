@@ -987,6 +987,7 @@ class FinancialDisclosureIncrementalSyncService:
         mapping_policy = 0
         source_missing = 0
         changed = 0
+        blocker_samples: List[Dict[str, Any]] = []
         lifecycle_summary = {
             "pre_listing": 0,
             "post_delisting": 0,
@@ -1069,6 +1070,8 @@ class FinancialDisclosureIncrementalSyncService:
                 dry_run=dry_run,
             )
             outcomes.append(outcome)
+            if status in {"blocking_gap", "mapping_policy_gap", "failed"}:
+                blocker_samples.append(outcome)
         return {
             "changed_count": changed,
             "unchanged_count": unchanged,
@@ -1084,6 +1087,7 @@ class FinancialDisclosureIncrementalSyncService:
             "source_routing": self._last_repair_source_summary
             or self.repair_router.default_summary(),
             "outcomes": outcomes[:50],
+            "blocker_samples": blocker_samples[:10],
         }
 
     async def _run_targeted_import(
@@ -1236,6 +1240,13 @@ class FinancialDisclosureIncrementalSyncService:
             ),
             "missing_field_count": len(readiness.get("missing_fields") or []),
         }
+        missing_names = [
+            str(item.get("canonical_fact") or item.get("reason") or "")
+            for item in readiness.get("missing_fields") or []
+            if str(item.get("canonical_fact") or item.get("reason") or "")
+        ]
+        if missing_names:
+            outcome["missing_fields"] = missing_names[:8]
         if not dry_run:
             with self.storage.financial_database_scope():
                 self.storage.upsert_financial_disclosure_event_state(

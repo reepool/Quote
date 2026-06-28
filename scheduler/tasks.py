@@ -646,6 +646,17 @@ def _format_financial_disclosure_scheduler_report(result: Dict[str, Any]) -> str
     if result.get("mapping_policy_gap_count", 0):
         lines.append("说明: mapping policy gap 是字段标准或映射准入问题，不会反复调用 CNInfo/THS/Sina 补数。")
     if result.get("blocking_gap_count", 0):
+        blocker_samples = result.get("blocker_samples") or []
+        if blocker_samples:
+            rendered_samples = []
+            for item in blocker_samples[:5]:
+                missing = item.get("missing_fields") or []
+                missing_text = ",".join(str(field) for field in missing[:3])
+                suffix = f":{missing_text}" if missing_text else ""
+                rendered_samples.append(
+                    f"{item.get('instrument_id')}@{item.get('report_period')}{suffix}"
+                )
+            lines.append("blocker样本: " + "；".join(rendered_samples))
         lines.append("后续动作: blocker 按 source missing 或其他数据质量问题补处理，不能并入 accepted gaps。")
     broker_post = result.get("broker_risk_control_post_task")
     if isinstance(broker_post, dict):
