@@ -394,7 +394,7 @@
       },
       "database_backup": {
         "enabled": true,
-        "description": "数据库备份任务",
+        "description": "统一数据库备份任务",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -407,9 +407,7 @@
         "max_instances": 1,
         "misfire_grace_time": 1800,
         "coalesce": true,
-        "parameters": {
-          "use_backup_config": true
-        }
+        "parameters": {}
       },
       "company_profile_shadow_sync": {
         "enabled": false,

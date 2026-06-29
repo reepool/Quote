@@ -1,227 +1,95 @@
-# 数据库备份任务实施总结
+# 数据库备份工作流
 
-## 🎯 任务概述
+## 状态
 
-`database_backup` 定时任务负责将 Quote 系统的本地 SQLite 数据库自动备份到 `data/PVE-Bak/QuoteBak/`，支持 Telegram 通知和自动清理过期备份。当前备份范围不再只限 `data/quotes.db`，而是覆盖 `quotes.db / research.db / financials.db / valuation.db / market_data.db`，并可通过 `include_extra_data_dbs` 自动纳入 `data/*.db` 下未来新增的数据库。
+当前生产数据库备份由独立周任务 `database_backup` 统一负责。旧的 `backup_config` 和 `weekly_data_maintenance -> data_manager.backup_data()` 不再定义生产备份语义。
 
-> 存储布局说明：生产环境中 `data/` 是 `/dev/sda3` 挂载到
-> `/home/python/Quote/data` 的本地数据卷；`data/PVE-Bak` 和
-> `data/QuoteBak` 是 NAS 子挂载。执行完整备份前必须确认
-> `data/PVE-Bak/QuoteBak` 已落在 NAS 上，避免把大文件写回本地数据卷。
+## 目标
 
-## 📋 实施内容
+- 统一备份入口，避免独立任务和周维护任务各自执行不同备份逻辑。
+- 通过配置声明需要备份的数据库、目标目录、命名规则和保留数量。
+- 默认覆盖当前 `data/*.db` 中的生产 SQLite 数据库：`quotes / research / financials / valuation / futures / fx`。
+- 每个数据库默认最多保留 3 个备份文件。
+- 使用 SQLite online backup，降低直接复制活跃 SQLite 文件导致不一致备份的风险。
+- 每个数据库完成后发送 Telegram 通知，整轮结束后发送汇总报告。
 
-### 1. 配置文件修改 ✅
+## 配置
 
-**文件**: `config/config.json`
+生产配置位于 `config/04_database.json` 的 `database_backup_config`：
 
-**新增配置项**:
 ```json
 {
-  "backup_config": {
+  "database_backup_config": {
     "enabled": true,
-    "source_db_path": "data/quotes.db",
-    "source_databases": [
-      {
-        "name": "quotes",
-        "path": "data/quotes.db",
-        "filename_pattern": "quotes_backup_{timestamp}.db"
-      },
-      {
-        "name": "research",
-        "path": "data/research.db",
-        "filename_pattern": "research_backup_{timestamp}.db"
-      },
-      {
-        "name": "financials",
-        "path": "data/financials.db",
-        "filename_pattern": "financials_backup_{timestamp}.db"
-      },
-      {
-        "name": "valuation",
-        "path": "data/valuation.db",
-        "filename_pattern": "valuation_backup_{timestamp}.db"
-      },
-      {
-        "name": "market_data",
-        "path": "data/market_data.db",
-        "filename_pattern": "market_data_backup_{timestamp}.db"
-      }
-    ],
-    "include_extra_data_dbs": true,
-    "extra_db_glob": "data/*.db",
     "backup_directory": "data/PVE-Bak/QuoteBak",
-    "retention_days": 30,
-    "compression_enabled": false,
+    "default_max_backup_files": 3,
+    "default_filename_pattern": "{stem}_backup_{timestamp}.db",
+    "timestamp_format": "%Y%m%d_%H%M%S",
+    "include_globs": ["data/*.db"],
+    "exclude_globs": ["data/*-wal", "data/*-shm"],
+    "skip_missing": true,
+    "continue_on_database_failure": true,
     "notification_enabled": true,
-    "filename_pattern": "quotes_backup_{timestamp}.db",
-    "max_backup_files": 10
-  },
-  "scheduler_config": {
-    "jobs": {
-      "database_backup": {
-        "enabled": true,
-        "description": "数据库备份任务",
-        "trigger": {
-          "type": "cron",
-          "day_of_week": "sat",
-          "hour": 6,
-          "minute": 0,
-          "second": 0
-        },
-        "max_instances": 1,
-        "misfire_grace_time": 1800,
-        "coalesce": true,
-        "parameters": {
-          "use_backup_config": true,
-          "override_notification": false
-        }
-      }
-    }
+    "per_database_notification": true,
+    "performance": {
+      "mode": "sqlite_online_backup",
+      "max_parallel_databases": 1,
+      "chunk_pages": 1000,
+      "chunk_sleep_seconds": 0.05,
+      "busy_timeout_seconds": 30,
+      "min_free_space_multiplier": 1.5
+    },
+    "databases": [
+      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "valuation", "path": "data/valuation.db", "filename_pattern": "valuation_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "futures", "path": "data/futures.db", "filename_pattern": "futures_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "fx", "path": "data/fx.db", "filename_pattern": "fx_backup_{timestamp}.db", "max_backup_files": 3}
+    ]
   }
 }
 ```
 
-### 2. 任务方法实现 ✅
+## 调度
 
-**文件**: `scheduler/tasks.py`
+`config/05_scheduler.json` 中的 `database_backup` 是唯一生产周度备份任务，当前默认每周六 `03:30` 执行。
 
-**新增方法**:
-- `database_backup()` - 主备份任务方法
-- `_resolve_database_backup_sources()` - 解析需要备份的数据库清单
-- `_check_disk_space_for_backup()` - 磁盘空间检查
-- `_cleanup_old_backups()` - 清理过期备份
-- `_send_backup_notification()` - 发送备份通知
+`weekly_data_maintenance` 不再调用旧备份入口，也不再在维护报告中宣称数据库备份成功；备份状态应以 `database_backup` 的每库通知和汇总报告为准。
 
-**核心功能**:
-- ✅ 配置优先级合并（任务参数 > 全局配置 > 默认值）
-- ✅ 多数据库清单备份，覆盖行情、研究、财务和市场数据数据库
-- ✅ 可自动纳入 `data/*.db` 下新增的 SQLite 数据库
-- ✅ 源文件验证和大小检查
-- ✅ 磁盘空间检查
-- ✅ 自动创建备份目录
-- ✅ 文件拷贝和完整性验证
-- ✅ 过期文件自动清理
-- ✅ Telegram 通知（成功/失败）
-- ✅ 详细的日志记录
+## 执行流程
 
-### 3. 导入语句优化 ✅
+1. 解析 `database_backup_config`。
+2. 合并显式数据库清单和 `include_globs` 自动发现结果。
+3. 跳过 disabled 数据库；对缺失数据库按 `skip_missing` 决定跳过或失败。
+4. 创建并校验目标目录，检查可用空间。
+5. 默认串行备份每个 SQLite 数据库。
+6. 使用 SQLite online backup 分批复制，按 `chunk_pages` 和 `chunk_sleep_seconds` 控制 I/O 压力。
+7. 备份完成后打开备份文件并执行 `PRAGMA quick_check`。
+8. 按每库 `max_backup_files` 清理旧备份。
+9. 发送每库 Telegram 通知和整轮汇总报告。
 
-在 `scheduler/tasks.py` 中添加了 `import os` 以支持文件操作。
+## 存储前提
 
-## 🔧 技术特点
+生产环境中 `data/` 是 Quote 本地数据卷；`data/PVE-Bak` 和 `data/QuoteBak` 是 NAS 子挂载点。备份任务写入 `data/PVE-Bak/QuoteBak` 前，应确认该路径落在预期备份挂载下，避免 NAS 不可用时把大库写回本地数据卷。
 
-### 配置管理
-- **统一配置**: 使用 `backup_config` 作为全局配置
-- **数据库清单**: `source_databases` 是生产备份清单；旧的 `source_db_path` 仍保留为单库手工覆盖兼容项
-- **灵活覆盖**: 任务参数可选择性覆盖全局配置
-- **避免冲突**: 清晰的配置优先级机制
+如果需要强制挂载校验，可在 `database_backup_config.performance` 中启用：
 
-### 健壮性设计
-- **磁盘空间检查**: 备份前检查可用空间（需要2倍文件大小）
-- **文件完整性**: 备份后验证文件大小一致性
-- **错误处理**: 完整的异常捕获和错误通知
-- **自动重试**: 集成到现有的错误恢复机制
-
-### 通知机制
-- **成功通知**: 包含文件名、大小、耗时、路径
-- **失败通知**: 详细错误信息和恢复建议
-- **可配置开关**: 支持启用/禁用通知
-
-### 清理策略
-- **时间保留**: 默认保留30天的备份文件
-- **数量限制**: 每个数据库备份文件模式最多保留10个备份文件
-- **智能清理**: 按修改时间排序，优先保留最新备份
-
-## 📊 测试验证
-
-### 配置验证 ✅
-- 配置文件解析正确
-- 备份配置完整性检查通过
-- 任务调度配置正确
-- 文件路径和权限验证通过
-
-### 功能验证 ✅
-- 小文件备份测试成功
-- 文件复制功能正常
-- 内容完整性验证通过
-- 多次备份和清理功能正常
-- 时间戳生成和文件命名正确
-
-### 性能测试 ✅
-- 小文件 (140 bytes): 耗时 0.001秒
-- 大文件 (12GB): 预计耗时几分钟（取决于磁盘性能）
-
-## 🚀 使用说明
-
-### 启动自动备份
-
-**选项1 - 仅启动调度器**:
-```bash
-python3 main.py scheduler
+```json
+{
+  "require_backup_mount": true,
+  "expected_mount_paths": ["data/PVE-Bak"]
+}
 ```
 
-**选项2 - 启动完整系统**:
-```bash
-python3 main.py full
-```
+## 结果判断
 
-### 手动测试备份
+- 单库 `success`：备份文件生成、大小非零、SQLite 可打开、`PRAGMA quick_check=ok`。
+- 单库 `skipped`：配置允许跳过且源库不存在或被禁用。
+- 单库 `failed`：复制、校验、空间、锁等待或目标目录校验失败。
+- 整轮 `success`：无 failed 数据库。
+- 整轮 `failed`：任一必需数据库 failed；调度任务返回 `False`，不会只因为 APScheduler 包装层完成而被视作业务成功。
 
-创建测试脚本验证功能:
-```bash
-python3 test_small_backup.py
-```
+## 兼容说明
 
-### 配置修改
-
-**修改备份时间**:
-编辑 `config/config.json` 中的 `scheduler_config.jobs.database_backup.trigger`
-
-**修改备份路径**:
-编辑 `config.json` 中的 `backup_config.backup_directory`
-
-**修改保留策略**:
-编辑 `backup_config.retention_days` 和 `backup_config.max_backup_files`
-
-## 📅 调度信息
-
-- **执行时间**: 每周六 03:30 (北京时间)
-- **任务ID**: `database_backup`
-- **最大实例数**: 1 (防止并发执行)
-- **错过执行宽限**: 30分钟
-- **合并执行**: 启用 (多次错过的执行合并为一次)
-
-## 📁 文件结构
-
-```
-data/
-├── quotes.db                          # 源数据库文件 (12GB)
-└── PVE-Bak/
-    └── QuoteBak/
-        ├── quotes_backup_20251014_200000.db  # 备份文件
-        ├── quotes_backup_20251021_200000.db
-        └── ...
-```
-
-## 🎉 实施结果
-
-✅ **所有目标已达成**:
-1. ✅ 数据库自动备份 (每周六6:00)
-2. ✅ 指定路径拷贝 (data/quotes.db → data/PVE-Bak/QuoteBak/)
-3. ✅ Telegram 通知 (成功/失败均可配置)
-4. ✅ 系统整体性 (与现有架构完美集成)
-5. ✅ 代码一致性 (遵循现有模式和规范)
-6. ✅ 配置简洁性 (避免重复和冲突)
-
-## 🔮 后续优化建议
-
-1. **压缩支持**: 启用 `compression_enabled` 可减少存储空间
-2. **增量备份**: 考虑实现增量备份以节省时间
-3. **远程备份**: 可扩展支持FTP/SSH等远程备份
-4. **备份验证**: 增加数据库连接测试等高级验证
-
----
-
-**实施完成时间**: 2025-10-14 20:25
-**状态**: ✅ 生产就绪
+旧 `backup_config` 仍可被读取为迁移输入，但会记录 deprecation warning。新开发和生产配置必须使用 `database_backup_config`。

@@ -695,7 +695,13 @@ async def weekly_data_maintenance(self,
 ### 8. 数据库备份 (database_backup)
 
 #### 功能描述
-按计划自动备份数据库文件，支持保留策略与通知。
+按计划执行统一数据库备份工作流。`database_backup` 是唯一生产周度数据库备份入口；`weekly_data_maintenance` 不再执行旧的单库备份逻辑。
+
+#### 行为
+- 备份范围由 `database_backup_config.databases` 与 `include_globs` 决定，当前默认覆盖 `quotes / research / financials / valuation / futures / fx`。
+- 每个数据库默认最多保留 3 个备份文件，可按数据库覆盖。
+- 备份使用 SQLite online backup，并通过 page chunk、sleep、busy timeout 和默认串行执行控制长时间备份对日常任务的影响。
+- 每个数据库完成后发送 Telegram 通知，整轮结束后发送汇总通知。
 
 #### 存储前提
 - `data/` 是 Quote 本地数据卷挂载点，生产环境应由 `/dev/sda3` 挂载到

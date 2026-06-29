@@ -18,7 +18,7 @@
 
 - 生产财务数据写入目标是 `data/financials.db`，不是 `data/research.db`。
 - `data/research.db` 当前不应保留 `financial_*` 财务物理表；代码初始化时也会在独立财务库配置下移除研究库内的财务表。
-- `database_backup` 已将 `data/financials.db` 纳入生产数据库备份清单，与 `quotes.db / research.db / market_data.db` 一起备份到 `data/PVE-Bak/QuoteBak`；未来新增的 `data/*.db` 也会按配置自动纳入备份。
+- `database_backup` 已将 `data/financials.db` 纳入统一生产数据库备份清单，默认与 `quotes.db / research.db / valuation.db / futures.db / fx.db` 一起备份到 `data/PVE-Bak/QuoteBak`；未来新增的 `data/*.db` 也会按 `database_backup_config` 自动纳入备份，显式禁用的数据库除外。
 - L1 字段必须来自已批准 mapping catalog；字段名相似、单样本数值相近、会计等式另一边相等，都不能自动进入本地核心层。
 - CNInfo data20 当前在财务日更/周度对账中作为官方结构化优先补数源：能明确覆盖的 canonical facts 优先使用 CNInfo data20；缺失、失败或总项/归母等语义不明确的字段再由 Sina/THS 字段级补齐。源顺序和 fallback 由 `research/financial_statement_maintenance_repair.py` 的维护路由器统一管理，增量和周度对账任务只提交标准 instrument-period 目标，避免不同任务各自硬编码数据源调用。
 - BSE 与少数上市前科创板历史期存在已确认上游缺口；这些缺口只允许显式登记为 accepted source gap，不能通过放宽映射伪造完整性。

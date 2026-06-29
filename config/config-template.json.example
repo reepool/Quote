@@ -790,7 +790,7 @@
       },
       "database_backup": {
         "enabled": true,
-        "description": "数据库备份任务",
+        "description": "统一数据库备份任务",
         "report": true,
         "trigger": {
           "type": "cron",
@@ -802,9 +802,7 @@
         "max_instances": 1,
         "misfire_grace_time": 1800,
         "coalesce": true,
-        "parameters": {
-          "use_backup_config": true
-        }
+        "parameters": {}
       }
     }
   },
@@ -819,44 +817,72 @@
       "max_consecutive_failures": 3
     }
   },
-  "backup_config": {
+  "database_backup_config": {
     "enabled": true,
-    "source_db_path": "data/quotes.db",
-    "source_databases": [
+    "backup_directory": "data/PVE-Bak/QuoteBak",
+    "default_max_backup_files": 3,
+    "default_filename_pattern": "{stem}_backup_{timestamp}.db",
+    "timestamp_format": "%Y%m%d_%H%M%S",
+    "include_globs": ["data/*.db"],
+    "exclude_globs": ["data/*-wal", "data/*-shm"],
+    "skip_missing": true,
+    "continue_on_database_failure": true,
+    "notification_enabled": true,
+    "per_database_notification": true,
+    "performance": {
+      "mode": "sqlite_online_backup",
+      "max_parallel_databases": 1,
+      "chunk_pages": 1000,
+      "chunk_sleep_seconds": 0.05,
+      "busy_timeout_seconds": 30,
+      "min_free_space_multiplier": 1.5,
+      "require_backup_mount": false,
+      "expected_mount_paths": []
+    },
+    "databases": [
       {
         "name": "quotes",
         "path": "data/quotes.db",
-        "filename_pattern": "quotes_backup_{timestamp}.db"
+        "enabled": true,
+        "filename_pattern": "quotes_backup_{timestamp}.db",
+        "max_backup_files": 3
       },
       {
         "name": "research",
         "path": "data/research.db",
-        "filename_pattern": "research_backup_{timestamp}.db"
+        "enabled": true,
+        "filename_pattern": "research_backup_{timestamp}.db",
+        "max_backup_files": 3
       },
       {
         "name": "financials",
         "path": "data/financials.db",
-        "filename_pattern": "financials_backup_{timestamp}.db"
+        "enabled": true,
+        "filename_pattern": "financials_backup_{timestamp}.db",
+        "max_backup_files": 3
       },
       {
         "name": "valuation",
         "path": "data/valuation.db",
-        "filename_pattern": "valuation_backup_{timestamp}.db"
+        "enabled": true,
+        "filename_pattern": "valuation_backup_{timestamp}.db",
+        "max_backup_files": 3
       },
       {
-        "name": "market_data",
-        "path": "data/market_data.db",
-        "filename_pattern": "market_data_backup_{timestamp}.db"
+        "name": "futures",
+        "path": "data/futures.db",
+        "enabled": true,
+        "filename_pattern": "futures_backup_{timestamp}.db",
+        "max_backup_files": 3
+      },
+      {
+        "name": "fx",
+        "path": "data/fx.db",
+        "enabled": true,
+        "filename_pattern": "fx_backup_{timestamp}.db",
+        "max_backup_files": 3
       }
-    ],
-    "include_extra_data_dbs": true,
-    "extra_db_glob": "data/*.db",
-    "backup_directory": "data/PVE-Bak/QuoteBak",
-    "retention_days": 30,
-    "compression_enabled": false,
-    "notification_enabled": true,
-    "filename_pattern": "quotes_backup_{timestamp}.db",
-    "max_backup_files": 10
+    ]
   },
   "cache_config": {
     "enabled": true,

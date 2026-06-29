@@ -390,8 +390,8 @@
 ```
 
 - **`db_path`**: `str` (默认: `data/quotes.db`) —— *系统中主数据 SQLite 物理文件存放地点*
-- **`backup_enabled`**: `bool` (默认: `False`) —— *是否开启独立文件定点自动硬备份*
-- **`backup_interval_days`**: `int` (默认: `7`) —— *硬备份循环的默认时长周期*
+- **`backup_enabled`**: `bool` (默认: `False`) —— *历史兼容字段，不再控制生产周度数据库备份；生产备份以 `database_backup_config` 为准*
+- **`backup_interval_days`**: `int` (默认: `7`) —— *历史兼容字段，不再控制生产周度数据库备份周期*
 - **`task_async_pool.pool_size`**: `int` (默认: `2`) —— *后台任务专用异步连接池基础连接数*
 - **`task_async_pool.max_overflow`**: `int` (默认: `0`) —— *后台任务专用异步连接池额外突发连接数；默认不溢出，保证任务侧容量可控*
 - **`task_async_pool.pool_timeout_seconds`**: `float` (默认: `30`) —— *后台任务等待任务池连接的最长秒数*
@@ -1684,39 +1684,57 @@
 - **`max_execution_time`**: `int` (默认: `300`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`max_failure_rate`**: `float` (默认: `0.1`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
 - **`max_consecutive_failures`**: `int` (默认: `3`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-## backup_config
+## database_backup_config
 
 ```json
 {
-  "backup_config": {
+  "database_backup_config": {
     "enabled": true,
-    "source_db_path": "data/quotes.db",
-    "source_databases": [
-      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db"},
-      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db"},
-      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db"},
-      {"name": "valuation", "path": "data/valuation.db", "filename_pattern": "valuation_backup_{timestamp}.db"},
-      {"name": "market_data", "path": "data/market_data.db", "filename_pattern": "market_data_backup_{timestamp}.db"}
+    "backup_directory": "data/PVE-Bak/QuoteBak",
+    "default_max_backup_files": 3,
+    "default_filename_pattern": "{stem}_backup_{timestamp}.db",
+    "timestamp_format": "%Y%m%d_%H%M%S",
+    "include_globs": ["data/*.db"],
+    "exclude_globs": ["data/*-wal", "data/*-shm"],
+    "skip_missing": true,
+    "continue_on_database_failure": true,
+    "notification_enabled": true,
+    "per_database_notification": true,
+    "performance": {
+      "mode": "sqlite_online_backup",
+      "max_parallel_databases": 1,
+      "chunk_pages": 1000,
+      "chunk_sleep_seconds": 0.05,
+      "busy_timeout_seconds": 30,
+      "min_free_space_multiplier": 1.5
+    },
+    "databases": [
+      {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "research", "path": "data/research.db", "filename_pattern": "research_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "financials", "path": "data/financials.db", "filename_pattern": "financials_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "valuation", "path": "data/valuation.db", "filename_pattern": "valuation_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "futures", "path": "data/futures.db", "filename_pattern": "futures_backup_{timestamp}.db", "max_backup_files": 3},
+      {"name": "fx", "path": "data/fx.db", "filename_pattern": "fx_backup_{timestamp}.db", "max_backup_files": 3}
     ],
-    "include_extra_data_dbs": true,
-    "extra_db_glob": "data/*.db",
-    "backup_directory": "data/PVE-Bak/QuoteBak"
   }
 }
   ...
 ```
 
 - **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`source_db_path`**: `str` (默认: `data/quotes.db`) —— *单库手工覆盖兼容项；正常自动备份使用 `source_databases`*
-- **`source_databases`**: `List[dict]` —— *生产备份数据库清单，当前覆盖 `quotes.db / research.db / financials.db / valuation.db / market_data.db`*
-- **`include_extra_data_dbs`**: `bool` (默认: `False`) —— *是否自动把 `extra_db_glob` 命中的新增 SQLite 数据库纳入备份*
-- **`extra_db_glob`**: `str` (默认: `data/*.db`) —— *新增数据库自动发现范围*
 - **`backup_directory`**: `str` (默认: `data/PVE-Bak/QuoteBak`) —— *NAS 备份输出路径；`data/PVE-Bak` 必须是 NAS 子挂载，不能退化为本地空目录*
-- **`retention_days`**: `int` (默认: `30`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`compression_enabled`**: `bool` (默认: `False`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`notification_enabled`**: `bool` (默认: `True`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`filename_pattern`**: `str` (默认: `quotes_backup_{timestamp}.db`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
-- **`max_backup_files`**: `int` (默认: `10`) —— *基本开闭设定属性（不填写或按内置模型自动约束处理默认值即可）*
+- **`default_max_backup_files`**: `int` (默认: `3`) —— *每个数据库默认最多保留的备份文件数*
+- **`default_filename_pattern`**: `str` (默认: `{stem}_backup_{timestamp}.db`) —— *未单独配置时的命名模板，支持 `{name}`、`{stem}`、`{timestamp}`*
+- **`include_globs`**: `List[str]` —— *自动发现新增 SQLite 数据库的 glob 范围*
+- **`exclude_globs`**: `List[str]` —— *自动发现时排除 WAL/SHM 等非主库文件*
+- **`skip_missing`**: `bool` (默认: `True`) —— *显式配置但缺失的库是否跳过并告警，而不是阻断整轮*
+- **`continue_on_database_failure`**: `bool` (默认: `True`) —— *单库失败后是否继续备份后续数据库*
+- **`notification_enabled`**: `bool` (默认: `True`) —— *是否发送数据库备份通知*
+- **`per_database_notification`**: `bool` (默认: `True`) —— *每个数据库完成后是否单独通知*
+- **`performance`**: `Object` —— *SQLite online backup 的分批、sleep、busy timeout、空间倍率等性能控制*
+- **`databases`**: `List[dict]` —— *生产备份数据库显式清单；当前默认覆盖 `quotes/research/financials/valuation/futures/fx`*
+
+旧 `backup_config` 和 `database_config.backup_enabled` 仅作为迁移兼容输入，不再是生产周度备份工作流的权威配置。
 ## cache_config
 
 ```json

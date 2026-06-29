@@ -17,6 +17,14 @@ _install_akshare_proxy_patch(required=False)
 
 from utils import scheduler_logger, config_manager, TelegramBot
 from .job_config import JobConfig
+from .database_backup import (
+    BACKUP_STATUS_FAILED,
+    BACKUP_STATUS_SKIPPED,
+    BACKUP_STATUS_SUCCESS,
+    DatabaseBackupResult,
+    DatabaseBackupRunResult,
+    DatabaseBackupService,
+)
 from data_manager import data_manager
 from instrument_master_governance import MasterGovernanceRequirement
 from utils.date_utils import DateUtils, get_shanghai_time
@@ -2311,15 +2319,11 @@ class ScheduledTasks:
             stats = await data_manager.db_ops.get_database_statistics()
             scheduler_logger.info(f"[Scheduler] Database stats: {stats}")
 
-            # 备份数据库
             if backup_database:
-                backup_enabled = self.config.get_nested('database_config.backup_enabled', True)
-                if backup_enabled:
-                    success = await data_manager.backup_data()
-                    if success:
-                        scheduler_logger.info("[Scheduler] Database backup completed successfully")
-                    else:
-                        scheduler_logger.warning("[Scheduler] Database backup failed")
+                scheduler_logger.info(
+                    "[Scheduler] Weekly maintenance no longer performs database backup; "
+                    "production backups are handled only by database_backup."
+                )
 
             # 清理旧日志
             if cleanup_old_logs:
@@ -2372,7 +2376,7 @@ class ScheduledTasks:
                 'tasks_completed': 6,
                 'duration': 'N/A', # 可以在任务开始和结束时记录时间来计算
                 'maintenance_tasks': [
-                    {'task_name': '数据库备份', 'status': '成功' if backup_database else '跳过'},
+                    {'task_name': '数据库备份', 'status': '独立任务执行' if backup_database else '跳过'},
                     {'task_name': '日志清理', 'status': '成功' if cleanup_old_logs else '跳过'},
                     {'task_name': '幽灵/僵尸标的清理', 'status': '已废弃，跳过'},
                     {'task_name': '复权因子周度同步', 'status': factor_summary},
@@ -6958,264 +6962,105 @@ class ScheduledTasks:
                             max_backup_files: Optional[int] = None,
                             job_config: Optional[JobConfig] = None) -> bool:
         """数据库备份任务"""
-        try:
-            scheduler_logger.info("[Scheduler] Starting database backup task...")
-            scheduler_logger.debug(f"[Scheduler] use_backup_config parameter: {use_backup_config}")
-
-            # 读取配置 - 按优先级合并参数
-            backup_config = self.config.get_nested('backup_config', {}) or {}
-
-            # 使用传入参数，否则使用配置文件中的值，最后使用默认值
-            backup_directory = backup_directory or backup_config.get('backup_directory', 'data/PVE-Bak/QuoteBak')
-            retention_days = retention_days or backup_config.get('retention_days', 30)
-            notification_enabled = notification_enabled if notification_enabled is not None else backup_config.get('notification_enabled', True)
-            filename_pattern = filename_pattern or backup_config.get('filename_pattern', 'quotes_backup_{timestamp}.db')
-            max_backup_files = max_backup_files or backup_config.get('max_backup_files', 10)
-            backup_sources = self._resolve_database_backup_sources(
-                backup_config=backup_config,
-                source_db_path=source_db_path,
-                filename_pattern=filename_pattern,
+        scheduler_logger.info("[Scheduler] Starting unified database backup task...")
+        if not use_backup_config:
+            scheduler_logger.warning(
+                "[Scheduler] use_backup_config=false is deprecated; unified database_backup_config is authoritative"
             )
-            if not backup_sources:
-                raise RuntimeError("没有可备份的数据库文件")
-
-            import os
-            for source in backup_sources:
-                if not os.path.exists(source["path"]):
-                    raise FileNotFoundError(f"源数据库文件不存在: {source['path']}")
-
-            total_source_size = sum(os.path.getsize(source["path"]) for source in backup_sources)
-
-            # 创建备份目录
-            os.makedirs(backup_directory, exist_ok=True)
-
-            # 检查磁盘空间
-            await self._check_disk_space_for_backup(total_source_size, backup_directory)
-
-            # 生成备份文件名
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-            # 执行备份
-            start_time = datetime.now()
-
-            import shutil
-            backup_results = []
-            cleanup_patterns = []
-            for source in backup_sources:
-                source_path = source["path"]
-                source_size = os.path.getsize(source_path)
-                source_name = source["name"]
-                source_stem = os.path.splitext(os.path.basename(source_path))[0]
-                source_pattern = source["filename_pattern"]
-                backup_filename = source_pattern.format(
-                    timestamp=timestamp,
-                    name=source_name,
-                    stem=source_stem,
-                )
-                backup_path = os.path.join(backup_directory, backup_filename)
-                scheduler_logger.info(
-                    f"[Scheduler] Copying database from {source_path} to {backup_path}"
-                )
-                shutil.copy2(source_path, backup_path)
-                if not os.path.exists(backup_path) or os.path.getsize(backup_path) != source_size:
-                    raise IOError(f"备份文件创建失败或大小不匹配: {backup_path}")
-                backup_results.append(
-                    {
-                        "name": source_name,
-                        "source": source_path,
-                        "backup_file": backup_filename,
-                        "file_size": source_size,
-                    }
-                )
-                cleanup_patterns.append(
-                    source_pattern.format(timestamp="*", name=source_name, stem=source_stem)
-                )
-
-            end_time = datetime.now()
-            duration = (end_time - start_time).total_seconds()
-
-            scheduler_logger.info(
-                f"[Scheduler] Database backup completed successfully: {len(backup_results)} files"
-            )
-
-            # 清理过期备份
-            await self._cleanup_old_backups(
+        if any(
+            value is not None
+            for value in (
+                source_db_path,
                 backup_directory,
                 retention_days,
+                notification_enabled,
+                filename_pattern,
                 max_backup_files,
-                backup_patterns=cleanup_patterns,
+            )
+        ):
+            scheduler_logger.warning(
+                "[Scheduler] legacy database_backup runtime override parameters are deprecated; "
+                "configure database_backup_config instead"
             )
 
-            # 使用统一报告接口发送通知
-            report_data = {
-                'name': '数据库备份报告',
-                'success': True,
-                'backup_file': f"{len(backup_results)} files",
-                'backup_files': backup_results,
-                'file_size': total_source_size,
-                'duration': duration,
-                'timestamp': datetime.now().isoformat()
-            }
-            await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
-            return True
+        service = DatabaseBackupService.from_config_manager(self.config, scheduler_logger)
 
-        except Exception as e:
-            error_msg = f"数据库备份失败: {str(e)}"
-            scheduler_logger.error(f"[Scheduler] {error_msg}")
-            report_data = {'name': '数据库备份报告', 'success': False, 'error_message': str(e)}
-            await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
-            return False
-
-    def _resolve_database_backup_sources(
-        self,
-        *,
-        backup_config: Dict[str, Any],
-        source_db_path: Optional[str],
-        filename_pattern: str,
-    ) -> List[Dict[str, str]]:
-        """Resolve the database files covered by the backup task."""
-        import glob
-
-        if source_db_path:
-            source_stem = os.path.splitext(os.path.basename(source_db_path))[0]
-            return [
-                {
-                    "name": source_stem,
-                    "path": source_db_path,
-                    "filename_pattern": filename_pattern,
-                }
-            ]
-
-        configured = backup_config.get("source_databases")
-        sources: List[Dict[str, str]] = []
-        if configured:
-            for item in configured:
-                if isinstance(item, str):
-                    path = item
-                    stem = os.path.splitext(os.path.basename(path))[0]
-                    pattern = f"{stem}_backup_{{timestamp}}.db"
-                    name = stem
-                else:
-                    path = str(item.get("path") or "")
-                    stem = os.path.splitext(os.path.basename(path))[0]
-                    name = str(item.get("name") or stem)
-                    pattern = str(
-                        item.get("filename_pattern") or f"{stem}_backup_{{timestamp}}.db"
-                    )
-                if path:
-                    sources.append({"name": name, "path": path, "filename_pattern": pattern})
-        else:
-            path = backup_config.get("source_db_path", "data/quotes.db")
-            sources.append(
-                {
-                    "name": os.path.splitext(os.path.basename(path))[0],
-                    "path": path,
-                    "filename_pattern": filename_pattern,
-                }
-            )
-
-        known_paths = {os.path.abspath(source["path"]) for source in sources}
-        if backup_config.get("include_extra_data_dbs", False):
-            for path in sorted(glob.glob(str(backup_config.get("extra_db_glob", "data/*.db")))):
-                abs_path = os.path.abspath(path)
-                if abs_path in known_paths:
-                    continue
-                stem = os.path.splitext(os.path.basename(path))[0]
-                sources.append(
-                    {
-                        "name": stem,
-                        "path": path,
-                        "filename_pattern": f"{stem}_backup_{{timestamp}}.db",
-                    }
-                )
-                known_paths.add(abs_path)
-        return sources
-
-    async def _check_disk_space_for_backup(self, required_bytes: int, backup_directory: str):
-        """检查备份目录的磁盘空间"""
-        try:
-            import shutil
-
-            # 获取备份目录所在磁盘的可用空间
-            stat = shutil.disk_usage(backup_directory)
-            free_space = stat.free
-
-            # 预留额外空间 (至少是备份文件大小的2倍)
-            required_space = required_bytes * 2
-
-            if free_space < required_space:
-                error_msg = f"磁盘空间不足: 需要 {required_space/(1024*1024):.1f}MB, 可用 {free_space/(1024*1024):.1f}MB"
-                scheduler_logger.warning(f"[Scheduler] {error_msg}")
-                raise RuntimeError(error_msg)
-
-            scheduler_logger.debug(f"[Scheduler] Disk space check passed: {free_space/(1024*1024):.1f}MB available")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Disk space check failed: {e}")
-            raise
-
-    async def _cleanup_old_backups(
-        self,
-        backup_directory: str,
-        retention_days: int,
-        max_files: int,
-        backup_patterns: Optional[List[str]] = None,
-    ):
-        """清理过期的备份文件"""
-        try:
-            import glob
-            from datetime import datetime, timedelta
-
-            if not os.path.exists(backup_directory):
+        async def notify_database_result(result: DatabaseBackupResult) -> None:
+            if not service.config.notification_enabled or not service.config.per_database_notification:
                 return
+            if not self.telegram_enabled or not self.bot:
+                return
+            level = "info" if result.status in {BACKUP_STATUS_SUCCESS, BACKUP_STATUS_SKIPPED} else "error"
+            try:
+                await self.bot.send_task_notification(
+                    self._format_database_backup_notification(result),
+                    task_name="database_backup",
+                    level=level,
+                )
+            except Exception as notify_err:
+                scheduler_logger.warning(
+                    "[Scheduler] Failed to send database backup per-db notification: %s",
+                    notify_err,
+                )
 
-            cutoff_date = datetime.now() - timedelta(days=retention_days)
-            deleted_count = 0
-            patterns = backup_patterns or ["quotes_backup_*.db"]
+        run_result: DatabaseBackupRunResult = await service.run(
+            on_database_result=notify_database_result
+        )
+        report_data = run_result.to_report_data()
+        if run_result.preflight_error:
+            report_data["error_message"] = run_result.preflight_error
+        elif run_result.failure_count:
+            report_data["error_message"] = "; ".join(
+                result.error or result.skipped_reason or result.name
+                for result in run_result.results
+                if result.status == BACKUP_STATUS_FAILED
+            )
 
-            for pattern in patterns:
-                backup_pattern = os.path.join(backup_directory, pattern)
-                backup_files = glob.glob(backup_pattern)
-                if not backup_files:
-                    continue
-                backup_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+        await self._send_task_report(report_data, 'backup_result', '数据库备份', job_config)
+        if run_result.success:
+            scheduler_logger.info(
+                "[Scheduler] Unified database backup completed successfully: success=%s skipped=%s deleted=%s",
+                run_result.success_count,
+                run_result.skipped_count,
+                run_result.cleanup_deleted_count,
+            )
+        else:
+            scheduler_logger.error(
+                "[Scheduler] Unified database backup failed: success=%s failed=%s skipped=%s error=%s",
+                run_result.success_count,
+                run_result.failure_count,
+                run_result.skipped_count,
+                run_result.preflight_error,
+            )
+        return run_result.success
 
-                for backup_file in backup_files[max_files:]:
-                    try:
-                        file_mtime = datetime.fromtimestamp(os.path.getmtime(backup_file))
-                        if file_mtime < cutoff_date:
-                            os.remove(backup_file)
-                            deleted_count += 1
-                            scheduler_logger.info(
-                                f"[Scheduler] Deleted old backup: {os.path.basename(backup_file)}"
-                            )
-                    except Exception as e:
-                        scheduler_logger.warning(
-                            f"[Scheduler] Failed to delete old backup {backup_file}: {e}"
-                        )
-
-                remaining_files = glob.glob(backup_pattern)
-                remaining_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
-
-                for backup_file in remaining_files[max_files:]:
-                    try:
-                        os.remove(backup_file)
-                        deleted_count += 1
-                        scheduler_logger.info(
-                            f"[Scheduler] Deleted excess backup: {os.path.basename(backup_file)}"
-                        )
-                    except Exception as e:
-                        scheduler_logger.warning(
-                            f"[Scheduler] Failed to delete excess backup {backup_file}: {e}"
-                        )
-
-            if deleted_count > 0:
-                scheduler_logger.info(f"[Scheduler] Cleanup completed: deleted {deleted_count} old backup files")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to cleanup old backups: {e}")
-
-
+    def _format_database_backup_notification(self, result: DatabaseBackupResult) -> str:
+        """Format one database backup result for Telegram task notification."""
+        if result.status == BACKUP_STATUS_SUCCESS:
+            return (
+                "数据库备份完成\n"
+                f"数据库: `{result.name}`\n"
+                f"源: `{result.source}`\n"
+                f"备份: `{result.backup_path}`\n"
+                f"大小: `{result.backup_size}` bytes\n"
+                f"耗时: `{result.duration:.1f}s`\n"
+                f"校验: `{result.validation_status}`\n"
+                f"清理: 删除 `{len(result.cleanup.deleted_files)}` 个旧备份"
+            )
+        if result.status == BACKUP_STATUS_SKIPPED:
+            return (
+                "数据库备份跳过\n"
+                f"数据库: `{result.name}`\n"
+                f"源: `{result.source}`\n"
+                f"原因: `{result.skipped_reason}`"
+            )
+        return (
+            "数据库备份失败\n"
+            f"数据库: `{result.name}`\n"
+            f"源: `{result.source}`\n"
+            f"错误: `{result.error}`\n"
+            f"继续后续: `{result.continued_after_failure}`"
+        )
 
 # 全局定时任务实例
 scheduled_tasks = ScheduledTasks()

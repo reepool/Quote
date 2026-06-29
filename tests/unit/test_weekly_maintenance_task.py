@@ -30,6 +30,7 @@ async def test_weekly_maintenance_factor_sync_config_and_order(monkeypatch):
     data_manager.db_ops = Mock()
     data_manager.db_ops.get_database_statistics = AsyncMock(return_value={})
     data_manager.db_ops.cleanup_ghost_instruments = AsyncMock(return_value=2)
+    data_manager.backup_data = AsyncMock(return_value=True)
     data_manager.sync_all_adjustment_factors = AsyncMock(
         side_effect=factor_sync_side_effect
     )
@@ -82,3 +83,48 @@ async def test_weekly_maintenance_factor_sync_config_and_order(monkeypatch):
         "optimize",
     ]
     data_manager.db_ops.cleanup_ghost_instruments.assert_not_awaited()
+    data_manager.backup_data.assert_not_awaited()
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_weekly_maintenance_does_not_report_legacy_backup_success(monkeypatch):
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.config = Mock()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock()
+
+    data_manager = Mock()
+    data_manager.db_ops = Mock()
+    data_manager.db_ops.get_database_statistics = AsyncMock(return_value={})
+    data_manager.backup_data = AsyncMock(return_value=True)
+    data_manager.sync_all_adjustment_factors = AsyncMock(return_value={})
+    monkeypatch.setattr(task_module, "data_manager", data_manager)
+
+    monkeypatch.setattr(
+        task_module.cache_manager.quote_cache,
+        "clear_expired_data",
+        AsyncMock(return_value=None),
+    )
+    monkeypatch.setattr(
+        task_module.cache_manager.general_cache,
+        "_cleanup_expired",
+        AsyncMock(return_value=None),
+    )
+    task._cleanup_old_logs = AsyncMock(return_value=None)
+    task._validate_data_integrity = AsyncMock(return_value=None)
+    task._optimize_database = AsyncMock(return_value=None)
+
+    result = await task.weekly_data_maintenance(
+        backup_database=True,
+        cleanup_old_logs=False,
+        sync_adjustment_factors=False,
+        validate_data_integrity=False,
+        optimize_database=False,
+    )
+
+    assert result is True
+    data_manager.backup_data.assert_not_awaited()
+    report_data = task._send_task_report.await_args.kwargs["report_data"]
+    backup_entry = report_data["maintenance_tasks"][0]
+    assert backup_entry == {"task_name": "数据库备份", "status": "独立任务执行"}
