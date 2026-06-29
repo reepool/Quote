@@ -42,6 +42,17 @@ CSIndex 的官方日线接口仍作为 SSE/CSI 指数行情优先源；但 CSInd
 
 股票字段 `delisted` 不应直接用于指数停编。若短期内仍复用 `instruments.status`，也应使用明确的指数状态值，例如 `calculation_terminated`，并通过 metadata/evidence 记录详细证据。
 
+### 终端行情日边界
+
+退市或停编指数的“没有后续行情”判断必须沉淀到 `index_lifecycle_evidence.last_quote_date`，不能长期依赖缺口修复阶段的短窗口启发式。治理层按以下优先级维护和消费边界：
+
+1. 官方生命周期证据直接给出或可明确推出最终行情日时，写入 `last_quote_date`，并保留 `source/confidence/event_type/evidence_url/diagnostics`。
+2. 官方生命周期证据只给出生效日时，可用本地最后行情日在 `effective_date` 之前的事实推断 `last_quote_date`，但 `confidence` 必须标记为推断，不能伪装成纯官方 final quote。
+3. 若只有 `effective_date` 而没有可验证最终行情日，历史修复可以用 `effective_date` 作为较弱生命周期边界，但报告必须与 `last_quote_date` 边界区分。
+4. 仅凭本地行情长期停滞得到的 `stale_no_quote` 或短 delisted-date fallback 只能作为降级兜底，报告中以 `*_fallback` reason 和 `degraded_fallback_count` 暴露，后续应通过指数主数据治理补齐正式证据。
+
+历史行情行不因上述治理被删除或 forward-fill。`last_quote_date` 只定义修复/日更不应再请求的生命周期窗口边界。
+
 ## 公告证据
 
 官方公告是生命周期最高置信来源。治理模块需要支持：
@@ -145,6 +156,7 @@ CNIndex 官方列表里同时存在“指数代码”和“深交所行情代码
 - 按生命周期原因统计跳过数量。
 - metadata-only 遗留行情 key 的停用数量，例如 `metadata-only: N` 或 `metadata_only_legacy_deactivated_count`；非 6 位行情 key 的清理数量，例如 `invalid-quote: N` 或 `invalid_quote_code_deactivated_count`。
 - 样例：指数代码、名称、状态、最后行情日、生效日、证据 URL。
+- 终端行情日覆盖：直接 `last_quote_date`、推断 `last_quote_date`、effective-date-only、missing boundary 和降级 fallback 的数量。
 - 官方源失败或使用缓存/fallback 时的 warning。
 - active 指数因官方源失败而使用 BaoStock/AkShare 的计数。
 

@@ -210,6 +210,10 @@ def _format_repair_universe_summary(diagnostics: Optional[Dict[str, Any]]) -> st
     reason_text = "，".join(
         f"{reason}={count}" for reason, count in list(reasons.items())[:5]
     ) or "无"
+    clip_reasons = diagnostics.get("clip_reason_distribution") or {}
+    clip_reason_text = "，".join(
+        f"{reason}={count}" for reason, count in list(clip_reasons.items())[:5]
+    )
     samples = diagnostics.get("samples") or []
     sample_text = "；".join(
         str(sample.get("instrument_id") or sample.get("symbol") or "unknown")
@@ -233,6 +237,10 @@ def _format_repair_universe_summary(diagnostics: Optional[Dict[str, Any]]) -> st
         ),
         f"原因: {reason_text}",
     ]
+    if clip_reason_text:
+        lines.append(f"裁剪原因: {clip_reason_text}")
+    if diagnostics.get("degraded_fallback_count"):
+        lines.append(f"降级兜底: {diagnostics.get('degraded_fallback_count')}")
     current_refresh = diagnostics.get("current_master_refresh")
     if isinstance(current_refresh, dict) and current_refresh.get("requested"):
         lines.append(
@@ -2745,10 +2753,13 @@ class ScheduledTasks:
             severity_distribution = dict(Counter(gap.severity for gap in reportable_gaps))
             affected_stocks = len({gap.instrument_id for gap in reportable_gaps})
             top_affected_stocks = data_manager.get_top_affected_stocks(reportable_gaps, limit=10)
+            repair_universe_degraded = bool(
+                repair_universe.get('warnings') or repair_universe.get('errors')
+            )
 
             report_data = {
                 'name': '数据缺口检测与修复报告',
-                'status': 'success' if failed == 0 else 'warning',
+                'status': 'success' if failed == 0 and not repair_universe_degraded else 'warning',
                 'total_gaps': len(reportable_gaps),
                 'affected_stocks': affected_stocks,
                 'severity_distribution': severity_distribution,

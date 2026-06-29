@@ -460,12 +460,14 @@
     "skip_index_lifecycle_states": [
       "calculation_terminated",
       "inactive",
+      "metadata_only",
       "stale_no_quote"
     ],
     "enable_local_stale_no_quote": true,
     "stale_no_quote_trading_days": 10,
     "max_index_no_data_failures_per_instrument": 1,
     "max_no_data_failures_per_instrument": 3,
+    "max_degraded_lifecycle_fallbacks_before_warning": 0,
     "stale_governance_continue_policy": "warn"
   }
 }
@@ -478,11 +480,12 @@
 - **`max_override_instruments` / `max_override_limit`**: override 模式的最大标的数或最大 limit，防止全市场绕过过滤后直接打到行情源。
 - **`current_repair_requires_tradable`**: `current_repair` 模式下是否要求 `trading_status=1`。
 - **`allow_inactive_pre_lifecycle_history`**: 历史模式下是否允许有明确 `delisted_date` 或指数生命周期边界的 inactive 标的补边界前历史。
-- **`skip_index_lifecycle_states`**: 指数生命周期状态黑名单；命中后会按 evidence effective/last quote date 裁剪，完全越界则跳过。
-- **`enable_local_stale_no_quote`**: 是否用本地最新行情日期识别长期无行情的 A 股指数，避免停编或失效指数反复触发 CNIndex/CSIndex/BaoStock/AkShare fallback。
+- **`skip_index_lifecycle_states`**: 指数生命周期状态黑名单；命中后优先按 `index_lifecycle_evidence.last_quote_date` 裁剪，其次才使用 `effective_date`，完全越界则跳过。
+- **`enable_local_stale_no_quote`**: 是否在缺少正式生命周期边界时，用本地最新行情日期识别长期无行情的 A 股指数，避免停编或失效指数反复触发 CNIndex/CSIndex/BaoStock/AkShare fallback。该规则属于降级兜底，不等同于正式终止计算证据。
 - **`stale_no_quote_trading_days`**: 本地 stale-no-quote 判断阈值，默认与指数主数据治理保持一致。
 - **`max_index_no_data_failures_per_instrument`**: `find_gap_and_repair` 中同一指数连续无数据失败后的本次任务熔断阈值。默认 1，成功补回任意 gap 后清零。该项不改变主数据状态，也不写生命周期证据，只避免健康性未知的指数在同一次运行中被拆成大量 gap 后反复请求外部源。
 - **`max_no_data_failures_per_instrument`**: `find_gap_and_repair` 中同一非指数标的连续无数据失败后的本次任务熔断阈值。默认 3，成功补回任意 gap 后清零。
+- **`max_degraded_lifecycle_fallbacks_before_warning`**: 单次 repair universe 过滤中允许的降级生命周期兜底次数。默认 0，表示只要使用本地 stale-no-quote 或短 delisted-date fallback，就在 `repair_universe.warnings` 和任务报告中提示，促使补齐正式 `last_quote_date` 证据。
 - **`stale_governance_continue_policy`**: 本地 lifecycle/evidence 不完整时的继续策略；当前实现以 warning 形式进入 `repair_universe.warnings`。
 
 ### data_config.instrument_master_sync

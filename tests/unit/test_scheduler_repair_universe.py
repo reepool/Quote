@@ -18,16 +18,20 @@ def test_scheduler_formats_repair_universe_summary_concisely():
         'skipped_gap_segment_count': 30,
         'skipped_missing_days': 90,
         'reason_distribution': {
-            'index_lifecycle_stale_no_quote': 18,
+            'index_lifecycle_stale_no_quote_fallback': 18,
             'after_delisted_date': 2,
         },
+        'clip_reason_distribution': {
+            'index_lifecycle_last_quote_date': 5,
+        },
+        'degraded_fallback_count': 18,
         'current_master_refresh': {
             'requested': True,
             'status': 'success',
             'scopes': ['a_share_index'],
         },
         'samples': [
-            {'instrument_id': f'00506{i}.SZ', 'reason': 'index_lifecycle_stale_no_quote'}
+            {'instrument_id': f'00506{i}.SZ', 'reason': 'index_lifecycle_stale_no_quote_fallback'}
             for i in range(10)
         ],
     })
@@ -36,7 +40,9 @@ def test_scheduler_formats_repair_universe_summary_concisely():
     assert '生命周期跳过=20' in summary
     assert 'segments=30' in summary
     assert '显式主数据刷新: success' in summary
-    assert summary.count('index_lifecycle_stale_no_quote') <= 6
+    assert '裁剪原因: index_lifecycle_last_quote_date=5' in summary
+    assert '降级兜底: 18' in summary
+    assert summary.count('index_lifecycle_stale_no_quote_fallback') <= 6
 
 
 @pytest.mark.asyncio

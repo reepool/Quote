@@ -263,6 +263,7 @@ async def test_index_governance_applies_direct_and_series_inferred_termination()
 
     assert result['summary']['direct_terminated_count'] == 1
     assert result['summary']['inferred_terminated_count'] == 1
+    assert result['summary']['terminal_boundary_missing_count'] == 1
     assert result['summary']['lifecycle_skip_count'] == 2
     assert manager.db_ops.rows['CNI980055.SZ']['status'] == 'calculation_terminated'
     assert manager.db_ops.rows['480055.SZ']['status'] == 'calculation_terminated'
@@ -272,6 +273,31 @@ async def test_index_governance_applies_direct_and_series_inferred_termination()
         tradable_only=True,
     )
     assert any(row['confidence'] == 'series_inferred' for row in manager.db_ops.evidence_rows)
+
+
+@pytest.mark.asyncio
+async def test_index_governance_infers_missing_direct_terminal_quote_boundary():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['index_master_governance']['exchanges'] = ['SSE', 'SZSE']
+    manager.data_config['index_master_governance']['official_sources'] = ['cnindex', 'csindex']
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.latest_quotes['CNI980055.SZ'] = datetime(2026, 5, 13)
+    manager.source_factory = FakeSourceFactory()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
+
+    assert result['summary']['terminal_boundary_inferred_count'] == 1
+    assert result['summary']['terminal_boundary_missing_count'] == 0
+    direct_evidence = [
+        row for row in manager.db_ops.evidence_rows
+        if row.get('instrument_id') == 'CNI980055.SZ'
+    ][0]
+    assert direct_evidence['last_quote_date'] == date(2026, 5, 13)
+    assert direct_evidence['confidence'] == 'direct_lifecycle_local_quote_boundary'
+    assert direct_evidence['diagnostics']['terminal_boundary_inference'] == (
+        'local_latest_quote_on_or_before_effective_date'
+    )
 
 
 class DuplicateCNIndexSource(FakeCNIndexSource):

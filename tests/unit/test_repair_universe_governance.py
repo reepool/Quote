@@ -180,6 +180,7 @@ class FakeRepairDbOps:
             '01688.HK': datetime(2026, 6, 26),
         }
         self.saved_quotes = []
+        self.index_lifecycle_evidence = []
 
     async def get_repair_universe_instruments(self, exchange, instrument_types=None):
         type_set = set(instrument_types or ['stock', 'index'])
@@ -193,7 +194,14 @@ class FakeRepairDbOps:
         return await self.get_repair_universe_instruments(exchange, instrument_types)
 
     async def get_index_lifecycle_evidence(self, *, exchanges=None, states=None):
-        return []
+        exchange_set = set(exchanges or [])
+        state_set = set(states or [])
+        return [
+            row.copy()
+            for row in self.index_lifecycle_evidence
+            if (not exchange_set or row.get('exchange') in exchange_set)
+            and (not state_set or row.get('lifecycle_state') in state_set)
+        ]
 
     async def get_latest_quote_date(self, instrument_id):
         return self.latest_quotes.get(instrument_id)
@@ -259,7 +267,8 @@ async def test_stopped_index_is_skipped_before_gap_detection_source_calendar():
     assert {gap.instrument_id for gap in result['gaps']} == {'399001.SZ'}
     diagnostics = result['repair_universe']
     assert diagnostics['skipped_instrument_count'] == 1
-    assert diagnostics['reason_distribution']['index_lifecycle_stale_no_quote'] == 1
+    assert diagnostics['reason_distribution']['index_lifecycle_stale_no_quote_fallback'] == 1
+    assert diagnostics['degraded_fallback_count'] == 1
     assert diagnostics['samples'][0]['instrument_id'] == '005061.SZ'
     assert manager.source_factory.get_trading_days.await_count == 1
 
@@ -359,9 +368,151 @@ async def test_delisted_index_window_clips_to_last_local_quote_before_terminal_d
 
     assert len(eligible) == 1
     assert eligible[0]['_repair_end_date'] == date(2025, 12, 5)
-    assert eligible[0]['_repair_universe_reason'] == 'index_delisted_last_quote'
+    assert eligible[0]['_repair_universe_reason'] == 'index_delisted_last_quote_fallback'
     assert eligible[0]['_repair_universe_clipped'] is True
     assert diagnostics['clipped_instrument_count'] == 1
+    assert diagnostics['clip_reason_distribution']['index_delisted_last_quote_fallback'] == 1
+    assert diagnostics['degraded_fallback_count'] == 1
+
+
+@pytest.mark.asyncio
+async def test_index_lifecycle_evidence_reader_prefers_official_last_quote_boundary():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.db_ops.index_lifecycle_evidence = [
+        {
+            'instrument_id': '399238.SZ',
+            'symbol': '399238',
+            'exchange': 'SZSE',
+            'lifecycle_state': 'stale_no_quote',
+            'event_type': 'stale_no_quote',
+            'last_quote_date': '2025-12-05',
+            'confidence': 'quote_gap',
+            'source': 'local_quote_freshness',
+            'updated_at': '2026-06-28T20:00:00',
+        },
+        {
+            'instrument_id': '399238.SZ',
+            'symbol': '399238',
+            'exchange': 'SZSE',
+            'lifecycle_state': 'calculation_terminated',
+            'event_type': 'calculation_terminated',
+            'effective_date': '2025-12-08',
+            'last_quote_date': '2025-12-04',
+            'confidence': 'direct',
+            'source': 'cnindex_announcement',
+            'updated_at': '2026-06-27T20:00:00',
+        },
+    ]
+
+    evidence = await manager._load_index_lifecycle_evidence_by_instrument(
+        ['SZSE'],
+        ['calculation_terminated', 'stale_no_quote'],
+    )
+
+    assert evidence['399238.SZ']['source'] == 'cnindex_announcement'
+    assert evidence['399238.SZ']['_terminal_boundary'] == date(2025, 12, 4)
+    assert evidence['399238.SZ']['_terminal_boundary_reason'] == 'index_lifecycle_last_quote_date'
+
+
+@pytest.mark.asyncio
+async def test_delisted_index_window_prefers_governed_last_quote_metadata():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.db_ops.index_lifecycle_evidence = [
+        {
+            'instrument_id': '399238.SZ',
+            'symbol': '399238',
+            'exchange': 'SZSE',
+            'lifecycle_state': 'calculation_terminated',
+            'event_type': 'calculation_terminated',
+            'effective_date': '2025-12-08',
+            'last_quote_date': '2025-12-04',
+            'confidence': 'direct',
+            'source': 'cnindex_announcement',
+        },
+    ]
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['399238.SZ']],
+        start_date=date(2025, 1, 1),
+        end_date=date(2026, 6, 28),
+        mode='historical_backfill',
+    )
+
+    assert len(eligible) == 1
+    assert eligible[0]['_repair_end_date'] == date(2025, 12, 4)
+    assert eligible[0]['_repair_universe_reason'] == 'index_lifecycle_last_quote_date'
+    assert diagnostics['clip_reason_distribution']['index_lifecycle_last_quote_date'] == 1
+    assert diagnostics['clip_samples'][0]['evidence_source'] == 'cnindex_announcement'
+    assert diagnostics['degraded_fallback_count'] == 0
+
+
+@pytest.mark.asyncio
+async def test_delisted_index_gap_after_governed_last_quote_is_metadata_skipped():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.db_ops.index_lifecycle_evidence = [
+        {
+            'instrument_id': '399238.SZ',
+            'symbol': '399238',
+            'exchange': 'SZSE',
+            'lifecycle_state': 'calculation_terminated',
+            'event_type': 'calculation_terminated',
+            'effective_date': '2025-12-08',
+            'last_quote_date': '2025-12-04',
+            'confidence': 'direct',
+            'source': 'cnindex_announcement',
+        },
+    ]
+    manager.source_factory = Mock()
+    manager.source_factory.get_daily_data = AsyncMock(return_value=[])
+
+    gap = DataGapInfo(
+        instrument_id='399238.SZ',
+        symbol='399238',
+        exchange='SZSE',
+        gap_start=date(2025, 12, 8),
+        gap_end=date(2025, 12, 8),
+        gap_days=1,
+        gap_type='missing_data',
+        severity='low',
+        recommendation='test',
+        missing_dates=[date(2025, 12, 8)],
+    )
+
+    assert await manager._fill_single_gap(gap) is False
+    manager.source_factory.get_daily_data.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_index_effective_date_boundary_is_distinguished_from_last_quote_metadata():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+    manager.db_ops.index_lifecycle_evidence = [
+        {
+            'instrument_id': '399238.SZ',
+            'symbol': '399238',
+            'exchange': 'SZSE',
+            'lifecycle_state': 'calculation_terminated',
+            'event_type': 'calculation_terminated',
+            'effective_date': '2025-12-08',
+            'confidence': 'direct',
+            'source': 'cnindex_announcement',
+        },
+    ]
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['399238.SZ']],
+        start_date=date(2025, 1, 1),
+        end_date=date(2026, 6, 28),
+        mode='historical_backfill',
+    )
+
+    assert len(eligible) == 1
+    assert eligible[0]['_repair_end_date'] == date(2025, 12, 8)
+    assert eligible[0]['_repair_universe_reason'] == 'index_lifecycle_effective_date'
+    assert diagnostics['clip_reason_distribution']['index_lifecycle_effective_date'] == 1
 
 
 @pytest.mark.asyncio

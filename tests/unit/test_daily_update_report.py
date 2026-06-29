@@ -493,12 +493,12 @@ def test_gap_report_renders_repair_universe_lifecycle_summary():
             'repair_universe': {
                 'skipped_instrument_count': 3,
                 'skipped_gap_segment_count': 4,
-                'reason_distribution': {'index_lifecycle_stale_no_quote': 3},
+                'reason_distribution': {'index_lifecycle_stale_no_quote_fallback': 3},
             },
             'repair_universe_summary': (
                 "模式: historical_backfill\n"
                 "标的: 输入=10，可修复=7，裁剪=1，生命周期跳过=3\n"
-                "原因: index_lifecycle_stale_no_quote=3"
+                "原因: index_lifecycle_stale_no_quote_fallback=3"
             ),
             'top_affected_stocks': [],
         },

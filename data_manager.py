@@ -8704,6 +8704,7 @@ class DataManager:
                 index_config.get('stale_no_quote_trading_days', 10) or 10
             ),
             'stale_governance_continue_policy': 'warn',
+            'max_degraded_lifecycle_fallbacks_before_warning': 0,
         }
         raw_config = self.data_config.get('repair_universe_governance')
         if not isinstance(raw_config, dict):
@@ -8759,7 +8760,10 @@ class DataManager:
             'skipped_gap_segment_count': 0,
             'skipped_missing_days': 0,
             'reason_distribution': {},
+            'clip_reason_distribution': {},
+            'degraded_fallback_count': 0,
             'samples': [],
+            'clip_samples': [],
             'warnings': [],
             'errors': [],
             'current_master_refresh': {
@@ -8782,6 +8786,7 @@ class DataManager:
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         detail: Optional[str] = None,
+        evidence: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Append one bounded lifecycle-skip diagnostic."""
         reason = str(reason or 'unknown')
@@ -8819,7 +8824,53 @@ class DataManager:
             })
         if detail:
             sample['detail'] = detail
+        if evidence:
+            sample.update({
+                'evidence_source': evidence.get('source'),
+                'evidence_confidence': evidence.get('confidence'),
+                'boundary_date': evidence.get('boundary_date'),
+                'boundary_field': evidence.get('boundary_field'),
+            })
         diagnostics.setdefault('samples', []).append(sample)
+
+    def _record_repair_universe_clip(
+        self,
+        diagnostics: Dict[str, Any],
+        *,
+        reason: str,
+        instrument: Dict[str, Any],
+        start_date: Optional[date],
+        end_date: Optional[date],
+        evidence: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Record lifecycle clipping separately from lifecycle skips."""
+        reason = str(reason or 'unknown')
+        distribution = Counter(diagnostics.get('clip_reason_distribution') or {})
+        distribution[reason] += 1
+        diagnostics['clip_reason_distribution'] = dict(distribution)
+
+        sample_limit = int(self._get_repair_universe_governance_config().get('sample_limit', 10) or 0)
+        if sample_limit <= 0 or len(diagnostics.get('clip_samples') or []) >= sample_limit:
+            return
+
+        sample = {
+            'instrument_id': instrument.get('instrument_id'),
+            'symbol': instrument.get('symbol'),
+            'exchange': instrument.get('exchange'),
+            'type': instrument.get('type'),
+            'status': instrument.get('status'),
+            'reason': reason,
+            'start_date': start_date.isoformat() if start_date else None,
+            'end_date': end_date.isoformat() if end_date else None,
+        }
+        if evidence:
+            sample.update({
+                'evidence_source': evidence.get('source'),
+                'evidence_confidence': evidence.get('confidence'),
+                'boundary_date': evidence.get('boundary_date'),
+                'boundary_field': evidence.get('boundary_field'),
+            })
+        diagnostics.setdefault('clip_samples', []).append(sample)
 
     def _validate_repair_universe_override(
         self,
@@ -8930,7 +8981,7 @@ class DataManager:
         exchanges: List[str],
         states: List[str],
     ) -> Dict[str, Dict[str, Any]]:
-        """Read latest local index lifecycle evidence, when the DB supports it."""
+        """Read local index lifecycle evidence and choose terminal-boundary rows by authority."""
         if not hasattr(self.db_ops, 'get_index_lifecycle_evidence'):
             return {}
         try:
@@ -8945,9 +8996,86 @@ class DataManager:
         evidence_by_id: Dict[str, Dict[str, Any]] = {}
         for row in rows or []:
             instrument_id = row.get('instrument_id')
-            if instrument_id and instrument_id not in evidence_by_id:
-                evidence_by_id[instrument_id] = row
+            if not instrument_id:
+                continue
+            normalized = self._normalize_index_lifecycle_evidence(row)
+            existing = evidence_by_id.get(instrument_id)
+            if (
+                existing is None
+                or int(normalized.get('_evidence_precedence', 0) or 0)
+                > int(existing.get('_evidence_precedence', 0) or 0)
+            ):
+                evidence_by_id[instrument_id] = normalized
         return evidence_by_id
+
+    def _normalize_index_lifecycle_evidence(self, row: Dict[str, Any]) -> Dict[str, Any]:
+        """Attach repair-specific authority metadata to one index lifecycle evidence row."""
+        evidence = dict(row or {})
+        state = str(evidence.get('lifecycle_state') or '').strip().lower()
+        source = str(evidence.get('source') or '').strip().lower()
+        confidence = str(evidence.get('confidence') or '').strip().lower()
+        event_type = str(evidence.get('event_type') or '').strip().lower()
+        last_quote_date = self._date_from_any(evidence.get('last_quote_date'))
+        effective_date = self._date_from_any(evidence.get('effective_date'))
+
+        degraded = (
+            state == 'stale_no_quote'
+            or source == 'local_quote_freshness'
+            or confidence in {'quote_gap', 'local_quote_gap', 'local_stale_no_quote'}
+        )
+        official = (
+            source.startswith('cnindex')
+            or source.startswith('csindex')
+            or confidence in {'direct', 'official', 'series_inferred', 'official_master_metadata_only'}
+        )
+        inferred = (
+            'inferred' in confidence
+            or 'local_quote_boundary' in confidence
+            or 'inferred' in event_type
+            or 'inference' in source
+        )
+
+        if last_quote_date:
+            boundary_date = last_quote_date
+            boundary_field = 'last_quote_date'
+        elif effective_date:
+            boundary_date = effective_date
+            boundary_field = 'effective_date'
+        else:
+            boundary_date = None
+            boundary_field = None
+
+        precedence = 0
+        if boundary_field == 'last_quote_date' and official and not degraded and not inferred:
+            precedence = 500
+        elif boundary_field == 'last_quote_date' and official and inferred:
+            precedence = 450
+        elif boundary_field == 'last_quote_date' and not degraded:
+            precedence = 350
+        elif boundary_field == 'effective_date' and official and not degraded:
+            precedence = 300
+        elif state in {'metadata_only', 'inactive', 'calculation_terminated'}:
+            precedence = 250
+        elif boundary_field == 'last_quote_date' and degraded:
+            precedence = 100
+        elif degraded:
+            precedence = 50
+
+        if degraded:
+            boundary_reason = 'index_lifecycle_stale_no_quote_fallback'
+        elif boundary_field == 'last_quote_date':
+            boundary_reason = 'index_lifecycle_last_quote_date'
+        elif boundary_field == 'effective_date':
+            boundary_reason = 'index_lifecycle_effective_date'
+        else:
+            boundary_reason = f'index_lifecycle_{state}' if state else 'index_lifecycle_unknown'
+
+        evidence['_terminal_boundary'] = boundary_date
+        evidence['_terminal_boundary_field'] = boundary_field
+        evidence['_terminal_boundary_reason'] = boundary_reason
+        evidence['_terminal_boundary_degraded'] = degraded
+        evidence['_evidence_precedence'] = precedence
+        return evidence
 
     async def _load_first_quote_dates_by_instrument(
         self,
@@ -9050,9 +9178,31 @@ class DataManager:
         evidence_state = str(evidence.get('lifecycle_state') or '').strip().lower()
         lifecycle_state = evidence_state or status
         index_lifecycle_boundary = (
-            self._date_from_any(evidence.get('effective_date'))
+            self._date_from_any(evidence.get('_terminal_boundary'))
             or self._date_from_any(evidence.get('last_quote_date'))
+            or self._date_from_any(evidence.get('effective_date'))
             or delisted
+        )
+        index_lifecycle_boundary_reason = (
+            str(evidence.get('_terminal_boundary_reason') or '').strip()
+            if evidence else ''
+        )
+        index_lifecycle_evidence_detail = {
+            'source': evidence.get('source'),
+            'confidence': evidence.get('confidence'),
+            'boundary_date': (
+                index_lifecycle_boundary.isoformat()
+                if index_lifecycle_boundary else None
+            ),
+            'boundary_field': evidence.get('_terminal_boundary_field'),
+        } if evidence else {}
+        index_lifecycle_boundary_degraded = bool(evidence.get('_terminal_boundary_degraded'))
+        has_governed_index_boundary = bool(
+            instrument_type == 'index'
+            and exchange in {'SSE', 'SZSE'}
+            and evidence
+            and index_lifecycle_boundary
+            and not index_lifecycle_boundary_degraded
         )
 
         if (
@@ -9063,18 +9213,20 @@ class DataManager:
             and latest_quote_date is not None
             and latest_quote_date < delisted
             and delisted - latest_quote_date <= timedelta(days=7)
+            and not has_governed_index_boundary
         ):
             if requested_start and requested_start > latest_quote_date:
                 return {
                     'eligible': False,
-                    'reason': 'index_delisted_after_last_quote',
+                    'reason': 'index_delisted_after_last_quote_fallback',
                     'start_date': start,
                     'end_date': latest_quote_date,
                     'clipped': True,
+                    'degraded_fallback': True,
                 }
             if end > latest_quote_date:
                 end = latest_quote_date
-                lifecycle_state = 'index_delisted_last_quote'
+                lifecycle_state = 'index_delisted_last_quote_fallback'
 
         if (
             exchange == 'HKEX'
@@ -9107,6 +9259,8 @@ class DataManager:
             if index_lifecycle_boundary:
                 if end > index_lifecycle_boundary:
                     end = index_lifecycle_boundary
+                if index_lifecycle_boundary_reason:
+                    lifecycle_state = index_lifecycle_boundary_reason
             else:
                 return {
                     'eligible': False,
@@ -9114,20 +9268,22 @@ class DataManager:
                     'start_date': start,
                     'end_date': end,
                     'clipped': False,
+                    'evidence': index_lifecycle_evidence_detail,
                 }
 
         if (
             instrument_type == 'index'
             and exchange in {'SSE', 'SZSE'}
             and lifecycle_state not in index_states
-            and lifecycle_state != 'index_delisted_last_quote'
+            and lifecycle_state != 'index_delisted_last_quote_fallback'
+            and not has_governed_index_boundary
             and config.get('enable_local_stale_no_quote', True)
         ):
             stale_days = int(config.get('stale_no_quote_trading_days', 10) or 10)
             if latest_quote_date is not None and requested_end > latest_quote_date + timedelta(days=stale_days):
                 if end > latest_quote_date:
                     end = latest_quote_date
-                lifecycle_state = 'stale_no_quote'
+                lifecycle_state = 'index_lifecycle_stale_no_quote_fallback'
 
         if (
             exchange == 'HKEX'
@@ -9196,10 +9352,14 @@ class DataManager:
         if start > end:
             if listed and listed > requested_end:
                 reason = 'before_listed_date'
+            elif instrument_type == 'index' and str(lifecycle_state).startswith('index_lifecycle_'):
+                reason = lifecycle_state
+            elif instrument_type == 'index' and lifecycle_state in index_states | {'stale_no_quote'}:
+                reason = index_lifecycle_boundary_reason or f'index_lifecycle_{lifecycle_state}'
+            elif lifecycle_state == 'index_delisted_last_quote_fallback':
+                reason = 'index_delisted_after_last_quote_fallback'
             elif delisted and requested_start and requested_start > delisted:
                 reason = 'after_delisted_date'
-            elif instrument_type == 'index' and lifecycle_state in index_states | {'stale_no_quote'}:
-                reason = f'index_lifecycle_{lifecycle_state}'
             else:
                 reason = 'outside_lifecycle_window'
             return {
@@ -9208,6 +9368,11 @@ class DataManager:
                 'start_date': start,
                 'end_date': end,
                 'clipped': True,
+                'evidence': index_lifecycle_evidence_detail,
+                'degraded_fallback': (
+                    bool(index_lifecycle_boundary_degraded)
+                    or reason.endswith('_fallback')
+                ),
             }
 
         return {
@@ -9216,6 +9381,11 @@ class DataManager:
             'end_date': end,
             'reason': lifecycle_state if lifecycle_state else 'eligible',
             'clipped': start != requested_start or end != requested_end,
+            'evidence': index_lifecycle_evidence_detail,
+            'degraded_fallback': (
+                bool(index_lifecycle_boundary_degraded)
+                or str(lifecycle_state).endswith('_fallback')
+            ),
         }
 
     async def filter_repair_universe(
@@ -9339,7 +9509,10 @@ class DataManager:
                     instrument=instrument,
                     start_date=window.get('start_date'),
                     end_date=window.get('end_date'),
+                    evidence=window.get('evidence'),
                 )
+                if window.get('degraded_fallback'):
+                    diagnostics['degraded_fallback_count'] += 1
                 continue
 
             item = dict(instrument)
@@ -9349,6 +9522,16 @@ class DataManager:
             item['_repair_universe_clipped'] = bool(window.get('clipped'))
             if window.get('clipped'):
                 diagnostics['clipped_instrument_count'] += 1
+                self._record_repair_universe_clip(
+                    diagnostics,
+                    reason=window.get('reason', 'outside_lifecycle_window'),
+                    instrument=instrument,
+                    start_date=window.get('start_date'),
+                    end_date=window.get('end_date'),
+                    evidence=window.get('evidence'),
+                )
+            if window.get('degraded_fallback'):
+                diagnostics['degraded_fallback_count'] += 1
             eligible.append(item)
 
         if (
@@ -9357,6 +9540,15 @@ class DataManager:
         ):
             diagnostics['warnings'].append(
                 'index lifecycle stale-no-quote diagnostics were not evaluated for this universe'
+            )
+
+        fallback_warning_threshold = int(
+            config.get('max_degraded_lifecycle_fallbacks_before_warning', 0) or 0
+        )
+        if int(diagnostics.get('degraded_fallback_count', 0) or 0) > fallback_warning_threshold:
+            diagnostics['warnings'].append(
+                "degraded index lifecycle fallback used "
+                f"{diagnostics.get('degraded_fallback_count', 0)} times"
             )
 
         diagnostics['eligible_instrument_count'] = len(eligible)
@@ -9495,11 +9687,17 @@ class DataManager:
                 )
                 for key in ('input_instrument_count', 'eligible_instrument_count',
                             'clipped_instrument_count', 'skipped_instrument_count',
-                            'skipped_gap_segment_count', 'skipped_missing_days'):
+                            'skipped_gap_segment_count', 'skipped_missing_days',
+                            'degraded_fallback_count'):
                     merged_diagnostics[key] += int(diagnostics.get(key, 0) or 0)
                 merged_counter = Counter(merged_diagnostics.get('reason_distribution') or {})
                 merged_counter.update(diagnostics.get('reason_distribution') or {})
                 merged_diagnostics['reason_distribution'] = dict(merged_counter)
+                merged_clip_counter = Counter(
+                    merged_diagnostics.get('clip_reason_distribution') or {}
+                )
+                merged_clip_counter.update(diagnostics.get('clip_reason_distribution') or {})
+                merged_diagnostics['clip_reason_distribution'] = dict(merged_clip_counter)
                 sample_limit = int(
                     self._get_repair_universe_governance_config().get('sample_limit', 10) or 0
                 )
@@ -9507,6 +9705,11 @@ class DataManager:
                     merged_diagnostics['samples'].extend(
                         diagnostics.get('samples', [])[
                             : max(0, sample_limit - len(merged_diagnostics.get('samples') or []))
+                        ]
+                    )
+                    merged_diagnostics['clip_samples'].extend(
+                        diagnostics.get('clip_samples', [])[
+                            : max(0, sample_limit - len(merged_diagnostics.get('clip_samples') or []))
                         ]
                     )
                 merged_diagnostics['warnings'].extend(diagnostics.get('warnings') or [])
@@ -12892,6 +13095,8 @@ class DataManager:
                 'inferred_terminated_count': 0,
                 'stale_no_quote_count': 0,
                 'stale_no_quote_written_count': 0,
+                'terminal_boundary_inferred_count': 0,
+                'terminal_boundary_missing_count': 0,
                 'metadata_only_legacy_deactivated_count': 0,
                 'invalid_quote_code_deactivated_count': 0,
                 'reactivated_count': 0,
@@ -13249,6 +13454,37 @@ class DataManager:
             if row.get('exchange') in sync_exchanges
             and row.get('lifecycle_state') == 'calculation_terminated'
         ]
+        direct_evidence_missing_boundary: List[Dict[str, Any]] = []
+        for row in direct_evidence:
+            if self._date_from_any(row.get('last_quote_date')):
+                continue
+            effective_date = self._date_from_any(row.get('effective_date'))
+            latest_quote = None
+            try:
+                latest_quote = await self.db_ops.get_latest_quote_date(row.get('instrument_id'))
+            except Exception:
+                latest_quote = None
+            latest_date = self._date_from_any(latest_quote)
+            if latest_date and (effective_date is None or latest_date <= effective_date):
+                row['last_quote_date'] = latest_date
+                row['confidence'] = 'direct_lifecycle_local_quote_boundary'
+                diagnostics = row.get('diagnostics') if isinstance(row.get('diagnostics'), dict) else {}
+                row['diagnostics'] = {
+                    **diagnostics,
+                    'terminal_boundary_inference': 'local_latest_quote_on_or_before_effective_date',
+                    'latest_quote_date': latest_date.isoformat(),
+                }
+                result['summary']['terminal_boundary_inferred_count'] += 1
+            else:
+                direct_evidence_missing_boundary.append(row)
+        if direct_evidence_missing_boundary:
+            result['summary']['terminal_boundary_missing_count'] += len(
+                direct_evidence_missing_boundary
+            )
+            result['warnings'].append(
+                "index terminal quote boundary missing for "
+                f"{len(direct_evidence_missing_boundary)} direct lifecycle evidence rows"
+            )
         if direct_evidence:
             result['summary']['evidence_rows_saved'] += await self.db_ops.save_index_lifecycle_evidence(
                 direct_evidence
@@ -14871,11 +15107,17 @@ class DataManager:
                 )
                 for key in ('input_instrument_count', 'eligible_instrument_count',
                             'clipped_instrument_count', 'skipped_instrument_count',
-                            'skipped_gap_segment_count', 'skipped_missing_days'):
+                            'skipped_gap_segment_count', 'skipped_missing_days',
+                            'degraded_fallback_count'):
                     update_results['repair_universe'][key] += int(repair_diag.get(key, 0) or 0)
                 merged_counter = Counter(update_results['repair_universe'].get('reason_distribution') or {})
                 merged_counter.update(repair_diag.get('reason_distribution') or {})
                 update_results['repair_universe']['reason_distribution'] = dict(merged_counter)
+                merged_clip_counter = Counter(
+                    update_results['repair_universe'].get('clip_reason_distribution') or {}
+                )
+                merged_clip_counter.update(repair_diag.get('clip_reason_distribution') or {})
+                update_results['repair_universe']['clip_reason_distribution'] = dict(merged_clip_counter)
                 sample_limit = int(
                     self._get_repair_universe_governance_config().get('sample_limit', 10) or 0
                 )
@@ -14883,6 +15125,11 @@ class DataManager:
                     update_results['repair_universe']['samples'].extend(
                         repair_diag.get('samples', [])[
                             : max(0, sample_limit - len(update_results['repair_universe'].get('samples') or []))
+                        ]
+                    )
+                    update_results['repair_universe']['clip_samples'].extend(
+                        repair_diag.get('clip_samples', [])[
+                            : max(0, sample_limit - len(update_results['repair_universe'].get('clip_samples') or []))
                         ]
                     )
                 update_results['repair_universe']['warnings'].extend(repair_diag.get('warnings') or [])

@@ -176,6 +176,7 @@
       "stale_no_quote_trading_days": 10,
       "max_index_no_data_failures_per_instrument": 1,
       "max_no_data_failures_per_instrument": 3,
+      "max_degraded_lifecycle_fallbacks_before_warning": 0,
       "stale_governance_continue_policy": "warn"
     },
     "master_governance": {
