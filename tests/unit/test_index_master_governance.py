@@ -300,6 +300,28 @@ async def test_index_governance_infers_missing_direct_terminal_quote_boundary():
     )
 
 
+@pytest.mark.asyncio
+async def test_index_governance_infers_direct_terminal_boundary_from_quote_alias():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+    manager.data_config['index_master_governance']['exchanges'] = ['SSE', 'SZSE']
+    manager.data_config['index_master_governance']['official_sources'] = ['cnindex', 'csindex']
+    manager.db_ops = FakeIndexDbOps()
+    manager.db_ops.latest_quotes['980055.SZ'] = datetime(2026, 5, 13)
+    manager.source_factory = FakeSourceFactory()
+
+    result = await manager.sync_index_master(['SZSE'], target_date=date(2026, 6, 12))
+
+    assert result['summary']['terminal_boundary_inferred_count'] == 1
+    assert result['summary']['terminal_boundary_missing_count'] == 0
+    direct_evidence = [
+        row for row in manager.db_ops.evidence_rows
+        if row.get('instrument_id') == 'CNI980055.SZ'
+    ][0]
+    assert direct_evidence['last_quote_date'] == date(2026, 5, 13)
+    assert direct_evidence['diagnostics']['quote_boundary_instrument_id'] == '980055.SZ'
+
+
 class DuplicateCNIndexSource(FakeCNIndexSource):
     async def get_index_master_snapshot(self):
         snapshot = await super().get_index_master_snapshot()

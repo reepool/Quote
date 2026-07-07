@@ -13454,16 +13454,46 @@ class DataManager:
             if row.get('exchange') in sync_exchanges
             and row.get('lifecycle_state') == 'calculation_terminated'
         ]
+
+        def _quote_candidate_ids(row: Dict[str, Any]) -> List[str]:
+            exchange_suffix = {
+                'SSE': 'SH',
+                'SZSE': 'SZ',
+                'BSE': 'BJ',
+            }.get(str(row.get('exchange') or '').upper())
+            candidates: List[str] = []
+
+            def _add(candidate: Any) -> None:
+                text = str(candidate or '').strip().upper()
+                if text and text not in candidates:
+                    candidates.append(text)
+
+            _add(row.get('instrument_id'))
+            if exchange_suffix:
+                for key in ('matched_code', 'symbol'):
+                    code = str(row.get(key) or '').strip()
+                    if len(code) == 6 and code.isdigit():
+                        _add(f'{code}.{exchange_suffix}')
+            return candidates
+
         direct_evidence_missing_boundary: List[Dict[str, Any]] = []
         for row in direct_evidence:
             if self._date_from_any(row.get('last_quote_date')):
                 continue
             effective_date = self._date_from_any(row.get('effective_date'))
             latest_quote = None
-            try:
-                latest_quote = await self.db_ops.get_latest_quote_date(row.get('instrument_id'))
-            except Exception:
-                latest_quote = None
+            latest_quote_instrument_id = None
+            for candidate_id in _quote_candidate_ids(row):
+                try:
+                    candidate_latest = await self.db_ops.get_latest_quote_date(candidate_id)
+                except Exception:
+                    candidate_latest = None
+                candidate_date = self._date_from_any(candidate_latest)
+                if not candidate_date:
+                    continue
+                latest_quote = candidate_latest
+                latest_quote_instrument_id = candidate_id
+                break
             latest_date = self._date_from_any(latest_quote)
             if latest_date and (effective_date is None or latest_date <= effective_date):
                 row['last_quote_date'] = latest_date
@@ -13473,6 +13503,7 @@ class DataManager:
                     **diagnostics,
                     'terminal_boundary_inference': 'local_latest_quote_on_or_before_effective_date',
                     'latest_quote_date': latest_date.isoformat(),
+                    'quote_boundary_instrument_id': latest_quote_instrument_id,
                 }
                 result['summary']['terminal_boundary_inferred_count'] += 1
             else:
