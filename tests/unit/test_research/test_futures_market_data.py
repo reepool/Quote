@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import sys
 import types
 from datetime import date, timedelta
@@ -4399,6 +4400,58 @@ def test_dce_browser_client_resolves_chrome_path_precedence(monkeypatch):
     monkeypatch.setenv("QUOTE_DCE_CHROME_PATH", "/env/chrome")
     assert DceOfficialBrowserClient({}).browser_executable_path == "/env/chrome"
     assert DceOfficialBrowserClient({"browser_executable_path": "/cfg/chrome"}).browser_executable_path == "/cfg/chrome"
+
+
+def test_dce_virtual_display_disables_displayfd_and_restores_env(monkeypatch):
+    events = []
+
+    class FakeDisplay:
+        def __init__(self, *, visible, size, retries, extra_args):
+            events.append(
+                {
+                    "phase": "init",
+                    "visible": visible,
+                    "size": size,
+                    "retries": retries,
+                    "extra_args": extra_args,
+                    "displayfd": os.environ.get("PYVIRTUALDISPLAY_DISPLAYFD"),
+                }
+            )
+            self.new_display_var = ":99"
+
+        def start(self):
+            events.append(
+                {
+                    "phase": "start",
+                    "displayfd": os.environ.get("PYVIRTUALDISPLAY_DISPLAYFD"),
+                }
+            )
+
+    monkeypatch.setitem(sys.modules, "pyvirtualdisplay", types.SimpleNamespace(Display=FakeDisplay))
+    monkeypatch.delenv("PYVIRTUALDISPLAY_DISPLAYFD", raising=False)
+
+    client = DceOfficialBrowserClient(
+        {
+            "virtual_display": True,
+            "display_size": [1280, 720],
+            "xvfb_retries": 2,
+            "xvfb_extra_args": ["-noreset"],
+        }
+    )
+    client._start_virtual_display_if_needed()
+
+    assert events == [
+        {
+            "phase": "init",
+            "visible": False,
+            "size": (1280, 720),
+            "retries": 2,
+            "extra_args": ["-noreset"],
+            "displayfd": "0",
+        },
+        {"phase": "start", "displayfd": "0"},
+    ]
+    assert os.environ.get("PYVIRTUALDISPLAY_DISPLAYFD") is None
 
 
 def test_official_futures_failure_classification_marks_network_and_antibot():

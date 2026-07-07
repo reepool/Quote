@@ -3406,6 +3406,9 @@ class ScheduledTasks:
         self._active_tasks.add('futures_market_data_sync')
         try:
             master_results: List[Dict[str, Any]] = []
+            effective_scope_id = scope_id
+            effective_scope_ids = scope_ids
+            effective_exchanges = exchanges
             if requires_trading_day_governance:
                 calendar_start_date = start_date or end_date or get_shanghai_time().date().isoformat()
                 calendar_end_date = end_date or start_date or calendar_start_date
@@ -3440,18 +3443,66 @@ class ScheduledTasks:
                         calendar_backfill_result.get("totals") or {},
                     )
                     if calendar_backfill_result.get("status") == "blocked" and not dry_run:
+                        exchange_results = calendar_backfill_result.get("exchanges") or []
+                        blocked_calendar_exchanges = sorted(
+                            {
+                                str(item.get("exchange") or "").upper()
+                                for item in exchange_results
+                                if str(item.get("status") or "") == "blocked"
+                                and str(item.get("exchange") or "").strip()
+                            }
+                        )
+                        runnable_calendar_exchanges = sorted(
+                            {
+                                str(item.get("exchange") or "").upper()
+                                for item in exchange_results
+                                if str(item.get("status") or "") != "blocked"
+                                and str(item.get("exchange") or "").strip()
+                            }
+                        )
+                        if not runnable_calendar_exchanges:
+                            await self._send_task_report(
+                                report_data={
+                                    'name': '商品期货官方交易日历前置回填报告',
+                                    'content': _format_futures_market_data_scheduler_report(calendar_backfill_result),
+                                    'status': 'error',
+                                    'tasks_completed': 0,
+                                    'duration': 'N/A',
+                                    'maintenance_tasks': [
+                                        {
+                                            'task_name': 'futures_official_calendar_backfill',
+                                            'status': "; ".join(
+                                                calendar_backfill_result.get("blockers") or ["blocked"]
+                                            ),
+                                        }
+                                    ],
+                                },
+                                report_type='maintenance_report',
+                                task_name='商品期货官方交易日历前置回填',
+                                job_config=job_config,
+                            )
+                            return False
+                        scheduler_logger.warning(
+                            "[Scheduler] Futures official calendar preflight partially blocked; "
+                            "continuing with runnable exchanges blocked=%s runnable=%s",
+                            blocked_calendar_exchanges,
+                            runnable_calendar_exchanges,
+                        )
                         await self._send_task_report(
                             report_data={
                                 'name': '商品期货官方交易日历前置回填报告',
                                 'content': _format_futures_market_data_scheduler_report(calendar_backfill_result),
-                                'status': 'error',
-                                'tasks_completed': 0,
+                                'status': 'warning',
+                                'tasks_completed': len(runnable_calendar_exchanges),
                                 'duration': 'N/A',
                                 'maintenance_tasks': [
                                     {
                                         'task_name': 'futures_official_calendar_backfill',
-                                        'status': "; ".join(
-                                            calendar_backfill_result.get("blockers") or ["blocked"]
+                                        'status': (
+                                            "blocked="
+                                            + ",".join(blocked_calendar_exchanges or ["unknown"])
+                                            + "; continued="
+                                            + ",".join(runnable_calendar_exchanges)
                                         ),
                                     }
                                 ],
@@ -3460,21 +3511,23 @@ class ScheduledTasks:
                             task_name='商品期货官方交易日历前置回填',
                             job_config=job_config,
                         )
-                        return False
+                        effective_scope_id = None
+                        effective_scope_ids = None
+                        effective_exchanges = runnable_calendar_exchanges
                 else:
                     scheduler_logger.info(
                         "[Scheduler] Futures official calendar preflight skipped exchanges=%s scope_id=%s "
                         "scope_ids=%s start=%s end=%s",
-                        exchanges,
-                        scope_id,
-                        scope_ids,
+                        effective_exchanges,
+                        effective_scope_id,
+                        effective_scope_ids,
                         calendar_start_date,
                         calendar_end_date,
                     )
                 governance_result = await data_manager.run_futures_trading_day_governance(
-                    scope_id=scope_id,
-                    scope_ids=scope_ids,
-                    exchanges=exchanges,
+                    scope_id=effective_scope_id,
+                    scope_ids=effective_scope_ids,
+                    exchanges=effective_exchanges,
                     categories=categories,
                     instrument_ids=instrument_ids,
                     series_ids=series_ids,
@@ -3557,9 +3610,9 @@ class ScheduledTasks:
                     else:
                         master_results.append(
                             await data_manager.run_futures_master_governance(
-                                scope_id=scope_id,
-                                scope_ids=scope_ids,
-                                exchanges=exchanges,
+                                scope_id=effective_scope_id,
+                                scope_ids=effective_scope_ids,
+                                exchanges=effective_exchanges,
                                 categories=categories,
                                 instrument_ids=instrument_ids,
                                 series_ids=series_ids,
@@ -3615,9 +3668,9 @@ class ScheduledTasks:
                         )
                         return False
             result = await data_manager.run_futures_market_data_sync(
-                scope_id=scope_id,
-                scope_ids=scope_ids,
-                exchanges=exchanges,
+                scope_id=effective_scope_id,
+                scope_ids=effective_scope_ids,
+                exchanges=effective_exchanges,
                 categories=categories,
                 instrument_ids=instrument_ids,
                 series_ids=series_ids,

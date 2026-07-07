@@ -2378,6 +2378,8 @@ class TaskManagerHandlers:
             from data_manager import data_manager
 
             governance_result: Dict[str, Any] = {}
+            effective_scope_id = scope_id
+            effective_exchanges = exchanges
             if requires_trading_day_governance:
                 calendar_start_date = start_date or end_date
                 calendar_end_date = end_date or start_date or calendar_start_date
@@ -2406,24 +2408,61 @@ class TaskManagerHandlers:
                     )
                     calendar_status = str(calendar_result.get('status') or '').lower()
                     if calendar_status == 'blocked' and not dry_run:
+                        exchange_results = calendar_result.get('exchanges') or []
+                        blocked_calendar_exchanges = sorted(
+                            {
+                                str(item.get('exchange') or '').upper()
+                                for item in exchange_results
+                                if str(item.get('status') or '').lower() == 'blocked'
+                                and str(item.get('exchange') or '').strip()
+                            }
+                        )
+                        runnable_calendar_exchanges = sorted(
+                            {
+                                str(item.get('exchange') or '').upper()
+                                for item in exchange_results
+                                if str(item.get('status') or '').lower() != 'blocked'
+                                and str(item.get('exchange') or '').strip()
+                            }
+                        )
+                        if not runnable_calendar_exchanges:
+                            await self.task_manager.send_message(
+                                chat_id,
+                                (
+                                    "❌ *期货行情任务失败*\n\n"
+                                    f"task: `{job_id}`\n"
+                                    "reason: `trading_calendar_preflight_failed`\n"
+                                    f"calendar_status: `{calendar_status}`"
+                                ),
+                                parse_mode='markdown',
+                            )
+                            return
+                        self.task_manager.logger.warning(
+                            "[TaskManagerHandlers] 期货行情前置官方交易日历部分失败，继续执行可运行交易所: "
+                            "blocked=%s runnable=%s",
+                            blocked_calendar_exchanges,
+                            runnable_calendar_exchanges,
+                        )
                         await self.task_manager.send_message(
                             chat_id,
                             (
-                                "❌ *期货行情任务失败*\n\n"
+                                "⚠️ *期货行情前置交易日历部分失败*\n\n"
                                 f"task: `{job_id}`\n"
-                                "reason: `trading_calendar_preflight_failed`\n"
-                                f"calendar_status: `{calendar_status}`"
+                                f"blocked: `{','.join(blocked_calendar_exchanges or ['unknown'])}`\n"
+                                f"continued: `{','.join(runnable_calendar_exchanges)}`\n\n"
+                                "已剔除 blocked 交易所，继续执行其余交易所。"
                             ),
                             parse_mode='markdown',
                         )
-                        return
+                        effective_scope_id = None
+                        effective_exchanges = runnable_calendar_exchanges
                 else:
                     self.task_manager.logger.info(
                         "[TaskManagerHandlers] 期货行情前置官方交易日历回填跳过: job_id=%s "
                         "scope_id=%s exchanges=%s start=%s end=%s",
                         job_id,
-                        scope_id,
-                        exchanges,
+                        effective_scope_id,
+                        effective_exchanges,
                         calendar_start_date,
                         calendar_end_date,
                     )
@@ -2432,16 +2471,16 @@ class TaskManagerHandlers:
                     "[TaskManagerHandlers] 期货行情前置交易日治理: job_id=%s scope_id=%s "
                     "exchanges=%s start=%s end=%s dry_run=%s",
                     job_id,
-                    scope_id,
-                    exchanges,
+                    effective_scope_id,
+                    effective_exchanges,
                     start_date,
                     end_date,
                     dry_run,
                 )
                 governance_result = await data_manager.run_futures_trading_day_governance(
-                    scope_id=scope_id,
+                    scope_id=effective_scope_id,
                     scope_ids=None,
-                    exchanges=exchanges,
+                    exchanges=effective_exchanges,
                     categories=categories,
                     instrument_ids=instrument_ids,
                     series_ids=series_ids,
@@ -2482,7 +2521,7 @@ class TaskManagerHandlers:
                             continue
                         master_results.append(
                             await data_manager.run_futures_master_governance(
-                                scope_id=scope_id,
+                                scope_id=effective_scope_id,
                                 scope_ids=None,
                                 exchanges=[exchange],
                                 categories=categories,
@@ -2502,9 +2541,9 @@ class TaskManagerHandlers:
                 else:
                     master_results.append(
                         await data_manager.run_futures_master_governance(
-                            scope_id=scope_id,
+                            scope_id=effective_scope_id,
                             scope_ids=None,
-                            exchanges=exchanges,
+                            exchanges=effective_exchanges,
                             categories=categories,
                             instrument_ids=instrument_ids,
                             series_ids=series_ids,
@@ -2538,9 +2577,9 @@ class TaskManagerHandlers:
                     return
 
             result_payload = await data_manager.run_futures_market_data_sync(
-                scope_id=scope_id,
+                scope_id=effective_scope_id,
                 scope_ids=None,
-                exchanges=exchanges,
+                exchanges=effective_exchanges,
                 categories=categories,
                 instrument_ids=instrument_ids,
                 series_ids=series_ids,

@@ -76,9 +76,12 @@ class DceOfficialBrowserClient:
         self.retry_backoff_seconds = max(0.0, float(cfg.get("retry_backoff_seconds", 2)))
         self.virtual_display = cfg.get("virtual_display", "auto")
         self.display_size = tuple(cfg.get("display_size") or (1920, 1080))
+        self.xvfb_retries = max(1, int(cfg.get("xvfb_retries", 3)))
+        self.xvfb_disable_displayfd = bool(cfg.get("xvfb_disable_displayfd", True))
+        self.xvfb_extra_args = list(cfg.get("xvfb_extra_args") or [])
         self.browser_args = list(
             cfg.get("browser_args")
-            or ["--no-sandbox", "--disable-dev-shm-usage", "--window-size=1920,1080"]
+            or ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu", "--window-size=1920,1080"]
         )
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._browser: Any = None
@@ -155,6 +158,16 @@ class DceOfficialBrowserClient:
         if self.browser_executable_path:
             kwargs["browser_executable_path"] = self.browser_executable_path
         try:
+            logger.info(
+                "[OfficialFutures] DCE browser start bootstrap=%s chrome=%s headless=%s "
+                "virtual_display=%s display=%s browser_args=%s",
+                self.bootstrap_page,
+                self.browser_executable_path or "auto",
+                self.headless,
+                self.virtual_display,
+                os.environ.get("DISPLAY") or "",
+                self.browser_args,
+            )
             self._browser = await uc.start(**kwargs)
             self._page = await self._browser.get(self.bootstrap_page)
             await self._page.sleep(self.settle_seconds)
@@ -311,8 +324,45 @@ class DceOfficialBrowserClient:
             raise OfficialFuturesSourceUnavailable(
                 "DCE official browser client needs pyvirtualdisplay when no DISPLAY is available"
             ) from exc
-        self._display = Display(visible=False, size=self.display_size)
-        self._display.start()
+        old_displayfd = os.environ.get("PYVIRTUALDISPLAY_DISPLAYFD")
+        if self.xvfb_disable_displayfd:
+            os.environ["PYVIRTUALDISPLAY_DISPLAYFD"] = "0"
+        try:
+            logger.info(
+                "[OfficialFutures] DCE virtual display start size=%s retries=%s "
+                "disable_displayfd=%s extra_args=%s",
+                self.display_size,
+                self.xvfb_retries,
+                self.xvfb_disable_displayfd,
+                self.xvfb_extra_args,
+            )
+            self._display = Display(
+                visible=False,
+                size=self.display_size,
+                retries=self.xvfb_retries,
+                extra_args=self.xvfb_extra_args,
+            )
+            self._display.start()
+            logger.info(
+                "[OfficialFutures] DCE virtual display started display=%s",
+                getattr(self._display, "new_display_var", os.environ.get("DISPLAY")),
+            )
+        except Exception as exc:
+            logger.warning(
+                "[OfficialFutures] DCE virtual display start failed size=%s retries=%s "
+                "disable_displayfd=%s error=%s",
+                self.display_size,
+                self.xvfb_retries,
+                self.xvfb_disable_displayfd,
+                exc,
+            )
+            self._display = None
+            raise
+        finally:
+            if old_displayfd is None:
+                os.environ.pop("PYVIRTUALDISPLAY_DISPLAYFD", None)
+            else:
+                os.environ["PYVIRTUALDISPLAY_DISPLAYFD"] = old_displayfd
 
 
 @dataclass(frozen=True)

@@ -222,7 +222,16 @@
           "browser_executable_path": "",
           "env_browser_executable_path": "QUOTE_DCE_CHROME_PATH",
           "headless": false,
+          "browser_args": [
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--window-size=1920,1080"
+          ],
           "virtual_display": "auto",
+          "xvfb_disable_displayfd": true,
+          "xvfb_retries": 3,
+          "xvfb_extra_args": [],
           "settle_seconds": 9,
           "page_settle_seconds": 2,
           "page_challenge_settle_seconds": 10,
