@@ -11810,20 +11810,18 @@ class DataManager:
             if not name.startswith('退市'):
                 continue
             result['checked_count'] += 1
-            delisted_date = None
+            latest_quote_date = None
             try:
                 latest_quote = await self.db_ops.get_latest_quote_date(instrument_id)
                 latest_quote_date = self._date_from_any(latest_quote)
-                if latest_quote_date:
-                    delisted_date = latest_quote_date
             except Exception:
-                delisted_date = None
+                latest_quote_date = None
             marker = getattr(self.db_ops, 'mark_instrument_delisted', None)
             if not callable(marker):
                 continue
             updated = marker(
                 instrument_id,
-                delisted_date=delisted_date,
+                delisted_date=None,
                 source=f'{exchange.lower()}_official_current_list_absence',
             )
             if inspect.isawaitable(updated):
@@ -11834,7 +11832,7 @@ class DataManager:
                     result['samples'].append({
                         'instrument_id': instrument_id,
                         'name': name,
-                        'delisted_date': self._date_text(delisted_date),
+                        'last_quote_date': self._date_text(latest_quote_date),
                     })
         return result
 

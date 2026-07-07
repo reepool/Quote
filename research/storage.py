@@ -7710,10 +7710,14 @@ class ResearchStorageManager:
         rows = self.get_valuation_inputs(
             instrument_id,
             end_date=as_of_date,
-            limit=1,
+            limit=0,
             include_diagnostics=include_diagnostics,
         )
-        return rows[0] if rows else None
+        available_rows = [
+            row for row in rows
+            if str(row.get("data_as_of") or row.get("as_of_date") or "") <= as_of_date
+        ]
+        return available_rows[0] if available_rows else None
 
     def get_latest_valuation_history_row(
         self,

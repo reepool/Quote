@@ -343,11 +343,15 @@ async def test_sync_instrument_master_deactivates_delisting_prefixed_official_ab
 
     manager.db_ops.mark_instrument_delisted.assert_awaited_once_with(
         '600355.SH',
-        delisted_date=date(2026, 7, 3),
+        delisted_date=None,
         source='sse_official_current_list_absence',
     )
     assert result['summary']['deactivated_instruments'] == 1
     assert result['exchanges']['SSE']['official_absent_delisting']['deactivated_count'] == 1
+    assert (
+        result['exchanges']['SSE']['official_absent_delisting']['samples'][0]['last_quote_date']
+        == '2026-07-03'
+    )
     assert result['exchanges']['SSE']['deactivated_samples'] == ['600355.SH']
 
 

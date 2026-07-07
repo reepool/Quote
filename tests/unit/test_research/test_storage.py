@@ -2427,6 +2427,30 @@ def test_upsert_valuation_input_uses_valuation_database_and_rejects_amount_units
     assert coverage["shares_outstanding_count"] == 1
     assert coverage["usable_input_count"] == 1
 
+    storage.upsert_valuation_input(
+        ValuationInputSnapshot(
+            instrument_id="600519.SH",
+            symbol="600519",
+            exchange="SSE",
+            as_of_date="2026-04-20",
+            market_cap=3000.0,
+            shares_outstanding=120.0,
+            source="manual",
+            source_mode="local",
+            input_kind="market_cap_and_share_count",
+            unit="share",
+            data_as_of="2026-04-21",
+            diagnostics_json={"unit_policy": "future_available_date"},
+        )
+    )
+    latest_available = storage.get_latest_valuation_input(
+        "600519.SH",
+        as_of_date="2026-04-20",
+    )
+    assert latest_available is not None
+    assert latest_available["market_cap"] == 2000.0
+    assert latest_available["diagnostics"]["unit_policy"] == "explicit_share_unit"
+
     try:
         storage.upsert_valuation_input(
             ValuationInputSnapshot(
