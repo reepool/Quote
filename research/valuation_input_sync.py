@@ -7,6 +7,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import asdict, dataclass, field
+from datetime import date
 from typing import Any, Dict, List, Optional
 
 from research.providers.base import BaseValuationInputProvider
@@ -32,6 +33,10 @@ class ValuationInputExchangeSyncResult:
     covered_instruments: int = 0
     missing_instruments: int = 0
     missing_instrument_ids: List[str] = field(default_factory=list)
+    source_missing_instruments: int = 0
+    source_missing_instrument_ids: List[str] = field(default_factory=list)
+    existing_covered_instruments: int = 0
+    existing_covered_instrument_ids: List[str] = field(default_factory=list)
     elapsed_seconds: Optional[float] = None
     error_message: Optional[str] = None
 
@@ -267,16 +272,34 @@ class ValuationInputSyncService:
                 )
                 snapshots_written += 1
 
-            missing_ids = sorted(target_ids - covered_ids)
+            source_missing_ids = sorted(target_ids - covered_ids)
+            existing_covered_ids: List[str] = []
+            true_missing_ids: List[str] = []
+            coverage_date = end_date or date.today().isoformat()
+            for instrument_id in source_missing_ids:
+                latest_input = self.storage.get_latest_valuation_input(
+                    instrument_id,
+                    as_of_date=coverage_date,
+                    include_diagnostics=False,
+                )
+                if latest_input:
+                    existing_covered_ids.append(instrument_id)
+                else:
+                    true_missing_ids.append(instrument_id)
+            effective_covered_count = len(covered_ids) + len(existing_covered_ids)
+            missing_ids = true_missing_ids
             status = "success" if snapshots_written > 0 else "degraded"
             elapsed = time.perf_counter() - exchange_started_at
             _logger.info(
                 "[ValuationInputs] Exchange sync finished: exchange=%s status=%s "
-                "requested=%s covered=%s missing=%s snapshots_written=%s elapsed=%.1fs",
+                "requested=%s covered=%s source_missing=%s existing_covered=%s "
+                "missing=%s snapshots_written=%s elapsed=%.1fs",
                 exchange,
                 status,
                 len(stock_instruments),
-                len(covered_ids),
+                effective_covered_count,
+                len(source_missing_ids),
+                len(existing_covered_ids),
                 len(missing_ids),
                 snapshots_written,
                 elapsed,
@@ -291,7 +314,9 @@ class ValuationInputSyncService:
                     "source_mode": source_mode,
                     "sync_mode": sync_mode,
                     "requested_instruments": len(stock_instruments),
-                    "covered_instruments": len(covered_ids),
+                    "covered_instruments": effective_covered_count,
+                    "source_missing_instrument_ids": source_missing_ids[:50],
+                    "existing_covered_instrument_ids": existing_covered_ids[:50],
                     "missing_instrument_ids": missing_ids[:50],
                     "valuation_db_path": self.storage.valuation_db_path,
                     "elapsed_seconds": round(elapsed, 3),
@@ -305,9 +330,13 @@ class ValuationInputSyncService:
                 sync_mode=sync_mode,
                 requested_instruments=len(stock_instruments),
                 snapshots_written=snapshots_written,
-                covered_instruments=len(covered_ids),
+                covered_instruments=effective_covered_count,
                 missing_instruments=len(missing_ids),
                 missing_instrument_ids=missing_ids[:20],
+                source_missing_instruments=len(source_missing_ids),
+                source_missing_instrument_ids=source_missing_ids[:20],
+                existing_covered_instruments=len(existing_covered_ids),
+                existing_covered_instrument_ids=existing_covered_ids[:20],
                 elapsed_seconds=round(elapsed, 3),
             )
         except Exception as exc:

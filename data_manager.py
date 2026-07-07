@@ -11585,6 +11585,7 @@ class DataManager:
 
         all_ids: Set[str] = set()
         active_ids: Set[str] = set()
+        rows_by_id: Dict[str, Dict[str, Any]] = {}
         updated_values: List[str] = []
         status_counts: Dict[str, int] = {}
         source_counts: Dict[str, int] = {}
@@ -11594,6 +11595,7 @@ class DataManager:
             if not instrument_id:
                 continue
             all_ids.add(instrument_id)
+            rows_by_id[instrument_id] = row
 
             is_active = row.get('is_active')
             if is_active in (True, 1, '1', 'true', 'True'):
@@ -11616,6 +11618,7 @@ class DataManager:
             'inactive_count': max(0, len(all_ids) - len(active_ids)),
             'all_ids': all_ids,
             'active_ids': active_ids,
+            'rows_by_id': rows_by_id,
             'status_counts': status_counts,
             'source_counts': source_counts,
             'freshness': {
@@ -11778,6 +11781,62 @@ class DataManager:
             if len(rows) >= 1000:
                 break
         return rows
+
+    async def _deactivate_official_absent_delisting_prefixed_stocks(
+        self,
+        *,
+        exchange: str,
+        before: Dict[str, Any],
+        instruments: List[Dict[str, Any]],
+        source_authority: Optional[str],
+    ) -> Dict[str, Any]:
+        """Deactivate delisting-period A-share stocks after official current-list disappearance."""
+        result: Dict[str, Any] = {
+            'checked_count': 0,
+            'deactivated_count': 0,
+            'samples': [],
+        }
+        if source_authority not in {'official', 'official_with_fallback_fields'}:
+            return result
+        official_ids = {
+            item.get('instrument_id')
+            for item in instruments or []
+            if item.get('instrument_id')
+        }
+        before_rows = before.get('rows_by_id') or {}
+        for instrument_id in sorted((before.get('active_ids') or set()) - official_ids):
+            row = before_rows.get(instrument_id) or {}
+            name = str(row.get('name') or '').strip()
+            if not name.startswith('退市'):
+                continue
+            result['checked_count'] += 1
+            delisted_date = None
+            try:
+                latest_quote = await self.db_ops.get_latest_quote_date(instrument_id)
+                latest_quote_date = self._date_from_any(latest_quote)
+                if latest_quote_date:
+                    delisted_date = latest_quote_date
+            except Exception:
+                delisted_date = None
+            marker = getattr(self.db_ops, 'mark_instrument_delisted', None)
+            if not callable(marker):
+                continue
+            updated = marker(
+                instrument_id,
+                delisted_date=delisted_date,
+                source=f'{exchange.lower()}_official_current_list_absence',
+            )
+            if inspect.isawaitable(updated):
+                updated = await updated
+            if updated:
+                result['deactivated_count'] += 1
+                if len(result['samples']) < 20:
+                    result['samples'].append({
+                        'instrument_id': instrument_id,
+                        'name': name,
+                        'delisted_date': self._date_text(delisted_date),
+                    })
+        return result
 
     async def _validate_instrument_master_with_pytdx(
         self,
@@ -12855,6 +12914,12 @@ class DataManager:
                         before_snapshot=before,
                         fetched_instruments=instruments or [],
                     )
+                official_absent_delisting = await self._deactivate_official_absent_delisting_prefixed_stocks(
+                    exchange=exchange,
+                    before=before,
+                    instruments=instruments or [],
+                    source_authority=source_authority,
+                )
                 after = await self._get_instrument_master_snapshot(exchange)
 
                 added_ids = sorted(after['all_ids'] - before['all_ids'])
@@ -12925,6 +12990,7 @@ class DataManager:
                     'deactivated_samples': deactivated_ids[:20],
                     'freshness': after['freshness'],
                     'bse_delisting': bse_delisting,
+                    'official_absent_delisting': official_absent_delisting,
                 })
 
                 if not instruments:

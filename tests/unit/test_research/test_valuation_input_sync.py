@@ -154,3 +154,58 @@ def test_valuation_input_sync_writes_to_valuation_db(tmp_path):
     assert latest["shares_outstanding"] == 100.0
     assert latest["float_shares"] == 60.0
     assert latest["source"] == "cninfo"
+
+
+def test_valuation_input_sync_reuses_existing_input_for_source_missing_target(tmp_path):
+    research_config = _build_research_config(tmp_path)
+    storage = ResearchStorageManager(research_config)
+    storage.initialize()
+    storage.upsert_valuation_input(
+        ValuationInputSnapshot(
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            as_of_date="2026-01-01",
+            shares_outstanding=200.0,
+            float_shares=180.0,
+            source="cninfo",
+            source_mode="direct",
+            input_kind="capital_snapshot",
+            unit="share",
+            data_as_of="2026-01-02",
+            diagnostics_json={"source_unit": "10k_share"},
+        )
+    )
+
+    service = ValuationInputSyncService(
+        db_ops=_MockDbOps(
+            instruments=[
+                {
+                    "instrument_id": "600519.SH",
+                    "symbol": "600519",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                },
+                {
+                    "instrument_id": "600000.SH",
+                    "symbol": "600000",
+                    "exchange": "SSE",
+                    "type": "stock",
+                    "is_active": True,
+                },
+            ]
+        ),
+        storage=storage,
+        research_config=research_config,
+        provider=_FakeValuationInputProvider(),
+    )
+
+    result = _run(service.sync(exchanges=["SSE"], sync_mode="incremental"))
+
+    assert result["total_covered_instruments"] == 2
+    assert result["total_missing_instruments"] == 0
+    exchange = result["exchanges"][0]
+    assert exchange["source_missing_instruments"] == 1
+    assert exchange["existing_covered_instruments"] == 1
+    assert exchange["existing_covered_instrument_ids"] == ["600000.SH"]

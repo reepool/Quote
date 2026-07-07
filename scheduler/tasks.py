@@ -329,18 +329,26 @@ def _format_valuation_input_scheduler_report(
         f"• 写入/更新: {total_rows}",
         f"• 耗时: {_format_seconds_for_report(elapsed_seconds)}",
     ]
+    existing_covered_total = sum(
+        int(item.get("existing_covered_instruments", 0) or 0)
+        for item in exchanges
+    )
+    if existing_covered_total:
+        lines.append(f"• 沿用既有输入: {existing_covered_total}")
 
     if exchanges:
         lines.extend(["", "*分交易所*"])
         for item in exchanges:
             ex_status = item.get("status", "unknown")
             ex_icon, ex_label = _format_scheduler_status(ex_status)
+            existing_covered = int(item.get("existing_covered_instruments", 0) or 0)
+            reuse_text = f", reused={existing_covered}" if existing_covered else ""
             lines.append(
                 f"• {item.get('exchange', 'unknown')}: {ex_icon} {ex_label}, "
                 f"rows={item.get('snapshots_written', 0)}, "
                 f"requested={item.get('requested_instruments', 0)}, "
                 f"covered={item.get('covered_instruments', 0)}, "
-                f"missing={item.get('missing_instruments', 0)}, "
+                f"missing={item.get('missing_instruments', 0)}{reuse_text}, "
                 f"elapsed={_format_seconds_for_report(item.get('elapsed_seconds'))}"
             )
             missing_ids = item.get("missing_instrument_ids") or []

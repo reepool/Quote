@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock
 
-from scheduler.tasks import ScheduledTasks
+from scheduler.tasks import ScheduledTasks, _format_valuation_input_scheduler_report
 
 
 def _run(coro):
@@ -162,6 +162,43 @@ def test_valuation_input_sync_task_calls_data_manager_and_clears_active_flag(mon
     assert "content" in report_data
     assert "写入/更新: 10" in report_data["content"]
     assert "请求标的: 10" in report_data["content"]
+
+
+def test_valuation_input_report_renders_existing_covered_count():
+    message = _format_valuation_input_scheduler_report(
+        {
+            "status": "success",
+            "successful_exchanges": 1,
+            "attempted_exchanges": 1,
+            "source": "cninfo",
+            "source_mode": "direct",
+            "sync_mode": "incremental",
+            "start_date": None,
+            "end_date": None,
+            "total_requested_instruments": 2,
+            "total_covered_instruments": 2,
+            "total_missing_instruments": 0,
+            "total_snapshots_written": 1,
+            "elapsed_seconds": 1.2,
+            "exchanges": [
+                {
+                    "exchange": "SSE",
+                    "status": "success",
+                    "snapshots_written": 1,
+                    "requested_instruments": 2,
+                    "covered_instruments": 2,
+                    "missing_instruments": 0,
+                    "existing_covered_instruments": 1,
+                    "elapsed_seconds": 1.2,
+                }
+            ],
+        },
+        title="估值输入同步报告",
+    )
+
+    assert "沿用既有输入: 1" in message
+    assert "reused=1" in message
+    assert "缺失样例" not in message
 
 
 def test_valuation_input_full_backfill_task_forces_full_mode_and_clears_active_flag(monkeypatch):

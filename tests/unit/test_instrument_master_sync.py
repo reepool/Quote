@@ -273,6 +273,85 @@ async def test_sync_instrument_master_reports_added_and_deactivated_rows():
 
 
 @pytest.mark.asyncio
+async def test_sync_instrument_master_deactivates_delisting_prefixed_official_absence():
+    manager = _manager()
+    before_rows = [
+        {
+            'instrument_id': '600355.SH',
+            'symbol': '600355',
+            'name': '退市样本',
+            'exchange': 'SSE',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'sse_official',
+            'updated_at': '2026-07-07 20:00:00',
+        },
+        {
+            'instrument_id': '600356.SH',
+            'symbol': '600356',
+            'name': '普通样本',
+            'exchange': 'SSE',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'sse_official',
+            'updated_at': '2026-07-07 20:00:00',
+        },
+        {
+            'instrument_id': '600000.SH',
+            'symbol': '600000',
+            'name': '浦发银行',
+            'exchange': 'SSE',
+            'type': 'stock',
+            'status': 'active',
+            'is_active': 1,
+            'source': 'sse_official',
+            'updated_at': '2026-07-07 20:00:00',
+        },
+    ]
+    after_rows = [
+        {**before_rows[0], 'status': 'delisted', 'is_active': 0},
+        before_rows[1],
+        before_rows[2],
+    ]
+    manager.db_ops = Mock()
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=[before_rows, after_rows])
+    manager.db_ops.get_latest_quote_date = AsyncMock(return_value=datetime(2026, 7, 3))
+    manager.db_ops.mark_instrument_delisted = AsyncMock(return_value=True)
+    manager.source_factory = Mock()
+    manager.source_factory.get_instrument_list = AsyncMock(return_value=[
+        {
+            'instrument_id': '600000.SH',
+            'symbol': '600000',
+            'name': '浦发银行',
+            'exchange': 'SSE',
+            'type': 'stock',
+            'currency': 'CNY',
+            'status': 'active',
+            'is_active': True,
+            'source': 'sse_official',
+            'source_authority': 'official',
+        },
+    ])
+
+    result = await manager.sync_instrument_master(
+        ['SSE'],
+        include_pytdx_validation=False,
+        freshness_threshold_hours=9999,
+    )
+
+    manager.db_ops.mark_instrument_delisted.assert_awaited_once_with(
+        '600355.SH',
+        delisted_date=date(2026, 7, 3),
+        source='sse_official_current_list_absence',
+    )
+    assert result['summary']['deactivated_instruments'] == 1
+    assert result['exchanges']['SSE']['official_absent_delisting']['deactivated_count'] == 1
+    assert result['exchanges']['SSE']['deactivated_samples'] == ['600355.SH']
+
+
+@pytest.mark.asyncio
 async def test_pytdx_validator_reports_discrepancies_without_master_write():
     manager = _manager()
     pytdx = Mock()
