@@ -2789,6 +2789,7 @@ class FxCalendarGovernanceService:
                     source_cfg=source_cfg,
                     calendar_cfg=calendar_cfg,
                     observed_count=observed_count,
+                    as_of_date=end,
                 )
                 is_publication_day = expected_publication_day or observed_count > 0
                 status = self._publication_status(
@@ -2889,6 +2890,7 @@ class FxCalendarGovernanceService:
         source_cfg: Mapping[str, Any],
         calendar_cfg: Mapping[str, Any],
         observed_count: int,
+        as_of_date: Optional[date] = None,
     ) -> tuple[bool, str]:
         normalized_policy = policy.strip().lower()
         if normalized_policy in {"manual_import", "observed_only"}:
@@ -2901,6 +2903,10 @@ class FxCalendarGovernanceService:
             calendar_cfg,
         ):
             return False, "configured_holiday"
+        lag_days = int(source_cfg.get("calendar_lag_days") or 0)
+        effective_as_of = as_of_date or get_shanghai_time().date()
+        if lag_days > 0 and observed_count == 0 and day > effective_as_of - timedelta(days=lag_days):
+            return False, "within_publication_lag"
         if normalized_policy in {
             "weekday_24x5",
             "weekday_except_configured_holidays",

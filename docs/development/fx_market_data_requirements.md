@@ -284,6 +284,14 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 | `fx_derivation_sync` | 生成反向汇率、交叉汇率、目标币种派生 |
 | `fx_quality_check` | 检查缺口、异常跳变、源差异 |
 
+当前生产日更配置：
+
+- `fx_rate_sync` 已配置为工作日 `10:45` 自动运行，`manual_only=false`，`dry_run=false`。
+- 日更下载范围使用 `scope_id="rmb_core_download"`，只包含可直接从外部源获取的 CFETS 在岸人民币中间价、CNH 聚合市场即期、FRED 美元贸易加权指数。
+- `rmb_core_download` 明确排除 `FX.EUR_CNH.DERIVED.DAILY`、`FX.JPY_CNH.DERIVED.DAILY` 和 disabled 的 `FXI.DXY.ICE.DAILY`；派生序列由 `fx_derivation_sync` 在日更成功后生成。
+- `fx_rate_sync` 前置依赖：`fx_master_sync`、`fx_calendar_governance`，日历源覆盖 `cfets_rmb_fixing`、`cnh_market_aggregated_public`、`fred_trade_weighted_dollar`。
+- `fx_rate_sync` 后置依赖：日历复核、`fx_derivation_sync`、`fx_quality_check`。质量检查返回 `warning` 时保留告警但不阻断日更链路。
+
 质量检查状态分级：
 
 - `missing_or_stale`、无效报价单位等 error 级问题应返回 `blocked`。

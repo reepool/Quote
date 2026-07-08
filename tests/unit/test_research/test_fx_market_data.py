@@ -716,6 +716,33 @@ def test_fx_calendar_governance_respects_configured_holidays(tmp_path):
     assert metadata["calendar_reason"] == "configured_holiday"
 
 
+def test_fx_calendar_governance_respects_source_publication_lag(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    config.modules["fx_market_data"]["sources"]["fred_trade_weighted_dollar"]["calendar_lag_days"] = 10
+
+    result = FxCalendarGovernanceService(storage, config.modules["fx_market_data"]).run(
+        source_profiles=["fred_trade_weighted_dollar"],
+        start_date="2026-07-08",
+        end_date="2026-07-08",
+    )
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT is_publication_day, publication_status, metadata_json
+            FROM fx_calendars
+            WHERE source_profile = ? AND calendar_date = ?
+            """,
+            ("fred_trade_weighted_dollar", "2026-07-08"),
+        ).fetchone()
+    metadata = json.loads(row["metadata_json"])
+
+    assert result["status_counts"] == {"expected_non_publication": 1}
+    assert row["is_publication_day"] == 0
+    assert row["publication_status"] == "expected_non_publication"
+    assert metadata["calendar_reason"] == "within_publication_lag"
+
+
 def test_fx_derivation_inverse_missing_source_gap_and_lag_policy(tmp_path):
     config, storage = _seed_storage(tmp_path)
     storage.upsert_observation(

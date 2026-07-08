@@ -4002,12 +4002,12 @@ class ScheduledTasks:
         self._active_tasks.add('fx_quality_check')
         try:
             result = await data_manager.run_fx_quality_check(as_of_date=as_of_date)
-            success = result.get("status") == "success"
+            success = result.get("status") in {"success", "warning"}
             await self._send_task_report(
                 report_data={
                     'name': '外汇数据质量检查报告',
                     'content': _format_fx_market_data_scheduler_report(result.get("readiness") or result),
-                    'status': 'success' if success else result.get("status", "error"),
+                    'status': result.get("status", "success") if success else result.get("status", "error"),
                     'tasks_completed': int(result.get("issues_recorded") or 0),
                     'duration': 'N/A',
                     'maintenance_tasks': [{'task_name': 'fx_quality_check', 'status': result.get("status")}],

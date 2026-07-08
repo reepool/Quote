@@ -87,6 +87,61 @@
         }
       },
       {
+        "scope_id": "rmb_core_download",
+        "name": "First-phase FX directly downloadable source coverage",
+        "enabled": true,
+        "currencies": [
+          "CNY",
+          "CNH",
+          "USD",
+          "EUR",
+          "JPY"
+        ],
+        "instrument_types": [
+          "currency_pair",
+          "currency_index"
+        ],
+        "market_scopes": [
+          "onshore",
+          "offshore",
+          "global"
+        ],
+        "source_profiles": [
+          "cfets_rmb_fixing",
+          "cnh_market_aggregated_public",
+          "fred_trade_weighted_dollar"
+        ],
+        "series_ids": [
+          "FX.USD_CNY.CFETS.MID.DAILY",
+          "FX.EUR_CNY.CFETS.MID.DAILY",
+          "FX.JPY_CNY.CFETS.MID.DAILY",
+          "FX.USD_CNH.MARKET.SPOT.DAILY",
+          "FX.EUR_CNH.MARKET.SPOT.DAILY",
+          "FX.JPY_CNH.MARKET.SPOT.DAILY",
+          "FXI.USD_TRADE_WEIGHTED.FRED.DAILY"
+        ],
+        "rate_types": [
+          "mid",
+          "spot",
+          "index_close"
+        ],
+        "frequencies": [
+          "daily"
+        ],
+        "metadata": {
+          "rollout_phase": "phase_1_daily_download",
+          "calendar_source_profiles": [
+            "cfets_rmb_fixing",
+            "cnh_market_aggregated_public",
+            "fred_trade_weighted_dollar"
+          ],
+          "excludes": [
+            "derived_cross",
+            "disabled_ice_dxy"
+          ]
+        }
+      },
+      {
         "scope_id": "rmb_core",
         "name": "First-phase RMB FX and dollar-index coverage",
         "enabled": true,
@@ -427,6 +482,7 @@
         "retry_attempts": 2,
         "parser_version": "fx_fred_series.v1",
         "max_stale_observation_days": 10,
+        "calendar_lag_days": 10,
         "calendar": {
           "policy": "us_business_day_configured_holidays",
           "holiday_dates": []

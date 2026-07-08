@@ -57,6 +57,11 @@ def test_fx_rate_tasks_have_governance_prerequisites():
     config_path = Path(__file__).resolve().parents[3] / "config" / "05_scheduler.json"
     scheduler_config = json.loads(config_path.read_text(encoding="utf-8"))["scheduler_config"]
     jobs = scheduler_config["jobs"]
+    first_phase_profiles = [
+        "cfets_rmb_fixing",
+        "cnh_market_aggregated_public",
+        "fred_trade_weighted_dollar",
+    ]
 
     backfill_deps = jobs["fx_rate_backfill"]["dependencies"]["pre_success"][0]["jobs"]
     assert [item["job_id"] for item in backfill_deps] == ["fx_master_sync", "fx_calendar_governance"]
@@ -69,12 +74,30 @@ def test_fx_rate_tasks_have_governance_prerequisites():
 
     sync_deps = jobs["fx_rate_sync"]["dependencies"]["pre_success"][0]["jobs"]
     assert [item["job_id"] for item in sync_deps] == ["fx_master_sync", "fx_calendar_governance"]
+    assert jobs["fx_rate_sync"]["manual_only"] is False
+    assert jobs["fx_rate_sync"]["trigger"] == {
+        "type": "cron",
+        "day_of_week": "mon-fri",
+        "hour": 10,
+        "minute": 45,
+        "second": 0,
+    }
+    assert jobs["fx_rate_sync"]["parameters"]["scope_id"] == "rmb_core_download"
+    assert jobs["fx_rate_sync"]["parameters"]["dry_run"] is False
     assert sync_deps[1]["inherit"] == ["dry_run"]
-    assert sync_deps[1]["parameters"]["source_profiles"] == ["cfets_rmb_fixing"]
+    assert sync_deps[1]["parameters"]["source_profiles"] == first_phase_profiles
     sync_post = jobs["fx_rate_sync"]["dependencies"]["post_success"][0]["jobs"]
-    assert [item["job_id"] for item in sync_post] == ["fx_calendar_governance"]
+    assert [item["job_id"] for item in sync_post] == [
+        "fx_calendar_governance",
+        "fx_derivation_sync",
+        "fx_quality_check",
+    ]
     assert sync_post[0]["inherit"] == ["dry_run"]
-    assert sync_post[0]["parameters"]["source_profiles"] == ["cfets_rmb_fixing"]
+    assert sync_post[0]["parameters"]["source_profiles"] == first_phase_profiles
+    assert sync_post[1]["inherit"] == ["dry_run"]
+    assert jobs["fx_derivation_sync"]["enabled"] is True
+    assert jobs["fx_derivation_sync"]["manual_only"] is True
+    assert jobs["fx_derivation_sync"]["parameters"]["dry_run"] is False
 
 
 def test_fx_config_has_offshore_rmb_spot_scope():
@@ -92,3 +115,13 @@ def test_fx_config_has_offshore_rmb_spot_scope():
         "FX.JPY_CNH.MARKET.SPOT.DAILY",
     ]
     assert offshore_scope["metadata"]["calendar_source_profiles"] == ["cnh_market_aggregated_public"]
+
+    download_scope = scopes["rmb_core_download"]
+    assert download_scope["source_profiles"] == [
+        "cfets_rmb_fixing",
+        "cnh_market_aggregated_public",
+        "fred_trade_weighted_dollar",
+    ]
+    assert "FX.EUR_CNH.DERIVED.DAILY" not in download_scope["series_ids"]
+    assert "FX.JPY_CNH.DERIVED.DAILY" not in download_scope["series_ids"]
+    assert "FXI.DXY.ICE.DAILY" not in download_scope["series_ids"]
