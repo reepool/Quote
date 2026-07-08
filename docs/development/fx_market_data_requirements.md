@@ -267,6 +267,8 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 - 离岸市场可能在部分中国假日仍有报价，但流动性和来源质量不同，需按来源日历治理。
 - 派生交叉汇率要求同日数据；如果同日数据缺失，可按配置使用最近可得日，但必须记录 source lag。
 - 派生任务不得按自然日把周末、假期或源非发布日直接记为缺口；默认只在所有源序列共同有观测值的日期生成派生观测。确需按目标日历补齐时，必须显式配置 date policy 和 source lag。
+- CFETS/FRED/ECB 等机构日历应先使用国家或机构公共假日历识别非发布日，再叠加 source profile 中的手工 `holiday_dates`。公共假日和调休不应记为 `missing_expected_observation`。
+- 对仍无法由公共假日解释的历史空洞，应保留为 `missing_expected_observation` 或后续人工确认为 source-specific known gap；不得为了消除告警把真实历史源缺口静默标成节假日。
 - DCF 读取时只能使用估值日或估值日前已发布数据，禁止未来函数。
 
 ---

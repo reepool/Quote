@@ -73,6 +73,7 @@ def _module_cfg() -> dict:
                 "role": "rmb_fixing_primary",
                 "quality_flag": "official",
                 "parser_version": "test.v1",
+                "calendar": {"policy": "china_business_day_configured_holidays"},
             },
             "cnh_market_aggregated_public": {
                 "enabled": True,
@@ -714,6 +715,32 @@ def test_fx_calendar_governance_respects_configured_holidays(tmp_path):
     assert row["is_publication_day"] == 0
     assert row["publication_status"] == "expected_non_publication"
     assert metadata["calendar_reason"] == "configured_holiday"
+
+
+def test_fx_calendar_governance_uses_public_holiday_calendar(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+
+    result = FxCalendarGovernanceService(storage, config.modules["fx_market_data"]).run(
+        source_profiles=["cfets_rmb_fixing"],
+        start_date="2026-01-02",
+        end_date="2026-01-02",
+    )
+
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT is_publication_day, publication_status, metadata_json
+            FROM fx_calendars
+            WHERE source_profile = ? AND calendar_date = ?
+            """,
+            ("cfets_rmb_fixing", "2026-01-02"),
+        ).fetchone()
+    metadata = json.loads(row["metadata_json"])
+
+    assert result["status_counts"] == {"expected_non_publication": 1}
+    assert row["is_publication_day"] == 0
+    assert row["publication_status"] == "expected_non_publication"
+    assert metadata["calendar_reason"].startswith("public_holiday:CN:")
 
 
 def test_fx_calendar_governance_respects_source_publication_lag(tmp_path):

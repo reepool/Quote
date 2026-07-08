@@ -20,6 +20,11 @@ from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import request_get, tls_config_from_source_config
 
+try:
+    import holidays as _holidays
+except Exception:  # pragma: no cover - optional dependency fallback
+    _holidays = None
+
 
 logger = logging.getLogger(__name__)
 
@@ -2903,6 +2908,9 @@ class FxCalendarGovernanceService:
             calendar_cfg,
         ):
             return False, "configured_holiday"
+        public_holiday_reason = self._public_holiday_reason(day, normalized_policy)
+        if public_holiday_reason:
+            return False, public_holiday_reason
         lag_days = int(source_cfg.get("calendar_lag_days") or 0)
         effective_as_of = as_of_date or get_shanghai_time().date()
         if lag_days > 0 and observed_count == 0 and day > effective_as_of - timedelta(days=lag_days):
@@ -2916,6 +2924,29 @@ class FxCalendarGovernanceService:
         }:
             return True, "policy_weekday"
         return True, "default_weekday"
+
+    @staticmethod
+    def _public_holiday_reason(day: date, normalized_policy: str) -> str:
+        if _holidays is None:
+            return ""
+        country_code = ""
+        if normalized_policy == "china_business_day_configured_holidays":
+            country_code = "CN"
+        elif normalized_policy == "us_business_day_configured_holidays":
+            country_code = "US"
+        elif normalized_policy == "euro_business_day_configured_holidays":
+            country_code = "ECB"
+        if not country_code:
+            return ""
+        try:
+            calendar = _holidays.financial_holidays(country_code, years=[day.year]) if country_code == "ECB" else _holidays.CountryHoliday(country_code, years=[day.year])
+            holiday_name = calendar.get(day)
+        except Exception:
+            logger.warning("[FX][calendar_governance] holidays lookup failed policy=%s date=%s", normalized_policy, day)
+            return ""
+        if not holiday_name:
+            return ""
+        return f"public_holiday:{country_code}:{holiday_name}"
 
     @staticmethod
     def _publication_status(*, expected_publication_day: bool, observed_count: int) -> str:
