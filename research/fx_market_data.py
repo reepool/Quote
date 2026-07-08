@@ -2940,6 +2940,7 @@ class FxDerivationService:
         end_date: Optional[str] = None,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
+        started = time.monotonic()
         derivations = self.storage.list_derivations(enabled_only=True)
         all_series = {row["series_id"]: row for row in self.storage.list_series(active_only=False)}
         start = _as_date(start_date)
@@ -2950,19 +2951,35 @@ class FxDerivationService:
                 return {"status": "success", "domain": "fx_derivation_sync", "derived": 0, "gaps": [], "dry_run": dry_run}
             start = start or min(available_dates)
             end = end or max(available_dates)
+        logger.info(
+            "[FX][derivation_sync] start derivations=%s start=%s end=%s dry_run=%s",
+            len(derivations),
+            start,
+            end,
+            dry_run,
+        )
         totals = {"inserted": 0, "updated": 0, "unchanged": 0, "gaps": 0}
         gaps: List[Dict[str, Any]] = []
-        day = start
-        while day <= end:
-            obs_date = day.isoformat()
-            for derivation in derivations:
+        processed = 0
+        for derivation in derivations:
+            derived_series_id = str(derivation.get("derived_series_id") or "").upper()
+            eligible_dates = self._eligible_dates_for_derivation(derivation, start, end)
+            logger.info(
+                "[FX][derivation_sync] derivation start derived_series_id=%s eligible_dates=%s start=%s end=%s dry_run=%s",
+                derived_series_id,
+                len(eligible_dates),
+                start,
+                end,
+                dry_run,
+            )
+            for obs_date in eligible_dates:
                 result = self._derive_one(derivation, obs_date, all_series)
                 if result is None:
-                    gaps.append({"derived_series_id": derivation["derived_series_id"], "observation_date": obs_date})
+                    gaps.append({"derived_series_id": derived_series_id, "observation_date": obs_date})
                     totals["gaps"] += 1
                     if not dry_run:
                         self.storage.record_quality_issue(
-                            series_id=derivation["derived_series_id"],
+                            series_id=derived_series_id,
                             observation_date=obs_date,
                             issue_type="derivation_gap",
                             severity="warning",
@@ -2976,8 +2993,31 @@ class FxDerivationService:
                 outcome = self.storage.upsert_observation(observation)
                 totals[outcome] += 1
                 self._upsert_derivation_observation(derivation_payload)
-            day += timedelta(days=1)
+                processed += 1
+                if processed % 1000 == 0:
+                    logger.info(
+                        "[FX][derivation_sync] progress processed=%s totals=%s gaps=%s dry_run=%s",
+                        processed,
+                        totals,
+                        len(gaps),
+                        dry_run,
+                    )
+            logger.info(
+                "[FX][derivation_sync] derivation complete derived_series_id=%s totals=%s gaps=%s dry_run=%s",
+                derived_series_id,
+                totals,
+                len(gaps),
+                dry_run,
+            )
         status = "partial" if totals["gaps"] else "success"
+        logger.info(
+            "[FX][derivation_sync] complete status=%s totals=%s gaps=%s dry_run=%s elapsed=%.2fs",
+            status,
+            totals,
+            len(gaps),
+            dry_run,
+            time.monotonic() - started,
+        )
         return {"status": status, "domain": "fx_derivation_sync", "totals": totals, "gaps": gaps, "dry_run": dry_run}
 
     def _available_dates_for_derivations(self, derivations: Sequence[Mapping[str, Any]]) -> List[date]:
@@ -2990,6 +3030,36 @@ class FxDerivationService:
                     if parsed:
                         dates.add(parsed)
         return sorted(dates)
+
+    def _eligible_dates_for_derivation(
+        self,
+        derivation: Mapping[str, Any],
+        start: date,
+        end: date,
+    ) -> List[str]:
+        """Return dates where every source series has an observation available.
+
+        FX derivations are downstream of governed publication calendars. A missing
+        weekend or source holiday is not a derivation gap; only dates where the
+        source set is jointly observable should be materialized.
+        """
+        source_ids = [str(sid).upper() for sid in derivation.get("source_series_ids") or []]
+        if not source_ids:
+            return []
+        common_dates: Optional[set[str]] = None
+        for sid in source_ids:
+            source_dates = {
+                str(row["observation_date"])
+                for row in self.storage.get_observations(
+                    series_id=sid,
+                    start_date=start.isoformat(),
+                    end_date=end.isoformat(),
+                )
+            }
+            common_dates = source_dates if common_dates is None else common_dates & source_dates
+            if not common_dates:
+                return []
+        return sorted(common_dates or [])
 
     def _derive_one(
         self,
@@ -3264,20 +3334,33 @@ class FxReadService:
         warnings: List[str] = []
         series_status: Dict[str, Any] = {}
         for sid in required:
+            series = self.storage.get_series(sid)
+            series_cfg = series.get("metadata", {}) if isinstance(series, Mapping) else {}
+            source_profile = str((series or {}).get("source_profile") or "")
+            source_cfg = (self.module_cfg.get("sources") or {}).get(source_profile, {})
+            series_max_stale = int(
+                series_cfg.get("max_stale_observation_days")
+                or source_cfg.get("max_stale_observation_days")
+                or max_stale
+            )
             obs = self.storage.get_latest_observation_on_or_before(
                 series_id=sid,
                 observation_date=as_of,
-                max_lag_days=max_stale,
+                max_lag_days=series_max_stale,
             )
             if obs is None:
                 blockers.append(f"missing_or_stale_fx_series:{sid}")
-                series_status[sid] = {"status": "missing_or_stale"}
+                series_status[sid] = {
+                    "status": "missing_or_stale",
+                    "max_stale_observation_days": series_max_stale,
+                }
             else:
                 series_status[sid] = {
                     "status": "ready",
                     "latest_observation_date": obs["observation_date"],
                     "quality_flag": obs["quality_flag"],
                     "source_profile": obs["source_profile"],
+                    "max_stale_observation_days": series_max_stale,
                 }
         status = "ready" if not blockers else "blocked"
         payload = {
@@ -3336,6 +3419,7 @@ class FxQualityService:
             "invalid_quote_multiplier": 0,
             "derivation_gap": 0,
         }
+        severity_counts = {"error": 0, "warning": 0}
         for blocker in readiness.get("blockers") or []:
             if blocker.startswith("missing_or_stale_fx_series:"):
                 sid = blocker.split(":", 1)[1]
@@ -3348,27 +3432,34 @@ class FxQualityService:
                 )
                 issues += 1
                 issue_counts["missing_or_stale"] += 1
+                severity_counts["error"] += 1
         for issue in self._check_invalid_quote_multipliers():
             self.storage.record_quality_issue(**issue)
             issues += 1
             issue_counts["invalid_quote_multiplier"] += 1
+            severity_counts[str(issue.get("severity") or "warning")] = severity_counts.get(str(issue.get("severity") or "warning"), 0) + 1
         for issue in self._check_abnormal_jumps():
             self.storage.record_quality_issue(**issue)
             issues += 1
             issue_counts["abnormal_jump"] += 1
+            severity_counts[str(issue.get("severity") or "warning")] = severity_counts.get(str(issue.get("severity") or "warning"), 0) + 1
         for issue in self._check_source_conflicts():
             self.storage.record_quality_issue(**issue)
             issues += 1
             issue_counts["source_conflict"] += 1
+            severity_counts[str(issue.get("severity") or "warning")] = severity_counts.get(str(issue.get("severity") or "warning"), 0) + 1
         for issue in self._check_derivation_gaps(readiness["as_of_date"]):
             self.storage.record_quality_issue(**issue)
             issues += 1
             issue_counts["derivation_gap"] += 1
+            severity_counts[str(issue.get("severity") or "warning")] = severity_counts.get(str(issue.get("severity") or "warning"), 0) + 1
+        status = "blocked" if severity_counts.get("error", 0) else ("warning" if issues else "success")
         return {
-            "status": "success" if issues == 0 else "blocked",
+            "status": status,
             "domain": "fx_quality_check",
             "issues_recorded": issues,
             "issue_counts": issue_counts,
+            "severity_counts": severity_counts,
             "readiness": readiness,
         }
 

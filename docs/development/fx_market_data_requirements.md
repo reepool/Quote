@@ -266,6 +266,7 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 - 官方中间价按发布机构工作日发布，缺失应区分节假日、未发布、源异常。
 - 离岸市场可能在部分中国假日仍有报价，但流动性和来源质量不同，需按来源日历治理。
 - 派生交叉汇率要求同日数据；如果同日数据缺失，可按配置使用最近可得日，但必须记录 source lag。
+- 派生任务不得按自然日把周末、假期或源非发布日直接记为缺口；默认只在所有源序列共同有观测值的日期生成派生观测。确需按目标日历补齐时，必须显式配置 date policy 和 source lag。
 - DCF 读取时只能使用估值日或估值日前已发布数据，禁止未来函数。
 
 ---
@@ -282,6 +283,12 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 | `fx_rate_sync` | 日更汇率 |
 | `fx_derivation_sync` | 生成反向汇率、交叉汇率、目标币种派生 |
 | `fx_quality_check` | 检查缺口、异常跳变、源差异 |
+
+质量检查状态分级：
+
+- `missing_or_stale`、无效报价单位等 error 级问题应返回 `blocked`。
+- 异常跳变、直接市场价与派生价差异、派生缺口等 warning 级问题应写入 `fx_quality_issues`，但不应阻断 readiness。
+- 时效性阈值默认使用 `quality.max_stale_observation_days`；FRED 等宏观/指数源可在 source profile 上配置 `max_stale_observation_days`，避免把官方发布延迟误判为汇率缺口。
 
 ### 8.1.1 在岸人民币优先落库顺序
 

@@ -271,7 +271,7 @@ def test_fx_manual_provider_sync_and_derivation_lineage(tmp_path):
         },
     ).sync(series_ids=[item["series_id"] for item in observations], start_date="2026-06-26", end_date="2026-06-26")
     derivation = FxDerivationService(storage, config.modules["fx_market_data"]).run(
-        start_date="2026-06-26",
+        start_date="2026-06-25",
         end_date="2026-06-26",
     )
     eur_cnh = storage.get_observations(series_id="FX.EUR_CNH.DERIVED.DAILY")[0]
@@ -280,6 +280,8 @@ def test_fx_manual_provider_sync_and_derivation_lineage(tmp_path):
     assert result["status"] == "success"
     assert result["totals"]["inserted"] == 4
     assert derivation["status"] == "success"
+    assert derivation["totals"]["inserted"] == 2
+    assert derivation["totals"]["gaps"] == 0
     assert round(eur_cnh["value"], 6) == round(7.92 / 7.2 * 7.25, 6)
     assert round(jpy_cnh["value"], 6) == round(4.65 / 7.2 * 7.25, 6)
     assert eur_cnh["quality_flag"] == "derived"
@@ -302,6 +304,31 @@ def test_fx_readiness_and_quality_are_local_only(tmp_path):
     assert quality["status"] == "blocked"
     assert missing["status"] == "missing"
     assert missing["source_policy"] == "local_fx_db_only"
+
+
+def test_fx_readiness_uses_source_stale_override(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    module_cfg["quality"]["required_first_phase_series"] = ["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]
+    module_cfg["sources"]["fred_trade_weighted_dollar"]["max_stale_observation_days"] = 10
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+            observation_date="2026-07-02",
+            value=120.69,
+            base_currency="USD",
+            quote_currency="",
+            quote_multiplier=1,
+            source_profile="fred_trade_weighted_dollar",
+            quality_flag="official",
+        )
+    )
+
+    readiness = FxReadService(storage, module_cfg).readiness(as_of_date="2026-07-08")
+
+    assert readiness["status"] == "ready"
+    assert readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]["latest_observation_date"] == "2026-07-02"
+    assert readiness["series"]["FXI.USD_TRADE_WEIGHTED.FRED.DAILY"]["max_stale_observation_days"] == 10
 
 
 def test_fx_configured_provider_contract_writes_reviewed_payloads(tmp_path):
@@ -718,8 +745,8 @@ def test_fx_derivation_inverse_missing_source_gap_and_lag_policy(tmp_path):
     assert inverse["status"] == "success"
     assert inverse["conversion_policy"] == "inverse"
     assert round(inverse["converted_amount"], 6) == 1.0
-    assert derivation["status"] == "partial"
-    assert derivation["totals"]["gaps"] == 2
+    assert derivation["status"] == "success"
+    assert derivation["totals"]["gaps"] == 0
     assert quality["issue_counts"]["derivation_gap"] == 2
 
 
@@ -791,6 +818,42 @@ def test_fx_quality_checks_abnormal_jumps_source_conflicts_and_multiplier(tmp_pa
     assert quality["issue_counts"]["invalid_quote_multiplier"] == 1
     assert quality["issue_counts"]["abnormal_jump"] >= 1
     assert quality["issue_counts"]["source_conflict"] == 1
+
+
+def test_fx_quality_warning_only_does_not_block(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    module_cfg = config.modules["fx_market_data"]
+    module_cfg["quality"]["required_first_phase_series"] = ["FX.USD_CNY.CFETS.MID.DAILY"]
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FX.USD_CNY.CFETS.MID.DAILY",
+            observation_date="2026-06-25",
+            value=7.2,
+            base_currency="USD",
+            quote_currency="CNY",
+            quote_multiplier=1,
+            source_profile="cfets_rmb_fixing",
+            quality_flag="official",
+        )
+    )
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FX.USD_CNY.CFETS.MID.DAILY",
+            observation_date="2026-06-26",
+            value=7.8,
+            base_currency="USD",
+            quote_currency="CNY",
+            quote_multiplier=1,
+            source_profile="cfets_rmb_fixing",
+            quality_flag="official",
+        )
+    )
+
+    quality = FxQualityService(storage, module_cfg).run(as_of_date="2026-06-26")
+
+    assert quality["status"] == "warning"
+    assert quality["severity_counts"]["error"] == 0
+    assert quality["severity_counts"]["warning"] >= 1
 
 
 def test_dcf_fx_context_helper_uses_valuation_date_cutoff(tmp_path):

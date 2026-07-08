@@ -426,6 +426,7 @@
         "timeout_seconds": 20,
         "retry_attempts": 2,
         "parser_version": "fx_fred_series.v1",
+        "max_stale_observation_days": 10,
         "calendar": {
           "policy": "us_business_day_configured_holidays",
           "holiday_dates": []
