@@ -1,4 +1,5 @@
 import sqlite3
+import subprocess
 from pathlib import Path
 from unittest.mock import AsyncMock, Mock
 
@@ -51,6 +52,9 @@ def test_database_backup_config_resolves_defaults_and_sources(tmp_path):
 
     assert config.default_max_backup_files == 3
     assert config.performance.max_parallel_databases == 1
+    assert config.performance.max_database_seconds == 7200
+    assert config.performance.validation_mode == "quick_check_small_open_large"
+    assert config.performance.quick_check_max_bytes == 5 * 1024 * 1024 * 1024
     assert config.databases[0]["name"] == "quotes"
 
 
@@ -238,6 +242,66 @@ async def test_database_backup_invalid_sqlite_reports_failure_and_continues(tmp_
     assert result.success_count == 1
     assert any(item.name == "bad" and item.status == BACKUP_STATUS_FAILED for item in result.results)
     assert any(item.name == "good" for item in result.results)
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_database_backup_large_database_uses_open_only_validation(tmp_path):
+    data_dir = tmp_path / "data"
+    backup_dir = tmp_path / "backups"
+    data_dir.mkdir()
+    _create_sqlite_db(data_dir / "financials.db", "financials")
+
+    raw = {
+        "backup_directory": str(backup_dir),
+        "databases": [
+            {"name": "financials", "path": str(data_dir / "financials.db")},
+        ],
+        "performance": {
+            "min_free_space_multiplier": 0.1,
+            "validation_mode": "quick_check_small_open_large",
+            "quick_check_max_bytes": 1,
+        },
+    }
+    service = DatabaseBackupService.from_config_manager(_config_manager(raw), Mock())
+
+    result = await service.run()
+
+    assert result.success is True
+    assert result.results[0].validation_status == "open_only_large_database"
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_database_backup_quick_check_timeout_reports_failure(tmp_path, monkeypatch):
+    data_dir = tmp_path / "data"
+    backup_dir = tmp_path / "backups"
+    data_dir.mkdir()
+    _create_sqlite_db(data_dir / "financials.db", "financials")
+
+    def raise_timeout(*_args, **_kwargs):
+        raise subprocess.TimeoutExpired(cmd="sqlite3", timeout=1)
+
+    monkeypatch.setattr("scheduler.database_backup.subprocess.run", raise_timeout)
+
+    raw = {
+        "backup_directory": str(backup_dir),
+        "databases": [
+            {"name": "financials", "path": str(data_dir / "financials.db")},
+        ],
+        "performance": {
+            "min_free_space_multiplier": 0.1,
+            "validation_mode": "quick_check",
+            "validation_timeout_seconds": 1,
+        },
+    }
+    service = DatabaseBackupService.from_config_manager(_config_manager(raw), Mock())
+
+    result = await service.run()
+
+    assert result.success is False
+    assert result.failure_count == 1
+    assert "quick_check timed out" in result.results[0].error
 
 
 @pytest.mark.unit

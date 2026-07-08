@@ -314,7 +314,7 @@ restart_system - 重启系统服务
 ### 7. 数据库备份 (database_backup)
 - **执行时间**: 每周六 03:30
 - **功能**: 通过统一数据库备份工作流备份 `data/*.db` 下的生产 SQLite 数据库
-- **特点**: 配置化数据库清单、默认每库保留 3 个备份、SQLite online backup、每库完成通知、整轮汇总通知
+- **特点**: 配置化数据库清单、默认每库保留 3 个备份、SQLite online backup、每库完成通知、整轮汇总通知、大库 open-only 校验避免 NAS quick_check 长时间阻塞
 
 ### 8. 缓存预热 (cache_warm_up)
 - **执行时间**: 每日 08:00

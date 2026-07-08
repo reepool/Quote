@@ -8,6 +8,7 @@ import glob
 import os
 import shutil
 import sqlite3
+import subprocess
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -30,6 +31,13 @@ class DatabaseBackupPerformanceConfig:
     min_free_space_multiplier: float = 1.5
     require_backup_mount: bool = False
     expected_mount_paths: tuple[str, ...] = ()
+    max_database_seconds: float = 7200.0
+    max_total_seconds: float = 21600.0
+    progress_stall_seconds: float = 900.0
+    progress_log_interval_seconds: float = 30.0
+    validation_mode: str = "quick_check_small_open_large"
+    quick_check_max_bytes: int = 5 * 1024 * 1024 * 1024
+    validation_timeout_seconds: float = 900.0
 
 
 @dataclass(frozen=True)
@@ -239,6 +247,10 @@ class DatabaseBackupService:
                     await on_database_result(skipped_result)
 
             for index, source in enumerate(planned, start=1):
+                if time.monotonic() - started > self.config.performance.max_total_seconds:
+                    raise TimeoutError(
+                        f"database backup run exceeded max_total_seconds={self.config.performance.max_total_seconds}"
+                    )
                 self.logger.info(
                     "[DatabaseBackup] database start %s/%s name=%s source=%s",
                     index,
@@ -384,7 +396,7 @@ class DatabaseBackupService:
         try:
             await asyncio.to_thread(self._backup_sqlite_sync, source, backup_path)
             backup_size = backup_path.stat().st_size if backup_path.exists() else 0
-            validation_status = self._validate_backup(backup_path)
+            validation_status = self._validate_backup(backup_path, source)
             cleanup = self._cleanup_source_backups(source)
             duration = time.monotonic() - started
             self.logger.info(
@@ -480,7 +492,12 @@ class DatabaseBackupService:
     def _backup_sqlite_sync(self, source: DatabaseBackupSource, backup_path: Path) -> None:
         backup_path.parent.mkdir(parents=True, exist_ok=True)
         source_uri = f"{source.path.resolve().as_uri()}?mode=ro"
-        progress_state = {"last_log": time.monotonic(), "last_remaining": None}
+        started = time.monotonic()
+        progress_state = {
+            "last_log": started,
+            "last_remaining": None,
+            "last_progress": started,
+        }
         with sqlite3.connect(source_uri, uri=True, timeout=self.config.performance.busy_timeout_seconds) as src:
             src.execute(
                 f"PRAGMA busy_timeout={int(self.config.performance.busy_timeout_seconds * 1000)}"
@@ -492,15 +509,31 @@ class DatabaseBackupService:
 
                 def progress(_status: int, remaining: int, total: int) -> None:
                     now = time.monotonic()
-                    if now - progress_state["last_log"] >= 30:
+                    if now - started > self.config.performance.max_database_seconds:
+                        raise TimeoutError(
+                            f"database backup exceeded max_database_seconds={self.config.performance.max_database_seconds}"
+                        )
+                    if progress_state["last_remaining"] != remaining:
+                        progress_state["last_progress"] = now
+                        progress_state["last_remaining"] = remaining
+                    elif now - progress_state["last_progress"] > self.config.performance.progress_stall_seconds:
+                        raise TimeoutError(
+                            f"database backup progress stalled for {self.config.performance.progress_stall_seconds}s"
+                        )
+                    if now - progress_state["last_log"] >= self.config.performance.progress_log_interval_seconds:
+                        copied = max(total - remaining, 0)
+                        ratio = copied / total if total else 0
                         self.logger.info(
-                            "[DatabaseBackup] progress name=%s remaining_pages=%s total_pages=%s",
+                            "[DatabaseBackup] progress name=%s copied_pages=%s remaining_pages=%s total_pages=%s progress=%.2f%%",
                             source.name,
+                            copied,
                             remaining,
                             total,
+                            ratio * 100,
                         )
                         progress_state["last_log"] = now
-                        progress_state["last_remaining"] = remaining
+                    if self.config.performance.chunk_sleep_seconds > 0:
+                        time.sleep(self.config.performance.chunk_sleep_seconds)
 
                 src.backup(
                     dst,
@@ -509,17 +542,53 @@ class DatabaseBackupService:
                     sleep=self.config.performance.chunk_sleep_seconds,
                 )
 
-    def _validate_backup(self, backup_path: Path) -> str:
+    def _validate_backup(self, backup_path: Path, source: DatabaseBackupSource) -> str:
         if not backup_path.exists():
             raise RuntimeError(f"backup file was not created: {backup_path}")
-        if backup_path.stat().st_size <= 0:
+        backup_size = backup_path.stat().st_size
+        if backup_size <= 0:
             raise RuntimeError(f"backup file is empty: {backup_path}")
-        with sqlite3.connect(str(backup_path)) as conn:
-            row = conn.execute("PRAGMA quick_check").fetchone()
-        status = str(row[0]) if row else ""
+        with sqlite3.connect(str(backup_path), timeout=self.config.performance.busy_timeout_seconds) as conn:
+            conn.execute("PRAGMA schema_version").fetchone()
+
+        mode = self.config.performance.validation_mode
+        if mode == "open_only":
+            return "open_only_ok"
+        if mode == "quick_check_small_open_large" and backup_size > self.config.performance.quick_check_max_bytes:
+            self.logger.info(
+                "[DatabaseBackup] skip quick_check for large database name=%s backup=%s size=%s threshold=%s",
+                source.name,
+                backup_path,
+                backup_size,
+                self.config.performance.quick_check_max_bytes,
+            )
+            return "open_only_large_database"
+
+        sqlite3_bin = shutil.which("sqlite3")
+        if sqlite3_bin:
+            try:
+                completed = subprocess.run(
+                    [sqlite3_bin, str(backup_path), "PRAGMA quick_check;"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.config.performance.validation_timeout_seconds,
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise TimeoutError(
+                    f"backup quick_check timed out after {self.config.performance.validation_timeout_seconds}s"
+                ) from exc
+            status = completed.stdout.strip().splitlines()[0] if completed.stdout.strip() else ""
+            if completed.returncode != 0:
+                detail = completed.stderr.strip() or status or f"exit={completed.returncode}"
+                raise RuntimeError(f"backup quick_check failed: {detail}")
+        else:
+            with sqlite3.connect(str(backup_path), timeout=self.config.performance.busy_timeout_seconds) as conn:
+                row = conn.execute("PRAGMA quick_check").fetchone()
+            status = str(row[0]) if row else ""
         if status.lower() != "ok":
             raise RuntimeError(f"backup quick_check failed: {status}")
-        return "ok"
+        return "quick_check_ok"
 
     def _cleanup_source_backups(self, source: DatabaseBackupSource) -> DatabaseBackupCleanupResult:
         cleanup = DatabaseBackupCleanupResult()
@@ -642,6 +711,21 @@ def _parse_database_backup_config(
         expected_mount_paths=tuple(
             str(item) for item in performance_raw.get("expected_mount_paths") or ()
         ),
+        max_database_seconds=float(performance_raw.get("max_database_seconds") or 7200.0),
+        max_total_seconds=float(performance_raw.get("max_total_seconds") or 21600.0),
+        progress_stall_seconds=float(performance_raw.get("progress_stall_seconds") or 900.0),
+        progress_log_interval_seconds=float(
+            performance_raw.get("progress_log_interval_seconds") or 30.0
+        ),
+        validation_mode=str(
+            performance_raw.get("validation_mode") or "quick_check_small_open_large"
+        ),
+        quick_check_max_bytes=int(
+            performance_raw.get("quick_check_max_bytes") or 5 * 1024 * 1024 * 1024
+        ),
+        validation_timeout_seconds=float(
+            performance_raw.get("validation_timeout_seconds") or 900.0
+        ),
     )
     return DatabaseBackupWorkflowConfig(
         enabled=bool(raw.get("enabled", True)),
@@ -680,6 +764,24 @@ def validate_database_backup_config(config: DatabaseBackupWorkflowConfig) -> Non
         raise ValueError("busy_timeout_seconds must be positive")
     if config.performance.min_free_space_multiplier <= 0:
         raise ValueError("min_free_space_multiplier must be positive")
+    if config.performance.max_database_seconds <= 0:
+        raise ValueError("max_database_seconds must be positive")
+    if config.performance.max_total_seconds <= 0:
+        raise ValueError("max_total_seconds must be positive")
+    if config.performance.progress_stall_seconds <= 0:
+        raise ValueError("progress_stall_seconds must be positive")
+    if config.performance.progress_log_interval_seconds <= 0:
+        raise ValueError("progress_log_interval_seconds must be positive")
+    if config.performance.validation_mode not in {
+        "quick_check",
+        "open_only",
+        "quick_check_small_open_large",
+    }:
+        raise ValueError("validation_mode must be quick_check, open_only, or quick_check_small_open_large")
+    if config.performance.quick_check_max_bytes <= 0:
+        raise ValueError("quick_check_max_bytes must be positive")
+    if config.performance.validation_timeout_seconds <= 0:
+        raise ValueError("validation_timeout_seconds must be positive")
     _validate_template(config.default_filename_pattern)
 
     seen_paths: set[str] = set()

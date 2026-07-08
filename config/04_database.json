@@ -39,7 +39,14 @@
             "busy_timeout_seconds": 30,
             "min_free_space_multiplier": 1.5,
             "require_backup_mount": false,
-            "expected_mount_paths": []
+            "expected_mount_paths": [],
+            "max_database_seconds": 7200,
+            "max_total_seconds": 21600,
+            "progress_stall_seconds": 900,
+            "progress_log_interval_seconds": 30,
+            "validation_mode": "quick_check_small_open_large",
+            "quick_check_max_bytes": 5368709120,
+            "validation_timeout_seconds": 900
         },
         "databases": [
             {

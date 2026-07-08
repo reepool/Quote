@@ -700,7 +700,8 @@ async def weekly_data_maintenance(self,
 #### 行为
 - 备份范围由 `database_backup_config.databases` 与 `include_globs` 决定，当前默认覆盖 `quotes / research / financials / valuation / futures / fx`。
 - 每个数据库默认最多保留 3 个备份文件，可按数据库覆盖。
-- 备份使用 SQLite online backup，并通过 page chunk、sleep、busy timeout 和默认串行执行控制长时间备份对日常任务的影响。
+- 备份使用 SQLite online backup，并通过 page chunk、sleep、busy timeout、每库最长耗时、进度停滞检测和默认串行执行控制长时间备份对日常任务的影响。
+- 备份完成后的校验默认对小库执行 `PRAGMA quick_check`；超过 5GB 的大库只做 SQLite open-only 校验，避免在 NAS 上全量扫描大文件导致调度进程长时间无响应。
 - 每个数据库完成后发送 Telegram 通知，整轮结束后发送汇总通知。
 
 #### 存储前提

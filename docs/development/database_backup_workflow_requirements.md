@@ -91,6 +91,7 @@
 - 使用 chunk/page 分批复制，并在批次间 sleep，降低长时间大文件备份对日常任务的 I/O 冲击。
 - 对大库按数据库串行执行，默认 `max_parallel_databases=1`。
 - 对每个数据库设置 busy timeout，遇到锁等待时可重试或按配置失败。
+- 对每个数据库设置最长耗时和进度停滞阈值，避免单个大库或 NAS I/O 问题导致整个调度进程长期无响应。
 
 如某个文件不是有效 SQLite 数据库，任务应失败该数据库并继续或终止，取决于 `continue_on_database_failure`。
 
@@ -100,7 +101,8 @@
 
 - 备份文件存在且大小大于 0。
 - 可打开 SQLite 连接。
-- `PRAGMA quick_check` 返回 `ok`。
+- 小型备份文件应执行 `PRAGMA quick_check` 并返回 `ok`。
+- 大型备份文件默认只做 SQLite open-only 校验，完整 `quick_check` 应作为独立离线校验任务或通过显式配置强制开启，避免在周备份窗口对 NAS 上几十 GB 文件全量扫描。
 - 记录源文件大小、备份文件大小、耗时、状态和错误摘要。
 
 ### 4.4 清理
@@ -150,7 +152,7 @@ Telegram 通知要求：
 实现完成后至少验证：
 
 1. 配置解析测试覆盖显式清单、自动发现、缺失文件、排除规则和 per-db 保留数量。
-2. 小型 SQLite fixture 使用 online backup 生成可通过 `PRAGMA quick_check` 的备份。
+2. 小型 SQLite fixture 使用 online backup 生成可通过 `PRAGMA quick_check` 的备份；大库阈值场景返回 open-only 校验状态。
 3. 单个数据库缺失时，在 `skip_missing=true` 下其他库继续备份。
 4. 单个数据库备份失败时，按 `continue_on_database_failure` 控制继续或终止。
 5. 每个数据库最多保留默认 3 个备份文件，单库 override 生效。

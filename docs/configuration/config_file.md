@@ -1706,7 +1706,14 @@
       "chunk_pages": 1000,
       "chunk_sleep_seconds": 0.05,
       "busy_timeout_seconds": 30,
-      "min_free_space_multiplier": 1.5
+      "min_free_space_multiplier": 1.5,
+      "max_database_seconds": 7200,
+      "max_total_seconds": 21600,
+      "progress_stall_seconds": 900,
+      "progress_log_interval_seconds": 30,
+      "validation_mode": "quick_check_small_open_large",
+      "quick_check_max_bytes": 5368709120,
+      "validation_timeout_seconds": 900
     },
     "databases": [
       {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 3},
@@ -1731,8 +1738,14 @@
 - **`continue_on_database_failure`**: `bool` (默认: `True`) —— *单库失败后是否继续备份后续数据库*
 - **`notification_enabled`**: `bool` (默认: `True`) —— *是否发送数据库备份通知*
 - **`per_database_notification`**: `bool` (默认: `True`) —— *每个数据库完成后是否单独通知*
-- **`performance`**: `Object` —— *SQLite online backup 的分批、sleep、busy timeout、空间倍率等性能控制*
+- **`performance`**: `Object` —— *SQLite online backup 的分批、sleep、busy timeout、空间倍率、每库/整轮超时、进度停滞检测和大库校验策略*
 - **`databases`**: `List[dict]` —— *生产备份数据库显式清单；当前默认覆盖 `quotes/research/financials/valuation/futures/fx`*
+
+`performance.validation_mode` 支持：
+
+- `quick_check_small_open_large`：默认。小库执行 `PRAGMA quick_check`，超过 `quick_check_max_bytes` 的大库只做 SQLite open-only 校验。
+- `quick_check`：所有库都执行 `PRAGMA quick_check`，受 `validation_timeout_seconds` 限制；不建议在周备份窗口对几十 GB NAS 文件使用。
+- `open_only`：所有库只验证文件存在、非空且 SQLite 可打开。
 
 旧 `backup_config` 和 `database_config.backup_enabled` 仅作为迁移兼容输入，不再是生产周度备份工作流的权威配置。
 ## cache_config

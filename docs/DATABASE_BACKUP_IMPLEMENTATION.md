@@ -37,7 +37,14 @@
       "chunk_pages": 1000,
       "chunk_sleep_seconds": 0.05,
       "busy_timeout_seconds": 30,
-      "min_free_space_multiplier": 1.5
+      "min_free_space_multiplier": 1.5,
+      "max_database_seconds": 7200,
+      "max_total_seconds": 21600,
+      "progress_stall_seconds": 900,
+      "progress_log_interval_seconds": 30,
+      "validation_mode": "quick_check_small_open_large",
+      "quick_check_max_bytes": 5368709120,
+      "validation_timeout_seconds": 900
     },
     "databases": [
       {"name": "quotes", "path": "data/quotes.db", "filename_pattern": "quotes_backup_{timestamp}.db", "max_backup_files": 3},
@@ -64,8 +71,8 @@
 3. 跳过 disabled 数据库；对缺失数据库按 `skip_missing` 决定跳过或失败。
 4. 创建并校验目标目录，检查可用空间。
 5. 默认串行备份每个 SQLite 数据库。
-6. 使用 SQLite online backup 分批复制，按 `chunk_pages` 和 `chunk_sleep_seconds` 控制 I/O 压力。
-7. 备份完成后打开备份文件并执行 `PRAGMA quick_check`。
+6. 使用 SQLite online backup 分批复制，按 `chunk_pages` 和 `chunk_sleep_seconds` 控制 I/O 压力，并通过每库最长耗时和进度停滞阈值避免长时间无响应。
+7. 备份完成后先打开备份文件确认 SQLite 可读；小库执行 `PRAGMA quick_check`，超过 `quick_check_max_bytes` 的大库默认只做 open-only 校验，避免在 NAS 上全量扫描几十 GB 文件拖死调度进程。
 8. 按每库 `max_backup_files` 清理旧备份。
 9. 发送每库 Telegram 通知和整轮汇总报告。
 
@@ -84,7 +91,7 @@
 
 ## 结果判断
 
-- 单库 `success`：备份文件生成、大小非零、SQLite 可打开、`PRAGMA quick_check=ok`。
+- 单库 `success`：备份文件生成、大小非零、SQLite 可打开；小库还要求 `PRAGMA quick_check=ok`，大库默认返回 `open_only_large_database`。
 - 单库 `skipped`：配置允许跳过且源库不存在或被禁用。
 - 单库 `failed`：复制、校验、空间、锁等待或目标目录校验失败。
 - 整轮 `success`：无 failed 数据库。
@@ -93,3 +100,16 @@
 ## 兼容说明
 
 旧 `backup_config` 仍可被读取为迁移输入，但会记录 deprecation warning。新开发和生产配置必须使用 `database_backup_config`。
+
+## 大库校验策略
+
+2026-07-04 的周备份中，`financials.db` 的 SQLite online backup 已在 `06:27` 完成并生成约 57GB 文件，但后续 `PRAGMA quick_check` 在 NAS 备份文件上长时间扫描，导致任务没有进入 `valuation/futures/fx`，Telegram 重启也受到正在等待的备份线程影响。
+
+为避免同类问题，默认策略为：
+
+- `validation_mode=quick_check_small_open_large`：小库执行完整 `quick_check`，大库只做 SQLite open-only 校验。
+- `quick_check_max_bytes=5368709120`：超过 5GB 的备份文件不在周任务里做 NAS 全量扫描。
+- `validation_timeout_seconds=900`：需要执行 quick_check 时最多等待 15 分钟，超时后该库失败并按 `continue_on_database_failure` 继续后续库。
+- `max_database_seconds=7200`、`progress_stall_seconds=900`：备份复制阶段如果单库耗时过长或进度长期不变，将主动失败，不再无限等待。
+
+如果需要对某个大库做完整一致性巡检，应在非周备份窗口单独执行校验任务，避免与生产调度和 Telegram 管理进程竞争资源。
