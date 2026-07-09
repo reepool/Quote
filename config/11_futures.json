@@ -708,8 +708,52 @@
           "parser_version": "fred_commodity_provider.v1",
           "timeout_seconds": 30,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
+        },
+        "eia_official_api": {
+          "venue": "EIA",
+          "source": "U.S. Energy Information Administration Open Data",
+          "source_mode": "direct_api",
+          "source_interface": "eia_v2_series_data",
+          "endpoint_url": "https://api.eia.gov/v2/seriesid/{source_symbol}",
+          "api_key_env": "EIA_API_KEY",
+          "quality_flag": "official_public_api",
+          "parser_version": "eia_commodity_provider.v1",
+          "timeout_seconds": 30,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData"
+        },
+        "world_bank_public_dataset": {
+          "venue": "WORLD_BANK",
+          "source": "World Bank Pink Sheet public dataset",
+          "source_mode": "public_dataset",
+          "source_interface": "world_bank_indicator_json",
+          "endpoint_url": "https://api.worldbank.org/v2/country/WLD/indicator/{source_symbol}",
+          "quality_flag": "official_public_dataset",
+          "parser_version": "world_bank_commodity_provider.v1",
+          "timeout_seconds": 30,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData"
+        },
+        "100ppi_public_web": {
+          "venue": "100PPI",
+          "source": "100ppi public web",
+          "source_mode": "public_web_aggregator",
+          "source_interface": "akshare_or_direct_100ppi",
+          "quality_flag": "aggregated_public_web",
+          "parser_version": "100ppi_commodity_provider.v1",
+          "timeout_seconds": 30,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "note": "Requires configured product mappings before production sync; never label as official."
+        },
+        "manual_policy_event": {
+          "venue": "MANUAL_POLICY",
+          "source": "Manual verified policy event import",
+          "source_mode": "manual_verified",
+          "source_interface": "config_or_file_policy_events",
+          "quality_flag": "manual_verified",
+          "parser_version": "manual_policy_event_provider.v1",
+          "note": "Used for thermal coal long-term contract and policy price events after source review."
         }
       },
+      "policy_events": [],
       "commodities": [
         {
           "commodity_id": "OIL.WTI.SPOT",
@@ -778,6 +822,21 @@
           "active": true
         },
         {
+          "series_id": "CMD.OIL.WTI.SPOT.EIA.DAILY",
+          "commodity_id": "OIL.WTI.SPOT",
+          "venue": "EIA",
+          "source_profile": "eia_official_api",
+          "source_symbol": "PET.RWTC.D",
+          "frequency": "daily",
+          "quote_type": "spot_validation",
+          "currency": "USD",
+          "unit": "USD/barrel",
+          "active": false,
+          "metadata": {
+            "role": "official_validation_or_replacement"
+          }
+        },
+        {
           "series_id": "CMD.OIL.BRENT.SPOT.FRED.DAILY",
           "commodity_id": "OIL.BRENT.SPOT",
           "venue": "FRED",
@@ -812,6 +871,36 @@
           "currency": "USD",
           "unit": "USD/metric_ton",
           "active": true
+        },
+        {
+          "series_id": "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
+          "commodity_id": "METAL.COPPER.IMF",
+          "venue": "WORLD_BANK",
+          "source_profile": "world_bank_public_dataset",
+          "source_symbol": "PCOPPUSDM",
+          "frequency": "monthly",
+          "quote_type": "benchmark_fallback",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": false,
+          "metadata": {
+            "role": "monthly_benchmark_fallback"
+          }
+        },
+        {
+          "series_id": "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
+          "commodity_id": "METAL.ALUMINUM.IMF",
+          "venue": "WORLD_BANK",
+          "source_profile": "world_bank_public_dataset",
+          "source_symbol": "PALUMUSDM",
+          "frequency": "monthly",
+          "quote_type": "benchmark_fallback",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": false,
+          "metadata": {
+            "role": "monthly_benchmark_fallback"
+          }
         }
       ],
       "download_scopes": [

@@ -1605,6 +1605,28 @@ async def get_research_special_commodity_dictionary():
 
 
 @router.get(
+    "/research/commodities/series",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_series(
+    active_only: bool = Query(True, description="是否只返回启用序列"),
+):
+    """读取特殊商品序列元数据。"""
+    try:
+        return await data_manager.get_special_commodity_series(
+            active_only=bool(_query_default(active_only, True)),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research commodity series: {str(e)}",
+        )
+
+
+@router.get(
     "/research/commodities/observations",
     response_model=Dict[str, Any],
     tags=["Research"],
@@ -1627,6 +1649,52 @@ async def get_research_special_commodity_observations(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to get research commodity observations: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/commodities/diagnostics",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_diagnostics(
+    target_currency: Optional[str] = Query(None, description="目标币种，例如 CNY"),
+    max_fx_lag_days: Optional[int] = Query(None, description="最大允许 FX 滞后自然日", ge=0),
+):
+    """读取特殊商品本地诊断和可选 FX 依赖状态。"""
+    try:
+        return await data_manager.get_special_commodity_diagnostics(
+            target_currency=_query_default(target_currency),
+            max_fx_lag_days=_query_default(max_fx_lag_days),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research commodity diagnostics: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/commodities/policy-events",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_policy_events(
+    commodity_id: Optional[str] = Query(None, description="commodity_id"),
+):
+    """读取特殊商品政策/长协事件。"""
+    try:
+        return await data_manager.get_special_commodity_policy_events(
+            commodity_id=_query_default(commodity_id),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research commodity policy events: {str(e)}",
         )
 
 
@@ -1672,6 +1740,63 @@ async def run_research_special_commodity_price_sync(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to run research commodity price sync: {str(e)}",
+        )
+
+
+@router.post(
+    "/research/commodities/calendar-governance",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_special_commodity_calendar_governance(
+    scope_id: Optional[str] = Query(None, description="特殊商品下载范围 ID"),
+    series_ids: Optional[str] = Query(None, description="逗号分隔 series_id"),
+    start_date: str = Query(..., description="开始日期 YYYY-MM-DD"),
+    end_date: str = Query(..., description="结束日期 YYYY-MM-DD"),
+    dry_run: bool = Query(False, description="是否只演练不落库"),
+):
+    """执行特殊商品观测日/发布期治理。"""
+    def _csv(value: Optional[str]) -> Optional[List[str]]:
+        if not value:
+            return None
+        items = [item.strip() for item in str(value).split(",") if item.strip()]
+        return items or None
+
+    try:
+        return await _run_data_task_workload(
+            data_manager.run_special_commodity_calendar_governance,
+            scope_id=_query_default(scope_id),
+            series_ids=_csv(_query_default(series_ids)),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+            dry_run=dry_run,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to run research commodity calendar governance: {str(e)}",
+        )
+
+
+@router.post(
+    "/research/commodities/lme/feasibility-probe",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_lme_feasibility_probe():
+    """检查 LME 官方源是否已完成登录、下载和许可验证。"""
+    try:
+        return await _run_data_task_workload(
+            data_manager.run_special_commodity_lme_feasibility_probe,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to run LME feasibility probe: {str(e)}",
         )
 
 

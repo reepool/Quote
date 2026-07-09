@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import logging
 import os
 import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequence
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
@@ -76,6 +78,61 @@ def _parse_date(value: Optional[str]) -> Optional[date]:
     if not value:
         return None
     return date.fromisoformat(str(value)[:10])
+
+
+def _redact_url(url: str) -> str:
+    """Remove secret-bearing query values before storing lineage URLs."""
+    if not url:
+        return ""
+    try:
+        parts = urlsplit(url)
+        secret_keys = {"api_key", "apikey", "key", "token", "access_token", "appkey", "secret"}
+        query = []
+        for key, value in parse_qsl(parts.query, keep_blank_values=True):
+            query.append((key, "***" if key.lower() in secret_keys else value))
+        return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+    except Exception:
+        return url
+
+
+def _build_observation(
+    *,
+    item: "CommoditySeries",
+    source_profile: str,
+    source_cfg: Mapping[str, Any],
+    observation_date: str,
+    value: float,
+    source_url: str,
+    source_symbol: str,
+    raw_payload: Mapping[str, Any],
+    metadata: Optional[Dict[str, Any]] = None,
+) -> "CommodityObservation":
+    raw_hash = _hash_payload(
+        {
+            "series_id": item.series_id,
+            "source_symbol": source_symbol,
+            "date": observation_date,
+            "value": value,
+            "raw_payload": dict(raw_payload),
+        }
+    )
+    return CommodityObservation(
+        series_id=item.series_id,
+        observation_date=observation_date,
+        value=value,
+        currency=item.currency,
+        unit=item.unit,
+        raw_value=value,
+        raw_currency=item.currency,
+        raw_unit=item.unit,
+        source_profile=source_profile,
+        source_url=_redact_url(source_url),
+        quality_flag=str(source_cfg.get("quality_flag") or "partial"),
+        source_symbol=source_symbol,
+        parser_version=str(source_cfg.get("parser_version") or SPECIAL_COMMODITY_SYNC_VERSION),
+        raw_payload_hash=raw_hash,
+        metadata=metadata or {},
+    )
 
 
 @dataclass(frozen=True)
@@ -153,6 +210,53 @@ class CommodityObservation:
     parser_version: str
     raw_payload_hash: str
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class CommodityPolicyEvent:
+    event_id: str
+    commodity_id: str
+    policy_type: str
+    effective_start: str
+    effective_end: Optional[str]
+    currency: str
+    unit: str
+    value_low: Optional[float]
+    value_high: Optional[float]
+    value_mid: Optional[float]
+    source_profile: str
+    source_url: str
+    quality_flag: str
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "CommodityPolicyEvent":
+        event_id = str(payload.get("event_id") or "")
+        if not event_id:
+            event_id = _hash_payload(
+                {
+                    "commodity_id": payload.get("commodity_id"),
+                    "policy_type": payload.get("policy_type"),
+                    "effective_start": payload.get("effective_start"),
+                    "source_profile": payload.get("source_profile"),
+                }
+            )[:24]
+        return cls(
+            event_id=event_id,
+            commodity_id=str(payload.get("commodity_id") or ""),
+            policy_type=str(payload.get("policy_type") or "policy_price"),
+            effective_start=str(payload.get("effective_start") or ""),
+            effective_end=str(payload.get("effective_end") or "") or None,
+            currency=str(payload.get("currency") or ""),
+            unit=str(payload.get("unit") or ""),
+            value_low=float(payload["value_low"]) if payload.get("value_low") is not None else None,
+            value_high=float(payload["value_high"]) if payload.get("value_high") is not None else None,
+            value_mid=float(payload["value_mid"]) if payload.get("value_mid") is not None else None,
+            source_profile=str(payload.get("source_profile") or "manual_policy_event"),
+            source_url=str(payload.get("source_url") or ""),
+            quality_flag=str(payload.get("quality_flag") or "manual_verified"),
+            metadata=dict(payload.get("metadata") or {}),
+        )
 
 
 @dataclass(frozen=True)
@@ -323,6 +427,22 @@ class SpecialCommodityStorageManager:
             notes TEXT NOT NULL,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS commodity_publication_calendar (
+            series_id TEXT NOT NULL,
+            observation_date TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            frequency TEXT NOT NULL,
+            expected_observation INTEGER NOT NULL,
+            observed INTEGER NOT NULL,
+            status TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (series_id, observation_date, source_profile),
+            FOREIGN KEY (series_id) REFERENCES commodity_price_series(series_id)
         );
         """
 
@@ -552,6 +672,91 @@ class SpecialCommodityStorageManager:
                 )
         return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
 
+    def upsert_policy_events(
+        self,
+        events: Sequence[CommodityPolicyEvent],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(events)}
+        inserted = changed = unchanged = 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in events:
+                payload_hash = _hash_payload(
+                    {
+                        "value_low": item.value_low,
+                        "value_high": item.value_high,
+                        "value_mid": item.value_mid,
+                        "currency": item.currency,
+                        "unit": item.unit,
+                        "effective_end": item.effective_end,
+                        "metadata": item.metadata,
+                    }
+                )
+                existing = conn.execute(
+                    "SELECT metadata_json FROM commodity_policy_events WHERE event_id = ?",
+                    (item.event_id,),
+                ).fetchone()
+                if existing is None:
+                    inserted += 1
+                else:
+                    try:
+                        old_payload = json.loads(existing["metadata_json"] or "{}")
+                    except json.JSONDecodeError:
+                        old_payload = {}
+                    if old_payload.get("payload_hash") == payload_hash:
+                        unchanged += 1
+                    else:
+                        changed += 1
+                metadata = dict(item.metadata)
+                metadata["payload_hash"] = payload_hash
+                conn.execute(
+                    """
+                    INSERT INTO commodity_policy_events (
+                        event_id, commodity_id, policy_type, effective_start,
+                        effective_end, currency, unit, value_low, value_high,
+                        value_mid, source_profile, source_url, quality_flag,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(event_id) DO UPDATE SET
+                        commodity_id=excluded.commodity_id,
+                        policy_type=excluded.policy_type,
+                        effective_start=excluded.effective_start,
+                        effective_end=excluded.effective_end,
+                        currency=excluded.currency,
+                        unit=excluded.unit,
+                        value_low=excluded.value_low,
+                        value_high=excluded.value_high,
+                        value_mid=excluded.value_mid,
+                        source_profile=excluded.source_profile,
+                        source_url=excluded.source_url,
+                        quality_flag=excluded.quality_flag,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        item.event_id,
+                        item.commodity_id,
+                        item.policy_type,
+                        item.effective_start,
+                        item.effective_end,
+                        item.currency,
+                        item.unit,
+                        item.value_low,
+                        item.value_high,
+                        item.value_mid,
+                        item.source_profile,
+                        item.source_url,
+                        item.quality_flag,
+                        _json_dumps(metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+
     def read_dictionary(self) -> Dict[str, Any]:
         with self.get_connection() as conn:
             instruments = [_row_to_dict(row) for row in conn.execute("SELECT * FROM commodity_price_instruments ORDER BY commodity_id")]
@@ -581,6 +786,89 @@ class SpecialCommodityStorageManager:
                     params,
                 )
             ]
+
+    def latest_observations(self) -> List[Dict[str, Any]]:
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT o.*
+                FROM commodity_price_observations o
+                JOIN (
+                    SELECT series_id, MAX(observation_date) AS latest_date
+                    FROM commodity_price_observations
+                    GROUP BY series_id
+                ) latest
+                ON latest.series_id = o.series_id
+                AND latest.latest_date = o.observation_date
+                ORDER BY o.series_id
+                """
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
+
+    def read_policy_events(
+        self,
+        *,
+        commodity_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if commodity_id:
+            clauses.append("commodity_id = ?")
+            params.append(commodity_id)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM commodity_policy_events
+                {where}
+                ORDER BY effective_start, commodity_id, policy_type
+                """,
+                params,
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
+
+    def upsert_publication_calendar(
+        self,
+        rows: Sequence[Mapping[str, Any]],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"written": 0, "would_write": len(rows)}
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for row in rows:
+                conn.execute(
+                    """
+                    INSERT INTO commodity_publication_calendar (
+                        series_id, observation_date, source_profile, frequency,
+                        expected_observation, observed, status, quality_flag,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(series_id, observation_date, source_profile) DO UPDATE SET
+                        frequency=excluded.frequency,
+                        expected_observation=excluded.expected_observation,
+                        observed=excluded.observed,
+                        status=excluded.status,
+                        quality_flag=excluded.quality_flag,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        row["series_id"],
+                        row["observation_date"],
+                        row["source_profile"],
+                        row["frequency"],
+                        1 if row.get("expected_observation") else 0,
+                        1 if row.get("observed") else 0,
+                        row["status"],
+                        row.get("quality_flag") or "calendar_governed",
+                        _json_dumps(dict(row.get("metadata") or {})),
+                        now,
+                        now,
+                    ),
+                )
+        return {"written": len(rows), "would_write": 0}
 
 
 def _special_cfg(research_config: ResearchConfig) -> Dict[str, Any]:
@@ -774,30 +1062,16 @@ class FredCommodityProvider:
                 obs_date = str(row.get("date") or "")
                 if not obs_date:
                     continue
-                raw_hash = _hash_payload(
-                    {
-                        "series_id": item.series_id,
-                        "source_symbol": item.source_symbol,
-                        "date": obs_date,
-                        "value": value_raw,
-                    }
-                )
                 observations.append(
-                    CommodityObservation(
-                        series_id=item.series_id,
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
                         observation_date=obs_date,
                         value=value,
-                        currency=item.currency,
-                        unit=item.unit,
-                        raw_value=value,
-                        raw_currency=item.currency,
-                        raw_unit=item.unit,
-                        source_profile=self.source_profile,
-                        source_url=response.url,
-                        quality_flag=str(self.source_cfg.get("quality_flag") or "official_public_api"),
+                        source_url=_redact_url(response.url),
                         source_symbol=item.source_symbol,
-                        parser_version=self.parser_version,
-                        raw_payload_hash=raw_hash,
+                        raw_payload=row,
                         metadata={"realtime_start": row.get("realtime_start"), "realtime_end": row.get("realtime_end")},
                     )
                 )
@@ -806,6 +1080,478 @@ class FredCommodityProvider:
             warnings=warnings,
             metadata={"provider": "FRED", "series_requested": len(series), "rows": len(observations)},
         )
+
+
+class EiaCommodityProvider:
+    """EIA Open Data adapter for energy commodity series."""
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        api_key_env = str(self.source_cfg.get("api_key_env") or "EIA_API_KEY")
+        api_key = os.environ.get(api_key_env)
+        if not api_key:
+            return CommodityProviderResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": api_key_env, "source_profile": self.source_profile}]
+            )
+        endpoint_template = str(self.source_cfg.get("endpoint_url") or "")
+        if "{source_symbol}" not in endpoint_template:
+            return CommodityProviderResult(
+                blockers=[{"reason": "invalid_endpoint_template", "source_profile": self.source_profile}]
+            )
+        timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        headers = {
+            "User-Agent": str(self.source_cfg.get("user_agent") or "QuoteSystem/SpecialCommodityMarketData"),
+            "Accept": "application/json,text/plain,*/*",
+        }
+        tls_config = tls_config_from_source_config(self.source_profile, self.source_cfg)
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        for item in series:
+            endpoint = endpoint_template.replace("{source_symbol}", item.source_symbol)
+            params: Dict[str, Any] = {"api_key": api_key}
+            if start_date:
+                params["start"] = start_date
+            if end_date:
+                params["end"] = end_date
+            try:
+                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
+                response.raise_for_status()
+                payload = response.json()
+            except Exception as exc:
+                warnings.append({"reason": "provider_request_failed", "series_id": item.series_id, "error": str(exc)})
+                continue
+            rows = []
+            if isinstance(payload.get("response"), dict):
+                rows = payload["response"].get("data") or []
+            if not rows and isinstance(payload.get("series"), list):
+                for series_payload in payload["series"]:
+                    rows.extend(series_payload.get("data") or [])
+            for row in rows:
+                if isinstance(row, Mapping):
+                    obs_date = str(row.get("period") or row.get("date") or "")
+                    value_raw = row.get("value")
+                elif isinstance(row, (list, tuple)):
+                    obs_date = str(row[0] if row else "")
+                    value_raw = row[1] if len(row) > 1 else None
+                else:
+                    continue
+                if value_raw is None and isinstance(row, (list, tuple)) and len(row) > 1:
+                    value_raw = row[1]
+                if value_raw in {None, "", "."} or not obs_date:
+                    continue
+                try:
+                    value = float(value_raw)
+                except (TypeError, ValueError):
+                    warnings.append({"reason": "invalid_numeric_value", "series_id": item.series_id, "date": obs_date, "value": value_raw})
+                    continue
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=obs_date[:10],
+                        value=value,
+                        source_url=_redact_url(response.url),
+                        source_symbol=item.source_symbol,
+                        raw_payload=row if isinstance(row, Mapping) else {"row": list(row)},
+                    )
+                )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            metadata={"provider": "EIA", "series_requested": len(series), "rows": len(observations)},
+        )
+
+
+class WorldBankCommodityProvider:
+    """World Bank public JSON adapter for monthly commodity benchmark indicators."""
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        endpoint_template = str(self.source_cfg.get("endpoint_url") or "")
+        if "{source_symbol}" not in endpoint_template:
+            return CommodityProviderResult(
+                blockers=[{"reason": "invalid_endpoint_template", "source_profile": self.source_profile}]
+            )
+        timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        headers = {
+            "User-Agent": str(self.source_cfg.get("user_agent") or "QuoteSystem/SpecialCommodityMarketData"),
+            "Accept": "application/json,text/plain,*/*",
+        }
+        tls_config = tls_config_from_source_config(self.source_profile, self.source_cfg)
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        year_range = None
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start and end:
+            year_range = f"{start.year}:{end.year}"
+        for item in series:
+            endpoint = endpoint_template.replace("{source_symbol}", item.source_symbol)
+            params: Dict[str, Any] = {"format": "json", "per_page": 20000}
+            if year_range:
+                params["date"] = year_range
+            try:
+                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
+                response.raise_for_status()
+                payload = response.json()
+            except Exception as exc:
+                warnings.append({"reason": "provider_request_failed", "series_id": item.series_id, "error": str(exc)})
+                continue
+            rows = payload[1] if isinstance(payload, list) and len(payload) > 1 and isinstance(payload[1], list) else []
+            for row in rows:
+                obs_date = str(row.get("date") or "")
+                value_raw = row.get("value")
+                if value_raw in {None, "", "."} or not obs_date:
+                    continue
+                try:
+                    value = float(value_raw)
+                except (TypeError, ValueError):
+                    warnings.append({"reason": "invalid_numeric_value", "series_id": item.series_id, "date": obs_date, "value": value_raw})
+                    continue
+                # World Bank annual/monthly APIs may return period strings. Keep the
+                # configured observation date as source-provided when precise dates are absent.
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=obs_date,
+                        value=value,
+                        source_url=_redact_url(response.url),
+                        source_symbol=item.source_symbol,
+                        raw_payload=row,
+                    )
+                )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            metadata={"provider": "WORLD_BANK", "series_requested": len(series), "rows": len(observations)},
+        )
+
+
+class AkshareCommoditySpotProvider:
+    """Gateable adapter for 100ppi public-web commodity spot data.
+
+    This provider intentionally requires explicit per-series mapping metadata before
+    it fetches data. It prevents ambiguous public-web rows from being silently
+    treated as official or comparable inputs.
+    """
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        blockers: List[Dict[str, Any]] = []
+        warnings: List[Dict[str, Any]] = []
+        observations: List[CommodityObservation] = []
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        for item in series:
+            function_name = str(item.metadata.get("akshare_function") or "").strip()
+            direct_url = str(item.metadata.get("direct_url") or "").strip()
+            if not function_name and not direct_url:
+                blockers.append(
+                    {
+                        "reason": "missing_100ppi_series_mapping",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "required_metadata": ["akshare_function or direct_url", "raw_unit", "region_or_spec"],
+                    }
+                )
+                continue
+            if not function_name:
+                blockers.append(
+                    {
+                        "reason": "direct_100ppi_parser_not_configured",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "direct_url": _redact_url(direct_url),
+                    }
+                )
+                continue
+            try:
+                akshare = importlib.import_module("akshare")
+            except Exception as exc:
+                blockers.append(
+                    {
+                        "reason": "akshare_unavailable",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "error": str(exc),
+                    }
+                )
+                continue
+            func = getattr(akshare, function_name, None)
+            if func is None:
+                blockers.append(
+                    {
+                        "reason": "akshare_function_not_found",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "akshare_function": function_name,
+                    }
+                )
+                continue
+            try:
+                payload = func(**dict(item.metadata.get("akshare_kwargs") or {}))
+            except Exception as exc:
+                warnings.append(
+                    {
+                        "reason": "provider_request_failed",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "akshare_function": function_name,
+                        "error": str(exc),
+                    }
+                )
+                continue
+            if hasattr(payload, "to_dict"):
+                rows = payload.to_dict("records")
+            elif isinstance(payload, list):
+                rows = payload
+            else:
+                rows = []
+            date_column = str(item.metadata.get("date_column") or item.metadata.get("observation_date_column") or "date")
+            value_column = str(item.metadata.get("value_column") or "value")
+            raw_unit = str(item.metadata.get("raw_unit") or item.unit)
+            source_url = direct_url or str(item.metadata.get("source_url") or f"akshare://{function_name}")
+            for row in rows:
+                if not isinstance(row, Mapping):
+                    continue
+                obs_text = str(row.get(date_column) or "")[:10]
+                value_raw = row.get(value_column)
+                if not obs_text or value_raw in {None, "", "."}:
+                    continue
+                obs_date = _parse_date(obs_text)
+                if obs_date is None:
+                    warnings.append({"reason": "invalid_observation_date", "series_id": item.series_id, "date": obs_text})
+                    continue
+                if start and obs_date < start:
+                    continue
+                if end and obs_date > end:
+                    continue
+                try:
+                    value = float(value_raw)
+                except (TypeError, ValueError):
+                    warnings.append(
+                        {
+                            "reason": "invalid_numeric_value",
+                            "series_id": item.series_id,
+                            "date": obs_text,
+                            "value": value_raw,
+                        }
+                    )
+                    continue
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=obs_date.isoformat(),
+                        value=value,
+                        source_url=source_url,
+                        source_symbol=item.source_symbol,
+                        raw_payload=row,
+                        metadata={
+                            "akshare_function": function_name,
+                            "source_label": "100ppi_public_web",
+                            "raw_unit": raw_unit,
+                            "region_or_spec": item.metadata.get("region_or_spec"),
+                        },
+                    )
+                )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "100PPI",
+                "series_requested": len(series),
+                "rows": len(observations),
+                "source_label": "100ppi_public_web",
+            },
+        )
+
+
+class ManualPolicyEventProvider:
+    """Provider for reviewed policy or long-term-contract event rows."""
+
+    def __init__(self, module_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+
+    def fetch(self) -> List[CommodityPolicyEvent]:
+        events: List[CommodityPolicyEvent] = []
+        for item in self.module_cfg.get("policy_events", []):
+            if not isinstance(item, Mapping):
+                continue
+            events.append(CommodityPolicyEvent.from_dict(item))
+        return events
+
+
+class SpecialCommodityPolicyEventService:
+    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
+        self.storage = storage
+        self.module_cfg = dict(module_cfg or {})
+
+    def sync(self, *, dry_run: bool = False) -> Dict[str, Any]:
+        if not _coerce_bool(self.module_cfg.get("enabled"), False):
+            return {"status": "disabled", "reason": "special_commodity_market_data_disabled"}
+        SpecialCommodityMasterDataService(self.storage, self.module_cfg).sync()
+        events = ManualPolicyEventProvider(self.module_cfg).fetch()
+        counts = self.storage.upsert_policy_events(events, dry_run=dry_run)
+        return {
+            "status": "success",
+            "dry_run": dry_run,
+            "policy_events": len(events),
+            **counts,
+        }
+
+
+class SpecialCommodityCalendarGovernanceService:
+    """Govern observation dates by source frequency without futures trading calendars."""
+
+    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
+        self.storage = storage
+        self.module_cfg = dict(module_cfg or {})
+
+    @staticmethod
+    def _daily_dates(start: date, end: date) -> List[str]:
+        current = start
+        values: List[str] = []
+        while current <= end:
+            if current.weekday() < 5:
+                values.append(current.isoformat())
+            current += timedelta(days=1)
+        return values
+
+    @staticmethod
+    def _monthly_dates(start: date, end: date) -> List[str]:
+        current = date(start.year, start.month, 1)
+        values: List[str] = []
+        while current <= end:
+            values.append(current.isoformat())
+            if current.month == 12:
+                current = date(current.year + 1, 1, 1)
+            else:
+                current = date(current.year, current.month + 1, 1)
+        return values
+
+    def run(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        series_ids: Optional[Sequence[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        if not start_date or not end_date:
+            raise ValueError("special commodity calendar governance requires start_date and end_date")
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start is None or end is None or start > end:
+            raise ValueError("invalid special commodity calendar date range")
+        SpecialCommodityMasterDataService(self.storage, self.module_cfg).sync()
+        selector = CommodityUniverseSelector(self.module_cfg)
+        target_series = selector.resolve(scope_id=scope_id, series_ids=series_ids)
+        observed_by_series = {
+            item.series_id: {row["observation_date"] for row in self.storage.read_observations(series_id=item.series_id)}
+            for item in target_series
+        }
+        rows: List[Dict[str, Any]] = []
+        for item in target_series:
+            if item.frequency == "monthly":
+                expected_dates = self._monthly_dates(start, end)
+            elif item.frequency == "daily":
+                expected_dates = self._daily_dates(start, end)
+            else:
+                expected_dates = []
+            observed_dates = observed_by_series.get(item.series_id, set())
+            for observation_date in expected_dates:
+                observed = observation_date in observed_dates
+                rows.append(
+                    {
+                        "series_id": item.series_id,
+                        "observation_date": observation_date,
+                        "source_profile": item.source_profile,
+                        "frequency": item.frequency,
+                        "expected_observation": True,
+                        "observed": observed,
+                        "status": "observed" if observed else "missing_observation",
+                        "quality_flag": "source_calendar_governed",
+                        "metadata": {"venue": item.venue, "source_symbol": item.source_symbol},
+                    }
+                )
+        counts = self.storage.upsert_publication_calendar(rows, dry_run=dry_run)
+        missing = sum(1 for row in rows if row["status"] == "missing_observation")
+        return {
+            "status": "success",
+            "dry_run": dry_run,
+            "start_date": start_date,
+            "end_date": end_date,
+            "target_series": len(target_series),
+            "calendar_rows": len(rows),
+            "missing_observations": missing,
+            **counts,
+        }
+
+
+class LmeOfficialReportProvider:
+    """Gated LME official report provider placeholder."""
+
+    def __init__(self, module_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+
+    def feasibility_probe(self) -> Dict[str, Any]:
+        venue_cfg = (self.module_cfg.get("venues") or {}).get("LME") or {}
+        verified = _coerce_bool(venue_cfg.get("feasibility_verified"), False)
+        enabled = _coerce_bool(venue_cfg.get("enabled"), False)
+        if not enabled or not verified:
+            return {
+                "status": "blocked",
+                "reason": "lme_official_source_not_verified",
+                "enabled": enabled,
+                "feasibility_verified": verified,
+                "registration_url": venue_cfg.get("registration_url"),
+                "required_checks": [
+                    "login_access",
+                    "report_download_permission",
+                    "historical_depth",
+                    "automation_stability",
+                    "licence_boundary",
+                ],
+            }
+        return {
+            "status": "ready",
+            "enabled": enabled,
+            "feasibility_verified": verified,
+        }
 
 
 class SpecialCommodityPriceSyncService:
@@ -821,6 +1567,12 @@ class SpecialCommodityPriceSyncService:
         venue = str(cfg.get("venue") or "").upper()
         if venue == "FRED":
             return FredCommodityProvider(source_profile, cfg)
+        if venue == "EIA":
+            return EiaCommodityProvider(source_profile, cfg)
+        if venue == "WORLD_BANK":
+            return WorldBankCommodityProvider(source_profile, cfg)
+        if venue == "100PPI":
+            return AkshareCommoditySpotProvider(source_profile, cfg)
         return None
 
     def sync(
@@ -914,6 +1666,18 @@ class SpecialCommodityReadService:
     def dictionary(self) -> Dict[str, Any]:
         return self.storage.read_dictionary()
 
+    def series(self, *, active_only: bool = True) -> Dict[str, Any]:
+        rows = self.storage.read_dictionary().get("series", [])
+        if active_only:
+            rows = [item for item in rows if item.get("active")]
+        return {
+            "status": "success",
+            "active_only": active_only,
+            "series": rows,
+            "count": len(rows),
+            "source_policy": "local_commodity_db_only",
+        }
+
     def observations(
         self,
         *,
@@ -930,4 +1694,36 @@ class SpecialCommodityReadService:
                 start_date=start_date,
                 end_date=end_date,
             ),
+        }
+
+    def diagnostics(self) -> Dict[str, Any]:
+        dictionary = self.storage.read_dictionary()
+        latest = self.storage.latest_observations()
+        latest_by_series = {item["series_id"]: item for item in latest}
+        series_rows = dictionary.get("series", [])
+        stale_or_missing = [
+            item["series_id"]
+            for item in series_rows
+            if item.get("active") and item["series_id"] not in latest_by_series
+        ]
+        currencies = sorted({row.get("currency") for row in latest if row.get("currency")})
+        units = sorted({row.get("unit") for row in latest if row.get("unit")})
+        return {
+            "status": "success",
+            "series_count": len(series_rows),
+            "latest_observations": latest,
+            "stale_or_missing_series": stale_or_missing,
+            "currencies": currencies,
+            "units": units,
+            "source_policy": "local_commodity_db_only",
+        }
+
+    def policy_events(self, *, commodity_id: Optional[str] = None) -> Dict[str, Any]:
+        events = self.storage.read_policy_events(commodity_id=commodity_id)
+        return {
+            "status": "success",
+            "commodity_id": commodity_id,
+            "events": events,
+            "count": len(events),
+            "source_policy": "local_commodity_db_only",
         }

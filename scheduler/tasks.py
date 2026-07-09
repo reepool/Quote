@@ -1627,6 +1627,77 @@ def _format_fx_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
+    """Return a compact operator report for special commodity data tasks."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status(status)
+    warnings = result.get("warnings") or []
+    blockers = result.get("blockers") or []
+    per_source = result.get("per_source") or {}
+    detailed = status not in {"success", "skipped", "disabled"} or bool(warnings or blockers)
+
+    lines = [
+        f"{icon} *特殊商品数据维护*",
+        "",
+        f"状态: `{status}` ({label})",
+    ]
+    if result.get("run_id") is not None:
+        lines.append(f"run_id: `{result.get('run_id')}`")
+    if result.get("dry_run") is not None:
+        lines.append(f"dry_run: `{bool(result.get('dry_run'))}`")
+    if result.get("start_date") or result.get("end_date"):
+        lines.append(f"range: `{result.get('start_date') or 'N/A'}` 至 `{result.get('end_date') or 'N/A'}`")
+    if result.get("target_series") is not None:
+        lines.append(f"序列数: `{result.get('target_series')}`")
+
+    if "fetched_rows" in result:
+        lines.append(
+            "观测值: "
+            f"获取 `{result.get('fetched_rows', 0)}`｜"
+            f"新增 `{result.get('inserted', 0)}`｜"
+            f"更新 `{result.get('changed', 0)}`｜"
+            f"不变 `{result.get('unchanged', 0)}`｜"
+            f"dry_run预计 `{result.get('would_write', 0)}`"
+        )
+    elif "calendar_rows" in result:
+        lines.append(
+            "发布日历: "
+            f"行数 `{result.get('calendar_rows', 0)}`｜"
+            f"缺失观测 `{result.get('missing_observations', 0)}`｜"
+            f"写入 `{result.get('written', 0)}`｜"
+            f"dry_run预计 `{result.get('would_write', 0)}`"
+        )
+    elif "policy_events" in result:
+        lines.append(
+            "政策事件: "
+            f"事件 `{result.get('policy_events', 0)}`｜"
+            f"新增 `{result.get('inserted', 0)}`｜"
+            f"更新 `{result.get('changed', 0)}`｜"
+            f"不变 `{result.get('unchanged', 0)}`"
+        )
+    elif result.get("reason"):
+        lines.append(f"原因: `{result.get('reason')}`")
+
+    if per_source:
+        source_lines = []
+        for source_profile, item in sorted(per_source.items()):
+            if isinstance(item, dict):
+                source_lines.append(
+                    f"{source_profile}: series={item.get('series', 0)}, "
+                    f"fetched={item.get('fetched', 0)}, warnings={item.get('warnings', 0)}, "
+                    f"blockers={item.get('blockers', 0)}"
+                )
+            else:
+                source_lines.append(f"{source_profile}: {item}")
+        lines.extend(["", "来源:", "```text", "\n".join(source_lines[:12]), "```"])
+
+    if detailed and blockers:
+        lines.extend(["", "阻断:", "```text", "\n".join(str(item) for item in blockers[:12]), "```"])
+    if detailed and warnings:
+        lines.extend(["", "告警:", "```text", "\n".join(str(item) for item in warnings[:12]), "```"])
+    return "\n".join(lines)
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -3943,6 +4014,238 @@ class ScheduledTasks:
             dry_run=dry_run,
             job_config=job_config,
         )
+
+    async def special_commodity_price_sync(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品价格/指数观测值同步任务。"""
+        self._active_tasks.add('special_commodity_price_sync')
+        try:
+            result = await data_manager.run_special_commodity_price_sync(
+                scope_id=scope_id,
+                scope_ids=scope_ids,
+                venues=venues,
+                categories=categories,
+                commodity_ids=commodity_ids,
+                series_ids=series_ids,
+                frequencies=frequencies,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品数据维护报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int(result.get("target_series", 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_price_sync', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品数据维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Special commodity price sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品数据维护报告',
+                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_price_sync', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品数据维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('special_commodity_price_sync')
+
+    async def special_commodity_price_backfill(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品历史回补任务，要求显式日期范围。"""
+        if not start_date or not end_date:
+            raise ValueError("special_commodity_price_backfill requires start_date and end_date")
+        return await self.special_commodity_price_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            venues=venues,
+            categories=categories,
+            commodity_ids=commodity_ids,
+            series_ids=series_ids,
+            frequencies=frequencies,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+            job_config=job_config,
+        )
+
+    async def special_commodity_calendar_governance(
+        self,
+        scope_id: Optional[str] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品观测/发布日历治理任务。"""
+        self._active_tasks.add('special_commodity_calendar_governance')
+        try:
+            result = await data_manager.run_special_commodity_calendar_governance(
+                scope_id=scope_id,
+                series_ids=series_ids,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品发布日历治理报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int(result.get("target_series", 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_calendar_governance', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品发布日历治理',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Special commodity calendar governance failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品发布日历治理报告',
+                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_calendar_governance', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品发布日历治理',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('special_commodity_calendar_governance')
+
+    async def special_commodity_policy_event_sync(
+        self,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品政策/长协事件导入任务。"""
+        self._active_tasks.add('special_commodity_policy_event_sync')
+        try:
+            result = await data_manager.run_special_commodity_policy_event_sync(dry_run=dry_run)
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品政策事件维护报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "error"),
+                    'tasks_completed': int(result.get("policy_events", 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_policy_event_sync', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品政策事件维护',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Special commodity policy event sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品政策事件维护报告',
+                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_policy_event_sync', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品政策事件维护',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('special_commodity_policy_event_sync')
+
+    async def special_commodity_lme_feasibility_probe(
+        self,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """LME 官方报表自动化可行性检查。"""
+        self._active_tasks.add('special_commodity_lme_feasibility_probe')
+        try:
+            result = await data_manager.run_special_commodity_lme_feasibility_probe()
+            success = result.get("status") == "ready"
+            await self._send_task_report(
+                report_data={
+                    'name': 'LME 官方源可行性检查报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': 'success' if success else result.get("status", "blocked"),
+                    'tasks_completed': 1 if success else 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_lme_feasibility_probe', 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='LME 官方源可行性检查',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] Special commodity LME feasibility probe failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': 'LME 官方源可行性检查报告',
+                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': 'special_commodity_lme_feasibility_probe', 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='LME 官方源可行性检查',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard('special_commodity_lme_feasibility_probe')
 
     async def fx_derivation_sync(
         self,

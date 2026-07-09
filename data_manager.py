@@ -4756,12 +4756,64 @@ class DataManager:
             dry_run=dry_run,
         )
 
+    async def run_special_commodity_calendar_governance(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        series_ids: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Govern special commodity observation/publication dates."""
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommodityCalendarGovernanceService
+
+        return await asyncio.to_thread(
+            SpecialCommodityCalendarGovernanceService(storage, module_cfg).run,
+            scope_id=scope_id,
+            series_ids=series_ids,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def run_special_commodity_lme_feasibility_probe(self) -> Dict[str, Any]:
+        """Return LME official-source feasibility status without downloading data."""
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import LmeOfficialReportProvider
+
+        return await asyncio.to_thread(
+            LmeOfficialReportProvider(module_cfg).feasibility_probe
+        )
+
     async def get_special_commodity_dictionary(self) -> Dict[str, Any]:
         """Read special commodity instruments and series dictionaries."""
         storage = self._require_special_commodity_storage()
         from research.special_commodity_market_data import SpecialCommodityReadService
 
         return await asyncio.to_thread(SpecialCommodityReadService(storage).dictionary)
+
+    async def get_special_commodity_series(
+        self,
+        *,
+        active_only: bool = True,
+    ) -> Dict[str, Any]:
+        """Read special commodity series metadata."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        return await asyncio.to_thread(
+            SpecialCommodityReadService(storage).series,
+            active_only=active_only,
+        )
 
     async def get_special_commodity_observations(
         self,
@@ -4779,6 +4831,96 @@ class DataManager:
             series_id=series_id,
             start_date=start_date,
             end_date=end_date,
+        )
+
+    async def get_special_commodity_diagnostics(
+        self,
+        *,
+        target_currency: Optional[str] = None,
+        max_fx_lag_days: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Read local special commodity diagnostics and optional local FX readiness."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        diagnostics = await asyncio.to_thread(SpecialCommodityReadService(storage).diagnostics)
+        if not target_currency:
+            return diagnostics
+
+        target = target_currency.upper()
+        fx_checks: List[Dict[str, Any]] = []
+        for row in diagnostics.get("latest_observations", []):
+            currency = str(row.get("currency") or "").upper()
+            if not currency or currency == target:
+                continue
+            try:
+                fx_storage = self._require_fx_storage()
+                module_cfg = self.research_config.modules.get("fx_market_data", {})
+                from research.fx_market_data import FxReadService
+
+                converted = await asyncio.to_thread(
+                    FxReadService(fx_storage, module_cfg).convert,
+                    from_currency=currency,
+                    to_currency=target,
+                    amount=float(row.get("value") or 1.0),
+                    observation_date=str(row.get("observation_date") or ""),
+                    max_lag_days=max_fx_lag_days,
+                )
+            except Exception as exc:
+                converted = {
+                    "success": False,
+                    "status": "blocked",
+                    "reason": "fx_conversion_check_failed",
+                    "blockers": [str(exc)],
+                }
+            fx_checks.append(
+                {
+                    "series_id": row.get("series_id"),
+                    "observation_date": row.get("observation_date"),
+                    "from_currency": currency,
+                    "to_currency": target,
+                    "fx_conversion": converted,
+                }
+            )
+        diagnostics["target_currency"] = target
+        diagnostics["fx_checks"] = fx_checks
+        diagnostics["fx_dependency_gaps"] = [
+            item
+            for item in fx_checks
+            if not (item.get("fx_conversion") or {}).get("success")
+        ]
+        return diagnostics
+
+    async def get_special_commodity_policy_events(
+        self,
+        *,
+        commodity_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Read reviewed commodity policy/long-term-contract events."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        return await asyncio.to_thread(
+            SpecialCommodityReadService(storage).policy_events,
+            commodity_id=commodity_id,
+        )
+
+    async def run_special_commodity_policy_event_sync(
+        self,
+        *,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Import reviewed special commodity policy/contract events."""
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommodityPolicyEventService
+
+        return await asyncio.to_thread(
+            SpecialCommodityPolicyEventService(storage, module_cfg).sync,
+            dry_run=dry_run,
         )
 
     async def run_fx_derivation_sync(
@@ -6724,6 +6866,13 @@ class DataManager:
             )
             overrides["futures_cycle_context"] = futures_cycle_context
 
+        special_commodity_context = await self._get_dcf_special_commodity_context(
+            valuation_date=overrides.get("valuation_date"),
+            target_currency="CNY",
+        )
+        if special_commodity_context:
+            overrides["special_commodity_market_data_context"] = special_commodity_context
+
         fx_context = await self._get_dcf_fx_context(
             valuation_date=overrides.get("valuation_date"),
             research_mode=research_mode,
@@ -6766,6 +6915,17 @@ class DataManager:
             cyclical_diagnostics = result.setdefault("cyclical_model_diagnostics", {})
             if isinstance(cyclical_diagnostics, dict):
                 cyclical_diagnostics["futures_market_data"] = futures_cycle_context
+        if special_commodity_context:
+            result = deepcopy(result)
+            cyclical_diagnostics = result.setdefault("cyclical_model_diagnostics", {})
+            if isinstance(cyclical_diagnostics, dict):
+                cyclical_diagnostics["special_commodity_market_data"] = special_commodity_context
+            if special_commodity_context.get("blockers"):
+                result.setdefault("warnings", [])
+                for blocker in special_commodity_context.get("blockers") or []:
+                    warning = f"special_commodity_market_data_{blocker}"
+                    if warning not in result["warnings"]:
+                        result["warnings"].append(warning)
         if fx_context:
             result = deepcopy(result)
             result["fx_market_data"] = fx_context
@@ -6777,6 +6937,52 @@ class DataManager:
                         result["warnings"].append(warning)
         self._store_dcf_run_cache(cache_key, result, module_cfg)
         return result
+
+    async def _get_dcf_special_commodity_context(
+        self,
+        *,
+        valuation_date: Optional[str],
+        target_currency: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Return local special-commodity diagnostics for DCF without remote fetches."""
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        special_cfg = (module_cfg or {}).get("special_commodity_market_data", {})
+        if not special_cfg or not special_cfg.get("enabled", False):
+            return None
+        try:
+            diagnostics = await self.get_special_commodity_diagnostics(
+                target_currency=target_currency,
+                max_fx_lag_days=None,
+            )
+        except Exception as exc:
+            return {
+                "status": "blocked",
+                "source_policy": "local_commodity_db_only",
+                "blockers": ["special_commodity_market_data_unavailable"],
+                "warnings": [str(exc)],
+                "valuation_date": str(valuation_date or get_shanghai_time().date().isoformat())[:10],
+            }
+        blockers: List[str] = []
+        warnings: List[str] = []
+        if diagnostics.get("stale_or_missing_series"):
+            warnings.append("special_commodity_series_missing_local_observation")
+        if diagnostics.get("fx_dependency_gaps"):
+            blockers.append("requires_fx_conversion")
+        return {
+            "status": "ready" if not blockers else "blocked",
+            "valuation_date": str(valuation_date or get_shanghai_time().date().isoformat())[:10],
+            "source_policy": "local_commodity_db_only",
+            "target_currency": target_currency,
+            "series_count": diagnostics.get("series_count", 0),
+            "latest_observations": diagnostics.get("latest_observations", []),
+            "stale_or_missing_series": diagnostics.get("stale_or_missing_series", []),
+            "currencies": diagnostics.get("currencies", []),
+            "units": diagnostics.get("units", []),
+            "fx_checks": diagnostics.get("fx_checks", []),
+            "fx_dependency_gaps": diagnostics.get("fx_dependency_gaps", []),
+            "blockers": blockers,
+            "warnings": warnings,
+        }
 
     async def _get_dcf_fx_context(
         self,

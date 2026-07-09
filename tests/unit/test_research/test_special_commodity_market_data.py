@@ -2,14 +2,22 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+import sys
+from types import SimpleNamespace
 
 from utils import config_manager
 from research.special_commodity_market_data import (
+    AkshareCommoditySpotProvider,
     CommodityUniverseSelector,
+    EiaCommodityProvider,
     FredCommodityProvider,
+    LmeOfficialReportProvider,
     SpecialCommodityMasterDataService,
+    SpecialCommodityCalendarGovernanceService,
+    SpecialCommodityPolicyEventService,
     SpecialCommodityPriceSyncService,
     SpecialCommodityStorageManager,
+    WorldBankCommodityProvider,
 )
 
 
@@ -33,7 +41,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
 
     assert result["status"] == "success"
     assert result["instruments"] == 4
-    assert result["series"] == 4
+    assert result["series"] >= 7
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -44,7 +52,9 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
+        "CMD.OIL.WTI.SPOT.EIA.DAILY",
         "CMD.METAL.COPPER.IMF.FRED.MONTHLY",
+        "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
     }
 
 
@@ -93,7 +103,7 @@ def test_fred_provider_parses_observations(monkeypatch):
     series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"])
 
     class _Response:
-        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO"
+        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO&api_key=unit-test-key"
 
         def raise_for_status(self):
             return None
@@ -125,6 +135,185 @@ def test_fred_provider_parses_observations(monkeypatch):
     assert obs.currency == "USD"
     assert obs.unit == "USD/barrel"
     assert obs.source_profile == "fred_official_api"
+    assert "unit-test-key" not in obs.source_url
+    assert "api_key=%2A%2A%2A" in obs.source_url or "api_key=***" in obs.source_url
+
+
+def test_eia_provider_parses_v2_observations(monkeypatch):
+    cfg = deepcopy(
+        config_manager.get_research_config().modules["commodity_market_data"][
+            "special_commodity_market_data"
+        ]
+    )
+    for item in cfg["series"]:
+        if item["series_id"] == "CMD.OIL.WTI.SPOT.EIA.DAILY":
+            item["active"] = True
+    source_cfg = cfg["source_profiles"]["eia_official_api"]
+    series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"])
+
+    class _Response:
+        url = "https://api.eia.gov/v2/seriesid/PET.RWTC.D?api_key=redacted"
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {
+                "response": {
+                    "data": [
+                        {"period": "2026-01-01", "value": "71.2"},
+                        {"period": "2026-01-02", "value": None},
+                    ]
+                }
+            }
+
+    monkeypatch.setenv("EIA_API_KEY", "unit-test-key")
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: _Response(),
+    )
+
+    result = EiaCommodityProvider("eia_official_api", source_cfg).fetch(
+        series,
+        start_date="2026-01-01",
+        end_date="2026-01-02",
+    )
+
+    assert len(result.observations) == 1
+    obs = result.observations[0]
+    assert obs.series_id == "CMD.OIL.WTI.SPOT.EIA.DAILY"
+    assert obs.value == 71.2
+    assert obs.source_profile == "eia_official_api"
+
+
+def test_world_bank_provider_parses_indicator_observations(monkeypatch):
+    cfg = deepcopy(
+        config_manager.get_research_config().modules["commodity_market_data"][
+            "special_commodity_market_data"
+        ]
+    )
+    for item in cfg["series"]:
+        if item["series_id"] == "CMD.METAL.COPPER.WORLDBANK.MONTHLY":
+            item["active"] = True
+    source_cfg = cfg["source_profiles"]["world_bank_public_dataset"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.WORLDBANK.MONTHLY"]
+    )
+
+    class _Response:
+        url = "https://api.worldbank.org/v2/country/WLD/indicator/PCOPPUSDM"
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return [
+                {"page": 1},
+                [
+                    {"date": "2026-01", "value": 8500.25},
+                    {"date": "2026-02", "value": None},
+                ],
+            ]
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: _Response(),
+    )
+
+    result = WorldBankCommodityProvider("world_bank_public_dataset", source_cfg).fetch(
+        series,
+        start_date="2026-01-01",
+        end_date="2026-02-28",
+    )
+
+    assert len(result.observations) == 1
+    obs = result.observations[0]
+    assert obs.series_id == "CMD.METAL.COPPER.WORLDBANK.MONTHLY"
+    assert obs.value == 8500.25
+    assert obs.unit == "USD/metric_ton"
+
+
+def test_100ppi_provider_requires_series_mapping():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["100ppi_public_web"]
+    series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"])
+
+    # Force a 100ppi provider call with an unmapped series to validate the gate.
+    result = AkshareCommoditySpotProvider("100ppi_public_web", source_cfg).fetch(
+        series,
+        start_date="2026-01-01",
+        end_date="2026-01-02",
+    )
+
+    assert result.observations == []
+    assert result.blockers[0]["reason"] == "missing_100ppi_series_mapping"
+
+
+def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
+    cfg = deepcopy(
+        config_manager.get_research_config().modules["commodity_market_data"][
+            "special_commodity_market_data"
+        ]
+    )
+    cfg["commodities"].append(
+        {
+            "commodity_id": "CN.CHEM.TEST.SPOT",
+            "symbol": "TEST",
+            "name": "Unit Test Chemical Spot",
+            "category": "chemical",
+            "commodity_type": "spot",
+            "default_currency": "CNY",
+            "default_unit": "CNY/ton",
+            "active": True,
+        }
+    )
+    cfg["series"].append(
+        {
+            "series_id": "CMD.CN.CHEM.TEST.100PPI.DAILY",
+            "commodity_id": "CN.CHEM.TEST.SPOT",
+            "venue": "100PPI",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "test",
+            "frequency": "daily",
+            "quote_type": "spot",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "active": True,
+            "metadata": {
+                "akshare_function": "unit_test_100ppi",
+                "date_column": "日期",
+                "value_column": "价格",
+                "raw_unit": "CNY/ton",
+                "region_or_spec": "unit-test",
+                "source_url": "https://www.100ppi.com/test?token=secret",
+            },
+        }
+    )
+    fake_akshare = SimpleNamespace(
+        unit_test_100ppi=lambda **kwargs: [
+            {"日期": "2026-01-01", "价格": "5500"},
+            {"日期": "2026-01-03", "价格": "5600"},
+        ]
+    )
+    monkeypatch.setitem(sys.modules, "akshare", fake_akshare)
+    source_cfg = cfg["source_profiles"]["100ppi_public_web"]
+    series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.CN.CHEM.TEST.100PPI.DAILY"])
+
+    result = AkshareCommoditySpotProvider("100ppi_public_web", source_cfg).fetch(
+        series,
+        start_date="2026-01-01",
+        end_date="2026-01-02",
+    )
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    obs = result.observations[0]
+    assert obs.value == 5500
+    assert obs.source_profile == "100ppi_public_web"
+    assert obs.quality_flag == "aggregated_public_web"
+    assert "secret" not in obs.source_url
 
 
 def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):
@@ -158,3 +347,180 @@ def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):
     assert result["fetched_rows"] == 1
     assert result["would_write"] == 1
     assert storage.read_observations(series_id="CMD.OIL.WTI.SPOT.FRED.DAILY") == []
+
+
+def test_special_commodity_storage_upsert_is_idempotent(monkeypatch, tmp_path):
+    cfg = _research_config(tmp_path)
+
+    class _Response:
+        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO&api_key=unit-test-key"
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"observations": [{"date": "2026-01-01", "value": "72.5"}]}
+
+    monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: _Response(),
+    )
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    service = SpecialCommodityPriceSyncService(storage, cfg)
+
+    first = service.sync(
+        series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
+        start_date="2026-01-01",
+        end_date="2026-01-01",
+        dry_run=False,
+    )
+    second = service.sync(
+        series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
+        start_date="2026-01-01",
+        end_date="2026-01-01",
+        dry_run=False,
+    )
+
+    assert first["inserted"] == 1
+    assert second["unchanged"] == 1
+    rows = storage.read_observations(series_id="CMD.OIL.WTI.SPOT.FRED.DAILY")
+    assert len(rows) == 1
+    assert "unit-test-key" not in rows[0]["source_url"]
+
+
+def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tmp_path):
+    cfg = _research_config(tmp_path)
+
+    class _Response:
+        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO"
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"observations": [{"date": "2026-01-01", "value": "72.5"}]}
+
+    monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: _Response(),
+    )
+
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
+        start_date="2026-01-01",
+        end_date="2026-01-01",
+        dry_run=False,
+    )
+
+    from research.special_commodity_market_data import SpecialCommodityReadService
+
+    diagnostics = SpecialCommodityReadService(storage).diagnostics()
+    assert diagnostics["currencies"] == ["USD"]
+    assert diagnostics["units"] == ["USD/barrel"]
+    assert diagnostics["latest_observations"][0]["series_id"] == "CMD.OIL.WTI.SPOT.FRED.DAILY"
+
+
+def test_manual_policy_event_sync_writes_policy_table(tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    special_cfg["policy_events"] = [
+        {
+            "event_id": "thermal-coal-policy-2026-01",
+            "commodity_id": "OIL.WTI.SPOT",
+            "policy_type": "long_term_contract_reference",
+            "effective_start": "2026-01-01",
+            "effective_end": "2026-12-31",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "value_mid": 700,
+            "source_profile": "manual_policy_event",
+            "source_url": "manual://unit-test",
+            "quality_flag": "manual_verified",
+        }
+    ]
+
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    result = SpecialCommodityPolicyEventService(storage, special_cfg).sync(dry_run=False)
+
+    assert result["status"] == "success"
+    assert result["policy_events"] == 1
+    assert result["inserted"] == 1
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            "SELECT commodity_id, policy_type, value_mid FROM commodity_policy_events WHERE event_id = ?",
+            ("thermal-coal-policy-2026-01",),
+        ).fetchone()
+    assert row["commodity_id"] == "OIL.WTI.SPOT"
+    assert row["policy_type"] == "long_term_contract_reference"
+    assert row["value_mid"] == 700
+
+    from research.special_commodity_market_data import SpecialCommodityReadService
+
+    events = SpecialCommodityReadService(storage).policy_events(commodity_id="OIL.WTI.SPOT")
+    assert events["count"] == 1
+    assert events["events"][0]["event_id"] == "thermal-coal-policy-2026-01"
+
+
+def test_calendar_governance_generates_weekday_observation_rows(tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+
+    result = SpecialCommodityCalendarGovernanceService(storage, special_cfg).run(
+        series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
+        start_date="2026-01-01",
+        end_date="2026-01-04",
+        dry_run=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["calendar_rows"] == 2
+    assert result["missing_observations"] == 2
+    assert result["would_write"] == 2
+
+
+def test_lme_feasibility_probe_blocks_until_verified():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+
+    result = LmeOfficialReportProvider(cfg).feasibility_probe()
+
+    assert result["status"] == "blocked"
+    assert result["reason"] == "lme_official_source_not_verified"
+    assert "licence_boundary" in result["required_checks"]
+
+
+def test_special_commodity_scheduler_report_compacts_normal_success():
+    from scheduler.tasks import _format_special_commodity_scheduler_report
+
+    report = _format_special_commodity_scheduler_report(
+        {
+            "status": "success",
+            "run_id": 1,
+            "dry_run": False,
+            "target_series": 2,
+            "fetched_rows": 2,
+            "inserted": 2,
+            "changed": 0,
+            "unchanged": 0,
+            "would_write": 0,
+            "per_source": {
+                "fred_official_api": {"series": 2, "fetched": 2, "warnings": 0, "blockers": 0}
+            },
+            "warnings": [],
+            "blockers": [],
+        }
+    )
+
+    assert "特殊商品数据维护" in report
+    assert "阻断:" not in report
+    assert "告警:" not in report
+    assert "fred_official_api" in report

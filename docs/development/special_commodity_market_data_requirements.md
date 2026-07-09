@@ -302,6 +302,12 @@ validate_observations(normalized_rows)
 | `LmeOfficialReportProvider` | LME 官方报表试点，完成登录/下载验证后启用 |
 | `ManualPolicyEventProvider` | 动力煤长协/政策事件表导入 |
 
+`AkshareCommoditySpotProvider` 必须采用配置驱动：只有当 `commodity_price_series.metadata`
+中明确配置 `akshare_function`、日期列、数值列、原始单位、地区/规格或来源 URL 时才允许抓取；
+否则任务必须以 `missing_100ppi_series_mapping` 阻塞该序列。通过 AkShare 获得的 100ppi/生意社
+数据仍应写入 `source_profile=100ppi_public_web`，质量标记为 `aggregated_public_web`，
+不得因为使用 AkShare 包装而标记为官方源。
+
 ### 6.2 调度任务
 
 新增任务建议：
@@ -313,6 +319,15 @@ validate_observations(normalized_rows)
 | `commodity_price_monthly_sync` | 每月 World Bank/FRED 更新后 | 同步 FRED/IMF、World Bank 月度价格 |
 | `commodity_policy_event_sync` | 手工触发为主 | 导入动力煤长协/政策事件 |
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
+
+当前工程落地的手工任务名使用 `special_commodity_*` 前缀，先保持 `manual_only=true`，
+等待 FRED/EIA/World Bank/100ppi 短窗口 dry-run 完成后再评估是否加入正式日更：
+
+- `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_policy_event_sync dry_run`
+- `/run special_commodity_lme_feasibility_probe`
 
 调度要求：
 

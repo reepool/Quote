@@ -3180,6 +3180,9 @@ class TaskManagerHandlers:
             'series_ids',
             'series_types',
             'source_profiles',
+            'venues',
+            'commodity_ids',
+            'frequencies',
         }
         aliases = {
             'end': 'end_date',
