@@ -2337,7 +2337,7 @@ class ResearchFxRatesResponse(BaseModel):
     series_id: str = Field(..., description="外汇序列ID")
     observations: List[Dict[str, Any]] = Field(
         default_factory=list,
-        description="观测值，包含 fx_date、value、source_profile、quality_flag 和 lineage",
+        description="观测值，包含 observation_date、value、source_profile、quality_flag 和 lineage",
     )
     count: int = Field(..., description="返回观测值数量")
     start_date: Optional[str] = Field(None, description="请求起始日期")

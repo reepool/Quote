@@ -730,7 +730,9 @@
                   ],
                   "parameters": {
                     "source_profiles": [
-                      "cfets_rmb_fixing"
+                      "cfets_rmb_fixing",
+                      "cnh_market_aggregated_public",
+                      "fred_trade_weighted_dollar"
                     ]
                   },
                   "timeout_seconds": 7200,
@@ -753,7 +755,9 @@
                   ],
                   "parameters": {
                     "source_profiles": [
-                      "cfets_rmb_fixing"
+                      "cfets_rmb_fixing",
+                      "cnh_market_aggregated_public",
+                      "fred_trade_weighted_dollar"
                     ]
                   },
                   "timeout_seconds": 7200,

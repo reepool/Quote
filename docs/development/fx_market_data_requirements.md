@@ -298,6 +298,7 @@ EUR/CNH = 1 EUR 兑换多少 CNH
 
 - `missing_or_stale`、无效报价单位等 error 级问题应返回 `blocked`。
 - 异常跳变、直接市场价与派生价差异、派生缺口等 warning 级问题应写入 `fx_quality_issues`，但不应阻断 readiness。
+- 直接市场价与派生交叉价差异应记录为 `cross_market_basis_monitoring`，不应混入 `source_conflict`；`source_conflict` 只用于同一 instrument 多数据源同口径观测冲突。
 - 时效性阈值默认使用 `quality.max_stale_observation_days`；FRED 等宏观/指数源可在 source profile 上配置 `max_stale_observation_days`，避免把官方发布延迟误判为汇率缺口。
 
 ### 8.1.1 在岸人民币优先落库顺序
@@ -339,7 +340,7 @@ FX.JPY_CNY.CFETS.MID.DAILY
 - `fx_rate_backfill` / `fx_rate_sync` 只写汇率观测值，不负责推断发布日规则；但调度任务必须先执行主数据治理和发布日治理前置依赖。
 - `fx_rate_backfill` / `fx_rate_sync` 写入成功后，应再执行发布日治理复核，把已写入观测的日期从 `missing_expected_observation` 更新为 `observed`。
 - 历史回补必须显式传入 `start_date` / `end_date`，避免无边界抓取。
-- 默认调度参数先使用 `rmb_onshore_fixing`，等 CNH 和美元指数链路单独验收后，再显式切换到 `rmb_core`。
+- 当前自动日更已切换为 `rmb_core_download`，覆盖在岸人民币中间价、离岸 CNH 直接市场序列和 FRED 美元贸易加权指数；历史回补任务仍为 `manual_only`，默认 scope 保持 `rmb_onshore_fixing`，但前置/后置日历治理覆盖第一阶段三类已验收源，显式回补 CNH 或 FRED 时不需要手工绕过调度依赖。
 - 长耗时任务必须在服务层记录关键阶段日志：任务开始、scope/series 解析、数据源请求开始/完成、解析行数、写入进度、写入统计、ingestion run 开始/结束和异常阻断原因。
 
 ### 8.1.2 离岸人民币 CNH 准备顺序
@@ -377,7 +378,7 @@ FX.JPY_CNH.MARKET.SPOT.DAILY -> JPYCNH
 /run fx_rate_backfill scope_id=rmb_offshore_spot start_date=YYYY-MM-DD end_date=YYYY-MM-DD dry_run=true
 ```
 
-dry-run 通过后再将同样参数改为 `dry_run=false`。当前调度静态前置依赖仍默认治理 `cfets_rmb_fixing`，这是为了保护已经验收的在岸人民币默认任务；CNH 首次落库阶段必须显式运行 `cnh_market_aggregated_public` 的日历治理。
+dry-run 通过后再将同样参数改为 `dry_run=false`。当前历史回补任务的调度前置/后置日历治理已覆盖 `cfets_rmb_fixing`、`cnh_market_aggregated_public` 和 `fred_trade_weighted_dollar`；CNH 首次大范围落库前仍建议单独执行 CNH 日历 dry-run，便于先审查该聚合源的发布日治理结果。
 
 ### 8.2 API
 
@@ -387,7 +388,7 @@ dry-run 通过后再将同样参数改为 `dry_run=false`。当前调度静态�
 GET /api/v1/research/fx/dictionary
 GET /api/v1/research/fx/series
 GET /api/v1/research/fx/rates?series_id=...&start_date=...&end_date=...
-GET /api/v1/research/fx/convert?from=USD&to=CNY&date=2026-06-26&amount=1
+GET /api/v1/research/fx/convert?from_currency=USD&to_currency=CNY&date=2026-06-26&amount=1
 GET /api/v1/research/fx/indices?index_id=FXI.DXY
 GET /api/v1/research/fx/index-observations?series_id=FXI.USD_TRADE_WEIGHTED.FRED.DAILY&start_date=...&end_date=...
 GET /api/v1/research/fx/readiness

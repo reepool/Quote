@@ -906,6 +906,39 @@ def test_fx_quality_checks_abnormal_jumps_source_conflicts_and_multiplier(tmp_pa
     assert quality["issue_counts"]["source_conflict"] == 1
 
 
+def test_fx_quality_separates_direct_derived_basis_from_source_conflict(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FX.EUR_CNH.DERIVED.DAILY",
+            observation_date="2026-06-26",
+            value=7.8,
+            base_currency="EUR",
+            quote_currency="CNH",
+            quote_multiplier=1,
+            source_profile="fx_derived_cross",
+            quality_flag="derived",
+        )
+    )
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FX.EUR_CNH.MARKET.SPOT.DAILY",
+            observation_date="2026-06-26",
+            value=7.95,
+            base_currency="EUR",
+            quote_currency="CNH",
+            quote_multiplier=1,
+            source_profile="cnh_market_aggregated_public",
+            quality_flag="aggregated_public",
+        )
+    )
+
+    quality = FxQualityService(storage, config.modules["fx_market_data"]).run(as_of_date="2026-06-26")
+
+    assert quality["issue_counts"]["source_conflict"] == 0
+    assert quality["issue_counts"]["cross_market_basis_monitoring"] == 1
+
+
 def test_fx_quality_warning_only_does_not_block(tmp_path):
     config, storage = _seed_storage(tmp_path)
     module_cfg = config.modules["fx_market_data"]

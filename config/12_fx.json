@@ -612,6 +612,7 @@
       "max_stale_observation_days": 5,
       "abnormal_jump_pct": 0.05,
       "source_conflict_tolerance_pct": 0.01,
+      "cross_market_basis_tolerance_pct": 0.01,
       "required_first_phase_series": [
         "FX.USD_CNY.CFETS.MID.DAILY",
         "FX.EUR_CNY.CFETS.MID.DAILY",

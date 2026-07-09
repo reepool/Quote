@@ -3512,6 +3512,7 @@ class FxQualityService:
             "missing_or_stale": 0,
             "abnormal_jump": 0,
             "source_conflict": 0,
+            "cross_market_basis_monitoring": 0,
             "invalid_quote_multiplier": 0,
             "derivation_gap": 0,
         }
@@ -3542,7 +3543,8 @@ class FxQualityService:
         for issue in self._check_source_conflicts():
             self.storage.record_quality_issue(**issue)
             issues += 1
-            issue_counts["source_conflict"] += 1
+            issue_type = str(issue.get("issue_type") or "source_conflict")
+            issue_counts[issue_type] = issue_counts.get(issue_type, 0) + 1
             severity_counts[str(issue.get("severity") or "warning")] = severity_counts.get(str(issue.get("severity") or "warning"), 0) + 1
         for issue in self._check_derivation_gaps(readiness["as_of_date"]):
             self.storage.record_quality_issue(**issue)
@@ -3612,6 +3614,7 @@ class FxQualityService:
     def _check_source_conflicts(self) -> List[Dict[str, Any]]:
         quality_cfg = self.module_cfg.get("quality") or {}
         tolerance = float(quality_cfg.get("source_conflict_tolerance_pct") or 0)
+        basis_tolerance = float(quality_cfg.get("cross_market_basis_tolerance_pct") or tolerance)
         if tolerance <= 0:
             return []
         rows = self.storage.get_observations()
@@ -3625,6 +3628,46 @@ class FxQualityService:
         for (instrument_id, obs_date), group in grouped.items():
             profiles = {row.get("source_profile") for row in group}
             if len(profiles) < 2:
+                continue
+            derived_rows = [
+                row for row in group
+                if str(row.get("quality_flag") or "") == "derived"
+                or str(row.get("source_profile") or "") == "fx_derived_cross"
+            ]
+            direct_rows = [row for row in group if row not in derived_rows]
+            if derived_rows and direct_rows and basis_tolerance > 0:
+                baseline = derived_rows[0]
+                baseline_value = float(baseline.get("value") or 0)
+                if baseline_value == 0:
+                    continue
+                conflicts = []
+                for row in direct_rows:
+                    diff_pct = abs(float(row.get("value") or 0) / baseline_value - 1.0)
+                    if diff_pct > basis_tolerance:
+                        conflicts.append({
+                            "series_id": row.get("series_id"),
+                            "source_profile": row.get("source_profile"),
+                            "value": row.get("value"),
+                            "diff_pct": diff_pct,
+                        })
+                if conflicts:
+                    issues.append({
+                        "series_id": str(baseline.get("series_id") or instrument_id),
+                        "observation_date": obs_date,
+                        "issue_type": "cross_market_basis_monitoring",
+                        "severity": "warning",
+                        "details": {
+                            "instrument_id": instrument_id,
+                            "baseline": {
+                                "series_id": baseline.get("series_id"),
+                                "source_profile": baseline.get("source_profile"),
+                                "value": baseline.get("value"),
+                            },
+                            "conflicts": conflicts,
+                            "tolerance": basis_tolerance,
+                            "monitoring_scope": "direct_market_vs_derived_cross",
+                        },
+                    })
                 continue
             official_rows = [
                 row for row in group
