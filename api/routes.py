@@ -1559,6 +1559,34 @@ async def get_research_fx_indices(
 
 
 @router.get(
+    "/research/fx/index-observations",
+    response_model=ResearchFxIndexObservationsResponse,
+    tags=["Research"],
+)
+async def get_research_fx_index_observations(
+    series_id: str = Query(..., description="FX currency-index series_id"),
+    start_date: Optional[str] = Query(None, description="开始日期 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="结束日期 YYYY-MM-DD"),
+    limit: Optional[int] = Query(None, description="最大返回行数", ge=1, le=10000),
+):
+    """读取本地外汇指数观测值。"""
+    try:
+        return await data_manager.get_research_fx_index_observations(
+            series_id=str(_query_default(series_id)),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+            limit=_query_default(limit),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research FX index observations: {str(e)}",
+        )
+
+
+@router.get(
     "/research/futures/readiness",
     response_model=Dict[str, Any],
     tags=["Research"],

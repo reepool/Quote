@@ -2384,6 +2384,27 @@ class ResearchFxIndicesResponse(BaseModel):
         extra = "allow"
 
 
+class ResearchFxIndexObservationsResponse(BaseModel):
+    """研究域外汇指数观测值响应模型。"""
+
+    enabled: bool = Field(..., description="外汇数据域是否启用")
+    index_id: Optional[str] = Field(None, description="外汇指数 instrument_id")
+    series_id: str = Field(..., description="外汇指数序列ID")
+    series: Optional[Dict[str, Any]] = Field(None, description="外汇指数序列元数据")
+    observations: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="指数观测值，包含 observation_date、value、source_profile、quality_flag 和 lineage",
+    )
+    count: int = Field(..., description="返回观测值数量")
+    start_date: Optional[str] = Field(None, description="请求起始日期")
+    end_date: Optional[str] = Field(None, description="请求结束日期")
+    limit: Optional[int] = Field(None, description="请求返回上限")
+    blockers: List[str] = Field(default_factory=list, description="阻断原因")
+
+    class Config:
+        extra = "allow"
+
+
 class ResearchFxReadinessResponse(BaseModel):
     """研究域外汇数据 readiness 响应模型。"""
 

@@ -389,8 +389,11 @@ GET /api/v1/research/fx/series
 GET /api/v1/research/fx/rates?series_id=...&start_date=...&end_date=...
 GET /api/v1/research/fx/convert?from=USD&to=CNY&date=2026-06-26&amount=1
 GET /api/v1/research/fx/indices?index_id=FXI.DXY
+GET /api/v1/research/fx/index-observations?series_id=FXI.USD_TRADE_WEIGHTED.FRED.DAILY&start_date=...&end_date=...
 GET /api/v1/research/fx/readiness
 ```
+
+`/indices` 只返回外汇指数主数据和序列元数据；实际指数时间序列通过 `/index-observations` 获取。`/rates` 仍可按 `series_id` 读取任意外汇观测值，但 API 消费方读取美元指数、贸易加权美元等 `currency_index` 序列时应优先使用 `/index-observations`，避免把指数值和可换算汇率混用。
 
 ---
 

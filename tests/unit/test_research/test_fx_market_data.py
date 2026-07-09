@@ -172,6 +172,38 @@ def test_fx_storage_initializes_and_seeds_master_data(tmp_path):
     assert any(item["source_profile"] == "cfets_rmb_fixing" for item in dictionary["source_profiles"])
 
 
+def test_fx_index_observations_read_series_time_series(tmp_path):
+    config, storage = _seed_storage(tmp_path)
+    storage.upsert_observation(
+        FxObservation(
+            series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+            observation_date="2026-07-02",
+            value=120.6902,
+            base_currency="USD",
+            quote_currency="",
+            quote_multiplier=1,
+            source_profile="fred_trade_weighted_dollar",
+            quality_flag="official",
+        )
+    )
+
+    service = FxReadService(storage, config.modules["fx_market_data"])
+    result = service.index_observations(
+        series_id="FXI.USD_TRADE_WEIGHTED.FRED.DAILY",
+        start_date="2026-07-01",
+        end_date="2026-07-08",
+    )
+    blocked = service.index_observations(series_id="FX.USD_CNY.CFETS.MID.DAILY")
+
+    assert result["status"] == "success"
+    assert result["index_id"] == "FXI.USD_TRADE_WEIGHTED"
+    assert result["count"] == 1
+    assert result["observations"][0]["observation_date"] == "2026-07-02"
+    assert result["observations"][0]["value"] == 120.6902
+    assert blocked["status"] == "blocked"
+    assert blocked["blockers"] == ["series_is_not_currency_index"]
+
+
 def test_fx_scope_resolution_defaults_and_fails_closed(tmp_path):
     config, storage = _seed_storage(tmp_path)
     selector = FxUniverseSelector(config.modules["fx_market_data"], storage)

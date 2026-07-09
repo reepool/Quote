@@ -3258,6 +3258,65 @@ class FxReadService:
             "source_policy": "local_fx_db_only",
         }
 
+    def index_observations(
+        self,
+        *,
+        series_id: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        series = self.storage.get_series(series_id)
+        normalized_series_id = series_id.upper()
+        if not series:
+            return {
+                "enabled": True,
+                "status": "missing",
+                "series_id": normalized_series_id,
+                "index_id": None,
+                "observations": [],
+                "count": 0,
+                "start_date": start_date,
+                "end_date": end_date,
+                "limit": limit,
+                "source_policy": "local_fx_db_only",
+                "blockers": ["unknown_fx_index_series"],
+            }
+        if series.get("instrument_type") != "currency_index":
+            return {
+                "enabled": True,
+                "status": "blocked",
+                "series_id": normalized_series_id,
+                "index_id": series.get("instrument_id"),
+                "observations": [],
+                "count": 0,
+                "start_date": start_date,
+                "end_date": end_date,
+                "limit": limit,
+                "source_policy": "local_fx_db_only",
+                "blockers": ["series_is_not_currency_index"],
+            }
+        rows = self.storage.get_observations(
+            series_id=normalized_series_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+        return {
+            "enabled": True,
+            "status": "success",
+            "index_id": series.get("instrument_id"),
+            "series_id": normalized_series_id,
+            "series": series,
+            "observations": rows,
+            "count": len(rows),
+            "start_date": start_date,
+            "end_date": end_date,
+            "limit": limit,
+            "source_policy": "local_fx_db_only",
+            "blockers": [],
+        }
+
     def convert(
         self,
         *,

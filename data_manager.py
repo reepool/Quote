@@ -4816,6 +4816,27 @@ class DataManager:
             index_id=index_id,
         )
 
+    async def get_research_fx_index_observations(
+        self,
+        *,
+        series_id: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Return local FX currency-index observations for one series."""
+        storage = self._require_fx_storage()
+        module_cfg = self.research_config.modules.get("fx_market_data", {})
+        from research.fx_market_data import FxReadService
+
+        return await asyncio.to_thread(
+            FxReadService(storage, module_cfg).index_observations,
+            series_id=series_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+
     async def run_futures_trading_day_governance(
         self,
         *,
