@@ -147,6 +147,7 @@ class DataManager:
         self.research_storage = None
         self.futures_storage = None
         self.fx_storage = None
+        self.special_commodity_storage = None
 
         # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
         # TTL = 1 小时, 适用于 API 高频查询场景
@@ -239,6 +240,7 @@ class DataManager:
             self._initialize_research_storage()
             self._initialize_futures_storage()
             self._initialize_fx_storage()
+            self._initialize_special_commodity_storage()
 
             if include_data_sources:
                 # 初始化数据源工厂
@@ -396,6 +398,52 @@ class DataManager:
         if self.fx_storage is None:
             raise RuntimeError("FX storage is not initialized")
         return self.fx_storage
+
+    def _initialize_special_commodity_storage(self) -> None:
+        """Initialize isolated special-commodity tables in the futures-domain DB."""
+        if not self.research_config.enabled:
+            return
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        special_cfg = (module_cfg or {}).get("special_commodity_market_data", {})
+        if not special_cfg:
+            return
+        try:
+            from research.special_commodity_market_data import (
+                SpecialCommodityMasterDataService,
+                SpecialCommodityStorageManager,
+            )
+
+            self.special_commodity_storage = SpecialCommodityStorageManager(self.research_config)
+            self.special_commodity_storage.initialize()
+            SpecialCommodityMasterDataService(
+                self.special_commodity_storage,
+                special_cfg,
+            ).sync()
+            dm_logger.info(
+                "[DataManager] Special commodity storage initialized: %s",
+                self.special_commodity_storage.db_path,
+            )
+        except Exception as e:
+            dm_logger.warning(
+                "[DataManager] Special commodity storage initialization failed, continuing "
+                "without special commodity storage: %s",
+                e,
+            )
+            self.special_commodity_storage = None
+
+    def _require_special_commodity_storage(self):
+        """Return special commodity storage or raise a structured runtime error."""
+        if not self.research_config.enabled:
+            raise RuntimeError("research_config.enabled is false")
+        module_cfg = self.research_config.modules.get("commodity_market_data", {})
+        special_cfg = (module_cfg or {}).get("special_commodity_market_data", {})
+        if not special_cfg:
+            raise RuntimeError("special_commodity_market_data config is missing")
+        if self.special_commodity_storage is None:
+            self._initialize_special_commodity_storage()
+        if self.special_commodity_storage is None:
+            raise RuntimeError("special commodity storage is not initialized")
+        return self.special_commodity_storage
 
     @staticmethod
     def _load_research_storage_state(loader):
@@ -4661,6 +4709,76 @@ class DataManager:
             start_date=start_date,
             end_date=end_date,
             dry_run=dry_run,
+        )
+
+    async def run_special_commodity_master_sync(self) -> Dict[str, Any]:
+        """Seed and refresh special commodity instruments, series, and source manifests."""
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommodityMasterDataService
+
+        return await asyncio.to_thread(
+            SpecialCommodityMasterDataService(storage, module_cfg).sync
+        )
+
+    async def run_special_commodity_price_sync(
+        self,
+        *,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Run special commodity price sync into isolated commodity tables."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityPriceSyncService
+
+        return await asyncio.to_thread(
+            SpecialCommodityPriceSyncService(storage, self.research_config).sync,
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            venues=venues,
+            categories=categories,
+            commodity_ids=commodity_ids,
+            series_ids=series_ids,
+            frequencies=frequencies,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def get_special_commodity_dictionary(self) -> Dict[str, Any]:
+        """Read special commodity instruments and series dictionaries."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        return await asyncio.to_thread(SpecialCommodityReadService(storage).dictionary)
+
+    async def get_special_commodity_observations(
+        self,
+        *,
+        series_id: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Read special commodity observations by series id."""
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        return await asyncio.to_thread(
+            SpecialCommodityReadService(storage).observations,
+            series_id=series_id,
+            start_date=start_date,
+            end_date=end_date,
         )
 
     async def run_fx_derivation_sync(

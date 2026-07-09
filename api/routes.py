@@ -1587,6 +1587,95 @@ async def get_research_fx_index_observations(
 
 
 @router.get(
+    "/research/commodities/dictionary",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_dictionary():
+    """读取特殊商品数据字典和序列元数据。"""
+    try:
+        return await data_manager.get_special_commodity_dictionary()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research commodity dictionary: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/commodities/observations",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_observations(
+    series_id: str = Query(..., description="商品价格 series_id"),
+    start_date: Optional[str] = Query(None, description="开始日期 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="结束日期 YYYY-MM-DD"),
+):
+    """读取特殊商品本地观测值。"""
+    try:
+        return await data_manager.get_special_commodity_observations(
+            series_id=str(_query_default(series_id)),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research commodity observations: {str(e)}",
+        )
+
+
+@router.post(
+    "/research/commodities/price-sync",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_special_commodity_price_sync(
+    scope_id: Optional[str] = Query(None, description="特殊商品下载范围 ID"),
+    venues: Optional[str] = Query(None, description="逗号分隔 venue"),
+    categories: Optional[str] = Query(None, description="逗号分隔商品分类，支持 all"),
+    commodity_ids: Optional[str] = Query(None, description="逗号分隔 commodity_id"),
+    series_ids: Optional[str] = Query(None, description="逗号分隔 series_id"),
+    frequencies: Optional[str] = Query(None, description="逗号分隔频率"),
+    start_date: Optional[str] = Query(None, description="开始日期 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="结束日期 YYYY-MM-DD"),
+    dry_run: bool = Query(False, description="是否只演练不落库"),
+):
+    """执行特殊商品价格同步。"""
+    def _csv(value: Optional[str]) -> Optional[List[str]]:
+        if not value:
+            return None
+        items = [item.strip() for item in str(value).split(",") if item.strip()]
+        return items or None
+
+    try:
+        return await _run_data_task_workload(
+            data_manager.run_special_commodity_price_sync,
+            scope_id=_query_default(scope_id),
+            venues=_csv(_query_default(venues)),
+            categories=_csv(_query_default(categories)),
+            commodity_ids=_csv(_query_default(commodity_ids)),
+            series_ids=_csv(_query_default(series_ids)),
+            frequencies=_csv(_query_default(frequencies)),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+            dry_run=dry_run,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to run research commodity price sync: {str(e)}",
+        )
+
+
+@router.get(
     "/research/futures/readiness",
     response_model=Dict[str, Any],
     tags=["Research"],

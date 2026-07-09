@@ -628,7 +628,7 @@
       }
     },
     "special_commodity_market_data": {
-      "enabled": false,
+      "enabled": true,
       "storage": {
         "database": "data/futures.db",
         "table_prefix": "commodity_"
@@ -696,6 +696,124 @@
           ]
         }
       },
+      "source_profiles": {
+        "fred_official_api": {
+          "venue": "FRED",
+          "source": "Federal Reserve Economic Data",
+          "source_mode": "direct_api",
+          "source_interface": "fred_series_observations",
+          "endpoint_url": "https://api.stlouisfed.org/fred/series/observations",
+          "api_key_env": "FRED_API_KEY",
+          "quality_flag": "official_public_api",
+          "parser_version": "fred_commodity_provider.v1",
+          "timeout_seconds": 30,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData"
+        }
+      },
+      "commodities": [
+        {
+          "commodity_id": "OIL.WTI.SPOT",
+          "symbol": "WTI",
+          "name": "WTI Crude Oil Spot Price",
+          "category": "energy",
+          "commodity_type": "spot_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/barrel",
+          "active": true,
+          "metadata": {
+            "dcf_role": "oil_price_anchor"
+          }
+        },
+        {
+          "commodity_id": "OIL.BRENT.SPOT",
+          "symbol": "BRENT",
+          "name": "Brent Crude Oil Spot Price",
+          "category": "energy",
+          "commodity_type": "spot_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/barrel",
+          "active": true,
+          "metadata": {
+            "dcf_role": "oil_price_anchor"
+          }
+        },
+        {
+          "commodity_id": "METAL.COPPER.IMF",
+          "symbol": "COPPER",
+          "name": "Global Copper Price IMF Benchmark",
+          "category": "nonferrous",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "global_metal_cycle_anchor"
+          }
+        },
+        {
+          "commodity_id": "METAL.ALUMINUM.IMF",
+          "symbol": "ALUMINUM",
+          "name": "Global Aluminum Price IMF Benchmark",
+          "category": "nonferrous",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "global_metal_cycle_anchor"
+          }
+        }
+      ],
+      "series": [
+        {
+          "series_id": "CMD.OIL.WTI.SPOT.FRED.DAILY",
+          "commodity_id": "OIL.WTI.SPOT",
+          "venue": "FRED",
+          "source_profile": "fred_official_api",
+          "source_symbol": "DCOILWTICO",
+          "frequency": "daily",
+          "quote_type": "spot",
+          "currency": "USD",
+          "unit": "USD/barrel",
+          "active": true
+        },
+        {
+          "series_id": "CMD.OIL.BRENT.SPOT.FRED.DAILY",
+          "commodity_id": "OIL.BRENT.SPOT",
+          "venue": "FRED",
+          "source_profile": "fred_official_api",
+          "source_symbol": "DCOILBRENTEU",
+          "frequency": "daily",
+          "quote_type": "spot",
+          "currency": "USD",
+          "unit": "USD/barrel",
+          "active": true
+        },
+        {
+          "series_id": "CMD.METAL.COPPER.IMF.FRED.MONTHLY",
+          "commodity_id": "METAL.COPPER.IMF",
+          "venue": "FRED",
+          "source_profile": "fred_official_api",
+          "source_symbol": "PCOPPUSDM",
+          "frequency": "monthly",
+          "quote_type": "benchmark",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true
+        },
+        {
+          "series_id": "CMD.METAL.ALUMINUM.IMF.FRED.MONTHLY",
+          "commodity_id": "METAL.ALUMINUM.IMF",
+          "venue": "FRED",
+          "source_profile": "fred_official_api",
+          "source_symbol": "PALUMUSDM",
+          "frequency": "monthly",
+          "quote_type": "benchmark",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true
+        }
+      ],
       "download_scopes": [
         {
           "scope_id": "fred_energy_oil",
