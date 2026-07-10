@@ -5,6 +5,8 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace
 
+import pandas as pd
+
 from utils import config_manager
 from research.special_commodity_market_data import (
     AkshareCommoditySpotProvider,
@@ -40,8 +42,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 4
-    assert result["series"] >= 7
+    assert result["instruments"] == 5
+    assert result["series"] >= 9
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -49,12 +51,14 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "OIL.BRENT.SPOT",
         "METAL.COPPER.IMF",
         "METAL.ALUMINUM.IMF",
+        "CN.CHEMICAL.PTA.SPOT",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
         "CMD.OIL.WTI.SPOT.EIA.DAILY",
         "CMD.METAL.COPPER.IMF.FRED.MONTHLY",
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
+        "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
     }
 
 
@@ -75,6 +79,15 @@ def test_special_commodity_scope_resolution():
         series_ids=["CMD.METAL.COPPER.IMF.FRED.MONTHLY"],
     )
     assert [item.series_id for item in explicit] == ["CMD.METAL.COPPER.IMF.FRED.MONTHLY"]
+
+    assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
+        "CMD.OIL.WTI.SPOT.EIA.DAILY",
+        "CMD.OIL.BRENT.SPOT.EIA.DAILY",
+    }
+    assert {item.series_id for item in selector.resolve(scope_id="world_bank_metals")} == {
+        "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
+        "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
+    }
 
 
 def test_fred_provider_missing_key_blocks(monkeypatch):
@@ -152,7 +165,7 @@ def test_eia_provider_parses_v2_observations(monkeypatch):
     series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"])
 
     class _Response:
-        url = "https://api.eia.gov/v2/seriesid/PET.RWTC.D?api_key=redacted"
+        url = "https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=unit-test-key"
 
         def raise_for_status(self):
             return None
@@ -160,6 +173,7 @@ def test_eia_provider_parses_v2_observations(monkeypatch):
         def json(self):
             return {
                 "response": {
+                    "total": 2,
                     "data": [
                         {"period": "2026-01-01", "value": "71.2"},
                         {"period": "2026-01-02", "value": None},
@@ -167,11 +181,14 @@ def test_eia_provider_parses_v2_observations(monkeypatch):
                 }
             }
 
+    captured = {}
+
+    def _fake_get(*args, **kwargs):
+        captured.update(kwargs.get("params") or {})
+        return _Response()
+
     monkeypatch.setenv("EIA_API_KEY", "unit-test-key")
-    monkeypatch.setattr(
-        "research.special_commodity_market_data.request_get",
-        lambda *args, **kwargs: _Response(),
-    )
+    monkeypatch.setattr("research.special_commodity_market_data.request_get", _fake_get)
 
     result = EiaCommodityProvider("eia_official_api", source_cfg).fetch(
         series,
@@ -184,9 +201,13 @@ def test_eia_provider_parses_v2_observations(monkeypatch):
     assert obs.series_id == "CMD.OIL.WTI.SPOT.EIA.DAILY"
     assert obs.value == 71.2
     assert obs.source_profile == "eia_official_api"
+    assert captured["start"] == "2026-01-01"
+    assert captured["end"] == "2026-01-02"
+    assert captured["facets[series][]"] == ["RWTC"]
+    assert "unit-test-key" not in obs.source_url
 
 
-def test_world_bank_provider_parses_indicator_observations(monkeypatch):
+def test_world_bank_provider_parses_pink_sheet_workbook(monkeypatch):
     cfg = deepcopy(
         config_manager.get_research_config().modules["commodity_market_data"][
             "special_commodity_market_data"
@@ -201,24 +222,29 @@ def test_world_bank_provider_parses_indicator_observations(monkeypatch):
     )
 
     class _Response:
-        url = "https://api.worldbank.org/v2/country/WLD/indicator/PCOPPUSDM"
+        url = "https://thedocs.worldbank.org/CMO-Historical-Data-Monthly.xlsx"
+        content = b"unit-test-workbook"
 
         def raise_for_status(self):
             return None
-
-        def json(self):
-            return [
-                {"page": 1},
-                [
-                    {"date": "2026-01", "value": 8500.25},
-                    {"date": "2026-02", "value": None},
-                ],
-            ]
 
     monkeypatch.setattr(
         "research.special_commodity_market_data.request_get",
         lambda *args, **kwargs: _Response(),
     )
+    frame = pd.DataFrame(
+        [
+            ["World Bank Commodity Price Data", None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, "Copper"],
+            [None, "($/mt)"],
+            ["2026M01", 8500.25],
+            ["2026M02", None],
+        ]
+    )
+    monkeypatch.setattr("pandas.read_excel", lambda *args, **kwargs: frame)
 
     result = WorldBankCommodityProvider("world_bank_public_dataset", source_cfg).fetch(
         series,
@@ -229,6 +255,7 @@ def test_world_bank_provider_parses_indicator_observations(monkeypatch):
     assert len(result.observations) == 1
     obs = result.observations[0]
     assert obs.series_id == "CMD.METAL.COPPER.WORLDBANK.MONTHLY"
+    assert obs.observation_date == "2026-01-01"
     assert obs.value == 8500.25
     assert obs.unit == "USD/metric_ton"
 
@@ -291,12 +318,25 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
             },
         }
     )
-    fake_akshare = SimpleNamespace(
-        unit_test_100ppi=lambda **kwargs: [
+    captured = {}
+
+    def _fake_100ppi(**kwargs):
+        captured.update(kwargs)
+        return [
             {"日期": "2026-01-01", "价格": "5500"},
             {"日期": "2026-01-03", "价格": "5600"},
         ]
-    )
+
+    for item in cfg["series"]:
+        if item["series_id"] == "CMD.CN.CHEM.TEST.100PPI.DAILY":
+            item["metadata"].update(
+                {
+                    "akshare_start_argument": "start_day",
+                    "akshare_end_argument": "end_day",
+                    "akshare_date_format": "compact",
+                }
+            )
+    fake_akshare = SimpleNamespace(unit_test_100ppi=_fake_100ppi)
     monkeypatch.setitem(sys.modules, "akshare", fake_akshare)
     source_cfg = cfg["source_profiles"]["100ppi_public_web"]
     series = CommodityUniverseSelector(cfg).resolve(series_ids=["CMD.CN.CHEM.TEST.100PPI.DAILY"])
@@ -314,6 +354,8 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert obs.source_profile == "100ppi_public_web"
     assert obs.quality_flag == "aggregated_public_web"
     assert "secret" not in obs.source_url
+    assert captured["start_day"] == "20260101"
+    assert captured["end_day"] == "20260102"
 
 
 def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):

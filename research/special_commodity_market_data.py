@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import io
 import json
 import logging
 import os
@@ -1103,9 +1104,9 @@ class EiaCommodityProvider:
                 blockers=[{"reason": "missing_api_key", "api_key_env": api_key_env, "source_profile": self.source_profile}]
             )
         endpoint_template = str(self.source_cfg.get("endpoint_url") or "")
-        if "{source_symbol}" not in endpoint_template:
+        if not endpoint_template:
             return CommodityProviderResult(
-                blockers=[{"reason": "invalid_endpoint_template", "source_profile": self.source_profile}]
+                blockers=[{"reason": "missing_endpoint_url", "source_profile": self.source_profile}]
             )
         timeout = float(self.source_cfg.get("timeout_seconds") or 30)
         headers = {
@@ -1117,54 +1118,99 @@ class EiaCommodityProvider:
         warnings: List[Dict[str, Any]] = []
         for item in series:
             endpoint = endpoint_template.replace("{source_symbol}", item.source_symbol)
-            params: Dict[str, Any] = {"api_key": api_key}
-            if start_date:
-                params["start"] = start_date
-            if end_date:
-                params["end"] = end_date
-            try:
-                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
-                response.raise_for_status()
-                payload = response.json()
-            except Exception as exc:
-                warnings.append({"reason": "provider_request_failed", "series_id": item.series_id, "error": str(exc)})
-                continue
-            rows = []
-            if isinstance(payload.get("response"), dict):
-                rows = payload["response"].get("data") or []
-            if not rows and isinstance(payload.get("series"), list):
-                for series_payload in payload["series"]:
-                    rows.extend(series_payload.get("data") or [])
-            for row in rows:
-                if isinstance(row, Mapping):
-                    obs_date = str(row.get("period") or row.get("date") or "")
-                    value_raw = row.get("value")
-                elif isinstance(row, (list, tuple)):
-                    obs_date = str(row[0] if row else "")
-                    value_raw = row[1] if len(row) > 1 else None
-                else:
-                    continue
-                if value_raw is None and isinstance(row, (list, tuple)) and len(row) > 1:
-                    value_raw = row[1]
-                if value_raw in {None, "", "."} or not obs_date:
-                    continue
-                try:
-                    value = float(value_raw)
-                except (TypeError, ValueError):
-                    warnings.append({"reason": "invalid_numeric_value", "series_id": item.series_id, "date": obs_date, "value": value_raw})
-                    continue
-                observations.append(
-                    _build_observation(
-                        item=item,
-                        source_profile=self.source_profile,
-                        source_cfg=self.source_cfg,
-                        observation_date=obs_date[:10],
-                        value=value,
-                        source_url=_redact_url(response.url),
-                        source_symbol=item.source_symbol,
-                        raw_payload=row if isinstance(row, Mapping) else {"row": list(row)},
-                    )
+            data_field = str(item.metadata.get("eia_data_field") or "value")
+            page_size = max(1, min(int(item.metadata.get("eia_page_size") or 5000), 5000))
+            base_params: Dict[str, Any] = {
+                "api_key": api_key,
+                "frequency": str(item.metadata.get("eia_frequency") or item.frequency),
+                "data[0]": data_field,
+                "sort[0][column]": "period",
+                "sort[0][direction]": "asc",
+                "length": page_size,
+            }
+            facets = item.metadata.get("eia_facets") or {}
+            if not isinstance(facets, Mapping) or not facets:
+                warnings.append(
+                    {
+                        "reason": "missing_eia_facets",
+                        "series_id": item.series_id,
+                        "source_symbol": item.source_symbol,
+                    }
                 )
+                continue
+            for facet_name, facet_values in facets.items():
+                base_params[f"facets[{facet_name}][]"] = _normalize_list(facet_values)
+            if start_date:
+                base_params["start"] = start_date
+            if end_date:
+                base_params["end"] = end_date
+
+            offset = 0
+            while True:
+                params = {**base_params, "offset": offset}
+                try:
+                    response = request_get(
+                        endpoint,
+                        params=params,
+                        headers=headers,
+                        timeout=timeout,
+                        tls_config=tls_config,
+                    )
+                    response.raise_for_status()
+                    payload = response.json()
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "provider_request_failed",
+                            "series_id": item.series_id,
+                            "offset": offset,
+                            "error": str(exc),
+                        }
+                    )
+                    break
+                response_payload = payload.get("response") if isinstance(payload, Mapping) else None
+                rows = response_payload.get("data") or [] if isinstance(response_payload, Mapping) else []
+                for row in rows:
+                    if not isinstance(row, Mapping):
+                        continue
+                    obs_date = str(row.get("period") or row.get("date") or "")[:10]
+                    value_raw = row.get(data_field)
+                    parsed_date = _parse_date(obs_date)
+                    if value_raw in {None, "", "."} or parsed_date is None:
+                        continue
+                    if start_date and parsed_date < date.fromisoformat(start_date[:10]):
+                        continue
+                    if end_date and parsed_date > date.fromisoformat(end_date[:10]):
+                        continue
+                    try:
+                        value = float(value_raw)
+                    except (TypeError, ValueError):
+                        warnings.append(
+                            {
+                                "reason": "invalid_numeric_value",
+                                "series_id": item.series_id,
+                                "date": obs_date,
+                                "value": value_raw,
+                            }
+                        )
+                        continue
+                    observations.append(
+                        _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=obs_date,
+                            value=value,
+                            source_url=_redact_url(response.url),
+                            source_symbol=item.source_symbol,
+                            raw_payload=row,
+                            metadata={"eia_facets": dict(facets), "eia_data_field": data_field},
+                        )
+                    )
+                total = int(response_payload.get("total") or len(rows)) if isinstance(response_payload, Mapping) else len(rows)
+                offset += len(rows)
+                if not rows or offset >= total:
+                    break
         return CommodityProviderResult(
             observations=observations,
             warnings=warnings,
@@ -1173,7 +1219,7 @@ class EiaCommodityProvider:
 
 
 class WorldBankCommodityProvider:
-    """World Bank public JSON adapter for monthly commodity benchmark indicators."""
+    """World Bank Pink Sheet monthly workbook adapter."""
 
     def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
         self.source_profile = source_profile
@@ -1186,10 +1232,10 @@ class WorldBankCommodityProvider:
         start_date: Optional[str],
         end_date: Optional[str],
     ) -> CommodityProviderResult:
-        endpoint_template = str(self.source_cfg.get("endpoint_url") or "")
-        if "{source_symbol}" not in endpoint_template:
+        endpoint = str(self.source_cfg.get("endpoint_url") or "")
+        if not endpoint:
             return CommodityProviderResult(
-                blockers=[{"reason": "invalid_endpoint_template", "source_profile": self.source_profile}]
+                blockers=[{"reason": "missing_endpoint_url", "source_profile": self.source_profile}]
             )
         timeout = float(self.source_cfg.get("timeout_seconds") or 30)
         headers = {
@@ -1199,46 +1245,79 @@ class WorldBankCommodityProvider:
         tls_config = tls_config_from_source_config(self.source_profile, self.source_cfg)
         observations: List[CommodityObservation] = []
         warnings: List[Dict[str, Any]] = []
-        year_range = None
         start = _parse_date(start_date)
         end = _parse_date(end_date)
-        if start and end:
-            year_range = f"{start.year}:{end.year}"
+        try:
+            response = request_get(endpoint, headers=headers, timeout=timeout, tls_config=tls_config)
+            response.raise_for_status()
+            pandas = importlib.import_module("pandas")
+            frame = pandas.read_excel(
+                io.BytesIO(response.content),
+                sheet_name=str(self.source_cfg.get("sheet_name") or "Monthly Prices"),
+                header=None,
+            )
+        except Exception as exc:
+            return CommodityProviderResult(
+                warnings=[{"reason": "provider_request_failed", "source_profile": self.source_profile, "error": str(exc)}],
+                metadata={"provider": "WORLD_BANK", "series_requested": len(series), "rows": 0},
+            )
+
+        header_row = None
+        expected_columns = {item.source_symbol for item in series}
+        for row_index in range(min(len(frame), 20)):
+            values = {str(value).strip() for value in frame.iloc[row_index].tolist() if value is not None}
+            if values & expected_columns:
+                header_row = row_index
+                break
+        if header_row is None:
+            return CommodityProviderResult(
+                warnings=[{"reason": "world_bank_header_not_found", "expected_columns": sorted(expected_columns)}],
+                metadata={"provider": "WORLD_BANK", "series_requested": len(series), "rows": 0},
+            )
+
+        headers_by_index = {
+            index: str(value).strip()
+            for index, value in enumerate(frame.iloc[header_row].tolist())
+            if value is not None and str(value).strip() not in {"", "nan"}
+        }
+        index_by_header = {value: index for index, value in headers_by_index.items()}
         for item in series:
-            endpoint = endpoint_template.replace("{source_symbol}", item.source_symbol)
-            params: Dict[str, Any] = {"format": "json", "per_page": 20000}
-            if year_range:
-                params["date"] = year_range
-            try:
-                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
-                response.raise_for_status()
-                payload = response.json()
-            except Exception as exc:
-                warnings.append({"reason": "provider_request_failed", "series_id": item.series_id, "error": str(exc)})
+            column_index = index_by_header.get(item.source_symbol)
+            if column_index is None:
+                warnings.append(
+                    {
+                        "reason": "world_bank_series_column_not_found",
+                        "series_id": item.series_id,
+                        "source_symbol": item.source_symbol,
+                    }
+                )
                 continue
-            rows = payload[1] if isinstance(payload, list) and len(payload) > 1 and isinstance(payload[1], list) else []
-            for row in rows:
-                obs_date = str(row.get("date") or "")
-                value_raw = row.get("value")
-                if value_raw in {None, "", "."} or not obs_date:
+            for row_index in range(header_row + 2, len(frame)):
+                period_raw = frame.iat[row_index, 0]
+                value_raw = frame.iat[row_index, column_index]
+                period = str(period_raw or "").strip()
+                if len(period) != 7 or period[4] != "M":
                     continue
                 try:
+                    obs_date = date(int(period[:4]), int(period[5:7]), 1)
                     value = float(value_raw)
                 except (TypeError, ValueError):
-                    warnings.append({"reason": "invalid_numeric_value", "series_id": item.series_id, "date": obs_date, "value": value_raw})
                     continue
-                # World Bank annual/monthly APIs may return period strings. Keep the
-                # configured observation date as source-provided when precise dates are absent.
+                if start and obs_date < date(start.year, start.month, 1):
+                    continue
+                if end and obs_date > date(end.year, end.month, 1):
+                    continue
                 observations.append(
                     _build_observation(
                         item=item,
                         source_profile=self.source_profile,
                         source_cfg=self.source_cfg,
-                        observation_date=obs_date,
+                        observation_date=obs_date.isoformat(),
                         value=value,
                         source_url=_redact_url(response.url),
                         source_symbol=item.source_symbol,
-                        raw_payload=row,
+                        raw_payload={"period": period, "value": value_raw},
+                        metadata={"workbook_sheet": self.source_cfg.get("sheet_name") or "Monthly Prices"},
                     )
                 )
         return CommodityProviderResult(
@@ -1318,8 +1397,23 @@ class AkshareCommoditySpotProvider:
                     }
                 )
                 continue
+            kwargs = dict(item.metadata.get("akshare_kwargs") or {})
+            date_format = str(item.metadata.get("akshare_date_format") or "compact")
+            start_argument = str(item.metadata.get("akshare_start_argument") or "").strip()
+            end_argument = str(item.metadata.get("akshare_end_argument") or "").strip()
+
+            def _format_argument(value: Optional[str]) -> Optional[str]:
+                parsed = _parse_date(value)
+                if parsed is None:
+                    return None
+                return parsed.strftime("%Y%m%d") if date_format == "compact" else parsed.isoformat()
+
+            if start_argument and start_date:
+                kwargs[start_argument] = _format_argument(start_date)
+            if end_argument and end_date:
+                kwargs[end_argument] = _format_argument(end_date)
             try:
-                payload = func(**dict(item.metadata.get("akshare_kwargs") or {}))
+                payload = func(**kwargs)
             except Exception as exc:
                 warnings.append(
                     {
@@ -1341,6 +1435,31 @@ class AkshareCommoditySpotProvider:
             value_column = str(item.metadata.get("value_column") or "value")
             raw_unit = str(item.metadata.get("raw_unit") or item.unit)
             source_url = direct_url or str(item.metadata.get("source_url") or f"akshare://{function_name}")
+            if not rows:
+                warnings.append(
+                    {
+                        "reason": "empty_provider_payload",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                )
+                continue
+            available_columns = {str(key) for row in rows if isinstance(row, Mapping) for key in row.keys()}
+            missing_columns = [column for column in (date_column, value_column) if column not in available_columns]
+            if missing_columns:
+                warnings.append(
+                    {
+                        "reason": "provider_columns_missing",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "missing_columns": missing_columns,
+                        "available_columns": sorted(available_columns),
+                    }
+                )
+                continue
+            observations_before = len(observations)
             for row in rows:
                 if not isinstance(row, Mapping):
                     continue
@@ -1385,6 +1504,17 @@ class AkshareCommoditySpotProvider:
                             "region_or_spec": item.metadata.get("region_or_spec"),
                         },
                     )
+                )
+            if len(observations) == observations_before:
+                warnings.append(
+                    {
+                        "reason": "provider_rows_outside_requested_range_or_invalid",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "source_rows": len(rows),
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
                 )
         return CommodityProviderResult(
             observations=observations,

@@ -1,6 +1,6 @@
 # 特殊商品现货与海外基准数据获取需求说明书
 
-> 更新日期：2026-06-26
+> 更新日期：2026-07-10
 > 适用项目：Quote System / Research Data Engine
 > 文档定位：本文用于定义国内五大商品期货交易所之外的特殊商品数据层，包括动力煤现货/长协价、LME 铜/铝、Brent/WTI、化工现货指数等免费可得数据源、注册要求、数据架构、更新维护和 DCF 对接边界。
 > 使用边界：本模块服务于周期行业 DCF、行业景气诊断和商品研究输入，不提供商品交易信号，不替代付费产业数据库。
@@ -308,6 +308,12 @@ validate_observations(normalized_rows)
 数据仍应写入 `source_profile=100ppi_public_web`，质量标记为 `aggregated_public_web`，
 不得因为使用 AkShare 包装而标记为官方源。
 
+当前已验证的具体实现边界：
+
+- EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
+- World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
+- 100ppi 第一条配置化落地序列为 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`，通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，规格和含税口径按来源披露。
+
 ### 6.2 调度任务
 
 新增任务建议：
@@ -325,6 +331,9 @@ validate_observations(normalized_rows)
 
 - `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=eia_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=world_bank_metals start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_policy_event_sync dry_run`
 - `/run special_commodity_lme_feasibility_probe`

@@ -713,11 +713,11 @@
           "venue": "EIA",
           "source": "U.S. Energy Information Administration Open Data",
           "source_mode": "direct_api",
-          "source_interface": "eia_v2_series_data",
-          "endpoint_url": "https://api.eia.gov/v2/seriesid/{source_symbol}",
+          "source_interface": "eia_v2_route_data",
+          "endpoint_url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
           "api_key_env": "EIA_API_KEY",
           "quality_flag": "official_public_api",
-          "parser_version": "eia_commodity_provider.v1",
+          "parser_version": "eia_commodity_provider.v2",
           "timeout_seconds": 30,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
@@ -725,10 +725,11 @@
           "venue": "WORLD_BANK",
           "source": "World Bank Pink Sheet public dataset",
           "source_mode": "public_dataset",
-          "source_interface": "world_bank_indicator_json",
-          "endpoint_url": "https://api.worldbank.org/v2/country/WLD/indicator/{source_symbol}",
+          "source_interface": "world_bank_pink_sheet_monthly_workbook",
+          "endpoint_url": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx",
+          "sheet_name": "Monthly Prices",
           "quality_flag": "official_public_dataset",
-          "parser_version": "world_bank_commodity_provider.v1",
+          "parser_version": "world_bank_commodity_provider.v2",
           "timeout_seconds": 30,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
@@ -806,6 +807,20 @@
           "metadata": {
             "dcf_role": "global_metal_cycle_anchor"
           }
+        },
+        {
+          "commodity_id": "CN.CHEMICAL.PTA.SPOT",
+          "symbol": "TA",
+          "name": "China PTA Spot Reference",
+          "category": "chemical",
+          "commodity_type": "spot_reference",
+          "default_currency": "CNY",
+          "default_unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "chemical_spot_cycle_anchor",
+            "source_scope": "100ppi public-web PTA spot reference"
+          }
         }
       ],
       "series": [
@@ -831,9 +846,38 @@
           "quote_type": "spot_validation",
           "currency": "USD",
           "unit": "USD/barrel",
-          "active": false,
+          "active": true,
           "metadata": {
-            "role": "official_validation_or_replacement"
+            "role": "official_validation_or_replacement",
+            "eia_frequency": "daily",
+            "eia_data_field": "value",
+            "eia_facets": {
+              "series": [
+                "RWTC"
+              ]
+            }
+          }
+        },
+        {
+          "series_id": "CMD.OIL.BRENT.SPOT.EIA.DAILY",
+          "commodity_id": "OIL.BRENT.SPOT",
+          "venue": "EIA",
+          "source_profile": "eia_official_api",
+          "source_symbol": "PET.RBRTE.D",
+          "frequency": "daily",
+          "quote_type": "spot_validation",
+          "currency": "USD",
+          "unit": "USD/barrel",
+          "active": true,
+          "metadata": {
+            "role": "official_validation_or_replacement",
+            "eia_frequency": "daily",
+            "eia_data_field": "value",
+            "eia_facets": {
+              "series": [
+                "RBRTE"
+              ]
+            }
           }
         },
         {
@@ -877,12 +921,12 @@
           "commodity_id": "METAL.COPPER.IMF",
           "venue": "WORLD_BANK",
           "source_profile": "world_bank_public_dataset",
-          "source_symbol": "PCOPPUSDM",
+          "source_symbol": "Copper",
           "frequency": "monthly",
           "quote_type": "benchmark_fallback",
           "currency": "USD",
           "unit": "USD/metric_ton",
-          "active": false,
+          "active": true,
           "metadata": {
             "role": "monthly_benchmark_fallback"
           }
@@ -892,14 +936,42 @@
           "commodity_id": "METAL.ALUMINUM.IMF",
           "venue": "WORLD_BANK",
           "source_profile": "world_bank_public_dataset",
-          "source_symbol": "PALUMUSDM",
+          "source_symbol": "Aluminum",
           "frequency": "monthly",
           "quote_type": "benchmark_fallback",
           "currency": "USD",
           "unit": "USD/metric_ton",
-          "active": false,
+          "active": true,
           "metadata": {
             "role": "monthly_benchmark_fallback"
+          }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.PTA.SPOT",
+          "venue": "100PPI",
+          "source_profile": "100ppi_public_web",
+          "source_symbol": "TA",
+          "frequency": "daily",
+          "quote_type": "spot_reference",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily",
+            "akshare_kwargs": {
+              "vars_list": [
+                "TA"
+              ]
+            },
+            "akshare_start_argument": "start_day",
+            "akshare_end_argument": "end_day",
+            "akshare_date_format": "compact",
+            "date_column": "date",
+            "value_column": "spot_price",
+            "raw_unit": "CNY/ton",
+            "region_or_spec": "China PTA spot reference; grade and tax basis follow 100ppi publication",
+            "source_url": "https://www.100ppi.com/sf/"
           }
         }
       ],
@@ -939,15 +1011,51 @@
           ]
         },
         {
+          "scope_id": "eia_energy_oil",
+          "enabled": true,
+          "venues": [
+            "EIA"
+          ],
+          "categories": [
+            "energy"
+          ],
+          "commodity_ids": [
+            "OIL.WTI.SPOT",
+            "OIL.BRENT.SPOT"
+          ],
+          "frequencies": [
+            "daily"
+          ]
+        },
+        {
+          "scope_id": "world_bank_metals",
+          "enabled": true,
+          "venues": [
+            "WORLD_BANK"
+          ],
+          "categories": [
+            "nonferrous"
+          ],
+          "commodity_ids": [
+            "METAL.COPPER.IMF",
+            "METAL.ALUMINUM.IMF"
+          ],
+          "frequencies": [
+            "monthly"
+          ]
+        },
+        {
           "scope_id": "cn_100ppi_chemical",
-          "enabled": false,
+          "enabled": true,
           "venues": [
             "100PPI"
           ],
           "categories": [
             "chemical"
           ],
-          "commodity_ids": [],
+          "commodity_ids": [
+            "CN.CHEMICAL.PTA.SPOT"
+          ],
           "frequencies": [
             "daily"
           ]
