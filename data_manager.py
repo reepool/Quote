@@ -4782,18 +4782,6 @@ class DataManager:
             dry_run=dry_run,
         )
 
-    async def run_special_commodity_lme_feasibility_probe(self) -> Dict[str, Any]:
-        """Return LME official-source feasibility status without downloading data."""
-        module_cfg = (
-            self.research_config.modules.get("commodity_market_data", {})
-            .get("special_commodity_market_data", {})
-        )
-        from research.special_commodity_market_data import LmeOfficialReportProvider
-
-        return await asyncio.to_thread(
-            LmeOfficialReportProvider(module_cfg).feasibility_probe
-        )
-
     async def get_special_commodity_dictionary(self) -> Dict[str, Any]:
         """Read special commodity instruments and series dictionaries."""
         storage = self._require_special_commodity_storage()

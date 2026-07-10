@@ -13,7 +13,7 @@
 国内五大商品期货交易所行情已经能够覆盖大部分 P0 周期品种，但 DCF 中仍需要若干“非国内期货主力连续”的外部锚：
 
 1. **Brent/WTI**：免费可得性最好，应作为第一批接入。优先 FRED/EIA 官方或准官方 API，单位统一为 `USD/barrel`，频率日频。
-2. **LME 铜/铝**：官方 LME 可提供网页登录下载和数据服务，但自动 API、历史深度和许可边界需要谨慎。第一阶段建议同时接入两层：FRED/IMF 月度全球铜铝价格作为可稳定自动化的长周期基准；LME 官方页面/报表作为可选增强源，先做可行性验证再生产化。
+2. **LME 六种基本金属 3M 代理行情**：铜、铝、锌、铅、镍、锡统一通过 AkShare 外盘期货接口获取。新浪详情页将这些品种标为“CFD 差价合约并非期货”，其价格跟踪 LME 三个月连续合约；因此数据库类型必须标为 `foreign_futures_3m_proxy`。新浪 `futures_foreign_hist` 为主源，东方财富 `futures_global_hist_em` 为请求或结构失败时的备源；两者均不标记为 LME 官方 Closing Price。FRED/IMF 与 World Bank 月度铜铝价格继续作为更长周期的独立 DCF 基准，不与 LME 3M 代理日线伪装成同一序列。
 3. **动力煤现货/长协价**：这是最难免费稳定自动化的部分。权威指数和长协价格多在资讯商、协会或政策公告体系中，免费源常有版权、反爬、口径不完整问题。第一版应拆成两类：可自动更新的公开现货/库存/指数辅助数据，以及人工或半自动维护的政策/长协事件表。
 4. **化工现货指数**：AkShare 可取生意社/100ppi 大宗商品现货价格和基差，适合做 P1 免费增强源；但它不是交易所官方源，应明确标记为 `aggregated_public_web`，并记录商品规格、单位、字段口径和缺失日期。
 
@@ -62,7 +62,7 @@ source_venue -> commodity category -> commodity instrument -> series
 | Brent Europe spot | FRED `DCOILBRENTEU` 或 EIA Open Data | AkShare/Sina 外盘期货仅作参考 | 日频 | USD/barrel | 高 |
 | 全球铜价 | FRED/IMF `PCOPPUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | 全球铝价 | FRED/IMF `PALUMUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
-| LME 铜/铝官方价 | LME 官方 Market Data 报表 | AkShare/Sina 外盘期货、FRED/IMF 月度 | 日频或月频 | USD/metric ton | 中，需账号/许可边界验证 |
+| LME 铜/铝/锌/铅/镍/锡 3M 代理 | AkShare/Sina 外盘期货 | AkShare/东方财富全球期货 | 日频 | USD/metric ton | 高，CFD/聚合代理；新浪约自 2016-07-11，东财约自 2013-06-21 |
 | 动力煤公开辅助数据 | 生意社/100ppi、金十沿海六大电库存、公开政策公告 | 手工导入政策/长协事件 | 日频/事件 | CNY/ton 或事件价 | 中低 |
 | 化工现货/基差 | 生意社/100ppi，经 AkShare 或直连页面 | 交易所期货主力连续 | 日频 | 多为 CNY/ton | 中 |
 
@@ -83,7 +83,6 @@ source_venue -> commodity category -> commodity instrument -> series
 |---|---|---:|---|---|
 | FRED API | `https://fredaccount.stlouisfed.org` 或 FRED API key 页面 | 是 | WTI、Brent、FRED/IMF 铜铝月度 | FRED 文档要求 API 请求使用 API key。注册后把 key 配到项目密钥配置，不写入代码和文档。 |
 | EIA Open Data API | `https://www.eia.gov/opendata/register.php` | 推荐 | WTI、Brent、能源相关官方数据 | EIA API 使用需要申请 key；bulk download 可不需要 key，但 API 方式更适合增量更新。 |
-| LME.com 账号 | `https://www.lme.com/` account/register | 可选 | 官方 LME 日价/月均价、库存、成交量等报表 | LME 页面说明下载部分报表需要登录或注册；自动化前必须确认许可、下载链接稳定性和使用条款。 |
 
 密钥配置原则：
 
@@ -92,20 +91,14 @@ source_venue -> commodity category -> commodity instrument -> series
 - 运行日志、Telegram 报告、OpenSpec 和需求文档不得输出 key 明文。
 - 本项目配置文件只记录 `api_key_env` 或私有配置路径；Provider 初始化时由配置层读取并脱敏记录状态。
 
-LME.com 账号使用原则：
-
-- LME 免费账号仅用于验证官方页面、报表下载和许可边界。
-- 自动化实现前，先用浏览器会话验证是否能下载铜/铝日价或月均价报表，并记录是否需要登录、cookie、动态 token、验证码或下载许可。
-- 如果 LME 要求登录态，应仿照 DCE/GFEX 的浏览器 adapter 思路，封装为 `LmeOfficialReportProvider`，但不得在代码、配置或日志中保存账号密码明文。
-- 如果 LME 只允许人工登录下载，第一版应保留 `ManualLmeReportImportProvider`，由用户下载后导入，避免违反使用条款或产生不稳定自动抓取。
-
 ### 3.2 不需要注册但需审慎使用的源
 
 | 来源 | 用途 | 风险 |
 |---|---|---|
 | World Bank Pink Sheet | 月度大宗商品价格和年度价格 | 频率较低，适合 DCF 中长期锚，不适合日更景气监控 |
 | 生意社/100ppi 公开页面 | 国内大宗商品现货价格、基差 | 非官方交易所源，字段规格和单位复杂，页面结构可能变动 |
-| Sina 外盘期货 | 外盘期货历史日线 | 聚合源，不是交易所官方源；适合作为 LME/ICE/CME 官方源不可用时的备源 |
+| Sina 外盘期货 | LME 3M 历史日线主源 | 聚合源，不是交易所官方源；必须保留真实来源、代码、OHLCV 和观测日期 |
+| 东方财富全球期货 | LME 3M 请求失败备源 | 聚合源，历史更长但接口存在 IP/频控；必须通过统一 proxy patch 运行时访问 |
 | 金十数据中心 | LME 库存、沿海六大电库存等宏观/产业数据 | 聚合源，非官方一手源；适合辅助景气指标，不适合替代核心价格锚 |
 | 东方财富大宗商品价格指数 | 宏观景气辅助 | 指数口径需核对，不作为 DCF 核心价格假设主源 |
 
@@ -118,7 +111,8 @@ LME.com 账号使用原则：
 | AkShare 接口 | AkShare 标注来源 | 可否找官方/一手源 | 建议定位 |
 |---|---|---|---|
 | `futures_spot_price_daily` / `futures_spot_price` | 生意社/100ppi，`https://www.100ppi.com/sf/` | 不是交易所官方源；可尝试直连 100ppi 页面，减少 AkShare 依赖 | P1 国内现货/基差增强源 |
-| `futures_foreign_hist` | 新浪财经外盘期货，`GlobalFuturesService.getGlobalFuturesDailyKLine` | 对 LME/ICE/CME 应优先找交易所或 FRED/EIA/World Bank；Sina 只能备源 | 海外期货行情备源 |
+| `futures_foreign_hist` | 新浪财经外盘期货，`GlobalFuturesService.getGlobalFuturesDailyKLine` | 本项目将其作为 LME 3M 日线主源，不能标记为交易所官方 Closing Price | LME 日线主源 |
+| `futures_global_hist_em` | 东方财富全球期货 | 本项目将其作为新浪请求/结构失败备源；不使用其缺失或为零的成交量覆盖新浪数据 | LME 日线备源 |
 | `macro_euro_lme_stock` | 金十数据中心 LME 库存 | 官方替代为 LME warehouse/stock reports，但自动化需登录/许可验证 | LME 库存辅助源 |
 | `macro_china_daily_energy` | 金十中国沿海六大电库存 | 更一手的电厂/煤炭库存数据通常不可免费稳定 API 化 | 动力煤供需辅助源 |
 | `spot_goods` | 新浪商品现货指数 | 可尝试寻找对应指数发布源，但第一版不作为核心价格 | 辅助观察 |
@@ -127,8 +121,8 @@ LME.com 账号使用原则：
 替代原则：
 
 - **油价**：不用 AkShare 做主源；优先 FRED/EIA。
-- **铜铝长期基准**：不用 Sina 外盘做主源；优先 FRED/IMF 或 World Bank 月度。
-- **LME 日价**：优先验证 LME 官方报表；未完成前以 FRED/IMF 月度作为 DCF 长周期锚，Sina/AkShare 只作备查。
+- **铜铝长期基准**：继续优先 FRED/IMF 或 World Bank 月度，作为独立长期周期序列。
+- **LME 3M 日价**：新浪/AkShare 为主源，东方财富/AkShare 为备源；只作为聚合 LME 3M 市场行情，和 LME 官方 Closing Price、Cash Price 分开定义。
 - **国内现货和化工指数**：如果没有交易所官方源，AkShare/100ppi 可以作为免费源，但必须保留 `source_profile=100ppi_public_web` 和字段口径。
 - **动力煤长协**：不要用 AkShare 猜长协价；长协应作为政策/事件表，由公告或人工确认维护。
 
@@ -272,7 +266,7 @@ validate_observations(normalized_rows)
 | `eia_energy_oil` | `["EIA"]` | `["energy"]` | EIA 原油官方数据校验或备源 |
 | `world_bank_metals` | `["WORLD_BANK"]` | `["nonferrous"]` | 铜、铝等月度长期基准 |
 | `fred_imf_metals` | `["FRED"]` | `["nonferrous"]` | FRED/IMF 铜铝月度价格 |
-| `lme_nonferrous` | `["LME"]` | `["nonferrous"]` | LME 铜铝官方价、库存或月均价 |
+| `lme_nonferrous` | `["LME"]` | `["nonferrous"]` | LME 铜、铝、锌、铅、镍、锡 3M 聚合日线 |
 | `cn_100ppi_chemical` | `["100PPI"]` | `["chemical"]` | 国内化工现货和基差 |
 | `cn_coal_policy` | `["NDRC", "MANUAL"]` | `["coal"]` | 动力煤长协和政策价格事件 |
 
@@ -285,7 +279,7 @@ validate_observations(normalized_rows)
 | FRED/EIA 日频 | 使用观测日和发布滞后；非发布日不视为异常 |
 | World Bank/FRED/IMF 月频 | 使用月度观测期；可按月末日期落库，DCF 读取时按估值日前最新可得值 |
 | 100ppi 日频现货 | 只使用网页/API 实际观测日；缺失日记录为 source gap，不用中国交易日或 weekday 猜测补齐 |
-| LME 官方报表 | 使用 LME 官方发布日或报表日期；若登录下载失败，保留 blocker |
+| LME 3M 聚合日线 | 仅使用新浪主源实际返回日期；主源请求/结构失败时使用东财返回日期；不根据 weekday 推断交易日或休市日 |
 | 动力煤长协/政策 | 使用 `effective_start/effective_end` 生效期，不做日频价格补点 |
 
 因此，任务名称可以继续叫 `commodity_price_backfill/sync`，但报告中要区分 `trading_day_governance`、`publication_calendar_governance`、`policy_effective_period_governance`。
@@ -295,7 +289,7 @@ validate_observations(normalized_rows)
 - 不允许用周一至周五、国内交易日历或月初/月末枚举结果冒充来源日历。
 - FRED/EIA/100ppi 仅把实际返回的观测日期写入治理日历；若来源同时返回发布日期、修订日期或 realtime vintage，应一并保存。
 - World Bank 以 Pink Sheet 工作簿中的实际月份为月度观测期，并保留工作簿更新时间/版本证据。
-- LME 或后续其他海外交易所品种必须由实现层 adapter 提供交易所交易日历、官方报告日或正式闭市公告证据；adapter 未完成时不得启用该序列。
+- LME 当前采用来源观测交易日治理：只有选定主/备源实际返回的日期可进入日历和行情落库；缺日先标记 source gap，未来接入可靠官方闭市公告后再增强为完整开闭市日历。
 - 政策价和长协价使用生效期，不应派生虚构的逐日行情。
 
 ### 6.1.3 Master Data Governance
@@ -308,7 +302,7 @@ validate_observations(normalized_rows)
 | EIA | API v2 route/facet 和数据字段：series description、frequency、units、首个观测日 |
 | World Bank | Pink Sheet 工作簿列名、单位行、首末有效月份、工作簿更新时间 |
 | 100ppi | 配置映射 + 实际返回字段、symbol、日期和值；无法从来源确认的规格/税基保持 partial |
-| LME | 官方品种/合约说明、交易单位、报价单位、报告类型和许可状态；未验证时 blocker |
+| LME | AkShare 可用品种表、`futures_foreign_detail` 返回的 CFD/非期货属性、交易所、报价单位、每手吨数、tick、3M 说明，另加主备代码、payload 列和首末观测日；未知代码形成 discovery warning |
 | 政策/长协 | 官方公告标题、发布机构、发布日期、生效期、价格口径和来源 URL |
 
 治理结果写入独立的 `commodity_master_governance`，至少记录：`series_id`、来源名称、频率、币种、单位、生命周期、证据 URL/hash、治理状态、质量标记和更新时间。配置重新加载不得覆盖已经持久化的来源证据。
@@ -338,8 +332,7 @@ scope 解析
 | `EiaCommodityProvider` | EIA 能源官方数据，作为油价主源或 FRED 校验源 |
 | `WorldBankPinkSheetProvider` | 月度/年度大宗商品长期价格 |
 | `AkshareCommoditySpotProvider` | 100ppi 现货和基差 |
-| `SinaForeignFuturesProvider` | 外盘期货备源 |
-| `LmeOfficialReportProvider` | LME 官方报表试点，完成登录/下载验证后启用 |
+| `AkshareForeignFuturesProvider` | 配置化外盘期货主备链；LME 使用新浪主源、东财备源 |
 | `ManualPolicyEventProvider` | 动力煤长协/政策事件表导入 |
 
 `AkshareCommoditySpotProvider` 必须采用配置驱动：只有当 `commodity_price_series.metadata`
@@ -353,6 +346,8 @@ scope 解析
 - EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
 - World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
 - 100ppi 第一条配置化落地序列为 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`，通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，规格和含税口径按来源披露。
+- LME 第一批覆盖六种 3M 金属：`CAD/AHD/ZSD/PBD/NID/SND` 对应新浪主源，`LCPT/LALT/LZNT/LLDT/LNKT/LTNT` 对应东财备源。主源成功时不请求备源；主源请求、空全量 payload 或必需列缺失时才切换。观测值使用 close/latest，完整 OHLCV 和实际来源写入 metadata。
+- 2026-07-10 真实短窗口验证：`lme_nonferrous` 六品种在 2026-07-06 至 2026-07-09 由新浪主源获取 24 条观测，六条主数据治理和来源交易日治理均成功；强制主源映射失效后，铜由东财 `LCPT` 成功接管，生命周期起点为 2013-06-21。临时库 write 验证写入六条观测、六条主数据证据和六条来源交易日记录，未使用 weekday 推断。
 
 ### 6.2 调度任务
 
@@ -367,16 +362,16 @@ scope 解析
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
 当前工程落地的手工任务名使用 `special_commodity_*` 前缀，先保持 `manual_only=true`，
-等待 FRED/EIA/World Bank/100ppi 短窗口 dry-run 完成后再评估是否加入正式日更：
+等待 FRED/EIA/World Bank/100ppi/LME 短窗口 dry-run 完成后再评估是否加入正式日更：
 
 - `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=eia_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=world_bank_metals start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_policy_event_sync dry_run`
-- `/run special_commodity_lme_feasibility_probe`
 
 调度要求：
 
@@ -397,8 +392,8 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 | DCF 输入 | 推荐数据 |
 |---|---|
 | 原油价格假设 | `OIL.BRENT.SPOT.FRED.DAILY`、`OIL.WTI.SPOT.FRED.DAILY` |
-| 全球铜价 mid-cycle | `METAL.COPPER.IMF.MONTHLY` 或 LME 官方月均价 |
-| 全球铝价 mid-cycle | `METAL.ALUMINUM.IMF.MONTHLY` 或 LME 官方月均价 |
+| 全球铜价 mid-cycle | `CMD.METAL.COPPER.IMF.FRED.MONTHLY` 或 World Bank 月度；LME 3M 日线用于当前景气校验 |
+| 全球铝价 mid-cycle | `CMD.METAL.ALUMINUM.IMF.FRED.MONTHLY` 或 World Bank 月度；LME 3M 日线用于当前景气校验 |
 | 国内化工价差 | 国内期货主力连续 + 100ppi 现货/基差 |
 | 动力煤长协价 | `commodity_policy_events` + 期货/现货辅助 |
 
@@ -453,4 +448,4 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 
 - FRED API key。
 - EIA API key，推荐但不是 Brent/WTI 第一版的绝对 blocker。
-- LME.com 免费账号，只有在决定做 LME 官方报表自动化时需要。
+- LME.com 账号不再是当前聚合行情方案的运行依赖。

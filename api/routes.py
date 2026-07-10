@@ -1780,26 +1780,6 @@ async def run_research_special_commodity_calendar_governance(
         )
 
 
-@router.post(
-    "/research/commodities/lme/feasibility-probe",
-    response_model=Dict[str, Any],
-    tags=["Research"],
-)
-async def run_research_lme_feasibility_probe():
-    """检查 LME 官方源是否已完成登录、下载和许可验证。"""
-    try:
-        return await _run_data_task_workload(
-            data_manager.run_special_commodity_lme_feasibility_probe,
-        )
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to run LME feasibility probe: {str(e)}",
-        )
-
-
 @router.get(
     "/research/futures/readiness",
     response_model=Dict[str, Any],

@@ -675,16 +675,14 @@
           ]
         },
         "LME": {
-          "enabled": false,
-          "venue_type": "exchange_official_report",
-          "requires_login": true,
-          "registration_url": "https://www.lme.com/",
-          "role": "official_report_candidate",
+          "enabled": true,
+          "venue_type": "foreign_futures_aggregator",
+          "requires_login": false,
+          "role": "sina_primary_eastmoney_fallback",
           "supported_frequencies": [
-            "daily",
-            "monthly"
+            "daily"
           ],
-          "note": "Verify free account access, report download stability, and licence boundaries before enabling automated production sync."
+          "note": "AkShare/Sina is the primary LME 3-month daily source; AkShare/Eastmoney is used only when the primary request or schema fails. Rows are aggregated market data, not official LME Closing Prices."
         },
         "100PPI": {
           "enabled": true,
@@ -761,18 +759,59 @@
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "Requires configured product mappings before production sync; never label as official."
         },
-        "lme_official_report": {
+        "lme_akshare_foreign_futures": {
           "venue": "LME",
-          "source": "London Metal Exchange official report",
-          "source_mode": "exchange_official_report",
-          "source_interface": "lme_official_report_gated",
-          "provider_adapter": "lme_gated",
-          "governance_adapter": "lme_gated",
-          "calendar_type": "exchange_trading_calendar",
-          "calendar_quality_flag": "official_exchange_calendar",
-          "quality_flag": "official_report_unverified",
-          "parser_version": "lme_official_report_provider.v1",
-          "note": "Concrete gated adapter. It must block until official product metadata, exchange calendar/report access, automation stability, and licence boundaries are verified."
+          "source": "AkShare foreign futures primary/fallback chain",
+          "source_mode": "aggregated_primary_fallback",
+          "source_interface": "akshare_foreign_futures_chain",
+          "provider_adapter": "akshare_foreign_futures",
+          "governance_adapter": "foreign_futures",
+          "calendar_type": "source_observed_trading_date",
+          "calendar_quality_flag": "aggregated_market_observed",
+          "quality_flag": "aggregated_foreign_futures",
+          "parser_version": "akshare_foreign_futures_provider.v1",
+          "akshare_mode": "proxy_patch",
+          "detail_function": "futures_foreign_detail",
+          "known_primary_symbols": [
+            "CAD",
+            "AHD",
+            "ZSD",
+            "PBD",
+            "NID",
+            "SND"
+          ],
+          "provider_chain": [
+            {
+              "provider_id": "sina",
+              "actual_source_profile": "sina_foreign_futures",
+              "source_name": "Sina Finance foreign futures",
+              "akshare_function": "futures_foreign_hist",
+              "date_column": "date",
+              "value_column": "close",
+              "open_column": "open",
+              "high_column": "high",
+              "low_column": "low",
+              "volume_column": "volume",
+              "position_column": "position",
+              "source_url": "https://finance.sina.com.cn/money/future/hf.html"
+            },
+            {
+              "provider_id": "eastmoney",
+              "actual_source_profile": "eastmoney_global_futures",
+              "source_name": "Eastmoney global futures",
+              "akshare_function": "futures_global_hist_em",
+              "date_column": "日期",
+              "value_column": "最新价",
+              "open_column": "开盘",
+              "high_column": "最高",
+              "low_column": "最低",
+              "volume_column": "总量",
+              "position_column": "持仓",
+              "name_column": "名称",
+              "source_url": "https://quote.eastmoney.com/center/gridlist.html#futures_global"
+            }
+          ],
+          "note": "Use Sina first. Use Eastmoney only for primary request failure, empty full payload, or missing required date/close columns. Preserve the selected provider in observation metadata."
         },
         "manual_policy_event": {
           "venue": "MANUAL_POLICY",
@@ -836,6 +875,98 @@
           "active": true,
           "metadata": {
             "dcf_role": "global_metal_cycle_anchor"
+          }
+        },
+        {
+          "commodity_id": "METAL.COPPER.LME_3M",
+          "symbol": "COPPER",
+          "name": "LME Copper 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "global_metal_current_cycle_anchor",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
+          }
+        },
+        {
+          "commodity_id": "METAL.ALUMINIUM.LME_3M",
+          "symbol": "ALUMINIUM",
+          "name": "LME Aluminium 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "global_metal_current_cycle_anchor",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
+          }
+        },
+        {
+          "commodity_id": "METAL.ZINC.LME_3M",
+          "symbol": "ZINC",
+          "name": "LME Zinc 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
+          }
+        },
+        {
+          "commodity_id": "METAL.LEAD.LME_3M",
+          "symbol": "LEAD",
+          "name": "LME Lead 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
+          }
+        },
+        {
+          "commodity_id": "METAL.NICKEL.LME_3M",
+          "symbol": "NICKEL",
+          "name": "LME Nickel 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
+          }
+        },
+        {
+          "commodity_id": "METAL.TIN.LME_3M",
+          "symbol": "TIN",
+          "name": "LME Tin 3-Month",
+          "category": "nonferrous",
+          "commodity_type": "foreign_futures_3m_proxy",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m"
           }
         },
         {
@@ -977,6 +1108,120 @@
           }
         },
         {
+          "series_id": "CMD.METAL.COPPER.LME3M.DAILY",
+          "commodity_id": "METAL.COPPER.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "CAD",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Copper 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "CAD", "eastmoney": "LCPT"}
+          }
+        },
+        {
+          "series_id": "CMD.METAL.ALUMINIUM.LME3M.DAILY",
+          "commodity_id": "METAL.ALUMINIUM.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "AHD",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Aluminium 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "AHD", "eastmoney": "LALT"}
+          }
+        },
+        {
+          "series_id": "CMD.METAL.ZINC.LME3M.DAILY",
+          "commodity_id": "METAL.ZINC.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "ZSD",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Zinc 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "ZSD", "eastmoney": "LZNT"}
+          }
+        },
+        {
+          "series_id": "CMD.METAL.LEAD.LME3M.DAILY",
+          "commodity_id": "METAL.LEAD.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "PBD",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Lead 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "PBD", "eastmoney": "LLDT"}
+          }
+        },
+        {
+          "series_id": "CMD.METAL.NICKEL.LME3M.DAILY",
+          "commodity_id": "METAL.NICKEL.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "NID",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Nickel 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "NID", "eastmoney": "LNKT"}
+          }
+        },
+        {
+          "series_id": "CMD.METAL.TIN.LME3M.DAILY",
+          "commodity_id": "METAL.TIN.LME_3M",
+          "venue": "LME",
+          "source_profile": "lme_akshare_foreign_futures",
+          "source_symbol": "SND",
+          "frequency": "daily",
+          "quote_type": "three_month_market_close",
+          "currency": "USD",
+          "unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {
+            "source_name": "LME Tin 3-Month",
+            "underlying_exchange": "LME",
+            "prompt_tenor": "3M",
+            "market_data_type": "cfd_proxy_to_lme_3m",
+            "provider_symbols": {"sina": "SND", "eastmoney": "LTNT"}
+          }
+        },
+        {
           "series_id": "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
           "commodity_id": "CN.CHEMICAL.PTA.SPOT",
           "venue": "100PPI",
@@ -1073,6 +1318,27 @@
           ],
           "frequencies": [
             "monthly"
+          ]
+        },
+        {
+          "scope_id": "lme_nonferrous",
+          "enabled": true,
+          "venues": [
+            "LME"
+          ],
+          "categories": [
+            "nonferrous"
+          ],
+          "commodity_ids": [
+            "METAL.COPPER.LME_3M",
+            "METAL.ALUMINIUM.LME_3M",
+            "METAL.ZINC.LME_3M",
+            "METAL.LEAD.LME_3M",
+            "METAL.NICKEL.LME_3M",
+            "METAL.TIN.LME_3M"
+          ],
+          "frequencies": [
+            "daily"
           ]
         },
         {

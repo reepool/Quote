@@ -4217,48 +4217,6 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('special_commodity_policy_event_sync')
 
-    async def special_commodity_lme_feasibility_probe(
-        self,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        """LME 官方报表自动化可行性检查。"""
-        self._active_tasks.add('special_commodity_lme_feasibility_probe')
-        try:
-            result = await data_manager.run_special_commodity_lme_feasibility_probe()
-            success = result.get("status") == "ready"
-            await self._send_task_report(
-                report_data={
-                    'name': 'LME 官方源可行性检查报告',
-                    'content': _format_special_commodity_scheduler_report(result),
-                    'status': 'success' if success else result.get("status", "blocked"),
-                    'tasks_completed': 1 if success else 0,
-                    'duration': 'N/A',
-                    'maintenance_tasks': [{'task_name': 'special_commodity_lme_feasibility_probe', 'status': result.get("status")}],
-                },
-                report_type='maintenance_report',
-                task_name='LME 官方源可行性检查',
-                job_config=job_config,
-            )
-            return success
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Special commodity LME feasibility probe failed: {e}")
-            await self._send_task_report(
-                report_data={
-                    'name': 'LME 官方源可行性检查报告',
-                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
-                    'status': 'error',
-                    'tasks_completed': 0,
-                    'duration': 'N/A',
-                    'maintenance_tasks': [{'task_name': 'special_commodity_lme_feasibility_probe', 'status': str(e)}],
-                },
-                report_type='maintenance_report',
-                task_name='LME 官方源可行性检查',
-                job_config=job_config,
-            )
-            return False
-        finally:
-            self._active_tasks.discard('special_commodity_lme_feasibility_probe')
-
     async def fx_derivation_sync(
         self,
         start_date: Optional[str] = None,

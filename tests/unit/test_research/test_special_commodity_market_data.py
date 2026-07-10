@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -10,11 +11,11 @@ import pandas as pd
 from utils import config_manager
 from research.special_commodity_market_data import (
     AkshareCommoditySpotProvider,
+    AkshareForeignFuturesProvider,
     CommodityAdapterRegistry,
     CommodityUniverseSelector,
     EiaCommodityProvider,
     FredCommodityProvider,
-    LmeOfficialReportProvider,
     SpecialCommodityMasterDataService,
     SpecialCommodityCalendarGovernanceService,
     SpecialCommodityPolicyEventService,
@@ -69,8 +70,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 5
-    assert result["series"] >= 9
+    assert result["instruments"] == 11
+    assert result["series"] >= 15
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -78,6 +79,12 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "OIL.BRENT.SPOT",
         "METAL.COPPER.IMF",
         "METAL.ALUMINUM.IMF",
+        "METAL.COPPER.LME_3M",
+        "METAL.ALUMINIUM.LME_3M",
+        "METAL.ZINC.LME_3M",
+        "METAL.LEAD.LME_3M",
+        "METAL.NICKEL.LME_3M",
+        "METAL.TIN.LME_3M",
         "CN.CHEMICAL.PTA.SPOT",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
@@ -85,6 +92,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.OIL.WTI.SPOT.EIA.DAILY",
         "CMD.METAL.COPPER.IMF.FRED.MONTHLY",
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
+        "CMD.METAL.COPPER.LME3M.DAILY",
+        "CMD.METAL.ALUMINIUM.LME3M.DAILY",
         "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
     }
 
@@ -114,6 +123,14 @@ def test_special_commodity_scope_resolution():
     assert {item.series_id for item in selector.resolve(scope_id="world_bank_metals")} == {
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
         "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
+    }
+    assert {item.series_id for item in selector.resolve(scope_id="lme_nonferrous")} == {
+        "CMD.METAL.COPPER.LME3M.DAILY",
+        "CMD.METAL.ALUMINIUM.LME3M.DAILY",
+        "CMD.METAL.ZINC.LME3M.DAILY",
+        "CMD.METAL.LEAD.LME3M.DAILY",
+        "CMD.METAL.NICKEL.LME3M.DAILY",
+        "CMD.METAL.TIN.LME3M.DAILY",
     }
 
 
@@ -429,6 +446,177 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert captured["end_day"] == "20260102"
 
 
+def test_lme_akshare_provider_uses_sina_primary_without_fallback(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
+    )
+    calls = {"sina": 0, "eastmoney": 0}
+
+    def _sina(symbol):
+        calls["sina"] += 1
+        assert symbol == "CAD"
+        return pd.DataFrame(
+            [
+                {"date": "2016-07-11", "open": 4700, "high": 4800, "low": 4650, "close": 4750, "volume": 100, "position": 0},
+                {"date": pd.Timestamp("2026-01-02"), "open": 9000, "high": 9100, "low": 8950, "close": 9050, "volume": 200, "position": 0},
+            ]
+        )
+
+    def _eastmoney(symbol):
+        calls["eastmoney"] += 1
+        raise AssertionError("fallback must not run when Sina succeeds")
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(
+            [{"symbol": "LME铜3个月", "code": "CAD"}]
+        ),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2026-01-01", end_date="2026-01-03")
+
+    assert result.blockers == []
+    assert calls == {"sina": 1, "eastmoney": 0}
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.value == 9050
+    assert observation.source_symbol == "CAD"
+    assert observation.metadata["actual_source_profile"] == "sina_foreign_futures"
+    assert observation.metadata["open"] == 9000
+    assert observation.metadata["volume"] == 200
+    source_meta = result.metadata["series_metadata"][series[0].series_id]
+    assert source_meta["lifecycle_start"] == "2016-07-11"
+    assert source_meta["lifecycle_end"] == "2026-01-02"
+
+
+def test_lme_akshare_provider_falls_back_to_eastmoney(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.ALUMINIUM.LME3M.DAILY"]
+    )
+
+    def _sina(symbol):
+        raise ConnectionError("unit-test primary failure")
+
+    def _eastmoney(symbol):
+        assert symbol == "LALT"
+        return pd.DataFrame(
+            [
+                {"日期": "2013-06-21", "名称": "综合铝03", "开盘": 1780, "最高": 1810, "最低": 1770, "最新价": 1795, "总量": 0, "持仓": 0},
+                {"日期": "2026-01-02", "名称": "综合铝03", "开盘": 2600, "最高": 2650, "最低": 2590, "最新价": 2630, "总量": 0, "持仓": 0},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(
+            [{"symbol": "LME铝3个月", "code": "AHD"}]
+        ),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2026-01-02", end_date="2026-01-02")
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    assert result.observations[0].value == 2630
+    assert result.observations[0].source_symbol == "LALT"
+    assert result.observations[0].metadata["actual_source_profile"] == "eastmoney_global_futures"
+    assert result.metadata["series_metadata"][series[0].series_id]["lifecycle_start"] == "2013-06-21"
+    assert any(
+        item["reason"] == "primary_provider_failed_fallback_used"
+        for item in result.warnings
+    )
+
+
+def test_lme_governance_precedes_write_and_uses_only_observed_dates(monkeypatch, tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    series_id = "CMD.METAL.COPPER.LME3M.DAILY"
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=lambda symbol: pd.DataFrame(
+            [
+                {"date": "2016-07-11", "open": 4700, "high": 4800, "low": 4650, "close": 4750, "volume": 100, "position": 0},
+                {"date": "2026-01-02", "open": 9000, "high": 9100, "low": 8950, "close": 9050, "volume": 200, "position": 0},
+            ]
+        ),
+        futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
+            AssertionError("fallback must not run")
+        ),
+        futures_foreign_detail=lambda symbol: pd.DataFrame(
+            [
+                ["交易品种", "伦敦铜(CFD差价合约并非期货)", "交易单位", "每手25吨", "报价单位", "美元/吨"],
+                ["最小变动价位", "电话交易：0.5美元/吨 电子盘：0.25美元/吨", "合约交割月份", "LME三个月期货合约是连续合约，每日都有交割", "交易代码", "CAD"],
+                ["上市交易所", "伦敦金属交易所", "交易时间", "LME Select北京时间（夏令时）08:00-02:00", "附加信息", None],
+            ]
+        ),
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(
+            [
+                {"symbol": "LME铜3个月", "code": "CAD"},
+                {"symbol": "LME铝3个月", "code": "AHD"},
+                {"symbol": "LME锌3个月", "code": "ZSD"},
+                {"symbol": "LME铅3个月", "code": "PBD"},
+                {"symbol": "LME镍3个月", "code": "NID"},
+                {"symbol": "LME锡3个月", "code": "SND"},
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=[series_id],
+        start_date="2026-01-01",
+        end_date="2026-01-04",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["master_data_governance"] == "success"
+    assert result["date_governance"] == "success"
+    assert result["inserted"] == 1
+    governance = {
+        row["series_id"]: row for row in storage.read_dictionary()["master_governance"]
+    }[series_id]
+    assert governance["governance_status"] == "success"
+    assert governance["lifecycle_start"] == "2016-07-11"
+    governance_metadata = json.loads(governance["metadata_json"])
+    assert governance_metadata["market_data_type"] == "cfd_proxy_to_lme_3m"
+    assert governance_metadata["contract_multiplier"] == 25
+    assert governance_metadata["tick_size"] == 0.25
+    calendar = storage.read_publication_calendar(series_id=series_id)
+    assert [row["observation_date"] for row in calendar] == ["2026-01-02"]
+    assert calendar[0]["quality_flag"] == "aggregated_market_observed"
+
+
 def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
 
@@ -590,18 +778,6 @@ def test_calendar_governance_uses_only_source_observed_dates(monkeypatch, tmp_pa
     assert result["missing_observations"] == 0
     assert result["would_write"] == 1
     assert result["per_source"]["fred_official_api"]["weekday_inference_used"] is False
-
-
-def test_lme_feasibility_probe_blocks_until_verified():
-    cfg = config_manager.get_research_config().modules["commodity_market_data"][
-        "special_commodity_market_data"
-    ]
-
-    result = LmeOfficialReportProvider(cfg).feasibility_probe()
-
-    assert result["status"] == "blocked"
-    assert result["reason"] == "lme_official_source_not_verified"
-    assert "licence_boundary" in result["required_checks"]
 
 
 def test_special_commodity_scheduler_report_compacts_normal_success():

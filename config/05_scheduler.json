@@ -798,7 +798,7 @@
       "special_commodity_price_sync": {
         "enabled": true,
         "manual_only": true,
-        "description": "特殊商品价格/指数观测值同步（FRED/EIA/World Bank/100ppi，当前仅手工启用）",
+        "description": "特殊商品价格/指数观测值同步（FRED/EIA/World Bank/100ppi/LME 聚合行情，当前仅手工启用）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -808,7 +808,7 @@
           "scope_id": "fred_energy_oil",
           "dry_run": true,
           "max_runtime_seconds": 3600,
-          "note": "Keep manual_only until FRED/EIA/World Bank/100ppi short-window dry-runs are validated."
+          "note": "Keep manual_only until every enabled scope, including LME Sina-primary/Eastmoney-fallback, passes short-window dry-run validation."
         }
       },
       "special_commodity_price_backfill": {
@@ -852,19 +852,6 @@
         "coalesce": true,
         "parameters": {
           "dry_run": true,
-          "max_runtime_seconds": 600
-        }
-      },
-      "special_commodity_lme_feasibility_probe": {
-        "enabled": true,
-        "manual_only": true,
-        "description": "LME 官方报表登录、下载、历史深度和许可边界可行性检查",
-        "report": true,
-        "pre_run_notify": false,
-        "max_instances": 1,
-        "misfire_grace_time": 600,
-        "coalesce": true,
-        "parameters": {
           "max_runtime_seconds": 600
         }
       },

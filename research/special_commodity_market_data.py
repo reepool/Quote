@@ -7,7 +7,9 @@ import importlib
 import io
 import json
 import logging
+import math
 import os
+import re
 import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -26,8 +28,24 @@ logger = logging.getLogger(__name__)
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
 
 
+def _json_default(value: Any) -> Any:
+    isoformat = getattr(value, "isoformat", None)
+    if callable(isoformat):
+        return isoformat()
+    scalar = getattr(value, "item", None)
+    if callable(scalar):
+        return scalar()
+    return str(value)
+
+
 def _json_dumps(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=_json_default,
+    )
 
 
 def _hash_payload(value: Any) -> str:
@@ -78,7 +96,10 @@ def _normalize_list(value: Any, *, upper: bool = False) -> List[str]:
 def _parse_date(value: Optional[str]) -> Optional[date]:
     if not value:
         return None
-    return date.fromisoformat(str(value)[:10])
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except (TypeError, ValueError):
+        return None
 
 
 def _redact_url(url: str) -> str:
@@ -1729,6 +1750,420 @@ class AkshareCommoditySpotProvider:
         )
 
 
+class AkshareForeignFuturesProvider:
+    """Configuration-driven foreign-futures provider with ordered fallback."""
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    @staticmethod
+    def _load_akshare(mode: str) -> Any:
+        from research.providers.akshare_support import load_akshare
+
+        return load_akshare(mode)
+
+    @staticmethod
+    def _payload_records(payload: Any) -> List[Dict[str, Any]]:
+        if hasattr(payload, "to_dict"):
+            return [dict(row) for row in payload.to_dict("records")]
+        if isinstance(payload, list):
+            return [dict(row) for row in payload if isinstance(row, Mapping)]
+        return []
+
+    @staticmethod
+    def _numeric(row: Mapping[str, Any], column: str) -> Optional[float]:
+        if not column:
+            return None
+        value = row.get(column)
+        if value in {None, "", "."}:
+            return None
+        try:
+            numeric = float(value)
+            return numeric if math.isfinite(numeric) else None
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _discover_lme_products(akshare: Any) -> List[Dict[str, str]]:
+        func = getattr(akshare, "futures_hq_subscribe_exchange_symbol", None)
+        if func is None:
+            return []
+        try:
+            rows = AkshareForeignFuturesProvider._payload_records(func())
+        except Exception as exc:
+            logger.warning(
+                "[AkshareForeignFutures] product discovery failed error=%s",
+                exc,
+            )
+            return []
+        products: List[Dict[str, str]] = []
+        for row in rows:
+            name = str(row.get("symbol") or "").strip()
+            code = str(row.get("code") or "").strip()
+            if name.upper().startswith("LME") and code:
+                products.append({"name": name, "code": code})
+        return products
+
+    @staticmethod
+    def _contract_detail(akshare: Any, function_name: str, source_symbol: str) -> Dict[str, Any]:
+        func = getattr(akshare, function_name, None)
+        if func is None:
+            return {}
+        payload = func(symbol=source_symbol)
+        rows = AkshareForeignFuturesProvider._payload_records(payload)
+        details: Dict[str, str] = {}
+        for row in rows:
+            values = list(row.values())
+            for index in range(0, len(values) - 1, 2):
+                key = str(values[index] or "").strip()
+                value = str(values[index + 1] or "").strip()
+                if key and value and value.lower() != "nan":
+                    details[key] = value
+        quote_unit = details.get("报价单位", "")
+        canonical_unit = ""
+        if "美元" in quote_unit and "吨" in quote_unit:
+            canonical_unit = "USD/metric_ton"
+        multiplier = None
+        multiplier_match = re.search(r"每手\s*([0-9.]+)\s*吨", details.get("交易单位", ""))
+        if multiplier_match:
+            multiplier = float(multiplier_match.group(1))
+        tick_size = None
+        tick_match = re.search(r"电子盘[：:]\s*([0-9.]+)\s*美元/吨", details.get("最小变动价位", ""))
+        if tick_match:
+            tick_size = float(tick_match.group(1))
+        product_label = details.get("交易品种", "")
+        return {
+            "fields": details,
+            "product_label": product_label,
+            "market_data_type": (
+                "cfd_proxy_to_lme_3m"
+                if "CFD" in product_label.upper() and "并非期货" in product_label
+                else "foreign_futures"
+            ),
+            "source_symbol": details.get("交易代码", ""),
+            "exchange_name": details.get("上市交易所", ""),
+            "source_unit": quote_unit,
+            "canonical_unit": canonical_unit,
+            "contract_multiplier": multiplier,
+            "tick_size": tick_size,
+            "prompt_description": details.get("合约交割月份", ""),
+            "trading_hours": details.get("交易时间", ""),
+        }
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        chain = [
+            dict(item)
+            for item in self.source_cfg.get("provider_chain", [])
+            if isinstance(item, Mapping)
+        ]
+        if not chain:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "missing_foreign_futures_provider_chain",
+                        "source_profile": self.source_profile,
+                    }
+                ]
+            )
+        try:
+            akshare = self._load_akshare(str(self.source_cfg.get("akshare_mode") or "direct"))
+        except Exception as exc:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "akshare_unavailable",
+                        "source_profile": self.source_profile,
+                        "error": str(exc),
+                    }
+                ]
+            )
+
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        series_metadata: Dict[str, Dict[str, Any]] = {}
+        attempts_by_series: Dict[str, List[Dict[str, Any]]] = {}
+        available_lme_products = self._discover_lme_products(akshare)
+        detail_function = str(self.source_cfg.get("detail_function") or "").strip()
+
+        for item in series:
+            provider_symbols = dict(item.metadata.get("provider_symbols") or {})
+            primary_symbol = str(provider_symbols.get("sina") or item.source_symbol)
+            contract_detail: Dict[str, Any] = {}
+            contract_detail_error = ""
+            try:
+                contract_detail = self._contract_detail(
+                    akshare,
+                    detail_function,
+                    primary_symbol,
+                )
+            except Exception as exc:
+                contract_detail_error = str(exc)
+                logger.warning(
+                    "[AkshareForeignFutures] contract detail failed series=%s symbol=%s error=%s",
+                    item.series_id,
+                    primary_symbol,
+                    exc,
+                )
+            attempts: List[Dict[str, Any]] = []
+            selected: Optional[Dict[str, Any]] = None
+            selected_rows: List[Dict[str, Any]] = []
+            selected_valid_rows: List[tuple[date, float, Dict[str, Any]]] = []
+
+            for candidate_index, candidate in enumerate(chain):
+                provider_id = str(candidate.get("provider_id") or "").strip()
+                function_name = str(candidate.get("akshare_function") or "").strip()
+                source_symbol = str(provider_symbols.get(provider_id) or "").strip()
+                if not source_symbol and candidate_index == 0:
+                    source_symbol = item.source_symbol
+                date_column = str(candidate.get("date_column") or "").strip()
+                value_column = str(candidate.get("value_column") or "").strip()
+                func = getattr(akshare, function_name, None)
+                if not provider_id or not function_name or not source_symbol or func is None:
+                    attempts.append(
+                        {
+                            "provider_id": provider_id,
+                            "status": "invalid_mapping",
+                            "function": function_name,
+                            "source_symbol": source_symbol,
+                        }
+                    )
+                    continue
+                try:
+                    payload = func(symbol=source_symbol)
+                    rows = self._payload_records(payload)
+                except Exception as exc:
+                    attempts.append(
+                        {
+                            "provider_id": provider_id,
+                            "status": "request_failed",
+                            "source_symbol": source_symbol,
+                            "error": str(exc),
+                        }
+                    )
+                    logger.warning(
+                        "[AkshareForeignFutures] source failed series=%s provider=%s symbol=%s error=%s",
+                        item.series_id,
+                        provider_id,
+                        source_symbol,
+                        exc,
+                    )
+                    continue
+                if not rows:
+                    attempts.append(
+                        {
+                            "provider_id": provider_id,
+                            "status": "empty_payload",
+                            "source_symbol": source_symbol,
+                        }
+                    )
+                    continue
+                available_columns = {
+                    str(key)
+                    for row in rows
+                    for key in row.keys()
+                }
+                missing_columns = [
+                    column
+                    for column in (date_column, value_column)
+                    if not column or column not in available_columns
+                ]
+                if missing_columns:
+                    attempts.append(
+                        {
+                            "provider_id": provider_id,
+                            "status": "required_columns_missing",
+                            "source_symbol": source_symbol,
+                            "missing_columns": missing_columns,
+                            "available_columns": sorted(available_columns),
+                        }
+                    )
+                    continue
+                valid_rows: List[tuple[date, float, Dict[str, Any]]] = []
+                for row in rows:
+                    observed = _parse_date(str(row.get(date_column) or "")[:10])
+                    value = self._numeric(row, value_column)
+                    if observed is None or value is None:
+                        continue
+                    valid_rows.append((observed, value, row))
+                if not valid_rows:
+                    attempts.append(
+                        {
+                            "provider_id": provider_id,
+                            "status": "no_valid_rows",
+                            "source_symbol": source_symbol,
+                        }
+                    )
+                    continue
+                attempts.append(
+                    {
+                        "provider_id": provider_id,
+                        "status": "success",
+                        "source_symbol": source_symbol,
+                        "rows": len(valid_rows),
+                    }
+                )
+                selected = {**candidate, "candidate_index": candidate_index, "source_symbol": source_symbol}
+                selected_rows = rows
+                selected_valid_rows = valid_rows
+                break
+
+            attempts_by_series[item.series_id] = attempts
+            if selected is None:
+                blockers.append(
+                    {
+                        "reason": "all_foreign_futures_providers_failed",
+                        "series_id": item.series_id,
+                        "source_profile": self.source_profile,
+                        "attempts": attempts,
+                    }
+                )
+                continue
+
+            provider_id = str(selected.get("provider_id") or "")
+            actual_source_profile = str(
+                selected.get("actual_source_profile") or provider_id
+            )
+            source_symbol = str(selected["source_symbol"])
+            source_url = str(selected.get("source_url") or f"akshare://{selected.get('akshare_function')}")
+            lifecycle_start = min(row[0] for row in selected_valid_rows).isoformat()
+            lifecycle_end = max(row[0] for row in selected_valid_rows).isoformat()
+            name_column = str(selected.get("name_column") or "")
+            source_name = str(item.metadata.get("source_name") or item.source_symbol)
+            if name_column:
+                source_names = [
+                    str(row.get(name_column) or "").strip()
+                    for row in selected_rows
+                    if str(row.get(name_column) or "").strip()
+                ]
+                if source_names:
+                    source_name = source_names[0]
+            series_metadata[item.series_id] = {
+                "source_name": source_name,
+                "source_frequency": item.frequency,
+                "source_currency": item.currency,
+                "source_unit": item.unit,
+                "lifecycle_start": lifecycle_start,
+                "lifecycle_end": lifecycle_end,
+                "selected_provider": provider_id,
+                "actual_source_profile": actual_source_profile,
+                "source_symbol": source_symbol,
+                "source_url": source_url,
+                "payload_columns": sorted(
+                    {str(key) for row in selected_rows for key in row.keys()}
+                ),
+                "contract_detail": contract_detail,
+                "contract_detail_error": contract_detail_error,
+            }
+            if int(selected.get("candidate_index") or 0) > 0:
+                warnings.append(
+                    {
+                        "reason": "primary_provider_failed_fallback_used",
+                        "series_id": item.series_id,
+                        "selected_provider": provider_id,
+                        "source_symbol": source_symbol,
+                        "attempts": attempts,
+                    }
+                )
+
+            before = len(observations)
+            for observed, value, row in selected_valid_rows:
+                if start and observed < start:
+                    continue
+                if end and observed > end:
+                    continue
+                metadata = {
+                    "actual_source_profile": actual_source_profile,
+                    "selected_provider": provider_id,
+                    "provider_attempts": attempts,
+                    "underlying_exchange": item.metadata.get("underlying_exchange"),
+                    "prompt_tenor": item.metadata.get("prompt_tenor"),
+                    "market_data_type": contract_detail.get("market_data_type"),
+                    "contract_multiplier": contract_detail.get("contract_multiplier"),
+                    "tick_size": contract_detail.get("tick_size"),
+                }
+                for target, config_key in (
+                    ("open", "open_column"),
+                    ("high", "high_column"),
+                    ("low", "low_column"),
+                    ("volume", "volume_column"),
+                    ("position", "position_column"),
+                ):
+                    numeric = self._numeric(row, str(selected.get(config_key) or ""))
+                    if numeric is not None:
+                        metadata[target] = numeric
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=observed.isoformat(),
+                        value=value,
+                        source_url=source_url,
+                        source_symbol=source_symbol,
+                        raw_payload=row,
+                        metadata=metadata,
+                    )
+                )
+            if len(observations) == before:
+                warnings.append(
+                    {
+                        "reason": "no_source_observed_dates",
+                        "series_id": item.series_id,
+                        "selected_provider": provider_id,
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                )
+            logger.info(
+                "[AkshareForeignFutures] series done series=%s provider=%s symbol=%s fallback=%s coverage=%s..%s requested_rows=%s",
+                item.series_id,
+                provider_id,
+                source_symbol,
+                int(selected.get("candidate_index") or 0) > 0,
+                lifecycle_start,
+                lifecycle_end,
+                len(observations) - before,
+            )
+
+        configured_primary_codes = set(
+            _normalize_list(self.source_cfg.get("known_primary_symbols"), upper=True)
+        )
+        if not configured_primary_codes:
+            configured_primary_codes = {
+                str((item.metadata.get("provider_symbols") or {}).get("sina") or item.source_symbol).upper()
+                for item in series
+            }
+        unmapped_products = [
+            product
+            for product in available_lme_products
+            if product["code"].upper() not in configured_primary_codes
+        ]
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "AKSHARE_FOREIGN_FUTURES",
+                "series_requested": len(series),
+                "rows": len(observations),
+                "series_metadata": series_metadata,
+                "attempts_by_series": attempts_by_series,
+                "available_lme_products": available_lme_products,
+                "unmapped_lme_products": unmapped_products,
+            },
+        )
+
+
 def _normalized_source_unit(value: str) -> str:
     text = str(value or "").strip().lower()
     text = text.replace("u.s. dollars", "usd").replace("us dollars", "usd")
@@ -2235,7 +2670,7 @@ class PublicWebCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         )
 
 
-class GatedLmeCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+class ForeignFuturesCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     def govern_master(
         self,
         series: Sequence[CommoditySeries],
@@ -2244,51 +2679,160 @@ class GatedLmeCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         start_date: Optional[str],
         end_date: Optional[str],
     ) -> CommodityMasterGovernanceResult:
-        return CommodityMasterGovernanceResult(
-            records=[
-                _blocked_master_governance_record(
-                    item,
-                    reason="lme_official_source_not_verified",
-                    metadata={"required_checks": ["official_product_metadata", "exchange_calendar", "report_download_permission", "licence_boundary"]},
+        records: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        warnings: List[Dict[str, Any]] = []
+        required_metadata = [
+            "source_name",
+            "underlying_exchange",
+            "prompt_tenor",
+            "market_data_type",
+            "provider_symbols",
+        ]
+        eligible: List[CommoditySeries] = []
+        for item in series:
+            missing = [key for key in required_metadata if not item.metadata.get(key)]
+            provider_symbols = dict(item.metadata.get("provider_symbols") or {})
+            if "sina" not in provider_symbols or "eastmoney" not in provider_symbols:
+                missing.append("provider_symbols.sina/eastmoney")
+            if missing:
+                blockers.append(
+                    {
+                        "reason": "foreign_futures_master_mapping_incomplete",
+                        "series_id": item.series_id,
+                        "missing_fields": sorted(set(missing)),
+                    }
                 )
-                for item in series
-            ],
-            blockers=[
-                {
-                    "reason": "lme_official_source_not_verified",
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="foreign_futures_master_mapping_incomplete",
+                        metadata={"missing_fields": sorted(set(missing))},
+                    )
+                )
+                continue
+            if str(item.metadata.get("underlying_exchange") or "").upper() != item.venue:
+                blockers.append(
+                    {
+                        "reason": "foreign_futures_exchange_mismatch",
+                        "series_id": item.series_id,
+                        "venue": item.venue,
+                        "underlying_exchange": item.metadata.get("underlying_exchange"),
+                    }
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="foreign_futures_exchange_mismatch",
+                    )
+                )
+                continue
+            eligible.append(item)
+
+        result = provider.fetch(
+            eligible,
+            start_date=start_date,
+            end_date=end_date,
+        ) if eligible else CommodityProviderResult()
+        provider_blocked = {
+            str(item.get("series_id")): item
+            for item in result.blockers
+            if item.get("series_id")
+        }
+        blockers.extend(result.blockers)
+        series_metadata = dict(result.metadata.get("series_metadata") or {})
+        for item in eligible:
+            source_meta = dict(series_metadata.get(item.series_id) or {})
+            if item.series_id in provider_blocked or not source_meta:
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="foreign_futures_source_identity_unavailable",
+                        metadata={"provider_blocker": provider_blocked.get(item.series_id)},
+                    )
+                )
+                if item.series_id not in provider_blocked:
+                    blocker = {
+                        "reason": "foreign_futures_source_identity_unavailable",
+                        "series_id": item.series_id,
+                    }
+                    blockers.append(blocker)
+                continue
+            contract_detail = dict(source_meta.get("contract_detail") or {})
+            detail_errors: List[str] = []
+            primary_symbol = str((item.metadata.get("provider_symbols") or {}).get("sina") or item.source_symbol)
+            if not contract_detail:
+                detail_errors.append("contract_detail_unavailable")
+            if contract_detail.get("source_symbol") and contract_detail.get("source_symbol") != primary_symbol:
+                detail_errors.append("source_symbol_mismatch")
+            if "伦敦金属交易所" not in str(contract_detail.get("exchange_name") or ""):
+                detail_errors.append("exchange_identity_mismatch")
+            if contract_detail.get("canonical_unit") != item.unit:
+                detail_errors.append("quote_unit_mismatch")
+            if contract_detail.get("market_data_type") != item.metadata.get("market_data_type"):
+                detail_errors.append("market_data_type_mismatch")
+            if detail_errors:
+                blocker = {
+                    "reason": "foreign_futures_contract_detail_invalid",
                     "series_id": item.series_id,
-                    "required_checks": [
-                        "official_product_metadata",
-                        "exchange_calendar",
-                        "report_download_permission",
-                        "licence_boundary",
-                    ],
+                    "detail_errors": detail_errors,
+                    "contract_detail_error": source_meta.get("contract_detail_error"),
                 }
-                for item in series
-            ]
-        )
-
-
-class GatedLmeCommodityProvider:
-    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
-        self.source_profile = source_profile
-        self.source_cfg = dict(source_cfg or {})
-
-    def fetch(
-        self,
-        series: Sequence[CommoditySeries],
-        *,
-        start_date: Optional[str],
-        end_date: Optional[str],
-    ) -> CommodityProviderResult:
-        return CommodityProviderResult(
-            blockers=[
+                blockers.append(blocker)
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="foreign_futures_contract_detail_invalid",
+                        metadata=blocker,
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="aggregated_master_verified",
+                    source_name=str(contract_detail.get("product_label") or source_meta.get("source_name") or item.metadata["source_name"]),
+                    source_frequency=str(source_meta.get("source_frequency") or item.frequency),
+                    source_currency=str(source_meta.get("source_currency") or item.currency),
+                    source_unit=str(contract_detail.get("canonical_unit") or source_meta.get("source_unit") or item.unit),
+                    lifecycle_start=source_meta.get("lifecycle_start"),
+                    lifecycle_end=source_meta.get("lifecycle_end"),
+                    evidence_url=str(source_meta.get("source_url") or ""),
+                    evidence_payload={
+                        "provider_chain": self.source_cfg.get("provider_chain"),
+                        "provider_symbols": item.metadata.get("provider_symbols"),
+                        "selected_provider": source_meta.get("selected_provider"),
+                        "payload_columns": source_meta.get("payload_columns"),
+                        "prompt_tenor": item.metadata.get("prompt_tenor"),
+                        "contract_detail": contract_detail,
+                    },
+                    metadata={
+                        "underlying_exchange": item.metadata.get("underlying_exchange"),
+                        "prompt_tenor": item.metadata.get("prompt_tenor"),
+                        "selected_provider": source_meta.get("selected_provider"),
+                        "actual_source_profile": source_meta.get("actual_source_profile"),
+                        "source_symbol": source_meta.get("source_symbol"),
+                        "market_data_type": contract_detail.get("market_data_type"),
+                        "contract_multiplier": contract_detail.get("contract_multiplier"),
+                        "tick_size": contract_detail.get("tick_size"),
+                        "trading_hours": contract_detail.get("trading_hours"),
+                    },
+                )
+            )
+        unmapped = list(result.metadata.get("unmapped_lme_products") or [])
+        if unmapped:
+            warnings.append(
                 {
-                    "reason": "lme_official_source_not_verified",
-                    "series_id": item.series_id,
+                    "reason": "unmapped_foreign_futures_products",
+                    "venue": "LME",
+                    "products": unmapped,
                 }
-                for item in series
-            ]
+            )
+        return CommodityMasterGovernanceResult(
+            records=records,
+            warnings=warnings,
+            blockers=blockers,
+            prefetched_result=result,
         )
 
 
@@ -2298,14 +2842,14 @@ class CommodityAdapterRegistry:
         "eia": EiaCommodityProvider,
         "world_bank_pink_sheet": WorldBankCommodityProvider,
         "100ppi_akshare": AkshareCommoditySpotProvider,
-        "lme_gated": GatedLmeCommodityProvider,
+        "akshare_foreign_futures": AkshareForeignFuturesProvider,
     }
     GOVERNANCE = {
         "fred": FredCommodityGovernanceAdapter,
         "eia": EiaCommodityGovernanceAdapter,
         "world_bank_pink_sheet": WorldBankCommodityGovernanceAdapter,
         "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
-        "lme_gated": GatedLmeCommodityGovernanceAdapter,
+        "foreign_futures": ForeignFuturesCommodityGovernanceAdapter,
     }
 
     def __init__(self, module_cfg: Mapping[str, Any]):
@@ -2629,38 +3173,6 @@ class SpecialCommodityCalendarGovernanceService:
         result["written"] = result.get("calendar_governance_write", {}).get("written", 0)
         result["would_write"] = result.get("calendar_governance_write", {}).get("would_write", 0)
         return result
-
-
-class LmeOfficialReportProvider:
-    """Gated LME official report provider placeholder."""
-
-    def __init__(self, module_cfg: Mapping[str, Any]):
-        self.module_cfg = dict(module_cfg or {})
-
-    def feasibility_probe(self) -> Dict[str, Any]:
-        venue_cfg = (self.module_cfg.get("venues") or {}).get("LME") or {}
-        verified = _coerce_bool(venue_cfg.get("feasibility_verified"), False)
-        enabled = _coerce_bool(venue_cfg.get("enabled"), False)
-        if not enabled or not verified:
-            return {
-                "status": "blocked",
-                "reason": "lme_official_source_not_verified",
-                "enabled": enabled,
-                "feasibility_verified": verified,
-                "registration_url": venue_cfg.get("registration_url"),
-                "required_checks": [
-                    "login_access",
-                    "report_download_permission",
-                    "historical_depth",
-                    "automation_stability",
-                    "licence_boundary",
-                ],
-            }
-        return {
-            "status": "ready",
-            "enabled": enabled,
-            "feasibility_verified": verified,
-        }
 
 
 class SpecialCommodityPriceSyncService:
