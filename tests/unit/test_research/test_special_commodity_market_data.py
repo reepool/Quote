@@ -10,6 +10,7 @@ import pandas as pd
 from utils import config_manager
 from research.special_commodity_market_data import (
     AkshareCommoditySpotProvider,
+    CommodityAdapterRegistry,
     CommodityUniverseSelector,
     EiaCommodityProvider,
     FredCommodityProvider,
@@ -20,6 +21,7 @@ from research.special_commodity_market_data import (
     SpecialCommodityPriceSyncService,
     SpecialCommodityStorageManager,
     WorldBankCommodityProvider,
+    _source_unit_matches,
 )
 
 
@@ -29,6 +31,31 @@ def _research_config(tmp_path: Path):
     special_cfg["enabled"] = True
     special_cfg["storage"]["database"] = str(tmp_path / "futures.db")
     return cfg
+
+
+def _fake_fred_governance_get(url, *args, **kwargs):
+    if str(url).endswith("/fred/series"):
+        return SimpleNamespace(
+            url="https://api.stlouisfed.org/fred/series?series_id=DCOILWTICO&api_key=unit-test-key",
+            raise_for_status=lambda: None,
+            json=lambda: {
+                "seriess": [
+                    {
+                        "id": "DCOILWTICO",
+                        "title": "Crude Oil Prices: West Texas Intermediate",
+                        "frequency": "Daily",
+                        "units": "Dollars per Barrel",
+                        "observation_start": "1986-01-02",
+                        "last_updated": "2026-01-03",
+                    }
+                ]
+            },
+        )
+    return SimpleNamespace(
+        url="https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO&api_key=unit-test-key",
+        raise_for_status=lambda: None,
+        json=lambda: {"observations": [{"date": "2026-01-01", "value": "72.5"}]},
+    )
 
 
 def test_special_commodity_master_schema_and_seed(tmp_path):
@@ -88,6 +115,50 @@ def test_special_commodity_scope_resolution():
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
         "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
     }
+
+
+def test_all_active_special_commodity_series_have_concrete_adapters():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    registry = CommodityAdapterRegistry(cfg)
+    selector = CommodityUniverseSelector(cfg)
+
+    for source_profile in {item.source_profile for item in selector.resolve()}:
+        provider, governance, blockers = registry.resolve(source_profile)
+        assert blockers == []
+        assert provider is not None
+        assert governance is not None
+
+
+def test_source_unit_governance_normalizes_equivalent_official_labels():
+    assert _source_unit_matches("USD/barrel", "Dollars per Barrel")
+    assert _source_unit_matches("USD/barrel", "$/BBL")
+    assert _source_unit_matches("USD/metric_ton", "U.S. Dollars per Metric Ton")
+    assert _source_unit_matches("USD/metric_ton", "($/mt)")
+
+
+def test_missing_governance_adapter_blocks_before_observation_write(tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    special_cfg["source_profiles"]["fred_official_api"]["governance_adapter"] = ""
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
+        start_date="2026-01-01",
+        end_date="2026-01-02",
+        dry_run=False,
+    )
+
+    assert result["status"] == "blocked"
+    assert result["master_data_governance"] == "blocked"
+    assert result["inserted"] == 0
+    assert result["blockers"][0]["reason"] == "missing_commodity_governance_adapter"
+    assert storage.read_observations(series_id="CMD.OIL.WTI.SPOT.FRED.DAILY") == []
+    governance_rows = storage.read_dictionary()["master_governance"]
+    assert governance_rows[0]["governance_status"] == "blocked"
 
 
 def test_fred_provider_missing_key_blocks(monkeypatch):
@@ -361,19 +432,10 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
 def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
 
-    class _Response:
-        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO"
-
-        def raise_for_status(self):
-            return None
-
-        def json(self):
-            return {"observations": [{"date": "2026-01-01", "value": "72.5"}]}
-
     monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
     monkeypatch.setattr(
         "research.special_commodity_market_data.request_get",
-        lambda *args, **kwargs: _Response(),
+        _fake_fred_governance_get,
     )
 
     storage = SpecialCommodityStorageManager(cfg)
@@ -388,25 +450,19 @@ def test_special_commodity_sync_dry_run_uses_provider(monkeypatch, tmp_path):
     assert result["status"] == "success"
     assert result["fetched_rows"] == 1
     assert result["would_write"] == 1
+    assert result["master_data_governance"] == "success"
+    assert result["date_governance"] == "success"
+    assert result["source_date_count"] == 1
     assert storage.read_observations(series_id="CMD.OIL.WTI.SPOT.FRED.DAILY") == []
 
 
 def test_special_commodity_storage_upsert_is_idempotent(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
 
-    class _Response:
-        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO&api_key=unit-test-key"
-
-        def raise_for_status(self):
-            return None
-
-        def json(self):
-            return {"observations": [{"date": "2026-01-01", "value": "72.5"}]}
-
     monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
     monkeypatch.setattr(
         "research.special_commodity_market_data.request_get",
-        lambda *args, **kwargs: _Response(),
+        _fake_fred_governance_get,
     )
     storage = SpecialCommodityStorageManager(cfg)
     storage.initialize()
@@ -430,24 +486,21 @@ def test_special_commodity_storage_upsert_is_idempotent(monkeypatch, tmp_path):
     rows = storage.read_observations(series_id="CMD.OIL.WTI.SPOT.FRED.DAILY")
     assert len(rows) == 1
     assert "unit-test-key" not in rows[0]["source_url"]
+    dictionary = storage.read_dictionary()
+    assert dictionary["master_governance"][0]["governance_status"] == "success"
+    calendar = storage.read_publication_calendar(
+        series_id="CMD.OIL.WTI.SPOT.FRED.DAILY"
+    )
+    assert [row["observation_date"] for row in calendar] == ["2026-01-01"]
 
 
 def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
 
-    class _Response:
-        url = "https://api.stlouisfed.org/fred/series/observations?series_id=DCOILWTICO"
-
-        def raise_for_status(self):
-            return None
-
-        def json(self):
-            return {"observations": [{"date": "2026-01-01", "value": "72.5"}]}
-
     monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
     monkeypatch.setattr(
         "research.special_commodity_market_data.request_get",
-        lambda *args, **kwargs: _Response(),
+        _fake_fred_governance_get,
     )
 
     storage = SpecialCommodityStorageManager(cfg)
@@ -465,6 +518,11 @@ def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tm
     assert diagnostics["currencies"] == ["USD"]
     assert diagnostics["units"] == ["USD/barrel"]
     assert diagnostics["latest_observations"][0]["series_id"] == "CMD.OIL.WTI.SPOT.FRED.DAILY"
+    assert diagnostics["missing_master_governance"] == [
+        item["series_id"]
+        for item in storage.read_dictionary()["series"]
+        if item["active"] and item["series_id"] != "CMD.OIL.WTI.SPOT.FRED.DAILY"
+    ]
 
 
 def test_manual_policy_event_sync_writes_policy_table(tmp_path):
@@ -509,11 +567,16 @@ def test_manual_policy_event_sync_writes_policy_table(tmp_path):
     assert events["events"][0]["event_id"] == "thermal-coal-policy-2026-01"
 
 
-def test_calendar_governance_generates_weekday_observation_rows(tmp_path):
+def test_calendar_governance_uses_only_source_observed_dates(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
     special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
     storage = SpecialCommodityStorageManager(cfg)
     storage.initialize()
+    monkeypatch.setenv("FRED_API_KEY", "unit-test-key")
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        _fake_fred_governance_get,
+    )
 
     result = SpecialCommodityCalendarGovernanceService(storage, special_cfg).run(
         series_ids=["CMD.OIL.WTI.SPOT.FRED.DAILY"],
@@ -523,9 +586,10 @@ def test_calendar_governance_generates_weekday_observation_rows(tmp_path):
     )
 
     assert result["status"] == "success"
-    assert result["calendar_rows"] == 2
-    assert result["missing_observations"] == 2
-    assert result["would_write"] == 2
+    assert result["calendar_rows"] == 1
+    assert result["missing_observations"] == 0
+    assert result["would_write"] == 1
+    assert result["per_source"]["fred_official_api"]["weekday_inference_used"] is False
 
 
 def test_lme_feasibility_probe_blocks_until_verified():
@@ -549,13 +613,26 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
             "run_id": 1,
             "dry_run": False,
             "target_series": 2,
+            "venues": ["FRED"],
+            "master_data_governance": "success",
+            "date_governance": "success",
+            "master_governance_records": 2,
+            "source_date_count": 2,
             "fetched_rows": 2,
             "inserted": 2,
             "changed": 0,
             "unchanged": 0,
             "would_write": 0,
             "per_source": {
-                "fred_official_api": {"series": 2, "fetched": 2, "warnings": 0, "blockers": 0}
+                "fred_official_api": {
+                    "status": "success",
+                    "series": 2,
+                    "master_records": 2,
+                    "calendar_rows": 2,
+                    "fetched": 2,
+                    "warnings": 0,
+                    "blockers": 0,
+                }
             },
             "warnings": [],
             "blockers": [],
@@ -566,3 +643,5 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "阻断:" not in report
     assert "告警:" not in report
     assert "fred_official_api" in report
+    assert "主数据 `success`" in report
+    assert "日期 `success`" in report

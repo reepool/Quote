@@ -11,7 +11,7 @@ import os
 import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -268,6 +268,23 @@ class CommodityProviderResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class CommodityMasterGovernanceResult:
+    records: List[Dict[str, Any]] = field(default_factory=list)
+    warnings: List[Dict[str, Any]] = field(default_factory=list)
+    blockers: List[Dict[str, Any]] = field(default_factory=list)
+    prefetched_result: Optional[CommodityProviderResult] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class CommodityDateGovernanceResult:
+    calendar_rows: List[Dict[str, Any]] = field(default_factory=list)
+    warnings: List[Dict[str, Any]] = field(default_factory=list)
+    blockers: List[Dict[str, Any]] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 class CommodityPriceProvider(Protocol):
     def fetch(
         self,
@@ -276,6 +293,28 @@ class CommodityPriceProvider(Protocol):
         start_date: Optional[str],
         end_date: Optional[str],
     ) -> CommodityProviderResult:
+        ...
+
+
+class CommodityGovernanceAdapter(Protocol):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        ...
+
+    def govern_dates(
+        self,
+        series: Sequence[CommoditySeries],
+        observations: Sequence[CommodityObservation],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityDateGovernanceResult:
         ...
 
 
@@ -429,6 +468,31 @@ class SpecialCommodityStorageManager:
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS commodity_master_governance (
+            series_id TEXT PRIMARY KEY,
+            commodity_id TEXT NOT NULL,
+            venue TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            governance_status TEXT NOT NULL,
+            quality_flag TEXT NOT NULL,
+            source_name TEXT NOT NULL,
+            source_frequency TEXT NOT NULL,
+            source_currency TEXT NOT NULL,
+            source_unit TEXT NOT NULL,
+            lifecycle_start TEXT,
+            lifecycle_end TEXT,
+            evidence_url TEXT NOT NULL,
+            evidence_hash TEXT NOT NULL,
+            governed_at TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (series_id) REFERENCES commodity_price_series(series_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_commodity_master_governance_scope
+        ON commodity_master_governance(venue, governance_status, quality_flag);
 
         CREATE TABLE IF NOT EXISTS commodity_publication_calendar (
             series_id TEXT NOT NULL,
@@ -758,11 +822,113 @@ class SpecialCommodityStorageManager:
                 )
         return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
 
+    def upsert_master_governance(
+        self,
+        records: Sequence[Mapping[str, Any]],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"written": 0, "would_write": len(records)}
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for record in records:
+                conn.execute(
+                    """
+                    INSERT INTO commodity_master_governance (
+                        series_id, commodity_id, venue, source_profile,
+                        governance_status, quality_flag, source_name,
+                        source_frequency, source_currency, source_unit,
+                        lifecycle_start, lifecycle_end, evidence_url,
+                        evidence_hash, governed_at, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(series_id) DO UPDATE SET
+                        commodity_id=excluded.commodity_id,
+                        venue=excluded.venue,
+                        source_profile=excluded.source_profile,
+                        governance_status=excluded.governance_status,
+                        quality_flag=excluded.quality_flag,
+                        source_name=excluded.source_name,
+                        source_frequency=excluded.source_frequency,
+                        source_currency=excluded.source_currency,
+                        source_unit=excluded.source_unit,
+                        lifecycle_start=excluded.lifecycle_start,
+                        lifecycle_end=excluded.lifecycle_end,
+                        evidence_url=excluded.evidence_url,
+                        evidence_hash=excluded.evidence_hash,
+                        governed_at=excluded.governed_at,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        record["series_id"],
+                        record["commodity_id"],
+                        record["venue"],
+                        record["source_profile"],
+                        record.get("governance_status") or "blocked",
+                        record.get("quality_flag") or "unverified",
+                        record.get("source_name") or "",
+                        record.get("source_frequency") or "",
+                        record.get("source_currency") or "",
+                        record.get("source_unit") or "",
+                        record.get("lifecycle_start"),
+                        record.get("lifecycle_end"),
+                        _redact_url(str(record.get("evidence_url") or "")),
+                        record.get("evidence_hash") or "",
+                        record.get("governed_at") or now,
+                        _json_dumps(dict(record.get("metadata") or {})),
+                        now,
+                        now,
+                    ),
+                )
+        return {"written": len(records), "would_write": 0}
+
     def read_dictionary(self) -> Dict[str, Any]:
         with self.get_connection() as conn:
             instruments = [_row_to_dict(row) for row in conn.execute("SELECT * FROM commodity_price_instruments ORDER BY commodity_id")]
             series = [_row_to_dict(row) for row in conn.execute("SELECT * FROM commodity_price_series ORDER BY series_id")]
-        return {"instruments": instruments, "series": series}
+            master_governance = [
+                _row_to_dict(row)
+                for row in conn.execute(
+                    "SELECT * FROM commodity_master_governance ORDER BY series_id"
+                )
+            ]
+        return {
+            "instruments": instruments,
+            "series": series,
+            "master_governance": master_governance,
+        }
+
+    def read_publication_calendar(
+        self,
+        *,
+        series_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if series_id:
+            clauses.append("series_id = ?")
+            params.append(series_id)
+        if start_date:
+            clauses.append("observation_date >= ?")
+            params.append(start_date)
+        if end_date:
+            clauses.append("observation_date <= ?")
+            params.append(end_date)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM commodity_publication_calendar
+                {where}
+                ORDER BY series_id, observation_date
+                """,
+                params,
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
 
     def read_observations(
         self,
@@ -1281,6 +1447,7 @@ class WorldBankCommodityProvider:
             if value is not None and str(value).strip() not in {"", "nan"}
         }
         index_by_header = {value: index for index, value in headers_by_index.items()}
+        series_metadata: Dict[str, Dict[str, Any]] = {}
         for item in series:
             column_index = index_by_header.get(item.source_symbol)
             if column_index is None:
@@ -1292,6 +1459,32 @@ class WorldBankCommodityProvider:
                     }
                 )
                 continue
+            all_periods: List[str] = []
+            for row_index in range(header_row + 2, len(frame)):
+                period = str(frame.iat[row_index, 0] or "").strip()
+                value_raw = frame.iat[row_index, column_index]
+                if len(period) == 7 and period[4] == "M":
+                    try:
+                        float(value_raw)
+                    except (TypeError, ValueError):
+                        continue
+                    all_periods.append(period)
+            workbook_unit = str(frame.iat[header_row + 1, column_index] or "").strip()
+            series_metadata[item.series_id] = {
+                "source_name": item.source_symbol,
+                "source_frequency": "monthly",
+                "source_unit": workbook_unit,
+                "lifecycle_start": (
+                    f"{min(all_periods)[:4]}-{min(all_periods)[5:7]}-01"
+                    if all_periods
+                    else None
+                ),
+                "lifecycle_end": (
+                    f"{max(all_periods)[:4]}-{max(all_periods)[5:7]}-01"
+                    if all_periods
+                    else None
+                ),
+            }
             for row_index in range(header_row + 2, len(frame)):
                 period_raw = frame.iat[row_index, 0]
                 value_raw = frame.iat[row_index, column_index]
@@ -1323,7 +1516,13 @@ class WorldBankCommodityProvider:
         return CommodityProviderResult(
             observations=observations,
             warnings=warnings,
-            metadata={"provider": "WORLD_BANK", "series_requested": len(series), "rows": len(observations)},
+            metadata={
+                "provider": "WORLD_BANK",
+                "series_requested": len(series),
+                "rows": len(observations),
+                "series_metadata": series_metadata,
+                "evidence_url": _redact_url(response.url),
+            },
         )
 
 
@@ -1502,6 +1701,7 @@ class AkshareCommoditySpotProvider:
                             "source_label": "100ppi_public_web",
                             "raw_unit": raw_unit,
                             "region_or_spec": item.metadata.get("region_or_spec"),
+                            "source_row_symbol": row.get("symbol") or row.get("var"),
                         },
                     )
                 )
@@ -1526,6 +1726,625 @@ class AkshareCommoditySpotProvider:
                 "rows": len(observations),
                 "source_label": "100ppi_public_web",
             },
+        )
+
+
+def _normalized_source_unit(value: str) -> str:
+    text = str(value or "").strip().lower()
+    text = text.replace("u.s. dollars", "usd").replace("us dollars", "usd")
+    text = text.replace("dollars", "usd").replace("dollar", "usd")
+    text = text.replace("metric_ton", "mt").replace("metric-ton", "mt")
+    for token in ("per", " ", "(", ")"):
+        text = text.replace(token, "")
+    text = text.replace("$", "usd").replace("metricton", "mt").replace("barrel", "bbl")
+    return text
+
+
+def _source_unit_matches(configured_unit: str, source_unit: str) -> bool:
+    configured = _normalized_source_unit(configured_unit)
+    source = _normalized_source_unit(source_unit)
+    aliases = {
+        "usd/bbl": {"usd/bbl", "usdbbl"},
+        "usd/mt": {"usd/mt", "usdmt"},
+        "cny/ton": {"cny/ton", "cnyton"},
+    }
+    configured_values = aliases.get(configured, {configured})
+    source_values = aliases.get(source, {source})
+    return bool(configured_values & source_values)
+
+
+def _master_governance_record(
+    item: CommoditySeries,
+    *,
+    quality_flag: str,
+    source_name: str,
+    source_frequency: str,
+    source_currency: str,
+    source_unit: str,
+    lifecycle_start: Optional[str],
+    lifecycle_end: Optional[str],
+    evidence_url: str,
+    evidence_payload: Mapping[str, Any],
+    metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    return {
+        "series_id": item.series_id,
+        "commodity_id": item.commodity_id,
+        "venue": item.venue,
+        "source_profile": item.source_profile,
+        "governance_status": "success",
+        "quality_flag": quality_flag,
+        "source_name": source_name,
+        "source_frequency": source_frequency,
+        "source_currency": source_currency,
+        "source_unit": source_unit,
+        "lifecycle_start": lifecycle_start,
+        "lifecycle_end": lifecycle_end,
+        "evidence_url": _redact_url(evidence_url),
+        "evidence_hash": _hash_payload(dict(evidence_payload)),
+        "governed_at": get_shanghai_time().isoformat(),
+        "metadata": metadata or {},
+    }
+
+
+def _blocked_master_governance_record(
+    item: CommoditySeries,
+    *,
+    reason: str,
+    evidence_url: str = "",
+    metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    payload = {"reason": reason, "series_id": item.series_id, **(metadata or {})}
+    return {
+        "series_id": item.series_id,
+        "commodity_id": item.commodity_id,
+        "venue": item.venue,
+        "source_profile": item.source_profile,
+        "governance_status": "blocked",
+        "quality_flag": "unverified",
+        "source_name": item.source_symbol,
+        "source_frequency": item.frequency,
+        "source_currency": item.currency,
+        "source_unit": item.unit,
+        "lifecycle_start": None,
+        "lifecycle_end": None,
+        "evidence_url": _redact_url(evidence_url),
+        "evidence_hash": _hash_payload(payload),
+        "governed_at": get_shanghai_time().isoformat(),
+        "metadata": payload,
+    }
+
+
+class SourceObservedDateGovernanceAdapter:
+    """Build date governance only from source-observed rows."""
+
+    def __init__(self, source_cfg: Mapping[str, Any]):
+        self.source_cfg = dict(source_cfg or {})
+
+    def govern_dates(
+        self,
+        series: Sequence[CommoditySeries],
+        observations: Sequence[CommodityObservation],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityDateGovernanceResult:
+        rows: List[Dict[str, Any]] = []
+        warnings: List[Dict[str, Any]] = []
+        calendar_type = str(self.source_cfg.get("calendar_type") or "source_observed")
+        quality_flag = str(
+            self.source_cfg.get("calendar_quality_flag")
+            or "source_observed_verified"
+        )
+        observations_by_series: Dict[str, List[CommodityObservation]] = {
+            item.series_id: [] for item in series
+        }
+        for observation in observations:
+            observations_by_series.setdefault(observation.series_id, []).append(observation)
+        for item in series:
+            source_rows = observations_by_series.get(item.series_id, [])
+            if not source_rows:
+                warnings.append(
+                    {
+                        "reason": "no_source_observed_dates",
+                        "series_id": item.series_id,
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                )
+                continue
+            seen: set[str] = set()
+            for observation in sorted(source_rows, key=lambda value: value.observation_date):
+                if observation.observation_date in seen:
+                    continue
+                seen.add(observation.observation_date)
+                rows.append(
+                    {
+                        "series_id": item.series_id,
+                        "observation_date": observation.observation_date,
+                        "source_profile": item.source_profile,
+                        "frequency": item.frequency,
+                        "expected_observation": True,
+                        "observed": True,
+                        "status": "source_observed",
+                        "quality_flag": quality_flag,
+                        "metadata": {
+                            "venue": item.venue,
+                            "source_symbol": item.source_symbol,
+                            "calendar_type": calendar_type,
+                            "evidence_type": "provider_observation",
+                            "observation_metadata": observation.metadata,
+                        },
+                    }
+                )
+        return CommodityDateGovernanceResult(
+            calendar_rows=rows,
+            warnings=warnings,
+            metadata={
+                "calendar_type": calendar_type,
+                "source_observed_dates": len(rows),
+                "weekday_inference_used": False,
+            },
+        )
+
+
+class FredCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        api_key_env = str(self.source_cfg.get("api_key_env") or "FRED_API_KEY")
+        api_key = os.environ.get(api_key_env)
+        if not api_key:
+            return CommodityMasterGovernanceResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": api_key_env}]
+            )
+        endpoint = str(
+            self.source_cfg.get("metadata_endpoint_url")
+            or "https://api.stlouisfed.org/fred/series"
+        )
+        timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        headers = {"User-Agent": str(self.source_cfg.get("user_agent") or "QuoteSystem/SpecialCommodityMarketData")}
+        tls_config = tls_config_from_source_config("fred_master_governance", self.source_cfg)
+        records: List[Dict[str, Any]] = []
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        for item in series:
+            try:
+                response = request_get(
+                    endpoint,
+                    params={"series_id": item.source_symbol, "api_key": api_key, "file_type": "json"},
+                    headers=headers,
+                    timeout=timeout,
+                    tls_config=tls_config,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                source_row = (payload.get("seriess") or [])[0]
+            except Exception as exc:
+                blockers.append(
+                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": str(exc)}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_metadata_request_failed",
+                        evidence_url=endpoint,
+                        metadata={"error": str(exc)},
+                    )
+                )
+                continue
+            source_frequency = str(source_row.get("frequency") or item.frequency).lower()
+            source_unit = str(source_row.get("units") or "")
+            if source_frequency and source_frequency != item.frequency.lower():
+                blockers.append(
+                    {
+                        "reason": "master_frequency_mismatch",
+                        "series_id": item.series_id,
+                        "configured": item.frequency,
+                        "source": source_frequency,
+                    }
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_frequency_mismatch",
+                        evidence_url=response.url,
+                        metadata={"configured": item.frequency, "source": source_frequency},
+                    )
+                )
+                continue
+            if source_unit and not _source_unit_matches(item.unit, source_unit):
+                blockers.append(
+                    {
+                        "reason": "master_unit_mismatch",
+                        "series_id": item.series_id,
+                        "configured": item.unit,
+                        "source": source_unit,
+                    }
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_unit_mismatch",
+                        evidence_url=response.url,
+                        metadata={"configured": item.unit, "source": source_unit},
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="official_master_verified",
+                    source_name=str(source_row.get("title") or item.source_symbol),
+                    source_frequency=source_frequency or item.frequency,
+                    source_currency=item.currency,
+                    source_unit=source_unit or item.unit,
+                    lifecycle_start=str(source_row.get("observation_start") or "") or None,
+                    lifecycle_end=None,
+                    evidence_url=response.url,
+                    evidence_payload=source_row,
+                    metadata={
+                        "last_updated": source_row.get("last_updated"),
+                        "seasonal_adjustment": source_row.get("seasonal_adjustment"),
+                        "notes": source_row.get("notes"),
+                    },
+                )
+            )
+        return CommodityMasterGovernanceResult(records=records, warnings=warnings, blockers=blockers)
+
+
+class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        api_key_env = str(self.source_cfg.get("api_key_env") or "EIA_API_KEY")
+        api_key = os.environ.get(api_key_env)
+        if not api_key:
+            return CommodityMasterGovernanceResult(
+                blockers=[{"reason": "missing_api_key", "api_key_env": api_key_env}]
+            )
+        endpoint = str(self.source_cfg.get("endpoint_url") or "")
+        timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        headers = {"User-Agent": str(self.source_cfg.get("user_agent") or "QuoteSystem/SpecialCommodityMarketData")}
+        tls_config = tls_config_from_source_config("eia_master_governance", self.source_cfg)
+        records: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        for item in series:
+            facets = item.metadata.get("eia_facets") or {}
+            params: Dict[str, Any] = {
+                "api_key": api_key,
+                "frequency": str(item.metadata.get("eia_frequency") or item.frequency),
+                "data[0]": str(item.metadata.get("eia_data_field") or "value"),
+                "sort[0][column]": "period",
+                "sort[0][direction]": "asc",
+                "length": 1,
+            }
+            for facet_name, facet_values in facets.items():
+                params[f"facets[{facet_name}][]"] = _normalize_list(facet_values)
+            try:
+                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
+                response.raise_for_status()
+                payload = response.json()
+                response_payload = payload.get("response") or {}
+                source_row = (response_payload.get("data") or [])[0]
+            except Exception as exc:
+                blockers.append(
+                    {"reason": "master_metadata_request_failed", "series_id": item.series_id, "error": str(exc)}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_metadata_request_failed",
+                        evidence_url=endpoint,
+                        metadata={"error": str(exc)},
+                    )
+                )
+                continue
+            source_frequency = str(response_payload.get("frequency") or item.frequency).lower()
+            source_unit = str(source_row.get("units") or "")
+            if source_frequency != item.frequency.lower():
+                blockers.append(
+                    {"reason": "master_frequency_mismatch", "series_id": item.series_id, "configured": item.frequency, "source": source_frequency}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_frequency_mismatch",
+                        evidence_url=response.url,
+                        metadata={"configured": item.frequency, "source": source_frequency},
+                    )
+                )
+                continue
+            if source_unit and not _source_unit_matches(item.unit, source_unit):
+                blockers.append(
+                    {"reason": "master_unit_mismatch", "series_id": item.series_id, "configured": item.unit, "source": source_unit}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_unit_mismatch",
+                        evidence_url=response.url,
+                        metadata={"configured": item.unit, "source": source_unit},
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="official_master_verified",
+                    source_name=str(source_row.get("series-description") or item.source_symbol),
+                    source_frequency=source_frequency,
+                    source_currency=item.currency,
+                    source_unit=source_unit or item.unit,
+                    lifecycle_start=str(source_row.get("period") or "") or None,
+                    lifecycle_end=None,
+                    evidence_url=response.url,
+                    evidence_payload={"response": response_payload, "row": source_row},
+                    metadata={
+                        "facets": dict(facets),
+                        "product_name": source_row.get("product-name"),
+                        "process_name": source_row.get("process-name"),
+                    },
+                )
+            )
+        return CommodityMasterGovernanceResult(records=records, blockers=blockers)
+
+
+class WorldBankCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        result = provider.fetch(series, start_date=start_date, end_date=end_date)
+        records: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        metadata_by_series = result.metadata.get("series_metadata") or {}
+        evidence_url = str(result.metadata.get("evidence_url") or self.source_cfg.get("endpoint_url") or "")
+        for item in series:
+            source_meta = metadata_by_series.get(item.series_id)
+            if not isinstance(source_meta, Mapping):
+                blockers.append({"reason": "master_metadata_missing", "series_id": item.series_id})
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_metadata_missing",
+                        evidence_url=evidence_url,
+                    )
+                )
+                continue
+            source_unit = str(source_meta.get("source_unit") or "")
+            if source_unit and not _source_unit_matches(item.unit, source_unit):
+                blockers.append(
+                    {"reason": "master_unit_mismatch", "series_id": item.series_id, "configured": item.unit, "source": source_unit}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_unit_mismatch",
+                        evidence_url=evidence_url,
+                        metadata={"configured": item.unit, "source": source_unit},
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="official_dataset_master_verified",
+                    source_name=str(source_meta.get("source_name") or item.source_symbol),
+                    source_frequency=str(source_meta.get("source_frequency") or item.frequency),
+                    source_currency=item.currency,
+                    source_unit=source_unit or item.unit,
+                    lifecycle_start=source_meta.get("lifecycle_start"),
+                    lifecycle_end=source_meta.get("lifecycle_end"),
+                    evidence_url=evidence_url,
+                    evidence_payload=dict(source_meta),
+                    metadata={"workbook_sheet": self.source_cfg.get("sheet_name")},
+                )
+            )
+        return CommodityMasterGovernanceResult(
+            records=records,
+            blockers=blockers,
+            prefetched_result=result,
+        )
+
+
+class PublicWebCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        records: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        for item in series:
+            required = ["akshare_function", "date_column", "value_column", "raw_unit", "region_or_spec", "source_url"]
+            missing = [key for key in required if not item.metadata.get(key)]
+            if missing:
+                blockers.append(
+                    {"reason": "master_mapping_incomplete", "series_id": item.series_id, "missing_fields": missing}
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="master_mapping_incomplete",
+                        metadata={"missing_fields": missing},
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="aggregated_master_partial",
+                    source_name=str(item.metadata.get("source_name") or item.source_symbol),
+                    source_frequency=item.frequency,
+                    source_currency=item.currency,
+                    source_unit=str(item.metadata.get("raw_unit") or item.unit),
+                    lifecycle_start=None,
+                    lifecycle_end=None,
+                    evidence_url=str(item.metadata.get("source_url") or ""),
+                    evidence_payload={key: item.metadata.get(key) for key in required},
+                    metadata={"region_or_spec": item.metadata.get("region_or_spec")},
+                )
+            )
+        if blockers:
+            return CommodityMasterGovernanceResult(records=records, blockers=blockers)
+        result = provider.fetch(series, start_date=start_date, end_date=end_date)
+        for observation in result.observations:
+            configured = next((item for item in series if item.series_id == observation.series_id), None)
+            source_symbol = str(observation.metadata.get("source_row_symbol") or "")
+            if configured and source_symbol and source_symbol.upper() != configured.source_symbol.upper():
+                blockers.append(
+                    {
+                        "reason": "master_source_symbol_mismatch",
+                        "series_id": observation.series_id,
+                        "configured": configured.source_symbol,
+                        "source": source_symbol,
+                    }
+                )
+                for record in records:
+                    if record.get("series_id") == observation.series_id:
+                        record.update(
+                            _blocked_master_governance_record(
+                                configured,
+                                reason="master_source_symbol_mismatch",
+                                evidence_url=str(configured.metadata.get("source_url") or ""),
+                                metadata={"configured": configured.source_symbol, "source": source_symbol},
+                            )
+                        )
+        return CommodityMasterGovernanceResult(
+            records=records,
+            blockers=blockers,
+            prefetched_result=result,
+        )
+
+
+class GatedLmeCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        return CommodityMasterGovernanceResult(
+            records=[
+                _blocked_master_governance_record(
+                    item,
+                    reason="lme_official_source_not_verified",
+                    metadata={"required_checks": ["official_product_metadata", "exchange_calendar", "report_download_permission", "licence_boundary"]},
+                )
+                for item in series
+            ],
+            blockers=[
+                {
+                    "reason": "lme_official_source_not_verified",
+                    "series_id": item.series_id,
+                    "required_checks": [
+                        "official_product_metadata",
+                        "exchange_calendar",
+                        "report_download_permission",
+                        "licence_boundary",
+                    ],
+                }
+                for item in series
+            ]
+        )
+
+
+class GatedLmeCommodityProvider:
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        return CommodityProviderResult(
+            blockers=[
+                {
+                    "reason": "lme_official_source_not_verified",
+                    "series_id": item.series_id,
+                }
+                for item in series
+            ]
+        )
+
+
+class CommodityAdapterRegistry:
+    PROVIDERS = {
+        "fred": FredCommodityProvider,
+        "eia": EiaCommodityProvider,
+        "world_bank_pink_sheet": WorldBankCommodityProvider,
+        "100ppi_akshare": AkshareCommoditySpotProvider,
+        "lme_gated": GatedLmeCommodityProvider,
+    }
+    GOVERNANCE = {
+        "fred": FredCommodityGovernanceAdapter,
+        "eia": EiaCommodityGovernanceAdapter,
+        "world_bank_pink_sheet": WorldBankCommodityGovernanceAdapter,
+        "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
+        "lme_gated": GatedLmeCommodityGovernanceAdapter,
+    }
+
+    def __init__(self, module_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+
+    def resolve(
+        self,
+        source_profile: str,
+    ) -> tuple[Optional[CommodityPriceProvider], Optional[CommodityGovernanceAdapter], List[Dict[str, Any]]]:
+        source_cfg = (self.module_cfg.get("source_profiles") or {}).get(source_profile)
+        if not isinstance(source_cfg, Mapping):
+            return None, None, [{"reason": "unknown_source_profile", "source_profile": source_profile}]
+        provider_name = str(source_cfg.get("provider_adapter") or "")
+        governance_name = str(source_cfg.get("governance_adapter") or "")
+        provider_factory = self.PROVIDERS.get(provider_name)
+        governance_factory = self.GOVERNANCE.get(governance_name)
+        blockers: List[Dict[str, Any]] = []
+        if provider_factory is None:
+            blockers.append(
+                {
+                    "reason": "missing_commodity_provider_adapter",
+                    "source_profile": source_profile,
+                    "adapter": provider_name,
+                }
+            )
+        if governance_factory is None:
+            blockers.append(
+                {
+                    "reason": "missing_commodity_governance_adapter",
+                    "source_profile": source_profile,
+                    "adapter": governance_name,
+                }
+            )
+        if blockers:
+            return None, None, blockers
+        return (
+            provider_factory(source_profile, source_cfg),
+            governance_factory(source_cfg),
+            [],
         )
 
 
@@ -1563,34 +2382,218 @@ class SpecialCommodityPolicyEventService:
         }
 
 
-class SpecialCommodityCalendarGovernanceService:
-    """Govern observation dates by source frequency without futures trading calendars."""
+class SpecialCommodityGovernancePipeline:
+    """Shared source-backed governance path for all special commodity tasks."""
 
     def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
         self.storage = storage
         self.module_cfg = dict(module_cfg or {})
 
-    @staticmethod
-    def _daily_dates(start: date, end: date) -> List[str]:
-        current = start
-        values: List[str] = []
-        while current <= end:
-            if current.weekday() < 5:
-                values.append(current.isoformat())
-            current += timedelta(days=1)
-        return values
-
-    @staticmethod
-    def _monthly_dates(start: date, end: date) -> List[str]:
-        current = date(start.year, start.month, 1)
-        values: List[str] = []
-        while current <= end:
-            values.append(current.isoformat())
-            if current.month == 12:
-                current = date(current.year + 1, 1, 1)
+    def run(
+        self,
+        *,
+        target_series: Sequence[CommoditySeries],
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        registry = CommodityAdapterRegistry(self.module_cfg)
+        observations: List[CommodityObservation] = []
+        master_records: List[Dict[str, Any]] = []
+        calendar_rows: List[Dict[str, Any]] = []
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        per_source: Dict[str, Dict[str, Any]] = {}
+        for source_profile in sorted({item.source_profile for item in target_series}):
+            source_series = [item for item in target_series if item.source_profile == source_profile]
+            provider, governance, resolution_blockers = registry.resolve(source_profile)
+            logger.info(
+                "[SpecialCommodityGovernance] source start source_profile=%s series=%s start=%s end=%s dry_run=%s",
+                source_profile,
+                len(source_series),
+                start_date,
+                end_date,
+                dry_run,
+            )
+            if resolution_blockers or provider is None or governance is None:
+                resolution_records = [
+                    _blocked_master_governance_record(
+                        item,
+                        reason="missing_commodity_governance_adapter",
+                        metadata={"resolution_blockers": resolution_blockers},
+                    )
+                    for item in source_series
+                ]
+                master_records.extend(resolution_records)
+                blockers.extend(
+                    [{**item, "governance_stage": "adapter_resolution"} for item in resolution_blockers]
+                )
+                per_source[source_profile] = {
+                    "series": len(source_series),
+                    "status": "blocked",
+                    "master_records": len(resolution_records),
+                    "calendar_rows": 0,
+                    "fetched": 0,
+                    "warnings": 0,
+                    "blockers": len(resolution_blockers),
+                }
+                continue
+            master_result = governance.govern_master(
+                source_series,
+                provider,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            master_records.extend(master_result.records)
+            warnings.extend(
+                [{**item, "governance_stage": "master_data"} for item in master_result.warnings]
+            )
+            blockers.extend(
+                [{**item, "governance_stage": "master_data"} for item in master_result.blockers]
+            )
+            blocked_series = {
+                str(item.get("series_id"))
+                for item in master_result.blockers
+                if item.get("series_id")
+            }
+            if any(not item.get("series_id") for item in master_result.blockers):
+                blocked_series.update(item.series_id for item in source_series)
+            governed_series_ids = {str(item.get("series_id")) for item in master_result.records}
+            eligible_series = [
+                item
+                for item in source_series
+                if item.series_id in governed_series_ids and item.series_id not in blocked_series
+            ]
+            if eligible_series:
+                provider_result = master_result.prefetched_result or provider.fetch(
+                    eligible_series,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
             else:
-                current = date(current.year, current.month + 1, 1)
-        return values
+                provider_result = CommodityProviderResult()
+            warnings.extend(
+                [{**item, "governance_stage": "provider"} for item in provider_result.warnings]
+            )
+            blockers.extend(
+                [{**item, "governance_stage": "provider"} for item in provider_result.blockers]
+            )
+            provider_blocked_series = {
+                str(item.get("series_id"))
+                for item in provider_result.blockers
+                if item.get("series_id")
+            }
+            date_series = [
+                item for item in eligible_series if item.series_id not in provider_blocked_series
+            ]
+            source_observations = [
+                item
+                for item in provider_result.observations
+                if item.series_id in {series_item.series_id for series_item in date_series}
+            ]
+            date_result = governance.govern_dates(
+                date_series,
+                source_observations,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            calendar_rows.extend(date_result.calendar_rows)
+            warnings.extend(
+                [{**item, "governance_stage": "date"} for item in date_result.warnings]
+            )
+            blockers.extend(
+                [{**item, "governance_stage": "date"} for item in date_result.blockers]
+            )
+            allowed_keys = {
+                (str(row["series_id"]), str(row["observation_date"]))
+                for row in date_result.calendar_rows
+                if row.get("observed") and row.get("status") == "source_observed"
+            }
+            governed_observations = [
+                item
+                for item in source_observations
+                if (item.series_id, item.observation_date) in allowed_keys
+            ]
+            rejected = len(source_observations) - len(governed_observations)
+            if rejected:
+                blockers.append(
+                    {
+                        "reason": "observation_outside_governed_dates",
+                        "source_profile": source_profile,
+                        "rejected_rows": rejected,
+                        "governance_stage": "date",
+                    }
+                )
+            observations.extend(governed_observations)
+            source_blockers = (
+                len(master_result.blockers)
+                + len(provider_result.blockers)
+                + len(date_result.blockers)
+                + (1 if rejected else 0)
+            )
+            source_warnings = (
+                len(master_result.warnings)
+                + len(provider_result.warnings)
+                + len(date_result.warnings)
+            )
+            per_source[source_profile] = {
+                "series": len(source_series),
+                "status": "blocked" if source_blockers else ("warning" if source_warnings else "success"),
+                "master_records": len(master_result.records),
+                "calendar_rows": len(date_result.calendar_rows),
+                "fetched": len(governed_observations),
+                "warnings": source_warnings,
+                "blockers": source_blockers,
+                "calendar_type": date_result.metadata.get("calendar_type"),
+                "weekday_inference_used": False,
+            }
+            logger.info(
+                "[SpecialCommodityGovernance] source done source_profile=%s status=%s master_records=%s calendar_rows=%s fetched=%s warnings=%s blockers=%s",
+                source_profile,
+                per_source[source_profile]["status"],
+                len(master_result.records),
+                len(date_result.calendar_rows),
+                len(governed_observations),
+                source_warnings,
+                source_blockers,
+            )
+        master_counts = self.storage.upsert_master_governance(master_records, dry_run=dry_run)
+        calendar_counts = self.storage.upsert_publication_calendar(calendar_rows, dry_run=dry_run)
+        master_status = "blocked" if any(
+            item.get("governance_stage") in {"adapter_resolution", "master_data"}
+            for item in blockers
+        ) else ("warning" if any(item.get("governance_stage") == "master_data" for item in warnings) else "success")
+        date_status = "blocked" if any(
+            item.get("governance_stage")
+            in {"adapter_resolution", "master_data", "provider", "date"}
+            for item in blockers
+        ) else ("warning" if any(item.get("reason") == "no_source_observed_dates" for item in warnings) else "success")
+        return {
+            "status": "blocked" if blockers else ("warning" if warnings else "success"),
+            "dry_run": dry_run,
+            "start_date": start_date,
+            "end_date": end_date,
+            "target_series": len(target_series),
+            "observations": observations,
+            "fetched_rows": len(observations),
+            "master_data_governance": master_status,
+            "date_governance": date_status,
+            "master_governance_records": len(master_records),
+            "source_date_count": len(calendar_rows),
+            "master_governance_write": master_counts,
+            "calendar_governance_write": calendar_counts,
+            "per_source": per_source,
+            "warnings": warnings,
+            "blockers": blockers,
+        }
+
+
+class SpecialCommodityCalendarGovernanceService:
+    """Run source-backed date governance without writing observations."""
+
+    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
+        self.storage = storage
+        self.module_cfg = dict(module_cfg or {})
 
     def run(
         self,
@@ -1610,46 +2613,22 @@ class SpecialCommodityCalendarGovernanceService:
         SpecialCommodityMasterDataService(self.storage, self.module_cfg).sync()
         selector = CommodityUniverseSelector(self.module_cfg)
         target_series = selector.resolve(scope_id=scope_id, series_ids=series_ids)
-        observed_by_series = {
-            item.series_id: {row["observation_date"] for row in self.storage.read_observations(series_id=item.series_id)}
-            for item in target_series
-        }
-        rows: List[Dict[str, Any]] = []
-        for item in target_series:
-            if item.frequency == "monthly":
-                expected_dates = self._monthly_dates(start, end)
-            elif item.frequency == "daily":
-                expected_dates = self._daily_dates(start, end)
-            else:
-                expected_dates = []
-            observed_dates = observed_by_series.get(item.series_id, set())
-            for observation_date in expected_dates:
-                observed = observation_date in observed_dates
-                rows.append(
-                    {
-                        "series_id": item.series_id,
-                        "observation_date": observation_date,
-                        "source_profile": item.source_profile,
-                        "frequency": item.frequency,
-                        "expected_observation": True,
-                        "observed": observed,
-                        "status": "observed" if observed else "missing_observation",
-                        "quality_flag": "source_calendar_governed",
-                        "metadata": {"venue": item.venue, "source_symbol": item.source_symbol},
-                    }
-                )
-        counts = self.storage.upsert_publication_calendar(rows, dry_run=dry_run)
-        missing = sum(1 for row in rows if row["status"] == "missing_observation")
-        return {
-            "status": "success",
-            "dry_run": dry_run,
-            "start_date": start_date,
-            "end_date": end_date,
-            "target_series": len(target_series),
-            "calendar_rows": len(rows),
-            "missing_observations": missing,
-            **counts,
-        }
+        if not target_series:
+            return {"status": "blocked", "reason": "empty_special_commodity_scope"}
+        result = SpecialCommodityGovernancePipeline(self.storage, self.module_cfg).run(
+            target_series=target_series,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+        result.pop("observations", None)
+        result["calendar_rows"] = result.get("source_date_count", 0)
+        result["missing_observations"] = sum(
+            1 for item in result.get("warnings", []) if item.get("reason") == "no_source_observed_dates"
+        )
+        result["written"] = result.get("calendar_governance_write", {}).get("written", 0)
+        result["would_write"] = result.get("calendar_governance_write", {}).get("would_write", 0)
+        return result
 
 
 class LmeOfficialReportProvider:
@@ -1689,21 +2668,6 @@ class SpecialCommodityPriceSyncService:
         self.storage = storage
         self.research_config = research_config
         self.module_cfg = _special_cfg(research_config)
-
-    def _provider_for(self, source_profile: str) -> Optional[CommodityPriceProvider]:
-        cfg = (self.module_cfg.get("source_profiles") or {}).get(source_profile)
-        if not isinstance(cfg, Mapping):
-            return None
-        venue = str(cfg.get("venue") or "").upper()
-        if venue == "FRED":
-            return FredCommodityProvider(source_profile, cfg)
-        if venue == "EIA":
-            return EiaCommodityProvider(source_profile, cfg)
-        if venue == "WORLD_BANK":
-            return WorldBankCommodityProvider(source_profile, cfg)
-        if venue == "100PPI":
-            return AkshareCommoditySpotProvider(source_profile, cfg)
-        return None
 
     def sync(
         self,
@@ -1751,41 +2715,66 @@ class SpecialCommodityPriceSyncService:
                 "dry_run": dry_run,
             },
         )
-        total_observations: List[CommodityObservation] = []
-        warnings: List[Dict[str, Any]] = []
-        blockers: List[Dict[str, Any]] = []
-        per_source: Dict[str, Dict[str, Any]] = {}
-        for source_profile in sorted({item.source_profile for item in target_series}):
-            provider = self._provider_for(source_profile)
-            source_series = [item for item in target_series if item.source_profile == source_profile]
-            if provider is None:
-                blockers.append({"reason": "unsupported_source_profile", "source_profile": source_profile})
-                continue
-            result = provider.fetch(source_series, start_date=start_date, end_date=end_date)
-            total_observations.extend(result.observations)
-            warnings.extend(result.warnings)
-            blockers.extend(result.blockers)
-            per_source[source_profile] = {
-                "series": len(source_series),
-                "fetched": len(result.observations),
-                "warnings": len(result.warnings),
-                "blockers": len(result.blockers),
-            }
-        write_counts = self.storage.upsert_observations(total_observations, ingestion_run_id=run_id, dry_run=dry_run)
-        status = "success" if not blockers and not warnings else ("blocked" if blockers else "warning")
+        logger.info(
+            "[SpecialCommodityPriceSync] governance pipeline start run_id=%s target_series=%s start=%s end=%s dry_run=%s",
+            run_id,
+            len(target_series),
+            start_date,
+            end_date,
+            dry_run,
+        )
+        governance = SpecialCommodityGovernancePipeline(self.storage, self.module_cfg).run(
+            target_series=target_series,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+        total_observations = list(governance.get("observations") or [])
+        warnings = list(governance.get("warnings") or [])
+        blockers = list(governance.get("blockers") or [])
+        write_counts = self.storage.upsert_observations(
+            total_observations,
+            ingestion_run_id=run_id,
+            dry_run=dry_run,
+        )
+        status = governance.get("status") or (
+            "success" if not blockers and not warnings else ("blocked" if blockers else "warning")
+        )
         summary = {
             "status": status,
             "run_id": run_id,
             "dry_run": dry_run,
+            "start_date": start_date,
+            "end_date": end_date,
+            "venues": sorted({item.venue for item in target_series}),
             "target_series": len(target_series),
             "fetched_rows": len(total_observations),
             "master_data": master,
-            "per_source": per_source,
+            "master_data_governance": governance.get("master_data_governance"),
+            "date_governance": governance.get("date_governance"),
+            "master_governance_records": governance.get("master_governance_records", 0),
+            "source_date_count": governance.get("source_date_count", 0),
+            "master_governance_write": governance.get("master_governance_write", {}),
+            "calendar_governance_write": governance.get("calendar_governance_write", {}),
+            "per_source": governance.get("per_source", {}),
             "warnings": warnings[:20],
             "blockers": blockers[:20],
             **write_counts,
         }
         self.storage.finish_ingestion_run(run_id, status=status, metadata=summary)
+        logger.info(
+            "[SpecialCommodityPriceSync] done run_id=%s status=%s master_governance=%s date_governance=%s fetched=%s inserted=%s changed=%s unchanged=%s warnings=%s blockers=%s",
+            run_id,
+            status,
+            summary.get("master_data_governance"),
+            summary.get("date_governance"),
+            len(total_observations),
+            write_counts.get("inserted", 0),
+            write_counts.get("changed", 0),
+            write_counts.get("unchanged", 0),
+            len(warnings),
+            len(blockers),
+        )
         return summary
 
 
@@ -1831,6 +2820,8 @@ class SpecialCommodityReadService:
         latest = self.storage.latest_observations()
         latest_by_series = {item["series_id"]: item for item in latest}
         series_rows = dictionary.get("series", [])
+        governance_rows = dictionary.get("master_governance", [])
+        governance_by_series = {item["series_id"]: item for item in governance_rows}
         stale_or_missing = [
             item["series_id"]
             for item in series_rows
@@ -1838,11 +2829,24 @@ class SpecialCommodityReadService:
         ]
         currencies = sorted({row.get("currency") for row in latest if row.get("currency")})
         units = sorted({row.get("unit") for row in latest if row.get("unit")})
+        missing_master_governance = [
+            item["series_id"]
+            for item in series_rows
+            if item.get("active") and item["series_id"] not in governance_by_series
+        ]
+        blocked_master_governance = [
+            item["series_id"]
+            for item in governance_rows
+            if item.get("governance_status") != "success"
+        ]
         return {
             "status": "success",
             "series_count": len(series_rows),
             "latest_observations": latest,
             "stale_or_missing_series": stale_or_missing,
+            "master_governance": governance_rows,
+            "missing_master_governance": missing_master_governance,
+            "blocked_master_governance": blocked_master_governance,
             "currencies": currencies,
             "units": units,
             "source_policy": "local_commodity_db_only",

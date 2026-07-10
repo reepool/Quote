@@ -1649,6 +1649,16 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
         lines.append(f"range: `{result.get('start_date') or 'N/A'}` 至 `{result.get('end_date') or 'N/A'}`")
     if result.get("target_series") is not None:
         lines.append(f"序列数: `{result.get('target_series')}`")
+    if result.get("venues"):
+        lines.append(f"venues: `{','.join(result.get('venues') or [])}`")
+    if result.get("master_data_governance") is not None:
+        lines.append(
+            "治理: "
+            f"主数据 `{result.get('master_data_governance')}`｜"
+            f"日期 `{result.get('date_governance')}`｜"
+            f"主数据证据 `{result.get('master_governance_records', 0)}`｜"
+            f"来源日期 `{result.get('source_date_count', 0)}`"
+        )
 
     if "fetched_rows" in result:
         lines.append(
@@ -1683,8 +1693,10 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
         for source_profile, item in sorted(per_source.items()):
             if isinstance(item, dict):
                 source_lines.append(
-                    f"{source_profile}: series={item.get('series', 0)}, "
-                    f"fetched={item.get('fetched', 0)}, warnings={item.get('warnings', 0)}, "
+                    f"{source_profile}: status={item.get('status', 'unknown')}, "
+                    f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
+                    f"dates={item.get('calendar_rows', 0)}, fetched={item.get('fetched', 0)}, "
+                    f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
                 )
             else:

@@ -284,11 +284,51 @@ validate_observations(normalized_rows)
 |---|---|
 | FRED/EIA 日频 | 使用观测日和发布滞后；非发布日不视为异常 |
 | World Bank/FRED/IMF 月频 | 使用月度观测期；可按月末日期落库，DCF 读取时按估值日前最新可得值 |
-| 100ppi 日频现货 | 使用中国交易日或网页实际发布时间；缺失日记录为 source_missing，不用 weekday 猜测补齐 |
+| 100ppi 日频现货 | 只使用网页/API 实际观测日；缺失日记录为 source gap，不用中国交易日或 weekday 猜测补齐 |
 | LME 官方报表 | 使用 LME 官方发布日或报表日期；若登录下载失败，保留 blocker |
 | 动力煤长协/政策 | 使用 `effective_start/effective_end` 生效期，不做日频价格补点 |
 
 因此，任务名称可以继续叫 `commodity_price_backfill/sync`，但报告中要区分 `trading_day_governance`、`publication_calendar_governance`、`policy_effective_period_governance`。
+
+日期治理必须基于来源证据：
+
+- 不允许用周一至周五、国内交易日历或月初/月末枚举结果冒充来源日历。
+- FRED/EIA/100ppi 仅把实际返回的观测日期写入治理日历；若来源同时返回发布日期、修订日期或 realtime vintage，应一并保存。
+- World Bank 以 Pink Sheet 工作簿中的实际月份为月度观测期，并保留工作簿更新时间/版本证据。
+- LME 或后续其他海外交易所品种必须由实现层 adapter 提供交易所交易日历、官方报告日或正式闭市公告证据；adapter 未完成时不得启用该序列。
+- 政策价和长协价使用生效期，不应派生虚构的逐日行情。
+
+### 6.1.3 Master Data Governance
+
+每一个启用的 `series_id` 都必须有来源级主数据治理，静态配置只能作为治理候选，不能单独视为“已验证”：
+
+| 来源 | 具体主数据证据 |
+|---|---|
+| FRED | `series` metadata：官方 series id、title、frequency、units、observation_start、last_updated |
+| EIA | API v2 route/facet 和数据字段：series description、frequency、units、首个观测日 |
+| World Bank | Pink Sheet 工作簿列名、单位行、首末有效月份、工作簿更新时间 |
+| 100ppi | 配置映射 + 实际返回字段、symbol、日期和值；无法从来源确认的规格/税基保持 partial |
+| LME | 官方品种/合约说明、交易单位、报价单位、报告类型和许可状态；未验证时 blocker |
+| 政策/长协 | 官方公告标题、发布机构、发布日期、生效期、价格口径和来源 URL |
+
+治理结果写入独立的 `commodity_master_governance`，至少记录：`series_id`、来源名称、频率、币种、单位、生命周期、证据 URL/hash、治理状态、质量标记和更新时间。配置重新加载不得覆盖已经持久化的来源证据。
+
+### 6.1.4 Unified Governance Pipeline
+
+行情回补、日更和月更必须复用同一条流程：
+
+```text
+scope 解析
+  -> provider/governance adapter registry 解析
+  -> 主数据治理
+  -> 获取一次来源 payload
+  -> 基于 payload/官方日历完成日期治理
+  -> 主数据与日期 gate
+  -> 仅写入治理日期范围内的观测值
+  -> 诊断和报告
+```
+
+如果观测日期只能从价格 payload 中获得，允许网络层先获取一次 payload 并在同一任务内复用，但必须在任何行情落库前完成日期治理。任务层不得识别来源页面字段，也不得针对某一商品写 skip 或特殊分支；所有差异都收敛在 adapter 层。
 
 第一批 provider：
 
