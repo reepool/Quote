@@ -139,6 +139,37 @@ python3 main.py scheduler
 python3 main.py full --host 0.0.0.0 --port 8000
 ```
 
+**生产部署：systemd 自启动与环境变量**
+
+项目提供 `scripts/service_manager.sh` 作为 systemd 部署入口。执行 `install` 时会同时完成两件事：
+
+- 复制 `scripts/quote-system.service` 到 `/etc/systemd/system/quote-system.service` 并设置开机自启。
+- 生成或补齐 `/etc/quote-system/quote-system.env`，用于持久维护 `FRED_API_KEY`、`EIA_API_KEY`、`TUSHARE_TOKEN` 等运行时密钥；已有文件不会被覆盖。
+
+```bash
+# 安装 systemd 服务并生成环境变量文件
+sudo scripts/service_manager.sh install
+
+# 编辑密钥值；不要把真实密钥写入 git 跟踪的配置文件
+sudo nano /etc/quote-system/quote-system.env
+
+# 启动或重启服务，使环境变量生效
+sudo scripts/service_manager.sh start
+sudo scripts/service_manager.sh restart
+
+# 查看服务状态和日志
+sudo scripts/service_manager.sh status
+sudo scripts/service_manager.sh logs 100
+```
+
+如只需要生成或补齐环境变量文件，不重新安装服务：
+
+```bash
+sudo scripts/service_manager.sh env
+```
+
+`quote-system.service` 通过 `EnvironmentFile=-/etc/quote-system/quote-system.env` 读取密钥。文件权限由部署脚本设置为 root 管理、受限读取，适合生产服务；本地交互式运行仍可按需使用 shell 环境变量或 `.env`，但当前主程序不会自动加载 `.env`。
+
 #### 4. Telegram任务管理
 
 系统提供完整的Telegram机器人管理界面：

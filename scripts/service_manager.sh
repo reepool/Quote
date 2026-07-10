@@ -17,6 +17,9 @@ SERVICE_NAME="quote-system"
 SERVICE_FILE="/home/python/Quote/scripts/quote-system.service"
 SYSTEMD_DIR="/etc/systemd/system"
 PROJECT_ROOT="/home/python/Quote"
+ENV_DIR="/etc/quote-system"
+ENV_FILE="$ENV_DIR/quote-system.env"
+ENV_GROUP="python"
 
 # 日志函数
 log_info() {
@@ -52,12 +55,90 @@ check_project() {
     fi
 }
 
+# 设置环境变量文件权限
+secure_env_file() {
+    if getent group "$ENV_GROUP" >/dev/null 2>&1; then
+        chown root:"$ENV_GROUP" "$ENV_FILE"
+        chmod 640 "$ENV_FILE"
+    else
+        chown root:root "$ENV_FILE"
+        chmod 600 "$ENV_FILE"
+        log_warning "系统组 $ENV_GROUP 不存在，环境变量文件已设置为仅 root 可读"
+    fi
+}
+
+# 追加缺失的环境变量键，不覆盖已有密钥
+append_missing_env_key() {
+    local key="$1"
+    local note="$2"
+
+    if ! grep -q "^${key}=" "$ENV_FILE"; then
+        {
+            echo ""
+            echo "# $note"
+            echo "$key="
+        } >> "$ENV_FILE"
+        log_info "已追加缺失环境变量: $key"
+    fi
+}
+
+# 生成或维护 systemd 环境变量文件
+install_env_file() {
+    log_info "配置 systemd 环境变量文件..."
+
+    mkdir -p "$ENV_DIR"
+    chmod 750 "$ENV_DIR"
+
+    if [ ! -f "$ENV_FILE" ]; then
+        cat > "$ENV_FILE" <<'EOF'
+# Quote System runtime environment variables
+# Managed by scripts/service_manager.sh.
+# Fill sensitive values here instead of tracked JSON config files.
+# After editing, run: sudo systemctl restart quote-system
+
+# Official commodity market data API keys
+FRED_API_KEY=
+EIA_API_KEY=
+
+# Optional data-source credentials
+TUSHARE_TOKEN=
+
+# Optional Telegram credentials used by environment-aware components
+TELEGRAM_API_ID=
+TELEGRAM_API_HASH=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+
+# Optional API runtime overrides
+# API_HOST=0.0.0.0
+# API_PORT=8000
+# API_WORKERS=1
+EOF
+        log_success "已生成环境变量文件: $ENV_FILE"
+    else
+        log_warning "环境变量文件已存在，保留已有值并只补充缺失键: $ENV_FILE"
+        append_missing_env_key "FRED_API_KEY" "Official commodity market data API key: FRED"
+        append_missing_env_key "EIA_API_KEY" "Official commodity market data API key: EIA"
+        append_missing_env_key "TUSHARE_TOKEN" "Optional Tushare data-source token"
+        append_missing_env_key "TELEGRAM_API_ID" "Optional Telegram API ID"
+        append_missing_env_key "TELEGRAM_API_HASH" "Optional Telegram API hash"
+        append_missing_env_key "TELEGRAM_BOT_TOKEN" "Optional Telegram bot token"
+        append_missing_env_key "TELEGRAM_CHAT_ID" "Optional Telegram chat IDs, comma separated"
+    fi
+
+    secure_env_file
+    log_info "请用 sudo 编辑密钥值: sudo nano $ENV_FILE"
+}
+
 # 安装服务
 install_service() {
     log_info "安装 Quote System systemd 服务..."
 
     # 检查项目目录
     check_project
+
+    # 生成或维护环境变量文件
+    install_env_file
 
     # 复制服务文件
     cp "$SERVICE_FILE" "$SYSTEMD_DIR/$SERVICE_NAME.service"
@@ -73,6 +154,7 @@ install_service() {
 
     log_success "服务安装完成"
     log_info "服务文件: $SYSTEMD_DIR/$SERVICE_NAME.service"
+    log_info "环境变量文件: $ENV_FILE"
     log_info "开机自启: 已启用"
 }
 
@@ -175,6 +257,7 @@ show_help() {
     echo ""
     echo "选项:"
     echo "  install                 安装服务并设置开机自启"
+    echo "  env                     生成或补齐 systemd 环境变量文件"
     echo "  uninstall               卸载服务"
     echo "  start                   启动服务"
     echo "  stop                    停止服务"
@@ -185,7 +268,8 @@ show_help() {
     echo "  -h, --help              显示此帮助信息"
     echo ""
     echo "示例:"
-    echo "  sudo $0 install         # 安装服务"
+    echo "  sudo $0 install         # 安装服务并生成环境变量文件"
+    echo "  sudo $0 env             # 只生成或补齐环境变量文件"
     echo "  sudo $0 start           # 启动服务"
     echo "  sudo $0 status          # 查看状态"
     echo "  sudo $0 logs 100        # 查看最近100行日志"
@@ -198,6 +282,10 @@ main() {
         install)
             check_root
             install_service
+            ;;
+        env)
+            check_root
+            install_env_file
             ;;
         uninstall)
             check_root
