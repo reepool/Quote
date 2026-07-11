@@ -1307,7 +1307,7 @@ def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
     ) == ("2025-01-01", "2026-05-31")
 
 
-def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
+def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
     scheduler_cfg = json.loads(
         (Path(__file__).parents[3] / "config" / "05_scheduler.json").read_text()
     )["scheduler_config"]
@@ -1325,6 +1325,18 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     assert special["parameters"]["scope_ids"] == [
         "lme_nonferrous",
         "eia_energy_oil",
+    ]
+    domestic_spot = jobs["special_commodity_cn_spot_sync"]
+    assert domestic_spot["enabled"] is True
+    assert domestic_spot["manual_only"] is False
+    assert domestic_spot["trigger"] == {
+        "type": "cron",
+        "day_of_week": "mon-fri",
+        "hour": 22,
+        "minute": 30,
+        "second": 0,
+    }
+    assert domestic_spot["parameters"]["scope_ids"] == [
         "cn_100ppi_chemical",
         "cn_100ppi_methanol",
         "cn_100ppi_ethylene_glycol",
@@ -1350,6 +1362,10 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     assert monthly["parameters"]["dry_run"] is False
     assert jobs["cache_warm_up"]["trigger"]["minute"] == 20
     assert "LME" not in jobs["futures_market_data_sync"]["parameters"]["exchanges"]
+    assert all(
+        not scope_id.startswith("cn_100ppi_")
+        for scope_id in special["parameters"]["scope_ids"]
+    )
 
     enabled_at_0800 = [
         job_id

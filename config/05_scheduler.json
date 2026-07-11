@@ -798,7 +798,7 @@
       "special_commodity_price_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "外盘及特殊商品日频同步（LME 六种3M代理行情、EIA主源/FRED备源 WTI/Brent 现货及 100ppi PTA/甲醇/乙二醇现货；独立于国内期货日更）",
+        "description": "海外商品日频同步（LME 六种3M代理行情及 EIA主源/FRED备源 WTI/Brent 现货）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -814,7 +814,32 @@
         "parameters": {
           "scope_ids": [
             "lme_nonferrous",
-            "eia_energy_oil",
+            "eia_energy_oil"
+          ],
+          "lookback_days": 10,
+          "dry_run": false,
+          "max_runtime_seconds": 3600,
+          "note": "Overseas daily scopes only. Domestic 100ppi spot series run in special_commodity_cn_spot_sync."
+        }
+      },
+      "special_commodity_cn_spot_sync": {
+        "enabled": true,
+        "manual_only": false,
+        "description": "国内特殊商品现货日频同步（100ppi PTA、甲醇、乙二醇；独立于国内期货连续合约日更）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 22,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_ids": [
             "cn_100ppi_chemical",
             "cn_100ppi_methanol",
             "cn_100ppi_ethylene_glycol"
@@ -822,7 +847,7 @@
           "lookback_days": 10,
           "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Production scopes include governed LME proxies, canonical WTI/Brent spot series using EIA primary and FRED date-level fallback, and governed 100ppi PTA, methanol, and ethylene-glycol spot series. Add other mature daily scopes here without changing the domestic futures task."
+          "note": "Governed domestic public-web spot scopes only. Do not add these series to futures_market_data_sync because their source-observed date governance differs from exchange futures governance."
         }
       },
       "special_commodity_price_monthly_sync": {
