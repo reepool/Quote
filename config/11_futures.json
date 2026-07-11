@@ -728,6 +728,29 @@
           "timeout_seconds": 30,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
+        "eia_fred_oil_chain": {
+          "venue": "EIA",
+          "source": "EIA primary with FRED date-level fallback",
+          "source_mode": "configured_primary_fallback",
+          "source_interface": "commodity_source_chain",
+          "provider_adapter": "configured_source_chain",
+          "governance_adapter": "configured_source_chain",
+          "calendar_type": "source_observed_date",
+          "calendar_quality_flag": "official_source_chain_observed",
+          "quality_flag": "official_primary_with_governed_fallback",
+          "parser_version": "configured_source_chain.v1",
+          "source_chain": [
+            {
+              "source_profile": "eia_official_api",
+              "role": "primary"
+            },
+            {
+              "source_profile": "fred_official_api",
+              "role": "fallback"
+            }
+          ],
+          "conflict_policy": "prefer_primary_and_report"
+        },
         "world_bank_public_dataset": {
           "venue": "WORLD_BANK",
           "source": "World Bank Pink Sheet public dataset",
@@ -1017,21 +1040,40 @@
           "series_id": "CMD.OIL.WTI.SPOT.EIA.DAILY",
           "commodity_id": "OIL.WTI.SPOT",
           "venue": "EIA",
-          "source_profile": "eia_official_api",
+          "source_profile": "eia_fred_oil_chain",
           "source_symbol": "PET.RWTC.D",
           "frequency": "daily",
-          "quote_type": "spot_validation",
+          "quote_type": "spot_canonical",
           "currency": "USD",
           "unit": "USD/barrel",
           "active": true,
           "metadata": {
-            "role": "official_validation_or_replacement",
+            "role": "canonical_primary_with_fallback",
             "eia_frequency": "daily",
             "eia_data_field": "value",
             "eia_facets": {
               "series": [
                 "RWTC"
               ]
+            },
+            "source_chain_sources": {
+              "eia_official_api": {
+                "venue": "EIA",
+                "source_symbol": "PET.RWTC.D",
+                "metadata": {
+                  "eia_frequency": "daily",
+                  "eia_data_field": "value",
+                  "eia_facets": {
+                    "series": [
+                      "RWTC"
+                    ]
+                  }
+                }
+              },
+              "fred_official_api": {
+                "venue": "FRED",
+                "source_symbol": "DCOILWTICO"
+              }
             }
           }
         },
@@ -1039,21 +1081,40 @@
           "series_id": "CMD.OIL.BRENT.SPOT.EIA.DAILY",
           "commodity_id": "OIL.BRENT.SPOT",
           "venue": "EIA",
-          "source_profile": "eia_official_api",
+          "source_profile": "eia_fred_oil_chain",
           "source_symbol": "PET.RBRTE.D",
           "frequency": "daily",
-          "quote_type": "spot_validation",
+          "quote_type": "spot_canonical",
           "currency": "USD",
           "unit": "USD/barrel",
           "active": true,
           "metadata": {
-            "role": "official_validation_or_replacement",
+            "role": "canonical_primary_with_fallback",
             "eia_frequency": "daily",
             "eia_data_field": "value",
             "eia_facets": {
               "series": [
                 "RBRTE"
               ]
+            },
+            "source_chain_sources": {
+              "eia_official_api": {
+                "venue": "EIA",
+                "source_symbol": "PET.RBRTE.D",
+                "metadata": {
+                  "eia_frequency": "daily",
+                  "eia_data_field": "value",
+                  "eia_facets": {
+                    "series": [
+                      "RBRTE"
+                    ]
+                  }
+                }
+              },
+              "fred_official_api": {
+                "venue": "FRED",
+                "source_symbol": "DCOILBRENTEU"
+              }
             }
           }
         },

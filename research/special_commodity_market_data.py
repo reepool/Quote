@@ -1405,6 +1405,216 @@ class EiaCommodityProvider:
         )
 
 
+class ConfiguredSourceChainProvider:
+    """Resolve a canonical series from configured primary and fallback sources."""
+
+    PROVIDERS = {
+        "fred": FredCommodityProvider,
+        "eia": EiaCommodityProvider,
+    }
+
+    def __init__(
+        self,
+        source_profile: str,
+        source_cfg: Mapping[str, Any],
+        module_cfg: Mapping[str, Any],
+    ):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.module_cfg = dict(module_cfg or {})
+        self.parser_version = str(
+            self.source_cfg.get("parser_version") or "configured_source_chain.v1"
+        )
+
+    def _chain_profiles(self) -> List[str]:
+        return [
+            str(item.get("source_profile") or "")
+            for item in self.source_cfg.get("source_chain", [])
+            if isinstance(item, Mapping) and item.get("source_profile")
+        ]
+
+    def mapped_series(
+        self,
+        source_profile: str,
+        series: Sequence[CommoditySeries],
+    ) -> List[CommoditySeries]:
+        mapped: List[CommoditySeries] = []
+        for item in series:
+            source_map = dict((item.metadata.get("source_chain_sources") or {}).get(source_profile) or {})
+            source_symbol = str(source_map.get("source_symbol") or "").strip()
+            if not source_symbol:
+                continue
+            metadata = dict(item.metadata)
+            metadata.update(dict(source_map.get("metadata") or {}))
+            mapped.append(
+                CommoditySeries(
+                    series_id=item.series_id,
+                    commodity_id=item.commodity_id,
+                    venue=str(source_map.get("venue") or item.venue).upper(),
+                    source_profile=source_profile,
+                    source_symbol=source_symbol,
+                    frequency=item.frequency,
+                    quote_type=item.quote_type,
+                    currency=item.currency,
+                    unit=item.unit,
+                    active=item.active,
+                    metadata=metadata,
+                )
+            )
+        return mapped
+
+    def _resolve_provider(self, source_profile: str) -> Optional[CommodityPriceProvider]:
+        source_cfg = dict((self.module_cfg.get("source_profiles") or {}).get(source_profile) or {})
+        provider_name = str(source_cfg.get("provider_adapter") or "")
+        provider_factory = self.PROVIDERS.get(provider_name)
+        if provider_factory is None:
+            return None
+        return provider_factory(source_profile, source_cfg)
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        profiles = self._chain_profiles()
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        results: Dict[str, CommodityProviderResult] = {}
+        rows_by_source: Dict[str, Dict[tuple[str, str], CommodityObservation]] = {}
+        for profile in profiles:
+            mapped = self.mapped_series(profile, series)
+            provider = self._resolve_provider(profile)
+            if provider is None or len(mapped) != len(series):
+                blockers.append(
+                    {
+                        "reason": "source_chain_adapter_or_mapping_missing",
+                        "source_profile": profile,
+                        "mapped_series": len(mapped),
+                        "expected_series": len(series),
+                    }
+                )
+                continue
+            result = provider.fetch(mapped, start_date=start_date, end_date=end_date)
+            results[profile] = result
+            warnings.extend(
+                [{**item, "chain_source_profile": profile} for item in result.warnings]
+            )
+            blockers.extend(
+                [{**item, "chain_source_profile": profile} for item in result.blockers]
+            )
+            rows_by_source[profile] = {
+                (item.series_id, item.observation_date): item
+                for item in result.observations
+            }
+
+        selected: List[CommodityObservation] = []
+        fallback_filled = 0
+        conflicts: List[Dict[str, Any]] = []
+        selected_by_source = {profile: 0 for profile in profiles}
+        for item in series:
+            dates = sorted(
+                {
+                    observed_date
+                    for profile in profiles
+                    for series_id, observed_date in rows_by_source.get(profile, {})
+                    if series_id == item.series_id
+                }
+            )
+            for observed_date in dates:
+                candidates = [
+                    (profile, rows_by_source.get(profile, {}).get((item.series_id, observed_date)))
+                    for profile in profiles
+                ]
+                available = [(profile, row) for profile, row in candidates if row is not None]
+                if not available:
+                    continue
+                selected_profile, source_row = available[0]
+                assert source_row is not None
+                if selected_profile != profiles[0]:
+                    fallback_filled += 1
+                selected_by_source[selected_profile] += 1
+                for comparison_profile, comparison in available[1:]:
+                    assert comparison is not None
+                    if not math.isclose(source_row.value, comparison.value, rel_tol=0.0, abs_tol=1e-12):
+                        conflicts.append(
+                            {
+                                "series_id": item.series_id,
+                                "observation_date": observed_date,
+                                "selected_source_profile": selected_profile,
+                                "selected_value": source_row.value,
+                                "comparison_source_profile": comparison_profile,
+                                "comparison_value": comparison.value,
+                                "absolute_difference": abs(source_row.value - comparison.value),
+                            }
+                        )
+                metadata = dict(source_row.metadata)
+                metadata.update(
+                    {
+                        "actual_source_profile": selected_profile,
+                        "canonical_source_profile": self.source_profile,
+                        "source_chain": profiles,
+                        "source_role": "primary" if selected_profile == profiles[0] else "fallback",
+                        "fallback_reason": None if selected_profile == profiles[0] else "primary_date_missing",
+                    }
+                )
+                selected.append(
+                    CommodityObservation(
+                        series_id=item.series_id,
+                        observation_date=source_row.observation_date,
+                        value=source_row.value,
+                        currency=source_row.currency,
+                        unit=source_row.unit,
+                        raw_value=source_row.raw_value,
+                        raw_currency=source_row.raw_currency,
+                        raw_unit=source_row.raw_unit,
+                        source_profile=self.source_profile,
+                        source_url=source_row.source_url,
+                        quality_flag=source_row.quality_flag,
+                        source_symbol=source_row.source_symbol,
+                        parser_version=self.parser_version,
+                        raw_payload_hash=_hash_payload(
+                            {
+                                "actual_source_profile": selected_profile,
+                                "source_hash": source_row.raw_payload_hash,
+                            }
+                        ),
+                        metadata=metadata,
+                    )
+                )
+
+        diagnostics = {
+            "primary_source_profile": profiles[0] if profiles else "",
+            "fallback_source_profiles": profiles[1:],
+            "selected_by_source": selected_by_source,
+            "fallback_filled_dates": fallback_filled,
+            "conflict_count": len(conflicts),
+            "conflict_samples": conflicts[:20],
+            "max_absolute_difference": max(
+                (float(item["absolute_difference"]) for item in conflicts),
+                default=0.0,
+            ),
+        }
+        return CommodityProviderResult(
+            observations=selected,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "CONFIGURED_SOURCE_CHAIN",
+                "series_requested": len(series),
+                "rows": len(selected),
+                "date_gap_fill": {
+                    "enabled": True,
+                    "fallback_filled_dates": fallback_filled,
+                    "unresolved_dates": 0,
+                },
+                "quality_diagnostics": {"cross_source": diagnostics},
+                "cross_source": diagnostics,
+            },
+        )
+
+
 class WorldBankCommodityProvider:
     """World Bank Pink Sheet monthly workbook adapter."""
 
@@ -2749,6 +2959,86 @@ class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         return CommodityMasterGovernanceResult(records=records, blockers=blockers)
 
 
+class ConfiguredSourceChainGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    """Govern canonical series from primary-source evidence and row-level lineage."""
+
+    GOVERNANCE = {
+        "fred": FredCommodityGovernanceAdapter,
+        "eia": EiaCommodityGovernanceAdapter,
+    }
+
+    def __init__(self, source_cfg: Mapping[str, Any], module_cfg: Mapping[str, Any]):
+        super().__init__(source_cfg)
+        self.module_cfg = dict(module_cfg or {})
+
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        if not isinstance(provider, ConfiguredSourceChainProvider):
+            return CommodityMasterGovernanceResult(
+                blockers=[{"reason": "invalid_source_chain_provider"}]
+            )
+        profiles = provider._chain_profiles()
+        if not profiles:
+            return CommodityMasterGovernanceResult(
+                blockers=[{"reason": "empty_source_chain"}]
+            )
+        primary_profile = profiles[0]
+        primary_cfg = dict(
+            (self.module_cfg.get("source_profiles") or {}).get(primary_profile) or {}
+        )
+        provider_factory = ConfiguredSourceChainProvider.PROVIDERS.get(
+            str(primary_cfg.get("provider_adapter") or "")
+        )
+        governance_factory = self.GOVERNANCE.get(
+            str(primary_cfg.get("governance_adapter") or "")
+        )
+        primary_series = provider.mapped_series(primary_profile, series)
+        if provider_factory is None or governance_factory is None or len(primary_series) != len(series):
+            return CommodityMasterGovernanceResult(
+                blockers=[
+                    {
+                        "reason": "primary_source_chain_governance_unavailable",
+                        "source_profile": primary_profile,
+                    }
+                ]
+            )
+        primary_result = governance_factory(primary_cfg).govern_master(
+            primary_series,
+            provider_factory(primary_profile, primary_cfg),
+            start_date=start_date,
+            end_date=end_date,
+        )
+        records: List[Dict[str, Any]] = []
+        for record in primary_result.records:
+            metadata = dict(record.get("metadata") or {})
+            metadata.update(
+                {
+                    "canonical_source_chain": profiles,
+                    "primary_source_profile": primary_profile,
+                    "fallback_source_profiles": profiles[1:],
+                }
+            )
+            records.append(
+                {
+                    **record,
+                    "source_profile": provider.source_profile,
+                    "quality_flag": "official_primary_with_governed_fallback",
+                    "metadata": metadata,
+                }
+            )
+        return CommodityMasterGovernanceResult(
+            records=records,
+            warnings=primary_result.warnings,
+            blockers=primary_result.blockers,
+        )
+
+
 class WorldBankCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     def govern_master(
         self,
@@ -3057,6 +3347,7 @@ class CommodityAdapterRegistry:
         "world_bank_pink_sheet": WorldBankCommodityProvider,
         "100ppi_akshare": AkshareCommoditySpotProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,
+        "configured_source_chain": ConfiguredSourceChainProvider,
     }
     GOVERNANCE = {
         "fred": FredCommodityGovernanceAdapter,
@@ -3064,6 +3355,7 @@ class CommodityAdapterRegistry:
         "world_bank_pink_sheet": WorldBankCommodityGovernanceAdapter,
         "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
         "foreign_futures": ForeignFuturesCommodityGovernanceAdapter,
+        "configured_source_chain": ConfiguredSourceChainGovernanceAdapter,
     }
 
     def __init__(self, module_cfg: Mapping[str, Any]):
@@ -3099,11 +3391,15 @@ class CommodityAdapterRegistry:
             )
         if blockers:
             return None, None, blockers
-        return (
-            provider_factory(source_profile, source_cfg),
-            governance_factory(source_cfg),
-            [],
-        )
+        if provider_name == "configured_source_chain":
+            provider = provider_factory(source_profile, source_cfg, self.module_cfg)
+        else:
+            provider = provider_factory(source_profile, source_cfg)
+        if governance_name == "configured_source_chain":
+            governance = governance_factory(source_cfg, self.module_cfg)
+        else:
+            governance = governance_factory(source_cfg)
+        return provider, governance, []
 
 
 class ManualPolicyEventProvider:

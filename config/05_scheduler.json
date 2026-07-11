@@ -798,7 +798,7 @@
       "special_commodity_price_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "外盘及特殊商品日频同步（LME 六种3M代理行情及 FRED WTI/Brent 现货；独立于国内期货日更）",
+        "description": "外盘及特殊商品日频同步（LME 六种3M代理行情及 EIA主源/FRED备源 WTI、Brent 现货；独立于国内期货日更）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -814,12 +814,12 @@
         "parameters": {
           "scope_ids": [
             "lme_nonferrous",
-            "fred_energy_oil"
+            "eia_energy_oil"
           ],
           "lookback_days": 10,
           "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Production scopes include governed and historically backfilled LME non-ferrous proxies plus FRED WTI/Brent spot series. Add other mature daily scopes here without changing the domestic futures task."
+          "note": "Production scopes include governed LME proxies plus canonical WTI/Brent spot series using EIA primary and FRED date-level fallback. Add other mature daily scopes here without changing the domestic futures task."
         }
       },
       "special_commodity_price_backfill": {

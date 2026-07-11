@@ -14,7 +14,10 @@ from research.special_commodity_market_data import (
     AkshareCommoditySpotProvider,
     AkshareForeignFuturesProvider,
     CommodityAdapterRegistry,
+    CommodityObservation,
+    CommoditySeries,
     CommodityUniverseSelector,
+    ConfiguredSourceChainProvider,
     EiaCommodityProvider,
     FredCommodityProvider,
     SpecialCommodityMasterDataService,
@@ -121,6 +124,9 @@ def test_special_commodity_scope_resolution():
         "CMD.OIL.WTI.SPOT.EIA.DAILY",
         "CMD.OIL.BRENT.SPOT.EIA.DAILY",
     }
+    assert {
+        item.source_profile for item in selector.resolve(scope_id="eia_energy_oil")
+    } == {"eia_fred_oil_chain"}
     assert {item.series_id for item in selector.resolve(scope_id="world_bank_metals")} == {
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
         "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
@@ -147,6 +153,71 @@ def test_all_active_special_commodity_series_have_concrete_adapters():
         assert blockers == []
         assert provider is not None
         assert governance is not None
+
+
+def test_configured_source_chain_prefers_primary_and_fills_missing_dates(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.OIL.WTI.SPOT.EIA.DAILY"]
+    )[0]
+    provider = ConfiguredSourceChainProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+        cfg,
+    )
+
+    def observation(series: CommoditySeries, observed_date: str, value: float):
+        return CommodityObservation(
+            series_id=series.series_id,
+            observation_date=observed_date,
+            value=value,
+            currency="USD",
+            unit="USD/barrel",
+            raw_value=value,
+            raw_currency="USD",
+            raw_unit="USD/barrel",
+            source_profile=series.source_profile,
+            source_url=f"https://example.test/{series.source_profile}",
+            quality_flag="official_public_api",
+            source_symbol=series.source_symbol,
+            parser_version="unit-test",
+            raw_payload_hash=f"{series.source_profile}-{observed_date}-{value}",
+        )
+
+    class FakeProvider:
+        def __init__(self, profile):
+            self.profile = profile
+
+        def fetch(self, series, *, start_date, end_date):
+            rows = [observation(series[0], "2026-01-02", 70.0)]
+            if self.profile == "fred_official_api":
+                rows = [
+                    observation(series[0], "2026-01-02", 70.5),
+                    observation(series[0], "2026-01-03", 71.0),
+                ]
+            from research.special_commodity_market_data import CommodityProviderResult
+
+            return CommodityProviderResult(observations=rows)
+
+    monkeypatch.setattr(
+        provider,
+        "_resolve_provider",
+        lambda profile: FakeProvider(profile),
+    )
+    result = provider.fetch([item], start_date="2026-01-01", end_date="2026-01-03")
+
+    assert [(row.observation_date, row.value) for row in result.observations] == [
+        ("2026-01-02", 70.0),
+        ("2026-01-03", 71.0),
+    ]
+    assert result.observations[0].metadata["source_role"] == "primary"
+    assert result.observations[1].metadata["source_role"] == "fallback"
+    diagnostics = result.metadata["cross_source"]
+    assert diagnostics["fallback_filled_dates"] == 1
+    assert diagnostics["conflict_count"] == 1
+    assert diagnostics["max_absolute_difference"] == 0.5
 
 
 def test_source_unit_governance_normalizes_equivalent_official_labels():
@@ -963,6 +1034,7 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
                     },
                     "quality_diagnostics": {
                         "ohlc": {"close_outside_range": 141},
+                        "cross_source": {"conflict_count": 3},
                     },
                     "warnings": 0,
                     "blockers": 0,
@@ -982,6 +1054,7 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "fallback_filled=7" in report
     assert "unresolved_gaps=0" in report
     assert "ohlc_outside=141" in report
+    assert "source_conflicts=3" in report
 
 
 def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
@@ -1018,7 +1091,7 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     }
     assert special["parameters"]["scope_ids"] == [
         "lme_nonferrous",
-        "fred_energy_oil",
+        "eia_energy_oil",
     ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False

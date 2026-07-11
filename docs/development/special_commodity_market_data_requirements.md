@@ -58,8 +58,8 @@ source_venue -> commodity category -> commodity instrument -> series
 
 | 数据 | 推荐主源 | 备源 | 频率 | 单位 | 可得性判断 |
 |---|---|---|---|---|---|
-| WTI Cushing spot | FRED `DCOILWTICO` 或 EIA Open Data | AkShare/Sina 外盘期货仅作参考 | 日频 | USD/barrel | 高 |
-| Brent Europe spot | FRED `DCOILBRENTEU` 或 EIA Open Data | AkShare/Sina 外盘期货仅作参考 | 日频 | USD/barrel | 高 |
+| WTI Cushing spot | EIA Open Data `RWTC` | FRED `DCOILWTICO` 逐日期补缺 | 日频 | USD/barrel | 高 |
+| Brent Europe spot | EIA Open Data `RBRTE` | FRED `DCOILBRENTEU` 逐日期补缺 | 日频 | USD/barrel | 高 |
 | 全球铜价 | FRED/IMF `PCOPPUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | 全球铝价 | FRED/IMF `PALUMUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | LME 铜/铝/锌/铅/镍/锡 3M 代理 | AkShare/Sina 外盘期货 | AkShare/东方财富全球期货 | 日频 | USD/metric ton | 高，CFD/聚合代理；新浪约自 2016-07-11，东财约自 2013-06-21 |
@@ -263,7 +263,7 @@ validate_observations(normalized_rows)
 | scope_id | venues | categories | 用途 |
 |---|---|---|---|
 | `fred_energy_oil` | `["FRED"]` | `["energy"]` | WTI、Brent 日频现货 |
-| `eia_energy_oil` | `["EIA"]` | `["energy"]` | EIA 原油官方数据校验或备源 |
+| `eia_energy_oil` | `["EIA"]` | `["energy"]` | WTI、Brent canonical 日频现货；EIA 主源、FRED 逐日期备源 |
 | `world_bank_metals` | `["WORLD_BANK"]` | `["nonferrous"]` | 铜、铝等月度长期基准 |
 | `fred_imf_metals` | `["FRED"]` | `["nonferrous"]` | FRED/IMF 铜铝月度价格 |
 | `lme_nonferrous` | `["LME"]` | `["nonferrous"]` | LME 铜、铝、锌、铅、镍、锡 3M 聚合日线 |
@@ -365,7 +365,9 @@ scope 解析
 | `commodity_policy_event_sync` | 手工触发为主 | 导入动力煤长协/政策事件 |
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous` 与 `fred_energy_oil` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；前者覆盖 LME 六种3M代理行情，后者覆盖 FRED WTI/Brent 日频现货。EIA/100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous` 与 `eia_energy_oil` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；前者覆盖 LME 六种3M代理行情，后者以 EIA 为主源、FRED 为逐日期备源构造 WTI/Brent canonical 日频现货。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+
+原油 source-chain 必须遵循统一规则：同日优先 EIA；EIA 缺少而 FRED 存在时才使用 FRED；同日数值不一致时保留 EIA，并记录两源值、差异和实际来源；不得无来源地覆盖或平均。
 
 - `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`

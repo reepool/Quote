@@ -1692,6 +1692,9 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
         source_lines = []
         for source_profile, item in sorted(per_source.items()):
             if isinstance(item, dict):
+                cross_source = (
+                    (item.get("quality_diagnostics") or {}).get("cross_source") or {}
+                )
                 source_lines.append(
                     f"{source_profile}: status={item.get('status', 'unknown')}, "
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
@@ -1699,6 +1702,7 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                     f"fallback_filled={(item.get('date_gap_fill') or {}).get('fallback_filled_dates', 0)}, "
                     f"unresolved_gaps={(item.get('date_gap_fill') or {}).get('unresolved_dates', 0)}, "
                     f"ohlc_outside={((item.get('quality_diagnostics') or {}).get('ohlc') or {}).get('close_outside_range', 0)}, "
+                    f"source_conflicts={cross_source.get('conflict_count', 0)}, "
                     f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
                 )
