@@ -329,6 +329,7 @@ class TaskManagerFormatters:
             "A股行情与主数据",
             "港美市场",
             "大宗商品市场",
+            "外汇",
             "行业与指数",
             "股东与披露",
             "财务与估值",
@@ -346,6 +347,11 @@ class TaskManagerFormatters:
         job_id = job_id.lower()
         if any(key in job_id for key in ("futures", "commodity")):
             return "大宗商品市场"
+        if job_id.startswith("fx_") or any(
+            key in job_id
+            for key in ("fx_rate", "foreign_exchange", "exchange_rate", "currency_rate")
+        ):
+            return "外汇"
         if any(key in job_id for key in ("industry", "index")):
             return "行业与指数"
         if any(key in job_id for key in ("daily_data", "master_governance", "instrument_master", "calendar")):

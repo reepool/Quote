@@ -91,7 +91,7 @@ def test_status_summary_accepts_task_status_enum():
     assert "`/run hkex_instrument_master_sync`" in text
 
 
-def test_status_summary_places_commodity_market_between_hk_us_and_industry():
+def test_status_summary_places_fx_between_commodity_market_and_industry():
     running_tasks = [
         {
             "job_id": "hk_daily_data_update",
@@ -103,6 +103,12 @@ def test_status_summary_places_commodity_market_between_hk_us_and_industry():
             "job_id": "futures_market_data_sync",
             "description": "商品期货行情日线与连续序列同步",
             "next_run": "周一 21:30",
+            "status": "running",
+        },
+        {
+            "job_id": "fx_rate_sync",
+            "description": "外汇日频汇率同步",
+            "next_run": "周一 10:45",
             "status": "running",
         },
         {
@@ -121,10 +127,13 @@ def test_status_summary_places_commodity_market_between_hk_us_and_industry():
 
     assert "**港美市场**" in text
     assert "**大宗商品市场**" in text
+    assert "**外汇**" in text
     assert "**行业与指数**" in text
     assert text.index("**港美市场**") < text.index("**大宗商品市场**")
-    assert text.index("**大宗商品市场**") < text.index("**行业与指数**")
+    assert text.index("**大宗商品市场**") < text.index("**外汇**")
+    assert text.index("**外汇**") < text.index("**行业与指数**")
     assert "`/run futures_market_data_sync`" in text
+    assert "`/run fx_rate_sync`" in text
 
 
 def test_status_summary_stays_under_telegram_message_limit():
