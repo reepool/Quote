@@ -1001,7 +1001,7 @@ def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
     ) == ("2026-01-01", "2026-01-31")
 
 
-def test_lme_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
+def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
     scheduler_cfg = json.loads(
         (Path(__file__).parents[3] / "config" / "05_scheduler.json").read_text()
     )["scheduler_config"]
@@ -1016,7 +1016,10 @@ def test_lme_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
         "minute": 0,
         "second": 0,
     }
-    assert special["parameters"]["scope_ids"] == ["lme_nonferrous"]
+    assert special["parameters"]["scope_ids"] == [
+        "lme_nonferrous",
+        "fred_energy_oil",
+    ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
     assert jobs["cache_warm_up"]["trigger"]["minute"] == 20

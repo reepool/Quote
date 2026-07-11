@@ -365,7 +365,7 @@ scope 解析
 | `commodity_policy_event_sync` | 手工触发为主 | 导入动力煤长协/政策事件 |
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。第一批仅上线已完成历史回补和治理验证的 `lme_nonferrous`：周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；FRED/EIA/100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous` 与 `fred_energy_oil` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；前者覆盖 LME 六种3M代理行情，后者覆盖 FRED WTI/Brent 日频现货。EIA/100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
 - `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
