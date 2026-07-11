@@ -825,7 +825,7 @@
       "special_commodity_cn_spot_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "国内特殊商品现货日频同步（100ppi PTA、甲醇、乙二醇；独立于国内期货连续合约日更）",
+        "description": "国内特殊商品现货日频同步（100ppi PTA、甲醇、乙二醇、PVC；独立于国内期货连续合约日更）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -842,7 +842,8 @@
           "scope_ids": [
             "cn_100ppi_chemical",
             "cn_100ppi_methanol",
-            "cn_100ppi_ethylene_glycol"
+            "cn_100ppi_ethylene_glycol",
+            "cn_100ppi_pvc"
           ],
           "lookback_days": 10,
           "dry_run": false,
