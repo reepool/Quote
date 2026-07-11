@@ -1304,6 +1304,7 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     assert special["parameters"]["scope_ids"] == [
         "lme_nonferrous",
         "eia_energy_oil",
+        "cn_100ppi_chemical",
     ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False

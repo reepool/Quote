@@ -369,7 +369,7 @@ scope 解析
 | `commodity_policy_event_sync` | 手工触发为主 | 导入动力煤长协/政策事件 |
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous` 与 `eia_energy_oil` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；前者覆盖 LME 六种3M代理行情，后者以 EIA 为主源、FRED 为逐日期备源构造 WTI/Brent canonical 日频现货。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous`、`eia_energy_oil` 与 `cn_100ppi_chemical` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；三者分别覆盖 LME 六种3M代理行情、以 EIA 为主源且 FRED 逐日期补缺的 WTI/Brent canonical 日频现货，以及 100ppi PTA 现货参考序列。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。其他100ppi品种需完成逐品种治理和历史验证后再按配置加入；World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
 `fred_imf_metals` 与 `world_bank_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
 
