@@ -369,6 +369,8 @@ scope 解析
 
 原油 source-chain 必须遵循统一规则：同日优先 EIA；EIA 缺少而 FRED 存在时才使用 FRED；同日数值不一致时保留 EIA，并记录两源值、差异和实际来源；不得无来源地覆盖或平均。
 
+FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略。SSL EOF、连接重置等瞬时网络错误在重试耗尽前不得直接把单一序列判定为主数据阻断；每次重试必须记录请求阶段、尝试次数和退避时间。
+
 - `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=eia_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`

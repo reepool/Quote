@@ -11,6 +11,7 @@ import math
 import os
 import re
 import sqlite3
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date
@@ -26,6 +27,52 @@ from utils.http_transport import request_get, tls_config_from_source_config
 logger = logging.getLogger(__name__)
 
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
+
+
+def _request_json_with_retry(
+    url: str,
+    *,
+    params: Mapping[str, Any],
+    headers: Mapping[str, str],
+    timeout: float,
+    tls_config: Any,
+    retry_cfg: Optional[Mapping[str, Any]] = None,
+    log_context: str,
+) -> tuple[Any, Any]:
+    """Execute a JSON GET with bounded, configuration-driven retries."""
+
+    cfg = dict(retry_cfg or {})
+    max_attempts = max(1, int(cfg.get("max_attempts") or 3))
+    backoff_seconds = max(0.0, float(cfg.get("backoff_seconds") or 0.5))
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = request_get(
+                url,
+                params=dict(params),
+                headers=dict(headers),
+                timeout=timeout,
+                tls_config=tls_config,
+            )
+            response.raise_for_status()
+            return response, response.json()
+        except Exception as exc:
+            last_error = exc
+            if attempt >= max_attempts:
+                break
+            sleep_seconds = backoff_seconds * attempt
+            logger.warning(
+                "[SpecialCommodityHTTP] retry context=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
+                log_context,
+                attempt,
+                attempt + 1,
+                sleep_seconds,
+                exc,
+            )
+            if sleep_seconds:
+                time.sleep(sleep_seconds)
+    assert last_error is not None
+    raise last_error
 
 
 def _json_default(value: Any) -> Any:
@@ -1212,15 +1259,15 @@ class FredCommodityProvider:
             if end_date:
                 params["observation_end"] = end_date
             try:
-                response = request_get(
+                response, payload = _request_json_with_retry(
                     endpoint,
                     params=params,
                     headers=headers,
                     timeout=timeout,
                     tls_config=tls_config,
+                    retry_cfg=self.source_cfg.get("request_retry"),
+                    log_context=f"fred_observations:{item.source_symbol}",
                 )
-                response.raise_for_status()
-                payload = response.json()
             except Exception as exc:
                 warnings.append(
                     {
@@ -1336,15 +1383,15 @@ class EiaCommodityProvider:
             while True:
                 params = {**base_params, "offset": offset}
                 try:
-                    response = request_get(
+                    response, payload = _request_json_with_retry(
                         endpoint,
                         params=params,
                         headers=headers,
                         timeout=timeout,
                         tls_config=tls_config,
+                        retry_cfg=self.source_cfg.get("request_retry"),
+                        log_context=f"eia_observations:{item.source_symbol}:offset={offset}",
                     )
-                    response.raise_for_status()
-                    payload = response.json()
                 except Exception as exc:
                     warnings.append(
                         {
@@ -2774,15 +2821,15 @@ class FredCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         blockers: List[Dict[str, Any]] = []
         for item in series:
             try:
-                response = request_get(
+                response, payload = _request_json_with_retry(
                     endpoint,
                     params={"series_id": item.source_symbol, "api_key": api_key, "file_type": "json"},
                     headers=headers,
                     timeout=timeout,
                     tls_config=tls_config,
+                    retry_cfg=self.source_cfg.get("request_retry"),
+                    log_context=f"fred_master:{item.source_symbol}",
                 )
-                response.raise_for_status()
-                payload = response.json()
                 source_row = (payload.get("seriess") or [])[0]
             except Exception as exc:
                 blockers.append(
@@ -2891,9 +2938,15 @@ class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
             for facet_name, facet_values in facets.items():
                 params[f"facets[{facet_name}][]"] = _normalize_list(facet_values)
             try:
-                response = request_get(endpoint, params=params, headers=headers, timeout=timeout, tls_config=tls_config)
-                response.raise_for_status()
-                payload = response.json()
+                response, payload = _request_json_with_retry(
+                    endpoint,
+                    params=params,
+                    headers=headers,
+                    timeout=timeout,
+                    tls_config=tls_config,
+                    retry_cfg=self.source_cfg.get("request_retry"),
+                    log_context=f"eia_master:{item.source_symbol}",
+                )
                 response_payload = payload.get("response") or {}
                 source_row = (response_payload.get("data") or [])[0]
             except Exception as exc:

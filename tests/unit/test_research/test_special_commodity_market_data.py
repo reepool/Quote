@@ -26,6 +26,7 @@ from research.special_commodity_market_data import (
     SpecialCommodityPriceSyncService,
     SpecialCommodityStorageManager,
     WorldBankCommodityProvider,
+    _request_json_with_retry,
     _source_unit_matches,
 )
 
@@ -225,6 +226,38 @@ def test_source_unit_governance_normalizes_equivalent_official_labels():
     assert _source_unit_matches("USD/barrel", "$/BBL")
     assert _source_unit_matches("USD/metric_ton", "U.S. Dollars per Metric Ton")
     assert _source_unit_matches("USD/metric_ton", "($/mt)")
+
+
+def test_official_api_json_request_retries_transient_failure(monkeypatch):
+    calls = []
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"status": "ok"}
+
+    def fake_get(*args, **kwargs):
+        calls.append((args, kwargs))
+        if len(calls) == 1:
+            raise ConnectionError("transient tls eof")
+        return Response()
+
+    monkeypatch.setattr("research.special_commodity_market_data.request_get", fake_get)
+    response, payload = _request_json_with_retry(
+        "https://example.test/data",
+        params={},
+        headers={},
+        timeout=1,
+        tls_config=None,
+        retry_cfg={"max_attempts": 3, "backoff_seconds": 0},
+        log_context="unit-test",
+    )
+
+    assert isinstance(response, Response)
+    assert payload == {"status": "ok"}
+    assert len(calls) == 2
 
 
 def test_missing_governance_adapter_blocks_before_observation_write(tmp_path):

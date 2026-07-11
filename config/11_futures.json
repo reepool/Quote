@@ -710,6 +710,10 @@
           "quality_flag": "official_public_api",
           "parser_version": "fred_commodity_provider.v1",
           "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 0.5
+          },
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
         "eia_official_api": {
@@ -726,6 +730,10 @@
           "quality_flag": "official_public_api",
           "parser_version": "eia_commodity_provider.v2",
           "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 0.5
+          },
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
         "eia_fred_oil_chain": {
