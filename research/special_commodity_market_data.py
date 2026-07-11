@@ -11,6 +11,7 @@ import math
 import os
 import re
 import sqlite3
+import threading
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -27,6 +28,96 @@ from utils.http_transport import request_get, tls_config_from_source_config
 logger = logging.getLogger(__name__)
 
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
+
+
+def _call_with_progress_logging(
+    func: Any,
+    *,
+    kwargs: Mapping[str, Any],
+    log_context: str,
+    interval_seconds: float,
+) -> Any:
+    """Run a blocking provider call with periodic heartbeat logs."""
+    interval = max(1.0, float(interval_seconds))
+    stop_event = threading.Event()
+    started = time.monotonic()
+
+    def _heartbeat() -> None:
+        while not stop_event.wait(interval):
+            logger.info(
+                "[SpecialCommodityProvider] progress context=%s elapsed_seconds=%.1f",
+                log_context,
+                time.monotonic() - started,
+            )
+
+    thread = threading.Thread(target=_heartbeat, name="commodity-provider-heartbeat", daemon=True)
+    thread.start()
+    try:
+        return func(**dict(kwargs))
+    finally:
+        stop_event.set()
+        thread.join(timeout=1.0)
+        logger.info(
+            "[SpecialCommodityProvider] call done context=%s elapsed_seconds=%.1f",
+            log_context,
+            time.monotonic() - started,
+        )
+
+
+def _observation_quality_diagnostics(
+    observations: Sequence[CommodityObservation],
+) -> Dict[str, Any]:
+    """Summarize date and numeric quality without changing source values."""
+    per_series: Dict[str, Dict[str, Any]] = {}
+    for series_id in sorted({item.series_id for item in observations}):
+        rows = sorted(
+            (item for item in observations if item.series_id == series_id),
+            key=lambda item: item.observation_date,
+        )
+        dates = [item.observation_date for item in rows]
+        values = [float(item.value) for item in rows]
+        annual_counts: Dict[str, int] = {}
+        for observation_date in dates:
+            year = observation_date[:4]
+            annual_counts[year] = annual_counts.get(year, 0) + 1
+        nonpositive = [
+            {"date": item.observation_date, "value": item.value}
+            for item in rows
+            if float(item.value) <= 0
+        ]
+        jumps: List[Dict[str, Any]] = []
+        for previous, current in zip(rows, rows[1:]):
+            previous_value = float(previous.value)
+            if previous_value == 0:
+                continue
+            change = float(current.value) / previous_value - 1.0
+            jumps.append(
+                {
+                    "date": current.observation_date,
+                    "previous_date": previous.observation_date,
+                    "pct_change": change,
+                    "previous_value": previous_value,
+                    "value": float(current.value),
+                }
+            )
+        jumps.sort(key=lambda item: abs(float(item["pct_change"])), reverse=True)
+        per_series[series_id] = {
+            "rows": len(rows),
+            "first_date": min(dates) if dates else None,
+            "latest_date": max(dates) if dates else None,
+            "min_value": min(values) if values else None,
+            "max_value": max(values) if values else None,
+            "nonpositive_count": len(nonpositive),
+            "nonpositive_samples": nonpositive[:10],
+            "duplicate_date_count": len(dates) - len(set(dates)),
+            "annual_counts": annual_counts,
+            "largest_absolute_changes": jumps[:10],
+            "currency": sorted({item.currency for item in rows}),
+            "unit": sorted({item.unit for item in rows}),
+            "raw_currency": sorted({item.raw_currency for item in rows}),
+            "raw_unit": sorted({item.raw_unit for item in rows}),
+        }
+    return {"series": per_series}
 
 
 def _request_with_retry(
@@ -1919,7 +2010,19 @@ class AkshareCommoditySpotProvider:
             if end_argument and end_date:
                 kwargs[end_argument] = _format_argument(end_date)
             try:
-                payload = func(**kwargs)
+                payload = _call_with_progress_logging(
+                    func,
+                    kwargs=kwargs,
+                    log_context=(
+                        f"source={self.source_profile} series={item.series_id} "
+                        f"start={start_date} end={end_date}"
+                    ),
+                    interval_seconds=float(
+                        item.metadata.get("progress_log_interval_seconds")
+                        or self.source_cfg.get("progress_log_interval_seconds")
+                        or 60
+                    ),
+                )
             except Exception as exc:
                 warnings.append(
                     {
@@ -2032,6 +2135,9 @@ class AkshareCommoditySpotProvider:
                 "series_requested": len(series),
                 "rows": len(observations),
                 "source_label": "100ppi_public_web",
+                "quality_diagnostics": {
+                    "observations": _observation_quality_diagnostics(observations)
+                },
             },
         )
 
@@ -3525,6 +3631,78 @@ class SpecialCommodityGovernancePipeline:
         self.storage = storage
         self.module_cfg = dict(module_cfg or {})
 
+    def _calendar_coverage_diagnostics(
+        self,
+        series: Sequence[CommoditySeries],
+        observations: Sequence[CommodityObservation],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> Dict[str, Any]:
+        """Compare source dates with configured, persisted exchange-calendar evidence."""
+        diagnostics: Dict[str, Any] = {}
+        observed_by_series: Dict[str, set[str]] = {}
+        for item in observations:
+            observed_by_series.setdefault(item.series_id, set()).add(item.observation_date)
+        with self.storage.get_connection() as conn:
+            table_exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='futures_trading_calendar'"
+            ).fetchone()
+            if not table_exists:
+                return diagnostics
+            for item in series:
+                exchange = str(item.metadata.get("expected_calendar_exchange") or "").upper()
+                if not exchange:
+                    continue
+                rows = conn.execute(
+                    """
+                    SELECT trade_date, quality_flag
+                    FROM futures_trading_calendar
+                    WHERE exchange = ? AND is_trading_day = 1
+                      AND (? IS NULL OR trade_date >= ?)
+                      AND (? IS NULL OR trade_date <= ?)
+                    ORDER BY trade_date
+                    """,
+                    (exchange, start_date, start_date, end_date, end_date),
+                ).fetchall()
+                expected_dates = [str(row["trade_date"]) for row in rows]
+                observed_dates = observed_by_series.get(item.series_id, set())
+                missing_dates = [value for value in expected_dates if value not in observed_dates]
+                annual: Dict[str, Dict[str, int]] = {}
+                for value in expected_dates:
+                    annual.setdefault(value[:4], {"expected": 0, "observed": 0, "missing": 0})[
+                        "expected"
+                    ] += 1
+                for value in expected_dates:
+                    key = "observed" if value in observed_dates else "missing"
+                    annual[value[:4]][key] += 1
+                longest_missing_run = 0
+                current_run = 0
+                for value in expected_dates:
+                    if value in observed_dates:
+                        current_run = 0
+                    else:
+                        current_run += 1
+                        longest_missing_run = max(longest_missing_run, current_run)
+                diagnostics[item.series_id] = {
+                    "exchange": exchange,
+                    "calendar_first_date": expected_dates[0] if expected_dates else None,
+                    "calendar_latest_date": expected_dates[-1] if expected_dates else None,
+                    "calendar_quality_flags": sorted({str(row["quality_flag"]) for row in rows}),
+                    "expected_dates": len(expected_dates),
+                    "observed_expected_dates": len(expected_dates) - len(missing_dates),
+                    "missing_dates": len(missing_dates),
+                    "coverage_ratio": (
+                        (len(expected_dates) - len(missing_dates)) / len(expected_dates)
+                        if expected_dates
+                        else None
+                    ),
+                    "missing_samples": missing_dates[:20],
+                    "longest_missing_trading_day_run": longest_missing_run,
+                    "annual_counts": annual,
+                }
+        return diagnostics
+
     def run(
         self,
         *,
@@ -3661,6 +3839,19 @@ class SpecialCommodityGovernancePipeline:
                     }
                 )
             observations.extend(governed_observations)
+            quality_diagnostics = dict(
+                provider_result.metadata.get("quality_diagnostics", {})
+            )
+            observation_diagnostics = _observation_quality_diagnostics(governed_observations)
+            quality_diagnostics.setdefault("observations", observation_diagnostics)
+            calendar_coverage = self._calendar_coverage_diagnostics(
+                date_series,
+                governed_observations,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            if calendar_coverage:
+                quality_diagnostics["calendar_coverage"] = calendar_coverage
             source_blockers = (
                 len(master_result.blockers)
                 + len(provider_result.blockers)
@@ -3683,7 +3874,7 @@ class SpecialCommodityGovernancePipeline:
                 "calendar_type": date_result.metadata.get("calendar_type"),
                 "weekday_inference_used": False,
                 "date_gap_fill": provider_result.metadata.get("date_gap_fill", {}),
-                "quality_diagnostics": provider_result.metadata.get("quality_diagnostics", {}),
+                "quality_diagnostics": quality_diagnostics,
             }
             logger.info(
                 "[SpecialCommodityGovernance] source done source_profile=%s status=%s master_records=%s calendar_rows=%s fetched=%s warnings=%s blockers=%s",

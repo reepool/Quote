@@ -346,6 +346,8 @@ scope 解析
 - EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
 - World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
 - 100ppi 第一条配置化落地序列为 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`，通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，规格和含税口径按来源披露。
+- 中长程特殊商品 provider 调用必须按配置间隔输出 heartbeat 日志，至少包含来源、序列、任务日期范围和累计耗时；任务开始/结束日志不能替代运行中的阶段进度日志。默认间隔为60秒。
+- 全量和长窗口 dry-run 必须输出并保留每条序列的实际首末观测日、年度行数、数值范围、非正值、重复日期、最大绝对涨跌样本、原始/规范化币种单位。对配置了 `expected_calendar_exchange` 的日频序列，还必须使用数据库中已治理交易日历计算覆盖率、缺失日期、最长连续缺口和年度覆盖，禁止用 weekday 生成预期日期。
 - LME 第一批覆盖六种 3M 金属：`CAD/AHD/ZSD/PBD/NID/SND` 对应新浪主源，`LCPT/LALT/LZNT/LLDT/LNKT/LTNT` 对应东财备源。主源请求、空全量 payload 或必需列缺失时切换备源；历史回补还应以同一范围内其他 LME 品种的来源观测日期并集识别孤立缺日，仅对受影响品种请求东财并逐日补缺。正常日更在新浪覆盖请求日期时不请求东财，避免双源全量下载和东财反爬压力。观测值使用 close/latest，完整 OHLCV、实际来源、补缺原因和请求尝试写入 metadata。
 - 跨源审计不能把所有缺日都判为数据错误。交易所公告可证明的品种级停牌或市场中断应作为通用 `observation_exceptions` 治理记录排除；例如 LME 镍 2022 年 3 月停牌窗口。东财也没有的日期若无公告证据，保留为 unresolved source gap，不使用 weekday 猜测。
 - 报告必须输出主源行数、备源补齐数、未解决缺口、已治理例外和 `close` 超出来源 `low/high` 的统计。CFD/LME 3M 代理的 close 与盘中 OHLC 可能属于不同会话口径，此类记录保留原值并标记诊断，不擅自修正高低价。

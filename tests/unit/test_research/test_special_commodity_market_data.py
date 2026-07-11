@@ -24,8 +24,11 @@ from research.special_commodity_market_data import (
     SpecialCommodityCalendarGovernanceService,
     SpecialCommodityPolicyEventService,
     SpecialCommodityPriceSyncService,
+    SpecialCommodityGovernancePipeline,
     SpecialCommodityStorageManager,
     WorldBankCommodityProvider,
+    _call_with_progress_logging,
+    _observation_quality_diagnostics,
     _request_json_with_retry,
     _source_unit_matches,
 )
@@ -594,6 +597,118 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert "secret" not in obs.source_url
     assert captured["start_day"] == "20260101"
     assert captured["end_day"] == "20260102"
+    diagnostics = result.metadata["quality_diagnostics"]["observations"]["series"]
+    assert diagnostics[obs.series_id]["first_date"] == "2026-01-01"
+    assert diagnostics[obs.series_id]["min_value"] == 5500
+    assert diagnostics[obs.series_id]["unit"] == ["CNY/ton"]
+
+
+def test_special_commodity_progress_wrapper_logs_completion(caplog):
+    caplog.set_level("INFO")
+    result = _call_with_progress_logging(
+        lambda value: value + 1,
+        kwargs={"value": 2},
+        log_context="source=test series=TEST",
+        interval_seconds=60,
+    )
+    assert result == 3
+    assert "call done context=source=test series=TEST" in caplog.text
+
+
+def test_calendar_coverage_uses_persisted_exchange_evidence(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    with storage.get_connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE futures_trading_calendar (
+                exchange TEXT NOT NULL,
+                trade_date TEXT NOT NULL,
+                is_trading_day INTEGER NOT NULL,
+                quality_flag TEXT NOT NULL
+            )
+            """
+        )
+        conn.executemany(
+            "INSERT INTO futures_trading_calendar VALUES (?, ?, ?, ?)",
+            [
+                ("CZCE", "2026-01-02", 1, "backfilled_verified"),
+                ("CZCE", "2026-01-05", 1, "backfilled_verified"),
+                ("CZCE", "2026-01-06", 1, "backfilled_verified"),
+            ],
+        )
+    series = CommoditySeries(
+        series_id="CMD.TEST.100PPI.DAILY",
+        commodity_id="TEST",
+        venue="100PPI",
+        source_profile="100ppi_public_web",
+        source_symbol="TEST",
+        frequency="daily",
+        quote_type="spot",
+        currency="CNY",
+        unit="CNY/ton",
+        metadata={"expected_calendar_exchange": "CZCE"},
+    )
+    observations = [
+        CommodityObservation(
+            series_id=series.series_id,
+            observation_date=value,
+            value=100.0,
+            currency="CNY",
+            unit="CNY/ton",
+            raw_value=100.0,
+            raw_currency="CNY",
+            raw_unit="CNY/ton",
+            source_profile="100ppi_public_web",
+            source_url="https://example.test",
+            quality_flag="aggregated_public_web",
+            source_symbol="TEST",
+            parser_version="test",
+            raw_payload_hash="hash",
+        )
+        for value in ("2026-01-02", "2026-01-06")
+    ]
+    diagnostics = SpecialCommodityGovernancePipeline(
+        storage,
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"],
+    )._calendar_coverage_diagnostics(
+        [series],
+        observations,
+        start_date="2026-01-01",
+        end_date="2026-01-31",
+    )[series.series_id]
+    assert diagnostics["expected_dates"] == 3
+    assert diagnostics["missing_dates"] == 1
+    assert diagnostics["missing_samples"] == ["2026-01-05"]
+    assert diagnostics["coverage_ratio"] == 2 / 3
+    assert diagnostics["longest_missing_trading_day_run"] == 1
+
+
+def test_observation_quality_diagnostics_reports_jumps_and_units():
+    rows = [
+        CommodityObservation(
+            series_id="CMD.TEST",
+            observation_date=day,
+            value=value,
+            currency="CNY",
+            unit="CNY/ton",
+            raw_value=value,
+            raw_currency="CNY",
+            raw_unit="CNY/ton",
+            source_profile="test",
+            source_url="test",
+            quality_flag="test",
+            source_symbol="TEST",
+            parser_version="test",
+            raw_payload_hash=day,
+        )
+        for day, value in (("2025-12-31", 100.0), ("2026-01-02", 120.0))
+    ]
+    result = _observation_quality_diagnostics(rows)["series"]["CMD.TEST"]
+    assert result["annual_counts"] == {"2025": 1, "2026": 1}
+    assert result["min_value"] == 100.0
+    assert round(result["largest_absolute_changes"][0]["pct_change"], 6) == 0.2
 
 
 def test_lme_akshare_provider_uses_sina_primary_without_fallback(monkeypatch):

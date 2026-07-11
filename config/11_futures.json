@@ -791,6 +791,7 @@
           "quality_flag": "aggregated_public_web",
           "parser_version": "100ppi_commodity_provider.v1",
           "timeout_seconds": 30,
+          "progress_log_interval_seconds": 60,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "Requires configured product mappings before production sync; never label as official."
         },
@@ -1334,6 +1335,8 @@
             "date_column": "date",
             "value_column": "spot_price",
             "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "CZCE",
+            "progress_log_interval_seconds": 60,
             "region_or_spec": "China PTA spot reference; grade and tax basis follow 100ppi publication",
             "source_name": "100ppi PTA spot reference",
             "source_url": "https://www.100ppi.com/sf/"

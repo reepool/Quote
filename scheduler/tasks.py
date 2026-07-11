@@ -1695,6 +1695,26 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                 cross_source = (
                     (item.get("quality_diagnostics") or {}).get("cross_source") or {}
                 )
+                diagnostics = item.get("quality_diagnostics") or {}
+                observation_series = (
+                    (diagnostics.get("observations") or {}).get("series") or {}
+                )
+                coverage_series = diagnostics.get("calendar_coverage") or {}
+                first_dates = [
+                    value.get("first_date")
+                    for value in observation_series.values()
+                    if isinstance(value, dict) and value.get("first_date")
+                ]
+                latest_dates = [
+                    value.get("latest_date")
+                    for value in observation_series.values()
+                    if isinstance(value, dict) and value.get("latest_date")
+                ]
+                missing_dates = sum(
+                    int(value.get("missing_dates", 0) or 0)
+                    for value in coverage_series.values()
+                    if isinstance(value, dict)
+                )
                 source_lines.append(
                     f"{source_profile}: status={item.get('status', 'unknown')}, "
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
@@ -1703,6 +1723,9 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                     f"unresolved_gaps={(item.get('date_gap_fill') or {}).get('unresolved_dates', 0)}, "
                     f"ohlc_outside={((item.get('quality_diagnostics') or {}).get('ohlc') or {}).get('close_outside_range', 0)}, "
                     f"source_conflicts={cross_source.get('conflict_count', 0)}, "
+                    f"first={min(first_dates) if first_dates else 'N/A'}, "
+                    f"latest={max(latest_dates) if latest_dates else 'N/A'}, "
+                    f"calendar_missing={missing_dates}, "
                     f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
                 )
