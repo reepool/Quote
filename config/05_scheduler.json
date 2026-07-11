@@ -798,7 +798,7 @@
       "special_commodity_price_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "外盘及特殊商品日频同步（LME 六种3M代理行情、EIA主源/FRED备源 WTI/Brent 现货及 100ppi PTA 现货；独立于国内期货日更）",
+        "description": "外盘及特殊商品日频同步（LME 六种3M代理行情、EIA主源/FRED备源 WTI/Brent 现货及 100ppi PTA/甲醇现货；独立于国内期货日更）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -815,12 +815,13 @@
           "scope_ids": [
             "lme_nonferrous",
             "eia_energy_oil",
-            "cn_100ppi_chemical"
+            "cn_100ppi_chemical",
+            "cn_100ppi_methanol"
           ],
           "lookback_days": 10,
           "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Production scopes include governed LME proxies, canonical WTI/Brent spot series using EIA primary and FRED date-level fallback, and the governed 100ppi PTA spot series. Add other mature daily scopes here without changing the domestic futures task."
+          "note": "Production scopes include governed LME proxies, canonical WTI/Brent spot series using EIA primary and FRED date-level fallback, and governed 100ppi PTA and methanol spot series. Add other mature daily scopes here without changing the domestic futures task."
         }
       },
       "special_commodity_price_monthly_sync": {
