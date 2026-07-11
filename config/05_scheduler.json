@@ -830,7 +830,7 @@
         "pre_run_notify": false,
         "trigger": {
           "type": "cron",
-          "day": 10,
+          "day": "10,20",
           "hour": 8,
           "minute": 40,
           "second": 0

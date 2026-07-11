@@ -1193,7 +1193,7 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     assert monthly["manual_only"] is False
     assert monthly["trigger"] == {
         "type": "cron",
-        "day": 10,
+        "day": "10,20",
         "hour": 8,
         "minute": 40,
         "second": 0,

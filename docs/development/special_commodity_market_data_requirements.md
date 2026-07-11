@@ -367,7 +367,7 @@ scope 解析
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous` 与 `eia_energy_oil` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；前者覆盖 LME 六种3M代理行情，后者以 EIA 为主源、FRED 为逐日期备源构造 WTI/Brent canonical 日频现货。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。100ppi 等日频 scope 后续成熟后按配置加入，World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
-`fred_imf_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。回看窗口用于吸收 IMF/FRED 的月末发布延迟和历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
+`fred_imf_metals` 与 `world_bank_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
 
 2026-07-11 World Bank 全历史 dry-run 验证成功：铜、铝各798个月，覆盖1960-01至2026-06，主数据与月份治理均成功，无 warning/blocker。与本地 FRED/IMF 1992-01至2026-05的413个重叠月份完全对齐，均为 `USD/metric_ton`；铜平均相对差0.116610%、月收益相关性0.999246，铝平均相对差0.116405%、月收益相关性0.999018。正式写入 `run_id=76` 新增1,596条观测、1,596条来源月份治理记录和2条主数据治理证据，零 warning/blocker。验证后 `world_bank_metals` 已与 `fred_imf_metals` 一同加入独立月更任务，但始终保持独立 `series_id` 和来源 lineage，不构造跨源 canonical 平均值。
 
