@@ -78,8 +78,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 14
-    assert result["series"] >= 18
+    assert result["instruments"] == 15
+    assert result["series"] >= 19
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -97,6 +97,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.METHANOL.SPOT",
         "CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT",
         "CN.CHEMICAL.PVC.SPOT",
+        "CN.CHEMICAL.POLYPROPYLENE.SPOT",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
@@ -109,6 +110,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY",
+        "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY",
     }
 
 
@@ -143,6 +145,11 @@ def test_special_commodity_scope_resolution():
     pvc = selector.resolve(scope_id="cn_100ppi_pvc")
     assert [item.series_id for item in pvc] == [
         "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY"
+    ]
+
+    polypropylene = selector.resolve(scope_id="cn_100ppi_polypropylene")
+    assert [item.series_id for item in polypropylene] == [
+        "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY"
     ]
 
     assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
