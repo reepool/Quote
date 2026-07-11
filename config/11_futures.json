@@ -773,6 +773,10 @@
           "quality_flag": "official_public_dataset",
           "parser_version": "world_bank_commodity_provider.v2",
           "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 1.0
+          },
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
         "100ppi_public_web": {

@@ -453,6 +453,51 @@ def test_world_bank_provider_parses_pink_sheet_workbook(monkeypatch):
     assert obs.unit == "USD/metric_ton"
 
 
+def test_world_bank_provider_retries_transient_workbook_failure(monkeypatch):
+    cfg = deepcopy(
+        config_manager.get_research_config().modules["commodity_market_data"][
+            "special_commodity_market_data"
+        ]
+    )
+    source_cfg = cfg["source_profiles"]["world_bank_public_dataset"]
+    source_cfg["request_retry"] = {"max_attempts": 2, "backoff_seconds": 0}
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.WORLDBANK.MONTHLY"]
+    )
+
+    class _Response:
+        url = "https://thedocs.worldbank.org/CMO-Historical-Data-Monthly.xlsx"
+        content = b"unit-test-workbook"
+
+        def raise_for_status(self):
+            return None
+
+    attempts = {"count": 0}
+
+    def _fake_get(*args, **kwargs):
+        attempts["count"] += 1
+        if attempts["count"] == 1:
+            raise ConnectionError("transient workbook failure")
+        return _Response()
+
+    monkeypatch.setattr("research.special_commodity_market_data.request_get", _fake_get)
+    monkeypatch.setattr(
+        "pandas.read_excel",
+        lambda *args, **kwargs: pd.DataFrame(
+            [[None, "Copper"], [None, "($/mt)"], ["2026M01", 8500.25]]
+        ),
+    )
+
+    result = WorldBankCommodityProvider("world_bank_public_dataset", source_cfg).fetch(
+        series,
+        start_date="2026-01-01",
+        end_date="2026-01-31",
+    )
+
+    assert attempts["count"] == 2
+    assert len(result.observations) == 1
+
+
 def test_100ppi_provider_requires_series_mapping():
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
@@ -1091,7 +1136,10 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
 
 
 def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
-    from scheduler.tasks import _resolve_special_commodity_sync_window
+    from scheduler.tasks import (
+        _resolve_special_commodity_monthly_sync_window,
+        _resolve_special_commodity_sync_window,
+    )
 
     assert _resolve_special_commodity_sync_window(
         None,
@@ -1105,6 +1153,18 @@ def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
         lookback_days=10,
         as_of_date=date(2026, 7, 11),
     ) == ("2026-01-01", "2026-01-31")
+    assert _resolve_special_commodity_monthly_sync_window(
+        None,
+        None,
+        lookback_months=6,
+        as_of_date=date(2026, 7, 11),
+    ) == ("2026-02-01", "2026-07-11")
+    assert _resolve_special_commodity_monthly_sync_window(
+        "2025-01-01",
+        "2026-05-31",
+        lookback_months=6,
+        as_of_date=date(2026, 7, 11),
+    ) == ("2025-01-01", "2026-05-31")
 
 
 def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
@@ -1128,6 +1188,23 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
     ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
+    monthly = jobs["special_commodity_price_monthly_sync"]
+    assert monthly["enabled"] is True
+    assert monthly["manual_only"] is False
+    assert monthly["trigger"] == {
+        "type": "cron",
+        "day": 10,
+        "hour": 8,
+        "minute": 40,
+        "second": 0,
+    }
+    assert monthly["parameters"]["scope_ids"] == [
+        "fred_imf_metals",
+        "world_bank_metals",
+    ]
+    assert monthly["parameters"]["frequencies"] == ["monthly"]
+    assert monthly["parameters"]["lookback_months"] == 6
+    assert monthly["parameters"]["dry_run"] is False
     assert jobs["cache_warm_up"]["trigger"]["minute"] == 20
     assert "LME" not in jobs["futures_market_data_sync"]["parameters"]["exchanges"]
 

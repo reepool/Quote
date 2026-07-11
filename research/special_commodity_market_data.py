@@ -29,6 +29,52 @@ logger = logging.getLogger(__name__)
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
 
 
+def _request_with_retry(
+    url: str,
+    *,
+    params: Optional[Mapping[str, Any]] = None,
+    headers: Mapping[str, str],
+    timeout: float,
+    tls_config: Any,
+    retry_cfg: Optional[Mapping[str, Any]] = None,
+    log_context: str,
+) -> Any:
+    """Execute a GET with bounded retries for JSON and file-based providers."""
+    cfg = dict(retry_cfg or {})
+    max_attempts = max(1, int(cfg.get("max_attempts") or 3))
+    backoff_seconds = max(0.0, float(cfg.get("backoff_seconds") or 0.5))
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = request_get(
+                url,
+                params=dict(params or {}),
+                headers=dict(headers),
+                timeout=timeout,
+                tls_config=tls_config,
+            )
+            response.raise_for_status()
+            return response
+        except Exception as exc:
+            last_error = exc
+            if attempt >= max_attempts:
+                break
+            sleep_seconds = backoff_seconds * attempt
+            logger.warning(
+                "[SpecialCommodityHTTP] retry context=%s attempt=%s next_attempt=%s "
+                "sleep_seconds=%s error=%s",
+                log_context,
+                attempt,
+                attempt + 1,
+                sleep_seconds,
+                exc,
+            )
+            if sleep_seconds:
+                time.sleep(sleep_seconds)
+    assert last_error is not None
+    raise last_error
+
+
 def _request_json_with_retry(
     url: str,
     *,
@@ -40,39 +86,16 @@ def _request_json_with_retry(
     log_context: str,
 ) -> tuple[Any, Any]:
     """Execute a JSON GET with bounded, configuration-driven retries."""
-
-    cfg = dict(retry_cfg or {})
-    max_attempts = max(1, int(cfg.get("max_attempts") or 3))
-    backoff_seconds = max(0.0, float(cfg.get("backoff_seconds") or 0.5))
-    last_error: Optional[Exception] = None
-    for attempt in range(1, max_attempts + 1):
-        try:
-            response = request_get(
-                url,
-                params=dict(params),
-                headers=dict(headers),
-                timeout=timeout,
-                tls_config=tls_config,
-            )
-            response.raise_for_status()
-            return response, response.json()
-        except Exception as exc:
-            last_error = exc
-            if attempt >= max_attempts:
-                break
-            sleep_seconds = backoff_seconds * attempt
-            logger.warning(
-                "[SpecialCommodityHTTP] retry context=%s attempt=%s next_attempt=%s sleep_seconds=%s error=%s",
-                log_context,
-                attempt,
-                attempt + 1,
-                sleep_seconds,
-                exc,
-            )
-            if sleep_seconds:
-                time.sleep(sleep_seconds)
-    assert last_error is not None
-    raise last_error
+    response = _request_with_retry(
+        url,
+        params=params,
+        headers=headers,
+        timeout=timeout,
+        tls_config=tls_config,
+        retry_cfg=retry_cfg,
+        log_context=log_context,
+    )
+    return response, response.json()
 
 
 def _json_default(value: Any) -> Any:
@@ -1692,8 +1715,14 @@ class WorldBankCommodityProvider:
         start = _parse_date(start_date)
         end = _parse_date(end_date)
         try:
-            response = request_get(endpoint, headers=headers, timeout=timeout, tls_config=tls_config)
-            response.raise_for_status()
+            response = _request_with_retry(
+                endpoint,
+                headers=headers,
+                timeout=timeout,
+                tls_config=tls_config,
+                retry_cfg=self.source_cfg.get("request_retry"),
+                log_context="world_bank_monthly_workbook",
+            )
             pandas = importlib.import_module("pandas")
             frame = pandas.read_excel(
                 io.BytesIO(response.content),

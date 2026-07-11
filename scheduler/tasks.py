@@ -1735,6 +1735,27 @@ def _resolve_special_commodity_sync_window(
     return resolved_start.isoformat(), resolved_end.isoformat()
 
 
+def _resolve_special_commodity_monthly_sync_window(
+    start_date: Optional[str],
+    end_date: Optional[str],
+    *,
+    lookback_months: int,
+    as_of_date: Optional[date] = None,
+) -> tuple[str, str]:
+    """Resolve a bounded month-aligned window for scheduled monthly sources."""
+    if bool(start_date) != bool(end_date):
+        raise ValueError("special commodity monthly sync requires both start_date and end_date")
+    if start_date and end_date:
+        return str(start_date)[:10], str(end_date)[:10]
+
+    months = max(1, int(lookback_months))
+    resolved_end = as_of_date or get_shanghai_time().date()
+    month_index = resolved_end.year * 12 + resolved_end.month - months
+    start_year, start_month_zero_based = divmod(month_index, 12)
+    resolved_start = date(start_year, start_month_zero_based + 1, 1)
+    return resolved_start.isoformat(), resolved_end.isoformat()
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -4155,6 +4176,51 @@ class ScheduledTasks:
             commodity_ids=commodity_ids,
             series_ids=series_ids,
             frequencies=frequencies,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+            job_config=job_config,
+        )
+
+    async def special_commodity_price_monthly_sync(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        lookback_months: int = 6,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Monthly special-commodity sync using the shared governance-first path."""
+        start_date, end_date = _resolve_special_commodity_monthly_sync_window(
+            start_date,
+            end_date,
+            lookback_months=lookback_months,
+        )
+        scheduler_logger.info(
+            "[Scheduler] Starting monthly special commodity sync: scope_id=%s scope_ids=%s "
+            "start=%s end=%s lookback_months=%s dry_run=%s",
+            scope_id,
+            scope_ids,
+            start_date,
+            end_date,
+            lookback_months,
+            dry_run,
+        )
+        return await self.special_commodity_price_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            venues=venues,
+            categories=categories,
+            commodity_ids=commodity_ids,
+            series_ids=series_ids,
+            frequencies=frequencies or ["monthly"],
             start_date=start_date,
             end_date=end_date,
             dry_run=dry_run,
