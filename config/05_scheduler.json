@@ -352,7 +352,7 @@
         "trigger": {
           "type": "cron",
           "hour": 8,
-          "minute": 0,
+          "minute": 20,
           "second": 0
         },
         "max_instances": 1,
@@ -797,18 +797,28 @@
       },
       "special_commodity_price_sync": {
         "enabled": true,
-        "manual_only": true,
-        "description": "特殊商品价格/指数观测值同步（FRED/EIA/World Bank/100ppi/LME 聚合行情，当前仅手工启用）",
+        "manual_only": false,
+        "description": "外盘及特殊商品日频同步（首批上线 LME 六种3M代理行情；独立于国内期货日更）",
         "report": true,
-        "pre_run_notify": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "tue-sat",
+          "hour": 8,
+          "minute": 0,
+          "second": 0
+        },
         "max_instances": 1,
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
-          "scope_id": "fred_energy_oil",
-          "dry_run": true,
+          "scope_ids": [
+            "lme_nonferrous"
+          ],
+          "lookback_days": 10,
+          "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Keep manual_only until every enabled scope, including LME Sina-primary/Eastmoney-fallback, passes short-window dry-run validation."
+          "note": "Initial production scope is LME only. Add other mature daily scopes here without changing the domestic futures task."
         }
       },
       "special_commodity_price_backfill": {

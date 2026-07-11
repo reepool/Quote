@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import date
 import json
 from pathlib import Path
 import sys
@@ -981,3 +982,52 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "fallback_filled=7" in report
     assert "unresolved_gaps=0" in report
     assert "ohlc_outside=141" in report
+
+
+def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
+    from scheduler.tasks import _resolve_special_commodity_sync_window
+
+    assert _resolve_special_commodity_sync_window(
+        None,
+        None,
+        lookback_days=10,
+        as_of_date=date(2026, 7, 11),
+    ) == ("2026-07-02", "2026-07-11")
+    assert _resolve_special_commodity_sync_window(
+        "2026-01-01",
+        "2026-01-31",
+        lookback_days=10,
+        as_of_date=date(2026, 7, 11),
+    ) == ("2026-01-01", "2026-01-31")
+
+
+def test_lme_schedule_is_isolated_from_domestic_futures_and_cache_warmup():
+    scheduler_cfg = json.loads(
+        (Path(__file__).parents[3] / "config" / "05_scheduler.json").read_text()
+    )["scheduler_config"]
+    jobs = scheduler_cfg["jobs"]
+    special = jobs["special_commodity_price_sync"]
+    assert special["enabled"] is True
+    assert special["manual_only"] is False
+    assert special["trigger"] == {
+        "type": "cron",
+        "day_of_week": "tue-sat",
+        "hour": 8,
+        "minute": 0,
+        "second": 0,
+    }
+    assert special["parameters"]["scope_ids"] == ["lme_nonferrous"]
+    assert special["parameters"]["lookback_days"] == 10
+    assert special["parameters"]["dry_run"] is False
+    assert jobs["cache_warm_up"]["trigger"]["minute"] == 20
+    assert "LME" not in jobs["futures_market_data_sync"]["parameters"]["exchanges"]
+
+    enabled_at_0800 = [
+        job_id
+        for job_id, payload in jobs.items()
+        if payload.get("enabled")
+        and not payload.get("manual_only")
+        and (payload.get("trigger") or {}).get("hour") == 8
+        and (payload.get("trigger") or {}).get("minute", 0) == 0
+    ]
+    assert enabled_at_0800 == ["special_commodity_price_sync"]

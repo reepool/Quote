@@ -1713,6 +1713,24 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _resolve_special_commodity_sync_window(
+    start_date: Optional[str],
+    end_date: Optional[str],
+    *,
+    lookback_days: int,
+    as_of_date: Optional[date] = None,
+) -> tuple[str, str]:
+    """Resolve an explicit or rolling calendar-day window for scheduled sync."""
+    if bool(start_date) != bool(end_date):
+        raise ValueError("special commodity sync requires both start_date and end_date")
+    if start_date and end_date:
+        return str(start_date)[:10], str(end_date)[:10]
+    days = max(1, int(lookback_days))
+    resolved_end = as_of_date or get_shanghai_time().date()
+    resolved_start = resolved_end - timedelta(days=days - 1)
+    return resolved_start.isoformat(), resolved_end.isoformat()
+
+
 class ScheduledTasks:
     """定时任务管理类"""
 
@@ -4041,12 +4059,27 @@ class ScheduledTasks:
         frequencies: Optional[List[str]] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
+        lookback_days: int = 10,
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """特殊商品价格/指数观测值同步任务。"""
         self._active_tasks.add('special_commodity_price_sync')
         try:
+            start_date, end_date = _resolve_special_commodity_sync_window(
+                start_date,
+                end_date,
+                lookback_days=lookback_days,
+            )
+            scheduler_logger.info(
+                "[Scheduler] Starting special commodity price sync: scope_id=%s scope_ids=%s start=%s end=%s lookback_days=%s dry_run=%s",
+                scope_id,
+                scope_ids,
+                start_date,
+                end_date,
+                lookback_days,
+                dry_run,
+            )
             result = await data_manager.run_special_commodity_price_sync(
                 scope_id=scope_id,
                 scope_ids=scope_ids,

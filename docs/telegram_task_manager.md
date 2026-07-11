@@ -340,7 +340,8 @@ restart_system - 重启系统服务
 • 每周数据维护 (weekly_data_maintenance) - 周日 02:00
 • 月度数据完整性检查 (monthly_data_integrity_check) - 下月2日 11:00
 • 季度数据清理 (quarterly_cleanup) - 下季度最后一天 14:30
-• 缓存预热 (cache_warm_up) - 每天 08:00
+• 外盘及特殊商品日频同步 (special_commodity_price_sync) - 周二至周六 08:00
+• 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00
 • 数据库备份任务 (database_backup) - 周六 03:30
 
