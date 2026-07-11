@@ -345,7 +345,7 @@ scope 解析
 
 - EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
 - World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
-- 100ppi 已配置化落地 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`；后续品种沿用同一 provider/governance adapter，以独立商品、序列和 scope 逐个验证。甲醇 `CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY` 的源端可用起点为 2014-06-17，完成全历史回补后加入日更。乙二醇 `CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY` 的源端可用起点为 2018-12-10，使用 DCE 已验证交易日历进行覆盖诊断。各序列均通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，地区、规格和含税口径按来源披露。
+- 100ppi 已配置化落地 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`；后续品种沿用同一 provider/governance adapter，以独立商品、序列和 scope 逐个验证。甲醇 `CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY` 的源端可用起点为 2014-06-17；乙二醇 `CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY` 的源端可用起点为 2018-12-10；PVC `CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY` 的源端可用起点为 2013-01-04。乙二醇和 PVC 使用 DCE 已验证交易日历进行覆盖诊断。各序列均通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，地区、规格和含税口径按来源披露。
 - 中长程特殊商品 provider 调用必须按配置间隔输出 heartbeat 日志，至少包含来源、序列、任务日期范围和累计耗时；任务开始/结束日志不能替代运行中的阶段进度日志。默认间隔为60秒。
 - 特殊商品采集、治理、质量诊断和 heartbeat 属于数据任务日志，必须通过项目统一 `DataSource` task-domain logger 写入 `log/task.log`；不得使用未路由的模块根 logger 写入 `log/sys.log`。`sys.log` 仅保留应用初始化、服务、网络连接和系统运行日志。
 - 全量和长窗口 dry-run 必须输出并保留每条序列的实际首末观测日、年度行数、数值范围、非正值、重复日期、最大绝对涨跌样本、原始/规范化币种单位。对配置了 `expected_calendar_exchange` 的日频序列，还必须使用数据库中已治理交易日历计算覆盖率、缺失日期、最长连续缺口和年度覆盖，禁止用 weekday 生成预期日期。
@@ -369,7 +369,7 @@ scope 解析
 | `commodity_policy_event_sync` | 手工触发为主 | 导入动力煤长协/政策事件 |
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous`、`eia_energy_oil`、`cn_100ppi_chemical` 与 `cn_100ppi_methanol` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；分别覆盖 LME 六种3M代理行情、以 EIA 为主源且 FRED 逐日期补缺的 WTI/Brent canonical 日频现货，以及 100ppi PTA 和甲醇现货参考序列。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。其他100ppi品种需完成逐品种治理和历史验证后再按配置加入；World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把外盘及特殊商品并入国内五大交易所的 `futures_market_data_sync`。已完成历史回补和治理验证的 `lme_nonferrous`、`eia_energy_oil`、`cn_100ppi_chemical`、`cn_100ppi_methanol` 与 `cn_100ppi_ethylene_glycol` 统一在周二至周六 08:00（Asia/Shanghai）运行，默认回看最近10个自然日；分别覆盖 LME 六种3M代理行情、以 EIA 为主源且 FRED 逐日期补缺的 WTI/Brent canonical 日频现货，以及 100ppi PTA、甲醇和乙二醇现货参考序列。原始 FRED 序列继续独立保存用于来源审计，不作为默认日更输出。其他100ppi品种需完成逐品种治理和历史验证后再按配置加入；World Bank/FRED-IMF 月频和政策事件继续使用独立频率。原08:00缓存预热调整到08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
 `fred_imf_metals` 与 `world_bank_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
 

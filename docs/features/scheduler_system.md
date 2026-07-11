@@ -33,7 +33,7 @@
 | `weekly_data_maintenance` | 周维护 | 周日 `02:00` | 预留 5 小时，避开周日白天修复 |
 | `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
-| `special_commodity_price_sync` | 外盘及特殊商品 | 周二至周六 `08:00` | LME 六种3M代理行情、EIA/FRED WTI/Brent 及 100ppi PTA/甲醇现货，动态回看10个自然日，独立于国内期货日更 |
+| `special_commodity_price_sync` | 外盘及特殊商品 | 周二至周六 `08:00` | LME 六种3M代理行情、EIA/FRED WTI/Brent 及 100ppi PTA/甲醇/乙二醇现货，动态回看10个自然日，独立于国内期货日更 |
 | `special_commodity_price_monthly_sync` | 外盘商品 | 每月10日、20日 `08:40` | FRED/IMF 与 World Bank 铜铝独立月均基准，动态回看6个月以吸收发布延迟和历史修订 |
 | `cache_warm_up` | 缓存 | 每日 `08:20` | LME 日更完成后执行轻量预热 |
 | `industry_index_analysis_sync` | 申万指数指标 | 周一至周五 `10:45` | 与申万分类同源，后移到分类窗口之后 |

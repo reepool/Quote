@@ -78,8 +78,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 13
-    assert result["series"] >= 17
+    assert result["instruments"] == 14
+    assert result["series"] >= 18
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -96,6 +96,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.PTA.SPOT",
         "CN.CHEMICAL.METHANOL.SPOT",
         "CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT",
+        "CN.CHEMICAL.PVC.SPOT",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
@@ -107,6 +108,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY",
+        "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY",
     }
 
 
@@ -136,6 +138,11 @@ def test_special_commodity_scope_resolution():
     ethylene_glycol = selector.resolve(scope_id="cn_100ppi_ethylene_glycol")
     assert [item.series_id for item in ethylene_glycol] == [
         "CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY"
+    ]
+
+    pvc = selector.resolve(scope_id="cn_100ppi_pvc")
+    assert [item.series_id for item in pvc] == [
+        "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY"
     ]
 
     assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
@@ -1320,6 +1327,7 @@ def test_special_commodity_schedule_is_isolated_from_domestic_futures_and_cache_
         "eia_energy_oil",
         "cn_100ppi_chemical",
         "cn_100ppi_methanol",
+        "cn_100ppi_ethylene_glycol",
     ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
