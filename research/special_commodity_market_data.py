@@ -6,7 +6,6 @@ import hashlib
 import importlib
 import io
 import json
-import logging
 import math
 import os
 import re
@@ -23,9 +22,10 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import request_get, tls_config_from_source_config
+from utils.logging_manager import ds_logger
 
 
-logger = logging.getLogger(__name__)
+logger = ds_logger
 
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
 

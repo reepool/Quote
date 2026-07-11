@@ -603,8 +603,12 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert diagnostics[obs.series_id]["unit"] == ["CNY/ton"]
 
 
-def test_special_commodity_progress_wrapper_logs_completion(caplog):
-    caplog.set_level("INFO")
+def test_special_commodity_progress_wrapper_logs_completion(monkeypatch):
+    messages = []
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.logger.info",
+        lambda message, *args: messages.append(message % args),
+    )
     result = _call_with_progress_logging(
         lambda value: value + 1,
         kwargs={"value": 2},
@@ -612,7 +616,7 @@ def test_special_commodity_progress_wrapper_logs_completion(caplog):
         interval_seconds=60,
     )
     assert result == 3
-    assert "call done context=source=test series=TEST" in caplog.text
+    assert any("call done context=source=test series=TEST" in item for item in messages)
 
 
 def test_calendar_coverage_uses_persisted_exchange_evidence(tmp_path):
