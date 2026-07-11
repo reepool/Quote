@@ -2135,6 +2135,218 @@ class AkshareForeignFuturesProvider:
                 len(observations) - before,
             )
 
+        gap_fill_diagnostics: Dict[str, Any] = {
+            "enabled": False,
+            "reference_dates": 0,
+            "affected_series": 0,
+            "fallback_requests": 0,
+            "primary_gap_dates": 0,
+            "fallback_filled_dates": 0,
+            "governed_exception_dates": 0,
+            "unresolved_dates": 0,
+            "by_series": {},
+        }
+        gap_cfg = dict(self.source_cfg.get("date_gap_fill") or {})
+        if _coerce_bool(gap_cfg.get("enabled"), False) and len(chain) > 1:
+            gap_fill_diagnostics["enabled"] = True
+            minimum_peers = max(1, int(gap_cfg.get("minimum_peer_series") or 2))
+            max_requests = max(0, int(gap_cfg.get("max_series_requests_per_run") or len(series)))
+            fallback_provider_id = str(gap_cfg.get("fallback_provider_id") or chain[1].get("provider_id") or "")
+            fallback_cfg = next(
+                (candidate for candidate in chain if candidate.get("provider_id") == fallback_provider_id),
+                None,
+            )
+            observations_by_series: Dict[str, List[CommodityObservation]] = {}
+            date_peer_counts: Dict[str, int] = {}
+            for observation in observations:
+                observations_by_series.setdefault(observation.series_id, []).append(observation)
+            for rows in observations_by_series.values():
+                for observed_date in {row.observation_date for row in rows}:
+                    date_peer_counts[observed_date] = date_peer_counts.get(observed_date, 0) + 1
+            reference_dates = {
+                observed_date
+                for observed_date, peer_count in date_peer_counts.items()
+                if peer_count >= minimum_peers
+            }
+            gap_fill_diagnostics["reference_dates"] = len(reference_dates)
+            primary_provider_id = str(chain[0].get("provider_id") or "")
+            item_by_series = {item.series_id: item for item in series}
+            exception_rows = [
+                dict(item)
+                for item in gap_cfg.get("observation_exceptions", [])
+                if isinstance(item, Mapping)
+            ]
+
+            for series_id, item in item_by_series.items():
+                source_meta = series_metadata.get(series_id) or {}
+                if source_meta.get("selected_provider") != primary_provider_id:
+                    continue
+                primary_dates = {
+                    row.observation_date for row in observations_by_series.get(series_id, [])
+                }
+                gap_dates = sorted(reference_dates - primary_dates)
+                if not gap_dates:
+                    continue
+                governed_exceptions: List[str] = []
+                for observed_date in gap_dates:
+                    parsed = _parse_date(observed_date)
+                    for exception in exception_rows:
+                        if str(exception.get("series_id") or "") != series_id:
+                            continue
+                        exception_start = _parse_date(exception.get("start_date"))
+                        exception_end = _parse_date(exception.get("end_date"))
+                        if parsed and exception_start and exception_end and exception_start <= parsed <= exception_end:
+                            governed_exceptions.append(observed_date)
+                            break
+                probe_dates = sorted(set(gap_dates) - set(governed_exceptions))
+                series_diag: Dict[str, Any] = {
+                    "primary_gap_dates": len(gap_dates),
+                    "governed_exception_dates": len(governed_exceptions),
+                    "fallback_filled_dates": 0,
+                    "unresolved_dates": 0,
+                    "fallback_requested": False,
+                }
+                gap_fill_diagnostics["affected_series"] += 1
+                gap_fill_diagnostics["primary_gap_dates"] += len(gap_dates)
+                gap_fill_diagnostics["governed_exception_dates"] += len(governed_exceptions)
+                if not probe_dates:
+                    gap_fill_diagnostics["by_series"][series_id] = series_diag
+                    continue
+                if fallback_cfg is None or gap_fill_diagnostics["fallback_requests"] >= max_requests:
+                    series_diag["unresolved_dates"] = len(probe_dates)
+                    gap_fill_diagnostics["unresolved_dates"] += len(probe_dates)
+                    warnings.append(
+                        {
+                            "reason": "foreign_futures_date_gaps_unresolved",
+                            "series_id": series_id,
+                            "dates": probe_dates[:20],
+                            "fallback_reason": "missing_or_exhausted_fallback_request_budget",
+                        }
+                    )
+                    gap_fill_diagnostics["by_series"][series_id] = series_diag
+                    continue
+
+                provider_symbols = dict(item.metadata.get("provider_symbols") or {})
+                fallback_symbol = str(provider_symbols.get(fallback_provider_id) or "").strip()
+                function_name = str(fallback_cfg.get("akshare_function") or "").strip()
+                date_column = str(fallback_cfg.get("date_column") or "").strip()
+                value_column = str(fallback_cfg.get("value_column") or "").strip()
+                func = getattr(akshare, function_name, None)
+                gap_fill_diagnostics["fallback_requests"] += 1
+                series_diag["fallback_requested"] = True
+                fallback_rows: List[Dict[str, Any]] = []
+                fallback_error = ""
+                try:
+                    if not fallback_symbol or func is None:
+                        raise ValueError("invalid date-gap fallback mapping")
+                    fallback_rows = self._payload_records(func(symbol=fallback_symbol))
+                except Exception as exc:
+                    fallback_error = str(exc)
+                fallback_by_date: Dict[str, tuple[float, Dict[str, Any]]] = {}
+                for row in fallback_rows:
+                    observed = _parse_date(str(row.get(date_column) or "")[:10])
+                    value = self._numeric(row, value_column)
+                    if observed is not None and value is not None:
+                        fallback_by_date[observed.isoformat()] = (value, row)
+                filled_dates: List[str] = []
+                actual_source_profile = str(
+                    fallback_cfg.get("actual_source_profile") or fallback_provider_id
+                )
+                source_url = str(
+                    fallback_cfg.get("source_url")
+                    or f"akshare://{fallback_cfg.get('akshare_function')}"
+                )
+                contract_detail = dict(source_meta.get("contract_detail") or {})
+                for observed_date in probe_dates:
+                    fallback_value_row = fallback_by_date.get(observed_date)
+                    if fallback_value_row is None:
+                        continue
+                    value, row = fallback_value_row
+                    metadata = {
+                        "actual_source_profile": actual_source_profile,
+                        "selected_provider": fallback_provider_id,
+                        "fallback_reason": "primary_date_missing",
+                        "primary_source_profile": source_meta.get("actual_source_profile"),
+                        "primary_source_symbol": source_meta.get("source_symbol"),
+                        "underlying_exchange": item.metadata.get("underlying_exchange"),
+                        "prompt_tenor": item.metadata.get("prompt_tenor"),
+                        "market_data_type": contract_detail.get("market_data_type"),
+                        "contract_multiplier": contract_detail.get("contract_multiplier"),
+                        "tick_size": contract_detail.get("tick_size"),
+                    }
+                    for target, config_key in (
+                        ("open", "open_column"),
+                        ("high", "high_column"),
+                        ("low", "low_column"),
+                        ("volume", "volume_column"),
+                        ("position", "position_column"),
+                    ):
+                        numeric = self._numeric(row, str(fallback_cfg.get(config_key) or ""))
+                        if numeric is not None:
+                            metadata[target] = numeric
+                    observations.append(
+                        _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=observed_date,
+                            value=value,
+                            source_url=source_url,
+                            source_symbol=fallback_symbol,
+                            raw_payload=row,
+                            metadata=metadata,
+                        )
+                    )
+                    filled_dates.append(observed_date)
+                unresolved_dates = sorted(set(probe_dates) - set(filled_dates))
+                series_diag["fallback_filled_dates"] = len(filled_dates)
+                series_diag["unresolved_dates"] = len(unresolved_dates)
+                gap_fill_diagnostics["fallback_filled_dates"] += len(filled_dates)
+                gap_fill_diagnostics["unresolved_dates"] += len(unresolved_dates)
+                attempts_by_series.setdefault(series_id, []).append(
+                    {
+                        "provider_id": fallback_provider_id,
+                        "status": "date_gap_fill",
+                        "source_symbol": fallback_symbol,
+                        "requested_dates": len(probe_dates),
+                        "filled_dates": len(filled_dates),
+                        "unresolved_dates": len(unresolved_dates),
+                        "error": fallback_error,
+                    }
+                )
+                if unresolved_dates:
+                    warnings.append(
+                        {
+                            "reason": "foreign_futures_date_gaps_unresolved",
+                            "series_id": series_id,
+                            "dates": unresolved_dates[:20],
+                            "fallback_error": fallback_error,
+                        }
+                    )
+                gap_fill_diagnostics["by_series"][series_id] = series_diag
+                logger.info(
+                    "[AkshareForeignFutures] date-gap audit series=%s primary_gaps=%s exceptions=%s fallback_filled=%s unresolved=%s",
+                    series_id,
+                    len(gap_dates),
+                    len(governed_exceptions),
+                    len(filled_dates),
+                    len(unresolved_dates),
+                )
+
+        ohlc_diagnostics: Dict[str, Any] = {"close_outside_range": 0, "by_series": {}}
+        for observation in observations:
+            low = observation.metadata.get("low")
+            high = observation.metadata.get("high")
+            if low is None or high is None:
+                continue
+            outside = float(low) > float(high) or observation.value < float(low) or observation.value > float(high)
+            if not outside:
+                continue
+            observation.metadata["ohlc_consistency"] = "close_outside_intraday_range"
+            ohlc_diagnostics["close_outside_range"] += 1
+            by_series = ohlc_diagnostics["by_series"]
+            by_series[observation.series_id] = by_series.get(observation.series_id, 0) + 1
+
         configured_primary_codes = set(
             _normalize_list(self.source_cfg.get("known_primary_symbols"), upper=True)
         )
@@ -2160,6 +2372,8 @@ class AkshareForeignFuturesProvider:
                 "attempts_by_series": attempts_by_series,
                 "available_lme_products": available_lme_products,
                 "unmapped_lme_products": unmapped_products,
+                "date_gap_fill": gap_fill_diagnostics,
+                "quality_diagnostics": {"ohlc": ohlc_diagnostics},
             },
         )
 
@@ -3090,6 +3304,8 @@ class SpecialCommodityGovernancePipeline:
                 "blockers": source_blockers,
                 "calendar_type": date_result.metadata.get("calendar_type"),
                 "weekday_inference_used": False,
+                "date_gap_fill": provider_result.metadata.get("date_gap_fill", {}),
+                "quality_diagnostics": provider_result.metadata.get("quality_diagnostics", {}),
             }
             logger.info(
                 "[SpecialCommodityGovernance] source done source_profile=%s status=%s master_records=%s calendar_rows=%s fetched=%s warnings=%s blockers=%s",

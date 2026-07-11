@@ -1696,6 +1696,9 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                     f"{source_profile}: status={item.get('status', 'unknown')}, "
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
                     f"dates={item.get('calendar_rows', 0)}, fetched={item.get('fetched', 0)}, "
+                    f"fallback_filled={(item.get('date_gap_fill') or {}).get('fallback_filled_dates', 0)}, "
+                    f"unresolved_gaps={(item.get('date_gap_fill') or {}).get('unresolved_dates', 0)}, "
+                    f"ohlc_outside={((item.get('quality_diagnostics') or {}).get('ohlc') or {}).get('close_outside_range', 0)}, "
                     f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
                 )

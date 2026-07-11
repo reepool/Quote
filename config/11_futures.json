@@ -811,7 +811,23 @@
               "source_url": "https://quote.eastmoney.com/center/gridlist.html#futures_global"
             }
           ],
-          "note": "Use Sina first. Use Eastmoney only for primary request failure, empty full payload, or missing required date/close columns. Preserve the selected provider in observation metadata."
+          "date_gap_fill": {
+            "enabled": true,
+            "fallback_provider_id": "eastmoney",
+            "reference_mode": "venue_primary_union",
+            "minimum_peer_series": 2,
+            "max_series_requests_per_run": 6,
+            "observation_exceptions": [
+              {
+                "series_id": "CMD.METAL.NICKEL.LME3M.DAILY",
+                "start_date": "2022-03-09",
+                "end_date": "2022-03-15",
+                "reason": "lme_nickel_market_suspension",
+                "evidence_url": "https://www.lme.com/Market-data/disruption-events"
+              }
+            ]
+          },
+          "note": "Use Sina first. Use Eastmoney for primary request/schema failure and bounded date-gap repair. Preserve the selected provider and fallback reason in observation metadata; do not perform routine full dual-source daily downloads."
         },
         "manual_policy_event": {
           "venue": "MANUAL_POLICY",

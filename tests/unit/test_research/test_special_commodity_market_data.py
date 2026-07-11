@@ -551,6 +551,156 @@ def test_lme_akshare_provider_falls_back_to_eastmoney(monkeypatch):
     )
 
 
+def test_lme_provider_fills_isolated_primary_date_gap_from_eastmoney(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=[
+            "CMD.METAL.COPPER.LME3M.DAILY",
+            "CMD.METAL.ALUMINIUM.LME3M.DAILY",
+            "CMD.METAL.TIN.LME3M.DAILY",
+        ]
+    )
+    fallback_calls = []
+
+    def _sina(symbol):
+        rows = [
+            {"date": "2021-02-24", "open": 100, "high": 110, "low": 90, "close": 105},
+        ]
+        if symbol in {"CAD", "AHD"}:
+            rows.append(
+                {"date": "2021-02-25", "open": 101, "high": 111, "low": 91, "close": 106}
+            )
+        return pd.DataFrame(rows)
+
+    def _eastmoney(symbol):
+        fallback_calls.append(symbol)
+        assert symbol == "LTNT"
+        return pd.DataFrame(
+            [
+                {"日期": "2021-02-25", "名称": "综合锡03", "开盘": 26910, "最高": 27500, "最低": 26385, "最新价": 26400},
+            ]
+        )
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=_eastmoney,
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2021-02-24", end_date="2021-02-25")
+
+    assert result.blockers == []
+    assert result.warnings == []
+    assert fallback_calls == ["LTNT"]
+    tin_rows = [
+        item
+        for item in result.observations
+        if item.series_id == "CMD.METAL.TIN.LME3M.DAILY"
+    ]
+    assert len(tin_rows) == 2
+    repaired = [item for item in tin_rows if item.observation_date == "2021-02-25"][0]
+    assert repaired.value == 26400
+    assert repaired.source_symbol == "LTNT"
+    assert repaired.metadata["actual_source_profile"] == "eastmoney_global_futures"
+    assert repaired.metadata["fallback_reason"] == "primary_date_missing"
+    diagnostics = result.metadata["date_gap_fill"]
+    assert diagnostics["fallback_requests"] == 1
+    assert diagnostics["fallback_filled_dates"] == 1
+    assert diagnostics["unresolved_dates"] == 0
+
+
+def test_lme_provider_excludes_governed_nickel_suspension_from_gap_fill(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=[
+            "CMD.METAL.COPPER.LME3M.DAILY",
+            "CMD.METAL.ALUMINIUM.LME3M.DAILY",
+            "CMD.METAL.NICKEL.LME3M.DAILY",
+        ]
+    )
+
+    def _sina(symbol):
+        rows = [
+            {"date": "2022-03-08", "open": 100, "high": 110, "low": 90, "close": 105},
+        ]
+        if symbol in {"CAD", "AHD"}:
+            rows.append(
+                {"date": "2022-03-09", "open": 101, "high": 111, "low": 91, "close": 106}
+            )
+        return pd.DataFrame(rows)
+
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=_sina,
+        futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
+            AssertionError("governed suspension must not request fallback")
+        ),
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2022-03-08", end_date="2022-03-09")
+
+    assert result.warnings == []
+    diagnostics = result.metadata["date_gap_fill"]
+    assert diagnostics["governed_exception_dates"] == 1
+    assert diagnostics["fallback_requests"] == 0
+    assert diagnostics["unresolved_dates"] == 0
+
+
+def test_lme_provider_reports_close_outside_intraday_range_without_rewrite(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["lme_akshare_foreign_futures"]
+    series = CommodityUniverseSelector(cfg).resolve(
+        series_ids=["CMD.METAL.COPPER.LME3M.DAILY"]
+    )
+    fake_akshare = SimpleNamespace(
+        futures_foreign_hist=lambda symbol: pd.DataFrame(
+            [
+                {"date": "2021-03-23", "open": 9134, "high": 9145, "low": 8871, "close": 8870},
+            ]
+        ),
+        futures_global_hist_em=lambda symbol: (_ for _ in ()).throw(
+            AssertionError("single covered date must not request fallback")
+        ),
+        futures_hq_subscribe_exchange_symbol=lambda: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        AkshareForeignFuturesProvider,
+        "_load_akshare",
+        staticmethod(lambda mode: fake_akshare),
+    )
+
+    result = AkshareForeignFuturesProvider(
+        "lme_akshare_foreign_futures", source_cfg
+    ).fetch(series, start_date="2021-03-23", end_date="2021-03-23")
+
+    assert result.observations[0].value == 8870
+    assert result.observations[0].metadata["low"] == 8871
+    assert result.observations[0].metadata["ohlc_consistency"] == "close_outside_intraday_range"
+    assert result.metadata["quality_diagnostics"]["ohlc"]["close_outside_range"] == 1
+
+
 def test_lme_governance_precedes_write_and_uses_only_observed_dates(monkeypatch, tmp_path):
     cfg = _research_config(tmp_path)
     special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
@@ -806,6 +956,13 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
                     "master_records": 2,
                     "calendar_rows": 2,
                     "fetched": 2,
+                    "date_gap_fill": {
+                        "fallback_filled_dates": 7,
+                        "unresolved_dates": 0,
+                    },
+                    "quality_diagnostics": {
+                        "ohlc": {"close_outside_range": 141},
+                    },
                     "warnings": 0,
                     "blockers": 0,
                 }
@@ -821,3 +978,6 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "fred_official_api" in report
     assert "主数据 `success`" in report
     assert "日期 `success`" in report
+    assert "fallback_filled=7" in report
+    assert "unresolved_gaps=0" in report
+    assert "ohlc_outside=141" in report

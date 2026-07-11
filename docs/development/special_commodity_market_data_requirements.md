@@ -346,8 +346,11 @@ scope 解析
 - EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
 - World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
 - 100ppi 第一条配置化落地序列为 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`，通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，规格和含税口径按来源披露。
-- LME 第一批覆盖六种 3M 金属：`CAD/AHD/ZSD/PBD/NID/SND` 对应新浪主源，`LCPT/LALT/LZNT/LLDT/LNKT/LTNT` 对应东财备源。主源成功时不请求备源；主源请求、空全量 payload 或必需列缺失时才切换。观测值使用 close/latest，完整 OHLCV 和实际来源写入 metadata。
+- LME 第一批覆盖六种 3M 金属：`CAD/AHD/ZSD/PBD/NID/SND` 对应新浪主源，`LCPT/LALT/LZNT/LLDT/LNKT/LTNT` 对应东财备源。主源请求、空全量 payload 或必需列缺失时切换备源；历史回补还应以同一范围内其他 LME 品种的来源观测日期并集识别孤立缺日，仅对受影响品种请求东财并逐日补缺。正常日更在新浪覆盖请求日期时不请求东财，避免双源全量下载和东财反爬压力。观测值使用 close/latest，完整 OHLCV、实际来源、补缺原因和请求尝试写入 metadata。
+- 跨源审计不能把所有缺日都判为数据错误。交易所公告可证明的品种级停牌或市场中断应作为通用 `observation_exceptions` 治理记录排除；例如 LME 镍 2022 年 3 月停牌窗口。东财也没有的日期若无公告证据，保留为 unresolved source gap，不使用 weekday 猜测。
+- 报告必须输出主源行数、备源补齐数、未解决缺口、已治理例外和 `close` 超出来源 `low/high` 的统计。CFD/LME 3M 代理的 close 与盘中 OHLC 可能属于不同会话口径，此类记录保留原值并标记诊断，不擅自修正高低价。
 - 2026-07-10 真实短窗口验证：`lme_nonferrous` 六品种在 2026-07-06 至 2026-07-09 由新浪主源获取 24 条观测，六条主数据治理和来源交易日治理均成功；强制主源映射失效后，铜由东财 `LCPT` 成功接管，生命周期起点为 2013-06-21。临时库 write 验证写入六条观测、六条主数据证据和六条来源交易日记录，未使用 weekday 推断。
+- 2026-07-11 全历史审计：新浪 2016-07-11 至 2026-07-10 六品种初始返回 15,216 条；同品种日期并集发现镍缺5日、锡缺7日。镍缺日落在 LME 公告证明的 2022 年3月停牌窗口，按治理例外排除；东财 `LTNT` 补齐锡7日，最终 15,223 条，实际只增加1次东财请求，未解决缺口为0。六品种全量东财审计显示其历史约自 2013-06-21、OHLC 内部一致性更高，但与新浪重叠期并非同一收盘口径：锡平均绝对价差约68美元/吨、最大3,525美元/吨，镍最大850美元/吨。因此仍保留新浪主源、东财逐日补缺备源，不因覆盖更长而切换主源或无治理拼接2013-2016历史。
 
 ### 6.2 调度任务
 
