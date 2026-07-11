@@ -1034,6 +1034,20 @@
             "dcf_role": "chemical_spot_cycle_anchor",
             "source_scope": "100ppi public-web PTA spot reference"
           }
+        },
+        {
+          "commodity_id": "CN.CHEMICAL.METHANOL.SPOT",
+          "symbol": "MA",
+          "name": "China Methanol Spot Reference",
+          "category": "chemical",
+          "commodity_type": "spot_reference",
+          "default_currency": "CNY",
+          "default_unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "chemical_spot_cycle_anchor",
+            "source_scope": "100ppi public-web methanol spot reference"
+          }
         }
       ],
       "series": [
@@ -1341,6 +1355,38 @@
             "source_name": "100ppi PTA spot reference",
             "source_url": "https://www.100ppi.com/sf/"
           }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.METHANOL.SPOT",
+          "venue": "100PPI",
+          "source_profile": "100ppi_public_web",
+          "source_symbol": "MA",
+          "frequency": "daily",
+          "quote_type": "spot_reference",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily",
+            "akshare_kwargs": {
+              "vars_list": [
+                "MA"
+              ]
+            },
+            "akshare_start_argument": "start_day",
+            "akshare_end_argument": "end_day",
+            "akshare_date_format": "compact",
+            "date_column": "date",
+            "value_column": "spot_price",
+            "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "CZCE",
+            "progress_log_interval_seconds": 60,
+            "source_available_from": "2014-06-17",
+            "region_or_spec": "China methanol spot reference; region, grade and tax basis follow 100ppi publication",
+            "source_name": "100ppi methanol spot reference",
+            "source_url": "https://www.100ppi.com/sf/"
+          }
         }
       ],
       "download_scopes": [
@@ -1444,6 +1490,22 @@
           ],
           "commodity_ids": [
             "CN.CHEMICAL.PTA.SPOT"
+          ],
+          "frequencies": [
+            "daily"
+          ]
+        },
+        {
+          "scope_id": "cn_100ppi_methanol",
+          "enabled": true,
+          "venues": [
+            "100PPI"
+          ],
+          "categories": [
+            "chemical"
+          ],
+          "commodity_ids": [
+            "CN.CHEMICAL.METHANOL.SPOT"
           ],
           "frequencies": [
             "daily"

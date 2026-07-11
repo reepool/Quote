@@ -78,8 +78,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 11
-    assert result["series"] >= 15
+    assert result["instruments"] == 12
+    assert result["series"] >= 16
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -94,6 +94,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "METAL.NICKEL.LME_3M",
         "METAL.TIN.LME_3M",
         "CN.CHEMICAL.PTA.SPOT",
+        "CN.CHEMICAL.METHANOL.SPOT",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
@@ -103,6 +104,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.METAL.COPPER.LME3M.DAILY",
         "CMD.METAL.ALUMINIUM.LME3M.DAILY",
         "CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY",
+        "CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY",
     }
 
 
@@ -123,6 +125,11 @@ def test_special_commodity_scope_resolution():
         series_ids=["CMD.METAL.COPPER.IMF.FRED.MONTHLY"],
     )
     assert [item.series_id for item in explicit] == ["CMD.METAL.COPPER.IMF.FRED.MONTHLY"]
+
+    methanol = selector.resolve(scope_id="cn_100ppi_methanol")
+    assert [item.series_id for item in methanol] == [
+        "CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY"
+    ]
 
     assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
         "CMD.OIL.WTI.SPOT.EIA.DAILY",
