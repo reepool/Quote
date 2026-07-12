@@ -1491,6 +1491,7 @@ def test_manual_policy_event_sync_writes_policy_table(tmp_path):
     assert result["status"] == "success"
     assert result["policy_events"] == 1
     assert result["inserted"] == 1
+    assert result["event_summaries"][0]["effective_start"] == "2026-01-01"
     with storage.get_connection() as conn:
         row = conn.execute(
             "SELECT commodity_id, policy_type, value_mid FROM commodity_policy_events WHERE event_id = ?",

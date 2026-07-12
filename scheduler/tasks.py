@@ -1683,8 +1683,21 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"事件 `{result.get('policy_events', 0)}`｜"
             f"新增 `{result.get('inserted', 0)}`｜"
             f"更新 `{result.get('changed', 0)}`｜"
-            f"不变 `{result.get('unchanged', 0)}`"
+            f"不变 `{result.get('unchanged', 0)}`｜"
+            f"dry_run预计 `{result.get('would_write', 0)}`"
         )
+        for event in (result.get("event_summaries") or [])[:5]:
+            value_range = (
+                f"{event.get('value_low')}-{event.get('value_high')}"
+                if event.get("value_low") is not None and event.get("value_high") is not None
+                else str(event.get("value_mid") if event.get("value_mid") is not None else "N/A")
+            )
+            lines.append(
+                "事件明细: "
+                f"`{event.get('commodity_id')}`｜"
+                f"生效 `{event.get('effective_start')}` 至 `{event.get('effective_end') or '持续有效'}`｜"
+                f"区间 `{value_range} {event.get('unit')}`｜非行情"
+            )
     elif result.get("reason"):
         lines.append(f"原因: `{result.get('reason')}`")
 

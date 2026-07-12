@@ -4200,9 +4200,16 @@ class SpecialCommodityPolicyEventService:
     def sync(self, *, dry_run: bool = False) -> Dict[str, Any]:
         if not _coerce_bool(self.module_cfg.get("enabled"), False):
             return {"status": "disabled", "reason": "special_commodity_market_data_disabled"}
+        logger.info("[SpecialCommodityPolicyEvent] started dry_run=%s", dry_run)
         SpecialCommodityMasterDataService(self.storage, self.module_cfg).sync()
         events, blockers = ConfiguredPolicyEventProvider(self.module_cfg).fetch()
         if blockers:
+            logger.error(
+                "[SpecialCommodityPolicyEvent] blocked dry_run=%s valid_events=%s blockers=%s",
+                dry_run,
+                len(events),
+                len(blockers),
+            )
             return {
                 "status": "blocked",
                 "dry_run": dry_run,
@@ -4214,10 +4221,37 @@ class SpecialCommodityPolicyEventService:
                 "blockers": blockers,
             }
         counts = self.storage.upsert_policy_events(events, dry_run=dry_run)
+        event_summaries = [
+            {
+                "event_id": event.event_id,
+                "commodity_id": event.commodity_id,
+                "policy_type": event.policy_type,
+                "effective_start": event.effective_start,
+                "effective_end": event.effective_end,
+                "currency": event.currency,
+                "unit": event.unit,
+                "value_low": event.value_low,
+                "value_high": event.value_high,
+                "value_mid": event.value_mid,
+                "source_profile": event.source_profile,
+                "value_semantics": event.metadata.get("value_semantics"),
+            }
+            for event in events
+        ]
+        logger.info(
+            "[SpecialCommodityPolicyEvent] done status=success dry_run=%s events=%s inserted=%s changed=%s unchanged=%s would_write=%s",
+            dry_run,
+            len(events),
+            counts.get("inserted", 0),
+            counts.get("changed", 0),
+            counts.get("unchanged", 0),
+            counts.get("would_write", 0),
+        )
         return {
             "status": "success",
             "dry_run": dry_run,
             "policy_events": len(events),
+            "event_summaries": event_summaries,
             "blockers": [],
             **counts,
         }
