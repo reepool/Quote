@@ -19,6 +19,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from urllib.parse import urljoin
 
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
@@ -29,6 +30,7 @@ from utils.logging_manager import ds_logger
 logger = ds_logger
 
 SPECIAL_COMMODITY_SYNC_VERSION = "special_commodity_market_data_sync.v1"
+NDRC_POLICY_DISCOVERY_VERSION = "ndrc_policy_discovery.v1"
 
 
 def _call_with_progress_logging(
@@ -228,6 +230,34 @@ def _coerce_bool(value: Any, default: bool = True) -> bool:
     if isinstance(value, str):
         return value.strip().lower() not in {"0", "false", "no", "off", "disabled"}
     return bool(value)
+
+
+def _actual_contract_series_blockers(
+    series: Sequence[CommoditySeries],
+) -> List[Dict[str, Any]]:
+    blockers: List[Dict[str, Any]] = []
+    required = (
+        "contract_scope",
+        "specification",
+        "region",
+        "tax_basis",
+        "freight_basis",
+        "stable_source_verified",
+    )
+    for item in series:
+        data_kind = str(item.metadata.get("data_kind") or item.quote_type)
+        if data_kind != "actual_contract_price":
+            continue
+        missing = [key for key in required if not item.metadata.get(key)]
+        if missing:
+            blockers.append(
+                {
+                    "reason": "actual_contract_series_semantics_incomplete",
+                    "series_id": item.series_id,
+                    "missing_fields": missing,
+                }
+            )
+    return blockers
 
 
 def _normalize_list(value: Any, *, upper: bool = False) -> List[str]:
@@ -490,6 +520,24 @@ class CommodityGovernanceAdapter(Protocol):
     ) -> CommodityMasterGovernanceResult:
         ...
 
+
+class CommodityDocumentDiscoveryAdapter(Protocol):
+    """Source adapter contract for official catalog and document discovery."""
+
+    def discover(
+        self,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        checkpoint: Optional[Mapping[str, Any]] = None,
+    ) -> Mapping[str, Any]:
+        ...
+
+
+class CommoditySeriesCandidateAdapter(Protocol):
+    def discover_candidates(self) -> Sequence[Mapping[str, Any]]:
+        ...
+
     def govern_dates(
         self,
         series: Sequence[CommoditySeries],
@@ -692,6 +740,120 @@ class SpecialCommodityStorageManager:
             PRIMARY KEY (series_id, observation_date, source_profile),
             FOREIGN KEY (series_id) REFERENCES commodity_price_series(series_id)
         );
+
+        CREATE TABLE IF NOT EXISTS commodity_source_documents (
+            document_id TEXT PRIMARY KEY,
+            source_profile TEXT NOT NULL,
+            source_url TEXT NOT NULL,
+            document_number TEXT NOT NULL DEFAULT '',
+            title TEXT NOT NULL,
+            published_date TEXT,
+            retrieved_at TEXT NOT NULL,
+            content_hash TEXT NOT NULL,
+            content_type TEXT NOT NULL DEFAULT 'text/html',
+            content_text TEXT NOT NULL DEFAULT '',
+            parser_version TEXT NOT NULL,
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(source_profile, source_url, content_hash)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_commodity_source_documents_lookup
+        ON commodity_source_documents(source_profile, published_date, document_number);
+
+        CREATE TABLE IF NOT EXISTS commodity_policy_candidates (
+            candidate_id TEXT PRIMARY KEY,
+            document_id TEXT NOT NULL,
+            commodity_id TEXT,
+            policy_type TEXT NOT NULL,
+            review_status TEXT NOT NULL,
+            confidence REAL NOT NULL,
+            effective_start TEXT,
+            effective_end TEXT,
+            currency TEXT NOT NULL DEFAULT '',
+            unit TEXT NOT NULL DEFAULT '',
+            value_low REAL,
+            value_high REAL,
+            value_mid REAL,
+            field_lineage_json TEXT NOT NULL DEFAULT '{}',
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (document_id) REFERENCES commodity_source_documents(document_id)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_commodity_policy_candidates_review
+        ON commodity_policy_candidates(review_status, policy_type, commodity_id);
+
+        CREATE TABLE IF NOT EXISTS commodity_data_licenses (
+            license_id TEXT PRIMARY KEY,
+            provider TEXT NOT NULL,
+            license_name TEXT NOT NULL,
+            valid_from TEXT,
+            valid_until TEXT,
+            status TEXT NOT NULL,
+            permitted_use TEXT NOT NULL,
+            redistribution_mode TEXT NOT NULL,
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS commodity_data_entitlements (
+            entitlement_id TEXT PRIMARY KEY,
+            license_id TEXT NOT NULL,
+            dataset_id TEXT NOT NULL,
+            application_id TEXT NOT NULL,
+            access_mode TEXT NOT NULL,
+            api_disclosure_allowed INTEGER NOT NULL DEFAULT 0,
+            active INTEGER NOT NULL DEFAULT 0,
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(license_id, dataset_id, application_id, access_mode),
+            FOREIGN KEY (license_id) REFERENCES commodity_data_licenses(license_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS commodity_data_access_audit (
+            audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            entitlement_id TEXT,
+            dataset_id TEXT NOT NULL,
+            action TEXT NOT NULL,
+            allowed INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            occurred_at TEXT NOT NULL,
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            FOREIGN KEY (entitlement_id) REFERENCES commodity_data_entitlements(entitlement_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS commodity_series_candidates (
+            candidate_id TEXT PRIMARY KEY,
+            provider_id TEXT NOT NULL,
+            source_profile TEXT NOT NULL,
+            source_symbol TEXT NOT NULL,
+            proposed_commodity_id TEXT NOT NULL,
+            proposed_series_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL,
+            specification TEXT NOT NULL DEFAULT '',
+            region TEXT NOT NULL DEFAULT '',
+            frequency TEXT NOT NULL,
+            currency TEXT NOT NULL DEFAULT '',
+            unit TEXT NOT NULL DEFAULT '',
+            history_start TEXT,
+            rollout_state TEXT NOT NULL,
+            scheduler_eligible INTEGER NOT NULL DEFAULT 0,
+            evidence_json TEXT NOT NULL DEFAULT '{}',
+            diagnostics_json TEXT NOT NULL DEFAULT '{}',
+            metadata_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(provider_id, source_profile, source_symbol)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_commodity_series_candidates_rollout
+        ON commodity_series_candidates(rollout_state, scheduler_eligible, category);
         """
 
     def start_ingestion_run(self, *, job_name: str, source: str, mode: str, metadata: Dict[str, Any]) -> int:
@@ -1005,6 +1167,537 @@ class SpecialCommodityStorageManager:
                 )
         return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
 
+    def upsert_source_documents(
+        self,
+        documents: Sequence[Mapping[str, Any]],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(documents)}
+        inserted = changed = unchanged = 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for document in documents:
+                document_id = str(document["document_id"])
+                content_hash = str(document["content_hash"])
+                existing = conn.execute(
+                    "SELECT content_hash FROM commodity_source_documents WHERE document_id = ?",
+                    (document_id,),
+                ).fetchone()
+                if existing is None:
+                    inserted += 1
+                elif existing["content_hash"] == content_hash:
+                    unchanged += 1
+                else:
+                    changed += 1
+                conn.execute(
+                    """
+                    INSERT INTO commodity_source_documents (
+                        document_id, source_profile, source_url, document_number,
+                        title, published_date, retrieved_at, content_hash,
+                        content_type, content_text, parser_version, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(document_id) DO UPDATE SET
+                        source_profile=excluded.source_profile,
+                        source_url=excluded.source_url,
+                        document_number=excluded.document_number,
+                        title=excluded.title,
+                        published_date=excluded.published_date,
+                        retrieved_at=excluded.retrieved_at,
+                        content_hash=excluded.content_hash,
+                        content_type=excluded.content_type,
+                        content_text=excluded.content_text,
+                        parser_version=excluded.parser_version,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        document_id,
+                        str(document.get("source_profile") or ""),
+                        _redact_url(str(document.get("source_url") or "")),
+                        str(document.get("document_number") or ""),
+                        str(document.get("title") or ""),
+                        document.get("published_date"),
+                        str(document.get("retrieved_at") or now),
+                        content_hash,
+                        str(document.get("content_type") or "text/html"),
+                        str(document.get("content_text") or ""),
+                        str(document.get("parser_version") or SPECIAL_COMMODITY_SYNC_VERSION),
+                        _json_dumps(dict(document.get("metadata") or {})),
+                        now,
+                        now,
+                    ),
+                )
+        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+
+    def upsert_policy_candidates(
+        self,
+        candidates: Sequence[Mapping[str, Any]],
+        *,
+        dry_run: bool,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(candidates)}
+        inserted = changed = unchanged = 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for candidate in candidates:
+                candidate_id = str(candidate["candidate_id"])
+                payload_hash = _hash_payload(dict(candidate))
+                existing = conn.execute(
+                    "SELECT metadata_json, review_status FROM commodity_policy_candidates WHERE candidate_id = ?",
+                    (candidate_id,),
+                ).fetchone()
+                old_metadata = json.loads(existing["metadata_json"] or "{}") if existing else {}
+                if existing is None:
+                    inserted += 1
+                elif old_metadata.get("payload_hash") == payload_hash:
+                    unchanged += 1
+                else:
+                    changed += 1
+                metadata = dict(candidate.get("metadata") or {})
+                review_status = str(candidate.get("review_status") or "pending_review")
+                if existing is not None and existing["review_status"] in {"approved", "rejected"}:
+                    review_status = str(existing["review_status"])
+                    if old_metadata.get("review"):
+                        metadata["review"] = old_metadata["review"]
+                metadata["payload_hash"] = payload_hash
+                conn.execute(
+                    """
+                    INSERT INTO commodity_policy_candidates (
+                        candidate_id, document_id, commodity_id, policy_type,
+                        review_status, confidence, effective_start, effective_end,
+                        currency, unit, value_low, value_high, value_mid,
+                        field_lineage_json, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(candidate_id) DO UPDATE SET
+                        document_id=excluded.document_id,
+                        commodity_id=excluded.commodity_id,
+                        policy_type=excluded.policy_type,
+                        review_status=excluded.review_status,
+                        confidence=excluded.confidence,
+                        effective_start=excluded.effective_start,
+                        effective_end=excluded.effective_end,
+                        currency=excluded.currency,
+                        unit=excluded.unit,
+                        value_low=excluded.value_low,
+                        value_high=excluded.value_high,
+                        value_mid=excluded.value_mid,
+                        field_lineage_json=excluded.field_lineage_json,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        candidate_id,
+                        str(candidate["document_id"]),
+                        candidate.get("commodity_id"),
+                        str(candidate.get("policy_type") or "unknown"),
+                        review_status,
+                        float(candidate.get("confidence") or 0.0),
+                        candidate.get("effective_start"),
+                        candidate.get("effective_end"),
+                        str(candidate.get("currency") or ""),
+                        str(candidate.get("unit") or ""),
+                        candidate.get("value_low"),
+                        candidate.get("value_high"),
+                        candidate.get("value_mid"),
+                        _json_dumps(dict(candidate.get("field_lineage") or {})),
+                        _json_dumps(metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+
+    def read_source_documents(
+        self,
+        *,
+        source_profile: Optional[str] = None,
+        include_content: bool = False,
+    ) -> List[Dict[str, Any]]:
+        where = "WHERE source_profile = ?" if source_profile else ""
+        params: Sequence[Any] = (source_profile,) if source_profile else ()
+        columns = "*" if include_content else """
+            document_id, source_profile, source_url, document_number, title,
+            published_date, retrieved_at, content_hash, content_type,
+            parser_version, metadata_json, created_at, updated_at
+        """
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"SELECT {columns} FROM commodity_source_documents {where} ORDER BY published_date, document_id",
+                params,
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
+
+    def read_policy_candidates(self, *, review_status: Optional[str] = None) -> List[Dict[str, Any]]:
+        where = "WHERE review_status = ?" if review_status else ""
+        params: Sequence[Any] = (review_status,) if review_status else ()
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"SELECT * FROM commodity_policy_candidates {where} ORDER BY updated_at DESC, candidate_id",
+                params,
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
+
+    def set_policy_candidate_review_status(
+        self,
+        *,
+        candidate_id: str,
+        review_status: str,
+        reviewer: str,
+        notes: str = "",
+    ) -> bool:
+        allowed = {"pending_review", "ready_for_promotion", "approved", "rejected"}
+        if review_status not in allowed:
+            raise ValueError(f"invalid policy candidate review status: {review_status}")
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT metadata_json FROM commodity_policy_candidates WHERE candidate_id = ?",
+                (candidate_id,),
+            ).fetchone()
+            if row is None:
+                return False
+            metadata = json.loads(row["metadata_json"] or "{}")
+            metadata["review"] = {
+                "reviewer": reviewer,
+                "notes": notes,
+                "reviewed_at": now,
+                "status": review_status,
+            }
+            conn.execute(
+                """
+                UPDATE commodity_policy_candidates
+                SET review_status = ?, metadata_json = ?, updated_at = ?
+                WHERE candidate_id = ?
+                """,
+                (review_status, _json_dumps(metadata), now, candidate_id),
+            )
+        return True
+
+    def check_data_entitlement(
+        self,
+        *,
+        dataset_id: str,
+        application_id: str,
+        access_mode: str,
+        api_disclosure: bool = False,
+    ) -> Dict[str, Any]:
+        today = get_shanghai_time().date().isoformat()
+        with self.get_connection() as conn:
+            row = conn.execute(
+                """
+                SELECT e.*, l.status AS license_status, l.valid_from, l.valid_until
+                FROM commodity_data_entitlements e
+                JOIN commodity_data_licenses l ON l.license_id = e.license_id
+                WHERE e.dataset_id = ? AND e.application_id = ? AND e.access_mode = ?
+                """,
+                (dataset_id, application_id, access_mode),
+            ).fetchone()
+        reason = "missing_entitlement"
+        allowed = False
+        entitlement_id = None
+        if row is not None:
+            entitlement_id = row["entitlement_id"]
+            if not row["active"] or row["license_status"] != "active":
+                reason = "inactive_entitlement"
+            elif row["valid_from"] and today < row["valid_from"]:
+                reason = "license_not_yet_valid"
+            elif row["valid_until"] and today > row["valid_until"]:
+                reason = "license_expired"
+            elif api_disclosure and not row["api_disclosure_allowed"]:
+                reason = "api_disclosure_not_permitted"
+            else:
+                allowed = True
+                reason = "entitlement_valid"
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO commodity_data_access_audit (
+                    entitlement_id, dataset_id, action, allowed, reason,
+                    occurred_at, metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    entitlement_id,
+                    dataset_id,
+                    access_mode,
+                    1 if allowed else 0,
+                    reason,
+                    now,
+                    _json_dumps({"application_id": application_id, "api_disclosure": api_disclosure}),
+                ),
+            )
+        return {"allowed": allowed, "reason": reason, "entitlement_id": entitlement_id}
+
+    def upsert_data_licenses(
+        self,
+        licenses: Sequence[Mapping[str, Any]],
+        entitlements: Sequence[Mapping[str, Any]],
+    ) -> Dict[str, int]:
+        """Persist non-secret licence scope and entitlement metadata."""
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in licenses:
+                conn.execute(
+                    """
+                    INSERT INTO commodity_data_licenses (
+                        license_id, provider, license_name, valid_from, valid_until,
+                        status, permitted_use, redistribution_mode, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(license_id) DO UPDATE SET
+                        provider=excluded.provider,
+                        license_name=excluded.license_name,
+                        valid_from=excluded.valid_from,
+                        valid_until=excluded.valid_until,
+                        status=excluded.status,
+                        permitted_use=excluded.permitted_use,
+                        redistribution_mode=excluded.redistribution_mode,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        str(item["license_id"]),
+                        str(item.get("provider") or ""),
+                        str(item.get("license_name") or ""),
+                        item.get("valid_from"),
+                        item.get("valid_until"),
+                        str(item.get("status") or "inactive"),
+                        str(item.get("permitted_use") or ""),
+                        str(item.get("redistribution_mode") or "prohibited"),
+                        _json_dumps(dict(item.get("metadata") or {})),
+                        now,
+                        now,
+                    ),
+                )
+            for item in entitlements:
+                conn.execute(
+                    """
+                    INSERT INTO commodity_data_entitlements (
+                        entitlement_id, license_id, dataset_id, application_id,
+                        access_mode, api_disclosure_allowed, active, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(entitlement_id) DO UPDATE SET
+                        license_id=excluded.license_id,
+                        dataset_id=excluded.dataset_id,
+                        application_id=excluded.application_id,
+                        access_mode=excluded.access_mode,
+                        api_disclosure_allowed=excluded.api_disclosure_allowed,
+                        active=excluded.active,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        str(item["entitlement_id"]),
+                        str(item["license_id"]),
+                        str(item["dataset_id"]),
+                        str(item.get("application_id") or "quote"),
+                        str(item.get("access_mode") or "internal_read"),
+                        1 if _coerce_bool(item.get("api_disclosure_allowed"), False) else 0,
+                        1 if _coerce_bool(item.get("active"), False) else 0,
+                        _json_dumps(dict(item.get("metadata") or {})),
+                        now,
+                        now,
+                    ),
+                )
+        return {"licenses": len(licenses), "entitlements": len(entitlements)}
+
+    def upsert_series_candidates(
+        self,
+        candidates: Sequence[Mapping[str, Any]],
+        *,
+        dry_run: bool = False,
+    ) -> Dict[str, int]:
+        if dry_run:
+            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(candidates)}
+        inserted = changed = unchanged = 0
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            for item in candidates:
+                candidate_id = str(item["candidate_id"])
+                payload_hash = _hash_payload(dict(item))
+                existing = conn.execute(
+                    """
+                    SELECT metadata_json, currency, unit, rollout_state, scheduler_eligible
+                    FROM commodity_series_candidates
+                    WHERE candidate_id = ?
+                    """,
+                    (candidate_id,),
+                ).fetchone()
+                old_metadata = json.loads(existing["metadata_json"] or "{}") if existing else {}
+                if existing is None:
+                    inserted += 1
+                elif old_metadata.get("payload_hash") == payload_hash:
+                    unchanged += 1
+                else:
+                    changed += 1
+                metadata = dict(item.get("metadata") or {})
+                metadata["payload_hash"] = payload_hash
+                state = str(item.get("rollout_state") or "discovered")
+                diagnostics = dict(item.get("diagnostics") or {})
+                if existing is not None:
+                    current_state = str(existing["rollout_state"] or "discovered")
+                    ordered_states = (
+                        "discovered",
+                        "metadata_verified",
+                        "short_dry_run_passed",
+                        "full_dry_run_passed",
+                        "persisted",
+                        "daily_idempotency_verified",
+                        "production_verified",
+                    )
+                    if current_state in ordered_states and state in ordered_states:
+                        if ordered_states.index(current_state) > ordered_states.index(state):
+                            state = current_state
+                    conflicts = {}
+                    for field_name in ("currency", "unit"):
+                        old_value = str(existing[field_name] or "")
+                        new_value = str(item.get(field_name) or "")
+                        if old_value and new_value and old_value != new_value:
+                            conflicts[field_name] = {"existing": old_value, "candidate": new_value}
+                    if conflicts:
+                        state = "blocked"
+                        diagnostics["metadata_conflicts"] = conflicts
+                scheduler_eligible = bool(
+                    state == "production_verified"
+                    and (
+                        item.get("scheduler_eligible")
+                        or (existing is not None and existing["scheduler_eligible"])
+                    )
+                )
+                conn.execute(
+                    """
+                    INSERT INTO commodity_series_candidates (
+                        candidate_id, provider_id, source_profile, source_symbol,
+                        proposed_commodity_id, proposed_series_id, name, category,
+                        specification, region, frequency, currency, unit,
+                        history_start, rollout_state, scheduler_eligible,
+                        evidence_json, diagnostics_json, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(candidate_id) DO UPDATE SET
+                        provider_id=excluded.provider_id,
+                        source_profile=excluded.source_profile,
+                        source_symbol=excluded.source_symbol,
+                        proposed_commodity_id=excluded.proposed_commodity_id,
+                        proposed_series_id=excluded.proposed_series_id,
+                        name=excluded.name,
+                        category=excluded.category,
+                        specification=excluded.specification,
+                        region=excluded.region,
+                        frequency=excluded.frequency,
+                        currency=excluded.currency,
+                        unit=excluded.unit,
+                        history_start=excluded.history_start,
+                        rollout_state=excluded.rollout_state,
+                        scheduler_eligible=excluded.scheduler_eligible,
+                        evidence_json=excluded.evidence_json,
+                        diagnostics_json=excluded.diagnostics_json,
+                        metadata_json=excluded.metadata_json,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        candidate_id,
+                        str(item.get("provider_id") or ""),
+                        str(item.get("source_profile") or ""),
+                        str(item.get("source_symbol") or ""),
+                        str(item.get("proposed_commodity_id") or ""),
+                        str(item.get("proposed_series_id") or ""),
+                        str(item.get("name") or ""),
+                        str(item.get("category") or "commodity"),
+                        str(item.get("specification") or ""),
+                        str(item.get("region") or ""),
+                        str(item.get("frequency") or "daily"),
+                        str(item.get("currency") or ""),
+                        str(item.get("unit") or ""),
+                        item.get("history_start"),
+                        state,
+                        1 if scheduler_eligible else 0,
+                        _json_dumps(dict(item.get("evidence") or {})),
+                        _json_dumps(diagnostics),
+                        _json_dumps(metadata),
+                        now,
+                        now,
+                    ),
+                )
+        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+
+    def read_series_candidates(
+        self,
+        *,
+        rollout_state: Optional[str] = None,
+        category: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        clauses: List[str] = []
+        params: List[Any] = []
+        if rollout_state:
+            clauses.append("rollout_state = ?")
+            params.append(rollout_state)
+        if category:
+            clauses.append("category = ?")
+            params.append(category)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"SELECT * FROM commodity_series_candidates {where} ORDER BY category, candidate_id",
+                params,
+            ).fetchall()
+        return [_row_to_dict(row) for row in rows]
+
+    def transition_series_candidate(
+        self,
+        *,
+        candidate_id: str,
+        target_state: str,
+        diagnostics: Optional[Mapping[str, Any]] = None,
+    ) -> bool:
+        states = (
+            "discovered",
+            "metadata_verified",
+            "short_dry_run_passed",
+            "full_dry_run_passed",
+            "persisted",
+            "daily_idempotency_verified",
+            "production_verified",
+            "blocked",
+        )
+        if target_state not in states:
+            raise ValueError(f"invalid commodity series rollout state: {target_state}")
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            row = conn.execute(
+                "SELECT rollout_state FROM commodity_series_candidates WHERE candidate_id = ?",
+                (candidate_id,),
+            ).fetchone()
+            if row is None:
+                return False
+            current = str(row["rollout_state"])
+            if target_state != "blocked":
+                current_index = states.index(current) if current in states[:-1] else -1
+                target_index = states.index(target_state)
+                if target_index > current_index + 1:
+                    raise ValueError(f"rollout transition cannot skip gates: {current} -> {target_state}")
+            conn.execute(
+                """
+                UPDATE commodity_series_candidates
+                SET rollout_state = ?, scheduler_eligible = ?, diagnostics_json = ?, updated_at = ?
+                WHERE candidate_id = ?
+                """,
+                (
+                    target_state,
+                    1 if target_state == "production_verified" else 0,
+                    _json_dumps(dict(diagnostics or {})),
+                    now,
+                    candidate_id,
+                ),
+            )
+        return True
+
     def upsert_master_governance(
         self,
         records: Sequence[Mapping[str, Any]],
@@ -1077,10 +1770,17 @@ class SpecialCommodityStorageManager:
                     "SELECT * FROM commodity_master_governance ORDER BY series_id"
                 )
             ]
+            series_candidates = [
+                _row_to_dict(row)
+                for row in conn.execute(
+                    "SELECT * FROM commodity_series_candidates ORDER BY category, candidate_id"
+                )
+            ]
         return {
             "instruments": instruments,
             "series": series,
             "master_governance": master_governance,
+            "series_candidates": series_candidates,
         }
 
     def read_publication_calendar(
@@ -2608,6 +3308,117 @@ class NbsProductionMaterialsProvider:
                 "date_gap_fill": discovery_diagnostics,
                 "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
             },
+        )
+
+
+class LicensedOfficialLmeFileProvider:
+    """Entitlement-gated adapter for operator-provided official LME files."""
+
+    def __init__(
+        self,
+        storage: SpecialCommodityStorageManager,
+        source_profile: str,
+        source_cfg: Mapping[str, Any],
+    ):
+        self.storage = storage
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        dataset_id = str(self.source_cfg.get("dataset_id") or "")
+        application_id = str(self.source_cfg.get("application_id") or "quote")
+        entitlement = self.storage.check_data_entitlement(
+            dataset_id=dataset_id,
+            application_id=application_id,
+            access_mode="internal_read",
+        )
+        if not entitlement.get("allowed"):
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "licensed_market_data_entitlement_blocked",
+                        "source_profile": self.source_profile,
+                        "dataset_id": dataset_id,
+                        "entitlement_reason": entitlement.get("reason"),
+                    }
+                ]
+            )
+        path_value = str(self.source_cfg.get("local_file_path") or "")
+        if not path_value:
+            return CommodityProviderResult(
+                blockers=[{"reason": "licensed_market_data_file_missing", "dataset_id": dataset_id}]
+            )
+        path = Path(path_value).expanduser().resolve()
+        allowed_root_value = str(self.source_cfg.get("allowed_file_root") or "")
+        if not allowed_root_value:
+            return CommodityProviderResult(
+                blockers=[{"reason": "licensed_market_data_allowed_root_missing", "dataset_id": dataset_id}]
+            )
+        allowed_root = Path(allowed_root_value).expanduser().resolve()
+        if path != allowed_root and allowed_root not in path.parents:
+            return CommodityProviderResult(
+                blockers=[{"reason": "licensed_market_data_file_outside_allowed_root", "dataset_id": dataset_id}]
+            )
+        if not path.is_file():
+            return CommodityProviderResult(
+                blockers=[{"reason": "licensed_market_data_file_not_found", "path": str(path)}]
+            )
+        try:
+            frame = __import__("pandas").read_csv(path)
+        except Exception as exc:
+            return CommodityProviderResult(blockers=[{"reason": "licensed_market_data_file_parse_failed", "error": str(exc)}])
+        date_column = str(self.source_cfg.get("date_column") or "date")
+        value_column = str(self.source_cfg.get("value_column") or "value")
+        symbol_column = str(self.source_cfg.get("symbol_column") or "symbol")
+        required = {date_column, value_column, symbol_column}
+        missing = sorted(required - set(frame.columns))
+        if missing:
+            return CommodityProviderResult(blockers=[{"reason": "licensed_market_data_columns_missing", "columns": missing}])
+        observations: List[CommodityObservation] = []
+        by_symbol = {item.source_symbol: item for item in series}
+        for row in frame.to_dict("records"):
+            item = by_symbol.get(str(row.get(symbol_column) or ""))
+            parsed_date = _parse_date(row.get(date_column))
+            observation_date = parsed_date.isoformat() if parsed_date else None
+            if item is None or observation_date is None:
+                continue
+            if start_date and observation_date < start_date:
+                continue
+            if end_date and observation_date > end_date:
+                continue
+            try:
+                value = float(row[value_column])
+            except (TypeError, ValueError):
+                continue
+            raw_hash = _hash_payload(row)
+            observations.append(
+                CommodityObservation(
+                    series_id=item.series_id,
+                    observation_date=observation_date,
+                    value=value,
+                    currency=item.currency,
+                    unit=item.unit,
+                    raw_value=value,
+                    raw_currency=item.currency,
+                    raw_unit=item.unit,
+                    source_profile=self.source_profile,
+                    source_url=f"licensed-file://{path.name}",
+                    quality_flag="licensed_official_market_data",
+                    source_symbol=item.source_symbol,
+                    parser_version=str(self.source_cfg.get("parser_version") or "lme_licensed_file.v1"),
+                    raw_payload_hash=raw_hash,
+                    metadata={"dataset_id": dataset_id, "entitlement_id": entitlement.get("entitlement_id")},
+                )
+            )
+        return CommodityProviderResult(
+            observations=observations,
+            metadata={"dataset_id": dataset_id, "licensed": True, "file": path.name},
         )
 
 
@@ -4141,6 +4952,17 @@ class ConfiguredPolicyEventProvider:
         self.module_cfg = dict(module_cfg or {})
 
     def fetch(self) -> tuple[List[CommodityPolicyEvent], List[Dict[str, Any]]]:
+        configured = [
+            CommodityPolicyEvent.from_dict(item)
+            for item in self.module_cfg.get("policy_events", [])
+            if isinstance(item, Mapping)
+        ]
+        return self.validate(configured)
+
+    def validate(
+        self,
+        candidate_events: Sequence[CommodityPolicyEvent],
+    ) -> tuple[List[CommodityPolicyEvent], List[Dict[str, Any]]]:
         events: List[CommodityPolicyEvent] = []
         blockers: List[Dict[str, Any]] = []
         commodity_ids = {
@@ -4149,10 +4971,7 @@ class ConfiguredPolicyEventProvider:
             if isinstance(item, Mapping)
         }
         source_profiles = self.module_cfg.get("source_profiles") or {}
-        for item in self.module_cfg.get("policy_events", []):
-            if not isinstance(item, Mapping):
-                continue
-            event = CommodityPolicyEvent.from_dict(item)
+        for event in candidate_events:
             reasons: List[str] = []
             if event.commodity_id not in commodity_ids:
                 reasons.append("unknown_commodity_id")
@@ -4221,6 +5040,13 @@ class SpecialCommodityPolicyEventService:
                 "blockers": blockers,
             }
         counts = self.storage.upsert_policy_events(events, dry_run=dry_run)
+        promotion = self.promote_approved_candidates(dry_run=dry_run)
+        if promotion.get("status") == "blocked":
+            blockers.extend(promotion.get("blockers") or [])
+        combined_counts = {
+            key: int(counts.get(key, 0) or 0) + int(promotion.get(key, 0) or 0)
+            for key in ("inserted", "changed", "unchanged", "would_write")
+        }
         event_summaries = [
             {
                 "event_id": event.event_id,
@@ -4242,17 +5068,62 @@ class SpecialCommodityPolicyEventService:
             "[SpecialCommodityPolicyEvent] done status=success dry_run=%s events=%s inserted=%s changed=%s unchanged=%s would_write=%s",
             dry_run,
             len(events),
-            counts.get("inserted", 0),
-            counts.get("changed", 0),
-            counts.get("unchanged", 0),
-            counts.get("would_write", 0),
+            combined_counts.get("inserted", 0),
+            combined_counts.get("changed", 0),
+            combined_counts.get("unchanged", 0),
+            combined_counts.get("would_write", 0),
         )
         return {
-            "status": "success",
+            "status": "blocked" if blockers else "success",
             "dry_run": dry_run,
-            "policy_events": len(events),
+            "policy_events": len(events) + int(promotion.get("policy_events", 0) or 0),
             "event_summaries": event_summaries,
-            "blockers": [],
+            "candidate_promotion": promotion,
+            "blockers": blockers,
+            **combined_counts,
+        }
+
+    def promote_approved_candidates(self, *, dry_run: bool = False) -> Dict[str, Any]:
+        rows = self.storage.read_policy_candidates(review_status="approved")
+        candidate_events: List[CommodityPolicyEvent] = []
+        for row in rows:
+            metadata = json.loads(row.get("metadata_json") or "{}")
+            candidate_events.append(
+                CommodityPolicyEvent(
+                    event_id="DISCOVERED." + str(row["candidate_id"]),
+                    commodity_id=str(row.get("commodity_id") or ""),
+                    policy_type=str(row.get("policy_type") or "policy_document"),
+                    effective_start=str(row.get("effective_start") or ""),
+                    effective_end=row.get("effective_end"),
+                    currency=str(row.get("currency") or ""),
+                    unit=str(row.get("unit") or ""),
+                    value_low=row.get("value_low"),
+                    value_high=row.get("value_high"),
+                    value_mid=row.get("value_mid"),
+                    source_profile="ndrc_official_policy_event",
+                    source_url=str(metadata.get("source_url") or ""),
+                    quality_flag="official_policy_document",
+                    metadata={
+                        **metadata,
+                        "candidate_id": row["candidate_id"],
+                        "document_id": row["document_id"],
+                        "promotion_semantics": "approved_candidate_not_transaction_price",
+                    },
+                )
+            )
+        events, blockers = ConfiguredPolicyEventProvider(self.module_cfg).validate(candidate_events)
+        counts = self.storage.upsert_policy_events(events, dry_run=dry_run) if not blockers else {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "would_write": 0,
+        }
+        return {
+            "status": "blocked" if blockers else "success",
+            "dry_run": dry_run,
+            "approved_candidates": len(rows),
+            "policy_events": len(events),
+            "blockers": blockers,
             **counts,
         }
 
@@ -4344,6 +5215,26 @@ class SpecialCommodityGovernancePipeline:
         end_date: Optional[str] = None,
         dry_run: bool = False,
     ) -> Dict[str, Any]:
+        contract_blockers = _actual_contract_series_blockers(target_series)
+        if contract_blockers:
+            return {
+                "status": "blocked",
+                "dry_run": dry_run,
+                "start_date": start_date,
+                "end_date": end_date,
+                "target_series": len(target_series),
+                "observations": [],
+                "fetched_rows": 0,
+                "master_data_governance": "blocked",
+                "date_governance": "blocked",
+                "master_governance_records": 0,
+                "source_date_count": 0,
+                "master_governance_write": {"written": 0, "would_write": 0},
+                "calendar_governance_write": {"written": 0, "would_write": 0},
+                "per_source": {},
+                "warnings": [],
+                "blockers": contract_blockers,
+            }
         registry = CommodityAdapterRegistry(self.module_cfg)
         observations: List[CommodityObservation] = []
         master_records: List[Dict[str, Any]] = []
@@ -4601,6 +5492,499 @@ class SpecialCommodityCalendarGovernanceService:
         return result
 
 
+def _html_to_text(payload: str) -> str:
+    text = re.sub(r"(?is)<(script|style).*?>.*?</\1>", " ", payload or "")
+    text = re.sub(r"(?s)<[^>]+>", " ", text)
+    text = (
+        text.replace("&nbsp;", " ")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+    )
+    return re.sub(r"\s+", " ", text).strip()
+
+
+class NdrcPolicyDiscoveryAdapter:
+    """Discover and version NDRC policy documents without auto-interpreting ambiguity."""
+
+    _HREF_RE = re.compile(r"(?i)href=[\"']([^\"']+)[\"']")
+    _DATE_RE = re.compile(r"(20\d{2})[年./-](\d{1,2})[月./-](\d{1,2})日?")
+    _DOCUMENT_NUMBER_RE = re.compile(
+        r"(?:发改|发改办)[^\s，。；]{0,12}[〔\[]\s*(20\d{2})\s*[〕\]]\s*\d+号"
+    )
+    _PRICE_RANGE_RE = re.compile(
+        r"(?:合理区间|价格区间)[^。；]{0,120}?(\d{2,5}(?:\.\d+)?)\s*[-—～至到]\s*(\d{2,5}(?:\.\d+)?)\s*元(?:/吨|每吨)?"
+    )
+    _PRICE_RANGE_BEFORE_SEMANTICS_RE = re.compile(
+        r"(?:每吨)?\s*(\d{2,5}(?:\.\d+)?)\s*[-—～至到]\s*(\d{2,5}(?:\.\d+)?)\s*元[^。；]{0,80}?(?:合理区间|较为合理)"
+    )
+
+    def __init__(self, source_cfg: Mapping[str, Any]):
+        self.cfg = dict(source_cfg or {})
+        self.catalog_urls = [str(item) for item in self.cfg.get("catalog_urls", []) if item]
+        self.keywords = [str(item) for item in self.cfg.get("keywords", []) if item]
+        self.timeout = float(self.cfg.get("timeout_seconds") or 30)
+        self.headers = {"User-Agent": str(self.cfg.get("user_agent") or "QuoteSystem/PolicyDiscovery")}
+        self.tls_config = tls_config_from_source_config("ndrc_policy_discovery", self.cfg)
+
+    def _expanded_catalog_urls(self) -> List[str]:
+        pages = max(1, int(self.cfg.get("max_catalog_pages") or 1))
+        expanded: List[str] = []
+        for url in self.catalog_urls:
+            if "{page}" in url:
+                expanded.extend(url.format(page=page) for page in range(1, pages + 1))
+            else:
+                expanded.append(url)
+        return list(dict.fromkeys(expanded))
+
+    def discover(
+        self,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        checkpoint: Optional[Mapping[str, Any]] = None,
+    ) -> Mapping[str, Any]:
+        catalog_urls = self._expanded_catalog_urls()
+        if not catalog_urls:
+            return {"documents": [], "candidates": [], "warnings": [], "blockers": [{"reason": "missing_policy_catalog_urls"}]}
+        candidate_urls: set[str] = set()
+        warnings: List[Dict[str, Any]] = []
+        for index, catalog_url in enumerate(catalog_urls, start=1):
+            logger.info(
+                "[CommodityPolicyDiscovery] catalog progress adapter=ndrc index=%s/%s url=%s",
+                index,
+                len(catalog_urls),
+                _redact_url(catalog_url),
+            )
+            try:
+                response = _request_with_retry(
+                    catalog_url,
+                    headers=self.headers,
+                    timeout=self.timeout,
+                    tls_config=self.tls_config,
+                    retry_cfg=self.cfg.get("request_retry"),
+                    log_context=f"ndrc_catalog:{index}",
+                )
+            except Exception as exc:
+                warnings.append({"reason": "policy_catalog_request_failed", "url": _redact_url(catalog_url), "error": str(exc)})
+                continue
+            for href in self._HREF_RE.findall(response.text or ""):
+                url = urljoin(response.url or catalog_url, href)
+                if "ndrc.gov.cn" not in url:
+                    continue
+                if not re.search(r"\.html?(?:\?|$)|iteminfo\.jsp", url, re.I):
+                    continue
+                candidate_urls.add(url)
+        configured_documents = [str(item) for item in self.cfg.get("document_urls", []) if item]
+        candidate_urls.update(configured_documents)
+        documents: List[Dict[str, Any]] = []
+        candidates: List[Dict[str, Any]] = []
+        for index, url in enumerate(sorted(candidate_urls), start=1):
+            logger.info(
+                "[CommodityPolicyDiscovery] document progress adapter=ndrc index=%s/%s documents=%s candidates=%s url=%s",
+                index,
+                len(candidate_urls),
+                len(documents),
+                len(candidates),
+                _redact_url(url),
+            )
+            try:
+                response = _request_with_retry(
+                    url,
+                    headers=self.headers,
+                    timeout=self.timeout,
+                    tls_config=self.tls_config,
+                    retry_cfg=self.cfg.get("request_retry"),
+                    log_context=f"ndrc_document:{index}",
+                )
+            except Exception as exc:
+                warnings.append({"reason": "policy_document_request_failed", "url": _redact_url(url), "error": str(exc)})
+                continue
+            response_content = getattr(response, "content", None)
+            if response_content is None:
+                response_content = str(getattr(response, "text", "") or "").encode("utf-8")
+            raw_bytes = bytes(response_content)
+            raw = self._decode_response_text(response, raw_bytes)
+            text = _html_to_text(raw)
+            if self.keywords and not any(keyword in text for keyword in self.keywords):
+                if url in configured_documents:
+                    warnings.append({"reason": "configured_policy_document_keyword_miss", "url": _redact_url(url)})
+                continue
+            content_hash = hashlib.sha256(raw_bytes).hexdigest()
+            title_match = re.search(r"(?is)<title[^>]*>(.*?)</title>", raw)
+            title = _html_to_text(title_match.group(1)) if title_match else text[:120]
+            date_match = self._DATE_RE.search(text)
+            published_date = None
+            if date_match:
+                published_date = f"{int(date_match.group(1)):04d}-{int(date_match.group(2)):02d}-{int(date_match.group(3)):02d}"
+            if start_date and published_date and published_date < start_date:
+                continue
+            if end_date and published_date and published_date > end_date:
+                continue
+            number_match = self._DOCUMENT_NUMBER_RE.search(text)
+            document_number = number_match.group(0) if number_match else ""
+            document_id = "NDRC." + _hash_payload({"url": url, "content_hash": content_hash})[:24]
+            document = {
+                "document_id": document_id,
+                "source_profile": "ndrc_official_policy_discovery",
+                "source_url": url,
+                "document_number": document_number,
+                "title": title,
+                "published_date": published_date,
+                "retrieved_at": get_shanghai_time().isoformat(),
+                "content_hash": content_hash,
+                "content_type": response.headers.get("Content-Type", "text/html"),
+                "content_text": text,
+                "parser_version": NDRC_POLICY_DISCOVERY_VERSION,
+                "metadata": {"catalog_discovery": url not in configured_documents},
+            }
+            documents.append(document)
+            documents.extend(
+                self._fetch_attachments(
+                    parent=document,
+                    raw_html=raw,
+                    base_url=str(getattr(response, "url", None) or url),
+                )
+            )
+            candidate = self._parse_candidate(document, text)
+            if candidate:
+                candidates.append(candidate)
+        configured_found = {str(item.get("source_url")) for item in documents}
+        missing_configured = [url for url in configured_documents if url not in configured_found]
+        blockers = []
+        if missing_configured:
+            blockers.append(
+                {
+                    "reason": "configured_policy_documents_unresolved",
+                    "count": len(missing_configured),
+                    "urls": [_redact_url(url) for url in missing_configured[:10]],
+                }
+            )
+        elif not documents and warnings:
+            blockers.append({"reason": "all_policy_sources_failed"})
+        return {
+            "documents": documents,
+            "candidates": candidates,
+            "warnings": warnings,
+            "blockers": blockers,
+            "checkpoint": {"catalogs_scanned": len(catalog_urls), "documents_scanned": len(candidate_urls)},
+        }
+
+    @staticmethod
+    def _decode_response_text(response: Any, raw_bytes: bytes) -> str:
+        content_prefix = raw_bytes[:2048].lower()
+        if b"charset=\"utf-8\"" in content_prefix or b"charset=utf-8" in content_prefix:
+            return raw_bytes.decode("utf-8", errors="replace")
+        encoding = str(getattr(response, "encoding", None) or "utf-8")
+        return raw_bytes.decode(encoding, errors="replace")
+
+    def _fetch_attachments(
+        self,
+        *,
+        parent: Mapping[str, Any],
+        raw_html: str,
+        base_url: str,
+    ) -> List[Dict[str, Any]]:
+        attachment_urls = []
+        for href in self._HREF_RE.findall(raw_html or ""):
+            url = urljoin(base_url, href)
+            if re.search(r"\.(?:pdf|docx?|xlsx?)(?:\?|$)", url, re.I):
+                attachment_urls.append(url)
+        results: List[Dict[str, Any]] = []
+        for index, url in enumerate(dict.fromkeys(attachment_urls), start=1):
+            logger.info(
+                "[CommodityPolicyDiscovery] attachment progress parent=%s index=%s/%s url=%s",
+                parent["document_id"],
+                index,
+                len(set(attachment_urls)),
+                _redact_url(url),
+            )
+            try:
+                response = _request_with_retry(
+                    url,
+                    headers=self.headers,
+                    timeout=self.timeout,
+                    tls_config=self.tls_config,
+                    retry_cfg=self.cfg.get("request_retry"),
+                    log_context=f"ndrc_attachment:{parent['document_id']}:{index}",
+                )
+            except Exception as exc:
+                logger.warning(
+                    "[CommodityPolicyDiscovery] attachment failed parent=%s url=%s error=%s",
+                    parent["document_id"],
+                    _redact_url(url),
+                    exc,
+                )
+                continue
+            content = bytes(response.content or b"")
+            content_hash = hashlib.sha256(content).hexdigest()
+            results.append(
+                {
+                    "document_id": "NDRC.ATTACHMENT." + _hash_payload({"url": url, "content_hash": content_hash})[:20],
+                    "source_profile": "ndrc_official_policy_discovery",
+                    "source_url": url,
+                    "document_number": str(parent.get("document_number") or ""),
+                    "title": Path(urlsplit(url).path).name or "policy attachment",
+                    "published_date": parent.get("published_date"),
+                    "retrieved_at": get_shanghai_time().isoformat(),
+                    "content_hash": content_hash,
+                    "content_type": response.headers.get("Content-Type", "application/octet-stream"),
+                    "content_text": "",
+                    "parser_version": NDRC_POLICY_DISCOVERY_VERSION,
+                    "metadata": {
+                        "parent_document_id": parent["document_id"],
+                        "attachment": True,
+                        "byte_length": len(content),
+                    },
+                }
+            )
+        return results
+
+    def _parse_candidate(self, document: Mapping[str, Any], text: str) -> Optional[Dict[str, Any]]:
+        title = str(document.get("title") or "")
+        title_policy_semantics = (
+            "煤" in title
+            and any(keyword in title for keyword in ("中长期", "价格", "合同", "机制", "通知", "意见", "办法"))
+        )
+        if not title_policy_semantics:
+            return None
+        if "煤" not in text or not any(keyword in text for keyword in ("中长期", "价格", "合同")):
+            return None
+        range_match = self._PRICE_RANGE_RE.search(text) or self._PRICE_RANGE_BEFORE_SEMANTICS_RE.search(text)
+        effective_match = re.search(r"自\s*(20\d{2})年(\d{1,2})月(\d{1,2})日\s*起", text)
+        effective_start = None
+        if effective_match:
+            effective_start = f"{int(effective_match.group(1)):04d}-{int(effective_match.group(2)):02d}-{int(effective_match.group(3)):02d}"
+        confidence = 0.45
+        if document.get("document_number"):
+            confidence += 0.15
+        if range_match:
+            confidence += 0.2
+        if effective_start:
+            confidence += 0.2
+        complete = bool(range_match and effective_start and "5500" in text and "秦皇岛" in text)
+        value_low = float(range_match.group(1)) if range_match else None
+        value_high = float(range_match.group(2)) if range_match else None
+        candidate_id = "NDRC.CANDIDATE." + _hash_payload(
+            {"document_id": document["document_id"], "policy_type": "coal_long_term_policy"}
+        )[:20]
+        referenced_numbers = sorted(
+            {
+                match.group(0)
+                for match in self._DOCUMENT_NUMBER_RE.finditer(text)
+                if match.group(0) != document.get("document_number")
+            }
+        )
+        supersession_terms = [term for term in ("废止", "停止执行", "替代", "同时失效") if term in text]
+        return {
+            "candidate_id": candidate_id,
+            "document_id": document["document_id"],
+            "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY" if complete else None,
+            "policy_type": "long_term_transaction_reasonable_range" if range_match else "coal_policy_document",
+            "review_status": "ready_for_promotion" if complete and confidence >= 0.95 else "pending_review",
+            "confidence": min(confidence, 1.0),
+            "effective_start": effective_start,
+            "currency": "CNY" if range_match else "",
+            "unit": "CNY/ton" if range_match else "",
+            "value_low": value_low,
+            "value_high": value_high,
+            "value_mid": None,
+            "field_lineage": {
+                "document_number": "official_text",
+                "effective_start": "official_text" if effective_start else "unresolved",
+                "value_range": "official_text" if range_match else "unresolved",
+                "commodity_id": "rule:qhd_5500" if complete else "unresolved",
+            },
+            "metadata": {
+                "title": document.get("title"),
+                "source_url": document.get("source_url"),
+                "not_observed_transaction_price": True,
+                "parser_version": NDRC_POLICY_DISCOVERY_VERSION,
+                "referenced_document_numbers": referenced_numbers,
+                "supersession_terms": supersession_terms,
+            },
+        }
+
+
+class CommodityDocumentDiscoveryRegistry:
+    def __init__(self, module_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+
+    def resolve(self, adapter_id: str) -> Optional[CommodityDocumentDiscoveryAdapter]:
+        cfg = dict((self.module_cfg.get("policy_discovery") or {}).get(adapter_id) or {})
+        if adapter_id == "ndrc" and _coerce_bool(cfg.get("enabled"), False):
+            return NdrcPolicyDiscoveryAdapter(cfg)
+        return None
+
+
+class ConfiguredSeriesCandidateAdapter:
+    """Seed candidate discovery through the same contract as live adapters."""
+
+    def __init__(self, candidates: Sequence[Mapping[str, Any]]):
+        self.candidates = [dict(item) for item in candidates if isinstance(item, Mapping)]
+
+    def discover_candidates(self) -> Sequence[Mapping[str, Any]]:
+        return list(self.candidates)
+
+
+class CommoditySeriesCandidateRegistry:
+    def __init__(self, module_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+
+    def adapters(self) -> Mapping[str, CommoditySeriesCandidateAdapter]:
+        catalog_cfg = dict(self.module_cfg.get("series_catalog") or {})
+        return {
+            "configured": ConfiguredSeriesCandidateAdapter(catalog_cfg.get("candidates") or []),
+        }
+
+
+class SpecialCommoditySeriesCatalogService:
+    REQUIRED_FIELDS = (
+        "provider_id",
+        "source_profile",
+        "source_symbol",
+        "proposed_commodity_id",
+        "proposed_series_id",
+        "name",
+        "category",
+        "frequency",
+    )
+
+    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
+        self.storage = storage
+        self.module_cfg = dict(module_cfg or {})
+
+    def sync(self, *, dry_run: bool = True) -> Dict[str, Any]:
+        self.storage.initialize()
+        candidates: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        seen_source_keys: Dict[tuple[str, str, str], str] = {}
+        for adapter_id, adapter in CommoditySeriesCandidateRegistry(self.module_cfg).adapters().items():
+            logger.info("[CommoditySeriesCatalog] adapter start adapter=%s", adapter_id)
+            for raw in adapter.discover_candidates():
+                candidate = dict(raw)
+                missing = [field for field in self.REQUIRED_FIELDS if not candidate.get(field)]
+                candidate_id = str(candidate.get("candidate_id") or "")
+                if not candidate_id:
+                    candidate_id = "CMD.CANDIDATE." + _hash_payload(
+                        {
+                            "provider_id": candidate.get("provider_id"),
+                            "source_profile": candidate.get("source_profile"),
+                            "source_symbol": candidate.get("source_symbol"),
+                        }
+                    )[:20]
+                    candidate["candidate_id"] = candidate_id
+                if missing:
+                    candidate["rollout_state"] = "blocked"
+                    blockers.append(
+                        {"reason": "commodity_candidate_metadata_incomplete", "candidate_id": candidate_id, "missing_fields": missing}
+                    )
+                key = (
+                    str(candidate.get("provider_id") or ""),
+                    str(candidate.get("source_profile") or ""),
+                    str(candidate.get("source_symbol") or ""),
+                )
+                previous_id = seen_source_keys.get(key)
+                if previous_id and previous_id != candidate_id:
+                    blockers.append(
+                        {
+                            "reason": "commodity_candidate_source_identity_conflict",
+                            "candidate_id": candidate_id,
+                            "conflicts_with": previous_id,
+                            "source_key": key,
+                        }
+                    )
+                    continue
+                seen_source_keys[key] = candidate_id
+                candidates.append(candidate)
+            logger.info(
+                "[CommoditySeriesCatalog] adapter done adapter=%s candidates=%s blockers=%s",
+                adapter_id,
+                len(candidates),
+                len(blockers),
+            )
+        counts = self.storage.upsert_series_candidates(candidates, dry_run=dry_run)
+        state_counts: Dict[str, int] = {}
+        for candidate in candidates:
+            state = str(candidate.get("rollout_state") or "discovered")
+            state_counts[state] = state_counts.get(state, 0) + 1
+        return {
+            "status": "warning" if blockers else "success",
+            "dry_run": dry_run,
+            "candidates": len(candidates),
+            "rollout_state_counts": state_counts,
+            "scheduler_eligible": sum(
+                bool(item.get("scheduler_eligible"))
+                and item.get("rollout_state") == "production_verified"
+                for item in candidates
+            ),
+            "blockers": blockers,
+            **counts,
+        }
+
+
+class SpecialCommodityPolicyDiscoveryService:
+    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
+        self.storage = storage
+        self.module_cfg = dict(module_cfg or {})
+
+    def run(
+        self,
+        *,
+        adapter_id: str = "ndrc",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        self.storage.initialize()
+        adapter = CommodityDocumentDiscoveryRegistry(self.module_cfg).resolve(adapter_id)
+        if adapter is None:
+            return {"status": "blocked", "reason": "missing_policy_discovery_adapter", "adapter_id": adapter_id}
+        logger.info(
+            "[CommodityPolicyDiscovery] started adapter=%s start=%s end=%s dry_run=%s",
+            adapter_id,
+            start_date,
+            end_date,
+            dry_run,
+        )
+        discovered = dict(adapter.discover(start_date=start_date, end_date=end_date, checkpoint=None))
+        documents = list(discovered.get("documents") or [])
+        candidates = list(discovered.get("candidates") or [])
+        blockers = list(discovered.get("blockers") or [])
+        warnings = list(discovered.get("warnings") or [])
+        document_write = self.storage.upsert_source_documents(documents, dry_run=dry_run)
+        candidate_write = self.storage.upsert_policy_candidates(candidates, dry_run=dry_run)
+        status = "blocked" if blockers else ("warning" if warnings else "success")
+        result = {
+            "status": status,
+            "adapter_id": adapter_id,
+            "dry_run": dry_run,
+            "start_date": start_date,
+            "end_date": end_date,
+            "documents": len(documents),
+            "candidates": len(candidates),
+            "ready_for_promotion": sum(item.get("review_status") == "ready_for_promotion" for item in candidates),
+            "pending_review": sum(item.get("review_status") != "ready_for_promotion" for item in candidates),
+            "document_write": document_write,
+            "candidate_write": candidate_write,
+            "warnings": warnings,
+            "blockers": blockers,
+            "checkpoint": discovered.get("checkpoint", {}),
+        }
+        logger.info(
+            "[CommodityPolicyDiscovery] done adapter=%s status=%s documents=%s candidates=%s ready=%s pending=%s warnings=%s blockers=%s",
+            adapter_id,
+            status,
+            len(documents),
+            len(candidates),
+            result["ready_for_promotion"],
+            result["pending_review"],
+            len(warnings),
+            len(blockers),
+        )
+        return result
+
+
 class SpecialCommodityPriceSyncService:
     def __init__(self, storage: SpecialCommodityStorageManager, research_config: ResearchConfig):
         self.storage = storage
@@ -4777,6 +6161,26 @@ class SpecialCommodityReadService:
             for item in governance_rows
             if item.get("governance_status") != "success"
         ]
+        policy_candidates = self.storage.read_policy_candidates()
+        candidate_status_counts: Dict[str, int] = {}
+        for candidate in policy_candidates:
+            status = str(candidate.get("review_status") or "unknown")
+            candidate_status_counts[status] = candidate_status_counts.get(status, 0) + 1
+        series_candidates = dictionary.get("series_candidates", [])
+        rollout_state_counts: Dict[str, int] = {}
+        for candidate in series_candidates:
+            state = str(candidate.get("rollout_state") or "unknown")
+            rollout_state_counts[state] = rollout_state_counts.get(state, 0) + 1
+        with self.storage.get_connection() as conn:
+            source_document_count = conn.execute(
+                "SELECT COUNT(*) FROM commodity_source_documents"
+            ).fetchone()[0]
+            active_entitlements = conn.execute(
+                "SELECT COUNT(*) FROM commodity_data_entitlements WHERE active = 1"
+            ).fetchone()[0]
+            denied_accesses = conn.execute(
+                "SELECT COUNT(*) FROM commodity_data_access_audit WHERE allowed = 0"
+            ).fetchone()[0]
         return {
             "status": "success",
             "series_count": len(series_rows),
@@ -4787,6 +6191,14 @@ class SpecialCommodityReadService:
             "blocked_master_governance": blocked_master_governance,
             "currencies": currencies,
             "units": units,
+            "source_document_count": source_document_count,
+            "policy_candidate_status_counts": candidate_status_counts,
+            "series_candidate_rollout_state_counts": rollout_state_counts,
+            "series_candidates_scheduler_eligible": sum(
+                bool(item.get("scheduler_eligible")) for item in series_candidates
+            ),
+            "active_data_entitlements": active_entitlements,
+            "denied_licensed_data_accesses": denied_accesses,
             "source_policy": "local_commodity_db_only",
         }
 
@@ -4797,5 +6209,46 @@ class SpecialCommodityReadService:
             "commodity_id": commodity_id,
             "events": events,
             "count": len(events),
+            "source_policy": "local_commodity_db_only",
+        }
+
+    def indicators(
+        self,
+        *,
+        category: Optional[str] = None,
+        series_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        dictionary = self.storage.read_dictionary()
+        instruments = {row["commodity_id"]: row for row in dictionary.get("instruments", [])}
+        indicator_series: List[Dict[str, Any]] = []
+        observations: Dict[str, List[Dict[str, Any]]] = {}
+        for row in dictionary.get("series", []):
+            metadata = json.loads(row.get("metadata_json") or "{}")
+            data_kind = str(metadata.get("data_kind") or row.get("quote_type") or "")
+            instrument = instruments.get(row.get("commodity_id"), {})
+            if data_kind != "industrial_indicator":
+                continue
+            if series_id and row.get("series_id") != series_id:
+                continue
+            if category and instrument.get("category") != category:
+                continue
+            item = dict(row)
+            item["data_kind"] = data_kind
+            item["category"] = instrument.get("category")
+            indicator_series.append(item)
+            observations[str(row["series_id"])] = self.storage.read_observations(
+                series_id=str(row["series_id"]),
+                start_date=start_date,
+                end_date=end_date,
+            )
+        return {
+            "status": "success",
+            "category": category,
+            "series_id": series_id,
+            "series": indicator_series,
+            "observations": observations,
+            "series_count": len(indicator_series),
             "source_policy": "local_commodity_db_only",
         }

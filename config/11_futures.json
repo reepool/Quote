@@ -874,6 +874,25 @@
           },
           "note": "Use Sina first. Use Eastmoney for primary request/schema failure and bounded date-gap repair. Preserve the selected provider and fallback reason in observation metadata; do not perform routine full dual-source daily downloads."
         },
+        "lme_official_licensed_file": {
+          "venue": "LME",
+          "source": "London Metal Exchange licensed official dataset",
+          "source_mode": "licensed_operator_file",
+          "source_interface": "entitlement_gated_csv",
+          "provider_adapter": "lme_licensed_file_not_registered_until_entitled",
+          "governance_adapter": "foreign_futures",
+          "enabled": false,
+          "dataset_id": "",
+          "application_id": "quote",
+          "allowed_file_root": "",
+          "local_file_path": "",
+          "date_column": "date",
+          "symbol_column": "symbol",
+          "value_column": "value",
+          "quality_flag": "licensed_official_market_data",
+          "parser_version": "lme_licensed_file.v1",
+          "note": "Fail closed. Configure only after purchasing the dataset and recording permitted use, entitlement, retention, and API disclosure terms. Official series IDs must remain separate from aggregated LME 3M proxy series."
+        },
         "nbs_production_material_market_price": {
           "venue": "NBS",
           "source": "National Bureau of Statistics production-material market prices",
@@ -980,6 +999,237 @@
           "parser_version": "configured_policy_event.v1",
           "note": "Official effective-period policy constraints. Values are not observed transaction prices and are never expanded into daily bars."
         }
+      },
+      "policy_discovery": {
+        "ndrc": {
+          "enabled": true,
+          "adapter": "ndrc",
+          "source_profile": "ndrc_official_policy_discovery",
+          "catalog_urls": [
+            "https://www.ndrc.gov.cn/xxgk/zcfb/",
+            "https://www.ndrc.gov.cn/fzggw/jgsj/yxj/"
+          ],
+          "max_catalog_pages": 1,
+          "document_urls": [
+            "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202202/t20220225_1317003.html"
+          ],
+          "keywords": [
+            "煤炭",
+            "中长期合同",
+            "煤炭市场价格"
+          ],
+          "timeout_seconds": 30,
+          "progress_log_interval_seconds": 60,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 1.0
+          },
+          "user_agent": "QuoteSystem/CommodityPolicyDiscovery",
+          "promotion": {
+            "auto_promote_enabled": false,
+            "minimum_confidence": 0.95,
+            "require_effective_start": true,
+            "require_explicit_value_semantics": true
+          }
+        }
+      },
+      "series_catalog": {
+        "enabled": true,
+        "rollout_states": [
+          "discovered",
+          "metadata_verified",
+          "short_dry_run_passed",
+          "full_dry_run_passed",
+          "persisted",
+          "daily_idempotency_verified",
+          "production_verified",
+          "blocked"
+        ],
+        "candidates": [
+          {
+            "candidate_id": "100PPI.CHEMICAL.BENZENE",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "纯苯",
+            "proposed_commodity_id": "CN.CHEMICAL.BENZENE.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.BENZENE.SPOT.100PPI.DAILY",
+            "name": "China Benzene Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; exact grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "blocked",
+            "scheduler_eligible": false,
+            "diagnostics": {
+              "reason": "no_futures_root_code_for_current_akshare_100ppi_adapter",
+              "required_adapter": "direct_100ppi_product_page"
+            }
+          },
+          {
+            "candidate_id": "100PPI.CHEMICAL.STYRENE",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "EB",
+            "proposed_commodity_id": "CN.CHEMICAL.STYRENE.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.STYRENE.SPOT.100PPI.DAILY",
+            "name": "China Styrene Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; exact grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 4, "source_row_symbol": "EB"}
+          },
+          {
+            "candidate_id": "100PPI.CHEMICAL.UREA",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "UR",
+            "proposed_commodity_id": "CN.CHEMICAL.UREA.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.UREA.SPOT.100PPI.DAILY",
+            "name": "China Urea Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; exact grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "UR"}
+          },
+          {
+            "candidate_id": "100PPI.CHEMICAL.CAUSTIC_SODA",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "SH",
+            "proposed_commodity_id": "CN.CHEMICAL.CAUSTIC_SODA.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.CAUSTIC_SODA.SPOT.100PPI.DAILY",
+            "name": "China Caustic Soda Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; concentration pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "SH"}
+          },
+          {
+            "candidate_id": "100PPI.CHEMICAL.SODA_ASH",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "SA",
+            "proposed_commodity_id": "CN.CHEMICAL.SODA_ASH.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY",
+            "name": "China Soda Ash Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "SA"}
+          },
+          {
+            "candidate_id": "100PPI.BUILDING.GLASS",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "FG",
+            "proposed_commodity_id": "CN.BUILDING.GLASS.SPOT",
+            "proposed_series_id": "CMD.CN.BUILDING.GLASS.SPOT.100PPI.DAILY",
+            "name": "China Flat Glass Spot Reference",
+            "category": "building_material",
+            "specification": "100ppi public-web product reference; thickness pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "FG"}
+          },
+          {
+            "candidate_id": "100PPI.ENERGY.ASPHALT",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "BU",
+            "proposed_commodity_id": "CN.ENERGY.ASPHALT.SPOT",
+            "proposed_series_id": "CMD.CN.ENERGY.ASPHALT.SPOT.100PPI.DAILY",
+            "name": "China Asphalt Spot Reference",
+            "category": "energy",
+            "specification": "100ppi public-web product reference; grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "BU"}
+          },
+          {
+            "candidate_id": "100PPI.ENERGY.LPG",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "PG",
+            "proposed_commodity_id": "CN.ENERGY.LPG.SPOT",
+            "proposed_series_id": "CMD.CN.ENERGY.LPG.SPOT.100PPI.DAILY",
+            "name": "China LPG Spot Reference",
+            "category": "energy",
+            "specification": "100ppi public-web product reference; composition pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 4, "source_row_symbol": "PG"}
+          },
+          {
+            "candidate_id": "100PPI.CHEMICAL.RUBBER",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "RU",
+            "proposed_commodity_id": "CN.CHEMICAL.NATURAL_RUBBER.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.NATURAL_RUBBER.SPOT.100PPI.DAILY",
+            "name": "China Natural Rubber Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference; grade pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "RU"}
+          },
+          {
+            "candidate_id": "100PPI.FORESTRY.PULP",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "SP",
+            "proposed_commodity_id": "CN.FORESTRY.SOFTWOOD_PULP.SPOT",
+            "proposed_series_id": "CMD.CN.FORESTRY.SOFTWOOD_PULP.SPOT.100PPI.DAILY",
+            "name": "China Softwood Pulp Spot Reference",
+            "category": "forestry",
+            "specification": "100ppi public-web product reference; brand pending probe",
+            "region": "China; exact market pending probe",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": false,
+            "evidence": {"short_probe": "2026-07-06/2026-07-10", "rows": 5, "source_row_symbol": "SP"}
+          }
+        ]
       },
       "policy_events": [
         {

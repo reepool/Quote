@@ -945,6 +945,42 @@
           "max_runtime_seconds": 600
         }
       },
+      "special_commodity_policy_discovery": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "NDRC等官方政策目录月度发现、版本存证与候选治理；真实dry-run验收后再启用",
+        "report": true,
+        "pre_run_notify": true,
+        "trigger": {
+          "type": "cron",
+          "day": "15",
+          "hour": 9,
+          "minute": 10,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "adapter_id": "ndrc",
+          "dry_run": true,
+          "max_runtime_seconds": 1800
+        }
+      },
+      "special_commodity_series_catalog_sync": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "特殊商品扩品候选目录同步；只维护候选和上线状态，不自动加入生产日更",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "dry_run": true,
+          "max_runtime_seconds": 600
+        }
+      },
       "futures_trading_day_governance": {
         "enabled": false,
         "description": "商品期货交易日治理前置任务（维护交易所日历、公告证据、人工复核状态和目标交易日集合）",

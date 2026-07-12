@@ -23,15 +23,21 @@ from research.special_commodity_market_data import (
     FredCommodityProvider,
     NbsProductionMaterialsGovernanceAdapter,
     NbsProductionMaterialsProvider,
+    LicensedOfficialLmeFileProvider,
+    NdrcPolicyDiscoveryAdapter,
+    SpecialCommodityPolicyDiscoveryService,
     SpecialCommodityMasterDataService,
     SpecialCommodityCalendarGovernanceService,
     SpecialCommodityPolicyEventService,
+    SpecialCommodityReadService,
+    SpecialCommoditySeriesCatalogService,
     SpecialCommodityPriceSyncService,
     SpecialCommodityGovernancePipeline,
     SpecialCommodityStorageManager,
     WorldBankCommodityProvider,
     _call_with_progress_logging,
     _observation_quality_diagnostics,
+    _actual_contract_series_blockers,
     _request_json_with_retry,
     _source_unit_matches,
 )
@@ -1720,3 +1726,504 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         and (payload.get("trigger") or {}).get("minute", 0) == 0
     ]
     assert enabled_at_0800 == ["special_commodity_price_sync"]
+
+
+def test_special_commodity_evidence_storage_is_additive_and_idempotent(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(
+        storage,
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"],
+    ).sync()
+
+    document = {
+        "document_id": "NDRC.2022.303.v1",
+        "source_profile": "ndrc_official_policy",
+        "source_url": "https://zfxxgk.ndrc.gov.cn/example",
+        "document_number": "发改价格〔2022〕303号",
+        "title": "关于进一步完善煤炭市场价格形成机制的通知",
+        "published_date": "2022-02-24",
+        "retrieved_at": "2026-07-12T12:00:00+08:00",
+        "content_hash": "hash-v1",
+        "content_text": "official policy evidence",
+        "parser_version": "test.v1",
+    }
+    assert storage.upsert_source_documents([document], dry_run=False)["inserted"] == 1
+    assert storage.upsert_source_documents([document], dry_run=False)["unchanged"] == 1
+
+    candidate = {
+        "candidate_id": "NDRC.2022.303.QHD5500",
+        "document_id": document["document_id"],
+        "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
+        "policy_type": "price_range",
+        "review_status": "pending_review",
+        "confidence": 0.95,
+        "effective_start": "2022-05-01",
+        "currency": "CNY",
+        "unit": "CNY/ton",
+        "value_low": 570.0,
+        "value_high": 770.0,
+        "field_lineage": {"value_low": "document:price-range"},
+    }
+    assert storage.upsert_policy_candidates([candidate], dry_run=False)["inserted"] == 1
+    assert storage.upsert_policy_candidates([candidate], dry_run=False)["unchanged"] == 1
+    assert storage.read_source_documents()[0]["document_number"] == "发改价格〔2022〕303号"
+    assert storage.read_policy_candidates()[0]["review_status"] == "pending_review"
+
+    # Existing price and policy repositories remain available after additive migration.
+    assert storage.read_dictionary()["series"]
+    assert storage.read_policy_events() == []
+
+
+def test_special_commodity_lme_entitlement_fails_closed_and_audits(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+
+    missing = storage.check_data_entitlement(
+        dataset_id="lme.official.copper",
+        application_id="quote",
+        access_mode="internal_read",
+    )
+    assert missing == {
+        "allowed": False,
+        "reason": "missing_entitlement",
+        "entitlement_id": None,
+    }
+
+    storage.upsert_data_licenses(
+        [
+            {
+                "license_id": "LME.TEST",
+                "provider": "LME",
+                "license_name": "unit test internal licence",
+                "valid_from": "2026-01-01",
+                "valid_until": "2026-12-31",
+                "status": "active",
+                "permitted_use": "internal_research",
+                "redistribution_mode": "prohibited",
+            }
+        ],
+        [
+            {
+                "entitlement_id": "LME.TEST.COPPER",
+                "license_id": "LME.TEST",
+                "dataset_id": "lme.official.copper",
+                "application_id": "quote",
+                "access_mode": "internal_read",
+                "active": True,
+                "api_disclosure_allowed": False,
+            }
+        ],
+    )
+    assert storage.check_data_entitlement(
+        dataset_id="lme.official.copper",
+        application_id="quote",
+        access_mode="internal_read",
+    )["allowed"] is True
+    assert storage.check_data_entitlement(
+        dataset_id="lme.official.copper",
+        application_id="quote",
+        access_mode="internal_read",
+        api_disclosure=True,
+    )["reason"] == "api_disclosure_not_permitted"
+
+    storage.upsert_data_licenses(
+        [
+            {
+                "license_id": "LME.EXPIRED",
+                "provider": "LME",
+                "license_name": "expired test licence",
+                "valid_from": "2025-01-01",
+                "valid_until": "2025-12-31",
+                "status": "active",
+                "permitted_use": "internal_research",
+                "redistribution_mode": "prohibited",
+            }
+        ],
+        [
+            {
+                "entitlement_id": "LME.EXPIRED.TIN",
+                "license_id": "LME.EXPIRED",
+                "dataset_id": "lme.official.tin",
+                "application_id": "quote",
+                "access_mode": "internal_read",
+                "active": True,
+            }
+        ],
+    )
+    assert storage.check_data_entitlement(
+        dataset_id="lme.official.tin",
+        application_id="quote",
+        access_mode="internal_read",
+    )["reason"] == "license_expired"
+
+    with storage.get_connection() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM commodity_data_access_audit").fetchone()[0] == 4
+
+
+def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monkeypatch, tmp_path):
+    catalog_url = "https://www.ndrc.gov.cn/xxgk/zcfb/"
+    document_url = "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202202/policy.html"
+    catalog = SimpleNamespace(
+        text=f'<a href="{document_url}">煤炭政策</a>',
+        url=catalog_url,
+        headers={"Content-Type": "text/html"},
+        encoding="utf-8",
+    )
+    document = SimpleNamespace(
+        text="""
+        <html><title>关于进一步完善煤炭市场价格形成机制的通知</title>
+        <body>发改价格〔2022〕303号 2022年2月25日
+        秦皇岛港下水煤（5500千卡）中长期交易价格合理区间570-770元/吨，
+        自2022年5月1日起执行。</body></html>
+        """,
+        url=document_url,
+        headers={"Content-Type": "text/html"},
+        encoding="utf-8",
+    )
+
+    def fake_request(url, **kwargs):
+        return catalog if url == catalog_url else document
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data._request_with_retry",
+        fake_request,
+    )
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    module_cfg["policy_discovery"]["ndrc"]["catalog_urls"] = [catalog_url]
+    module_cfg["policy_discovery"]["ndrc"]["document_urls"] = []
+    storage = SpecialCommodityStorageManager(cfg)
+    result = SpecialCommodityPolicyDiscoveryService(storage, module_cfg).run(
+        start_date="2022-01-01",
+        end_date="2022-12-31",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["documents"] == 1
+    assert result["candidates"] == 1
+    assert result["ready_for_promotion"] == 1
+    candidate = storage.read_policy_candidates()[0]
+    assert candidate["value_low"] == 570.0
+    assert candidate["value_high"] == 770.0
+    assert candidate["value_mid"] is None
+    assert candidate["effective_start"] == "2022-05-01"
+    assert json.loads(candidate["metadata_json"])["not_observed_transaction_price"] is True
+    assert storage.set_policy_candidate_review_status(
+        candidate_id=candidate["candidate_id"],
+        review_status="approved",
+        reviewer="unit-test",
+        notes="official fields verified",
+    ) is True
+    promotion = SpecialCommodityPolicyEventService(storage, module_cfg).promote_approved_candidates(
+        dry_run=False
+    )
+    assert promotion["status"] == "success"
+    assert promotion["inserted"] == 1
+    promoted = storage.read_policy_events()[0]
+    assert promoted["value_low"] == 570.0
+    assert promoted["value_high"] == 770.0
+    assert promoted["value_mid"] is None
+    rerun = SpecialCommodityPolicyDiscoveryService(storage, module_cfg).run(
+        start_date="2022-01-01",
+        end_date="2022-12-31",
+        dry_run=False,
+    )
+    assert rerun["status"] == "success"
+    assert storage.read_policy_candidates()[0]["review_status"] == "approved"
+
+
+def test_ndrc_policy_parser_fails_closed_for_ambiguous_contract_text():
+    adapter = NdrcPolicyDiscoveryAdapter({"catalog_urls": ["https://www.ndrc.gov.cn/"]})
+    document = {
+        "document_id": "NDRC.ambiguous.v1",
+        "title": "煤炭中长期合同工作通知",
+        "source_url": "https://www.ndrc.gov.cn/ambiguous.html",
+        "document_number": "",
+    }
+    candidate = adapter._parse_candidate(document, "煤炭中长期合同价格机制应保持合理稳定。")
+    assert candidate is not None
+    assert candidate["review_status"] == "pending_review"
+    assert candidate["commodity_id"] is None
+    assert candidate["value_low"] is None
+    assert candidate["value_mid"] is None
+
+
+def test_special_commodity_indicator_api_contract_returns_only_indicator_series(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    module_cfg["commodities"].append(
+        {
+            "commodity_id": "CN.COAL.PORT.INVENTORY",
+            "symbol": "COAL_PORT_INVENTORY",
+            "name": "Coal Port Inventory",
+            "category": "coal",
+            "commodity_type": "industrial_indicator",
+            "default_currency": "",
+            "default_unit": "10k_ton",
+            "active": True,
+        }
+    )
+    module_cfg["series"].append(
+        {
+            "series_id": "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY",
+            "commodity_id": "CN.COAL.PORT.INVENTORY",
+            "venue": "TEST",
+            "source_profile": "test_indicator",
+            "source_symbol": "inventory",
+            "frequency": "daily",
+            "quote_type": "industrial_indicator",
+            "currency": "",
+            "unit": "10k_ton",
+            "active": True,
+            "metadata": {"data_kind": "industrial_indicator"},
+        }
+    )
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    result = SpecialCommodityReadService(storage).indicators(category="coal")
+    assert result["status"] == "success"
+    assert result["series_count"] == 1
+    assert result["series"][0]["series_id"] == "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY"
+    assert result["observations"] == {"CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY": []}
+
+
+def test_actual_contract_price_requires_complete_contract_semantics():
+    incomplete = CommoditySeries(
+        series_id="CMD.CN.COAL.CONTRACT.TEST.MONTHLY",
+        commodity_id="CN.COAL.CONTRACT.TEST",
+        venue="TEST",
+        source_profile="test",
+        source_symbol="contract",
+        frequency="monthly",
+        quote_type="actual_contract_price",
+        currency="CNY",
+        unit="CNY/ton",
+        metadata={"data_kind": "actual_contract_price"},
+    )
+    blockers = _actual_contract_series_blockers([incomplete])
+    assert blockers[0]["reason"] == "actual_contract_series_semantics_incomplete"
+    assert "stable_source_verified" in blockers[0]["missing_fields"]
+
+    complete = CommoditySeries(
+        **{
+            **incomplete.__dict__,
+            "metadata": {
+                "data_kind": "actual_contract_price",
+                "contract_scope": "annual_long_term_contract_monthly_settlement",
+                "specification": "5500 kcal",
+                "region": "Qinhuangdao",
+                "tax_basis": "tax_inclusive",
+                "freight_basis": "FOB",
+                "stable_source_verified": True,
+            },
+        }
+    )
+    assert _actual_contract_series_blockers([complete]) == []
+
+
+def test_lme_official_file_provider_checks_entitlement_before_file_access(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    provider = LicensedOfficialLmeFileProvider(
+        storage,
+        "lme_official_licensed_file",
+        {
+            "dataset_id": "lme.official.copper",
+            "application_id": "quote",
+            "local_file_path": str(tmp_path / "does-not-exist.csv"),
+            "allowed_file_root": str(tmp_path),
+        },
+    )
+    result = provider.fetch([], start_date="2026-01-01", end_date="2026-01-31")
+    assert result.blockers[0]["reason"] == "licensed_market_data_entitlement_blocked"
+    assert result.blockers[0]["entitlement_reason"] == "missing_entitlement"
+
+    storage.upsert_data_licenses(
+        [
+            {
+                "license_id": "LME.FILE.TEST",
+                "provider": "LME",
+                "license_name": "file provider test",
+                "valid_from": "2026-01-01",
+                "valid_until": "2026-12-31",
+                "status": "active",
+                "permitted_use": "internal_research",
+                "redistribution_mode": "prohibited",
+            }
+        ],
+        [
+            {
+                "entitlement_id": "LME.FILE.TEST.COPPER",
+                "license_id": "LME.FILE.TEST",
+                "dataset_id": "lme.official.copper",
+                "application_id": "quote",
+                "access_mode": "internal_read",
+                "active": True,
+            }
+        ],
+    )
+    csv_path = tmp_path / "official.csv"
+    csv_path.write_text("date,symbol,value\n2026-07-10,COPPER,10010\n", encoding="ascii")
+    provider = LicensedOfficialLmeFileProvider(
+        storage,
+        "lme_official_licensed_file",
+        {
+            "dataset_id": "lme.official.copper",
+            "application_id": "quote",
+            "local_file_path": str(csv_path),
+            "allowed_file_root": str(tmp_path),
+        },
+    )
+    series = CommoditySeries(
+        series_id="CMD.METAL.COPPER.LME.OFFICIAL.CLOSING.DAILY",
+        commodity_id="METAL.COPPER.LME_3M",
+        venue="LME",
+        source_profile="lme_official_licensed_file",
+        source_symbol="COPPER",
+        frequency="daily",
+        quote_type="official_closing_price",
+        currency="USD",
+        unit="USD/metric_ton",
+    )
+    allowed = provider.fetch([series], start_date="2026-07-01", end_date="2026-07-31")
+    assert allowed.blockers == []
+    assert allowed.observations[0].observation_date == "2026-07-10"
+    assert allowed.observations[0].value == 10010.0
+
+
+def test_lme_official_and_proxy_series_do_not_overwrite_each_other(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    module_cfg["series"].append(
+        {
+            "series_id": "CMD.METAL.COPPER.LME.OFFICIAL.CLOSING.DAILY",
+            "commodity_id": "METAL.COPPER.LME_3M",
+            "venue": "LME",
+            "source_profile": "lme_official_licensed_file",
+            "source_symbol": "COPPER",
+            "frequency": "daily",
+            "quote_type": "official_closing_price",
+            "currency": "USD",
+            "unit": "USD/metric_ton",
+            "active": False,
+            "metadata": {"data_kind": "licensed_official_price"},
+        }
+    )
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    common = {
+        "observation_date": "2026-07-10",
+        "currency": "USD",
+        "unit": "USD/metric_ton",
+        "raw_value": 10000.0,
+        "raw_currency": "USD",
+        "raw_unit": "USD/metric_ton",
+        "source_url": "test://local",
+        "quality_flag": "test",
+        "source_symbol": "COPPER",
+        "parser_version": "test",
+        "metadata": {},
+    }
+    observations = [
+        CommodityObservation(
+            series_id="CMD.METAL.COPPER.LME3M.DAILY",
+            source_profile="lme_akshare_foreign_futures",
+            value=10000.0,
+            raw_payload_hash="proxy",
+            **common,
+        ),
+        CommodityObservation(
+            series_id="CMD.METAL.COPPER.LME.OFFICIAL.CLOSING.DAILY",
+            source_profile="lme_official_licensed_file",
+            value=10010.0,
+            raw_payload_hash="official",
+            **{**common, "raw_value": 10010.0},
+        ),
+    ]
+    assert storage.upsert_observations(observations, ingestion_run_id=None, dry_run=False)["inserted"] == 2
+    assert len(storage.read_observations(series_id="CMD.METAL.COPPER.LME3M.DAILY")) == 1
+    assert len(storage.read_observations(series_id="CMD.METAL.COPPER.LME.OFFICIAL.CLOSING.DAILY")) == 1
+
+
+def test_special_commodity_series_catalog_is_idempotent_and_not_scheduled(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    service = SpecialCommoditySeriesCatalogService(storage, module_cfg)
+    first = service.sync(dry_run=False)
+    second = service.sync(dry_run=False)
+    assert first["status"] == "success"
+    assert first["candidates"] == 10
+    assert first["inserted"] == 10
+    assert second["unchanged"] == 10
+    assert second["scheduler_eligible"] == 0
+    state_counts = {}
+    for row in storage.read_series_candidates():
+        state_counts[row["rollout_state"]] = state_counts.get(row["rollout_state"], 0) + 1
+    assert state_counts == {"blocked": 1, "discovered": 9}
+    selector = CommodityUniverseSelector(module_cfg)
+    assert all("BENZENE" not in item.series_id for item in selector.resolve(categories=["all"]))
+
+
+def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_conflicts(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
+    candidate_id = "100PPI.CHEMICAL.STYRENE"
+    with pytest.raises(ValueError, match="cannot skip gates"):
+        storage.transition_series_candidate(candidate_id=candidate_id, target_state="full_dry_run_passed")
+    for state in (
+        "metadata_verified",
+        "short_dry_run_passed",
+        "full_dry_run_passed",
+        "persisted",
+        "daily_idempotency_verified",
+        "production_verified",
+    ):
+        assert storage.transition_series_candidate(candidate_id=candidate_id, target_state=state)
+    row = next(
+        item
+        for item in storage.read_series_candidates(category="chemical")
+        if item["candidate_id"] == candidate_id
+    )
+    assert row["scheduler_eligible"] == 1
+
+    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
+    row = next(
+        item
+        for item in storage.read_series_candidates(category="chemical")
+        if item["candidate_id"] == candidate_id
+    )
+    assert row["rollout_state"] == "production_verified"
+    assert row["scheduler_eligible"] == 1
+
+    changed = dict(module_cfg["series_catalog"]["candidates"][1])
+    changed["unit"] = "CNY/kg"
+    storage.upsert_series_candidates([changed], dry_run=False)
+    row = next(item for item in storage.read_series_candidates() if item["candidate_id"] == candidate_id)
+    assert row["rollout_state"] == "blocked"
+    assert json.loads(row["diagnostics_json"])["metadata_conflicts"]["unit"] == {
+        "existing": "CNY/ton",
+        "candidate": "CNY/kg",
+    }
+
+
+def test_special_commodity_series_catalog_reports_duplicate_source_identity(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    duplicate = dict(module_cfg["series_catalog"]["candidates"][0])
+    duplicate["candidate_id"] = "100PPI.CHEMICAL.BENZENE.DUPLICATE"
+    module_cfg["series_catalog"]["candidates"].append(duplicate)
+    result = SpecialCommoditySeriesCatalogService(
+        SpecialCommodityStorageManager(cfg), module_cfg
+    ).sync(dry_run=True)
+    assert result["status"] == "warning"
+    assert result["blockers"][0]["reason"] == "commodity_candidate_source_identity_conflict"

@@ -1435,3 +1435,4 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 10. API 响应包含 `calc_method / calc_version / parameter_hash / input_hash`。
 
 这比当前轻量 DCF 有实质升级，同时仍能保持工程边界可控。
+> 特殊商品增强边界：DCF 读取只能使用正式治理后的商品观测或政策事件。`commodity_policy_candidates` 和 `commodity_source_documents` 是证据与审核对象，不是估值输入；`ready_for_promotion` 也不得视为已生效政策。实际长协成交价必须与政策合理区间、市场现货和产业指标使用不同的 series/data kind。详见 `special_commodity_market_data_enhancement_requirements.md`。

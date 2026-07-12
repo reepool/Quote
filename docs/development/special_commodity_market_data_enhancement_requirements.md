@@ -124,6 +124,19 @@ LME 官方历史数据可通过 LME Portal/Data Services 购买；官网说明�
 - 交易所仓单、库存、交割和注册品牌公开数据，但必须保持为产业指标而非价格。
 - 海关和统计部门的进口量、产量、价格指数，按发布期治理。
 
+### 7.3 2026-07-12 候选短窗口探测
+
+使用现有 `akshare_proxy_patch` 和 `futures_spot_price_daily` 对 2026-07-06 至 2026-07-10 进行合并探测，未逐品种重复下载：
+
+- 化工/能源：`EB/UR/SH/SA/FG/BU/RU/SP` 各返回5条或接近5条有效记录，`PG` 返回4条；纯苯没有当前 AkShare 接口所需的期货根代码，保持 blocked，后续需直连100ppi产品页。
+- 有色/黑色：`CU/AL/ZN/PB/NI/SN/RB/HC` 各5条，`I` 4条。
+- 农产品/新能源：`M/Y/P/C/JD/LH` 各4条，`SR/CF/LC/SI/PS` 各5条。
+- 返回字段统一为 `date/symbol/spot_price/near_contract/dominant_contract/basis`，只能证明短窗口接口和字段存在，不能替代历史深度、规格、区域、税基、单位和缺口治理。
+
+因此以上品种仍不得直接进入日更；应逐项完成候选元数据确认和全历史 dry-run。
+
+同日对国家统计局 2026 年 6 月下旬官方生产资料旬价正文完成真实探测。页面提供50项产品、单位、价格和独立规格表，包含螺纹钢、电解铜/铝锭/铅锭/锌锭、烧碱、甲醇、纯苯、乙醇、聚烯烃、磷酸铁锂、LNG/LPG、煤炭、玻璃、多晶硅、农产品、化肥、天然橡胶和纸浆等。现有 `NbsProductionMaterialsProvider` 已按配置化 `source_product_names/source_units/source_specification` 解析同一表格，因此新增 NBS 产品应复用该 adapter；每个产品仍需验证历史名称和规格是否发生变化。
+
 ## 8. 数据模型增强
 
 在保留现有表兼容性的前提下评估以下字段/表：
@@ -147,6 +160,15 @@ LME 官方历史数据可通过 LME Portal/Data Services 购买；官网说明�
 - `/api/v1/research/commodities/policy-candidates`。
 - `/api/v1/research/commodities/indicators`。
 - `/api/v1/research/commodities/source-documents`。
+
+首期实现状态：
+
+- 已实现 `special_commodity_policy_discovery` 的统一 Scheduler/DataManager/API 入口；月度配置位于每月15日09:10，但在真实验收完成前保持 `enabled=false`。
+- 手工 dry-run：`/run special_commodity_policy_discovery adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
+- 本地 API：`GET /api/v1/research/commodities/policy-candidates`、`GET /api/v1/research/commodities/source-documents`、`POST /api/v1/research/commodities/policy-discovery`。
+- `ready_for_promotion` 仅表示 parser 字段完整；必须明确变更为 `approved` 后，现有 `special_commodity_policy_event_sync` 才会通过统一 validator 提升正式事件。
+- 2026-07-12 真实 NDRC dry-run 扫描2个目录和6个正文入口，保存候选证据5份、政策候选3条；复核后通过标题政策语义 gate 去除课题和保供会议噪声，303号文件正确识别 `570-770 CNY/ton`、`2022-05-01` 生效且 `value_mid` 为空。
+- 已实现扩品候选目录和强制上线状态机。手工任务为 `/run special_commodity_series_catalog_sync dry_run`；API 为 `GET /api/v1/research/commodities/series-candidates` 和 `POST /api/v1/research/commodities/series-catalog-sync`。候选不会进入生产 scope，只有依次通过 metadata、短期 dry-run、全量 dry-run、落库、幂等日更并达到 `production_verified` 后才具备 scheduler eligibility。
 
 政策发现建议每月执行，但“自动发现”和“正式 promotion”必须分状态报告。正常报告保持简洁；存在解析失败、许可阻塞、未解决日期或单位冲突时输出详细诊断。
 

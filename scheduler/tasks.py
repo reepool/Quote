@@ -1726,6 +1726,30 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                 f"生效 `{event.get('effective_start')}` 至 `{event.get('effective_end') or '持续有效'}`｜"
                 f"区间 `{value_range} {event.get('unit')}`｜非行情"
             )
+    elif "documents" in result:
+        lines.append(
+            "政策发现: "
+            f"文档 `{result.get('documents', 0)}`｜"
+            f"候选 `{result.get('candidates', 0)}`｜"
+            f"可提升 `{result.get('ready_for_promotion', 0)}`｜"
+            f"待复核 `{result.get('pending_review', 0)}`"
+        )
+        document_write = result.get("document_write") or {}
+        candidate_write = result.get("candidate_write") or {}
+        lines.append(
+            "写入: "
+            f"文档新增 `{document_write.get('inserted', 0)}`/预计 `{document_write.get('would_write', 0)}`｜"
+            f"候选新增 `{candidate_write.get('inserted', 0)}`/预计 `{candidate_write.get('would_write', 0)}`"
+        )
+    elif "rollout_state_counts" in result:
+        states = result.get("rollout_state_counts") or {}
+        lines.append(
+            "扩品候选: "
+            f"总数 `{result.get('candidates', 0)}`｜"
+            f"已发现 `{states.get('discovered', 0)}`｜"
+            f"阻断 `{states.get('blocked', 0)}`｜"
+            f"可调度 `{result.get('scheduler_eligible', 0)}`"
+        )
     elif result.get("reason"):
         lines.append(f"原因: `{result.get('reason')}`")
 
@@ -4465,6 +4489,89 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('special_commodity_policy_event_sync')
+
+    async def special_commodity_policy_discovery(
+        self,
+        adapter_id: str = "ndrc",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品官方政策目录发现与候选治理任务。"""
+        task_id = 'special_commodity_policy_discovery'
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.run_special_commodity_policy_discovery(
+                adapter_id=adapter_id,
+                start_date=start_date,
+                end_date=end_date,
+                dry_run=dry_run,
+            )
+            success = result.get("status") in {"success", "warning"}
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品政策目录发现报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': result.get("status", "error"),
+                    'tasks_completed': int(result.get("documents", 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_id, 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品政策目录发现',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error("[Scheduler] Special commodity policy discovery failed: %s", e)
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品政策目录发现报告',
+                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_id, 'status': str(e)}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品政策目录发现',
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def special_commodity_series_catalog_sync(
+        self,
+        dry_run: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """特殊商品扩品候选目录同步任务。"""
+        task_id = 'special_commodity_series_catalog_sync'
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.run_special_commodity_series_catalog_sync(dry_run=dry_run)
+            success = result.get("status") in {"success", "warning"}
+            await self._send_task_report(
+                report_data={
+                    'name': '特殊商品扩品候选目录报告',
+                    'content': _format_special_commodity_scheduler_report(result),
+                    'status': result.get("status", "error"),
+                    'tasks_completed': int(result.get("candidates", 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [{'task_name': task_id, 'status': result.get("status")}],
+                },
+                report_type='maintenance_report',
+                task_name='特殊商品扩品候选目录',
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error("[Scheduler] Special commodity series catalog sync failed: %s", e)
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
 
     async def fx_derivation_sync(
         self,

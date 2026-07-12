@@ -1792,6 +1792,134 @@ async def get_research_special_commodity_policy_events(
         )
 
 
+@router.get(
+    "/research/commodities/policy-candidates",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_policy_candidates(
+    review_status: Optional[str] = Query(None, description="pending_review/ready_for_promotion"),
+):
+    """读取本地政策解析候选，不触发远程发现。"""
+    try:
+        return await data_manager.get_special_commodity_policy_candidates(
+            review_status=_query_default(review_status),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get policy candidates: {str(e)}")
+
+
+@router.get(
+    "/research/commodities/source-documents",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_source_documents(
+    source_profile: Optional[str] = Query(None, description="来源 profile"),
+):
+    """读取本地官方文档证据，不触发远程发现。"""
+    try:
+        return await data_manager.get_special_commodity_source_documents(
+            source_profile=_query_default(source_profile),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get source documents: {str(e)}")
+
+
+@router.get(
+    "/research/commodities/indicators",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_indicators(
+    category: Optional[str] = Query(None, description="商品分类"),
+    series_id: Optional[str] = Query(None, description="产业指标 series_id"),
+    start_date: Optional[str] = Query(None, description="开始日期 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="结束日期 YYYY-MM-DD"),
+):
+    """读取本地产业指标，当前无已治理序列时返回空集合。"""
+    try:
+        return await data_manager.get_special_commodity_indicators(
+            category=_query_default(category),
+            series_id=_query_default(series_id),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get commodity indicators: {str(e)}")
+
+
+@router.get(
+    "/research/commodities/series-candidates",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def get_research_special_commodity_series_candidates(
+    rollout_state: Optional[str] = Query(None, description="扩品上线状态"),
+    category: Optional[str] = Query(None, description="商品分类"),
+):
+    """读取扩品候选及上线状态，不触发远程探测。"""
+    try:
+        return await data_manager.get_special_commodity_series_candidates(
+            rollout_state=_query_default(rollout_state),
+            category=_query_default(category),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get commodity series candidates: {str(e)}")
+
+
+@router.post(
+    "/research/commodities/series-catalog-sync",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_special_commodity_series_catalog_sync(
+    dry_run: bool = Query(True, description="默认只演练"),
+):
+    """同步配置化扩品候选目录，默认 dry-run。"""
+    try:
+        return await data_manager.run_special_commodity_series_catalog_sync(
+            dry_run=bool(_query_default(dry_run)),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to sync commodity series catalog: {str(e)}")
+
+
+@router.post(
+    "/research/commodities/policy-discovery",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def run_research_special_commodity_policy_discovery(
+    adapter_id: str = Query("ndrc", description="政策目录 adapter"),
+    start_date: Optional[str] = Query(None, description="发布日期开始 YYYY-MM-DD"),
+    end_date: Optional[str] = Query(None, description="发布日期结束 YYYY-MM-DD"),
+    dry_run: bool = Query(True, description="默认只演练"),
+):
+    """执行官方政策目录发现，默认 dry-run。"""
+    try:
+        return await data_manager.run_special_commodity_policy_discovery(
+            adapter_id=str(_query_default(adapter_id) or "ndrc"),
+            start_date=_query_default(start_date),
+            end_date=_query_default(end_date),
+            dry_run=bool(_query_default(dry_run)),
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to discover commodity policies: {str(e)}")
+
+
 @router.post(
     "/research/commodities/price-sync",
     response_model=Dict[str, Any],

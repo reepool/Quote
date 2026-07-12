@@ -4975,6 +4975,104 @@ class DataManager:
             dry_run=dry_run,
         )
 
+    async def run_special_commodity_policy_discovery(
+        self,
+        *,
+        adapter_id: str = "ndrc",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        """Discover official policy documents and persist governed candidates."""
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommodityPolicyDiscoveryService
+
+        return await asyncio.to_thread(
+            SpecialCommodityPolicyDiscoveryService(storage, module_cfg).run,
+            adapter_id=adapter_id,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
+    async def get_special_commodity_policy_candidates(
+        self,
+        *,
+        review_status: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        rows = await asyncio.to_thread(
+            storage.read_policy_candidates,
+            review_status=review_status,
+        )
+        return {"status": "success", "review_status": review_status, "candidates": rows, "count": len(rows)}
+
+    async def get_special_commodity_source_documents(
+        self,
+        *,
+        source_profile: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        rows = await asyncio.to_thread(
+            storage.read_source_documents,
+            source_profile=source_profile,
+        )
+        return {"status": "success", "source_profile": source_profile, "documents": rows, "count": len(rows)}
+
+    async def get_special_commodity_indicators(
+        self,
+        *,
+        category: Optional[str] = None,
+        series_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        from research.special_commodity_market_data import SpecialCommodityReadService
+
+        return await asyncio.to_thread(
+            SpecialCommodityReadService(storage).indicators,
+            category=category,
+            series_id=series_id,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+    async def run_special_commodity_series_catalog_sync(
+        self,
+        *,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommoditySeriesCatalogService
+
+        return await asyncio.to_thread(
+            SpecialCommoditySeriesCatalogService(storage, module_cfg).sync,
+            dry_run=dry_run,
+        )
+
+    async def get_special_commodity_series_candidates(
+        self,
+        *,
+        rollout_state: Optional[str] = None,
+        category: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        rows = await asyncio.to_thread(
+            storage.read_series_candidates,
+            rollout_state=rollout_state,
+            category=category,
+        )
+        return {"status": "success", "rollout_state": rollout_state, "category": category, "candidates": rows, "count": len(rows)}
+
     async def run_fx_derivation_sync(
         self,
         *,
