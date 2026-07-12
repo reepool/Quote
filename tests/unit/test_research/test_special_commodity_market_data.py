@@ -290,6 +290,13 @@ def test_nbs_ten_day_title_period_parsing():
         "period_start": "2026-01-21",
         "period_end": "2026-01-30",
     }
+    assert NbsProductionMaterialsProvider.parse_period(
+        "流通领域重要生产资料市场价格变动情况（2017年12月21日-30日）"
+    ) == {
+        "observation_date": "2017-12-30",
+        "period_start": "2017-12-21",
+        "period_end": "2017-12-30",
+    }
 
 
 def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
@@ -319,7 +326,7 @@ def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
         ]
 
     monkeypatch.setattr(provider, "_search_page", fake_search_page)
-    articles, warnings = provider._discover_articles(
+    articles, warnings, diagnostics = provider._discover_articles(
         date(2017, 1, 1), date(2017, 1, 10)
     )
 
@@ -329,6 +336,7 @@ def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
         item.get("reason") == "nbs_unresolved_observation_periods"
         for item in warnings
     )
+    assert diagnostics["unresolved_dates"] == 0
 
 
 def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
@@ -342,7 +350,7 @@ def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
     )
     monkeypatch.setattr(provider, "_search_page", lambda **kwargs: [])
 
-    articles, warnings = provider._discover_articles(
+    articles, warnings, diagnostics = provider._discover_articles(
         date(2017, 1, 1), date(2017, 1, 10)
     )
 
@@ -355,6 +363,37 @@ def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
     assert unresolved["expected_periods"] == 1
     assert unresolved["missing_periods"] == 1
     assert unresolved["missing_samples"] == ["2017-01-10"]
+    assert diagnostics["unresolved_dates"] == 1
+
+
+def test_nbs_official_observation_exception_is_governed_not_warned(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_production_material_market_price"])
+    source_cfg["exact_only_max_periods"] = 100
+    source_cfg["observation_exceptions"] = [
+        {
+            "observation_date": "2017-01-30",
+            "reason": "spring_festival_release_cancelled",
+            "evidence_url": "https://www.stats.gov.cn/example-schedule.html",
+        }
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    monkeypatch.setattr(provider, "_search_page", lambda **kwargs: [])
+
+    articles, warnings, diagnostics = provider._discover_articles(
+        date(2017, 1, 21), date(2017, 1, 30)
+    )
+
+    assert articles == []
+    assert warnings == []
+    assert diagnostics["expected_periods"] == 1
+    assert diagnostics["search_expected_periods"] == 0
+    assert diagnostics["governed_exception_dates"] == 1
+    assert diagnostics["unresolved_dates"] == 0
 
 
 def test_nbs_provider_parses_official_coal_row_and_preserves_publication_date(monkeypatch):
@@ -379,10 +418,21 @@ def test_nbs_provider_parses_official_coal_row_and_preserves_publication_date(mo
                     "title": "2026年6月下旬流通领域重要生产资料市场价格变动情况",
                     "source_url": "https://www.stats.gov.cn/example.html",
                 }
-            ],
-            [],
-        ),
-    )
+                ],
+                [],
+                {
+                    "enabled": True,
+                    "expected_periods": 1,
+                    "search_expected_periods": 1,
+                    "discovered_periods": 1,
+                    "governed_exception_dates": 0,
+                    "governed_exception_samples": [],
+                    "unresolved_dates": 0,
+                    "unresolved_samples": [],
+                    "publication_eligible_end": "2026-06-30",
+                },
+            ),
+        )
     response = SimpleNamespace(
         text="""
         <table><tr><th>产品名称</th><th>单位</th><th>本期价格（元）</th></tr>

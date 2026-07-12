@@ -351,6 +351,8 @@ scope 解析
 - 100ppi 已配置化落地 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`；后续品种沿用同一 provider/governance adapter，以独立商品、序列和 scope 逐个验证。甲醇 `CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY` 的源端可用起点为 2014-06-17；乙二醇 `CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY` 的源端可用起点为 2018-12-10；PVC `CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY` 的源端可用起点为 2013-01-04；聚丙烯 `CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY` 的源端可用起点为 2014-02-28。乙二醇、PVC 和聚丙烯使用 DCE 已验证交易日历进行覆盖诊断。各序列均通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，地区、规格和含税口径按来源披露。
 - 国家统计局动力煤序列 `CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY` 使用独立 `NBS` venue、`nbs_production_material_market_price` source profile 和 `cn_nbs_thermal_coal` scope。provider 通过国家统计局站内官方检索发现新旧栏目文章，解析正文中的产品名称、单位和本期价格；主数据治理核验“山西优混/5500 大卡/吨”，日期治理仅写入来源实际发布的旬期。历史起点按国家统计局说明设为 2014-01-10，配置和报告必须明确该序列不是长协价。
 - 国家统计局该栏目旧标题将旬期明确写为每月 `1-10`、`11-20`、`21-30` 日；31 天月份的下旬治理日期仍为 30 日，2 月下旬使用当月最后一日。现代“上旬/中旬/下旬”标题必须沿用同一口径，不能用自然月末 31 日制造假缺口。
+- 历史标题同时存在 `1-10日` 与 `1日-10日`、半角连字符与中文破折号等变体，NBS adapter 必须在来源实现层统一解析；任务治理层不得按年份或单个旬期添加跳过逻辑。官方发布日程明确取消的春节等旬期应配置为带证据 URL 的来源日历例外。
+- NBS 来源日期治理必须分别报告理论旬期、官方证据支持的停发例外、实际发现旬期和未解决缺口。已治理停发例外不触发任务降级；缺少官方证据的空缺仍保持 `warning`，不得按周末或经验推断。
 - 2026-07-12 真实烟雾验证：2014 年首期旧标题页面解析为观测期 2014-01-01 至 2014-01-10、发布日期 2014-01-14、价格 625.6 CNY/ton；2026 年 6 月下旬新标题页面解析为观测期 2026-06-21 至 2026-06-30、价格 854.6 CNY/ton。临时库端到端 dry-run 的主数据治理、日期治理和 provider 均为 success，未写生产库。
 - 中长程特殊商品 provider 调用必须按配置间隔输出 heartbeat 日志，至少包含来源、序列、任务日期范围和累计耗时；任务开始/结束日志不能替代运行中的阶段进度日志。默认间隔为60秒。
 - 特殊商品采集、治理、质量诊断和 heartbeat 属于数据任务日志，必须通过项目统一 `DataSource` task-domain logger 写入 `log/task.log`；不得使用未路由的模块根 logger 写入 `log/sys.log`。`sys.log` 仅保留应用初始化、服务、网络连接和系统运行日志。

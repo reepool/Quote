@@ -2153,7 +2153,8 @@ class NbsProductionMaterialsProvider:
     _LEGACY_TITLE = re.compile(
         r"流通领域重要生产资料市场价格变动情况[（(]\s*"
         r"(?P<year>\d{4})\s*年\s*(?P<month>\d{1,2})\s*月\s*"
-        r"(?P<start>\d{1,2})\s*[-—至]\s*(?P<end>\d{1,2})\s*日\s*[）)]"
+        r"(?P<start>\d{1,2})\s*日?\s*[-—至]\s*"
+        r"(?P<end>\d{1,2})\s*日\s*[）)]"
     )
 
     def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
@@ -2284,10 +2285,33 @@ class NbsProductionMaterialsProvider:
             return f"{end.year}年{end.month}月{marker}旬流通领域重要生产资料市场价格变动情况"
         return (
             "流通领域重要生产资料市场价格变动情况"
-            f"（{end.year}年{end.month}月{start.day}-{end.day}日）"
+            f"（{end.year}年{end.month}月{start.day}日-{end.day}日）"
         )
 
-    def _discover_articles(self, start: date, end: date) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
+    def _configured_observation_exceptions(
+        self, start: date, end: date
+    ) -> Dict[str, Dict[str, str]]:
+        exceptions: Dict[str, Dict[str, str]] = {}
+        for raw in self.source_cfg.get("observation_exceptions", []):
+            if not isinstance(raw, Mapping):
+                continue
+            observed = _parse_date(raw.get("observation_date"))
+            reason = str(raw.get("reason") or "").strip()
+            evidence_url = str(raw.get("evidence_url") or "").strip()
+            if observed is None or not (start <= observed <= end):
+                continue
+            if not reason or not evidence_url:
+                continue
+            exceptions[observed.isoformat()] = {
+                "observation_date": observed.isoformat(),
+                "reason": reason,
+                "evidence_url": evidence_url,
+            }
+        return exceptions
+
+    def _discover_articles(
+        self, start: date, end: date
+    ) -> tuple[List[Dict[str, str]], List[Dict[str, Any]], Dict[str, Any]]:
         query = str(
             self.source_cfg.get("search_query")
             or "流通领域重要生产资料市场价格变动情况 山西优混"
@@ -2301,7 +2325,13 @@ class NbsProductionMaterialsProvider:
         )
         today = get_shanghai_time().date()
         eligible_end = min(end, today - timedelta(days=publication_lag_days))
-        expected_periods = self._expected_periods(start, eligible_end)
+        all_expected_periods = self._expected_periods(start, eligible_end)
+        governed_exceptions = self._configured_observation_exceptions(start, eligible_end)
+        expected_periods = [
+            period
+            for period in all_expected_periods
+            if period["observation_date"] not in governed_exceptions
+        ]
         short_range_limit = max(1, int(self.source_cfg.get("exact_only_max_periods") or 12))
         if len(expected_periods) > short_range_limit:
             for sort in ("dateAsc", "dateDesc"):
@@ -2399,16 +2429,32 @@ class NbsProductionMaterialsProvider:
                 }
             )
         logger.info(
-            "[NbsProductionMaterials] discovery done search_requests=%s articles=%s expected=%s unresolved=%s range=%s..%s publication_eligible_end=%s",
+            "[NbsProductionMaterials] discovery done search_requests=%s articles=%s expected=%s governed_exceptions=%s unresolved=%s range=%s..%s publication_eligible_end=%s",
             request_count,
             len(discovered),
-            len(expected_periods),
+            len(all_expected_periods),
+            len(governed_exceptions),
             len(missing_periods),
             start,
             end,
             eligible_end,
         )
-        return sorted(discovered.values(), key=lambda row: row["observation_date"]), warnings
+        diagnostics = {
+            "enabled": True,
+            "expected_periods": len(all_expected_periods),
+            "search_expected_periods": len(expected_periods),
+            "discovered_periods": len(discovered),
+            "governed_exception_dates": len(governed_exceptions),
+            "governed_exception_samples": list(governed_exceptions.values())[:20],
+            "unresolved_dates": len(missing_periods),
+            "unresolved_samples": missing_periods[:50],
+            "publication_eligible_end": eligible_end.isoformat(),
+        }
+        return (
+            sorted(discovered.values(), key=lambda row: row["observation_date"]),
+            warnings,
+            diagnostics,
+        )
 
     def _parse_article(self, article: Mapping[str, str], item: CommoditySeries) -> CommodityObservation:
         response = request_get(
@@ -2481,7 +2527,7 @@ class NbsProductionMaterialsProvider:
         observations: List[CommodityObservation] = []
         warnings: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
-        articles, discovery_warnings = self._discover_articles(start, end)
+        articles, discovery_warnings, discovery_diagnostics = self._discover_articles(start, end)
         warnings.extend(discovery_warnings)
         for index, article in enumerate(articles, start=1):
             for item in series:
@@ -2513,14 +2559,6 @@ class NbsProductionMaterialsProvider:
                     "end_date": end_date,
                 }
             )
-        unresolved = next(
-            (
-                item
-                for item in warnings
-                if item.get("reason") == "nbs_unresolved_observation_periods"
-            ),
-            {},
-        )
         return CommodityProviderResult(
             observations=observations,
             warnings=warnings,
@@ -2529,14 +2567,7 @@ class NbsProductionMaterialsProvider:
                 "provider": "NBS",
                 "articles": len(articles),
                 "rows": len(observations),
-                "date_gap_fill": {
-                    "enabled": True,
-                    "expected_periods": unresolved.get("expected_periods", len(articles)),
-                    "discovered_periods": unresolved.get("discovered_periods", len(articles)),
-                    "unresolved_dates": unresolved.get("missing_periods", 0),
-                    "unresolved_samples": unresolved.get("missing_samples", []),
-                    "publication_eligible_end": unresolved.get("publication_eligible_end"),
-                },
+                "date_gap_fill": discovery_diagnostics,
                 "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
             },
         )

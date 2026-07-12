@@ -895,6 +895,28 @@
           "exact_search_max_pages": 3,
           "exact_gap_discovery_enabled": true,
           "publication_lag_days": 4,
+          "observation_exceptions": [
+            {
+              "observation_date": "2016-02-10",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918253.html"
+            },
+            {
+              "observation_date": "2017-01-30",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918254.html"
+            },
+            {
+              "observation_date": "2019-02-10",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918256.html"
+            },
+            {
+              "observation_date": "2022-02-10",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xxgk/sjfb/fbrcb/202210/t20221024_1889506.html"
+            }
+          ],
           "timeout_seconds": 30,
           "progress_log_interval_seconds": 60,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
