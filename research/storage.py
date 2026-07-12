@@ -10,7 +10,6 @@ Phase 0 scope:
 from __future__ import annotations
 
 import json
-import logging
 import os
 import sqlite3
 import hashlib
@@ -28,11 +27,6 @@ from research.official_shenwan_mapping import OfficialShenwanCodeMapping
 from utils import db_logger
 from utils.config_manager import ResearchConfig, config_manager
 from utils.date_utils import get_shanghai_time
-
-# 注: db_logger("Database" 模块) 在 config/01_log.json 中设为 WARNING, 用于抑制
-# 高频 DB 层日志; info() 会被静默丢弃。中长程写入的阶段性进度日志改用独立的
-# logging.getLogger(__name__)(与 research/fx_market_data.py 惯例一致), 保证可见。
-_progress_logger = logging.getLogger(__name__)
 from research.providers.base import (
     AnalystForecastSnapshot,
     CompanyProfileSnapshot,
@@ -6974,7 +6968,11 @@ class ResearchStorageManager:
     def upsert_risk_free_rate_observations(
         self, series_id: str, observations: List[Dict[str, Any]]
     ) -> int:
-        """批量写入观测值 (revision_id 默认 'latest')。分块写入并按块记录进度日志。返回写入行数。"""
+        """批量写入观测值 (revision_id 默认 'latest')。返回写入行数。
+
+        调用方 (research/risk_free_rate_sync.py) 负责分块调用以获得写入进度可见性;
+        本方法保持存储层职责单一, 不在此处做日志/进度上报。
+        """
         if not observations:
             return 0
         now = get_shanghai_time().isoformat()
@@ -6988,33 +6986,23 @@ class ResearchStorageManager:
             )
             for obs in observations
         ]
-        chunk_size = 500
-        total = len(rows)
-        written = 0
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
-            for start in range(0, total, chunk_size):
-                chunk = rows[start:start + chunk_size]
-                conn.executemany(
-                    """
-                    INSERT INTO risk_free_rate_observations (
-                        series_id, observation_date, source_profile, value, revision_id,
-                        source, source_mode, data_as_of, ingestion_run_id, created_at, updated_at
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
-                    ON CONFLICT(series_id, observation_date, source_profile, revision_id)
-                    DO UPDATE SET value=excluded.value, source=excluded.source,
-                        source_mode=excluded.source_mode, data_as_of=excluded.data_as_of,
-                        ingestion_run_id=excluded.ingestion_run_id, updated_at=excluded.updated_at
-                    """,
-                    chunk,
-                )
-                written += len(chunk)
-                _progress_logger.info(
-                    "[RiskFreeRate] upsert_observations series_id=%s progress %s/%s",
-                    series_id, written, total,
-                )
+            conn.executemany(
+                """
+                INSERT INTO risk_free_rate_observations (
+                    series_id, observation_date, source_profile, value, revision_id,
+                    source, source_mode, data_as_of, ingestion_run_id, created_at, updated_at
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(series_id, observation_date, source_profile, revision_id)
+                DO UPDATE SET value=excluded.value, source=excluded.source,
+                    source_mode=excluded.source_mode, data_as_of=excluded.data_as_of,
+                    ingestion_run_id=excluded.ingestion_run_id, updated_at=excluded.updated_at
+                """,
+                rows,
+            )
             conn.commit()
-        return written
+        return len(rows)
 
     def list_risk_free_rate_series(self) -> List[Dict[str, Any]]:
         """列出所有无风险利率序列定义。"""

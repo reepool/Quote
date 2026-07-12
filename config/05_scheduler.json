@@ -12,7 +12,7 @@
         "enabled": true,
         "manual_only": false,
         "description": "无风险利率序列日更（中国10Y国债到期收益率，akshare 全量拉取+幂等 upsert，17:30 mon-fri，写入 research 存储）",
-        "report": false,
+        "report": true,
         "pre_run_notify": false,
         "max_instances": 1,
         "misfire_grace_time": 600,

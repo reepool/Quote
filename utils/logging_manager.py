@@ -102,6 +102,7 @@ class LoggingManager:
                 'research.broker_risk_control',
                 'research.providers.official_futures',
                 'research.futures_market_data',
+                'research.risk_free_rate_sync',
             },
             'access': {
                 'API.Access',

@@ -1627,6 +1627,34 @@ def _format_fx_market_data_scheduler_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_risk_free_rate_sync_report(result: Dict[str, Any]) -> str:
+    """Return a compact operator report for the risk-free-rate series sync task."""
+    status = result.get("status", "unknown")
+    icon, label = _format_scheduler_status("success" if status == "ok" else status)
+    lines = [
+        f"{icon} *无风险利率序列同步*",
+        "",
+        f"状态: `{status}` ({label})",
+    ]
+    if result.get("series_id"):
+        lines.append(f"序列: `{result.get('series_id')}`")
+    lines.append(
+        "写入统计: "
+        f"拉取 `{result.get('fetched', 0)}`｜写入 `{result.get('written', 0)}`"
+    )
+    if result.get("earliest_date") or result.get("latest_date"):
+        lines.append(
+            f"覆盖区间: `{result.get('earliest_date') or 'N/A'}` 至 `{result.get('latest_date') or 'N/A'}`"
+        )
+    if result.get("latest_value") is not None:
+        lines.append(f"最新值: `{result.get('latest_value')}`")
+    if result.get("elapsed_seconds") is not None:
+        lines.append(f"耗时: `{result.get('elapsed_seconds')}s`")
+    if result.get("reason"):
+        lines.extend(["", f"原因: `{result.get('reason')}`"])
+    return "\n".join(lines)
+
+
 def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
     """Return a compact operator report for special commodity data tasks."""
     status = result.get("status", "unknown")
@@ -4100,12 +4128,32 @@ class ScheduledTasks:
         try:
             result = await data_manager.sync_risk_free_rate(data_as_of=data_as_of)
             success = result.get("status") in ("ok", "empty")
-            scheduler_logger.info(
-                f"[Scheduler] risk_free_rate_sync: {result}"
+            scheduler_logger.info(f"[Scheduler] risk_free_rate_sync: {result}")
+            await self._send_task_report(
+                report_data={
+                    'name': '无风险利率序列同步报告',
+                    'status': 'success' if success else 'error',
+                    'content': _format_risk_free_rate_sync_report(result),
+                },
+                report_type='maintenance_report',
+                task_name='无风险利率序列同步',
+                job_config=job_config,
             )
             return success
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] risk_free_rate_sync failed: {e}")
+            await self._send_task_report(
+                report_data={
+                    'name': '无风险利率序列同步报告',
+                    'status': 'error',
+                    'content': _format_risk_free_rate_sync_report(
+                        {'status': 'error', 'reason': str(e)}
+                    ),
+                },
+                report_type='maintenance_report',
+                task_name='无风险利率序列同步',
+                job_config=job_config,
+            )
             return False
         finally:
             self._active_tasks.discard('risk_free_rate_sync')

@@ -21,6 +21,7 @@ from typing import Any, Callable, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 _PROGRESS_LOG_EVERY = 200
+_WRITE_CHUNK_SIZE = 500
 
 CHINA_TREASURY_10Y = {
     "series_id": "china_treasury_10y",
@@ -131,16 +132,31 @@ class RiskFreeRateSyncService:
             "[RiskFreeRate] sync series_id=%s fetched=%s, writing ...",
             series_id, len(observations),
         )
-        written = self._storage.upsert_risk_free_rate_observations(
-            series_id, observations
-        )
+        written = 0
+        total = len(observations)
+        for start in range(0, total, _WRITE_CHUNK_SIZE):
+            chunk = observations[start:start + _WRITE_CHUNK_SIZE]
+            written += self._storage.upsert_risk_free_rate_observations(series_id, chunk)
+            logger.info(
+                "[RiskFreeRate] sync series_id=%s write progress %s/%s",
+                series_id, written, total,
+            )
+
+        elapsed = time.monotonic() - started
         logger.info(
             "[RiskFreeRate] sync done series_id=%s fetched=%s written=%s elapsed=%.1fs",
-            series_id, len(observations), written, time.monotonic() - started,
+            series_id, total, written, elapsed,
         )
+
+        sorted_dates = sorted(obs["observation_date"] for obs in observations) if observations else []
+        latest_obs = max(observations, key=lambda o: o["observation_date"]) if observations else None
         return {
             "series_id": series_id,
-            "fetched": len(observations),
+            "fetched": total,
             "written": written,
             "status": "ok" if observations else "empty",
+            "elapsed_seconds": round(elapsed, 1),
+            "earliest_date": sorted_dates[0] if sorted_dates else None,
+            "latest_date": sorted_dates[-1] if sorted_dates else None,
+            "latest_value": latest_obs.get("value") if latest_obs else None,
         }
