@@ -304,6 +304,20 @@ class ResearchStorageManager:
                 "valuation.db",
             )
             self.research_config.storage.valuation_db_path = self.valuation_db_path
+        self.interests_db_path = getattr(
+            self.research_config.storage, "interests_db_path", "data/interests.db"
+        )
+        if (
+            os.path.normpath(self.interests_db_path)
+            == os.path.normpath("data/interests.db")
+            and os.path.normpath(self.db_path) != os.path.normpath("data/research.db")
+        ):
+            self.interests_db_path = os.path.join(
+                os.path.dirname(self.db_path),
+                "interests.db",
+            )
+            if hasattr(self.research_config.storage, "interests_db_path"):
+                self.research_config.storage.interests_db_path = self.interests_db_path
         self.quotes_db_path = self.research_config.storage.quotes_db_path
         self.quotes_db_alias = self.research_config.storage.quotes_db_alias
         self._active_db_path: Optional[str] = None
@@ -322,6 +336,8 @@ class ResearchStorageManager:
                 self._drop_financial_tables_from_research_database(conn)
             if self._uses_separate_valuation_database():
                 self._drop_valuation_tables_from_research_database(conn)
+            if self._uses_separate_interests_database():
+                self._drop_interests_tables_from_research_database(conn)
 
             if self.research_config.storage.attach_quotes_db:
                 self._attach_quotes_db(conn)
@@ -351,6 +367,18 @@ class ResearchStorageManager:
             db_logger.info(
                 "[ResearchStorage] Initialized valuation database at %s",
                 self.valuation_db_path,
+            )
+        if self.interests_db_path and self.interests_db_path != self.db_path:
+            os.makedirs(os.path.dirname(self.interests_db_path), exist_ok=True)
+            with self.interests_database_scope():
+                with self.get_connection() as conn:
+                    self._apply_pragmas(conn)
+                    self._create_tables(conn)
+                    self._migrate_tables(conn)
+                    conn.commit()
+            db_logger.info(
+                "[ResearchStorage] Initialized interests database at %s",
+                self.interests_db_path,
             )
 
     @contextmanager
@@ -383,6 +411,16 @@ class ResearchStorageManager:
         finally:
             self._active_db_path = previous_db_path
 
+    @contextmanager
+    def interests_database_scope(self) -> Generator[None, None, None]:
+        """Route storage operations inside this block to the interests (rates) database."""
+        previous_db_path = self._active_db_path
+        self._active_db_path = self.interests_db_path or self.db_path
+        try:
+            yield
+        finally:
+            self._active_db_path = previous_db_path
+
     def active_storage_db_path(self) -> str:
         """Return the SQLite path currently used by storage operations."""
         return self._active_db_path or self.db_path
@@ -395,6 +433,11 @@ class ResearchStorageManager:
     def _uses_separate_valuation_database(self) -> bool:
         return bool(self.valuation_db_path) and (
             os.path.abspath(self.valuation_db_path) != os.path.abspath(self.db_path)
+        )
+
+    def _uses_separate_interests_database(self) -> bool:
+        return bool(self.interests_db_path) and (
+            os.path.abspath(self.interests_db_path) != os.path.abspath(self.db_path)
         )
 
     @classmethod
@@ -414,6 +457,22 @@ class ResearchStorageManager:
         """Remove valuation-domain physical tables from the non-valuation research DB."""
         for table_name in cls._valuation_table_names():
             conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+    @classmethod
+    def _drop_interests_tables_from_research_database(
+        cls,
+        conn: sqlite3.Connection,
+    ) -> None:
+        """Remove interests(rates)-domain physical tables from the non-interests research DB."""
+        for table_name in cls._interests_table_names():
+            conn.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+    @staticmethod
+    def _interests_table_names() -> tuple[str, ...]:
+        return (
+            "risk_free_rate_series",
+            "risk_free_rate_observations",
+        )
 
     @staticmethod
     def _financial_table_names() -> tuple[str, ...]:
@@ -11025,6 +11084,29 @@ def _route_financial_method_to_financial_db(method_name: str) -> None:
     wrapped.__name__ = original.__name__
     wrapped.__doc__ = original.__doc__
     setattr(ResearchStorageManager, method_name, wrapped)
+
+
+def _route_interests_method_to_interests_db(method_name: str) -> None:
+    original = getattr(ResearchStorageManager, method_name)
+
+    def wrapped(self: ResearchStorageManager, *args: Any, **kwargs: Any) -> Any:
+        if self._active_db_path is not None:
+            return original(self, *args, **kwargs)
+        with self.interests_database_scope():
+            return original(self, *args, **kwargs)
+
+    wrapped.__name__ = original.__name__
+    wrapped.__doc__ = original.__doc__
+    setattr(ResearchStorageManager, method_name, wrapped)
+
+
+for _interests_method_name in (
+    "upsert_risk_free_rate_series",
+    "upsert_risk_free_rate_observations",
+    "list_risk_free_rate_series",
+    "get_risk_free_rate_observations",
+):
+    _route_interests_method_to_interests_db(_interests_method_name)
 
 
 for _financial_method_name in (

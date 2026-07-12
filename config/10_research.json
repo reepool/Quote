@@ -1097,6 +1097,7 @@
       "quotes_db_alias": "quotes",
       "financials_db_path": "data/financials.db",
       "valuation_db_path": "data/valuation.db",
+      "interests_db_path": "data/interests.db",
       "filings_archive_root": "data/filings/financial_statements"
     },
     "budget": {

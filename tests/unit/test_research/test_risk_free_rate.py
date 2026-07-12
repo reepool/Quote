@@ -20,6 +20,9 @@ from research.risk_free_rate_sync import RiskFreeRateSyncService
 class _StorageStub:
     def __init__(self, conn):
         self._conn = conn
+        # non-None so the interests-db routing wrapper calls through to the raw
+        # method and uses this stub's get_connection instead of opening a file.
+        self._active_db_path = ":memory:"
 
     @contextmanager
     def get_connection(self):
