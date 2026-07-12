@@ -4073,6 +4073,30 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('fx_rate_sync')
 
+    async def risk_free_rate_sync(
+        self,
+        data_as_of: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """无风险利率序列日更任务 (REQ-13)。
+
+        采集失败降级为空写入, 不抛出; 只写 risk_free_rate_* 表, 消费端只读。
+        注: 需在 config/05_scheduler.json 注册调度条目后才会周期运行。
+        """
+        self._active_tasks.add('risk_free_rate_sync')
+        try:
+            result = await data_manager.sync_risk_free_rate(data_as_of=data_as_of)
+            success = result.get("status") in ("ok", "empty")
+            scheduler_logger.info(
+                f"[Scheduler] risk_free_rate_sync: {result}"
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(f"[Scheduler] risk_free_rate_sync failed: {e}")
+            return False
+        finally:
+            self._active_tasks.discard('risk_free_rate_sync')
+
     async def fx_rate_backfill(
         self,
         scope_id: Optional[str] = None,

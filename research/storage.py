@@ -6803,6 +6803,184 @@ class ResearchStorageManager:
             data["membership"] = self._deserialize_json(membership_json)
         return data
 
+    def get_industry_membership_as_of(
+        self,
+        instrument_id: str,
+        as_of_date: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """时点化行业归属 (REQ-07.2)。
+
+        基于 industry_classification_history 的官方分类变更留痕, 返回在 as_of_date
+        当日生效的分类, 并推导 effective_date/expiry_date 区间。
+        as_of_date 为 'YYYY-MM-DD' 字符串; official_start_date 亦为 ISO 文本, 可字典序比较。
+        不命中(该日之前无已知分类)时返回 None。
+        """
+        as_of_str = str(as_of_date)[:10]
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                """
+                SELECT
+                    instrument_id,
+                    symbol,
+                    exchange,
+                    taxonomy_system,
+                    taxonomy_version,
+                    official_industry_code,
+                    official_start_date,
+                    official_update_time,
+                    classification_json,
+                    source,
+                    source_mode,
+                    created_at,
+                    updated_at
+                FROM industry_classification_history
+                WHERE instrument_id = ?
+                  AND (? IS NULL OR taxonomy_system = ?)
+                ORDER BY
+                    COALESCE(official_start_date, official_update_time, created_at) ASC,
+                    COALESCE(official_update_time, updated_at) ASC
+                """,
+                (instrument_id, taxonomy_system, taxonomy_system),
+            ).fetchall()
+
+        if not rows:
+            return None
+
+        def _start(row: sqlite3.Row) -> str:
+            return (row["official_start_date"] or row["official_update_time"] or "")[:10]
+
+        eligible = [row for row in rows if _start(row) and _start(row) <= as_of_str]
+        if not eligible:
+            return None
+        chosen = eligible[-1]
+        chosen_start = _start(chosen)
+        later_starts = sorted(
+            {_start(row) for row in rows if _start(row) and _start(row) > chosen_start}
+        )
+        expiry = later_starts[0] if later_starts else None
+
+        data = dict(chosen)
+        classification_json = data.pop("classification_json", None)
+        if include_snapshot:
+            data["classification"] = self._deserialize_json(classification_json)
+        data["effective_date"] = chosen_start
+        data["expiry_date"] = expiry
+        data["as_of_date"] = as_of_str
+        return data
+
+    # ----- REQ-13: 无风险利率序列 -----
+
+    def upsert_risk_free_rate_series(self, series: Dict[str, Any]) -> None:
+        """写入/更新一条无风险利率序列定义。"""
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.execute(
+                """
+                INSERT INTO risk_free_rate_series (
+                    series_id, name, rate_type, tenor, currency, unit, frequency,
+                    timezone, source_profile, source, source_mode, data_as_of,
+                    ingestion_run_id, created_at, updated_at
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(series_id) DO UPDATE SET
+                    name=excluded.name, rate_type=excluded.rate_type, tenor=excluded.tenor,
+                    currency=excluded.currency, unit=excluded.unit, frequency=excluded.frequency,
+                    timezone=excluded.timezone, source_profile=excluded.source_profile,
+                    source=excluded.source, source_mode=excluded.source_mode,
+                    data_as_of=excluded.data_as_of, ingestion_run_id=excluded.ingestion_run_id,
+                    updated_at=excluded.updated_at
+                """,
+                (
+                    series["series_id"], series.get("name", series["series_id"]),
+                    series.get("rate_type", "unknown"), series.get("tenor"),
+                    series.get("currency", "CNY"), series.get("unit", "percent_annual"),
+                    series.get("frequency", "daily"), series.get("timezone", "Asia/Shanghai"),
+                    series.get("source_profile"), series.get("source"),
+                    series.get("source_mode"), series.get("data_as_of"),
+                    series.get("ingestion_run_id"), now, now,
+                ),
+            )
+            conn.commit()
+
+    def upsert_risk_free_rate_observations(
+        self, series_id: str, observations: List[Dict[str, Any]]
+    ) -> int:
+        """批量写入观测值 (revision_id 默认 'latest')。返回写入行数。"""
+        if not observations:
+            return 0
+        now = get_shanghai_time().isoformat()
+        rows = [
+            (
+                series_id, str(obs["observation_date"])[:10],
+                obs.get("source_profile", "default"), obs.get("value"),
+                obs.get("revision_id", "latest"), obs.get("source"),
+                obs.get("source_mode"), obs.get("data_as_of"),
+                obs.get("ingestion_run_id"), now, now,
+            )
+            for obs in observations
+        ]
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            conn.executemany(
+                """
+                INSERT INTO risk_free_rate_observations (
+                    series_id, observation_date, source_profile, value, revision_id,
+                    source, source_mode, data_as_of, ingestion_run_id, created_at, updated_at
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(series_id, observation_date, source_profile, revision_id)
+                DO UPDATE SET value=excluded.value, source=excluded.source,
+                    source_mode=excluded.source_mode, data_as_of=excluded.data_as_of,
+                    ingestion_run_id=excluded.ingestion_run_id, updated_at=excluded.updated_at
+                """,
+                rows,
+            )
+            conn.commit()
+        return len(rows)
+
+    def list_risk_free_rate_series(self) -> List[Dict[str, Any]]:
+        """列出所有无风险利率序列定义。"""
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                "SELECT * FROM risk_free_rate_series ORDER BY series_id"
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_risk_free_rate_observations(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        revision_id: str = "latest",
+    ) -> List[Dict[str, Any]]:
+        """按日期区间读取某序列的观测值 (无数据返回空列表)。"""
+        conditions = ["series_id = ?", "revision_id = ?"]
+        params: list[Any] = [series_id, revision_id]
+        if start_date:
+            conditions.append("observation_date >= ?")
+            params.append(str(start_date)[:10])
+        if end_date:
+            conditions.append("observation_date <= ?")
+            params.append(str(end_date)[:10])
+        where_sql = " AND ".join(conditions)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT observation_date, value, source, source_mode, data_as_of, revision_id
+                FROM risk_free_rate_observations
+                WHERE {where_sql}
+                ORDER BY observation_date ASC
+                """,
+                params,
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def get_official_industry_classification(
         self,
         instrument_id: str,
@@ -10791,6 +10969,46 @@ class ResearchStorageManager:
 
             CREATE INDEX IF NOT EXISTS idx_raw_payload_run_id
             ON raw_payload_audit(ingestion_run_id);
+
+            -- REQ-13: 无风险利率序列 (仿 fx_series / fx_observations 模式)
+            CREATE TABLE IF NOT EXISTS risk_free_rate_series (
+                series_id TEXT NOT NULL PRIMARY KEY,
+                name TEXT NOT NULL,
+                rate_type TEXT NOT NULL,          -- e.g. china_treasury_yield / shibor
+                tenor TEXT,                        -- e.g. 10Y / 3M / ON
+                currency TEXT NOT NULL DEFAULT 'CNY',
+                unit TEXT NOT NULL DEFAULT 'percent_annual',
+                frequency TEXT NOT NULL DEFAULT 'daily',
+                timezone TEXT NOT NULL DEFAULT 'Asia/Shanghai',
+                source_profile TEXT,
+                source TEXT,
+                source_mode TEXT,
+                data_as_of TEXT,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS risk_free_rate_observations (
+                series_id TEXT NOT NULL,
+                observation_date TEXT NOT NULL,
+                source_profile TEXT NOT NULL DEFAULT 'default',
+                value REAL,
+                revision_id TEXT NOT NULL DEFAULT 'latest',
+                source TEXT,
+                source_mode TEXT,
+                data_as_of TEXT,
+                ingestion_run_id INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (series_id, observation_date, source_profile, revision_id),
+                FOREIGN KEY (series_id) REFERENCES risk_free_rate_series(series_id),
+                FOREIGN KEY (ingestion_run_id) REFERENCES ingestion_runs(id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_risk_free_obs_series_date
+            ON risk_free_rate_observations(series_id, observation_date);
             """
         )
 

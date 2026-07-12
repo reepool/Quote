@@ -286,6 +286,96 @@ async def get_research_company_industry(
 
 
 @router.get(
+    "/research/company/{instrument_id}/industry/as-of",
+    response_model=ResearchIndustryMembershipAsOfResponse,
+    tags=["Research"],
+)
+async def get_research_company_industry_as_of(
+    instrument_id: str,
+    as_of_date: date = Query(..., description="查询时点 (YYYY-MM-DD), 返回当日生效的行业归属"),
+    taxonomy_system: Optional[str] = Query(None, description="内部行业体系标识 (可选过滤)"),
+    include_snapshot: bool = Query(True, description="是否包含官方分类详情"),
+):
+    """时点化行业归属 (REQ-07.2)。
+
+    基于官方分类变更留痕, 返回 as_of_date 当日生效的行业归属及其 effective_date/expiry_date 区间。
+    该日之前无已知分类时返回 404。此端点不影响既有 /research/company/{id}/industry 当前态查询。
+    """
+    try:
+        industry = await data_manager.get_research_industry_as_of(
+            instrument_id,
+            as_of_date.isoformat(),
+            taxonomy_system=taxonomy_system,
+            include_snapshot=include_snapshot,
+        )
+        if not industry:
+            raise HTTPException(
+                status_code=404,
+                detail="No industry classification known as of the given date",
+            )
+        return ResearchIndustryMembershipAsOfResponse(**industry)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research industry as-of snapshot: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/risk-free-rate/series",
+    response_model=RiskFreeRateSeriesListResponse,
+    tags=["Research"],
+)
+async def list_research_risk_free_rate_series():
+    """列出无风险利率序列定义 (REQ-13)。"""
+    try:
+        series = await data_manager.list_research_risk_free_rate_series()
+        return RiskFreeRateSeriesListResponse(total=len(series), series=series)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to list risk-free-rate series: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/risk-free-rate",
+    response_model=RiskFreeRateResponse,
+    tags=["Research"],
+)
+async def get_research_risk_free_rate(
+    series_id: str = Query(..., description="序列标识, 如 china_treasury_10y"),
+    start_date: Optional[date] = Query(None, description="起始日期 (含)"),
+    end_date: Optional[date] = Query(None, description="结束日期 (含)"),
+):
+    """按日期查询无风险利率序列 (REQ-13)。无数据时返回空序列而非报错。"""
+    try:
+        payload = await data_manager.get_research_risk_free_rate(
+            series_id,
+            start_date=start_date.isoformat() if start_date else None,
+            end_date=end_date.isoformat() if end_date else None,
+        )
+        return RiskFreeRateResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get risk-free-rate series: {str(e)}",
+        )
+
+
+@router.get(
     "/research/industry/standard-readiness",
     response_model=ResearchIndustryStandardReadinessResponse,
     tags=["Research"],
