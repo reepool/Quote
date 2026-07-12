@@ -343,6 +343,7 @@ restart_system - 重启系统服务
 • 海外商品日频同步 (special_commodity_price_sync) - 周二至周六 08:00
 • 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
 • 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
+• 特殊商品政策/长协事件导入 (special_commodity_policy_event_sync) - 仅手工运行
 • 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00
 • 数据库备份任务 (database_backup) - 周六 03:30
