@@ -2186,7 +2186,7 @@ class NbsProductionMaterialsProvider:
             end_day = {
                 "上": 10,
                 "中": 20,
-                "下": monthrange(year, month)[1],
+                "下": min(30, monthrange(year, month)[1]),
             }[period]
         else:
             match = cls._LEGACY_TITLE.search(normalized)
@@ -2257,7 +2257,8 @@ class NbsProductionMaterialsProvider:
         cursor = date(start.year, start.month, 1)
         while cursor <= end:
             last_day = monthrange(cursor.year, cursor.month)[1]
-            for start_day, end_day in ((1, 10), (11, 20), (21, last_day)):
+            lower_period_end = min(30, last_day)
+            for start_day, end_day in ((1, 10), (11, 20), (21, lower_period_end)):
                 period_end = date(cursor.year, cursor.month, end_day)
                 if period_end < start or period_end > end:
                     continue

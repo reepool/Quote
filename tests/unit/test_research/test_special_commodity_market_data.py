@@ -283,6 +283,13 @@ def test_nbs_ten_day_title_period_parsing():
         "period_start": "2014-01-01",
         "period_end": "2014-01-10",
     }
+    assert NbsProductionMaterialsProvider.parse_period(
+        "2026年1月下旬流通领域重要生产资料市场价格变动情况"
+    ) == {
+        "observation_date": "2026-01-30",
+        "period_start": "2026-01-21",
+        "period_end": "2026-01-30",
+    }
 
 
 def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
