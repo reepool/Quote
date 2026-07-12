@@ -42,6 +42,20 @@ def hkex_instrument_id(code: Any) -> str:
     return f"{normalized}.HK" if normalized else ""
 
 
+def _parse_board_lot(value: Any) -> Optional[int]:
+    """REQ-12: 解析港股每手股数字符串 (如 '500' / '1,000') 为 int; 无效返回 None。"""
+    if value is None:
+        return None
+    text = str(value).replace(",", "").replace(" ", "").strip()
+    if not text:
+        return None
+    try:
+        lot = int(float(text))
+    except (TypeError, ValueError):
+        return None
+    return lot if lot > 0 else None
+
+
 def _snapshot_hash(raw_text: str) -> str:
     return hashlib.sha256((raw_text or "").encode("utf-8")).hexdigest()
 
@@ -352,6 +366,7 @@ class HKEXSecuritiesListProvider:
                 "hkex_category": str(item.get("category") or "").strip(),
                 "hkex_sub_category": str(item.get("sub_category") or "").strip(),
                 "board_lot": str(item.get("board_lot") or "").strip(),
+                "lot_size": _parse_board_lot(item.get("board_lot")),  # REQ-12: 港股每手股数
                 "isin": str(item.get("isin") or "").strip(),
                 "rmb_counter": str(item.get("rmb_counter") or "").strip(),
                 "official_lifecycle_source": self.source,

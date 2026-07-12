@@ -279,6 +279,8 @@ class AShareOfficialStockMasterSource(BaseDataSource):
             "is_active": True,
             "is_st": "ST" in name.upper(),
             "trading_status": 1,
+            "lot_size": 100,      # REQ-12: A股每手固定 100 股
+            "tick_size": 0.01,    # REQ-12: A股最小价位 0.01 元
             "source": source_name,
             "source_symbol": symbol,
             "source_authority": "official",

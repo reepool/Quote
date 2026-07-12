@@ -8,6 +8,24 @@
     "monitor_startup_delay": 3,
     "market_close_delay_minutes": 15,
     "jobs": {
+      "risk_free_rate_sync": {
+        "enabled": true,
+        "manual_only": false,
+        "description": "无风险利率序列日更（中国10Y国债到期收益率，akshare 全量拉取+幂等 upsert，17:30 mon-fri，写入 research 存储）",
+        "report": false,
+        "pre_run_notify": false,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 17,
+          "minute": 30,
+          "second": 0
+        },
+        "parameters": {}
+      },
       "daily_data_update": {
         "enabled": true,
         "description": "每日数据更新任务（沪深A股）",

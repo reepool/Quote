@@ -63,6 +63,8 @@ def fetch_china_treasury_10y() -> List[Dict[str, Any]]:
             value = float(raw_value)
         except (TypeError, ValueError):
             continue
+        if value != value:  # skip NaN (early history has gaps)
+            continue
         observations.append(
             {"observation_date": str(raw_date)[:10], "value": value}
         )
