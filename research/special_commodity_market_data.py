@@ -2234,6 +2234,13 @@ class NbsProductionMaterialsProvider:
         )
         response.raise_for_status()
         payload = response.json()
+        if payload.get("ok") is False:
+            raise RuntimeError(
+                "official NBS search business failure "
+                f"code={payload.get('code')} message={payload.get('msg') or 'unknown'}"
+            )
+        if not isinstance(payload.get("resultDocs"), list):
+            raise RuntimeError("official NBS search response missing resultDocs")
         rows: List[Dict[str, str]] = []
         for result in payload.get("resultDocs") or []:
             source = result.get("data") or {}
@@ -2285,7 +2292,7 @@ class NbsProductionMaterialsProvider:
             return f"{end.year}年{end.month}月{marker}旬流通领域重要生产资料市场价格变动情况"
         return (
             "流通领域重要生产资料市场价格变动情况"
-            f"（{end.year}年{end.month}月{start.day}日-{end.day}日）"
+            f"（{end.year}年{end.month}月{start.day}-{end.day}日）"
         )
 
     def _configured_observation_exceptions(
@@ -2367,6 +2374,37 @@ class NbsProductionMaterialsProvider:
                         start,
                         end,
                     )
+
+            if not discovered:
+                warnings.append(
+                    {
+                        "reason": "nbs_broad_discovery_empty_anomaly",
+                        "expected_periods": len(expected_periods),
+                        "message": "both official broad-search passes returned no parseable articles",
+                    }
+                )
+                missing_periods = [
+                    period["observation_date"] for period in expected_periods
+                ]
+                diagnostics = {
+                    "enabled": True,
+                    "expected_periods": len(all_expected_periods),
+                    "search_expected_periods": len(expected_periods),
+                    "discovered_periods": 0,
+                    "governed_exception_dates": len(governed_exceptions),
+                    "governed_exception_samples": list(governed_exceptions.values())[:20],
+                    "unresolved_dates": len(missing_periods),
+                    "unresolved_samples": missing_periods[:50],
+                    "publication_eligible_end": eligible_end.isoformat(),
+                }
+                logger.error(
+                    "[NbsProductionMaterials] broad discovery empty; exact discovery aborted expected=%s governed_exceptions=%s range=%s..%s",
+                    len(expected_periods),
+                    len(governed_exceptions),
+                    start,
+                    end,
+                )
+                return [], warnings, diagnostics
 
         if _coerce_bool(self.source_cfg.get("exact_gap_discovery_enabled"), True):
             for index, period in enumerate(expected_periods, start=1):

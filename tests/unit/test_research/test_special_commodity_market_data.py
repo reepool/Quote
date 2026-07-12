@@ -8,6 +8,7 @@ import sys
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 from utils import config_manager
 from research.special_commodity_market_data import (
@@ -337,6 +338,58 @@ def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
         for item in warnings
     )
     assert diagnostics["unresolved_dates"] == 0
+
+
+def test_nbs_search_business_failure_is_not_treated_as_empty(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price",
+        cfg["source_profiles"]["nbs_production_material_market_price"],
+    )
+    response = SimpleNamespace(
+        raise_for_status=lambda: None,
+        json=lambda: {"ok": False, "code": -101, "msg": "network address disabled"},
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post",
+        lambda *args, **kwargs: response,
+    )
+
+    with pytest.raises(RuntimeError, match="business failure code=-101"):
+        provider._search_page(page=1, sort="dateAsc", query="test")
+
+
+def test_nbs_long_range_empty_broad_search_aborts_exact_scan(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_production_material_market_price"])
+    source_cfg["search_max_pages_per_sort"] = 1
+    source_cfg["exact_only_max_periods"] = 1
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    calls = []
+
+    def empty_search(**kwargs):
+        calls.append(kwargs)
+        return []
+
+    monkeypatch.setattr(provider, "_search_page", empty_search)
+    articles, warnings, diagnostics = provider._discover_articles(
+        date(2017, 1, 1), date(2017, 1, 20)
+    )
+
+    assert articles == []
+    assert len(calls) == 2
+    assert {item["sort"] for item in calls} == {"dateAsc", "dateDesc"}
+    assert any(
+        item.get("reason") == "nbs_broad_discovery_empty_anomaly"
+        for item in warnings
+    )
+    assert diagnostics["unresolved_dates"] == 2
 
 
 def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
