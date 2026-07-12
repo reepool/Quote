@@ -897,6 +897,11 @@
           "publication_lag_days": 4,
           "observation_exceptions": [
             {
+              "observation_date": "2015-02-20",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918252.html"
+            },
+            {
               "observation_date": "2016-02-10",
               "reason": "spring_festival_release_cancelled",
               "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918253.html"
@@ -907,6 +912,11 @@
               "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918254.html"
             },
             {
+              "observation_date": "2018-02-20",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918255.html"
+            },
+            {
               "observation_date": "2019-02-10",
               "reason": "spring_festival_release_cancelled",
               "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202302/t20230222_1918256.html"
@@ -915,6 +925,36 @@
               "observation_date": "2022-02-10",
               "reason": "spring_festival_release_cancelled",
               "evidence_url": "https://www.stats.gov.cn/xxgk/sjfb/fbrcb/202210/t20221024_1889506.html"
+            },
+            {
+              "observation_date": "2021-02-20",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xxgk/sjfb/fbrcb/202203/t20220315_1828643.html"
+            },
+            {
+              "observation_date": "2023-01-30",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/202302/t20230202_1897055.html"
+            },
+            {
+              "observation_date": "2024-02-20",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/sj/fbrc/ljxxfb/202312/t20231226_1945787.html"
+            },
+            {
+              "observation_date": "2025-01-30",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xw/tjxw/tzgg/202412/t20241230_1957931.html"
+            },
+            {
+              "observation_date": "2025-10-10",
+              "reason": "national_day_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xw/tjxw/tzgg/202412/t20241230_1957931.html"
+            },
+            {
+              "observation_date": "2026-02-20",
+              "reason": "spring_festival_release_cancelled",
+              "evidence_url": "https://www.stats.gov.cn/xw/tjxw/tzgg/202512/t20251224_1962137.html"
             }
           ],
           "timeout_seconds": 30,
