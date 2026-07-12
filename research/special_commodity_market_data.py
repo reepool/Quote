@@ -1502,6 +1502,44 @@ class SpecialCommodityStorageManager:
             ).fetchall()
         return [_row_to_dict(row) for row in rows]
 
+    def delete_series_candidates_by_source_keys(
+        self,
+        source_keys: Sequence[tuple[str, str]],
+        *,
+        dry_run: bool = False,
+    ) -> int:
+        normalized = sorted(
+            {
+                (str(profile or ""), str(symbol or "").strip().upper())
+                for profile, symbol in source_keys
+                if profile and symbol
+            }
+        )
+        if not normalized:
+            return 0
+        placeholders = ",".join("(?, ?)" for _ in normalized)
+        params = [value for pair in normalized for value in pair]
+        with self.get_connection() as conn:
+            count = int(
+                conn.execute(
+                    f"""
+                    SELECT COUNT(*)
+                    FROM commodity_series_candidates
+                    WHERE (source_profile, UPPER(source_symbol)) IN ({placeholders})
+                    """,
+                    params,
+                ).fetchone()[0]
+            )
+            if not dry_run and count:
+                conn.execute(
+                    f"""
+                    DELETE FROM commodity_series_candidates
+                    WHERE (source_profile, UPPER(source_symbol)) IN ({placeholders})
+                    """,
+                    params,
+                )
+        return count
+
     def transition_series_candidate(
         self,
         *,
@@ -5622,15 +5660,126 @@ class ConfiguredSeriesCandidateAdapter:
         return list(self.candidates)
 
 
+class AkShare100PpiSeriesCandidateAdapter:
+    """Discover source symbols that are not present in the production catalog."""
+
+    def __init__(self, module_cfg: Mapping[str, Any], discovery_cfg: Mapping[str, Any]):
+        self.module_cfg = dict(module_cfg or {})
+        self.discovery_cfg = dict(discovery_cfg or {})
+
+    def _production_symbols(self) -> set[str]:
+        return {
+            str(item.get("source_symbol") or "").strip().upper()
+            for item in self.module_cfg.get("series") or []
+            if isinstance(item, Mapping)
+            and str(item.get("source_profile") or "") == "100ppi_public_web"
+            and item.get("source_symbol")
+        }
+
+    def discover_candidates(self) -> Sequence[Mapping[str, Any]]:
+        akshare = importlib.import_module("akshare")
+        fetch = getattr(akshare, "futures_spot_price", None)
+        if not callable(fetch):
+            raise RuntimeError("akshare futures_spot_price is unavailable")
+        lookback_days = max(1, int(self.discovery_cfg.get("lookback_days") or 10))
+        progress_interval = float(
+            self.discovery_cfg.get("progress_log_interval_seconds") or 60
+        )
+        source_date: Optional[date] = None
+        frame: Any = None
+        for offset in range(lookback_days):
+            probe_date = get_shanghai_time().date() - timedelta(days=offset)
+            logger.info(
+                "[CommoditySeriesCatalog] 100ppi source probe date=%s attempt=%s/%s",
+                probe_date.isoformat(),
+                offset + 1,
+                lookback_days,
+            )
+            frame = _call_with_progress_logging(
+                fetch,
+                kwargs={"date": probe_date.strftime("%Y%m%d")},
+                log_context=f"candidate_discovery=100ppi date={probe_date.isoformat()}",
+                interval_seconds=progress_interval,
+            )
+            if frame is not None and not getattr(frame, "empty", True):
+                source_date = probe_date
+                break
+        if source_date is None or frame is None or getattr(frame, "empty", True):
+            raise RuntimeError("100ppi candidate discovery returned no recent source rows")
+        if "symbol" not in frame.columns:
+            raise RuntimeError("100ppi candidate discovery response missing symbol column")
+
+        production_symbols = self._production_symbols()
+        candidates: List[Dict[str, Any]] = []
+        for source_symbol in sorted(
+            {
+                str(value or "").strip().upper()
+                for value in frame["symbol"].tolist()
+                if str(value or "").strip()
+            }
+            - production_symbols
+        ):
+            candidates.append(
+                {
+                    "candidate_id": f"100PPI.DISCOVERED.{source_symbol}",
+                    "provider_id": "100ppi_akshare",
+                    "source_profile": "100ppi_public_web",
+                    "source_symbol": source_symbol,
+                    "proposed_commodity_id": "",
+                    "proposed_series_id": "",
+                    "name": f"100ppi source product {source_symbol}",
+                    "category": "unresolved",
+                    "specification": "",
+                    "region": "China; source semantics pending review",
+                    "frequency": "daily",
+                    "currency": "",
+                    "unit": "",
+                    "rollout_state": "discovered",
+                    "scheduler_eligible": False,
+                    "evidence": {
+                        "source_date": source_date.isoformat(),
+                        "source_symbol": source_symbol,
+                        "source_url": "https://www.100ppi.com/sf/",
+                    },
+                    "diagnostics": {
+                        "reason": "new_source_symbol_requires_semantic_review",
+                        "required_fields": [
+                            "name",
+                            "category",
+                            "specification",
+                            "currency",
+                            "unit",
+                            "proposed_commodity_id",
+                            "proposed_series_id",
+                        ],
+                    },
+                }
+            )
+        logger.info(
+            "[CommoditySeriesCatalog] 100ppi source discovery date=%s source_symbols=%s production_symbols=%s new_candidates=%s",
+            source_date.isoformat(),
+            len(set(str(value or "").strip().upper() for value in frame["symbol"].tolist())),
+            len(production_symbols),
+            len(candidates),
+        )
+        return candidates
+
+
 class CommoditySeriesCandidateRegistry:
     def __init__(self, module_cfg: Mapping[str, Any]):
         self.module_cfg = dict(module_cfg or {})
 
     def adapters(self) -> Mapping[str, CommoditySeriesCandidateAdapter]:
         catalog_cfg = dict(self.module_cfg.get("series_catalog") or {})
-        return {
+        adapters: Dict[str, CommoditySeriesCandidateAdapter] = {
             "configured": ConfiguredSeriesCandidateAdapter(catalog_cfg.get("candidates") or []),
         }
+        discovery_cfg = dict((catalog_cfg.get("live_discovery") or {}).get("100ppi") or {})
+        if _coerce_bool(discovery_cfg.get("enabled"), False):
+            adapters["100ppi_live"] = AkShare100PpiSeriesCandidateAdapter(
+                self.module_cfg, discovery_cfg
+            )
+        return adapters
 
 
 class SpecialCommoditySeriesCatalogService:
@@ -5638,10 +5787,7 @@ class SpecialCommoditySeriesCatalogService:
         "provider_id",
         "source_profile",
         "source_symbol",
-        "proposed_commodity_id",
-        "proposed_series_id",
         "name",
-        "category",
         "frequency",
     )
 
@@ -5651,12 +5797,40 @@ class SpecialCommoditySeriesCatalogService:
 
     def sync(self, *, dry_run: bool = True) -> Dict[str, Any]:
         self.storage.initialize()
+        production_source_keys = [
+            (
+                str(item.get("source_profile") or ""),
+                str(item.get("source_symbol") or ""),
+            )
+            for item in self.module_cfg.get("series") or []
+            if isinstance(item, Mapping) and item.get("source_profile") and item.get("source_symbol")
+        ]
+        retired_candidates = self.storage.delete_series_candidates_by_source_keys(
+            production_source_keys,
+            dry_run=dry_run,
+        )
         candidates: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
         seen_source_keys: Dict[tuple[str, str, str], str] = {}
         for adapter_id, adapter in CommoditySeriesCandidateRegistry(self.module_cfg).adapters().items():
             logger.info("[CommoditySeriesCatalog] adapter start adapter=%s", adapter_id)
-            for raw in adapter.discover_candidates():
+            try:
+                discovered = adapter.discover_candidates()
+            except Exception as exc:
+                logger.exception(
+                    "[CommoditySeriesCatalog] adapter failed adapter=%s error=%s",
+                    adapter_id,
+                    exc,
+                )
+                blockers.append(
+                    {
+                        "reason": "commodity_candidate_discovery_adapter_failed",
+                        "adapter_id": adapter_id,
+                        "error": str(exc),
+                    }
+                )
+                continue
+            for raw in discovered:
                 candidate = dict(raw)
                 missing = [field for field in self.REQUIRED_FIELDS if not candidate.get(field)]
                 candidate_id = str(candidate.get("candidate_id") or "")
@@ -5714,6 +5888,7 @@ class SpecialCommoditySeriesCatalogService:
                 for item in candidates
             ),
             "blockers": blockers,
+            "retired_production_candidates": retired_candidates,
             **counts,
         }
 

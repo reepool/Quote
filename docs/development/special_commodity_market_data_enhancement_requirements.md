@@ -153,6 +153,8 @@
 - 2026-07-12 任务进程真实 NDRC dry-run 扫描2个目录、6份有效文档（含1个附件），只生成303号文件对应的1条政策候选，状态为 `ready_for_promotion`，无 warning、blocker 或噪声候选；正确识别 `570-770 CNY/ton`、`2022-05-01` 生效且 `value_mid` 为空。执行 `write` 只保存来源文档和候选，候选仍须审核为 `approved` 后才能由政策事件任务提升。
 - 已实现扩品候选目录和强制上线状态机。手工任务为 `/run special_commodity_series_catalog_sync dry_run|write`；API 为 `GET /api/v1/research/commodities/series-candidates` 和 `POST /api/v1/research/commodities/series-catalog-sync`。`write` 只落候选治理记录，不创建正式商品序列、不进入生产 scope；只有依次通过 metadata、短期 dry-run、全量 dry-run、落库、幂等日更并达到 `production_verified` 后才具备 scheduler eligibility。
 - 已实现通用候选验收任务 `/run special_commodity_series_candidate_validate candidate_ref=<source_symbol或候选ID> target_state=short_dry_run_passed|full_dry_run_passed start_date=... end_date=... dry_run|write`。任务通过统一 provider、主数据治理、来源日期治理和质量诊断执行，不在任务层区分具体商品。短窗口和全量 dry-run 均为无状态验证，不要求事先 write 中间状态；全量验收 write 成功时可一次记录 metadata、short 和 full 三级 gate。候选目录只保存自动发现和验收证据，正式历史落库与日更仍复用现有 scope/backfill/sync 链路。
+- 已知且已决定上线的品种不进入候选审核状态机：直接建立正式 series/scope，再按现有“主数据与来源日期治理 -> 全量 backfill dry-run -> write -> 幂等日更验收 -> 加入调度”流程上线。候选验收任务只面向来源 adapter 未来自动发现的未知符号。
+- 100ppi 实时候选发现 adapter 必须枚举最近可用来源页的全部 symbol，与正式 `series` 中的 `100ppi_public_web` symbol 做差集。仅差集项写入 `discovered`，不自动推断名称、分类、规格、币种和单位，不自动进入调度。已转为正式 series 的同源候选记录应在目录同步时退役，避免 API 同时显示“正式”和“待审”。
 
 政策发现建议每月执行，但“自动发现”和“正式 promotion”必须分状态报告。正常报告保持简洁；存在解析失败、未解决日期或单位冲突时输出详细诊断。
 

@@ -1026,7 +1026,16 @@
           "production_verified",
           "blocked"
         ],
-        "candidates": [
+        "live_discovery": {
+          "100ppi": {
+            "enabled": true,
+            "lookback_days": 10,
+            "progress_log_interval_seconds": 60,
+            "note": "Enumerate recent 100ppi source symbols and create discovered records only for symbols absent from the formal production series catalog."
+          }
+        },
+        "candidates": [],
+        "known_rollout_backlog": [
           {
             "candidate_id": "100PPI.CHEMICAL.BENZENE",
             "provider_id": "100ppi_akshare",
@@ -1920,6 +1929,152 @@
           }
         },
         {
+          "series_id": "CMD.CN.CHEMICAL.STYRENE.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.STYRENE.SPOT",
+          "venue": "100PPI",
+          "source_profile": "100ppi_public_web",
+          "source_symbol": "EB",
+          "frequency": "daily",
+          "quote_type": "spot_reference",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily",
+            "akshare_kwargs": {"vars_list": ["EB"]},
+            "akshare_start_argument": "start_day",
+            "akshare_end_argument": "end_day",
+            "akshare_date_format": "compact",
+            "date_column": "date",
+            "value_column": "spot_price",
+            "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "DCE",
+            "progress_log_interval_seconds": 60,
+            "source_available_from": "2019-09-26",
+            "region_or_spec": "China styrene spot reference; grade, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi styrene spot reference",
+            "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.UREA.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.UREA.SPOT",
+          "venue": "100PPI",
+          "source_profile": "100ppi_public_web",
+          "source_symbol": "UR",
+          "frequency": "daily",
+          "quote_type": "spot_reference",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["UR"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China urea spot reference; grade, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi urea spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.CAUSTIC_SODA.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.CAUSTIC_SODA.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SH",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SH"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "GFEX", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China caustic soda spot reference; concentration, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi caustic soda spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.SODA_ASH.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SA",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SA"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China soda ash spot reference; grade, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi soda ash spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.BUILDING.GLASS.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.BUILDING.GLASS.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "FG",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["FG"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China flat glass spot reference normalized by AkShare to CNY/ton; grade and region follow 100ppi publication",
+            "source_name": "100ppi flat glass spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.ENERGY.ASPHALT.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.ENERGY.ASPHALT.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "BU",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["BU"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China asphalt spot reference; grade, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi asphalt spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.ENERGY.LPG.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.ENERGY.LPG.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "PG",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["PG"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "DCE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China LPG spot reference; composition, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi LPG spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.CHEMICAL.NATURAL_RUBBER.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.CHEMICAL.NATURAL_RUBBER.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "RU",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["RU"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China natural rubber spot reference; grade, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi natural rubber spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
+          "series_id": "CMD.CN.FORESTRY.SOFTWOOD_PULP.SPOT.100PPI.DAILY",
+          "commodity_id": "CN.FORESTRY.SOFTWOOD_PULP.SPOT",
+          "venue": "100PPI", "source_profile": "100ppi_public_web", "source_symbol": "SP",
+          "frequency": "daily", "quote_type": "spot_reference", "currency": "CNY", "unit": "CNY/ton", "active": true,
+          "metadata": {
+            "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SP"]},
+            "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
+            "region_or_spec": "China softwood pulp spot reference; brand, region and tax basis follow 100ppi publication",
+            "source_name": "100ppi softwood pulp spot reference", "source_url": "https://www.100ppi.com/sf/"
+          }
+        },
+        {
           "series_id": "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
           "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
           "venue": "NBS",
@@ -2118,6 +2273,42 @@
           "frequencies": [
             "daily"
           ]
+        },
+        {
+          "scope_id": "cn_100ppi_styrene", "enabled": true, "venues": ["100PPI"],
+          "categories": ["chemical"], "commodity_ids": ["CN.CHEMICAL.STYRENE.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_urea", "enabled": true, "venues": ["100PPI"],
+          "categories": ["chemical"], "commodity_ids": ["CN.CHEMICAL.UREA.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_caustic_soda", "enabled": true, "venues": ["100PPI"],
+          "categories": ["chemical"], "commodity_ids": ["CN.CHEMICAL.CAUSTIC_SODA.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_soda_ash", "enabled": true, "venues": ["100PPI"],
+          "categories": ["chemical"], "commodity_ids": ["CN.CHEMICAL.SODA_ASH.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_glass", "enabled": true, "venues": ["100PPI"],
+          "categories": ["building_material"], "commodity_ids": ["CN.BUILDING.GLASS.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_asphalt", "enabled": true, "venues": ["100PPI"],
+          "categories": ["energy"], "commodity_ids": ["CN.ENERGY.ASPHALT.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_lpg", "enabled": true, "venues": ["100PPI"],
+          "categories": ["energy"], "commodity_ids": ["CN.ENERGY.LPG.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_natural_rubber", "enabled": true, "venues": ["100PPI"],
+          "categories": ["chemical"], "commodity_ids": ["CN.CHEMICAL.NATURAL_RUBBER.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_100ppi_softwood_pulp", "enabled": true, "venues": ["100PPI"],
+          "categories": ["forestry"], "commodity_ids": ["CN.FORESTRY.SOFTWOOD_PULP.SPOT"], "frequencies": ["daily"]
         },
         {
           "scope_id": "cn_nbs_thermal_coal",

@@ -12,6 +12,7 @@ import pytest
 
 from utils import config_manager
 from research.special_commodity_market_data import (
+    AkShare100PpiSeriesCandidateAdapter,
     AkshareCommoditySpotProvider,
     AkshareForeignFuturesProvider,
     CommodityAdapterRegistry,
@@ -52,6 +53,36 @@ def _research_config(tmp_path: Path):
     special_cfg["enabled"] = True
     special_cfg["storage"]["database"] = str(tmp_path / "futures.db")
     return cfg
+
+
+def _configure_eb_candidate_fixture(module_cfg):
+    catalog_cfg = module_cfg["series_catalog"]
+    catalog_cfg["live_discovery"]["100ppi"]["enabled"] = False
+    module_cfg["series"] = [
+        item
+        for item in module_cfg["series"]
+        if item.get("source_symbol") != "EB"
+        or item.get("source_profile") != "100ppi_public_web"
+    ]
+    catalog_cfg["candidates"] = [
+        {
+            "candidate_id": "100PPI.CHEMICAL.STYRENE",
+            "provider_id": "100ppi_akshare",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "EB",
+            "proposed_commodity_id": "CN.CHEMICAL.STYRENE.SPOT",
+            "proposed_series_id": "CMD.CN.CHEMICAL.STYRENE.SPOT.100PPI.DAILY",
+            "name": "China Styrene Spot Reference",
+            "category": "chemical",
+            "specification": "100ppi public-web product reference",
+            "region": "China",
+            "frequency": "daily",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "rollout_state": "discovered",
+            "scheduler_eligible": False,
+        }
+    ]
 
 
 def _fake_fred_governance_get(url, *args, **kwargs):
@@ -2024,21 +2055,78 @@ def test_actual_contract_price_requires_complete_contract_semantics():
 def test_special_commodity_series_catalog_is_idempotent_and_not_scheduled(tmp_path):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
     storage = SpecialCommodityStorageManager(cfg)
     service = SpecialCommoditySeriesCatalogService(storage, module_cfg)
     first = service.sync(dry_run=False)
     second = service.sync(dry_run=False)
     assert first["status"] == "success"
-    assert first["candidates"] == 10
-    assert first["inserted"] == 10
-    assert second["unchanged"] == 10
+    assert first["candidates"] == 1
+    assert first["inserted"] == 1
+    assert second["unchanged"] == 1
     assert second["scheduler_eligible"] == 0
     state_counts = {}
     for row in storage.read_series_candidates():
         state_counts[row["rollout_state"]] = state_counts.get(row["rollout_state"], 0) + 1
-    assert state_counts == {"blocked": 1, "discovered": 9}
+    assert state_counts == {"discovered": 1}
     selector = CommodityUniverseSelector(module_cfg)
     assert all("BENZENE" not in item.series_id for item in selector.resolve(categories=["all"]))
+
+
+def test_100ppi_live_discovery_only_returns_symbols_missing_from_production(
+    tmp_path, monkeypatch
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    fake_akshare = SimpleNamespace(
+        futures_spot_price=lambda **kwargs: pd.DataFrame(
+            {"symbol": ["EB", "NEW1"], "spot_price": [8000.0, 1000.0]}
+        )
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.importlib.import_module",
+        lambda name: fake_akshare,
+    )
+
+    rows = AkShare100PpiSeriesCandidateAdapter(
+        module_cfg,
+        {"lookback_days": 1, "progress_log_interval_seconds": 1},
+    ).discover_candidates()
+
+    assert [item["source_symbol"] for item in rows] == ["NEW1"]
+    assert rows[0]["rollout_state"] == "discovered"
+    assert rows[0]["scheduler_eligible"] is False
+    assert rows[0]["diagnostics"]["reason"] == "new_source_symbol_requires_semantic_review"
+
+
+def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
+    storage = SpecialCommodityStorageManager(cfg)
+    service = SpecialCommoditySeriesCatalogService(storage, module_cfg)
+    service.sync(dry_run=False)
+    assert storage.resolve_series_candidate("EB") is not None
+
+    module_cfg["series"].append(
+        {
+            "series_id": "CMD.CN.CHEMICAL.STYRENE.SPOT.100PPI.DAILY",
+            "commodity_id": "CN.CHEMICAL.STYRENE.SPOT",
+            "venue": "100PPI",
+            "source_profile": "100ppi_public_web",
+            "source_symbol": "EB",
+            "frequency": "daily",
+            "quote_type": "spot_reference",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "active": True,
+        }
+    )
+    module_cfg["series_catalog"]["candidates"] = []
+    result = service.sync(dry_run=False)
+
+    assert result["retired_production_candidates"] == 1
+    assert storage.resolve_series_candidate("EB") is None
 
 
 def test_series_candidate_validation_uses_common_governance_and_advances_one_gate(
@@ -2046,6 +2134,7 @@ def test_series_candidate_validation_uses_common_governance_and_advances_one_gat
 ):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
     storage = SpecialCommodityStorageManager(cfg)
     SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
 
@@ -2118,6 +2207,7 @@ def test_candidate_full_validation_records_prior_gates_without_intermediate_writ
 ):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
     storage = SpecialCommodityStorageManager(cfg)
     SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
 
@@ -2180,6 +2270,7 @@ def test_candidate_full_validation_records_prior_gates_without_intermediate_writ
 def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_conflicts(tmp_path):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
     storage = SpecialCommodityStorageManager(cfg)
     SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
     candidate_id = "100PPI.CHEMICAL.STYRENE"
@@ -2210,7 +2301,7 @@ def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_confli
     assert row["rollout_state"] == "production_verified"
     assert row["scheduler_eligible"] == 1
 
-    changed = dict(module_cfg["series_catalog"]["candidates"][1])
+    changed = dict(module_cfg["series_catalog"]["candidates"][0])
     changed["unit"] = "CNY/kg"
     storage.upsert_series_candidates([changed], dry_run=False)
     row = next(item for item in storage.read_series_candidates() if item["candidate_id"] == candidate_id)
@@ -2224,6 +2315,7 @@ def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_confli
 def test_special_commodity_series_catalog_reports_duplicate_source_identity(tmp_path):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    _configure_eb_candidate_fixture(module_cfg)
     duplicate = dict(module_cfg["series_catalog"]["candidates"][0])
     duplicate["candidate_id"] = "100PPI.CHEMICAL.BENZENE.DUPLICATE"
     module_cfg["series_catalog"]["candidates"].append(duplicate)
