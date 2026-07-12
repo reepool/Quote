@@ -5123,6 +5123,31 @@ class DataManager:
         )
         return {"status": "success", "rollout_state": rollout_state, "category": category, "candidates": rows, "count": len(rows)}
 
+    async def validate_special_commodity_series_candidate(
+        self,
+        *,
+        candidate_ref: str,
+        target_state: str,
+        start_date: str,
+        end_date: str,
+        dry_run: bool = True,
+    ) -> Dict[str, Any]:
+        storage = self._require_special_commodity_storage()
+        module_cfg = (
+            self.research_config.modules.get("commodity_market_data", {})
+            .get("special_commodity_market_data", {})
+        )
+        from research.special_commodity_market_data import SpecialCommoditySeriesCandidateValidationService
+
+        return await asyncio.to_thread(
+            SpecialCommoditySeriesCandidateValidationService(storage, module_cfg).validate,
+            candidate_ref=candidate_ref,
+            target_state=target_state,
+            start_date=start_date,
+            end_date=end_date,
+            dry_run=dry_run,
+        )
+
     async def run_fx_derivation_sync(
         self,
         *,

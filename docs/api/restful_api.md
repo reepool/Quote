@@ -799,3 +799,11 @@ POST /api/v1/research/commodities/policy-candidates/review?candidate_ref=93acac0
 ```
 
 `GET /api/v1/research/commodities/policy-candidates` 会返回 `review_code`、文号和标题。批准默认在同一请求中通过统一 validator 幂等提升正式事件；拒绝状态会持久保留，重复发现不再提示。
+
+### 验收特殊商品扩品候选
+
+```http
+POST /api/v1/research/commodities/series-candidates/validate?candidate_ref=EB&target_state=short_dry_run_passed&start_date=2026-07-06&end_date=2026-07-10&dry_run=true
+```
+
+候选验收复用生产 provider 和治理 adapter，但不会直接创建正式序列或加入日更。短窗口 write 可一次完成 metadata/short gate；全量 gate 必须以前一次短窗口 write 成功为前置。

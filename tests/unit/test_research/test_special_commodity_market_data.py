@@ -16,6 +16,9 @@ from research.special_commodity_market_data import (
     AkshareForeignFuturesProvider,
     CommodityAdapterRegistry,
     CommodityObservation,
+    CommodityDateGovernanceResult,
+    CommodityMasterGovernanceResult,
+    CommodityProviderResult,
     CommoditySeries,
     CommodityUniverseSelector,
     ConfiguredSourceChainProvider,
@@ -30,6 +33,7 @@ from research.special_commodity_market_data import (
     SpecialCommodityPolicyEventService,
     SpecialCommodityReadService,
     SpecialCommoditySeriesCatalogService,
+    SpecialCommoditySeriesCandidateValidationService,
     SpecialCommodityPriceSyncService,
     SpecialCommodityGovernancePipeline,
     SpecialCommodityStorageManager,
@@ -2035,6 +2039,78 @@ def test_special_commodity_series_catalog_is_idempotent_and_not_scheduled(tmp_pa
     assert state_counts == {"blocked": 1, "discovered": 9}
     selector = CommodityUniverseSelector(module_cfg)
     assert all("BENZENE" not in item.series_id for item in selector.resolve(categories=["all"]))
+
+
+def test_series_candidate_validation_uses_common_governance_and_advances_one_gate(
+    monkeypatch, tmp_path
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
+
+    class FakeProvider:
+        def fetch(self, series, *, start_date, end_date):
+            item = series[0]
+            return CommodityProviderResult(
+                observations=[
+                    CommodityObservation(
+                        series_id=item.series_id,
+                        observation_date="2026-07-10",
+                        value=1000.0,
+                        currency=item.currency,
+                        unit=item.unit,
+                        raw_value=1000.0,
+                        raw_currency=item.currency,
+                        raw_unit=item.unit,
+                        source_profile=item.source_profile,
+                        source_url="https://www.100ppi.com/sf/",
+                        quality_flag="test",
+                        source_symbol=item.source_symbol,
+                        parser_version="test.v1",
+                        raw_payload_hash="candidate-validation",
+                        metadata={"source_row_symbol": item.source_symbol},
+                    )
+                ]
+            )
+
+    class FakeGovernance:
+        def govern_master(self, series, provider, *, start_date, end_date):
+            return CommodityMasterGovernanceResult(
+                records=[{"series_id": series[0].series_id, "governance_status": "success"}],
+                prefetched_result=provider.fetch(series, start_date=start_date, end_date=end_date),
+            )
+
+        def govern_dates(self, series, observations, *, start_date, end_date):
+            return CommodityDateGovernanceResult(
+                calendar_rows=[{"observation_date": observations[0].observation_date}]
+            )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.CommodityAdapterRegistry.resolve",
+        lambda self, source_profile: (FakeProvider(), FakeGovernance(), []),
+    )
+    service = SpecialCommoditySeriesCandidateValidationService(storage, module_cfg)
+    dry_run = service.validate(
+        candidate_ref="EB",
+        target_state="metadata_verified",
+        start_date="2026-07-06",
+        end_date="2026-07-10",
+        dry_run=True,
+    )
+    assert dry_run["status"] == "success"
+    assert dry_run["would_transition"] is True
+    assert storage.resolve_series_candidate("EB")["rollout_state"] == "discovered"
+
+    write = service.validate(
+        candidate_ref="EB",
+        target_state="short_dry_run_passed",
+        start_date="2026-07-06",
+        end_date="2026-07-10",
+        dry_run=False,
+    )
+    assert write["transitioned"] is True
+    assert storage.resolve_series_candidate("EB")["rollout_state"] == "short_dry_run_passed"
 
 
 def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_conflicts(tmp_path):
