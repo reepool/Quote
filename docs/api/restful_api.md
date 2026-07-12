@@ -792,4 +792,10 @@ curl "http://localhost:8000/api/v1/calendar/trading/previous?exchange=SSE&date=2
 POST /api/v1/research/commodities/policy-candidates/{candidate_id}/review?decision=approved&reviewer=operator&notes=verified
 ```
 
-审核只修改候选状态；批准后仍需运行政策事件同步任务，由统一 validator 提升正式事件。
+推荐使用无需完整主键的短码接口：
+
+```http
+POST /api/v1/research/commodities/policy-candidates/review?candidate_ref=93acac0c&decision=approved&reviewer=operator&notes=verified&promote=true
+```
+
+`GET /api/v1/research/commodities/policy-candidates` 会返回 `review_code`、文号和标题。批准默认在同一请求中通过统一 validator 幂等提升正式事件；拒绝状态会持久保留，重复发现不再提示。

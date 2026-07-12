@@ -1734,6 +1734,20 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"可提升 `{result.get('ready_for_promotion', 0)}`｜"
             f"待复核 `{result.get('pending_review', 0)}`"
         )
+        for action in (result.get("review_actions") or [])[:5]:
+            lines.extend(
+                [
+                    "",
+                    f"待审核政策: `{action.get('document_number') or action.get('title') or action.get('review_code')}`",
+                    f"类型: `{action.get('policy_type')}`｜生效: `{action.get('effective_start') or 'N/A'}`｜值: `{action.get('value')}`",
+                    "批准并落库:",
+                    f"`/run special_commodity_policy_candidate_review candidate_ref={action.get('review_code')} decision=approved notes=verified`",
+                    "拒绝并永久忽略当前版本:",
+                    f"`/run special_commodity_policy_candidate_review candidate_ref={action.get('review_code')} decision=rejected notes=not_applicable`",
+                ]
+            )
+        if result.get("terminal_reviewed"):
+            lines.append(f"已审核且不再提示: `{result.get('terminal_reviewed')}`")
         document_write = result.get("document_write") or {}
         candidate_write = result.get("candidate_write") or {}
         lines.append(
@@ -1746,7 +1760,7 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             "政策候选审核: "
             f"候选 `{result.get('candidate_id')}`｜"
             f"决定 `{result.get('decision')}`｜"
-            f"后续任务 `{result.get('next_task') or '无需提升'}`"
+            f"正式提升 `{'已完成' if result.get('promoted') else '不适用'}`"
         )
     elif "rollout_state_counts" in result:
         states = result.get("rollout_state_counts") or {}
@@ -4551,10 +4565,11 @@ class ScheduledTasks:
 
     async def special_commodity_policy_candidate_review(
         self,
-        candidate_id: str,
+        candidate_ref: str,
         decision: str,
         reviewer: str = "telegram_operator",
         notes: str = "",
+        promote: bool = True,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """人工审核政策候选；正式事件仍由独立治理任务提升。"""
@@ -4562,10 +4577,11 @@ class ScheduledTasks:
         self._active_tasks.add(task_id)
         try:
             result = await data_manager.review_special_commodity_policy_candidate(
-                candidate_id=candidate_id,
+                candidate_ref=candidate_ref,
                 decision=decision,
                 reviewer=reviewer,
                 notes=notes,
+                promote=promote,
             )
             success = result.get("status") == "success"
             await self._send_task_report(

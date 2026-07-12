@@ -1825,10 +1825,40 @@ async def review_research_special_commodity_policy_candidate(
     """审核政策候选；批准不会绕过正式政策事件 validator。"""
     try:
         return await data_manager.review_special_commodity_policy_candidate(
-            candidate_id=candidate_id,
+            candidate_ref=candidate_id,
             decision=str(_query_default(decision) or ""),
             reviewer=str(_query_default(reviewer) or "api_operator"),
             notes=str(_query_default(notes) or ""),
+            promote=True,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to review policy candidate: {str(e)}")
+
+
+@router.post(
+    "/research/commodities/policy-candidates/review",
+    response_model=Dict[str, Any],
+    tags=["Research"],
+)
+async def review_research_special_commodity_policy_candidate_by_ref(
+    candidate_ref: str = Query(..., description="报告中的8位 review_code、完整ID或文号"),
+    decision: str = Query(..., description="approved/rejected"),
+    reviewer: str = Query("api_operator", description="审核人标识"),
+    notes: str = Query("", description="审核说明"),
+    promote: bool = Query(True, description="批准后立即通过统一 validator 提升"),
+):
+    """使用短审核码完成候选审核，可一步批准并正式提升。"""
+    try:
+        return await data_manager.review_special_commodity_policy_candidate(
+            candidate_ref=str(_query_default(candidate_ref) or ""),
+            decision=str(_query_default(decision) or ""),
+            reviewer=str(_query_default(reviewer) or "api_operator"),
+            notes=str(_query_default(notes) or ""),
+            promote=bool(_query_default(promote)),
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

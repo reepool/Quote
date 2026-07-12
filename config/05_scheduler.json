@@ -977,10 +977,11 @@
         "misfire_grace_time": 600,
         "coalesce": true,
         "parameters": {
-          "candidate_id": "",
+          "candidate_ref": "",
           "decision": "",
           "reviewer": "telegram_operator",
           "notes": "",
+          "promote": true,
           "max_runtime_seconds": 300
         }
       },

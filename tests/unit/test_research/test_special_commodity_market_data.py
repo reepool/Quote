@@ -1620,6 +1620,36 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "source_conflicts=3" in report
 
 
+def test_policy_discovery_report_contains_copyable_review_commands():
+    from scheduler.tasks import _format_special_commodity_scheduler_report
+
+    report = _format_special_commodity_scheduler_report(
+        {
+            "status": "success",
+            "dry_run": False,
+            "documents": 1,
+            "candidates": 1,
+            "ready_for_promotion": 1,
+            "pending_review": 0,
+            "terminal_reviewed": 0,
+            "document_write": {"inserted": 1},
+            "candidate_write": {"inserted": 1},
+            "review_actions": [
+                {
+                    "review_code": "93acac0c",
+                    "document_number": "发改价格〔2022〕303号",
+                    "policy_type": "long_term_transaction_reasonable_range",
+                    "effective_start": "2022-05-01",
+                    "value": "570.0-770.0 CNY/ton",
+                }
+            ],
+        }
+    )
+    assert "待审核政策" in report
+    assert "candidate_ref=93acac0c decision=approved" in report
+    assert "candidate_ref=93acac0c decision=rejected" in report
+
+
 def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
     from scheduler.tasks import (
         _resolve_special_commodity_monthly_sync_window,
@@ -1819,6 +1849,9 @@ def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monk
     assert result["candidates"] == 1
     assert result["ready_for_promotion"] == 1
     candidate = storage.read_policy_candidates()[0]
+    review_code = candidate["candidate_id"].rsplit(".", 1)[-1][:8]
+    assert storage.resolve_policy_candidate(review_code)["candidate_id"] == candidate["candidate_id"]
+    assert storage.resolve_policy_candidate("发改价格〔2022〕303号")["candidate_id"] == candidate["candidate_id"]
     assert candidate["value_low"] == 570.0
     assert candidate["value_high"] == 770.0
     assert candidate["value_mid"] is None
@@ -1845,6 +1878,8 @@ def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monk
         dry_run=False,
     )
     assert rerun["status"] == "success"
+    assert rerun["terminal_reviewed"] == 1
+    assert rerun["review_actions"] == []
     assert storage.read_policy_candidates()[0]["review_status"] == "approved"
 
 

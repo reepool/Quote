@@ -5009,24 +5009,41 @@ class DataManager:
             storage.read_policy_candidates,
             review_status=review_status,
         )
+        documents = await asyncio.to_thread(storage.read_source_documents)
+        document_by_id = {str(item["document_id"]): item for item in documents}
+        for row in rows:
+            row["review_code"] = str(row["candidate_id"]).rsplit(".", 1)[-1][:8]
+            document = document_by_id.get(str(row.get("document_id") or ""), {})
+            row["document_number"] = document.get("document_number")
+            row["document_title"] = document.get("title")
         return {"status": "success", "review_status": review_status, "candidates": rows, "count": len(rows)}
 
     async def review_special_commodity_policy_candidate(
         self,
         *,
-        candidate_id: str,
+        candidate_ref: str,
         decision: str,
         reviewer: str = "operator",
         notes: str = "",
+        promote: bool = True,
     ) -> Dict[str, Any]:
-        """Record an operator decision without bypassing policy-event validation."""
+        """Record a decision and optionally promote through the formal validator."""
         normalized = str(decision or "").strip().lower()
         if normalized not in {"approved", "rejected"}:
             raise ValueError("decision must be approved or rejected")
         storage = self._require_special_commodity_storage()
+        candidate = await asyncio.to_thread(storage.resolve_policy_candidate, candidate_ref)
+        if candidate is None:
+            return {
+                "status": "blocked",
+                "candidate_ref": candidate_ref,
+                "decision": normalized,
+                "reason": "policy_candidate_not_found",
+            }
+        candidate_id = str(candidate["candidate_id"])
         updated = await asyncio.to_thread(
             storage.set_policy_candidate_review_status,
-            candidate_id=str(candidate_id or "").strip(),
+            candidate_id=candidate_id,
             review_status=normalized,
             reviewer=str(reviewer or "operator").strip(),
             notes=str(notes or "").strip(),
@@ -5038,13 +5055,28 @@ class DataManager:
                 "decision": normalized,
                 "reason": "policy_candidate_not_found",
             }
+        promotion: Dict[str, Any] = {}
+        if normalized == "approved" and promote:
+            module_cfg = (
+                self.research_config.modules.get("commodity_market_data", {})
+                .get("special_commodity_market_data", {})
+            )
+            from research.special_commodity_market_data import SpecialCommodityPolicyEventService
+
+            promotion = await asyncio.to_thread(
+                SpecialCommodityPolicyEventService(storage, module_cfg).promote_approved_candidates,
+                dry_run=False,
+            )
+        status = "blocked" if promotion.get("status") == "blocked" else "success"
         return {
-            "status": "success",
+            "status": status,
             "candidate_id": candidate_id,
+            "candidate_ref": candidate_ref,
             "decision": normalized,
             "reviewer": reviewer,
-            "promotion_required": normalized == "approved",
-            "next_task": "special_commodity_policy_event_sync" if normalized == "approved" else None,
+            "promoted": bool(normalized == "approved" and promote),
+            "promotion": promotion,
+            "next_task": None,
         }
 
     async def get_special_commodity_source_documents(

@@ -1300,6 +1300,30 @@ class SpecialCommodityStorageManager:
             ).fetchall()
         return [_row_to_dict(row) for row in rows]
 
+    def resolve_policy_candidate(self, candidate_ref: str) -> Optional[Dict[str, Any]]:
+        """Resolve an operator-friendly code, full ID, or document number."""
+        normalized = str(candidate_ref or "").strip()
+        if not normalized:
+            raise ValueError("candidate_ref is required")
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                """
+                SELECT c.*
+                FROM commodity_policy_candidates c
+                JOIN commodity_source_documents d ON d.document_id = c.document_id
+                WHERE c.candidate_id = ?
+                   OR c.candidate_id LIKE ?
+                   OR d.document_number = ?
+                ORDER BY c.updated_at DESC
+                """,
+                (normalized, f"%{normalized}%", normalized),
+            ).fetchall()
+        if not rows:
+            return None
+        if len(rows) > 1:
+            raise ValueError(f"ambiguous candidate_ref: {normalized}")
+        return _row_to_dict(rows[0])
+
     def set_policy_candidate_review_status(
         self,
         *,
@@ -5703,6 +5727,43 @@ class SpecialCommodityPolicyDiscoveryService:
         warnings = list(discovered.get("warnings") or [])
         document_write = self.storage.upsert_source_documents(documents, dry_run=dry_run)
         candidate_write = self.storage.upsert_policy_candidates(candidates, dry_run=dry_run)
+        documents_by_id = {str(item.get("document_id")): item for item in documents}
+        persisted_by_id = {
+            str(item["candidate_id"]): item for item in self.storage.read_policy_candidates()
+        }
+        review_actions: List[Dict[str, Any]] = []
+        terminal_reviewed = 0
+        effective_statuses: List[str] = []
+        for item in candidates:
+            candidate_id = str(item.get("candidate_id") or "")
+            persisted = persisted_by_id.get(candidate_id)
+            review_status = str(
+                (persisted or {}).get("review_status")
+                or item.get("review_status")
+                or "pending_review"
+            )
+            effective_statuses.append(review_status)
+            if review_status in {"approved", "rejected"}:
+                terminal_reviewed += 1
+                continue
+            document = documents_by_id.get(str(item.get("document_id") or ""), {})
+            value_text = "N/A"
+            if item.get("value_low") is not None and item.get("value_high") is not None:
+                value_text = f"{item.get('value_low')}-{item.get('value_high')} {item.get('unit') or ''}".strip()
+            elif item.get("value_mid") is not None:
+                value_text = f"{item.get('value_mid')} {item.get('unit') or ''}".strip()
+            review_actions.append(
+                {
+                    "candidate_id": candidate_id,
+                    "review_code": candidate_id.rsplit(".", 1)[-1][:8],
+                    "document_number": document.get("document_number") or "",
+                    "title": document.get("title") or "",
+                    "policy_type": item.get("policy_type"),
+                    "effective_start": item.get("effective_start"),
+                    "value": value_text,
+                    "review_status": review_status,
+                }
+            )
         status = "blocked" if blockers else ("warning" if warnings else "success")
         result = {
             "status": status,
@@ -5712,8 +5773,10 @@ class SpecialCommodityPolicyDiscoveryService:
             "end_date": end_date,
             "documents": len(documents),
             "candidates": len(candidates),
-            "ready_for_promotion": sum(item.get("review_status") == "ready_for_promotion" for item in candidates),
-            "pending_review": sum(item.get("review_status") != "ready_for_promotion" for item in candidates),
+            "ready_for_promotion": sum(status == "ready_for_promotion" for status in effective_statuses),
+            "pending_review": sum(status == "pending_review" for status in effective_statuses),
+            "terminal_reviewed": terminal_reviewed,
+            "review_actions": review_actions,
             "document_write": document_write,
             "candidate_write": candidate_write,
             "warnings": warnings,
