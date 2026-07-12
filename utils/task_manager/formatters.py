@@ -330,6 +330,7 @@ class TaskManagerFormatters:
             "港美市场",
             "大宗商品市场",
             "外汇",
+            "利率与债券",
             "行业与指数",
             "股东与披露",
             "财务与估值",
@@ -352,12 +353,17 @@ class TaskManagerFormatters:
             for key in ("fx_rate", "foreign_exchange", "exchange_rate", "currency_rate")
         ):
             return "外汇"
-        if any(key in job_id for key in ("industry", "index")):
-            return "行业与指数"
+        if any(
+            key in job_id
+            for key in ("risk_free_rate", "treasury_yield", "yield_curve", "interest_rate", "bond")
+        ):
+            return "利率与债券"
         if any(key in job_id for key in ("daily_data", "master_governance", "instrument_master", "calendar")):
             if job_id.startswith(("hk_", "us_")) or "hkex" in job_id:
                 return "港美市场"
             return "A股行情与主数据"
+        if any(key in job_id for key in ("industry", "index")):
+            return "行业与指数"
         if any(key in job_id for key in ("shareholder", "disclosure", "broker_risk")):
             return "股东与披露"
         if any(key in job_id for key in ("financial", "valuation")):

@@ -66,9 +66,9 @@ def test_status_summary_groups_tasks_by_status_and_domain():
     assert "**🔴 已禁用**" in text
     assert "**A股行情与主数据**" in text
     assert "**股东与披露**" in text
-    assert "**行业与指数**" in text
     assert "**研究与风控**" in text
     assert text.index("**A股行情与主数据**") < text.index("`/run daily_data_update`")
+    assert text.index("**A股行情与主数据**") < text.index("`/run index_master_governance_sync`")
     assert text.index("**股东与披露**") < text.index("`/run shareholder_reconciliation_sync`")
 
 
@@ -134,6 +134,58 @@ def test_status_summary_places_fx_between_commodity_market_and_industry():
     assert text.index("**外汇**") < text.index("**行业与指数**")
     assert "`/run futures_market_data_sync`" in text
     assert "`/run fx_rate_sync`" in text
+
+
+def test_status_summary_groups_risk_free_rate_as_rate_and_bond():
+    running_tasks = [
+        {
+            "job_id": "risk_free_rate_sync",
+            "description": "无风险利率序列日更",
+            "next_run": "今天 17:30",
+            "status": "running",
+        }
+    ]
+
+    text = TaskManagerFormatters.format_task_status_summary(
+        running_tasks,
+        [],
+        total_tasks=1,
+    )
+
+    assert "**利率与债券**" in text
+    assert "**研究与风控**" not in text
+    assert "`/run risk_free_rate_sync`" in text
+
+
+def test_manual_status_places_a_share_market_group_before_hk_us_market():
+    running_tasks = [
+        {
+            "job_id": "hkex_instrument_master_sync",
+            "description": "港股主数据同步",
+            "next_run": "手工触发",
+            "status": "paused",
+        },
+        {
+            "job_id": "index_master_governance_sync",
+            "description": "A股指数主数据治理",
+            "next_run": "手工触发",
+            "status": "paused",
+        },
+    ]
+
+    messages = TaskManagerFormatters.format_task_status_messages(
+        running_tasks,
+        [],
+        total_tasks=2,
+    )
+
+    manual_message = messages[0] if len(messages) == 1 else messages[1]
+    assert "**A股行情与主数据**" in manual_message
+    assert "**港美市场**" in manual_message
+    assert manual_message.index("**A股行情与主数据**") < manual_message.index("**港美市场**")
+    assert manual_message.index("**A股行情与主数据**") < manual_message.index(
+        "`/run index_master_governance_sync`"
+    )
 
 
 def test_status_summary_stays_under_telegram_message_limit():
