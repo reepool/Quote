@@ -12915,7 +12915,7 @@ class DataManager:
             'instrument_id', 'symbol', 'name', 'exchange', 'type', 'currency',
             'listed_date', 'delisted_date', 'issue_date', 'industry', 'sector',
             'market', 'status', 'is_active', 'is_st', 'trading_status', 'source',
-            'source_symbol',
+            'source_symbol', 'lot_size', 'tick_size',
         }
         safe_rows: List[Dict[str, Any]] = []
         for row in rows or []:
@@ -12941,6 +12941,10 @@ class DataManager:
             }
             if row.get('listed_date'):
                 item['listed_date'] = row.get('listed_date')
+            if row.get('lot_size') is not None:
+                item['lot_size'] = row.get('lot_size')
+            if row.get('tick_size') is not None:
+                item['tick_size'] = row.get('tick_size')
             safe_rows.append({key: value for key, value in item.items() if key in valid_fields})
         return safe_rows
 
