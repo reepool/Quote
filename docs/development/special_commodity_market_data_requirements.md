@@ -14,7 +14,7 @@
 
 1. **Brent/WTI**：免费可得性最好，应作为第一批接入。优先 FRED/EIA 官方或准官方 API，单位统一为 `USD/barrel`，频率日频。
 2. **LME 六种基本金属 3M 代理行情**：铜、铝、锌、铅、镍、锡统一通过 AkShare 外盘期货接口获取。新浪详情页将这些品种标为“CFD 差价合约并非期货”，其价格跟踪 LME 三个月连续合约；因此数据库类型必须标为 `foreign_futures_3m_proxy`。新浪 `futures_foreign_hist` 为主源，东方财富 `futures_global_hist_em` 为请求或结构失败时的备源；两者均不标记为 LME 官方 Closing Price。FRED/IMF 与 World Bank 月度铜铝价格继续作为更长周期的独立 DCF 基准，不与 LME 3M 代理日线伪装成同一序列。
-3. **动力煤现货/长协价**：这是最难免费稳定自动化的部分。权威指数和长协价格多在资讯商、协会或政策公告体系中，免费源常有版权、反爬、口径不完整问题。第一版应拆成两类：可自动更新的公开现货/库存/指数辅助数据，以及人工或半自动维护的政策/长协事件表。
+3. **动力煤现货/长协价**：国家统计局自 2014 年 1 月起公开发布“流通领域重要生产资料市场价格变动情况”，其中“山西优混（5500 大卡）”可作为免费官方动力煤市场价格参考；它是经营企业批发和销售价格的旬度统计，不是港口现货指数、期货结算价或年度长协价。长协价格仍使用政策生效期事件治理，不能由该旬度价格推导。
 4. **化工现货指数**：AkShare 可取生意社/100ppi 大宗商品现货价格和基差，适合做 P1 免费增强源；但它不是交易所官方源，应明确标记为 `aggregated_public_web`，并记录商品规格、单位、字段口径和缺失日期。
 
 本模块不应复用 `futures_price_bars` 表，因为这些数据不是标准期货合约日线，也不一定有交易日历、OHLC、成交量、持仓量。第一版建议在 `data/futures.db` 中新增独立 `commodity_*` 表，复用期货域已有 DB 通道、任务报告、API 分区和 DCF 对接经验，但通过表名前缀与期货行情严格隔离。未来如果宏观/产业数据层扩大，可以再迁移到独立 `commodity.db` 或研究域统一库。
@@ -63,7 +63,7 @@ source_venue -> commodity category -> commodity instrument -> series
 | 全球铜价 | FRED/IMF `PCOPPUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | 全球铝价 | FRED/IMF `PALUMUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | LME 铜/铝/锌/铅/镍/锡 3M 代理 | AkShare/Sina 外盘期货 | AkShare/东方财富全球期货 | 日频 | USD/metric ton | 高，CFD/聚合代理；新浪约自 2016-07-11，东财约自 2013-06-21 |
-| 动力煤公开辅助数据 | 生意社/100ppi、金十沿海六大电库存、公开政策公告 | 手工导入政策/长协事件 | 日频/事件 | CNY/ton 或事件价 | 中低 |
+| 动力煤公开市场参考 | 国家统计局“山西优混（5500 大卡）”旬度价格 | 100ppi/库存指标仅作辅助；政策长协独立维护 | 旬度/事件 | CNY/ton 或事件价 | 高（统计局序列）/人工核验（长协） |
 | 化工现货/基差 | 生意社/100ppi，经 AkShare 或直连页面 | 交易所期货主力连续 | 日频 | 多为 CNY/ton | 中 |
 
 ### 2.2 不纳入第一阶段自动化的内容
@@ -124,7 +124,8 @@ source_venue -> commodity category -> commodity instrument -> series
 - **铜铝长期基准**：继续优先 FRED/IMF 或 World Bank 月度，作为独立长期周期序列。
 - **LME 3M 日价**：新浪/AkShare 为主源，东方财富/AkShare 为备源；只作为聚合 LME 3M 市场行情，和 LME 官方 Closing Price、Cash Price 分开定义。
 - **国内现货和化工指数**：如果没有交易所官方源，AkShare/100ppi 可以作为免费源，但必须保留 `source_profile=100ppi_public_web` 和字段口径。
-- **动力煤长协**：不要用 AkShare 猜长协价；长协应作为政策/事件表，由公告或人工确认维护。
+- **动力煤市场价**：使用国家统计局官方旬度“山西优混（5500 大卡）”批发和销售市场价格，保留观测旬与发布日期，不展开成伪日频。
+- **动力煤长协**：不要用 AkShare 或国家统计局市场价猜长协价；长协应作为政策/事件表，由公告或人工确认维护。
 
 ---
 
@@ -280,6 +281,7 @@ validate_observations(normalized_rows)
 | World Bank/FRED/IMF 月频 | 使用月度观测期；可按月末日期落库，DCF 读取时按估值日前最新可得值 |
 | 100ppi 日频现货 | 只使用网页/API 实际观测日；缺失日记录为 source gap，不用中国交易日或 weekday 猜测补齐 |
 | LME 3M 聚合日线 | 仅使用新浪主源实际返回日期；主源请求/结构失败时使用东财返回日期；不根据 weekday 推断交易日或休市日 |
+| 国家统计局动力煤旬度价 | 使用旬期末作为 `observation_date`，同时保存旬期起止日和官方发布日期；只认国家统计局正文证据，不按交易日展开 |
 | 动力煤长协/政策 | 使用 `effective_start/effective_end` 生效期，不做日频价格补点 |
 
 因此，任务名称可以继续叫 `commodity_price_backfill/sync`，但报告中要区分 `trading_day_governance`、`publication_calendar_governance`、`policy_effective_period_governance`。
@@ -334,6 +336,7 @@ scope 解析
 | `AkshareCommoditySpotProvider` | 100ppi 现货和基差 |
 | `AkshareForeignFuturesProvider` | 配置化外盘期货主备链；LME 使用新浪主源、东财备源 |
 | `ManualPolicyEventProvider` | 动力煤长协/政策事件表导入 |
+| `NbsProductionMaterialsProvider` | 国家统计局流通领域重要生产资料旬度市场价格；官方检索发现文章并解析产品表格 |
 
 `AkshareCommoditySpotProvider` 必须采用配置驱动：只有当 `commodity_price_series.metadata`
 中明确配置 `akshare_function`、日期列、数值列、原始单位、地区/规格或来源 URL 时才允许抓取；
@@ -346,6 +349,8 @@ scope 解析
 - EIA 使用 API v2 数据集路由和 facet 查询（`petroleum/pri/spt/data`），不使用会忽略日期边界的旧 `seriesid` 兼容端点；provider 必须分页并再次按任务起止日期过滤。
 - World Bank 使用官方 `CMO-Historical-Data-Monthly.xlsx` Pink Sheet 月度工作簿，按 `Monthly Prices` 中的 `Copper`、`Aluminum` 列解析；`api.worldbank.org` 普通国家/指标接口不提供这组 Pink Sheet 商品序列。
 - 100ppi 已配置化落地 PTA 现货参考 `CMD.CN.CHEMICAL.PTA.SPOT.100PPI.DAILY`；后续品种沿用同一 provider/governance adapter，以独立商品、序列和 scope 逐个验证。甲醇 `CMD.CN.CHEMICAL.METHANOL.SPOT.100PPI.DAILY` 的源端可用起点为 2014-06-17；乙二醇 `CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY` 的源端可用起点为 2018-12-10；PVC `CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY` 的源端可用起点为 2013-01-04；聚丙烯 `CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY` 的源端可用起点为 2014-02-28。乙二醇、PVC 和聚丙烯使用 DCE 已验证交易日历进行覆盖诊断。各序列均通过 AkShare `futures_spot_price_daily` 包装 100ppi 页面，任务日期映射为接口的 `start_day/end_day`；单位为 `CNY/ton`，质量标记保持 `aggregated_public_web`，地区、规格和含税口径按来源披露。
+- 国家统计局动力煤序列 `CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY` 使用独立 `NBS` venue、`nbs_production_material_market_price` source profile 和 `cn_nbs_thermal_coal` scope。provider 通过国家统计局站内官方检索发现新旧栏目文章，解析正文中的产品名称、单位和本期价格；主数据治理核验“山西优混/5500 大卡/吨”，日期治理仅写入来源实际发布的旬期。历史起点按国家统计局说明设为 2014-01-10，配置和报告必须明确该序列不是长协价。
+- 2026-07-12 真实烟雾验证：2014 年首期旧标题页面解析为观测期 2014-01-01 至 2014-01-10、发布日期 2014-01-14、价格 625.6 CNY/ton；2026 年 6 月下旬新标题页面解析为观测期 2026-06-21 至 2026-06-30、价格 854.6 CNY/ton。临时库端到端 dry-run 的主数据治理、日期治理和 provider 均为 success，未写生产库。
 - 中长程特殊商品 provider 调用必须按配置间隔输出 heartbeat 日志，至少包含来源、序列、任务日期范围和累计耗时；任务开始/结束日志不能替代运行中的阶段进度日志。默认间隔为60秒。
 - 特殊商品采集、治理、质量诊断和 heartbeat 属于数据任务日志，必须通过项目统一 `DataSource` task-domain logger 写入 `log/task.log`；不得使用未路由的模块根 logger 写入 `log/sys.log`。`sys.log` 仅保留应用初始化、服务、网络连接和系统运行日志。
 - 全量和长窗口 dry-run 必须输出并保留每条序列的实际首末观测日、年度行数、数值范围、非正值、重复日期、最大绝对涨跌样本、原始/规范化币种单位。对配置了 `expected_calendar_exchange` 的日频序列，还必须使用数据库中已治理交易日历计算覆盖率、缺失日期、最长连续缺口和年度覆盖，禁止用 weekday 生成预期日期。
@@ -385,6 +390,7 @@ FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略
 - `/run special_commodity_price_backfill scope_id=world_bank_metals start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_price_backfill scope_id=cn_nbs_thermal_coal start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_policy_event_sync dry_run`
 

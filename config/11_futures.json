@@ -692,6 +692,15 @@
           "supported_frequencies": [
             "daily"
           ]
+        },
+        "NBS": {
+          "enabled": true,
+          "venue_type": "official_public_web",
+          "requires_api_key": false,
+          "role": "official_domestic_production_material_price_benchmark",
+          "supported_frequencies": [
+            "ten_day"
+          ]
         }
       },
       "source_profiles": {
@@ -864,6 +873,30 @@
             ]
           },
           "note": "Use Sina first. Use Eastmoney for primary request/schema failure and bounded date-gap repair. Preserve the selected provider and fallback reason in observation metadata; do not perform routine full dual-source daily downloads."
+        },
+        "nbs_production_material_market_price": {
+          "venue": "NBS",
+          "source": "National Bureau of Statistics production-material market prices",
+          "source_mode": "official_public_web",
+          "source_interface": "nbs_production_material_ten_day_articles",
+          "provider_adapter": "nbs_production_materials",
+          "governance_adapter": "nbs_production_materials",
+          "calendar_type": "source_observed_ten_day_period",
+          "calendar_quality_flag": "official_period_observed",
+          "quality_flag": "official_public_web",
+          "parser_version": "nbs_production_materials.v1",
+          "listing_url": "https://www.stats.gov.cn/sj/zxfb/",
+          "search_endpoint_url": "https://api.so-gov.cn/query/s",
+          "search_site_code": "bm36000002",
+          "search_query": "流通领域重要生产资料市场价格变动情况 山西优混",
+          "search_page_size": 20,
+          "search_max_pages_per_sort": 20,
+          "exact_only_max_periods": 12,
+          "exact_gap_discovery_enabled": true,
+          "timeout_seconds": 30,
+          "progress_log_interval_seconds": 60,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "note": "Official NBS wholesale/sales market-price observation. Observation date is the ten-day period end; publication date is preserved separately."
         },
         "manual_policy_event": {
           "venue": "MANUAL_POLICY",
@@ -1089,6 +1122,21 @@
           "metadata": {
             "dcf_role": "polyolefin_spot_cycle_anchor",
             "source_scope": "100ppi public-web polypropylene spot reference"
+          }
+        },
+        {
+          "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
+          "symbol": "SHANXI_BLEND_5500",
+          "name": "China Shanxi Premium Blend 5500 kcal Market Price",
+          "category": "coal",
+          "commodity_type": "official_wholesale_market_reference",
+          "default_currency": "CNY",
+          "default_unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_spot_cycle_anchor",
+            "source_scope": "NBS production-material wholesale and sales market price",
+            "not_long_term_contract_price": true
           }
         }
       ],
@@ -1525,6 +1573,35 @@
             "source_name": "100ppi polypropylene spot reference",
             "source_url": "https://www.100ppi.com/sf/"
           }
+        },
+        {
+          "series_id": "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
+          "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
+          "venue": "NBS",
+          "source_profile": "nbs_production_material_market_price",
+          "source_symbol": "山西优混（5500大卡）",
+          "frequency": "ten_day",
+          "quote_type": "wholesale_market_reference",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "source_product_names": [
+              "山西优混（5500大卡）",
+              "山西优混(5500大卡)",
+              "山西优混（5500 大卡）"
+            ],
+            "source_units": [
+              "吨"
+            ],
+            "source_specification": "优质的混煤，热值5500大卡",
+            "source_available_from": "2014-01-10",
+            "observation_date_semantics": "ten_day_period_end",
+            "publication_date_semantics": "official_article_publication_date",
+            "price_semantics": "important production-material wholesale and sales market price including circulation costs, profit and tax",
+            "source_name": "National Bureau of Statistics Shanxi premium blend 5500 kcal market price",
+            "source_url": "https://www.stats.gov.cn/sj/zxfb/"
+          }
         }
       ],
       "download_scopes": [
@@ -1695,6 +1772,22 @@
           ],
           "frequencies": [
             "daily"
+          ]
+        },
+        {
+          "scope_id": "cn_nbs_thermal_coal",
+          "enabled": true,
+          "venues": [
+            "NBS"
+          ],
+          "categories": [
+            "coal"
+          ],
+          "commodity_ids": [
+            "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS"
+          ],
+          "frequencies": [
+            "ten_day"
           ]
         }
       ]

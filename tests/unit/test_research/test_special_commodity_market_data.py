@@ -20,6 +20,8 @@ from research.special_commodity_market_data import (
     ConfiguredSourceChainProvider,
     EiaCommodityProvider,
     FredCommodityProvider,
+    NbsProductionMaterialsGovernanceAdapter,
+    NbsProductionMaterialsProvider,
     SpecialCommodityMasterDataService,
     SpecialCommodityCalendarGovernanceService,
     SpecialCommodityPolicyEventService,
@@ -78,8 +80,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 15
-    assert result["series"] >= 19
+    assert result["instruments"] == 16
+    assert result["series"] >= 20
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -98,6 +100,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT",
         "CN.CHEMICAL.PVC.SPOT",
         "CN.CHEMICAL.POLYPROPYLENE.SPOT",
+        "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
@@ -111,6 +114,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY",
+        "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
     }
 
 
@@ -150,6 +154,11 @@ def test_special_commodity_scope_resolution():
     polypropylene = selector.resolve(scope_id="cn_100ppi_polypropylene")
     assert [item.series_id for item in polypropylene] == [
         "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY"
+    ]
+
+    thermal_coal = selector.resolve(scope_id="cn_nbs_thermal_coal")
+    assert [item.series_id for item in thermal_coal] == [
+        "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY"
     ]
 
     assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
@@ -257,6 +266,126 @@ def test_source_unit_governance_normalizes_equivalent_official_labels():
     assert _source_unit_matches("USD/barrel", "$/BBL")
     assert _source_unit_matches("USD/metric_ton", "U.S. Dollars per Metric Ton")
     assert _source_unit_matches("USD/metric_ton", "($/mt)")
+
+
+def test_nbs_ten_day_title_period_parsing():
+    assert NbsProductionMaterialsProvider.parse_period(
+        "2026年6月下旬流通领域重要生产资料市场价格变动情况"
+    ) == {
+        "observation_date": "2026-06-30",
+        "period_start": "2026-06-21",
+        "period_end": "2026-06-30",
+    }
+    assert NbsProductionMaterialsProvider.parse_period(
+        "流通领域重要生产资料市场价格变动情况（2014年1月1-10日）"
+    ) == {
+        "observation_date": "2014-01-10",
+        "period_start": "2014-01-01",
+        "period_end": "2014-01-10",
+    }
+
+
+def test_nbs_provider_parses_official_coal_row_and_preserves_publication_date(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_nbs_thermal_coal")[0]
+    provider = NbsProductionMaterialsProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+    )
+    monkeypatch.setattr(
+        provider,
+        "_discover_articles",
+        lambda start, end: (
+            [
+                {
+                    "observation_date": "2026-06-30",
+                    "period_start": "2026-06-21",
+                    "period_end": "2026-06-30",
+                    "publication_date": "2026-07-04",
+                    "title": "2026年6月下旬流通领域重要生产资料市场价格变动情况",
+                    "source_url": "https://www.stats.gov.cn/example.html",
+                }
+            ],
+            [],
+        ),
+    )
+    response = SimpleNamespace(
+        text="""
+        <table><tr><th>产品名称</th><th>单位</th><th>本期价格（元）</th></tr>
+        <tr><td>山西优混（5500 大卡）</td><td>吨</td><td>854.6</td></tr></table>
+        """,
+        apparent_encoding="utf-8",
+        encoding="utf-8",
+        raise_for_status=lambda: None,
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: response,
+    )
+
+    result = provider.fetch([item], start_date="2026-06-21", end_date="2026-06-30")
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.observation_date == "2026-06-30"
+    assert observation.value == 854.6
+    assert observation.currency == "CNY"
+    assert observation.unit == "CNY/ton"
+    assert observation.metadata["publication_date"] == "2026-07-04"
+    assert observation.metadata["observation_period_start"] == "2026-06-21"
+    assert observation.metadata["price_semantics"] == "wholesale_and_sales_market_price"
+
+
+def test_nbs_master_governance_uses_source_row_evidence():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_nbs_thermal_coal")[0]
+    observation = CommodityObservation(
+        series_id=item.series_id,
+        observation_date="2026-06-30",
+        value=854.6,
+        currency="CNY",
+        unit="CNY/ton",
+        raw_value=854.6,
+        raw_currency="CNY",
+        raw_unit="CNY/ton",
+        source_profile=item.source_profile,
+        source_url="https://www.stats.gov.cn/example.html",
+        quality_flag="official_public_web",
+        source_symbol=item.source_symbol,
+        parser_version="unit-test",
+        raw_payload_hash="nbs-test",
+        metadata={
+            "source_product_name": "山西优混（5500大卡）",
+            "source_unit": "吨",
+            "price_semantics": "wholesale_and_sales_market_price",
+        },
+    )
+
+    class FakeProvider:
+        def fetch(self, series, *, start_date, end_date):
+            from research.special_commodity_market_data import CommodityProviderResult
+
+            return CommodityProviderResult(observations=[observation])
+
+    adapter = NbsProductionMaterialsGovernanceAdapter(
+        cfg["source_profiles"][item.source_profile]
+    )
+    result = adapter.govern_master(
+        [item],
+        FakeProvider(),
+        start_date="2026-06-21",
+        end_date="2026-06-30",
+    )
+
+    assert result.blockers == []
+    assert result.records[0]["governance_status"] == "success"
+    assert result.records[0]["quality_flag"] == "official_master_verified"
+    assert result.records[0]["lifecycle_start"] == "2014-01-10"
 
 
 def test_official_api_json_request_retries_transient_failure(monkeypatch):

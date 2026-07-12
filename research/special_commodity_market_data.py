@@ -12,6 +12,7 @@ import re
 import sqlite3
 import threading
 import time
+from calendar import monthrange
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import date
@@ -21,7 +22,7 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
-from utils.http_transport import request_get, tls_config_from_source_config
+from utils.http_transport import request_get, request_post, tls_config_from_source_config
 from utils.logging_manager import ds_logger
 
 
@@ -2142,6 +2143,356 @@ class AkshareCommoditySpotProvider:
         )
 
 
+class NbsProductionMaterialsProvider:
+    """Official NBS ten-day production-material market-price provider."""
+
+    _MODERN_TITLE = re.compile(
+        r"(?P<year>\d{4})\s*年\s*(?P<month>\d{1,2})\s*月\s*"
+        r"(?P<period>[上中下])\s*旬.*流通领域重要生产资料市场价格变动情况"
+    )
+    _LEGACY_TITLE = re.compile(
+        r"流通领域重要生产资料市场价格变动情况[（(]\s*"
+        r"(?P<year>\d{4})\s*年\s*(?P<month>\d{1,2})\s*月\s*"
+        r"(?P<start>\d{1,2})\s*[-—至]\s*(?P<end>\d{1,2})\s*日\s*[）)]"
+    )
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        self.headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "QuoteSystem/SpecialCommodityMarketData"
+            ),
+            "Referer": str(
+                self.source_cfg.get("listing_url")
+                or "https://www.stats.gov.cn/sj/zxfb/"
+            ),
+        }
+        self.tls_config = tls_config_from_source_config(
+            "nbs_production_material_prices", self.source_cfg
+        )
+
+    @classmethod
+    def parse_period(cls, title: str) -> Optional[Dict[str, str]]:
+        normalized = " ".join(str(title or "").split())
+        match = cls._MODERN_TITLE.search(normalized)
+        if match:
+            year = int(match.group("year"))
+            month = int(match.group("month"))
+            period = match.group("period")
+            start_day = {"上": 1, "中": 11, "下": 21}[period]
+            end_day = {
+                "上": 10,
+                "中": 20,
+                "下": monthrange(year, month)[1],
+            }[period]
+        else:
+            match = cls._LEGACY_TITLE.search(normalized)
+            if not match:
+                return None
+            year = int(match.group("year"))
+            month = int(match.group("month"))
+            start_day = int(match.group("start"))
+            end_day = int(match.group("end"))
+        try:
+            period_start = date(year, month, start_day)
+            period_end = date(year, month, end_day)
+        except ValueError:
+            return None
+        return {
+            "observation_date": period_end.isoformat(),
+            "period_start": period_start.isoformat(),
+            "period_end": period_end.isoformat(),
+        }
+
+    @staticmethod
+    def _clean_title(value: Any) -> str:
+        text = re.sub(r"<[^>]+>", "", str(value or ""))
+        return " ".join(text.replace("#数据发布#", "").strip(" 【】").split())
+
+    def _search_page(self, *, page: int, sort: str, query: str) -> List[Dict[str, str]]:
+        endpoint = str(
+            self.source_cfg.get("search_endpoint_url")
+            or "https://api.so-gov.cn/query/s"
+        )
+        response = request_post(
+            endpoint,
+            data={
+                "siteCode": str(self.source_cfg.get("search_site_code") or "bm36000002"),
+                "tab": "",
+                "qt": query,
+                "page": page,
+                "pageSize": int(self.source_cfg.get("search_page_size") or 20),
+                "sort": sort,
+            },
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        rows: List[Dict[str, str]] = []
+        for result in payload.get("resultDocs") or []:
+            source = result.get("data") or {}
+            source_url = str(source.get("url") or "")
+            title = self._clean_title(source.get("titleO") or source.get("title"))
+            period = self.parse_period(title)
+            if period is None or "stats.gov.cn/" not in source_url:
+                continue
+            rows.append(
+                {
+                    **period,
+                    "title": title,
+                    "source_url": source_url.replace("http://", "https://", 1),
+                    "publication_date": str(source.get("docDate") or "")[:10],
+                }
+            )
+        return rows
+
+    @staticmethod
+    def _expected_periods(start: date, end: date) -> List[Dict[str, str]]:
+        rows: List[Dict[str, str]] = []
+        cursor = date(start.year, start.month, 1)
+        while cursor <= end:
+            last_day = monthrange(cursor.year, cursor.month)[1]
+            for start_day, end_day in ((1, 10), (11, 20), (21, last_day)):
+                period_end = date(cursor.year, cursor.month, end_day)
+                if period_end < start or period_end > end:
+                    continue
+                rows.append(
+                    {
+                        "observation_date": period_end.isoformat(),
+                        "period_start": date(cursor.year, cursor.month, start_day).isoformat(),
+                        "period_end": period_end.isoformat(),
+                    }
+                )
+            cursor = (
+                date(cursor.year + 1, 1, 1)
+                if cursor.month == 12
+                else date(cursor.year, cursor.month + 1, 1)
+            )
+        return rows
+
+    def _exact_search_query(self, period: Mapping[str, str]) -> str:
+        start = date.fromisoformat(str(period["period_start"]))
+        end = date.fromisoformat(str(period["period_end"]))
+        if end.year >= 2019:
+            marker = "上" if start.day == 1 else ("中" if start.day == 11 else "下")
+            return f"{end.year}年{end.month}月{marker}旬流通领域重要生产资料市场价格变动情况"
+        return (
+            "流通领域重要生产资料市场价格变动情况"
+            f"（{end.year}年{end.month}月{start.day}-{end.day}日）"
+        )
+
+    def _discover_articles(self, start: date, end: date) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
+        query = str(
+            self.source_cfg.get("search_query")
+            or "流通领域重要生产资料市场价格变动情况 山西优混"
+        )
+        max_pages = max(1, int(self.source_cfg.get("search_max_pages_per_sort") or 20))
+        discovered: Dict[str, Dict[str, str]] = {}
+        warnings: List[Dict[str, Any]] = []
+        request_count = 0
+        expected_periods = self._expected_periods(start, end)
+        short_range_limit = max(1, int(self.source_cfg.get("exact_only_max_periods") or 12))
+        if len(expected_periods) > short_range_limit:
+            for sort in ("dateAsc", "dateDesc"):
+                previous_signature: Optional[tuple[str, ...]] = None
+                for page in range(1, max_pages + 1):
+                    try:
+                        rows = self._search_page(page=page, sort=sort, query=query)
+                    except Exception as exc:
+                        warnings.append(
+                            {
+                                "reason": "nbs_article_search_failed",
+                                "sort": sort,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        break
+                    request_count += 1
+                    signature = tuple(sorted(row["source_url"] for row in rows))
+                    if page > 1 and signature == previous_signature:
+                        break
+                    previous_signature = signature
+                    for row in rows:
+                        observed = date.fromisoformat(row["observation_date"])
+                        if start <= observed <= end:
+                            discovered[row["observation_date"]] = row
+                    logger.info(
+                        "[NbsProductionMaterials] discovery progress sort=%s page=%s/%s candidates=%s range=%s..%s",
+                        sort,
+                        page,
+                        max_pages,
+                        len(discovered),
+                        start,
+                        end,
+                    )
+
+        if _coerce_bool(self.source_cfg.get("exact_gap_discovery_enabled"), True):
+            for index, period in enumerate(expected_periods, start=1):
+                observation_date = period["observation_date"]
+                if observation_date in discovered:
+                    continue
+                try:
+                    rows = self._search_page(
+                        page=1,
+                        sort="relevance",
+                        query=self._exact_search_query(period),
+                    )
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_exact_article_search_failed",
+                            "observation_date": observation_date,
+                            "error": str(exc),
+                        }
+                    )
+                    continue
+                request_count += 1
+                match = next(
+                    (row for row in rows if row["observation_date"] == observation_date),
+                    None,
+                )
+                if match:
+                    discovered[observation_date] = match
+                if index % 24 == 0:
+                    logger.info(
+                        "[NbsProductionMaterials] exact discovery progress checked=%s expected=%s candidates=%s range=%s..%s",
+                        index,
+                        len(expected_periods),
+                        len(discovered),
+                        start,
+                        end,
+                    )
+        logger.info(
+            "[NbsProductionMaterials] discovery done search_requests=%s articles=%s range=%s..%s",
+            request_count,
+            len(discovered),
+            start,
+            end,
+        )
+        return sorted(discovered.values(), key=lambda row: row["observation_date"]), warnings
+
+    def _parse_article(self, article: Mapping[str, str], item: CommoditySeries) -> CommodityObservation:
+        response = request_get(
+            str(article["source_url"]),
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+        )
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding or response.encoding
+        tables = __import__("pandas").read_html(io.StringIO(response.text))
+        product_names = {
+            re.sub(r"\s+", "", str(value))
+            for value in item.metadata.get("source_product_names", [item.source_symbol])
+        }
+        matched: Optional[Dict[str, Any]] = None
+        for table in tables:
+            for raw_row in table.astype(object).where(table.notna(), None).values.tolist():
+                cells = [str(value).strip() if value is not None else "" for value in raw_row]
+                if len(cells) < 3:
+                    continue
+                normalized_name = re.sub(r"\s+", "", cells[0])
+                if not any(name in normalized_name for name in product_names):
+                    continue
+                try:
+                    value = float(str(cells[2]).replace(",", ""))
+                except ValueError:
+                    continue
+                matched = {"product_name": cells[0], "unit": cells[1], "value": value, "row": cells}
+                break
+            if matched:
+                break
+        if matched is None:
+            raise ValueError(f"NBS product row not found: {item.source_symbol}")
+        if matched["unit"] not in set(item.metadata.get("source_units") or ["吨"]):
+            raise ValueError(f"NBS product unit mismatch: {matched['unit']}")
+        return _build_observation(
+            item=item,
+            source_profile=self.source_profile,
+            source_cfg=self.source_cfg,
+            observation_date=str(article["observation_date"]),
+            value=float(matched["value"]),
+            source_url=str(article["source_url"]),
+            source_symbol=item.source_symbol,
+            raw_payload={"article": dict(article), "row": matched["row"]},
+            metadata={
+                "source_label": "nbs_official_production_material_market_price",
+                "source_product_name": matched["product_name"],
+                "source_unit": matched["unit"],
+                "observation_period_start": article["period_start"],
+                "observation_period_end": article["period_end"],
+                "publication_date": article.get("publication_date"),
+                "price_semantics": "wholesale_and_sales_market_price",
+            },
+        )
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start is None or end is None or start > end:
+            return CommodityProviderResult(
+                blockers=[{"reason": "invalid_nbs_date_range", "start_date": start_date, "end_date": end_date}]
+            )
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        articles, discovery_warnings = self._discover_articles(start, end)
+        warnings.extend(discovery_warnings)
+        for index, article in enumerate(articles, start=1):
+            for item in series:
+                try:
+                    observations.append(self._parse_article(article, item))
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_article_parse_failed",
+                            "series_id": item.series_id,
+                            "observation_date": article["observation_date"],
+                            "source_url": article["source_url"],
+                            "error": str(exc),
+                        }
+                    )
+            if index % 24 == 0 or index == len(articles):
+                logger.info(
+                    "[NbsProductionMaterials] article progress processed=%s/%s observations=%s warnings=%s",
+                    index,
+                    len(articles),
+                    len(observations),
+                    len(warnings),
+                )
+        if not articles:
+            warnings.append(
+                {
+                    "reason": "no_nbs_articles_in_requested_range",
+                    "start_date": start_date,
+                    "end_date": end_date,
+                }
+            )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "NBS",
+                "articles": len(articles),
+                "rows": len(observations),
+                "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
+            },
+        )
+
+
 class AkshareForeignFuturesProvider:
     """Configuration-driven foreign-futures provider with ordered fallback."""
 
@@ -3362,6 +3713,80 @@ class PublicWebCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         )
 
 
+class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    """Govern NBS product identity and ten-day observation periods from source rows."""
+
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityMasterGovernanceResult:
+        result = provider.fetch(series, start_date=start_date, end_date=end_date)
+        records: List[Dict[str, Any]] = []
+        blockers = list(result.blockers)
+        observations_by_series = {
+            item.series_id: [
+                row for row in result.observations if row.series_id == item.series_id
+            ]
+            for item in series
+        }
+        for item in series:
+            required = ["source_product_names", "source_units", "source_specification"]
+            missing = [key for key in required if not item.metadata.get(key)]
+            source_rows = observations_by_series.get(item.series_id, [])
+            if missing or not source_rows:
+                reason = "nbs_master_mapping_incomplete" if missing else "nbs_master_evidence_unavailable"
+                blocker = {
+                    "reason": reason,
+                    "series_id": item.series_id,
+                    "missing_fields": missing,
+                }
+                blockers.append(blocker)
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason=reason,
+                        metadata=blocker,
+                    )
+                )
+                continue
+            first = min(source_rows, key=lambda row: row.observation_date)
+            last = max(source_rows, key=lambda row: row.observation_date)
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="official_master_verified",
+                    source_name=str(first.metadata.get("source_product_name") or item.source_symbol),
+                    source_frequency=item.frequency,
+                    source_currency=item.currency,
+                    source_unit=item.unit,
+                    lifecycle_start=str(item.metadata.get("source_available_from") or first.observation_date),
+                    lifecycle_end=None,
+                    evidence_url=first.source_url,
+                    evidence_payload={
+                        "source_product_name": first.metadata.get("source_product_name"),
+                        "source_unit": first.metadata.get("source_unit"),
+                        "source_specification": item.metadata.get("source_specification"),
+                        "price_semantics": first.metadata.get("price_semantics"),
+                    },
+                    metadata={
+                        "observation_period_semantics": "ten_day_period_end",
+                        "publication_date_semantics": "source_article_publication_date",
+                        "latest_evidence_date": last.observation_date,
+                    },
+                )
+            )
+        return CommodityMasterGovernanceResult(
+            records=records,
+            warnings=list(result.warnings),
+            blockers=blockers,
+            prefetched_result=result,
+        )
+
+
 class ForeignFuturesCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     def govern_master(
         self,
@@ -3534,6 +3959,7 @@ class CommodityAdapterRegistry:
         "eia": EiaCommodityProvider,
         "world_bank_pink_sheet": WorldBankCommodityProvider,
         "100ppi_akshare": AkshareCommoditySpotProvider,
+        "nbs_production_materials": NbsProductionMaterialsProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,
         "configured_source_chain": ConfiguredSourceChainProvider,
     }
@@ -3542,6 +3968,7 @@ class CommodityAdapterRegistry:
         "eia": EiaCommodityGovernanceAdapter,
         "world_bank_pink_sheet": WorldBankCommodityGovernanceAdapter,
         "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
+        "nbs_production_materials": NbsProductionMaterialsGovernanceAdapter,
         "foreign_futures": ForeignFuturesCommodityGovernanceAdapter,
         "configured_source_chain": ConfiguredSourceChainGovernanceAdapter,
     }
