@@ -786,47 +786,6 @@ class SpecialCommodityStorageManager:
         CREATE INDEX IF NOT EXISTS idx_commodity_policy_candidates_review
         ON commodity_policy_candidates(review_status, policy_type, commodity_id);
 
-        CREATE TABLE IF NOT EXISTS commodity_data_licenses (
-            license_id TEXT PRIMARY KEY,
-            provider TEXT NOT NULL,
-            license_name TEXT NOT NULL,
-            valid_from TEXT,
-            valid_until TEXT,
-            status TEXT NOT NULL,
-            permitted_use TEXT NOT NULL,
-            redistribution_mode TEXT NOT NULL,
-            metadata_json TEXT NOT NULL DEFAULT '{}',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        );
-
-        CREATE TABLE IF NOT EXISTS commodity_data_entitlements (
-            entitlement_id TEXT PRIMARY KEY,
-            license_id TEXT NOT NULL,
-            dataset_id TEXT NOT NULL,
-            application_id TEXT NOT NULL,
-            access_mode TEXT NOT NULL,
-            api_disclosure_allowed INTEGER NOT NULL DEFAULT 0,
-            active INTEGER NOT NULL DEFAULT 0,
-            metadata_json TEXT NOT NULL DEFAULT '{}',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            UNIQUE(license_id, dataset_id, application_id, access_mode),
-            FOREIGN KEY (license_id) REFERENCES commodity_data_licenses(license_id)
-        );
-
-        CREATE TABLE IF NOT EXISTS commodity_data_access_audit (
-            audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            entitlement_id TEXT,
-            dataset_id TEXT NOT NULL,
-            action TEXT NOT NULL,
-            allowed INTEGER NOT NULL,
-            reason TEXT NOT NULL,
-            occurred_at TEXT NOT NULL,
-            metadata_json TEXT NOT NULL DEFAULT '{}',
-            FOREIGN KEY (entitlement_id) REFERENCES commodity_data_entitlements(entitlement_id)
-        );
-
         CREATE TABLE IF NOT EXISTS commodity_series_candidates (
             candidate_id TEXT PRIMARY KEY,
             provider_id TEXT NOT NULL,
@@ -1376,136 +1335,6 @@ class SpecialCommodityStorageManager:
                 (review_status, _json_dumps(metadata), now, candidate_id),
             )
         return True
-
-    def check_data_entitlement(
-        self,
-        *,
-        dataset_id: str,
-        application_id: str,
-        access_mode: str,
-        api_disclosure: bool = False,
-    ) -> Dict[str, Any]:
-        today = get_shanghai_time().date().isoformat()
-        with self.get_connection() as conn:
-            row = conn.execute(
-                """
-                SELECT e.*, l.status AS license_status, l.valid_from, l.valid_until
-                FROM commodity_data_entitlements e
-                JOIN commodity_data_licenses l ON l.license_id = e.license_id
-                WHERE e.dataset_id = ? AND e.application_id = ? AND e.access_mode = ?
-                """,
-                (dataset_id, application_id, access_mode),
-            ).fetchone()
-        reason = "missing_entitlement"
-        allowed = False
-        entitlement_id = None
-        if row is not None:
-            entitlement_id = row["entitlement_id"]
-            if not row["active"] or row["license_status"] != "active":
-                reason = "inactive_entitlement"
-            elif row["valid_from"] and today < row["valid_from"]:
-                reason = "license_not_yet_valid"
-            elif row["valid_until"] and today > row["valid_until"]:
-                reason = "license_expired"
-            elif api_disclosure and not row["api_disclosure_allowed"]:
-                reason = "api_disclosure_not_permitted"
-            else:
-                allowed = True
-                reason = "entitlement_valid"
-        now = get_shanghai_time().isoformat()
-        with self.get_connection() as conn:
-            conn.execute(
-                """
-                INSERT INTO commodity_data_access_audit (
-                    entitlement_id, dataset_id, action, allowed, reason,
-                    occurred_at, metadata_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    entitlement_id,
-                    dataset_id,
-                    access_mode,
-                    1 if allowed else 0,
-                    reason,
-                    now,
-                    _json_dumps({"application_id": application_id, "api_disclosure": api_disclosure}),
-                ),
-            )
-        return {"allowed": allowed, "reason": reason, "entitlement_id": entitlement_id}
-
-    def upsert_data_licenses(
-        self,
-        licenses: Sequence[Mapping[str, Any]],
-        entitlements: Sequence[Mapping[str, Any]],
-    ) -> Dict[str, int]:
-        """Persist non-secret licence scope and entitlement metadata."""
-        now = get_shanghai_time().isoformat()
-        with self.get_connection() as conn:
-            for item in licenses:
-                conn.execute(
-                    """
-                    INSERT INTO commodity_data_licenses (
-                        license_id, provider, license_name, valid_from, valid_until,
-                        status, permitted_use, redistribution_mode, metadata_json,
-                        created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(license_id) DO UPDATE SET
-                        provider=excluded.provider,
-                        license_name=excluded.license_name,
-                        valid_from=excluded.valid_from,
-                        valid_until=excluded.valid_until,
-                        status=excluded.status,
-                        permitted_use=excluded.permitted_use,
-                        redistribution_mode=excluded.redistribution_mode,
-                        metadata_json=excluded.metadata_json,
-                        updated_at=excluded.updated_at
-                    """,
-                    (
-                        str(item["license_id"]),
-                        str(item.get("provider") or ""),
-                        str(item.get("license_name") or ""),
-                        item.get("valid_from"),
-                        item.get("valid_until"),
-                        str(item.get("status") or "inactive"),
-                        str(item.get("permitted_use") or ""),
-                        str(item.get("redistribution_mode") or "prohibited"),
-                        _json_dumps(dict(item.get("metadata") or {})),
-                        now,
-                        now,
-                    ),
-                )
-            for item in entitlements:
-                conn.execute(
-                    """
-                    INSERT INTO commodity_data_entitlements (
-                        entitlement_id, license_id, dataset_id, application_id,
-                        access_mode, api_disclosure_allowed, active, metadata_json,
-                        created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(entitlement_id) DO UPDATE SET
-                        license_id=excluded.license_id,
-                        dataset_id=excluded.dataset_id,
-                        application_id=excluded.application_id,
-                        access_mode=excluded.access_mode,
-                        api_disclosure_allowed=excluded.api_disclosure_allowed,
-                        active=excluded.active,
-                        metadata_json=excluded.metadata_json,
-                        updated_at=excluded.updated_at
-                    """,
-                    (
-                        str(item["entitlement_id"]),
-                        str(item["license_id"]),
-                        str(item["dataset_id"]),
-                        str(item.get("application_id") or "quote"),
-                        str(item.get("access_mode") or "internal_read"),
-                        1 if _coerce_bool(item.get("api_disclosure_allowed"), False) else 0,
-                        1 if _coerce_bool(item.get("active"), False) else 0,
-                        _json_dumps(dict(item.get("metadata") or {})),
-                        now,
-                        now,
-                    ),
-                )
-        return {"licenses": len(licenses), "entitlements": len(entitlements)}
 
     def upsert_series_candidates(
         self,
@@ -3308,117 +3137,6 @@ class NbsProductionMaterialsProvider:
                 "date_gap_fill": discovery_diagnostics,
                 "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
             },
-        )
-
-
-class LicensedOfficialLmeFileProvider:
-    """Entitlement-gated adapter for operator-provided official LME files."""
-
-    def __init__(
-        self,
-        storage: SpecialCommodityStorageManager,
-        source_profile: str,
-        source_cfg: Mapping[str, Any],
-    ):
-        self.storage = storage
-        self.source_profile = source_profile
-        self.source_cfg = dict(source_cfg or {})
-
-    def fetch(
-        self,
-        series: Sequence[CommoditySeries],
-        *,
-        start_date: Optional[str],
-        end_date: Optional[str],
-    ) -> CommodityProviderResult:
-        dataset_id = str(self.source_cfg.get("dataset_id") or "")
-        application_id = str(self.source_cfg.get("application_id") or "quote")
-        entitlement = self.storage.check_data_entitlement(
-            dataset_id=dataset_id,
-            application_id=application_id,
-            access_mode="internal_read",
-        )
-        if not entitlement.get("allowed"):
-            return CommodityProviderResult(
-                blockers=[
-                    {
-                        "reason": "licensed_market_data_entitlement_blocked",
-                        "source_profile": self.source_profile,
-                        "dataset_id": dataset_id,
-                        "entitlement_reason": entitlement.get("reason"),
-                    }
-                ]
-            )
-        path_value = str(self.source_cfg.get("local_file_path") or "")
-        if not path_value:
-            return CommodityProviderResult(
-                blockers=[{"reason": "licensed_market_data_file_missing", "dataset_id": dataset_id}]
-            )
-        path = Path(path_value).expanduser().resolve()
-        allowed_root_value = str(self.source_cfg.get("allowed_file_root") or "")
-        if not allowed_root_value:
-            return CommodityProviderResult(
-                blockers=[{"reason": "licensed_market_data_allowed_root_missing", "dataset_id": dataset_id}]
-            )
-        allowed_root = Path(allowed_root_value).expanduser().resolve()
-        if path != allowed_root and allowed_root not in path.parents:
-            return CommodityProviderResult(
-                blockers=[{"reason": "licensed_market_data_file_outside_allowed_root", "dataset_id": dataset_id}]
-            )
-        if not path.is_file():
-            return CommodityProviderResult(
-                blockers=[{"reason": "licensed_market_data_file_not_found", "path": str(path)}]
-            )
-        try:
-            frame = __import__("pandas").read_csv(path)
-        except Exception as exc:
-            return CommodityProviderResult(blockers=[{"reason": "licensed_market_data_file_parse_failed", "error": str(exc)}])
-        date_column = str(self.source_cfg.get("date_column") or "date")
-        value_column = str(self.source_cfg.get("value_column") or "value")
-        symbol_column = str(self.source_cfg.get("symbol_column") or "symbol")
-        required = {date_column, value_column, symbol_column}
-        missing = sorted(required - set(frame.columns))
-        if missing:
-            return CommodityProviderResult(blockers=[{"reason": "licensed_market_data_columns_missing", "columns": missing}])
-        observations: List[CommodityObservation] = []
-        by_symbol = {item.source_symbol: item for item in series}
-        for row in frame.to_dict("records"):
-            item = by_symbol.get(str(row.get(symbol_column) or ""))
-            parsed_date = _parse_date(row.get(date_column))
-            observation_date = parsed_date.isoformat() if parsed_date else None
-            if item is None or observation_date is None:
-                continue
-            if start_date and observation_date < start_date:
-                continue
-            if end_date and observation_date > end_date:
-                continue
-            try:
-                value = float(row[value_column])
-            except (TypeError, ValueError):
-                continue
-            raw_hash = _hash_payload(row)
-            observations.append(
-                CommodityObservation(
-                    series_id=item.series_id,
-                    observation_date=observation_date,
-                    value=value,
-                    currency=item.currency,
-                    unit=item.unit,
-                    raw_value=value,
-                    raw_currency=item.currency,
-                    raw_unit=item.unit,
-                    source_profile=self.source_profile,
-                    source_url=f"licensed-file://{path.name}",
-                    quality_flag="licensed_official_market_data",
-                    source_symbol=item.source_symbol,
-                    parser_version=str(self.source_cfg.get("parser_version") or "lme_licensed_file.v1"),
-                    raw_payload_hash=raw_hash,
-                    metadata={"dataset_id": dataset_id, "entitlement_id": entitlement.get("entitlement_id")},
-                )
-            )
-        return CommodityProviderResult(
-            observations=observations,
-            metadata={"dataset_id": dataset_id, "licensed": True, "file": path.name},
         )
 
 
@@ -6175,12 +5893,6 @@ class SpecialCommodityReadService:
             source_document_count = conn.execute(
                 "SELECT COUNT(*) FROM commodity_source_documents"
             ).fetchone()[0]
-            active_entitlements = conn.execute(
-                "SELECT COUNT(*) FROM commodity_data_entitlements WHERE active = 1"
-            ).fetchone()[0]
-            denied_accesses = conn.execute(
-                "SELECT COUNT(*) FROM commodity_data_access_audit WHERE allowed = 0"
-            ).fetchone()[0]
         return {
             "status": "success",
             "series_count": len(series_rows),
@@ -6197,8 +5909,6 @@ class SpecialCommodityReadService:
             "series_candidates_scheduler_eligible": sum(
                 bool(item.get("scheduler_eligible")) for item in series_candidates
             ),
-            "active_data_entitlements": active_entitlements,
-            "denied_licensed_data_accesses": denied_accesses,
             "source_policy": "local_commodity_db_only",
         }
 

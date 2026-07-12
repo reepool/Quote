@@ -489,4 +489,4 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 - EIA API key，用于当前 WTI/Brent 官方主源。
 - LME.com 账号不再是当前聚合行情方案的运行依赖。
 
-后续政策发现、实际长协证据、煤炭库存/港口价/运费、LME 官方付费数据及更多连续商品序列的增强需求，见 [特殊商品政策、产业证据与行情目录增强需求说明书](special_commodity_market_data_enhancement_requirements.md)。该增强拆分为 `enhance-commodity-policy-and-industrial-evidence` 与 `expand-special-commodity-series-catalog` 两个 OpenSpec change，避免将低频政策治理和 100ppi 行情扩品混为同一任务。
+后续政策发现、实际长协证据、煤炭库存/港口价/运费及更多连续商品序列的增强需求，见 [特殊商品政策、产业证据与行情目录增强需求说明书](special_commodity_market_data_enhancement_requirements.md)。该增强拆分为 `enhance-commodity-policy-and-industrial-evidence` 与 `expand-special-commodity-series-catalog` 两个 OpenSpec change，避免将低频政策治理和 100ppi 行情扩品混为同一任务。

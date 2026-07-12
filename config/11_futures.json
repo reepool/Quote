@@ -874,25 +874,6 @@
           },
           "note": "Use Sina first. Use Eastmoney for primary request/schema failure and bounded date-gap repair. Preserve the selected provider and fallback reason in observation metadata; do not perform routine full dual-source daily downloads."
         },
-        "lme_official_licensed_file": {
-          "venue": "LME",
-          "source": "London Metal Exchange licensed official dataset",
-          "source_mode": "licensed_operator_file",
-          "source_interface": "entitlement_gated_csv",
-          "provider_adapter": "lme_licensed_file_not_registered_until_entitled",
-          "governance_adapter": "foreign_futures",
-          "enabled": false,
-          "dataset_id": "",
-          "application_id": "quote",
-          "allowed_file_root": "",
-          "local_file_path": "",
-          "date_column": "date",
-          "symbol_column": "symbol",
-          "value_column": "value",
-          "quality_flag": "licensed_official_market_data",
-          "parser_version": "lme_licensed_file.v1",
-          "note": "Fail closed. Configure only after purchasing the dataset and recording permitted use, entitlement, retention, and API disclosure terms. Official series IDs must remain separate from aggregated LME 3M proxy series."
-        },
         "nbs_production_material_market_price": {
           "venue": "NBS",
           "source": "National Bureau of Statistics production-material market prices",
