@@ -1790,6 +1790,70 @@ class DataManager:
             )
         return None
 
+    async def get_research_industry_as_of(
+        self,
+        instrument_id: str,
+        as_of_date: str,
+        *,
+        taxonomy_system: Optional[str] = None,
+        include_snapshot: bool = True,
+    ) -> Optional[Dict[str, Any]]:
+        """读取研究域行业归属的时点化视图 (REQ-07.2)。"""
+        storage = self._require_research_storage()
+        industry_config = self.research_config.modules.get("industry", {})
+        if not industry_config.get("enabled", False):
+            raise RuntimeError("research industry module is disabled")
+
+        normalized_id = convert_to_database_format(instrument_id)
+        return await asyncio.to_thread(
+            storage.get_industry_membership_as_of,
+            normalized_id,
+            as_of_date,
+            taxonomy_system=taxonomy_system,
+            include_snapshot=include_snapshot,
+        )
+
+    async def get_research_risk_free_rate(
+        self,
+        series_id: str,
+        *,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """读取无风险利率序列观测值 (REQ-13)。无数据返回空序列而非报错。"""
+        storage = self._require_research_storage()
+        series_list = await asyncio.to_thread(storage.list_risk_free_rate_series)
+        series_meta = next(
+            (s for s in series_list if s.get("series_id") == series_id), None
+        )
+        observations = await asyncio.to_thread(
+            storage.get_risk_free_rate_observations,
+            series_id,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        return {
+            "series_id": series_id,
+            "series": series_meta,
+            "observations": observations,
+            "total": len(observations),
+        }
+
+    async def list_research_risk_free_rate_series(self) -> List[Dict[str, Any]]:
+        """列出所有无风险利率序列定义 (REQ-13)。"""
+        storage = self._require_research_storage()
+        return await asyncio.to_thread(storage.list_risk_free_rate_series)
+
+    async def sync_risk_free_rate(
+        self, *, data_as_of: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """采集无风险利率序列写入研究存储 (REQ-13, 写入侧)。"""
+        from research.risk_free_rate_sync import RiskFreeRateSyncService
+
+        storage = self._require_research_storage()
+        service = RiskFreeRateSyncService(storage)
+        return await asyncio.to_thread(service.sync, data_as_of=data_as_of)
+
     async def list_research_industry_taxonomy(
         self,
         *,

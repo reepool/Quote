@@ -1569,6 +1569,68 @@ class ResearchIndustryMembershipResponse(BaseModel):
     membership: Optional[Dict[str, Any]] = Field(None, description="标准化归属详情")
 
 
+class RiskFreeRateSeriesMeta(BaseModel):
+    """无风险利率序列定义 (REQ-13)。"""
+    series_id: str = Field(..., description="序列标识")
+    name: Optional[str] = Field(None, description="序列名称")
+    rate_type: Optional[str] = Field(None, description="利率类型, 如 china_treasury_yield / shibor")
+    tenor: Optional[str] = Field(None, description="期限, 如 10Y/3M/ON")
+    currency: Optional[str] = Field(None, description="币种")
+    unit: Optional[str] = Field(None, description="单位, 如 percent_annual")
+    frequency: Optional[str] = Field(None, description="频率")
+    timezone: Optional[str] = Field(None, description="时区")
+    source_profile: Optional[str] = Field(None, description="来源画像")
+    source: Optional[str] = Field(None, description="数据来源")
+    data_as_of: Optional[str] = Field(None, description="数据截止")
+
+
+class RiskFreeRateObservation(BaseModel):
+    """无风险利率观测值 (REQ-13)。"""
+    observation_date: str = Field(..., description="观测日 (YYYY-MM-DD)")
+    value: Optional[float] = Field(None, description="利率值")
+    source: Optional[str] = Field(None, description="数据来源")
+    data_as_of: Optional[str] = Field(None, description="数据截止")
+    revision_id: Optional[str] = Field("latest", description="修订标识")
+
+
+class RiskFreeRateResponse(BaseModel):
+    """无风险利率序列响应 (REQ-13)。无数据时 observations 为空。"""
+    series_id: str = Field(..., description="序列标识")
+    series: Optional[RiskFreeRateSeriesMeta] = Field(None, description="序列定义 (可能为 null)")
+    total: int = Field(0, description="观测值数量")
+    observations: List[RiskFreeRateObservation] = Field(
+        default_factory=list, description="按日期升序的观测值"
+    )
+
+
+class RiskFreeRateSeriesListResponse(BaseModel):
+    """无风险利率序列列表响应 (REQ-13)。"""
+    total: int = Field(0, description="序列数量")
+    series: List[RiskFreeRateSeriesMeta] = Field(default_factory=list, description="序列定义列表")
+
+
+class ResearchIndustryMembershipAsOfResponse(BaseModel):
+    """研究域行业归属时点化响应 (REQ-07.2)。
+
+    基于官方分类变更留痕, 返回 as_of_date 当日生效的分类与区间。
+    """
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: Optional[str] = Field(None, description="交易代码")
+    exchange: Optional[str] = Field(None, description="交易所")
+    taxonomy_system: Optional[str] = Field(None, description="内部行业体系标识")
+    taxonomy_version: Optional[str] = Field(None, description="行业体系版本")
+    official_industry_code: Optional[str] = Field(None, description="官方行业编码")
+    as_of_date: str = Field(..., description="查询时点 (YYYY-MM-DD)")
+    effective_date: Optional[str] = Field(None, description="该分类区间起 (生效日)")
+    expiry_date: Optional[str] = Field(None, description="该分类区间止 (下一次变更日; null=至今)")
+    source: Optional[str] = Field(None, description="数据来源")
+    source_mode: Optional[str] = Field(None, description="命中模式")
+    official_update_time: Optional[str] = Field(None, description="官方更新时间")
+    created_at: Optional[str] = Field(None, description="创建时间")
+    updated_at: Optional[str] = Field(None, description="更新时间")
+    classification: Optional[Dict[str, Any]] = Field(None, description="官方分类详情")
+
+
 class ResearchIndustryTaxonomyNodeResponse(BaseModel):
     """研究域行业 taxonomy 节点响应模型。"""
 
