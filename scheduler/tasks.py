@@ -1755,6 +1755,15 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"文档新增 `{document_write.get('inserted', 0)}`/预计 `{document_write.get('would_write', 0)}`｜"
             f"候选新增 `{candidate_write.get('inserted', 0)}`/预计 `{candidate_write.get('would_write', 0)}`"
         )
+        event_reconciliation = result.get("event_reconciliation") or {}
+        if event_reconciliation:
+            lines.append(
+                "正式事件对账: "
+                f"新增 `{event_reconciliation.get('inserted', 0)}`｜"
+                f"更新 `{event_reconciliation.get('changed', 0)}`｜"
+                f"不变 `{event_reconciliation.get('unchanged', 0)}`｜"
+                f"状态 `{event_reconciliation.get('status', 'unknown')}`"
+            )
     elif result.get("candidate_id") and result.get("decision"):
         lines.append(
             "政策候选审核: "
@@ -4467,49 +4476,6 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('special_commodity_calendar_governance')
-
-    async def special_commodity_policy_event_sync(
-        self,
-        dry_run: bool = False,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        """特殊商品政策/长协事件导入任务。"""
-        self._active_tasks.add('special_commodity_policy_event_sync')
-        try:
-            result = await data_manager.run_special_commodity_policy_event_sync(dry_run=dry_run)
-            success = result.get("status") == "success"
-            await self._send_task_report(
-                report_data={
-                    'name': '特殊商品政策事件维护报告',
-                    'content': _format_special_commodity_scheduler_report(result),
-                    'status': 'success' if success else result.get("status", "error"),
-                    'tasks_completed': int(result.get("policy_events", 0) or 0),
-                    'duration': 'N/A',
-                    'maintenance_tasks': [{'task_name': 'special_commodity_policy_event_sync', 'status': result.get("status")}],
-                },
-                report_type='maintenance_report',
-                task_name='特殊商品政策事件维护',
-                job_config=job_config,
-            )
-            return success
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Special commodity policy event sync failed: {e}")
-            await self._send_task_report(
-                report_data={
-                    'name': '特殊商品政策事件维护报告',
-                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
-                    'status': 'error',
-                    'tasks_completed': 0,
-                    'duration': 'N/A',
-                    'maintenance_tasks': [{'task_name': 'special_commodity_policy_event_sync', 'status': str(e)}],
-                },
-                report_type='maintenance_report',
-                task_name='特殊商品政策事件维护',
-                job_config=job_config,
-            )
-            return False
-        finally:
-            self._active_tasks.discard('special_commodity_policy_event_sync')
 
     async def special_commodity_policy_discovery(
         self,

@@ -377,9 +377,9 @@ scope 解析
 | `special_commodity_price_sync` | 周二至周六 08:00 | 同步 LME 3M 代理日线和 EIA/FRED WTI、Brent |
 | `special_commodity_cn_spot_sync` | 周一至周五 22:30 | 同步100ppi国内现货和NBS动力煤旬价 |
 | `special_commodity_price_monthly_sync` | 每月10日、20日 08:40 | 同步 FRED/IMF、World Bank 铜铝月度价格 |
-| `special_commodity_policy_event_sync` | `manual_only` | 导入已完成证据复核的动力煤长协/政策事件 |
+| `special_commodity_policy_discovery` | 每月15日 09:10 | 发现NDRC新增/修订政策、保存证据和候选，并在同一任务末尾幂等对账正式事件 |
 
-`special_commodity_policy_event_sync` 当前保持 `manual_only`：它导入已经完成证据复核的配置事件，不负责联网发现新政策。将该导入任务并入日更只会重复幂等写入，不能提升政策发现及时性。未来如实现 NDRC 官方政策目录发现、文号去重、正文解析和变更复核，应新增独立的低频政策治理任务（建议月度），审核通过后再调用本导入链路；不得把政策区间展开为日行情。
+政策治理已经收口为单一月度运维入口 `special_commodity_policy_discovery`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与官方基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene` 与 `cn_nbs_thermal_coal`。任务共用同一 provider/governance/persistence 链路，默认回看最近10个自然日；该窗口同时覆盖 NBS 旬价通常约4天的发布滞后。各 scope 隔离来源、频率、报告和日期治理。国内现货及官方旬价不进入期货连续合约任务，因为来源观测日、单值价格和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
@@ -399,7 +399,7 @@ FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略
 - `/run special_commodity_price_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_nbs_thermal_coal start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_policy_event_sync dry_run`
+- `/run special_commodity_policy_discovery adapter_id=ndrc start_date=YYYY-MM-DD end_date=YYYY-MM-DD dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 
 部署后 API 统一位于 `/api/v1` 前缀下：

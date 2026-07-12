@@ -1848,6 +1848,7 @@ def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monk
     assert result["documents"] == 1
     assert result["candidates"] == 1
     assert result["ready_for_promotion"] == 1
+    assert result["event_reconciliation"]["inserted"] == 1
     candidate = storage.read_policy_candidates()[0]
     review_code = candidate["candidate_id"].rsplit(".", 1)[-1][:8]
     assert storage.resolve_policy_candidate(review_code)["candidate_id"] == candidate["candidate_id"]
@@ -1867,7 +1868,9 @@ def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monk
         dry_run=False
     )
     assert promotion["status"] == "success"
-    assert promotion["inserted"] == 1
+    assert promotion["inserted"] == 0
+    assert promotion["already_represented"] == 1
+    assert promotion["unchanged"] == 1
     promoted = storage.read_policy_events()[0]
     assert promoted["value_low"] == 570.0
     assert promoted["value_high"] == 770.0

@@ -5727,6 +5727,12 @@ class SpecialCommodityPolicyDiscoveryService:
         warnings = list(discovered.get("warnings") or [])
         document_write = self.storage.upsert_source_documents(documents, dry_run=dry_run)
         candidate_write = self.storage.upsert_policy_candidates(candidates, dry_run=dry_run)
+        event_reconciliation: Dict[str, Any] = {}
+        if not dry_run:
+            event_reconciliation = SpecialCommodityPolicyEventService(
+                self.storage,
+                self.module_cfg,
+            ).sync(dry_run=False)
         documents_by_id = {str(item.get("document_id")): item for item in documents}
         persisted_by_id = {
             str(item["candidate_id"]): item for item in self.storage.read_policy_candidates()
@@ -5779,6 +5785,7 @@ class SpecialCommodityPolicyDiscoveryService:
             "review_actions": review_actions,
             "document_write": document_write,
             "candidate_write": candidate_write,
+            "event_reconciliation": event_reconciliation,
             "warnings": warnings,
             "blockers": blockers,
             "checkpoint": discovered.get("checkpoint", {}),

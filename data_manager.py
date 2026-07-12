@@ -4957,24 +4957,6 @@ class DataManager:
             commodity_id=commodity_id,
         )
 
-    async def run_special_commodity_policy_event_sync(
-        self,
-        *,
-        dry_run: bool = False,
-    ) -> Dict[str, Any]:
-        """Import reviewed special commodity policy/contract events."""
-        storage = self._require_special_commodity_storage()
-        module_cfg = (
-            self.research_config.modules.get("commodity_market_data", {})
-            .get("special_commodity_market_data", {})
-        )
-        from research.special_commodity_market_data import SpecialCommodityPolicyEventService
-
-        return await asyncio.to_thread(
-            SpecialCommodityPolicyEventService(storage, module_cfg).sync,
-            dry_run=dry_run,
-        )
-
     async def run_special_commodity_policy_discovery(
         self,
         *,

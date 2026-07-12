@@ -931,24 +931,10 @@
           "max_runtime_seconds": 1800
         }
       },
-      "special_commodity_policy_event_sync": {
-        "enabled": true,
-        "manual_only": true,
-        "description": "特殊商品政策/长协事件导入（官方或人工证据复核后从配置导入）",
-        "report": true,
-        "pre_run_notify": false,
-        "max_instances": 1,
-        "misfire_grace_time": 600,
-        "coalesce": true,
-        "parameters": {
-          "dry_run": true,
-          "max_runtime_seconds": 600
-        }
-      },
       "special_commodity_policy_discovery": {
         "enabled": true,
-        "manual_only": true,
-        "description": "NDRC等官方政策目录发现、版本存证与候选治理；当前仅允许手工dry-run，完成生产验收后再启用月度调度",
+        "manual_only": false,
+        "description": "NDRC等官方政策目录月度发现、版本存证与候选治理；新候选通过报告驱动人工审核并一步提升",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -963,7 +949,7 @@
         "coalesce": true,
         "parameters": {
           "adapter_id": "ndrc",
-          "dry_run": true,
+          "dry_run": false,
           "max_runtime_seconds": 1800
         }
       },
