@@ -10,9 +10,17 @@
 """
 from __future__ import annotations
 
+import logging
+import time
 from typing import Any, Callable, Dict, List, Optional
 
-from utils import db_logger
+# 注: 不用 utils.db_logger ("Database" 模块日志器) —— config/01_log.json 将其
+# 显式设为 WARNING(抑制高频 DB 层日志), info() 会被静默丢弃。本模块用独立的
+# logging.getLogger(__name__), 与 research/fx_market_data.py 的惯例一致, 保证
+# 中长程采集的阶段性进度日志真正可见。
+logger = logging.getLogger(__name__)
+
+_PROGRESS_LOG_EVERY = 200
 
 CHINA_TREASURY_10Y = {
     "series_id": "china_treasury_10y",
@@ -34,40 +42,57 @@ _CN10Y_COLUMNS = ("中国国债收益率10年", "中国国债收益率10年%")
 
 def fetch_china_treasury_10y() -> List[Dict[str, Any]]:
     """拉取中国 10Y 国债收益率序列; 失败返回空列表。"""
+    started = time.monotonic()
+    logger.info("[RiskFreeRate] fetch_china_treasury_10y: requesting akshare.bond_zh_us_rate() ...")
     try:
         import akshare as ak  # type: ignore
 
         df = ak.bond_zh_us_rate()
     except Exception as exc:  # pragma: no cover - 网络/源不可用
-        db_logger.warning("fetch_china_treasury_10y failed: %s", exc)
+        logger.warning("fetch_china_treasury_10y failed: %s", exc)
         return []
 
     if df is None or getattr(df, "empty", True):
+        logger.warning("fetch_china_treasury_10y: source returned empty frame")
         return []
 
     date_col = next((c for c in _DATE_COLUMNS if c in df.columns), None)
     value_col = next((c for c in _CN10Y_COLUMNS if c in df.columns), None)
     if date_col is None or value_col is None:
-        db_logger.warning(
+        logger.warning(
             "bond_zh_us_rate columns unexpected: %s", list(df.columns)
         )
         return []
 
+    total_rows = len(df)
+    logger.info(
+        "[RiskFreeRate] fetch_china_treasury_10y: received %s rows in %.1fs, parsing ...",
+        total_rows, time.monotonic() - started,
+    )
+
     observations: List[Dict[str, Any]] = []
-    for _, row in df.iterrows():
+    for index, (_, row) in enumerate(df.iterrows(), start=1):
         raw_date = row.get(date_col)
         raw_value = row.get(value_col)
-        if raw_date is None or raw_value is None:
-            continue
-        try:
-            value = float(raw_value)
-        except (TypeError, ValueError):
-            continue
-        if value != value:  # skip NaN (early history has gaps)
-            continue
-        observations.append(
-            {"observation_date": str(raw_date)[:10], "value": value}
-        )
+        if raw_date is not None and raw_value is not None:
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError):
+                value = float("nan")
+            if value == value:  # skip NaN (early history has gaps)
+                observations.append(
+                    {"observation_date": str(raw_date)[:10], "value": value}
+                )
+        if index % _PROGRESS_LOG_EVERY == 0 or index == total_rows:
+            logger.info(
+                "[RiskFreeRate] fetch_china_treasury_10y: parsed %s/%s rows (%s valid so far)",
+                index, total_rows, len(observations),
+            )
+
+    logger.info(
+        "[RiskFreeRate] fetch_china_treasury_10y: done, %s valid observations in %.1fs total",
+        len(observations), time.monotonic() - started,
+    )
     return observations
 
 
@@ -87,6 +112,9 @@ class RiskFreeRateSyncService:
 
     def sync(self, *, data_as_of: Optional[str] = None) -> Dict[str, Any]:
         series_id = self._series_meta["series_id"]
+        started = time.monotonic()
+        logger.info("[RiskFreeRate] sync start series_id=%s", series_id)
+
         meta = dict(self._series_meta)
         if data_as_of:
             meta["data_as_of"] = data_as_of
@@ -98,8 +126,17 @@ class RiskFreeRateSyncService:
             obs.setdefault("source_mode", meta.get("source_mode"))
             if data_as_of:
                 obs.setdefault("data_as_of", data_as_of)
+
+        logger.info(
+            "[RiskFreeRate] sync series_id=%s fetched=%s, writing ...",
+            series_id, len(observations),
+        )
         written = self._storage.upsert_risk_free_rate_observations(
             series_id, observations
+        )
+        logger.info(
+            "[RiskFreeRate] sync done series_id=%s fetched=%s written=%s elapsed=%.1fs",
+            series_id, len(observations), written, time.monotonic() - started,
         )
         return {
             "series_id": series_id,
