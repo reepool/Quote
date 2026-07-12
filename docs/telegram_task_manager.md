@@ -347,7 +347,7 @@ restart_system - 重启系统服务
 • 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
 • 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
 • 特殊商品政策/长协事件导入 (special_commodity_policy_event_sync) - 仅手工运行
-• 特殊商品政策目录发现 (special_commodity_policy_discovery) - 手工可运行；月度调度当前禁用待验收
+• 特殊商品政策目录发现 (special_commodity_policy_discovery) - `enabled=true + manual_only=true`，手工可运行但不自动调度；生产验收后再启用月度触发器
 • 特殊商品扩品候选目录 (special_commodity_series_catalog_sync) - 仅手工运行，不自动上线候选
 • 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00

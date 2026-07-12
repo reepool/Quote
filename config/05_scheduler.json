@@ -946,9 +946,9 @@
         }
       },
       "special_commodity_policy_discovery": {
-        "enabled": false,
-        "manual_only": false,
-        "description": "NDRC等官方政策目录月度发现、版本存证与候选治理；真实dry-run验收后再启用",
+        "enabled": true,
+        "manual_only": true,
+        "description": "NDRC等官方政策目录发现、版本存证与候选治理；当前仅允许手工dry-run，完成生产验收后再启用月度调度",
         "report": true,
         "pre_run_notify": true,
         "trigger": {

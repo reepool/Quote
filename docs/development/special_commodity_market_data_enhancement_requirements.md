@@ -163,7 +163,7 @@ LME 官方历史数据可通过 LME Portal/Data Services 购买；官网说明�
 
 首期实现状态：
 
-- 已实现 `special_commodity_policy_discovery` 的统一 Scheduler/DataManager/API 入口；月度配置位于每月15日09:10，但在真实验收完成前保持 `enabled=false`。
+- 已实现 `special_commodity_policy_discovery` 的统一 Scheduler/DataManager/API 入口；当前采用 `enabled=true + manual_only=true`，允许手工 dry-run，但不会加入自动调度。月度触发器预设为每月15日09:10，完成生产验收后再将 `manual_only` 改为 `false`。
 - 手工 dry-run：`/run special_commodity_policy_discovery adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
 - 本地 API：`GET /api/v1/research/commodities/policy-candidates`、`GET /api/v1/research/commodities/source-documents`、`POST /api/v1/research/commodities/policy-discovery`。
 - `ready_for_promotion` 仅表示 parser 字段完整；必须明确变更为 `approved` 后，现有 `special_commodity_policy_event_sync` 才会通过统一 validator 提升正式事件。
