@@ -15,7 +15,7 @@ import time
 from calendar import monthrange
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequence
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -2295,7 +2295,12 @@ class NbsProductionMaterialsProvider:
         discovered: Dict[str, Dict[str, str]] = {}
         warnings: List[Dict[str, Any]] = []
         request_count = 0
-        expected_periods = self._expected_periods(start, end)
+        publication_lag_days = max(
+            0, int(self.source_cfg.get("publication_lag_days") or 4)
+        )
+        today = get_shanghai_time().date()
+        eligible_end = min(end, today - timedelta(days=publication_lag_days))
+        expected_periods = self._expected_periods(start, eligible_end)
         short_range_limit = max(1, int(self.source_cfg.get("exact_only_max_periods") or 12))
         if len(expected_periods) > short_range_limit:
             for sort in ("dateAsc", "dateDesc"):
@@ -2337,26 +2342,34 @@ class NbsProductionMaterialsProvider:
                 observation_date = period["observation_date"]
                 if observation_date in discovered:
                     continue
-                try:
-                    rows = self._search_page(
-                        page=1,
-                        sort="relevance",
-                        query=self._exact_search_query(period),
-                    )
-                except Exception as exc:
-                    warnings.append(
-                        {
-                            "reason": "nbs_exact_article_search_failed",
-                            "observation_date": observation_date,
-                            "error": str(exc),
-                        }
-                    )
-                    continue
-                request_count += 1
-                match = next(
-                    (row for row in rows if row["observation_date"] == observation_date),
-                    None,
+                match: Optional[Dict[str, str]] = None
+                exact_max_pages = max(
+                    1, int(self.source_cfg.get("exact_search_max_pages") or 3)
                 )
+                for page in range(1, exact_max_pages + 1):
+                    try:
+                        rows = self._search_page(
+                            page=page,
+                            sort="relevance",
+                            query=self._exact_search_query(period),
+                        )
+                    except Exception as exc:
+                        warnings.append(
+                            {
+                                "reason": "nbs_exact_article_search_failed",
+                                "observation_date": observation_date,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        break
+                    request_count += 1
+                    match = next(
+                        (row for row in rows if row["observation_date"] == observation_date),
+                        None,
+                    )
+                    if match:
+                        break
                 if match:
                     discovered[observation_date] = match
                 if index % 24 == 0:
@@ -2368,12 +2381,31 @@ class NbsProductionMaterialsProvider:
                         start,
                         end,
                     )
+        missing_periods = [
+            period["observation_date"]
+            for period in expected_periods
+            if period["observation_date"] not in discovered
+        ]
+        if missing_periods:
+            warnings.append(
+                {
+                    "reason": "nbs_unresolved_observation_periods",
+                    "expected_periods": len(expected_periods),
+                    "discovered_periods": len(discovered),
+                    "missing_periods": len(missing_periods),
+                    "missing_samples": missing_periods[:50],
+                    "publication_eligible_end": eligible_end.isoformat(),
+                }
+            )
         logger.info(
-            "[NbsProductionMaterials] discovery done search_requests=%s articles=%s range=%s..%s",
+            "[NbsProductionMaterials] discovery done search_requests=%s articles=%s expected=%s unresolved=%s range=%s..%s publication_eligible_end=%s",
             request_count,
             len(discovered),
+            len(expected_periods),
+            len(missing_periods),
             start,
             end,
+            eligible_end,
         )
         return sorted(discovered.values(), key=lambda row: row["observation_date"]), warnings
 
@@ -2480,6 +2512,14 @@ class NbsProductionMaterialsProvider:
                     "end_date": end_date,
                 }
             )
+        unresolved = next(
+            (
+                item
+                for item in warnings
+                if item.get("reason") == "nbs_unresolved_observation_periods"
+            ),
+            {},
+        )
         return CommodityProviderResult(
             observations=observations,
             warnings=warnings,
@@ -2488,6 +2528,14 @@ class NbsProductionMaterialsProvider:
                 "provider": "NBS",
                 "articles": len(articles),
                 "rows": len(observations),
+                "date_gap_fill": {
+                    "enabled": True,
+                    "expected_periods": unresolved.get("expected_periods", len(articles)),
+                    "discovered_periods": unresolved.get("discovered_periods", len(articles)),
+                    "unresolved_dates": unresolved.get("missing_periods", 0),
+                    "unresolved_samples": unresolved.get("missing_samples", []),
+                    "publication_eligible_end": unresolved.get("publication_eligible_end"),
+                },
                 "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
             },
         )
@@ -3781,7 +3829,6 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
             )
         return CommodityMasterGovernanceResult(
             records=records,
-            warnings=list(result.warnings),
             blockers=blockers,
             prefetched_result=result,
         )
@@ -4323,7 +4370,15 @@ class SpecialCommodityGovernancePipeline:
             item.get("governance_stage")
             in {"adapter_resolution", "master_data", "provider", "date"}
             for item in blockers
-        ) else ("warning" if any(item.get("reason") == "no_source_observed_dates" for item in warnings) else "success")
+        ) else (
+            "warning"
+            if any(
+                item.get("reason")
+                in {"no_source_observed_dates", "nbs_unresolved_observation_periods"}
+                for item in warnings
+            )
+            else "success"
+        )
         return {
             "status": "blocked" if blockers else ("warning" if warnings else "success"),
             "dry_run": dry_run,

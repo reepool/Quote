@@ -51,6 +51,10 @@ class InstrumentDB(Base):
     sector = Column(String(64), nullable=True, index=True)  # 板块
     market = Column(String(16), nullable=True, index=True)  # 市场 (主板、创业板等)
 
+    # Trading specification (REQ-12) - 逐股每手数 / 价位, 主要用于港股; A股默认由平台处理
+    lot_size = Column(Integer, nullable=True)  # 每手股数 (board lot)
+    tick_size = Column(Float, nullable=True)   # 最小价位 (tick size)
+
     # Trading status
     status = Column(String(16), nullable=False, default='active', index=True)  # active, suspended, delisted
     is_active = Column(Boolean, default=True, index=True)  # 兼容性字段

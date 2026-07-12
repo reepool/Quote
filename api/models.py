@@ -72,6 +72,10 @@ class InstrumentResponse(BaseModel):
     sector: Optional[str] = Field(None, description="板块")
     market: Optional[str] = Field(None, description="市场")
 
+    # 交易规格 (REQ-12) - 主要用于港股; A股/未知时为 null
+    lot_size: Optional[int] = Field(None, description="每手股数 (board lot); 未知为 null")
+    tick_size: Optional[float] = Field(None, description="最小价位 (tick size); 未知为 null")
+
     # 交易状态
     status: InstrumentStatusEnum = Field(InstrumentStatusEnum.ACTIVE, description="交易状态")
     is_active: bool = Field(True, description="是否活跃")
@@ -176,6 +180,95 @@ class DailyQuoteResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class DailyQuotePaginationMeta(BaseModel):
+    """日线行情分页元数据 (REQ-11.1)"""
+    limit: Optional[int] = Field(None, description="本次请求的限制数; None 表示未分页, 返回全量")
+    offset: int = Field(0, description="偏移量")
+    total_available: int = Field(0, description="过滤后可用总记录数 (分页前)")
+    returned_records: int = Field(0, description="本次响应实际返回的记录数")
+
+
+class DailyQuotesEnvelopeResponse(BaseModel):
+    """/quotes/daily 200 响应外层结构 (REQ-04.6 契约化)
+
+    说明:
+    - `data` 中每行的字段语义见 `DailyQuoteResponse`。
+    - 后复权价 = 原始价 × cumulative_factor(t); 前复权价 = 原始价 × cumulative_factor(t)/cumulative_factor(latest)。
+    - `time` 使用 Asia/Shanghai 时区; `volume` 单位为股, `amount` 为成交额(人民币元)。
+    - `start_date`/`end_date` 双端包含。
+    """
+    instrument_id: str = Field(..., description="交易品种ID")
+    symbol: str = Field(..., description="交易代码")
+    name: Optional[str] = Field(None, description="品种名称")
+    exchange: Optional[str] = Field(None, description="交易所")
+    data: List[DailyQuoteResponse] = Field(default_factory=list, description="日线行情行")
+    total_records: int = Field(0, description="本次响应返回的记录数")
+    start_date: Optional[str] = Field(None, description="查询开始日期 (含)")
+    end_date: Optional[str] = Field(None, description="查询结束日期 (含)")
+    format: str = Field("json", description="返回格式: pandas/json/csv")
+    adjust: str = Field("qfq", description="复权类型: qfq=前复权, hfq=后复权, none=不复权")
+    filters: Dict[str, Any] = Field(default_factory=dict, description="生效的过滤条件")
+    stats: Optional[Dict[str, Any]] = Field(None, description="统计摘要")
+    quality_summary: Optional[Dict[str, Any]] = Field(None, description="质量摘要")
+    pagination: Optional[DailyQuotePaginationMeta] = Field(None, description="分页元数据 (REQ-11.1)")
+    include_delisted: bool = Field(False, description="本次请求是否允许退市证券 (REQ-01.1)")
+    instrument_delisted: bool = Field(False, description="该证券是否已退市 (delisted_date 非空)")
+
+
+class CorporateActionItem(BaseModel):
+    """单条公司行为事件 (REQ-02)
+
+    来源为复权因子事件表 adjustment_factors。字段可得性说明:
+    - record_date / pay_date / announcement_date 当前不采集, 恒为 null。
+    - 送股(bonus)与转增(transfer)未分离, 统一体现在 bonus_shares 并以 action_type 标注。
+    """
+    instrument_id: str = Field(..., description="交易品种ID")
+    ex_date: date = Field(..., description="除权除息日")
+    record_date: Optional[date] = Field(None, description="股权登记日 (当前不可得, 恒为 null)")
+    pay_date: Optional[date] = Field(None, description="现金到账日 (当前不可得, 恒为 null)")
+    announcement_date: Optional[date] = Field(None, description="公告日 (当前不可得, 恒为 null)")
+    action_type: Optional[str] = Field(
+        None, description="事件类型: dividend/split/rights/mixed/roll (来自 event_type)"
+    )
+    cash_dividend_per_share: Optional[float] = Field(None, description="每股现金分红 (税前)")
+    bonus_shares: Optional[float] = Field(None, description="每股送转股 (送股与转增合计, 未分离)")
+    rights_shares: Optional[float] = Field(None, description="每股配股数")
+    rights_price: Optional[float] = Field(None, description="配股价")
+    factor: Optional[float] = Field(None, description="单日除权因子")
+    cumulative_factor: Optional[float] = Field(None, description="累积后复权因子")
+    source: Optional[str] = Field(None, description="数据来源")
+    updated_at: Optional[datetime] = Field(None, description="记录更新时间")
+
+
+class CorporateActionsResponse(BaseModel):
+    """公司行为明细事件序列响应 (REQ-02)"""
+    instrument_id: str = Field(..., description="交易品种ID")
+    total: int = Field(0, description="事件数量")
+    events: List[CorporateActionItem] = Field(default_factory=list, description="按 ex_date 升序的事件序列")
+    source: Optional[str] = Field(None, description="数据来源")
+    data_as_of: Optional[datetime] = Field(None, description="数据截止时间 (最新事件的 updated_at)")
+    field_availability_note: str = Field(
+        "record_date/pay_date/announcement_date 当前不可得(null); 送股与转增未分离。",
+        description="字段可得性说明",
+    )
+
+
+class DailyCoverageItem(BaseModel):
+    """单日行情覆盖率 (REQ-01.3)"""
+    date: str = Field(..., description="交易日 (YYYY-MM-DD)")
+    exchange: Optional[str] = Field(None, description="交易所过滤")
+    instrument_type: Optional[str] = Field(None, description="品种类型过滤")
+    listed_count: int = Field(0, description="当日已上市且未退市的证券数")
+    quoted_count: int = Field(0, description="当日库内有行情的证券数")
+    coverage_ratio: Optional[float] = Field(None, description="quoted_count / listed_count")
+
+
+class DailyCoverageResponse(BaseModel):
+    """行情覆盖率响应 (REQ-01.3)"""
+    total: int = Field(0, description="返回的日期数")
+    items: List[DailyCoverageItem] = Field(default_factory=list, description="按日期升序的覆盖率")
 
 
 class TradingCalendarResponse(BaseModel):

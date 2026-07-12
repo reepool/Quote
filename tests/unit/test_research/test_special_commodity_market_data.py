@@ -285,6 +285,71 @@ def test_nbs_ten_day_title_period_parsing():
     }
 
 
+def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_production_material_market_price"])
+    source_cfg["exact_search_max_pages"] = 3
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    calls = []
+
+    def fake_search_page(*, page, sort, query):
+        calls.append((page, sort, query))
+        if page != 2:
+            return []
+        return [
+            {
+                "observation_date": "2017-01-10",
+                "period_start": "2017-01-01",
+                "period_end": "2017-01-10",
+                "publication_date": "2017-01-14",
+                "title": "流通领域重要生产资料市场价格变动情况（2017年1月1-10日）",
+                "source_url": "https://www.stats.gov.cn/example.html",
+            }
+        ]
+
+    monkeypatch.setattr(provider, "_search_page", fake_search_page)
+    articles, warnings = provider._discover_articles(
+        date(2017, 1, 1), date(2017, 1, 10)
+    )
+
+    assert [item[0] for item in calls] == [1, 2]
+    assert [item["observation_date"] for item in articles] == ["2017-01-10"]
+    assert not any(
+        item.get("reason") == "nbs_unresolved_observation_periods"
+        for item in warnings
+    )
+
+
+def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_production_material_market_price"])
+    source_cfg["exact_only_max_periods"] = 100
+    provider = NbsProductionMaterialsProvider(
+        "nbs_production_material_market_price", source_cfg
+    )
+    monkeypatch.setattr(provider, "_search_page", lambda **kwargs: [])
+
+    articles, warnings = provider._discover_articles(
+        date(2017, 1, 1), date(2017, 1, 10)
+    )
+
+    assert articles == []
+    unresolved = next(
+        item
+        for item in warnings
+        if item.get("reason") == "nbs_unresolved_observation_periods"
+    )
+    assert unresolved["expected_periods"] == 1
+    assert unresolved["missing_periods"] == 1
+    assert unresolved["missing_samples"] == ["2017-01-10"]
+
+
 def test_nbs_provider_parses_official_coal_row_and_preserves_publication_date(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"

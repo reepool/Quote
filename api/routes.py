@@ -76,6 +76,8 @@ async def get_instruments(
     trading_status: Optional[int] = Query(None, description="交易状态码"),
     listed_after: Optional[date] = Query(None, description="上市日期晚于"),
     listed_before: Optional[date] = Query(None, description="上市日期早于"),
+    delisted_after: Optional[date] = Query(None, description="退市日期晚于 (REQ-01.1)"),
+    delisted_before: Optional[date] = Query(None, description="退市日期早于 (REQ-01.1)"),
     limit: int = Query(100, description="返回数量限制", ge=1, le=1000),
     offset: int = Query(0, description="偏移量"),
     sort_by: str = Query("symbol", description="排序字段"),
@@ -95,6 +97,8 @@ async def get_instruments(
             trading_status=trading_status,
             listed_after=listed_after,
             listed_before=listed_before,
+            delisted_after=delisted_after,
+            delisted_before=delisted_before,
             limit=limit,
             offset=offset,
             sort_by=sort_by,
@@ -137,6 +141,72 @@ async def get_instrument_by_symbol(symbol: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get instrument: {str(e)}")
+
+
+@router.get(
+    "/instruments/{instrument_id}/corporate-actions",
+    response_model=CorporateActionsResponse,
+    tags=["Instruments"],
+)
+async def get_instrument_corporate_actions(
+    instrument_id: str,
+    start_date: Optional[date] = Query(None, description="按除权除息日过滤: 起 (含)"),
+    end_date: Optional[date] = Query(None, description="按除权除息日过滤: 止 (含)"),
+):
+    """获取证券公司行为明细事件序列 (REQ-02)
+
+    数据源为复权因子事件表 adjustment_factors, 无需额外采集。字段可得性:
+    - record_date / pay_date / announcement_date 当前不采集, 恒为 null。
+    - 送股(bonus)与转增(transfer)未分离, 统一体现在 bonus_shares 并由 action_type 标注。
+    """
+    try:
+        query_id = convert_to_database_format(instrument_id)
+        rows = await data_manager.db_ops.get_corporate_actions(
+            query_id, start_date=start_date, end_date=end_date
+        )
+
+        def _as_date(value):
+            if value is None:
+                return None
+            return value.date() if hasattr(value, 'date') else value
+
+        events = []
+        latest_updated = None
+        source = None
+        for r in rows:
+            updated_at = r.get('updated_at')
+            if updated_at is not None and (latest_updated is None or updated_at > latest_updated):
+                latest_updated = updated_at
+            source = source or r.get('source')
+            events.append(CorporateActionItem(
+                instrument_id=r['instrument_id'],
+                ex_date=_as_date(r['ex_date']),
+                record_date=None,
+                pay_date=None,
+                announcement_date=None,
+                action_type=r.get('event_type'),
+                cash_dividend_per_share=r.get('dividend'),
+                bonus_shares=r.get('bonus_shares'),
+                rights_shares=r.get('rights_shares'),
+                rights_price=r.get('rights_price'),
+                factor=r.get('factor'),
+                cumulative_factor=r.get('cumulative_factor'),
+                source=r.get('source'),
+                updated_at=updated_at,
+            ))
+
+        return CorporateActionsResponse(
+            instrument_id=query_id,
+            total=len(events),
+            events=events,
+            source=source,
+            data_as_of=latest_updated,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get corporate actions: {str(e)}",
+        )
 
 
 @router.get(
@@ -2647,17 +2717,45 @@ async def get_research_technical_indicators(
 
 
 # Quote Data
-@router.get("/quotes/daily", tags=["Quotes"])
+@router.get(
+    "/quotes/daily",
+    tags=["Quotes"],
+    responses={
+        200: {
+            "model": DailyQuotesEnvelopeResponse,
+            "description": "日线行情外层结构; data 中每行字段见 DailyQuoteResponse",
+        }
+    },
+)
 async def get_daily_quotes(
     request: QuoteQueryRequest = Depends(),
-    adjust: str = Query("qfq", description="复权类型: qfq=前复权, hfq=后复权, none=不复权")
+    adjust: str = Query("qfq", description="复权类型: qfq=前复权, hfq=后复权, none=不复权"),
+    include_delisted: bool = Query(
+        False,
+        description="是否允许取回已退市证券的历史行情 (REQ-01.1); 默认 false 保持既有行为。"
+        "按 instrument_id 精确查询本就不受 active 状态限制。",
+    ),
 ):
     """获取日线行情数据
 
-    支持动态复权计算:
-    - adjust=qfq: 前复权（默认）, 以最新日为基准向历史调整
-    - adjust=hfq: 后复权, 以上市日为基准向未来调整
-    - adjust=none: 不复权, 返回原始价格
+    复权语义 (REQ-04):
+    - adjust=qfq: 前复权（默认）, 以最新交易日为基准的静态前复权; 后复权价 = 原始价 × cumulative_factor(t),
+      前复权价 = 原始价 × cumulative_factor(t) / cumulative_factor(latest)。
+    - adjust=hfq: 后复权, 以上市日为基准。
+    - adjust=none: 不复权, 返回原始价格 (factor=1.0, adjustment_type='none')。
+
+    字段与单位 (REQ-04):
+    - tradestatus: 1=正常交易, 0=停牌。
+    - pre_close: 除权日为除权调整后的参考价 (非昨日原始收盘)。
+    - volume 单位为股, amount 为成交额 (人民币元); time 字段为 Asia/Shanghai 时区。
+
+    分页 (REQ-11.1):
+    - 显式传入 limit 时按稳定顺序 (time 升序) 返回 offset 之后至多 limit 行, 并在 pagination 中给出 total_available。
+    - 不传 limit (默认) 时返回全量, 行为与既有一致。
+    - start_date / end_date 双端包含。
+
+    退市证券 (REQ-01.1):
+    - include_delisted=true 时不因证券已退市而排除; 默认 false 保持既有行为。
     """
     try:
         # 参数验证
@@ -2783,6 +2881,34 @@ async def get_daily_quotes(
                     'records_below_threshold': len([q for q in quality_scores if q < 0.7])
                 }
 
+        # ---- 分页 (REQ-11.1) ----
+        # 仅当调用方显式传入 limit 时才切片; limit=None (默认) 保持全量返回, 行为与既有一致。
+        # 切片前固定 time 升序以保证跨请求分页稳定。
+        total_available = len(filtered_data) if isinstance(filtered_data, (list, pd.DataFrame)) else 0
+        page_offset = request.offset or 0
+        if request.limit is not None:
+            if isinstance(filtered_data, pd.DataFrame):
+                if 'time' in filtered_data.columns:
+                    filtered_data = filtered_data.sort_values(
+                        'time', kind='mergesort'
+                    ).reset_index(drop=True)
+                filtered_data = filtered_data.iloc[page_offset:page_offset + request.limit]
+            elif isinstance(filtered_data, list):
+                if filtered_data and isinstance(filtered_data[0], dict) and 'time' in filtered_data[0]:
+                    filtered_data = sorted(
+                        filtered_data, key=lambda r: (r.get('time') is None, r.get('time'))
+                    )
+                filtered_data = filtered_data[page_offset:page_offset + request.limit]
+        pagination_meta = {
+            "limit": request.limit,
+            "offset": page_offset,
+            "total_available": total_available,
+            "returned_records": (
+                len(filtered_data) if isinstance(filtered_data, (list, pd.DataFrame)) else 0
+            ),
+        }
+        instrument_delisted = bool(instrument_info.get('delisted_date'))
+
         def _serialize_value(value):
             import math
             try:
@@ -2832,7 +2958,10 @@ async def get_daily_quotes(
                 "adjust": adjust_type,
                 "filters": serialized_filters,
                 "stats": serialized_stats,
-                "quality_summary": quality_summary
+                "quality_summary": quality_summary,
+                "pagination": pagination_meta,
+                "include_delisted": include_delisted,
+                "instrument_delisted": instrument_delisted
             }
             return JSONResponse(content=_serialize_value(response_payload))
 
@@ -2854,7 +2983,10 @@ async def get_daily_quotes(
                 "adjust": adjust_type,
                 "filters": serialized_filters,
                 "stats": serialized_stats,
-                "quality_summary": quality_summary
+                "quality_summary": quality_summary,
+                "pagination": pagination_meta,
+                "include_delisted": include_delisted,
+                "instrument_delisted": instrument_delisted
             }
             return JSONResponse(content=_serialize_value(response_payload))
 
@@ -2874,6 +3006,52 @@ async def get_daily_quotes(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get daily quotes: {str(e)}")
+
+
+@router.get("/quotes/coverage", response_model=DailyCoverageResponse, tags=["Quotes"])
+async def get_quotes_coverage(
+    date: Optional[date] = Query(None, description="单个交易日 (与 start_date/end_date 二选一)"),
+    start_date: Optional[date] = Query(None, description="区间起 (含)"),
+    end_date: Optional[date] = Query(None, description="区间止 (含)"),
+    exchange: Optional[str] = Query(None, description="交易所过滤 (可选)"),
+    instrument_type: str = Query("stock", description="品种类型, 默认 stock"),
+):
+    """行情覆盖率: 当日上市证券数 vs 库内有行情证券数 (REQ-01.3)
+
+    用于量化幸存者偏差残余。传单个 `date` 返回一行; 或传 `start_date`/`end_date`
+    返回区间内每日 (区间上限 366 天)。
+    """
+    try:
+        from datetime import timedelta
+        if date is None and start_date is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Provide either 'date' or 'start_date'/'end_date'",
+            )
+
+        if date is not None:
+            dates = [date]
+        else:
+            rng_end = end_date or start_date
+            if rng_end < start_date:
+                raise HTTPException(status_code=400, detail="end_date must be >= start_date")
+            span = (rng_end - start_date).days
+            if span > 366:
+                raise HTTPException(status_code=400, detail="date range too large (max 366 days)")
+            dates = [start_date + timedelta(days=i) for i in range(span + 1)]
+
+        items = []
+        for d in dates:
+            cov = await data_manager.db_ops.get_daily_coverage(
+                d, exchange=exchange, instrument_type=instrument_type
+            )
+            items.append(DailyCoverageItem(**cov))
+
+        return DailyCoverageResponse(total=len(items), items=items)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get quotes coverage: {str(e)}")
 
 
 @router.get("/quotes/latest", response_model=List[DailyQuoteResponse], tags=["Quotes"])

@@ -255,11 +255,13 @@ class DatabaseOperations:
                         'industry': instrument.industry,
                         'sector': instrument.sector,
                         'market': instrument.market,
+                        'lot_size': instrument.lot_size,
+                        'tick_size': instrument.tick_size,
                         'status': instrument.status,
                         'is_active': instrument.is_active,
                         'is_st': instrument.is_st,
                         'trading_status': instrument.trading_status,
-                                                'source': instrument.source,
+                        'source': instrument.source,
                         'source_symbol': instrument.source_symbol,
                         'created_at': instrument.created_at,
                         'updated_at': instrument.updated_at,
@@ -352,6 +354,8 @@ class DatabaseOperations:
         trading_status: int = None,
         listed_after: date = None,
         listed_before: date = None,
+        delisted_after: date = None,
+        delisted_before: date = None,
         limit: int = 100,
         offset: int = 0,
         sort_by: str = "symbol",
@@ -385,6 +389,10 @@ class DatabaseOperations:
                     stmt = stmt.filter(InstrumentDB.listed_date >= listed_after)
                 if listed_before:
                     stmt = stmt.filter(InstrumentDB.listed_date <= listed_before)
+                if delisted_after:
+                    stmt = stmt.filter(InstrumentDB.delisted_date >= delisted_after)
+                if delisted_before:
+                    stmt = stmt.filter(InstrumentDB.delisted_date <= delisted_before)
 
                 # 排序
                 if hasattr(InstrumentDB, sort_by):
@@ -414,11 +422,13 @@ class DatabaseOperations:
                         'industry': instrument.industry,
                         'sector': instrument.sector,
                         'market': instrument.market,
+                        'lot_size': instrument.lot_size,
+                        'tick_size': instrument.tick_size,
                         'status': instrument.status,
                         'is_active': instrument.is_active,
                         'is_st': instrument.is_st,
                         'trading_status': instrument.trading_status,
-                                                'source': instrument.source,
+                        'source': instrument.source,
                         'source_symbol': instrument.source_symbol,
                         'created_at': instrument.created_at,
                         'updated_at': instrument.updated_at,
@@ -450,6 +460,70 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to count quotes for {instrument_id}: {e}")
             return 0
+
+    async def get_daily_coverage(
+        self,
+        as_of: date,
+        exchange: Optional[str] = None,
+        instrument_type: str = "stock",
+    ) -> Dict[str, Any]:
+        """给定日期, 返回当日上市证券数与库内有行情证券数 (REQ-01.3)
+
+        listed_count: 当日已上市且未退市的证券数 (listed_date<=d 且 delisted_date 为空或>=d)。
+        quoted_count: 当日在 daily_quotes 有行情行的不同证券数。
+        """
+        try:
+            from sqlalchemy import or_, and_
+            day_str = as_of.isoformat()
+            async with self.get_async_session() as session:
+                listed_stmt = select(func.count()).select_from(InstrumentDB).filter(
+                    InstrumentDB.listed_date <= as_of,
+                    or_(
+                        InstrumentDB.delisted_date.is_(None),
+                        InstrumentDB.delisted_date >= as_of,
+                    ),
+                )
+                if instrument_type:
+                    listed_stmt = listed_stmt.filter(InstrumentDB.type == instrument_type)
+                if exchange:
+                    listed_stmt = listed_stmt.filter(InstrumentDB.exchange == exchange)
+                listed_count = await session.scalar(listed_stmt) or 0
+
+                quoted_stmt = select(
+                    func.count(func.distinct(DailyQuoteDB.instrument_id))
+                ).select_from(DailyQuoteDB).filter(
+                    func.date(DailyQuoteDB.time) == day_str
+                )
+                if instrument_type or exchange:
+                    quoted_stmt = quoted_stmt.join(
+                        InstrumentDB,
+                        InstrumentDB.instrument_id == DailyQuoteDB.instrument_id,
+                    )
+                    if instrument_type:
+                        quoted_stmt = quoted_stmt.filter(InstrumentDB.type == instrument_type)
+                    if exchange:
+                        quoted_stmt = quoted_stmt.filter(InstrumentDB.exchange == exchange)
+                quoted_count = await session.scalar(quoted_stmt) or 0
+
+                ratio = (quoted_count / listed_count) if listed_count else None
+                return {
+                    "date": day_str,
+                    "exchange": exchange,
+                    "instrument_type": instrument_type,
+                    "listed_count": int(listed_count),
+                    "quoted_count": int(quoted_count),
+                    "coverage_ratio": ratio,
+                }
+        except Exception as e:
+            self.db_logger.error(f"Failed to compute daily coverage for {as_of}: {e}")
+            return {
+                "date": as_of.isoformat(),
+                "exchange": exchange,
+                "instrument_type": instrument_type,
+                "listed_count": 0,
+                "quoted_count": 0,
+                "coverage_ratio": None,
+            }
 
     async def get_instrument_date_range(self, instrument_id: str, start_date: date = None,
                                         end_date: date = None) -> Dict[str, Any]:
@@ -1367,11 +1441,13 @@ class DatabaseOperations:
                         'industry': instrument.industry,
                         'sector': instrument.sector,
                         'market': instrument.market,
+                        'lot_size': instrument.lot_size,
+                        'tick_size': instrument.tick_size,
                         'status': instrument.status,
                         'is_active': instrument.is_active,
                         'is_st': instrument.is_st,
                         'trading_status': instrument.trading_status,
-                                                'source': instrument.source,
+                        'source': instrument.source,
                         'source_symbol': instrument.source_symbol,
                         'created_at': instrument.created_at,
                         'updated_at': instrument.updated_at,
@@ -1425,6 +1501,8 @@ class DatabaseOperations:
                     'industry': instrument.industry,
                     'sector': instrument.sector,
                     'market': instrument.market,
+                    'lot_size': instrument.lot_size,
+                    'tick_size': instrument.tick_size,
                     'status': instrument.status,
                     'is_active': instrument.is_active,
                     'is_st': instrument.is_st,
@@ -2561,6 +2639,54 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(
                 "Failed to get adjustment factors for %s: %s",
+                instrument_id, e
+            )
+            return []
+
+    async def get_corporate_actions(
+        self,
+        instrument_id: str,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+    ) -> List[Dict[str, Any]]:
+        """查询公司行为明细事件 (REQ-02)
+
+        直接暴露复权因子事件表 adjustment_factors 的原始事件字段, 附带 updated_at
+        供血缘记录。按 ex_date 升序返回。
+        """
+        try:
+            async with self.get_async_session() as session:
+                from sqlalchemy import select
+                stmt = select(AdjustmentFactorDB).where(
+                    AdjustmentFactorDB.instrument_id == instrument_id
+                )
+                if start_date:
+                    stmt = stmt.where(AdjustmentFactorDB.ex_date >= start_date)
+                if end_date:
+                    stmt = stmt.where(AdjustmentFactorDB.ex_date <= end_date)
+                stmt = stmt.order_by(AdjustmentFactorDB.ex_date.asc())
+                result = await session.execute(stmt)
+                rows = result.scalars().all()
+
+                return [
+                    {
+                        'instrument_id': r.instrument_id,
+                        'ex_date': r.ex_date,
+                        'event_type': r.event_type,
+                        'dividend': r.dividend,
+                        'bonus_shares': r.bonus_shares,
+                        'rights_shares': r.rights_shares,
+                        'rights_price': r.rights_price,
+                        'factor': r.factor,
+                        'cumulative_factor': r.cumulative_factor,
+                        'source': r.source,
+                        'updated_at': r.updated_at,
+                    }
+                    for r in rows
+                ]
+        except Exception as e:
+            self.db_logger.error(
+                "Failed to get corporate actions for %s: %s",
                 instrument_id, e
             )
             return []
