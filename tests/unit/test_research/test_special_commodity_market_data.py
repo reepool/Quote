@@ -1348,6 +1348,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_methanol",
         "cn_100ppi_ethylene_glycol",
         "cn_100ppi_pvc",
+        "cn_100ppi_polypropylene",
     ]
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
