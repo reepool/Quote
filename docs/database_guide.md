@@ -49,6 +49,7 @@
    - `quotes.db` 不承载财务事实表，避免行情主库被低频大字段写入放大。
    - 财务库离线优化必须保持最终库名 `data/financials.db`；如需备份生产库，默认写入 `/home/python/Quote/data/PVE-Bak/QuoteBak`。
    - `2026-05-25` 已完成 `data/financials.db` 离线优化：生产库从约 `79G` 降至约 `53G`，`financial_numeric_facts` 已改为兼容视图，`financial_numeric_facts_hot/history` 为权威物理表，NAS 备份保留为 `/home/python/Quote/data/PVE-Bak/QuoteBak/financials.db.20260525_011603.bak`。
+   - `2026-07-12` 新增利率产品专用库 `data/interests.db`，通过 `interests_db_path` 路由（沿用 financial/valuation 的 `*_database_scope` + 方法路由机制）。当前含 `risk_free_rate_series` / `risk_free_rate_observations`（中国 10Y 国债收益率等无风险利率序列），由 `risk_free_rate_sync` 写入，消费端只读；未来 SHIBOR/LPR/回购/美债等利率产品扩展至此库。`research.db` 中同名表在 `initialize()` 时被移除，避免重复。
 
 2. **访问抽象**
    - `DataManager`、API 路由、provider 和 sync service 只依赖 storage/repository 方法。

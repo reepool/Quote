@@ -5,6 +5,27 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased] - 2026-07-12 ⭐ Quote System API 数据能力改进（面向量化平台）
+
+> 对照《Quote System API 数据能力改进需求》落地一批需求，API 版本 `1.0.0 → 1.1.0`；OpenSpec change：`add-quote-api-data-capability-improvements`。
+
+### 新增
+- **REQ-04 日 K 契约**：`/quotes/daily` 补全 OpenAPI 200 响应 Schema（`DailyQuotesEnvelopeResponse`，此前为空对象），文档化复权因子公式、停牌行、`pre_close`、单位与 Asia/Shanghai 时区、`adjust` 取值语义。
+- **REQ-11.1 分页**：`/quotes/daily` 落实 `limit`/`offset`（稳定 `time` 升序切片，`limit=None` 保持全量），响应新增 `pagination` 元数据。
+- **REQ-01.1 退市可得性**：`/quotes/daily` 新增可选 `include_delisted`（默认 false，行为不变）；`/instruments` 透出 `delisted_after`/`delisted_before` 过滤。
+- **REQ-01.3 覆盖率**：新增只读端点 `GET /quotes/coverage`（按交易日返回上市证券数 vs 有行情证券数）。
+- **REQ-12 交易规格**：`instruments` 新增 `lot_size`/`tick_size` 列（migration 003）；A 股填 `100`/`0.01`，港股 `lot_size` 从官方 board lot 回填、`tick_size` 暂 null。
+- **REQ-07.2 行业时点化**：新增只读端点 `GET /research/company/{id}/industry/as-of`（基于 `industry_classification_history` 推导 `effective_date`/`expiry_date` 区间），既有当前态查询不变。
+- **REQ-13 无风险利率序列**：新增利率产品专用库 `data/interests.db`（`risk_free_rate_series`/`risk_free_rate_observations`，沿用 financial/valuation 库隔离机制）；新增 `risk_free_rate_sync` 日更任务（周一至周五 `17:30`，中国 10Y 国债收益率，akshare 全量拉取+幂等 upsert，Telegram `/run` 可手工触发，含富文本完成报告）与只读端点 `GET /research/risk-free-rate(/series)`。
+- **REQ-03.1 / 07.1 / 09.1 / 09.3 / 06.3 契约澄清**：文档化财务披露口径（单版本 + `data_available_date`，重述覆盖）、行业当前态、估值 as_of 点 PIT 计算与重述 caveat、`batch_id`/`updated_at` 语义。
+
+### 修复
+- 港股 `lot_size` 回填曾全部为空：`DataManager._filter_hkex_safe_write_rows` 的字段白名单未放行 `lot_size/tick_size`，即便解析层已产出也在写库前被丢弃；已修复并透传。
+- `risk_free_rate_sync` 日志曾误落 `sys.log`：改为在 `utils/logging_manager.py` 的 task 域路由表登记 `research.risk_free_rate_sync`，正确落 `task.log`；进度日志按框架规范输出。
+
+### 暂缓（Non-goals，评估后未纳入本批）
+- REQ-02 公司行为明细（生产因子表未存现金分红/送转/配股拆解，需新增采集单独立项）、REQ-05 ST 状态历史、REQ-08 宽基指数历史成分、REQ-10 涨跌停字段、REQ-03.2 财务 vintage（历史修订回溯不可行）、REQ-09.2 前瞻指标 vintage、REQ-01.2 退市股大规模回补、REQ-06.2 全库变更日志、REQ-11.2 Parquet 批量导出。
+
 ## [Unreleased] - 2026-04-30
 
 ### 新增

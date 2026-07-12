@@ -133,6 +133,16 @@ A 股主数据没有独立自动 cron 任务；自动触发主要来自 `daily_d
 
 数据库写入保留既有 `delisted_date`，且基于已过期的 `delisted_date` 强制设置 `is_active=False`、`status=delisted`。对已有 `delisted` 或 `auto_deactivated*` 状态的记录，缺少 `delisted_date` 的 BaoStock/AkShare/pytdx 等非官方当前名单源不能自动重新激活，避免备用源把退市股或幽灵股唤醒；只有 `sse_official`、`szse_official`、`bse_official` 等官方源确认在市时，才允许恢复 active 状态。
 
+## 交易规格字段：lot_size / tick_size
+
+`instruments` 表含可空字段 `lot_size`（每手股数 board lot）与 `tick_size`（最小价位），由主数据同步填充，供量化侧计算手数/最低佣金/整手约束：
+
+- **迁移**：字段通过 `database/migrations/003_add_lot_tick_size.sql` 加列；`scripts/apply_migration_003.py` 幂等应用（先 `PRAGMA table_info` 判断），全新库由 `create_all` 自动建列。
+- **A 股**（`a_share_stock_master_sync`）：`lot_size=100`、`tick_size=0.01`（常量，写入主数据 dict）。
+- **港股**（`hkex_instrument_master_sync`）：`lot_size` 由官方证券名单的 board lot 解析回填（`_parse_board_lot`，如 `00001.HK→500`、`00003.HK→1000`）；`tick_size` 港股为随价格分档的价位表、非单一标量，暂为 `null`。
+- **透传链路**：源解析层产出字段后，`save_instruments_batch` 会写入任何属于 `InstrumentDB` 列的键；港股 `safe_write/lifecycle_write` 路径额外需在 `DataManager._filter_hkex_safe_write_rows` 的字段白名单中放行 `lot_size/tick_size`（否则会在写库前被收窄逻辑丢弃）。
+- **回填与更新**：属性随每次主数据同步 upsert，退市/被 `excluded`/非规范双柜台证券可能保持 `null`。首次回填需手工 `/run` 一次对应主数据同步；之后自动跟随主数据刷新（港股 board lot 变化会被捕获）。
+
 ## 报告
 
 日更 JSON 报告包含 `instrument_master_sync`：

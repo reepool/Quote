@@ -144,6 +144,9 @@ python3 main.py api --host 0.0.0.0 --port 8000
 - `/run financial_l1_full_import` - 手工执行财务 L1 本地核心层全量导入或补处理，写入 `data/financials.db`
 - `/run financial_disclosure_incremental_sync` - 手工执行财务公告驱动增量检查，按定期报告公告候选定向补处理
 - `/run financial_disclosure_reconciliation_sync` - 手工执行财务周度对账修复，补缺失或变化的财务报告期
+- `/run risk_free_rate_sync` - 手工执行无风险利率序列同步（中国 10Y 国债收益率，全量拉取+幂等 upsert，写入 `data/interests.db`）；也在周一至周五 `17:30` 自动运行
+- `/run a_share_stock_master_sync` - 手工执行 A 股股票主数据同步（官方源优先，回填 `lot_size=100`/`tick_size=0.01`，不下载日更行情）
+- `/run hkex_instrument_master_sync` - 手工执行港股主数据同步（`lifecycle_write`，从官方证券名单 board lot 回填 `lot_size`，`tick_size` 港股价位表暂为 null）
 - `/backfill <日期> [交易所...]` - 补充指定日期的缺失数据
 - `/backfill <开始日期> <结束日期> [交易所...]` - 以区间模式补充日期范围内缺失数据
 - `/industry_standard_sync [force]` - 申万官方分类日更同步；默认使用 source manifest，官方文件未变化时短路
@@ -344,6 +347,8 @@ restart_system - 重启系统服务
 • 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
 • 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
 • 特殊商品政策/长协事件导入 (special_commodity_policy_event_sync) - 仅手工运行
+• 特殊商品政策目录发现 (special_commodity_policy_discovery) - 手工可运行；月度调度当前禁用待验收
+• 特殊商品扩品候选目录 (special_commodity_series_catalog_sync) - 仅手工运行，不自动上线候选
 • 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00
 • 数据库备份任务 (database_backup) - 周六 03:30

@@ -370,6 +370,21 @@ curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_da
 
 # 获取最新行情数据（支持 SZSE/SSE 标准后缀，返回查询窗口内 time 最大的记录）
 curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&instrument_ids=600000.SSE"
+
+# 取回退市证券历史行情（include_delisted，默认 false 不改变原行为）+ 分页
+curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=600000.SH&start_date=2024-01-01&end_date=2024-12-31&include_delisted=true&limit=100&offset=0"
+
+# 行情覆盖率自查（当日上市证券数 vs 有行情证券数）
+curl "http://localhost:8000/api/v1/quotes/coverage?date=2024-06-03&exchange=SSE"
+```
+
+#### 研究域新增接口
+```bash
+# 时点化行业归属（返回 as_of_date 当日生效的行业及 effective/expiry 区间）
+curl "http://localhost:8000/api/v1/research/company/600000.SH/industry/as-of?as_of_date=2021-03-15"
+
+# 无风险利率序列（中国 10Y 国债收益率，存于 data/interests.db）
+curl "http://localhost:8000/api/v1/research/risk-free-rate?series_id=china_treasury_10y&start_date=2026-01-01&end_date=2026-07-11"
 ```
 
 #### 数据缺口管理

@@ -36,6 +36,8 @@
 | `special_commodity_price_sync` | 海外商品 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
 | `special_commodity_cn_spot_sync` | 国内特殊商品现货与官方基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯现货及 NBS 动力煤旬价，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
 | `special_commodity_price_monthly_sync` | 外盘商品 | 每月10日、20日 `08:40` | FRED/IMF 与 World Bank 铜铝独立月均基准，动态回看6个月以吸收发布延迟和历史修订 |
+| `special_commodity_policy_discovery` | 政策治理 | 每月15日 `09:10`（当前禁用） | NDRC 官方目录发现、正文/附件版本存证和政策候选治理；真实验收后再启用 |
+| `special_commodity_series_catalog_sync` | 扩品治理 | 仅手工 | 同步候选和上线状态，不自动加入任何生产日更 scope |
 | `cache_warm_up` | 缓存 | 每日 `08:20` | LME 日更完成后执行轻量预热 |
 | `industry_index_analysis_sync` | 申万指数指标 | 周一至周五 `10:45` | 与申万分类同源，后移到分类窗口之后 |
 | `market_dependency_version_check` | 依赖检查 | 每日 `12:00` | 轻量网络检查 |
@@ -44,6 +46,7 @@
 | `quarterly_cleanup` | 季度清理 | 季度最后一天 `14:30` | 避开凌晨维护/备份窗口 |
 | `find_gap_and_repair` | 缺口修复 | 周日 `15:00` | 周维护完成后执行，预留 4 小时 |
 | `hk_daily_data_update` | 港股行情 | 周一至周五 `17:30` | 港股收盘后执行，前置 HKEX 主数据 `lifecycle_write` 治理 |
+| `risk_free_rate_sync` | 无风险利率 | 周一至周五 `17:30` | 中国 10Y 国债到期收益率日更，akshare 全量拉取 + 幂等 upsert，写入 `data/interests.db`；单一参考序列，无主数据/交易日治理依赖 |
 | `industry_standard_sync` | 申万分类 | 每日 `19:15` | 收盘后强制刷新 A 股主数据，再维护申万分类/归属基础层 |
 | `daily_data_update` | A 股行情 | 周一至周五 `20:00` | 强制刷新 A 股主数据，再读取 tradable universe 做行情日更 |
 

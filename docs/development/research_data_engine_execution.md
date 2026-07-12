@@ -166,12 +166,14 @@
 - `sentiment_events`
 - `risk_snapshots`
 - `technical_indicator_latest`
+- `risk_free_rate_series` / `risk_free_rate_observations`（利率产品序列，路由到独立的 `data/interests.db`，见 §4.2 注意事项）
 
 注意：
 
 - `company_profiles` 与 `financial_summaries` 目前是“部分字段标准化 + 完整快照 JSON 并存”的设计
 - 这满足了 Phase 0 / Phase 1 的可读性要求，但还不是最终 fully normalized 形态
 - `industry_index_analysis_daily` 同时承接最新日更与历史回补；`bargain_volume` 为成交量（亿股），百分比字段保持百分数值，不转换成小数比例
+- `risk_free_rate_*` 两表物理落在独立库 `data/interests.db`（通过 `interests_db_path` + `interests_database_scope` 路由，沿用 financial/valuation 库隔离机制），`research.db` 中同名表在 `initialize()` 时移除；未来 SHIBOR/LPR/回购/美债等利率产品扩展至该库
 
 ### 4.3 已落地的研究接口
 
@@ -180,6 +182,8 @@
 - `GET /api/v1/research/company/{instrument_id}/overview`
 - `GET /api/v1/research/company/{instrument_id}/profile`
 - `GET /api/v1/research/company/{instrument_id}/industry`
+- `GET /api/v1/research/company/{instrument_id}/industry/as-of`（时点化行业归属，基于 `industry_classification_history` 推导 effective/expiry 区间；当前态查询不变）
+- `GET /api/v1/research/risk-free-rate` / `GET /api/v1/research/risk-free-rate/series`（无风险利率序列，读 `data/interests.db`，由 `risk_free_rate_sync` 写入）
 - `GET /api/v1/research/industry/taxonomy`
 - `GET /api/v1/research/industry/component-sets`
 - `GET /api/v1/research/industry/index-analysis`

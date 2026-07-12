@@ -51,7 +51,13 @@ http://localhost:8000/api/v1
 - `exchange`、`type`、`industry`、`sector`、`market`、`status`
 - `is_active`、`is_st`、`trading_status`
 - `listed_after`、`listed_before`
+- `delisted_after`、`delisted_before`（按退市日期过滤，用于构造退市证券资产池）
 - `limit`、`offset`、`sort_by`、`sort_order`
+
+响应字段补充（`InstrumentResponse`）：
+- `lot_size`：每手股数（board lot）。A 股固定 `100`；港股由官方证券名单的 board lot 回填（如 `00001.HK` 为 `500`）；未知或不适用时为 `null`。
+- `tick_size`：最小价位。A 股为 `0.01`；港股为随价格分档的价位表、无法用单一标量表达，暂为 `null`。
+- 这两个字段由主数据同步任务填充（A 股 `a_share_stock_master_sync`、港股 `hkex_instrument_master_sync`），退市/被排除/非规范证券可能为 `null`。
 
 ### GET /api/v1/instruments/{instrument_id}
 按 `instrument_id` 查询单个品种信息。
@@ -80,6 +86,7 @@ http://localhost:8000/api/v1
 可选参数：
 - `return_format`: `pandas`（默认）、`json`、`csv`
 - `adjust`: `qfq`（前复权，默认）、`hfq`（后复权）、`none`（不复权）
+- `include_delisted`: 是否允许取回已退市证券的历史行情，默认 `false`。默认行为不变；按 `instrument_id` 精确查询本就不受 active 状态限制。
 - `tradestatus`、`is_complete`、`min_volume`、`min_quality_score`
 - `include_quality`、`include_metadata`
 - `limit`、`offset`
@@ -89,6 +96,18 @@ http://localhost:8000/api/v1
 - 仅**股票**类品种支持复权，指数/ETF 不存在除权概念，即使传入 `adjust=qfq` 也会返回原始数据
 - 前复权以查询范围内最新交易日为基准（价格=原始价格），历史价格向下调整使得价格序列连续
 - 后复权以上市首日为基准，价格按除权事件累乘放大，反映真实持股收益
+- 复权因子公式：后复权价 = 原始价 × `cumulative_factor(t)`；前复权价 = 原始价 × `cumulative_factor(t)/cumulative_factor(latest)`
+
+分页与语义：
+- 显式传入 `limit` 时，按稳定的 `time` 升序返回 `offset` 之后至多 `limit` 行；不传 `limit` 时返回全量（默认行为不变）。
+- `start_date`/`end_date` 双端包含。
+- `time` 字段为 Asia/Shanghai 时区；`volume` 单位为股，`amount` 为成交额（人民币元）。
+- `tradestatus`：`1`=正常交易，`0`=停牌；`pre_close` 在除权日为除权调整后的参考价。
+
+响应结构（200，`DailyQuotesEnvelopeResponse`）：
+- `data`：日线行情行数组，行字段见 `DailyQuoteResponse`（`time/open/high/low/close/volume/amount/turnover/pre_close/change/pct_change/tradestatus/factor/adjustment_type/source/batch_id`）。
+- `total_records`、`pagination`（`{limit, offset, total_available, returned_records}`）、`include_delisted`、`instrument_delisted`、`adjust`、`filters`、`stats`、`quality_summary`。
+- OpenAPI (`/openapi.json`) 已为该端点补全 200 响应 Schema（此前为空对象）。
 
 示例：
 ```bash
@@ -118,6 +137,24 @@ curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_da
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&instrument_ids=600000.SSE"
+```
+
+### GET /api/v1/quotes/coverage
+行情覆盖率自查：给定交易日，返回当日"已上市且未退市的证券数"与"库内有行情的证券数"，用于量化退市历史覆盖缺口（幸存者偏差残余）。只读聚合，不写库。
+
+参数：
+- `date`（单日，与 `start_date`/`end_date` 二选一）
+- `start_date`、`end_date`（区间，双端包含，上限 366 天，逐日返回）
+- `exchange`（可选过滤）
+- `instrument_type`（默认 `stock`）
+
+返回：`{total, items:[{date, exchange, instrument_type, listed_count, quoted_count, coverage_ratio}]}`。
+
+说明：`listed_count` 依赖已知的 `listed_date`；跨市场（尤其含港股，多为 `listed_date` 空）时建议用 `exchange` 过滤以获得可比数值。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/quotes/coverage?date=2024-06-03&exchange=SSE"
 ```
 
 ---
@@ -280,6 +317,11 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statemen
 - `include_industry_facts`：是否附加 L1.5 行业专项字段诊断
 - `allow_remote_extension`：是否显式允许 L3 东财远程扩展，默认 `false`
 
+时点性（PIT）口径说明：
+- 财务事实按 `(instrument_id, [statement_type,] report_period)` 单版本存储，**后续重述会覆盖同一报告期的旧值**（不保留完整修订 vintage）。
+- `data_available_date` 记录该值对市场首次可见的时间；`publish_date` 为披露日。
+- 因此当前口径为"披露时点已知（disclosure-only）"，对"重述"不成立——量化侧应据此登记 `FUNDAMENTAL_REVISION_BIAS`。完整 vintage 留痕（REQ-03.2）为暂缓项，且历史修订无法回溯回补，只能前向积累。
+
 示例：
 ```bash
 curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statements/history?period_window=latest&rolling_quarters=12&include_statements=false"
@@ -301,6 +343,11 @@ curl "http://localhost:8000/api/v1/research/company/600000.SH/financial-statemen
 - 当前估值历史已拆分 `pe_static / pe_ttm / pe_forward / pb_mrq / ps_static / ps_ttm / ps_forward`；`include_details=true` 时返回每个指标的 numerator、denominator、报告期和可得日。
 - `market_cap` 为总市值，`float_market_cap` 为流通市值；两者来自本地收盘价和已落库 `valuation_inputs`，读取接口不会同步请求 CNInfo/AkShare。
 - `pe_forward / ps_forward` 在 analyst forecast 输入未启用或缺失时返回空值，并在 details 中给出 explicit unavailable 状态和原因。
+
+时点性（PIT）口径说明：
+- 每个 `as_of_date` 点的估值**严格只使用当时可知的财务**（构建逻辑按 `data_available_date <= as_of_date` 过滤 `valuation_service._eligible_financial_facts`），即对"披露时点"是 point-in-time 计算。
+- **重述 caveat**：因财务只保留最新修订版本（见 `/financial-statements/history`），PIT 正确性仅对披露时点成立、对重述不成立。
+- `pe_forward / ps_forward` 无历史预测 vintage，属 display-only（REQ-09.2 暂缓）。
 
 示例：
 ```bash
@@ -621,6 +668,45 @@ curl "http://localhost:8000/api/v1/research/shareholders/readiness"
 | `shareholder_incremental_sync` | 每日 `06:30` / `/run` | 按公告候选定向刷新，变化或缺口才更新 `shareholder_snapshots` |
 | `shareholder_reconciliation_sync` | 周六 `12:30` / `/run` | 全量读取后做 changed-only 复核，补足静默变化或历史缺口 |
 | `shareholder_shadow_sync` | 仅 `/run` | 手工全量刷新 `shareholder_snapshots` |
+
+### GET /api/v1/research/company/{instrument_id}/industry/as-of
+
+时点化行业归属：给定历史日期，返回当日**生效**的行业归属及其区间，用于历史行业中性化去偏。基于官方分类变更留痕 `industry_classification_history` 推导，不改变既有当前态查询（若存在 `/industry` 当前态端点，其行为不变）。
+
+必填参数：
+- `as_of_date`（`YYYY-MM-DD`，返回当日生效的行业归属）
+
+可选参数：
+- `taxonomy_system`：行业体系过滤
+- `include_snapshot`：是否包含官方分类详情，默认 `true`
+
+返回字段：`instrument_id / official_industry_code / as_of_date / effective_date / expiry_date（下一次变更日，NULL=至今） / source / classification`。
+
+边界：该日期早于该证券任何已知分类时返回 `404`（不做当前态回退）。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/company/600000.SH/industry/as-of?as_of_date=2021-03-15"
+```
+
+### GET /api/v1/research/risk-free-rate
+
+按日期查询无风险利率序列（当前提供 `china_treasury_10y` 中国 10 年期国债到期收益率）。数据存于独立的 `data/interests.db`（利率产品专用库，便于未来扩展 SHIBOR/LPR/回购/美债等），由 `risk_free_rate_sync` 任务采集，消费端只读。
+
+参数：
+- `series_id`（必填，如 `china_treasury_10y`）
+- `start_date`、`end_date`（可选，双端包含）
+
+返回：`{series_id, series:{rate_type, tenor, currency, unit, frequency, timezone, source, ...}, total, observations:[{observation_date, value, source, data_as_of, revision_id}]}`。无数据时返回空序列而非报错。
+
+### GET /api/v1/research/risk-free-rate/series
+列出所有已定义的无风险利率序列。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/research/risk-free-rate/series"
+curl "http://localhost:8000/api/v1/research/risk-free-rate?series_id=china_treasury_10y&start_date=2026-01-01&end_date=2026-07-11"
+```
 
 ---
 
