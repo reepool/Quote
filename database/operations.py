@@ -2643,54 +2643,6 @@ class DatabaseOperations:
             )
             return []
 
-    async def get_corporate_actions(
-        self,
-        instrument_id: str,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-    ) -> List[Dict[str, Any]]:
-        """查询公司行为明细事件 (REQ-02)
-
-        直接暴露复权因子事件表 adjustment_factors 的原始事件字段, 附带 updated_at
-        供血缘记录。按 ex_date 升序返回。
-        """
-        try:
-            async with self.get_async_session() as session:
-                from sqlalchemy import select
-                stmt = select(AdjustmentFactorDB).where(
-                    AdjustmentFactorDB.instrument_id == instrument_id
-                )
-                if start_date:
-                    stmt = stmt.where(AdjustmentFactorDB.ex_date >= start_date)
-                if end_date:
-                    stmt = stmt.where(AdjustmentFactorDB.ex_date <= end_date)
-                stmt = stmt.order_by(AdjustmentFactorDB.ex_date.asc())
-                result = await session.execute(stmt)
-                rows = result.scalars().all()
-
-                return [
-                    {
-                        'instrument_id': r.instrument_id,
-                        'ex_date': r.ex_date,
-                        'event_type': r.event_type,
-                        'dividend': r.dividend,
-                        'bonus_shares': r.bonus_shares,
-                        'rights_shares': r.rights_shares,
-                        'rights_price': r.rights_price,
-                        'factor': r.factor,
-                        'cumulative_factor': r.cumulative_factor,
-                        'source': r.source,
-                        'updated_at': r.updated_at,
-                    }
-                    for r in rows
-                ]
-        except Exception as e:
-            self.db_logger.error(
-                "Failed to get corporate actions for %s: %s",
-                instrument_id, e
-            )
-            return []
-
     async def get_latest_cumulative_factor(
         self, instrument_id: str
     ) -> float:

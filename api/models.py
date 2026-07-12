@@ -217,44 +217,6 @@ class DailyQuotesEnvelopeResponse(BaseModel):
     instrument_delisted: bool = Field(False, description="该证券是否已退市 (delisted_date 非空)")
 
 
-class CorporateActionItem(BaseModel):
-    """单条公司行为事件 (REQ-02)
-
-    来源为复权因子事件表 adjustment_factors。字段可得性说明:
-    - record_date / pay_date / announcement_date 当前不采集, 恒为 null。
-    - 送股(bonus)与转增(transfer)未分离, 统一体现在 bonus_shares 并以 action_type 标注。
-    """
-    instrument_id: str = Field(..., description="交易品种ID")
-    ex_date: date = Field(..., description="除权除息日")
-    record_date: Optional[date] = Field(None, description="股权登记日 (当前不可得, 恒为 null)")
-    pay_date: Optional[date] = Field(None, description="现金到账日 (当前不可得, 恒为 null)")
-    announcement_date: Optional[date] = Field(None, description="公告日 (当前不可得, 恒为 null)")
-    action_type: Optional[str] = Field(
-        None, description="事件类型: dividend/split/rights/mixed/roll (来自 event_type)"
-    )
-    cash_dividend_per_share: Optional[float] = Field(None, description="每股现金分红 (税前)")
-    bonus_shares: Optional[float] = Field(None, description="每股送转股 (送股与转增合计, 未分离)")
-    rights_shares: Optional[float] = Field(None, description="每股配股数")
-    rights_price: Optional[float] = Field(None, description="配股价")
-    factor: Optional[float] = Field(None, description="单日除权因子")
-    cumulative_factor: Optional[float] = Field(None, description="累积后复权因子")
-    source: Optional[str] = Field(None, description="数据来源")
-    updated_at: Optional[datetime] = Field(None, description="记录更新时间")
-
-
-class CorporateActionsResponse(BaseModel):
-    """公司行为明细事件序列响应 (REQ-02)"""
-    instrument_id: str = Field(..., description="交易品种ID")
-    total: int = Field(0, description="事件数量")
-    events: List[CorporateActionItem] = Field(default_factory=list, description="按 ex_date 升序的事件序列")
-    source: Optional[str] = Field(None, description="数据来源")
-    data_as_of: Optional[datetime] = Field(None, description="数据截止时间 (最新事件的 updated_at)")
-    field_availability_note: str = Field(
-        "record_date/pay_date/announcement_date 当前不可得(null); 送股与转增未分离。",
-        description="字段可得性说明",
-    )
-
-
 class DailyCoverageItem(BaseModel):
     """单日行情覆盖率 (REQ-01.3)"""
     date: str = Field(..., description="交易日 (YYYY-MM-DD)")

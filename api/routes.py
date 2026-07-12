@@ -144,72 +144,6 @@ async def get_instrument_by_symbol(symbol: str):
 
 
 @router.get(
-    "/instruments/{instrument_id}/corporate-actions",
-    response_model=CorporateActionsResponse,
-    tags=["Instruments"],
-)
-async def get_instrument_corporate_actions(
-    instrument_id: str,
-    start_date: Optional[date] = Query(None, description="按除权除息日过滤: 起 (含)"),
-    end_date: Optional[date] = Query(None, description="按除权除息日过滤: 止 (含)"),
-):
-    """获取证券公司行为明细事件序列 (REQ-02)
-
-    数据源为复权因子事件表 adjustment_factors, 无需额外采集。字段可得性:
-    - record_date / pay_date / announcement_date 当前不采集, 恒为 null。
-    - 送股(bonus)与转增(transfer)未分离, 统一体现在 bonus_shares 并由 action_type 标注。
-    """
-    try:
-        query_id = convert_to_database_format(instrument_id)
-        rows = await data_manager.db_ops.get_corporate_actions(
-            query_id, start_date=start_date, end_date=end_date
-        )
-
-        def _as_date(value):
-            if value is None:
-                return None
-            return value.date() if hasattr(value, 'date') else value
-
-        events = []
-        latest_updated = None
-        source = None
-        for r in rows:
-            updated_at = r.get('updated_at')
-            if updated_at is not None and (latest_updated is None or updated_at > latest_updated):
-                latest_updated = updated_at
-            source = source or r.get('source')
-            events.append(CorporateActionItem(
-                instrument_id=r['instrument_id'],
-                ex_date=_as_date(r['ex_date']),
-                record_date=None,
-                pay_date=None,
-                announcement_date=None,
-                action_type=r.get('event_type'),
-                cash_dividend_per_share=r.get('dividend'),
-                bonus_shares=r.get('bonus_shares'),
-                rights_shares=r.get('rights_shares'),
-                rights_price=r.get('rights_price'),
-                factor=r.get('factor'),
-                cumulative_factor=r.get('cumulative_factor'),
-                source=r.get('source'),
-                updated_at=updated_at,
-            ))
-
-        return CorporateActionsResponse(
-            instrument_id=query_id,
-            total=len(events),
-            events=events,
-            source=source,
-            data_as_of=latest_updated,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get corporate actions: {str(e)}",
-        )
-
-
-@router.get(
     "/instruments/hkex/master/review-required",
     response_model=HKEXReviewRequiredResponse,
     tags=["Instruments"],
@@ -2758,6 +2692,13 @@ async def get_daily_quotes(
     - include_delisted=true 时不因证券已退市而排除; 默认 false 保持既有行为。
     """
     try:
+        # 归一化 include_delisted: 直接以函数方式调用(单测)时 FastAPI 默认值不会被解析,
+        # 此处将 Query 默认对象回落为其 bool 默认, 保证既有调用路径与响应序列化不受影响。
+        if not isinstance(include_delisted, bool):
+            include_delisted = getattr(include_delisted, "default", False)
+            if not isinstance(include_delisted, bool):
+                include_delisted = False
+
         # 参数验证
         if not (request.instrument_id or request.symbol):
             raise HTTPException(status_code=400, detail="Either instrument_id or symbol must be provided")
