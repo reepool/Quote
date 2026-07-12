@@ -1653,7 +1653,9 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_ethylene_glycol",
         "cn_100ppi_pvc",
         "cn_100ppi_polypropylene",
+        "cn_nbs_thermal_coal",
     ]
+    assert domestic_spot["parameters"]["lookback_days"] == 10
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
     monthly = jobs["special_commodity_price_monthly_sync"]

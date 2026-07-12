@@ -4215,7 +4215,7 @@ class ScheduledTasks:
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """国内特殊商品现货日频同步，共用特殊商品治理与持久化链路。"""
+        """国内特殊商品现货与官方基准同步，共用治理与持久化链路。"""
         return await self.special_commodity_price_sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
