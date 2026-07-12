@@ -970,9 +970,44 @@
           "quality_flag": "manual_verified",
           "parser_version": "manual_policy_event_provider.v1",
           "note": "Used for thermal coal long-term contract and policy price events after source review."
+        },
+        "ndrc_official_policy_event": {
+          "venue": "NDRC",
+          "source": "National Development and Reform Commission policy documents",
+          "source_mode": "official_policy_document",
+          "source_interface": "configured_official_policy_events",
+          "quality_flag": "official_policy_document",
+          "parser_version": "configured_policy_event.v1",
+          "note": "Official effective-period policy constraints. Values are not observed transaction prices and are never expanded into daily bars."
         }
       },
-      "policy_events": [],
+      "policy_events": [
+        {
+          "event_id": "CN.COAL.THERMAL.QHD_5500.NDRC.2022_303",
+          "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
+          "policy_type": "long_term_transaction_reasonable_range",
+          "effective_start": "2022-05-01",
+          "effective_end": null,
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "value_low": 570,
+          "value_high": 770,
+          "value_mid": null,
+          "source_profile": "ndrc_official_policy_event",
+          "source_url": "https://www.ndrc.gov.cn/xxgk/zcfb/tz/202202/t20220225_1317003.html",
+          "quality_flag": "official_policy_document",
+          "metadata": {
+            "document_number": "发改价格〔2022〕303号",
+            "publication_date": "2022-02-25",
+            "product": "秦皇岛港下水煤",
+            "heat_value_kcal": 5500,
+            "tax_basis": "tax_inclusive",
+            "applicability": "domestic_thermal_coal",
+            "excludes_imported_coal": true,
+            "value_semantics": "reasonable_range_not_observed_transaction_price"
+          }
+        }
+      ],
       "commodities": [
         {
           "commodity_id": "OIL.WTI.SPOT",
@@ -1201,6 +1236,21 @@
             "dcf_role": "thermal_coal_spot_cycle_anchor",
             "source_scope": "NBS production-material wholesale and sales market price",
             "not_long_term_contract_price": true
+          }
+        },
+        {
+          "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
+          "symbol": "QHD_5500_LONG_TERM_POLICY",
+          "name": "Qinhuangdao 5500 kcal Long-Term Coal Policy Range",
+          "category": "coal",
+          "commodity_type": "official_policy_range",
+          "default_currency": "CNY",
+          "default_unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_long_term_policy_anchor",
+            "not_observed_transaction_price": true,
+            "not_daily_series": true
           }
         }
       ],

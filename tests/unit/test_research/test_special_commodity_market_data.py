@@ -81,7 +81,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 16
+    assert result["instruments"] == 17
     assert result["series"] >= 20
 
     dictionary = storage.read_dictionary()
@@ -102,6 +102,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.PVC.SPOT",
         "CN.CHEMICAL.POLYPROPYLENE.SPOT",
         "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
+        "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
         "CMD.OIL.WTI.SPOT.FRED.DAILY",
@@ -1504,6 +1505,33 @@ def test_manual_policy_event_sync_writes_policy_table(tmp_path):
     events = SpecialCommodityReadService(storage).policy_events(commodity_id="OIL.WTI.SPOT")
     assert events["count"] == 1
     assert events["events"][0]["event_id"] == "thermal-coal-policy-2026-01"
+
+
+def test_configured_policy_event_rejects_invalid_range(tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    special_cfg["policy_events"] = [
+        {
+            "event_id": "invalid-policy-range",
+            "commodity_id": "OIL.WTI.SPOT",
+            "policy_type": "reasonable_range",
+            "effective_start": "2026-01-01",
+            "currency": "CNY",
+            "unit": "CNY/ton",
+            "value_low": 800,
+            "value_high": 700,
+            "source_profile": "manual_policy_event",
+            "source_url": "manual://unit-test",
+        }
+    ]
+
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    result = SpecialCommodityPolicyEventService(storage, special_cfg).sync(dry_run=True)
+
+    assert result["status"] == "blocked"
+    assert result["policy_events"] == 0
+    assert result["blockers"][0]["validation_errors"] == ["policy_range_inverted"]
 
 
 def test_calendar_governance_uses_only_source_observed_dates(monkeypatch, tmp_path):

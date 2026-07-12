@@ -934,7 +934,7 @@
       "special_commodity_policy_event_sync": {
         "enabled": true,
         "manual_only": true,
-        "description": "特殊商品政策/长协事件导入（人工复核后从配置导入）",
+        "description": "特殊商品政策/长协事件导入（官方或人工证据复核后从配置导入）",
         "report": true,
         "pre_run_notify": false,
         "max_instances": 1,

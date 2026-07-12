@@ -4134,19 +4134,62 @@ class CommodityAdapterRegistry:
         return provider, governance, []
 
 
-class ManualPolicyEventProvider:
-    """Provider for reviewed policy or long-term-contract event rows."""
+class ConfiguredPolicyEventProvider:
+    """Provider for reviewed policy events with shared governance validation."""
 
     def __init__(self, module_cfg: Mapping[str, Any]):
         self.module_cfg = dict(module_cfg or {})
 
-    def fetch(self) -> List[CommodityPolicyEvent]:
+    def fetch(self) -> tuple[List[CommodityPolicyEvent], List[Dict[str, Any]]]:
         events: List[CommodityPolicyEvent] = []
+        blockers: List[Dict[str, Any]] = []
+        commodity_ids = {
+            str(item.get("commodity_id") or "")
+            for item in self.module_cfg.get("commodities", [])
+            if isinstance(item, Mapping)
+        }
+        source_profiles = self.module_cfg.get("source_profiles") or {}
         for item in self.module_cfg.get("policy_events", []):
             if not isinstance(item, Mapping):
                 continue
-            events.append(CommodityPolicyEvent.from_dict(item))
-        return events
+            event = CommodityPolicyEvent.from_dict(item)
+            reasons: List[str] = []
+            if event.commodity_id not in commodity_ids:
+                reasons.append("unknown_commodity_id")
+            if event.source_profile not in source_profiles:
+                reasons.append("unknown_source_profile")
+            effective_start = _parse_date(event.effective_start)
+            effective_end = _parse_date(event.effective_end)
+            if effective_start is None:
+                reasons.append("invalid_effective_start")
+            if effective_end is not None and effective_start is not None and effective_end < effective_start:
+                reasons.append("effective_end_before_start")
+            if not event.currency:
+                reasons.append("missing_currency")
+            if not event.unit:
+                reasons.append("missing_unit")
+            values = [event.value_low, event.value_high, event.value_mid]
+            if all(value is None for value in values):
+                reasons.append("missing_policy_value")
+            if (
+                event.value_low is not None
+                and event.value_high is not None
+                and event.value_low > event.value_high
+            ):
+                reasons.append("policy_range_inverted")
+            if not event.source_url.startswith(("https://", "http://", "manual://")):
+                reasons.append("invalid_evidence_url")
+            if reasons:
+                blockers.append(
+                    {
+                        "reason": "invalid_configured_policy_event",
+                        "event_id": event.event_id,
+                        "validation_errors": reasons,
+                    }
+                )
+                continue
+            events.append(event)
+        return events, blockers
 
 
 class SpecialCommodityPolicyEventService:
@@ -4158,12 +4201,24 @@ class SpecialCommodityPolicyEventService:
         if not _coerce_bool(self.module_cfg.get("enabled"), False):
             return {"status": "disabled", "reason": "special_commodity_market_data_disabled"}
         SpecialCommodityMasterDataService(self.storage, self.module_cfg).sync()
-        events = ManualPolicyEventProvider(self.module_cfg).fetch()
+        events, blockers = ConfiguredPolicyEventProvider(self.module_cfg).fetch()
+        if blockers:
+            return {
+                "status": "blocked",
+                "dry_run": dry_run,
+                "policy_events": len(events),
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "would_write": 0,
+                "blockers": blockers,
+            }
         counts = self.storage.upsert_policy_events(events, dry_run=dry_run)
         return {
             "status": "success",
             "dry_run": dry_run,
             "policy_events": len(events),
+            "blockers": [],
             **counts,
         }
 

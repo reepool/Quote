@@ -126,6 +126,7 @@ source_venue -> commodity category -> commodity instrument -> series
 - **国内现货和化工指数**：如果没有交易所官方源，AkShare/100ppi 可以作为免费源，但必须保留 `source_profile=100ppi_public_web` 和字段口径。
 - **动力煤市场价**：使用国家统计局官方旬度“山西优混（5500 大卡）”批发和销售市场价格，保留观测旬与发布日期，不展开成伪日频。
 - **动力煤长协**：不要用 AkShare 或国家统计局市场价猜长协价；长协应作为政策/事件表，由公告或人工确认维护。
+- **动力煤政策区间首期落地**：发改价格〔2022〕303号自2022-05-01起规定秦皇岛港下水煤（5500千卡）中长期交易价格合理区间为含税 `570-770 CNY/ton`，且进口煤不适用。该记录写入政策事件表的 `value_low/value_high`，不自行计算 `value_mid`，不伪装成实际长协成交价或日行情。后续晋陕蒙出矿区间沿用同一配置化治理契约逐项验证。
 
 ---
 
@@ -395,6 +396,7 @@ FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略
 - `/run special_commodity_price_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_price_backfill scope_id=cn_nbs_thermal_coal start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_policy_event_sync dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 - `/run special_commodity_policy_event_sync dry_run`
 
