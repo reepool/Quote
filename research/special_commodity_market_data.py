@@ -5841,6 +5841,14 @@ class SpecialCommoditySeriesCandidateValidationService:
                 transitions = ["metadata_verified", "short_dry_run_passed"]
             elif target_state == "short_dry_run_passed" and current_state == "metadata_verified":
                 transitions = ["short_dry_run_passed"]
+            elif target_state == "full_dry_run_passed" and current_state == "discovered":
+                transitions = [
+                    "metadata_verified",
+                    "short_dry_run_passed",
+                    "full_dry_run_passed",
+                ]
+            elif target_state == "full_dry_run_passed" and current_state == "metadata_verified":
+                transitions = ["short_dry_run_passed", "full_dry_run_passed"]
             elif target_state == "full_dry_run_passed" and current_state == "short_dry_run_passed":
                 transitions = ["full_dry_run_passed"]
             else:
