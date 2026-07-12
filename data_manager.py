@@ -5011,6 +5011,42 @@ class DataManager:
         )
         return {"status": "success", "review_status": review_status, "candidates": rows, "count": len(rows)}
 
+    async def review_special_commodity_policy_candidate(
+        self,
+        *,
+        candidate_id: str,
+        decision: str,
+        reviewer: str = "operator",
+        notes: str = "",
+    ) -> Dict[str, Any]:
+        """Record an operator decision without bypassing policy-event validation."""
+        normalized = str(decision or "").strip().lower()
+        if normalized not in {"approved", "rejected"}:
+            raise ValueError("decision must be approved or rejected")
+        storage = self._require_special_commodity_storage()
+        updated = await asyncio.to_thread(
+            storage.set_policy_candidate_review_status,
+            candidate_id=str(candidate_id or "").strip(),
+            review_status=normalized,
+            reviewer=str(reviewer or "operator").strip(),
+            notes=str(notes or "").strip(),
+        )
+        if not updated:
+            return {
+                "status": "blocked",
+                "candidate_id": candidate_id,
+                "decision": normalized,
+                "reason": "policy_candidate_not_found",
+            }
+        return {
+            "status": "success",
+            "candidate_id": candidate_id,
+            "decision": normalized,
+            "reviewer": reviewer,
+            "promotion_required": normalized == "approved",
+            "next_task": "special_commodity_policy_event_sync" if normalized == "approved" else None,
+        }
+
     async def get_special_commodity_source_documents(
         self,
         *,

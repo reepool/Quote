@@ -1864,6 +1864,47 @@ def test_ndrc_policy_parser_fails_closed_for_ambiguous_contract_text():
     assert candidate["value_mid"] is None
 
 
+def test_approved_policy_candidate_does_not_duplicate_existing_semantic_event(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    service = SpecialCommodityPolicyEventService(storage, module_cfg)
+    assert service.sync(dry_run=False)["inserted"] == 1
+    document = {
+        "document_id": "NDRC.2022.303.DEDUP",
+        "source_profile": "ndrc_official_policy_event",
+        "source_url": "https://www.ndrc.gov.cn/303.html",
+        "document_number": "发改价格〔2022〕303号",
+        "title": "关于进一步完善煤炭市场价格形成机制的通知",
+        "published_date": "2022-02-25",
+        "retrieved_at": "2026-07-12T00:00:00+08:00",
+        "content_hash": "dedup-test",
+        "content_type": "text/html",
+        "parser_version": "test.v1",
+    }
+    storage.upsert_source_documents([document], dry_run=False)
+    candidate = {
+        "candidate_id": "NDRC.CANDIDATE.DEDUP",
+        "document_id": document["document_id"],
+        "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
+        "policy_type": "long_term_transaction_reasonable_range",
+        "review_status": "approved",
+        "confidence": 1.0,
+        "effective_start": "2022-05-01",
+        "currency": "CNY",
+        "unit": "CNY/ton",
+        "value_low": 570.0,
+        "value_high": 770.0,
+        "value_mid": None,
+    }
+    storage.upsert_policy_candidates([candidate], dry_run=False)
+    promotion = service.promote_approved_candidates(dry_run=False)
+    assert promotion["already_represented"] == 1
+    assert promotion["unchanged"] == 1
+    assert len(storage.read_policy_events()) == 1
+
+
 def test_special_commodity_indicator_api_contract_returns_only_indicator_series(tmp_path):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]

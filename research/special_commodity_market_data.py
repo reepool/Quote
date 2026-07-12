@@ -4804,31 +4804,60 @@ class SpecialCommodityPolicyEventService:
     def promote_approved_candidates(self, *, dry_run: bool = False) -> Dict[str, Any]:
         rows = self.storage.read_policy_candidates(review_status="approved")
         candidate_events: List[CommodityPolicyEvent] = []
+        already_represented = 0
         for row in rows:
             metadata = json.loads(row.get("metadata_json") or "{}")
-            candidate_events.append(
-                CommodityPolicyEvent(
-                    event_id="DISCOVERED." + str(row["candidate_id"]),
-                    commodity_id=str(row.get("commodity_id") or ""),
-                    policy_type=str(row.get("policy_type") or "policy_document"),
-                    effective_start=str(row.get("effective_start") or ""),
-                    effective_end=row.get("effective_end"),
-                    currency=str(row.get("currency") or ""),
-                    unit=str(row.get("unit") or ""),
-                    value_low=row.get("value_low"),
-                    value_high=row.get("value_high"),
-                    value_mid=row.get("value_mid"),
-                    source_profile="ndrc_official_policy_event",
-                    source_url=str(metadata.get("source_url") or ""),
-                    quality_flag="official_policy_document",
-                    metadata={
-                        **metadata,
-                        "candidate_id": row["candidate_id"],
-                        "document_id": row["document_id"],
-                        "promotion_semantics": "approved_candidate_not_transaction_price",
-                    },
-                )
+            candidate_event = CommodityPolicyEvent(
+                event_id="DISCOVERED." + str(row["candidate_id"]),
+                commodity_id=str(row.get("commodity_id") or ""),
+                policy_type=str(row.get("policy_type") or "policy_document"),
+                effective_start=str(row.get("effective_start") or ""),
+                effective_end=row.get("effective_end"),
+                currency=str(row.get("currency") or ""),
+                unit=str(row.get("unit") or ""),
+                value_low=row.get("value_low"),
+                value_high=row.get("value_high"),
+                value_mid=row.get("value_mid"),
+                source_profile="ndrc_official_policy_event",
+                source_url=str(metadata.get("source_url") or ""),
+                quality_flag="official_policy_document",
+                metadata={
+                    **metadata,
+                    "candidate_id": row["candidate_id"],
+                    "document_id": row["document_id"],
+                    "promotion_semantics": "approved_candidate_not_transaction_price",
+                },
             )
+            existing_events = self.storage.read_policy_events(
+                commodity_id=candidate_event.commodity_id
+            )
+            semantic_key = (
+                candidate_event.policy_type,
+                candidate_event.effective_start,
+                candidate_event.effective_end,
+                candidate_event.currency,
+                candidate_event.unit,
+                candidate_event.value_low,
+                candidate_event.value_high,
+                candidate_event.value_mid,
+            )
+            if any(
+                (
+                    event.get("policy_type"),
+                    event.get("effective_start"),
+                    event.get("effective_end"),
+                    event.get("currency"),
+                    event.get("unit"),
+                    event.get("value_low"),
+                    event.get("value_high"),
+                    event.get("value_mid"),
+                )
+                == semantic_key
+                for event in existing_events
+            ):
+                already_represented += 1
+                continue
+            candidate_events.append(candidate_event)
         events, blockers = ConfiguredPolicyEventProvider(self.module_cfg).validate(candidate_events)
         counts = self.storage.upsert_policy_events(events, dry_run=dry_run) if not blockers else {
             "inserted": 0,
@@ -4836,11 +4865,13 @@ class SpecialCommodityPolicyEventService:
             "unchanged": 0,
             "would_write": 0,
         }
+        counts["unchanged"] = int(counts.get("unchanged", 0) or 0) + already_represented
         return {
             "status": "blocked" if blockers else "success",
             "dry_run": dry_run,
             "approved_candidates": len(rows),
             "policy_events": len(events),
+            "already_represented": already_represented,
             "blockers": blockers,
             **counts,
         }

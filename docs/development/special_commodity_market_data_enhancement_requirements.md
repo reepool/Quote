@@ -149,7 +149,7 @@
 - 已实现 `special_commodity_policy_discovery` 的统一 Scheduler/DataManager/API 入口；当前采用 `enabled=true + manual_only=true`，允许手工 dry-run，但不会加入自动调度。月度触发器预设为每月15日09:10，完成生产验收后再将 `manual_only` 改为 `false`。
 - 手工 dry-run：`/run special_commodity_policy_discovery adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
 - 本地 API：`GET /api/v1/research/commodities/policy-candidates`、`GET /api/v1/research/commodities/source-documents`、`POST /api/v1/research/commodities/policy-discovery`。
-- `ready_for_promotion` 仅表示 parser 字段完整；必须明确变更为 `approved` 后，现有 `special_commodity_policy_event_sync` 才会通过统一 validator 提升正式事件。
+- `ready_for_promotion` 仅表示 parser 字段完整；通过 `/run special_commodity_policy_candidate_review candidate_id=... decision=approved notes=...` 或候选审核 API 明确批准后，再运行 `/run special_commodity_policy_event_sync write`，由统一 validator 幂等提升正式事件。拒绝使用 `decision=rejected`，审核入口不会直接写正式事件表。
 - 2026-07-12 任务进程真实 NDRC dry-run 扫描2个目录、6份有效文档（含1个附件），只生成303号文件对应的1条政策候选，状态为 `ready_for_promotion`，无 warning、blocker 或噪声候选；正确识别 `570-770 CNY/ton`、`2022-05-01` 生效且 `value_mid` 为空。执行 `write` 只保存来源文档和候选，候选仍须审核为 `approved` 后才能由政策事件任务提升。
 - 已实现扩品候选目录和强制上线状态机。手工任务为 `/run special_commodity_series_catalog_sync dry_run|write`；API 为 `GET /api/v1/research/commodities/series-candidates` 和 `POST /api/v1/research/commodities/series-catalog-sync`。`write` 只落候选治理记录，不创建正式商品序列、不进入生产 scope；只有依次通过 metadata、短期 dry-run、全量 dry-run、落库、幂等日更并达到 `production_verified` 后才具备 scheduler eligibility。
 

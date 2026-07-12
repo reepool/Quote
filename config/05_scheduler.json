@@ -967,6 +967,23 @@
           "max_runtime_seconds": 1800
         }
       },
+      "special_commodity_policy_candidate_review": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "特殊商品政策候选人工审核；批准后仍需运行政策事件任务完成统一校验和提升",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 600,
+        "coalesce": true,
+        "parameters": {
+          "candidate_id": "",
+          "decision": "",
+          "reviewer": "telegram_operator",
+          "notes": "",
+          "max_runtime_seconds": 300
+        }
+      },
       "special_commodity_series_catalog_sync": {
         "enabled": true,
         "manual_only": true,

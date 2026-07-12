@@ -786,3 +786,10 @@ curl "http://localhost:8000/api/v1/calendar/trading/previous?exchange=SSE&date=2
 - `GET /api/v1/quotes/{instrument_id}`
 - `GET /api/v1/quotes/batch`
 - `GET /api/v1/indicators/{instrument_id}`
+### 审核特殊商品政策候选
+
+```http
+POST /api/v1/research/commodities/policy-candidates/{candidate_id}/review?decision=approved&reviewer=operator&notes=verified
+```
+
+审核只修改候选状态；批准后仍需运行政策事件同步任务，由统一 validator 提升正式事件。

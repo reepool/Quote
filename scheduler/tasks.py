@@ -1741,6 +1741,13 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"文档新增 `{document_write.get('inserted', 0)}`/预计 `{document_write.get('would_write', 0)}`｜"
             f"候选新增 `{candidate_write.get('inserted', 0)}`/预计 `{candidate_write.get('would_write', 0)}`"
         )
+    elif result.get("candidate_id") and result.get("decision"):
+        lines.append(
+            "政策候选审核: "
+            f"候选 `{result.get('candidate_id')}`｜"
+            f"决定 `{result.get('decision')}`｜"
+            f"后续任务 `{result.get('next_task') or '无需提升'}`"
+        )
     elif "rollout_state_counts" in result:
         states = result.get("rollout_state_counts") or {}
         lines.append(
@@ -4538,6 +4545,45 @@ class ScheduledTasks:
                 task_name='特殊商品政策目录发现',
                 job_config=job_config,
             )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def special_commodity_policy_candidate_review(
+        self,
+        candidate_id: str,
+        decision: str,
+        reviewer: str = "telegram_operator",
+        notes: str = "",
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """人工审核政策候选；正式事件仍由独立治理任务提升。"""
+        task_id = "special_commodity_policy_candidate_review"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.review_special_commodity_policy_candidate(
+                candidate_id=candidate_id,
+                decision=decision,
+                reviewer=reviewer,
+                notes=notes,
+            )
+            success = result.get("status") == "success"
+            await self._send_task_report(
+                report_data={
+                    "name": "特殊商品政策候选审核报告",
+                    "content": _format_special_commodity_scheduler_report(result),
+                    "status": result.get("status", "error"),
+                    "tasks_completed": 1 if success else 0,
+                    "duration": "N/A",
+                    "maintenance_tasks": [{"task_name": task_id, "status": result.get("status")}],
+                },
+                report_type="maintenance_report",
+                task_name="特殊商品政策候选审核",
+                job_config=job_config,
+            )
+            return success
+        except Exception as exc:
+            scheduler_logger.error("[Scheduler] Special commodity policy candidate review failed: %s", exc)
             return False
         finally:
             self._active_tasks.discard(task_id)
