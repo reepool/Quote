@@ -67,7 +67,7 @@ source_venue -> commodity category -> commodity instrument -> series
 | 动力煤公开市场参考 | 国家统计局“山西优混（5500 大卡）”旬度价格 | 100ppi/库存指标仅作辅助；政策长协独立维护 | 旬度/事件 | CNY/ton 或事件价 | 高（统计局序列）/人工核验（长协） |
 | 化工现货/基差 | 生意社/100ppi，经 AkShare 或直连页面 | 交易所期货主力连续 | 日频 | 多为 CNY/ton | 中 |
 
-World Bank 化肥序列使用独立 `world_bank_fertilizers` scope，并保持为全球月度基准，不与国内100ppi尿素现货合并。2026-07-13 官方工作簿探测确认磷矿石、TSP、尿素和氯化钾自1960-01起可用，DAP自1967-01起可用，五项单位均为 `$/mt`，规范化为 `USD/metric_ton`。短窗口 dry-run 获取90条；全历史复验获取3,905条，主数据和月份治理均为成功。官方工作簿中磷矿石 `2023M11` 明确使用 `…` 无值标记，系统将其登记为带工作簿 URL 的来源治理例外，不插值、不伪造观测；其余月份无未解决缺口。该 scope 在完成正式落库和幂等验证前不得加入月更调度。
+World Bank 化肥序列使用独立 `world_bank_fertilizers` scope，并保持为全球月度基准，不与国内100ppi尿素现货合并。2026-07-13 官方工作簿探测确认磷矿石、TSP、尿素和氯化钾自1960-01起可用，DAP自1967-01起可用，五项单位均为 `$/mt`，规范化为 `USD/metric_ton`。短窗口 dry-run 获取90条；全历史复验获取3,905条，主数据和月份治理均为成功。官方工作簿中磷矿石 `2023M11` 明确使用 `…` 无值标记，系统将其登记为带工作簿 URL 的来源治理例外，不插值、不伪造观测；其余月份无未解决缺口。正式写入 `run_id=131` 新增3,905条，幂等复验 `run_id=132` 为新增0、变更0、不变3,905，均无 warning/blocker；验证后已加入 `special_commodity_price_monthly_sync`。
 
 ### 2.2 不纳入第一阶段自动化的内容
 
@@ -253,7 +253,7 @@ validate_observations(normalized_rows)
 
 | 字段 | 说明 |
 |---|---|
-| `scope_id` | 稳定配置 ID，例如 `fred_energy_oil`、`world_bank_metals`、`lme_nonferrous`、`cn_100ppi_chemical` |
+| `scope_id` | 稳定配置 ID，例如 `fred_energy_oil`、`world_bank_metals`、`world_bank_fertilizers`、`lme_nonferrous`、`cn_100ppi_chemical` |
 | `venues` | 数据发布机构或采集源，支持 `["all"]`，例如 `["FRED"]`、`["EIA"]`、`["LME"]` |
 | `categories` | 商品分类，支持 `["all"]` |
 | `commodity_ids` | 可选根商品列表 |
@@ -270,6 +270,7 @@ validate_observations(normalized_rows)
 | `fred_energy_oil` | `["FRED"]` | `["energy"]` | WTI、Brent 日频现货 |
 | `eia_energy_oil` | `["EIA"]` | `["energy"]` | WTI、Brent canonical 日频现货；EIA 主源、FRED 逐日期备源 |
 | `world_bank_metals` | `["WORLD_BANK"]` | `["nonferrous"]` | 铜、铝等月度长期基准 |
+| `world_bank_fertilizers` | `["WORLD_BANK"]` | `["fertilizer"]` | 磷矿石、DAP、TSP、尿素和氯化钾全球月度基准 |
 | `fred_imf_metals` | `["FRED"]` | `["nonferrous"]` | FRED/IMF 铜铝月度价格 |
 | `lme_nonferrous` | `["LME"]` | `["nonferrous"]` | LME 铜、铝、锌、铅、镍、锡 3M 聚合日线 |
 | `cn_100ppi_chemical` | `["100PPI"]` | `["chemical"]` | 国内化工现货和基差 |
@@ -388,7 +389,7 @@ scope 解析
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与官方基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。任务共用同一 provider/governance/persistence 链路，默认回看最近10个自然日；该窗口同时覆盖 NBS 旬价通常约4天的发布滞后。各 scope 隔离来源、频率、报告和日期治理。国内现货及官方旬价不进入期货连续合约任务，因为来源观测日、单值价格和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
-`fred_imf_metals` 与 `world_bank_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
+`fred_imf_metals`、`world_bank_metals` 与 `world_bank_fertilizers` 使用同一个 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。World Bank 金属与化肥是各自独立的 Pink Sheet 全球月度基准，不得覆盖、平均或伪装成 IMF/FRED 或国内100ppi现货。每个 scope 须先完成全历史 dry-run、正式落库和幂等验证，验证通过后才可加入月更任务。
 
 2026-07-11 World Bank 全历史 dry-run 验证成功：铜、铝各798个月，覆盖1960-01至2026-06，主数据与月份治理均成功，无 warning/blocker。与本地 FRED/IMF 1992-01至2026-05的413个重叠月份完全对齐，均为 `USD/metric_ton`；铜平均相对差0.116610%、月收益相关性0.999246，铝平均相对差0.116405%、月收益相关性0.999018。正式写入 `run_id=76` 新增1,596条观测、1,596条来源月份治理记录和2条主数据治理证据，零 warning/blocker。验证后 `world_bank_metals` 已与 `fred_imf_metals` 一同加入独立月更任务，但始终保持独立 `series_id` 和来源 lineage，不构造跨源 canonical 平均值。
 

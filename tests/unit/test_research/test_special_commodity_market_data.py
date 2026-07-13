@@ -1942,6 +1942,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
     assert monthly["parameters"]["scope_ids"] == [
         "fred_imf_metals",
         "world_bank_metals",
+        "world_bank_fertilizers",
     ]
     assert monthly["parameters"]["frequencies"] == ["monthly"]
     assert monthly["parameters"]["lookback_months"] == 6
