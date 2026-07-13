@@ -847,6 +847,7 @@
             "cn_100ppi_asphalt",
             "cn_100ppi_lpg",
             "cn_100ppi_natural_rubber",
+            "cn_100ppi_softwood_pulp",
             "cn_nbs_thermal_coal"
           ],
           "lookback_days": 10,

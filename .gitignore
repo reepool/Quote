@@ -131,6 +131,7 @@ dmypy.json
 .pyre/
 
 # 项目特定文件
+.worktrees/
 
 # 配置文件 (包含敏感信息)
 config/config.json*

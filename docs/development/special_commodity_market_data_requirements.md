@@ -62,9 +62,12 @@ source_venue -> commodity category -> commodity instrument -> series
 | Brent Europe spot | EIA Open Data `RBRTE` | FRED `DCOILBRENTEU` 逐日期补缺 | 日频 | USD/barrel | 高 |
 | 全球铜价 | FRED/IMF `PCOPPUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
 | 全球铝价 | FRED/IMF `PALUMUSDM` | World Bank Pink Sheet | 月频 | USD/metric ton | 高 |
+| 全球化肥基准 | World Bank Pink Sheet（磷矿石、DAP、TSP、尿素、氯化钾） | 后续按品种评估 FRED/IMF | 月频 | USD/metric ton | 高，官方公开月度数据 |
 | LME 铜/铝/锌/铅/镍/锡 3M 代理 | AkShare/Sina 外盘期货 | AkShare/东方财富全球期货 | 日频 | USD/metric ton | 高，CFD/聚合代理；新浪约自 2016-07-11，东财约自 2013-06-21 |
 | 动力煤公开市场参考 | 国家统计局“山西优混（5500 大卡）”旬度价格 | 100ppi/库存指标仅作辅助；政策长协独立维护 | 旬度/事件 | CNY/ton 或事件价 | 高（统计局序列）/人工核验（长协） |
 | 化工现货/基差 | 生意社/100ppi，经 AkShare 或直连页面 | 交易所期货主力连续 | 日频 | 多为 CNY/ton | 中 |
+
+World Bank 化肥序列使用独立 `world_bank_fertilizers` scope，并保持为全球月度基准，不与国内100ppi尿素现货合并。2026-07-13 官方工作簿探测确认磷矿石、TSP、尿素和氯化钾自1960-01起可用，DAP自1967-01起可用，五项单位均为 `$/mt`，规范化为 `USD/metric_ton`。该 scope 在完成任务级短窗口与全历史 dry-run、正式落库和幂等验证前不得加入月更调度。
 
 ### 2.2 不纳入第一阶段自动化的内容
 
@@ -382,7 +385,7 @@ scope 解析
 政策治理已经收口为单一月度运维入口 `special_commodity_policy_discovery`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
 | `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与官方基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber` 与 `cn_nbs_thermal_coal`。任务共用同一 provider/governance/persistence 链路，默认回看最近10个自然日；该窗口同时覆盖 NBS 旬价通常约4天的发布滞后。各 scope 隔离来源、频率、报告和日期治理。国内现货及官方旬价不进入期货连续合约任务，因为来源观测日、单值价格和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与官方基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。任务共用同一 provider/governance/persistence 链路，默认回看最近10个自然日；该窗口同时覆盖 NBS 旬价通常约4天的发布滞后。各 scope 隔离来源、频率、报告和日期治理。国内现货及官方旬价不进入期货连续合约任务，因为来源观测日、单值价格和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
 `fred_imf_metals` 与 `world_bank_metals` 使用独立的 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。`world_bank_metals` 是独立的 Pink Sheet 月度基准，不得覆盖、平均或伪装成 IMF/FRED 备源。它须先完成全历史 dry-run，并对重叠月份的单位、覆盖率、绝对/相对差异、月度收益相关性和修订行为进行交叉验证，验证通过后才可加入月更任务。
 

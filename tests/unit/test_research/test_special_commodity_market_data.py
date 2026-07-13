@@ -222,6 +222,24 @@ def test_special_commodity_scope_resolution():
         "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
         "CMD.METAL.ALUMINUM.WORLDBANK.MONTHLY",
     }
+    world_bank_fertilizers = selector.resolve(scope_id="world_bank_fertilizers")
+    assert {item.series_id for item in world_bank_fertilizers} == {
+        "CMD.FERTILIZER.PHOSPHATE_ROCK.WORLDBANK.MONTHLY",
+        "CMD.FERTILIZER.DAP.WORLDBANK.MONTHLY",
+        "CMD.FERTILIZER.TSP.WORLDBANK.MONTHLY",
+        "CMD.FERTILIZER.UREA.WORLDBANK.MONTHLY",
+        "CMD.FERTILIZER.POTASSIUM_CHLORIDE.WORLDBANK.MONTHLY",
+    }
+    assert {
+        item.series_id: item.metadata["source_available_from"]
+        for item in world_bank_fertilizers
+    } == {
+        "CMD.FERTILIZER.PHOSPHATE_ROCK.WORLDBANK.MONTHLY": "1960-01-01",
+        "CMD.FERTILIZER.DAP.WORLDBANK.MONTHLY": "1967-01-01",
+        "CMD.FERTILIZER.TSP.WORLDBANK.MONTHLY": "1960-01-01",
+        "CMD.FERTILIZER.UREA.WORLDBANK.MONTHLY": "1960-01-01",
+        "CMD.FERTILIZER.POTASSIUM_CHLORIDE.WORLDBANK.MONTHLY": "1960-01-01",
+    }
     assert {item.series_id for item in selector.resolve(scope_id="lme_nonferrous")} == {
         "CMD.METAL.COPPER.LME3M.DAILY",
         "CMD.METAL.ALUMINIUM.LME3M.DAILY",
@@ -1772,6 +1790,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_asphalt",
         "cn_100ppi_lpg",
         "cn_100ppi_natural_rubber",
+        "cn_100ppi_softwood_pulp",
         "cn_nbs_thermal_coal",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10

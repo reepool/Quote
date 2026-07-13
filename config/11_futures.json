@@ -1111,6 +1111,61 @@
           }
         },
         {
+          "commodity_id": "FERTILIZER.PHOSPHATE_ROCK.GLOBAL",
+          "symbol": "PHOSPHATE_ROCK",
+          "name": "Global Phosphate Rock Price Benchmark",
+          "category": "fertilizer",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
+        },
+        {
+          "commodity_id": "FERTILIZER.DAP.GLOBAL",
+          "symbol": "DAP",
+          "name": "Global DAP Price Benchmark",
+          "category": "fertilizer",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
+        },
+        {
+          "commodity_id": "FERTILIZER.TSP.GLOBAL",
+          "symbol": "TSP",
+          "name": "Global TSP Price Benchmark",
+          "category": "fertilizer",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
+        },
+        {
+          "commodity_id": "FERTILIZER.UREA.GLOBAL",
+          "symbol": "UREA",
+          "name": "Global Urea Price Benchmark",
+          "category": "fertilizer",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
+        },
+        {
+          "commodity_id": "FERTILIZER.POTASSIUM_CHLORIDE.GLOBAL",
+          "symbol": "POTASSIUM_CHLORIDE",
+          "name": "Global Potassium Chloride Price Benchmark",
+          "category": "fertilizer",
+          "commodity_type": "monthly_benchmark",
+          "default_currency": "USD",
+          "default_unit": "USD/metric_ton",
+          "active": true,
+          "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
+        },
+        {
           "commodity_id": "METAL.COPPER.LME_3M",
           "symbol": "COPPER",
           "name": "LME Copper 3-Month",
@@ -1508,6 +1563,41 @@
           "metadata": {
             "role": "monthly_benchmark_fallback"
           }
+        },
+        {
+          "series_id": "CMD.FERTILIZER.PHOSPHATE_ROCK.WORLDBANK.MONTHLY",
+          "commodity_id": "FERTILIZER.PHOSPHATE_ROCK.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Phosphate rock",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.FERTILIZER.DAP.WORLDBANK.MONTHLY",
+          "commodity_id": "FERTILIZER.DAP.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "DAP",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1967-01-01"}
+        },
+        {
+          "series_id": "CMD.FERTILIZER.TSP.WORLDBANK.MONTHLY",
+          "commodity_id": "FERTILIZER.TSP.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "TSP",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.FERTILIZER.UREA.WORLDBANK.MONTHLY",
+          "commodity_id": "FERTILIZER.UREA.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Urea",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.FERTILIZER.POTASSIUM_CHLORIDE.WORLDBANK.MONTHLY",
+          "commodity_id": "FERTILIZER.POTASSIUM_CHLORIDE.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Potassium chloride **",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
         },
         {
           "series_id": "CMD.METAL.COPPER.LME3M.DAILY",
@@ -2035,6 +2125,20 @@
           "frequencies": [
             "monthly"
           ]
+        },
+        {
+          "scope_id": "world_bank_fertilizers",
+          "enabled": true,
+          "venues": ["WORLD_BANK"],
+          "categories": ["fertilizer"],
+          "commodity_ids": [
+            "FERTILIZER.PHOSPHATE_ROCK.GLOBAL",
+            "FERTILIZER.DAP.GLOBAL",
+            "FERTILIZER.TSP.GLOBAL",
+            "FERTILIZER.UREA.GLOBAL",
+            "FERTILIZER.POTASSIUM_CHLORIDE.GLOBAL"
+          ],
+          "frequencies": ["monthly"]
         },
         {
           "scope_id": "lme_nonferrous",
