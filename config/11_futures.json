@@ -1869,7 +1869,8 @@
           "metadata": {
             "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["FG"]},
             "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
-            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
+            "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/m2",
+            "provider_value_multiplier_from_raw": 80,
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
             "source_available_from": "2013-01-04",
             "region_or_spec": "China flat glass spot reference normalized by AkShare to CNY/ton; grade and region follow 100ppi publication",

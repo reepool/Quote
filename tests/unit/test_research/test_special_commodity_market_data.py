@@ -934,7 +934,8 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
                 "akshare_function": "unit_test_100ppi",
                 "date_column": "日期",
                 "value_column": "价格",
-                "raw_unit": "CNY/ton",
+                "raw_unit": "CNY/kg",
+                "provider_value_multiplier_from_raw": 1000,
                 "region_or_spec": "unit-test",
                 "source_url": "https://www.100ppi.com/test?token=secret",
             },
@@ -973,6 +974,8 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert len(result.observations) == 1
     obs = result.observations[0]
     assert obs.value == 5500
+    assert obs.raw_value == 5.5
+    assert obs.raw_unit == "CNY/kg"
     assert obs.source_profile == "100ppi_public_web"
     assert obs.quality_flag == "aggregated_public_web"
     assert "secret" not in obs.source_url
@@ -982,6 +985,7 @@ def test_100ppi_provider_fetches_mapped_akshare_rows(monkeypatch):
     assert diagnostics[obs.series_id]["first_date"] == "2026-01-01"
     assert diagnostics[obs.series_id]["min_value"] == 5500
     assert diagnostics[obs.series_id]["unit"] == ["CNY/ton"]
+    assert diagnostics[obs.series_id]["raw_unit"] == ["CNY/kg"]
 
 
 def test_special_commodity_progress_wrapper_logs_completion(monkeypatch):
@@ -2137,6 +2141,8 @@ def test_known_100ppi_expansion_scopes_use_the_existing_production_selector(tmp_
     assert soda_ash.metadata["source_available_from"] == "2020-06-01"
     glass = selector.resolve(scope_id="cn_100ppi_glass")[0]
     assert glass.metadata["source_available_from"] == "2013-01-04"
+    assert glass.metadata["raw_unit"] == "CNY/m2"
+    assert glass.metadata["provider_value_multiplier_from_raw"] == 80
 
 
 def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):

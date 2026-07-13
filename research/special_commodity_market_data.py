@@ -320,6 +320,9 @@ def _build_observation(
     source_symbol: str,
     raw_payload: Mapping[str, Any],
     metadata: Optional[Dict[str, Any]] = None,
+    raw_value: Optional[float] = None,
+    raw_currency: Optional[str] = None,
+    raw_unit: Optional[str] = None,
 ) -> "CommodityObservation":
     raw_hash = _hash_payload(
         {
@@ -336,9 +339,9 @@ def _build_observation(
         value=value,
         currency=item.currency,
         unit=item.unit,
-        raw_value=value,
-        raw_currency=item.currency,
-        raw_unit=item.unit,
+        raw_value=value if raw_value is None else raw_value,
+        raw_currency=raw_currency or item.currency,
+        raw_unit=raw_unit or item.unit,
         source_profile=source_profile,
         source_url=_redact_url(source_url),
         quality_flag=str(source_cfg.get("quality_flag") or "partial"),
@@ -2589,6 +2592,21 @@ class AkshareCommoditySpotProvider:
             date_column = str(item.metadata.get("date_column") or item.metadata.get("observation_date_column") or "date")
             value_column = str(item.metadata.get("value_column") or "value")
             raw_unit = str(item.metadata.get("raw_unit") or item.unit)
+            try:
+                provider_value_multiplier_from_raw = float(
+                    item.metadata.get("provider_value_multiplier_from_raw") or 1.0
+                )
+            except (TypeError, ValueError):
+                provider_value_multiplier_from_raw = 0.0
+            if provider_value_multiplier_from_raw <= 0:
+                blockers.append(
+                    {
+                        "reason": "invalid_provider_value_multiplier_from_raw",
+                        "series_id": item.series_id,
+                        "value": item.metadata.get("provider_value_multiplier_from_raw"),
+                    }
+                )
+                continue
             source_url = direct_url or str(item.metadata.get("source_url") or f"akshare://{function_name}")
             if not rows:
                 warnings.append(
@@ -2652,10 +2670,14 @@ class AkshareCommoditySpotProvider:
                         source_url=source_url,
                         source_symbol=item.source_symbol,
                         raw_payload=row,
+                        raw_value=value / provider_value_multiplier_from_raw,
+                        raw_currency=item.currency,
+                        raw_unit=raw_unit,
                         metadata={
                             "akshare_function": function_name,
                             "source_label": "100ppi_public_web",
                             "raw_unit": raw_unit,
+                            "provider_value_multiplier_from_raw": provider_value_multiplier_from_raw,
                             "region_or_spec": item.metadata.get("region_or_spec"),
                             "source_row_symbol": row.get("symbol") or row.get("var"),
                         },

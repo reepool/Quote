@@ -458,6 +458,7 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 - FRED/IMF 铜、铝月度序列可同步，单位为 `USD/metric_ton`。
 - World Bank Pink Sheet 可作为月度价格备源或交叉校验源。
 - 100ppi 现货/基差可通过 AkShare 或直连页面获取，明确记录 `raw_unit` 和规格差异。
+- 若整合源在 adapter 内已做单位换算，观测构造层必须通过配置化换算因子同时保留上游 `raw_value/raw_unit` 和标准化 `value/unit`；不得将 adapter 输出单位冒充上游原始单位。玻璃现货按 100ppi/AkShare 规则从 `CNY/m2` 以因子 `80` 换算为 `CNY/ton`。
 - 动力煤长协不伪装成日频行情；先支持政策/事件表。
 - API 能查询商品字典、序列、观测值、诊断指标。
 - DCF readiness 能识别缺少油价、铜铝、动力煤或现货增强数据的输入缺口。
