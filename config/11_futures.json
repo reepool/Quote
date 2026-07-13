@@ -1174,6 +1174,51 @@
           "metadata": {"dcf_role": "global_fertilizer_cycle_anchor"}
         },
         {
+          "commodity_id": "AGRI.PALM_OIL.GLOBAL", "symbol": "PALM_OIL", "name": "Global Palm Oil Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.SOYBEANS.GLOBAL", "symbol": "SOYBEANS", "name": "Global Soybeans Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.SOYBEAN_OIL.GLOBAL", "symbol": "SOYBEAN_OIL", "name": "Global Soybean Oil Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.SOYBEAN_MEAL.GLOBAL", "symbol": "SOYBEAN_MEAL", "name": "Global Soybean Meal Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.MAIZE.GLOBAL", "symbol": "MAIZE", "name": "Global Maize Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.WHEAT_US_HRW.GLOBAL", "symbol": "WHEAT_US_HRW", "name": "US HRW Wheat Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/metric_ton", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.SUGAR_WORLD.GLOBAL", "symbol": "SUGAR_WORLD", "name": "World Sugar Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/kg", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.COTTON_A_INDEX.GLOBAL", "symbol": "COTTON_A_INDEX", "name": "Cotton A Index Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/kg", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
+          "commodity_id": "AGRI.RUBBER_TSR20.GLOBAL", "symbol": "RUBBER_TSR20", "name": "Global TSR20 Rubber Price Benchmark",
+          "category": "agriculture", "commodity_type": "monthly_benchmark", "default_currency": "USD", "default_unit": "USD/kg", "active": true,
+          "metadata": {"dcf_role": "global_agriculture_cycle_anchor"}
+        },
+        {
           "commodity_id": "METAL.COPPER.LME_3M",
           "symbol": "COPPER",
           "name": "LME Copper 3-Month",
@@ -1606,6 +1651,60 @@
           "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Potassium chloride **",
           "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
           "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.PALM_OIL.WORLDBANK.MONTHLY", "commodity_id": "AGRI.PALM_OIL.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Palm oil",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.SOYBEANS.WORLDBANK.MONTHLY", "commodity_id": "AGRI.SOYBEANS.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Soybeans",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.SOYBEAN_OIL.WORLDBANK.MONTHLY", "commodity_id": "AGRI.SOYBEAN_OIL.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Soybean oil",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.SOYBEAN_MEAL.WORLDBANK.MONTHLY", "commodity_id": "AGRI.SOYBEAN_MEAL.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Soybean meal",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.MAIZE.WORLDBANK.MONTHLY", "commodity_id": "AGRI.MAIZE.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Maize",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.WHEAT_US_HRW.WORLDBANK.MONTHLY", "commodity_id": "AGRI.WHEAT_US_HRW.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Wheat, US HRW",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/metric_ton", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.SUGAR_WORLD.WORLDBANK.MONTHLY", "commodity_id": "AGRI.SUGAR_WORLD.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Sugar, world",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/kg", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.COTTON_A_INDEX.WORLDBANK.MONTHLY", "commodity_id": "AGRI.COTTON_A_INDEX.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Cotton, A Index",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/kg", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1960-01-01"}
+        },
+        {
+          "series_id": "CMD.AGRI.RUBBER_TSR20.WORLDBANK.MONTHLY", "commodity_id": "AGRI.RUBBER_TSR20.GLOBAL",
+          "venue": "WORLD_BANK", "source_profile": "world_bank_public_dataset", "source_symbol": "Rubber, TSR20 **",
+          "frequency": "monthly", "quote_type": "benchmark", "currency": "USD", "unit": "USD/kg", "active": true,
+          "metadata": {"role": "monthly_benchmark", "source_available_from": "1999-01-01"}
         },
         {
           "series_id": "CMD.METAL.COPPER.LME3M.DAILY",
@@ -2145,6 +2244,24 @@
             "FERTILIZER.TSP.GLOBAL",
             "FERTILIZER.UREA.GLOBAL",
             "FERTILIZER.POTASSIUM_CHLORIDE.GLOBAL"
+          ],
+          "frequencies": ["monthly"]
+        },
+        {
+          "scope_id": "world_bank_agriculture",
+          "enabled": true,
+          "venues": ["WORLD_BANK"],
+          "categories": ["agriculture"],
+          "commodity_ids": [
+            "AGRI.PALM_OIL.GLOBAL",
+            "AGRI.SOYBEANS.GLOBAL",
+            "AGRI.SOYBEAN_OIL.GLOBAL",
+            "AGRI.SOYBEAN_MEAL.GLOBAL",
+            "AGRI.MAIZE.GLOBAL",
+            "AGRI.WHEAT_US_HRW.GLOBAL",
+            "AGRI.SUGAR_WORLD.GLOBAL",
+            "AGRI.COTTON_A_INDEX.GLOBAL",
+            "AGRI.RUBBER_TSR20.GLOBAL"
           ],
           "frequencies": ["monthly"]
         },

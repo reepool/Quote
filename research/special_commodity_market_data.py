@@ -987,14 +987,16 @@ class SpecialCommodityStorageManager:
             for item in observations:
                 existing = conn.execute(
                     """
-                    SELECT raw_payload_hash FROM commodity_price_observations
+                    SELECT value, currency, unit, raw_value, raw_currency, raw_unit,
+                           quality_flag, source_symbol
+                    FROM commodity_price_observations
                     WHERE series_id = ? AND observation_date = ? AND source_profile = ?
                     """,
                     (item.series_id, item.observation_date, item.source_profile),
                 ).fetchone()
                 if existing is None:
                     inserted += 1
-                elif existing["raw_payload_hash"] == item.raw_payload_hash:
+                elif self._observation_semantics_equal(existing, item):
                     unchanged += 1
                 else:
                     changed += 1
@@ -1044,6 +1046,29 @@ class SpecialCommodityStorageManager:
                     ),
                 )
         return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+
+    @staticmethod
+    def _observation_semantics_equal(
+        existing: sqlite3.Row,
+        item: CommodityObservation,
+    ) -> bool:
+        """Compare canonical observation meaning, excluding volatile source metadata."""
+
+        def _numbers_equal(left: Any, right: Any) -> bool:
+            if left is None or right is None:
+                return left is right
+            return math.isclose(float(left), float(right), rel_tol=1e-12, abs_tol=1e-12)
+
+        return (
+            _numbers_equal(existing["value"], item.value)
+            and _numbers_equal(existing["raw_value"], item.raw_value)
+            and str(existing["currency"] or "") == item.currency
+            and str(existing["unit"] or "") == item.unit
+            and str(existing["raw_currency"] or "") == item.raw_currency
+            and str(existing["raw_unit"] or "") == item.raw_unit
+            and str(existing["quality_flag"] or "") == item.quality_flag
+            and str(existing["source_symbol"] or "") == item.source_symbol
+        )
 
     def upsert_policy_events(
         self,

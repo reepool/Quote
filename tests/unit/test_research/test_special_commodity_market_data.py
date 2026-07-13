@@ -120,8 +120,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 31
-    assert result["series"] >= 29
+    assert result["instruments"] == 40
+    assert result["series"] >= 43
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -240,6 +240,25 @@ def test_special_commodity_scope_resolution():
         "CMD.FERTILIZER.UREA.WORLDBANK.MONTHLY": "1960-01-01",
         "CMD.FERTILIZER.POTASSIUM_CHLORIDE.WORLDBANK.MONTHLY": "1960-01-01",
     }
+    world_bank_agriculture = selector.resolve(scope_id="world_bank_agriculture")
+    assert {item.series_id for item in world_bank_agriculture} == {
+        "CMD.AGRI.PALM_OIL.WORLDBANK.MONTHLY",
+        "CMD.AGRI.SOYBEANS.WORLDBANK.MONTHLY",
+        "CMD.AGRI.SOYBEAN_OIL.WORLDBANK.MONTHLY",
+        "CMD.AGRI.SOYBEAN_MEAL.WORLDBANK.MONTHLY",
+        "CMD.AGRI.MAIZE.WORLDBANK.MONTHLY",
+        "CMD.AGRI.WHEAT_US_HRW.WORLDBANK.MONTHLY",
+        "CMD.AGRI.SUGAR_WORLD.WORLDBANK.MONTHLY",
+        "CMD.AGRI.COTTON_A_INDEX.WORLDBANK.MONTHLY",
+        "CMD.AGRI.RUBBER_TSR20.WORLDBANK.MONTHLY",
+    }
+    assert {item.unit for item in world_bank_agriculture} == {
+        "USD/metric_ton",
+        "USD/kg",
+    }
+    assert {
+        item.metadata["source_available_from"] for item in world_bank_agriculture
+    } == {"1960-01-01", "1999-01-01"}
     assert {item.series_id for item in selector.resolve(scope_id="lme_nonferrous")} == {
         "CMD.METAL.COPPER.LME3M.DAILY",
         "CMD.METAL.ALUMINIUM.LME3M.DAILY",
@@ -334,6 +353,7 @@ def test_source_unit_governance_normalizes_equivalent_official_labels():
     assert _source_unit_matches("USD/barrel", "$/BBL")
     assert _source_unit_matches("USD/metric_ton", "U.S. Dollars per Metric Ton")
     assert _source_unit_matches("USD/metric_ton", "($/mt)")
+    assert _source_unit_matches("USD/kg", "($/kg)")
 
 
 def test_nbs_ten_day_title_period_parsing():
@@ -1635,6 +1655,84 @@ def test_special_commodity_storage_upsert_is_idempotent(monkeypatch, tmp_path):
         series_id="CMD.OIL.WTI.SPOT.FRED.DAILY"
     )
     assert [row["observation_date"] for row in calendar] == ["2026-01-01"]
+
+
+def test_observation_change_count_ignores_volatile_source_metadata(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(
+        storage,
+        cfg.modules["commodity_market_data"]["special_commodity_market_data"],
+    ).sync()
+
+    base = CommodityObservation(
+        series_id="CMD.METAL.COPPER.IMF.FRED.MONTHLY",
+        observation_date="2026-01-01",
+        value=12_345.0,
+        currency="USD",
+        unit="USD/metric_ton",
+        raw_value=12_345.0,
+        raw_currency="USD",
+        raw_unit="USD/metric_ton",
+        source_profile="fred_api",
+        source_url="https://api.stlouisfed.org/fred/series/observations",
+        quality_flag="official_verified",
+        source_symbol="PCOPPUSDM",
+        parser_version="fred_commodity_provider.v1",
+        raw_payload_hash="vintage-a",
+        metadata={"realtime_start": "2026-07-12"},
+    )
+    first = storage.upsert_observations([base], ingestion_run_id=None, dry_run=False)
+    refreshed = CommodityObservation(
+        **{
+            **base.__dict__,
+            "raw_payload_hash": "vintage-b",
+            "metadata": {"realtime_start": "2026-07-13"},
+        }
+    )
+    second = storage.upsert_observations(
+        [refreshed], ingestion_run_id=None, dry_run=False
+    )
+    revised = CommodityObservation(
+        **{
+            **refreshed.__dict__,
+            "value": 12_346.0,
+            "raw_value": 12_346.0,
+        }
+    )
+    third = storage.upsert_observations([revised], ingestion_run_id=None, dry_run=False)
+
+    assert first == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "would_write": 0,
+    }
+    assert second == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "would_write": 0,
+    }
+    assert third == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "would_write": 0,
+    }
+    with storage.get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT value, raw_payload_hash, metadata_json
+            FROM commodity_price_observations
+            WHERE series_id = ? AND observation_date = ? AND source_profile = ?
+            """,
+            (base.series_id, base.observation_date, base.source_profile),
+        ).fetchone()
+    assert row["value"] == 12_346.0
+    assert row["raw_payload_hash"] == "vintage-b"
+    assert json.loads(row["metadata_json"])["realtime_start"] == "2026-07-13"
 
 
 def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tmp_path):
