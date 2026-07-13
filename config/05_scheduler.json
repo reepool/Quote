@@ -985,24 +985,6 @@
           "max_runtime_seconds": 600
         }
       },
-      "special_commodity_series_candidate_validate": {
-        "enabled": true,
-        "manual_only": true,
-        "description": "特殊商品扩品候选分阶段验收；复用统一provider、主数据和日期治理，不直接加入生产日更",
-        "report": true,
-        "pre_run_notify": true,
-        "max_instances": 1,
-        "misfire_grace_time": 1800,
-        "coalesce": true,
-        "parameters": {
-          "candidate_ref": "",
-          "target_state": "metadata_verified",
-          "start_date": "",
-          "end_date": "",
-          "dry_run": true,
-          "max_runtime_seconds": 14400
-        }
-      },
       "futures_trading_day_governance": {
         "enabled": false,
         "description": "商品期货交易日治理前置任务（维护交易所日历、公告证据、人工复核状态和目标交易日集合）",

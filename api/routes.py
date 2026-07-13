@@ -1953,35 +1953,6 @@ async def run_research_special_commodity_series_catalog_sync(
 
 
 @router.post(
-    "/research/commodities/series-candidates/validate",
-    response_model=Dict[str, Any],
-    tags=["Research"],
-)
-async def validate_research_special_commodity_series_candidate(
-    candidate_ref: str = Query(..., description="candidate_id、proposed_series_id或唯一source_symbol"),
-    target_state: str = Query(..., description="metadata_verified/short_dry_run_passed/full_dry_run_passed"),
-    start_date: str = Query(..., description="开始日期 YYYY-MM-DD"),
-    end_date: str = Query(..., description="结束日期 YYYY-MM-DD"),
-    dry_run: bool = Query(True, description="默认只验证，不推进候选状态"),
-):
-    """通过统一来源和治理链路分阶段验收扩品候选。"""
-    try:
-        return await data_manager.validate_special_commodity_series_candidate(
-            candidate_ref=str(_query_default(candidate_ref) or ""),
-            target_state=str(_query_default(target_state) or ""),
-            start_date=str(_query_default(start_date) or ""),
-            end_date=str(_query_default(end_date) or ""),
-            dry_run=bool(_query_default(dry_run)),
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to validate commodity series candidate: {str(e)}")
-
-
-@router.post(
     "/research/commodities/policy-discovery",
     response_model=Dict[str, Any],
     tags=["Research"],

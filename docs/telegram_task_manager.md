@@ -349,7 +349,6 @@ restart_system - 重启系统服务
 • 特殊商品政策目录发现 (special_commodity_policy_discovery) - 每月15日09:10自动 write；发现并保存证据/候选、对账正式事件，但不自动批准新政策
 • 特殊商品政策候选审核 (special_commodity_policy_candidate_review) - 仅手工运行；直接复制发现报告中的 `candidate_ref=<8位短码> decision=approved|rejected notes=...`，批准默认同步完成正式提升
 • 特殊商品扩品候选目录 (special_commodity_series_catalog_sync) - 仅手工运行，不自动上线候选
-• 特殊商品扩品候选验收 (special_commodity_series_candidate_validate) - 仅手工运行；统一执行来源、主数据、日期和质量治理，按 short/full 阶段推进候选
 • 缓存预热 (cache_warm_up) - 每天 08:20
 • 交易日历更新 (trading_calendar_update) - 下月1日 01:00
 • 数据库备份任务 (database_backup) - 周六 03:30

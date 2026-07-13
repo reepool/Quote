@@ -1771,20 +1771,6 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"决定 `{result.get('decision')}`｜"
             f"正式提升 `{'已完成' if result.get('promoted') else '不适用'}`"
         )
-    elif result.get("candidate_id") and result.get("target_state"):
-        lines.append(
-            "扩品候选验收: "
-            f"候选 `{result.get('candidate_id')}`｜"
-            f"当前 `{result.get('current_state')}`｜"
-            f"目标 `{result.get('target_state')}`"
-        )
-        lines.append(
-            "验收结果: "
-            f"观测 `{result.get('observations', 0)}`｜"
-            f"来源日期 `{result.get('source_dates', 0)}`｜"
-            f"预计推进 `{bool(result.get('would_transition'))}`｜"
-            f"已推进 `{bool(result.get('transitioned'))}`"
-        )
     elif "rollout_state_counts" in result:
         states = result.get("rollout_state_counts") or {}
         lines.append(
@@ -4611,47 +4597,6 @@ class ScheduledTasks:
             return success
         except Exception as e:
             scheduler_logger.error("[Scheduler] Special commodity series catalog sync failed: %s", e)
-            return False
-        finally:
-            self._active_tasks.discard(task_id)
-
-    async def special_commodity_series_candidate_validate(
-        self,
-        candidate_ref: str,
-        target_state: str,
-        start_date: str,
-        end_date: str,
-        dry_run: bool = True,
-        job_config: Optional[JobConfig] = None,
-    ) -> bool:
-        """通过统一provider/governance链路验收扩品候选。"""
-        task_id = "special_commodity_series_candidate_validate"
-        self._active_tasks.add(task_id)
-        try:
-            result = await data_manager.validate_special_commodity_series_candidate(
-                candidate_ref=candidate_ref,
-                target_state=target_state,
-                start_date=start_date,
-                end_date=end_date,
-                dry_run=dry_run,
-            )
-            success = result.get("status") == "success"
-            await self._send_task_report(
-                report_data={
-                    "name": "特殊商品扩品候选验收报告",
-                    "content": _format_special_commodity_scheduler_report(result),
-                    "status": result.get("status", "error"),
-                    "tasks_completed": 1 if success else 0,
-                    "duration": "N/A",
-                    "maintenance_tasks": [{"task_name": task_id, "status": result.get("status")}],
-                },
-                report_type="maintenance_report",
-                task_name="特殊商品扩品候选验收",
-                job_config=job_config,
-            )
-            return success
-        except Exception as exc:
-            scheduler_logger.error("[Scheduler] Special commodity candidate validation failed: %s", exc)
             return False
         finally:
             self._active_tasks.discard(task_id)

@@ -34,7 +34,6 @@ from research.special_commodity_market_data import (
     SpecialCommodityPolicyEventService,
     SpecialCommodityReadService,
     SpecialCommoditySeriesCatalogService,
-    SpecialCommoditySeriesCandidateValidationService,
     SpecialCommodityPriceSyncService,
     SpecialCommodityGovernancePipeline,
     SpecialCommodityStorageManager,
@@ -121,8 +120,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 17
-    assert result["series"] >= 20
+    assert result["instruments"] == 26
+    assert result["series"] >= 29
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -141,6 +140,15 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.ETHYLENE_GLYCOL.SPOT",
         "CN.CHEMICAL.PVC.SPOT",
         "CN.CHEMICAL.POLYPROPYLENE.SPOT",
+        "CN.CHEMICAL.STYRENE.SPOT",
+        "CN.CHEMICAL.UREA.SPOT",
+        "CN.CHEMICAL.CAUSTIC_SODA.SPOT",
+        "CN.CHEMICAL.SODA_ASH.SPOT",
+        "CN.BUILDING.GLASS.SPOT",
+        "CN.ENERGY.ASPHALT.SPOT",
+        "CN.ENERGY.LPG.SPOT",
+        "CN.CHEMICAL.NATURAL_RUBBER.SPOT",
+        "CN.FORESTRY.SOFTWOOD_PULP.SPOT",
         "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
         "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
     }
@@ -2099,6 +2107,26 @@ def test_100ppi_live_discovery_only_returns_symbols_missing_from_production(
     assert rows[0]["diagnostics"]["reason"] == "new_source_symbol_requires_semantic_review"
 
 
+def test_known_100ppi_expansion_scopes_use_the_existing_production_selector(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    selector = CommodityUniverseSelector(module_cfg)
+    expected = {
+        "cn_100ppi_styrene": "CMD.CN.CHEMICAL.STYRENE.SPOT.100PPI.DAILY",
+        "cn_100ppi_urea": "CMD.CN.CHEMICAL.UREA.SPOT.100PPI.DAILY",
+        "cn_100ppi_caustic_soda": "CMD.CN.CHEMICAL.CAUSTIC_SODA.SPOT.100PPI.DAILY",
+        "cn_100ppi_soda_ash": "CMD.CN.CHEMICAL.SODA_ASH.SPOT.100PPI.DAILY",
+        "cn_100ppi_glass": "CMD.CN.BUILDING.GLASS.SPOT.100PPI.DAILY",
+        "cn_100ppi_asphalt": "CMD.CN.ENERGY.ASPHALT.SPOT.100PPI.DAILY",
+        "cn_100ppi_lpg": "CMD.CN.ENERGY.LPG.SPOT.100PPI.DAILY",
+        "cn_100ppi_natural_rubber": "CMD.CN.CHEMICAL.NATURAL_RUBBER.SPOT.100PPI.DAILY",
+        "cn_100ppi_softwood_pulp": "CMD.CN.FORESTRY.SOFTWOOD_PULP.SPOT.100PPI.DAILY",
+    }
+
+    for scope_id, series_id in expected.items():
+        assert [item.series_id for item in selector.resolve(scope_id=scope_id)] == [series_id]
+
+
 def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):
     cfg = _research_config(tmp_path)
     module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
@@ -2127,189 +2155,6 @@ def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path)
 
     assert result["retired_production_candidates"] == 1
     assert storage.resolve_series_candidate("EB") is None
-
-
-def test_series_candidate_validation_uses_common_governance_and_advances_one_gate(
-    monkeypatch, tmp_path
-):
-    cfg = _research_config(tmp_path)
-    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
-    _configure_eb_candidate_fixture(module_cfg)
-    storage = SpecialCommodityStorageManager(cfg)
-    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
-
-    class FakeProvider:
-        def fetch(self, series, *, start_date, end_date):
-            item = series[0]
-            return CommodityProviderResult(
-                observations=[
-                    CommodityObservation(
-                        series_id=item.series_id,
-                        observation_date="2026-07-10",
-                        value=1000.0,
-                        currency=item.currency,
-                        unit=item.unit,
-                        raw_value=1000.0,
-                        raw_currency=item.currency,
-                        raw_unit=item.unit,
-                        source_profile=item.source_profile,
-                        source_url="https://www.100ppi.com/sf/",
-                        quality_flag="test",
-                        source_symbol=item.source_symbol,
-                        parser_version="test.v1",
-                        raw_payload_hash="candidate-validation",
-                        metadata={"source_row_symbol": item.source_symbol},
-                    )
-                ]
-            )
-
-    class FakeGovernance:
-        def govern_master(self, series, provider, *, start_date, end_date):
-            return CommodityMasterGovernanceResult(
-                records=[{"series_id": series[0].series_id, "governance_status": "success"}],
-                prefetched_result=provider.fetch(series, start_date=start_date, end_date=end_date),
-            )
-
-        def govern_dates(self, series, observations, *, start_date, end_date):
-            return CommodityDateGovernanceResult(
-                calendar_rows=[{"observation_date": observations[0].observation_date}]
-            )
-
-    monkeypatch.setattr(
-        "research.special_commodity_market_data.CommodityAdapterRegistry.resolve",
-        lambda self, source_profile: (FakeProvider(), FakeGovernance(), []),
-    )
-    service = SpecialCommoditySeriesCandidateValidationService(storage, module_cfg)
-    dry_run = service.validate(
-        candidate_ref="EB",
-        target_state="metadata_verified",
-        start_date="2026-07-06",
-        end_date="2026-07-10",
-        dry_run=True,
-    )
-    assert dry_run["status"] == "success"
-    assert dry_run["would_transition"] is True
-    assert storage.resolve_series_candidate("EB")["rollout_state"] == "discovered"
-
-    write = service.validate(
-        candidate_ref="EB",
-        target_state="short_dry_run_passed",
-        start_date="2026-07-06",
-        end_date="2026-07-10",
-        dry_run=False,
-    )
-    assert write["transitioned"] is True
-    assert storage.resolve_series_candidate("EB")["rollout_state"] == "short_dry_run_passed"
-
-
-def test_candidate_full_validation_records_prior_gates_without_intermediate_writes(
-    tmp_path, monkeypatch
-):
-    cfg = _research_config(tmp_path)
-    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
-    _configure_eb_candidate_fixture(module_cfg)
-    storage = SpecialCommodityStorageManager(cfg)
-    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
-
-    class FakeProvider:
-        def fetch(self, series, *, start_date, end_date):
-            item = series[0]
-            return CommodityProviderResult(
-                observations=[
-                    CommodityObservation(
-                        series_id=item.series_id,
-                        observation_date="2019-09-26",
-                        value=8766.67,
-                        currency=item.currency,
-                        unit=item.unit,
-                        raw_value=8766.67,
-                        raw_currency=item.currency,
-                        raw_unit=item.unit,
-                        source_profile=item.source_profile,
-                        source_url="https://www.100ppi.com/sf/",
-                        quality_flag="test",
-                        source_symbol=item.source_symbol,
-                        parser_version="test.v1",
-                        raw_payload_hash="candidate-full-validation",
-                        metadata={"source_row_symbol": item.source_symbol},
-                    )
-                ]
-            )
-
-    class FakeGovernance:
-        def govern_master(self, series, provider, *, start_date, end_date):
-            return CommodityMasterGovernanceResult(
-                records=[{"series_id": series[0].series_id, "governance_status": "success"}],
-                prefetched_result=provider.fetch(
-                    series, start_date=start_date, end_date=end_date
-                ),
-            )
-
-        def govern_dates(self, series, observations, *, start_date, end_date):
-            return CommodityDateGovernanceResult(
-                calendar_rows=[{"observation_date": observations[0].observation_date}]
-            )
-
-    monkeypatch.setattr(
-        "research.special_commodity_market_data.CommodityAdapterRegistry.resolve",
-        lambda self, source_profile: (FakeProvider(), FakeGovernance(), []),
-    )
-    result = SpecialCommoditySeriesCandidateValidationService(storage, module_cfg).validate(
-        candidate_ref="EB",
-        target_state="full_dry_run_passed",
-        start_date="2019-09-26",
-        end_date="2026-07-10",
-        dry_run=False,
-    )
-
-    assert result["status"] == "success"
-    assert result["transitioned"] is True
-    assert storage.resolve_series_candidate("EB")["rollout_state"] == "full_dry_run_passed"
-
-
-def test_special_commodity_series_catalog_enforces_rollout_gates_and_unit_conflicts(tmp_path):
-    cfg = _research_config(tmp_path)
-    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
-    _configure_eb_candidate_fixture(module_cfg)
-    storage = SpecialCommodityStorageManager(cfg)
-    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
-    candidate_id = "100PPI.CHEMICAL.STYRENE"
-    with pytest.raises(ValueError, match="cannot skip gates"):
-        storage.transition_series_candidate(candidate_id=candidate_id, target_state="full_dry_run_passed")
-    for state in (
-        "metadata_verified",
-        "short_dry_run_passed",
-        "full_dry_run_passed",
-        "persisted",
-        "daily_idempotency_verified",
-        "production_verified",
-    ):
-        assert storage.transition_series_candidate(candidate_id=candidate_id, target_state=state)
-    row = next(
-        item
-        for item in storage.read_series_candidates(category="chemical")
-        if item["candidate_id"] == candidate_id
-    )
-    assert row["scheduler_eligible"] == 1
-
-    SpecialCommoditySeriesCatalogService(storage, module_cfg).sync(dry_run=False)
-    row = next(
-        item
-        for item in storage.read_series_candidates(category="chemical")
-        if item["candidate_id"] == candidate_id
-    )
-    assert row["rollout_state"] == "production_verified"
-    assert row["scheduler_eligible"] == 1
-
-    changed = dict(module_cfg["series_catalog"]["candidates"][0])
-    changed["unit"] = "CNY/kg"
-    storage.upsert_series_candidates([changed], dry_run=False)
-    row = next(item for item in storage.read_series_candidates() if item["candidate_id"] == candidate_id)
-    assert row["rollout_state"] == "blocked"
-    assert json.loads(row["diagnostics_json"])["metadata_conflicts"]["unit"] == {
-        "existing": "CNY/ton",
-        "candidate": "CNY/kg",
-    }
 
 
 def test_special_commodity_series_catalog_reports_duplicate_source_identity(tmp_path):

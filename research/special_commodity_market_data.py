@@ -1394,19 +1394,6 @@ class SpecialCommodityStorageManager:
                 state = str(item.get("rollout_state") or "discovered")
                 diagnostics = dict(item.get("diagnostics") or {})
                 if existing is not None:
-                    current_state = str(existing["rollout_state"] or "discovered")
-                    ordered_states = (
-                        "discovered",
-                        "metadata_verified",
-                        "short_dry_run_passed",
-                        "full_dry_run_passed",
-                        "persisted",
-                        "daily_idempotency_verified",
-                        "production_verified",
-                    )
-                    if current_state in ordered_states and state in ordered_states:
-                        if ordered_states.index(current_state) > ordered_states.index(state):
-                            state = current_state
                     conflicts = {}
                     for field_name in ("currency", "unit"):
                         old_value = str(existing[field_name] or "")
@@ -1416,13 +1403,7 @@ class SpecialCommodityStorageManager:
                     if conflicts:
                         state = "blocked"
                         diagnostics["metadata_conflicts"] = conflicts
-                scheduler_eligible = bool(
-                    state == "production_verified"
-                    and (
-                        item.get("scheduler_eligible")
-                        or (existing is not None and existing["scheduler_eligible"])
-                    )
-                )
+                scheduler_eligible = False
                 conn.execute(
                     """
                     INSERT INTO commodity_series_candidates (
@@ -1539,55 +1520,6 @@ class SpecialCommodityStorageManager:
                     params,
                 )
         return count
-
-    def transition_series_candidate(
-        self,
-        *,
-        candidate_id: str,
-        target_state: str,
-        diagnostics: Optional[Mapping[str, Any]] = None,
-    ) -> bool:
-        states = (
-            "discovered",
-            "metadata_verified",
-            "short_dry_run_passed",
-            "full_dry_run_passed",
-            "persisted",
-            "daily_idempotency_verified",
-            "production_verified",
-            "blocked",
-        )
-        if target_state not in states:
-            raise ValueError(f"invalid commodity series rollout state: {target_state}")
-        now = get_shanghai_time().isoformat()
-        with self.get_connection() as conn:
-            row = conn.execute(
-                "SELECT rollout_state FROM commodity_series_candidates WHERE candidate_id = ?",
-                (candidate_id,),
-            ).fetchone()
-            if row is None:
-                return False
-            current = str(row["rollout_state"])
-            if target_state != "blocked":
-                current_index = states.index(current) if current in states[:-1] else -1
-                target_index = states.index(target_state)
-                if target_index > current_index + 1:
-                    raise ValueError(f"rollout transition cannot skip gates: {current} -> {target_state}")
-            conn.execute(
-                """
-                UPDATE commodity_series_candidates
-                SET rollout_state = ?, scheduler_eligible = ?, diagnostics_json = ?, updated_at = ?
-                WHERE candidate_id = ?
-                """,
-                (
-                    target_state,
-                    1 if target_state == "production_verified" else 0,
-                    _json_dumps(dict(diagnostics or {})),
-                    now,
-                    candidate_id,
-                ),
-            )
-        return True
 
     def resolve_series_candidate(self, candidate_ref: str) -> Optional[Dict[str, Any]]:
         normalized = str(candidate_ref or "").strip()
@@ -5882,187 +5814,10 @@ class SpecialCommoditySeriesCatalogService:
             "dry_run": dry_run,
             "candidates": len(candidates),
             "rollout_state_counts": state_counts,
-            "scheduler_eligible": sum(
-                bool(item.get("scheduler_eligible"))
-                and item.get("rollout_state") == "production_verified"
-                for item in candidates
-            ),
+            "scheduler_eligible": 0,
             "blockers": blockers,
             "retired_production_candidates": retired_candidates,
             **counts,
-        }
-
-
-class SpecialCommoditySeriesCandidateValidationService:
-    """Validate a catalog candidate through the common provider/governance contracts."""
-
-    VALID_TARGETS = {
-        "metadata_verified",
-        "short_dry_run_passed",
-        "full_dry_run_passed",
-    }
-
-    def __init__(self, storage: SpecialCommodityStorageManager, module_cfg: Mapping[str, Any]):
-        self.storage = storage
-        self.module_cfg = dict(module_cfg or {})
-
-    @staticmethod
-    def _series_from_candidate(candidate: Mapping[str, Any]) -> CommoditySeries:
-        source_profile = str(candidate.get("source_profile") or "")
-        source_symbol = str(candidate.get("source_symbol") or "")
-        specification = str(candidate.get("specification") or "")
-        region = str(candidate.get("region") or "")
-        metadata = json.loads(candidate.get("metadata_json") or "{}")
-        if source_profile == "100ppi_public_web":
-            metadata = {
-                **metadata,
-                "akshare_function": "futures_spot_price_daily",
-                "akshare_kwargs": {"vars_list": [source_symbol]},
-                "akshare_start_argument": "start_day",
-                "akshare_end_argument": "end_day",
-                "akshare_date_format": "compact",
-                "date_column": "date",
-                "value_column": "spot_price",
-                "raw_unit": str(candidate.get("unit") or ""),
-                "region_or_spec": "; ".join(value for value in (region, specification) if value),
-                "source_name": f"100ppi {candidate.get('name') or source_symbol}",
-                "source_url": "https://www.100ppi.com/sf/",
-                "progress_log_interval_seconds": 60,
-            }
-        return CommoditySeries(
-            series_id=str(candidate.get("proposed_series_id") or ""),
-            commodity_id=str(candidate.get("proposed_commodity_id") or ""),
-            venue=str((source_profile.split("_", 1)[0] or "CANDIDATE").upper()),
-            source_profile=source_profile,
-            source_symbol=source_symbol,
-            frequency=str(candidate.get("frequency") or "daily"),
-            quote_type="spot_reference",
-            currency=str(candidate.get("currency") or ""),
-            unit=str(candidate.get("unit") or ""),
-            active=False,
-            metadata=metadata,
-        )
-
-    def validate(
-        self,
-        *,
-        candidate_ref: str,
-        target_state: str,
-        start_date: str,
-        end_date: str,
-        dry_run: bool = True,
-    ) -> Dict[str, Any]:
-        self.storage.initialize()
-        if target_state not in self.VALID_TARGETS:
-            raise ValueError(f"unsupported candidate validation target: {target_state}")
-        candidate = self.storage.resolve_series_candidate(candidate_ref)
-        if candidate is None:
-            return {"status": "blocked", "reason": "series_candidate_not_found", "candidate_ref": candidate_ref}
-        if str(candidate.get("rollout_state")) == "blocked":
-            return {
-                "status": "blocked",
-                "reason": "series_candidate_governance_blocked",
-                "candidate_id": candidate.get("candidate_id"),
-            }
-        series = self._series_from_candidate(candidate)
-        provider, governance, registry_blockers = CommodityAdapterRegistry(self.module_cfg).resolve(
-            series.source_profile
-        )
-        if registry_blockers or provider is None or governance is None:
-            return {
-                "status": "blocked",
-                "candidate_id": candidate.get("candidate_id"),
-                "blockers": registry_blockers,
-            }
-        logger.info(
-            "[CommoditySeriesCandidateValidation] started candidate=%s target=%s start=%s end=%s dry_run=%s",
-            candidate.get("candidate_id"),
-            target_state,
-            start_date,
-            end_date,
-            dry_run,
-        )
-        master = governance.govern_master(
-            [series], provider, start_date=start_date, end_date=end_date
-        )
-        provider_result = master.prefetched_result or provider.fetch(
-            [series], start_date=start_date, end_date=end_date
-        )
-        date_result = governance.govern_dates(
-            [series], provider_result.observations, start_date=start_date, end_date=end_date
-        )
-        blockers = [*master.blockers, *provider_result.blockers]
-        warnings = [*master.warnings, *provider_result.warnings, *date_result.warnings]
-        diagnostics = {
-            "target_state": target_state,
-            "start_date": start_date,
-            "end_date": end_date,
-            "observations": len(provider_result.observations),
-            "source_dates": len(date_result.calendar_rows),
-            "quality": _observation_quality_diagnostics(provider_result.observations),
-            "warnings": warnings,
-            "blockers": blockers,
-        }
-        passed = bool(provider_result.observations) and not blockers and not warnings
-        transitioned = False
-        if passed and not dry_run:
-            current_state = str(candidate.get("rollout_state") or "discovered")
-            transitions: List[str] = []
-            if target_state == current_state:
-                transitions = []
-            elif target_state == "metadata_verified" and current_state == "discovered":
-                transitions = ["metadata_verified"]
-            elif target_state == "short_dry_run_passed" and current_state == "discovered":
-                transitions = ["metadata_verified", "short_dry_run_passed"]
-            elif target_state == "short_dry_run_passed" and current_state == "metadata_verified":
-                transitions = ["short_dry_run_passed"]
-            elif target_state == "full_dry_run_passed" and current_state == "discovered":
-                transitions = [
-                    "metadata_verified",
-                    "short_dry_run_passed",
-                    "full_dry_run_passed",
-                ]
-            elif target_state == "full_dry_run_passed" and current_state == "metadata_verified":
-                transitions = ["short_dry_run_passed", "full_dry_run_passed"]
-            elif target_state == "full_dry_run_passed" and current_state == "short_dry_run_passed":
-                transitions = ["full_dry_run_passed"]
-            else:
-                blockers.append(
-                    {
-                        "reason": "series_candidate_rollout_prerequisite_not_met",
-                        "current_state": current_state,
-                        "target_state": target_state,
-                    }
-                )
-                passed = False
-            for transition_state in transitions:
-                transitioned = self.storage.transition_series_candidate(
-                    candidate_id=str(candidate["candidate_id"]),
-                    target_state=transition_state,
-                    diagnostics=diagnostics,
-                ) or transitioned
-        status = "success" if passed else ("warning" if warnings and not blockers else "blocked")
-        logger.info(
-            "[CommoditySeriesCandidateValidation] done candidate=%s status=%s observations=%s dates=%s transitioned=%s warnings=%s blockers=%s",
-            candidate.get("candidate_id"),
-            status,
-            len(provider_result.observations),
-            len(date_result.calendar_rows),
-            transitioned,
-            len(warnings),
-            len(blockers),
-        )
-        return {
-            "status": status,
-            "dry_run": dry_run,
-            "candidate_id": candidate.get("candidate_id"),
-            "candidate_ref": candidate_ref,
-            "current_state": candidate.get("rollout_state"),
-            "target_state": target_state,
-            "would_transition": bool(passed and dry_run),
-            "transitioned": transitioned,
-            **diagnostics,
-            "blockers": blockers,
         }
 
 
