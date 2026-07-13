@@ -1887,6 +1887,7 @@
             "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "SHFE", "progress_log_interval_seconds": 60,
+            "source_available_from": "2013-10-09",
             "region_or_spec": "China asphalt spot reference; grade, region and tax basis follow 100ppi publication",
             "source_name": "100ppi asphalt spot reference", "source_url": "https://www.100ppi.com/sf/"
           }
