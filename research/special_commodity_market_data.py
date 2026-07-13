@@ -520,6 +520,7 @@ class CommodityGovernanceAdapter(Protocol):
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         ...
 
@@ -1555,8 +1556,26 @@ class SpecialCommodityStorageManager:
         if dry_run:
             return {"written": 0, "would_write": len(records)}
         now = get_shanghai_time().isoformat()
+        written = 0
+        preserved_verified = 0
         with self.get_connection() as conn:
             for record in records:
+                existing = conn.execute(
+                    "SELECT governance_status FROM commodity_master_governance WHERE series_id = ?",
+                    (record["series_id"],),
+                ).fetchone()
+                if (
+                    existing is not None
+                    and str(existing["governance_status"]) == "success"
+                    and str(record.get("governance_status") or "blocked") != "success"
+                ):
+                    preserved_verified += 1
+                    logger.warning(
+                        "[SpecialCommodityMasterGovernance] preserved last verified record series=%s incoming_status=%s",
+                        record["series_id"],
+                        record.get("governance_status") or "blocked",
+                    )
+                    continue
                 conn.execute(
                     """
                     INSERT INTO commodity_master_governance (
@@ -1606,7 +1625,34 @@ class SpecialCommodityStorageManager:
                         now,
                     ),
                 )
-        return {"written": len(records), "would_write": 0}
+                written += 1
+        return {
+            "written": written,
+            "would_write": 0,
+            "preserved_verified": preserved_verified,
+        }
+
+    def read_master_governance(
+        self, series_ids: Sequence[str]
+    ) -> Dict[str, Dict[str, Any]]:
+        normalized = sorted({str(value).strip() for value in series_ids if str(value).strip()})
+        if not normalized:
+            return {}
+        placeholders = ",".join("?" for _ in normalized)
+        with self.get_connection() as conn:
+            rows = conn.execute(
+                f"SELECT * FROM commodity_master_governance WHERE series_id IN ({placeholders})",
+                normalized,
+            ).fetchall()
+        result: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            record = _row_to_dict(row)
+            try:
+                record["metadata"] = json.loads(str(record.get("metadata_json") or "{}"))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                record["metadata"] = {}
+            result[str(record["series_id"])] = record
+        return result
 
     def read_dictionary(self) -> Dict[str, Any]:
         with self.get_connection() as conn:
@@ -3156,7 +3202,10 @@ class NbsProductionMaterialsProvider:
                     len(observations),
                     len(warnings),
                 )
-        if not articles:
+        if not articles and not (
+            discovery_diagnostics.get("expected_periods") == 0
+            and discovery_diagnostics.get("unresolved_dates") == 0
+        ):
             warnings.append(
                 {
                     "reason": "no_nbs_articles_in_requested_range",
@@ -3892,6 +3941,42 @@ def _blocked_master_governance_record(
     }
 
 
+def _reused_master_governance_record(
+    prior: Mapping[str, Any],
+) -> Dict[str, Any]:
+    """Carry forward last verified source evidence across a legal empty window."""
+    metadata = dict(prior.get("metadata") or {})
+    metadata["evidence_reused_for_empty_window"] = True
+    return {
+        "series_id": prior["series_id"],
+        "commodity_id": prior["commodity_id"],
+        "venue": prior["venue"],
+        "source_profile": prior["source_profile"],
+        "governance_status": "success",
+        "quality_flag": prior["quality_flag"],
+        "source_name": prior["source_name"],
+        "source_frequency": prior["source_frequency"],
+        "source_currency": prior["source_currency"],
+        "source_unit": prior["source_unit"],
+        "lifecycle_start": prior.get("lifecycle_start"),
+        "lifecycle_end": prior.get("lifecycle_end"),
+        "evidence_url": prior.get("evidence_url") or "",
+        "evidence_hash": prior["evidence_hash"],
+        "governed_at": prior["governed_at"],
+        "metadata": metadata,
+    }
+
+
+def _is_governed_empty_provider_window(result: CommodityProviderResult) -> bool:
+    diagnostics = result.metadata.get("date_gap_fill")
+    if not isinstance(diagnostics, Mapping):
+        return False
+    return (
+        diagnostics.get("expected_periods") == 0
+        and diagnostics.get("unresolved_dates") == 0
+    )
+
+
 class SourceObservedDateGovernanceAdapter:
     """Build date governance only from source-observed rows."""
 
@@ -3973,6 +4058,7 @@ class FredCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         api_key_env = str(self.source_cfg.get("api_key_env") or "FRED_API_KEY")
         api_key = os.environ.get(api_key_env)
@@ -4083,6 +4169,7 @@ class EiaCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         api_key_env = str(self.source_cfg.get("api_key_env") or "EIA_API_KEY")
         api_key = os.environ.get(api_key_env)
@@ -4202,6 +4289,7 @@ class ConfiguredSourceChainGovernanceAdapter(SourceObservedDateGovernanceAdapter
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         if not isinstance(provider, ConfiguredSourceChainProvider):
             return CommodityMasterGovernanceResult(
@@ -4271,6 +4359,7 @@ class WorldBankCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         result = provider.fetch(series, start_date=start_date, end_date=end_date)
         records: List[Dict[str, Any]] = []
@@ -4333,6 +4422,7 @@ class PublicWebCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         records: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
@@ -4408,6 +4498,7 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         result = provider.fetch(series, start_date=start_date, end_date=end_date)
         records: List[Dict[str, Any]] = []
@@ -4422,6 +4513,17 @@ class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapte
             required = ["source_product_names", "source_units", "source_specification"]
             missing = [key for key in required if not item.metadata.get(key)]
             source_rows = observations_by_series.get(item.series_id, [])
+            prior = (prior_master_records or {}).get(item.series_id)
+            if (
+                not missing
+                and not source_rows
+                and _is_governed_empty_provider_window(result)
+                and prior
+                and prior.get("governance_status") == "success"
+                and prior.get("source_profile") == item.source_profile
+            ):
+                records.append(_reused_master_governance_record(prior))
+                continue
             if missing or not source_rows:
                 reason = "nbs_master_mapping_incomplete" if missing else "nbs_master_evidence_unavailable"
                 blocker = {
@@ -4479,6 +4581,7 @@ class ForeignFuturesCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapt
         *,
         start_date: Optional[str],
         end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
     ) -> CommodityMasterGovernanceResult:
         records: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
@@ -5068,6 +5171,9 @@ class SpecialCommodityGovernancePipeline:
                 provider,
                 start_date=start_date,
                 end_date=end_date,
+                prior_master_records=self.storage.read_master_governance(
+                    [item.series_id for item in source_series]
+                ),
             )
             master_records.extend(master_result.records)
             warnings.extend(
@@ -5116,12 +5222,29 @@ class SpecialCommodityGovernancePipeline:
                 for item in provider_result.observations
                 if item.series_id in {series_item.series_id for series_item in date_series}
             ]
-            date_result = governance.govern_dates(
-                date_series,
-                source_observations,
-                start_date=start_date,
-                end_date=end_date,
-            )
+            if not source_observations and _is_governed_empty_provider_window(
+                provider_result
+            ):
+                date_result = CommodityDateGovernanceResult(
+                    metadata={
+                        "calendar_type": str(
+                            (registry.module_cfg.get("source_profiles") or {})
+                            .get(source_profile, {})
+                            .get("calendar_type", "source_observed")
+                        ),
+                        "source_observed_dates": 0,
+                        "expected_observations": 0,
+                        "legal_empty_window": True,
+                        "weekday_inference_used": False,
+                    }
+                )
+            else:
+                date_result = governance.govern_dates(
+                    date_series,
+                    source_observations,
+                    start_date=start_date,
+                    end_date=end_date,
+                )
             calendar_rows.extend(date_result.calendar_rows)
             warnings.extend(
                 [{**item, "governance_stage": "date"} for item in date_result.warnings]

@@ -120,7 +120,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 26
+    assert result["instruments"] == 31
     assert result["series"] >= 29
 
     dictionary = storage.read_dictionary()
@@ -628,6 +628,114 @@ def test_nbs_master_governance_uses_source_row_evidence():
     assert result.records[0]["governance_status"] == "success"
     assert result.records[0]["quality_flag"] == "official_master_verified"
     assert result.records[0]["lifecycle_start"] == "2014-01-10"
+
+
+def test_nbs_legal_empty_window_reuses_verified_master_and_stays_success(
+    tmp_path, monkeypatch
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    item = CommodityUniverseSelector(module_cfg).resolve(
+        scope_id="cn_nbs_thermal_coal"
+    )[0]
+    verified = {
+        "series_id": item.series_id,
+        "commodity_id": item.commodity_id,
+        "venue": item.venue,
+        "source_profile": item.source_profile,
+        "governance_status": "success",
+        "quality_flag": "official_master_verified",
+        "source_name": item.source_symbol,
+        "source_frequency": item.frequency,
+        "source_currency": item.currency,
+        "source_unit": item.unit,
+        "lifecycle_start": "2014-01-10",
+        "lifecycle_end": None,
+        "evidence_url": "https://www.stats.gov.cn/example.html",
+        "evidence_hash": "verified-evidence",
+        "governed_at": "2026-07-04T12:00:00+08:00",
+        "metadata": {"latest_evidence_date": "2026-06-30"},
+    }
+    storage.upsert_master_governance([verified], dry_run=False)
+
+    monkeypatch.setattr(
+        NbsProductionMaterialsProvider,
+        "fetch",
+        lambda self, series, *, start_date, end_date: CommodityProviderResult(
+            metadata={
+                "date_gap_fill": {
+                    "expected_periods": 0,
+                    "unresolved_dates": 0,
+                    "publication_eligible_end": "2026-07-09",
+                }
+            }
+        ),
+    )
+
+    result = SpecialCommodityPriceSyncService(storage, cfg).sync(
+        scope_id="cn_nbs_thermal_coal",
+        start_date="2026-07-04",
+        end_date="2026-07-13",
+        dry_run=False,
+    )
+
+    assert result["status"] == "success"
+    assert result["master_data_governance"] == "success"
+    assert result["date_governance"] == "success"
+    assert result["fetched_rows"] == 0
+    assert result["warnings"] == []
+    assert result["blockers"] == []
+    stored = storage.read_master_governance([item.series_id])[item.series_id]
+    assert stored["governance_status"] == "success"
+    assert stored["evidence_hash"] == "verified-evidence"
+
+
+def test_master_governance_refresh_failure_does_not_downgrade_verified_record(
+    tmp_path,
+):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, module_cfg).sync()
+    item = CommodityUniverseSelector(module_cfg).resolve(
+        scope_id="cn_nbs_thermal_coal"
+    )[0]
+    verified = {
+        "series_id": item.series_id,
+        "commodity_id": item.commodity_id,
+        "venue": item.venue,
+        "source_profile": item.source_profile,
+        "governance_status": "success",
+        "quality_flag": "official_master_verified",
+        "source_name": item.source_symbol,
+        "source_frequency": item.frequency,
+        "source_currency": item.currency,
+        "source_unit": item.unit,
+        "lifecycle_start": "2014-01-10",
+        "lifecycle_end": None,
+        "evidence_url": "https://www.stats.gov.cn/example.html",
+        "evidence_hash": "verified-evidence",
+        "governed_at": "2026-07-04T12:00:00+08:00",
+        "metadata": {},
+    }
+    storage.upsert_master_governance([verified], dry_run=False)
+    blocked = dict(verified)
+    blocked.update(
+        governance_status="blocked",
+        quality_flag="unverified",
+        evidence_hash="failed-refresh",
+    )
+
+    counts = storage.upsert_master_governance([blocked], dry_run=False)
+
+    assert counts == {"written": 0, "would_write": 0, "preserved_verified": 1}
+    stored = storage.read_master_governance([item.series_id])[item.series_id]
+    assert stored["governance_status"] == "success"
+    assert stored["evidence_hash"] == "verified-evidence"
 
 
 def test_official_api_json_request_retries_transient_failure(monkeypatch):
