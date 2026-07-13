@@ -11034,6 +11034,9 @@ class DataManager:
             catchup_stats = update_results.get('catchup_stats')
             if not isinstance(catchup_stats, dict):
                 catchup_stats = {}
+            changelog_stats = update_results.get('changelog_stats')
+            if not isinstance(changelog_stats, dict):
+                changelog_stats = {}
 
             report = {
                 'summary': {
@@ -11051,6 +11054,7 @@ class DataManager:
                 'instrument_master_governance': instrument_master_governance,
                 'index_master_governance': index_master_governance,
                 'catchup_stats': catchup_stats,
+                'changelog_stats': changelog_stats,
                 'errors': []
             }
 
@@ -11086,6 +11090,7 @@ class DataManager:
                                 'total_count': total_count,
                                 'quotes_count': quotes_count,
                                 'catchup_stats': stats.get('catchup_stats', {}),
+                                'changelog_stats': stats.get('changelog_stats', {}),
                             }
                             report['summary']['total_instruments_checked'] += total_count
                             report['summary']['updated_instruments'] += success_count
@@ -11142,6 +11147,7 @@ class DataManager:
                 'instrument_master_sync': update_results.get('instrument_master_sync'),
                 'instrument_master_governance': update_results.get('instrument_master_governance'),
                 'index_master_governance': update_results.get('index_master_governance'),
+                'changelog_stats': update_results.get('changelog_stats', {}),
                 'errors': [str(e)]
             }
 
@@ -15590,6 +15596,14 @@ class DataManager:
                     'catchup_quotes_added': 0,
                     'samples': [],
                 },
+                'changelog_stats': {
+                    'inserted': 0,
+                    'changed': 0,
+                    'unchanged': 0,
+                    'skipped': 0,
+                    'failed': 0,
+                    'changelog_written': 0,
+                },
             }
             instrument_master_sync = await self._maybe_sync_instrument_master_before_daily_update(
                 exchanges,
@@ -15636,6 +15650,14 @@ class DataManager:
                             'skipped_missing_listed_date': 0,
                             'catchup_quotes_added': 0,
                             'samples': [],
+                        },
+                        'changelog_stats': {
+                            'inserted': 0,
+                            'changed': 0,
+                            'unchanged': 0,
+                            'skipped': 0,
+                            'failed': 0,
+                            'changelog_written': 0,
                         },
                     }
 
@@ -15708,7 +15730,19 @@ class DataManager:
                                     )
 
                                 if data:
-                                    await self.db_ops.save_daily_quotes(data)
+                                    write_stats = await self.db_ops.save_daily_quotes(
+                                        data,
+                                        return_stats=True,
+                                    )
+                                    if not isinstance(write_stats, dict):
+                                        write_stats = {}
+                                    for stat_key in (
+                                        'inserted', 'changed', 'unchanged',
+                                        'skipped', 'failed', 'changelog_written',
+                                    ):
+                                        stat_value = int(write_stats.get(stat_key, 0) or 0)
+                                        exchange_result['changelog_stats'][stat_key] += stat_value
+                                        update_results['changelog_stats'][stat_key] += stat_value
                                     exchange_result['quotes_added'] += len(data)
                                     update_results['total_quotes_added'] += len(data)
                                     if is_catchup:

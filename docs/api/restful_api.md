@@ -126,6 +126,58 @@ curl "http://localhost:8000/api/v1/quotes/daily?symbol=600519&start_date=2025-01
 curl "http://localhost:8000/api/v1/quotes/daily?instrument_id=000001.SH&start_date=2024-01-01&end_date=2024-01-31&return_format=json"
 ```
 
+### GET /api/v1/changes/latest
+查询本地已观测变更日志的最新水位。
+
+可选参数：
+- `domain`：如 `quotes`、`adjustment_factor`
+- `dataset`：如 `daily_quotes`、`adjustment_factors`
+
+语义：
+- 返回当前过滤条件下的 `latest_sequence`。
+- 无匹配变更时返回 `latest_sequence=0`、`is_empty=true`。
+- 水位是本地平台实际拉取、标准化、比较后发现的变化，不代表免费上游源提供完整 CDC。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/changes/latest?domain=quotes&dataset=daily_quotes"
+```
+
+### GET /api/v1/changes
+按水位分页查询本地已观测变更记录。
+
+可选参数：
+- `since_sequence`：返回 `sequence_id > since_sequence` 的记录，默认 `0`
+- `domain`、`dataset`
+- `instrument_id`、`series_id`
+- `start_date`、`end_date`
+- `limit`：默认 `1000`，最大 `5000`
+
+响应字段：
+- `changes`：只包含变化键和元数据，不返回完整行情行
+- `latest_sequence`：当前过滤条件下的最新水位
+- `latest_returned_sequence` / `next_sequence`：本页续拉水位
+- `has_more`：是否还有后续页
+
+说明：
+- `quotes` 域表示 raw 日行情行变化。
+- `adjustment_factor` 域表示复权因子变化；`adjust=none` 消费者可只关注 raw quote，qfq/hfq 消费者需要同时关注复权因子。
+- 现有 `/quotes/daily` 是补拉完整数据的接口，默认行为不变。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/changes?domain=quotes&dataset=daily_quotes&since_sequence=123&limit=1000"
+curl "http://localhost:8000/api/v1/changes?domain=adjustment_factor&dataset=adjustment_factors&since_sequence=123"
+```
+
+### GET /api/v1/quotes/daily/changes
+日行情变更查询便捷端点，等价于 `domain=quotes&dataset=daily_quotes` 的过滤视图。
+
+示例：
+```bash
+curl "http://localhost:8000/api/v1/quotes/daily/changes?since_sequence=123&instrument_id=000001.SZ"
+```
+
 ### GET /api/v1/quotes/latest
 获取指定品种的最新一条行情（从最近 5 天数据中取最新）。
 

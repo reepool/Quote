@@ -36,6 +36,12 @@ def _query_default(value, default=None):
     return default if isinstance(value, Param) else value
 
 
+def _normalize_optional_query(value, default=None):
+    if isinstance(value, Param):
+        return default
+    return value
+
+
 # Health Check
 @router.get("/health", response_model=SystemStatusResponse, tags=["System"])
 async def health_check():
@@ -2926,6 +2932,95 @@ async def get_research_technical_indicators(
 
 
 # Quote Data
+@router.get(
+    "/changes/latest",
+    response_model=ChangeWatermarkResponse,
+    tags=["Changes"],
+)
+async def get_latest_change_watermark(
+    domain: Optional[str] = Query(None, description="变更域, 如 quotes / adjustment_factor"),
+    dataset: Optional[str] = Query(None, description="具体数据集"),
+):
+    """查询最新本地变更水位。"""
+    try:
+        domain = _normalize_optional_query(domain)
+        dataset = _normalize_optional_query(dataset)
+        payload = await data_manager.db_ops.get_change_watermark(
+            domain=domain,
+            dataset=dataset,
+        )
+        return ChangeWatermarkResponse(**payload)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get latest watermark: {str(e)}")
+
+
+@router.get(
+    "/changes",
+    response_model=ChangeLogPageResponse,
+    tags=["Changes"],
+)
+async def get_data_changes(
+    since_sequence: int = Query(0, description="起始水位, 返回 sequence_id > since_sequence", ge=0),
+    domain: Optional[str] = Query(None, description="变更域过滤"),
+    dataset: Optional[str] = Query(None, description="数据集过滤"),
+    instrument_id: Optional[str] = Query(None, description="证券/合约 ID 过滤"),
+    series_id: Optional[str] = Query(None, description="序列 ID 过滤"),
+    start_date: Optional[datetime] = Query(None, description="观测日起始"),
+    end_date: Optional[datetime] = Query(None, description="观测日结束"),
+    limit: int = Query(1000, description="返回数量限制", ge=1, le=5000),
+):
+    """按水位查询本地已观测变更记录。"""
+    try:
+        since_sequence = _normalize_optional_query(since_sequence, 0)
+        domain = _normalize_optional_query(domain)
+        dataset = _normalize_optional_query(dataset)
+        instrument_id = _normalize_optional_query(instrument_id)
+        series_id = _normalize_optional_query(series_id)
+        start_date = _normalize_optional_query(start_date)
+        end_date = _normalize_optional_query(end_date)
+        limit = _normalize_optional_query(limit, 1000)
+        payload = await data_manager.db_ops.get_data_changes(
+            since_sequence=since_sequence,
+            domain=domain,
+            dataset=dataset,
+            instrument_id=instrument_id,
+            series_id=series_id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+        )
+        return ChangeLogPageResponse(**payload)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get changes: {str(e)}")
+
+
+@router.get(
+    "/quotes/daily/changes",
+    response_model=ChangeLogPageResponse,
+    tags=["Changes", "Quotes"],
+)
+async def get_daily_quote_changes(
+    since_sequence: int = Query(0, description="起始水位, 返回 sequence_id > since_sequence", ge=0),
+    instrument_id: Optional[str] = Query(None, description="证券 ID 过滤"),
+    start_date: Optional[datetime] = Query(None, description="交易日起始"),
+    end_date: Optional[datetime] = Query(None, description="交易日结束"),
+    limit: int = Query(1000, description="返回数量限制", ge=1, le=5000),
+):
+    """查询日行情行的增量变更键; 完整行情仍通过 /quotes/daily 补拉。"""
+    return await get_data_changes(
+        since_sequence=since_sequence,
+        domain="quotes",
+        dataset="daily_quotes",
+        instrument_id=instrument_id,
+        series_id=None,
+        start_date=start_date,
+        end_date=end_date,
+        limit=limit,
+    )
+
+
 @router.get(
     "/quotes/daily",
     tags=["Quotes"],

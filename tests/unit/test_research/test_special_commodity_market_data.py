@@ -1770,6 +1770,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_soda_ash",
         "cn_100ppi_glass",
         "cn_100ppi_asphalt",
+        "cn_100ppi_lpg",
         "cn_nbs_thermal_coal",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
@@ -2149,6 +2150,8 @@ def test_known_100ppi_expansion_scopes_use_the_existing_production_selector(tmp_
     assert asphalt.metadata["source_available_from"] == "2013-10-09"
     lpg = selector.resolve(scope_id="cn_100ppi_lpg")[0]
     assert lpg.metadata["source_available_from"] == "2020-03-30"
+    natural_rubber = selector.resolve(scope_id="cn_100ppi_natural_rubber")[0]
+    assert natural_rubber.metadata["source_available_from"] == "2013-01-04"
 
 
 def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):

@@ -128,6 +128,8 @@ class DatabaseManager:
             )
             self.AsyncSessionLocal = self.TaskAsyncSessionLocal
 
+            self._ensure_change_watermark_schema()
+
             db_logger.info("[Database] Database connection initialized successfully")
 
         except Exception as e:
@@ -212,6 +214,83 @@ class DatabaseManager:
                         db_logger.warning(f"[Database] Failed to create index {index_sql}: {e}")
                     # 继续执行其他索引创建
 
+            conn.commit()
+
+    def _ensure_change_watermark_schema(self):
+        """Apply additive schema pieces needed by local change watermarks."""
+        ddl = [
+            """
+            CREATE TABLE IF NOT EXISTS data_change_log (
+                sequence_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                domain VARCHAR(32) NOT NULL,
+                dataset VARCHAR(64) NOT NULL,
+                change_type VARCHAR(32) NOT NULL,
+                business_key_json TEXT NOT NULL,
+                instrument_id VARCHAR(32),
+                series_id VARCHAR(64),
+                observation_date DATETIME,
+                period VARCHAR(32),
+                old_hash VARCHAR(64),
+                new_hash VARCHAR(64),
+                row_version INTEGER,
+                source VARCHAR(32),
+                source_mode VARCHAR(32),
+                source_profile VARCHAR(64),
+                ingestion_run_id VARCHAR(64),
+                batch_id VARCHAR(64),
+                changed_at DATETIME NOT NULL
+            )
+            """,
+            "CREATE INDEX IF NOT EXISTS idx_daily_quotes_row_hash ON daily_quotes(row_hash)",
+            "CREATE INDEX IF NOT EXISTS idx_adj_factor_row_hash ON adjustment_factors(row_hash)",
+            "CREATE INDEX IF NOT EXISTS idx_change_log_domain_sequence ON data_change_log(domain, sequence_id)",
+            "CREATE INDEX IF NOT EXISTS idx_change_log_dataset_sequence ON data_change_log(dataset, sequence_id)",
+            "CREATE INDEX IF NOT EXISTS idx_change_log_domain_dataset_sequence ON data_change_log(domain, dataset, sequence_id)",
+            "CREATE INDEX IF NOT EXISTS idx_change_log_instrument_date ON data_change_log(instrument_id, observation_date)",
+            "CREATE INDEX IF NOT EXISTS idx_change_log_series_date ON data_change_log(series_id, observation_date)",
+        ]
+        additive_columns = {
+            "daily_quotes": [
+                ("row_hash", "VARCHAR(64)"),
+                ("row_version", "INTEGER NOT NULL DEFAULT 1"),
+            ],
+            "adjustment_factors": [
+                ("row_hash", "VARCHAR(64)"),
+                ("row_version", "INTEGER NOT NULL DEFAULT 1"),
+            ],
+        }
+
+        with self.sync_engine.connect() as conn:
+            existing_tables = {
+                row[0]
+                for row in conn.execute(
+                    text("SELECT name FROM sqlite_master WHERE type='table'")
+                ).fetchall()
+            }
+
+            for table_name, columns in additive_columns.items():
+                if table_name not in existing_tables:
+                    continue
+                existing_columns = {
+                    row[1]
+                    for row in conn.execute(text(f"PRAGMA table_info({table_name})")).fetchall()
+                }
+                for column_name, column_type in columns:
+                    if column_name not in existing_columns:
+                        conn.execute(
+                            text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type}")
+                        )
+
+            for stmt in ddl:
+                try:
+                    conn.execute(text(stmt))
+                except Exception as e:
+                    message = str(e).lower()
+                    if "no such table" in message and (
+                        "daily_quotes" in message or "adjustment_factors" in message
+                    ):
+                        continue
+                    raise
             conn.commit()
 
     def get_session(self) -> Session:

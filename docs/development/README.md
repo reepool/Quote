@@ -731,6 +731,7 @@ test(download): add unit tests for baostock source
 - [API文档](../api/restful_api.md)
 - [配置文档](../configuration/config_file.md)
 - [架构设计](../architecture.md)
+- [全域日更增量同步变更日志与水位需求](incremental_sync_change_watermarks_requirements.md)
 - [故障排除](../troubleshooting/faq.md)
 
 ### 工具和库

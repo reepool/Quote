@@ -80,6 +80,42 @@ async def test_generate_daily_update_report_supports_legacy_flat_payload():
 
 
 @pytest.mark.asyncio
+async def test_generate_daily_update_report_includes_changelog_stats():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    changelog_stats = {
+        'inserted': 2,
+        'changed': 1,
+        'unchanged': 7,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 3,
+    }
+    update_results = {
+        'changelog_stats': changelog_stats,
+        'exchange_stats': {
+            'SSE': {
+                'success_count': 10,
+                'failure_count': 0,
+                'quotes_added': 10,
+                'total_instruments': 10,
+                'changelog_stats': changelog_stats,
+            }
+        },
+    }
+
+    report = await manager._generate_daily_update_report(
+        ['SSE'],
+        date(2026, 7, 13),
+        update_results,
+    )
+
+    assert report['changelog_stats'] == changelog_stats
+    assert report['exchange_stats']['SSE']['changelog_stats'] == changelog_stats
+
+
+@pytest.mark.asyncio
 async def test_generate_daily_update_report_marks_idempotent_noop_as_successful():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()

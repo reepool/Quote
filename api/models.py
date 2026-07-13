@@ -223,6 +223,48 @@ class DailyQuotesEnvelopeResponse(BaseModel):
     instrument_delisted: bool = Field(False, description="该证券是否已退市 (delisted_date 非空)")
 
 
+class ChangeLogRecordResponse(BaseModel):
+    """本地已观测增量变更记录。"""
+    sequence_id: int = Field(..., description="单库内只增不减水位")
+    domain: str = Field(..., description="变更域, 如 quotes / adjustment_factor")
+    dataset: str = Field(..., description="具体数据集")
+    change_type: str = Field(..., description="insert / update / delete_marker / invalidate 等")
+    business_key: Dict[str, Any] = Field(default_factory=dict, description="域特定业务键")
+    instrument_id: Optional[str] = Field(None, description="证券或合约标识")
+    series_id: Optional[str] = Field(None, description="序列标识")
+    observation_date: Optional[datetime] = Field(None, description="交易日/观测日/as-of date")
+    period: Optional[str] = Field(None, description="财报期/月频期等")
+    old_hash: Optional[str] = Field(None, description="变更前语义 hash")
+    new_hash: Optional[str] = Field(None, description="变更后语义 hash")
+    row_version: Optional[int] = Field(None, description="目标业务行版本")
+    source: Optional[str] = Field(None, description="数据来源")
+    source_mode: Optional[str] = Field(None, description="来源模式")
+    source_profile: Optional[str] = Field(None, description="来源口径")
+    ingestion_run_id: Optional[str] = Field(None, description="写入运行 ID")
+    batch_id: Optional[str] = Field(None, description="批次 ID")
+    changed_at: datetime = Field(..., description="平台本地发现变化的时间")
+
+
+class ChangeLogPageResponse(BaseModel):
+    """增量变更分页响应。"""
+    since_sequence: int = Field(0, description="请求起始水位, 返回 sequence_id > 该值")
+    latest_sequence: int = Field(0, description="当前库最新水位")
+    latest_returned_sequence: int = Field(0, description="本页返回的最高水位")
+    next_sequence: int = Field(0, description="下一次续拉可使用的水位")
+    has_more: bool = Field(False, description="是否还有后续记录")
+    limit: int = Field(1000, description="本页限制")
+    count: int = Field(0, description="本页记录数")
+    changes: List[ChangeLogRecordResponse] = Field(default_factory=list)
+
+
+class ChangeWatermarkResponse(BaseModel):
+    """最新增量水位响应。"""
+    domain: Optional[str] = Field(None, description="过滤域")
+    dataset: Optional[str] = Field(None, description="过滤数据集")
+    latest_sequence: int = Field(0, description="最新水位; 无记录时为 0")
+    is_empty: bool = Field(True, description="是否没有任何匹配变更记录")
+
+
 class DailyCoverageItem(BaseModel):
     """单日行情覆盖率 (REQ-01.3)"""
     date: str = Field(..., description="交易日 (YYYY-MM-DD)")

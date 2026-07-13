@@ -154,6 +154,8 @@ class DailyQuoteDB(Base):
     created_at = Column(DateTime, default=safe_get_shanghai_time)
     updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
     batch_id = Column(String(32), nullable=True)  # 批次ID
+    row_hash = Column(String(64), nullable=True, index=True)
+    row_version = Column(Integer, nullable=False, default=1)
 
     # Relationships
     instrument = relationship("InstrumentDB", back_populates="market_data")
@@ -161,6 +163,7 @@ class DailyQuoteDB(Base):
     __table_args__ = (
         PrimaryKeyConstraint('time', 'instrument_id'),
         Index('idx_daily_quotes_instrument_time', 'instrument_id', 'time'),
+        Index('idx_daily_quotes_row_hash', 'row_hash'),
     )
 
 
@@ -274,12 +277,47 @@ class AdjustmentFactorDB(Base):
     created_at = Column(DateTime, default=safe_get_shanghai_time)
     updated_at = Column(DateTime, default=safe_get_shanghai_time,
                         onupdate=safe_get_shanghai_time)
+    row_hash = Column(String(64), nullable=True, index=True)
+    row_version = Column(Integer, nullable=False, default=1)
 
     __table_args__ = (
         UniqueConstraint('instrument_id', 'ex_date',
                          name='uq_adj_factor_inst_date'),
         Index('idx_adj_factor_inst_date', 'instrument_id', 'ex_date'),
+        Index('idx_adj_factor_row_hash', 'row_hash'),
         PrimaryKeyConstraint('id'),
+    )
+
+
+class DataChangeLogDB(Base):
+    """Append-only local-observed change records for incremental sync."""
+    __tablename__ = 'data_change_log'
+
+    sequence_id = Column(Integer, primary_key=True, autoincrement=True)
+    domain = Column(String(32), nullable=False, index=True)
+    dataset = Column(String(64), nullable=False, index=True)
+    change_type = Column(String(32), nullable=False)
+    business_key_json = Column(Text, nullable=False)
+    instrument_id = Column(String(32), nullable=True, index=True)
+    series_id = Column(String(64), nullable=True, index=True)
+    observation_date = Column(DateTime, nullable=True, index=True)
+    period = Column(String(32), nullable=True, index=True)
+    old_hash = Column(String(64), nullable=True)
+    new_hash = Column(String(64), nullable=True)
+    row_version = Column(Integer, nullable=True)
+    source = Column(String(32), nullable=True)
+    source_mode = Column(String(32), nullable=True)
+    source_profile = Column(String(64), nullable=True)
+    ingestion_run_id = Column(String(64), nullable=True)
+    batch_id = Column(String(64), nullable=True)
+    changed_at = Column(DateTime, default=safe_get_shanghai_time, nullable=False, index=True)
+
+    __table_args__ = (
+        Index('idx_change_log_domain_sequence', 'domain', 'sequence_id'),
+        Index('idx_change_log_dataset_sequence', 'dataset', 'sequence_id'),
+        Index('idx_change_log_domain_dataset_sequence', 'domain', 'dataset', 'sequence_id'),
+        Index('idx_change_log_instrument_date', 'instrument_id', 'observation_date'),
+        Index('idx_change_log_series_date', 'series_id', 'observation_date'),
     )
 
 

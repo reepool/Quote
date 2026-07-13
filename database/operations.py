@@ -4,11 +4,14 @@ Supports comprehensive data management with new schema.
 """
 
 import asyncio
+import hashlib
 import json
+import math
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
-from sqlalchemy import text, func, desc, asc
+from sqlalchemy import text, func, desc, asc, tuple_
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
@@ -19,7 +22,8 @@ from sqlalchemy.future import select
 from .connection import db_manager
 from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
-    DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB
+    DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB,
+    DataChangeLogDB,
 )
 
 
@@ -74,6 +78,187 @@ class DatabaseOperations:
     def get_session(self):
         """Get synchronous database session"""
         return self.SessionLocal()
+
+    @staticmethod
+    def _coerce_datetime(value: Any) -> Optional[datetime]:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value.replace(tzinfo=None)
+        if isinstance(value, date):
+            return datetime(value.year, value.month, value.day)
+        parsed = pd.to_datetime(value, errors="coerce")
+        if pd.isna(parsed):
+            return None
+        if hasattr(parsed, "to_pydatetime"):
+            parsed = parsed.to_pydatetime()
+        return parsed.replace(tzinfo=None) if isinstance(parsed, datetime) else None
+
+    @staticmethod
+    def _canonical_hash_value(value: Any) -> Any:
+        if value is None:
+            return None
+        try:
+            if pd.isna(value):
+                return None
+        except (TypeError, ValueError):
+            pass
+        if isinstance(value, datetime):
+            return value.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            if not math.isfinite(value):
+                return None
+            try:
+                return format(Decimal(str(value)).normalize(), "f")
+            except InvalidOperation:
+                return str(value)
+        if isinstance(value, Decimal):
+            return format(value.normalize(), "f")
+        if isinstance(value, dict):
+            return {
+                str(k): DatabaseOperations._canonical_hash_value(v)
+                for k, v in sorted(value.items())
+            }
+        if isinstance(value, (list, tuple)):
+            return [DatabaseOperations._canonical_hash_value(v) for v in value]
+        return str(value)
+
+    @classmethod
+    def _semantic_hash(cls, values: Dict[str, Any]) -> str:
+        payload = {
+            key: cls._canonical_hash_value(values.get(key))
+            for key in sorted(values.keys())
+        }
+        encoded = json.dumps(
+            payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    @classmethod
+    def _daily_quote_payload(cls, quote: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "time": cls._coerce_datetime(quote.get("time") or quote.get("date")),
+            "instrument_id": quote.get("instrument_id"),
+            "open": float(quote.get("open", 0.0)),
+            "high": float(quote.get("high", 0.0)),
+            "low": float(quote.get("low", 0.0)),
+            "close": float(quote.get("close", 0.0)),
+            "volume": int(quote.get("volume", 0) or 0),
+            "amount": float(quote.get("amount", 0.0) or 0.0),
+            "turnover": cls._optional_float(quote.get("turnover")),
+            "pre_close": cls._optional_float(quote.get("pre_close")),
+            "change": cls._optional_float(quote.get("change")),
+            "pct_change": cls._optional_float(quote.get("pct_change")),
+            "tradestatus": int(quote.get("tradestatus") if quote.get("tradestatus") is not None else 1),
+            "factor": float(quote.get("factor", 1.0) or 1.0),
+            "adjustment_type": quote.get("adjustment_type", "none"),
+            "is_complete": bool(quote.get("is_complete", True)),
+            "quality_score": cls._optional_float(quote.get("quality_score", 1.0)),
+            "source": quote.get("source"),
+            "batch_id": quote.get("batch_id"),
+        }
+
+    @classmethod
+    def _daily_quote_hash(cls, payload: Dict[str, Any]) -> str:
+        hash_fields = {
+            key: payload.get(key)
+            for key in (
+                "instrument_id", "time", "open", "high", "low", "close",
+                "volume", "amount", "turnover", "pre_close", "change",
+                "pct_change", "tradestatus", "factor", "adjustment_type",
+                "is_complete", "quality_score", "source",
+            )
+        }
+        return cls._semantic_hash(hash_fields)
+
+    @classmethod
+    def _adjustment_factor_payload(cls, factor: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "instrument_id": factor.get("instrument_id"),
+            "ex_date": cls._coerce_datetime(factor.get("ex_date")),
+            "factor": float(factor.get("factor", 1.0) or 1.0),
+            "cumulative_factor": float(factor.get("cumulative_factor", 1.0) or 1.0),
+            "dividend": float(factor.get("dividend", 0.0) or 0.0),
+            "bonus_shares": float(factor.get("bonus_shares", 0.0) or 0.0),
+            "rights_shares": float(factor.get("rights_shares", 0.0) or 0.0),
+            "rights_price": float(factor.get("rights_price", 0.0) or 0.0),
+            "event_type": factor.get("event_type"),
+            "source": factor.get("source"),
+        }
+
+    @classmethod
+    def _adjustment_factor_hash(cls, payload: Dict[str, Any]) -> str:
+        return cls._semantic_hash(payload)
+
+    @staticmethod
+    def _optional_float(value: Any) -> Optional[float]:
+        if value is None:
+            return None
+        try:
+            if pd.isna(value):
+                return None
+        except (TypeError, ValueError):
+            pass
+        return float(value)
+
+    @staticmethod
+    def _empty_write_stats() -> Dict[str, int]:
+        return {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "skipped": 0,
+            "failed": 0,
+            "changelog_written": 0,
+        }
+
+    @staticmethod
+    def _change_log_record(
+        *,
+        domain: str,
+        dataset: str,
+        change_type: str,
+        business_key: Dict[str, Any],
+        instrument_id: Optional[str] = None,
+        series_id: Optional[str] = None,
+        observation_date: Optional[datetime] = None,
+        period: Optional[str] = None,
+        old_hash: Optional[str] = None,
+        new_hash: Optional[str] = None,
+        row_version: Optional[int] = None,
+        source: Optional[str] = None,
+        source_mode: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        ingestion_run_id: Optional[str] = None,
+        batch_id: Optional[str] = None,
+    ) -> DataChangeLogDB:
+        return DataChangeLogDB(
+            domain=domain,
+            dataset=dataset,
+            change_type=change_type,
+            business_key_json=json.dumps(
+                business_key, ensure_ascii=False, sort_keys=True, default=str
+            ),
+            instrument_id=instrument_id,
+            series_id=series_id,
+            observation_date=observation_date,
+            period=period,
+            old_hash=old_hash,
+            new_hash=new_hash,
+            row_version=row_version,
+            source=source,
+            source_mode=source_mode,
+            source_profile=source_profile,
+            ingestion_run_id=ingestion_run_id,
+            batch_id=batch_id,
+            changed_at=get_shanghai_time(),
+        )
 
     @staticmethod
     def _serialize_instrument_row(instrument: InstrumentDB) -> Dict[str, Any]:
@@ -1784,51 +1969,158 @@ class DatabaseOperations:
 
     # === Daily Quote Operations ===
 
-    async def save_daily_data(self, quotes: List[Dict[str, Any]]) -> bool:
-        """批量保存日线数据"""
+    async def save_daily_data(
+        self,
+        quotes: List[Dict[str, Any]],
+        *,
+        return_stats: bool = False,
+    ) -> Union[bool, Dict[str, int]]:
+        """批量保存日线数据.
+
+        默认返回 bool 以兼容既有调用方; return_stats=True 时返回增量写入计数。
+        """
         if not quotes:
-            return True
+            return self._empty_write_stats() if return_stats else True
+        stats = self._empty_write_stats()
         try:
-            from sqlalchemy.dialects.sqlite import insert as sqlite_insert
-            from utils.date_utils import get_shanghai_time
-            
             async with self.get_async_session() as session:
                 chunk_size = 1000
-                total_saved = 0
                 for i in range(0, len(quotes), chunk_size):
                     chunk = quotes[i:i + chunk_size]
-                    
-                    # 批量Upsert
-                    stmt = sqlite_insert(DailyQuoteDB).values(chunk)
-                    
-                    # 排除主键，其他的如果有冲突就更新
-                    update_dict = {
-                        c.name: c
-                        for c in stmt.excluded
-                        if c.name not in ('time', 'instrument_id')
-                    }
-                    update_dict['updated_at'] = get_shanghai_time()
-                    
-                    stmt = stmt.on_conflict_do_update(
-                        index_elements=['time', 'instrument_id'],
-                        set_=update_dict
+                    payloads = []
+                    for quote in chunk:
+                        payload = self._daily_quote_payload(quote)
+                        if not payload.get("instrument_id") or payload.get("time") is None:
+                            stats["skipped"] += 1
+                            continue
+                        payload["row_hash"] = self._daily_quote_hash(payload)
+                        payloads.append(payload)
+
+                    if not payloads:
+                        continue
+
+                    keys = [
+                        (payload["time"], payload["instrument_id"])
+                        for payload in payloads
+                    ]
+                    result = await session.execute(
+                        select(DailyQuoteDB).where(
+                            tuple_(DailyQuoteDB.time, DailyQuoteDB.instrument_id).in_(keys)
+                        )
                     )
-                    
-                    await session.execute(stmt)
-                    total_saved += len(chunk)
-                    
+                    existing_by_key = {
+                        (row.time, row.instrument_id): row
+                        for row in result.scalars().all()
+                    }
+
+                    for payload in payloads:
+                        key = (payload["time"], payload["instrument_id"])
+                        existing = existing_by_key.get(key)
+                        if existing is None:
+                            row = DailyQuoteDB(**payload, row_version=1)
+                            session.add(row)
+                            session.add(self._change_log_record(
+                                domain="quotes",
+                                dataset="daily_quotes",
+                                change_type="insert",
+                                business_key={
+                                    "instrument_id": payload["instrument_id"],
+                                    "trade_date": payload["time"].date().isoformat(),
+                                },
+                                instrument_id=payload["instrument_id"],
+                                observation_date=payload["time"],
+                                old_hash=None,
+                                new_hash=payload["row_hash"],
+                                row_version=1,
+                                source=payload.get("source"),
+                                batch_id=payload.get("batch_id"),
+                            ))
+                            stats["inserted"] += 1
+                            stats["changelog_written"] += 1
+                            continue
+
+                        old_hash = existing.row_hash or self._daily_quote_hash({
+                            "time": existing.time,
+                            "instrument_id": existing.instrument_id,
+                            "open": existing.open,
+                            "high": existing.high,
+                            "low": existing.low,
+                            "close": existing.close,
+                            "volume": existing.volume,
+                            "amount": existing.amount,
+                            "turnover": existing.turnover,
+                            "pre_close": existing.pre_close,
+                            "change": existing.change,
+                            "pct_change": existing.pct_change,
+                            "tradestatus": existing.tradestatus,
+                            "factor": existing.factor,
+                            "adjustment_type": existing.adjustment_type,
+                            "is_complete": existing.is_complete,
+                            "quality_score": existing.quality_score,
+                            "source": existing.source,
+                        })
+
+                        if old_hash == payload["row_hash"]:
+                            if existing.row_hash is None:
+                                existing.row_hash = old_hash
+                            if not existing.row_version:
+                                existing.row_version = 1
+                            stats["unchanged"] += 1
+                            continue
+
+                        previous_version = existing.row_version or 1
+                        next_version = previous_version + 1
+                        for field in (
+                            "open", "high", "low", "close", "volume", "amount",
+                            "turnover", "pre_close", "change", "pct_change",
+                            "tradestatus", "factor", "adjustment_type",
+                            "is_complete", "quality_score", "source", "batch_id",
+                        ):
+                            setattr(existing, field, payload.get(field))
+                        existing.row_hash = payload["row_hash"]
+                        existing.row_version = next_version
+                        existing.updated_at = get_shanghai_time()
+                        session.add(self._change_log_record(
+                            domain="quotes",
+                            dataset="daily_quotes",
+                            change_type="update",
+                            business_key={
+                                "instrument_id": payload["instrument_id"],
+                                "trade_date": payload["time"].date().isoformat(),
+                            },
+                            instrument_id=payload["instrument_id"],
+                            observation_date=payload["time"],
+                            old_hash=old_hash,
+                            new_hash=payload["row_hash"],
+                            row_version=next_version,
+                            source=payload.get("source"),
+                            batch_id=payload.get("batch_id"),
+                        ))
+                        stats["changed"] += 1
+                        stats["changelog_written"] += 1
+
                 await session.commit()
-                
-                self.db_logger.info(f"Successfully saved {total_saved} daily quotes via bulk upsert")
-                return True
+
+                self.db_logger.info(
+                    "Saved daily quotes with CDC counters: %s", stats
+                )
+                return stats if return_stats else True
                 
         except Exception as e:
             self.db_logger.error(f"Failed to save daily data: {e}")
+            if return_stats:
+                stats["failed"] += max(0, len(quotes) - stats["inserted"] - stats["changed"] - stats["unchanged"] - stats["skipped"])
+                return stats
             return False
 
-    async def save_daily_quotes(self, quotes: List[Dict[str, Any]]) -> bool:
+    async def save_daily_quotes(
+        self,
+        quotes: List[Dict[str, Any]],
+        *,
+        return_stats: bool = False,
+    ) -> Union[bool, Dict[str, int]]:
         """批量保存日线数据 (save_daily_data的别名)"""
-        return await self.save_daily_data(quotes)
+        return await self.save_daily_data(quotes, return_stats=return_stats)
 
     async def get_daily_data(
         self,
@@ -1911,6 +2203,127 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to get daily data: {e}")
             return pd.DataFrame() if return_format == 'pandas' else []
+
+    @staticmethod
+    def _serialize_change_log_row(row: DataChangeLogDB) -> Dict[str, Any]:
+        try:
+            business_key = json.loads(row.business_key_json)
+        except (TypeError, json.JSONDecodeError):
+            business_key = {}
+        return {
+            "sequence_id": row.sequence_id,
+            "domain": row.domain,
+            "dataset": row.dataset,
+            "change_type": row.change_type,
+            "business_key": business_key,
+            "instrument_id": row.instrument_id,
+            "series_id": row.series_id,
+            "observation_date": row.observation_date,
+            "period": row.period,
+            "old_hash": row.old_hash,
+            "new_hash": row.new_hash,
+            "row_version": row.row_version,
+            "source": row.source,
+            "source_mode": row.source_mode,
+            "source_profile": row.source_profile,
+            "ingestion_run_id": row.ingestion_run_id,
+            "batch_id": row.batch_id,
+            "changed_at": row.changed_at,
+        }
+
+    async def get_change_watermark(
+        self,
+        *,
+        domain: Optional[str] = None,
+        dataset: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Return the latest local-observed changelog sequence."""
+        try:
+            async with self.get_async_session() as session:
+                stmt = select(func.max(DataChangeLogDB.sequence_id))
+                if domain:
+                    stmt = stmt.where(DataChangeLogDB.domain == domain)
+                if dataset:
+                    stmt = stmt.where(DataChangeLogDB.dataset == dataset)
+                latest = await session.scalar(stmt)
+                return {
+                    "domain": domain,
+                    "dataset": dataset,
+                    "latest_sequence": int(latest or 0),
+                    "is_empty": latest is None,
+                }
+        except Exception as e:
+            self.db_logger.error("Failed to get change watermark: %s", e)
+            return {
+                "domain": domain,
+                "dataset": dataset,
+                "latest_sequence": 0,
+                "is_empty": True,
+            }
+
+    async def get_data_changes(
+        self,
+        *,
+        since_sequence: int = 0,
+        domain: Optional[str] = None,
+        dataset: Optional[str] = None,
+        instrument_id: Optional[str] = None,
+        series_id: Optional[str] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 1000,
+    ) -> Dict[str, Any]:
+        """List changelog records after a sequence in stable ascending order."""
+        if since_sequence < 0:
+            raise ValueError("since_sequence must be >= 0")
+        if limit <= 0:
+            raise ValueError("limit must be > 0")
+        limit = min(int(limit), 5000)
+
+        start_dt = self._coerce_datetime(start_date)
+        end_dt = self._coerce_datetime(end_date)
+        async with self.get_async_session() as session:
+            stmt = select(DataChangeLogDB).where(
+                DataChangeLogDB.sequence_id > since_sequence
+            )
+            latest_stmt = select(func.max(DataChangeLogDB.sequence_id))
+            if domain:
+                stmt = stmt.where(DataChangeLogDB.domain == domain)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.domain == domain)
+            if dataset:
+                stmt = stmt.where(DataChangeLogDB.dataset == dataset)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.dataset == dataset)
+            if instrument_id:
+                stmt = stmt.where(DataChangeLogDB.instrument_id == instrument_id)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.instrument_id == instrument_id)
+            if series_id:
+                stmt = stmt.where(DataChangeLogDB.series_id == series_id)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.series_id == series_id)
+            if start_dt:
+                stmt = stmt.where(DataChangeLogDB.observation_date >= start_dt)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.observation_date >= start_dt)
+            if end_dt:
+                stmt = stmt.where(DataChangeLogDB.observation_date <= end_dt)
+                latest_stmt = latest_stmt.where(DataChangeLogDB.observation_date <= end_dt)
+
+            stmt = stmt.order_by(asc(DataChangeLogDB.sequence_id)).limit(limit + 1)
+            result = await session.execute(stmt)
+            rows = result.scalars().all()
+            has_more = len(rows) > limit
+            page_rows = rows[:limit]
+            changes = [self._serialize_change_log_row(row) for row in page_rows]
+            latest_available = await session.scalar(latest_stmt)
+            latest_returned = changes[-1]["sequence_id"] if changes else since_sequence
+            return {
+                "since_sequence": since_sequence,
+                "latest_sequence": int(latest_available or 0),
+                "latest_returned_sequence": int(latest_returned or 0),
+                "next_sequence": int(latest_returned or since_sequence),
+                "has_more": has_more,
+                "limit": limit,
+                "count": len(changes),
+                "changes": changes,
+            }
 
     async def get_latest_quote_date(self, instrument_id: str) -> Optional[datetime]:
         """获取最新日期"""
@@ -2770,8 +3183,11 @@ class DatabaseOperations:
     # ------------------------------------------------------------------
 
     async def save_adjustment_factors(
-        self, factors: List[Dict[str, Any]]
-    ) -> int:
+        self,
+        factors: List[Dict[str, Any]],
+        *,
+        return_stats: bool = False,
+    ) -> Union[int, Dict[str, int]]:
         """批量保存复权因子（upsert 语义）
 
         Args:
@@ -2781,23 +3197,26 @@ class DatabaseOperations:
                 event_type, source
 
         Returns:
-            成功保存/更新的记录数
+            默认返回成功插入或语义更新的记录数; return_stats=True 时返回增量写入计数。
         """
         if not factors:
-            return 0
+            return self._empty_write_stats() if return_stats else 0
 
         saved_count = 0
+        stats = self._empty_write_stats()
         try:
             async with self.get_async_session() as session:
                 for f in factors:
                     try:
-                        instrument_id = f.get('instrument_id')
-                        ex_date = f.get('ex_date')
+                        payload = self._adjustment_factor_payload(f)
+                        instrument_id = payload.get('instrument_id')
+                        ex_date = payload.get('ex_date')
                         if not instrument_id or not ex_date:
+                            stats["skipped"] += 1
                             continue
+                        payload["row_hash"] = self._adjustment_factor_hash(payload)
 
                         # 检查是否已存在
-                        from sqlalchemy import select
                         stmt = select(AdjustmentFactorDB).where(
                             AdjustmentFactorDB.instrument_id == instrument_id,
                             AdjustmentFactorDB.ex_date == ex_date
@@ -2806,33 +3225,92 @@ class DatabaseOperations:
                         existing = result.scalar_one_or_none()
 
                         if existing:
-                            # 更新
-                            existing.factor = float(f.get('factor', 1.0))
-                            existing.cumulative_factor = float(f.get('cumulative_factor', 1.0))
-                            existing.dividend = float(f.get('dividend', 0.0))
-                            existing.bonus_shares = float(f.get('bonus_shares', 0.0))
-                            existing.rights_shares = float(f.get('rights_shares', 0.0))
-                            existing.rights_price = float(f.get('rights_price', 0.0))
-                            existing.event_type = f.get('event_type')
-                            existing.source = f.get('source')
+                            old_hash = existing.row_hash or self._adjustment_factor_hash({
+                                "instrument_id": existing.instrument_id,
+                                "ex_date": existing.ex_date,
+                                "factor": existing.factor,
+                                "cumulative_factor": existing.cumulative_factor,
+                                "dividend": existing.dividend,
+                                "bonus_shares": existing.bonus_shares,
+                                "rights_shares": existing.rights_shares,
+                                "rights_price": existing.rights_price,
+                                "event_type": existing.event_type,
+                                "source": existing.source,
+                            })
+                            if old_hash == payload["row_hash"]:
+                                if existing.row_hash is None:
+                                    existing.row_hash = old_hash
+                                if not existing.row_version:
+                                    existing.row_version = 1
+                                stats["unchanged"] += 1
+                                saved_count += 1
+                                continue
+
+                            next_version = (existing.row_version or 1) + 1
+                            for field in (
+                                "factor", "cumulative_factor", "dividend",
+                                "bonus_shares", "rights_shares", "rights_price",
+                                "event_type", "source",
+                            ):
+                                setattr(existing, field, payload.get(field))
+                            existing.row_hash = payload["row_hash"]
+                            existing.row_version = next_version
+                            existing.updated_at = get_shanghai_time()
+                            session.add(self._change_log_record(
+                                domain="adjustment_factor",
+                                dataset="adjustment_factors",
+                                change_type="update",
+                                business_key={
+                                    "instrument_id": instrument_id,
+                                    "ex_date": ex_date.date().isoformat(),
+                                },
+                                instrument_id=instrument_id,
+                                observation_date=ex_date,
+                                old_hash=old_hash,
+                                new_hash=payload["row_hash"],
+                                row_version=next_version,
+                                source=payload.get("source"),
+                            ))
+                            stats["changed"] += 1
+                            stats["changelog_written"] += 1
                         else:
                             # 新增
                             new_record = AdjustmentFactorDB(
                                 instrument_id=instrument_id,
                                 ex_date=ex_date,
-                                factor=float(f.get('factor', 1.0)),
-                                cumulative_factor=float(f.get('cumulative_factor', 1.0)),
-                                dividend=float(f.get('dividend', 0.0)),
-                                bonus_shares=float(f.get('bonus_shares', 0.0)),
-                                rights_shares=float(f.get('rights_shares', 0.0)),
-                                rights_price=float(f.get('rights_price', 0.0)),
-                                event_type=f.get('event_type'),
-                                source=f.get('source'),
+                                factor=payload["factor"],
+                                cumulative_factor=payload["cumulative_factor"],
+                                dividend=payload["dividend"],
+                                bonus_shares=payload["bonus_shares"],
+                                rights_shares=payload["rights_shares"],
+                                rights_price=payload["rights_price"],
+                                event_type=payload["event_type"],
+                                source=payload["source"],
+                                row_hash=payload["row_hash"],
+                                row_version=1,
                             )
                             session.add(new_record)
+                            session.add(self._change_log_record(
+                                domain="adjustment_factor",
+                                dataset="adjustment_factors",
+                                change_type="insert",
+                                business_key={
+                                    "instrument_id": instrument_id,
+                                    "ex_date": ex_date.date().isoformat(),
+                                },
+                                instrument_id=instrument_id,
+                                observation_date=ex_date,
+                                old_hash=None,
+                                new_hash=payload["row_hash"],
+                                row_version=1,
+                                source=payload.get("source"),
+                            ))
+                            stats["inserted"] += 1
+                            stats["changelog_written"] += 1
 
                         saved_count += 1
                     except Exception as row_e:
+                        stats["failed"] += 1
                         self.db_logger.warning(
                             "Failed to save adjustment factor for %s: %s",
                             f.get('instrument_id'), row_e
@@ -2842,13 +3320,14 @@ class DatabaseOperations:
                 await session.commit()
 
             self.db_logger.info(
-                "Saved %d adjustment factors", saved_count
+                "Saved %d adjustment factors with CDC counters: %s",
+                saved_count, stats
             )
-            return saved_count
+            return stats if return_stats else saved_count
 
         except Exception as e:
             self.db_logger.error("Failed to save adjustment factors: %s", e)
-            return 0
+            return stats if return_stats else 0
 
     async def get_adjustment_factors(
         self,
