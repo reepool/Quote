@@ -34,7 +34,7 @@
 | `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
 | `special_commodity_price_sync` | 海外商品 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
-| `special_commodity_cn_spot_sync` | 国内特殊商品现货与官方基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯现货及 NBS 动力煤旬价，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
+| `special_commodity_cn_spot_sync` | 国内特殊商品现货与官方基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯、苯乙烯现货及 NBS 动力煤旬价，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
 | `special_commodity_price_monthly_sync` | 外盘商品 | 每月10日、20日 `08:40` | FRED/IMF 与 World Bank 铜铝独立月均基准，动态回看6个月以吸收发布延迟和历史修订 |
 | `special_commodity_policy_discovery` | 政策治理 | 每月15日 `09:10` | NDRC 官方目录发现、正文/附件版本存证和政策候选治理；自动保存证据和候选，并在任务末尾对账正式事件；人工一键批准并提升或拒绝 |
 | `special_commodity_series_catalog_sync` | 扩品治理 | 仅手工 | 同步候选和上线状态，不自动加入任何生产日更 scope |
