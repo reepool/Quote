@@ -1840,7 +1840,8 @@
             "akshare_function": "futures_spot_price_daily", "akshare_kwargs": {"vars_list": ["SH"]},
             "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
-            "expected_calendar_exchange": "GFEX", "progress_log_interval_seconds": 60,
+            "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
+            "source_available_from": "2023-09-15",
             "region_or_spec": "China caustic soda spot reference; concentration, region and tax basis follow 100ppi publication",
             "source_name": "100ppi caustic soda spot reference", "source_url": "https://www.100ppi.com/sf/"
           }

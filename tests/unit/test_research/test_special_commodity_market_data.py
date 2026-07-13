@@ -1758,10 +1758,11 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_chemical",
         "cn_100ppi_methanol",
         "cn_100ppi_ethylene_glycol",
-            "cn_100ppi_pvc",
-            "cn_100ppi_polypropylene",
-            "cn_100ppi_styrene",
-            "cn_nbs_thermal_coal",
+        "cn_100ppi_pvc",
+        "cn_100ppi_polypropylene",
+        "cn_100ppi_styrene",
+        "cn_100ppi_urea",
+        "cn_nbs_thermal_coal",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
     assert special["parameters"]["lookback_days"] == 10
@@ -2126,6 +2127,10 @@ def test_known_100ppi_expansion_scopes_use_the_existing_production_selector(tmp_
 
     for scope_id, series_id in expected.items():
         assert [item.series_id for item in selector.resolve(scope_id=scope_id)] == [series_id]
+
+    caustic_soda = selector.resolve(scope_id="cn_100ppi_caustic_soda")[0]
+    assert caustic_soda.metadata["expected_calendar_exchange"] == "CZCE"
+    assert caustic_soda.metadata["source_available_from"] == "2023-09-15"
 
 
 def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):

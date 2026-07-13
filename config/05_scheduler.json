@@ -840,6 +840,7 @@
             "cn_100ppi_pvc",
             "cn_100ppi_polypropylene",
             "cn_100ppi_styrene",
+            "cn_100ppi_urea",
             "cn_nbs_thermal_coal"
           ],
           "lookback_days": 10,
