@@ -3649,38 +3649,60 @@ async def get_previous_trading_day(
 async def get_data_statistics():
     """获取数据统计信息"""
     try:
+        # get_database_statistics() 返回嵌套结构 (与 /system/status 同源); 此前按扁平键读取
+        # 导致全部静默落空值 (A3)，此处改为按实际嵌套路径读取。
         stats = await data_manager.db_ops.get_database_statistics()
+        instruments = stats.get('instruments') or {}
+        daily_quotes = stats.get('daily_quotes') or {}
+        trading_calendar = stats.get('trading_calendar') or {}
+        data_updates = stats.get('data_updates') or {}
+
+        supplement = await data_manager.db_ops.get_stats_supplement()
+
+        quotes_date_range: Dict[str, Any] = {}
+        if daily_quotes.get('earliest_date') and daily_quotes.get('latest_date'):
+            quotes_date_range = {
+                'start': daily_quotes['earliest_date'],
+                'end': daily_quotes['latest_date'],
+            }
+
+        trading_calendar_range: Dict[str, Any] = {}
+        if supplement.get('trading_calendar_earliest') and supplement.get('trading_calendar_latest'):
+            trading_calendar_range = {
+                'start': supplement['trading_calendar_earliest'],
+                'end': supplement['trading_calendar_latest'],
+            }
 
         # 计算质量摘要
         quality_summary = {
-            'overall_score': stats.get('quality_score', 1.0),
-            'total_records': stats.get('quotes_count', 0),
-            'quality_issues': stats.get('quality_issues', 0),
-            'completeness_rate': stats.get('completeness_rate', 1.0)
+            'overall_score': 1.0,
+            'total_records': daily_quotes.get('total', 0),
+            'quality_issues': 0,
+            'completeness_rate': 1.0
         }
 
-        # 计算缺口摘要
+        # 计算缺口摘要 (当前无缺口聚合接入此端点, 保持默认值)
         gap_summary = {
-            'total_gaps': stats.get('total_gaps', 0),
-            'critical_gaps': stats.get('critical_gaps', 0),
-            'high_gaps': stats.get('high_gaps', 0),
-            'medium_gaps': stats.get('medium_gaps', 0),
-            'low_gaps': stats.get('low_gaps', 0)
+            'total_gaps': 0,
+            'critical_gaps': 0,
+            'high_gaps': 0,
+            'medium_gaps': 0,
+            'low_gaps': 0
         }
 
         return DataStatsResponse(
-            instruments_count=stats.get('instruments_count', 0),
-            quotes_count=stats.get('quotes_count', 0),
-            trading_days_count=stats.get('trading_days_count', 0),
-            quotes_date_range=stats.get('quotes_date_range', {}),
-            trading_calendar_range=stats.get('trading_calendar_range', {}),
-            instruments_by_exchange=stats.get('instruments_by_exchange', {}),
-            instruments_by_type=stats.get('instruments_by_type', {}),
-            instruments_by_industry=stats.get('instruments_by_industry', {}),
+            instruments_count=instruments.get('total', 0) or 0,
+            quotes_count=daily_quotes.get('total', 0) or 0,
+            trading_days_count=trading_calendar.get('trading_days', 0) or 0,
+            quotes_date_range=quotes_date_range,
+            trading_calendar_range=trading_calendar_range,
+            instruments_by_exchange=instruments.get('by_exchange', {}),
+            instruments_by_type=instruments.get('by_type', {}),
+            instruments_by_industry=supplement.get('by_industry', {}),
             data_quality_summary=quality_summary,
             gap_summary=gap_summary,
-            recent_updates=stats.get('recent_updates', []),
-            last_data_update=stats.get('last_data_update')
+            recent_updates=[],
+            last_data_update=(data_updates.get('latest') or {}).get('created_at')
         )
 
     except Exception as e:

@@ -37,6 +37,12 @@ class InstrumentStatusEnum(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
+    DELISTED = "delisted"
+    EXCLUDED = "excluded"
+    AUTO_DEACTIVATED_NO_DATA = "auto_deactivated_no_data"
+    AUTO_DEACTIVATED_ZOMBIE = "auto_deactivated_zombie"
+    CALCULATION_TERMINATED = "calculation_terminated"
+    METADATA_ONLY = "metadata_only"
 
 
 class AdjustmentTypeEnum(str, Enum):
@@ -222,9 +228,12 @@ class DailyCoverageItem(BaseModel):
     date: str = Field(..., description="交易日 (YYYY-MM-DD)")
     exchange: Optional[str] = Field(None, description="交易所过滤")
     instrument_type: Optional[str] = Field(None, description="品种类型过滤")
-    listed_count: int = Field(0, description="当日已上市且未退市的证券数")
-    quoted_count: int = Field(0, description="当日库内有行情的证券数")
-    coverage_ratio: Optional[float] = Field(None, description="quoted_count / listed_count")
+    listed_count: int = Field(0, description="当日已上市且未退市的证券数 (要求 listed_date 已知)")
+    quoted_count: int = Field(0, description="当日库内有行情且 listed_date 已知的证券数 (与 listed_count 同口径)")
+    unknown_listed_date_quoted_count: int = Field(
+        0, description="当日有行情但 listed_date 未知的证券数 (不计入 coverage_ratio, 单独暴露, 如港股)"
+    )
+    coverage_ratio: Optional[float] = Field(None, description="quoted_count / listed_count (理论上限 1.0)")
 
 
 class DailyCoverageResponse(BaseModel):

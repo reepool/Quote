@@ -370,7 +370,8 @@ class DatabaseOperations:
                 if exchange:
                     stmt = stmt.filter(InstrumentDB.exchange == exchange)
                 if instrument_type:
-                    stmt = stmt.filter(InstrumentDB.type == instrument_type)
+                    # type 存储为小写 (stock/index/...); 归一化大小写避免静默返回 0 条 (A2)
+                    stmt = stmt.filter(InstrumentDB.type == instrument_type.lower())
                 if industry:
                     stmt = stmt.filter(InstrumentDB.industry == industry)
                 if sector:
@@ -470,7 +471,11 @@ class DatabaseOperations:
         """给定日期, 返回当日上市证券数与库内有行情证券数 (REQ-01.3)
 
         listed_count: 当日已上市且未退市的证券数 (listed_date<=d 且 delisted_date 为空或>=d)。
-        quoted_count: 当日在 daily_quotes 有行情行的不同证券数。
+        quoted_count: 当日在 daily_quotes 有行情行、且 listed_date 已知的不同证券数 —— 与
+            listed_count 统一口径 (均要求 listed_date 非空), 避免 listed_date 大面积缺失的市场
+            (如港股) 把 coverage_ratio 拉到 >1 (A6)。
+        unknown_listed_date_quoted_count: 当日有行情但 listed_date 未知的证券数, 不计入主比值,
+            但透明暴露, 不隐藏信息。
         """
         try:
             from sqlalchemy import or_, and_
@@ -489,21 +494,32 @@ class DatabaseOperations:
                     listed_stmt = listed_stmt.filter(InstrumentDB.exchange == exchange)
                 listed_count = await session.scalar(listed_stmt) or 0
 
-                quoted_stmt = select(
-                    func.count(func.distinct(DailyQuoteDB.instrument_id))
-                ).select_from(DailyQuoteDB).filter(
-                    func.date(DailyQuoteDB.time) == day_str
-                )
-                if instrument_type or exchange:
-                    quoted_stmt = quoted_stmt.join(
+                def _quoted_count_stmt(*, require_known_listed_date: bool):
+                    stmt = select(
+                        func.count(func.distinct(DailyQuoteDB.instrument_id))
+                    ).select_from(DailyQuoteDB).filter(
+                        func.date(DailyQuoteDB.time) == day_str
+                    )
+                    stmt = stmt.join(
                         InstrumentDB,
                         InstrumentDB.instrument_id == DailyQuoteDB.instrument_id,
                     )
                     if instrument_type:
-                        quoted_stmt = quoted_stmt.filter(InstrumentDB.type == instrument_type)
+                        stmt = stmt.filter(InstrumentDB.type == instrument_type)
                     if exchange:
-                        quoted_stmt = quoted_stmt.filter(InstrumentDB.exchange == exchange)
-                quoted_count = await session.scalar(quoted_stmt) or 0
+                        stmt = stmt.filter(InstrumentDB.exchange == exchange)
+                    if require_known_listed_date:
+                        stmt = stmt.filter(InstrumentDB.listed_date.isnot(None))
+                    else:
+                        stmt = stmt.filter(InstrumentDB.listed_date.is_(None))
+                    return stmt
+
+                quoted_count = await session.scalar(
+                    _quoted_count_stmt(require_known_listed_date=True)
+                ) or 0
+                unknown_listed_date_quoted_count = await session.scalar(
+                    _quoted_count_stmt(require_known_listed_date=False)
+                ) or 0
 
                 ratio = (quoted_count / listed_count) if listed_count else None
                 return {
@@ -512,6 +528,7 @@ class DatabaseOperations:
                     "instrument_type": instrument_type,
                     "listed_count": int(listed_count),
                     "quoted_count": int(quoted_count),
+                    "unknown_listed_date_quoted_count": int(unknown_listed_date_quoted_count),
                     "coverage_ratio": ratio,
                 }
         except Exception as e:
@@ -522,6 +539,7 @@ class DatabaseOperations:
                 "instrument_type": instrument_type,
                 "listed_count": 0,
                 "quoted_count": 0,
+                "unknown_listed_date_quoted_count": 0,
                 "coverage_ratio": None,
             }
 
@@ -2032,6 +2050,31 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to get database statistics: {e}")
             return {}
+
+    async def get_stats_supplement(self) -> Dict[str, Any]:
+        """/stats 专用补充统计 (行业分布 + 交易日历日期范围), 不动 get_database_statistics() (A3)。"""
+        try:
+            async with self.get_async_session() as session:
+                by_industry: Dict[str, int] = {}
+                industry_res = await session.execute(
+                    select(InstrumentDB.industry, func.count(InstrumentDB.industry))
+                    .filter(InstrumentDB.industry.isnot(None))
+                    .group_by(InstrumentDB.industry)
+                )
+                for industry, count in industry_res.all():
+                    by_industry[industry] = count
+
+                earliest = await session.scalar(select(func.min(TradingCalendarDB.date)))
+                latest = await session.scalar(select(func.max(TradingCalendarDB.date)))
+
+                return {
+                    'by_industry': by_industry,
+                    'trading_calendar_earliest': earliest,
+                    'trading_calendar_latest': latest,
+                }
+        except Exception as e:
+            self.db_logger.error(f"Failed to get stats supplement: {e}")
+            return {'by_industry': {}, 'trading_calendar_earliest': None, 'trading_calendar_latest': None}
 
     # === Database Maintenance ===
 

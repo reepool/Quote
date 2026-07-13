@@ -12,11 +12,11 @@
 | 编号 | 结论类型 | 一句话 |
 |---|---|---|
 | A1 🔴 | **本实例数据未全量导入** | 全库 `daily_quotes` 对**所有**标的（含仍在市蓝筹）统一起点 `2023-07-17`，非源端限制，也非退市股特有问题 |
-| A2 🔴 | **缺陷可修** | 已复现根因：`InstrumentResponse.status` 枚举缺失真实状态值，导致命中即 500；已给出修复方案 |
-| A3 🔴 | **缺陷可修** | 已复现根因：路由层字段名与聚合函数返回结构不匹配，底层数据其实是有的（`/system/status` 用同一函数证明） |
+| A2 🔴 | **已修复** | `InstrumentResponse.status` 枚举补全全部真实状态值，`type` 过滤增加大小写归一化。已用真实生产库验证：`is_active=false`/`status=delisted`/`type=STOCK` 均恢复正常 |
+| A3 🔴 | **已修复** | `/stats` 路由改为正确读取 `get_database_statistics()` 的嵌套结构，新增行业分布/日历日期范围补充查询。已用真实生产库验证：`instruments.total=13155`、`daily_quotes.total=6487818` 等字段正确返回 |
 | A4 | **既定行为，此前遗漏一处文档表述** | 不传 `limit` 时确认为 `time` **降序**（非升序）；已据实修正文档 |
 | A5 | **既定行为，已确认** | 公式验证通过：`hfq.close = raw.close × hfq.factor`（精确到小数点后三位一致） |
-| A6 | **缺陷可修（数据质量问题导致指标失真）** | 已复现根因：港股 `listed_date` 大面积缺失，跨市场混算导致 ratio 失真；单市场查询下数值正常 |
+| A6 | **计算口径已修复；港股仍需数据补全** | `quoted_count` 现与 `listed_count` 同口径（均要求 `listed_date` 已知），跨市场比值不再 >1；新增 `unknown_listed_date_quoted_count` 透明暴露被排除数量。真实库验证：2024-06-28 跨市场 ratio 从 1.428 修正为 0.988。港股本身仍需回填 `listed_date`（数据获取类工作，未在本次范围） |
 | A7 | **既定行为** | `.SSE/.SZSE`→`.SH/.SZ` 为既有内部代码归一化约定 |
 | A8 | **既定行为，SRS 假设需修正** | 官方留痕最早并非统一起点；个别记录的 `1990-01-01` 为占位默认值，非真实留痕日期 |
 | A9 | **已用全量数据回答** | 全库 `pre_close` 缺失率 **0.1188%**（7709/6487818），集中在近期个别交易日，非除权日 |
@@ -45,7 +45,7 @@ data_updates（批次记录表）:            0 条记录
 
 ### A2 🔴 `/instruments` 状态过滤 500
 
-**结论：已复现，是真实缺陷，根因明确，可修复。**
+**结论：已修复。**（原：已复现，是真实缺陷，根因明确，可修复——OpenSpec change `fix-instrument-stats-coverage-defects`）
 
 复现（对当前活跃服务实测）：
 ```
@@ -66,16 +66,15 @@ auto_deactivated_no_data(46) / auto_deactivated_zombie(21) ...（stock 类型统
 
 **库内退市 STOCK 数量级**：`type='stock' AND status='delisted'` = **447 条**；若含更广义的"非活跃"（`is_active=0`）则为 **1949 条**（含 excluded/auto_deactivated 等类别）。
 
-**当前唯一可用的枚举方式**（修复前的临时方案）：只能绕过 API，直接由我方按需查询导出，或等待下方修复上线。
-
-**修复方案**（评估：低成本，向后兼容，纯新增/放宽）：
+**修复方案（已上线）**：
 1. `InstrumentStatusEnum` 补全为库内实际 8 个状态值（新增枚举项，不改变已有值语义）
 2. `type` 过滤增加大小写归一化
-3. 工作量：0.5–1 人日，且此修复本身不改变任何现有成功查询的返回结果
+
+**修复后真实生产库验证**：`is_active=false`、`status=delisted`、`type=STOCK` 均返回 200 且拿到预期数据（不再是 500 或空列表）。
 
 ### A3 🔴 `/stats` 返回全 0
 
-**结论：已复现，是真实缺陷（字段映射 bug），不是"未刷新"。**
+**结论：已修复。**（原：已复现，是真实缺陷（字段映射 bug），不是"未刷新"）
 
 复现：`/stats` 返回 `instruments_count=0, quotes_count=0, ...` 全部为空/零值。但通过 `/api/v1/system/status`（走的是**同一个底层聚合函数** `get_database_statistics()`）证实底层数据完全正常：
 
@@ -86,7 +85,9 @@ auto_deactivated_no_data(46) / auto_deactivated_zombie(21) ...（stock 类型统
 
 **根因**：`get_database_statistics()` 返回的是**嵌套结构**（`stats['instruments']['total']`、`stats['daily_quotes']['total']`），但 `/stats` 路由的处理代码按**扁平字段名**读取（`stats.get('instruments_count', 0)`、`stats.get('quotes_count', 0)`）——这些扁平键在返回字典里根本不存在，所以全部静默落到默认值 0/{}。这是路由层与数据函数之间的字段命名不一致，纯代码 bug，与"聚合未跑/未刷新"无关——聚合本身是对的，`/system/status` 已证明。
 
-**修复方案**：改写 `/stats` 路由的字段提取逻辑以匹配实际嵌套结构。工作量：0.5 人日。
+**修复方案（已上线）**：改写 `/stats` 路由的字段提取逻辑以匹配实际嵌套结构；新增行业分布与交易日历日期范围补充查询（`get_stats_supplement`，不改动 `get_database_statistics()` 本体，避免影响 `/system/status`）。
+
+**修复后真实生产库验证**：`instruments_count=13155`、`quotes_count=6487818`、`instruments_by_exchange` 等字段正确返回非零值。
 
 ### A4 排序方向
 
@@ -120,22 +121,27 @@ adjust=hfq:  close=11440.124,  factor=6.969311，   adjustment_type=backward
 
 ### A6 `/quotes/coverage` 的 `coverage_ratio` 语义
 
-**结论：已复现根因，是真实的数据质量问题导致的指标失真，非计算公式错误。**
+**结论：计算口径缺陷已修复；港股 `listed_date` 数据缺失仍需单独回补（数据获取类工作）。**
 
-**精确定义**：`coverage_ratio = quoted_count / listed_count`，两者均按 `instrument_type`（默认 `stock`）与可选 `exchange` 过滤后统计。
+**精确定义（修复后）**：`coverage_ratio = quoted_count / listed_count`，两者现在统一要求 `listed_date` 已知（非 NULL），理论上限为 `1.0`；新增 `unknown_listed_date_quoted_count` 字段透明暴露"有行情但 `listed_date` 未知"的证券数，不再让其静默污染主比值。
 
-**根因复现**（`2024-06-28`，`instrument_type=stock`）：
+**修复前根因复现**（`2024-06-28`，`instrument_type=stock`）：
 ```
 不传 exchange:        listed_count=5365  quoted_count=7663  ratio=1.428（失真）
 exchange=SSE:          listed_count=2267  quoted_count=2242  ratio=0.989（正常）
 exchange=HKEX:          listed_count=0     quoted_count=2362  ratio=null（HKEX 完全不可用）
 ```
+根因：`2024-06-28` 当日有行情的 2362 只港股 `stock` **全部 `listed_date` 为 `NULL`**，只计入分子不计入分母，跨市场汇总时比值失真。
 
-直接验证：`2024-06-28` 当日有行情的 2362 只港股 `stock`，**全部 2362 只的 `listed_date` 字段为 `NULL`**。`listed_count` 的计算依赖 `listed_date <= 当日`，`listed_date` 为空的记录必然被排除在 `listed_count` 之外，但只要有行情就会被计入 `quoted_count`——跨市场（尤其含港股）汇总时，港股全额计入分子、完全不计入分母，导致比值失真甚至 >1。
+**修复后真实生产库验证**（同一天）：
+```
+不传 exchange: listed_count=5365 quoted_count=5301 unknown_listed_date_quoted_count=2362 ratio=0.988
+exchange=SSE:  listed_count=2267 quoted_count=2242 unknown_listed_date_quoted_count=0    ratio=0.989（与修复前一致，无回归）
+```
 
-**正确查询姿势**：**必须传 `exchange` 参数按单市场查询**，跨市场汇总的 `coverage_ratio` 目前不具备可解释性。A 股（SSE/SZSE/BSE）单独查询时比值正常（≤1）；**港股当前该指标完全不可用**（`listed_count` 恒为 0），需先补齐港股 `listed_date` 主数据（属既有的港股主数据完整性问题，独立于本次覆盖率端点开发）。
+**正确查询姿势**：修复后跨市场查询也不再失真，但 `unknown_listed_date_quoted_count` 较大时（如混入港股）该市场的覆盖信息仍不完整，建议仍用 `exchange` 过滤按单市场查询以获得最精确数值。**港股 `listed_count` 仍恒为 0**（`listed_date` 全字段缺失属于港股主数据完整性问题，需要单独的数据回补工作，不在本次代码修复范围）。
 
-**是否为退市历史覆盖率的权威来源**：是，但仅限**按 `exchange` 分市场查询**的场景；不建议跨市场聚合使用，也不建议在港股 `listed_date` 缺口修复前使用于港股。
+**是否为退市历史覆盖率的权威来源**：是，计算口径已修复；港股场景需等 `listed_date` 回补后才可用。
 
 ### A7 证券 ID 回显
 
@@ -190,9 +196,13 @@ B4/B5/B6/B7 的"未验证"是如实说明——这四项此前评估阶段就已
 
 ---
 
-## 3. 关于缺陷修复的下一步
+## 3. 缺陷修复状态
 
-A2、A3 是明确的、低成本（各 0.5–1 人日）、纯新增/放宽性质的修复，不改变任何现有正常查询的返回结果。**是否现在安排修复，请贵方确认**；确认后我方可在本次交互周期内完成并回归验证。A4（默认排序方向是否改为统一升序）涉及现有默认响应顺序变更，建议贵方评估是否真需要，需要的话按变更现有默认行为的流程单独走查。
+A2、A3、A6 已修复上线（OpenSpec change `fix-instrument-stats-coverage-defects`），均为新增枚举值/修正内部计算逻辑/新增响应字段，未改变任何现有成功查询路径的返回结果结构。已用真实生产库直接验证（详见各节"修复后真实生产库验证"）；线上服务生效需等待下次进程重启（FastAPI 路由/模型改动需重启进程才能反映到 `/openapi.json` 与实际响应，详见此前关于"自动更新"的说明）。
+
+A4（默认排序方向是否改为统一升序）**未修改**——涉及现有默认响应顺序变更，按贵方"不改变现有端点默认行为"的原则，需贵方明确需要后再单独评估执行，不在本次自动修复范围内。
+
+A1/B1-B7（历史数据回补、公司行为明细采集、财务修订 vintage、ST 状态历史等）均涉及数据重新获取或较大架构改造，按约定推至下一步，不在本次修复范围。
 
 ---
 

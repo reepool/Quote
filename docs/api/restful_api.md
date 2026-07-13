@@ -48,11 +48,13 @@ http://localhost:8000/api/v1
 查询交易品种列表，支持过滤与分页。
 
 常用参数：
-- `exchange`、`type`、`industry`、`sector`、`market`、`status`
+- `exchange`、`type`（大小写不敏感，`STOCK`/`stock` 等效）、`industry`、`sector`、`market`、`status`
 - `is_active`、`is_st`、`trading_status`
 - `listed_after`、`listed_before`
 - `delisted_after`、`delisted_before`（按退市日期过滤，用于构造退市证券资产池）
 - `limit`、`offset`、`sort_by`、`sort_order`
+
+`status` 取值（`InstrumentStatusEnum`）：`active`、`inactive`、`suspended`、`delisted`、`excluded`、`auto_deactivated_no_data`、`auto_deactivated_zombie`、`calculation_terminated`、`metadata_only`。此前枚举缺失后 6 个真实状态值，导致查询命中即 500（已修复）。
 
 响应字段补充（`InstrumentResponse`）：
 - `lot_size`：每手股数（board lot）。A 股固定 `100`；港股由官方证券名单的 board lot 回填（如 `00001.HK` 为 `500`）；未知或不适用时为 `null`。
@@ -148,9 +150,11 @@ curl "http://localhost:8000/api/v1/quotes/latest?instrument_ids=000001.SZSE&inst
 - `exchange`（可选过滤）
 - `instrument_type`（默认 `stock`）
 
-返回：`{total, items:[{date, exchange, instrument_type, listed_count, quoted_count, coverage_ratio}]}`。
+返回：`{total, items:[{date, exchange, instrument_type, listed_count, quoted_count, unknown_listed_date_quoted_count, coverage_ratio}]}`。
 
-说明：`listed_count` 依赖已知的 `listed_date`；跨市场（尤其含港股，多为 `listed_date` 空）时建议用 `exchange` 过滤以获得可比数值。
+计算口径：`listed_count` 与 `quoted_count` 统一要求 `listed_date` 已知（非 NULL），保证 `coverage_ratio = quoted_count / listed_count` 理论上限为 `1.0`；当日有行情但 `listed_date` 未知的证券数单独计入 `unknown_listed_date_quoted_count`，不计入主比值，但不隐藏。
+
+说明：跨市场（尤其含港股，`listed_date` 大面积为空）查询时，`unknown_listed_date_quoted_count` 可能较大，此时该市场的覆盖率不具代表性；建议用 `exchange` 过滤按单市场查询以获得可比数值。港股当前 `coverage_ratio` 因 `listed_date` 全字段缺失而恒为 `null`（`listed_count=0`），需先补齐港股主数据 `listed_date` 字段。
 
 示例：
 ```bash
@@ -761,7 +765,9 @@ curl "http://localhost:8000/api/v1/calendar/trading/previous?exchange=SSE&date=2
 ## 统计与验证
 
 ### GET /api/v1/stats
-返回数据库与数据质量统计摘要（与 `DataStatsResponse` 结构一致），包括品种数、行情数、高质量记录、缺口总数及各级分布等。
+返回数据库与数据质量统计摘要（与 `DataStatsResponse` 结构一致），包括品种数、行情数、按交易所/类型/行业分布、行情与交易日历日期范围等。
+
+数据来源：`instruments_count`/`quotes_count`/`trading_days_count`/`instruments_by_exchange`/`instruments_by_type` 与 `/api/v1/system/status` 共用同一底层聚合（`get_database_statistics()`）；`instruments_by_industry`、`quotes_date_range`、`trading_calendar_range` 为补充查询。`data_quality_summary`/`gap_summary` 当前为占位默认值（未接入缺口聚合），如需真实缺口统计请使用 `/api/v1/gaps/report`。
 
 ### POST /api/v1/data/validate
 启动数据质量验证并返回基本验证结果（`DataValidationResponse`）。
