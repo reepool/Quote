@@ -3651,7 +3651,10 @@ async def get_data_statistics():
     try:
         # get_database_statistics() 返回嵌套结构 (与 /system/status 同源); 此前按扁平键读取
         # 导致全部静默落空值 (A3)，此处改为按实际嵌套路径读取。
-        stats = await data_manager.db_ops.get_database_statistics()
+        # fast_mode=True: 跳过 daily_quotes 的 by_trading_status/by_source group-by ——
+        # 在当前 2900万+ 行规模下这两项合计耗时 ~35s 且 /stats 从不消费, 与 /system/status
+        # 的既有用法一致 (data_manager.py 对 /system/status 同样传 fast_mode=True)。
+        stats = await data_manager.db_ops.get_database_statistics(fast_mode=True)
         instruments = stats.get('instruments') or {}
         daily_quotes = stats.get('daily_quotes') or {}
         trading_calendar = stats.get('trading_calendar') or {}
@@ -3660,10 +3663,10 @@ async def get_data_statistics():
         supplement = await data_manager.db_ops.get_stats_supplement()
 
         quotes_date_range: Dict[str, Any] = {}
-        if daily_quotes.get('earliest_date') and daily_quotes.get('latest_date'):
+        if supplement.get('quotes_earliest') and supplement.get('quotes_latest'):
             quotes_date_range = {
-                'start': daily_quotes['earliest_date'],
-                'end': daily_quotes['latest_date'],
+                'start': supplement['quotes_earliest'],
+                'end': supplement['quotes_latest'],
             }
 
         trading_calendar_range: Dict[str, Any] = {}

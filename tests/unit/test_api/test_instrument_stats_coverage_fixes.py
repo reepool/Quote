@@ -91,13 +91,14 @@ async def test_stats_route_reads_nested_structure(monkeypatch):
         "by_industry": {"银行": 42, "白酒": 12},
         "trading_calendar_earliest": datetime(2023, 7, 17),
         "trading_calendar_latest": datetime(2026, 9, 29),
+        "quotes_earliest": datetime(1990, 12, 19),
+        "quotes_latest": datetime(2026, 7, 10),
     }
-    mgr = SimpleNamespace(
-        db_ops=SimpleNamespace(
-            get_database_statistics=AsyncMock(return_value=nested_stats),
-            get_stats_supplement=AsyncMock(return_value=supplement),
-        )
+    db_ops = SimpleNamespace(
+        get_database_statistics=AsyncMock(return_value=nested_stats),
+        get_stats_supplement=AsyncMock(return_value=supplement),
     )
+    mgr = SimpleNamespace(db_ops=db_ops)
     monkeypatch.setattr(routes, "data_manager", mgr)
 
     resp = await routes.get_data_statistics()
@@ -107,8 +108,12 @@ async def test_stats_route_reads_nested_structure(monkeypatch):
     assert resp.instruments_by_exchange == {"SSE": 2742, "SZSE": 5396, "BSE": 327, "HKEX": 4690}
     assert resp.instruments_by_industry == {"银行": 42, "白酒": 12}
     assert resp.quotes_date_range == {
-        "start": datetime(2023, 7, 17), "end": datetime(2026, 7, 10)
+        "start": datetime(1990, 12, 19), "end": datetime(2026, 7, 10)
     }
+    # /stats must call with fast_mode=True to avoid the ~35s by_trading_status/by_source
+    # group-by scans on the multi-tens-of-millions-row daily_quotes table (perf regression
+    # found during A1 re-verification after the platform's historical backfill).
+    db_ops.get_database_statistics.assert_awaited_once_with(fast_mode=True)
 
 
 @pytest.mark.asyncio

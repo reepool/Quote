@@ -2052,7 +2052,13 @@ class DatabaseOperations:
             return {}
 
     async def get_stats_supplement(self) -> Dict[str, Any]:
-        """/stats 专用补充统计 (行业分布 + 交易日历日期范围), 不动 get_database_statistics() (A3)。"""
+        """/stats 专用补充统计 (行业分布 + 交易日历/行情日期范围), 不动 get_database_statistics() (A3)。
+
+        /stats 对 get_database_statistics() 使用 fast_mode=True 以跳过 daily_quotes 的
+        by_trading_status/by_source group-by (在 2900万+ 行规模下合计耗时 ~35s, 且 /stats
+        从不消费这两个字段, 纯浪费); 但 fast_mode 同时会跳过 daily_quotes 的 min/max(time),
+        而这正是 quotes_date_range 需要的, 所以在此单独用一次轻量 min/max 查询补回。
+        """
         try:
             async with self.get_async_session() as session:
                 by_industry: Dict[str, int] = {}
@@ -2067,10 +2073,15 @@ class DatabaseOperations:
                 earliest = await session.scalar(select(func.min(TradingCalendarDB.date)))
                 latest = await session.scalar(select(func.max(TradingCalendarDB.date)))
 
+                quotes_earliest = await session.scalar(select(func.min(DailyQuoteDB.time)))
+                quotes_latest = await session.scalar(select(func.max(DailyQuoteDB.time)))
+
                 return {
                     'by_industry': by_industry,
                     'trading_calendar_earliest': earliest,
                     'trading_calendar_latest': latest,
+                    'quotes_earliest': quotes_earliest,
+                    'quotes_latest': quotes_latest,
                 }
         except Exception as e:
             self.db_logger.error(f"Failed to get stats supplement: {e}")
