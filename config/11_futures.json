@@ -786,6 +786,14 @@
             "max_attempts": 3,
             "backoff_seconds": 1.0
           },
+          "observation_exceptions": [
+            {
+              "series_id": "CMD.FERTILIZER.PHOSPHATE_ROCK.WORLDBANK.MONTHLY",
+              "observation_date": "2023-11-01",
+              "reason": "official_workbook_missing_value_marker",
+              "evidence_url": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
+            }
+          ],
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
         "100ppi_public_web": {

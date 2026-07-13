@@ -2441,6 +2441,12 @@ class WorldBankCommodityProvider:
         }
         index_by_header = {value: index for index, value in headers_by_index.items()}
         series_metadata: Dict[str, Dict[str, Any]] = {}
+        gap_diagnostics: Dict[str, Any] = {
+            "enabled": True,
+            "governed_exception_dates": 0,
+            "unresolved_dates": 0,
+            "by_series": {},
+        }
         for item in series:
             column_index = index_by_header.get(item.source_symbol)
             if column_index is None:
@@ -2453,15 +2459,75 @@ class WorldBankCommodityProvider:
                 )
                 continue
             all_periods: List[str] = []
+            requested_periods: List[tuple[str, Any]] = []
+            available_from = _parse_date(item.metadata.get("source_available_from"))
             for row_index in range(header_row + 2, len(frame)):
                 period = str(frame.iat[row_index, 0] or "").strip()
                 value_raw = frame.iat[row_index, column_index]
-                if len(period) == 7 and period[4] == "M":
-                    try:
-                        float(value_raw)
-                    except (TypeError, ValueError):
-                        continue
+                if len(period) != 7 or period[4] != "M":
+                    continue
+                try:
+                    period_date = date(int(period[:4]), int(period[5:7]), 1)
+                except ValueError:
+                    continue
+                if available_from and period_date < date(
+                    available_from.year, available_from.month, 1
+                ):
+                    continue
+                try:
+                    numeric = float(value_raw)
+                except (TypeError, ValueError):
+                    numeric = None
+                if numeric is not None and math.isfinite(numeric):
                     all_periods.append(period)
+                if start and period_date < date(start.year, start.month, 1):
+                    continue
+                if end and period_date > date(end.year, end.month, 1):
+                    continue
+                requested_periods.append((period_date.isoformat(), value_raw))
+            configured_exceptions = {
+                str(raw.get("observation_date")): dict(raw)
+                for raw in self.source_cfg.get("observation_exceptions", [])
+                if isinstance(raw, Mapping)
+                and str(raw.get("series_id") or "") == item.series_id
+                and raw.get("observation_date")
+                and raw.get("reason")
+                and raw.get("evidence_url")
+            }
+            missing_dates: List[str] = []
+            governed_dates: List[str] = []
+            for observation_date, value_raw in requested_periods:
+                try:
+                    numeric = float(value_raw)
+                except (TypeError, ValueError):
+                    numeric = None
+                if numeric is not None and math.isfinite(numeric):
+                    continue
+                if observation_date in configured_exceptions:
+                    governed_dates.append(observation_date)
+                else:
+                    missing_dates.append(observation_date)
+            if missing_dates:
+                warnings.append(
+                    {
+                        "reason": "world_bank_unresolved_monthly_values",
+                        "series_id": item.series_id,
+                        "missing_dates": len(missing_dates),
+                        "missing_samples": missing_dates[:20],
+                    }
+                )
+            gap_diagnostics["governed_exception_dates"] += len(governed_dates)
+            gap_diagnostics["unresolved_dates"] += len(missing_dates)
+            gap_diagnostics["by_series"][item.series_id] = {
+                "requested_periods": len(requested_periods),
+                "observed_periods": len(requested_periods)
+                - len(governed_dates)
+                - len(missing_dates),
+                "governed_exception_dates": len(governed_dates),
+                "governed_exception_samples": governed_dates[:20],
+                "unresolved_dates": len(missing_dates),
+                "unresolved_samples": missing_dates[:20],
+            }
             workbook_unit = str(frame.iat[header_row + 1, column_index] or "").strip()
             series_metadata[item.series_id] = {
                 "source_name": item.source_symbol,
@@ -2489,6 +2555,8 @@ class WorldBankCommodityProvider:
                     value = float(value_raw)
                 except (TypeError, ValueError):
                     continue
+                if not math.isfinite(value):
+                    continue
                 if start and obs_date < date(start.year, start.month, 1):
                     continue
                 if end and obs_date > date(end.year, end.month, 1):
@@ -2515,6 +2583,7 @@ class WorldBankCommodityProvider:
                 "rows": len(observations),
                 "series_metadata": series_metadata,
                 "evidence_url": _redact_url(response.url),
+                "date_gap_fill": gap_diagnostics,
             },
         )
 

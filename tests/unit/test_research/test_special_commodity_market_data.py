@@ -961,6 +961,31 @@ def test_world_bank_provider_parses_pink_sheet_workbook(monkeypatch):
     assert obs.observation_date == "2026-01-01"
     assert obs.value == 8500.25
     assert obs.unit == "USD/metric_ton"
+    unresolved = next(
+        item
+        for item in result.warnings
+        if item["reason"] == "world_bank_unresolved_monthly_values"
+    )
+    assert unresolved["missing_samples"] == ["2026-02-01"]
+    assert result.metadata["date_gap_fill"]["unresolved_dates"] == 1
+
+    governed_source_cfg = deepcopy(source_cfg)
+    governed_source_cfg["observation_exceptions"] = [
+        {
+            "series_id": "CMD.METAL.COPPER.WORLDBANK.MONTHLY",
+            "observation_date": "2026-02-01",
+            "reason": "official_workbook_missing_value_marker",
+            "evidence_url": "https://thedocs.worldbank.org/CMO-Historical-Data-Monthly.xlsx",
+        }
+    ]
+    governed = WorldBankCommodityProvider(
+        "world_bank_public_dataset", governed_source_cfg
+    ).fetch(series, start_date="2026-01-01", end_date="2026-02-28")
+    assert not any(
+        item["reason"] == "world_bank_unresolved_monthly_values"
+        for item in governed.warnings
+    )
+    assert governed.metadata["date_gap_fill"]["governed_exception_dates"] == 1
 
 
 def test_world_bank_provider_retries_transient_workbook_failure(monkeypatch):
