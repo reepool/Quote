@@ -310,16 +310,12 @@ restart_system - 重启系统服务
 - **执行时间**: 每月1日 03:00
 - **功能**: 检查上月数据缺口并自动修复
 
-### 6. 季度数据清理 (quarterly_cleanup)
-- **执行时间**: 每季度最后一天 04:00
-- **功能**: 清理过期数据和文件
-
-### 7. 数据库备份 (database_backup)
+### 6. 数据库备份 (database_backup)
 - **执行时间**: 每周六 03:30
 - **功能**: 通过统一数据库备份工作流备份 `data/*.db` 下的生产 SQLite 数据库
 - **特点**: 配置化数据库清单、默认每库保留 3 个备份、SQLite online backup、每库完成通知、整轮汇总通知、大库 open-only 校验避免 NAS quick_check 长时间阻塞
 
-### 8. 缓存预热 (cache_warm_up)
+### 7. 缓存预热 (cache_warm_up)
 - **执行时间**: 每日 08:00
 - **功能**: 预加载热门数据到缓存
 
@@ -342,7 +338,6 @@ restart_system - 重启系统服务
 • 系统健康检查 (system_health_check) - 45分钟后
 • 每周数据维护 (weekly_data_maintenance) - 周日 02:00
 • 月度数据完整性检查 (monthly_data_integrity_check) - 下月2日 11:00
-• 季度数据清理 (quarterly_cleanup) - 下季度最后一天 14:30
 • 海外商品日频同步 (special_commodity_price_sync) - 周二至周六 08:00
 • 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
 • 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
@@ -447,7 +442,6 @@ restart_system - 重启系统服务
 | weekly_data_maintenance | ✅ | 每周数据维护 |
 | monthly_data_integrity_check | ✅ | 月度完整性检查 |
 | find_gap_and_repair | ✅ | 数据缺口修复 |
-| quarterly_cleanup | ✅ | 季度数据清理 |
 | trading_calendar_update | ✅ | 交易日历更新 |
 | database_backup | ✅ | 数据库备份 |
 | system_health_check | ❌ | 每小时执行，过于频繁 |

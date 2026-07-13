@@ -43,7 +43,6 @@
 | `market_dependency_version_check` | 依赖检查 | 每日 `12:00` | 轻量网络检查 |
 | `monthly_data_integrity_check` | 月度完整性 | 每月 2 日 `11:00` | 避开 1 日交易日历和周日凌晨维护高峰 |
 | `shareholder_reconciliation_sync` | 股东周期复核 | 周六 `12:30` | 预留 5 小时，避开备份和申万任务 |
-| `quarterly_cleanup` | 季度清理 | 季度最后一天 `14:30` | 避开凌晨维护/备份窗口 |
 | `find_gap_and_repair` | 缺口修复 | 周日 `15:00` | 周维护完成后执行，预留 4 小时 |
 | `hk_daily_data_update` | 港股行情 | 周一至周五 `17:30` | 港股收盘后执行，前置 HKEX 主数据 `lifecycle_write` 治理 |
 | `risk_free_rate_sync` | 无风险利率 | 周一至周五 `17:30` | 中国 10Y 国债到期收益率日更，akshare 全量拉取 + 幂等 upsert，写入 `data/interests.db`；单一参考序列，无主数据/交易日治理依赖 |
@@ -280,43 +279,7 @@ async def weekly_data_maintenance(self,
 }
 ```
 
-### 5. 季度数据清理 (quarterly_cleanup)
-
-#### 功能描述
-每季度执行一次维护性清理，仅用于临时文件和按配置启用的备份文件清理。
-行情库中的 `daily_quotes` 和 `trading_calendar` 是研究、回测和数据质量审计的基础历史数据，不属于滚动缓存，不允许按保留期删除。若历史行情占用空间过大，应通过归档库、分区或冷热存储方案处理，不能直接删除主库历史。
-
-#### 配置示例
-```json
-{
-  "quarterly_cleanup": {
-    "enabled": true,
-    "description": "季度数据清理",
-    "trigger": {
-      "type": "cron",
-      "month": "3,6,9,12",
-      "day": "last",
-      "hour": 4,
-      "minute": 0,
-      "second": 0
-    },
-    "max_instances": 1,
-    "misfire_grace_time": 1800,
-    "coalesce": true,
-    "parameters": {
-      "cleanup_old_quotes": false,
-      "quote_retention_months": 36,
-      "cleanup_temp_files": true,
-      "cleanup_backup_files": false,
-      "backup_retention_months": 12
-    }
-  }
-}
-```
-
-`cleanup_old_quotes` 是废弃开关，必须保持 `false`。即使旧配置误设为 `true`，调度任务也会忽略该请求并保留行情历史。
-
-### 6. 数据缺口检测与修复 (find_gap_and_repair)
+### 5. 数据缺口检测与修复 (find_gap_and_repair)
 
 #### 功能描述
 定期检测交易品种的数据缺口，并根据配置参数触发自动修复。

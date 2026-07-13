@@ -1568,29 +1568,6 @@
 - **`misfire_grace_time`**: `int` (默认: `3600`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
-#### jobs.quarterly_cleanup
-
-```json
-{
-  "quarterly_cleanup": {
-    "enabled": true,
-    "description": "季度数据清理",
-    "report": true
-  }
-}
-  ...
-```
-
-- **`enabled`**: `bool` (默认: `True`) —— *决定是否开启某子项/数据源/子系统的记录与服务开关*
-- **`description`**: `str` (默认: `季度数据清理`) —— *用以展示在 Telegram 前端机器人等查询输出的具象化备注名称*
-- **`report`**: `bool` (默认: `True`) —— *决定本任务在其成败生命周期结束后是否撰写推送简报向群组汇报分发*
-- **`trigger`**: `Object` /* 挂历执行周期间隔触发器类型与形态定义结构：如 cron , interval 等 */
-- **`max_instances`**: `int` (默认: `1`) —— *针对并行触发的任务最多允许多少重并发任务队列并跑（1 限制表示严格串行单挑）*
-- **`misfire_grace_time`**: `int` (默认: `1800`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
-- **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
-- **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
-- **`parameters.cleanup_old_quotes`**: `bool` (默认: `False`) —— *废弃开关，必须保持关闭。行情和交易日历历史是研究/回测基础数据，不允许按滚动保留期删除。*
-- **`parameters.quote_retention_months`**: `int` —— *历史兼容字段；不再用于删除行情历史。*
 #### jobs.cache_warm_up
 
 ```json

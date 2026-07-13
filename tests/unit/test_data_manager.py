@@ -226,18 +226,6 @@ class TestDataManager:
         assert result is True
 
     @pytest.mark.asyncio
-    async def test_cleanup_old_data(self, data_manager):
-        """Test cleanup of old data"""
-        cutoff_date = date(2023, 1, 1)
-
-        data_manager.db.delete_quotes_before_date = AsyncMock(return_value=1000)
-
-        deleted_count = await data_manager.cleanup_old_data(cutoff_date)
-
-        assert deleted_count == 1000
-        data_manager.db.delete_quotes_before_date.assert_called_once_with(cutoff_date)
-
-    @pytest.mark.asyncio
     async def test_get_download_progress(self, data_manager):
         """Test download progress tracking"""
         # Create a test progress

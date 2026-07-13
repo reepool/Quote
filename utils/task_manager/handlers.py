@@ -126,7 +126,6 @@ class TaskManagerHandlers:
             "• `system_health_check` - 系统健康检查\n"
             "• `weekly_maintenance` - 每周数据维护\n"
             "• `monthly_sync` - 每月全量数据同步\n"
-            "• `quarterly_cleanup` - 季度数据清理\n"
             "• `cache_warm_up` - 缓存预热\n\n"
             "*研究域任务ID：*\n"
             "• `shareholder_shadow_sync` - 股东摘要手工全量刷新\n"

@@ -223,10 +223,9 @@ BaseDataSource (抽象基类)
 2. **系统健康检查** (system_health_check)
 3. **每周数据维护** (weekly_data_maintenance)
 4. **月度数据完整性检查** (monthly_data_integrity_check)
-5. **季度数据清理** (quarterly_cleanup)
-6. **数据库备份** (database_backup)
-7. **缓存预热** (cache_warm_up)
-8. **交易日历更新** (trading_calendar_update)
+5. **数据库备份** (database_backup)
+6. **缓存预热** (cache_warm_up)
+7. **交易日历更新** (trading_calendar_update)
 
 ### 6. Telegram 任务管理器 (`utils/task_manager/`) ⭐ v2.3.0
 

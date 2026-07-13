@@ -156,7 +156,7 @@ class JobConfigManager:
             elif 'day' in trigger_config:
                 day_value = trigger_config['day']
                 if day_value == 'last':
-                    cron_kwargs['day'] = 'last'  # 支持quarterly_cleanup的"day": "last"
+                    cron_kwargs['day'] = 'last'
                 else:
                     cron_kwargs['day'] = day_value
 

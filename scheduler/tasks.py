@@ -3088,72 +3088,6 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('find_gap_and_repair')
 
-    async def quarterly_cleanup(self,
-                              cleanup_old_quotes: bool = False,
-                              quote_retention_months: int = 36,
-                              cleanup_temp_files: bool = True,
-                              cleanup_backup_files: bool = False,
-                              backup_retention_months: int = 12,
-                              job_config: Optional[JobConfig] = None) -> bool:
-        """季度清理任务"""
-        try:
-            scheduler_logger.info("[Scheduler] Starting quarterly cleanup...")
-
-            # 行情历史是研究和回测的基础数据，不能按滚动窗口删除。
-            if cleanup_old_quotes:
-                scheduler_logger.warning(
-                    "[Scheduler] Ignoring deprecated cleanup_old_quotes=true; "
-                    "market quote and trading-calendar history must be retained for research/backtests "
-                    "(requested retention_months=%s)",
-                    quote_retention_months,
-                )
-
-            # 清理临时文件
-            if cleanup_temp_files:
-                await self._cleanup_temp_files()
-
-            # 清理备份文件
-            if cleanup_backup_files:
-                await self._cleanup_backup_files(backup_retention_months)
-
-            scheduler_logger.info("[Scheduler] Quarterly cleanup completed")
-            if self.telegram_enabled:
-                try:
-                    # 生成季度清理报告数据
-                    cleanup_report_data = {
-                        'name': '季度数据清理报告',
-                        'status': 'success',  # 明确的成功状态
-                        'tasks_completed': '临时文件清理, 备份文件清理(如启用)',
-                        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    }
-
-                    # 发送清理报告
-                    await self._send_task_report(
-                        report_data=cleanup_report_data,
-                        report_type='maintenance_report',
-                        task_name='季度数据清理',
-                        job_config=job_config
-                    )
-                except Exception as e:
-                    scheduler_logger.error(f"[Scheduler] Failed to send notification: {e}")
-            return True
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Quarterly cleanup failed: {e}")
-            # 统一使用报告系统发送失败通知
-            failure_report_data = {
-                'name': '季度数据清理报告',
-                'status': 'error',
-                'error_message': str(e)
-            }
-            await self._send_task_report(
-                report_data=failure_report_data,
-                report_type='maintenance_report', # 复用维护报告模板
-                task_name='季度数据清理',
-                job_config=job_config
-            )
-            return False
-
     async def company_profile_shadow_sync(
         self,
         exchanges: Optional[List[str]] = None,
@@ -7443,64 +7377,6 @@ class ScheduledTasks:
 
         except Exception as e:
             scheduler_logger.error(f"[Scheduler] Data integrity validation failed: {e}")
-
-    async def _cleanup_temp_files(self):
-        """清理临时文件"""
-        try:
-            import os
-            import glob
-            from datetime import datetime, timedelta
-
-            temp_dirs = ["temp", "tmp", "/tmp/quote_system"]
-            cleaned_files = 0
-            cutoff_date = datetime.now() - timedelta(days=7)  # 7天前的临时文件
-
-            for temp_dir in temp_dirs:
-                if os.path.exists(temp_dir):
-                    for temp_file in glob.glob(os.path.join(temp_dir, "*")):
-                        try:
-                            file_time = datetime.fromtimestamp(os.path.getmtime(temp_file))
-                            if file_time < cutoff_date:
-                                if os.path.isfile(temp_file):
-                                    os.remove(temp_file)
-                                    cleaned_files += 1
-                        except Exception as e:
-                            scheduler_logger.warning(f"[Scheduler] Failed to remove temp file {temp_file}: {e}")
-
-            if cleaned_files > 0:
-                scheduler_logger.info(f"[Scheduler] Cleaned up {cleaned_files} temporary files")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to cleanup temp files: {e}")
-
-    async def _cleanup_backup_files(self, retention_months: int):
-        """清理备份文件"""
-        try:
-            import os
-            import glob
-            from datetime import datetime, timedelta
-
-            backup_dir = "backup"
-            if not os.path.exists(backup_dir):
-                return
-
-            cutoff_date = datetime.now() - timedelta(days=retention_months * 30)
-            cleaned_files = 0
-
-            for backup_file in glob.glob(os.path.join(backup_dir, "*.db*")):
-                try:
-                    file_time = datetime.fromtimestamp(os.path.getmtime(backup_file))
-                    if file_time < cutoff_date:
-                        os.remove(backup_file)
-                        cleaned_files += 1
-                except Exception as e:
-                    scheduler_logger.warning(f"[Scheduler] Failed to remove backup file {backup_file}: {e}")
-
-            if cleaned_files > 0:
-                scheduler_logger.info(f"[Scheduler] Cleaned up {cleaned_files} old backup files (retention: {retention_months} months)")
-
-        except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Failed to cleanup backup files: {e}")
 
     async def _check_disk_space(self, threshold_mb: int):
         """检查磁盘空间"""

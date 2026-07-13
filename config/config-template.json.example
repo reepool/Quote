@@ -720,29 +720,6 @@
           "days_to_check": 45
         }
       },
-      "quarterly_cleanup": {
-        "enabled": true,
-        "description": "季度数据清理",
-        "report": true,
-        "trigger": {
-          "type": "cron",
-          "month": "3,6,9,12",
-          "day": "last",
-          "hour": 4,
-          "minute": 0,
-          "second": 0
-        },
-        "max_instances": 1,
-        "misfire_grace_time": 1800,
-        "coalesce": true,
-        "parameters": {
-          "cleanup_old_quotes": false,
-          "quote_retention_months": 36,
-          "cleanup_temp_files": true,
-          "cleanup_backup_files": false,
-          "backup_retention_months": 12
-        }
-      },
       "cache_warm_up": {
         "enabled": true,
         "description": "缓存预热",

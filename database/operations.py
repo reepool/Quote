@@ -2078,20 +2078,6 @@ class DatabaseOperations:
 
     # === Database Maintenance ===
 
-    async def cleanup_old_data(self, days_to_keep: int = 365) -> bool:
-        """Deprecated safety guard for market-history cleanup.
-
-        Daily quote and trading-calendar history are research/backtest inputs, not
-        rolling cache rows.  Retention-tier maintenance belongs in domain-specific
-        storage layers such as the financial hot/history tables.
-        """
-        self.db_logger.warning(
-            "Ignoring deprecated cleanup_old_data(days_to_keep=%s); "
-            "daily_quotes and trading_calendar history are retained",
-            days_to_keep,
-        )
-        return False
-
     async def optimize_database(self) -> bool:
         """优化数据库"""
         try:
