@@ -1815,7 +1815,7 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
                     f"dates={item.get('calendar_rows', 0)}, fetched={item.get('fetched', 0)}, "
                     f"fallback_filled={(item.get('date_gap_fill') or {}).get('fallback_filled_dates', 0)}, "
-                    f"unresolved_gaps={(item.get('date_gap_fill') or {}).get('unresolved_dates', 0)}, "
+                    f"fallback_unresolved={(item.get('date_gap_fill') or {}).get('unresolved_dates', 0)}, "
                     f"ohlc_outside={((item.get('quality_diagnostics') or {}).get('ohlc') or {}).get('close_outside_range', 0)}, "
                     f"source_conflicts={cross_source.get('conflict_count', 0)}, "
                     f"first={min(first_dates) if first_dates else 'N/A'}, "
@@ -3089,7 +3089,7 @@ class ScheduledTasks:
             self._active_tasks.discard('find_gap_and_repair')
 
     async def quarterly_cleanup(self,
-                              cleanup_old_quotes: bool = True,
+                              cleanup_old_quotes: bool = False,
                               quote_retention_months: int = 36,
                               cleanup_temp_files: bool = True,
                               cleanup_backup_files: bool = False,
@@ -3099,15 +3099,14 @@ class ScheduledTasks:
         try:
             scheduler_logger.info("[Scheduler] Starting quarterly cleanup...")
 
-            # 清理旧行情数据
+            # 行情历史是研究和回测的基础数据，不能按滚动窗口删除。
             if cleanup_old_quotes:
-                days_to_keep = quote_retention_months * 30  # 转换为天数
-                success = await data_manager.db_ops.cleanup_old_data(days_to_keep=days_to_keep)
-
-                if success:
-                    scheduler_logger.info(f"[Scheduler] Cleaned up quotes older than {quote_retention_months} months")
-                else:
-                    scheduler_logger.warning("[Scheduler] Failed to cleanup old quotes")
+                scheduler_logger.warning(
+                    "[Scheduler] Ignoring deprecated cleanup_old_quotes=true; "
+                    "market quote and trading-calendar history must be retained for research/backtests "
+                    "(requested retention_months=%s)",
+                    quote_retention_months,
+                )
 
             # 清理临时文件
             if cleanup_temp_files:
@@ -3124,7 +3123,7 @@ class ScheduledTasks:
                     cleanup_report_data = {
                         'name': '季度数据清理报告',
                         'status': 'success',  # 明确的成功状态
-                        'tasks_completed': '历史数据清理, 临时文件清理',
+                        'tasks_completed': '临时文件清理, 备份文件清理(如启用)',
                         'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     }
 

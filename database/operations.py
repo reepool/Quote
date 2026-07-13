@@ -2079,34 +2079,18 @@ class DatabaseOperations:
     # === Database Maintenance ===
 
     async def cleanup_old_data(self, days_to_keep: int = 365) -> bool:
-        """清理旧数据"""
-        try:
-            cutoff_date = get_shanghai_time() - timedelta(days=days_to_keep)
+        """Deprecated safety guard for market-history cleanup.
 
-            async with self.get_async_session() as session:
-                # Clean up old daily quotes
-                quotes_delete_stmt = DailyQuoteDB.__table__.delete().where(
-                    DailyQuoteDB.time < cutoff_date
-                )
-                quotes_deleted_res = await session.execute(quotes_delete_stmt)
-                quotes_deleted = quotes_deleted_res.rowcount
-
-                # Clean up old trading calendar data
-                calendar_delete_stmt = TradingCalendarDB.__table__.delete().where(
-                    TradingCalendarDB.date < cutoff_date
-                )
-                calendar_deleted_res = await session.execute(calendar_delete_stmt)
-                calendar_deleted = calendar_deleted_res.rowcount
-
-                # Clean up old data update records
-                updates_deleted = 0 # This table is small, maybe not delete for now.
-                await session.commit()
-                self.db_logger.info(f"Cleaned up old data: {quotes_deleted} quotes, {calendar_deleted} calendar records, {updates_deleted} update records")
-                return True
-
-        except Exception as e:
-            self.db_logger.error(f"Failed to cleanup old data: {e}")
-            return False
+        Daily quote and trading-calendar history are research/backtest inputs, not
+        rolling cache rows.  Retention-tier maintenance belongs in domain-specific
+        storage layers such as the financial hot/history tables.
+        """
+        self.db_logger.warning(
+            "Ignoring deprecated cleanup_old_data(days_to_keep=%s); "
+            "daily_quotes and trading_calendar history are retained",
+            days_to_keep,
+        )
+        return False
 
     async def optimize_database(self) -> bool:
         """优化数据库"""

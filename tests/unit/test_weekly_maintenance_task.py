@@ -128,3 +128,30 @@ async def test_weekly_maintenance_does_not_report_legacy_backup_success(monkeypa
     report_data = task._send_task_report.await_args.kwargs["report_data"]
     backup_entry = report_data["maintenance_tasks"][0]
     assert backup_entry == {"task_name": "数据库备份", "status": "独立任务执行"}
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_quarterly_cleanup_never_deletes_quote_history(monkeypatch):
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task.config = Mock()
+    task.telegram_enabled = False
+    task._send_task_report = AsyncMock()
+    task._cleanup_temp_files = AsyncMock()
+    task._cleanup_backup_files = AsyncMock()
+
+    data_manager = Mock()
+    data_manager.db_ops = Mock()
+    data_manager.db_ops.cleanup_old_data = AsyncMock(return_value=True)
+    monkeypatch.setattr(task_module, "data_manager", data_manager)
+
+    result = await task.quarterly_cleanup(
+        cleanup_old_quotes=True,
+        quote_retention_months=36,
+        cleanup_temp_files=True,
+        cleanup_backup_files=False,
+    )
+
+    assert result is True
+    data_manager.db_ops.cleanup_old_data.assert_not_awaited()
+    task._cleanup_temp_files.assert_awaited_once()

@@ -1658,7 +1658,7 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "主数据 `success`" in report
     assert "日期 `success`" in report
     assert "fallback_filled=7" in report
-    assert "unresolved_gaps=0" in report
+    assert "fallback_unresolved=0" in report
     assert "ohlc_outside=141" in report
     assert "source_conflicts=3" in report
 

@@ -1589,6 +1589,8 @@
 - **`misfire_grace_time`**: `int` (默认: `1800`) —— *当原定计划由于进程锁或忙碌延误错过了，允许它事后弥补执行的最大原谅时间宽度（秒）*
 - **`coalesce`**: `bool` (默认: `True`) —— *如果同类型的发令积压多次错失，恢复后是否合并压缩命令为最新一次单次命令（防止突然雪崩喷发）*
 - **`parameters`**: `Object` /* 当按时激活任务方法时所需往下方传递的特征动作字典形参设定记录集 */
+- **`parameters.cleanup_old_quotes`**: `bool` (默认: `False`) —— *废弃开关，必须保持关闭。行情和交易日历历史是研究/回测基础数据，不允许按滚动保留期删除。*
+- **`parameters.quote_retention_months`**: `int` —— *历史兼容字段；不再用于删除行情历史。*
 #### jobs.cache_warm_up
 
 ```json

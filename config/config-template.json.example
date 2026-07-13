@@ -736,7 +736,7 @@
         "misfire_grace_time": 1800,
         "coalesce": true,
         "parameters": {
-          "cleanup_old_quotes": true,
+          "cleanup_old_quotes": false,
           "quote_retention_months": 36,
           "cleanup_temp_files": true,
           "cleanup_backup_files": false,

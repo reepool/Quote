@@ -283,7 +283,8 @@ async def weekly_data_maintenance(self,
 ### 5. 季度数据清理 (quarterly_cleanup)
 
 #### 功能描述
-每季度执行一次深度清理，删除过期数据。
+每季度执行一次维护性清理，仅用于临时文件和按配置启用的备份文件清理。
+行情库中的 `daily_quotes` 和 `trading_calendar` 是研究、回测和数据质量审计的基础历史数据，不属于滚动缓存，不允许按保留期删除。若历史行情占用空间过大，应通过归档库、分区或冷热存储方案处理，不能直接删除主库历史。
 
 #### 配置示例
 ```json
@@ -303,7 +304,7 @@ async def weekly_data_maintenance(self,
     "misfire_grace_time": 1800,
     "coalesce": true,
     "parameters": {
-      "cleanup_old_quotes": true,
+      "cleanup_old_quotes": false,
       "quote_retention_months": 36,
       "cleanup_temp_files": true,
       "cleanup_backup_files": false,
@@ -312,6 +313,8 @@ async def weekly_data_maintenance(self,
   }
 }
 ```
+
+`cleanup_old_quotes` 是废弃开关，必须保持 `false`。即使旧配置误设为 `true`，调度任务也会忽略该请求并保留行情历史。
 
 ### 6. 数据缺口检测与修复 (find_gap_and_repair)
 
