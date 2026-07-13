@@ -7,7 +7,7 @@ import asyncio
 import json
 import os
 from datetime import datetime, date, timedelta, time
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 
 # Some tests and operator scripts import scheduler.tasks directly. Install the
 # proxy patch before project utility imports can pull in HTTP client stacks.
@@ -2548,6 +2548,69 @@ class ScheduledTasks:
             }
         finally:
             self._active_tasks.discard('daily_data_backfill_range')
+
+    async def delisted_a_share_quote_backfill(
+        self,
+        exchanges: Optional[List[str]] = None,
+        delisted_year_start: Optional[int] = None,
+        delisted_year_end: Optional[int] = None,
+        delisted_start_date: Optional[Union[str, date, datetime]] = None,
+        delisted_end_date: Optional[Union[str, date, datetime]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+        dry_run: bool = True,
+        per_instrument_timeout_sec: Optional[int] = None,
+        fail_fast: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Operator-triggered historical quote backfill for delisted A-share stocks."""
+        self._active_tasks.add('delisted_a_share_quote_backfill')
+        try:
+            scheduler_logger.info(
+                "[Scheduler] Starting delisted A-share quote backfill dry_run=%s exchanges=%s years=%s-%s limit=%s",
+                dry_run,
+                exchanges,
+                delisted_year_start,
+                delisted_year_end,
+                limit,
+            )
+            result = await data_manager.run_delisted_a_share_quote_backfill(
+                exchanges=exchanges,
+                delisted_year_start=delisted_year_start,
+                delisted_year_end=delisted_year_end,
+                delisted_start_date=delisted_start_date,
+                delisted_end_date=delisted_end_date,
+                instrument_ids=instrument_ids,
+                limit=limit,
+                dry_run=dry_run,
+                per_instrument_timeout_sec=per_instrument_timeout_sec,
+                fail_fast=fail_fast,
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data=result,
+                    report_type='maintenance_report',
+                    task_name='退市A股历史行情回补',
+                    job_config=job_config,
+                )
+            return result
+        except Exception as e:
+            scheduler_logger.error("[Scheduler] Delisted A-share quote backfill failed: %s", e)
+            failure = {
+                'operation': 'delisted_a_share_quote_backfill',
+                'status': 'error',
+                'error_message': str(e),
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data=failure,
+                    report_type='maintenance_report',
+                    task_name='退市A股历史行情回补',
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard('delisted_a_share_quote_backfill')
 
     async def weekly_data_maintenance(self,
                                   backup_database: bool = True,

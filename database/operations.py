@@ -307,6 +307,244 @@ class DatabaseOperations:
             self.db_logger.error(f"Failed to get repair universe instruments: {e}")
             return []
 
+    @staticmethod
+    def _normalize_sequence_filter(values: Optional[List[Any]]) -> List[str]:
+        return [str(item).strip() for item in (values or []) if str(item).strip()]
+
+    @staticmethod
+    def _coerce_date_value(value: Any) -> Optional[date]:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        try:
+            return datetime.fromisoformat(str(value)[:10]).date()
+        except Exception:
+            return None
+
+    @staticmethod
+    def _chunked_values(values: List[str], size: int = 800) -> List[List[str]]:
+        return [values[idx: idx + size] for idx in range(0, len(values), size)]
+
+    async def get_delisted_a_share_quote_backfill_candidates(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        delisted_year_start: Optional[int] = None,
+        delisted_year_end: Optional[int] = None,
+        delisted_start_date: Optional[Union[str, date, datetime]] = None,
+        delisted_end_date: Optional[Union[str, date, datetime]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        include_already_covered: bool = False,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """List delisted A-share stocks that need historical quote backfill."""
+        def _to_datetime(value: Optional[Union[str, date, datetime]], end: bool = False) -> Optional[datetime]:
+            if value is None:
+                return None
+            if isinstance(value, datetime):
+                return value
+            if isinstance(value, date):
+                return datetime.combine(value, datetime.max.time() if end else datetime.min.time())
+            parsed = datetime.fromisoformat(str(value)[:10])
+            return datetime.combine(parsed.date(), datetime.max.time() if end else datetime.min.time())
+
+        try:
+            normalized_exchanges = self._normalize_sequence_filter(exchanges) or ['SSE', 'SZSE', 'BSE']
+            normalized_ids = self._normalize_sequence_filter(instrument_ids)
+            start_dt = _to_datetime(delisted_start_date)
+            end_dt = _to_datetime(delisted_end_date, end=True)
+
+            async with self.get_async_session() as session:
+                stmt = (
+                    select(
+                        InstrumentDB.instrument_id,
+                        InstrumentDB.symbol,
+                        InstrumentDB.name,
+                        InstrumentDB.exchange,
+                        InstrumentDB.listed_date,
+                        InstrumentDB.delisted_date,
+                        InstrumentDB.status,
+                        InstrumentDB.is_active,
+                        InstrumentDB.trading_status,
+                        InstrumentDB.source_symbol,
+                    )
+                    .filter(
+                        InstrumentDB.type == 'stock',
+                        InstrumentDB.exchange.in_(normalized_exchanges),
+                        InstrumentDB.listed_date.isnot(None),
+                        InstrumentDB.delisted_date.isnot(None),
+                    )
+                )
+
+                if delisted_year_start is not None:
+                    stmt = stmt.filter(func.strftime('%Y', InstrumentDB.delisted_date) >= str(int(delisted_year_start)))
+                if delisted_year_end is not None:
+                    stmt = stmt.filter(func.strftime('%Y', InstrumentDB.delisted_date) <= str(int(delisted_year_end)))
+                if start_dt is not None:
+                    stmt = stmt.filter(InstrumentDB.delisted_date >= start_dt)
+                if end_dt is not None:
+                    stmt = stmt.filter(InstrumentDB.delisted_date <= end_dt)
+                if normalized_ids:
+                    stmt = stmt.filter(InstrumentDB.instrument_id.in_(normalized_ids))
+
+                stmt = stmt.order_by(InstrumentDB.delisted_date, InstrumentDB.exchange, InstrumentDB.symbol)
+                result = await session.execute(stmt)
+                instrument_rows = [dict(row) for row in result.mappings().all()]
+                instrument_ids_to_check = [row['instrument_id'] for row in instrument_rows if row.get('instrument_id')]
+                coverage_by_id: Dict[str, Dict[str, Any]] = {}
+                for chunk in self._chunked_values(instrument_ids_to_check):
+                    coverage_stmt = (
+                        select(
+                            DailyQuoteDB.instrument_id.label('instrument_id'),
+                            func.count(DailyQuoteDB.instrument_id).label('quote_rows'),
+                            func.min(DailyQuoteDB.time).label('first_quote_date'),
+                            func.max(DailyQuoteDB.time).label('last_quote_date'),
+                        )
+                        .filter(DailyQuoteDB.instrument_id.in_(chunk))
+                        .group_by(DailyQuoteDB.instrument_id)
+                    )
+                    coverage_result = await session.execute(coverage_stmt)
+                    for row in coverage_result.mappings().all():
+                        coverage_by_id[row['instrument_id']] = dict(row)
+
+                rows: List[Dict[str, Any]] = []
+                for item in instrument_rows:
+                    coverage = coverage_by_id.get(item.get('instrument_id'), {})
+                    quote_rows = int(coverage.get('quote_rows') or 0)
+                    first_quote_date = coverage.get('first_quote_date')
+                    last_quote_date = coverage.get('last_quote_date')
+                    listed = self._coerce_date_value(item.get('listed_date'))
+                    delisted = self._coerce_date_value(item.get('delisted_date'))
+                    first_quote = self._coerce_date_value(first_quote_date)
+                    last_quote = self._coerce_date_value(last_quote_date)
+                    if quote_rows <= 0:
+                        coverage_status = 'missing'
+                    elif listed and delisted and first_quote and last_quote and first_quote <= listed and last_quote >= delisted:
+                        coverage_status = 'covered'
+                    else:
+                        coverage_status = 'partial'
+
+                    if not include_already_covered and coverage_status == 'covered':
+                        continue
+
+                    item.update({
+                        'quote_rows': quote_rows,
+                        'first_quote_date': first_quote_date,
+                        'last_quote_date': last_quote_date,
+                        'coverage_status': coverage_status,
+                    })
+                    rows.append(item)
+                    if limit is not None and int(limit) > 0 and len(rows) >= int(limit):
+                        break
+                return rows
+        except Exception as e:
+            self.db_logger.error("Failed to list delisted A-share quote backfill candidates: %s", e)
+            return []
+
+    async def get_delisted_a_share_quote_coverage_by_year(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        delisted_year_start: Optional[int] = None,
+        delisted_year_end: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Summarize local quote coverage for delisted A-share stocks by delisted year."""
+        try:
+            normalized_exchanges = self._normalize_sequence_filter(exchanges) or ['SSE', 'SZSE', 'BSE']
+            async with self.get_async_session() as session:
+                year = func.strftime('%Y', InstrumentDB.delisted_date)
+                stmt = (
+                    select(
+                        InstrumentDB.instrument_id,
+                        InstrumentDB.listed_date,
+                        InstrumentDB.delisted_date,
+                        year.label('delisted_year'),
+                    )
+                    .filter(
+                        InstrumentDB.type == 'stock',
+                        InstrumentDB.exchange.in_(normalized_exchanges),
+                        InstrumentDB.listed_date.isnot(None),
+                        InstrumentDB.delisted_date.isnot(None),
+                    )
+                    .order_by(year)
+                )
+                if delisted_year_start is not None:
+                    stmt = stmt.filter(year >= str(int(delisted_year_start)))
+                if delisted_year_end is not None:
+                    stmt = stmt.filter(year <= str(int(delisted_year_end)))
+                stmt = stmt.order_by(year, InstrumentDB.instrument_id)
+                result = await session.execute(stmt)
+                instrument_rows = [dict(row) for row in result.mappings().all()]
+                instrument_ids_to_check = [row['instrument_id'] for row in instrument_rows if row.get('instrument_id')]
+                coverage_by_id: Dict[str, Dict[str, Any]] = {}
+                for chunk in self._chunked_values(instrument_ids_to_check):
+                    coverage_stmt = (
+                        select(
+                            DailyQuoteDB.instrument_id.label('instrument_id'),
+                            func.count(DailyQuoteDB.instrument_id).label('quote_rows'),
+                            func.min(DailyQuoteDB.time).label('first_quote_date'),
+                            func.max(DailyQuoteDB.time).label('last_quote_date'),
+                        )
+                        .filter(DailyQuoteDB.instrument_id.in_(chunk))
+                        .group_by(DailyQuoteDB.instrument_id)
+                    )
+                    coverage_result = await session.execute(coverage_stmt)
+                    for row in coverage_result.mappings().all():
+                        coverage_by_id[row['instrument_id']] = dict(row)
+
+                grouped: Dict[str, Dict[str, Any]] = {}
+                for item in instrument_rows:
+                    delisted_year = str(item.get('delisted_year') or '')
+                    if not delisted_year:
+                        continue
+                    bucket = grouped.setdefault(delisted_year, {
+                        'delisted_year': delisted_year,
+                        'instrument_count': 0,
+                        'with_quotes_count': 0,
+                        'no_quotes_count': 0,
+                        'covered_count': 0,
+                        'first_quote_date': None,
+                        'last_quote_date': None,
+                    })
+                    bucket['instrument_count'] += 1
+                    coverage = coverage_by_id.get(item.get('instrument_id'), {})
+                    quote_rows = int(coverage.get('quote_rows') or 0)
+                    first_quote = self._coerce_date_value(coverage.get('first_quote_date'))
+                    last_quote = self._coerce_date_value(coverage.get('last_quote_date'))
+                    listed = self._coerce_date_value(item.get('listed_date'))
+                    delisted = self._coerce_date_value(item.get('delisted_date'))
+
+                    if quote_rows > 0:
+                        bucket['with_quotes_count'] += 1
+                        raw_first = coverage.get('first_quote_date')
+                        raw_last = coverage.get('last_quote_date')
+                        if raw_first is not None and (
+                            bucket['first_quote_date'] is None or raw_first < bucket['first_quote_date']
+                        ):
+                            bucket['first_quote_date'] = raw_first
+                        if raw_last is not None and (
+                            bucket['last_quote_date'] is None or raw_last > bucket['last_quote_date']
+                        ):
+                            bucket['last_quote_date'] = raw_last
+                    else:
+                        bucket['no_quotes_count'] += 1
+
+                    if quote_rows > 0 and listed and delisted and first_quote and last_quote and first_quote <= listed and last_quote >= delisted:
+                        bucket['covered_count'] += 1
+
+                rows = []
+                for delisted_year in sorted(grouped):
+                    item = grouped[delisted_year]
+                    item['uncovered_count'] = item['instrument_count'] - item['covered_count']
+                    rows.append(item)
+                return rows
+        except Exception as e:
+            self.db_logger.error("Failed to summarize delisted A-share quote coverage: %s", e)
+            return []
+
     async def get_existing_data_dates(self, instrument_id: str, start_date: date, end_date: date) -> List[date]:
         """获取指定品种的已有数据日期"""
         try:

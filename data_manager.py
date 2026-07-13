@@ -13646,6 +13646,229 @@ class DataManager:
         except Exception:
             return None
 
+    @staticmethod
+    def _bounded_samples(items: List[Dict[str, Any]], limit: int = 10) -> List[Dict[str, Any]]:
+        samples: List[Dict[str, Any]] = []
+        for item in items[: max(0, int(limit or 0))]:
+            samples.append({
+                'instrument_id': item.get('instrument_id'),
+                'symbol': item.get('symbol'),
+                'name': item.get('name'),
+                'exchange': item.get('exchange'),
+                'listed_date': DataManager._date_text(item.get('listed_date')),
+                'delisted_date': DataManager._date_text(item.get('delisted_date')),
+                'quote_rows': int(item.get('quote_rows') or 0),
+                'first_quote_date': DataManager._date_text(item.get('first_quote_date')),
+                'last_quote_date': DataManager._date_text(item.get('last_quote_date')),
+                'coverage_status': item.get('coverage_status'),
+            })
+        return samples
+
+    async def get_delisted_a_share_quote_backfill_coverage(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        delisted_year_start: Optional[int] = None,
+        delisted_year_end: Optional[int] = None,
+        instrument_ids: Optional[List[str]] = None,
+        include_already_covered: bool = False,
+        limit: Optional[int] = None,
+        sample_limit: int = 10,
+    ) -> Dict[str, Any]:
+        """Return local coverage evidence for delisted A-share quote backfill."""
+        candidates = await self.db_ops.get_delisted_a_share_quote_backfill_candidates(
+            exchanges=exchanges,
+            delisted_year_start=delisted_year_start,
+            delisted_year_end=delisted_year_end,
+            instrument_ids=instrument_ids,
+            include_already_covered=include_already_covered,
+            limit=limit,
+        )
+        by_year = await self.db_ops.get_delisted_a_share_quote_coverage_by_year(
+            exchanges=exchanges,
+            delisted_year_start=delisted_year_start,
+            delisted_year_end=delisted_year_end,
+        )
+        status_counts = Counter(str(item.get('coverage_status') or 'unknown') for item in candidates)
+        return {
+            'status': 'success',
+            'target_count': len(candidates),
+            'coverage_status_counts': dict(status_counts),
+            'coverage_by_year': by_year,
+            'samples': self._bounded_samples(candidates, sample_limit),
+        }
+
+    async def run_delisted_a_share_quote_backfill(
+        self,
+        *,
+        exchanges: Optional[List[str]] = None,
+        delisted_year_start: Optional[int] = None,
+        delisted_year_end: Optional[int] = None,
+        delisted_start_date: Optional[Union[str, date, datetime]] = None,
+        delisted_end_date: Optional[Union[str, date, datetime]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        include_already_covered: bool = False,
+        limit: Optional[int] = None,
+        dry_run: bool = True,
+        per_instrument_timeout_sec: Optional[int] = None,
+        fail_fast: bool = False,
+        sample_limit: int = 10,
+        progress_log_every: int = 25,
+    ) -> Dict[str, Any]:
+        """Backfill historical quotes for locally known delisted A-share stocks."""
+        started_at = get_shanghai_time()
+        candidates = await self.db_ops.get_delisted_a_share_quote_backfill_candidates(
+            exchanges=exchanges,
+            delisted_year_start=delisted_year_start,
+            delisted_year_end=delisted_year_end,
+            delisted_start_date=delisted_start_date,
+            delisted_end_date=delisted_end_date,
+            instrument_ids=instrument_ids,
+            include_already_covered=include_already_covered,
+            limit=limit,
+        )
+        coverage_before = await self.db_ops.get_delisted_a_share_quote_coverage_by_year(
+            exchanges=exchanges,
+            delisted_year_start=delisted_year_start,
+            delisted_year_end=delisted_year_end,
+        )
+        result: Dict[str, Any] = {
+            'operation': 'delisted_a_share_quote_backfill',
+            'dry_run': bool(dry_run),
+            'started_at': started_at.isoformat(),
+            'filters': {
+                'exchanges': exchanges or ['SSE', 'SZSE', 'BSE'],
+                'delisted_year_start': delisted_year_start,
+                'delisted_year_end': delisted_year_end,
+                'delisted_start_date': self._date_text(delisted_start_date),
+                'delisted_end_date': self._date_text(delisted_end_date),
+                'instrument_ids': instrument_ids or [],
+                'include_already_covered': include_already_covered,
+                'limit': limit,
+            },
+            'target_count': len(candidates),
+            'processed_count': 0,
+            'already_covered_count': 0,
+            'saved_rows': 0,
+            'source_empty_count': 0,
+            'failure_count': 0,
+            'timeout_count': 0,
+            'skipped_lifecycle_count': 0,
+            'coverage_before': coverage_before,
+            'samples': {
+                'targets': self._bounded_samples(candidates, sample_limit),
+                'source_empty': [],
+                'failures': [],
+                'skipped_lifecycle': [],
+                'saved': [],
+            },
+            'errors': [],
+        }
+
+        if dry_run:
+            result['status'] = 'dry_run'
+            result['finished_at'] = get_shanghai_time().isoformat()
+            return result
+
+        if self.source_factory is None:
+            from data_sources.source_factory import get_data_source_factory
+
+            self.source_factory = await get_data_source_factory(self.db_ops)
+
+        sample_limit = max(0, int(sample_limit or 0))
+        for idx, instrument in enumerate(candidates, start=1):
+            instrument_id = instrument.get('instrument_id')
+            listed = self._date_from_any(instrument.get('listed_date'))
+            delisted = self._date_from_any(instrument.get('delisted_date'))
+            if not listed or not delisted or listed > delisted:
+                result['skipped_lifecycle_count'] += 1
+                if len(result['samples']['skipped_lifecycle']) < sample_limit:
+                    result['samples']['skipped_lifecycle'].append(self._bounded_samples([instrument], 1)[0])
+                continue
+
+            if instrument.get('coverage_status') == 'covered' and not include_already_covered:
+                result['already_covered_count'] += 1
+                continue
+
+            async def _fetch() -> list:
+                return await self.source_factory.get_daily_data(
+                    instrument.get('exchange'),
+                    instrument_id,
+                    instrument.get('symbol'),
+                    datetime.combine(listed, datetime.min.time()),
+                    datetime.combine(delisted, datetime.max.time()),
+                    instrument_type='stock',
+                    source_symbol=instrument.get('source_symbol') or '',
+                )
+
+            try:
+                if per_instrument_timeout_sec:
+                    rows = await asyncio.wait_for(_fetch(), timeout=per_instrument_timeout_sec)
+                else:
+                    rows = await _fetch()
+                result['processed_count'] += 1
+                if rows:
+                    await self.db_ops.save_daily_quotes(rows)
+                    result['saved_rows'] += len(rows)
+                    if len(result['samples']['saved']) < sample_limit:
+                        result['samples']['saved'].append({
+                            'instrument_id': instrument_id,
+                            'symbol': instrument.get('symbol'),
+                            'name': instrument.get('name'),
+                            'exchange': instrument.get('exchange'),
+                            'rows': len(rows),
+                            'start_date': listed.isoformat(),
+                            'end_date': delisted.isoformat(),
+                        })
+                else:
+                    result['source_empty_count'] += 1
+                    if len(result['samples']['source_empty']) < sample_limit:
+                        result['samples']['source_empty'].append(self._bounded_samples([instrument], 1)[0])
+            except asyncio.TimeoutError:
+                result['processed_count'] += 1
+                result['timeout_count'] += 1
+                result['failure_count'] += 1
+                message = f"{instrument_id}: timeout after {per_instrument_timeout_sec}s"
+                result['errors'].append(message)
+                if len(result['samples']['failures']) < sample_limit:
+                    failure = self._bounded_samples([instrument], 1)[0]
+                    failure['error'] = message
+                    result['samples']['failures'].append(failure)
+                if fail_fast:
+                    break
+            except Exception as exc:
+                result['processed_count'] += 1
+                result['failure_count'] += 1
+                message = f"{instrument_id}: {exc}"
+                result['errors'].append(message)
+                if len(result['samples']['failures']) < sample_limit:
+                    failure = self._bounded_samples([instrument], 1)[0]
+                    failure['error'] = str(exc)
+                    result['samples']['failures'].append(failure)
+                if fail_fast:
+                    break
+
+            if progress_log_every and idx % int(progress_log_every) == 0:
+                dm_logger.info(
+                    "[DataManager] Delisted A-share quote backfill progress: %s/%s saved_rows=%s empty=%s failures=%s",
+                    idx,
+                    len(candidates),
+                    result['saved_rows'],
+                    result['source_empty_count'],
+                    result['failure_count'],
+                )
+
+        result['coverage_after'] = await self.db_ops.get_delisted_a_share_quote_coverage_by_year(
+            exchanges=exchanges,
+            delisted_year_start=delisted_year_start,
+            delisted_year_end=delisted_year_end,
+        )
+        result['status'] = 'success' if result['failure_count'] == 0 else 'warning'
+        finished_at = get_shanghai_time()
+        result['finished_at'] = finished_at.isoformat()
+        result['elapsed_sec'] = round((finished_at - started_at).total_seconds(), 3)
+        return result
+
     def _build_index_metadata_rows(
         self,
         rows: List[Dict[str, Any]],
