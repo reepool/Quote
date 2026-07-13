@@ -842,6 +842,7 @@
             "cn_100ppi_styrene",
             "cn_100ppi_urea",
             "cn_100ppi_caustic_soda",
+            "cn_100ppi_soda_ash",
             "cn_nbs_thermal_coal"
           ],
           "lookback_days": 10,

@@ -1763,6 +1763,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_styrene",
         "cn_100ppi_urea",
         "cn_100ppi_caustic_soda",
+        "cn_100ppi_soda_ash",
         "cn_nbs_thermal_coal",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
@@ -2134,6 +2135,8 @@ def test_known_100ppi_expansion_scopes_use_the_existing_production_selector(tmp_
     assert caustic_soda.metadata["source_available_from"] == "2023-09-15"
     soda_ash = selector.resolve(scope_id="cn_100ppi_soda_ash")[0]
     assert soda_ash.metadata["source_available_from"] == "2020-06-01"
+    glass = selector.resolve(scope_id="cn_100ppi_glass")[0]
+    assert glass.metadata["source_available_from"] == "2013-01-04"
 
 
 def test_catalog_retires_candidate_once_source_symbol_is_formal_series(tmp_path):
