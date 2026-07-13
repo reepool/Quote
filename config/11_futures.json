@@ -1856,6 +1856,7 @@
             "akshare_start_argument": "start_day", "akshare_end_argument": "end_day", "akshare_date_format": "compact",
             "date_column": "date", "value_column": "spot_price", "raw_unit": "CNY/ton",
             "expected_calendar_exchange": "CZCE", "progress_log_interval_seconds": 60,
+            "source_available_from": "2020-06-01",
             "region_or_spec": "China soda ash spot reference; grade, region and tax basis follow 100ppi publication",
             "source_name": "100ppi soda ash spot reference", "source_url": "https://www.100ppi.com/sf/"
           }
