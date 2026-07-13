@@ -180,3 +180,27 @@ async def test_latest_watermark_supports_empty_and_multiple_domains(tmp_path):
         assert all_watermark["latest_sequence"] == 2
     finally:
         await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_changelog_domain_can_be_disabled_without_blocking_source_writes(tmp_path):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_instrument(manager)
+        ops.config_manager.get_nested = lambda path, default=None: {
+            "enabled": True,
+            "domains": {"quotes": False},
+            "datasets": {"daily_quotes": True},
+        } if path == "database_config.change_watermark" else default
+
+        stats = await ops.save_daily_quotes([_quote()], return_stats=True)
+        changes = await ops.get_data_changes(domain="quotes", dataset="daily_quotes", since_sequence=0)
+
+        assert stats["inserted"] == 1
+        assert stats["changelog_written"] == 0
+        assert changes["count"] == 0
+        with manager.get_session() as session:
+            quote = session.query(DailyQuoteDB).one()
+            assert quote.close == 10.5
+    finally:
+        await manager.close_async()

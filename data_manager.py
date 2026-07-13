@@ -10911,6 +10911,14 @@ class DataManager:
         try:
             db_stats = await self.db_ops.get_database_statistics(fast_mode=True)
             source_health = await self.source_factory.health_check_all()
+            try:
+                change_watermarks = await self.db_ops.get_change_watermark_health()
+            except Exception as watermark_e:
+                dm_logger.warning(
+                    "[DataManager] Failed to collect change watermark health: %s",
+                    watermark_e,
+                )
+                change_watermarks = {"status": "error", "error": str(watermark_e)}
 
             return {
                 'data_manager': {
@@ -10926,6 +10934,7 @@ class DataManager:
                     }
                 },
                 'database': db_stats,
+                'change_watermarks': change_watermarks,
                 'data_sources': source_health,
                 'timestamp': get_shanghai_time()
             }

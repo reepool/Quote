@@ -218,6 +218,19 @@ class DatabaseOperations:
             "changelog_written": 0,
         }
 
+    def _is_changelog_enabled(self, domain: str, dataset: str) -> bool:
+        """Return whether one domain/dataset should emit persistent changelog rows."""
+        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
+        if not cfg.get("enabled", True):
+            return False
+        domains = cfg.get("domains") or {}
+        datasets = cfg.get("datasets") or {}
+        if domain in domains and not bool(domains[domain]):
+            return False
+        if dataset in datasets and not bool(datasets[dataset]):
+            return False
+        return True
+
     @staticmethod
     def _change_log_record(
         *,
@@ -1983,6 +1996,7 @@ class DatabaseOperations:
             return self._empty_write_stats() if return_stats else True
         stats = self._empty_write_stats()
         try:
+            emit_changelog = self._is_changelog_enabled("quotes", "daily_quotes")
             async with self.get_async_session() as session:
                 chunk_size = 1000
                 for i in range(0, len(quotes), chunk_size):
@@ -2019,24 +2033,25 @@ class DatabaseOperations:
                         if existing is None:
                             row = DailyQuoteDB(**payload, row_version=1)
                             session.add(row)
-                            session.add(self._change_log_record(
-                                domain="quotes",
-                                dataset="daily_quotes",
-                                change_type="insert",
-                                business_key={
-                                    "instrument_id": payload["instrument_id"],
-                                    "trade_date": payload["time"].date().isoformat(),
-                                },
-                                instrument_id=payload["instrument_id"],
-                                observation_date=payload["time"],
-                                old_hash=None,
-                                new_hash=payload["row_hash"],
-                                row_version=1,
-                                source=payload.get("source"),
-                                batch_id=payload.get("batch_id"),
-                            ))
+                            if emit_changelog:
+                                session.add(self._change_log_record(
+                                    domain="quotes",
+                                    dataset="daily_quotes",
+                                    change_type="insert",
+                                    business_key={
+                                        "instrument_id": payload["instrument_id"],
+                                        "trade_date": payload["time"].date().isoformat(),
+                                    },
+                                    instrument_id=payload["instrument_id"],
+                                    observation_date=payload["time"],
+                                    old_hash=None,
+                                    new_hash=payload["row_hash"],
+                                    row_version=1,
+                                    source=payload.get("source"),
+                                    batch_id=payload.get("batch_id"),
+                                ))
+                                stats["changelog_written"] += 1
                             stats["inserted"] += 1
-                            stats["changelog_written"] += 1
                             continue
 
                         old_hash = existing.row_hash or self._daily_quote_hash({
@@ -2080,24 +2095,25 @@ class DatabaseOperations:
                         existing.row_hash = payload["row_hash"]
                         existing.row_version = next_version
                         existing.updated_at = get_shanghai_time()
-                        session.add(self._change_log_record(
-                            domain="quotes",
-                            dataset="daily_quotes",
-                            change_type="update",
-                            business_key={
-                                "instrument_id": payload["instrument_id"],
-                                "trade_date": payload["time"].date().isoformat(),
-                            },
-                            instrument_id=payload["instrument_id"],
-                            observation_date=payload["time"],
-                            old_hash=old_hash,
-                            new_hash=payload["row_hash"],
-                            row_version=next_version,
-                            source=payload.get("source"),
-                            batch_id=payload.get("batch_id"),
-                        ))
+                        if emit_changelog:
+                            session.add(self._change_log_record(
+                                domain="quotes",
+                                dataset="daily_quotes",
+                                change_type="update",
+                                business_key={
+                                    "instrument_id": payload["instrument_id"],
+                                    "trade_date": payload["time"].date().isoformat(),
+                                },
+                                instrument_id=payload["instrument_id"],
+                                observation_date=payload["time"],
+                                old_hash=old_hash,
+                                new_hash=payload["row_hash"],
+                                row_version=next_version,
+                                source=payload.get("source"),
+                                batch_id=payload.get("batch_id"),
+                            ))
+                            stats["changelog_written"] += 1
                         stats["changed"] += 1
-                        stats["changelog_written"] += 1
 
                 await session.commit()
 
@@ -2278,7 +2294,9 @@ class DatabaseOperations:
             raise ValueError("since_sequence must be >= 0")
         if limit <= 0:
             raise ValueError("limit must be > 0")
-        limit = min(int(limit), 5000)
+        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
+        max_limit = int(cfg.get("max_limit", 5000) or 5000)
+        limit = min(int(limit), max_limit)
 
         start_dt = self._coerce_datetime(start_date)
         end_dt = self._coerce_datetime(end_date)
@@ -2323,6 +2341,54 @@ class DatabaseOperations:
                 "limit": limit,
                 "count": len(changes),
                 "changes": changes,
+            }
+
+    async def get_change_watermark_health(self) -> Dict[str, Any]:
+        """Return a compact operational health snapshot for P0 change watermarks."""
+        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
+        domains = {
+            "quotes": bool((cfg.get("domains") or {}).get("quotes", True)),
+            "adjustment_factor": bool(
+                (cfg.get("domains") or {}).get("adjustment_factor", True)
+            ),
+        }
+        datasets = {
+            "daily_quotes": bool((cfg.get("datasets") or {}).get("daily_quotes", True)),
+            "adjustment_factors": bool(
+                (cfg.get("datasets") or {}).get("adjustment_factors", True)
+            ),
+        }
+        try:
+            async with self.get_async_session() as session:
+                total_rows = await session.scalar(select(func.count(DataChangeLogDB.sequence_id)))
+                latest_rows = await session.execute(
+                    select(DataChangeLogDB.domain, func.max(DataChangeLogDB.sequence_id))
+                    .group_by(DataChangeLogDB.domain)
+                    .order_by(DataChangeLogDB.domain)
+                )
+                latest_by_domain = {
+                    domain: int(sequence or 0)
+                    for domain, sequence in latest_rows.all()
+                }
+            return {
+                "enabled": bool(cfg.get("enabled", True)),
+                "domains": domains,
+                "datasets": datasets,
+                "latest_by_domain": latest_by_domain,
+                "total_change_rows": int(total_rows or 0),
+                "default_limit": int(cfg.get("default_limit", 1000) or 1000),
+                "max_limit": int(cfg.get("max_limit", 5000) or 5000),
+            }
+        except Exception as e:
+            self.db_logger.error("Failed to get change watermark health: %s", e)
+            return {
+                "enabled": bool(cfg.get("enabled", True)),
+                "domains": domains,
+                "datasets": datasets,
+                "latest_by_domain": {},
+                "total_change_rows": 0,
+                "status": "error",
+                "error": str(e),
             }
 
     async def get_latest_quote_date(self, instrument_id: str) -> Optional[datetime]:
@@ -3205,6 +3271,9 @@ class DatabaseOperations:
         saved_count = 0
         stats = self._empty_write_stats()
         try:
+            emit_changelog = self._is_changelog_enabled(
+                "adjustment_factor", "adjustment_factors"
+            )
             async with self.get_async_session() as session:
                 for f in factors:
                     try:
@@ -3256,23 +3325,24 @@ class DatabaseOperations:
                             existing.row_hash = payload["row_hash"]
                             existing.row_version = next_version
                             existing.updated_at = get_shanghai_time()
-                            session.add(self._change_log_record(
-                                domain="adjustment_factor",
-                                dataset="adjustment_factors",
-                                change_type="update",
-                                business_key={
-                                    "instrument_id": instrument_id,
-                                    "ex_date": ex_date.date().isoformat(),
-                                },
-                                instrument_id=instrument_id,
-                                observation_date=ex_date,
-                                old_hash=old_hash,
-                                new_hash=payload["row_hash"],
-                                row_version=next_version,
-                                source=payload.get("source"),
-                            ))
+                            if emit_changelog:
+                                session.add(self._change_log_record(
+                                    domain="adjustment_factor",
+                                    dataset="adjustment_factors",
+                                    change_type="update",
+                                    business_key={
+                                        "instrument_id": instrument_id,
+                                        "ex_date": ex_date.date().isoformat(),
+                                    },
+                                    instrument_id=instrument_id,
+                                    observation_date=ex_date,
+                                    old_hash=old_hash,
+                                    new_hash=payload["row_hash"],
+                                    row_version=next_version,
+                                    source=payload.get("source"),
+                                ))
+                                stats["changelog_written"] += 1
                             stats["changed"] += 1
-                            stats["changelog_written"] += 1
                         else:
                             # 新增
                             new_record = AdjustmentFactorDB(
@@ -3290,23 +3360,24 @@ class DatabaseOperations:
                                 row_version=1,
                             )
                             session.add(new_record)
-                            session.add(self._change_log_record(
-                                domain="adjustment_factor",
-                                dataset="adjustment_factors",
-                                change_type="insert",
-                                business_key={
-                                    "instrument_id": instrument_id,
-                                    "ex_date": ex_date.date().isoformat(),
-                                },
-                                instrument_id=instrument_id,
-                                observation_date=ex_date,
-                                old_hash=None,
-                                new_hash=payload["row_hash"],
-                                row_version=1,
-                                source=payload.get("source"),
-                            ))
+                            if emit_changelog:
+                                session.add(self._change_log_record(
+                                    domain="adjustment_factor",
+                                    dataset="adjustment_factors",
+                                    change_type="insert",
+                                    business_key={
+                                        "instrument_id": instrument_id,
+                                        "ex_date": ex_date.date().isoformat(),
+                                    },
+                                    instrument_id=instrument_id,
+                                    observation_date=ex_date,
+                                    old_hash=None,
+                                    new_hash=payload["row_hash"],
+                                    row_version=1,
+                                    source=payload.get("source"),
+                                ))
+                                stats["changelog_written"] += 1
                             stats["inserted"] += 1
-                            stats["changelog_written"] += 1
 
                         saved_count += 1
                     except Exception as row_e:

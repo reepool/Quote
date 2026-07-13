@@ -40,6 +40,12 @@ http://localhost:8000/api/v1
 ### GET /api/v1/system/status
 返回系统状态详情（与 `SystemStatusResponse` 结构一致）。
 
+增量水位补充字段：
+- `change_watermarks.enabled`：全局 changelog emission 开关。
+- `change_watermarks.domains` / `datasets`：P0 域和数据集开关。
+- `change_watermarks.latest_by_domain`：各域最新 `sequence_id`。
+- `change_watermarks.total_change_rows`：quote DB 内 changelog 明细行数。
+
 ---
 
 ## 交易品种（Instruments）
@@ -151,7 +157,7 @@ curl "http://localhost:8000/api/v1/changes/latest?domain=quotes&dataset=daily_qu
 - `domain`、`dataset`
 - `instrument_id`、`series_id`
 - `start_date`、`end_date`
-- `limit`：默认 `1000`，最大 `5000`
+- `limit`：默认 `1000`，最大值由 `database_config.change_watermark.max_limit` 控制，当前默认 `5000`
 
 响应字段：
 - `changes`：只包含变化键和元数据，不返回完整行情行
@@ -163,6 +169,7 @@ curl "http://localhost:8000/api/v1/changes/latest?domain=quotes&dataset=daily_qu
 - `quotes` 域表示 raw 日行情行变化。
 - `adjustment_factor` 域表示复权因子变化；`adjust=none` 消费者可只关注 raw quote，qfq/hfq 消费者需要同时关注复权因子。
 - 现有 `/quotes/daily` 是补拉完整数据的接口，默认行为不变。
+- 如果 `database_config.change_watermark.enabled=false` 或对应 domain/dataset 被关闭，源表仍会写入，但不会新增 changelog 或推进水位。
 
 示例：
 ```bash

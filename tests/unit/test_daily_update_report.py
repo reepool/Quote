@@ -116,6 +116,28 @@ async def test_generate_daily_update_report_includes_changelog_stats():
 
 
 @pytest.mark.asyncio
+async def test_system_status_includes_change_watermark_health():
+    with patch('data_manager.config_manager', _build_config_manager()):
+        manager = DataManager()
+
+    manager.db_ops = Mock()
+    manager.db_ops.get_database_statistics = AsyncMock(return_value={'fast_mode': True})
+    manager.db_ops.get_change_watermark_health = AsyncMock(return_value={
+        'enabled': True,
+        'latest_by_domain': {'quotes': 3},
+        'total_change_rows': 3,
+    })
+    manager.source_factory = Mock()
+    manager.source_factory.health_check_all = AsyncMock(return_value={'akshare': True})
+
+    status = await manager.get_system_status()
+
+    assert status['database'] == {'fast_mode': True}
+    assert status['change_watermarks']['latest_by_domain']['quotes'] == 3
+    assert status['data_sources'] == {'akshare': True}
+
+
+@pytest.mark.asyncio
 async def test_generate_daily_update_report_marks_idempotent_noop_as_successful():
     with patch('data_manager.config_manager', _build_config_manager()):
         manager = DataManager()

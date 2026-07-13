@@ -374,6 +374,26 @@ GET /api/v1/quotes/daily/changes?since_sequence=12345&exchange=SSE
 - 支持最大 changelog 页大小、默认页大小。
 - 支持任务报告是否显示零值计数。
 
+P0 当前配置位于 `config/04_database.json` 的 `database_config.change_watermark`：
+
+```json
+{
+  "enabled": true,
+  "default_limit": 1000,
+  "max_limit": 5000,
+  "domains": {
+    "quotes": true,
+    "adjustment_factor": true
+  },
+  "datasets": {
+    "daily_quotes": true,
+    "adjustment_factors": true
+  }
+}
+```
+
+关闭某个 domain/dataset 后，源表写入仍照常执行，`inserted/changed/unchanged` 仍可统计，但不新增 changelog 行、也不推进水位。
+
 运维要求：
 
 - 健康检查能看到各域 latest sequence。
@@ -479,6 +499,7 @@ GET /api/v1/quotes/daily/changes?since_sequence=12345&exchange=SSE
   - `GET /api/v1/changes/latest?domain=quotes&dataset=daily_quotes`
   - `GET /api/v1/changes?domain=quotes&dataset=daily_quotes&since_sequence=123&limit=1000`
   - `GET /api/v1/quotes/daily/changes?since_sequence=123&instrument_id=000001.SZ`
+- `/api/v1/system/status` 增加 `change_watermarks` 摘要，包含 P0 域开关、各域 latest sequence、changelog 总行数和分页配置。
 - `/api/v1/quotes/daily` 默认查询参数、响应结构和补拉方式不变。
 
 ### 16.2 P0 语义 hash 字段
@@ -536,7 +557,8 @@ GET /api/v1/quotes/daily/changes?since_sequence=12345&exchange=SSE
 回滚方式：
 
 - 不删除源表字段和 changelog 表。
-- 如某域出现噪声，先停用该域写入路径的 changelog emission 或回退调用方使用原 API。
+- 如某域出现噪声，先在 `database_config.change_watermark.domains` 或 `datasets` 中关闭该域/数据集的 changelog emission，源表写入不受影响。
+- 如全局需要降级，可设置 `database_config.change_watermark.enabled=false`，后续写入不再推进水位；已存在 changelog 保留供排查。
 - 源表仍是权威数据；changelog 只是本地已观测增量信号。
 
 ### 16.5 已验证测试
@@ -558,6 +580,8 @@ GET /api/v1/quotes/daily/changes?since_sequence=12345&exchange=SSE
 - OHLCV 变化推进水位并递增 row version。
 - 复权因子修订进入 `adjustment_factor` 域。
 - API 空水位、分页、domain/dataset 过滤可用。
+- domain/dataset 开关关闭时源表仍写入但不推进水位。
+- `/system/status` 暴露 `change_watermarks` 健康摘要。
 - `/quotes/daily` 默认行为未回归。
 
 ### 16.6 未解决和后续风险
@@ -565,4 +589,4 @@ GET /api/v1/quotes/daily/changes?since_sequence=12345&exchange=SSE
 - P1/P2/P3 尚未把 futures、FX、commodity、research、governance、policy 写入路径接入 changelog；本次只是完成 P0 和审计矩阵。
 - 当前 `data_change_log.sequence_id` 是 quote DB 内单库水位，不承诺跨 futures/research/FX 多库全局顺序。
 - 详细 changelog 暂不做 retention/compaction；在消费者 checkpoint 策略确定前不得清理明细记录。
-- 后续如果增加按域开关，默认应先灰度启用，避免某个数据源字段抖动制造噪声。
+- P0 已有按域/数据集开关；P1/P2/P3 接入前必须先定义各自默认开关和灰度策略，避免某个数据源字段抖动制造噪声。
