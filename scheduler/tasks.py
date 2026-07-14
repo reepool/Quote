@@ -1853,6 +1853,34 @@ def _resolve_special_commodity_sync_window(
     return resolved_start.isoformat(), resolved_end.isoformat()
 
 
+def _resolve_special_commodity_task_window(
+    start_date: Optional[str],
+    end_date: Optional[str],
+    *,
+    lookback_days: int,
+    window_mode: str,
+    as_of_date: Optional[date] = None,
+) -> tuple[Optional[str], Optional[str]]:
+    """Resolve rolling windows or leave latest-snapshot sources unbounded."""
+    normalized_mode = str(window_mode or "rolling").strip().lower()
+    if normalized_mode == "rolling":
+        return _resolve_special_commodity_sync_window(
+            start_date,
+            end_date,
+            lookback_days=lookback_days,
+            as_of_date=as_of_date,
+        )
+    if normalized_mode == "provider_latest":
+        if bool(start_date) != bool(end_date):
+            raise ValueError(
+                "special commodity provider_latest sync requires both start_date and end_date"
+            )
+        if start_date and end_date:
+            return str(start_date)[:10], str(end_date)[:10]
+        return None, None
+    raise ValueError(f"unsupported special commodity window_mode: {window_mode}")
+
+
 def _resolve_special_commodity_monthly_sync_window(
     start_date: Optional[str],
     end_date: Optional[str],
@@ -4243,6 +4271,7 @@ class ScheduledTasks:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         lookback_days: int = 10,
+        window_mode: str = 'rolling',
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
         _task_id: str = 'special_commodity_price_sync',
@@ -4251,18 +4280,20 @@ class ScheduledTasks:
         """特殊商品价格/指数观测值同步任务。"""
         self._active_tasks.add(_task_id)
         try:
-            start_date, end_date = _resolve_special_commodity_sync_window(
+            start_date, end_date = _resolve_special_commodity_task_window(
                 start_date,
                 end_date,
                 lookback_days=lookback_days,
+                window_mode=window_mode,
             )
             scheduler_logger.info(
-                "[Scheduler] Starting special commodity price sync: scope_id=%s scope_ids=%s start=%s end=%s lookback_days=%s dry_run=%s",
+                "[Scheduler] Starting special commodity price sync: scope_id=%s scope_ids=%s start=%s end=%s lookback_days=%s window_mode=%s dry_run=%s",
                 scope_id,
                 scope_ids,
                 start_date,
                 end_date,
                 lookback_days,
+                window_mode,
                 dry_run,
             )
             result = await data_manager.run_special_commodity_price_sync(
@@ -4342,6 +4373,41 @@ class ScheduledTasks:
             job_config=job_config,
             _task_id='special_commodity_cn_spot_sync',
             _task_name='国内特殊商品现货维护',
+        )
+
+    async def special_commodity_industrial_indicator_sync(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        lookback_days: int = 10,
+        window_mode: str = 'provider_latest',
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """产业指标同步，复用特殊商品治理链路并尊重来源窗口。"""
+        return await self.special_commodity_price_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            venues=venues,
+            categories=categories,
+            commodity_ids=commodity_ids,
+            series_ids=series_ids,
+            frequencies=frequencies,
+            start_date=start_date,
+            end_date=end_date,
+            lookback_days=lookback_days,
+            window_mode=window_mode,
+            dry_run=dry_run,
+            job_config=job_config,
+            _task_id='special_commodity_industrial_indicator_sync',
+            _task_name='大宗商品产业指标维护',
         )
 
     async def special_commodity_price_backfill(

@@ -73,4 +73,3 @@ The Quotes API SHALL expose the latest quote or adjustment-factor watermark with
 - **WHEN** a caller requests the latest quote-domain watermark
 - **THEN** the API SHALL return the latest quote change sequence
 - **AND** it SHALL include enough domain metadata for the caller to persist the checkpoint safely
-

@@ -372,4 +372,3 @@ Special commodity syncs running in dry-run mode SHALL report would-write counter
 - **WHEN** a dry-run commodity sync detects observations that would be changed
 - **THEN** the task result SHALL report would-write or changed estimates
 - **AND** no persistent change watermark SHALL be advanced
-

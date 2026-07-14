@@ -3097,7 +3097,7 @@ class AkshareCommoditySpotProvider:
 
 
 class ShanghaiShippingExchangeCbcfiProvider:
-    """Public latest-period CBCFI composite index from Shanghai Shipping Exchange."""
+    """Public latest and previous CBCFI composite values from Shanghai Shipping Exchange."""
 
     def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
         self.source_profile = source_profile
@@ -3205,11 +3205,16 @@ class ShanghaiShippingExchangeCbcfiProvider:
         observations: List[CommodityObservation] = []
         warnings: List[Dict[str, Any]] = []
         blockers: List[Dict[str, Any]] = []
-        if end and end < current:
+        available = [
+            (previous, float(parsed["previous_value"]), "previous"),
+            (current, float(parsed["current_value"]), "current"),
+        ]
+        if end and end < previous:
             blockers.append(
                 {
                     "reason": "sse_cbcfi_public_history_requires_entitlement",
                     "requested_end": end.isoformat(),
+                    "earliest_public_date": previous.isoformat(),
                     "latest_public_date": current.isoformat(),
                     "history_interface": "authenticated_multi_period_query",
                 }
@@ -3233,37 +3238,43 @@ class ShanghaiShippingExchangeCbcfiProvider:
                         }
                     )
                     continue
-                observations.append(
-                    _build_observation(
-                        item=item,
-                        source_profile=self.source_profile,
-                        source_cfg=self.source_cfg,
-                        observation_date=current.isoformat(),
-                        value=float(parsed["current_value"]),
-                        source_url=self.endpoint,
-                        source_symbol=item.source_symbol,
-                        raw_payload=parsed,
-                        metadata={
-                            "data_kind": "industrial_indicator",
-                            "publication_date": current.isoformat(),
-                            "source_period_start": current.isoformat(),
-                            "source_period_end": current.isoformat(),
-                            "previous_observation_date": parsed["previous_date"],
-                            "previous_value": parsed["previous_value"],
-                            "reported_change": parsed["change"],
-                            "region": "China coastal coal shipping market",
-                            "public_history_mode": "latest_period_only",
-                        },
+                for observation_date, value, period_role in available:
+                    if start and observation_date < start:
+                        continue
+                    if end and observation_date > end:
+                        continue
+                    observations.append(
+                        _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=observation_date.isoformat(),
+                            value=value,
+                            source_url=self.endpoint,
+                            source_symbol=item.source_symbol,
+                            raw_payload=parsed,
+                            metadata={
+                                "data_kind": "industrial_indicator",
+                                "publication_date": observation_date.isoformat(),
+                                "source_period_start": observation_date.isoformat(),
+                                "source_period_end": observation_date.isoformat(),
+                                "public_page_period_role": period_role,
+                                "previous_observation_date": parsed["previous_date"],
+                                "previous_value": parsed["previous_value"],
+                                "reported_change": parsed["change"],
+                                "region": "China coastal coal shipping market",
+                                "public_history_mode": "latest_and_previous_periods_only",
+                            },
+                        )
                     )
-                )
             if start and start < previous:
-                warnings.append(
+                blockers.append(
                     {
-                        "reason": "sse_cbcfi_public_history_not_included",
+                        "reason": "sse_cbcfi_public_history_requires_entitlement",
                         "requested_start": start.isoformat(),
-                        "previous_public_date": previous.isoformat(),
+                        "earliest_public_date": previous.isoformat(),
                         "latest_public_date": current.isoformat(),
-                        "message": "public page exposes the latest period; historical query requires login",
+                        "history_interface": "authenticated_multi_period_query",
                     }
                 )
         logger.info(

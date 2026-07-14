@@ -876,6 +876,32 @@
           "note": "Governed domestic public-web spot and benchmark scopes only. The 10-day lookback covers NBS publication lag. Do not add these series to futures_market_data_sync because their source-observed date governance differs from exchange futures governance."
         }
       },
+      "special_commodity_industrial_indicator_sync": {
+        "enabled": true,
+        "manual_only": false,
+        "description": "大宗商品产业指标同步（当前为上海航运交易所 CBCFI 沿海煤炭运价综合指数）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "mon-fri",
+          "hour": 16,
+          "minute": 30,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "scope_ids": [
+            "cn_coal_cbcfi"
+          ],
+          "window_mode": "provider_latest",
+          "dry_run": false,
+          "max_runtime_seconds": 1800,
+          "note": "Latest-snapshot industrial sources govern their own public observation window. CBCFI collects the official current and previous periods without pretending that earlier history is publicly available."
+        }
+      },
       "special_commodity_price_monthly_sync": {
         "enabled": true,
         "manual_only": false,

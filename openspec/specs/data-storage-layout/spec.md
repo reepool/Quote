@@ -158,4 +158,3 @@ Changelog storage SHALL include a lossless JSON business key plus indexed common
 - **WHEN** a financial fact change record is appended
 - **THEN** the record SHALL preserve report period and fact identity in the business key
 - **AND** it SHALL NOT force the fact into a trade-date-only schema
-

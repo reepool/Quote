@@ -229,4 +229,3 @@ FX changelog emission SHALL NOT replace FX publication calendar governance or qu
 #### Scenario: No observation expected
 - **WHEN** FX calendar governance marks a date as an expected non-publication date
 - **THEN** FX sync SHALL NOT emit a missing-data change record solely because no observation was written
-

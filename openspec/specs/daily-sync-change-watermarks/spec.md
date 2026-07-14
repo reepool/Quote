@@ -84,4 +84,3 @@ Dry-run, preflight, diagnostic, and read-only workflows SHALL NOT persist change
 - **WHEN** a dry-run task detects rows that would be inserted or changed in write mode
 - **THEN** the task result SHALL report would-write counters
 - **AND** no persistent changelog sequence SHALL be created
-

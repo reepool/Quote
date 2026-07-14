@@ -484,4 +484,3 @@ Futures continuous-series observations SHALL emit change records using series-le
 #### Scenario: Continuous series row changes
 - **WHEN** a continuous futures series observation changes after roll or source repair
 - **THEN** the changelog SHALL identify the series id and trade date affected
-

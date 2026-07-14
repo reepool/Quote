@@ -278,4 +278,3 @@ Scheduled jobs SHALL keep configured overlap windows, catch-up windows, reconcil
 #### Scenario: Changelog is enabled
 - **WHEN** changelog emission is enabled for a daily sync job
 - **THEN** the job SHALL still execute its existing market close checks, trading-day checks, governance requirements, and fetch-window policy
-
