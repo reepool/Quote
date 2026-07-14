@@ -97,7 +97,7 @@
 | 重点港口煤炭库存 | 已探测页面的具体值属于付费内容；AkShare 的沿海电厂库存不是港口库存，统计对象不等价 | 尚无满足持续免费、口径明确和可自动化要求的主源，保持 blocked。不得把电厂库存、研究报告截图或付费页面泄露内容冒充港口库存。 |
 | 全国规模以上工业原煤累计产量 | 国家统计局月度工业增加值官方发布页可稳定发现统计期、发布日期和原煤累计绝对量；1—2月为合并累计口径，3月以后同时发布当月值和年初至当月累计值 | 已实现 `nbs_monthly_industrial_output` adapter、`CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY` 和 `cn_nbs_raw_coal_output` scope。统一治理仅保存官方累计值，单位为 `10k_ton`、币种为空、`data_kind=industrial_indicator`，不自动差分或伪造1月/2月单月值。来源发现以官方栏目目录为主，只有目录缺少应披露统计期时才调用辅助搜索；直连网络失败或 challenge 使用统一代理配置做最多3次出口轮换，临时限流最多重试3次并从5秒开始退避，出口轮换仍无法解除 `-101` IP禁用才熔断本轮搜索。2026年2—5月短窗及2022-02-28至2026-05-31全历史隔离 dry-run 均成功；全历史应有48期、实际发现和解析48期，年度分布为2022—2025各11期、2026年截至5月4期，无 warning 或 blocker。向前探测证明2017—2021年旧版工业增加值文章并不稳定包含原煤绝对量，因此当前同口径可用起点收紧为2022-02-28；更早“能源生产情况”数据不得未经精度和口径治理直接混填。生产 write 和调度幂等验证仍是上线前门槛。 |
 
-CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_overseas_daily_price_sync`、`special_commodity_domestic_spot_price_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口，当前 CBCFI 使用 `provider_latest` 并已启用，NBS 使用月度回看窗口但在生产 write 与幂等复验前禁用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
+CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_overseas_daily_price_sync`、`special_commodity_domestic_spot_price_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口；CBCFI 使用 `provider_latest`，NBS 原煤累计产量在完成48条全历史写入及幂等复验后使用月度四个月回看窗口，两者均已启用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
 
 ## 6. 更多连续商品行情
 

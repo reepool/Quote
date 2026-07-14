@@ -901,7 +901,7 @@
             },
             {
               "scope_id": "cn_nbs_raw_coal_output",
-              "enabled": false,
+              "enabled": true,
               "window_mode": "monthly",
               "lookback_months": 4,
               "run_days_of_month": [
@@ -913,8 +913,7 @@
                 20,
                 21,
                 22
-              ],
-              "rollout_note": "Enable only after production write and idempotency validation."
+              ]
             }
           ],
           "dry_run": false,

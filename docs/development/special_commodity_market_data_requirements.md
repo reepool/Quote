@@ -395,7 +395,9 @@ scope 解析
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 按“地域 + 数据语义 + 频率”命名，直接区分海外日频价格、国内现货价格、国际月频价格、非价格产业指标、政策治理和历史观测回补；旧的歧义 ID 已一次性删除且不保留别名。所有价格和指标入口复用同一个内部治理执行器，不形成平行链路。海外日频任务 `special_commodity_overseas_daily_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_domestic_spot_price_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。
 
-`special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 已启用并使用 `provider_latest` 窗口；`cn_nbs_raw_coal_output` 已预配置月度窗口和候选运行日，但在生产 write 与幂等复验完成前保持禁用。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
+`special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 已启用并使用 `provider_latest` 窗口；`cn_nbs_raw_coal_output` 已完成全历史 dry-run、正式写入和幂等复验，并以月度四个月回看窗口在每月15日至22日启用。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
+
+2026-07-14，`cn_nbs_raw_coal_output` 全历史 dry-run `run_id=148` 获取48条官方累计产量观测，覆盖2022-02至2026-05，预期月份48、发现48、未解决缺口0。正式写入 `run_id=149` 新增48条观测、48条来源月份治理和1条主数据治理记录；回补入口幂等复验 `run_id=150` 为新增0、变更0、不变48。三个阶段均为主数据治理成功、日期治理成功且无 warning/blocker，因此正式加入非价格产业指标聚合任务；应用重启后仍须运行一次聚合任务，验收 scope 到期判断、月度窗口和聚合报告幂等性。
 
 滚动窗口任务默认回看最近10个自然日，而来源窗口任务使用来源公开边界。各 scope 隔离来源、频率、报告和日期治理。国内现货、官方旬价和产业指标不进入期货连续合约任务，因为来源观测日、单值价格或指数和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 

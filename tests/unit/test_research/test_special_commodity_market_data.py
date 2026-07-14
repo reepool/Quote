@@ -2931,11 +2931,10 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         },
         {
             "scope_id": "cn_nbs_raw_coal_output",
-            "enabled": False,
+            "enabled": True,
             "window_mode": "monthly",
             "lookback_months": 4,
             "run_days_of_month": [15, 16, 17, 18, 19, 20, 21, 22],
-            "rollout_note": "Enable only after production write and idempotency validation.",
         },
     ]
     assert industrial["parameters"]["dry_run"] is False
