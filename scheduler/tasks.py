@@ -1655,7 +1655,9 @@ def _format_risk_free_rate_sync_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
+def _format_special_commodity_scheduler_report(
+    result: Dict[str, Any], *, title: str = "特殊商品数据维护"
+) -> str:
     """Return a compact operator report for special commodity data tasks."""
     status = result.get("status", "unknown")
     icon, label = _format_scheduler_status(status)
@@ -1665,12 +1667,18 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
     detailed = status not in {"success", "skipped", "disabled"} or bool(warnings or blockers)
 
     lines = [
-        f"{icon} *特殊商品数据维护*",
+        f"{icon} *{title}*",
         "",
         f"状态: `{status}` ({label})",
     ]
     if result.get("run_id") is not None:
         lines.append(f"run_id: `{result.get('run_id')}`")
+    elif result.get("run_ids"):
+        lines.append(
+            "run_ids: `"
+            + ",".join(str(value) for value in result.get("run_ids", []))
+            + "`"
+        )
     if result.get("dry_run") is not None:
         lines.append(f"dry_run: `{bool(result.get('dry_run'))}`")
     if result.get("start_date") or result.get("end_date"):
@@ -1697,6 +1705,17 @@ def _format_special_commodity_scheduler_report(result: Dict[str, Any]) -> str:
             f"不变 `{result.get('unchanged', 0)}`｜"
             f"dry_run预计 `{result.get('would_write', 0)}`"
         )
+        for scope in result.get("scope_results") or []:
+            lines.append(
+                "scope: "
+                f"`{scope.get('scope_id')}`｜状态 `{scope.get('status')}`｜"
+                f"获取 `{scope.get('fetched_rows', 0)}`｜新增 `{scope.get('inserted', 0)}`｜"
+                f"更新 `{scope.get('changed', 0)}`｜不变 `{scope.get('unchanged', 0)}`"
+            )
+        for scope in result.get("skipped_scopes") or []:
+            lines.append(
+                f"scope: `{scope.get('scope_id')}`｜跳过 `{scope.get('reason', 'not_due')}`"
+            )
     elif "calendar_rows" in result:
         lines.append(
             "发布日历: "
@@ -1900,6 +1919,109 @@ def _resolve_special_commodity_monthly_sync_window(
     start_year, start_month_zero_based = divmod(month_index, 12)
     resolved_start = date(start_year, start_month_zero_based + 1, 1)
     return resolved_start.isoformat(), resolved_end.isoformat()
+
+
+def _special_commodity_scope_run_due(
+    scope_run: Dict[str, Any], *, as_of_date: Optional[date] = None
+) -> bool:
+    """Return whether a configured scope profile is due on this scheduler run."""
+    if scope_run.get("enabled") is False:
+        return False
+    resolved = as_of_date or get_shanghai_time().date()
+    days = [int(value) for value in scope_run.get("run_days_of_month", [])]
+    return not days or resolved.day in days
+
+
+def _resolve_special_commodity_scope_run_window(
+    scope_run: Dict[str, Any], *, as_of_date: Optional[date] = None
+) -> tuple[Optional[str], Optional[str]]:
+    """Resolve one industrial scope's provider-specific observation window."""
+    mode = str(scope_run.get("window_mode") or "rolling").strip().lower()
+    if mode == "monthly":
+        return _resolve_special_commodity_monthly_sync_window(
+            None,
+            None,
+            lookback_months=max(1, int(scope_run.get("lookback_months") or 4)),
+            as_of_date=as_of_date,
+        )
+    return _resolve_special_commodity_task_window(
+        None,
+        None,
+        lookback_days=max(1, int(scope_run.get("lookback_days") or 10)),
+        window_mode=mode,
+        as_of_date=as_of_date,
+    )
+
+
+def _aggregate_special_commodity_scope_results(
+    results: List[Dict[str, Any]], skipped_scopes: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """Aggregate independently governed scopes into one operator-facing task result."""
+    severity = {
+        "success": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "warning": 1,
+        "partial": 1,
+        "blocked": 2,
+        "error": 3,
+        "failed": 3,
+    }
+    statuses = [str(item.get("status") or "error") for item in results]
+    status = max(statuses, key=lambda value: severity.get(value, 3)) if statuses else "skipped"
+    aggregate: Dict[str, Any] = {
+        "status": status,
+        "dry_run": any(bool(item.get("dry_run")) for item in results),
+        "run_ids": [item.get("run_id") for item in results if item.get("run_id") is not None],
+        "venues": sorted({venue for item in results for venue in item.get("venues", [])}),
+        "target_series": sum(int(item.get("target_series", 0) or 0) for item in results),
+        "fetched_rows": sum(int(item.get("fetched_rows", 0) or 0) for item in results),
+        "inserted": sum(int(item.get("inserted", 0) or 0) for item in results),
+        "changed": sum(int(item.get("changed", 0) or 0) for item in results),
+        "unchanged": sum(int(item.get("unchanged", 0) or 0) for item in results),
+        "would_write": sum(int(item.get("would_write", 0) or 0) for item in results),
+        "master_governance_records": sum(
+            int(item.get("master_governance_records", 0) or 0) for item in results
+        ),
+        "source_date_count": sum(
+            int(item.get("source_date_count", 0) or 0) for item in results
+        ),
+        "master_data_governance": (
+            "success" if results and all(item.get("master_data_governance") == "success" for item in results)
+            else status
+        ),
+        "date_governance": (
+            "success" if results and all(item.get("date_governance") == "success" for item in results)
+            else status
+        ),
+        "per_source": {},
+        "warnings": [],
+        "blockers": [],
+        "scope_results": [],
+        "skipped_scopes": skipped_scopes,
+    }
+    for item in results:
+        scope_id = item.get("scope_id")
+        for source_id, source_result in (item.get("per_source") or {}).items():
+            aggregate["per_source"][f"{scope_id}:{source_id}"] = source_result
+        aggregate["warnings"].extend(
+            [{**warning, "scope_id": scope_id} for warning in item.get("warnings", [])]
+        )
+        aggregate["blockers"].extend(
+            [{**blocker, "scope_id": scope_id} for blocker in item.get("blockers", [])]
+        )
+        aggregate["scope_results"].append(
+            {
+                "scope_id": scope_id,
+                "status": item.get("status"),
+                "run_id": item.get("run_id"),
+                "fetched_rows": item.get("fetched_rows", 0),
+                "inserted": item.get("inserted", 0),
+                "changed": item.get("changed", 0),
+                "unchanged": item.get("unchanged", 0),
+            }
+        )
+    return aggregate
 
 
 class ScheduledTasks:
@@ -4275,7 +4397,7 @@ class ScheduledTasks:
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
         _task_id: str = 'special_commodity_price_sync',
-        _task_name: str = '海外商品数据维护',
+        _task_name: str = '海外特殊商品日频价格同步',
     ) -> bool:
         """特殊商品价格/指数观测值同步任务。"""
         self._active_tasks.add(_task_id)
@@ -4287,7 +4409,9 @@ class ScheduledTasks:
                 window_mode=window_mode,
             )
             scheduler_logger.info(
-                "[Scheduler] Starting special commodity price sync: scope_id=%s scope_ids=%s start=%s end=%s lookback_days=%s window_mode=%s dry_run=%s",
+                "[Scheduler] Starting special commodity task: task_id=%s task_name=%s scope_id=%s scope_ids=%s start=%s end=%s lookback_days=%s window_mode=%s dry_run=%s",
+                _task_id,
+                _task_name,
                 scope_id,
                 scope_ids,
                 start_date,
@@ -4311,8 +4435,10 @@ class ScheduledTasks:
             success = result.get("status") == "success"
             await self._send_task_report(
                 report_data={
-                    'name': '特殊商品数据维护报告',
-                    'content': _format_special_commodity_scheduler_report(result),
+                    'name': f'{_task_name}报告',
+                    'content': _format_special_commodity_scheduler_report(
+                        result, title=_task_name
+                    ),
                     'status': 'success' if success else result.get("status", "error"),
                     'tasks_completed': int(result.get("target_series", 0) or 0),
                     'duration': 'N/A',
@@ -4324,11 +4450,17 @@ class ScheduledTasks:
             )
             return success
         except Exception as e:
-            scheduler_logger.error(f"[Scheduler] Special commodity price sync failed: {e}")
+            scheduler_logger.exception(
+                "[Scheduler] Special commodity task failed: task_id=%s task_name=%s",
+                _task_id,
+                _task_name,
+            )
             await self._send_task_report(
                 report_data={
-                    'name': '特殊商品数据维护报告',
-                    'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
+                    'name': f'{_task_name}报告',
+                    'content': _format_special_commodity_scheduler_report(
+                        {'status': 'error', 'reason': str(e)}, title=_task_name
+                    ),
                     'status': 'error',
                     'tasks_completed': 0,
                     'duration': 'N/A',
@@ -4357,7 +4489,7 @@ class ScheduledTasks:
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """国内特殊商品现货与官方基准同步，共用治理与持久化链路。"""
+        """国内特殊商品现货与价格基准同步，共用治理与持久化链路。"""
         return await self.special_commodity_price_sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
@@ -4372,7 +4504,7 @@ class ScheduledTasks:
             dry_run=dry_run,
             job_config=job_config,
             _task_id='special_commodity_cn_spot_sync',
-            _task_name='国内特殊商品现货维护',
+            _task_name='国内特殊商品现货与基准同步',
         )
 
     async def special_commodity_industrial_indicator_sync(
@@ -4388,27 +4520,169 @@ class ScheduledTasks:
         end_date: Optional[str] = None,
         lookback_days: int = 10,
         window_mode: str = 'provider_latest',
+        scope_runs: Optional[List[Dict[str, Any]]] = None,
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """产业指标同步，复用特殊商品治理链路并尊重来源窗口。"""
-        return await self.special_commodity_price_sync(
-            scope_id=scope_id,
-            scope_ids=scope_ids,
-            venues=venues,
-            categories=categories,
-            commodity_ids=commodity_ids,
-            series_ids=series_ids,
-            frequencies=frequencies,
-            start_date=start_date,
-            end_date=end_date,
-            lookback_days=lookback_days,
-            window_mode=window_mode,
-            dry_run=dry_run,
-            job_config=job_config,
-            _task_id='special_commodity_industrial_indicator_sync',
-            _task_name='大宗商品产业指标维护',
-        )
+        """Aggregate independently scheduled industrial-indicator scopes."""
+        task_id = 'special_commodity_industrial_indicator_sync'
+        task_name = '大宗商品产业指标聚合同步'
+        self._active_tasks.add(task_id)
+        try:
+            explicit_selection = any(
+                (
+                    scope_id,
+                    scope_ids,
+                    venues,
+                    categories,
+                    commodity_ids,
+                    series_ids,
+                    frequencies,
+                    start_date,
+                    end_date,
+                )
+            )
+            if scope_runs and not explicit_selection:
+                as_of_date = get_shanghai_time().date()
+                results: List[Dict[str, Any]] = []
+                skipped_scopes: List[Dict[str, Any]] = []
+                for scope_run in scope_runs:
+                    configured_scope = str(scope_run.get('scope_id') or '').strip()
+                    if not configured_scope:
+                        raise ValueError('industrial indicator scope_run requires scope_id')
+                    if not _special_commodity_scope_run_due(
+                        scope_run, as_of_date=as_of_date
+                    ):
+                        skip_reason = (
+                            'disabled'
+                            if scope_run.get('enabled') is False
+                            else 'not_due'
+                        )
+                        skipped_scopes.append(
+                            {
+                                'scope_id': configured_scope,
+                                'reason': skip_reason,
+                                'run_days_of_month': scope_run.get('run_days_of_month', []),
+                            }
+                        )
+                        scheduler_logger.info(
+                            "[Scheduler] Industrial indicator scope skipped: scope_id=%s reason=%s as_of=%s",
+                            configured_scope,
+                            skip_reason,
+                            as_of_date,
+                        )
+                        continue
+                    scope_start, scope_end = _resolve_special_commodity_scope_run_window(
+                        scope_run, as_of_date=as_of_date
+                    )
+                    scheduler_logger.info(
+                        "[Scheduler] Industrial indicator scope start: scope_id=%s window_mode=%s start=%s end=%s dry_run=%s",
+                        configured_scope,
+                        scope_run.get('window_mode'),
+                        scope_start,
+                        scope_end,
+                        dry_run,
+                    )
+                    try:
+                        result = await data_manager.run_special_commodity_price_sync(
+                            scope_id=configured_scope,
+                            start_date=scope_start,
+                            end_date=scope_end,
+                            dry_run=dry_run,
+                        )
+                    except Exception as exc:
+                        scheduler_logger.exception(
+                            "[Scheduler] Industrial indicator scope failed: scope_id=%s",
+                            configured_scope,
+                        )
+                        result = {
+                            'status': 'error',
+                            'dry_run': dry_run,
+                            'target_series': 0,
+                            'fetched_rows': 0,
+                            'inserted': 0,
+                            'changed': 0,
+                            'unchanged': 0,
+                            'would_write': 0,
+                            'master_data_governance': 'error',
+                            'date_governance': 'error',
+                            'warnings': [],
+                            'blockers': [
+                                {
+                                    'reason': 'industrial_scope_sync_failed',
+                                    'error': str(exc),
+                                }
+                            ],
+                            'per_source': {},
+                        }
+                    result['scope_id'] = configured_scope
+                    results.append(result)
+                combined = _aggregate_special_commodity_scope_results(
+                    results, skipped_scopes
+                )
+            else:
+                resolved_start, resolved_end = _resolve_special_commodity_task_window(
+                    start_date,
+                    end_date,
+                    lookback_days=lookback_days,
+                    window_mode=window_mode,
+                )
+                combined = await data_manager.run_special_commodity_price_sync(
+                    scope_id=scope_id,
+                    scope_ids=scope_ids,
+                    venues=venues,
+                    categories=categories,
+                    commodity_ids=commodity_ids,
+                    series_ids=series_ids,
+                    frequencies=frequencies,
+                    start_date=resolved_start,
+                    end_date=resolved_end,
+                    dry_run=dry_run,
+                )
+                combined['scope_id'] = scope_id
+            success = combined.get('status') in {'success', 'skipped'}
+            await self._send_task_report(
+                report_data={
+                    'name': '大宗商品产业指标聚合同步报告',
+                    'content': _format_special_commodity_scheduler_report(
+                        combined, title=task_name
+                    ),
+                    'status': 'success' if success else combined.get('status', 'error'),
+                    'tasks_completed': int(combined.get('target_series', 0) or 0),
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': task_id, 'status': combined.get('status')}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name=task_name,
+                job_config=job_config,
+            )
+            return success
+        except Exception as e:
+            scheduler_logger.error(
+                "[Scheduler] Industrial indicator sync failed: %s", e
+            )
+            await self._send_task_report(
+                report_data={
+                    'name': '大宗商品产业指标聚合同步报告',
+                    'content': _format_special_commodity_scheduler_report(
+                        {'status': 'error', 'reason': str(e)}, title=task_name
+                    ),
+                    'status': 'error',
+                    'tasks_completed': 0,
+                    'duration': 'N/A',
+                    'maintenance_tasks': [
+                        {'task_name': task_id, 'status': str(e)}
+                    ],
+                },
+                report_type='maintenance_report',
+                task_name=task_name,
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
 
     async def special_commodity_price_backfill(
         self,
@@ -4439,6 +4713,8 @@ class ScheduledTasks:
             end_date=end_date,
             dry_run=dry_run,
             job_config=job_config,
+            _task_id='special_commodity_price_backfill',
+            _task_name='特殊商品历史数据回补',
         )
 
     async def special_commodity_price_monthly_sync(
@@ -4484,6 +4760,8 @@ class ScheduledTasks:
             end_date=end_date,
             dry_run=dry_run,
             job_config=job_config,
+            _task_id='special_commodity_price_monthly_sync',
+            _task_name='国际特殊商品月度基准价格同步',
         )
 
     async def special_commodity_calendar_governance(

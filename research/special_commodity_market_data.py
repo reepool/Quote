@@ -3836,6 +3836,16 @@ class NbsMonthlyIndustrialOutputProvider:
     def _clean_title(value: Any) -> str:
         return NbsProductionMaterialsProvider._clean_title(value)
 
+    @staticmethod
+    def _is_official_release_url(value: str) -> bool:
+        parsed = urlsplit(str(value or ""))
+        hostname = str(parsed.hostname or "").lower()
+        return (
+            hostname == "stats.gov.cn" or hostname.endswith(".stats.gov.cn")
+        ) and parsed.path.startswith(
+            ("/sj/zxfb/", "/sj/zxfbhjd/")
+        )
+
     @classmethod
     def parse_period(cls, title: str) -> Optional[Dict[str, str]]:
         normalized = cls._clean_title(title)
@@ -3888,8 +3898,7 @@ class NbsMonthlyIndustrialOutputProvider:
             period = self.parse_period(title)
             if (
                 period is None
-                or "stats.gov.cn/" not in source_url
-                or "/sj/zxfb/" not in source_url
+                or not self._is_official_release_url(source_url)
             ):
                 continue
             rows.append(
@@ -3941,7 +3950,7 @@ class NbsMonthlyIndustrialOutputProvider:
                     publication_date = published.isoformat()
                 except ValueError:
                     pass
-            if period is None or "/sj/zxfb/" not in source_url:
+            if period is None or not self._is_official_release_url(source_url):
                 continue
             if published is not None:
                 publication_dates.append(published)
@@ -3981,6 +3990,7 @@ class NbsMonthlyIndustrialOutputProvider:
         expected = self._expected_periods(start, eligible_end)
         discovered: Dict[str, Dict[str, str]] = {}
         warnings: List[Dict[str, Any]] = []
+        auxiliary_search_warnings: List[Dict[str, Any]] = []
         request_count = 0
         max_pages = max(1, int(self.source_cfg.get("search_max_pages_per_sort") or 20))
         broad_threshold = max(
@@ -3997,7 +4007,7 @@ class NbsMonthlyIndustrialOutputProvider:
                     try:
                         rows = self._search_page(page=page, sort=sort, query=query)
                     except Exception as exc:
-                        warnings.append(
+                        auxiliary_search_warnings.append(
                             {
                                 "reason": "nbs_monthly_output_search_failed",
                                 "sort": sort,
@@ -4085,7 +4095,7 @@ class NbsMonthlyIndustrialOutputProvider:
                         page=page, sort="relevance", query=exact_query
                     )
                 except Exception as exc:
-                    warnings.append(
+                    auxiliary_search_warnings.append(
                         {
                             "reason": "nbs_monthly_output_exact_search_failed",
                             "observation_date": observation_date,
@@ -4120,6 +4130,7 @@ class NbsMonthlyIndustrialOutputProvider:
             if item["observation_date"] not in discovered
         ]
         if unresolved:
+            warnings.extend(auxiliary_search_warnings)
             warnings.append(
                 {
                     "reason": "nbs_monthly_output_unresolved_periods",
@@ -4129,6 +4140,13 @@ class NbsMonthlyIndustrialOutputProvider:
                     "missing_samples": unresolved[:50],
                     "publication_eligible_end": eligible_end.isoformat(),
                 }
+            )
+        elif auxiliary_search_warnings:
+            logger.info(
+                "[NbsMonthlyIndustrialOutput] auxiliary search unavailable but official listing coverage is complete warnings=%s range=%s..%s",
+                len(auxiliary_search_warnings),
+                start,
+                end,
             )
         logger.info(
             "[NbsMonthlyIndustrialOutput] discovery done requests=%s articles=%s expected=%s unresolved=%s range=%s..%s eligible_end=%s",
@@ -4147,6 +4165,7 @@ class NbsMonthlyIndustrialOutputProvider:
             "unresolved_dates": len(unresolved),
             "unresolved_samples": unresolved[:50],
             "publication_eligible_end": eligible_end.isoformat(),
+            "auxiliary_search_warnings": len(auxiliary_search_warnings),
         }
         return (
             sorted(discovered.values(), key=lambda row: row["observation_date"]),
@@ -5621,8 +5640,6 @@ class OfficialPublicIndicatorGovernanceAdapter(SourceObservedDateGovernanceAdapt
         result = provider.fetch(series, start_date=start_date, end_date=end_date)
         return CommodityMasterGovernanceResult(
             records=records,
-            warnings=list(result.warnings),
-            blockers=list(result.blockers),
             prefetched_result=result,
         )
 

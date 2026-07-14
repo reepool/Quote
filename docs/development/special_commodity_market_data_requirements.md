@@ -378,21 +378,26 @@ scope 解析
 
 ### 6.2 调度任务
 
-新增任务建议：
+当前特殊商品任务及显示语义：
 
-| 任务 | 频率 | 用途 |
-|---|---|---|
-| `commodity_price_master_sync` | 每周 | 同步主数据和 series 字典 |
-| `special_commodity_price_sync` | 周二至周六 08:00 | 同步 LME 3M 代理日线和 EIA/FRED WTI、Brent |
-| `special_commodity_cn_spot_sync` | 周一至周五 22:30 | 同步100ppi国内现货和NBS动力煤旬价 |
-| `special_commodity_industrial_indicator_sync` | 周一至周五 16:30 | 同步来源自行声明观测窗口的产业指标，当前覆盖上海航交所 CBCFI 本期/上期 |
-| `special_commodity_price_monthly_sync` | 每月10日、20日 08:40 | 同步 FRED/IMF、World Bank 铜铝月度价格 |
-| `special_commodity_policy_discovery` | 每月15日 09:10 | 发现NDRC新增/修订政策、保存证据和候选，并在同一任务末尾幂等对账正式事件 |
+| 任务 ID | 显示名称 | 频率 | 用途 |
+|---|---|---|---|
+| `commodity_price_master_sync` | 特殊商品主数据与序列字典同步 | 每周 | 同步主数据和 series 字典 |
+| `special_commodity_price_sync` | 海外特殊商品日频价格同步 | 周二至周六 08:00 | 同步 LME 3M 代理日线和 EIA/FRED WTI、Brent |
+| `special_commodity_cn_spot_sync` | 国内特殊商品现货与价格基准同步 | 周一至周五 22:30 | 同步100ppi国内现货和NBS动力煤旬价 |
+| `special_commodity_industrial_indicator_sync` | 大宗商品产业指标聚合同步 | 周一至周五 16:30 | 在一个任务内按 scope 独立调度产量、库存、运费、进口量和仓单等非价格指标 |
+| `special_commodity_price_monthly_sync` | 国际特殊商品月频价格基准同步 | 每月10日、20日 08:40 | 同步 FRED/IMF、World Bank 月度价格基准 |
+| `special_commodity_policy_discovery` | 特殊商品政策目录发现与治理 | 每月15日 09:10 | 发现NDRC新增/修订政策、保存证据和候选，并在同一任务末尾幂等对账正式事件 |
+| `special_commodity_price_backfill` | 特殊商品历史数据回补 | 仅手工 | 对指定 scope 和区间执行治理前置、dry-run 或正式回补 |
+| `commodity_price_readiness_check` | DCF 商品输入就绪检查 | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
 政策治理已经收口为单一月度运维入口 `special_commodity_policy_discovery`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
-| `commodity_price_readiness_check` | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；产业指标任务 `special_commodity_industrial_indicator_sync` 在周一至周五 16:30 运行，当前只覆盖 `cn_coal_cbcfi`，使用 `provider_latest` 来源窗口接收官方本期和上期，不把匿名页不可见的更早日期误报为已回补；国内现货与官方基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。任务共用同一 provider/governance/persistence 链路；滚动窗口任务默认回看最近10个自然日，而来源窗口任务使用来源公开边界。各 scope 隔离来源、频率、报告和日期治理。国内现货、官方旬价和产业指标不进入期货连续合约任务，因为来源观测日、单值价格或指数和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
+当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 是稳定的命令和调度接口，面向用户的显示名称必须明确区分海外日频价格、国内现货与价格基准、国际月频价格基准、非价格产业指标和历史回补。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。
+
+`special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 已启用并使用 `provider_latest` 窗口；`cn_nbs_raw_coal_output` 已预配置月度窗口和候选运行日，但在生产 write 与幂等复验完成前保持禁用。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
+
+滚动窗口任务默认回看最近10个自然日，而来源窗口任务使用来源公开边界。各 scope 隔离来源、频率、报告和日期治理。国内现货、官方旬价和产业指标不进入期货连续合约任务，因为来源观测日、单值价格或指数和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
 `fred_imf_metals`、`world_bank_metals`、`world_bank_fertilizers` 与 `world_bank_agriculture` 使用同一个 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。World Bank 金属、化肥与农产品是各自独立的 Pink Sheet 全球月度基准，不得覆盖、平均或伪装成 IMF/FRED 或国内100ppi现货。每个 scope 须先完成全历史 dry-run、正式落库和幂等验证，验证通过后才可加入月更任务。
 
@@ -504,6 +509,6 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 
 后续政策发现、实际长协证据、煤炭库存/港口价/运费及更多连续商品序列的增强需求，见 [特殊商品政策、产业证据与行情目录增强需求说明书](special_commodity_market_data_enhancement_requirements.md)。该增强拆分为 `enhance-commodity-policy-and-industrial-evidence` 与 `expand-special-commodity-series-catalog` 两个 OpenSpec change，避免将低频政策治理和 100ppi 行情扩品混为同一任务。
 
-截至 2026-07-14，沿海煤炭运价已按统一工业指标契约增加上海航运交易所 CBCFI 综合指数 provider、主数据、来源日期治理和独立 scope。官方匿名页只提供本期和上期，两期均按请求区间接收；因此当前能力仍是从部署日起持续积累，不代表已完成 2011 年以来的历史回补。该 scope 已进入独立 `special_commodity_industrial_indicator_sync` 调度，不进入任何价格日更任务。港口价格和港口库存仍按增强需求中的来源阻断状态管理。
+截至 2026-07-14，沿海煤炭运价已按统一工业指标契约增加上海航运交易所 CBCFI 综合指数 provider、主数据、来源日期治理和独立 scope。官方匿名页只提供本期和上期，两期均按请求区间接收；因此当前能力仍是从部署日起持续积累，不代表已完成 2011 年以来的历史回补。该 scope 已进入共享的 `special_commodity_industrial_indicator_sync` 聚合调度，不进入任何价格日更任务。港口价格和港口库存仍按增强需求中的来源阻断状态管理。
 
-同日已按相同工业指标契约实现国家统计局规模以上工业原煤累计产量 provider、主数据和 `cn_nbs_raw_coal_output` scope。该序列保存国家统计局官方年初至统计月累计绝对量，单位为 `10k_ton`；1—2月合并口径不会被拆成单月值，后续月份也不自动通过累计差分生成“官方月度产量”。2026年2—5月短窗及2022-02-28至2026-05-31全历史隔离 dry-run 均成功；全历史48个应披露期间全部发现并解析，主数据治理和来源日期治理均成功。对2017年以来的向前探测确认，2017—2021年旧版工业增加值文章不稳定包含同精度原煤绝对量，因此当前生产历史起点为2022-02-28；更早能源生产材料需作为独立来源完成精度和口径治理后才能扩展。它尚未加入生产调度，必须先完成生产 write 和幂等复验。
+同日已按相同工业指标契约实现国家统计局规模以上工业原煤累计产量 provider、主数据和 `cn_nbs_raw_coal_output` scope。该序列保存国家统计局官方年初至统计月累计绝对量，单位为 `10k_ton`；1—2月合并口径不会被拆成单月值，后续月份也不自动通过累计差分生成“官方月度产量”。生产 dry-run 曾因 adapter 只接受 `/sj/zxfb/` 而漏掉发布在 `/sj/zxfbhjd/` 的2026年4月文章，同时辅助搜索接口对本机 IP 返回禁用，形成47/48期 warning。adapter 现已将两个国家统计局官方发布栏目纳入同一来源契约；官方目录覆盖完整时，辅助搜索失败仅记诊断而不再把任务降级。修复后的2022-02-28至2026-05-31隔离全历史 dry-run取得48/48期，主数据治理和来源日期治理均成功，零 warning/blocker。对2017年以来的向前探测确认，2017—2021年旧版工业增加值文章不稳定包含同精度原煤绝对量，因此当前生产历史起点为2022-02-28；更早能源生产材料需作为独立来源完成精度和口径治理后才能扩展。该 scope 已进入产业指标聚合任务配置但保持禁用，必须先完成生产 write 和幂等复验后才能启用自动调度。

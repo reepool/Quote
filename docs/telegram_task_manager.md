@@ -338,10 +338,10 @@ restart_system - 重启系统服务
 • 系统健康检查 (system_health_check) - 45分钟后
 • 每周数据维护 (weekly_data_maintenance) - 周日 02:00
 • 月度数据完整性检查 (monthly_data_integrity_check) - 下月2日 11:00
-• 海外商品日频同步 (special_commodity_price_sync) - 周二至周六 08:00
-• 大宗商品产业指标同步 (special_commodity_industrial_indicator_sync) - 周一至周五 16:30
-• 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
-• 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
+• 海外特殊商品日频价格同步 (special_commodity_price_sync) - 周二至周六 08:00
+• 大宗商品产业指标聚合同步 (special_commodity_industrial_indicator_sync) - 周一至周五 16:30
+• 国内特殊商品现货与价格基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
+• 国际特殊商品月频价格基准同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
 • 特殊商品政策目录发现 (special_commodity_policy_discovery) - 每月15日09:10自动 write；发现并保存证据/候选、对账正式事件，但不自动批准新政策
 • 特殊商品政策候选审核 (special_commodity_policy_candidate_review) - 仅手工运行；直接复制发现报告中的 `candidate_ref=<8位短码> decision=approved|rejected notes=...`，批准默认同步完成正式提升
 • 特殊商品扩品候选目录 (special_commodity_series_catalog_sync) - 仅手工运行，不自动上线候选

@@ -606,6 +606,9 @@ def test_nbs_monthly_output_listing_ignores_unrelated_old_links(monkeypatch):
       <a href="/sj/zxfb/202606/t20260616_1963953.html">
         2026年5月份规模以上工业增加值增长5.8%
       </a>
+      <a href="/sj/zxfbhjd/202605/t20260518_1963731.html">
+        2026年1—4月份规模以上工业增加值增长5.6%
+      </a>
     </body></html>
     """
     monkeypatch.setattr(
@@ -620,8 +623,53 @@ def test_nbs_monthly_output_listing_ignores_unrelated_old_links(monkeypatch):
 
     rows, oldest_publication = provider._listing_page(1)
 
-    assert [row["observation_date"] for row in rows] == ["2026-05-31"]
-    assert oldest_publication == date(2026, 6, 16)
+    assert sorted(row["observation_date"] for row in rows) == [
+        "2026-04-30",
+        "2026-05-31",
+    ]
+    assert oldest_publication == date(2026, 5, 18)
+
+
+def test_nbs_monthly_output_auxiliary_search_failure_is_recovered_by_listing(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_monthly_raw_coal_output"])
+    source_cfg["exact_only_max_periods"] = 1
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+    expected = provider._expected_periods(date(2025, 2, 28), date(2026, 5, 31))
+    listing_rows = [
+        {
+            **item,
+            "title": f"official-{item['observation_date']}",
+            "source_url": f"https://www.stats.gov.cn/sj/zxfb/{item['observation_date']}.html",
+            "publication_date": item["observation_date"],
+        }
+        for item in expected
+    ]
+    monkeypatch.setattr(
+        provider,
+        "_search_page",
+        lambda **kwargs: (_ for _ in ()).throw(RuntimeError("search IP blocked")),
+    )
+    monkeypatch.setattr(
+        provider,
+        "_listing_page",
+        lambda page: (listing_rows, date(2025, 1, 1)),
+    )
+
+    articles, warnings, diagnostics = provider._discover_articles(
+        date(2025, 2, 28), date(2026, 5, 31)
+    )
+
+    assert len(articles) == len(expected)
+    assert warnings == []
+    assert diagnostics["unresolved_dates"] == 0
+    assert diagnostics["auxiliary_search_warnings"] == 2
 
 
 def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
@@ -2302,6 +2350,155 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "source_conflicts=3" in report
 
 
+def test_special_commodity_industrial_scope_windows_and_aggregation():
+    from scheduler.tasks import (
+        _aggregate_special_commodity_scope_results,
+        _format_special_commodity_scheduler_report,
+        _resolve_special_commodity_scope_run_window,
+        _special_commodity_scope_run_due,
+    )
+
+    assert _special_commodity_scope_run_due(
+        {"enabled": True, "run_days_of_month": [16, 17]},
+        as_of_date=date(2026, 7, 16),
+    )
+    assert not _special_commodity_scope_run_due(
+        {"enabled": True, "run_days_of_month": [16, 17]},
+        as_of_date=date(2026, 7, 14),
+    )
+    assert not _special_commodity_scope_run_due(
+        {"enabled": False}, as_of_date=date(2026, 7, 16)
+    )
+    assert _resolve_special_commodity_scope_run_window(
+        {"window_mode": "provider_latest"}, as_of_date=date(2026, 7, 16)
+    ) == (None, None)
+    assert _resolve_special_commodity_scope_run_window(
+        {"window_mode": "monthly", "lookback_months": 4},
+        as_of_date=date(2026, 7, 16),
+    ) == ("2026-04-01", "2026-07-16")
+
+    result = _aggregate_special_commodity_scope_results(
+        [
+            {
+                "scope_id": "cn_coal_cbcfi",
+                "status": "success",
+                "run_id": 1,
+                "venues": ["SSE"],
+                "target_series": 1,
+                "fetched_rows": 2,
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 2,
+                "master_data_governance": "success",
+                "date_governance": "success",
+                "per_source": {},
+                "warnings": [],
+                "blockers": [],
+            }
+        ],
+        [{"scope_id": "cn_nbs_raw_coal_output", "reason": "not_due"}],
+    )
+    assert result["status"] == "success"
+    assert result["fetched_rows"] == 2
+    assert result["run_ids"] == [1]
+    report = _format_special_commodity_scheduler_report(
+        result, title="大宗商品产业指标聚合同步"
+    )
+    assert "大宗商品产业指标聚合同步" in report
+    assert "run_ids: `1`" in report
+    assert "cn_coal_cbcfi" in report
+    assert "cn_nbs_raw_coal_output" in report
+
+    failed = _aggregate_special_commodity_scope_results(
+        [
+            {
+                "scope_id": "cn_nbs_raw_coal_output",
+                "status": "error",
+                "blockers": [{"reason": "source_failed"}],
+            },
+            {
+                "scope_id": "cn_coal_cbcfi",
+                "status": "success",
+                "fetched_rows": 2,
+                "per_source": {
+                    "sse_cbcfi_public_latest": {"status": "success"}
+                },
+            },
+        ],
+        [],
+    )
+    assert failed["status"] == "error"
+    assert failed["fetched_rows"] == 2
+    assert failed["blockers"][0]["scope_id"] == "cn_nbs_raw_coal_output"
+    assert "cn_coal_cbcfi:sse_cbcfi_public_latest" in failed["per_source"]
+
+
+@pytest.mark.asyncio
+async def test_special_commodity_industrial_scope_failure_is_isolated(monkeypatch):
+    import scheduler.tasks as task_module
+
+    calls = []
+    reports = []
+
+    async def run_special_commodity_price_sync(**kwargs):
+        calls.append(kwargs["scope_id"])
+        if kwargs["scope_id"] == "broken_scope":
+            raise RuntimeError("source unavailable")
+        return {
+            "status": "success",
+            "dry_run": kwargs["dry_run"],
+            "run_id": 7,
+            "venues": ["SSE"],
+            "target_series": 1,
+            "fetched_rows": 2,
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 2,
+            "would_write": 0,
+            "master_data_governance": "success",
+            "date_governance": "success",
+            "per_source": {},
+            "warnings": [],
+            "blockers": [],
+        }
+
+    async def send_task_report(**kwargs):
+        reports.append(kwargs)
+        return True
+
+    monkeypatch.setattr(
+        task_module,
+        "data_manager",
+        SimpleNamespace(
+            run_special_commodity_price_sync=run_special_commodity_price_sync
+        ),
+    )
+    task = task_module.ScheduledTasks.__new__(task_module.ScheduledTasks)
+    task._active_tasks = set()
+    task._send_task_report = send_task_report
+
+    success = await task.special_commodity_industrial_indicator_sync(
+        scope_runs=[
+            {"scope_id": "broken_scope", "enabled": True},
+            {
+                "scope_id": "cn_coal_cbcfi",
+                "enabled": True,
+                "window_mode": "provider_latest",
+            },
+        ],
+        dry_run=True,
+    )
+
+    assert success is False
+    assert calls == ["broken_scope", "cn_coal_cbcfi"]
+    assert task._active_tasks == set()
+    assert len(reports) == 1
+    content = reports[0]["report_data"]["content"]
+    assert "大宗商品产业指标聚合同步" in content
+    assert "broken_scope" in content
+    assert "cn_coal_cbcfi" in content
+
+
 def test_policy_discovery_report_contains_copyable_review_commands():
     from scheduler.tasks import _format_special_commodity_scheduler_report
 
@@ -2436,8 +2633,21 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "minute": 30,
         "second": 0,
     }
-    assert industrial["parameters"]["scope_ids"] == ["cn_coal_cbcfi"]
-    assert industrial["parameters"]["window_mode"] == "provider_latest"
+    assert industrial["parameters"]["scope_runs"] == [
+        {
+            "scope_id": "cn_coal_cbcfi",
+            "enabled": True,
+            "window_mode": "provider_latest",
+        },
+        {
+            "scope_id": "cn_nbs_raw_coal_output",
+            "enabled": False,
+            "window_mode": "monthly",
+            "lookback_months": 4,
+            "run_days_of_month": [15, 16, 17, 18, 19, 20, 21, 22],
+            "rollout_note": "Enable only after production write and idempotency validation.",
+        },
+    ]
     assert industrial["parameters"]["dry_run"] is False
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False

@@ -33,10 +33,10 @@
 | `weekly_data_maintenance` | 周维护 | 周日 `02:00` | 预留 5 小时，避开周日白天修复 |
 | `database_backup` | 备份 | 周六 `03:30` | 早于股东增量、申万和股东周期复核 |
 | `shareholder_incremental_sync` | 股东增量 | 每日 `06:30` | 公告驱动，预留 1 小时，早于申万任务 |
-| `special_commodity_price_sync` | 海外商品 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
-| `special_commodity_industrial_indicator_sync` | 大宗商品产业指标 | 周一至周五 `16:30` | 上海航交所 CBCFI 本期/上期；使用来源公开窗口，不推断历史 |
-| `special_commodity_cn_spot_sync` | 国内特殊商品现货与官方基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯、苯乙烯、尿素、烧碱、纯碱、玻璃、沥青、液化石油气、天然橡胶、软木浆现货及 NBS 动力煤旬价，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
-| `special_commodity_price_monthly_sync` | 外盘商品 | 每月10日、20日 `08:40` | FRED/IMF 与 World Bank 铜铝独立月均基准，动态回看6个月以吸收发布延迟和历史修订 |
+| `special_commodity_price_sync` | 海外特殊商品日频价格 | 周二至周六 `08:00` | LME 六种3M代理行情及 EIA/FRED WTI、Brent，动态回看10个自然日 |
+| `special_commodity_industrial_indicator_sync` | 大宗商品产业指标聚合 | 周一至周五 `16:30` | 单任务按 scope 独立调度产量、库存、运费等非价格指标；CBCFI 已启用，NBS 原煤累计产量待生产验证后启用 |
+| `special_commodity_cn_spot_sync` | 国内特殊商品现货与价格基准 | 周一至周五 `22:30` | 100ppi PTA、甲醇、乙二醇、PVC、聚丙烯、苯乙烯、尿素、烧碱、纯碱、玻璃、沥青、液化石油气、天然橡胶、软木浆现货及 NBS 动力煤旬价，动态回看10个自然日；与国内期货任务共库但不共用治理语义 |
+| `special_commodity_price_monthly_sync` | 国际特殊商品月频价格基准 | 每月10日、20日 `08:40` | FRED/IMF 与 World Bank 独立月均基准，动态回看6个月以吸收发布延迟和历史修订 |
 | `special_commodity_policy_discovery` | 政策治理 | 每月15日 `09:10` | NDRC 官方目录发现、正文/附件版本存证和政策候选治理；自动保存证据和候选，并在任务末尾对账正式事件；人工一键批准并提升或拒绝 |
 | `special_commodity_series_catalog_sync` | 扩品治理 | 仅手工 | 同步候选和上线状态，不自动加入任何生产日更 scope |
 | `cache_warm_up` | 缓存 | 每日 `08:20` | LME 日更完成后执行轻量预热 |
