@@ -2784,7 +2784,7 @@ async def test_special_commodity_industrial_scope_failure_is_isolated(monkeypatc
     assert task._active_tasks == set()
     assert len(reports) == 1
     content = reports[0]["report_data"]["content"]
-    assert "大宗商品产业指标聚合同步" in content
+    assert "大宗商品非价格产业指标聚合同步" in content
     assert "broken_scope" in content
     assert "cn_coal_cbcfi" in content
 
@@ -2871,7 +2871,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         (Path(__file__).parents[3] / "config" / "05_scheduler.json").read_text()
     )["scheduler_config"]
     jobs = scheduler_cfg["jobs"]
-    special = jobs["special_commodity_price_sync"]
+    special = jobs["special_commodity_overseas_daily_price_sync"]
     assert special["enabled"] is True
     assert special["manual_only"] is False
     assert special["trigger"] == {
@@ -2885,7 +2885,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "lme_nonferrous",
         "eia_energy_oil",
     ]
-    domestic_spot = jobs["special_commodity_cn_spot_sync"]
+    domestic_spot = jobs["special_commodity_domestic_spot_price_sync"]
     assert domestic_spot["enabled"] is True
     assert domestic_spot["manual_only"] is False
     assert domestic_spot["trigger"] == {
@@ -2941,7 +2941,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
     assert industrial["parameters"]["dry_run"] is False
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
-    monthly = jobs["special_commodity_price_monthly_sync"]
+    monthly = jobs["special_commodity_international_monthly_price_sync"]
     assert monthly["enabled"] is True
     assert monthly["manual_only"] is False
     assert monthly["trigger"] == {
@@ -2960,6 +2960,15 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
     assert monthly["parameters"]["frequencies"] == ["monthly"]
     assert monthly["parameters"]["lookback_months"] == 6
     assert monthly["parameters"]["dry_run"] is False
+    assert jobs["special_commodity_observation_backfill"]["manual_only"] is True
+    assert jobs["special_commodity_policy_governance_sync"]["manual_only"] is False
+    assert not {
+        "special_commodity_price_sync",
+        "special_commodity_cn_spot_sync",
+        "special_commodity_price_monthly_sync",
+        "special_commodity_price_backfill",
+        "special_commodity_policy_discovery",
+    }.intersection(jobs)
     assert jobs["cache_warm_up"]["trigger"]["minute"] == 20
     assert "LME" not in jobs["futures_market_data_sync"]["parameters"]["exchanges"]
     assert all(
@@ -2975,7 +2984,51 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         and (payload.get("trigger") or {}).get("hour") == 8
         and (payload.get("trigger") or {}).get("minute", 0) == 0
     ]
-    assert enabled_at_0800 == ["special_commodity_price_sync"]
+    assert enabled_at_0800 == ["special_commodity_overseas_daily_price_sync"]
+
+
+@pytest.mark.asyncio
+async def test_semantic_special_commodity_tasks_reuse_one_private_runner():
+    from scheduler.tasks import ScheduledTasks
+
+    calls = []
+
+    async def run_observation(**kwargs):
+        calls.append(kwargs)
+        return True
+
+    task = ScheduledTasks.__new__(ScheduledTasks)
+    task._run_special_commodity_observation_sync = run_observation
+
+    assert await task.special_commodity_overseas_daily_price_sync(
+        start_date="2026-07-01", end_date="2026-07-02", dry_run=True
+    )
+    assert await task.special_commodity_domestic_spot_price_sync(
+        start_date="2026-07-01", end_date="2026-07-02", dry_run=True
+    )
+    assert await task.special_commodity_international_monthly_price_sync(
+        start_date="2026-01-01", end_date="2026-06-30", dry_run=True
+    )
+    assert await task.special_commodity_observation_backfill(
+        start_date="2026-07-01", end_date="2026-07-02", dry_run=True
+    )
+
+    assert [call["_task_id"] for call in calls] == [
+        "special_commodity_overseas_daily_price_sync",
+        "special_commodity_domestic_spot_price_sync",
+        "special_commodity_international_monthly_price_sync",
+        "special_commodity_observation_backfill",
+    ]
+    assert calls[0]["frequencies"] == ["daily"]
+    assert calls[2]["frequencies"] == ["monthly"]
+    for old_name in (
+        "special_commodity_price_sync",
+        "special_commodity_cn_spot_sync",
+        "special_commodity_price_monthly_sync",
+        "special_commodity_price_backfill",
+        "special_commodity_policy_discovery",
+    ):
+        assert not hasattr(ScheduledTasks, old_name)
 
 
 def test_special_commodity_evidence_storage_is_additive_and_idempotent(tmp_path):

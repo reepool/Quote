@@ -68,9 +68,9 @@ source_venue -> commodity category -> commodity instrument -> series
 | 动力煤公开市场参考 | 国家统计局“山西优混（5500 大卡）”旬度价格 | 100ppi/库存指标仅作辅助；政策长协独立维护 | 旬度/事件 | CNY/ton 或事件价 | 高（统计局序列）/人工核验（长协） |
 | 化工现货/基差 | 生意社/100ppi，经 AkShare 或直连页面 | 交易所期货主力连续 | 日频 | 多为 CNY/ton | 中 |
 
-World Bank 化肥序列使用独立 `world_bank_fertilizers` scope，并保持为全球月度基准，不与国内100ppi尿素现货合并。2026-07-13 官方工作簿探测确认磷矿石、TSP、尿素和氯化钾自1960-01起可用，DAP自1967-01起可用，五项单位均为 `$/mt`，规范化为 `USD/metric_ton`。短窗口 dry-run 获取90条；全历史复验获取3,905条，主数据和月份治理均为成功。官方工作簿中磷矿石 `2023M11` 明确使用 `…` 无值标记，系统将其登记为带工作簿 URL 的来源治理例外，不插值、不伪造观测；其余月份无未解决缺口。正式写入 `run_id=131` 新增3,905条，幂等复验 `run_id=132` 为新增0、变更0、不变3,905，均无 warning/blocker；验证后已加入 `special_commodity_price_monthly_sync`。
+World Bank 化肥序列使用独立 `world_bank_fertilizers` scope，并保持为全球月度基准，不与国内100ppi尿素现货合并。2026-07-13 官方工作簿探测确认磷矿石、TSP、尿素和氯化钾自1960-01起可用，DAP自1967-01起可用，五项单位均为 `$/mt`，规范化为 `USD/metric_ton`。短窗口 dry-run 获取90条；全历史复验获取3,905条，主数据和月份治理均为成功。官方工作簿中磷矿石 `2023M11` 明确使用 `…` 无值标记，系统将其登记为带工作簿 URL 的来源治理例外，不插值、不伪造观测；其余月份无未解决缺口。正式写入 `run_id=131` 新增3,905条，幂等复验 `run_id=132` 为新增0、变更0、不变3,905，均无 warning/blocker；验证后已加入 `special_commodity_international_monthly_price_sync`。
 
-World Bank 农产品使用独立 `world_bank_agriculture` scope。2026-07-13 官方工作簿探测确认棕榈油、大豆、豆油、豆粕、玉米、美国HRW小麦、世界糖和Cotton A Index连续覆盖1960-01至2026-06，各798个月；TSR20橡胶连续覆盖1999-01至2026-06，共330个月；生命周期内均无缺月。油籽、谷物按 `USD/metric_ton`，糖、棉花和橡胶按 `USD/kg` 保存。短窗口 dry-run `run_id=134` 覆盖2025-01至2026-06，9个序列共162条；全历史 dry-run `run_id=135` 共6,714条；正式写入 `run_id=137` 新增6,714条；幂等复验 `run_id=138` 为新增0、变更0、不变6,714。各阶段主数据与月份治理均成功且无 warning/blocker，验证后已加入 `special_commodity_price_monthly_sync`。
+World Bank 农产品使用独立 `world_bank_agriculture` scope。2026-07-13 官方工作簿探测确认棕榈油、大豆、豆油、豆粕、玉米、美国HRW小麦、世界糖和Cotton A Index连续覆盖1960-01至2026-06，各798个月；TSR20橡胶连续覆盖1999-01至2026-06，共330个月；生命周期内均无缺月。油籽、谷物按 `USD/metric_ton`，糖、棉花和橡胶按 `USD/kg` 保存。短窗口 dry-run `run_id=134` 覆盖2025-01至2026-06，9个序列共162条；全历史 dry-run `run_id=135` 共6,714条；正式写入 `run_id=137` 新增6,714条；幂等复验 `run_id=138` 为新增0、变更0、不变6,714。各阶段主数据与月份治理均成功且无 warning/blocker，验证后已加入 `special_commodity_international_monthly_price_sync`。
 
 ### 2.2 不纳入第一阶段自动化的内容
 
@@ -383,23 +383,23 @@ scope 解析
 | 任务 ID | 显示名称 | 频率 | 用途 |
 |---|---|---|---|
 | `commodity_price_master_sync` | 特殊商品主数据与序列字典同步 | 每周 | 同步主数据和 series 字典 |
-| `special_commodity_price_sync` | 海外特殊商品日频价格同步 | 周二至周六 08:00 | 同步 LME 3M 代理日线和 EIA/FRED WTI、Brent |
-| `special_commodity_cn_spot_sync` | 国内特殊商品现货与价格基准同步 | 周一至周五 22:30 | 同步100ppi国内现货和NBS动力煤旬价 |
-| `special_commodity_industrial_indicator_sync` | 大宗商品产业指标聚合同步 | 周一至周五 16:30 | 在一个任务内按 scope 独立调度产量、库存、运费、进口量和仓单等非价格指标 |
-| `special_commodity_price_monthly_sync` | 国际特殊商品月频价格基准同步 | 每月10日、20日 08:40 | 同步 FRED/IMF、World Bank 月度价格基准 |
-| `special_commodity_policy_discovery` | 特殊商品政策目录发现与治理 | 每月15日 09:10 | 发现NDRC新增/修订政策、保存证据和候选，并在同一任务末尾幂等对账正式事件 |
-| `special_commodity_price_backfill` | 特殊商品历史数据回补 | 仅手工 | 对指定 scope 和区间执行治理前置、dry-run 或正式回补 |
+| `special_commodity_overseas_daily_price_sync` | 海外特殊商品日频价格同步 | 周二至周六 08:00 | 同步 LME 3M 代理日线和 EIA/FRED WTI、Brent |
+| `special_commodity_domestic_spot_price_sync` | 国内特殊商品现货价格与基准同步 | 周一至周五 22:30 | 同步100ppi国内现货和NBS动力煤旬价 |
+| `special_commodity_industrial_indicator_sync` | 大宗商品非价格产业指标聚合同步 | 周一至周五 16:30 | 在一个任务内按 scope 独立调度产量、库存、运费、进口量和仓单等非价格指标 |
+| `special_commodity_international_monthly_price_sync` | 国际特殊商品月频价格基准同步 | 每月10日、20日 08:40 | 同步 FRED/IMF、World Bank 月度价格基准 |
+| `special_commodity_policy_governance_sync` | 特殊商品政策目录发现与事件治理 | 每月15日 09:10 | 发现NDRC新增/修订政策、保存证据和候选，并在同一任务末尾幂等对账正式事件 |
+| `special_commodity_observation_backfill` | 特殊商品价格与产业指标历史观测回补 | 仅手工 | 对指定 scope 和区间执行治理前置、dry-run 或正式回补 |
 | `commodity_price_readiness_check` | DCF 商品输入就绪检查 | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-政策治理已经收口为单一月度运维入口 `special_commodity_policy_discovery`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
+政策治理已经收口为单一月度运维入口 `special_commodity_policy_governance_sync`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
 
-当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 是稳定的命令和调度接口，面向用户的显示名称必须明确区分海外日频价格、国内现货与价格基准、国际月频价格基准、非价格产业指标和历史回补。海外日频任务 `special_commodity_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_cn_spot_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。
+当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 按“地域 + 数据语义 + 频率”命名，直接区分海外日频价格、国内现货价格、国际月频价格、非价格产业指标、政策治理和历史观测回补；旧的歧义 ID 已一次性删除且不保留别名。所有价格和指标入口复用同一个内部治理执行器，不形成平行链路。海外日频任务 `special_commodity_overseas_daily_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_domestic_spot_price_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。
 
 `special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 已启用并使用 `provider_latest` 窗口；`cn_nbs_raw_coal_output` 已预配置月度窗口和候选运行日，但在生产 write 与幂等复验完成前保持禁用。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
 
 滚动窗口任务默认回看最近10个自然日，而来源窗口任务使用来源公开边界。各 scope 隔离来源、频率、报告和日期治理。国内现货、官方旬价和产业指标不进入期货连续合约任务，因为来源观测日、单值价格或指数和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
-`fred_imf_metals`、`world_bank_metals`、`world_bank_fertilizers` 与 `world_bank_agriculture` 使用同一个 `special_commodity_price_monthly_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。World Bank 金属、化肥与农产品是各自独立的 Pink Sheet 全球月度基准，不得覆盖、平均或伪装成 IMF/FRED 或国内100ppi现货。每个 scope 须先完成全历史 dry-run、正式落库和幂等验证，验证通过后才可加入月更任务。
+`fred_imf_metals`、`world_bank_metals`、`world_bank_fertilizers` 与 `world_bank_agriculture` 使用同一个 `special_commodity_international_monthly_price_sync`，每月10日、20日 08:40（Asia/Shanghai）运行并滚动回看最近6个月。双月更用于覆盖 World Bank 月初发布以及 IMF 数据经 FRED 转发时可能出现的额外延迟，回看窗口同时吸收历史修订；观测日期表示统计月份，不表示月初当日成交价。World Bank 金属、化肥与农产品是各自独立的 Pink Sheet 全球月度基准，不得覆盖、平均或伪装成 IMF/FRED 或国内100ppi现货。每个 scope 须先完成全历史 dry-run、正式落库和幂等验证，验证通过后才可加入月更任务。
 
 月更报告中的 `changed` 必须表示规范价格语义发生变化，包括规范值/原始值、币种、单位、来源代码或质量标记变化。FRED `realtime_start/realtime_end`、请求日期、来源 URL、parser 版本或其他审计 payload 单独变化时，不得误报为价格修订；任务仍须更新并保留最新 metadata 与 `raw_payload_hash`，供来源追溯和 vintage 审计。
 
@@ -409,14 +409,14 @@ scope 解析
 
 FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略。SSL EOF、连接重置等瞬时网络错误在重试耗尽前不得直接把单一序列判定为主数据阻断；每次重试必须记录请求阶段、尝试次数和退避时间。
 
-- `/run special_commodity_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=eia_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=world_bank_metals start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_price_backfill scope_id=cn_nbs_thermal_coal start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
-- `/run special_commodity_policy_discovery adapter_id=ndrc start_date=YYYY-MM-DD end_date=YYYY-MM-DD dry_run`
+- `/run special_commodity_overseas_daily_price_sync scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=eia_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=world_bank_metals start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=lme_nonferrous start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=cn_100ppi_chemical start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_observation_backfill scope_id=cn_nbs_thermal_coal start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
+- `/run special_commodity_policy_governance_sync adapter_id=ndrc start_date=YYYY-MM-DD end_date=YYYY-MM-DD dry_run`
 - `/run special_commodity_calendar_governance scope_id=fred_energy_oil start=YYYY-MM-DD end=YYYY-MM-DD dry_run`
 
 部署后 API 统一位于 `/api/v1` 前缀下：

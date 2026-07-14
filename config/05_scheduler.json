@@ -809,7 +809,7 @@
           "max_runtime_seconds": 600
         }
       },
-      "special_commodity_price_sync": {
+      "special_commodity_overseas_daily_price_sync": {
         "enabled": true,
         "manual_only": false,
         "description": "海外特殊商品日频价格同步（LME 六种3M代理行情及 EIA主源/FRED备源 WTI/Brent 现货）",
@@ -833,13 +833,13 @@
           "lookback_days": 10,
           "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Overseas daily scopes only. Domestic 100ppi spot series run in special_commodity_cn_spot_sync."
+          "note": "Overseas daily scopes only. Domestic 100ppi spot series run in special_commodity_domestic_spot_price_sync."
         }
       },
-      "special_commodity_cn_spot_sync": {
+      "special_commodity_domestic_spot_price_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "国内特殊商品现货与价格基准同步（100ppi 化工现货、国家统计局动力煤旬价；独立于国内期货连续合约日更）",
+        "description": "国内特殊商品现货价格与基准同步（100ppi 化工现货、国家统计局动力煤旬价；独立于国内期货连续合约日更）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -879,7 +879,7 @@
       "special_commodity_industrial_indicator_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "大宗商品产业指标聚合同步（产量、库存、运费、进口量和仓单等非价格指标按 scope 独立治理窗口）",
+        "description": "大宗商品非价格产业指标聚合同步（产量、库存、运费、进口量和仓单按 scope 独立治理窗口）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -922,7 +922,7 @@
           "note": "One domain task aggregates industrial indicators. Each scope declares its own due dates and observation window; disabled scopes are reported as skipped without network requests."
         }
       },
-      "special_commodity_price_monthly_sync": {
+      "special_commodity_international_monthly_price_sync": {
         "enabled": true,
         "manual_only": false,
         "description": "国际特殊商品月频价格基准同步（FRED/IMF 铜铝与 World Bank 金属、化肥、农产品月均价；治理观测月份与来源修订）",
@@ -954,10 +954,10 @@
           "note": "FRED/IMF and World Bank Pink Sheet are independently identified monthly benchmarks. World Bank fertilizer and agriculture series remain separate from domestic spot series; no source or regional benchmark silently overwrites or averages another."
         }
       },
-      "special_commodity_price_backfill": {
+      "special_commodity_observation_backfill": {
         "enabled": true,
         "manual_only": true,
-        "description": "特殊商品历史回补（manual_only，需要显式 start_date/end_date，默认 dry_run）",
+        "description": "特殊商品价格与产业指标历史观测回补（manual_only，需要显式 start_date/end_date，默认 dry_run）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -984,10 +984,10 @@
           "max_runtime_seconds": 1800
         }
       },
-      "special_commodity_policy_discovery": {
+      "special_commodity_policy_governance_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "NDRC等官方政策目录月度发现、版本存证与候选治理；新候选通过报告驱动人工审核并一步提升",
+        "description": "特殊商品政策目录发现、版本存证、候选审核与正式事件对账治理",
         "report": true,
         "pre_run_notify": true,
         "trigger": {

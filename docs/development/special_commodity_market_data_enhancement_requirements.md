@@ -97,7 +97,7 @@
 | 重点港口煤炭库存 | 已探测页面的具体值属于付费内容；AkShare 的沿海电厂库存不是港口库存，统计对象不等价 | 尚无满足持续免费、口径明确和可自动化要求的主源，保持 blocked。不得把电厂库存、研究报告截图或付费页面泄露内容冒充港口库存。 |
 | 全国规模以上工业原煤累计产量 | 国家统计局月度工业增加值官方发布页可稳定发现统计期、发布日期和原煤累计绝对量；1—2月为合并累计口径，3月以后同时发布当月值和年初至当月累计值 | 已实现 `nbs_monthly_industrial_output` adapter、`CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY` 和 `cn_nbs_raw_coal_output` scope。统一治理仅保存官方累计值，单位为 `10k_ton`、币种为空、`data_kind=industrial_indicator`，不自动差分或伪造1月/2月单月值。来源发现以官方栏目目录为主，只有目录缺少应披露统计期时才调用辅助搜索；直连网络失败或 challenge 使用统一代理配置做最多3次出口轮换，临时限流最多重试3次并从5秒开始退避，出口轮换仍无法解除 `-101` IP禁用才熔断本轮搜索。2026年2—5月短窗及2022-02-28至2026-05-31全历史隔离 dry-run 均成功；全历史应有48期、实际发现和解析48期，年度分布为2022—2025各11期、2026年截至5月4期，无 warning 或 blocker。向前探测证明2017—2021年旧版工业增加值文章并不稳定包含原煤绝对量，因此当前同口径可用起点收紧为2022-02-28；更早“能源生产情况”数据不得未经精度和口径治理直接混填。生产 write 和调度幂等验证仍是上线前门槛。 |
 
-CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_price_sync`、`special_commodity_cn_spot_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口，当前 CBCFI 使用 `provider_latest` 并已启用，NBS 使用月度回看窗口但在生产 write 与幂等复验前禁用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
+CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_overseas_daily_price_sync`、`special_commodity_domestic_spot_price_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口，当前 CBCFI 使用 `provider_latest` 并已启用，NBS 使用月度回看窗口但在生产 write 与幂等复验前禁用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
 
 ## 6. 更多连续商品行情
 
@@ -161,7 +161,7 @@ CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观
 
 建议新增：
 
-- `/run special_commodity_policy_discovery dry_run|write`：月度政策发现和候选治理。
+- `/run special_commodity_policy_governance_sync dry_run|write`：月度政策发现和候选治理。
 - `/run special_commodity_industrial_indicator_backfill scope_id=...`。
 - `/run special_commodity_industrial_indicator_sync`。
 - `/api/v1/research/commodities/policy-candidates`。
@@ -170,8 +170,8 @@ CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观
 
 首期实现状态：
 
-- 已实现 `special_commodity_policy_discovery` 的统一 Scheduler/DataManager/API 入口，并在真实 dry-run、write、候选审核和幂等提升验证后正式上线：每月15日09:10自动执行 write，保存新增/修订文档和候选，但不自动批准政策；同一任务末尾自动完成既有配置政策和已批准候选的正式事件幂等对账。无待审核项时发送简洁报告；有待审核项时报告附政策摘要、批准并提升命令和拒绝命令。原独立 `special_commodity_policy_event_sync` 运维任务已删除，底层 validator/service 仅作为发现和审核链路的共享能力。
-- 手工 dry-run：`/run special_commodity_policy_discovery adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
+- 已实现 `special_commodity_policy_governance_sync` 的统一 Scheduler/DataManager/API 入口，并在真实 dry-run、write、候选审核和幂等提升验证后正式上线：每月15日09:10自动执行 write，保存新增/修订文档和候选，但不自动批准政策；同一任务末尾自动完成既有配置政策和已批准候选的正式事件幂等对账。无待审核项时发送简洁报告；有待审核项时报告附政策摘要、批准并提升命令和拒绝命令。原独立 `special_commodity_policy_event_sync` 运维任务已删除，底层 validator/service 仅作为发现和审核链路的共享能力。
+- 手工 dry-run：`/run special_commodity_policy_governance_sync adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
 - 本地 API：`GET /api/v1/research/commodities/policy-candidates`、`GET /api/v1/research/commodities/source-documents`、`POST /api/v1/research/commodities/policy-discovery`。
 - `ready_for_promotion` 仅表示 parser 字段完整。发现报告必须附政策摘要、8位 `review_code`、批准和拒绝命令。运行 `/run special_commodity_policy_candidate_review candidate_ref=<review_code> decision=approved notes=verified` 会在同一任务中记录审核并通过统一 validator 幂等提升正式事件；无需再运行第二条 write 命令。拒绝使用 `decision=rejected`，状态持久保留，后续发现同一版本时不再重复提示。完整 `candidate_id` 仅作为内部稳定主键，API 和任务同时支持短码、完整ID或文号。
 - 2026-07-12 任务进程真实 NDRC dry-run 扫描2个目录、6份有效文档（含1个附件），只生成303号文件对应的1条政策候选，状态为 `ready_for_promotion`，无 warning、blocker 或噪声候选；正确识别 `570-770 CNY/ton`、`2022-05-01` 生效且 `value_mid` 为空。执行 `write` 只保存来源文档和候选，候选仍须审核为 `approved` 后才能由政策事件任务提升。

@@ -4381,7 +4381,7 @@ class ScheduledTasks:
             job_config=job_config,
         )
 
-    async def special_commodity_price_sync(
+    async def _run_special_commodity_observation_sync(
         self,
         scope_id: Optional[str] = None,
         scope_ids: Optional[List[str]] = None,
@@ -4396,10 +4396,12 @@ class ScheduledTasks:
         window_mode: str = 'rolling',
         dry_run: bool = False,
         job_config: Optional[JobConfig] = None,
-        _task_id: str = 'special_commodity_price_sync',
-        _task_name: str = '海外特殊商品日频价格同步',
+        _task_id: Optional[str] = None,
+        _task_name: Optional[str] = None,
     ) -> bool:
-        """特殊商品价格/指数观测值同步任务。"""
+        """Run one governed special-commodity observation task."""
+        if not _task_id or not _task_name:
+            raise ValueError('special commodity task identity is required')
         self._active_tasks.add(_task_id)
         try:
             start_date, end_date = _resolve_special_commodity_task_window(
@@ -4474,7 +4476,40 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(_task_id)
 
-    async def special_commodity_cn_spot_sync(
+    async def special_commodity_overseas_daily_price_sync(
+        self,
+        scope_id: Optional[str] = None,
+        scope_ids: Optional[List[str]] = None,
+        venues: Optional[List[str]] = None,
+        categories: Optional[List[str]] = None,
+        commodity_ids: Optional[List[str]] = None,
+        series_ids: Optional[List[str]] = None,
+        frequencies: Optional[List[str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        lookback_days: int = 10,
+        dry_run: bool = False,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """同步海外特殊商品日频价格。"""
+        return await self._run_special_commodity_observation_sync(
+            scope_id=scope_id,
+            scope_ids=scope_ids,
+            venues=venues,
+            categories=categories,
+            commodity_ids=commodity_ids,
+            series_ids=series_ids,
+            frequencies=frequencies or ['daily'],
+            start_date=start_date,
+            end_date=end_date,
+            lookback_days=lookback_days,
+            dry_run=dry_run,
+            job_config=job_config,
+            _task_id='special_commodity_overseas_daily_price_sync',
+            _task_name='海外特殊商品日频价格同步',
+        )
+
+    async def special_commodity_domestic_spot_price_sync(
         self,
         scope_id: Optional[str] = None,
         scope_ids: Optional[List[str]] = None,
@@ -4490,7 +4525,7 @@ class ScheduledTasks:
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """国内特殊商品现货与价格基准同步，共用治理与持久化链路。"""
-        return await self.special_commodity_price_sync(
+        return await self._run_special_commodity_observation_sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
             venues=venues,
@@ -4503,8 +4538,8 @@ class ScheduledTasks:
             lookback_days=lookback_days,
             dry_run=dry_run,
             job_config=job_config,
-            _task_id='special_commodity_cn_spot_sync',
-            _task_name='国内特殊商品现货与基准同步',
+            _task_id='special_commodity_domestic_spot_price_sync',
+            _task_name='国内特殊商品现货价格与基准同步',
         )
 
     async def special_commodity_industrial_indicator_sync(
@@ -4526,7 +4561,7 @@ class ScheduledTasks:
     ) -> bool:
         """Aggregate independently scheduled industrial-indicator scopes."""
         task_id = 'special_commodity_industrial_indicator_sync'
-        task_name = '大宗商品产业指标聚合同步'
+        task_name = '大宗商品非价格产业指标聚合同步'
         self._active_tasks.add(task_id)
         try:
             explicit_selection = any(
@@ -4643,7 +4678,7 @@ class ScheduledTasks:
             success = combined.get('status') in {'success', 'skipped'}
             await self._send_task_report(
                 report_data={
-                    'name': '大宗商品产业指标聚合同步报告',
+                    'name': '大宗商品非价格产业指标聚合同步报告',
                     'content': _format_special_commodity_scheduler_report(
                         combined, title=task_name
                     ),
@@ -4665,7 +4700,7 @@ class ScheduledTasks:
             )
             await self._send_task_report(
                 report_data={
-                    'name': '大宗商品产业指标聚合同步报告',
+                    'name': '大宗商品非价格产业指标聚合同步报告',
                     'content': _format_special_commodity_scheduler_report(
                         {'status': 'error', 'reason': str(e)}, title=task_name
                     ),
@@ -4684,7 +4719,7 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard(task_id)
 
-    async def special_commodity_price_backfill(
+    async def special_commodity_observation_backfill(
         self,
         scope_id: Optional[str] = None,
         scope_ids: Optional[List[str]] = None,
@@ -4698,10 +4733,12 @@ class ScheduledTasks:
         dry_run: bool = True,
         job_config: Optional[JobConfig] = None,
     ) -> bool:
-        """特殊商品历史回补任务，要求显式日期范围。"""
+        """特殊商品价格和产业指标历史观测回补，要求显式日期范围。"""
         if not start_date or not end_date:
-            raise ValueError("special_commodity_price_backfill requires start_date and end_date")
-        return await self.special_commodity_price_sync(
+            raise ValueError(
+                "special_commodity_observation_backfill requires start_date and end_date"
+            )
+        return await self._run_special_commodity_observation_sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
             venues=venues,
@@ -4713,11 +4750,11 @@ class ScheduledTasks:
             end_date=end_date,
             dry_run=dry_run,
             job_config=job_config,
-            _task_id='special_commodity_price_backfill',
-            _task_name='特殊商品历史数据回补',
+            _task_id='special_commodity_observation_backfill',
+            _task_name='特殊商品价格与产业指标历史回补',
         )
 
-    async def special_commodity_price_monthly_sync(
+    async def special_commodity_international_monthly_price_sync(
         self,
         scope_id: Optional[str] = None,
         scope_ids: Optional[List[str]] = None,
@@ -4748,7 +4785,7 @@ class ScheduledTasks:
             lookback_months,
             dry_run,
         )
-        return await self.special_commodity_price_sync(
+        return await self._run_special_commodity_observation_sync(
             scope_id=scope_id,
             scope_ids=scope_ids,
             venues=venues,
@@ -4760,8 +4797,8 @@ class ScheduledTasks:
             end_date=end_date,
             dry_run=dry_run,
             job_config=job_config,
-            _task_id='special_commodity_price_monthly_sync',
-            _task_name='国际特殊商品月度基准价格同步',
+            _task_id='special_commodity_international_monthly_price_sync',
+            _task_name='国际特殊商品月度价格基准同步',
         )
 
     async def special_commodity_calendar_governance(
@@ -4817,7 +4854,7 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('special_commodity_calendar_governance')
 
-    async def special_commodity_policy_discovery(
+    async def special_commodity_policy_governance_sync(
         self,
         adapter_id: str = "ndrc",
         start_date: Optional[str] = None,
@@ -4826,7 +4863,7 @@ class ScheduledTasks:
         job_config: Optional[JobConfig] = None,
     ) -> bool:
         """特殊商品官方政策目录发现与候选治理任务。"""
-        task_id = 'special_commodity_policy_discovery'
+        task_id = 'special_commodity_policy_governance_sync'
         self._active_tasks.add(task_id)
         try:
             result = await data_manager.run_special_commodity_policy_discovery(
@@ -4838,7 +4875,7 @@ class ScheduledTasks:
             success = result.get("status") in {"success", "warning"}
             await self._send_task_report(
                 report_data={
-                    'name': '特殊商品政策目录发现报告',
+                    'name': '特殊商品政策目录发现与事件治理报告',
                     'content': _format_special_commodity_scheduler_report(result),
                     'status': result.get("status", "error"),
                     'tasks_completed': int(result.get("documents", 0) or 0),
@@ -4846,7 +4883,7 @@ class ScheduledTasks:
                     'maintenance_tasks': [{'task_name': task_id, 'status': result.get("status")}],
                 },
                 report_type='maintenance_report',
-                task_name='特殊商品政策目录发现',
+                task_name='特殊商品政策目录发现与事件治理',
                 job_config=job_config,
             )
             return success
@@ -4854,7 +4891,7 @@ class ScheduledTasks:
             scheduler_logger.error("[Scheduler] Special commodity policy discovery failed: %s", e)
             await self._send_task_report(
                 report_data={
-                    'name': '特殊商品政策目录发现报告',
+                    'name': '特殊商品政策目录发现与事件治理报告',
                     'content': _format_special_commodity_scheduler_report({'status': 'error', 'reason': str(e)}),
                     'status': 'error',
                     'tasks_completed': 0,
@@ -4862,7 +4899,7 @@ class ScheduledTasks:
                     'maintenance_tasks': [{'task_name': task_id, 'status': str(e)}],
                 },
                 report_type='maintenance_report',
-                task_name='特殊商品政策目录发现',
+                task_name='特殊商品政策目录发现与事件治理',
                 job_config=job_config,
             )
             return False

@@ -301,13 +301,13 @@ The system SHALL schedule non-domestic special commodity observations independen
 #### Scenario: LME daily sync is enabled
 
 - **WHEN** the first production LME scope is activated
-- **THEN** `special_commodity_price_sync` SHALL run `lme_nonferrous` Tuesday-Saturday at 08:00 Asia/Shanghai
+- **THEN** `special_commodity_overseas_daily_price_sync` SHALL run `lme_nonferrous` Tuesday-Saturday at 08:00 Asia/Shanghai
 - **AND** `futures_market_data_sync` SHALL remain limited to the five configured domestic exchanges.
 
 #### Scenario: Governed FRED oil spot series are enabled
 
 - **WHEN** WTI and Brent FRED series have completed full-range master governance, source-observed date governance, and historical backfill
-- **THEN** `special_commodity_price_sync` SHALL include canonical `eia_energy_oil` in the same Tuesday-Saturday 08:00 Asia/Shanghai run as `lme_nonferrous`
+- **THEN** `special_commodity_overseas_daily_price_sync` SHALL include canonical `eia_energy_oil` in the same Tuesday-Saturday 08:00 Asia/Shanghai run as `lme_nonferrous`
 - **AND** the common governance-first pipeline SHALL remain mandatory for both scopes.
 
 #### Scenario: Canonical oil source chain resolves a date
@@ -327,7 +327,7 @@ The system SHALL schedule non-domestic special commodity observations independen
 #### Scenario: Governed monthly metal benchmarks are scheduled
 
 - **WHEN** FRED/IMF copper and aluminum have completed historical governance and backfill
-- **THEN** `special_commodity_price_monthly_sync` SHALL run twice per month on the configured schedule with a bounded multi-month lookback
+- **THEN** `special_commodity_international_monthly_price_sync` SHALL run twice per month on the configured schedule with a bounded multi-month lookback
 - **AND** master and source-period governance SHALL run before observations are persisted
 - **AND** the lookback SHALL allow delayed publication and historical revisions to update existing months idempotently.
 
