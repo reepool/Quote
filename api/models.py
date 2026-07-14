@@ -458,6 +458,7 @@ class SystemStatusResponse(BaseModel):
     timestamp: datetime
 
     # 新增字段
+    change_watermarks: Dict[str, Any] = Field(default_factory=dict)
     trading_calendar_status: Dict[str, Any] = Field(default_factory=dict)
     data_quality_metrics: Dict[str, Any] = Field(default_factory=dict)
     recent_gaps: List[Dict[str, Any]] = Field(default_factory=list)

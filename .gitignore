@@ -202,8 +202,32 @@ Thumbs.db
 process.pid
 
 # Openspce辅助文件
-openspec/
-openspec/*/
+openspec/*
+!openspec/config.yaml
+!openspec/changes/
+openspec/changes/*
+!openspec/changes/archive/
+openspec/changes/archive/*
+!openspec/changes/archive/2026-07-14-add-daily-sync-change-watermarks/
+!openspec/changes/archive/2026-07-14-add-daily-sync-change-watermarks/**
+!openspec/specs/
+openspec/specs/*
+!openspec/specs/daily-sync-change-watermarks/
+!openspec/specs/daily-sync-change-watermarks/**
+!openspec/specs/data-storage-layout/
+!openspec/specs/data-storage-layout/**
+!openspec/specs/futures-market-data/
+!openspec/specs/futures-market-data/**
+!openspec/specs/fx-market-data/
+!openspec/specs/fx-market-data/**
+!openspec/specs/quote-api-query-semantics/
+!openspec/specs/quote-api-query-semantics/**
+!openspec/specs/research-data-engine/
+!openspec/specs/research-data-engine/**
+!openspec/specs/scheduler/
+!openspec/specs/scheduler/**
+!openspec/specs/special-commodity-market-data/
+!openspec/specs/special-commodity-market-data/**
 AGENTS.md
 CLAUDE.md
 

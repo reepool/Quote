@@ -219,6 +219,7 @@ class ReportEngine:
                     data.get('index_master_governance'),
                 ),
                 'catchup_stats': summary.get('catchup_stats', data.get('catchup_stats')),
+                'changelog_stats': summary.get('changelog_stats', data.get('changelog_stats')),
             })
 
         data['instrument_master_sync_summary'] = self._format_instrument_master_sync_summary(
@@ -230,11 +231,36 @@ class ReportEngine:
         data['daily_catchup_summary'] = self._format_daily_catchup_summary(
             data.get('catchup_stats')
         )
+        data['daily_changelog_summary'] = self._format_daily_changelog_summary(
+            data.get('changelog_stats')
+        )
 
         # 确保所有报告都有一个明确的名称
         data['name'] = data.get('name', '每日数据更新报告')
 
         return data
+
+    def _format_daily_changelog_summary(self, changelog_stats: Dict[str, Any]) -> str:
+        """Format compact changelog counters for operator reports."""
+        if not isinstance(changelog_stats, dict) or not changelog_stats:
+            return ''
+
+        counters = {
+            '新增': int(changelog_stats.get('inserted', 0) or 0),
+            '修订': int(changelog_stats.get('changed', 0) or 0),
+            '未变': int(changelog_stats.get('unchanged', 0) or 0),
+            '跳过': int(changelog_stats.get('skipped', 0) or 0),
+            '失败': int(changelog_stats.get('failed', 0) or 0),
+            '水位写入': int(changelog_stats.get('changelog_written', 0) or 0),
+        }
+        if not any(counters.values()):
+            return ''
+
+        visible_parts = []
+        for label, value in counters.items():
+            if value or label == '水位写入':
+                visible_parts.append(f"{label}: {value}")
+        return '，'.join(visible_parts)
 
     def _format_daily_exchange_stats_for_table(
         self,

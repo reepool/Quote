@@ -135,8 +135,8 @@
 
 ### 11. 全库变更日志/增量水位端点（REQ-06.2）
 **要做什么**：一个只读端点，返回"最近哪些 `(instrument_id, trade_date)` 分区被修订过"，供量化平台做精确增量同步（替代当前的"重叠区间重拉"兜底策略）。类比数据库的变更捕获（CDC）机制——量化平台每次同步时不用整体重拉，只按这个列表精确补拉变化的部分。更彻底的版本是给每一行数据一个只增不减的版本号（全库单调 `revision_seq`），调用方直接说"给我版本号大于 N 的所有变化"。
-**现状**：`batch_id`/`updated_at`/`ingestion_run_id` 语义已在文档澄清（属已完成项），但"变更日志端点"本身、以及"全库单调 revision_seq"都还没做，属架构级改动。
-**工作量**：预估 4-7 人日（基于 `updated_at` 的变更日志端点相对可行；全库单调 revision_seq 成本更高，不建议做）。
+**现状（2026-07-14 更新）**：OpenSpec change `add-daily-sync-change-watermarks` 已在独立 worktree 完成 P0/P1/P2 实现和审查。quote DB 已提供只读水位端点；futures、FX、commodity、financial、industry、valuation 等域已在各自数据库持久化本地已观测 changelog。各数据库 sequence 独立，跨库聚合 API 和 P3 master/calendar governance 仍为后续项，不能把 quote DB sequence 解释成全库强全局水位。
+**后续工作量**：跨库聚合只读 API 及 P3 governance 需重新评估，必须保留 `database_id/domain`，不得承诺跨 SQLite 数据库的全局事务顺序。
 
 ### 12. Parquet/Arrow 批量导出端点（REQ-11.2）
 **要做什么**：按"交易所×日期范围"直接导出 Parquet/Arrow 格式的批量端点，替代分页轮询，加速量化平台首次全量同步。现在 `/quotes/daily` 是分页 JSON/CSV，做一次全市场全历史同步要发几千次分页请求；这个端点让平台一次性下载一个 Parquet/Arrow 文件，量化工具链（pandas/polars）读取效率远高于逐页解析 JSON。只对"一次性拉全量历史"这种场景有用，日常小范围查询用现在的接口就够。
@@ -150,9 +150,65 @@
 
 ---
 
+## 六、期货测试与治理契约基线问题（待独立 OpenSpec change）
+
+> 发现时间：2026-07-14。发现于 `add-daily-sync-change-watermarks` 完成前全量回归，但已使用不含该 change 改动的基线提交 `fb58f4479d29b8a9f41c36ff89c1463821f86354` 独立复现，确认不是增量同步回归。本 change 只记录，不修改期货 provider 或交易日历治理语义。
+
+复核结论：治理能力并未缺失。交易所期货 `CNF.*` 的日更同时经过 `FuturesTradingDayGovernanceService`、`FuturesMasterGovernanceService` 和 master discovery，调度配置也要求 trading-day/master-data 两项前置治理；外汇和特殊商品中的非交易所观察序列则按 publication calendar 或 source-observed date 治理，并保留各自的 series/master 配置。两类数据的日期语义不同，不能用交易所交易日历统一替代。以下问题分别属于 provider 质量契约和测试 fixture 未满足既有门禁，不创建“治理缺失” change。
+
+### 14. AkShare 期货 bar 质量契约与 fixture 预期不一致
+
+**问题编号**：`FUT-QUALITY-001`
+
+**现象**：`test_akshare_futures_provider_normalizes_fixture` 的 fixture 只提供 OHLCV，不含 settlement/open interest/amount；生产归一化逻辑返回 `quality_flag=partial`，测试仍断言 `ok`。
+
+**风险**：测试无法表达当前质量规则的真实契约。直接把 `partial` 放宽成 `ok` 可能掩盖字段缺失，影响期货研究、连续合约质量门禁和数据完整性判断。
+
+**建议新 change**：`align-futures-provider-quality-contracts`。
+
+**验收边界**：
+- 明确不同 source profile 的必需字段与 `ok/partial` 判定表。
+- 使用可控 fixture 覆盖字段齐全、字段缺失和合法空值。
+- 不为通过测试降低生产质量门槛；若测试预期过时，应修正测试并记录理由。
+
+### 15. 期货 sync 测试未满足 verified trading calendar 前置条件
+
+**问题编号**：`FUT-CALENDAR-002`
+
+**现象**：6 个 provider 路由、dry-run、heartbeat 和 timeout 测试没有预置 governed trading dates，sync 在调用 provider 前按现有安全门禁返回 `blocked`，导致原测试预期的 success/partial、would-write、heartbeat 和 timeout 行为均未执行。
+
+受影响用例：
+- `test_futures_market_data_sync_uses_governed_trading_dates`
+- `test_futures_market_data_sync_falls_back_after_official_unavailable`
+- `test_futures_market_data_sync_falls_back_after_official_empty`
+- `test_futures_market_data_sync_dry_run_reports_would_write_rows`
+- `test_futures_market_data_sync_heartbeats_progress_metadata`
+- `test_futures_market_data_sync_times_out_stuck_provider`
+
+**风险**：完整期货测试文件长期红灯会掩盖真正回归；若为了恢复测试而绕过 calendar gate，则可能让日更在未经治理的日期请求数据，制造错误缺口、周末行情或不可靠回补。
+
+**建议新 change**：`stabilize-futures-calendar-governance-tests`。
+
+**验收边界**：
+- provider 路由类测试显式写入最小 verified calendar fixture，并使用固定起止日期。
+- calendar gate 自身继续由独立测试覆盖 blocked、auto-backfill、closed day 和 unresolved date。
+- timeout 测试必须先通过 calendar gate，再验证 provider 超时，不允许依赖当前日期或实时网络。
+- `tests/unit/test_research/test_futures_market_data.py` 全文件通过，且不得降低生产 calendar minimum-quality 门槛。
+
+**基线复现命令**：
+
+```bash
+python -m pytest -q tests/unit/test_research/test_futures_market_data.py
+```
+
+基线结果：`93 passed, 7 failed`。两个问题应在新的 worktree/OpenSpec change 中处理，不与增量同步 change 混合提交。
+
+---
+
 ## 当前排期状态
 
 - **一（排序方向）**：已决定不改，不再是待办。
 - **二、三**：本轮重写为更清晰、更自包含的问题描述（现象/影响/根因/调研方向/工作量），已提交你审阅优化。
 - **四**：按你的要求先搁置，后面再讨论。
-- **五**：三项用途已在对话中解释，内容保留在本文档，暂不安排。
+- **五**：增量水位 P0/P1/P2 已在 `add-daily-sync-change-watermarks` 落地；跨库 API/P3 governance、Parquet/Arrow 和占位日期标注仍暂不安排。
+- **六**：`FUT-QUALITY-001` 与 `FUT-CALENDAR-002` 已确认是基线问题，等待分别创建独立 worktree/OpenSpec change，不进入当前增量同步提交。

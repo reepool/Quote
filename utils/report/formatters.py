@@ -82,6 +82,8 @@ class ReportFormatter:
                     eval_locals['index_master_governance_summary'] = ''
                 if 'repair_universe_summary' not in eval_locals:
                     eval_locals['repair_universe_summary'] = ''
+                if 'daily_changelog_summary' not in eval_locals:
+                    eval_locals['daily_changelog_summary'] = ''
                 if not eval(condition, {}, eval_locals):
                     return ""  # 条件不满足，不渲染此段落
             except Exception as e:

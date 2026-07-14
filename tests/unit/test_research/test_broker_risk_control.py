@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import sqlite3
 
 import pytest
 
@@ -375,6 +376,31 @@ def test_broker_risk_control_repair_replace_removes_stale_source_file_facts(tmp_
     )
     storage.upsert_financial_numeric_facts(parsed.numeric_facts, tier="history")
 
+    with sqlite3.connect(storage.db_path) as conn:
+        changes_before_replace = conn.execute(
+            """
+            SELECT COUNT(*) FROM data_change_log
+            WHERE dataset = 'financial_numeric_facts'
+            """
+        ).fetchone()[0]
+    unchanged_replace = storage.replace_financial_numeric_facts_for_source_file(
+        source_file_id,
+        parsed.numeric_facts,
+        tier="history",
+        parser_version=BROKER_RISK_CONTROL_PARSER_VERSION,
+        statement_family="regulatory_risk_control",
+    )
+    with sqlite3.connect(storage.db_path) as conn:
+        changes_after_unchanged_replace = conn.execute(
+            """
+            SELECT COUNT(*) FROM data_change_log
+            WHERE dataset = 'financial_numeric_facts'
+            """
+        ).fetchone()[0]
+
+    assert unchanged_replace == {"deleted": 0, "inserted": len(parsed.numeric_facts)}
+    assert changes_after_unchanged_replace == changes_before_replace
+
     replace_result = storage.replace_financial_numeric_facts_for_source_file(
         source_file_id,
         [],
@@ -390,6 +416,15 @@ def test_broker_risk_control_repair_replace_removes_stale_source_file_facts(tmp_
         include_history=True,
         canonical_fact_name="net_capital",
     ) == []
+    with sqlite3.connect(storage.db_path) as conn:
+        delete_markers = conn.execute(
+            """
+            SELECT COUNT(*) FROM data_change_log
+            WHERE dataset = 'financial_numeric_facts'
+              AND change_type = 'delete_marker'
+            """
+        ).fetchone()[0]
+    assert delete_markers == len(parsed.numeric_facts)
 
 
 @dataclass

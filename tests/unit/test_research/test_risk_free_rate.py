@@ -41,13 +41,23 @@ def _make_conn():
             series_id TEXT PRIMARY KEY, name TEXT, rate_type TEXT, tenor TEXT,
             currency TEXT, unit TEXT, frequency TEXT, timezone TEXT,
             source_profile TEXT, source TEXT, source_mode TEXT, data_as_of TEXT,
+            row_hash TEXT, row_version INTEGER NOT NULL DEFAULT 1,
             ingestion_run_id INTEGER, created_at TEXT, updated_at TEXT
         );
         CREATE TABLE risk_free_rate_observations (
             series_id TEXT, observation_date TEXT, source_profile TEXT DEFAULT 'default',
             value REAL, revision_id TEXT DEFAULT 'latest', source TEXT, source_mode TEXT,
-            data_as_of TEXT, ingestion_run_id INTEGER, created_at TEXT, updated_at TEXT,
+            data_as_of TEXT, row_hash TEXT, row_version INTEGER NOT NULL DEFAULT 1,
+            ingestion_run_id INTEGER, created_at TEXT, updated_at TEXT,
             PRIMARY KEY (series_id, observation_date, source_profile, revision_id)
+        );
+        CREATE TABLE data_change_log (
+            sequence_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            domain TEXT NOT NULL, dataset TEXT NOT NULL, change_type TEXT NOT NULL,
+            business_key_json TEXT NOT NULL, instrument_id TEXT, series_id TEXT,
+            observation_date TEXT, period TEXT, old_hash TEXT, new_hash TEXT,
+            row_version INTEGER, source TEXT, source_mode TEXT, source_profile TEXT,
+            ingestion_run_id TEXT, batch_id TEXT, changed_at TEXT NOT NULL
         );
         """
     )
@@ -77,6 +87,8 @@ def test_storage_roundtrip_and_date_filter():
 
     series = stub.list_risk_free_rate_series()
     assert series[0]["series_id"] == "china_treasury_10y"
+    assert "row_hash" not in series[0]
+    assert "row_version" not in series[0]
 
     all_obs = stub.get_risk_free_rate_observations("china_treasury_10y")
     assert [o["observation_date"] for o in all_obs] == ["2024-01-02", "2024-02-01", "2024-03-01"]
@@ -97,9 +109,22 @@ def test_storage_upsert_is_idempotent():
     stub = _bind(_StorageStub(_make_conn()))
     stub.upsert_risk_free_rate_series({"series_id": "s1"})
     stub.upsert_risk_free_rate_observations("s1", [{"observation_date": "2024-01-02", "value": 2.5}])
+    stub.upsert_risk_free_rate_observations("s1", [{"observation_date": "2024-01-02", "value": 2.5}])
     stub.upsert_risk_free_rate_observations("s1", [{"observation_date": "2024-01-02", "value": 2.7}])
     obs = stub.get_risk_free_rate_observations("s1")
     assert len(obs) == 1 and obs[0]["value"] == 2.7
+    changes = stub._conn.execute(
+        """
+        SELECT dataset, series_id, observation_date, row_version
+        FROM data_change_log
+        WHERE dataset = 'risk_free_rate_observations'
+        ORDER BY sequence_id
+        """
+    ).fetchall()
+    assert [tuple(row) for row in changes] == [
+        ("risk_free_rate_observations", "s1", "2024-01-02", 1),
+        ("risk_free_rate_observations", "s1", "2024-01-02", 2),
+    ]
 
 
 def test_sync_service_writes_fetched_observations():

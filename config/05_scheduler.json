@@ -170,6 +170,10 @@
       "system_health_check": {
         "enabled": true,
         "description": "系统健康检查",
+        "change_watermark": {
+          "expected": false,
+          "reason": "diagnostics_only"
+        },
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -196,6 +200,10 @@
       "market_dependency_version_check": {
         "enabled": true,
         "description": "行情数据依赖版本检查",
+        "change_watermark": {
+          "expected": false,
+          "reason": "diagnostics_only"
+        },
         "report": false,
         "pre_run_notify": false,
         "trigger": {
@@ -341,6 +349,10 @@
       "cache_warm_up": {
         "enabled": true,
         "description": "缓存预热",
+        "change_watermark": {
+          "expected": false,
+          "reason": "cache_only"
+        },
         "report": false,
         "pre_run_notify": false,
         "trigger": {
@@ -389,6 +401,10 @@
       "database_backup": {
         "enabled": true,
         "description": "统一数据库备份任务",
+        "change_watermark": {
+          "expected": false,
+          "reason": "backup_only"
+        },
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -780,6 +796,10 @@
         "enabled": true,
         "manual_only": true,
         "description": "外汇质量检查与 readiness 快照（缺失、过期、异常跳变、来源冲突、派生缺口）",
+        "change_watermark": {
+          "expected": false,
+          "reason": "read_only_quality_check"
+        },
         "report": true,
         "pre_run_notify": false,
         "max_instances": 1,
@@ -1152,6 +1172,10 @@
       "futures_cycle_diagnostics_refresh": {
         "enabled": false,
         "description": "商品期货周期分位与景气诊断刷新（只读 data/futures.db 本地行情）",
+        "change_watermark": {
+          "expected": false,
+          "reason": "disabled_diagnostics_only"
+        },
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -1174,6 +1198,10 @@
       "futures_spread_recompute": {
         "enabled": false,
         "description": "商品期货价差重算（只读 data/futures.db 本地行情）",
+        "change_watermark": {
+          "expected": false,
+          "reason": "disabled_read_only"
+        },
         "report": true,
         "pre_run_notify": false,
         "trigger": {

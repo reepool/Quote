@@ -866,10 +866,20 @@ class IndustryStandardSyncService:
         cleared_counts = self.storage.clear_industry_standard_slice(
             taxonomy_system=taxonomy_system,
             taxonomy_version=taxonomy_version,
+            preserve_change_tracked=True,
         )
         dm_logger.info("[IndustryStandardSync] Cleared strict Shenwan slice: %s", cleared_counts)
         for node in taxonomy_nodes:
-            self.storage.upsert_industry_taxonomy(node)
+            self.storage.upsert_industry_taxonomy(
+                node,
+                ingestion_run_id=run_id,
+            )
+        taxonomy_nodes_deactivated = self.storage.deactivate_missing_industry_taxonomy(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            active_industry_codes=[node.industry_code for node in taxonomy_nodes],
+            ingestion_run_id=run_id,
+        )
         dm_logger.info("[IndustryStandardSync] Taxonomy upserted: %s nodes", len(taxonomy_nodes))
 
         stock_history_artifact = getattr(
@@ -951,6 +961,22 @@ class IndustryStandardSyncService:
                 exchange_result.error_message,
             )
 
+        active_instrument_ids = [
+            str(instrument.get("instrument_id") or "").strip()
+            for exchange in target_exchanges
+            for instrument in instruments_by_exchange.get(exchange, [])
+            if str(instrument.get("instrument_id") or "").strip()
+        ]
+        stale_non_target_memberships_removed = (
+            self.storage.delete_industry_memberships_outside_universe(
+                taxonomy_system=taxonomy_system,
+                taxonomy_version=taxonomy_version,
+                exchanges=target_exchanges,
+                active_instrument_ids=active_instrument_ids,
+                ingestion_run_id=run_id,
+            )
+        )
+
         successful_exchanges = sum(
             1 for result in exchange_results if result.status == "success"
         )
@@ -975,10 +1001,12 @@ class IndustryStandardSyncService:
             "attempted_sources": attempted_sources,
             "official_classification_primary": True,
             "taxonomy_nodes_written": len(taxonomy_nodes),
+            "taxonomy_nodes_deactivated": taxonomy_nodes_deactivated,
             "classification_history_rows_written": len(history_rows),
             "source_files_written": len(bundle.source_files),
             "total_memberships_written": total_memberships_written,
             "total_official_classifications_written": total_official_classifications_written,
+            "stale_non_target_memberships_removed": stale_non_target_memberships_removed,
             "successful_exchanges": successful_exchanges,
             "attempted_exchanges": len(exchange_results),
             "exchanges": [asdict(result) for result in exchange_results],
@@ -1136,6 +1164,7 @@ class IndustryStandardSyncService:
                 taxonomy_system=taxonomy_system,
                 taxonomy_version=taxonomy_version,
                 instrument_ids=unresolved_instrument_ids,
+                ingestion_run_id=run_id,
             )
 
         result_diagnostics = {
@@ -1876,6 +1905,7 @@ class IndustryStandardSyncService:
                 taxonomy_system=taxonomy_system,
                 taxonomy_version=taxonomy_version,
                 instrument_ids=unresolved_instrument_ids,
+                ingestion_run_id=run_id,
             )
         diagnostics.update(
             {

@@ -21,6 +21,11 @@ from typing import Any, Dict, Generator, List, Mapping, Optional, Protocol, Sequ
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from urllib.parse import urljoin
 
+from research.change_watermarks import (
+    append_change_record,
+    ensure_change_log_schema,
+    ensure_row_version_column,
+)
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import request_get, request_post, tls_config_from_source_config
@@ -216,8 +221,29 @@ def _hash_payload(value: Any) -> str:
     return hashlib.sha256(_json_dumps(value).encode("utf-8")).hexdigest()
 
 
+def _source_document_semantic_hash(value: Mapping[str, Any]) -> str:
+    """Hash policy evidence fields while excluding retrieval-only metadata."""
+    return _hash_payload(
+        {
+            "document_id": str(value.get("document_id") or ""),
+            "source_profile": str(value.get("source_profile") or ""),
+            "source_url": _redact_url(str(value.get("source_url") or "")),
+            "document_number": str(value.get("document_number") or ""),
+            "title": str(value.get("title") or ""),
+            "published_date": value.get("published_date"),
+            "content_hash": str(value.get("content_hash") or ""),
+            "content_type": str(value.get("content_type") or "text/html"),
+            "parser_version": str(
+                value.get("parser_version") or SPECIAL_COMMODITY_SYNC_VERSION
+            ),
+        }
+    )
+
+
 def _row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
-    return {key: row[key] for key in row.keys()}
+    payload = {key: row[key] for key in row.keys()}
+    payload.pop("row_version", None)
+    return payload
 
 
 def _coerce_bool(value: Any, default: bool = True) -> bool:
@@ -561,12 +587,23 @@ class SpecialCommodityStorageManager:
         special_cfg = module_cfg.get("special_commodity_market_data", {}) if isinstance(module_cfg, dict) else {}
         storage_cfg = special_cfg.get("storage", {}) if isinstance(special_cfg, dict) else {}
         self.db_path = db_path or storage_cfg.get("database") or "data/futures.db"
+        self.change_watermark_config = (
+            special_cfg.get("change_watermark", {}) if isinstance(special_cfg, dict) else {}
+        )
 
     def initialize(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
             conn.executescript(self._schema_sql())
+            for table_name in (
+                "commodity_price_observations",
+                "commodity_policy_events",
+                "commodity_source_documents",
+                "commodity_policy_candidates",
+            ):
+                ensure_row_version_column(conn, table_name)
+            ensure_change_log_schema(conn)
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
@@ -653,6 +690,7 @@ class SpecialCommodityStorageManager:
             source_symbol TEXT NOT NULL,
             parser_version TEXT NOT NULL,
             raw_payload_hash TEXT NOT NULL,
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL,
             ingestion_run_id INTEGER,
             created_at TEXT NOT NULL,
@@ -679,6 +717,7 @@ class SpecialCommodityStorageManager:
             source_profile TEXT NOT NULL,
             source_url TEXT NOT NULL,
             quality_flag TEXT NOT NULL,
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
@@ -757,6 +796,7 @@ class SpecialCommodityStorageManager:
             content_type TEXT NOT NULL DEFAULT 'text/html',
             content_text TEXT NOT NULL DEFAULT '',
             parser_version TEXT NOT NULL,
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL DEFAULT '{}',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
@@ -781,6 +821,7 @@ class SpecialCommodityStorageManager:
             value_high REAL,
             value_mid REAL,
             field_lineage_json TEXT NOT NULL DEFAULT '{}',
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL DEFAULT '{}',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
@@ -980,15 +1021,22 @@ class SpecialCommodityStorageManager:
         dry_run: bool,
     ) -> Dict[str, int]:
         if dry_run:
-            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(observations)}
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "would_write": len(observations),
+                "changelog_written": 0,
+            }
         inserted = changed = unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for item in observations:
                 existing = conn.execute(
                     """
                     SELECT value, currency, unit, raw_value, raw_currency, raw_unit,
-                           quality_flag, source_symbol
+                           quality_flag, source_symbol, raw_payload_hash, row_version
                     FROM commodity_price_observations
                     WHERE series_id = ? AND observation_date = ? AND source_profile = ?
                     """,
@@ -998,16 +1046,18 @@ class SpecialCommodityStorageManager:
                     inserted += 1
                 elif self._observation_semantics_equal(existing, item):
                     unchanged += 1
+                    continue
                 else:
                     changed += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
                     INSERT INTO commodity_price_observations (
                         series_id, observation_date, source_profile, value, currency,
                         unit, raw_value, raw_currency, raw_unit, source_url,
                         quality_flag, source_symbol, parser_version, raw_payload_hash,
-                        metadata_json, ingestion_run_id, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        row_version, metadata_json, ingestion_run_id, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(series_id, observation_date, source_profile) DO UPDATE SET
                         value=excluded.value,
                         currency=excluded.currency,
@@ -1020,6 +1070,7 @@ class SpecialCommodityStorageManager:
                         source_symbol=excluded.source_symbol,
                         parser_version=excluded.parser_version,
                         raw_payload_hash=excluded.raw_payload_hash,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         ingestion_run_id=excluded.ingestion_run_id,
                         updated_at=excluded.updated_at
@@ -1039,13 +1090,43 @@ class SpecialCommodityStorageManager:
                         item.source_symbol,
                         item.parser_version,
                         item.raw_payload_hash,
+                        row_version,
                         _json_dumps(item.metadata),
                         ingestion_run_id,
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="commodity",
+                    dataset="commodity_price_observations",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "series_id": item.series_id,
+                        "observation_date": item.observation_date,
+                        "source_profile": item.source_profile,
+                    },
+                    series_id=item.series_id,
+                    observation_date=item.observation_date,
+                    old_hash=existing["raw_payload_hash"] if existing else None,
+                    new_hash=item.raw_payload_hash,
+                    row_version=row_version,
+                    source=item.source_profile,
+                    source_mode="observation",
+                    source_profile=item.source_profile,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "would_write": 0,
+            "changelog_written": changelog_written,
+        }
 
     @staticmethod
     def _observation_semantics_equal(
@@ -1077,8 +1158,15 @@ class SpecialCommodityStorageManager:
         dry_run: bool,
     ) -> Dict[str, int]:
         if dry_run:
-            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(events)}
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "would_write": len(events),
+                "changelog_written": 0,
+            }
         inserted = changed = unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for item in events:
@@ -1087,14 +1175,19 @@ class SpecialCommodityStorageManager:
                         "value_low": item.value_low,
                         "value_high": item.value_high,
                         "value_mid": item.value_mid,
+                        "commodity_id": item.commodity_id,
+                        "policy_type": item.policy_type,
+                        "effective_start": item.effective_start,
                         "currency": item.currency,
                         "unit": item.unit,
                         "effective_end": item.effective_end,
+                        "source_profile": item.source_profile,
+                        "quality_flag": item.quality_flag,
                         "metadata": item.metadata,
                     }
                 )
                 existing = conn.execute(
-                    "SELECT metadata_json FROM commodity_policy_events WHERE event_id = ?",
+                    "SELECT metadata_json, row_version FROM commodity_policy_events WHERE event_id = ?",
                     (item.event_id,),
                 ).fetchone()
                 if existing is None:
@@ -1106,8 +1199,10 @@ class SpecialCommodityStorageManager:
                         old_payload = {}
                     if old_payload.get("payload_hash") == payload_hash:
                         unchanged += 1
+                        continue
                     else:
                         changed += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 metadata = dict(item.metadata)
                 metadata["payload_hash"] = payload_hash
                 conn.execute(
@@ -1116,8 +1211,8 @@ class SpecialCommodityStorageManager:
                         event_id, commodity_id, policy_type, effective_start,
                         effective_end, currency, unit, value_low, value_high,
                         value_mid, source_profile, source_url, quality_flag,
-                        metadata_json, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        row_version, metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(event_id) DO UPDATE SET
                         commodity_id=excluded.commodity_id,
                         policy_type=excluded.policy_type,
@@ -1131,6 +1226,7 @@ class SpecialCommodityStorageManager:
                         source_profile=excluded.source_profile,
                         source_url=excluded.source_url,
                         quality_flag=excluded.quality_flag,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         updated_at=excluded.updated_at
                     """,
@@ -1148,12 +1244,42 @@ class SpecialCommodityStorageManager:
                         item.source_profile,
                         item.source_url,
                         item.quality_flag,
+                        row_version,
                         _json_dumps(metadata),
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="policy",
+                    dataset="commodity_policy_events",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "event_id": item.event_id,
+                        "commodity_id": item.commodity_id,
+                        "publication_or_effective_date": item.effective_start,
+                        "policy_type": item.policy_type,
+                    },
+                    instrument_id=item.commodity_id,
+                    period=item.effective_start,
+                    old_hash=old_payload.get("payload_hash") if existing else None,
+                    new_hash=payload_hash,
+                    row_version=row_version,
+                    source=item.source_profile,
+                    source_mode="policy_event",
+                    source_profile=item.source_profile,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "would_write": 0,
+            "changelog_written": changelog_written,
+        }
 
     def upsert_source_documents(
         self,
@@ -1162,31 +1288,51 @@ class SpecialCommodityStorageManager:
         dry_run: bool,
     ) -> Dict[str, int]:
         if dry_run:
-            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(documents)}
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "would_write": len(documents),
+                "changelog_written": 0,
+            }
         inserted = changed = unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for document in documents:
                 document_id = str(document["document_id"])
                 content_hash = str(document["content_hash"])
+                new_semantic_hash = _source_document_semantic_hash(document)
                 existing = conn.execute(
-                    "SELECT content_hash FROM commodity_source_documents WHERE document_id = ?",
+                    """
+                    SELECT document_id, source_profile, source_url, document_number,
+                           title, published_date, content_hash, content_type,
+                           parser_version, row_version
+                    FROM commodity_source_documents WHERE document_id = ?
+                    """,
                     (document_id,),
                 ).fetchone()
+                old_semantic_hash = (
+                    _source_document_semantic_hash(dict(existing))
+                    if existing is not None
+                    else None
+                )
                 if existing is None:
                     inserted += 1
-                elif existing["content_hash"] == content_hash:
+                elif old_semantic_hash == new_semantic_hash:
                     unchanged += 1
+                    continue
                 else:
                     changed += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
                     INSERT INTO commodity_source_documents (
                         document_id, source_profile, source_url, document_number,
                         title, published_date, retrieved_at, content_hash,
-                        content_type, content_text, parser_version, metadata_json,
-                        created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        content_type, content_text, parser_version, row_version,
+                        metadata_json, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(document_id) DO UPDATE SET
                         source_profile=excluded.source_profile,
                         source_url=excluded.source_url,
@@ -1198,6 +1344,7 @@ class SpecialCommodityStorageManager:
                         content_type=excluded.content_type,
                         content_text=excluded.content_text,
                         parser_version=excluded.parser_version,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         updated_at=excluded.updated_at
                     """,
@@ -1213,12 +1360,42 @@ class SpecialCommodityStorageManager:
                         str(document.get("content_type") or "text/html"),
                         str(document.get("content_text") or ""),
                         str(document.get("parser_version") or SPECIAL_COMMODITY_SYNC_VERSION),
+                        row_version,
                         _json_dumps(dict(document.get("metadata") or {})),
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+                source_profile = str(document.get("source_profile") or "")
+                published_date = document.get("published_date")
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="policy",
+                    dataset="commodity_source_documents",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "document_id": document_id,
+                        "published_date": published_date,
+                        "source_profile": source_profile,
+                    },
+                    observation_date=str(published_date) if published_date else None,
+                    old_hash=old_semantic_hash,
+                    new_hash=new_semantic_hash,
+                    row_version=row_version,
+                    source=source_profile,
+                    source_mode="policy_discovery",
+                    source_profile=source_profile,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "would_write": 0,
+            "changelog_written": changelog_written,
+        }
 
     def upsert_policy_candidates(
         self,
@@ -1227,15 +1404,25 @@ class SpecialCommodityStorageManager:
         dry_run: bool,
     ) -> Dict[str, int]:
         if dry_run:
-            return {"inserted": 0, "changed": 0, "unchanged": 0, "would_write": len(candidates)}
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "would_write": len(candidates),
+                "changelog_written": 0,
+            }
         inserted = changed = unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for candidate in candidates:
                 candidate_id = str(candidate["candidate_id"])
                 payload_hash = _hash_payload(dict(candidate))
                 existing = conn.execute(
-                    "SELECT metadata_json, review_status FROM commodity_policy_candidates WHERE candidate_id = ?",
+                    """
+                    SELECT metadata_json, review_status, row_version
+                    FROM commodity_policy_candidates WHERE candidate_id = ?
+                    """,
                     (candidate_id,),
                 ).fetchone()
                 old_metadata = json.loads(existing["metadata_json"] or "{}") if existing else {}
@@ -1243,8 +1430,10 @@ class SpecialCommodityStorageManager:
                     inserted += 1
                 elif old_metadata.get("payload_hash") == payload_hash:
                     unchanged += 1
+                    continue
                 else:
                     changed += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 metadata = dict(candidate.get("metadata") or {})
                 review_status = str(candidate.get("review_status") or "pending_review")
                 if existing is not None and existing["review_status"] in {"approved", "rejected"}:
@@ -1258,8 +1447,9 @@ class SpecialCommodityStorageManager:
                         candidate_id, document_id, commodity_id, policy_type,
                         review_status, confidence, effective_start, effective_end,
                         currency, unit, value_low, value_high, value_mid,
-                        field_lineage_json, metadata_json, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        field_lineage_json, row_version, metadata_json, created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(candidate_id) DO UPDATE SET
                         document_id=excluded.document_id,
                         commodity_id=excluded.commodity_id,
@@ -1274,6 +1464,7 @@ class SpecialCommodityStorageManager:
                         value_high=excluded.value_high,
                         value_mid=excluded.value_mid,
                         field_lineage_json=excluded.field_lineage_json,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         updated_at=excluded.updated_at
                     """,
@@ -1292,12 +1483,43 @@ class SpecialCommodityStorageManager:
                         candidate.get("value_high"),
                         candidate.get("value_mid"),
                         _json_dumps(dict(candidate.get("field_lineage") or {})),
+                        row_version,
                         _json_dumps(metadata),
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged, "would_write": 0}
+                source_profile = str(candidate.get("source_profile") or "")
+                effective_start = candidate.get("effective_start")
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="policy",
+                    dataset="commodity_policy_candidates",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "candidate_id": candidate_id,
+                        "document_id": str(candidate["document_id"]),
+                        "effective_start": effective_start,
+                    },
+                    instrument_id=str(candidate.get("commodity_id") or "") or None,
+                    period=str(effective_start) if effective_start else None,
+                    old_hash=old_metadata.get("payload_hash") if existing else None,
+                    new_hash=payload_hash,
+                    row_version=row_version,
+                    source=source_profile,
+                    source_mode="policy_candidate",
+                    source_profile=source_profile,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "would_write": 0,
+            "changelog_written": changelog_written,
+        }
 
     def read_source_documents(
         self,
@@ -1367,25 +1589,49 @@ class SpecialCommodityStorageManager:
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             row = conn.execute(
-                "SELECT metadata_json FROM commodity_policy_candidates WHERE candidate_id = ?",
+                """
+                SELECT metadata_json, review_status, row_version
+                FROM commodity_policy_candidates WHERE candidate_id = ?
+                """,
                 (candidate_id,),
             ).fetchone()
             if row is None:
                 return False
             metadata = json.loads(row["metadata_json"] or "{}")
+            old_hash = _hash_payload(
+                {"review_status": row["review_status"], "review": metadata.get("review")}
+            )
             metadata["review"] = {
                 "reviewer": reviewer,
                 "notes": notes,
                 "reviewed_at": now,
                 "status": review_status,
             }
+            new_hash = _hash_payload(
+                {"review_status": review_status, "review": metadata.get("review")}
+            )
+            row_version = int(row["row_version"] or 1) + 1
             conn.execute(
                 """
                 UPDATE commodity_policy_candidates
-                SET review_status = ?, metadata_json = ?, updated_at = ?
+                SET review_status = ?, row_version = ?, metadata_json = ?, updated_at = ?
                 WHERE candidate_id = ?
                 """,
-                (review_status, _json_dumps(metadata), now, candidate_id),
+                (review_status, row_version, _json_dumps(metadata), now, candidate_id),
+            )
+            append_change_record(
+                conn,
+                config=self.change_watermark_config,
+                domain="policy",
+                dataset="commodity_policy_candidates",
+                change_type="metadata_change",
+                business_key={"candidate_id": candidate_id, "review_status": review_status},
+                old_hash=old_hash,
+                new_hash=new_hash,
+                row_version=row_version,
+                source=reviewer,
+                source_mode="policy_candidate_review",
+                changed_at=now,
             )
         return True
 
@@ -5258,6 +5504,7 @@ class SpecialCommodityPolicyEventService:
                 "changed": 0,
                 "unchanged": 0,
                 "would_write": 0,
+                "changelog_written": 0,
                 "blockers": blockers,
             }
         counts = self.storage.upsert_policy_events(events, dry_run=dry_run)
@@ -5266,7 +5513,13 @@ class SpecialCommodityPolicyEventService:
             blockers.extend(promotion.get("blockers") or [])
         combined_counts = {
             key: int(counts.get(key, 0) or 0) + int(promotion.get(key, 0) or 0)
-            for key in ("inserted", "changed", "unchanged", "would_write")
+            for key in (
+                "inserted",
+                "changed",
+                "unchanged",
+                "would_write",
+                "changelog_written",
+            )
         }
         event_summaries = [
             {
@@ -5367,6 +5620,7 @@ class SpecialCommodityPolicyEventService:
             "changed": 0,
             "unchanged": 0,
             "would_write": 0,
+            "changelog_written": 0,
         }
         counts["unchanged"] = int(counts.get("unchanged", 0) or 0) + already_represented
         return {

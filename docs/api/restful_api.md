@@ -157,7 +157,9 @@ curl "http://localhost:8000/api/v1/changes/latest?domain=quotes&dataset=daily_qu
 - `domain`、`dataset`
 - `instrument_id`、`series_id`
 - `start_date`、`end_date`
-- `limit`：默认 `1000`，最大值由 `database_config.change_watermark.max_limit` 控制，当前默认 `5000`
+- `limit`：省略时使用 `database_config.change_watermark.default_limit`，当前默认 `1000`；传入值会按 `database_config.change_watermark.max_limit` 裁剪，当前默认最大 `5000`
+
+水位读取依赖数据库成功响应；数据库不可用或查询失败时端点返回 HTTP `500`，不会伪装成 `latest_sequence=0` 的空水位。调用方只有在成功响应后才能推进本地 checkpoint。
 
 响应字段：
 - `changes`：只包含变化键和元数据，不返回完整行情行

@@ -533,13 +533,13 @@ P0 当前配置位于 `config/04_database.json` 的 `database_config.change_wate
 |---|---|---|---|---|---|
 | P0 | A/H/US 股票、指数、ETF 日行情 | `daily_data_update`, `hk_daily_data_update`; `us_daily_data_update` 当前配置禁用 | quote DB / `database.operations` | `instrument_id + trade_date` | P0 写入路径已接入；调用方默认行为不变 |
 | P0 | 复权因子 | 日更 Phase 2、weekly maintenance、factor backfill | quote DB / `adjustment_factors` | `instrument_id + ex_date` | P0 写入路径已接入 |
-| P1 | 商品期货行情与连续序列 | `futures_market_data_sync`, `futures_market_data_backfill` | `data/futures.db` / futures storage | `contract_id/series_id + trade_date + source_mode` | 延后；应复用已有 hash-aware counters |
-| P1 | FX 观测与派生 | `fx_rate_sync`, `fx_rate_backfill`, `fx_derivation_sync` | `data/fx.db` | `series_id + observation_date + revision/lineage` | 延后；dry-run/manual_only 不推进水位 |
-| P1 | 特殊商品价格 | `special_commodity_price_sync`, `special_commodity_cn_spot_sync`, `special_commodity_price_monthly_sync` | research/commodity storage | `series_id + observation_date/period + source_profile` | 延后；价格域和政策域隔离 |
-| P2 | 股东/财务/公告事实 | `shareholder_incremental_sync`, `shareholder_reconciliation_sync`, `financial_disclosure_incremental_sync`, `financial_disclosure_reconciliation_sync` | research/financial storage | `instrument_id + period/snapshot + source identity` | 延后；必须保留公告可得时点 |
-| P2 | 行业/估值/利率/技术风险 | `industry_standard_sync`, `industry_index_analysis_sync`, `valuation_input_sync`, `valuation_history_rebuild`, `risk_free_rate_sync` | research storage | taxonomy/as-of/calc/input hash | 延后；现有 read API 不加默认字段 |
+| P1 | 商品期货行情与连续序列 | `futures_market_data_sync`, `futures_market_data_backfill` | `data/futures.db` / futures storage | `contract_id/series_id + trade_date + source_mode` | 已接入；合约 bar 与连续序列分别记录，unchanged 不推进水位 |
+| P1 | FX 观测与派生 | `fx_rate_sync`, `fx_rate_backfill`, `fx_derivation_sync` | `data/fx.db` | `series_id + observation_date + revision/lineage` | 已接入；派生行保留 input hash，dry-run 不推进水位 |
+| P1 | 特殊商品价格 | `special_commodity_price_sync`, `special_commodity_cn_spot_sync`, `special_commodity_price_monthly_sync` | research/commodity storage | `series_id + observation_date/period + source_profile` | 已接入；价格使用 `commodity` 域，政策证据使用 `policy` 域 |
+| P2 | 股东/财务/公告事实 | `shareholder_incremental_sync`, `shareholder_reconciliation_sync`, `financial_disclosure_incremental_sync`, `financial_disclosure_reconciliation_sync` | `research.db` / `financials.db` | `instrument_id + period/snapshot + source identity` | 已接入 shareholder、核心事实和数值事实；保留公告/可得时点、source file、mapping/parser lineage |
+| P2 | 行业/估值/利率/技术风险 | `industry_standard_sync`, `valuation_input_sync`, `valuation_history_rebuild`, `risk_free_rate_sync`; technical/risk 当前配置禁用 | `research.db` / `valuation.db` / `interests.db` | taxonomy/effective/as-of/calc/input/revision hash | 已接入 taxonomy、membership、估值输入/历史、技术、风险、利率；现有 read API 不加默认字段 |
 | P3 | 主数据/交易日历治理 | `trading_calendar_update`, `hkex_instrument_master_sync`, `a_share_stock_master_sync`, `index_master_governance_sync`, futures/FX/commodity governance | quote/futures/FX/research governance storage | lifecycle/calendar effective key | 延后；不进入 quote-only 查询 |
-| P3 | 政策发现与候选治理 | `special_commodity_policy_discovery`, `special_commodity_policy_candidate_review`, catalog sync | policy/evidence storage | adapter/document/event/effective date | 延后；不影响市场数据消费者 |
+| P3 | 政策发现与候选治理 | `special_commodity_policy_discovery`, `special_commodity_policy_candidate_review`, catalog sync | policy/evidence storage | adapter/document/event/effective date | P1 已完成域隔离与事件/证据/候选记录；P3 聚合查询和治理扩展仍延后 |
 | 不推进 | 只读/诊断/备份/依赖检查 | `system_health_check`, `market_dependency_version_check`, `cache_warm_up`, `database_backup`, diagnostics/recompute read-only jobs | n/a | n/a | 不写 changelog |
 
 ### 16.4 迁移与回滚
@@ -560,6 +560,7 @@ P0 当前配置位于 `config/04_database.json` 的 `database_config.change_wate
 - 如某域出现噪声，先在 `database_config.change_watermark.domains` 或 `datasets` 中关闭该域/数据集的 changelog emission，源表写入不受影响。
 - 如全局需要降级，可设置 `database_config.change_watermark.enabled=false`，后续写入不再推进水位；已存在 changelog 保留供排查。
 - 源表仍是权威数据；changelog 只是本地已观测增量信号。
+- P2 开关位于 `config/10_research.json` 的 `research_config.modules.change_watermark`，可按 domain/dataset 关闭；各研究数据库分别维护 sequence。
 
 ### 16.5 已验证测试
 
@@ -579,14 +580,76 @@ P0 当前配置位于 `config/04_database.json` 的 `database_config.change_wate
 - 仅 `batch_id` 变化不推进水位。
 - OHLCV 变化推进水位并递增 row version。
 - 复权因子修订进入 `adjustment_factor` 域。
+- 行情和复权因子整批事务提交失败时，已回滚的 insert/update/changelog 计数归零，不能向报告虚报落库成功。
+- 同一行情批次内重复业务键按 last-write-wins 归并，重复输入计入 skipped；单条格式错误计入 failed，不拖垮其余有效行。
 - API 空水位、分页、domain/dataset 过滤可用。
 - domain/dataset 开关关闭时源表仍写入但不推进水位。
+- 全局 `change_watermark.enabled=false` 时，行情和复权因子源表仍写入但不推进水位。
+- `default_limit` / `max_limit` / `domains` / `datasets` 配置类型异常时回退安全默认值，不影响查询和状态页可用性。
+- 省略 `limit` 时使用 `default_limit`，显式传入过大 `limit` 时按 `max_limit` 裁剪。
 - `/system/status` 暴露 `change_watermarks` 健康摘要。
+- 日更报告可展示 overlap-window 的 unchanged 计数，且 unchanged 不推进水位。
+- Telegram/report formatter 以紧凑段落展示 changelog counters，并在全零时省略该段，避免零噪音。
+- 历史 gap repair 修正已存在行情行时会通过同一 quote changelog 写入路径追加 update 记录。
+- repair universe 生命周期过滤和 operator override 语义保持不变，生命周期跳过目标不会触发行情源请求。
 - `/quotes/daily` 默认行为未回归。
 
-### 16.6 未解决和后续风险
+### 16.6 P1 期货、FX、特色商品与政策隔离
 
-- P1/P2/P3 尚未把 futures、FX、commodity、research、governance、policy 写入路径接入 changelog；本次只是完成 P0 和审计矩阵。
-- 当前 `data_change_log.sequence_id` 是 quote DB 内单库水位，不承诺跨 futures/research/FX 多库全局顺序。
+P1 在各自数据库内复用同一 `data_change_log` 契约，不承诺跨库全局顺序：
+
+- `data/futures.db`
+  - `futures_contract_price_bars` 与 `futures_price_bars` 增加 `row_version`。
+  - 合约 bar 使用 `contract_id + trade_date + source + source_mode` 业务键。
+  - 连续/主力序列使用 `series_id + trade_date + source + source_mode` 业务键。
+  - 官方源替换同日同序列 fallback 行时，先为被删除的 fallback 业务键写 `delete_marker`，再写官方行 insert/update；两者处于同一事务。
+  - 特色商品 `commodity_price_observations` 使用独立 `commodity` 域。
+  - 政策事件、官方文档、候选与审核动作使用独立 `policy` 域，不进入商品价格变更流；官方文档的标题、文号、发布日期、正文 hash 或 parser version 修订均属于文档语义变化。
+- `data/fx.db`
+  - `fx_observations` 增加 `row_version`。
+  - 直连与派生观测共同使用 `fx` 域；业务键保留 `series_id + observation_date + source_profile + revision_id`。
+  - 派生 FX 的 `input_hash` 继续保存在行 metadata 中；changelog hash 是包含 value、币种、倍率、发布时间、质量、revision 和 input/raw lineage 的规范化语义 hash，不直接等于裸 `input_hash`。
+  - 即使提供方 `raw_payload_hash` 未变化，`revision_id`、`publication_time` 或 `quality_flag` 修订也必须推进 row version 和水位。
+- 三个存储管理器初始化时执行加法 schema guard；不删除、不重写历史业务行。
+- `row_version` 不进入既有读取结果，避免默认 API/服务响应形状变化。
+- P1 开关位于 `config/11_futures.json` 和 `config/12_fx.json` 的 `change_watermark`，可按 domain/dataset 关闭；关闭后源表仍正常写入。
+- dry-run 只返回 `would_write`/`would_write_price_bars` 和零 `changelog_written`，不创建 changelog 记录。
+
+P1 当前只完成各数据库内的持久化与任务计数。现有 `/api/v1/changes*` 仍只读取 quote DB；跨 futures/FX/research 数据库的聚合只读 API 属于后续阶段，不能把 quote DB sequence 解释为全库全局水位。
+
+### 16.7 P2 研究域与有界 hash 回填
+
+P2 使用 `research/change_watermarks.py` 在 `research.db`、`financials.db`、`valuation.db`、`interests.db` 内分别创建 `data_change_log`，不提供跨库强全局顺序。
+
+- shareholder：`shareholder_snapshots`；holder count、scope 和规范化 snapshot 变化才推进，`data_as_of` 与 manifest 重试状态不参与 hash。
+- financial：`financial_facts`、`financial_numeric_facts`；保留 `data_available_date/publish_date/report_period/source_file_id/parser/mapping/schema`，公告扫描和重试状态不记业务变更；parser repair 先保留式 upsert，再只删除本次确实消失的事实并写 `delete_marker`，相同内容 repair 不重置版本或制造 insert。
+- industry：`industry_taxonomy`、`industry_memberships`；业务键保留 taxonomy version 和 effective date。strict rebuild 使用 preserve-and-diff：未变化行保留，缺失 taxonomy 节点转 inactive，超出当前 universe 或确实失效的 membership 定向删除并写 `delete_marker`，删除后重建仍保持版本单调递增。
+- valuation：`valuation_inputs`、`valuation_history`；输入可得日进入语义，派生历史保留 `calc_version/parameter_hash` 与 compact details 中的 input lineage。
+- technical/risk：`technical_indicator_latest`、`risk_snapshots`；同计算身份重复重算且输出一致时不推进水位。
+- interest rate：`risk_free_rate_series`、`risk_free_rate_observations`；观测键包含 series/date/source profile/revision id，`data_as_of` 作为 PIT 语义保留。
+- `/api/v1/research/*` 默认读取不返回内部 `row_hash/row_version`；研究 API 全套兼容测试已通过。
+- `config/05_scheduler.json` 对 system health、依赖检查、cache warm-up、backup、FX quality check 和禁用的只读期货诊断显式设置 `change_watermark.expected=false`。
+
+有界历史 hash 回填工具：
+
+```bash
+python scripts/backfill_change_watermark_hashes.py \
+  --db-path data/valuation.db \
+  --table valuation_history \
+  --start-date 2025-01-01 \
+  --end-date 2025-12-31 \
+  --limit 1000
+```
+
+默认只 dry-run；显式增加 `--execute` 才写入。工具只填充 `row_hash IS NULL`，不修改业务列、不生成 changelog、不推进 row version；`limit` 必须在 1 到 10000 之间。`--db-path` 必须指向已存在的普通文件，路径拼错时直接失败，dry-run 也不得隐式创建空 SQLite 文件。
+
+### 16.8 未解决和后续风险
+
+- P3 的 master/calendar governance 尚未接入统一 changelog；行业 index-analysis、财务指标快照等非本次 P2 核心数据集仍需按后续消费需求评估。
+- P1 已完成 futures、FX、commodity 和 commodity-policy 隔离接入，但尚未提供跨数据库聚合 API。
+- 各数据库的 `data_change_log.sequence_id` 都只表示本库顺序，不承诺 quote/futures/FX/research 多库全局顺序。
 - 详细 changelog 暂不做 retention/compaction；在消费者 checkpoint 策略确定前不得清理明细记录。
-- P0 已有按域/数据集开关；P1/P2/P3 接入前必须先定义各自默认开关和灰度策略，避免某个数据源字段抖动制造噪声。
+- P0/P1/P2 已有按域/数据集开关；P3 接入前必须先定义默认开关和灰度策略，避免治理字段抖动制造噪声。
+- 官方行业 bundle 内容变化触发 strict slice preserve-and-diff；普通重复/unchanged bundle 会短路。该策略避免未变化 taxonomy/membership 被重插和版本重置，并对真实 stale membership 删除发 `delete_marker`。
+- 完成前审计中，CDC 相关期货存储、幂等和官方源 supersession 用例通过；期货完整测试文件仍有 7 个 provider/交易日历治理基线失败。已在不含本 change 改动的提交 `fb58f4479d29b8a9f41c36ff89c1463821f86354` 上复现相同 `7 failed`，并登记为 `FUT-QUALITY-001`、`FUT-CALENDAR-002`。后续应由独立 OpenSpec change 修复，不能通过放宽交易日历门禁来掩盖。
+- 治理复核确认：交易所期货日更已有 trading-day 与 master-data 双治理；外汇及特殊商品观察序列使用 publication/source-observed calendar，并保留 series/master 配置。两者均不是治理缺失，后续修复只处理 provider 质量契约和测试 fixture，不改变生产日期语义。

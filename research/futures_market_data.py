@@ -16,6 +16,11 @@ from pathlib import Path
 from statistics import median
 from typing import Any, Dict, Generator, Iterable, List, Mapping, Optional, Protocol, Sequence
 
+from research.change_watermarks import (
+    append_change_record,
+    ensure_change_log_schema,
+    ensure_row_version_column,
+)
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 
@@ -1047,7 +1052,9 @@ def _hash_payload(value: Any) -> str:
 
 
 def _row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
-    return {key: row[key] for key in row.keys()}
+    payload = {key: row[key] for key in row.keys()}
+    payload.pop("row_version", None)
+    return payload
 
 
 class FuturesStorageManager:
@@ -1057,6 +1064,9 @@ class FuturesStorageManager:
         module_cfg = research_config.modules.get("commodity_market_data", {})
         storage_cfg = module_cfg.get("storage", {}) if isinstance(module_cfg, dict) else {}
         self.db_path = db_path or storage_cfg.get("database") or storage_cfg.get("db_path") or "data/futures.db"
+        self.change_watermark_config = (
+            module_cfg.get("change_watermark", {}) if isinstance(module_cfg, dict) else {}
+        )
 
     def initialize(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
@@ -1367,6 +1377,7 @@ class FuturesStorageManager:
             parser_version TEXT NOT NULL,
             quality_flag TEXT NOT NULL,
             raw_payload_hash TEXT NOT NULL,
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL,
             ingestion_run_id INTEGER,
             created_at TEXT NOT NULL,
@@ -1400,6 +1411,7 @@ class FuturesStorageManager:
             parser_version TEXT NOT NULL,
             quality_flag TEXT NOT NULL,
             raw_payload_hash TEXT NOT NULL,
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL,
             ingestion_run_id INTEGER,
             created_at TEXT NOT NULL,
@@ -1540,6 +1552,9 @@ class FuturesStorageManager:
         for column, definition in calendar_columns.items():
             if column not in existing:
                 conn.execute(f"ALTER TABLE futures_trading_calendar ADD COLUMN {column} {definition}")
+        ensure_row_version_column(conn, "futures_contract_price_bars")
+        ensure_row_version_column(conn, "futures_price_bars")
+        ensure_change_log_schema(conn)
 
     def start_ingestion_run(
         self,
@@ -2129,12 +2144,13 @@ class FuturesStorageManager:
         inserted = 0
         changed = 0
         unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for bar in bars:
                 existing = conn.execute(
                     """
-                    SELECT raw_payload_hash FROM futures_contract_price_bars
+                    SELECT raw_payload_hash, row_version FROM futures_contract_price_bars
                     WHERE contract_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
                     """,
                     (bar.contract_id, bar.trade_date, bar.source, bar.source_mode),
@@ -2146,15 +2162,16 @@ class FuturesStorageManager:
                     changed += 1
                 else:
                     inserted += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
                     INSERT INTO futures_contract_price_bars (
                         contract_id, instrument_id, trade_date, source, source_mode,
                         open, high, low, close, settlement, volume, open_interest,
                         amount, currency, unit, source_profile, source_interface,
-                        parser_version, quality_flag, raw_payload_hash, metadata_json,
-                        ingestion_run_id, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        parser_version, quality_flag, raw_payload_hash, row_version,
+                        metadata_json, ingestion_run_id, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(contract_id, trade_date, source, source_mode) DO UPDATE SET
                         instrument_id=excluded.instrument_id,
                         open=excluded.open,
@@ -2172,6 +2189,7 @@ class FuturesStorageManager:
                         parser_version=excluded.parser_version,
                         quality_flag=excluded.quality_flag,
                         raw_payload_hash=excluded.raw_payload_hash,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         ingestion_run_id=excluded.ingestion_run_id,
                         updated_at=excluded.updated_at
@@ -2197,13 +2215,43 @@ class FuturesStorageManager:
                         bar.parser_version,
                         bar.quality_flag,
                         bar.raw_payload_hash,
+                        row_version,
                         _json_dumps(bar.metadata),
                         ingestion_run_id,
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged}
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="futures",
+                    dataset="futures_contract_price_bars",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "contract_id": bar.contract_id,
+                        "trade_date": bar.trade_date,
+                        "source": bar.source,
+                        "source_mode": bar.source_mode,
+                    },
+                    instrument_id=bar.instrument_id,
+                    observation_date=bar.trade_date,
+                    old_hash=existing["raw_payload_hash"] if existing else None,
+                    new_hash=bar.raw_payload_hash,
+                    row_version=row_version,
+                    source=bar.source,
+                    source_mode=bar.source_mode,
+                    source_profile=bar.source_profile,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "changelog_written": changelog_written,
+        }
 
     def upsert_trading_calendar(self, days: Sequence[FuturesTradingCalendarDay]) -> int:
         now = get_shanghai_time().isoformat()
@@ -3003,10 +3051,23 @@ class FuturesStorageManager:
         inserted = 0
         changed = 0
         unchanged = 0
+        changelog_written = 0
         now = get_shanghai_time().isoformat()
         with self.get_connection() as conn:
             for bar in bars:
                 if str(bar.source_profile or "") == "exchange_official":
+                    superseded_rows = conn.execute(
+                        """
+                        SELECT source, source_mode, source_profile,
+                               raw_payload_hash, row_version
+                        FROM futures_price_bars
+                        WHERE series_id = ?
+                          AND trade_date = ?
+                          AND source_mode = ?
+                          AND source_profile != 'exchange_official'
+                        """,
+                        (bar.series_id, bar.trade_date, bar.source_mode),
+                    ).fetchall()
                     conn.execute(
                         """
                         DELETE FROM futures_price_bars
@@ -3017,6 +3078,31 @@ class FuturesStorageManager:
                         """,
                         (bar.series_id, bar.trade_date, bar.source_mode),
                     )
+                    for superseded in superseded_rows:
+                        if append_change_record(
+                            conn,
+                            config=self.change_watermark_config,
+                            domain="futures",
+                            dataset="futures_price_bars",
+                            change_type="delete_marker",
+                            business_key={
+                                "series_id": bar.series_id,
+                                "trade_date": bar.trade_date,
+                                "source": superseded["source"],
+                                "source_mode": superseded["source_mode"],
+                            },
+                            series_id=bar.series_id,
+                            observation_date=bar.trade_date,
+                            old_hash=superseded["raw_payload_hash"],
+                            new_hash=None,
+                            row_version=int(superseded["row_version"] or 1) + 1,
+                            source=superseded["source"],
+                            source_mode=superseded["source_mode"],
+                            source_profile=superseded["source_profile"],
+                            ingestion_run_id=ingestion_run_id,
+                            changed_at=now,
+                        ):
+                            changelog_written += 1
                 else:
                     official_existing = conn.execute(
                         """
@@ -3034,7 +3120,7 @@ class FuturesStorageManager:
                         continue
                 existing = conn.execute(
                     """
-                    SELECT raw_payload_hash FROM futures_price_bars
+                    SELECT raw_payload_hash, row_version FROM futures_price_bars
                     WHERE series_id = ? AND trade_date = ? AND source = ? AND source_mode = ?
                     """,
                     (bar.series_id, bar.trade_date, bar.source, bar.source_mode),
@@ -3046,15 +3132,16 @@ class FuturesStorageManager:
                     changed += 1
                 else:
                     inserted += 1
+                row_version = int(existing["row_version"] or 1) + 1 if existing else 1
                 conn.execute(
                     """
                     INSERT INTO futures_price_bars (
                         series_id, trade_date, source, source_mode, open, high, low,
                         close, settlement, volume, open_interest, amount, currency,
                         unit, source_profile, source_interface, parser_version,
-                        quality_flag, raw_payload_hash, metadata_json,
+                        quality_flag, raw_payload_hash, row_version, metadata_json,
                         ingestion_run_id, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(series_id, trade_date, source, source_mode) DO UPDATE SET
                         open=excluded.open,
                         high=excluded.high,
@@ -3071,6 +3158,7 @@ class FuturesStorageManager:
                         parser_version=excluded.parser_version,
                         quality_flag=excluded.quality_flag,
                         raw_payload_hash=excluded.raw_payload_hash,
+                        row_version=excluded.row_version,
                         metadata_json=excluded.metadata_json,
                         ingestion_run_id=excluded.ingestion_run_id,
                         updated_at=excluded.updated_at
@@ -3095,13 +3183,43 @@ class FuturesStorageManager:
                         bar.parser_version,
                         bar.quality_flag,
                         bar.raw_payload_hash,
+                        row_version,
                         _json_dumps(bar.metadata),
                         ingestion_run_id,
                         now,
                         now,
                     ),
                 )
-        return {"inserted": inserted, "changed": changed, "unchanged": unchanged}
+                if append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="futures",
+                    dataset="futures_price_bars",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "series_id": bar.series_id,
+                        "trade_date": bar.trade_date,
+                        "source": bar.source,
+                        "source_mode": bar.source_mode,
+                    },
+                    series_id=bar.series_id,
+                    observation_date=bar.trade_date,
+                    old_hash=existing["raw_payload_hash"] if existing else None,
+                    new_hash=bar.raw_payload_hash,
+                    row_version=row_version,
+                    source=bar.source,
+                    source_mode=bar.source_mode,
+                    source_profile=bar.source_profile,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                ):
+                    changelog_written += 1
+        return {
+            "inserted": inserted,
+            "changed": changed,
+            "unchanged": unchanged,
+            "changelog_written": changelog_written,
+        }
 
     def list_instruments(self, *, active_only: bool = True) -> List[Dict[str, Any]]:
         with self.get_connection() as conn:
@@ -7546,6 +7664,7 @@ class FuturesMarketDataSyncService:
                     "inserted": 0,
                     "changed": 0,
                     "unchanged": 0,
+                    "changelog_written": 0,
                     "failed": 0,
                     "calendar_skipped": 0,
                     "provider_empty_on_trading_day": 0,
@@ -7702,6 +7821,7 @@ class FuturesMarketDataSyncService:
             "inserted": 0,
             "changed": 0,
             "unchanged": 0,
+            "changelog_written": 0,
             "failed": 0,
             "calendar_skipped": calendar_gate.get("skipped_date_count", 0),
             "provider_empty_on_trading_day": 0,
@@ -8089,17 +8209,26 @@ class FuturesMarketDataSyncService:
                         )
                     if not dry_run and contracts:
                         self.storage.upsert_contracts(contracts)
-                        self.storage.upsert_contract_price_bars(
+                        contract_write_result = self.storage.upsert_contract_price_bars(
                             contract_bars,
                             ingestion_run_id=run_id,
                         )
+                        totals["changelog_written"] += int(
+                            contract_write_result.get("changelog_written", 0) or 0
+                        )
                         self.storage.upsert_continuous_mappings(mappings)
-                    write_result = {"inserted": 0, "changed": 0, "unchanged": 0, "would_write_rows": len(bars)}
+                    write_result = {
+                        "inserted": 0,
+                        "changed": 0,
+                        "unchanged": 0,
+                        "changelog_written": 0,
+                        "would_write_rows": len(bars),
+                    }
                     if dry_run:
                         totals["would_write_price_bars"] += len(bars)
                     if not dry_run:
                         write_result = self.storage.upsert_price_bars(bars, ingestion_run_id=run_id)
-                    for key in ("inserted", "changed", "unchanged"):
+                    for key in ("inserted", "changed", "unchanged", "changelog_written"):
                         totals[key] += int(write_result.get(key, 0) or 0)
                     series_results.append(
                         {

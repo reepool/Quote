@@ -1,4 +1,5 @@
 import sqlite3
+from dataclasses import replace
 
 from research.financial_source_field_mapping import (
     MAPPING_VERSION,
@@ -22,6 +23,7 @@ from research.providers.base import (
     IndustryIndexAnalysisSnapshot,
     IndustrySnapshot,
     IndustrySourceFileSnapshot,
+    IndustryTaxonomySnapshot,
     OfficialIndustryClassificationSnapshot,
     ResearchReportSnapshot,
     RiskSnapshot,
@@ -39,7 +41,12 @@ from utils.config_manager import (
 from research.storage import ResearchStorageManager
 
 
-def _build_storage_manager(tmp_path, *, attach_quotes_db: bool = False):
+def _build_storage_manager(
+    tmp_path,
+    *,
+    attach_quotes_db: bool = False,
+    separate_financial_db: bool = False,
+):
     research_db_path = tmp_path / "research.db"
     quotes_db_path = tmp_path / "quotes.db"
     quotes_db_path.write_bytes(b"")
@@ -52,7 +59,11 @@ def _build_storage_manager(tmp_path, *, attach_quotes_db: bool = False):
             attach_quotes_db=attach_quotes_db,
             quotes_db_path=str(quotes_db_path),
             quotes_db_alias="quotes",
-            financials_db_path=str(research_db_path),
+            financials_db_path=str(
+                tmp_path / "financials.db"
+                if separate_financial_db
+                else research_db_path
+            ),
             valuation_db_path=str(tmp_path / "valuation.db"),
         ),
         budget=ResearchBudgetConfig(),
@@ -416,7 +427,16 @@ def test_upsert_shareholder_snapshot_writes_normalized_snapshot(tmp_path):
         job_name="shareholder_shadow_sync",
         market="SSE",
     )
-    storage.upsert_shareholder_snapshot(snapshot, ingestion_run_id=run_id)
+    first_stats = storage.upsert_shareholder_snapshot(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    duplicate_stats = storage.upsert_shareholder_snapshot(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
 
     with sqlite3.connect(research_db_path) as conn:
         row = conn.execute(
@@ -429,6 +449,18 @@ def test_upsert_shareholder_snapshot_writes_normalized_snapshot(tmp_path):
         ).fetchone()
 
     assert row == ("600519.SH", 123456, "efinance", "direct", run_id)
+    assert first_stats == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    assert duplicate_stats == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "changelog_written": 0,
+    }
 
     loaded = storage.get_shareholder_snapshot("600519.SH")
     assert loaded is not None
@@ -437,6 +469,36 @@ def test_upsert_shareholder_snapshot_writes_normalized_snapshot(tmp_path):
         loaded["snapshot"]["top_holders"][0]["holder_name"]
         == "中国贵州茅台酒厂（集团）有限责任公司"
     )
+
+    changed_stats = storage.upsert_shareholder_snapshot(
+        replace(
+            snapshot,
+            holder_count=123457,
+            snapshot_json={
+                **snapshot.snapshot_json,
+                "holder_count": {"value": 123457},
+            },
+        ),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    assert changed_stats == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    with sqlite3.connect(research_db_path) as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, instrument_id, row_version, ingestion_run_id
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert changes == [
+        ("shareholder", "shareholder_snapshots", "600519.SH", 1, str(run_id)),
+        ("shareholder", "shareholder_snapshots", "600519.SH", 2, str(run_id)),
+    ]
 
 
 def test_shareholder_snapshot_summary_helpers_report_counts_and_exchange_coverage(tmp_path):
@@ -548,7 +610,16 @@ def test_upsert_industry_membership_writes_taxonomy_and_membership(tmp_path):
         job_name="industry_shadow_sync",
         market="SSE",
     )
-    storage.upsert_industry_membership(snapshot, ingestion_run_id=run_id)
+    inserted = storage.upsert_industry_membership(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    unchanged = storage.upsert_industry_membership(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
 
     with sqlite3.connect(research_db_path) as conn:
         membership_row = conn.execute(
@@ -606,6 +677,236 @@ def test_upsert_industry_membership_writes_taxonomy_and_membership(tmp_path):
     assert taxonomy_records[0]["industry_name"] == "白酒"
     assert taxonomy_records[0]["aliases"] == {}
     assert taxonomy_records[0]["is_active"] is True
+
+    changed = storage.upsert_industry_membership(
+        replace(snapshot, effective_date="2024-01-03"),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    assert inserted == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    assert unchanged == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "changelog_written": 0,
+    }
+    assert changed == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    with sqlite3.connect(research_db_path) as conn:
+        changes = conn.execute(
+            """
+            SELECT dataset, instrument_id, series_id, observation_date, row_version
+            FROM data_change_log
+            WHERE domain = 'industry'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert changes == [
+        ("industry_taxonomy", None, "850111.SI", None, 1),
+        ("industry_memberships", "600519.SH", None, "2024-01-02", 1),
+        ("industry_memberships", "600519.SH", None, "2024-01-03", 2),
+    ]
+    deleted = storage.delete_industry_memberships(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        instrument_ids=["600519.SH"],
+        ingestion_run_id=run_id,
+    )
+    assert deleted == 1
+    with sqlite3.connect(research_db_path) as conn:
+        delete_change = conn.execute(
+            """
+            SELECT change_type, instrument_id, observation_date, row_version,
+                   ingestion_run_id
+            FROM data_change_log
+            WHERE dataset = 'industry_memberships'
+            ORDER BY sequence_id DESC
+            LIMIT 1
+            """
+        ).fetchone()
+    assert delete_change == (
+        "delete_marker",
+        "600519.SH",
+        "2024-01-03",
+        3,
+        str(run_id),
+    )
+    reinserted = storage.upsert_industry_membership(
+        replace(snapshot, effective_date="2024-01-04"),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    assert reinserted["inserted"] == 1
+    with sqlite3.connect(research_db_path) as conn:
+        reinsert_version = conn.execute(
+            """
+            SELECT row_version FROM data_change_log
+            WHERE dataset = 'industry_memberships'
+            ORDER BY sequence_id DESC LIMIT 1
+            """
+        ).fetchone()[0]
+    assert reinsert_version == 4
+
+
+def test_industry_taxonomy_emits_only_semantic_changes(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    node = IndustryTaxonomySnapshot(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        industry_code="850111.SI",
+        industry_name="白酒",
+        industry_level=3,
+        parent_code="801124.SI",
+        source_classification="申万标准行业",
+        source="swsresearch",
+        source_mode="direct",
+    )
+
+    inserted = storage.upsert_industry_taxonomy(node, return_stats=True)
+    unchanged = storage.upsert_industry_taxonomy(node, return_stats=True)
+    changed = storage.upsert_industry_taxonomy(
+        replace(node, industry_name="白酒制造"),
+        return_stats=True,
+    )
+
+    assert inserted["changelog_written"] == 1
+    assert unchanged == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "changelog_written": 0,
+    }
+    assert changed == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    with sqlite3.connect(research_db_path) as conn:
+        changes = conn.execute(
+            """
+            SELECT dataset, series_id, row_version
+            FROM data_change_log
+            WHERE dataset = 'industry_taxonomy'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert changes == [
+        ("industry_taxonomy", "850111.SI", 1),
+        ("industry_taxonomy", "850111.SI", 2),
+    ]
+
+
+def test_industry_rebuild_preserves_unchanged_rows_and_removes_only_stale_rows(
+    tmp_path,
+):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    active_node = IndustryTaxonomySnapshot(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        industry_code="850111.SI",
+        industry_name="白酒",
+        source="swsresearch",
+        source_mode="direct",
+    )
+    stale_node = replace(
+        active_node,
+        industry_code="850112.SI",
+        industry_name="其他酒类",
+    )
+    active_membership = IndustrySnapshot(
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        industry_code=active_node.industry_code,
+        industry_name=active_node.industry_name,
+        mapping_status="authoritative",
+        source="swsresearch",
+        source_mode="direct",
+    )
+    stale_membership = replace(
+        active_membership,
+        instrument_id="600999.SH",
+        symbol="600999",
+        industry_code=stale_node.industry_code,
+        industry_name=stale_node.industry_name,
+    )
+    storage.upsert_industry_taxonomy(active_node)
+    storage.upsert_industry_taxonomy(stale_node)
+    storage.upsert_industry_membership(active_membership)
+    storage.upsert_industry_membership(stale_membership)
+
+    with sqlite3.connect(research_db_path) as conn:
+        changes_before = conn.execute("SELECT COUNT(*) FROM data_change_log").fetchone()[0]
+    cleared = storage.clear_industry_standard_slice(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        preserve_change_tracked=True,
+    )
+    storage.upsert_industry_taxonomy(active_node)
+    storage.upsert_industry_membership(active_membership)
+    with sqlite3.connect(research_db_path) as conn:
+        changes_after_unchanged_upserts = conn.execute(
+            "SELECT COUNT(*) FROM data_change_log"
+        ).fetchone()[0]
+        tracked_rows = (
+            conn.execute("SELECT COUNT(*) FROM industry_taxonomy").fetchone()[0],
+            conn.execute("SELECT COUNT(*) FROM industry_memberships").fetchone()[0],
+        )
+
+    assert "industry_taxonomy" not in cleared
+    assert "industry_memberships" not in cleared
+    assert tracked_rows == (2, 2)
+    assert changes_after_unchanged_upserts == changes_before
+
+    deactivated = storage.deactivate_missing_industry_taxonomy(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        active_industry_codes=[active_node.industry_code],
+    )
+    deleted = storage.delete_industry_memberships_outside_universe(
+        taxonomy_system="sw",
+        taxonomy_version="sw_2021",
+        exchanges=["SSE"],
+        active_instrument_ids=[active_membership.instrument_id],
+    )
+    assert deactivated == 1
+    assert deleted == 1
+    with sqlite3.connect(research_db_path) as conn:
+        stale_active = conn.execute(
+            """
+            SELECT is_active, row_version FROM industry_taxonomy
+            WHERE industry_code = '850112.SI'
+            """
+        ).fetchone()
+        remaining_memberships = conn.execute(
+            "SELECT instrument_id FROM industry_memberships ORDER BY instrument_id"
+        ).fetchall()
+        final_changes = conn.execute(
+            """
+            SELECT dataset, change_type FROM data_change_log
+            ORDER BY sequence_id DESC LIMIT 2
+            """
+        ).fetchall()
+    assert stale_active == (0, 2)
+    assert remaining_memberships == [("600519.SH",)]
+    assert set(final_changes) == {
+        ("industry_taxonomy", "update"),
+        ("industry_memberships", "delete_marker"),
+    }
 
 
 def test_get_industry_membership_deprioritizes_dryrun_seed(tmp_path):
@@ -1549,6 +1850,114 @@ def test_upsert_financial_statement_bundle_writes_raw_facts_and_indicators(tmp_p
     assert len(loaded["statements"]) == 2
 
 
+def test_financial_core_facts_emit_only_semantic_changes(tmp_path):
+    storage, research_db_path = _build_storage_manager(tmp_path)
+    storage.initialize()
+    run_id = storage.start_ingestion_run(
+        domain="financial_statements",
+        job_name="financial_disclosure_incremental_sync",
+        market="SSE",
+    )
+    snapshot = FinancialFactsSnapshot(
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        report_period="2025-12-31",
+        report_type="annual",
+        statement_family="core",
+        publish_date="2026-03-30",
+        revenue=1000.0,
+        net_income=180.0,
+        source="cninfo",
+        source_mode="direct",
+        source_file_id="cninfo-600519-2025",
+        filing_id="filing-600519-2025",
+        facts_json={"revenue": 1000.0, "net_income": 180.0},
+        lineage_json={
+            "mapping_version": "sina_ths_core_financial_facts.v1",
+            "parser_version": "cninfo_data20_structured_json_facts.v1",
+        },
+    )
+
+    inserted = storage.upsert_financial_facts(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    unchanged = storage.upsert_financial_facts(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    changed = storage.upsert_financial_facts(
+        replace(
+            snapshot,
+            revenue=1001.0,
+            facts_json={"revenue": 1001.0, "net_income": 180.0},
+        ),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+
+    assert inserted == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    assert unchanged == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "changelog_written": 0,
+    }
+    assert changed == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+
+    facts = storage.get_financial_core_facts(
+        "600519.SH",
+        report_period="2025-12-31",
+    )
+    assert facts[0]["data_available_date"] == "2026-03-30"
+    assert facts[0]["revenue"] == 1001.0
+    assert "row_hash" not in facts[0]
+    assert "row_version" not in facts[0]
+
+    with sqlite3.connect(research_db_path) as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, instrument_id, period, row_version,
+                   source_profile
+            FROM data_change_log
+            WHERE dataset = 'financial_facts'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+
+    assert changes == [
+        (
+            "financial",
+            "financial_facts",
+            "600519.SH",
+            "2025-12-31",
+            1,
+            "sina_ths_core_financial_facts.v1",
+        ),
+        (
+            "financial",
+            "financial_facts",
+            "600519.SH",
+            "2025-12-31",
+            2,
+            "sina_ths_core_financial_facts.v1",
+        ),
+    ]
+
+
 def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
     storage, research_db_path = _build_storage_manager(tmp_path)
     storage.initialize()
@@ -1578,35 +1987,34 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
         ),
         ingestion_run_id=run_id,
     )
+    numeric_fact = FinancialNumericFactSnapshot(
+        source_file_id=source_file_id,
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2024-03-31",
+        report_type="quarterly",
+        statement_family="income_statement",
+        fact_name="Revenue",
+        canonical_fact_name="revenue",
+        canonical_statement_family="income_statement",
+        canonical_semantic="operating_revenue",
+        canonical_unit="CNY",
+        canonical_version="standard_financial_numeric_facts.v1",
+        taxonomy_namespace="cn-gaap",
+        context_id="current_q1",
+        unit="CNY",
+        period_start="2024-01-01",
+        period_end="2024-03-31",
+        fact_value=1000.0,
+        source="sse",
+        source_mode="direct",
+        parser_version="financial_structured_filing.v1",
+        dimensions_json={"consolidated": True},
+        raw_fact_json={"name": "Revenue"},
+    )
     written = storage.financial_statements.upsert_numeric_facts(
-        [
-            FinancialNumericFactSnapshot(
-                source_file_id=source_file_id,
-                instrument_id="600000.SH",
-                symbol="600000",
-                exchange="SSE",
-                report_period="2024-03-31",
-                report_type="quarterly",
-                statement_family="income_statement",
-                fact_name="Revenue",
-                canonical_fact_name="revenue",
-                canonical_statement_family="income_statement",
-                canonical_semantic="operating_revenue",
-                canonical_unit="CNY",
-                canonical_version="standard_financial_numeric_facts.v1",
-                taxonomy_namespace="cn-gaap",
-                context_id="current_q1",
-                unit="CNY",
-                period_start="2024-01-01",
-                period_end="2024-03-31",
-                fact_value=1000.0,
-                source="sse",
-                source_mode="direct",
-                parser_version="financial_structured_filing.v1",
-                dimensions_json={"consolidated": True},
-                raw_fact_json={"name": "Revenue"},
-            )
-        ],
+        [numeric_fact],
         ingestion_run_id=run_id,
     )
 
@@ -1638,10 +2046,20 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
     assert canonical_facts[0]["fact_name"] == "Revenue"
     assert facts[0]["fact_value"] == 1000.0
     assert facts[0]["dimensions"] == {"consolidated": True}
+    assert "row_hash" not in facts[0]
+    assert "row_version" not in facts[0]
     assert derived is not None
     assert derived.revenue == 1000.0
     assert derived.source_file_id == source_file_id
     assert derived.lineage_json["numeric_fact_count"] == 1
+    storage.financial_statements.upsert_numeric_facts(
+        [numeric_fact],
+        ingestion_run_id=run_id,
+    )
+    storage.financial_statements.upsert_numeric_facts(
+        [replace(numeric_fact, fact_value=1001.0, value_text="1001.0")],
+        ingestion_run_id=run_id,
+    )
     storage.upsert_financial_source_file_manifest(
         FinancialSourceFileManifest(
             source_file_id=source_file_id,
@@ -1673,9 +2091,96 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
         hot_count = conn.execute(
             "SELECT COUNT(*) FROM financial_numeric_facts_hot"
         ).fetchone()[0]
+        changes = conn.execute(
+            """
+            SELECT dataset, instrument_id, period, row_version, source_profile
+            FROM data_change_log
+            WHERE dataset = 'financial_numeric_facts'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
 
     assert canonical_count == 0
     assert hot_count == 1
+    assert changes == [
+        (
+            "financial_numeric_facts",
+            "600000.SH",
+            "2024-03-31",
+            1,
+            "financial_structured_filing.v1",
+        ),
+        (
+            "financial_numeric_facts",
+            "600000.SH",
+            "2024-03-31",
+            2,
+            "financial_structured_filing.v1",
+        ),
+    ]
+
+
+def test_financial_numeric_fact_replace_routes_to_separate_database(tmp_path):
+    storage, research_db_path = _build_storage_manager(
+        tmp_path,
+        separate_financial_db=True,
+    )
+    storage.initialize()
+    source_file_id = storage.upsert_financial_source_file_manifest(
+        FinancialSourceFileManifest(
+            source="cninfo",
+            source_mode="direct",
+            instrument_id="600000.SH",
+            symbol="600000",
+            exchange="SSE",
+            report_period="2025-12-31",
+            report_type="annual",
+            content_hash="separate-financial-db",
+            parser_version="financial_structured_filing.v1",
+        )
+    )
+    fact = FinancialNumericFactSnapshot(
+        source_file_id=source_file_id,
+        instrument_id="600000.SH",
+        symbol="600000",
+        exchange="SSE",
+        report_period="2025-12-31",
+        report_type="annual",
+        statement_family="income_statement",
+        fact_name="Revenue",
+        fact_value=1000.0,
+        source="cninfo",
+        source_mode="direct",
+        parser_version="financial_structured_filing.v1",
+    )
+    storage.upsert_financial_numeric_facts([fact], tier="history")
+
+    result = storage.replace_financial_numeric_facts_for_source_file(
+        source_file_id,
+        [],
+        tier="history",
+    )
+
+    assert result == {"deleted": 1, "inserted": 0}
+    with sqlite3.connect(research_db_path) as conn:
+        research_tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            ).fetchall()
+        }
+    assert "financial_numeric_facts_history" not in research_tables
+    with sqlite3.connect(storage.financials_db_path) as conn:
+        assert conn.execute(
+            "SELECT COUNT(*) FROM financial_numeric_facts_history"
+        ).fetchone()[0] == 0
+        assert conn.execute(
+            """
+            SELECT COUNT(*) FROM data_change_log
+            WHERE dataset = 'financial_numeric_facts'
+              AND change_type = 'delete_marker'
+            """
+        ).fetchone()[0] == 1
 
 
 def test_financial_source_field_mappings_and_audit_results_round_trip(tmp_path):
@@ -2471,6 +2976,78 @@ def test_upsert_valuation_input_uses_valuation_database_and_rejects_amount_units
         raise AssertionError("amount-denominated share-count input should be rejected")
 
 
+def test_valuation_inputs_and_history_emit_only_semantic_changes(tmp_path):
+    storage, _ = _build_storage_manager(tmp_path)
+    storage.initialize()
+    valuation_input = ValuationInputSnapshot(
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        as_of_date="2026-04-18",
+        market_cap=2000.0,
+        source="manual",
+        source_mode="local",
+        input_kind="market_cap",
+        data_as_of="2026-04-18",
+    )
+    history = ValuationHistorySnapshot(
+        instrument_id="600519.SH",
+        symbol="600519",
+        exchange="SSE",
+        as_of_date="2026-04-18",
+        close_price=1600.0,
+        market_cap=2000.0,
+        pe_ttm=25.0,
+        parameter_hash="valuation-hash",
+        details_json={"input_hash": "input-v1"},
+    )
+
+    input_inserted = storage.upsert_valuation_input(
+        valuation_input,
+        return_stats=True,
+    )
+    input_unchanged = storage.upsert_valuation_input(
+        valuation_input,
+        return_stats=True,
+    )
+    input_changed = storage.upsert_valuation_input(
+        replace(valuation_input, market_cap=2001.0),
+        return_stats=True,
+    )
+    history_inserted = storage.upsert_valuation_history(
+        history,
+        return_stats=True,
+    )
+    storage.upsert_valuation_history_many([history])
+    revised_history = replace(
+        history,
+        pe_ttm=25.1,
+        details_json={"input_hash": "input-v2"},
+    )
+    storage.upsert_valuation_history_many([revised_history])
+    storage.upsert_valuation_history_many([revised_history])
+
+    assert input_inserted["changelog_written"] == 1
+    assert input_unchanged["unchanged"] == 1
+    assert input_changed["changed"] == 1
+    assert history_inserted["changelog_written"] == 1
+    with sqlite3.connect(storage.valuation_db_path) as conn:
+        changes = conn.execute(
+            """
+            SELECT dataset, observation_date, row_version
+            FROM data_change_log
+            WHERE dataset IN ('valuation_inputs', 'valuation_history')
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert changes == [
+        ("valuation_inputs", "2026-04-18", 1),
+        ("valuation_inputs", "2026-04-18", 2),
+        ("valuation_history", "2026-04-18", 1),
+        ("valuation_history", "2026-04-18", 2),
+    ]
+
+
 def test_valuation_history_read_filters_current_identity(tmp_path):
     storage, _ = _build_storage_manager(tmp_path)
     storage.initialize()
@@ -2745,7 +3322,7 @@ def test_upsert_sentiment_event_writes_rows_and_counts(tmp_path):
 
 
 def test_upsert_risk_snapshot_writes_row(tmp_path):
-    storage, _ = _build_storage_manager(tmp_path)
+    storage, research_db_path = _build_storage_manager(tmp_path)
     storage.initialize()
 
     snapshot = RiskSnapshot(
@@ -2775,17 +3352,43 @@ def test_upsert_risk_snapshot_writes_row(tmp_path):
         job_name="risk_snapshot_rebuild",
         market="SSE",
     )
-    storage.upsert_risk_snapshot(snapshot, ingestion_run_id=run_id)
+    inserted = storage.upsert_risk_snapshot(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    unchanged = storage.upsert_risk_snapshot(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
 
     loaded = storage.get_latest_risk_snapshot("600519.SH")
     assert loaded is not None
     assert loaded["risk_level"] == "low"
     assert loaded["benchmark_instrument_id"] == "000300.SH"
     assert loaded["details"]["component_scores"]["volatility"] == 8.0
+    changed = storage.upsert_risk_snapshot(
+        replace(snapshot, risk_score=29.0),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    assert inserted["changelog_written"] == 1
+    assert unchanged["unchanged"] == 1
+    assert changed["changed"] == 1
+    with sqlite3.connect(research_db_path) as conn:
+        versions = conn.execute(
+            """
+            SELECT row_version FROM data_change_log
+            WHERE dataset = 'risk_snapshots'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert versions == [(1,), (2,)]
 
 
 def test_upsert_technical_indicator_latest_writes_snapshot(tmp_path):
-    storage, _ = _build_storage_manager(tmp_path)
+    storage, research_db_path = _build_storage_manager(tmp_path)
     storage.initialize()
 
     snapshot = TechnicalIndicatorLatestSnapshot(
@@ -2822,7 +3425,16 @@ def test_upsert_technical_indicator_latest_writes_snapshot(tmp_path):
         job_name="technical_snapshot_refresh",
         market="SSE",
     )
-    storage.upsert_technical_indicator_latest(snapshot, ingestion_run_id=run_id)
+    inserted = storage.upsert_technical_indicator_latest(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    unchanged = storage.upsert_technical_indicator_latest(
+        snapshot,
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
 
     loaded = storage.get_latest_technical_indicator_snapshot(
         "600519.SH",
@@ -2851,3 +3463,20 @@ def test_upsert_technical_indicator_latest_writes_snapshot(tmp_path):
     assert summary["signal_counts"] == {"bullish": 1}
     assert summary["latest_as_of_date"] == "2026-04-17"
     assert by_exchange == {"SSE": 1}
+    changed = storage.upsert_technical_indicator_latest(
+        replace(snapshot, close_price=1601.0),
+        ingestion_run_id=run_id,
+        return_stats=True,
+    )
+    assert inserted["changelog_written"] == 1
+    assert unchanged["unchanged"] == 1
+    assert changed["changed"] == 1
+    with sqlite3.connect(research_db_path) as conn:
+        versions = conn.execute(
+            """
+            SELECT row_version FROM data_change_log
+            WHERE dataset = 'technical_indicator_latest'
+            ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert versions == [(1,), (2,)]

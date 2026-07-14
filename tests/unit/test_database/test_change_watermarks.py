@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import text
 
 from database.connection import DatabaseManager
-from database.models import DataChangeLogDB, DailyQuoteDB, InstrumentDB
+from database.models import AdjustmentFactorDB, DataChangeLogDB, DailyQuoteDB, InstrumentDB
 from database.operations import DatabaseOperations
 
 
@@ -133,6 +133,85 @@ async def test_daily_quote_cdc_ignores_overlap_and_records_material_changes(tmp_
 
 
 @pytest.mark.asyncio
+async def test_daily_quote_cdc_rollback_reports_no_persisted_writes(
+    tmp_path,
+    monkeypatch,
+):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        class EmptyScalars:
+            @staticmethod
+            def all():
+                return []
+
+        class EmptyResult:
+            @staticmethod
+            def scalars():
+                return EmptyScalars()
+
+        class FailingSession:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, exc_type, exc, traceback):
+                return False
+
+            async def execute(self, statement):
+                return EmptyResult()
+
+            def add(self, row):
+                return None
+
+            async def commit(self):
+                raise RuntimeError("forced commit failure")
+
+        monkeypatch.setattr(ops, "get_async_session", lambda: FailingSession())
+        stats = await ops.save_daily_quotes([_quote()], return_stats=True)
+
+        assert stats == {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "skipped": 0,
+            "failed": 1,
+            "changelog_written": 0,
+        }
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_daily_quote_cdc_collapses_duplicate_batch_keys_and_keeps_valid_rows(tmp_path):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_instrument(manager)
+        malformed = {**_quote(), "instrument_id": "MALFORMED.SZ", "close": "bad"}
+
+        stats = await ops.save_daily_quotes(
+            [_quote(close=10.5), malformed, _quote(close=10.8, batch_id="last")],
+            return_stats=True,
+        )
+
+        assert stats == {
+            "inserted": 1,
+            "changed": 0,
+            "unchanged": 0,
+            "skipped": 1,
+            "failed": 1,
+            "changelog_written": 1,
+        }
+        with manager.get_session() as session:
+            quote = session.query(DailyQuoteDB).one()
+            change = session.query(DataChangeLogDB).one()
+        assert quote.close == 10.8
+        assert quote.batch_id == "last"
+        assert change.change_type == "insert"
+        assert change.row_version == 1
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
 async def test_adjustment_factor_cdc_uses_separate_domain(tmp_path):
     manager, ops = await _ops_for_tmp_db(tmp_path)
     try:
@@ -153,6 +232,49 @@ async def test_adjustment_factor_cdc_uses_separate_domain(tmp_path):
         assert restated_stats["changed"] == 1
         assert changes["count"] == 2
         assert all(row["domain"] == "adjustment_factor" for row in changes["changes"])
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_adjustment_factor_cdc_rollback_reports_no_persisted_writes(
+    tmp_path,
+    monkeypatch,
+):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        class EmptyResult:
+            @staticmethod
+            def scalar_one_or_none():
+                return None
+
+        class FailingSession:
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, exc_type, exc, traceback):
+                return False
+
+            async def execute(self, statement):
+                return EmptyResult()
+
+            def add(self, row):
+                return None
+
+            async def commit(self):
+                raise RuntimeError("forced commit failure")
+
+        monkeypatch.setattr(ops, "get_async_session", lambda: FailingSession())
+        stats = await ops.save_adjustment_factors([_factor()], return_stats=True)
+
+        assert stats == {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "skipped": 0,
+            "failed": 1,
+            "changelog_written": 0,
+        }
     finally:
         await manager.close_async()
 
@@ -183,15 +305,34 @@ async def test_latest_watermark_supports_empty_and_multiple_domains(tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_changelog_domain_can_be_disabled_without_blocking_source_writes(tmp_path):
+async def test_latest_watermark_does_not_mask_database_failures(tmp_path, monkeypatch):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        def fail_session():
+            raise RuntimeError("watermark database unavailable")
+
+        monkeypatch.setattr(ops, "get_async_session", fail_session)
+
+        with pytest.raises(RuntimeError, match="watermark database unavailable"):
+            await ops.get_change_watermark(domain="quotes")
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_changelog_domain_can_be_disabled_without_blocking_source_writes(tmp_path, monkeypatch):
     manager, ops = await _ops_for_tmp_db(tmp_path)
     try:
         _seed_instrument(manager)
-        ops.config_manager.get_nested = lambda path, default=None: {
-            "enabled": True,
-            "domains": {"quotes": False},
-            "datasets": {"daily_quotes": True},
-        } if path == "database_config.change_watermark" else default
+        monkeypatch.setattr(
+            ops.config_manager,
+            "get_nested",
+            lambda path, default=None: {
+                "enabled": True,
+                "domains": {"quotes": False},
+                "datasets": {"daily_quotes": True},
+            } if path == "database_config.change_watermark" else default,
+        )
 
         stats = await ops.save_daily_quotes([_quote()], return_stats=True)
         changes = await ops.get_data_changes(domain="quotes", dataset="daily_quotes", since_sequence=0)
@@ -202,5 +343,96 @@ async def test_changelog_domain_can_be_disabled_without_blocking_source_writes(t
         with manager.get_session() as session:
             quote = session.query(DailyQuoteDB).one()
             assert quote.close == 10.5
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_changelog_global_disable_keeps_source_writes_without_watermark(tmp_path, monkeypatch):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_instrument(manager)
+        monkeypatch.setattr(
+            ops.config_manager,
+            "get_nested",
+            lambda path, default=None: {"enabled": False}
+            if path == "database_config.change_watermark" else default,
+        )
+
+        quote_stats = await ops.save_daily_quotes([_quote()], return_stats=True)
+        factor_stats = await ops.save_adjustment_factors([_factor()], return_stats=True)
+        changes = await ops.get_data_changes(since_sequence=0)
+
+        assert quote_stats["inserted"] == 1
+        assert quote_stats["changelog_written"] == 0
+        assert factor_stats["inserted"] == 1
+        assert factor_stats["changelog_written"] == 0
+        assert changes["count"] == 0
+        with manager.get_session() as session:
+            assert session.query(DailyQuoteDB).count() == 1
+            assert session.query(AdjustmentFactorDB).count() == 1
+            assert session.query(DataChangeLogDB).count() == 0
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_change_watermark_invalid_config_falls_back_to_safe_defaults(tmp_path, monkeypatch):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_instrument(manager)
+        await ops.save_daily_quotes([_quote()], return_stats=True)
+        monkeypatch.setattr(
+            ops.config_manager,
+            "get_nested",
+            lambda path, default=None: {
+                "enabled": True,
+                "default_limit": "bad",
+                "max_limit": "bad",
+                "domains": "bad",
+                "datasets": "bad",
+            } if path == "database_config.change_watermark" else default,
+        )
+
+        changes = await ops.get_data_changes(since_sequence=0, limit=10000)
+        health = await ops.get_change_watermark_health()
+
+        assert changes["limit"] == 5000
+        assert changes["count"] == 1
+        assert health["default_limit"] == 1000
+        assert health["max_limit"] == 5000
+        assert health["domains"] == {"quotes": True, "adjustment_factor": True}
+        assert health["datasets"] == {"daily_quotes": True, "adjustment_factors": True}
+    finally:
+        await manager.close_async()
+
+
+@pytest.mark.asyncio
+async def test_change_query_uses_configured_default_limit_when_omitted(tmp_path, monkeypatch):
+    manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_instrument(manager)
+        await ops.save_daily_quotes([_quote(close=10.5, batch_id="b1")], return_stats=True)
+        await ops.save_daily_quotes([_quote(close=10.8, batch_id="b2")], return_stats=True)
+        await ops.save_daily_quotes([_quote(close=10.9, batch_id="b3")], return_stats=True)
+        monkeypatch.setattr(
+            ops.config_manager,
+            "get_nested",
+            lambda path, default=None: {
+                "enabled": True,
+                "default_limit": 1,
+                "max_limit": 2,
+            } if path == "database_config.change_watermark" else default,
+        )
+
+        changes = await ops.get_data_changes(since_sequence=0)
+        capped = await ops.get_data_changes(since_sequence=0, limit=10)
+
+        assert changes["limit"] == 1
+        assert changes["count"] == 1
+        assert changes["has_more"] is True
+        assert capped["limit"] == 2
+        assert capped["count"] == 2
+        assert capped["has_more"] is True
     finally:
         await manager.close_async()

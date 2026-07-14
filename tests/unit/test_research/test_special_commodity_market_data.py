@@ -172,6 +172,98 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     }
 
 
+def test_special_commodity_observation_watermarks_and_dry_run(tmp_path):
+    cfg = _research_config(tmp_path)
+    special_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    SpecialCommodityMasterDataService(storage, special_cfg).sync()
+    series = CommodityUniverseSelector(special_cfg).resolve()[0]
+    observation = CommodityObservation(
+        series_id=series.series_id,
+        observation_date="2026-01-02",
+        value=100.0,
+        currency=series.currency,
+        unit=series.unit,
+        raw_value=100.0,
+        raw_currency=series.currency,
+        raw_unit=series.unit,
+        source_profile=series.source_profile,
+        source_url="https://example.test/commodity",
+        quality_flag="unit_test",
+        source_symbol=series.source_symbol,
+        parser_version="unit-test",
+        raw_payload_hash="commodity-h1",
+    )
+
+    dry_run = storage.upsert_observations(
+        [observation], ingestion_run_id=None, dry_run=True
+    )
+    inserted = storage.upsert_observations(
+        [observation], ingestion_run_id=None, dry_run=False
+    )
+    unchanged = storage.upsert_observations(
+        [observation], ingestion_run_id=None, dry_run=False
+    )
+    changed_observation = CommodityObservation(
+        **{
+            **observation.__dict__,
+            "value": 101.0,
+            "raw_value": 101.0,
+            "raw_payload_hash": "commodity-h2",
+        }
+    )
+    changed = storage.upsert_observations(
+        [changed_observation], ingestion_run_id=None, dry_run=False
+    )
+
+    assert dry_run["would_write"] == 1
+    assert dry_run["changelog_written"] == 0
+    assert inserted["changelog_written"] == 1
+    assert unchanged["unchanged"] == 1
+    assert unchanged["changelog_written"] == 0
+    assert changed["changed"] == 1
+    assert changed["changelog_written"] == 1
+    assert "row_version" not in storage.read_observations(series_id=series.series_id)[0]
+    with storage.get_connection() as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, series_id, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [dict(row) for row in changes] == [
+        {
+            "domain": "commodity",
+            "dataset": "commodity_price_observations",
+            "series_id": series.series_id,
+            "row_version": 1,
+        },
+        {
+            "domain": "commodity",
+            "dataset": "commodity_price_observations",
+            "series_id": series.series_id,
+            "row_version": 2,
+        },
+    ]
+    storage.change_watermark_config = {"enabled": False}
+    disabled_observation = CommodityObservation(
+        **{
+            **observation.__dict__,
+            "observation_date": "2026-01-03",
+            "raw_payload_hash": "commodity-disabled",
+        }
+    )
+    disabled_write = storage.upsert_observations(
+        [disabled_observation], ingestion_run_id=None, dry_run=False
+    )
+    assert disabled_write["inserted"] == 1
+    assert disabled_write["changelog_written"] == 0
+    assert len(storage.read_observations(series_id=series.series_id)) == 2
+    with storage.get_connection() as conn:
+        assert conn.execute("SELECT COUNT(*) FROM data_change_log").fetchone()[0] == 2
+
+
 def test_special_commodity_scope_resolution():
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
@@ -1814,18 +1906,21 @@ def test_observation_change_count_ignores_volatile_source_metadata(tmp_path):
         "changed": 0,
         "unchanged": 0,
         "would_write": 0,
+        "changelog_written": 1,
     }
     assert second == {
         "inserted": 0,
         "changed": 0,
         "unchanged": 1,
         "would_write": 0,
+        "changelog_written": 0,
     }
     assert third == {
         "inserted": 0,
         "changed": 1,
         "unchanged": 0,
         "would_write": 0,
+        "changelog_written": 1,
     }
     with storage.get_connection() as conn:
         row = conn.execute(
@@ -1836,9 +1931,14 @@ def test_observation_change_count_ignores_volatile_source_metadata(tmp_path):
             """,
             (base.series_id, base.observation_date, base.source_profile),
         ).fetchone()
+        change_count = conn.execute(
+            "SELECT COUNT(*) FROM data_change_log WHERE dataset = ?",
+            ("commodity_price_observations",),
+        ).fetchone()[0]
     assert row["value"] == 12_346.0
     assert row["raw_payload_hash"] == "vintage-b"
     assert json.loads(row["metadata_json"])["realtime_start"] == "2026-07-13"
+    assert change_count == 2
 
 
 def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tmp_path):
@@ -1898,15 +1998,30 @@ def test_manual_policy_event_sync_writes_policy_table(tmp_path):
     assert result["status"] == "success"
     assert result["policy_events"] == 1
     assert result["inserted"] == 1
+    assert result["changelog_written"] == 1
     assert result["event_summaries"][0]["effective_start"] == "2026-01-01"
     with storage.get_connection() as conn:
         row = conn.execute(
             "SELECT commodity_id, policy_type, value_mid FROM commodity_policy_events WHERE event_id = ?",
             ("thermal-coal-policy-2026-01",),
         ).fetchone()
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, instrument_id
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
     assert row["commodity_id"] == "OIL.WTI.SPOT"
     assert row["policy_type"] == "long_term_contract_reference"
     assert row["value_mid"] == 700
+    assert [dict(item) for item in changes] == [
+        {
+            "domain": "policy",
+            "dataset": "commodity_policy_events",
+            "instrument_id": "OIL.WTI.SPOT",
+        }
+    ]
+    assert not any(item["domain"] == "commodity" for item in changes)
 
     from research.special_commodity_market_data import SpecialCommodityReadService
 
@@ -2191,8 +2306,12 @@ def test_special_commodity_evidence_storage_is_additive_and_idempotent(tmp_path)
         "content_text": "official policy evidence",
         "parser_version": "test.v1",
     }
-    assert storage.upsert_source_documents([document], dry_run=False)["inserted"] == 1
-    assert storage.upsert_source_documents([document], dry_run=False)["unchanged"] == 1
+    document_insert = storage.upsert_source_documents([document], dry_run=False)
+    document_duplicate = storage.upsert_source_documents([document], dry_run=False)
+    assert document_insert["inserted"] == 1
+    assert document_insert["changelog_written"] == 1
+    assert document_duplicate["unchanged"] == 1
+    assert document_duplicate["changelog_written"] == 0
 
     candidate = {
         "candidate_id": "NDRC.2022.303.QHD5500",
@@ -2208,14 +2327,80 @@ def test_special_commodity_evidence_storage_is_additive_and_idempotent(tmp_path)
         "value_high": 770.0,
         "field_lineage": {"value_low": "document:price-range"},
     }
-    assert storage.upsert_policy_candidates([candidate], dry_run=False)["inserted"] == 1
-    assert storage.upsert_policy_candidates([candidate], dry_run=False)["unchanged"] == 1
+    candidate_insert = storage.upsert_policy_candidates([candidate], dry_run=False)
+    candidate_duplicate = storage.upsert_policy_candidates([candidate], dry_run=False)
+    assert candidate_insert["inserted"] == 1
+    assert candidate_insert["changelog_written"] == 1
+    assert candidate_duplicate["unchanged"] == 1
+    assert candidate_duplicate["changelog_written"] == 0
     assert storage.read_source_documents()[0]["document_number"] == "发改价格〔2022〕303号"
     assert storage.read_policy_candidates()[0]["review_status"] == "pending_review"
+    with storage.get_connection() as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [dict(row) for row in changes] == [
+        {"domain": "policy", "dataset": "commodity_source_documents"},
+        {"domain": "policy", "dataset": "commodity_policy_candidates"},
+    ]
 
     # Existing price and policy repositories remain available after additive migration.
     assert storage.read_dictionary()["series"]
     assert storage.read_policy_events() == []
+
+
+def test_policy_document_metadata_correction_advances_only_policy_watermark(tmp_path):
+    cfg = _research_config(tmp_path)
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    document = {
+        "document_id": "NDRC.METADATA.CORRECTION",
+        "source_profile": "ndrc_official_policy",
+        "source_url": "https://www.ndrc.gov.cn/policy.html",
+        "document_number": "draft-1",
+        "title": "Draft policy title",
+        "published_date": "2026-07-01",
+        "retrieved_at": "2026-07-12T12:00:00+08:00",
+        "content_hash": "stable-content-hash",
+        "content_text": "unchanged policy body",
+        "parser_version": "test.v1",
+    }
+    corrected = {
+        **document,
+        "document_number": "final-1",
+        "title": "Final policy title",
+        "published_date": "2026-07-02",
+        "retrieved_at": "2026-07-13T12:00:00+08:00",
+    }
+
+    assert storage.upsert_source_documents([document], dry_run=False)["inserted"] == 1
+    corrected_write = storage.upsert_source_documents([corrected], dry_run=False)
+    assert corrected_write["changed"] == 1
+    assert corrected_write["changelog_written"] == 1
+    assert storage.upsert_source_documents([corrected], dry_run=False)["unchanged"] == 1
+
+    persisted = storage.read_source_documents()[0]
+    assert persisted["document_number"] == "final-1"
+    assert persisted["title"] == "Final policy title"
+    assert persisted["published_date"] == "2026-07-02"
+    assert "row_version" not in persisted
+    with storage.get_connection() as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, change_type, old_hash, new_hash, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [row["domain"] for row in changes] == ["policy", "policy"]
+    assert [row["dataset"] for row in changes] == [
+        "commodity_source_documents",
+        "commodity_source_documents",
+    ]
+    assert [row["change_type"] for row in changes] == ["insert", "update"]
+    assert changes[1]["old_hash"] != changes[1]["new_hash"]
+    assert changes[1]["row_version"] == 2
 
 
 def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monkeypatch, tmp_path):

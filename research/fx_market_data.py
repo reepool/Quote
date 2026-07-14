@@ -16,6 +16,11 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, Generator, Iterable, List, Mapping, Optional, Protocol, Sequence
 
+from research.change_watermarks import (
+    append_change_record,
+    ensure_change_log_schema,
+    ensure_row_version_column,
+)
 from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import request_get, tls_config_from_source_config
@@ -41,6 +46,33 @@ def _hash_payload(value: Any) -> str:
     return hashlib.sha256(_json_dumps(value).encode("utf-8")).hexdigest()
 
 
+def _observation_semantic_hash(value: Mapping[str, Any]) -> str:
+    """Hash normalized FX meaning while retaining the provider payload hash as lineage."""
+    metadata = value.get("metadata")
+    if metadata is None and value.get("metadata_json"):
+        try:
+            metadata = json.loads(str(value["metadata_json"]))
+        except (TypeError, ValueError, json.JSONDecodeError):
+            metadata = {}
+    metadata = metadata if isinstance(metadata, Mapping) else {}
+    return _hash_payload(
+        {
+            "series_id": str(value.get("series_id") or "").upper(),
+            "observation_date": str(value.get("observation_date") or ""),
+            "value": float(value.get("value") or 0.0),
+            "base_currency": str(value.get("base_currency") or "").upper(),
+            "quote_currency": str(value.get("quote_currency") or "").upper(),
+            "quote_multiplier": float(value.get("quote_multiplier") or 0.0),
+            "source_profile": str(value.get("source_profile") or ""),
+            "publication_time": str(value.get("publication_time") or ""),
+            "quality_flag": str(value.get("quality_flag") or ""),
+            "revision_id": str(value.get("revision_id") or "latest"),
+            "source_payload_hash": str(value.get("raw_payload_hash") or ""),
+            "lineage_hash": metadata.get("input_hash"),
+        }
+    )
+
+
 def _json_safe_scalar(value: Any) -> Any:
     if isinstance(value, (date, datetime)):
         return value.isoformat()
@@ -55,7 +87,9 @@ def _json_safe_scalar(value: Any) -> Any:
 
 
 def _row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
-    return {key: row[key] for key in row.keys()}
+    payload = {key: row[key] for key in row.keys()}
+    payload.pop("row_version", None)
+    return payload
 
 
 def _coerce_bool(value: Any, default: bool = True) -> bool:
@@ -578,6 +612,9 @@ class FxStorageManager:
         module_cfg = research_config.modules.get("fx_market_data", {})
         storage_cfg = module_cfg.get("storage", {}) if isinstance(module_cfg, dict) else {}
         self.db_path = db_path or storage_cfg.get("database") or storage_cfg.get("db_path") or "data/fx.db"
+        self.change_watermark_config = (
+            module_cfg.get("change_watermark", {}) if isinstance(module_cfg, dict) else {}
+        )
 
     def initialize(self) -> None:
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
@@ -688,6 +725,7 @@ class FxStorageManager:
             quality_flag TEXT NOT NULL,
             revision_id TEXT NOT NULL DEFAULT 'latest',
             raw_payload_hash TEXT NOT NULL DEFAULT '',
+            row_version INTEGER NOT NULL DEFAULT 1,
             metadata_json TEXT NOT NULL,
             ingestion_run_id INTEGER,
             created_at TEXT NOT NULL,
@@ -799,8 +837,9 @@ class FxStorageManager:
 
     @staticmethod
     def _migrate_schema(conn: sqlite3.Connection) -> None:
-        # Placeholder for additive migrations as the FX schema evolves.
-        conn.execute("PRAGMA user_version = 1")
+        ensure_row_version_column(conn, "fx_observations")
+        ensure_change_log_schema(conn)
+        conn.execute("PRAGMA user_version = 2")
 
     def start_ingestion_run(
         self,
@@ -1028,25 +1067,58 @@ class FxStorageManager:
                 ),
             )
 
-    def upsert_observation(self, item: FxObservation) -> str:
+    def upsert_observation(
+        self,
+        item: FxObservation,
+        *,
+        return_stats: bool = False,
+    ) -> str | Dict[str, Any]:
         now = get_shanghai_time().isoformat()
-        raw_hash = item.raw_payload_hash or _hash_payload(item.as_dict())
+        raw_hash = item.raw_payload_hash or _hash_payload(
+            {
+                "series_id": item.series_id.upper(),
+                "observation_date": item.observation_date,
+                "value": float(item.value),
+                "base_currency": item.base_currency.upper(),
+                "quote_currency": item.quote_currency.upper(),
+                "quote_multiplier": float(item.quote_multiplier),
+                "source_profile": item.source_profile,
+                "publication_time": item.publication_time,
+                "quality_flag": item.quality_flag,
+                "revision_id": item.revision_id,
+                "lineage_hash": item.metadata.get("input_hash"),
+            }
+        )
+        new_semantic_hash = _observation_semantic_hash(
+            {**item.as_dict(), "raw_payload_hash": raw_hash}
+        )
         with self.get_connection() as conn:
             existing = conn.execute(
                 """
-                SELECT value, raw_payload_hash FROM fx_observations
+                SELECT series_id, observation_date, value, base_currency,
+                       quote_currency, quote_multiplier, source_profile,
+                       publication_time, quality_flag, revision_id,
+                       raw_payload_hash, row_version, metadata_json
+                FROM fx_observations
                 WHERE series_id = ? AND observation_date = ? AND source_profile = ?
                 """,
                 (item.series_id, item.observation_date, item.source_profile),
             ).fetchone()
+            old_semantic_hash = (
+                _observation_semantic_hash(dict(existing)) if existing is not None else None
+            )
+            if existing is not None and old_semantic_hash == new_semantic_hash:
+                result = {"outcome": "unchanged", "changelog_written": 0}
+                return result if return_stats else "unchanged"
+            row_version = int(existing["row_version"] or 1) + 1 if existing else 1
             conn.execute(
                 """
                 INSERT INTO fx_observations (
                     series_id, observation_date, value, base_currency,
                     quote_currency, quote_multiplier, source_profile, source_url,
                     publication_time, quality_flag, revision_id, raw_payload_hash,
-                    metadata_json, ingestion_run_id, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    row_version, metadata_json, ingestion_run_id, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(series_id, observation_date, source_profile) DO UPDATE SET
                     value=excluded.value,
                     base_currency=excluded.base_currency,
@@ -1057,6 +1129,7 @@ class FxStorageManager:
                     quality_flag=excluded.quality_flag,
                     revision_id=excluded.revision_id,
                     raw_payload_hash=excluded.raw_payload_hash,
+                    row_version=excluded.row_version,
                     metadata_json=excluded.metadata_json,
                     ingestion_run_id=excluded.ingestion_run_id,
                     updated_at=excluded.updated_at
@@ -1074,17 +1147,39 @@ class FxStorageManager:
                     item.quality_flag,
                     item.revision_id,
                     raw_hash,
+                    row_version,
                     _json_dumps(item.metadata),
                     item.ingestion_run_id,
                     now,
                     now,
                 ),
             )
-        if existing is None:
-            return "inserted"
-        if float(existing["value"]) != float(item.value) or (existing["raw_payload_hash"] or "") != raw_hash:
-            return "updated"
-        return "unchanged"
+            changelog_written = append_change_record(
+                conn,
+                config=self.change_watermark_config,
+                domain="fx",
+                dataset="fx_observations",
+                change_type="update" if existing else "insert",
+                business_key={
+                    "series_id": item.series_id.upper(),
+                    "observation_date": item.observation_date,
+                    "source_profile": item.source_profile,
+                    "revision_id": item.revision_id,
+                },
+                series_id=item.series_id.upper(),
+                observation_date=item.observation_date,
+                old_hash=old_semantic_hash,
+                new_hash=new_semantic_hash,
+                row_version=row_version,
+                source=item.source_profile,
+                source_mode="derived" if item.quality_flag == "derived" else "direct",
+                source_profile=item.source_profile,
+                ingestion_run_id=item.ingestion_run_id,
+                changed_at=now,
+            )
+        outcome = "updated" if existing else "inserted"
+        result = {"outcome": outcome, "changelog_written": int(changelog_written)}
+        return result if return_stats else outcome
 
     def upsert_calendar_day(
         self,
@@ -2641,7 +2736,13 @@ class FxRateSyncService:
                 metadata={"scope_selection": selection.as_dict(), "start_date": start_date, "end_date": end_date},
             )
             logger.info("[FX][rate_sync] ingestion run started run_id=%s sources=%s", run_id, sorted(by_source))
-        totals = {"inserted": 0, "updated": 0, "unchanged": 0, "failed": 0}
+        totals = {
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "changelog_written": 0,
+            "failed": 0,
+        }
         source_results: List[Dict[str, Any]] = []
         sources_cfg = self.module_cfg.get("sources") or {}
         status = "success"
@@ -2674,14 +2775,26 @@ class FxRateSyncService:
                 blockers.extend(result.blockers)
                 status = "blocked"
             warnings.extend(result.warnings)
-            write_counts = {"inserted": 0, "updated": 0, "unchanged": 0}
+            write_counts = {
+                "inserted": 0,
+                "updated": 0,
+                "unchanged": 0,
+                "changelog_written": 0,
+            }
             if result.status == "success" and not dry_run:
                 total_observations = len(result.observations)
                 for index, observation in enumerate(result.observations, start=1):
                     observation = FxObservation(**{**observation.as_dict(), "ingestion_run_id": run_id})
-                    outcome = self.storage.upsert_observation(observation)
+                    write_stats = self.storage.upsert_observation(observation, return_stats=True)
+                    outcome = str(write_stats["outcome"])
                     write_counts[outcome] += 1
                     totals[outcome] += 1
+                    write_counts["changelog_written"] += int(
+                        write_stats.get("changelog_written", 0) or 0
+                    )
+                    totals["changelog_written"] += int(
+                        write_stats.get("changelog_written", 0) or 0
+                    )
                     if index % 1000 == 0 or index == total_observations:
                         logger.info(
                             "[FX][rate_sync] write progress source_profile=%s written=%s/%s write_counts=%s totals=%s",
@@ -2995,7 +3108,13 @@ class FxDerivationService:
             end,
             dry_run,
         )
-        totals = {"inserted": 0, "updated": 0, "unchanged": 0, "gaps": 0}
+        totals = {
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "changelog_written": 0,
+            "gaps": 0,
+        }
         gaps: List[Dict[str, Any]] = []
         processed = 0
         for derivation in derivations:
@@ -3027,8 +3146,12 @@ class FxDerivationService:
                     totals["inserted"] += 1
                     continue
                 observation, derivation_payload = result
-                outcome = self.storage.upsert_observation(observation)
+                write_stats = self.storage.upsert_observation(observation, return_stats=True)
+                outcome = str(write_stats["outcome"])
                 totals[outcome] += 1
+                totals["changelog_written"] += int(
+                    write_stats.get("changelog_written", 0) or 0
+                )
                 self._upsert_derivation_observation(derivation_payload)
                 processed += 1
                 if processed % 1000 == 0:

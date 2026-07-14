@@ -18,6 +18,7 @@ from dataclasses import asdict, dataclass
 from datetime import timedelta
 from typing import Any, Dict, Generator, List, Optional
 
+from research.change_watermarks import append_change_record, ensure_change_log_schema
 from research.financial_fact_aliases import (
     describe_core_financial_fact_alias,
     get_core_financial_fact_derivation_rules,
@@ -323,6 +324,9 @@ class ResearchStorageManager:
         self._active_db_path: Optional[str] = None
         self._financial_ingestion_run_ids: set[int] = set()
         self._valuation_ingestion_run_ids: set[int] = set()
+        self.change_watermark_config = self.research_config.modules.get(
+            "change_watermark", {}
+        )
         self.financial_statements = FinancialStatementStorageRepository(self)
 
     def initialize(self) -> None:
@@ -332,6 +336,7 @@ class ResearchStorageManager:
             self._apply_pragmas(conn)
             self._create_tables(conn)
             self._migrate_tables(conn)
+            ensure_change_log_schema(conn)
             if self._uses_separate_financial_database():
                 self._drop_financial_tables_from_research_database(conn)
             if self._uses_separate_valuation_database():
@@ -351,6 +356,7 @@ class ResearchStorageManager:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
                 "[ResearchStorage] Initialized financial database at %s",
@@ -363,6 +369,7 @@ class ResearchStorageManager:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
                 "[ResearchStorage] Initialized valuation database at %s",
@@ -375,6 +382,7 @@ class ResearchStorageManager:
                     self._apply_pragmas(conn)
                     self._create_tables(conn)
                     self._migrate_tables(conn)
+                    ensure_change_log_schema(conn)
                     conn.commit()
             db_logger.info(
                 "[ResearchStorage] Initialized interests database at %s",
@@ -953,7 +961,8 @@ class ResearchStorageManager:
         snapshot: ShareholderSnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one normalized shareholder summary snapshot."""
         now = get_shanghai_time().isoformat()
         snapshot_json = json.dumps(
@@ -961,9 +970,94 @@ class ResearchStorageManager:
             ensure_ascii=False,
             sort_keys=True,
         )
+        semantic_payload = {
+            "instrument_id": snapshot.instrument_id,
+            "symbol": snapshot.symbol,
+            "exchange": snapshot.exchange,
+            "coverage_status": snapshot.coverage_status,
+            "holder_count": snapshot.holder_count,
+            "holder_count_report_date": snapshot.holder_count_report_date,
+            "top_holders_report_date": snapshot.top_holders_report_date,
+            "top_holders_count": snapshot.top_holders_count,
+            "top_holders_total_ratio": snapshot.top_holders_total_ratio,
+            "control_owner_name": snapshot.control_owner_name,
+            "control_owner_ratio": snapshot.control_owner_ratio,
+            "schema_version": snapshot.schema_version,
+            "source": snapshot.source,
+            "source_mode": snapshot.source_mode,
+            "snapshot": snapshot.snapshot_json,
+        }
+        row_hash = hashlib.sha256(
+            json.dumps(
+                semantic_payload,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                default=str,
+            ).encode("utf-8")
+        ).hexdigest()
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT *
+                FROM shareholder_snapshots
+                WHERE instrument_id = ?
+                """,
+                (snapshot.instrument_id,),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_snapshot = self._deserialize_json(existing["snapshot_json"]) or {}
+                old_payload = {
+                    key: existing[key]
+                    for key in (
+                        "instrument_id",
+                        "symbol",
+                        "exchange",
+                        "coverage_status",
+                        "holder_count",
+                        "holder_count_report_date",
+                        "top_holders_report_date",
+                        "top_holders_count",
+                        "top_holders_total_ratio",
+                        "control_owner_name",
+                        "control_owner_ratio",
+                        "schema_version",
+                        "source",
+                        "source_mode",
+                    )
+                }
+                old_payload["snapshot"] = old_snapshot
+                old_hash = existing["row_hash"] or hashlib.sha256(
+                    json.dumps(
+                        old_payload,
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                        default=str,
+                    ).encode("utf-8")
+                ).hexdigest()
+                if old_hash == row_hash:
+                    if not existing["row_hash"]:
+                        conn.execute(
+                            """
+                            UPDATE shareholder_snapshots
+                            SET row_hash = ?
+                            WHERE instrument_id = ?
+                            """,
+                            (row_hash, snapshot.instrument_id),
+                        )
+                        conn.commit()
+                    stats = {
+                        "inserted": 0,
+                        "changed": 0,
+                        "unchanged": 1,
+                        "changelog_written": 0,
+                    }
+                    return stats if return_stats else None
+            row_version = int(existing["row_version"] or 1) + 1 if existing else 1
             conn.execute(
                 """
                 INSERT INTO shareholder_snapshots (
@@ -983,10 +1077,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     snapshot_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -1004,6 +1100,8 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     snapshot_json = excluded.snapshot_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -1024,12 +1122,44 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     snapshot_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = append_change_record(
+                conn,
+                config=self.change_watermark_config,
+                domain="shareholder",
+                dataset="shareholder_snapshots",
+                change_type="update" if existing else "insert",
+                business_key={
+                    "instrument_id": snapshot.instrument_id,
+                    "holder_count_report_date": snapshot.holder_count_report_date,
+                    "top_holders_report_date": snapshot.top_holders_report_date,
+                    "coverage_status": snapshot.coverage_status,
+                },
+                instrument_id=snapshot.instrument_id,
+                period=snapshot.top_holders_report_date or snapshot.holder_count_report_date,
+                old_hash=old_hash,
+                new_hash=row_hash,
+                row_version=row_version,
+                source=snapshot.source,
+                source_mode=snapshot.source_mode,
+                source_profile=snapshot.schema_version,
+                ingestion_run_id=ingestion_run_id,
+                changed_at=now,
+            )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None),
+            "unchanged": 0,
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_financial_statement_bundle(
         self,
@@ -1545,6 +1675,7 @@ class ResearchStorageManager:
                     fact,
                     table_name=tier_table,
                     ingestion_run_id=ingestion_run_id,
+                    change_watermark_config=self.change_watermark_config,
                     now=now,
                 )
             conn.commit()
@@ -1585,18 +1716,75 @@ class ResearchStorageManager:
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
-            cursor = conn.execute(
-                f"DELETE FROM {table_name} WHERE {' AND '.join(filters)}",
+            existing_rows = conn.execute(
+                f"SELECT * FROM {table_name} WHERE {' AND '.join(filters)}",
                 params,
-            )
-            deleted = int(cursor.rowcount if cursor.rowcount is not None else 0)
+            ).fetchall()
+            incoming_keys = {
+                (
+                    fact.source_file_id,
+                    fact.fact_name,
+                    fact.context_id or "",
+                    fact.unit or "",
+                    self._financial_dimensions_hash(fact.dimensions_json),
+                )
+                for fact in facts
+            }
             for fact in facts:
                 self._upsert_financial_numeric_fact_row(
                     conn,
                     fact,
                     table_name=table_name,
                     ingestion_run_id=ingestion_run_id,
+                    change_watermark_config=self.change_watermark_config,
                     now=now,
+                )
+            deleted = 0
+            for row in existing_rows:
+                row_key = (
+                    row["source_file_id"],
+                    row["fact_name"],
+                    row["context_id"],
+                    row["unit"],
+                    row["dimensions_hash"],
+                )
+                if row_key in incoming_keys:
+                    continue
+                cursor = conn.execute(
+                    f"""
+                    DELETE FROM {table_name}
+                    WHERE source_file_id = ? AND fact_name = ?
+                      AND context_id = ? AND unit = ? AND dimensions_hash = ?
+                    """,
+                    row_key,
+                )
+                deleted += int(cursor.rowcount or 0)
+                old_hash = self._financial_numeric_fact_row_hash(row)
+                append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="financial",
+                    dataset="financial_numeric_facts",
+                    change_type="delete_marker",
+                    business_key={
+                        "source_file_id": row["source_file_id"],
+                        "instrument_id": row["instrument_id"],
+                        "report_period": row["report_period"],
+                        "fact_name": row["fact_name"],
+                        "canonical_fact_name": row["canonical_fact_name"],
+                        "context_id": row["context_id"],
+                        "unit": row["unit"],
+                        "dimensions_hash": row["dimensions_hash"],
+                    },
+                    instrument_id=row["instrument_id"],
+                    period=row["report_period"],
+                    old_hash=old_hash,
+                    row_version=int(row["row_version"] or 1) + 1,
+                    source=row["source"],
+                    source_mode=row["source_mode"],
+                    source_profile=row["parser_version"],
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
                 )
             conn.commit()
         return {"deleted": deleted, "inserted": len(facts)}
@@ -1755,18 +1943,55 @@ class ResearchStorageManager:
         snapshot: FinancialFactsSnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one normalized financial facts row."""
         now = get_shanghai_time().isoformat()
         facts_json = json.dumps(snapshot.facts_json, ensure_ascii=False, sort_keys=True)
+        semantic_payload = asdict(snapshot)
+        semantic_payload["data_available_date"] = (
+            snapshot.data_available_date or snapshot.publish_date
+        )
+        row_hash = self._semantic_hash(semantic_payload)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT * FROM financial_facts
+                WHERE instrument_id = ? AND report_period = ?
+                """,
+                (snapshot.instrument_id, snapshot.report_period),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                old_payload["facts_json"] = self._deserialize_json(
+                    old_payload.get("facts_json")
+                ) or {}
+                old_payload["lineage_json"] = self._deserialize_json(
+                    old_payload.get("lineage_json")
+                ) or {}
+                for key in (
+                    "data_as_of",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                    "row_hash",
+                    "row_version",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+            row_version = int(existing["row_version"] or 1) + 1 if existing and old_hash != row_hash else 1
+            if existing and old_hash == row_hash:
+                row_version = int(existing["row_version"] or 1)
             self._upsert_financial_core_fact_row(
                 conn,
                 snapshot,
                 table_name="financial_facts",
                 facts_json=facts_json,
+                row_hash=row_hash,
+                row_version=row_version,
                 ingestion_run_id=ingestion_run_id,
                 now=now,
             )
@@ -1775,10 +2000,49 @@ class ResearchStorageManager:
                 snapshot,
                 table_name="financial_core_facts_hot",
                 facts_json=facts_json,
+                row_hash=row_hash,
+                row_version=row_version,
                 ingestion_run_id=ingestion_run_id,
                 now=now,
             )
+            changelog_written = False
+            if existing is None or old_hash != row_hash:
+                lineage = snapshot.lineage_json or {}
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="financial",
+                    dataset="financial_facts",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "report_period": snapshot.report_period,
+                        "statement_family": snapshot.statement_family,
+                        "source_file_id": snapshot.source_file_id,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    period=snapshot.report_period,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=str(
+                        lineage.get("mapping_version")
+                        or lineage.get("parser_version")
+                        or snapshot.schema_version
+                    ),
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and old_hash != row_hash),
+            "unchanged": int(existing is not None and old_hash == row_hash),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_financial_indicator_snapshot(
         self,
@@ -1902,20 +2166,60 @@ class ResearchStorageManager:
         snapshot: ValuationHistorySnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one derived valuation history row."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
             with self.valuation_database_scope():
-                self.upsert_valuation_history(
+                return self.upsert_valuation_history(
                     snapshot,
                     ingestion_run_id=ingestion_run_id,
+                    return_stats=return_stats,
                 )
-            return
         now = get_shanghai_time().isoformat()
         details_json = self._valuation_history_details_json(snapshot.details_json)
+        semantic_payload = asdict(snapshot)
+        semantic_payload["details_json"] = self._deserialize_json(details_json) or {}
+        row_hash = self._semantic_hash(semantic_payload)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT * FROM valuation_history
+                WHERE instrument_id = ? AND as_of_date = ? AND calc_method = ?
+                  AND calc_version = ? AND parameter_hash = ?
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.as_of_date,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                ),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                old_payload["details_json"] = self._deserialize_json(
+                    old_payload.get("details_json")
+                ) or {}
+                for key in (
+                    "data_as_of",
+                    "row_hash",
+                    "row_version",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+            changed = existing is None or old_hash != row_hash
+            row_version = (
+                1
+                if existing is None
+                else int(existing["row_version"] or 1) + int(changed)
+            )
             conn.execute(
                 """
                 INSERT INTO valuation_history (
@@ -1944,10 +2248,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     details_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -1970,6 +2276,8 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     details_json = excluded.details_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -1999,12 +2307,47 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     details_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = False
+            if changed:
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="valuation",
+                    dataset="valuation_history",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "as_of_date": snapshot.as_of_date,
+                        "calc_method": snapshot.calc_method,
+                        "calc_version": snapshot.calc_version,
+                        "parameter_hash": snapshot.parameter_hash,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.as_of_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.calc_version,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_valuation_history_many(
         self,
@@ -2024,44 +2367,90 @@ class ResearchStorageManager:
             return
 
         now = get_shanghai_time().isoformat()
-        rows = []
-        for snapshot in snapshots:
-            details_json = self._valuation_history_details_json(snapshot.details_json)
-            rows.append(
-                (
-                    snapshot.instrument_id,
-                    snapshot.symbol,
-                    snapshot.exchange,
-                    snapshot.as_of_date,
-                    snapshot.currency,
-                    snapshot.close_price,
-                    snapshot.market_cap,
-                    snapshot.float_market_cap,
-                    snapshot.pe_ratio,
-                    snapshot.pb_ratio,
-                    snapshot.ps_ratio,
-                    snapshot.pe_static,
-                    snapshot.pe_ttm,
-                    snapshot.pe_forward,
-                    snapshot.pb_mrq,
-                    snapshot.ps_static,
-                    snapshot.ps_ttm,
-                    snapshot.ps_forward,
-                    snapshot.calc_method,
-                    snapshot.calc_version,
-                    snapshot.parameter_hash,
-                    snapshot.source,
-                    snapshot.source_mode,
-                    now,
-                    details_json,
-                    ingestion_run_id,
-                    now,
-                    now,
-                )
-            )
-
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            rows = []
+            change_states = []
+            for snapshot in snapshots:
+                details_json = self._valuation_history_details_json(snapshot.details_json)
+                semantic_payload = asdict(snapshot)
+                semantic_payload["details_json"] = self._deserialize_json(
+                    details_json
+                ) or {}
+                row_hash = self._semantic_hash(semantic_payload)
+                existing = conn.execute(
+                    """
+                    SELECT * FROM valuation_history
+                    WHERE instrument_id = ? AND as_of_date = ? AND calc_method = ?
+                      AND calc_version = ? AND parameter_hash = ?
+                    """,
+                    (
+                        snapshot.instrument_id,
+                        snapshot.as_of_date,
+                        snapshot.calc_method,
+                        snapshot.calc_version,
+                        snapshot.parameter_hash,
+                    ),
+                ).fetchone()
+                old_hash = None
+                if existing is not None:
+                    old_payload = dict(existing)
+                    old_payload["details_json"] = self._deserialize_json(
+                        old_payload.get("details_json")
+                    ) or {}
+                    for key in (
+                        "data_as_of",
+                        "row_hash",
+                        "row_version",
+                        "ingestion_run_id",
+                        "created_at",
+                        "updated_at",
+                    ):
+                        old_payload.pop(key, None)
+                    old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+                changed = existing is None or old_hash != row_hash
+                row_version = (
+                    1
+                    if existing is None
+                    else int(existing["row_version"] or 1) + int(changed)
+                )
+                rows.append(
+                    (
+                        snapshot.instrument_id,
+                        snapshot.symbol,
+                        snapshot.exchange,
+                        snapshot.as_of_date,
+                        snapshot.currency,
+                        snapshot.close_price,
+                        snapshot.market_cap,
+                        snapshot.float_market_cap,
+                        snapshot.pe_ratio,
+                        snapshot.pb_ratio,
+                        snapshot.ps_ratio,
+                        snapshot.pe_static,
+                        snapshot.pe_ttm,
+                        snapshot.pe_forward,
+                        snapshot.pb_mrq,
+                        snapshot.ps_static,
+                        snapshot.ps_ttm,
+                        snapshot.ps_forward,
+                        snapshot.calc_method,
+                        snapshot.calc_version,
+                        snapshot.parameter_hash,
+                        snapshot.source,
+                        snapshot.source_mode,
+                        now,
+                        details_json,
+                        row_hash,
+                        row_version,
+                        ingestion_run_id,
+                        now,
+                        now,
+                    )
+                )
+                change_states.append(
+                    (snapshot, existing, old_hash, row_hash, row_version, changed)
+                )
             conn.executemany(
                 """
                 INSERT INTO valuation_history (
@@ -2090,10 +2479,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     details_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -2116,11 +2507,40 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     details_json = excluded.details_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
                 rows,
             )
+            for snapshot, existing, old_hash, row_hash, row_version, changed in change_states:
+                if not changed:
+                    continue
+                append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="valuation",
+                    dataset="valuation_history",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "as_of_date": snapshot.as_of_date,
+                        "calc_method": snapshot.calc_method,
+                        "calc_version": snapshot.calc_version,
+                        "parameter_hash": snapshot.parameter_hash,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.as_of_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.calc_version,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
 
     def get_existing_valuation_history_dates(
@@ -2185,15 +2605,16 @@ class ResearchStorageManager:
         snapshot: ValuationInputSnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one explicit valuation input row into valuation storage."""
         if self._uses_separate_valuation_database() and self._active_db_path is None:
             with self.valuation_database_scope():
-                self.upsert_valuation_input(
+                return self.upsert_valuation_input(
                     snapshot,
                     ingestion_run_id=ingestion_run_id,
+                    return_stats=return_stats,
                 )
-            return
         if (
             snapshot.shares_outstanding is not None
             or snapshot.float_shares is not None
@@ -2208,8 +2629,46 @@ class ResearchStorageManager:
             sort_keys=True,
         )
         data_as_of = snapshot.data_as_of or snapshot.as_of_date
+        semantic_payload = asdict(snapshot)
+        semantic_payload["data_as_of"] = data_as_of
+        row_hash = self._semantic_hash(semantic_payload)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT * FROM valuation_inputs
+                WHERE instrument_id = ? AND as_of_date = ? AND source = ?
+                  AND source_mode = ? AND input_kind = ?
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.as_of_date,
+                    snapshot.source,
+                    snapshot.source_mode,
+                    snapshot.input_kind,
+                ),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                old_payload["diagnostics_json"] = self._deserialize_json(
+                    old_payload.get("diagnostics_json")
+                ) or {}
+                for key in (
+                    "row_hash",
+                    "row_version",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+            changed = existing is None or old_hash != row_hash
+            row_version = (
+                1
+                if existing is None
+                else int(existing["row_version"] or 1) + int(changed)
+            )
             conn.execute(
                 """
                 INSERT INTO valuation_inputs (
@@ -2228,10 +2687,12 @@ class ResearchStorageManager:
                     unit,
                     data_as_of,
                     diagnostics_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, source, source_mode, input_kind)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -2244,6 +2705,8 @@ class ResearchStorageManager:
                     unit = excluded.unit,
                     data_as_of = excluded.data_as_of,
                     diagnostics_json = excluded.diagnostics_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -2263,12 +2726,47 @@ class ResearchStorageManager:
                     snapshot.unit,
                     data_as_of,
                     diagnostics_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = False
+            if changed:
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="valuation",
+                    dataset="valuation_inputs",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "as_of_date": snapshot.as_of_date,
+                        "source": snapshot.source,
+                        "source_mode": snapshot.source_mode,
+                        "input_kind": snapshot.input_kind,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.as_of_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.input_kind,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_analyst_forecast(
         self,
@@ -2525,13 +3023,51 @@ class ResearchStorageManager:
         snapshot: RiskSnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one derived risk snapshot row."""
         now = get_shanghai_time().isoformat()
         details_json = json.dumps(snapshot.details_json, ensure_ascii=False, sort_keys=True)
+        row_hash = self._semantic_hash(asdict(snapshot))
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT * FROM risk_snapshots
+                WHERE instrument_id = ? AND as_of_date = ?
+                  AND calc_method = ? AND calc_version = ? AND parameter_hash = ?
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.as_of_date,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                ),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                old_payload["details_json"] = self._deserialize_json(
+                    old_payload.get("details_json")
+                ) or {}
+                for key in (
+                    "data_as_of",
+                    "row_hash",
+                    "row_version",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+            changed = existing is None or old_hash != row_hash
+            row_version = (
+                1
+                if existing is None
+                else int(existing["row_version"] or 1) + int(changed)
+            )
             conn.execute(
                 """
                 INSERT INTO risk_snapshots (
@@ -2559,10 +3095,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     details_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, as_of_date, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -2584,6 +3122,8 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     details_json = excluded.details_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -2612,19 +3152,55 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     details_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = False
+            if changed:
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="risk",
+                    dataset="risk_snapshots",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "as_of_date": snapshot.as_of_date,
+                        "calc_method": snapshot.calc_method,
+                        "calc_version": snapshot.calc_version,
+                        "parameter_hash": snapshot.parameter_hash,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.as_of_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.calc_version,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_technical_indicator_latest(
         self,
         snapshot: TechnicalIndicatorLatestSnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one latest technical indicator snapshot."""
         now = get_shanghai_time().isoformat()
         summary_json = json.dumps(
@@ -2633,9 +3209,47 @@ class ResearchStorageManager:
             sort_keys=True,
             default=str,
         )
+        row_hash = self._semantic_hash(asdict(snapshot))
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                """
+                SELECT * FROM technical_indicator_latest
+                WHERE instrument_id = ? AND period = ? AND adjustment = ?
+                  AND calc_method = ? AND calc_version = ? AND parameter_hash = ?
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.period,
+                    snapshot.adjustment,
+                    snapshot.calc_method,
+                    snapshot.calc_version,
+                    snapshot.parameter_hash,
+                ),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                old_payload["summary_json"] = self._deserialize_json(
+                    old_payload.get("summary_json")
+                ) or {}
+                for key in (
+                    "data_as_of",
+                    "row_hash",
+                    "row_version",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or self._semantic_hash(old_payload)
+            changed = existing is None or old_hash != row_hash
+            row_version = (
+                1
+                if existing is None
+                else int(existing["row_version"] or 1) + int(changed)
+            )
             conn.execute(
                 """
                 INSERT INTO technical_indicator_latest (
@@ -2682,10 +3296,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     summary_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, period, adjustment, calc_method, calc_version, parameter_hash)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -2725,6 +3341,8 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     summary_json = excluded.summary_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -2772,22 +3390,61 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     summary_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = False
+            if changed:
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="technical",
+                    dataset="technical_indicator_latest",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "period": snapshot.period,
+                        "adjustment": snapshot.adjustment,
+                        "calc_method": snapshot.calc_method,
+                        "calc_version": snapshot.calc_version,
+                        "parameter_hash": snapshot.parameter_hash,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.as_of_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.calc_version,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_industry_membership(
         self,
         snapshot: IndustrySnapshot,
         *,
         ingestion_run_id: Optional[int] = None,
-    ) -> None:
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one normalized industry membership snapshot and taxonomy row."""
         now = get_shanghai_time().isoformat()
         membership_json = json.dumps(snapshot.membership_json, ensure_ascii=False, sort_keys=True)
+        semantic_payload = self._industry_membership_semantic_payload(snapshot)
+        row_hash = self._semantic_hash(semantic_payload)
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
@@ -2804,8 +3461,38 @@ class ResearchStorageManager:
                     source=snapshot.source,
                     source_mode=snapshot.source_mode,
                 ),
+                ingestion_run_id=ingestion_run_id,
                 now=now,
             )
+            existing = conn.execute(
+                """
+                SELECT * FROM industry_memberships
+                WHERE instrument_id = ?
+                  AND taxonomy_system = ?
+                  AND taxonomy_version = ?
+                """,
+                (
+                    snapshot.instrument_id,
+                    snapshot.taxonomy_system,
+                    snapshot.taxonomy_version or "",
+                ),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_hash = existing["row_hash"] or self._semantic_hash(
+                    self._industry_membership_row_semantic_payload(existing)
+                )
+            changed = existing is None or old_hash != row_hash
+            if existing is None:
+                previous_version = self._latest_industry_membership_version(
+                    conn,
+                    instrument_id=snapshot.instrument_id,
+                    taxonomy_system=snapshot.taxonomy_system,
+                    taxonomy_version=snapshot.taxonomy_version or "",
+                )
+                row_version = previous_version + 1
+            else:
+                row_version = int(existing["row_version"] or 1) + int(changed)
             conn.execute(
                 """
                 INSERT INTO industry_memberships (
@@ -2835,10 +3522,12 @@ class ResearchStorageManager:
                     source_mode,
                     data_as_of,
                     membership_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(instrument_id, taxonomy_system, taxonomy_version)
                 DO UPDATE SET
                     symbol = excluded.symbol,
@@ -2864,6 +3553,8 @@ class ResearchStorageManager:
                     source_mode = excluded.source_mode,
                     data_as_of = excluded.data_as_of,
                     membership_json = excluded.membership_json,
+                    row_hash = excluded.row_hash,
+                    row_version = excluded.row_version,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
                 """,
@@ -2894,12 +3585,46 @@ class ResearchStorageManager:
                     snapshot.source_mode,
                     now,
                     membership_json,
+                    row_hash,
+                    row_version,
                     ingestion_run_id,
                     now,
                     now,
                 ),
             )
+            changelog_written = False
+            if changed:
+                changelog_written = append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="industry",
+                    dataset="industry_memberships",
+                    change_type="update" if existing else "insert",
+                    business_key={
+                        "instrument_id": snapshot.instrument_id,
+                        "taxonomy_system": snapshot.taxonomy_system,
+                        "taxonomy_version": snapshot.taxonomy_version or "",
+                        "effective_date": snapshot.effective_date,
+                    },
+                    instrument_id=snapshot.instrument_id,
+                    observation_date=snapshot.effective_date,
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=snapshot.source,
+                    source_mode=snapshot.source_mode,
+                    source_profile=snapshot.source_classification,
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
+        stats = {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
+        return stats if return_stats else None
 
     def upsert_industry_index_analysis(
         self,
@@ -3194,6 +3919,7 @@ class ResearchStorageManager:
         taxonomy_system: str,
         taxonomy_version: str,
         instrument_ids: List[str],
+        ingestion_run_id: Optional[int] = None,
     ) -> int:
         """Delete normalized industry memberships for one taxonomy and instrument set."""
         normalized_ids = [
@@ -3213,10 +3939,46 @@ class ResearchStorageManager:
         """
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT * FROM industry_memberships
+                WHERE taxonomy_system = ?
+                  AND taxonomy_version = ?
+                  AND instrument_id IN ({placeholders})
+                """,
+                [taxonomy_system, taxonomy_version or "", *normalized_ids],
+            ).fetchall()
             cursor = conn.execute(
                 sql,
                 [taxonomy_system, taxonomy_version or "", *normalized_ids],
             )
+            now = get_shanghai_time().isoformat()
+            for row in rows:
+                old_hash = row["row_hash"] or self._semantic_hash(
+                    self._industry_membership_row_semantic_payload(row)
+                )
+                append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="industry",
+                    dataset="industry_memberships",
+                    change_type="delete_marker",
+                    business_key={
+                        "instrument_id": row["instrument_id"],
+                        "taxonomy_system": row["taxonomy_system"],
+                        "taxonomy_version": row["taxonomy_version"],
+                        "effective_date": row["effective_date"],
+                    },
+                    instrument_id=row["instrument_id"],
+                    observation_date=row["effective_date"],
+                    old_hash=old_hash,
+                    row_version=int(row["row_version"] or 1) + 1,
+                    source=row["source"],
+                    source_mode=row["source_mode"],
+                    source_profile=row["source_classification"],
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
             conn.commit()
             return int(cursor.rowcount or 0)
 
@@ -3451,16 +4213,17 @@ class ResearchStorageManager:
         taxonomy_system: str,
         taxonomy_version: str,
         include_source_files: bool = False,
+        preserve_change_tracked: bool = False,
     ) -> Dict[str, int]:
         """Delete rebuildable strict-industry rows for one taxonomy version."""
         tables = [
-            "industry_memberships",
             "industry_official_classifications",
             "industry_classification_history",
             "industry_component_sets",
             "industry_official_code_mappings",
-            "industry_taxonomy",
         ]
+        if not preserve_change_tracked:
+            tables = ["industry_memberships", *tables, "industry_taxonomy"]
         deleted: Dict[str, int] = {}
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
@@ -3485,6 +4248,136 @@ class ResearchStorageManager:
                 deleted["industry_source_files"] = int(cursor.rowcount or 0)
             conn.commit()
         return deleted
+
+    def deactivate_missing_industry_taxonomy(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        active_industry_codes: List[str],
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Mark taxonomy nodes absent from a complete refresh as inactive."""
+        normalized_codes = sorted(
+            {str(code).strip() for code in active_industry_codes if str(code).strip()}
+        )
+        params: List[Any] = [taxonomy_system, taxonomy_version or ""]
+        exclusion = ""
+        if normalized_codes:
+            placeholders = ",".join("?" for _ in normalized_codes)
+            exclusion = f"AND industry_code NOT IN ({placeholders})"
+            params.extend(normalized_codes)
+        now = get_shanghai_time().isoformat()
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT * FROM industry_taxonomy
+                WHERE taxonomy_system = ? AND taxonomy_version = ?
+                  AND is_active = 1
+                  {exclusion}
+                """,
+                params,
+            ).fetchall()
+            for row in rows:
+                old_hash = row["row_hash"] or self._semantic_hash(
+                    self._industry_taxonomy_row_semantic_payload(row)
+                )
+                new_payload = self._industry_taxonomy_row_semantic_payload(row)
+                new_payload["is_active"] = 0
+                new_hash = self._semantic_hash(new_payload)
+                row_version = int(row["row_version"] or 1) + 1
+                conn.execute(
+                    """
+                    UPDATE industry_taxonomy
+                    SET is_active = 0, row_hash = ?, row_version = ?, updated_at = ?
+                    WHERE taxonomy_system = ? AND taxonomy_version = ?
+                      AND industry_code = ?
+                    """,
+                    (
+                        new_hash,
+                        row_version,
+                        now,
+                        row["taxonomy_system"],
+                        row["taxonomy_version"],
+                        row["industry_code"],
+                    ),
+                )
+                append_change_record(
+                    conn,
+                    config=self.change_watermark_config,
+                    domain="industry",
+                    dataset="industry_taxonomy",
+                    change_type="update",
+                    business_key={
+                        "taxonomy_system": row["taxonomy_system"],
+                        "taxonomy_version": row["taxonomy_version"],
+                        "industry_code": row["industry_code"],
+                    },
+                    series_id=row["industry_code"],
+                    old_hash=old_hash,
+                    new_hash=new_hash,
+                    row_version=row_version,
+                    source=row["source"],
+                    source_mode=row["source_mode"],
+                    source_profile=row["source_classification"],
+                    ingestion_run_id=ingestion_run_id,
+                    changed_at=now,
+                )
+            conn.commit()
+        return len(rows)
+
+    def delete_industry_memberships_outside_universe(
+        self,
+        *,
+        taxonomy_system: str,
+        taxonomy_version: str,
+        exchanges: List[str],
+        active_instrument_ids: List[str],
+        ingestion_run_id: Optional[int] = None,
+    ) -> int:
+        """Delete memberships no longer present in the refreshed target universe."""
+        normalized_exchanges = sorted(
+            {str(exchange).strip() for exchange in exchanges if str(exchange).strip()}
+        )
+        if not normalized_exchanges:
+            return 0
+        normalized_ids = sorted(
+            {
+                str(instrument_id).strip()
+                for instrument_id in active_instrument_ids
+                if str(instrument_id).strip()
+            }
+        )
+        exchange_placeholders = ",".join("?" for _ in normalized_exchanges)
+        params: List[Any] = [
+            taxonomy_system,
+            taxonomy_version or "",
+            *normalized_exchanges,
+        ]
+        universe_clause = ""
+        if normalized_ids:
+            id_placeholders = ",".join("?" for _ in normalized_ids)
+            universe_clause = f"AND instrument_id NOT IN ({id_placeholders})"
+            params.extend(normalized_ids)
+        with self.get_connection() as conn:
+            self._apply_pragmas(conn)
+            rows = conn.execute(
+                f"""
+                SELECT instrument_id
+                FROM industry_memberships
+                WHERE taxonomy_system = ? AND taxonomy_version = ?
+                  AND exchange IN ({exchange_placeholders})
+                  {universe_clause}
+                """,
+                params,
+            ).fetchall()
+        return self.delete_industry_memberships(
+            taxonomy_system=taxonomy_system,
+            taxonomy_version=taxonomy_version,
+            instrument_ids=[str(row["instrument_id"]) for row in rows],
+            ingestion_run_id=ingestion_run_id,
+        )
 
     def summarize_industry_classification_history(
         self,
@@ -4787,14 +5680,23 @@ class ResearchStorageManager:
     def upsert_industry_taxonomy(
         self,
         snapshot: IndustryTaxonomySnapshot,
-    ) -> None:
+        *,
+        ingestion_run_id: Optional[int] = None,
+        return_stats: bool = False,
+    ) -> Optional[Dict[str, int]]:
         """Upsert one normalized industry taxonomy node."""
         now = get_shanghai_time().isoformat()
 
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
-            self._upsert_industry_taxonomy_row(conn, snapshot, now=now)
+            stats = self._upsert_industry_taxonomy_row(
+                conn,
+                snapshot,
+                ingestion_run_id=ingestion_run_id,
+                now=now,
+            )
             conn.commit()
+        return stats if return_stats else None
 
     def list_industry_taxonomy(
         self,
@@ -6936,21 +7838,74 @@ class ResearchStorageManager:
     def upsert_risk_free_rate_series(self, series: Dict[str, Any]) -> None:
         """写入/更新一条无风险利率序列定义。"""
         now = get_shanghai_time().isoformat()
+        semantic_payload = {
+            key: series.get(key)
+            for key in (
+                "series_id",
+                "name",
+                "rate_type",
+                "tenor",
+                "currency",
+                "unit",
+                "frequency",
+                "timezone",
+                "source_profile",
+                "source",
+                "source_mode",
+                "data_as_of",
+            )
+        }
+        semantic_payload.update(
+            {
+                "name": series.get("name", series["series_id"]),
+                "rate_type": series.get("rate_type", "unknown"),
+                "currency": series.get("currency", "CNY"),
+                "unit": series.get("unit", "percent_annual"),
+                "frequency": series.get("frequency", "daily"),
+                "timezone": series.get("timezone", "Asia/Shanghai"),
+            }
+        )
+        row_hash = ResearchStorageManager._semantic_hash(semantic_payload)
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
+            existing = conn.execute(
+                "SELECT * FROM risk_free_rate_series WHERE series_id = ?",
+                (series["series_id"],),
+            ).fetchone()
+            old_hash = None
+            if existing is not None:
+                old_payload = dict(existing)
+                for key in (
+                    "row_hash",
+                    "row_version",
+                    "ingestion_run_id",
+                    "created_at",
+                    "updated_at",
+                ):
+                    old_payload.pop(key, None)
+                old_hash = existing["row_hash"] or ResearchStorageManager._semantic_hash(
+                    old_payload
+                )
+            changed = existing is None or old_hash != row_hash
+            row_version = (
+                1
+                if existing is None
+                else int(existing["row_version"] or 1) + int(changed)
+            )
             conn.execute(
                 """
                 INSERT INTO risk_free_rate_series (
                     series_id, name, rate_type, tenor, currency, unit, frequency,
                     timezone, source_profile, source, source_mode, data_as_of,
-                    ingestion_run_id, created_at, updated_at
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    row_hash, row_version, ingestion_run_id, created_at, updated_at
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 ON CONFLICT(series_id) DO UPDATE SET
                     name=excluded.name, rate_type=excluded.rate_type, tenor=excluded.tenor,
                     currency=excluded.currency, unit=excluded.unit, frequency=excluded.frequency,
                     timezone=excluded.timezone, source_profile=excluded.source_profile,
                     source=excluded.source, source_mode=excluded.source_mode,
                     data_as_of=excluded.data_as_of, ingestion_run_id=excluded.ingestion_run_id,
+                    row_hash=excluded.row_hash, row_version=excluded.row_version,
                     updated_at=excluded.updated_at
                 """,
                 (
@@ -6960,9 +7915,27 @@ class ResearchStorageManager:
                     series.get("frequency", "daily"), series.get("timezone", "Asia/Shanghai"),
                     series.get("source_profile"), series.get("source"),
                     series.get("source_mode"), series.get("data_as_of"),
-                    series.get("ingestion_run_id"), now, now,
+                    row_hash, row_version, series.get("ingestion_run_id"), now, now,
                 ),
             )
+            if changed:
+                append_change_record(
+                    conn,
+                    config=getattr(self, "change_watermark_config", None),
+                    domain="interest_rate",
+                    dataset="risk_free_rate_series",
+                    change_type="update" if existing else "insert",
+                    business_key={"series_id": series["series_id"]},
+                    series_id=series["series_id"],
+                    old_hash=old_hash,
+                    new_hash=row_hash,
+                    row_version=row_version,
+                    source=series.get("source"),
+                    source_mode=series.get("source_mode"),
+                    source_profile=series.get("source_profile"),
+                    ingestion_run_id=series.get("ingestion_run_id"),
+                    changed_at=now,
+                )
             conn.commit()
 
     def upsert_risk_free_rate_observations(
@@ -6976,33 +7949,108 @@ class ResearchStorageManager:
         if not observations:
             return 0
         now = get_shanghai_time().isoformat()
-        rows = [
-            (
-                series_id, str(obs["observation_date"])[:10],
-                obs.get("source_profile", "default"), obs.get("value"),
-                obs.get("revision_id", "latest"), obs.get("source"),
-                obs.get("source_mode"), obs.get("data_as_of"),
-                obs.get("ingestion_run_id"), now, now,
-            )
-            for obs in observations
-        ]
         with self.get_connection() as conn:
             self._apply_pragmas(conn)
-            conn.executemany(
-                """
-                INSERT INTO risk_free_rate_observations (
-                    series_id, observation_date, source_profile, value, revision_id,
-                    source, source_mode, data_as_of, ingestion_run_id, created_at, updated_at
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
-                ON CONFLICT(series_id, observation_date, source_profile, revision_id)
-                DO UPDATE SET value=excluded.value, source=excluded.source,
-                    source_mode=excluded.source_mode, data_as_of=excluded.data_as_of,
-                    ingestion_run_id=excluded.ingestion_run_id, updated_at=excluded.updated_at
-                """,
-                rows,
-            )
+            for obs in observations:
+                observation_date = str(obs["observation_date"])[:10]
+                source_profile = obs.get("source_profile", "default")
+                revision_id = obs.get("revision_id", "latest")
+                semantic_payload = {
+                    "series_id": series_id,
+                    "observation_date": observation_date,
+                    "source_profile": source_profile,
+                    "value": obs.get("value"),
+                    "revision_id": revision_id,
+                    "source": obs.get("source"),
+                    "source_mode": obs.get("source_mode"),
+                    "data_as_of": obs.get("data_as_of"),
+                }
+                row_hash = ResearchStorageManager._semantic_hash(semantic_payload)
+                existing = conn.execute(
+                    """
+                    SELECT *
+                    FROM risk_free_rate_observations
+                    WHERE series_id = ? AND observation_date = ?
+                      AND source_profile = ? AND revision_id = ?
+                    """,
+                    (series_id, observation_date, source_profile, revision_id),
+                ).fetchone()
+                old_hash = None
+                if existing is not None:
+                    old_payload = dict(existing)
+                    for key in (
+                        "row_hash",
+                        "row_version",
+                        "ingestion_run_id",
+                        "created_at",
+                        "updated_at",
+                    ):
+                        old_payload.pop(key, None)
+                    old_hash = existing["row_hash"] or ResearchStorageManager._semantic_hash(
+                        old_payload
+                    )
+                changed = existing is None or old_hash != row_hash
+                row_version = (
+                    1
+                    if existing is None
+                    else int(existing["row_version"] or 1) + int(changed)
+                )
+                conn.execute(
+                    """
+                    INSERT INTO risk_free_rate_observations (
+                        series_id, observation_date, source_profile, value, revision_id,
+                        source, source_mode, data_as_of, row_hash, row_version,
+                        ingestion_run_id, created_at, updated_at
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    ON CONFLICT(series_id, observation_date, source_profile, revision_id)
+                    DO UPDATE SET value=excluded.value, source=excluded.source,
+                        source_mode=excluded.source_mode, data_as_of=excluded.data_as_of,
+                        row_hash=excluded.row_hash, row_version=excluded.row_version,
+                        ingestion_run_id=excluded.ingestion_run_id,
+                        updated_at=excluded.updated_at
+                    """,
+                    (
+                        series_id,
+                        observation_date,
+                        source_profile,
+                        obs.get("value"),
+                        revision_id,
+                        obs.get("source"),
+                        obs.get("source_mode"),
+                        obs.get("data_as_of"),
+                        row_hash,
+                        row_version,
+                        obs.get("ingestion_run_id"),
+                        now,
+                        now,
+                    ),
+                )
+                if changed:
+                    append_change_record(
+                        conn,
+                        config=getattr(self, "change_watermark_config", None),
+                        domain="interest_rate",
+                        dataset="risk_free_rate_observations",
+                        change_type="update" if existing else "insert",
+                        business_key={
+                            "series_id": series_id,
+                            "observation_date": observation_date,
+                            "source_profile": source_profile,
+                            "revision_id": revision_id,
+                        },
+                        series_id=series_id,
+                        observation_date=observation_date,
+                        old_hash=old_hash,
+                        new_hash=row_hash,
+                        row_version=row_version,
+                        source=obs.get("source"),
+                        source_mode=obs.get("source_mode"),
+                        source_profile=source_profile,
+                        ingestion_run_id=obs.get("ingestion_run_id"),
+                        changed_at=now,
+                    )
             conn.commit()
-        return len(rows)
+        return len(observations)
 
     def list_risk_free_rate_series(self) -> List[Dict[str, Any]]:
         """列出所有无风险利率序列定义。"""
@@ -7011,7 +8059,13 @@ class ResearchStorageManager:
             rows = conn.execute(
                 "SELECT * FROM risk_free_rate_series ORDER BY series_id"
             ).fetchall()
-        return [dict(row) for row in rows]
+        result = []
+        for row in rows:
+            item = dict(row)
+            item.pop("row_hash", None)
+            item.pop("row_version", None)
+            result.append(item)
+        return result
 
     def get_risk_free_rate_observations(
         self,
@@ -8840,6 +9894,130 @@ class ResearchStorageManager:
         return json.dumps(value or {}, ensure_ascii=False, sort_keys=True)
 
     @staticmethod
+    def _semantic_hash(value: Dict[str, Any]) -> str:
+        raw = json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=str,
+        )
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _industry_taxonomy_semantic_payload(
+        snapshot: IndustryTaxonomySnapshot,
+    ) -> Dict[str, Any]:
+        return {
+            "taxonomy_system": snapshot.taxonomy_system,
+            "taxonomy_version": snapshot.taxonomy_version or "",
+            "industry_code": snapshot.industry_code,
+            "industry_name": snapshot.industry_name,
+            "industry_level": snapshot.industry_level,
+            "parent_code": snapshot.parent_code,
+            "sw_index_code": snapshot.sw_index_code,
+            "aliases_json": snapshot.aliases_json or {},
+            "source_classification": snapshot.source_classification,
+            "source": snapshot.source,
+            "source_mode": snapshot.source_mode,
+            "is_active": 1,
+        }
+
+    @classmethod
+    def _industry_taxonomy_row_semantic_payload(
+        cls,
+        row: sqlite3.Row,
+    ) -> Dict[str, Any]:
+        item = dict(row)
+        item["aliases_json"] = cls._deserialize_json(item.get("aliases_json")) or {}
+        for key in ("created_at", "updated_at", "row_hash", "row_version"):
+            item.pop(key, None)
+        return item
+
+    @staticmethod
+    def _industry_membership_semantic_payload(
+        snapshot: IndustrySnapshot,
+    ) -> Dict[str, Any]:
+        return {
+            "instrument_id": snapshot.instrument_id,
+            "symbol": snapshot.symbol,
+            "exchange": snapshot.exchange,
+            "taxonomy_system": snapshot.taxonomy_system,
+            "taxonomy_version": snapshot.taxonomy_version or "",
+            "industry_code": snapshot.industry_code,
+            "industry_name": snapshot.industry_name,
+            "industry_level": snapshot.industry_level,
+            "parent_code": snapshot.parent_code,
+            "mapping_status": snapshot.mapping_status,
+            "effective_date": snapshot.effective_date,
+            "source_classification": snapshot.source_classification,
+            "source_industry_name": snapshot.source_industry_name,
+            "sw_l1_code": snapshot.sw_l1_code,
+            "sw_l1_name": snapshot.sw_l1_name,
+            "sw_l2_code": snapshot.sw_l2_code,
+            "sw_l2_name": snapshot.sw_l2_name,
+            "sw_l3_code": snapshot.sw_l3_code,
+            "sw_l3_name": snapshot.sw_l3_name,
+            "sw_l1_index_code": snapshot.sw_l1_index_code,
+            "sw_l2_index_code": snapshot.sw_l2_index_code,
+            "sw_l3_index_code": snapshot.sw_l3_index_code,
+            "source": snapshot.source,
+            "source_mode": snapshot.source_mode,
+            "membership_json": snapshot.membership_json or {},
+        }
+
+    @classmethod
+    def _industry_membership_row_semantic_payload(
+        cls,
+        row: sqlite3.Row,
+    ) -> Dict[str, Any]:
+        item = dict(row)
+        item["membership_json"] = cls._deserialize_json(
+            item.get("membership_json")
+        ) or {}
+        for key in (
+            "data_as_of",
+            "ingestion_run_id",
+            "created_at",
+            "updated_at",
+            "row_hash",
+            "row_version",
+        ):
+            item.pop(key, None)
+        return item
+
+    @staticmethod
+    def _latest_industry_membership_version(
+        conn: sqlite3.Connection,
+        *,
+        instrument_id: str,
+        taxonomy_system: str,
+        taxonomy_version: str,
+    ) -> int:
+        rows = conn.execute(
+            """
+            SELECT business_key_json, row_version
+            FROM data_change_log
+            WHERE dataset = 'industry_memberships' AND instrument_id = ?
+            ORDER BY sequence_id DESC
+            LIMIT 50
+            """,
+            (instrument_id,),
+        ).fetchall()
+        for row in rows:
+            try:
+                business_key = json.loads(str(row["business_key_json"]))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                continue
+            if (
+                str(business_key.get("taxonomy_system") or "") == taxonomy_system
+                and str(business_key.get("taxonomy_version") or "")
+                == taxonomy_version
+            ):
+                return int(row["row_version"] or 0)
+        return 0
+
+    @staticmethod
     def _is_share_unit(unit: Optional[str]) -> bool:
         normalized = str(unit or "").strip().lower()
         return normalized in {"share", "shares", "股"}
@@ -8870,6 +10048,28 @@ class ResearchStorageManager:
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
     @classmethod
+    def _financial_numeric_fact_row_hash(cls, row: sqlite3.Row) -> str:
+        if row["row_hash"]:
+            return str(row["row_hash"])
+        old_payload = dict(row)
+        old_payload["dimensions_json"] = cls._deserialize_json(
+            old_payload.get("dimensions_json")
+        ) or {}
+        old_payload["raw_fact_json"] = cls._deserialize_json(
+            old_payload.get("raw_fact_json")
+        ) or {}
+        for key in (
+            "dimensions_hash",
+            "ingestion_run_id",
+            "created_at",
+            "updated_at",
+            "row_hash",
+            "row_version",
+        ):
+            old_payload.pop(key, None)
+        return cls._semantic_hash(old_payload)
+
+    @classmethod
     def _upsert_financial_numeric_fact_row(
         cls,
         conn: sqlite3.Connection,
@@ -8877,8 +10077,9 @@ class ResearchStorageManager:
         *,
         table_name: str,
         ingestion_run_id: Optional[int],
+        change_watermark_config: Optional[Dict[str, Any]],
         now: str,
-    ) -> None:
+    ) -> Dict[str, int]:
         cls._assert_financial_table_name(
             table_name,
             {
@@ -8893,6 +10094,31 @@ class ResearchStorageManager:
         value_text = fact.value_text
         if value_text is None and fact.fact_value is not None:
             value_text = str(fact.fact_value)
+        semantic_payload = asdict(fact)
+        semantic_payload["context_id"] = fact.context_id or ""
+        semantic_payload["unit"] = fact.unit or ""
+        semantic_payload["value_text"] = value_text
+        row_hash = cls._semantic_hash(semantic_payload)
+        existing = conn.execute(
+            f"""
+            SELECT * FROM {table_name}
+            WHERE source_file_id = ? AND fact_name = ?
+              AND context_id = ? AND unit = ? AND dimensions_hash = ?
+            """,
+            (
+                fact.source_file_id,
+                fact.fact_name,
+                fact.context_id or "",
+                fact.unit or "",
+                dimensions_hash,
+            ),
+        ).fetchone()
+        old_hash = None
+        if existing is not None:
+            old_hash = cls._financial_numeric_fact_row_hash(existing)
+        row_version = int(existing["row_version"] or 1) + 1 if existing and old_hash != row_hash else 1
+        if existing and old_hash == row_hash:
+            row_version = int(existing["row_version"] or 1)
 
         conn.execute(
             f"""
@@ -8927,10 +10153,12 @@ class ResearchStorageManager:
                 source,
                 source_mode,
                 raw_fact_json,
+                row_hash,
+                row_version,
                 ingestion_run_id,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(source_file_id, fact_name, context_id, unit, dimensions_hash)
             DO UPDATE SET
                 instrument_id = excluded.instrument_id,
@@ -8958,6 +10186,8 @@ class ResearchStorageManager:
                 source = excluded.source,
                 source_mode = excluded.source_mode,
                 raw_fact_json = excluded.raw_fact_json,
+                row_hash = excluded.row_hash,
+                row_version = excluded.row_version,
                 ingestion_run_id = excluded.ingestion_run_id,
                 updated_at = excluded.updated_at
             """,
@@ -8992,11 +10222,48 @@ class ResearchStorageManager:
                 fact.source,
                 fact.source_mode,
                 raw_fact_json,
+                row_hash,
+                row_version,
                 ingestion_run_id,
                 now,
                 now,
             ),
         )
+        changelog_written = False
+        if existing is None or old_hash != row_hash:
+            changelog_written = append_change_record(
+                conn,
+                config=change_watermark_config,
+                domain="financial",
+                dataset="financial_numeric_facts",
+                change_type="update" if existing else "insert",
+                business_key={
+                    "source_file_id": fact.source_file_id,
+                    "instrument_id": fact.instrument_id,
+                    "report_period": fact.report_period,
+                    "fact_name": fact.fact_name,
+                    "canonical_fact_name": fact.canonical_fact_name,
+                    "context_id": fact.context_id or "",
+                    "unit": fact.unit or "",
+                    "dimensions_hash": dimensions_hash,
+                },
+                instrument_id=fact.instrument_id,
+                period=fact.report_period,
+                old_hash=old_hash,
+                new_hash=row_hash,
+                row_version=row_version,
+                source=fact.source,
+                source_mode=fact.source_mode,
+                source_profile=fact.parser_version,
+                ingestion_run_id=ingestion_run_id,
+                changed_at=now,
+            )
+        return {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and old_hash != row_hash),
+            "unchanged": int(existing is not None and old_hash == row_hash),
+            "changelog_written": int(changelog_written),
+        }
 
     @classmethod
     def _decode_financial_numeric_fact_row(
@@ -9004,6 +10271,8 @@ class ResearchStorageManager:
         row: sqlite3.Row,
     ) -> Dict[str, Any]:
         item = dict(row)
+        item.pop("row_hash", None)
+        item.pop("row_version", None)
         item["dimensions"] = cls._deserialize_json(item.pop("dimensions_json", None)) or {}
         item["raw_fact"] = cls._deserialize_json(item.pop("raw_fact_json", None)) or {}
         return item
@@ -9016,6 +10285,8 @@ class ResearchStorageManager:
         *,
         table_name: str,
         facts_json: str,
+        row_hash: str,
+        row_version: int,
         ingestion_run_id: Optional[int],
         now: str,
     ) -> None:
@@ -9068,10 +10339,12 @@ class ResearchStorageManager:
                 data_as_of,
                 facts_json,
                 lineage_json,
+                row_hash,
+                row_version,
                 ingestion_run_id,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(instrument_id, report_period)
             DO UPDATE SET
                 symbol = excluded.symbol,
@@ -9108,6 +10381,8 @@ class ResearchStorageManager:
                 data_as_of = excluded.data_as_of,
                 facts_json = excluded.facts_json,
                 lineage_json = excluded.lineage_json,
+                row_hash = excluded.row_hash,
+                row_version = excluded.row_version,
                 ingestion_run_id = excluded.ingestion_run_id,
                 updated_at = excluded.updated_at
             """,
@@ -9148,6 +10423,8 @@ class ResearchStorageManager:
                 now,
                 facts_json,
                 lineage_json,
+                row_hash,
+                row_version,
                 ingestion_run_id,
                 now,
                 now,
@@ -9160,6 +10437,8 @@ class ResearchStorageManager:
         row: sqlite3.Row,
     ) -> Dict[str, Any]:
         item = dict(row)
+        item.pop("row_hash", None)
+        item.pop("row_version", None)
         item["facts"] = cls._deserialize_json(item.pop("facts_json", None)) or {}
         item["lineage"] = cls._deserialize_json(item.pop("lineage_json", None)) or {}
         return item
@@ -9546,13 +10825,40 @@ class ResearchStorageManager:
             "indicators": int(indicators),
         }
 
-    @staticmethod
     def _upsert_industry_taxonomy_row(
+        self,
         conn: sqlite3.Connection,
         snapshot: IndustryTaxonomySnapshot,
         *,
+        ingestion_run_id: Optional[int],
         now: str,
-    ) -> None:
+    ) -> Dict[str, int]:
+        semantic_payload = self._industry_taxonomy_semantic_payload(snapshot)
+        row_hash = self._semantic_hash(semantic_payload)
+        existing = conn.execute(
+            """
+            SELECT * FROM industry_taxonomy
+            WHERE taxonomy_system = ?
+              AND taxonomy_version = ?
+              AND industry_code = ?
+            """,
+            (
+                snapshot.taxonomy_system,
+                snapshot.taxonomy_version or "",
+                snapshot.industry_code,
+            ),
+        ).fetchone()
+        old_hash = None
+        if existing is not None:
+            old_hash = existing["row_hash"] or self._semantic_hash(
+                self._industry_taxonomy_row_semantic_payload(existing)
+            )
+        changed = existing is None or old_hash != row_hash
+        row_version = (
+            1
+            if existing is None
+            else int(existing["row_version"] or 1) + int(changed)
+        )
         conn.execute(
             """
             INSERT INTO industry_taxonomy (
@@ -9568,9 +10874,11 @@ class ResearchStorageManager:
                 source,
                 source_mode,
                 is_active,
+                row_hash,
+                row_version,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(taxonomy_system, taxonomy_version, industry_code)
             DO UPDATE SET
                 industry_name = excluded.industry_name,
@@ -9582,6 +10890,8 @@ class ResearchStorageManager:
                 source = excluded.source,
                 source_mode = excluded.source_mode,
                 is_active = excluded.is_active,
+                row_hash = excluded.row_hash,
+                row_version = excluded.row_version,
                 updated_at = excluded.updated_at
             """,
             (
@@ -9597,10 +10907,41 @@ class ResearchStorageManager:
                 snapshot.source,
                 snapshot.source_mode,
                 1,
+                row_hash,
+                row_version,
                 now,
                 now,
             ),
         )
+        changelog_written = False
+        if changed:
+            changelog_written = append_change_record(
+                conn,
+                config=self.change_watermark_config,
+                domain="industry",
+                dataset="industry_taxonomy",
+                change_type="update" if existing else "insert",
+                business_key={
+                    "taxonomy_system": snapshot.taxonomy_system,
+                    "taxonomy_version": snapshot.taxonomy_version or "",
+                    "industry_code": snapshot.industry_code,
+                },
+                series_id=snapshot.industry_code,
+                old_hash=old_hash,
+                new_hash=row_hash,
+                row_version=row_version,
+                source=snapshot.source,
+                source_mode=snapshot.source_mode,
+                source_profile=snapshot.source_classification,
+                ingestion_run_id=ingestion_run_id,
+                changed_at=now,
+            )
+        return {
+            "inserted": int(existing is None),
+            "changed": int(existing is not None and changed),
+            "unchanged": int(existing is not None and not changed),
+            "changelog_written": int(changelog_written),
+        }
 
     def _attach_quotes_db(self, conn: sqlite3.Connection) -> None:
         if not os.path.exists(self.quotes_db_path):
@@ -9667,9 +11008,43 @@ class ResearchStorageManager:
         """Apply lightweight additive migrations for research shadow tables."""
         cls._ensure_column(
             conn,
+            "shareholder_snapshots",
+            "row_hash",
+            "row_hash TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "shareholder_snapshots",
+            "row_version",
+            "row_version INTEGER NOT NULL DEFAULT 1",
+        )
+        for table_name in (
+            "financial_facts",
+            "financial_core_facts_hot",
+            "financial_core_facts_history",
+            "financial_numeric_facts",
+            "financial_numeric_facts_hot",
+            "financial_numeric_facts_history",
+        ):
+            cls._ensure_column(conn, table_name, "row_hash", "row_hash TEXT")
+            cls._ensure_column(
+                conn,
+                table_name,
+                "row_version",
+                "row_version INTEGER NOT NULL DEFAULT 1",
+            )
+        cls._ensure_column(
+            conn,
             "industry_taxonomy",
             "taxonomy_version",
             "taxonomy_version TEXT NOT NULL DEFAULT ''",
+        )
+        cls._ensure_column(conn, "industry_taxonomy", "row_hash", "row_hash TEXT")
+        cls._ensure_column(
+            conn,
+            "industry_taxonomy",
+            "row_version",
+            "row_version INTEGER NOT NULL DEFAULT 1",
         )
         cls._ensure_column(
             conn,
@@ -9743,6 +11118,28 @@ class ResearchStorageManager:
             "sw_l3_index_code",
             "sw_l3_index_code TEXT",
         )
+        cls._ensure_column(conn, "industry_memberships", "row_hash", "row_hash TEXT")
+        cls._ensure_column(
+            conn,
+            "industry_memberships",
+            "row_version",
+            "row_version INTEGER NOT NULL DEFAULT 1",
+        )
+        for table_name in (
+            "risk_free_rate_series",
+            "risk_free_rate_observations",
+            "risk_snapshots",
+            "technical_indicator_latest",
+            "valuation_inputs",
+            "valuation_history",
+        ):
+            cls._ensure_column(conn, table_name, "row_hash", "row_hash TEXT")
+            cls._ensure_column(
+                conn,
+                table_name,
+                "row_version",
+                "row_version INTEGER NOT NULL DEFAULT 1",
+            )
         cls._ensure_column(
             conn,
             "industry_taxonomy",
@@ -9953,6 +11350,8 @@ class ResearchStorageManager:
                 source_mode TEXT NOT NULL,
                 data_as_of TEXT NOT NULL,
                 snapshot_json TEXT NOT NULL,
+                row_hash TEXT,
+                row_version INTEGER NOT NULL DEFAULT 1,
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
@@ -10784,6 +12183,8 @@ class ResearchStorageManager:
                 source TEXT NOT NULL,
                 source_mode TEXT NOT NULL,
                 is_active INTEGER NOT NULL DEFAULT 1,
+                row_hash TEXT,
+                row_version INTEGER NOT NULL DEFAULT 1,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 PRIMARY KEY (taxonomy_system, taxonomy_version, industry_code)
@@ -10952,6 +12353,8 @@ class ResearchStorageManager:
                 source_mode TEXT NOT NULL,
                 data_as_of TEXT NOT NULL,
                 membership_json TEXT NOT NULL,
+                row_hash TEXT,
+                row_version INTEGER NOT NULL DEFAULT 1,
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
@@ -11047,6 +12450,8 @@ class ResearchStorageManager:
                 source TEXT,
                 source_mode TEXT,
                 data_as_of TEXT,
+                row_hash TEXT,
+                row_version INTEGER NOT NULL DEFAULT 1,
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
@@ -11062,6 +12467,8 @@ class ResearchStorageManager:
                 source TEXT,
                 source_mode TEXT,
                 data_as_of TEXT,
+                row_hash TEXT,
+                row_version INTEGER NOT NULL DEFAULT 1,
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
@@ -11125,6 +12532,7 @@ for _financial_method_name in (
     "upsert_financial_mapping_audit_result",
     "get_financial_mapping_audit_results",
     "upsert_financial_numeric_facts",
+    "replace_financial_numeric_facts_for_source_file",
     "get_financial_numeric_facts",
     "get_financial_local_core_facts",
     "upsert_financial_facts",

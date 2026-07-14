@@ -7,6 +7,31 @@
       "BSE"
     ],
     "modules": {
+      "change_watermark": {
+        "enabled": true,
+        "domains": {
+          "shareholder": true,
+          "financial": true,
+          "industry": true,
+          "valuation": true,
+          "technical": true,
+          "risk": true,
+          "interest_rate": true
+        },
+        "datasets": {
+          "shareholder_snapshots": true,
+          "financial_facts": true,
+          "financial_numeric_facts": true,
+          "industry_taxonomy": true,
+          "industry_memberships": true,
+          "risk_free_rate_series": true,
+          "risk_free_rate_observations": true,
+          "risk_snapshots": true,
+          "technical_indicator_latest": true,
+          "valuation_inputs": true,
+          "valuation_history": true
+        }
+      },
       "company_profile": {
         "enabled": true,
         "optional_empty_exchanges": [
