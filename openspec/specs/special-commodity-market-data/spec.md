@@ -349,6 +349,87 @@ The system SHALL schedule non-domestic special commodity observations independen
 - **WHEN** an enabled maintenance task is already configured at the LME start minute
 - **THEN** the schedules SHALL be deconflicted before production enablement to avoid concurrent writes or resource contention.
 
+### Requirement: Candidate discovery is outside production scope resolution
+
+The special-commodity scope resolver SHALL resolve only formal commodity/series/scope configuration and SHALL never resolve rows from the discovery-candidate table.
+
+#### Scenario: Source discovery finds an unknown symbol
+
+- **WHEN** the discovery adapter writes an unknown symbol to the candidate table
+- **THEN** all scheduled and manual price scopes SHALL remain unchanged
+- **AND** the symbol SHALL become downloadable only after formal commodity/series/scope configuration is created.
+
+### Requirement: Catalog onboarding reports governance evidence
+
+Backfill and governance reports SHALL include source identity, raw and normalized unit, specification, history start, observed coverage, and unresolved gaps for newly onboarded formal series.
+
+#### Scenario: Full-history dry-run completes
+
+- **WHEN** a newly configured formal series finishes a full-history dry-run through the existing backfill task
+- **THEN** the report SHALL contain sufficient evidence to decide whether production write is safe.
+
+#### Scenario: Official monthly workbook contains a missing-value marker
+
+- **WHEN** a configured monthly source column contains a non-numeric missing-value marker inside the governed lifecycle
+- **THEN** the provider SHALL report the affected series and observation month
+- **AND** SHALL distinguish a configured source-evidenced exception from an unresolved parsing or coverage gap
+- **AND** SHALL NOT interpolate or persist a fabricated observation.
+
+#### Scenario: World Bank agriculture benchmark is configured for rollout
+
+- **WHEN** an accepted agriculture series is present in the official Pink Sheet workbook with an explicit source unit and continuous lifecycle evidence
+- **THEN** it SHALL use the existing World Bank provider, master governance, monthly period governance, and backfill workflow
+- **AND** SHALL remain outside the monthly scheduler until short dry-run, full-history dry-run, write, and idempotent verification all pass.
+
+### Requirement: Adapter unit conversion preserves upstream evidence
+
+When an integration adapter returns a value already normalized from the upstream publication unit, the shared observation builder SHALL preserve both the upstream `raw_value/raw_unit` and normalized `value/unit`. Conversion SHALL be driven by series metadata and SHALL NOT be hard-coded in the production task.
+
+#### Scenario: 100ppi glass is normalized from square metres to tonnes
+
+- **WHEN** the AkShare adapter returns a glass value produced by multiplying the 100ppi `CNY/m2` quote by `80`
+- **THEN** the canonical observation SHALL store the adapter value in `value` with `unit=CNY/ton`
+- **AND** SHALL reconstruct and store the upstream value in `raw_value` with `raw_unit=CNY/m2`
+- **AND** all other series without a configured conversion factor SHALL retain factor `1` behavior.
+
+### Requirement: Governed empty publication windows preserve verified state
+
+Low-frequency and publication-driven sources SHALL distinguish a window with no expected observation from a missing expected observation. A refresh failure SHALL NOT downgrade the last verified master-governance record.
+
+#### Scenario: Scheduled lookback contains no expected low-frequency release
+
+- **WHEN** the provider reports `expected_periods=0` and `unresolved_dates=0`
+- **THEN** the governance pipeline SHALL classify the date window as a legal empty window
+- **AND** SHALL reuse the last verified source-backed master evidence
+- **AND** SHALL complete without fabricating an observation date or emitting a missing-data warning.
+
+#### Scenario: Current master refresh cannot reproduce prior evidence
+
+- **WHEN** `commodity_master_governance` already contains a successful record and the current refresh produces a blocked record
+- **THEN** persistence SHALL retain the successful record
+- **AND** the current ingestion run SHALL report the refresh blocker without replacing verified evidence with `unverified` state.
+
+### Requirement: Observation revisions use canonical data semantics
+
+The shared observation persistence layer SHALL count a row as changed only when its canonical or raw value, currency, unit, source symbol, or quality semantics change. Volatile retrieval metadata SHALL remain auditable without being reported as a price revision.
+
+#### Scenario: FRED realtime metadata changes without a price revision
+
+- **WHEN** a monthly refresh returns the same value and unit with a new `realtime_start`, `realtime_end`, request URL, parser version, or raw payload hash
+- **THEN** the observation SHALL be counted as unchanged
+- **AND** the latest metadata and raw payload hash SHALL still be persisted for lineage auditing.
+
+### Requirement: Industrial indicators remain separate from prices
+
+Warehouse receipts, inventories, deliveries, production, imports, and other industrial indicators SHALL use formally governed series marked with `data_kind=industrial_indicator`. Provider-specific parsing SHALL remain in source adapters while the shared governance and persistence contracts remain reusable.
+
+#### Scenario: An official source publishes a commodity inventory value
+
+- **WHEN** an exchange, customs authority, statistics bureau, or energy authority publishes an inventory, production, delivery, or import observation
+- **THEN** the observation SHALL use an indicator series distinct from every price series
+- **AND** its statistical period, publication date, unit, revision lineage, and cumulative or period-value semantics SHALL be governed explicitly
+- **AND** it SHALL NOT participate in price scopes, price fallback chains, or price synchronization tasks.
+
 ### Requirement: Commodity Observations Emit Change Records
 Special commodity daily and monthly observation syncs SHALL emit changelog records for inserted and materially changed observations.
 
