@@ -1014,6 +1014,32 @@
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "Official NBS wholesale/sales market-price observation. Observation date is the ten-day period end; publication date is preserved separately."
         },
+        "nbs_monthly_raw_coal_output": {
+          "venue": "NBS",
+          "source": "National Bureau of Statistics monthly industrial output",
+          "source_mode": "official_public_web",
+          "source_interface": "nbs_monthly_industrial_output_articles",
+          "provider_adapter": "nbs_monthly_industrial_output",
+          "governance_adapter": "official_public_indicator",
+          "calendar_type": "source_observed_publication_month",
+          "calendar_quality_flag": "official_period_observed",
+          "quality_flag": "official_public_web",
+          "parser_version": "nbs_monthly_industrial_output.v1",
+          "listing_url": "https://www.stats.gov.cn/sj/zxfb/",
+          "search_endpoint_url": "https://api.so-gov.cn/query/s",
+          "search_site_code": "bm36000002",
+          "search_query": "月份规模以上工业增加值增长 原煤",
+          "search_page_size": 20,
+          "search_max_pages_per_sort": 20,
+          "listing_max_pages": 120,
+          "exact_only_max_periods": 12,
+          "exact_search_max_pages": 3,
+          "publication_lag_days": 16,
+          "timeout_seconds": 30,
+          "progress_log_interval_seconds": 60,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "note": "Official NBS year-to-date raw-coal output. January-February is a combined cumulative period; no synthetic monthly split or automatic differencing is allowed."
+        },
         "manual_policy_event": {
           "venue": "MANUAL_POLICY",
           "source": "Manual verified policy event import",
@@ -1468,6 +1494,22 @@
           "commodity_id": "CN.FORESTRY.SOFTWOOD_PULP.SPOT", "symbol": "SP", "name": "China Softwood Pulp Spot Reference",
           "category": "forestry", "commodity_type": "spot_reference", "default_currency": "CNY", "default_unit": "CNY/ton", "active": true,
           "metadata": {"dcf_role": "pulp_paper_spot_cycle_anchor", "source_scope": "100ppi public-web softwood pulp spot reference"}
+        },
+        {
+          "commodity_id": "CN.COAL.RAW_COAL.OUTPUT.NBS",
+          "symbol": "RAW_COAL_OUTPUT_YTD",
+          "name": "China Above-Scale Industrial Raw Coal Output YTD",
+          "category": "coal",
+          "commodity_type": "industrial_indicator",
+          "default_currency": "",
+          "default_unit": "10k_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_domestic_supply_indicator",
+            "not_commodity_price": true,
+            "not_monthly_flow": true,
+            "source_scope": "NBS above-scale industrial raw-coal cumulative output"
+          }
         },
         {
           "commodity_id": "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
@@ -2194,6 +2236,31 @@
           }
         },
         {
+          "series_id": "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
+          "commodity_id": "CN.COAL.RAW_COAL.OUTPUT.NBS",
+          "venue": "NBS",
+          "source_profile": "nbs_monthly_raw_coal_output",
+          "source_symbol": "原煤（万吨）",
+          "frequency": "monthly",
+          "quote_type": "cumulative_output",
+          "currency": "",
+          "unit": "10k_ton",
+          "active": true,
+          "metadata": {
+            "data_kind": "industrial_indicator",
+            "source_product_names": ["原煤（万吨）", "原煤(万吨)"],
+            "source_name": "National Bureau of Statistics above-scale industrial raw-coal output",
+            "source_url": "https://www.stats.gov.cn/sj/zxfb/",
+            "source_available_from": "2022-02-28",
+            "region_or_spec": "China above-scale industrial enterprises; statistical scope may change by year",
+            "publication_date_semantics": "official_article_publication_date",
+            "source_period_semantics": "year_to_date_cumulative_period_end",
+            "metric_type": "cumulative_ytd_output",
+            "not_derived_monthly_value": true,
+            "statistical_scope_warning": "Enterprise coverage can change annually; published comparable growth uses adjusted same-period coverage."
+          }
+        },
+        {
           "series_id": "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
           "commodity_id": "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
           "venue": "SSE",
@@ -2484,6 +2551,14 @@
         {
           "scope_id": "cn_100ppi_softwood_pulp", "enabled": true, "venues": ["100PPI"],
           "categories": ["forestry"], "commodity_ids": ["CN.FORESTRY.SOFTWOOD_PULP.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_nbs_raw_coal_output",
+          "enabled": true,
+          "venues": ["NBS"],
+          "categories": ["coal"],
+          "commodity_ids": ["CN.COAL.RAW_COAL.OUTPUT.NBS"],
+          "frequencies": ["monthly"]
         },
         {
           "scope_id": "cn_coal_cbcfi",

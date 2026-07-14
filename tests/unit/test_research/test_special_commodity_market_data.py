@@ -25,6 +25,7 @@ from research.special_commodity_market_data import (
     ConfiguredSourceChainProvider,
     EiaCommodityProvider,
     FredCommodityProvider,
+    NbsMonthlyIndustrialOutputProvider,
     NbsProductionMaterialsGovernanceAdapter,
     NbsProductionMaterialsProvider,
     OfficialPublicIndicatorGovernanceAdapter,
@@ -122,7 +123,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 41
+    assert result["instruments"] == 42
     assert result["series"] >= 43
 
     dictionary = storage.read_dictionary()
@@ -152,6 +153,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.NATURAL_RUBBER.SPOT",
         "CN.FORESTRY.SOFTWOOD_PULP.SPOT",
         "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
+        "CN.COAL.RAW_COAL.OUTPUT.NBS",
         "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
         "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
     }
@@ -168,6 +170,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY",
         "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
+        "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
     }
 
@@ -305,6 +308,11 @@ def test_special_commodity_scope_resolution():
     thermal_coal = selector.resolve(scope_id="cn_nbs_thermal_coal")
     assert [item.series_id for item in thermal_coal] == [
         "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY"
+    ]
+
+    raw_coal_output = selector.resolve(scope_id="cn_nbs_raw_coal_output")
+    assert [item.series_id for item in raw_coal_output] == [
+        "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY"
     ]
 
     cbcfi = selector.resolve(scope_id="cn_coal_cbcfi")
@@ -486,6 +494,134 @@ def test_nbs_ten_day_title_period_parsing():
         "period_start": "2017-12-21",
         "period_end": "2017-12-30",
     }
+
+
+def test_nbs_monthly_output_title_period_parsing():
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2026年1—2月份规模以上工业增加值增长6.3%"
+    ) == {
+        "observation_date": "2026-02-28",
+        "period_start": "2026-01-01",
+        "period_end": "2026-02-28",
+    }
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2026年1—4月份规模以上工业增加值增长5.6%"
+    ) == {
+        "observation_date": "2026-04-30",
+        "period_start": "2026-01-01",
+        "period_end": "2026-04-30",
+    }
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2026年3月份规模以上工业增加值增长5.7%"
+    ) == {
+        "observation_date": "2026-03-31",
+        "period_start": "2026-01-01",
+        "period_end": "2026-03-31",
+    }
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2026年1月份规模以上工业增加值"
+    ) is None
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2023年上半年规模以上工业增加值增长3.8%"
+    ) == {
+        "observation_date": "2023-06-30",
+        "period_start": "2023-01-01",
+        "period_end": "2023-06-30",
+    }
+    assert NbsMonthlyIndustrialOutputProvider.parse_period(
+        "2025年前三季度规模以上工业增加值增长"
+    ) == {
+        "observation_date": "2025-09-30",
+        "period_start": "2025-01-01",
+        "period_end": "2025-09-30",
+    }
+
+
+@pytest.mark.parametrize(
+    ("header", "row", "expected"),
+    [
+        (
+            "<tr><td>指标</td><td>1—2月</td><td>1—2月</td></tr>"
+            "<tr><td>指标</td><td>绝对量</td><td>同比增长（%）</td></tr>",
+            "<tr><td>原煤（万吨）</td><td>76289</td><td>-0.3</td></tr>",
+            76289.0,
+        ),
+        (
+            "<tr><td>指标</td><td>5月</td><td>5月</td><td>1—5月</td><td>1—5月</td></tr>"
+            "<tr><td>指标</td><td>绝对量</td><td>同比增长（%）</td><td>绝对量</td><td>同比增长（%）</td></tr>",
+            "<tr><td>原煤（万吨）</td><td>39722</td><td>-1.7</td><td>198043</td><td>-0.3</td></tr>",
+            198043.0,
+        ),
+    ],
+)
+def test_nbs_monthly_output_parses_only_published_ytd_value(
+    monkeypatch, header, row, expected
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        scope_id="cn_nbs_raw_coal_output"
+    )[0]
+    provider = NbsMonthlyIndustrialOutputProvider(
+        item.source_profile, cfg["source_profiles"][item.source_profile]
+    )
+    html = f"<html><body><table>{header}{row}</table></body></html>"
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: SimpleNamespace(
+            text=html,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        ),
+    )
+    observation = provider._parse_article(
+        {
+            "observation_date": "2026-05-31",
+            "period_start": "2026-01-01",
+            "period_end": "2026-05-31",
+            "publication_date": "2026-06-16",
+            "source_url": "https://www.stats.gov.cn/example.html",
+        },
+        item,
+    )
+
+    assert observation.value == expected
+    assert observation.metadata["metric_type"] == "cumulative_ytd_output"
+    assert observation.metadata["not_derived_monthly_value"] is True
+
+
+def test_nbs_monthly_output_listing_ignores_unrelated_old_links(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = cfg["source_profiles"]["nbs_monthly_raw_coal_output"]
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+    html = """
+    <html><body>
+      <a href="/sj/zxfb/202302/t20230217_1896711.html">其他历史统计信息</a>
+      <a href="/sj/zxfb/202606/t20260616_1963953.html">
+        2026年5月份规模以上工业增加值增长5.8%
+      </a>
+    </body></html>
+    """
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: SimpleNamespace(
+            text=html,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        ),
+    )
+
+    rows, oldest_publication = provider._listing_page(1)
+
+    assert [row["observation_date"] for row in rows] == ["2026-05-31"]
+    assert oldest_publication == date(2026, 6, 16)
 
 
 def test_nbs_exact_discovery_checks_later_pages(monkeypatch):
@@ -2633,10 +2769,11 @@ def test_special_commodity_indicator_api_contract_returns_only_indicator_series(
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
     result = SpecialCommodityReadService(storage).indicators(category="coal")
     assert result["status"] == "success"
-    assert result["series_count"] == 2
+    assert result["series_count"] == 3
     expected = {
         "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY",
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
+        "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
     }
     assert {item["series_id"] for item in result["series"]} == expected
     assert result["observations"] == {series_id: [] for series_id in expected}
