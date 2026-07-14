@@ -2085,6 +2085,7 @@ def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
     from scheduler.tasks import (
         _resolve_special_commodity_monthly_sync_window,
         _resolve_special_commodity_sync_window,
+        _resolve_special_commodity_task_window,
     )
 
     assert _resolve_special_commodity_sync_window(
@@ -2111,6 +2112,20 @@ def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
         lookback_months=6,
         as_of_date=date(2026, 7, 11),
     ) == ("2025-01-01", "2026-05-31")
+    assert _resolve_special_commodity_task_window(
+        None,
+        None,
+        lookback_days=10,
+        window_mode="provider_latest",
+        as_of_date=date(2026, 7, 11),
+    ) == (None, None)
+    assert _resolve_special_commodity_task_window(
+        "2026-07-10",
+        "2026-07-13",
+        lookback_days=10,
+        window_mode="provider_latest",
+        as_of_date=date(2026, 7, 11),
+    ) == ("2026-07-10", "2026-07-13")
 
 
 def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
@@ -2160,6 +2175,19 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_nbs_thermal_coal",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
+    industrial = jobs["special_commodity_industrial_indicator_sync"]
+    assert industrial["enabled"] is True
+    assert industrial["manual_only"] is False
+    assert industrial["trigger"] == {
+        "type": "cron",
+        "day_of_week": "mon-fri",
+        "hour": 16,
+        "minute": 30,
+        "second": 0,
+    }
+    assert industrial["parameters"]["scope_ids"] == ["cn_coal_cbcfi"]
+    assert industrial["parameters"]["window_mode"] == "provider_latest"
+    assert industrial["parameters"]["dry_run"] is False
     assert special["parameters"]["lookback_days"] == 10
     assert special["parameters"]["dry_run"] is False
     monthly = jobs["special_commodity_price_monthly_sync"]

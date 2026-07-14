@@ -339,6 +339,7 @@ restart_system - 重启系统服务
 • 每周数据维护 (weekly_data_maintenance) - 周日 02:00
 • 月度数据完整性检查 (monthly_data_integrity_check) - 下月2日 11:00
 • 海外商品日频同步 (special_commodity_price_sync) - 周二至周六 08:00
+• 大宗商品产业指标同步 (special_commodity_industrial_indicator_sync) - 周一至周五 16:30
 • 国内特殊商品现货与官方基准同步 (special_commodity_cn_spot_sync) - 周一至周五 22:30
 • 外盘及特殊商品月频同步 (special_commodity_price_monthly_sync) - 每月10日、20日 08:40
 • 特殊商品政策目录发现 (special_commodity_policy_discovery) - 每月15日09:10自动 write；发现并保存证据/候选、对账正式事件，但不自动批准新政策

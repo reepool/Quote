@@ -112,7 +112,7 @@
 | 复权因子 | 日更 Phase 2、weekly maintenance、factor backfill | `instrument_id + ex_date` | P0 |
 | 商品期货 | `futures_market_data_sync`、backfill、continuous series | `contract_id/series_id + trade_date + source_mode` | P1 |
 | FX | `fx_rate_sync`、derivation、backfill | `series_id + observation_date + revision_id` | P1 |
-| 特殊商品价格 | `special_commodity_price_sync`、`special_commodity_cn_spot_sync`、monthly sync | `series_id + observation_date/period + source_profile` | P1 |
+| 特殊商品价格与产业指标 | `special_commodity_price_sync`、`special_commodity_cn_spot_sync`、`special_commodity_industrial_indicator_sync`、monthly sync | `series_id + observation_date/period + source_profile` | P1 |
 | 特殊商品政策 | policy discovery、candidate review、event promotion | `adapter_id + document/event id + publication/effective date` | P2 |
 | 财务披露/事实 | `financial_disclosure_incremental_sync`、reconciliation、broker risk-control | `instrument_id + report_period + fact/source identity` | P2 |
 | 股东摘要 | `shareholder_incremental_sync`、reconciliation、shadow sync | `instrument_id + snapshot scope` | P2 |
@@ -535,7 +535,7 @@ P0 当前配置位于 `config/04_database.json` 的 `database_config.change_wate
 | P0 | 复权因子 | 日更 Phase 2、weekly maintenance、factor backfill | quote DB / `adjustment_factors` | `instrument_id + ex_date` | P0 写入路径已接入 |
 | P1 | 商品期货行情与连续序列 | `futures_market_data_sync`, `futures_market_data_backfill` | `data/futures.db` / futures storage | `contract_id/series_id + trade_date + source_mode` | 延后；应复用已有 hash-aware counters |
 | P1 | FX 观测与派生 | `fx_rate_sync`, `fx_rate_backfill`, `fx_derivation_sync` | `data/fx.db` | `series_id + observation_date + revision/lineage` | 延后；dry-run/manual_only 不推进水位 |
-| P1 | 特殊商品价格 | `special_commodity_price_sync`, `special_commodity_cn_spot_sync`, `special_commodity_price_monthly_sync` | research/commodity storage | `series_id + observation_date/period + source_profile` | 延后；价格域和政策域隔离 |
+| P1 | 特殊商品价格与产业指标 | `special_commodity_price_sync`, `special_commodity_cn_spot_sync`, `special_commodity_industrial_indicator_sync`, `special_commodity_price_monthly_sync` | research/commodity storage | `series_id + observation_date/period + source_profile` | 延后；价格、产业指标和政策域隔离 |
 | P2 | 股东/财务/公告事实 | `shareholder_incremental_sync`, `shareholder_reconciliation_sync`, `financial_disclosure_incremental_sync`, `financial_disclosure_reconciliation_sync` | research/financial storage | `instrument_id + period/snapshot + source identity` | 延后；必须保留公告可得时点 |
 | P2 | 行业/估值/利率/技术风险 | `industry_standard_sync`, `industry_index_analysis_sync`, `valuation_input_sync`, `valuation_history_rebuild`, `risk_free_rate_sync` | research storage | taxonomy/as-of/calc/input hash | 延后；现有 read API 不加默认字段 |
 | P3 | 主数据/交易日历治理 | `trading_calendar_update`, `hkex_instrument_master_sync`, `a_share_stock_master_sync`, `index_master_governance_sync`, futures/FX/commodity governance | quote/futures/FX/research governance storage | lifecycle/calendar effective key | 延后；不进入 quote-only 查询 |

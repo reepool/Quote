@@ -96,7 +96,7 @@
 | 环渤海动力煤价格指数 | 中国煤炭工业协会公开目录可确认 2013 年以来的 BSPI 周评及价格口径；直连返回 `403/Bad crawler`，现有代理通道定向探测可访问，但该目录最新仅到 2025-06。中国煤炭运销协会存在 2026 年更新文章，但尚未发现可稳定枚举的专用目录/API | 继续作为首选候选源，尚未注册生产 scope。必须先形成“历史目录 + 可持续日更目录”的连续、可审计来源链，再实施回补；不得扫描文章 ID、依赖搜索引擎摘要或用媒体转载代替 canonical 观测。 |
 | 重点港口煤炭库存 | 已探测页面的具体值属于付费内容；AkShare 的沿海电厂库存不是港口库存，统计对象不等价 | 尚无满足持续免费、口径明确和可自动化要求的主源，保持 blocked。不得把电厂库存、研究报告截图或付费页面泄露内容冒充港口库存。 |
 
-CBCFI 的治理前置仍走统一主数据、来源观测日、持久化和报告流水线；交易所页面解析只存在于 provider adapter 内。由于它不是商品价格，不得加入 `special_commodity_price_sync`、`special_commodity_cn_spot_sync` 或月度价格任务，后续应配置独立产业指标日更任务。
+CBCFI 的治理前置仍走统一主数据、来源观测日、持久化和报告流水线；交易所页面解析只存在于 provider adapter 内。由于它不是商品价格，不得加入 `special_commodity_price_sync`、`special_commodity_cn_spot_sync` 或月度价格任务；已配置独立 `special_commodity_industrial_indicator_sync`，周一至周五 16:30 使用 `provider_latest` 来源窗口运行。
 
 ## 6. 更多连续商品行情
 
@@ -142,7 +142,7 @@ CBCFI 的治理前置仍走统一主数据、来源观测日、持久化和报�
 | 原煤、原油、钢铁、有色等产量 | 国家统计局月度工业产品发布 | 统计月、发布日期、当月/累计口径 | 新建 NBS monthly production adapter；累计值转换为单月值时必须保留原始累计值和转换 lineage |
 | 国际能源库存 | EIA Open Data | 观测期、发布日期、修订 vintage | 可复用 EIA transport 和认证配置，但使用独立 indicator series/source profile，不进入 WTI/Brent 价格 source-chain |
 
-现有 `commodity_price_series`、观测表和 `/indicators` 读取接口可承载首批指标，正式序列必须设置 `metadata.data_kind=industrial_indicator` 和明确的 `quote_type`。价格、库存、仓单、产量、进口量和政策事件必须使用不同 `series_id`；指标不得加入 `special_commodity_price_sync`、`special_commodity_cn_spot_sync` 或 `special_commodity_price_monthly_sync`。后续实际 adapter、历史回补和调度上线应单独立项，逐来源完成来源许可、历史深度、字段稳定性和反爬验证。
+现有 `commodity_price_series`、观测表和 `/indicators` 读取接口可承载首批指标，正式序列必须设置 `metadata.data_kind=industrial_indicator` 和明确的 `quote_type`。价格、库存、仓单、产量、进口量和政策事件必须使用不同 `series_id`；指标不得加入价格、国内现货或月度价格任务，而应加入共享治理链路之上的 `special_commodity_industrial_indicator_sync`。后续实际 adapter 和 scope 仍须逐来源完成来源许可、历史深度、字段稳定性、历史回补及调度验收。
 
 ## 7. 数据模型增强
 
