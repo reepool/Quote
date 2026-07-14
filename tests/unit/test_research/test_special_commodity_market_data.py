@@ -545,20 +545,48 @@ def test_sse_cbcfi_provider_parses_latest_official_period(monkeypatch):
     )
 
     result = provider.fetch(
-        [item], start_date="2026-07-06", end_date="2026-07-13"
+        [item], start_date="2026-07-10", end_date="2026-07-13"
     )
 
     assert result.blockers == []
-    assert len(result.observations) == 1
-    observation = result.observations[0]
-    assert observation.observation_date == "2026-07-13"
-    assert observation.value == 920.45
+    assert len(result.observations) == 2
+    assert [item.observation_date for item in result.observations] == [
+        "2026-07-10",
+        "2026-07-13",
+    ]
+    assert [item.value for item in result.observations] == [877.88, 920.45]
+    observation = result.observations[-1]
     assert observation.unit == "index_point"
     assert observation.currency == ""
     assert observation.metadata["data_kind"] == "industrial_indicator"
     assert observation.metadata["publication_date"] == "2026-07-13"
     assert observation.metadata["previous_value"] == 877.88
-    assert result.warnings[0]["reason"] == "sse_cbcfi_public_history_not_included"
+    assert result.warnings == []
+
+
+def test_sse_cbcfi_provider_can_return_previous_public_period(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_cbcfi")[0]
+    response = SimpleNamespace(text=_cbcfi_html(), raise_for_status=lambda: None)
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: response,
+    )
+    provider = ShanghaiShippingExchangeCbcfiProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+    )
+
+    result = provider.fetch(
+        [item], start_date="2026-07-10", end_date="2026-07-10"
+    )
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    assert result.observations[0].observation_date == "2026-07-10"
+    assert result.observations[0].value == 877.88
 
 
 def test_sse_cbcfi_provider_blocks_unentitled_historical_backfill(monkeypatch):
@@ -580,7 +608,8 @@ def test_sse_cbcfi_provider_blocks_unentitled_historical_backfill(monkeypatch):
         [item], start_date="2011-12-07", end_date="2026-07-10"
     )
 
-    assert result.observations == []
+    assert len(result.observations) == 1
+    assert result.observations[0].observation_date == "2026-07-10"
     assert result.blockers[0]["reason"] == "sse_cbcfi_public_history_requires_entitlement"
 
 

@@ -815,7 +815,7 @@
             "backoff_seconds": 1.0
           },
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
-          "note": "The unauthenticated official page exposes only the latest and previous periods. Multi-period history requires login/entitlement; the adapter must report this gap and must not synthesize history."
+          "note": "The unauthenticated official page exposes the latest and previous periods. Both are accepted when they fall in the requested range. Earlier multi-period history requires login/entitlement; the adapter must report this gap and must not synthesize history."
         },
         "100ppi_public_web": {
           "venue": "100PPI",
@@ -2189,7 +2189,7 @@
             "region_or_spec": "China coastal coal shipping market composite index",
             "publication_date_semantics": "official_index_date",
             "source_period_semantics": "official_index_date",
-            "public_history_mode": "latest_period_only",
+            "public_history_mode": "latest_and_previous_periods_only",
             "index_base": "official CBCFI methodology",
             "not_commodity_price": true
           }

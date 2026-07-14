@@ -503,4 +503,4 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 
 后续政策发现、实际长协证据、煤炭库存/港口价/运费及更多连续商品序列的增强需求，见 [特殊商品政策、产业证据与行情目录增强需求说明书](special_commodity_market_data_enhancement_requirements.md)。该增强拆分为 `enhance-commodity-policy-and-industrial-evidence` 与 `expand-special-commodity-series-catalog` 两个 OpenSpec change，避免将低频政策治理和 100ppi 行情扩品混为同一任务。
 
-截至 2026-07-14，沿海煤炭运价已按统一工业指标契约增加上海航运交易所 CBCFI 综合指数 provider、主数据、来源日期治理和手工 scope。官方匿名页只提供最近单期，因此当前能力是从部署日起持续积累，不代表已完成 2011 年以来的历史回补，也暂未进入任何价格日更任务。港口价格和港口库存仍按增强需求中的来源阻断状态管理。
+截至 2026-07-14，沿海煤炭运价已按统一工业指标契约增加上海航运交易所 CBCFI 综合指数 provider、主数据、来源日期治理和手工 scope。官方匿名页只提供本期和上期，两期均按请求区间接收；因此当前能力仍是从部署日起持续积累，不代表已完成 2011 年以来的历史回补，也暂未进入任何价格日更任务。港口价格和港口库存仍按增强需求中的来源阻断状态管理。

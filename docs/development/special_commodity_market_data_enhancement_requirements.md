@@ -92,7 +92,7 @@
 
 | 指标 | 探测结论 | 当前实现与边界 |
 |---|---|---|
-| 沿海煤炭运价 | 上海航运交易所公开 CBCFI 单期页可匿名读取综合指数、本期日、上期值和涨跌；多期查询要求登录/授权 | 已实现 `sse_cbcfi_public_latest` adapter、`CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY` 和 `cn_coal_cbcfi` scope。该序列单位为 `index_point`、币种为空、`data_kind=industrial_indicator`，暂不加入调度。公开页只能支持从部署日起持续积累；历史区间必须报告 `sse_cbcfi_public_history_requires_entitlement`，不得猜测或绕过登录。 |
+| 沿海煤炭运价 | 上海航运交易所公开 CBCFI 单期页可匿名读取综合指数、本期日、上期值和涨跌；多期查询要求登录/授权 | 已实现 `sse_cbcfi_public_latest` adapter、`CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY` 和 `cn_coal_cbcfi` scope。该序列单位为 `index_point`、币种为空、`data_kind=industrial_indicator`，暂不加入调度。provider 会接收请求区间内的本期和上期，但公开页总体仍只能支持从部署日起持续积累；更早历史区间必须报告 `sse_cbcfi_public_history_requires_entitlement`，不得猜测或绕过登录。 |
 | 环渤海动力煤价格指数 | 中国煤炭工业协会公开目录可确认 2013 年以来的 BSPI 周评及价格口径；直连返回 `403/Bad crawler`，现有代理通道定向探测可访问，但该目录最新仅到 2025-06。中国煤炭运销协会存在 2026 年更新文章，但尚未发现可稳定枚举的专用目录/API | 继续作为首选候选源，尚未注册生产 scope。必须先形成“历史目录 + 可持续日更目录”的连续、可审计来源链，再实施回补；不得扫描文章 ID、依赖搜索引擎摘要或用媒体转载代替 canonical 观测。 |
 | 重点港口煤炭库存 | 已探测页面的具体值属于付费内容；AkShare 的沿海电厂库存不是港口库存，统计对象不等价 | 尚无满足持续免费、口径明确和可自动化要求的主源，保持 blocked。不得把电厂库存、研究报告截图或付费页面泄露内容冒充港口库存。 |
 
