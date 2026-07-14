@@ -943,6 +943,11 @@
           "search_query": "流通领域重要生产资料市场价格变动情况 山西优混",
           "search_page_size": 20,
           "search_max_pages_per_sort": 20,
+          "search_request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 5.0,
+            "blocked_proxy_rotation_attempts": 3
+          },
           "exact_only_max_periods": 12,
           "exact_search_max_pages": 3,
           "exact_gap_discovery_enabled": true,
@@ -1010,6 +1015,7 @@
             }
           ],
           "timeout_seconds": 30,
+          "page_proxy_rotation_attempts": 3,
           "progress_log_interval_seconds": 60,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "Official NBS wholesale/sales market-price observation. Observation date is the ten-day period end; publication date is preserved separately."
@@ -1031,11 +1037,17 @@
           "search_query": "月份规模以上工业增加值增长 原煤",
           "search_page_size": 20,
           "search_max_pages_per_sort": 20,
+          "search_request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 5.0,
+            "blocked_proxy_rotation_attempts": 3
+          },
           "listing_max_pages": 120,
           "exact_only_max_periods": 12,
           "exact_search_max_pages": 3,
           "publication_lag_days": 16,
           "timeout_seconds": 30,
+          "page_proxy_rotation_attempts": 3,
           "progress_log_interval_seconds": 60,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "Official NBS year-to-date raw-coal output. January-February is a combined cumulative period; no synthetic monthly split or automatic differencing is allowed."

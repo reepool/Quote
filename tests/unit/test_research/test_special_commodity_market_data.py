@@ -26,6 +26,8 @@ from research.special_commodity_market_data import (
     EiaCommodityProvider,
     FredCommodityProvider,
     NbsMonthlyIndustrialOutputProvider,
+    NbsOfficialAccessChallengeError,
+    NbsOfficialSearchBlockedError,
     NbsProductionMaterialsGovernanceAdapter,
     NbsProductionMaterialsProvider,
     OfficialPublicIndicatorGovernanceAdapter,
@@ -43,6 +45,7 @@ from research.special_commodity_market_data import (
     WorldBankCommodityProvider,
     _call_with_progress_logging,
     _observation_quality_diagnostics,
+    _query_nbs_official_search,
     _actual_contract_series_blockers,
     _request_json_with_retry,
     _source_unit_matches,
@@ -576,6 +579,12 @@ def test_nbs_monthly_output_parses_only_published_ytd_value(
             raise_for_status=lambda: None,
         ),
     )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_with_akshare_proxy",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            RuntimeError("all proxy exits challenged")
+        ),
+    )
     observation = provider._parse_article(
         {
             "observation_date": "2026-05-31",
@@ -630,7 +639,59 @@ def test_nbs_monthly_output_listing_ignores_unrelated_old_links(monkeypatch):
     assert oldest_publication == date(2026, 5, 18)
 
 
-def test_nbs_monthly_output_auxiliary_search_failure_is_recovered_by_listing(
+def test_nbs_monthly_output_listing_rejects_access_challenge(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_monthly_raw_coal_output"])
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: SimpleNamespace(
+            text=(
+                "<noscript>Please enable JavaScript and refresh the page.</noscript>"
+                "<script>var c='/WZWSREL3NqL3p4ZmJoamQv/';</script>"
+            ),
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        ),
+    )
+
+    with pytest.raises(NbsOfficialAccessChallengeError):
+        provider._listing_page(1)
+
+
+def test_nbs_monthly_output_listing_preserves_not_found_without_proxy(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_monthly_raw_coal_output"])
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+
+    class NotFoundError(RuntimeError):
+        response = SimpleNamespace(status_code=404)
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: (_ for _ in ()).throw(NotFoundError("404")),
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_with_akshare_proxy",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("404 must not use proxy fallback")
+        ),
+    )
+
+    with pytest.raises(NotFoundError):
+        provider._listing_page(67)
+
+
+def test_nbs_monthly_output_complete_listing_skips_auxiliary_search(
     monkeypatch,
 ):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
@@ -654,7 +715,9 @@ def test_nbs_monthly_output_auxiliary_search_failure_is_recovered_by_listing(
     monkeypatch.setattr(
         provider,
         "_search_page",
-        lambda **kwargs: (_ for _ in ()).throw(RuntimeError("search IP blocked")),
+        lambda **kwargs: (_ for _ in ()).throw(
+            AssertionError("complete official listing must not use auxiliary search")
+        ),
     )
     monkeypatch.setattr(
         provider,
@@ -669,7 +732,234 @@ def test_nbs_monthly_output_auxiliary_search_failure_is_recovered_by_listing(
     assert len(articles) == len(expected)
     assert warnings == []
     assert diagnostics["unresolved_dates"] == 0
-    assert diagnostics["auxiliary_search_warnings"] == 2
+    assert diagnostics["auxiliary_search_warnings"] == 0
+
+
+def test_nbs_monthly_output_hard_search_block_stops_remaining_gap_requests(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    source_cfg = deepcopy(cfg["source_profiles"]["nbs_monthly_raw_coal_output"])
+    source_cfg["exact_only_max_periods"] = 1
+    provider = NbsMonthlyIndustrialOutputProvider(
+        "nbs_monthly_raw_coal_output", source_cfg
+    )
+    expected = provider._expected_periods(date(2025, 2, 28), date(2026, 5, 31))
+    listing_rows = [
+        {
+            **item,
+            "title": f"official-{item['observation_date']}",
+            "source_url": f"https://www.stats.gov.cn/sj/zxfb/{item['observation_date']}.html",
+            "publication_date": item["observation_date"],
+        }
+        for item in expected[:-1]
+    ]
+    search_calls = []
+
+    def blocked_search(**kwargs):
+        search_calls.append(kwargs)
+        raise NbsOfficialSearchBlockedError("current network address disabled")
+
+    monkeypatch.setattr(provider, "_search_page", blocked_search)
+    monkeypatch.setattr(
+        provider,
+        "_listing_page",
+        lambda page: (listing_rows, date(2025, 1, 1)),
+    )
+
+    articles, warnings, diagnostics = provider._discover_articles(
+        date(2025, 2, 28), date(2026, 5, 31)
+    )
+
+    assert len(search_calls) == 1
+    assert search_calls[0]["sort"] == "relevance"
+    assert len(articles) == len(expected) - 1
+    assert diagnostics["unresolved_dates"] == 1
+    assert diagnostics["auxiliary_search_warnings"] == 1
+    assert any(
+        item.get("reason") == "nbs_monthly_output_search_access_blocked"
+        for item in warnings
+    )
+
+
+def test_nbs_official_search_hard_ip_block_opens_circuit_without_retry(
+    monkeypatch,
+):
+    calls = []
+
+    def fake_post(*args, **kwargs):
+        calls.append((args, kwargs))
+        return SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {
+                "ok": False,
+                "code": -101,
+                "msg": "当前网络地址已被禁用",
+            },
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post", fake_post
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.time.sleep",
+        lambda seconds: (_ for _ in ()).throw(
+            AssertionError("hard IP block must not sleep and retry")
+        ),
+    )
+
+    with pytest.raises(NbsOfficialSearchBlockedError):
+        _query_nbs_official_search(
+            endpoint="https://api.so-gov.cn/query/s",
+            site_code="bm36000002",
+            query="原煤",
+            page=1,
+            page_size=20,
+            sort="dateDesc",
+            headers={},
+            timeout=30.0,
+            tls_config={},
+            retry_cfg={"max_attempts": 3, "backoff_seconds": 5.0},
+        )
+
+    assert len(calls) == 1
+
+
+def test_nbs_official_search_rotates_proxy_after_hard_ip_block(monkeypatch):
+    direct_calls = []
+    proxy_calls = []
+
+    def fake_post(*args, **kwargs):
+        direct_calls.append((args, kwargs))
+        return SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {
+                "ok": False,
+                "code": -101,
+                "msg": "当前网络地址已被禁用",
+            },
+        )
+
+    def fake_proxy(*args, **kwargs):
+        proxy_calls.append((args, kwargs))
+        return SimpleNamespace(
+            json=lambda: {"ok": True, "resultDocs": [{"data": {"url": "x"}}]},
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post", fake_post
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_with_akshare_proxy",
+        fake_proxy,
+    )
+
+    documents = _query_nbs_official_search(
+        endpoint="https://api.so-gov.cn/query/s",
+        site_code="bm36000002",
+        query="原煤",
+        page=1,
+        page_size=20,
+        sort="dateDesc",
+        headers={},
+        timeout=30.0,
+        tls_config={},
+        retry_cfg={
+            "max_attempts": 3,
+            "backoff_seconds": 5.0,
+            "blocked_proxy_rotation_attempts": 3,
+        },
+    )
+
+    assert documents == [{"data": {"url": "x"}}]
+    assert len(direct_calls) == 1
+    assert len(proxy_calls) == 1
+    assert proxy_calls[0][1]["attempts"] == 3
+
+
+def test_nbs_official_search_recovers_transport_failure_through_proxy(monkeypatch):
+    proxy_calls = []
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            ConnectionError("direct DNS failure")
+        ),
+    )
+
+    def fake_proxy(*args, **kwargs):
+        proxy_calls.append((args, kwargs))
+        return SimpleNamespace(
+            json=lambda: {"ok": True, "resultDocs": [{"data": {"url": "x"}}]},
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_with_akshare_proxy",
+        fake_proxy,
+    )
+
+    documents = _query_nbs_official_search(
+        endpoint="https://api.so-gov.cn/query/s",
+        site_code="bm36000002",
+        query="原煤",
+        page=1,
+        page_size=20,
+        sort="dateDesc",
+        headers={},
+        timeout=30.0,
+        tls_config={},
+        retry_cfg={"blocked_proxy_rotation_attempts": 2},
+    )
+
+    assert documents == [{"data": {"url": "x"}}]
+    assert len(proxy_calls) == 1
+    assert proxy_calls[0][1]["attempts"] == 2
+
+
+def test_nbs_official_search_transient_rate_limit_uses_bounded_backoff(
+    monkeypatch,
+):
+    payloads = iter(
+        [
+            {"ok": False, "code": 429, "msg": "访问过于频繁，请稍后"},
+            {"ok": True, "resultDocs": []},
+        ]
+    )
+    calls = []
+    sleeps = []
+
+    def fake_post(*args, **kwargs):
+        calls.append((args, kwargs))
+        payload = next(payloads)
+        return SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: payload,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_post", fake_post
+    )
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.time.sleep", sleeps.append
+    )
+
+    documents = _query_nbs_official_search(
+        endpoint="https://api.so-gov.cn/query/s",
+        site_code="bm36000002",
+        query="原煤",
+        page=1,
+        page_size=20,
+        sort="dateDesc",
+        headers={},
+        timeout=30.0,
+        tls_config={},
+        retry_cfg={"max_attempts": 3, "backoff_seconds": 5.0},
+    )
+
+    assert documents == []
+    assert len(calls) == 2
+    assert sleeps == [5.0]
 
 
 def test_nbs_exact_discovery_checks_later_pages(monkeypatch):

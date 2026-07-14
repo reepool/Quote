@@ -30,6 +30,10 @@ from utils.config_manager import ResearchConfig
 from utils.date_utils import get_shanghai_time
 from utils.http_transport import request_get, request_post, tls_config_from_source_config
 from utils.logging_manager import ds_logger
+from utils.proxy_patch_runtime import (
+    ProxyResponseRejectedError,
+    request_with_akshare_proxy,
+)
 
 
 logger = ds_logger
@@ -3311,33 +3315,249 @@ def _query_nbs_official_search(
     headers: Mapping[str, str],
     timeout: float,
     tls_config: Mapping[str, Any],
+    retry_cfg: Optional[Mapping[str, Any]] = None,
 ) -> List[Mapping[str, Any]]:
     """Return validated raw documents from the official NBS site search."""
-    response = request_post(
-        endpoint,
-        data={
-            "siteCode": site_code,
-            "tab": "",
-            "qt": query,
-            "page": page,
-            "pageSize": page_size,
-            "sort": sort,
-        },
-        headers=dict(headers),
-        timeout=timeout,
-        tls_config=tls_config,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    if payload.get("ok") is False:
-        raise RuntimeError(
-            "official NBS search business failure "
-            f"code={payload.get('code')} message={payload.get('msg') or 'unknown'}"
+    cfg = dict(retry_cfg or {})
+    max_attempts = max(1, int(cfg.get("max_attempts") or 3))
+    backoff_seconds = max(0.0, float(cfg.get("backoff_seconds") or 5.0))
+    request_data = {
+        "siteCode": site_code,
+        "tab": "",
+        "qt": query,
+        "page": page,
+        "pageSize": page_size,
+        "sort": sort,
+    }
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = request_post(
+                endpoint,
+                data=request_data,
+                headers=dict(headers),
+                timeout=timeout,
+                tls_config=tls_config,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            if payload.get("ok") is False:
+                code = str(payload.get("code") or "")
+                message = str(payload.get("msg") or "unknown")
+                error_text = (
+                    "official NBS search business failure "
+                    f"code={code} message={message}"
+                )
+                if code == "-101" or ("网络地址" in message and "禁用" in message):
+                    rotation_attempts = max(
+                        0, int(cfg.get("blocked_proxy_rotation_attempts") or 0)
+                    )
+                    if rotation_attempts:
+                        try:
+                            response = request_with_akshare_proxy(
+                                "POST",
+                                endpoint,
+                                attempts=rotation_attempts,
+                                timeout=timeout,
+                                headers=dict(headers),
+                                data=request_data,
+                                accept_response=lambda item: not _nbs_search_ip_blocked(
+                                    item
+                                ),
+                                warning_logger=logger,
+                            )
+                            payload = response.json()
+                        except Exception as proxy_exc:
+                            raise NbsOfficialSearchBlockedError(error_text) from proxy_exc
+                        if payload.get("ok") is not False:
+                            documents = payload.get("resultDocs")
+                            if not isinstance(documents, list):
+                                raise NbsOfficialSearchRejectedError(
+                                    "official NBS search response missing resultDocs"
+                                )
+                            return documents
+                    raise NbsOfficialSearchBlockedError(error_text)
+                retryable = code in {"429", "-429", "503", "-503"} or any(
+                    marker in message for marker in ("访问频繁", "稍后", "繁忙")
+                )
+                if not retryable:
+                    raise NbsOfficialSearchRejectedError(error_text)
+                raise NbsOfficialSearchTransientError(error_text)
+            documents = payload.get("resultDocs")
+            if not isinstance(documents, list):
+                raise NbsOfficialSearchRejectedError(
+                    "official NBS search response missing resultDocs"
+                )
+            return documents
+        except (NbsOfficialSearchBlockedError, NbsOfficialSearchRejectedError):
+            raise
+        except Exception as exc:
+            if not isinstance(exc, NbsOfficialSearchTransientError):
+                try:
+                    response = request_with_akshare_proxy(
+                        "POST",
+                        endpoint,
+                        attempts=max(
+                            1,
+                            int(cfg.get("blocked_proxy_rotation_attempts") or 3),
+                        ),
+                        timeout=timeout,
+                        headers=dict(headers),
+                        data=request_data,
+                        accept_response=lambda item: not _nbs_search_ip_blocked(
+                            item
+                        ),
+                        warning_logger=logger,
+                    )
+                    payload = response.json()
+                    if payload.get("ok") is False:
+                        code = str(payload.get("code") or "")
+                        message = str(payload.get("msg") or "unknown")
+                        if code in {"429", "-429", "503", "-503"} or any(
+                            marker in message
+                            for marker in ("访问频繁", "稍后", "繁忙")
+                        ):
+                            exc = NbsOfficialSearchTransientError(
+                                "official NBS search business failure "
+                                f"code={code} message={message}"
+                            )
+                        else:
+                            raise NbsOfficialSearchRejectedError(
+                                "official NBS search business failure "
+                                f"code={code} message={message}"
+                            )
+                    else:
+                        documents = payload.get("resultDocs")
+                        if not isinstance(documents, list):
+                            raise NbsOfficialSearchRejectedError(
+                                "official NBS search response missing resultDocs"
+                            )
+                        return documents
+                except ProxyResponseRejectedError as proxy_exc:
+                    raise NbsOfficialSearchBlockedError(
+                        "official NBS search proxy exits are blocked"
+                    ) from proxy_exc
+                except (NbsOfficialSearchBlockedError, NbsOfficialSearchRejectedError):
+                    raise
+                except Exception as proxy_exc:
+                    exc = proxy_exc
+            last_error = exc
+            if attempt >= max_attempts:
+                break
+            sleep_seconds = backoff_seconds * attempt
+            logger.warning(
+                "[NbsOfficialSearch] transient failure attempt=%s next_attempt=%s "
+                "sleep_seconds=%s page=%s sort=%s error=%s",
+                attempt,
+                attempt + 1,
+                sleep_seconds,
+                page,
+                sort,
+                exc,
+            )
+            if sleep_seconds:
+                time.sleep(sleep_seconds)
+    assert last_error is not None
+    raise last_error
+
+
+class NbsOfficialSearchBlockedError(RuntimeError):
+    """The official search service has disabled the current network address."""
+
+
+class NbsOfficialSearchRejectedError(RuntimeError):
+    """The official search service returned a non-retryable business response."""
+
+
+class NbsOfficialSearchTransientError(RuntimeError):
+    """The official search service returned a retryable business response."""
+
+
+class NbsOfficialAccessChallengeError(RuntimeError):
+    """An official NBS page returned an access challenge instead of content."""
+
+
+def _looks_like_nbs_access_challenge(value: Any) -> bool:
+    text = str(value or "")[:10000].lower()
+    return any(
+        marker in text
+        for marker in (
+            "please enable javascript and refresh the page",
+            "wzwsrel",
+            "safeline_bot_challenge",
+            "js-challenge",
+            "slidercontainer",
+            "captcha",
         )
-    documents = payload.get("resultDocs")
-    if not isinstance(documents, list):
-        raise RuntimeError("official NBS search response missing resultDocs")
-    return documents
+    )
+
+
+def _nbs_search_ip_blocked(response: Any) -> bool:
+    try:
+        payload = response.json()
+    except Exception:
+        return False
+    if payload.get("ok") is not False:
+        return False
+    code = str(payload.get("code") or "")
+    message = str(payload.get("msg") or "")
+    return code == "-101" or ("网络地址" in message and "禁用" in message)
+
+
+def _request_nbs_official_page(
+    url: str,
+    *,
+    headers: Mapping[str, str],
+    timeout: float,
+    tls_config: Mapping[str, Any],
+    proxy_attempts: int,
+    force_proxy: bool = False,
+) -> Any:
+    if not force_proxy:
+        try:
+            response = request_get(
+                url,
+                headers=dict(headers),
+                timeout=timeout,
+                tls_config=tls_config,
+            )
+            response.raise_for_status()
+            if not _looks_like_nbs_access_challenge(response.text):
+                return response
+            direct_error = "access challenge"
+        except Exception as exc:
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            if (
+                isinstance(status_code, int)
+                and 400 <= status_code < 500
+                and status_code not in {403, 429}
+            ):
+                raise
+            direct_error = str(exc)
+        logger.warning(
+            "[NbsOfficialPage] direct access unavailable; rotating proxy exit url=%s attempts=%s error=%s",
+            url,
+            proxy_attempts,
+            direct_error,
+        )
+    try:
+        response = request_with_akshare_proxy(
+            "GET",
+            url,
+            attempts=max(1, int(proxy_attempts)),
+            timeout=timeout,
+            headers=dict(headers),
+            accept_response=lambda item: not _looks_like_nbs_access_challenge(
+                item.text
+            ),
+            warning_logger=logger,
+        )
+        setattr(response, "_quote_proxy_fallback_used", True)
+        return response
+    except Exception as exc:
+        raise NbsOfficialAccessChallengeError(
+            f"official NBS page access challenge after proxy rotation url={url}"
+        ) from exc
 
 
 class NbsProductionMaterialsProvider:
@@ -3371,6 +3591,7 @@ class NbsProductionMaterialsProvider:
         self.tls_config = tls_config_from_source_config(
             "nbs_production_material_prices", self.source_cfg
         )
+        self._page_proxy_forced = False
 
     @classmethod
     def parse_period(cls, title: str) -> Optional[Dict[str, str]]:
@@ -3425,6 +3646,7 @@ class NbsProductionMaterialsProvider:
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
+            retry_cfg=self.source_cfg.get("search_request_retry"),
         )
         rows: List[Dict[str, str]] = []
         for result in documents:
@@ -3512,6 +3734,7 @@ class NbsProductionMaterialsProvider:
         discovered: Dict[str, Dict[str, str]] = {}
         warnings: List[Dict[str, Any]] = []
         request_count = 0
+        search_access_blocked = False
         publication_lag_days = max(
             0, int(self.source_cfg.get("publication_lag_days") or 4)
         )
@@ -3531,6 +3754,17 @@ class NbsProductionMaterialsProvider:
                 for page in range(1, max_pages + 1):
                     try:
                         rows = self._search_page(page=page, sort=sort, query=query)
+                    except NbsOfficialSearchBlockedError as exc:
+                        warnings.append(
+                            {
+                                "reason": "nbs_article_search_access_blocked",
+                                "sort": sort,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        search_access_blocked = True
+                        break
                     except Exception as exc:
                         warnings.append(
                             {
@@ -3559,6 +3793,8 @@ class NbsProductionMaterialsProvider:
                         start,
                         end,
                     )
+                if search_access_blocked:
+                    break
 
             if not discovered:
                 warnings.append(
@@ -3593,6 +3829,8 @@ class NbsProductionMaterialsProvider:
 
         if _coerce_bool(self.source_cfg.get("exact_gap_discovery_enabled"), True):
             for index, period in enumerate(expected_periods, start=1):
+                if search_access_blocked:
+                    break
                 observation_date = period["observation_date"]
                 if observation_date in discovered:
                     continue
@@ -3607,6 +3845,17 @@ class NbsProductionMaterialsProvider:
                             sort="relevance",
                             query=self._exact_search_query(period),
                         )
+                    except NbsOfficialSearchBlockedError as exc:
+                        warnings.append(
+                            {
+                                "reason": "nbs_exact_article_search_access_blocked",
+                                "observation_date": observation_date,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        search_access_blocked = True
+                        break
                     except Exception as exc:
                         warnings.append(
                             {
@@ -3680,14 +3929,25 @@ class NbsProductionMaterialsProvider:
         )
 
     def _parse_article(self, article: Mapping[str, str], item: CommoditySeries) -> CommodityObservation:
-        response = request_get(
+        response = _request_nbs_official_page(
             str(article["source_url"]),
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
+            proxy_attempts=int(
+                self.source_cfg.get("page_proxy_rotation_attempts") or 3
+            ),
+            force_proxy=self._page_proxy_forced,
+        )
+        self._page_proxy_forced = self._page_proxy_forced or bool(
+            getattr(response, "_quote_proxy_fallback_used", False)
         )
         response.raise_for_status()
         response.encoding = response.apparent_encoding or response.encoding
+        if _looks_like_nbs_access_challenge(response.text):
+            raise NbsOfficialAccessChallengeError(
+                f"official NBS article access challenge url={article['source_url']}"
+            )
         tables = __import__("pandas").read_html(io.StringIO(response.text))
         product_names = {
             re.sub(r"\s+", "", str(value))
@@ -3752,10 +4012,23 @@ class NbsProductionMaterialsProvider:
         blockers: List[Dict[str, Any]] = []
         articles, discovery_warnings, discovery_diagnostics = self._discover_articles(start, end)
         warnings.extend(discovery_warnings)
+        article_access_blocked = False
         for index, article in enumerate(articles, start=1):
             for item in series:
                 try:
                     observations.append(self._parse_article(article, item))
+                except NbsOfficialAccessChallengeError as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_article_access_blocked",
+                            "series_id": item.series_id,
+                            "observation_date": article["observation_date"],
+                            "source_url": article["source_url"],
+                            "error": str(exc),
+                        }
+                    )
+                    article_access_blocked = True
+                    break
                 except Exception as exc:
                     warnings.append(
                         {
@@ -3766,6 +4039,8 @@ class NbsProductionMaterialsProvider:
                             "error": str(exc),
                         }
                     )
+            if article_access_blocked:
+                break
             if index % 24 == 0 or index == len(articles):
                 logger.info(
                     "[NbsProductionMaterials] article progress processed=%s/%s observations=%s warnings=%s",
@@ -3831,6 +4106,7 @@ class NbsMonthlyIndustrialOutputProvider:
         self.tls_config = tls_config_from_source_config(
             "nbs_monthly_industrial_output", self.source_cfg
         )
+        self._page_proxy_forced = False
 
     @staticmethod
     def _clean_title(value: Any) -> str:
@@ -3889,6 +4165,7 @@ class NbsMonthlyIndustrialOutputProvider:
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
+            retry_cfg=self.source_cfg.get("search_request_retry"),
         )
         rows: List[Dict[str, str]] = []
         for result in documents:
@@ -3919,15 +4196,26 @@ class NbsMonthlyIndustrialOutputProvider:
             or "https://www.stats.gov.cn/sj/zxfb/"
         ).rstrip("/") + "/"
         page_url = base_url if page == 1 else urljoin(base_url, f"index_{page}.html")
-        response = request_get(
+        response = _request_nbs_official_page(
             page_url,
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
+            proxy_attempts=int(
+                self.source_cfg.get("page_proxy_rotation_attempts") or 3
+            ),
+            force_proxy=self._page_proxy_forced,
+        )
+        self._page_proxy_forced = self._page_proxy_forced or bool(
+            getattr(response, "_quote_proxy_fallback_used", False)
         )
         response.raise_for_status()
         response.encoding = response.apparent_encoding or response.encoding
         html = response.text
+        if _looks_like_nbs_access_challenge(html):
+            raise NbsOfficialAccessChallengeError(
+                f"official NBS listing access challenge page={page} url={page_url}"
+            )
         rows: Dict[str, Dict[str, str]] = {}
         publication_dates: List[date] = []
         for href, raw_title in re.findall(
@@ -3992,49 +4280,6 @@ class NbsMonthlyIndustrialOutputProvider:
         warnings: List[Dict[str, Any]] = []
         auxiliary_search_warnings: List[Dict[str, Any]] = []
         request_count = 0
-        max_pages = max(1, int(self.source_cfg.get("search_max_pages_per_sort") or 20))
-        broad_threshold = max(
-            1, int(self.source_cfg.get("exact_only_max_periods") or 12)
-        )
-        query = str(
-            self.source_cfg.get("search_query")
-            or "月份规模以上工业增加值增长 原煤"
-        )
-        if len(expected) > broad_threshold:
-            for sort in ("dateAsc", "dateDesc"):
-                previous_signature: Optional[tuple[str, ...]] = None
-                for page in range(1, max_pages + 1):
-                    try:
-                        rows = self._search_page(page=page, sort=sort, query=query)
-                    except Exception as exc:
-                        auxiliary_search_warnings.append(
-                            {
-                                "reason": "nbs_monthly_output_search_failed",
-                                "sort": sort,
-                                "page": page,
-                                "error": str(exc),
-                            }
-                        )
-                        break
-                    request_count += 1
-                    signature = tuple(sorted(row["source_url"] for row in rows))
-                    if page > 1 and signature == previous_signature:
-                        break
-                    previous_signature = signature
-                    for row in rows:
-                        observed = date.fromisoformat(row["observation_date"])
-                        if start <= observed <= eligible_end:
-                            discovered[row["observation_date"]] = row
-                    logger.info(
-                        "[NbsMonthlyIndustrialOutput] discovery progress sort=%s page=%s/%s candidates=%s range=%s..%s",
-                        sort,
-                        page,
-                        max_pages,
-                        len(discovered),
-                        start,
-                        end,
-                    )
-
         listing_max_pages = max(
             1, int(self.source_cfg.get("listing_max_pages") or 120)
         )
@@ -4076,7 +4321,93 @@ class NbsMonthlyIndustrialOutputProvider:
             if oldest_publication and oldest_publication < start:
                 break
 
+        max_pages = max(1, int(self.source_cfg.get("search_max_pages_per_sort") or 20))
+        broad_threshold = max(
+            1, int(self.source_cfg.get("exact_only_max_periods") or 12)
+        )
+        query = str(
+            self.source_cfg.get("search_query")
+            or "月份规模以上工业增加值增长 原煤"
+        )
+        unresolved_before_search = [
+            item["observation_date"]
+            for item in expected
+            if item["observation_date"] not in discovered
+        ]
+        search_access_blocked = False
+        if len(unresolved_before_search) > broad_threshold:
+            for sort in ("dateAsc", "dateDesc"):
+                previous_signature: Optional[tuple[str, ...]] = None
+                for page in range(1, max_pages + 1):
+                    try:
+                        rows = self._search_page(page=page, sort=sort, query=query)
+                    except NbsOfficialSearchBlockedError as exc:
+                        auxiliary_search_warnings.append(
+                            {
+                                "reason": "nbs_monthly_output_search_access_blocked",
+                                "sort": sort,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        search_access_blocked = True
+                        break
+                    except Exception as exc:
+                        auxiliary_search_warnings.append(
+                            {
+                                "reason": "nbs_monthly_output_search_failed",
+                                "sort": sort,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        break
+                    request_count += 1
+                    signature = tuple(sorted(row["source_url"] for row in rows))
+                    if page > 1 and signature == previous_signature:
+                        break
+                    previous_signature = signature
+                    for row in rows:
+                        observed = date.fromisoformat(row["observation_date"])
+                        if start <= observed <= eligible_end:
+                            discovered[row["observation_date"]] = row
+                    coverage_complete = all(
+                        item["observation_date"] in discovered for item in expected
+                    )
+                    logger.info(
+                        "[NbsMonthlyIndustrialOutput] discovery progress sort=%s page=%s/%s candidates=%s range=%s..%s",
+                        sort,
+                        page,
+                        max_pages,
+                        len(discovered),
+                        start,
+                        end,
+                    )
+                    if coverage_complete:
+                        logger.info(
+                            "[NbsMonthlyIndustrialOutput] auxiliary search coverage complete; remaining pages skipped sort=%s page=%s",
+                            sort,
+                            page,
+                        )
+                        break
+                if search_access_blocked:
+                    break
+                if all(
+                    item["observation_date"] in discovered for item in expected
+                ):
+                    break
+
+        if not unresolved_before_search:
+            logger.info(
+                "[NbsMonthlyIndustrialOutput] official listing coverage complete; auxiliary search skipped range=%s..%s periods=%s",
+                start,
+                end,
+                len(expected),
+            )
+
         for index, period in enumerate(expected, start=1):
+            if search_access_blocked:
+                break
             observation_date = period["observation_date"]
             if observation_date in discovered:
                 continue
@@ -4094,6 +4425,17 @@ class NbsMonthlyIndustrialOutputProvider:
                     rows = self._search_page(
                         page=page, sort="relevance", query=exact_query
                     )
+                except NbsOfficialSearchBlockedError as exc:
+                    auxiliary_search_warnings.append(
+                        {
+                            "reason": "nbs_monthly_output_search_access_blocked",
+                            "observation_date": observation_date,
+                            "page": page,
+                            "error": str(exc),
+                        }
+                    )
+                    search_access_blocked = True
+                    break
                 except Exception as exc:
                     auxiliary_search_warnings.append(
                         {
@@ -4180,14 +4522,25 @@ class NbsMonthlyIndustrialOutputProvider:
     def _parse_article(
         self, article: Mapping[str, str], item: CommoditySeries
     ) -> CommodityObservation:
-        response = request_get(
+        response = _request_nbs_official_page(
             str(article["source_url"]),
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
+            proxy_attempts=int(
+                self.source_cfg.get("page_proxy_rotation_attempts") or 3
+            ),
+            force_proxy=self._page_proxy_forced,
+        )
+        self._page_proxy_forced = self._page_proxy_forced or bool(
+            getattr(response, "_quote_proxy_fallback_used", False)
         )
         response.raise_for_status()
         response.encoding = response.apparent_encoding or response.encoding
+        if _looks_like_nbs_access_challenge(response.text):
+            raise NbsOfficialAccessChallengeError(
+                f"official NBS article access challenge url={article['source_url']}"
+            )
         tables = __import__("pandas").read_html(io.StringIO(response.text))
         product_names = {
             self._normalize_cell(value)
@@ -4275,10 +4628,23 @@ class NbsMonthlyIndustrialOutputProvider:
         warnings: List[Dict[str, Any]] = []
         articles, discovery_warnings, diagnostics = self._discover_articles(start, end)
         warnings.extend(discovery_warnings)
+        article_access_blocked = False
         for index, article in enumerate(articles, start=1):
             for item in series:
                 try:
                     observations.append(self._parse_article(article, item))
+                except NbsOfficialAccessChallengeError as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_monthly_output_article_access_blocked",
+                            "series_id": item.series_id,
+                            "observation_date": article["observation_date"],
+                            "source_url": article["source_url"],
+                            "error": str(exc),
+                        }
+                    )
+                    article_access_blocked = True
+                    break
                 except Exception as exc:
                     warnings.append(
                         {
@@ -4289,6 +4655,8 @@ class NbsMonthlyIndustrialOutputProvider:
                             "error": str(exc),
                         }
                     )
+            if article_access_blocked:
+                break
             if index % 12 == 0 or index == len(articles):
                 logger.info(
                     "[NbsMonthlyIndustrialOutput] article progress processed=%s/%s observations=%s warnings=%s",

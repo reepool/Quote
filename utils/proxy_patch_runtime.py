@@ -13,7 +13,7 @@ import json
 import logging
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Mapping, Optional
 
 
 _logger = logging.getLogger("proxy_patch_runtime")
@@ -37,6 +37,10 @@ class ProxyPatchState:
 
 _AKSHARE_STATE = ProxyPatchState(target="akshare")
 _YFINANCE_STATE = ProxyPatchState(target="yfinance")
+
+
+class ProxyResponseRejectedError(RuntimeError):
+    """All acquired proxy exits returned a response rejected by the caller."""
 
 
 def install_akshare_proxy_patch(*, required: bool = False) -> ProxyPatchState:
@@ -86,6 +90,88 @@ def get_akshare_proxy_patch_state() -> Dict[str, Any]:
 
 def get_yfinance_proxy_patch_state() -> Dict[str, Any]:
     return _YFINANCE_STATE.as_dict()
+
+
+def request_with_akshare_proxy(
+    method: str,
+    url: str,
+    *,
+    attempts: int = 3,
+    timeout: float = 15.0,
+    headers: Optional[Mapping[str, str]] = None,
+    accept_response: Optional[Callable[[Any], bool]] = None,
+    warning_logger: Optional[Any] = None,
+    **kwargs: Any,
+) -> Any:
+    """Request one URL through freshly authorized proxy exits.
+
+    This is an explicit fallback for source adapters that must inspect HTTP 200
+    response bodies before deciding whether an exit is usable. It does not
+    replace the normal domain hook and never logs credentials or proxy URLs.
+    """
+    config = _load_proxy_patch_config("akshare")
+    gateway = str(config.get("gateway") or "").strip()
+    auth_token = str(config.get("auth_token") or "").strip()
+    if not config.get("enabled", False) or not gateway or not auth_token:
+        raise RuntimeError("akshare proxy fallback is not fully configured")
+
+    import requests
+
+    try:
+        proxy_patch = importlib.import_module("akshare_proxy_patch")
+        patch_version = str(getattr(proxy_patch, "__version__", "0.5.0"))
+    except ImportError:
+        patch_version = "0.5.0"
+    session_class = getattr(requests, "_OriginalSession", requests.Session)
+    auth_url = f"http://{gateway}:47001/api/akshare-auth"
+    last_error: Optional[Exception] = None
+    for attempt in range(1, max(1, int(attempts)) + 1):
+        try:
+            with session_class() as session:
+                auth_response = session.get(
+                    auth_url,
+                    params={"token": auth_token, "version": patch_version},
+                    timeout=(1.5, 5.0),
+                )
+                auth_response.raise_for_status()
+                auth_payload = auth_response.json()
+                proxy_url = str(auth_payload.get("proxy") or "").strip()
+                user_agent = str(auth_payload.get("ua") or "").strip()
+                if not proxy_url or not user_agent:
+                    raise RuntimeError("proxy authorization returned incomplete data")
+                request_headers = dict(headers or {})
+                request_headers["User-Agent"] = user_agent
+                cookie = str(auth_payload.get("cookie") or "").strip()
+                if cookie:
+                    request_headers["Cookie"] = cookie
+                response = session.request(
+                    method.upper(),
+                    url,
+                    headers=request_headers,
+                    proxies={"http": proxy_url, "https": proxy_url},
+                    timeout=timeout,
+                    **kwargs,
+                )
+                response.raise_for_status()
+                if accept_response is not None and not accept_response(response):
+                    raise ProxyResponseRejectedError(
+                        "proxy exit returned a rejected response body"
+                    )
+                return response
+        except Exception as exc:
+            last_error = exc
+            (warning_logger or _logger).warning(
+                "akshare proxy fallback attempt failed attempt=%s/%s url_host=%s error_type=%s",
+                attempt,
+                max(1, int(attempts)),
+                url.split("/", 3)[2] if "://" in url else "unknown",
+                type(exc).__name__,
+            )
+    if isinstance(last_error, ProxyResponseRejectedError):
+        raise ProxyResponseRejectedError(
+            "akshare proxy exits returned rejected response bodies"
+        ) from last_error
+    raise RuntimeError("akshare proxy fallback exhausted") from last_error
 
 
 def _install_patch(
