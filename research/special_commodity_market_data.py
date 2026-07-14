@@ -3054,6 +3054,46 @@ class ShanghaiShippingExchangeCbcfiProvider:
         )
 
 
+def _query_nbs_official_search(
+    *,
+    endpoint: str,
+    site_code: str,
+    query: str,
+    page: int,
+    page_size: int,
+    sort: str,
+    headers: Mapping[str, str],
+    timeout: float,
+    tls_config: Mapping[str, Any],
+) -> List[Mapping[str, Any]]:
+    """Return validated raw documents from the official NBS site search."""
+    response = request_post(
+        endpoint,
+        data={
+            "siteCode": site_code,
+            "tab": "",
+            "qt": query,
+            "page": page,
+            "pageSize": page_size,
+            "sort": sort,
+        },
+        headers=dict(headers),
+        timeout=timeout,
+        tls_config=tls_config,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    if payload.get("ok") is False:
+        raise RuntimeError(
+            "official NBS search business failure "
+            f"code={payload.get('code')} message={payload.get('msg') or 'unknown'}"
+        )
+    documents = payload.get("resultDocs")
+    if not isinstance(documents, list):
+        raise RuntimeError("official NBS search response missing resultDocs")
+    return documents
+
+
 class NbsProductionMaterialsProvider:
     """Official NBS ten-day production-material market-price provider."""
 
@@ -3129,31 +3169,19 @@ class NbsProductionMaterialsProvider:
             self.source_cfg.get("search_endpoint_url")
             or "https://api.so-gov.cn/query/s"
         )
-        response = request_post(
-            endpoint,
-            data={
-                "siteCode": str(self.source_cfg.get("search_site_code") or "bm36000002"),
-                "tab": "",
-                "qt": query,
-                "page": page,
-                "pageSize": int(self.source_cfg.get("search_page_size") or 20),
-                "sort": sort,
-            },
+        documents = _query_nbs_official_search(
+            endpoint=endpoint,
+            site_code=str(self.source_cfg.get("search_site_code") or "bm36000002"),
+            query=query,
+            page=page,
+            page_size=int(self.source_cfg.get("search_page_size") or 20),
+            sort=sort,
             headers=self.headers,
             timeout=self.timeout,
             tls_config=self.tls_config,
         )
-        response.raise_for_status()
-        payload = response.json()
-        if payload.get("ok") is False:
-            raise RuntimeError(
-                "official NBS search business failure "
-                f"code={payload.get('code')} message={payload.get('msg') or 'unknown'}"
-            )
-        if not isinstance(payload.get("resultDocs"), list):
-            raise RuntimeError("official NBS search response missing resultDocs")
         rows: List[Dict[str, str]] = []
-        for result in payload.get("resultDocs") or []:
+        for result in documents:
             source = result.get("data") or {}
             source_url = str(source.get("url") or "")
             title = self._clean_title(source.get("titleO") or source.get("title"))
@@ -3521,6 +3549,500 @@ class NbsProductionMaterialsProvider:
                 "rows": len(observations),
                 "date_gap_fill": discovery_diagnostics,
                 "quality_diagnostics": {"observations": _observation_quality_diagnostics(observations)},
+            },
+        )
+
+
+class NbsMonthlyIndustrialOutputProvider:
+    """Official NBS monthly industrial-output cumulative observations."""
+
+    _TITLE = re.compile(
+        r"(?P<year>\d{4})\s*年\s*"
+        r"(?:(?:1\s*[-—]\s*)?(?P<month>\d{1,2}))\s*月份"
+        r".*规模以上工业增加值"
+    )
+    _PERIOD_ALIASES = {
+        "一季度": 3,
+        "上半年": 6,
+        "前三季度": 9,
+        "全年": 12,
+    }
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        self.headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "QuoteSystem/SpecialCommodityMarketData"
+            ),
+            "Referer": str(
+                self.source_cfg.get("listing_url")
+                or "https://www.stats.gov.cn/sj/zxfb/"
+            ),
+        }
+        self.tls_config = tls_config_from_source_config(
+            "nbs_monthly_industrial_output", self.source_cfg
+        )
+
+    @staticmethod
+    def _clean_title(value: Any) -> str:
+        return NbsProductionMaterialsProvider._clean_title(value)
+
+    @classmethod
+    def parse_period(cls, title: str) -> Optional[Dict[str, str]]:
+        normalized = cls._clean_title(title)
+        match = cls._TITLE.search(normalized)
+        if match:
+            year = int(match.group("year"))
+            month = int(match.group("month"))
+        else:
+            year_match = re.search(r"(?P<year>\d{4})\s*年", normalized)
+            month = next(
+                (
+                    alias_month
+                    for alias, alias_month in cls._PERIOD_ALIASES.items()
+                    if alias in normalized and "规模以上工业增加值" in normalized
+                ),
+                0,
+            )
+            if year_match is None or month == 0:
+                return None
+            year = int(year_match.group("year"))
+        if month < 2 or month > 12:
+            return None
+        period_end = date(year, month, monthrange(year, month)[1])
+        return {
+            "observation_date": period_end.isoformat(),
+            "period_start": date(year, 1, 1).isoformat(),
+            "period_end": period_end.isoformat(),
+        }
+
+    def _search_page(self, *, page: int, sort: str, query: str) -> List[Dict[str, str]]:
+        documents = _query_nbs_official_search(
+            endpoint=str(
+                self.source_cfg.get("search_endpoint_url")
+                or "https://api.so-gov.cn/query/s"
+            ),
+            site_code=str(self.source_cfg.get("search_site_code") or "bm36000002"),
+            query=query,
+            page=page,
+            page_size=int(self.source_cfg.get("search_page_size") or 20),
+            sort=sort,
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+        )
+        rows: List[Dict[str, str]] = []
+        for result in documents:
+            source = result.get("data") or {}
+            source_url = str(source.get("url") or "")
+            title = self._clean_title(source.get("titleO") or source.get("title"))
+            period = self.parse_period(title)
+            if (
+                period is None
+                or "stats.gov.cn/" not in source_url
+                or "/sj/zxfb/" not in source_url
+            ):
+                continue
+            rows.append(
+                {
+                    **period,
+                    "title": title,
+                    "source_url": source_url.replace("http://", "https://", 1),
+                    "publication_date": str(source.get("docDate") or "")[:10],
+                }
+            )
+        return rows
+
+    def _listing_page(
+        self, page: int
+    ) -> tuple[List[Dict[str, str]], Optional[date]]:
+        base_url = str(
+            self.source_cfg.get("listing_url")
+            or "https://www.stats.gov.cn/sj/zxfb/"
+        ).rstrip("/") + "/"
+        page_url = base_url if page == 1 else urljoin(base_url, f"index_{page}.html")
+        response = request_get(
+            page_url,
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+        )
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding or response.encoding
+        html = response.text
+        rows: Dict[str, Dict[str, str]] = {}
+        publication_dates: List[date] = []
+        for href, raw_title in re.findall(
+            r"<a\b[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+            html,
+            flags=re.IGNORECASE | re.DOTALL,
+        ):
+            title = self._clean_title(raw_title)
+            period = self.parse_period(title)
+            source_url = urljoin(page_url, href)
+            published_match = re.search(r"t(?P<date>\d{8})_", source_url)
+            publication_date = ""
+            published: Optional[date] = None
+            if published_match:
+                raw_date = published_match.group("date")
+                try:
+                    published = date(
+                        int(raw_date[:4]), int(raw_date[4:6]), int(raw_date[6:])
+                    )
+                    publication_date = published.isoformat()
+                except ValueError:
+                    pass
+            if period is None or "/sj/zxfb/" not in source_url:
+                continue
+            if published is not None:
+                publication_dates.append(published)
+            rows[source_url] = {
+                **period,
+                "title": title,
+                "source_url": source_url,
+                "publication_date": publication_date,
+            }
+        return list(rows.values()), min(publication_dates) if publication_dates else None
+
+    @staticmethod
+    def _expected_periods(start: date, end: date) -> List[Dict[str, str]]:
+        rows: List[Dict[str, str]] = []
+        for year in range(start.year, end.year + 1):
+            for month in range(2, 13):
+                period_end = date(year, month, monthrange(year, month)[1])
+                if start <= period_end <= end:
+                    rows.append(
+                        {
+                            "observation_date": period_end.isoformat(),
+                            "period_start": date(year, 1, 1).isoformat(),
+                            "period_end": period_end.isoformat(),
+                        }
+                    )
+        return rows
+
+    def _discover_articles(
+        self, start: date, end: date
+    ) -> tuple[List[Dict[str, str]], List[Dict[str, Any]], Dict[str, Any]]:
+        publication_lag_days = max(
+            0, int(self.source_cfg.get("publication_lag_days") or 16)
+        )
+        eligible_end = min(
+            end, get_shanghai_time().date() - timedelta(days=publication_lag_days)
+        )
+        expected = self._expected_periods(start, eligible_end)
+        discovered: Dict[str, Dict[str, str]] = {}
+        warnings: List[Dict[str, Any]] = []
+        request_count = 0
+        max_pages = max(1, int(self.source_cfg.get("search_max_pages_per_sort") or 20))
+        broad_threshold = max(
+            1, int(self.source_cfg.get("exact_only_max_periods") or 12)
+        )
+        query = str(
+            self.source_cfg.get("search_query")
+            or "月份规模以上工业增加值增长 原煤"
+        )
+        if len(expected) > broad_threshold:
+            for sort in ("dateAsc", "dateDesc"):
+                previous_signature: Optional[tuple[str, ...]] = None
+                for page in range(1, max_pages + 1):
+                    try:
+                        rows = self._search_page(page=page, sort=sort, query=query)
+                    except Exception as exc:
+                        warnings.append(
+                            {
+                                "reason": "nbs_monthly_output_search_failed",
+                                "sort": sort,
+                                "page": page,
+                                "error": str(exc),
+                            }
+                        )
+                        break
+                    request_count += 1
+                    signature = tuple(sorted(row["source_url"] for row in rows))
+                    if page > 1 and signature == previous_signature:
+                        break
+                    previous_signature = signature
+                    for row in rows:
+                        observed = date.fromisoformat(row["observation_date"])
+                        if start <= observed <= eligible_end:
+                            discovered[row["observation_date"]] = row
+                    logger.info(
+                        "[NbsMonthlyIndustrialOutput] discovery progress sort=%s page=%s/%s candidates=%s range=%s..%s",
+                        sort,
+                        page,
+                        max_pages,
+                        len(discovered),
+                        start,
+                        end,
+                    )
+
+        listing_max_pages = max(
+            1, int(self.source_cfg.get("listing_max_pages") or 120)
+        )
+        for page in range(1, listing_max_pages + 1):
+            try:
+                rows, oldest_publication = self._listing_page(page)
+            except Exception as exc:
+                status_code = getattr(getattr(exc, "response", None), "status_code", None)
+                if status_code == 404:
+                    logger.info(
+                        "[NbsMonthlyIndustrialOutput] listing exhausted page=%s/%s",
+                        page,
+                        listing_max_pages,
+                    )
+                    break
+                warnings.append(
+                    {
+                        "reason": "nbs_monthly_output_listing_failed",
+                        "page": page,
+                        "error": str(exc),
+                    }
+                )
+                break
+            request_count += 1
+            for row in rows:
+                observed = date.fromisoformat(row["observation_date"])
+                if start <= observed <= eligible_end:
+                    discovered[row["observation_date"]] = row
+            if page % 10 == 0 or page == 1:
+                logger.info(
+                    "[NbsMonthlyIndustrialOutput] listing progress page=%s/%s candidates=%s oldest_publication=%s range=%s..%s",
+                    page,
+                    listing_max_pages,
+                    len(discovered),
+                    oldest_publication,
+                    start,
+                    end,
+                )
+            if oldest_publication and oldest_publication < start:
+                break
+
+        for index, period in enumerate(expected, start=1):
+            observation_date = period["observation_date"]
+            if observation_date in discovered:
+                continue
+            period_end = date.fromisoformat(observation_date)
+            exact_query = (
+                f"{period_end.year}年1—{period_end.month}月份规模以上工业增加值增长 原煤"
+                if period_end.month != 3
+                else f"{period_end.year}年3月份规模以上工业增加值增长 原煤"
+            )
+            exact_max_pages = max(
+                1, int(self.source_cfg.get("exact_search_max_pages") or 3)
+            )
+            for page in range(1, exact_max_pages + 1):
+                try:
+                    rows = self._search_page(
+                        page=page, sort="relevance", query=exact_query
+                    )
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_monthly_output_exact_search_failed",
+                            "observation_date": observation_date,
+                            "page": page,
+                            "error": str(exc),
+                        }
+                    )
+                    break
+                request_count += 1
+                match = next(
+                    (
+                        row
+                        for row in rows
+                        if row["observation_date"] == observation_date
+                    ),
+                    None,
+                )
+                if match:
+                    discovered[observation_date] = match
+                    break
+            if index % 12 == 0:
+                logger.info(
+                    "[NbsMonthlyIndustrialOutput] exact discovery progress checked=%s/%s candidates=%s",
+                    index,
+                    len(expected),
+                    len(discovered),
+                )
+
+        unresolved = [
+            item["observation_date"]
+            for item in expected
+            if item["observation_date"] not in discovered
+        ]
+        if unresolved:
+            warnings.append(
+                {
+                    "reason": "nbs_monthly_output_unresolved_periods",
+                    "expected_periods": len(expected),
+                    "discovered_periods": len(discovered),
+                    "missing_periods": len(unresolved),
+                    "missing_samples": unresolved[:50],
+                    "publication_eligible_end": eligible_end.isoformat(),
+                }
+            )
+        logger.info(
+            "[NbsMonthlyIndustrialOutput] discovery done requests=%s articles=%s expected=%s unresolved=%s range=%s..%s eligible_end=%s",
+            request_count,
+            len(discovered),
+            len(expected),
+            len(unresolved),
+            start,
+            end,
+            eligible_end,
+        )
+        diagnostics = {
+            "enabled": True,
+            "expected_periods": len(expected),
+            "discovered_periods": len(discovered),
+            "unresolved_dates": len(unresolved),
+            "unresolved_samples": unresolved[:50],
+            "publication_eligible_end": eligible_end.isoformat(),
+        }
+        return (
+            sorted(discovered.values(), key=lambda row: row["observation_date"]),
+            warnings,
+            diagnostics,
+        )
+
+    @staticmethod
+    def _normalize_cell(value: Any) -> str:
+        return re.sub(r"\s+", "", str(value or "")).replace("－", "—")
+
+    def _parse_article(
+        self, article: Mapping[str, str], item: CommoditySeries
+    ) -> CommodityObservation:
+        response = request_get(
+            str(article["source_url"]),
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+        )
+        response.raise_for_status()
+        response.encoding = response.apparent_encoding or response.encoding
+        tables = __import__("pandas").read_html(io.StringIO(response.text))
+        product_names = {
+            self._normalize_cell(value)
+            for value in item.metadata.get(
+                "source_product_names", [item.source_symbol]
+            )
+        }
+        matched: Optional[Dict[str, Any]] = None
+        for table in tables:
+            rows = table.astype(object).where(table.notna(), None).values.tolist()
+            if len(rows) < 3:
+                continue
+            top = [self._normalize_cell(value) for value in rows[0]]
+            second = [self._normalize_cell(value) for value in rows[1]]
+            cumulative_column: Optional[int] = None
+            for column in range(1, min(len(top), len(second))):
+                if "绝对量" not in second[column]:
+                    continue
+                if top[column].startswith("1—") or top[column].startswith("1-"):
+                    cumulative_column = column
+            if cumulative_column is None and len(top) == 3 and "绝对量" in second[1]:
+                cumulative_column = 1
+            if cumulative_column is None:
+                continue
+            for raw_row in rows[2:]:
+                cells = [str(value).strip() if value is not None else "" for value in raw_row]
+                if not cells or self._normalize_cell(cells[0]) not in product_names:
+                    continue
+                try:
+                    value = float(cells[cumulative_column].replace(",", ""))
+                except (IndexError, ValueError):
+                    continue
+                matched = {
+                    "product_name": cells[0],
+                    "value": value,
+                    "row": cells,
+                    "header": [top, second],
+                }
+                break
+            if matched:
+                break
+        if matched is None:
+            raise ValueError(f"NBS monthly output row not found: {item.source_symbol}")
+        return _build_observation(
+            item=item,
+            source_profile=self.source_profile,
+            source_cfg=self.source_cfg,
+            observation_date=str(article["observation_date"]),
+            value=float(matched["value"]),
+            source_url=str(article["source_url"]),
+            source_symbol=item.source_symbol,
+            raw_payload={"article": dict(article), "row": matched["row"]},
+            metadata={
+                "data_kind": "industrial_indicator",
+                "metric_type": "cumulative_ytd_output",
+                "source_product_name": matched["product_name"],
+                "source_unit": "10k_ton",
+                "source_period_start": article["period_start"],
+                "source_period_end": article["period_end"],
+                "publication_date": article.get("publication_date"),
+                "not_derived_monthly_value": True,
+            },
+        )
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start is None or end is None or start > end:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "invalid_nbs_monthly_output_date_range",
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                ]
+            )
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        articles, discovery_warnings, diagnostics = self._discover_articles(start, end)
+        warnings.extend(discovery_warnings)
+        for index, article in enumerate(articles, start=1):
+            for item in series:
+                try:
+                    observations.append(self._parse_article(article, item))
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "nbs_monthly_output_article_parse_failed",
+                            "series_id": item.series_id,
+                            "observation_date": article["observation_date"],
+                            "source_url": article["source_url"],
+                            "error": str(exc),
+                        }
+                    )
+            if index % 12 == 0 or index == len(articles):
+                logger.info(
+                    "[NbsMonthlyIndustrialOutput] article progress processed=%s/%s observations=%s warnings=%s",
+                    index,
+                    len(articles),
+                    len(observations),
+                    len(warnings),
+                )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            metadata={
+                "provider": "NBS",
+                "articles": len(articles),
+                "rows": len(observations),
+                "date_gap_fill": diagnostics,
+                "quality_diagnostics": {
+                    "observations": _observation_quality_diagnostics(observations)
+                },
             },
         )
 
@@ -5119,6 +5641,7 @@ class CommodityAdapterRegistry:
         "100ppi_akshare": AkshareCommoditySpotProvider,
         "sse_cbcfi_public_latest": ShanghaiShippingExchangeCbcfiProvider,
         "nbs_production_materials": NbsProductionMaterialsProvider,
+        "nbs_monthly_industrial_output": NbsMonthlyIndustrialOutputProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,
         "configured_source_chain": ConfiguredSourceChainProvider,
     }
