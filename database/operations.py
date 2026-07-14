@@ -218,13 +218,48 @@ class DatabaseOperations:
             "changelog_written": 0,
         }
 
+    def _change_watermark_config(self) -> Dict[str, Any]:
+        """Return sanitized change watermark config with conservative defaults."""
+        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
+        return cfg if isinstance(cfg, dict) else {}
+
+    def _change_watermark_int_config(self, key: str, default: int) -> int:
+        cfg = self._change_watermark_config()
+        try:
+            value = int(cfg.get(key, default) or default)
+        except (TypeError, ValueError):
+            self.db_logger.warning(
+                "Invalid change watermark config %s=%r, using default %s",
+                key,
+                cfg.get(key),
+                default,
+            )
+            value = default
+        return max(1, value)
+
+    def _change_watermark_enabled_map(
+        self,
+        key: str,
+        defaults: Dict[str, bool],
+    ) -> Dict[str, bool]:
+        cfg = self._change_watermark_config()
+        configured = cfg.get(key) or {}
+        if not isinstance(configured, dict):
+            configured = {}
+        return {
+            name: bool(configured.get(name, enabled))
+            for name, enabled in defaults.items()
+        }
+
     def _is_changelog_enabled(self, domain: str, dataset: str) -> bool:
         """Return whether one domain/dataset should emit persistent changelog rows."""
-        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
-        if not cfg.get("enabled", True):
+        cfg = self._change_watermark_config()
+        if cfg.get("enabled", True) is False:
             return False
         domains = cfg.get("domains") or {}
         datasets = cfg.get("datasets") or {}
+        domains = domains if isinstance(domains, dict) else {}
+        datasets = datasets if isinstance(datasets, dict) else {}
         if domain in domains and not bool(domains[domain]):
             return False
         if dataset in datasets and not bool(datasets[dataset]):
@@ -1997,21 +2032,35 @@ class DatabaseOperations:
         stats = self._empty_write_stats()
         try:
             emit_changelog = self._is_changelog_enabled("quotes", "daily_quotes")
+            payloads_by_key: Dict[tuple, Dict[str, Any]] = {}
+            for quote in quotes:
+                try:
+                    payload = self._daily_quote_payload(quote)
+                    if not payload.get("instrument_id") or payload.get("time") is None:
+                        stats["skipped"] += 1
+                        continue
+                    payload["row_hash"] = self._daily_quote_hash(payload)
+                except (TypeError, ValueError, OverflowError) as row_error:
+                    stats["failed"] += 1
+                    self.db_logger.warning(
+                        "Failed to normalize daily quote for %s: %s",
+                        quote.get("instrument_id") if isinstance(quote, dict) else None,
+                        row_error,
+                    )
+                    continue
+                key = (payload["time"], payload["instrument_id"])
+                if key in payloads_by_key:
+                    stats["skipped"] += 1
+                payloads_by_key[key] = payload
+
+            normalized_payloads = list(payloads_by_key.values())
+            if not normalized_payloads:
+                return stats if return_stats else stats["failed"] == 0
+
             async with self.get_async_session() as session:
                 chunk_size = 1000
-                for i in range(0, len(quotes), chunk_size):
-                    chunk = quotes[i:i + chunk_size]
-                    payloads = []
-                    for quote in chunk:
-                        payload = self._daily_quote_payload(quote)
-                        if not payload.get("instrument_id") or payload.get("time") is None:
-                            stats["skipped"] += 1
-                            continue
-                        payload["row_hash"] = self._daily_quote_hash(payload)
-                        payloads.append(payload)
-
-                    if not payloads:
-                        continue
+                for i in range(0, len(normalized_payloads), chunk_size):
+                    payloads = normalized_payloads[i:i + chunk_size]
 
                     keys = [
                         (payload["time"], payload["instrument_id"])
@@ -2125,7 +2174,10 @@ class DatabaseOperations:
         except Exception as e:
             self.db_logger.error(f"Failed to save daily data: {e}")
             if return_stats:
-                stats["failed"] += max(0, len(quotes) - stats["inserted"] - stats["changed"] - stats["unchanged"] - stats["skipped"])
+                skipped = int(stats.get("skipped", 0) or 0)
+                stats = self._empty_write_stats()
+                stats["skipped"] = skipped
+                stats["failed"] = max(0, len(quotes) - skipped)
                 return stats
             return False
 
@@ -2270,12 +2322,7 @@ class DatabaseOperations:
                 }
         except Exception as e:
             self.db_logger.error("Failed to get change watermark: %s", e)
-            return {
-                "domain": domain,
-                "dataset": dataset,
-                "latest_sequence": 0,
-                "is_empty": True,
-            }
+            raise
 
     async def get_data_changes(
         self,
@@ -2287,16 +2334,16 @@ class DatabaseOperations:
         series_id: Optional[str] = None,
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
-        limit: int = 1000,
+        limit: Optional[int] = None,
     ) -> Dict[str, Any]:
         """List changelog records after a sequence in stable ascending order."""
         if since_sequence < 0:
             raise ValueError("since_sequence must be >= 0")
+        if limit is None:
+            limit = self._change_watermark_int_config("default_limit", 1000)
         if limit <= 0:
             raise ValueError("limit must be > 0")
-        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
-        max_limit = int(cfg.get("max_limit", 5000) or 5000)
-        limit = min(int(limit), max_limit)
+        limit = min(int(limit), self._change_watermark_int_config("max_limit", 5000))
 
         start_dt = self._coerce_datetime(start_date)
         end_dt = self._coerce_datetime(end_date)
@@ -2345,19 +2392,15 @@ class DatabaseOperations:
 
     async def get_change_watermark_health(self) -> Dict[str, Any]:
         """Return a compact operational health snapshot for P0 change watermarks."""
-        cfg = self.config_manager.get_nested("database_config.change_watermark", {}) or {}
-        domains = {
-            "quotes": bool((cfg.get("domains") or {}).get("quotes", True)),
-            "adjustment_factor": bool(
-                (cfg.get("domains") or {}).get("adjustment_factor", True)
-            ),
-        }
-        datasets = {
-            "daily_quotes": bool((cfg.get("datasets") or {}).get("daily_quotes", True)),
-            "adjustment_factors": bool(
-                (cfg.get("datasets") or {}).get("adjustment_factors", True)
-            ),
-        }
+        cfg = self._change_watermark_config()
+        domains = self._change_watermark_enabled_map(
+            "domains",
+            {"quotes": True, "adjustment_factor": True},
+        )
+        datasets = self._change_watermark_enabled_map(
+            "datasets",
+            {"daily_quotes": True, "adjustment_factors": True},
+        )
         try:
             async with self.get_async_session() as session:
                 total_rows = await session.scalar(select(func.count(DataChangeLogDB.sequence_id)))
@@ -2376,8 +2419,8 @@ class DatabaseOperations:
                 "datasets": datasets,
                 "latest_by_domain": latest_by_domain,
                 "total_change_rows": int(total_rows or 0),
-                "default_limit": int(cfg.get("default_limit", 1000) or 1000),
-                "max_limit": int(cfg.get("max_limit", 5000) or 5000),
+                "default_limit": self._change_watermark_int_config("default_limit", 1000),
+                "max_limit": self._change_watermark_int_config("max_limit", 5000),
             }
         except Exception as e:
             self.db_logger.error("Failed to get change watermark health: %s", e)
@@ -3398,7 +3441,14 @@ class DatabaseOperations:
 
         except Exception as e:
             self.db_logger.error("Failed to save adjustment factors: %s", e)
-            return stats if return_stats else 0
+            if return_stats:
+                skipped = int(stats.get("skipped", 0) or 0)
+                failed = int(stats.get("failed", 0) or 0)
+                stats = self._empty_write_stats()
+                stats["skipped"] = skipped
+                stats["failed"] = max(failed, len(factors) - skipped)
+                return stats
+            return 0
 
     async def get_adjustment_factors(
         self,

@@ -4,6 +4,16 @@
     "storage": {
       "database": "data/futures.db"
     },
+    "change_watermark": {
+      "enabled": true,
+      "domains": {
+        "futures": true
+      },
+      "datasets": {
+        "futures_contract_price_bars": true,
+        "futures_price_bars": true
+      }
+    },
     "universe": {
       "default_scope_id": "domestic_all",
       "default_series_types": [
@@ -632,6 +642,19 @@
       "storage": {
         "database": "data/futures.db",
         "table_prefix": "commodity_"
+      },
+      "change_watermark": {
+        "enabled": true,
+        "domains": {
+          "commodity": true,
+          "policy": true
+        },
+        "datasets": {
+          "commodity_price_observations": true,
+          "commodity_policy_events": true,
+          "commodity_source_documents": true,
+          "commodity_policy_candidates": true
+        }
       },
       "secrets": {
         "fred_api_key_env": "FRED_API_KEY",

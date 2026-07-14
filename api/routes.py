@@ -2967,7 +2967,7 @@ async def get_data_changes(
     series_id: Optional[str] = Query(None, description="序列 ID 过滤"),
     start_date: Optional[datetime] = Query(None, description="观测日起始"),
     end_date: Optional[datetime] = Query(None, description="观测日结束"),
-    limit: int = Query(1000, description="返回数量限制", ge=1, le=5000),
+    limit: Optional[int] = Query(None, description="返回数量限制; 省略时使用 change_watermark.default_limit", ge=1),
 ):
     """按水位查询本地已观测变更记录。"""
     try:
@@ -2978,7 +2978,7 @@ async def get_data_changes(
         series_id = _normalize_optional_query(series_id)
         start_date = _normalize_optional_query(start_date)
         end_date = _normalize_optional_query(end_date)
-        limit = _normalize_optional_query(limit, 1000)
+        limit = _normalize_optional_query(limit)
         payload = await data_manager.db_ops.get_data_changes(
             since_sequence=since_sequence,
             domain=domain,
@@ -3006,7 +3006,7 @@ async def get_daily_quote_changes(
     instrument_id: Optional[str] = Query(None, description="证券 ID 过滤"),
     start_date: Optional[datetime] = Query(None, description="交易日起始"),
     end_date: Optional[datetime] = Query(None, description="交易日结束"),
-    limit: int = Query(1000, description="返回数量限制", ge=1, le=5000),
+    limit: Optional[int] = Query(None, description="返回数量限制; 省略时使用 change_watermark.default_limit", ge=1),
 ):
     """查询日行情行的增量变更键; 完整行情仍通过 /quotes/daily 补拉。"""
     return await get_data_changes(

@@ -237,6 +237,41 @@ def test_fx_observations_are_idempotent_and_jpy_multiplier_affects_conversion(tm
     )
     assert storage.upsert_observation(obs) == "inserted"
     assert storage.upsert_observation(obs) == "unchanged"
+    changed = FxObservation(
+        series_id=obs.series_id,
+        observation_date=obs.observation_date,
+        value=4.66,
+        base_currency=obs.base_currency,
+        quote_currency=obs.quote_currency,
+        quote_multiplier=obs.quote_multiplier,
+        source_profile=obs.source_profile,
+        quality_flag=obs.quality_flag,
+    )
+    assert storage.upsert_observation(changed) == "updated"
+
+    with storage.get_connection() as conn:
+        changes = conn.execute(
+            """
+            SELECT domain, dataset, series_id, observation_date, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [dict(row) for row in changes] == [
+        {
+            "domain": "fx",
+            "dataset": "fx_observations",
+            "series_id": obs.series_id,
+            "observation_date": obs.observation_date,
+            "row_version": 1,
+        },
+        {
+            "domain": "fx",
+            "dataset": "fx_observations",
+            "series_id": obs.series_id,
+            "observation_date": obs.observation_date,
+            "row_version": 2,
+        },
+    ]
 
     converted = FxReadService(storage, config.modules["fx_market_data"]).convert(
         from_currency="JPY",
@@ -246,8 +281,64 @@ def test_fx_observations_are_idempotent_and_jpy_multiplier_affects_conversion(tm
     )
 
     assert converted["status"] == "success"
-    assert converted["converted_amount"] == 4.65
+    assert converted["converted_amount"] == 4.66
     assert converted["conversion_policy"] == "direct"
+    assert "row_version" not in storage.get_observations(series_id=obs.series_id)[0]
+
+
+def test_fx_revision_metadata_change_advances_watermark_with_stable_provider_hash(tmp_path):
+    _, storage = _seed_storage(tmp_path)
+    original = FxObservation(
+        series_id="FX.JPY_CNY.CFETS.MID.DAILY",
+        observation_date="2026-06-26",
+        value=4.65,
+        base_currency="JPY",
+        quote_currency="CNY",
+        quote_multiplier=100,
+        source_profile="cfets_rmb_fixing",
+        quality_flag="official_preliminary",
+        publication_time="2026-06-26T09:15:00+08:00",
+        revision_id="preliminary",
+        raw_payload_hash="stable-provider-hash",
+    )
+    revised = FxObservation(
+        **{
+            **original.as_dict(),
+            "quality_flag": "official_final",
+            "publication_time": "2026-06-26T16:30:00+08:00",
+            "revision_id": "final",
+        }
+    )
+
+    assert storage.upsert_observation(original) == "inserted"
+    assert storage.upsert_observation(revised) == "updated"
+    assert storage.upsert_observation(revised) == "unchanged"
+
+    with storage.get_connection() as conn:
+        observation = conn.execute(
+            """
+            SELECT revision_id, publication_time, quality_flag, row_version
+            FROM fx_observations
+            WHERE series_id = ? AND observation_date = ? AND source_profile = ?
+            """,
+            (revised.series_id, revised.observation_date, revised.source_profile),
+        ).fetchone()
+        changes = conn.execute(
+            """
+            SELECT change_type, old_hash, new_hash, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+
+    assert dict(observation) == {
+        "revision_id": "final",
+        "publication_time": "2026-06-26T16:30:00+08:00",
+        "quality_flag": "official_final",
+        "row_version": 2,
+    }
+    assert [row["change_type"] for row in changes] == ["insert", "update"]
+    assert changes[1]["old_hash"] != changes[1]["new_hash"]
+    assert changes[1]["row_version"] == 2
 
 
 def test_fx_manual_provider_sync_and_derivation_lineage(tmp_path):
@@ -312,13 +403,29 @@ def test_fx_manual_provider_sync_and_derivation_lineage(tmp_path):
 
     assert result["status"] == "success"
     assert result["totals"]["inserted"] == 4
+    assert result["totals"]["changelog_written"] == 4
     assert derivation["status"] == "success"
     assert derivation["totals"]["inserted"] == 2
+    assert derivation["totals"]["changelog_written"] == 2
     assert derivation["totals"]["gaps"] == 0
     assert round(eur_cnh["value"], 6) == round(7.92 / 7.2 * 7.25, 6)
     assert round(jpy_cnh["value"], 6) == round(4.65 / 7.2 * 7.25, 6)
     assert eur_cnh["quality_flag"] == "derived"
     assert "source_observations" in eur_cnh["metadata"]
+    with storage.get_connection() as conn:
+        derived_changes = conn.execute(
+            """
+            SELECT series_id, source_mode, new_hash
+            FROM data_change_log
+            WHERE domain = 'fx' AND source_mode = 'derived'
+            ORDER BY series_id
+            """
+        ).fetchall()
+    assert [row["series_id"] for row in derived_changes] == [
+        "FX.EUR_CNH.DERIVED.DAILY",
+        "FX.JPY_CNH.DERIVED.DAILY",
+    ]
+    assert all(row["new_hash"] for row in derived_changes)
 
 
 def test_fx_readiness_and_quality_are_local_only(tmp_path):

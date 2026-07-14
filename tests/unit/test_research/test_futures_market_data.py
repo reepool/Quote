@@ -2941,11 +2941,66 @@ def test_futures_storage_initializes_futures_db_and_upserts_bars(tmp_path):
 
     first = storage.upsert_price_bars(bars)
     second = storage.upsert_price_bars(bars)
+    changed = storage.upsert_price_bars([
+        FuturesBar(
+            series_id=series.series_id,
+            trade_date="2020-01-02",
+            open=1.0,
+            high=1.2,
+            low=0.9,
+            close=1.15,
+            raw_payload_hash="h2",
+            source="akshare",
+            source_mode="direct",
+            source_profile="akshare_futures",
+        )
+    ])
 
     assert (tmp_path / "futures.db").exists()
-    assert first == {"inserted": 1, "changed": 0, "unchanged": 0}
-    assert second == {"inserted": 0, "changed": 0, "unchanged": 1}
-    assert storage.get_price_bars(series.series_id)[0]["close"] == 1.1
+    assert first == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    assert second == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "changelog_written": 0,
+    }
+    assert changed == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "changelog_written": 1,
+    }
+    price_bar = storage.get_price_bars(series.series_id)[0]
+    assert price_bar["close"] == 1.15
+    assert "row_version" not in price_bar
+    with storage.get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT dataset, change_type, series_id, observation_date, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [dict(row) for row in rows] == [
+        {
+            "dataset": "futures_price_bars",
+            "change_type": "insert",
+            "series_id": series.series_id,
+            "observation_date": "2020-01-02",
+            "row_version": 1,
+        },
+        {
+            "dataset": "futures_price_bars",
+            "change_type": "update",
+            "series_id": series.series_id,
+            "observation_date": "2020-01-02",
+            "row_version": 2,
+        },
+    ]
     manifests = storage.list_source_manifests(enabled_only=False)
     assert {item["source_profile"] for item in manifests} == {
         "exchange_official",
@@ -2992,12 +3047,44 @@ def test_futures_storage_official_price_bar_supersedes_fallback(tmp_path):
     )
 
     assert storage.upsert_price_bars([fallback_bar])["inserted"] == 1
-    assert storage.upsert_price_bars([official_bar])["inserted"] == 1
+    official_write = storage.upsert_price_bars([official_bar])
+    assert official_write["inserted"] == 1
+    assert official_write["changelog_written"] == 2
 
     rows = storage.get_price_bars(series.series_id)
     assert len(rows) == 1
     assert rows[0]["source_profile"] == "exchange_official"
     assert rows[0]["close"] == 1.2
+    with storage.get_connection() as conn:
+        changes = conn.execute(
+            """
+            SELECT change_type, source_profile, old_hash, new_hash, row_version
+            FROM data_change_log ORDER BY sequence_id
+            """
+        ).fetchall()
+    assert [dict(row) for row in changes] == [
+        {
+            "change_type": "insert",
+            "source_profile": "akshare_futures",
+            "old_hash": None,
+            "new_hash": "fallback",
+            "row_version": 1,
+        },
+        {
+            "change_type": "delete_marker",
+            "source_profile": "akshare_futures",
+            "old_hash": "fallback",
+            "new_hash": None,
+            "row_version": 2,
+        },
+        {
+            "change_type": "insert",
+            "source_profile": "exchange_official",
+            "old_hash": None,
+            "new_hash": "official",
+            "row_version": 1,
+        },
+    ]
 
 
 def test_futures_storage_preserves_contract_observed_metadata_on_market_data_upsert(tmp_path):
@@ -3093,9 +3180,22 @@ def test_futures_storage_persists_contract_bars_mapping_and_calendar(tmp_path):
     )
 
     assert write_result["inserted"] == 1
+    assert write_result["changelog_written"] == 1
     assert storage.get_contract(contract.contract_id)["exchange_contract_code"] == "CU2407"
     assert storage.get_contract_price_bars(contract.contract_id)[0]["close"] == 11
     assert storage.list_continuous_mappings("CNF.CU.SHFE.main")[0]["contract_id"] == contract.contract_id
+    with storage.get_connection() as conn:
+        contract_change = conn.execute(
+            """
+            SELECT dataset, instrument_id, observation_date
+            FROM data_change_log WHERE dataset = 'futures_contract_price_bars'
+            """
+        ).fetchone()
+    assert dict(contract_change) == {
+        "dataset": "futures_contract_price_bars",
+        "instrument_id": contract.instrument_id,
+        "observation_date": "2024-06-03",
+    }
     assert calendar_result["calendar_rows"] == 4
     assert storage.get_latest_expected_trade_date("SHFE", as_of_date="2024-06-04")["trade_date"] == "2024-06-04"
 
@@ -4590,6 +4690,7 @@ async def test_futures_market_data_sync_writes_fixture_bars(monkeypatch, tmp_pat
     config = _research_config(tmp_path)
     storage = FuturesStorageManager(config)
     storage.initialize()
+    _seed_verified_calendar(storage, trade_date="2020-01-02")
 
     async def fake_fetch_daily_bars(self, series, *, start_date=None, end_date=None, mode="direct"):
         return [
@@ -4614,7 +4715,11 @@ async def test_futures_market_data_sync_writes_fixture_bars(monkeypatch, tmp_pat
     )
 
     series_id = "CNF.CU.SHFE.main"
-    result = await FuturesMarketDataSyncService(storage, config).sync(series_ids=[series_id])
+    result = await FuturesMarketDataSyncService(storage, config).sync(
+        series_ids=[series_id],
+        start_date="2020-01-02",
+        end_date="2020-01-02",
+    )
 
     assert result["status"] == "success"
     assert result["totals"]["inserted"] == 1
@@ -4986,6 +5091,7 @@ async def test_futures_market_data_sync_dry_run_reports_would_write_rows(monkeyp
         "inserted": 0,
         "changed": 0,
         "unchanged": 0,
+        "changelog_written": 0,
         "would_write_rows": 1,
     }
     assert storage.get_price_bars("CNF.CU.SHFE.main") == []

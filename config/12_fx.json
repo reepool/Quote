@@ -4,6 +4,15 @@
     "storage": {
       "database": "data/fx.db"
     },
+    "change_watermark": {
+      "enabled": true,
+      "domains": {
+        "fx": true
+      },
+      "datasets": {
+        "fx_observations": true
+      }
+    },
     "universe": {
       "default_scope_id": "rmb_core",
       "default_frequency": "daily"

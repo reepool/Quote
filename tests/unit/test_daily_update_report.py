@@ -3,6 +3,9 @@ from unittest.mock import AsyncMock, Mock, mock_open, patch
 
 import pytest
 
+from database.connection import DatabaseManager
+from database.models import InstrumentDB
+from database.operations import DatabaseOperations
 from data_manager import DataManager
 from utils.report.engine import ReportEngine
 
@@ -14,6 +17,59 @@ def _build_config_manager() -> Mock:
         'data_config': {'data_dir': 'data', 'download_chunk_days': 7},
     }.get(key, default)
     return config
+
+
+async def _ops_for_tmp_db(tmp_path):
+    manager = DatabaseManager(str(tmp_path / "daily_report_cdc.db"))
+    manager.initialize()
+    manager.create_tables()
+    ops = DatabaseOperations(auto_initialize=False)
+    ops.db = manager
+    ops.engine = manager.sync_engine
+    ops.async_engine = manager.async_engine
+    ops.SessionLocal = manager.SessionLocal
+    ops.AsyncSessionLocal = manager.TaskAsyncSessionLocal
+    return manager, ops
+
+
+def _seed_report_instrument(manager):
+    with manager.get_session() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                name="Ping An Bank",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                source="unit",
+            )
+        )
+        session.commit()
+
+
+def _report_quote(batch_id: str = "b1"):
+    return {
+        "time": datetime(2026, 7, 10),
+        "instrument_id": "000001.SZ",
+        "open": 10.0,
+        "high": 11.0,
+        "low": 9.8,
+        "close": 10.5,
+        "volume": 1000,
+        "amount": 10500.0,
+        "turnover": 1.2,
+        "pre_close": 10.0,
+        "change": 0.5,
+        "pct_change": 0.05,
+        "tradestatus": 1,
+        "factor": 1.0,
+        "adjustment_type": "none",
+        "is_complete": True,
+        "quality_score": 1.0,
+        "source": "unit",
+        "batch_id": batch_id,
+    }
 
 
 @pytest.mark.asyncio
@@ -113,6 +169,48 @@ async def test_generate_daily_update_report_includes_changelog_stats():
 
     assert report['changelog_stats'] == changelog_stats
     assert report['exchange_stats']['SSE']['changelog_stats'] == changelog_stats
+
+
+@pytest.mark.asyncio
+async def test_daily_update_report_shows_overlap_unchanged_without_advancing_watermark(tmp_path):
+    db_manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_report_instrument(db_manager)
+        await ops.save_daily_quotes([_report_quote(batch_id="initial")], return_stats=True)
+        before = await ops.get_change_watermark(domain="quotes", dataset="daily_quotes")
+
+        overlap_stats = await ops.save_daily_quotes([_report_quote(batch_id="overlap")], return_stats=True)
+        after = await ops.get_change_watermark(domain="quotes", dataset="daily_quotes")
+
+        with patch('data_manager.config_manager', _build_config_manager()):
+            manager = DataManager()
+
+        update_results = {
+            'changelog_stats': overlap_stats,
+            'exchange_stats': {
+                'SZSE': {
+                    'success_count': 1,
+                    'failure_count': 0,
+                    'quotes_added': 1,
+                    'total_instruments': 1,
+                    'changelog_stats': overlap_stats,
+                }
+            },
+        }
+        report = await manager._generate_daily_update_report(
+            ['SZSE'],
+            date(2026, 7, 13),
+            update_results,
+        )
+
+        assert before["latest_sequence"] == after["latest_sequence"]
+        assert overlap_stats["unchanged"] == 1
+        assert overlap_stats["changelog_written"] == 0
+        assert report["changelog_stats"]["unchanged"] == 1
+        assert report["changelog_stats"]["changelog_written"] == 0
+        assert report["exchange_stats"]["SZSE"]["changelog_stats"]["unchanged"] == 1
+    finally:
+        await db_manager.close_async()
 
 
 @pytest.mark.asyncio
@@ -484,6 +582,28 @@ def test_report_engine_formats_daily_catchup_summary():
     assert '920083.BJ' in summary
 
 
+def test_report_engine_formats_daily_changelog_summary_compactly():
+    engine = ReportEngine()
+    summary = engine._format_daily_changelog_summary({
+        'inserted': 0,
+        'changed': 0,
+        'unchanged': 7,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 0,
+    })
+
+    assert summary == '未变: 7，水位写入: 0'
+    assert engine._format_daily_changelog_summary({
+        'inserted': 0,
+        'changed': 0,
+        'unchanged': 0,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 0,
+    }) == ''
+
+
 def test_report_engine_formats_index_master_governance_summary_concisely():
     engine = ReportEngine()
     summary = engine._format_index_master_governance_summary({
@@ -632,6 +752,46 @@ def test_daily_update_report_does_not_render_nested_catchup_stats_in_exchange_ta
     assert 'Catchup Stats' not in message
     assert "'samples':" not in message
     assert '*行情追补*' in message
+
+
+def test_daily_update_report_renders_changelog_summary_without_nested_table_noise():
+    engine = ReportEngine()
+    changelog_stats = {
+        'inserted': 2,
+        'changed': 1,
+        'unchanged': 7,
+        'skipped': 0,
+        'failed': 0,
+        'changelog_written': 3,
+    }
+    message = engine.generate(
+        'daily_update_report',
+        {
+            'date': '2026-07-13',
+            'status': 'success',
+            'update_results': {
+                'success_count': 1,
+                'failure_count': 0,
+                'total_quotes_added': 10,
+                'changelog_stats': changelog_stats,
+                'exchange_stats': {
+                    'SSE': {
+                        'success_count': 1,
+                        'failure_count': 0,
+                        'quotes_added': 10,
+                        'total_instruments': 1,
+                        'changelog_stats': changelog_stats,
+                    },
+                },
+            },
+        },
+        'telegram',
+    )
+
+    assert '*增量水位*' in message
+    assert '新增: 2，修订: 1，未变: 7，水位写入: 3' in message
+    assert 'Changelog Stats' not in message
+    assert "'changelog_written':" not in message
 
 
 def test_daily_update_report_renders_idempotent_noop_note_as_success():

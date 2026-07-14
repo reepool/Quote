@@ -56,6 +56,20 @@ async def test_latest_change_watermark_empty(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_latest_change_watermark_database_failure_returns_500(monkeypatch):
+    db_ops = SimpleNamespace(
+        get_change_watermark=AsyncMock(side_effect=RuntimeError("database unavailable"))
+    )
+    monkeypatch.setattr(routes, "data_manager", SimpleNamespace(db_ops=db_ops))
+
+    with pytest.raises(HTTPException) as exc:
+        await routes.get_latest_change_watermark(domain="quotes", dataset=None)
+
+    assert exc.value.status_code == 500
+    assert "database unavailable" in exc.value.detail
+
+
+@pytest.mark.asyncio
 async def test_change_query_returns_paginated_records(monkeypatch):
     db_ops = SimpleNamespace(
         get_data_changes=AsyncMock(
@@ -90,6 +104,38 @@ async def test_change_query_returns_paginated_records(monkeypatch):
     kwargs = db_ops.get_data_changes.await_args.kwargs
     assert kwargs["domain"] == "quotes"
     assert kwargs["dataset"] == "daily_quotes"
+
+
+@pytest.mark.asyncio
+async def test_change_query_omitted_limit_delegates_default_to_database(monkeypatch):
+    db_ops = SimpleNamespace(
+        get_data_changes=AsyncMock(
+            return_value={
+                "since_sequence": 0,
+                "latest_sequence": 0,
+                "latest_returned_sequence": 0,
+                "next_sequence": 0,
+                "has_more": False,
+                "limit": 1000,
+                "count": 0,
+                "changes": [],
+            }
+        )
+    )
+    monkeypatch.setattr(routes, "data_manager", SimpleNamespace(db_ops=db_ops))
+
+    response = await routes.get_data_changes(
+        since_sequence=0,
+        domain=None,
+        dataset=None,
+        instrument_id=None,
+        series_id=None,
+        start_date=None,
+        end_date=None,
+    )
+
+    assert response.count == 0
+    assert db_ops.get_data_changes.await_args.kwargs["limit"] is None
 
 
 @pytest.mark.asyncio

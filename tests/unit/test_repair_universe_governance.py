@@ -3,6 +3,9 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from database.connection import DatabaseManager
+from database.models import InstrumentDB
+from database.operations import DatabaseOperations
 from data_manager import DataGapInfo, DataManager
 
 
@@ -45,6 +48,63 @@ def _build_config_manager() -> Mock:
 def _manager() -> DataManager:
     with patch('data_manager.config_manager', _build_config_manager()):
         return DataManager()
+
+
+async def _ops_for_tmp_db(tmp_path):
+    manager = DatabaseManager(str(tmp_path / "repair_cdc.db"))
+    manager.initialize()
+    manager.create_tables()
+    ops = DatabaseOperations(auto_initialize=False)
+    ops.db = manager
+    ops.engine = manager.sync_engine
+    ops.async_engine = manager.async_engine
+    ops.SessionLocal = manager.SessionLocal
+    ops.AsyncSessionLocal = manager.TaskAsyncSessionLocal
+    return manager, ops
+
+
+def _seed_stock_instrument(manager):
+    with manager.get_session() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                name="Ping An Bank",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                status="active",
+                is_active=True,
+                trading_status=1,
+                listed_date=datetime(1991, 4, 3),
+                source="unit",
+            )
+        )
+        session.commit()
+
+
+def _quote(close: float, batch_id: str):
+    return {
+        "time": datetime(2026, 6, 10),
+        "instrument_id": "000001.SZ",
+        "open": 10.0,
+        "high": 11.0,
+        "low": 9.8,
+        "close": close,
+        "volume": 1000,
+        "amount": close * 1000,
+        "turnover": 1.2,
+        "pre_close": 10.0,
+        "change": close - 10.0,
+        "pct_change": (close - 10.0) / 10.0,
+        "tradestatus": 1,
+        "factor": 1.0,
+        "adjustment_type": "none",
+        "is_complete": True,
+        "quality_score": 1.0,
+        "source": "unit",
+        "batch_id": batch_id,
+    }
 
 
 class FakeRepairDbOps:
@@ -677,6 +737,54 @@ async def test_lifecycle_eligible_gap_still_uses_quote_source():
     assert await manager._fill_single_gap(gap) is True
     manager.source_factory.get_daily_data.assert_awaited_once()
     assert manager.db_ops.saved_quotes[0]['instrument_id'] == '399001.SZ'
+
+
+@pytest.mark.asyncio
+async def test_gap_fill_historical_repair_emits_changelog_for_changed_row(tmp_path):
+    db_manager, ops = await _ops_for_tmp_db(tmp_path)
+    try:
+        _seed_stock_instrument(db_manager)
+        await ops.save_daily_quotes([_quote(close=10.5, batch_id="initial")], return_stats=True)
+        before = await ops.get_change_watermark(domain="quotes", dataset="daily_quotes")
+
+        manager = _manager()
+        manager.db_ops = ops
+        manager.source_factory = Mock()
+        manager.source_factory.get_daily_data = AsyncMock(
+            return_value=[_quote(close=10.8, batch_id="repair")]
+        )
+        manager.source_factory.get_adjustment_factors = AsyncMock(return_value=[])
+
+        gap = DataGapInfo(
+            instrument_id='000001.SZ',
+            symbol='000001',
+            exchange='SZSE',
+            gap_start=date(2026, 6, 10),
+            gap_end=date(2026, 6, 10),
+            gap_days=1,
+            gap_type='missing_data',
+            severity='low',
+            recommendation='test',
+            missing_dates=[date(2026, 6, 10)],
+        )
+
+        assert await manager._fill_single_gap(gap) is True
+        after = await ops.get_change_watermark(domain="quotes", dataset="daily_quotes")
+        changes = await ops.get_data_changes(
+            domain="quotes",
+            dataset="daily_quotes",
+            since_sequence=before["latest_sequence"],
+        )
+
+        assert after["latest_sequence"] == before["latest_sequence"] + 1
+        assert changes["count"] == 1
+        assert changes["changes"][0]["change_type"] == "update"
+        assert changes["changes"][0]["business_key"] == {
+            "instrument_id": "000001.SZ",
+            "trade_date": "2026-06-10",
+        }
+    finally:
+        await db_manager.close_async()
 
 
 @pytest.mark.asyncio

@@ -25,19 +25,6 @@
             "pool_size": 2,
             "max_overflow": 6,
             "pool_timeout_seconds": 30
-        },
-        "change_watermark": {
-            "enabled": true,
-            "default_limit": 1000,
-            "max_limit": 5000,
-            "domains": {
-                "quotes": true,
-                "adjustment_factor": true
-            },
-            "datasets": {
-                "daily_quotes": true,
-                "adjustment_factors": true
-            }
         }
     },
     "database_backup_config": {

@@ -131,6 +131,7 @@ dmypy.json
 .pyre/
 
 # 项目特定文件
+.worktrees/
 
 # 配置文件 (包含敏感信息)
 config/config.json*
@@ -201,8 +202,12 @@ Thumbs.db
 process.pid
 
 # Openspce辅助文件
-openspec/
-openspec/*/
+openspec/*
+!openspec/config.yaml
+!openspec/changes/
+openspec/changes/*
+!openspec/changes/add-daily-sync-change-watermarks/
+!openspec/changes/add-daily-sync-change-watermarks/**
 AGENTS.md
 CLAUDE.md
 
