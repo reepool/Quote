@@ -796,6 +796,27 @@
           ],
           "user_agent": "QuoteSystem/SpecialCommodityMarketData"
         },
+        "sse_cbcfi_public_latest": {
+          "venue": "SSE",
+          "source": "Shanghai Shipping Exchange CBCFI public latest-period page",
+          "source_mode": "official_public_web_latest_only",
+          "source_interface": "sse_cbcfi_single_period_page",
+          "provider_adapter": "sse_cbcfi_public_latest",
+          "governance_adapter": "official_public_indicator",
+          "calendar_type": "source_observed_publication_date",
+          "calendar_quality_flag": "official_source_observed",
+          "quality_flag": "official_public_web",
+          "parser_version": "sse_cbcfi_public_latest.v1",
+          "endpoint_url": "https://www.sse.net.cn/index/singleIndex?indexType=cbcfi",
+          "referer": "https://www.sse.net.cn/indexIntro?indexName=cbcfi",
+          "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 1.0
+          },
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "note": "The unauthenticated official page exposes only the latest and previous periods. Multi-period history requires login/entitlement; the adapter must report this gap and must not synthesize history."
+        },
         "100ppi_public_web": {
           "venue": "100PPI",
           "source": "100ppi public web",
@@ -1424,6 +1445,21 @@
           "commodity_id": "CN.FORESTRY.SOFTWOOD_PULP.SPOT", "symbol": "SP", "name": "China Softwood Pulp Spot Reference",
           "category": "forestry", "commodity_type": "spot_reference", "default_currency": "CNY", "default_unit": "CNY/ton", "active": true,
           "metadata": {"dcf_role": "pulp_paper_spot_cycle_anchor", "source_scope": "100ppi public-web softwood pulp spot reference"}
+        },
+        {
+          "commodity_id": "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
+          "symbol": "CBCFI_COMPOSITE",
+          "name": "China Coastal Coal Freight Composite Index",
+          "category": "coal",
+          "commodity_type": "industrial_indicator",
+          "default_currency": "",
+          "default_unit": "index_point",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_coastal_freight_indicator",
+            "not_commodity_price": true,
+            "source_scope": "Shanghai Shipping Exchange CBCFI composite index"
+          }
         },
         {
           "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
@@ -2135,6 +2171,30 @@
           }
         },
         {
+          "series_id": "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
+          "commodity_id": "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
+          "venue": "SSE",
+          "source_profile": "sse_cbcfi_public_latest",
+          "source_symbol": "CBCFI_COMPOSITE",
+          "frequency": "daily",
+          "quote_type": "industrial_indicator",
+          "currency": "",
+          "unit": "index_point",
+          "active": true,
+          "metadata": {
+            "data_kind": "industrial_indicator",
+            "source_name": "Shanghai Shipping Exchange China Coastal Coal Freight Index composite",
+            "source_url": "https://www.sse.net.cn/index/singleIndex?indexType=cbcfi",
+            "source_available_from": "2011-12-07",
+            "region_or_spec": "China coastal coal shipping market composite index",
+            "publication_date_semantics": "official_index_date",
+            "source_period_semantics": "official_index_date",
+            "public_history_mode": "latest_period_only",
+            "index_base": "official CBCFI methodology",
+            "not_commodity_price": true
+          }
+        },
+        {
           "series_id": "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
           "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
           "venue": "NBS",
@@ -2401,6 +2461,22 @@
         {
           "scope_id": "cn_100ppi_softwood_pulp", "enabled": true, "venues": ["100PPI"],
           "categories": ["forestry"], "commodity_ids": ["CN.FORESTRY.SOFTWOOD_PULP.SPOT"], "frequencies": ["daily"]
+        },
+        {
+          "scope_id": "cn_coal_cbcfi",
+          "enabled": true,
+          "venues": [
+            "SSE"
+          ],
+          "categories": [
+            "coal"
+          ],
+          "commodity_ids": [
+            "CN.COAL.FREIGHT.CBCFI.COMPOSITE"
+          ],
+          "frequencies": [
+            "daily"
+          ]
         },
         {
           "scope_id": "cn_nbs_thermal_coal",

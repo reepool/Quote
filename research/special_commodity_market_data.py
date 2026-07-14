@@ -2850,6 +2850,199 @@ class AkshareCommoditySpotProvider:
         )
 
 
+class ShanghaiShippingExchangeCbcfiProvider:
+    """Public latest-period CBCFI composite index from Shanghai Shipping Exchange."""
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        self.endpoint = str(
+            self.source_cfg.get("endpoint_url")
+            or "https://www.sse.net.cn/index/singleIndex?indexType=cbcfi"
+        )
+        self.headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "QuoteSystem/SpecialCommodityMarketData"
+            ),
+            "Referer": str(
+                self.source_cfg.get("referer")
+                or "https://www.sse.net.cn/indexIntro?indexName=cbcfi"
+            ),
+        }
+        self.tls_config = tls_config_from_source_config(
+            "sse_cbcfi_public_latest", self.source_cfg
+        )
+
+    @staticmethod
+    def parse_latest_html(html: str) -> Dict[str, Any]:
+        """Parse the current and previous CBCFI composite rows from the official page."""
+        tables = __import__("pandas").read_html(io.StringIO(html))
+        date_pattern = re.compile(r"20\d{2}-\d{2}-\d{2}")
+        page_dates = date_pattern.findall(html)
+        for table in tables:
+            frame = table.fillna("")
+            matching_rows = []
+            for _, row in frame.iterrows():
+                cells = [" ".join(str(value).split()) for value in row.tolist()]
+                if any("综合指数" in value for value in cells):
+                    matching_rows.append(cells)
+            if not matching_rows:
+                continue
+            cells = matching_rows[0]
+            numeric_values: List[float] = []
+            for value in cells:
+                normalized = str(value).replace(",", "").strip()
+                if not normalized or "综合指数" in normalized:
+                    continue
+                try:
+                    numeric_values.append(float(normalized))
+                except ValueError:
+                    continue
+            table_dates = date_pattern.findall(table.to_html())
+            dates = table_dates if len(table_dates) >= 2 else page_dates
+            if len(numeric_values) < 2 or len(dates) < 2:
+                continue
+            previous_date, current_date = dates[-2:]
+            return {
+                "previous_date": previous_date,
+                "current_date": current_date,
+                "previous_value": numeric_values[0],
+                "current_value": numeric_values[1],
+                "change": numeric_values[2] if len(numeric_values) > 2 else None,
+            }
+        raise ValueError("official SSE CBCFI page missing composite index row")
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start and end and start > end:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "invalid_sse_cbcfi_date_range",
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                ]
+            )
+        try:
+            response = _request_with_retry(
+                self.endpoint,
+                headers=self.headers,
+                timeout=self.timeout,
+                tls_config=self.tls_config,
+                retry_cfg=self.source_cfg.get("request_retry"),
+                log_context="sse_cbcfi_latest",
+            )
+            parsed = self.parse_latest_html(response.text)
+        except Exception as exc:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "official_sse_cbcfi_request_or_parse_failed",
+                        "source_url": self.endpoint,
+                        "error": str(exc),
+                    }
+                ]
+            )
+
+        current = date.fromisoformat(parsed["current_date"])
+        previous = date.fromisoformat(parsed["previous_date"])
+        observations: List[CommodityObservation] = []
+        warnings: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        if end and end < current:
+            blockers.append(
+                {
+                    "reason": "sse_cbcfi_public_history_requires_entitlement",
+                    "requested_end": end.isoformat(),
+                    "latest_public_date": current.isoformat(),
+                    "history_interface": "authenticated_multi_period_query",
+                }
+            )
+        elif start and start > current:
+            warnings.append(
+                {
+                    "reason": "sse_cbcfi_not_yet_published_for_requested_window",
+                    "requested_start": start.isoformat(),
+                    "latest_public_date": current.isoformat(),
+                }
+            )
+        else:
+            for item in series:
+                if item.source_symbol.upper() != "CBCFI_COMPOSITE":
+                    blockers.append(
+                        {
+                            "reason": "unsupported_sse_cbcfi_source_symbol",
+                            "series_id": item.series_id,
+                            "source_symbol": item.source_symbol,
+                        }
+                    )
+                    continue
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=current.isoformat(),
+                        value=float(parsed["current_value"]),
+                        source_url=self.endpoint,
+                        source_symbol=item.source_symbol,
+                        raw_payload=parsed,
+                        metadata={
+                            "data_kind": "industrial_indicator",
+                            "publication_date": current.isoformat(),
+                            "source_period_start": current.isoformat(),
+                            "source_period_end": current.isoformat(),
+                            "previous_observation_date": parsed["previous_date"],
+                            "previous_value": parsed["previous_value"],
+                            "reported_change": parsed["change"],
+                            "region": "China coastal coal shipping market",
+                            "public_history_mode": "latest_period_only",
+                        },
+                    )
+                )
+            if start and start < previous:
+                warnings.append(
+                    {
+                        "reason": "sse_cbcfi_public_history_not_included",
+                        "requested_start": start.isoformat(),
+                        "previous_public_date": previous.isoformat(),
+                        "latest_public_date": current.isoformat(),
+                        "message": "public page exposes the latest period; historical query requires login",
+                    }
+                )
+        logger.info(
+            "[ShanghaiShippingExchangeCBCFI] fetch done range=%s..%s latest=%s "
+            "observations=%s warnings=%s blockers=%s",
+            start_date,
+            end_date,
+            current.isoformat(),
+            len(observations),
+            len(warnings),
+            len(blockers),
+        )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "Shanghai Shipping Exchange",
+                "public_history_mode": "latest_period_only",
+                "latest_public_date": current.isoformat(),
+                "rows": len(observations),
+            },
+        )
+
+
 class NbsProductionMaterialsProvider:
     """Official NBS ten-day production-material market-price provider."""
 
@@ -4582,6 +4775,79 @@ class PublicWebCommodityGovernanceAdapter(SourceObservedDateGovernanceAdapter):
         )
 
 
+class OfficialPublicIndicatorGovernanceAdapter(SourceObservedDateGovernanceAdapter):
+    """Govern configured identity plus source-observed dates for public indicators."""
+
+    def govern_master(
+        self,
+        series: Sequence[CommoditySeries],
+        provider: CommodityPriceProvider,
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+        prior_master_records: Optional[Mapping[str, Mapping[str, Any]]] = None,
+    ) -> CommodityMasterGovernanceResult:
+        records: List[Dict[str, Any]] = []
+        blockers: List[Dict[str, Any]] = []
+        required = (
+            "data_kind",
+            "source_name",
+            "source_url",
+            "source_available_from",
+            "region_or_spec",
+            "publication_date_semantics",
+        )
+        for item in series:
+            missing = [key for key in required if not item.metadata.get(key)]
+            if item.metadata.get("data_kind") != "industrial_indicator":
+                missing.append("data_kind=industrial_indicator")
+            if missing:
+                blockers.append(
+                    {
+                        "reason": "industrial_indicator_master_mapping_incomplete",
+                        "series_id": item.series_id,
+                        "missing_fields": missing,
+                    }
+                )
+                records.append(
+                    _blocked_master_governance_record(
+                        item,
+                        reason="industrial_indicator_master_mapping_incomplete",
+                        evidence_url=str(item.metadata.get("source_url") or ""),
+                        metadata={"missing_fields": missing},
+                    )
+                )
+                continue
+            records.append(
+                _master_governance_record(
+                    item,
+                    quality_flag="official_public_indicator_master_verified",
+                    source_name=str(item.metadata["source_name"]),
+                    source_frequency=item.frequency,
+                    source_currency=item.currency,
+                    source_unit=item.unit,
+                    lifecycle_start=str(item.metadata["source_available_from"]),
+                    lifecycle_end=None,
+                    evidence_url=str(item.metadata["source_url"]),
+                    evidence_payload={key: item.metadata.get(key) for key in required},
+                    metadata={
+                        "data_kind": "industrial_indicator",
+                        "region_or_spec": item.metadata["region_or_spec"],
+                        "public_history_mode": item.metadata.get("public_history_mode"),
+                    },
+                )
+            )
+        if blockers:
+            return CommodityMasterGovernanceResult(records=records, blockers=blockers)
+        result = provider.fetch(series, start_date=start_date, end_date=end_date)
+        return CommodityMasterGovernanceResult(
+            records=records,
+            warnings=list(result.warnings),
+            blockers=list(result.blockers),
+            prefetched_result=result,
+        )
+
+
 class NbsProductionMaterialsGovernanceAdapter(SourceObservedDateGovernanceAdapter):
     """Govern NBS product identity and ten-day observation periods from source rows."""
 
@@ -4840,6 +5106,7 @@ class CommodityAdapterRegistry:
         "eia": EiaCommodityProvider,
         "world_bank_pink_sheet": WorldBankCommodityProvider,
         "100ppi_akshare": AkshareCommoditySpotProvider,
+        "sse_cbcfi_public_latest": ShanghaiShippingExchangeCbcfiProvider,
         "nbs_production_materials": NbsProductionMaterialsProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,
         "configured_source_chain": ConfiguredSourceChainProvider,
@@ -4849,6 +5116,7 @@ class CommodityAdapterRegistry:
         "eia": EiaCommodityGovernanceAdapter,
         "world_bank_pink_sheet": WorldBankCommodityGovernanceAdapter,
         "100ppi_public_web": PublicWebCommodityGovernanceAdapter,
+        "official_public_indicator": OfficialPublicIndicatorGovernanceAdapter,
         "nbs_production_materials": NbsProductionMaterialsGovernanceAdapter,
         "foreign_futures": ForeignFuturesCommodityGovernanceAdapter,
         "configured_source_chain": ConfiguredSourceChainGovernanceAdapter,

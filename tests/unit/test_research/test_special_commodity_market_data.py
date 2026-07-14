@@ -27,6 +27,7 @@ from research.special_commodity_market_data import (
     FredCommodityProvider,
     NbsProductionMaterialsGovernanceAdapter,
     NbsProductionMaterialsProvider,
+    OfficialPublicIndicatorGovernanceAdapter,
     NdrcPolicyDiscoveryAdapter,
     SpecialCommodityPolicyDiscoveryService,
     SpecialCommodityMasterDataService,
@@ -37,6 +38,7 @@ from research.special_commodity_market_data import (
     SpecialCommodityPriceSyncService,
     SpecialCommodityGovernancePipeline,
     SpecialCommodityStorageManager,
+    ShanghaiShippingExchangeCbcfiProvider,
     WorldBankCommodityProvider,
     _call_with_progress_logging,
     _observation_quality_diagnostics,
@@ -120,7 +122,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 40
+    assert result["instruments"] == 41
     assert result["series"] >= 43
 
     dictionary = storage.read_dictionary()
@@ -150,6 +152,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.NATURAL_RUBBER.SPOT",
         "CN.FORESTRY.SOFTWOOD_PULP.SPOT",
         "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
+        "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
         "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
@@ -165,6 +168,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.CHEMICAL.PVC.SPOT.100PPI.DAILY",
         "CMD.CN.CHEMICAL.POLYPROPYLENE.SPOT.100PPI.DAILY",
         "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
+        "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
     }
 
 
@@ -209,6 +213,11 @@ def test_special_commodity_scope_resolution():
     thermal_coal = selector.resolve(scope_id="cn_nbs_thermal_coal")
     assert [item.series_id for item in thermal_coal] == [
         "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY"
+    ]
+
+    cbcfi = selector.resolve(scope_id="cn_coal_cbcfi")
+    assert [item.series_id for item in cbcfi] == [
+        "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY"
     ]
 
     assert {item.series_id for item in selector.resolve(scope_id="eia_energy_oil")} == {
@@ -504,6 +513,103 @@ def test_nbs_unresolved_period_is_reported_not_silently_omitted(monkeypatch):
     assert unresolved["missing_periods"] == 1
     assert unresolved["missing_samples"] == ["2017-01-10"]
     assert diagnostics["unresolved_dates"] == 1
+
+
+def _cbcfi_html() -> str:
+    return """
+    <html><body><table>
+      <thead>
+        <tr><th>航线</th><th>单位</th><th>上期 2026-07-10</th>
+        <th>本期 2026-07-13</th><th>与上期比涨跌</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>综合指数</td><td>点</td><td>877.88</td><td>920.45</td><td>42.57</td></tr>
+      </tbody>
+    </table></body></html>
+    """
+
+
+def test_sse_cbcfi_provider_parses_latest_official_period(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_cbcfi")[0]
+    response = SimpleNamespace(text=_cbcfi_html(), raise_for_status=lambda: None)
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: response,
+    )
+    provider = ShanghaiShippingExchangeCbcfiProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+    )
+
+    result = provider.fetch(
+        [item], start_date="2026-07-06", end_date="2026-07-13"
+    )
+
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.observation_date == "2026-07-13"
+    assert observation.value == 920.45
+    assert observation.unit == "index_point"
+    assert observation.currency == ""
+    assert observation.metadata["data_kind"] == "industrial_indicator"
+    assert observation.metadata["publication_date"] == "2026-07-13"
+    assert observation.metadata["previous_value"] == 877.88
+    assert result.warnings[0]["reason"] == "sse_cbcfi_public_history_not_included"
+
+
+def test_sse_cbcfi_provider_blocks_unentitled_historical_backfill(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_cbcfi")[0]
+    response = SimpleNamespace(text=_cbcfi_html(), raise_for_status=lambda: None)
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get",
+        lambda *args, **kwargs: response,
+    )
+    provider = ShanghaiShippingExchangeCbcfiProvider(
+        item.source_profile,
+        cfg["source_profiles"][item.source_profile],
+    )
+
+    result = provider.fetch(
+        [item], start_date="2011-12-07", end_date="2026-07-10"
+    )
+
+    assert result.observations == []
+    assert result.blockers[0]["reason"] == "sse_cbcfi_public_history_requires_entitlement"
+
+
+def test_official_public_indicator_governance_uses_explicit_series_semantics(
+    monkeypatch,
+):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_cbcfi")[0]
+    provider_result = CommodityProviderResult()
+
+    class FakeProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return provider_result
+
+    adapter = OfficialPublicIndicatorGovernanceAdapter(
+        cfg["source_profiles"][item.source_profile]
+    )
+    result = adapter.govern_master(
+        [item], FakeProvider(), start_date="2026-07-13", end_date="2026-07-13"
+    )
+
+    assert result.blockers == []
+    assert result.records[0]["governance_status"] == "success"
+    assert result.records[0]["source_unit"] == "index_point"
+    assert result.records[0]["lifecycle_start"] == "2011-12-07"
+    assert result.records[0]["metadata"]["data_kind"] == "industrial_indicator"
+    assert result.prefetched_result is provider_result
 
 
 def test_nbs_official_observation_exception_is_governed_not_warned(monkeypatch):
@@ -2285,9 +2391,13 @@ def test_special_commodity_indicator_api_contract_returns_only_indicator_series(
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
     result = SpecialCommodityReadService(storage).indicators(category="coal")
     assert result["status"] == "success"
-    assert result["series_count"] == 1
-    assert result["series"][0]["series_id"] == "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY"
-    assert result["observations"] == {"CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY": []}
+    assert result["series_count"] == 2
+    expected = {
+        "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY",
+        "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
+    }
+    assert {item["series_id"] for item in result["series"]} == expected
+    assert result["observations"] == {series_id: [] for series_id in expected}
 
 
 def test_actual_contract_price_requires_complete_contract_semantics():
