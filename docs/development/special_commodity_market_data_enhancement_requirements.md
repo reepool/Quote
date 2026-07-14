@@ -121,6 +121,19 @@
 
 同日对国家统计局 2026 年 6 月下旬官方生产资料旬价正文完成真实探测。页面提供50项产品、单位、价格和独立规格表，包含螺纹钢、电解铜/铝锭/铅锭/锌锭、烧碱、甲醇、纯苯、乙醇、聚烯烃、磷酸铁锂、LNG/LPG、煤炭、玻璃、多晶硅、农产品、化肥、天然橡胶和纸浆等。现有 `NbsProductionMaterialsProvider` 已按配置化 `source_product_names/source_units/source_specification` 解析同一表格，因此新增 NBS 产品应复用该 adapter；每个产品仍需验证历史名称和规格是否发生变化。
 
+### 6.4 产业指标来源与实施边界评估
+
+2026-07-13 完成交易所仓单/库存/交割、海关进口和国家统计局产量数据的架构评估：
+
+| 指标域 | 首选来源 | 时间治理 | 实施结论 |
+|---|---|---|---|
+| 交易所仓单、库存、交割 | SHFE/INE、DCE、CZCE、GFEX 官方日报/周报 | 业务日期、发布日期、修订版本 | 在统一 indicator adapter 契约下按交易所分别实现 parser；可复用现有 HTTP/浏览器传输，但不得复用期货日行情 parser 或价格 scope |
+| 商品进口量/金额 | 海关总署统计数据查询及官方月报 | 统计月、发布日期、修订日期 | 按 HS code、贸易伙伴、数量单位和金额币种建立主数据；累计值与单月值必须显式区分，不得直接当价格 |
+| 原煤、原油、钢铁、有色等产量 | 国家统计局月度工业产品发布 | 统计月、发布日期、当月/累计口径 | 新建 NBS monthly production adapter；累计值转换为单月值时必须保留原始累计值和转换 lineage |
+| 国际能源库存 | EIA Open Data | 观测期、发布日期、修订 vintage | 可复用 EIA transport 和认证配置，但使用独立 indicator series/source profile，不进入 WTI/Brent 价格 source-chain |
+
+现有 `commodity_price_series`、观测表和 `/indicators` 读取接口可承载首批指标，正式序列必须设置 `metadata.data_kind=industrial_indicator` 和明确的 `quote_type`。价格、库存、仓单、产量、进口量和政策事件必须使用不同 `series_id`；指标不得加入 `special_commodity_price_sync`、`special_commodity_cn_spot_sync` 或 `special_commodity_price_monthly_sync`。后续实际 adapter、历史回补和调度上线应单独立项，逐来源完成来源许可、历史深度、字段稳定性和反爬验证。
+
 ## 7. 数据模型增强
 
 在保留现有表兼容性的前提下评估以下字段/表：

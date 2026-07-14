@@ -2041,6 +2041,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "fred_imf_metals",
         "world_bank_metals",
         "world_bank_fertilizers",
+        "world_bank_agriculture",
     ]
     assert monthly["parameters"]["frequencies"] == ["monthly"]
     assert monthly["parameters"]["lookback_months"] == 6

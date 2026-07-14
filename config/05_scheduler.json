@@ -859,7 +859,7 @@
       "special_commodity_price_monthly_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "特殊商品月频基准同步（FRED/IMF 铜铝与 World Bank 金属、化肥月均价；治理观测月份与来源修订）",
+        "description": "特殊商品月频基准同步（FRED/IMF 铜铝与 World Bank 金属、化肥、农产品月均价；治理观测月份与来源修订）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -876,7 +876,8 @@
           "scope_ids": [
             "fred_imf_metals",
             "world_bank_metals",
-            "world_bank_fertilizers"
+            "world_bank_fertilizers",
+            "world_bank_agriculture"
           ],
           "frequencies": [
             "monthly"
@@ -884,7 +885,7 @@
           "lookback_months": 6,
           "dry_run": false,
           "max_runtime_seconds": 1800,
-          "note": "FRED/IMF and World Bank Pink Sheet are independently identified monthly benchmarks. World Bank fertilizer series remain separate from domestic spot series; no source or regional benchmark silently overwrites or averages another."
+          "note": "FRED/IMF and World Bank Pink Sheet are independently identified monthly benchmarks. World Bank fertilizer and agriculture series remain separate from domestic spot series; no source or regional benchmark silently overwrites or averages another."
         }
       },
       "special_commodity_price_backfill": {
