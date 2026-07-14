@@ -13,6 +13,7 @@ import json
 import os
 import sqlite3
 import hashlib
+import threading
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import timedelta
@@ -321,6 +322,7 @@ class ResearchStorageManager:
                 self.research_config.storage.interests_db_path = self.interests_db_path
         self.quotes_db_path = self.research_config.storage.quotes_db_path
         self.quotes_db_alias = self.research_config.storage.quotes_db_alias
+        self._db_route_state = threading.local()
         self._active_db_path: Optional[str] = None
         self._financial_ingestion_run_ids: set[int] = set()
         self._valuation_ingestion_run_ids: set[int] = set()
@@ -328,6 +330,22 @@ class ResearchStorageManager:
             "change_watermark", {}
         )
         self.financial_statements = FinancialStatementStorageRepository(self)
+
+    @property
+    def _active_db_path(self) -> Optional[str]:
+        """Return the active database route for the current worker thread."""
+        state = self.__dict__.get("_db_route_state")
+        return getattr(state, "active_db_path", None) if state is not None else None
+
+    @_active_db_path.setter
+    def _active_db_path(self, value: Optional[str]) -> None:
+        # API storage calls run through asyncio.to_thread, so route state must
+        # not leak between concurrent workers sharing this manager instance.
+        state = self.__dict__.get("_db_route_state")
+        if state is None:
+            state = threading.local()
+            self.__dict__["_db_route_state"] = state
+        state.active_db_path = value
 
     def initialize(self) -> None:
         """Ensure database file, pragmas, and base tables exist."""
