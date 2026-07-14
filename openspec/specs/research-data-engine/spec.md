@@ -2413,3 +2413,31 @@ The Research Data Engine SHALL expose source configuration sufficient for exchan
 - **WHEN** the futures official-source smoke script is run against a temp database
 - **THEN** it SHALL be able to request a bounded series/date range
 - **AND** it SHALL return success, partial, or failed status with source-selection details without writing production `data/futures.db` by default
+
+### Requirement: Research Storage Database Routing Must Be Execution-Isolated
+The Research Data Engine SHALL isolate the active physical database route for each concurrent execution thread or equivalent execution context so one API request or scheduler operation cannot change the database selected by another operation.
+
+#### Scenario: Concurrent financial scopes overlap
+- **WHEN** two worker threads enter and exit financial database scopes with overlapping lifetimes
+- **THEN** each thread SHALL restore its own previous database route
+- **AND** the manager SHALL NOT remain routed to `financials.db` for later operations that did not explicitly select that database
+
+#### Scenario: Interest-rate read runs during another domain operation
+- **WHEN** an interest-rate series read executes concurrently with a financial or valuation storage operation
+- **THEN** the interest-rate read SHALL query the configured interests database
+- **AND** it SHALL NOT return a valid-looking empty result solely because another execution context selected `financials.db` or `valuation.db`
+
+#### Scenario: Database scopes are nested in one execution context
+- **WHEN** financial, valuation, interests, or default research database scopes are nested within one execution thread
+- **THEN** the innermost explicit scope SHALL select its intended database
+- **AND** exiting each scope SHALL restore the immediately preceding route in that same execution thread
+
+#### Scenario: Scoped operation raises an exception
+- **WHEN** a storage operation raises while an explicit database scope is active
+- **THEN** the scope SHALL restore that execution context's previous database route in a `finally` path
+- **AND** subsequent operations in that context SHALL resolve their normal configured database
+
+#### Scenario: Routing isolation is deployed
+- **WHEN** the routing implementation is upgraded
+- **THEN** public storage method signatures, REST request and response schemas, configured database paths, and existing SQLite data formats SHALL remain unchanged
+- **AND** the upgrade SHALL NOT require a schema migration or data rewrite
