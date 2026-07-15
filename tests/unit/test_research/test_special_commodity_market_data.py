@@ -2803,6 +2803,13 @@ def test_policy_discovery_report_contains_copyable_review_commands():
             "terminal_reviewed": 0,
             "document_write": {"inserted": 1},
             "candidate_write": {"inserted": 1},
+            "event_reconciliation": {
+                "status": "success",
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 1,
+                "candidate_already_represented": 1,
+            },
             "review_actions": [
                 {
                     "review_code": "93acac0c",
@@ -2817,6 +2824,7 @@ def test_policy_discovery_report_contains_copyable_review_commands():
     assert "待审核政策" in report
     assert "candidate_ref=93acac0c decision=approved" in report
     assert "candidate_ref=93acac0c decision=rejected" in report
+    assert "已批准候选已由正式事件覆盖: `1`" in report
 
 
 def test_special_commodity_scheduled_window_is_bounded_and_explicit_dates_win():
@@ -3213,7 +3221,7 @@ def test_ndrc_policy_discovery_versions_evidence_and_keeps_policy_semantics(monk
     assert promotion["status"] == "success"
     assert promotion["inserted"] == 0
     assert promotion["already_represented"] == 1
-    assert promotion["unchanged"] == 1
+    assert promotion["unchanged"] == 0
     promoted = storage.read_policy_events()[0]
     assert promoted["value_low"] == 570.0
     assert promoted["value_high"] == 770.0
@@ -3282,7 +3290,58 @@ def test_approved_policy_candidate_does_not_duplicate_existing_semantic_event(tm
     storage.upsert_policy_candidates([candidate], dry_run=False)
     promotion = service.promote_approved_candidates(dry_run=False)
     assert promotion["already_represented"] == 1
-    assert promotion["unchanged"] == 1
+    assert promotion["unchanged"] == 0
+    assert len(storage.read_policy_events()) == 1
+
+
+def test_policy_event_sync_separates_existing_candidate_from_event_write_counts(tmp_path):
+    cfg = _research_config(tmp_path)
+    module_cfg = cfg.modules["commodity_market_data"]["special_commodity_market_data"]
+    storage = SpecialCommodityStorageManager(cfg)
+    storage.initialize()
+    service = SpecialCommodityPolicyEventService(storage, module_cfg)
+    assert service.sync(dry_run=False)["inserted"] == 1
+
+    document = {
+        "document_id": "NDRC.2022.303.REPORT",
+        "source_profile": "ndrc_official_policy_event",
+        "source_url": "https://www.ndrc.gov.cn/303.html",
+        "document_number": "发改价格〔2022〕303号",
+        "title": "关于进一步完善煤炭市场价格形成机制的通知",
+        "published_date": "2022-02-25",
+        "retrieved_at": "2026-07-15T00:00:00+08:00",
+        "content_hash": "report-count-test",
+        "content_type": "text/html",
+        "parser_version": "test.v1",
+    }
+    storage.upsert_source_documents([document], dry_run=False)
+    storage.upsert_policy_candidates(
+        [
+            {
+                "candidate_id": "NDRC.CANDIDATE.REPORT",
+                "document_id": document["document_id"],
+                "commodity_id": "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
+                "policy_type": "long_term_transaction_reasonable_range",
+                "review_status": "approved",
+                "confidence": 1.0,
+                "effective_start": "2022-05-01",
+                "currency": "CNY",
+                "unit": "CNY/ton",
+                "value_low": 570.0,
+                "value_high": 770.0,
+                "value_mid": None,
+            }
+        ],
+        dry_run=False,
+    )
+
+    result = service.sync(dry_run=False)
+
+    assert result["policy_events"] == 1
+    assert result["inserted"] == 0
+    assert result["changed"] == 0
+    assert result["unchanged"] == 1
+    assert result["candidate_already_represented"] == 1
     assert len(storage.read_policy_events()) == 1
 
 

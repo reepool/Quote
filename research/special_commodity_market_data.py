@@ -6470,6 +6470,9 @@ class SpecialCommodityPolicyEventService:
             "status": "blocked" if blockers else "success",
             "dry_run": dry_run,
             "policy_events": len(events) + int(promotion.get("policy_events", 0) or 0),
+            "candidate_already_represented": int(
+                promotion.get("already_represented", 0) or 0
+            ),
             "event_summaries": event_summaries,
             "candidate_promotion": promotion,
             "blockers": blockers,
@@ -6541,7 +6544,6 @@ class SpecialCommodityPolicyEventService:
             "would_write": 0,
             "changelog_written": 0,
         }
-        counts["unchanged"] = int(counts.get("unchanged", 0) or 0) + already_represented
         return {
             "status": "blocked" if blockers else "success",
             "dry_run": dry_run,

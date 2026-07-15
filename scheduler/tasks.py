@@ -1783,6 +1783,11 @@ def _format_special_commodity_scheduler_report(
                 f"不变 `{event_reconciliation.get('unchanged', 0)}`｜"
                 f"状态 `{event_reconciliation.get('status', 'unknown')}`"
             )
+            already_represented = int(
+                event_reconciliation.get("candidate_already_represented", 0) or 0
+            )
+            if already_represented:
+                lines.append(f"已批准候选已由正式事件覆盖: `{already_represented}`")
     elif result.get("candidate_id") and result.get("decision"):
         lines.append(
             "政策候选审核: "

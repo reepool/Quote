@@ -391,7 +391,7 @@ scope 解析
 | `special_commodity_observation_backfill` | 特殊商品价格与产业指标历史观测回补 | 仅手工 | 对指定 scope 和区间执行治理前置、dry-run 或正式回补 |
 | `commodity_price_readiness_check` | DCF 商品输入就绪检查 | 每日或每周 | 检查 DCF 所需 commodity input 缺口 |
 
-政策治理已经收口为单一月度运维入口 `special_commodity_policy_governance_sync`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
+政策治理已经收口为单一月度运维入口 `special_commodity_policy_governance_sync`：任务自动完成目录发现、文号与版本去重、正文/附件存证、候选解析，以及既有配置政策和已批准候选的正式事件幂等对账。新候选不得自动批准；报告提供一条批准并提升命令和一条拒绝命令。正式事件的新增、更新、不变计数必须互斥，已批准候选若已被同语义正式事件覆盖，应单独报告而不得重复计入“不变”。原独立 `special_commodity_policy_event_sync` 任务已删除，底层 validator/service 仅作为月度发现和人工审核链路的共享实现；政策区间不得展开为日行情。
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 按“地域 + 数据语义 + 频率”命名，直接区分海外日频价格、国内现货价格、国际月频价格、非价格产业指标、政策治理和历史观测回补；旧的歧义 ID 已一次性删除且不保留别名。所有价格和指标入口复用同一个内部治理执行器，不形成平行链路。海外日频任务 `special_commodity_overseas_daily_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_domestic_spot_price_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp` 与 `cn_nbs_thermal_coal`。
 

@@ -170,7 +170,7 @@ CBCFI 和 NBS 原煤累计产量的治理前置均走统一主数据、来源观
 
 首期实现状态：
 
-- 已实现 `special_commodity_policy_governance_sync` 的统一 Scheduler/DataManager/API 入口，并在真实 dry-run、write、候选审核和幂等提升验证后正式上线：每月15日09:10自动执行 write，保存新增/修订文档和候选，但不自动批准政策；同一任务末尾自动完成既有配置政策和已批准候选的正式事件幂等对账。无待审核项时发送简洁报告；有待审核项时报告附政策摘要、批准并提升命令和拒绝命令。原独立 `special_commodity_policy_event_sync` 运维任务已删除，底层 validator/service 仅作为发现和审核链路的共享能力。
+- 已实现 `special_commodity_policy_governance_sync` 的统一 Scheduler/DataManager/API 入口，并在真实 dry-run、write、候选审核和幂等提升验证后正式上线：每月15日09:10自动执行 write，保存新增/修订文档和候选，但不自动批准政策；同一任务末尾自动完成既有配置政策和已批准候选的正式事件幂等对账。正式事件新增、更新、不变为互斥计数，已批准候选若已被正式事件覆盖则单列报告。无待审核项时发送简洁报告；有待审核项时报告附政策摘要、批准并提升命令和拒绝命令。原独立 `special_commodity_policy_event_sync` 运维任务已删除，底层 validator/service 仅作为发现和审核链路的共享能力。
 - 手工 dry-run：`/run special_commodity_policy_governance_sync adapter_id=ndrc start_date=2022-01-01 end_date=YYYY-MM-DD dry_run`。
 - 本地 API：`GET /api/v1/research/commodities/policy-candidates`、`GET /api/v1/research/commodities/source-documents`、`POST /api/v1/research/commodities/policy-discovery`。
 - `ready_for_promotion` 仅表示 parser 字段完整。发现报告必须附政策摘要、8位 `review_code`、批准和拒绝命令。运行 `/run special_commodity_policy_candidate_review candidate_ref=<review_code> decision=approved notes=verified` 会在同一任务中记录审核并通过统一 validator 幂等提升正式事件；无需再运行第二条 write 命令。拒绝使用 `decision=rejected`，状态持久保留，后续发现同一版本时不再重复提示。完整 `candidate_id` 仅作为内部稳定主键，API 和任务同时支持短码、完整ID或文号。
