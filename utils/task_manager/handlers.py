@@ -3209,9 +3209,9 @@ class TaskManagerHandlers:
             lowered = value_text.lower()
             if key in list_keys:
                 value: Any = [item.strip() for item in value_text.split(',') if item.strip()]
-            elif lowered in {'true', 'yes', 'y', '1'}:
+            elif lowered in {'true', 'yes', 'y'}:
                 value = True
-            elif lowered in {'false', 'no', 'n', '0'}:
+            elif lowered in {'false', 'no', 'n'}:
                 value = False
             elif lowered in {'none', 'null'}:
                 value = None
