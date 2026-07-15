@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import html as html_lib
 import importlib
 import io
 import json
@@ -3304,6 +3305,323 @@ class ShanghaiShippingExchangeCbcfiProvider:
         )
 
 
+class CctdaTtciPortInventoryProvider:
+    """Weekly Bohai-Rim port coal inventory from CCTDA TTCI reports."""
+
+    _LISTING_LINK = re.compile(
+        r"<el-link\b[^>]*href=[\"'](?P<url>[^\"']+)[\"'][^>]*>"
+        r"(?P<title>.*?)</el-link>",
+        re.IGNORECASE | re.DOTALL,
+    )
+    _PERIOD = re.compile(
+        r"TTCI.*?[（(](?P<start_year>\d{4})年(?P<start_month>\d{1,2})月"
+        r"(?P<start_day>\d{1,2})日\s*[-—至]\s*"
+        r"(?:(?P<end_year>\d{4})年)?(?:(?P<end_month>\d{1,2})月)?"
+        r"(?P<end_day>\d{1,2})日[）)]"
+    )
+    _PUBLICATION_DATE = re.compile(
+        r"(?P<date>20\d{2}-\d{2}-\d{2})\s+\d{2}:\d{2}:\d{2}"
+        r"\s*来源[：:]\s*中国煤炭运销协会"
+    )
+    _INVENTORY = re.compile(
+        r"环渤海港口(?:(?!联系电话).){0,500}?库\s*存\s*"
+        r"(?P<value>\d+(?:\.\d+)?)\s*万吨"
+    )
+
+    def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
+        self.source_profile = source_profile
+        self.source_cfg = dict(source_cfg or {})
+        self.timeout = float(self.source_cfg.get("timeout_seconds") or 30)
+        self.listing_urls = [
+            str(item)
+            for item in self.source_cfg.get("listing_urls", [])
+            if str(item).strip()
+        ] or ["https://www.cctda.org.cn/list-42-1.html"]
+        self.headers = {
+            "User-Agent": str(
+                self.source_cfg.get("user_agent")
+                or "QuoteSystem/SpecialCommodityMarketData"
+            ),
+            "Referer": self.listing_urls[0],
+        }
+        self.tls_config = tls_config_from_source_config(
+            "cctda_ttci_port_inventory", self.source_cfg
+        )
+
+    @staticmethod
+    def _plain_text(value: str) -> str:
+        text = re.sub(r"<script\b.*?</script>", " ", value, flags=re.I | re.S)
+        text = re.sub(r"<style\b.*?</style>", " ", text, flags=re.I | re.S)
+        text = re.sub(r"<[^>]+>", " ", text)
+        return " ".join(html_lib.unescape(text).replace("\xa0", " ").split())
+
+    @classmethod
+    def parse_period(cls, title: str) -> Optional[Dict[str, str]]:
+        normalized = cls._plain_text(title)
+        match = cls._PERIOD.search(normalized)
+        if match is None:
+            return None
+        start_year = int(match.group("start_year"))
+        start_month = int(match.group("start_month"))
+        start_day = int(match.group("start_day"))
+        end_year = int(match.group("end_year") or start_year)
+        end_month = int(match.group("end_month") or start_month)
+        end_day = int(match.group("end_day"))
+        if match.group("end_year") is None and end_month < start_month:
+            end_year += 1
+        try:
+            period_start = date(start_year, start_month, start_day)
+            period_end = date(end_year, end_month, end_day)
+        except ValueError:
+            return None
+        if period_end < period_start:
+            return None
+        return {
+            "period_start": period_start.isoformat(),
+            "period_end": period_end.isoformat(),
+            "observation_date": period_end.isoformat(),
+        }
+
+    @classmethod
+    def parse_article(
+        cls,
+        html: str,
+        *,
+        source_url: str,
+        period: Mapping[str, str],
+    ) -> Dict[str, Any]:
+        text = cls._plain_text(html)
+        inventory = cls._INVENTORY.search(text)
+        if inventory is None:
+            raise ValueError("CCTDA TTCI report missing Bohai-Rim port inventory")
+        publication = cls._PUBLICATION_DATE.search(text)
+        if publication is None:
+            raise ValueError("CCTDA TTCI report missing publication date")
+        return {
+            **dict(period),
+            "publication_date": publication.group("date"),
+            "value": float(inventory.group("value")),
+            "source_url": source_url,
+        }
+
+    def _fetch_html(self, url: str, *, context: str) -> str:
+        response = _request_with_retry(
+            url,
+            headers=self.headers,
+            timeout=self.timeout,
+            tls_config=self.tls_config,
+            retry_cfg=self.source_cfg.get("request_retry"),
+            log_context=context,
+        )
+        response.encoding = response.apparent_encoding or response.encoding
+        return response.text
+
+    def _discover_reports(
+        self, start: Optional[date], end: Optional[date]
+    ) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
+        discovered: Dict[str, Dict[str, str]] = {}
+        warnings: List[Dict[str, Any]] = []
+        max_pages = max(1, int(self.source_cfg.get("listing_max_pages") or 4))
+        for configured_url in self.listing_urls:
+            for page in range(1, max_pages + 1):
+                page_url = re.sub(r"-\d+\.html$", f"-{page}.html", configured_url)
+                try:
+                    html = self._fetch_html(
+                        page_url,
+                        context=f"cctda_ttci_listing page={page}",
+                    )
+                except Exception as exc:
+                    warnings.append(
+                        {
+                            "reason": "cctda_ttci_listing_failed",
+                            "source_url": page_url,
+                            "page": page,
+                            "error": str(exc),
+                        }
+                    )
+                    break
+                list_start = html.find('class="news_list"')
+                list_end = html.find('id="pages"', list_start + 1)
+                listing_html = (
+                    html[list_start:list_end]
+                    if list_start >= 0 and list_end > list_start
+                    else html
+                )
+                page_rows = 0
+                page_dates: List[date] = []
+                for match in self._LISTING_LINK.finditer(listing_html):
+                    title = self._plain_text(match.group("title"))
+                    period = self.parse_period(title)
+                    if period is None:
+                        continue
+                    source_url = urljoin(page_url, html_lib.unescape(match.group("url")))
+                    observed = date.fromisoformat(period["observation_date"])
+                    page_dates.append(observed)
+                    page_rows += 1
+                    if start and observed < start:
+                        continue
+                    if end and observed > end:
+                        continue
+                    discovered.setdefault(
+                        period["observation_date"],
+                        {**period, "title": title, "source_url": source_url},
+                    )
+                logger.info(
+                    "[CctdaTtciPortInventory] listing progress source=%s page=%s/%s "
+                    "page_rows=%s candidates=%s oldest=%s newest=%s",
+                    configured_url,
+                    page,
+                    max_pages,
+                    page_rows,
+                    len(discovered),
+                    min(page_dates).isoformat() if page_dates else None,
+                    max(page_dates).isoformat() if page_dates else None,
+                )
+                if page_rows == 0 or (start and page_dates and min(page_dates) < start):
+                    break
+        rows = sorted(discovered.values(), key=lambda item: item["observation_date"])
+        if not start and not end and rows:
+            rows = rows[-1:]
+        return rows, warnings
+
+    def fetch(
+        self,
+        series: Sequence[CommoditySeries],
+        *,
+        start_date: Optional[str],
+        end_date: Optional[str],
+    ) -> CommodityProviderResult:
+        start = _parse_date(start_date)
+        end = _parse_date(end_date)
+        if start and end and start > end:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "invalid_cctda_ttci_date_range",
+                        "start_date": start_date,
+                        "end_date": end_date,
+                    }
+                ]
+            )
+        unsupported = [
+            item.series_id
+            for item in series
+            if item.source_symbol.upper() != "BOHAI_PORT_COAL_INVENTORY"
+        ]
+        if unsupported:
+            return CommodityProviderResult(
+                blockers=[
+                    {
+                        "reason": "unsupported_cctda_ttci_source_symbol",
+                        "series_ids": unsupported,
+                    }
+                ]
+            )
+        logger.info(
+            "[CctdaTtciPortInventory] fetch start range=%s..%s series=%s",
+            start_date,
+            end_date,
+            len(series),
+        )
+        reports, warnings = self._discover_reports(start, end)
+        observations: List[CommodityObservation] = []
+        parse_failures: List[Dict[str, Any]] = []
+        progress_every = max(
+            1, int(self.source_cfg.get("progress_log_every_articles") or 10)
+        )
+        for index, report in enumerate(reports, start=1):
+            try:
+                article_html = self._fetch_html(
+                    report["source_url"],
+                    context=(
+                        "cctda_ttci_article "
+                        f"date={report['observation_date']}"
+                    ),
+                )
+                parsed = self.parse_article(
+                    article_html,
+                    source_url=report["source_url"],
+                    period=report,
+                )
+            except Exception as exc:
+                parse_failures.append(
+                    {
+                        "reason": "cctda_ttci_inventory_parse_failed",
+                        "observation_date": report["observation_date"],
+                        "source_url": report["source_url"],
+                        "error": str(exc),
+                    }
+                )
+                continue
+            for item in series:
+                observations.append(
+                    _build_observation(
+                        item=item,
+                        source_profile=self.source_profile,
+                        source_cfg=self.source_cfg,
+                        observation_date=parsed["observation_date"],
+                        value=parsed["value"],
+                        source_url=parsed["source_url"],
+                        source_symbol=item.source_symbol,
+                        raw_payload=parsed,
+                        metadata={
+                            "data_kind": "industrial_indicator",
+                            "publication_date": parsed["publication_date"],
+                            "source_period_start": parsed["period_start"],
+                            "source_period_end": parsed["period_end"],
+                            "region": "Bohai-Rim coal ports",
+                            "statistical_scope": "combined Bohai-Rim port coal inventory",
+                            "source_report": "CCTDA TTCI weekly report",
+                            "not_port_throughput": True,
+                            "not_power_plant_inventory": True,
+                        },
+                    )
+                )
+            if index % progress_every == 0 or index == len(reports):
+                logger.info(
+                    "[CctdaTtciPortInventory] article progress processed=%s/%s "
+                    "observations=%s parse_failures=%s",
+                    index,
+                    len(reports),
+                    len(observations),
+                    len(parse_failures),
+                )
+        warnings.extend(parse_failures)
+        blockers: List[Dict[str, Any]] = []
+        if reports and not observations:
+            blockers.append(
+                {
+                    "reason": "cctda_ttci_inventory_no_parseable_observations",
+                    "reports": len(reports),
+                    "parse_failures": len(parse_failures),
+                }
+            )
+        logger.info(
+            "[CctdaTtciPortInventory] fetch done range=%s..%s reports=%s "
+            "observations=%s warnings=%s blockers=%s",
+            start_date,
+            end_date,
+            len(reports),
+            len(observations),
+            len(warnings),
+            len(blockers),
+        )
+        return CommodityProviderResult(
+            observations=observations,
+            warnings=warnings,
+            blockers=blockers,
+            metadata={
+                "provider": "China Coal Transportation and Distribution Association",
+                "reports_discovered": len(reports),
+                "rows": len(observations),
+                "parse_failures": len(parse_failures),
+                "quality_diagnostics": {
+                    "observations": _observation_quality_diagnostics(observations)
+                },
+            },
+        )
+
+
 def _query_nbs_official_search(
     *,
     endpoint: str,
@@ -6271,6 +6589,7 @@ class CommodityAdapterRegistry:
         "world_bank_pink_sheet": WorldBankCommodityProvider,
         "100ppi_akshare": AkshareCommoditySpotProvider,
         "sse_cbcfi_public_latest": ShanghaiShippingExchangeCbcfiProvider,
+        "cctda_ttci_port_inventory": CctdaTtciPortInventoryProvider,
         "nbs_production_materials": NbsProductionMaterialsProvider,
         "nbs_monthly_industrial_output": NbsMonthlyIndustrialOutputProvider,
         "akshare_foreign_futures": AkshareForeignFuturesProvider,

@@ -840,6 +840,32 @@
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "note": "The unauthenticated official page exposes the latest and previous periods. Both are accepted when they fall in the requested range. Earlier multi-period history requires login/entitlement; the adapter must report this gap and must not synthesize history."
         },
+        "cctda_ttci_port_inventory": {
+          "venue": "CCTDA",
+          "source": "China Coal Transportation and Distribution Association TTCI weekly reports",
+          "source_mode": "industry_association_public_web",
+          "source_interface": "cctda_ttci_weekly_report_catalog",
+          "provider_adapter": "cctda_ttci_port_inventory",
+          "governance_adapter": "official_public_indicator",
+          "calendar_type": "source_observed_weekly_report_period",
+          "calendar_quality_flag": "association_source_observed",
+          "quality_flag": "industry_association_public_web",
+          "parser_version": "cctda_ttci_port_inventory.v1",
+          "listing_urls": [
+            "https://www.cctda.org.cn/list-42-1.html",
+            "https://www.cctda.org.cn/list-60-1.html"
+          ],
+          "listing_max_pages": 4,
+          "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 1.0
+          },
+          "progress_log_every_articles": 10,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "reuse_policy": "internal_research_factual_observations_only",
+          "note": "Parse only factual Bohai-Rim combined port coal inventory values, report periods, publication dates, and source URLs from CCTDA-authored TTCI weekly reports. Do not store or redistribute article text, treat TTCI index points as CNY/ton, or substitute power-plant inventory."
+        },
         "100ppi_public_web": {
           "venue": "100PPI",
           "source": "100ppi public web",
@@ -1536,6 +1562,23 @@
             "dcf_role": "thermal_coal_coastal_freight_indicator",
             "not_commodity_price": true,
             "source_scope": "Shanghai Shipping Exchange CBCFI composite index"
+          }
+        },
+        {
+          "commodity_id": "CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA",
+          "symbol": "BOHAI_PORT_COAL_INVENTORY",
+          "name": "Bohai-Rim Combined Port Coal Inventory",
+          "category": "coal",
+          "commodity_type": "industrial_indicator",
+          "default_currency": "",
+          "default_unit": "10k_ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_port_inventory_indicator",
+            "not_commodity_price": true,
+            "not_port_throughput": true,
+            "not_power_plant_inventory": true,
+            "source_scope": "CCTDA TTCI weekly reports"
           }
         },
         {
@@ -2297,6 +2340,32 @@
           }
         },
         {
+          "series_id": "CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY",
+          "commodity_id": "CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA",
+          "venue": "CCTDA",
+          "source_profile": "cctda_ttci_port_inventory",
+          "source_symbol": "BOHAI_PORT_COAL_INVENTORY",
+          "frequency": "weekly",
+          "quote_type": "industrial_indicator",
+          "currency": "",
+          "unit": "10k_ton",
+          "active": true,
+          "metadata": {
+            "data_kind": "industrial_indicator",
+            "source_name": "China Coal Transportation and Distribution Association TTCI weekly reports",
+            "source_url": "https://www.cctda.org.cn/list-42-1.html",
+            "source_available_from": "2024-08-02",
+            "region_or_spec": "Combined coal inventory across Bohai-Rim ports reported in CCTDA TTCI weekly reports",
+            "publication_date_semantics": "association_report_publication_date",
+            "source_period_semantics": "weekly_report_period_end",
+            "statistical_scope": "Bohai-Rim combined port coal inventory",
+            "reuse_policy": "internal_research_factual_observations_only",
+            "not_commodity_price": true,
+            "not_port_throughput": true,
+            "not_power_plant_inventory": true
+          }
+        },
+        {
           "series_id": "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
           "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
           "venue": "NBS",
@@ -2586,6 +2655,22 @@
           ],
           "frequencies": [
             "daily"
+          ]
+        },
+        {
+          "scope_id": "cn_coal_bohai_port_inventory",
+          "enabled": true,
+          "venues": [
+            "CCTDA"
+          ],
+          "categories": [
+            "coal"
+          ],
+          "commodity_ids": [
+            "CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA"
+          ],
+          "frequencies": [
+            "weekly"
           ]
         },
         {

@@ -23,6 +23,7 @@ from research.special_commodity_market_data import (
     CommoditySeries,
     CommodityUniverseSelector,
     ConfiguredSourceChainProvider,
+    CctdaTtciPortInventoryProvider,
     EiaCommodityProvider,
     FredCommodityProvider,
     NbsMonthlyIndustrialOutputProvider,
@@ -126,8 +127,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 42
-    assert result["series"] >= 43
+    assert result["instruments"] == 43
+    assert result["series"] >= 44
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -158,6 +159,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
         "CN.COAL.RAW_COAL.OUTPUT.NBS",
         "CN.COAL.FREIGHT.CBCFI.COMPOSITE",
+        "CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA",
         "CN.COAL.THERMAL.QHD_5500.LONG_TERM_POLICY",
     }
     assert {item["series_id"] for item in dictionary["series"]} >= {
@@ -175,6 +177,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
         "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
+        "CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY",
     }
 
 
@@ -1177,6 +1180,101 @@ def test_sse_cbcfi_provider_blocks_unentitled_historical_backfill(monkeypatch):
     assert len(result.observations) == 1
     assert result.observations[0].observation_date == "2026-07-10"
     assert result.blockers[0]["reason"] == "sse_cbcfi_public_history_requires_entitlement"
+
+
+def _cctda_ttci_listing_html() -> str:
+    return """
+    <html><body><ul>
+      <li><el-link href="https://www.cctda.org.cn/report-20260703.html">
+        唐山动力煤现货价格指数（TTCI）（2026年6月29日-7月3日）
+      </el-link></li>
+      <li><el-link href="https://www.cctda.org.cn/report-20260626.html">
+        唐山动力煤现货价格指数（TTCI）（2026年6月22日-6月26日）
+      </el-link></li>
+    </ul></body></html>
+    """
+
+
+def _cctda_ttci_article_html() -> str:
+    return """
+    <html><body>
+      <h1>唐山动力煤现货价格指数（TTCI）（2026年6月29日-7月3日）</h1>
+      <p>2026-07-07 10:20:00 来源：中国煤炭运销协会</p>
+      <p>截止到7月3日，环渤海港口合计调入201.3万吨，调出198.2万吨，
+      库 存 3012万吨，环比上涨22万吨。</p>
+    </body></html>
+    """
+
+
+def test_cctda_ttci_port_inventory_provider_preserves_weekly_semantics(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        scope_id="cn_coal_bohai_port_inventory"
+    )[0]
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+    source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-42-1.html"]
+    source_cfg["listing_max_pages"] = 2
+
+    def fake_get(url, *args, **kwargs):
+        if str(url).endswith("list-42-1.html"):
+            payload = _cctda_ttci_listing_html()
+        elif str(url).endswith("list-42-2.html"):
+            payload = "<html><body></body></html>"
+        elif str(url).endswith("report-20260703.html"):
+            payload = _cctda_ttci_article_html()
+        else:
+            raise AssertionError(f"unexpected URL: {url}")
+        return SimpleNamespace(
+            text=payload,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get", fake_get
+    )
+    provider = CctdaTtciPortInventoryProvider(item.source_profile, source_cfg)
+
+    result = provider.fetch(
+        [item], start_date="2026-06-29", end_date="2026-07-03"
+    )
+
+    assert result.blockers == []
+    assert result.warnings == []
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.observation_date == "2026-07-03"
+    assert observation.value == 3012.0
+    assert observation.unit == "10k_ton"
+    assert observation.currency == ""
+    assert observation.metadata["publication_date"] == "2026-07-07"
+    assert observation.metadata["source_period_start"] == "2026-06-29"
+    assert observation.metadata["source_period_end"] == "2026-07-03"
+    assert observation.metadata["not_power_plant_inventory"] is True
+
+
+def test_cctda_ttci_port_inventory_parser_rejects_index_without_inventory():
+    period = CctdaTtciPortInventoryProvider.parse_period(
+        "唐山动力煤现货价格指数（TTCI）（2026年12月29日-2027年1月2日）"
+    )
+
+    assert period == {
+        "period_start": "2026-12-29",
+        "period_end": "2027-01-02",
+        "observation_date": "2027-01-02",
+    }
+    with pytest.raises(ValueError, match="missing Bohai-Rim port inventory"):
+        CctdaTtciPortInventoryProvider.parse_article(
+            """
+            <p>2027-01-05 09:00:00 来源：中国煤炭运销协会</p>
+            <p>唐山动力煤现货价格指数本周平均报收1600.25。</p>
+            """,
+            source_url="https://www.cctda.org.cn/example.html",
+            period=period,
+        )
 
 
 def test_official_public_indicator_governance_uses_explicit_series_semantics(
@@ -2938,6 +3036,12 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
             "window_mode": "provider_latest",
         },
         {
+            "scope_id": "cn_coal_bohai_port_inventory",
+            "enabled": False,
+            "window_mode": "rolling",
+            "lookback_days": 21,
+        },
+        {
             "scope_id": "cn_nbs_raw_coal_output",
             "enabled": True,
             "window_mode": "monthly",
@@ -3380,10 +3484,11 @@ def test_special_commodity_indicator_api_contract_returns_only_indicator_series(
     SpecialCommodityMasterDataService(storage, module_cfg).sync()
     result = SpecialCommodityReadService(storage).indicators(category="coal")
     assert result["status"] == "success"
-    assert result["series_count"] == 3
+    assert result["series_count"] == 4
     expected = {
         "CMD.CN.COAL.PORT.INVENTORY.TEST.DAILY",
         "CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY",
+        "CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY",
         "CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY",
     }
     assert {item["series_id"] for item in result["series"]} == expected

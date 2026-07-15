@@ -900,6 +900,12 @@
               "window_mode": "provider_latest"
             },
             {
+              "scope_id": "cn_coal_bohai_port_inventory",
+              "enabled": false,
+              "window_mode": "rolling",
+              "lookback_days": 21
+            },
+            {
               "scope_id": "cn_nbs_raw_coal_output",
               "enabled": true,
               "window_mode": "monthly",
