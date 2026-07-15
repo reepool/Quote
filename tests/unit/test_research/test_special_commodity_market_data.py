@@ -3168,7 +3168,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         },
         {
             "scope_id": "cn_coal_bohai_port_inventory",
-            "enabled": False,
+            "enabled": True,
             "window_mode": "rolling",
             "lookback_days": 21,
         },

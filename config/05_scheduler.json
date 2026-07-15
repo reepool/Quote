@@ -935,7 +935,7 @@
             },
             {
               "scope_id": "cn_coal_bohai_port_inventory",
-              "enabled": false,
+              "enabled": true,
               "window_mode": "rolling",
               "lookback_days": 21
             },
