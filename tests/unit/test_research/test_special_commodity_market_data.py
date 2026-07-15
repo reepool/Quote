@@ -2988,6 +2988,48 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "field_reconciled=2" in report
 
 
+def test_special_commodity_report_supports_article_source_coverage():
+    from scheduler.tasks import _format_special_commodity_scheduler_report
+
+    report = _format_special_commodity_scheduler_report(
+        {
+            "status": "success",
+            "run_id": 166,
+            "dry_run": True,
+            "target_series": 1,
+            "venues": ["CCTDA"],
+            "master_data_governance": "success",
+            "date_governance": "success",
+            "master_governance_records": 1,
+            "source_date_count": 45,
+            "fetched_rows": 45,
+            "would_write": 45,
+            "per_source": {
+                "cctda_bspi_weekly_port_price": {
+                    "status": "success",
+                    "series": 1,
+                    "master_records": 1,
+                    "calendar_rows": 45,
+                    "fetched": 45,
+                    "source_coverage": {
+                        "articles_discovered": 47,
+                        "reports_without_metric": 2,
+                        "parse_failures": 0,
+                        "title_value_recoveries": 0,
+                    },
+                    "warnings": 0,
+                    "blockers": 0,
+                }
+            },
+        }
+    )
+
+    assert "reports=47" in report
+    assert "metric_absent=2" in report
+    assert "parse_failed=0" in report
+    assert "title_recovered=0" in report
+
+
 def test_special_commodity_industrial_scope_windows_and_aggregation():
     from scheduler.tasks import (
         _aggregate_special_commodity_scope_results,
@@ -3267,6 +3309,7 @@ def test_special_commodity_schedules_split_overseas_and_domestic_spot_scopes():
         "cn_100ppi_natural_rubber",
         "cn_100ppi_softwood_pulp",
         "cn_nbs_thermal_coal",
+        "cn_coal_bspi",
     ]
     assert domestic_spot["parameters"]["lookback_days"] == 10
     industrial = jobs["special_commodity_industrial_indicator_sync"]

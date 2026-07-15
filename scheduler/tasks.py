@@ -1898,12 +1898,24 @@ def _format_special_commodity_scheduler_report(
                 source_coverage = item.get("source_coverage") or {}
                 coverage_suffix = ""
                 if source_coverage:
+                    reports_discovered = source_coverage.get(
+                        "reports_discovered"
+                    )
+                    if reports_discovered is None:
+                        reports_discovered = source_coverage.get(
+                            "articles_discovered", 0
+                        )
                     coverage_suffix = (
-                        f", reports={source_coverage.get('reports_discovered', 0)}, "
+                        f", reports={reports_discovered}, "
                         f"metric_absent={source_coverage.get('reports_without_metric', 0)}, "
                         f"parse_failed={source_coverage.get('parse_failures', 0)}, "
                         f"field_reconciled={source_coverage.get('field_reconciliations', 0)}"
                     )
+                    if "title_value_recoveries" in source_coverage:
+                        coverage_suffix += (
+                            ", title_recovered="
+                            f"{source_coverage.get('title_value_recoveries', 0)}"
+                        )
                 source_lines.append(
                     f"{source_profile}: status={item.get('status', 'unknown')}, "
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "

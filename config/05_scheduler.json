@@ -874,7 +874,7 @@
       "special_commodity_domestic_spot_price_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "国内特殊商品现货价格与基准同步（100ppi 化工现货、国家统计局动力煤旬价；独立于国内期货连续合约日更）",
+        "description": "国内特殊商品现货价格与基准同步（100ppi 化工现货、国家统计局动力煤旬价、CCTDA 周频 BSPI；独立于国内期货连续合约日更）",
         "report": true,
         "pre_run_notify": false,
         "trigger": {
@@ -903,12 +903,13 @@
             "cn_100ppi_lpg",
             "cn_100ppi_natural_rubber",
             "cn_100ppi_softwood_pulp",
-            "cn_nbs_thermal_coal"
+            "cn_nbs_thermal_coal",
+            "cn_coal_bspi"
           ],
           "lookback_days": 10,
           "dry_run": false,
           "max_runtime_seconds": 3600,
-          "note": "Governed domestic public-web spot and benchmark scopes only. The 10-day lookback covers NBS publication lag. Do not add these series to futures_market_data_sync because their source-observed date governance differs from exchange futures governance."
+          "note": "Governed domestic public-web spot and benchmark scopes only. The 10-day lookback covers NBS and weekly BSPI publication lag. Do not add these series to futures_market_data_sync because their source-observed date governance differs from exchange futures governance."
         }
       },
       "special_commodity_industrial_indicator_sync": {
