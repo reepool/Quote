@@ -54,6 +54,7 @@ def normalize_a_share_backfill_parameters(
     scopes: Any = None,
     instrument_ids: Any = None,
     dry_run: Any = True,
+    scan_sources: Any = False,
     resume: Any = True,
     chunk_size: Any = 100,
     repair_universe_mode: str = "historical_backfill",
@@ -85,13 +86,21 @@ def normalize_a_share_backfill_parameters(
     if normalized_chunk_size < 1 or normalized_chunk_size > 1000:
         raise ValueError("chunk_size must be between 1 and 1000")
 
+    normalized_dry_run = _coerce_bool(dry_run)
+    normalized_scan_sources = _coerce_bool(scan_sources)
+    if normalized_scan_sources and not normalized_dry_run:
+        raise ValueError("scan_sources=true requires dry_run=true")
+    if normalized_scan_sources and not ({"dividends", "factors"} & set(normalized_scopes)):
+        raise ValueError("scan_sources=true requires dividends or factors scope")
+
     return {
         "start_date": normalized_start,
         "end_date": normalized_end,
         "exchanges": normalized_exchanges,
         "scopes": normalized_scopes,
         "instrument_ids": normalize_string_list(instrument_ids),
-        "dry_run": _coerce_bool(dry_run),
+        "dry_run": normalized_dry_run,
+        "scan_sources": normalized_scan_sources,
         "resume": _coerce_bool(resume),
         "chunk_size": normalized_chunk_size,
         "repair_universe_mode": str(repair_universe_mode or "historical_backfill").strip(),
@@ -254,4 +263,3 @@ class AShareBackfillCheckpointStore:
             os.fsync(handle.fileno())
         os.replace(temporary, path)
         return path
-

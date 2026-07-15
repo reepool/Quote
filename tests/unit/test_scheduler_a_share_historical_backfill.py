@@ -79,6 +79,49 @@ async def test_a_share_historical_backfill_dry_run_has_no_business_writes(monkey
 
 
 @pytest.mark.asyncio
+async def test_a_share_historical_backfill_source_scan_reads_without_writes(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [{"date": datetime(2026, 1, 5)}])
+    xdxr_mock = AsyncMock(return_value={
+        "status": "dry_run",
+        "totals": {
+            "raw_events": 3,
+            "saved_events": 0,
+            "existing_events_refreshed": 0,
+            "derived_factors": 2,
+            "pending_factors": 1,
+            "empty_instruments": 0,
+            "timeouts": 0,
+            "errors": 0,
+        },
+    })
+    monkeypatch.setattr(data_manager, "backfill_tdx_xdxr_history", xdxr_mock)
+
+    result = await task.a_share_daily_data_historical_backfill(
+        start_date="2026-01-05",
+        end_date="2026-01-05",
+        exchanges="SSE",
+        scopes="dividends,factors",
+        dry_run=True,
+        scan_sources=True,
+        chunk_size="1",
+    )
+
+    assert result["status"] == "scan_only"
+    assert result["scan_sources"] is True
+    assert result["stages"]["dividends"]["status"] == "scan_only"
+    assert result["stages"]["dividends"]["totals"]["raw_events"] == 3
+    assert result["stages"]["factors"]["totals"]["derived_factors"] == 2
+    assert result["stages"]["dividends"]["totals"]["chunks_completed"] == 1
+    xdxr_mock.assert_awaited_once()
+    assert xdxr_mock.await_args.kwargs["dry_run"] is True
+    assert not (tmp_path / "backfill_checkpoints").exists()
+    assert is_successful_task_result(result) is True
+
+
+@pytest.mark.asyncio
 async def test_a_share_historical_backfill_blocks_quotes_when_calendar_missing(monkeypatch, tmp_path):
     task = _task(monkeypatch, tmp_path, [])
     quote_mock = AsyncMock()
@@ -197,6 +240,7 @@ def test_scheduler_config_registers_manual_dry_run_job():
     assert job["manual_only"] is True
     assert "trigger" not in job
     assert job["parameters"]["dry_run"] is True
+    assert job["parameters"]["scan_sources"] is False
     assert job["parameters"]["resume"] is True
     assert job["parameters"]["scopes"] == [
         "master", "calendar", "quotes", "dividends", "factors"
@@ -229,3 +273,32 @@ def test_historical_backfill_report_is_bounded_and_exposes_checkpoint():
     assert "quotes: partial" in content
     assert "sample-9" in content
     assert "sample-10" not in content
+
+
+def test_historical_backfill_report_distinguishes_preview_and_source_scan():
+    common = {
+        "dry_run": True,
+        "checkpoint_id": "test-checkpoint",
+        "parameters": {
+            "start_date": "2020-01-01",
+            "end_date": "2020-12-31",
+            "exchanges": ["SSE"],
+            "scopes": ["dividends"],
+        },
+        "stages": {"dividends": {"status": "dry_run", "totals": {}}},
+    }
+
+    preview = _format_a_share_historical_backfill_report({
+        **common,
+        "status": "dry_run",
+        "scan_sources": False,
+    })
+    scan = _format_a_share_historical_backfill_report({
+        **common,
+        "status": "scan_only",
+        "scan_sources": True,
+    })
+
+    assert "结论: *预演完成*" in preview
+    assert "结论: *源扫描完成*" in scan
+    assert "scan_sources: `True`" in scan

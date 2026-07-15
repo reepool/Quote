@@ -191,3 +191,34 @@ async def test_xdxr_history_derivation_updates_pending_event():
     assert result["totals"]["pending_factors"] == 0
     assert manager.db_ops.saved_calls[1][1] is False
     assert manager.db_ops.saved_calls[1][0][0]["validation_result"] == "computed_unvalidated"
+
+
+@pytest.mark.asyncio
+async def test_xdxr_history_dry_run_counts_events_and_factors_without_saving():
+    factor = {
+        "instrument_id": "600000.SH",
+        "ex_date": datetime(2020, 6, 1),
+        "factor": 1.02,
+        "cumulative_factor": 1.02,
+        "pre_close": 10.0,
+        "fenhong": 2.0,
+        "songzhuangu": 0.0,
+        "peigu": 0.0,
+        "peigujia": 0.0,
+    }
+    manager = _build_manager(_FakeTdxSource([factor]))
+
+    result = await manager.backfill_tdx_xdxr_history(
+        exchanges=["SSE"],
+        start_date=date(2020, 1, 1),
+        end_date=date(2020, 12, 31),
+        derive_factors=True,
+        dry_run=True,
+    )
+
+    assert result["status"] == "dry_run"
+    assert result["totals"]["raw_events"] == 1
+    assert result["totals"]["saved_events"] == 0
+    assert result["totals"]["derived_factors"] == 1
+    assert result["totals"]["pending_factors"] == 0
+    assert manager.db_ops.saved_calls == []

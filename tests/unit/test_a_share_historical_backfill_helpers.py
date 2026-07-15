@@ -26,6 +26,7 @@ def test_normalize_a_share_backfill_parameters_accepts_scheduler_strings():
     assert result["exchanges"] == ["SSE", "SZSE", "BSE"]
     assert result["scopes"] == ["calendar", "quotes", "dividends"]
     assert result["dry_run"] is False
+    assert result["scan_sources"] is False
     assert result["resume"] is True
     assert result["chunk_size"] == 25
 
@@ -42,6 +43,44 @@ def test_normalize_a_share_backfill_parameters_accepts_scheduler_strings():
 def test_normalize_a_share_backfill_parameters_rejects_invalid_input(kwargs):
     with pytest.raises(ValueError):
         normalize_a_share_backfill_parameters(**kwargs)
+
+
+def test_normalize_a_share_backfill_parameters_accepts_read_only_source_scan():
+    result = normalize_a_share_backfill_parameters(
+        start_date="2020-01-01",
+        end_date="2020-12-31",
+        scopes="dividends,factors",
+        dry_run=True,
+        scan_sources="true",
+    )
+
+    assert result["dry_run"] is True
+    assert result["scan_sources"] is True
+
+
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        (
+            {"dry_run": False, "scan_sources": True, "scopes": ["dividends"]},
+            "requires dry_run=true",
+        ),
+        (
+            {"dry_run": True, "scan_sources": True, "scopes": ["quotes"]},
+            "requires dividends or factors scope",
+        ),
+    ],
+)
+def test_normalize_a_share_backfill_parameters_rejects_invalid_source_scan(
+    kwargs,
+    message,
+):
+    with pytest.raises(ValueError, match=message):
+        normalize_a_share_backfill_parameters(
+            start_date="2020-01-01",
+            end_date="2020-12-31",
+            **kwargs,
+        )
 
 
 def test_calendar_coverage_respects_bse_inception():

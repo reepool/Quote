@@ -146,6 +146,7 @@
             "factors"
           ],
           "dry_run": true,
+          "scan_sources": false,
           "resume": true,
           "chunk_size": 100,
           "repair_universe_mode": "historical_backfill",

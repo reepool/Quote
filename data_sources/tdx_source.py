@@ -730,7 +730,36 @@ class TdxSource(BaseDataSource):
             return []
 
         api = self.pool.get_connection()
-        xdxr = api.get_xdxr_info(market, code)
+        reconnected = False
+        try:
+            xdxr = api.get_xdxr_info(market, code)
+        except Exception as exc:
+            tdx_logger.warning(
+                f"[{self.name}] XDXR 请求失败, 尝试重连 ({instrument_id}): {exc}"
+            )
+            api = self.pool.reconnect_current()
+            reconnected = True
+            xdxr = api.get_xdxr_info(market, code)
+
+        if not xdxr:
+            try:
+                connection_probe = api.get_security_bars(
+                    KLINE_TYPE_DAILY, market, code, 0, 1
+                )
+            except Exception:
+                connection_probe = None
+            if not connection_probe and not reconnected:
+                tdx_logger.warning(
+                    f"[{self.name}] XDXR 与行情探针均为空, 怀疑连接已断开, "
+                    f"尝试重连... ({instrument_id})"
+                )
+                api = self.pool.reconnect_current(mark_failure=False)
+                reconnected = True
+                xdxr = api.get_xdxr_info(market, code)
+                if xdxr:
+                    tdx_logger.info(
+                        f"[{self.name}] 重连后成功获取 XDXR ({instrument_id})"
+                    )
         if not xdxr:
             return []
 

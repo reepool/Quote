@@ -13,6 +13,12 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 
 任务为 `manual_only`，没有 cron trigger，默认 `dry_run=true`。部署或重启 Scheduler 不会自动执行历史下载。
 
+执行模式分为三类：
+
+- `dry_run`：只校验参数、治理历史股票池并生成 chunk 计划，不请求行情或 TDX 数据源。
+- `dry_run scan_sources=true`：真实请求 TDX XDXR 和可选因子派生，统计事件、空响应、超时和错误，但不写数据库、不保存 checkpoint。
+- `write`：真实请求数据源并持久化结果，成功 chunk 写入 checkpoint。
+
 ## 推荐执行顺序
 
 先运行全范围 dry-run：
@@ -21,7 +27,13 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 /run a_share_daily_data_historical_backfill start_date=1990-12-19 end_date=2025-12-31 exchanges=SSE,SZSE,BSE scopes=master,calendar,quotes,dividends,factors dry_run
 ```
 
-再使用少量明确股票进行写入验证：
+再使用少量明确股票进行 TDX 真实源扫描：
+
+```text
+/run a_share_daily_data_historical_backfill start_date=1990-12-19 end_date=2025-12-31 exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ scopes=dividends,factors chunk_size=2 dry_run scan_sources=true
+```
+
+确认扫描返回非零 `raw_events`、合理的 `derived_factors`，并且 `saved_events=0` 后，再进行小范围写入验证：
 
 ```text
 /run a_share_daily_data_historical_backfill start_date=2018-01-01 end_date=2025-12-31 exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ scopes=master,calendar,quotes,dividends,factors chunk_size=2 write
@@ -36,6 +48,7 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 - `scopes`：可选 `master,calendar,quotes,dividends,factors`。
 - `instrument_ids`：可选，用于小样本验证或定向恢复。
 - `dry_run` / `write`：默认 dry-run；只有 `write` 才执行生产写入。
+- `scan_sources`：默认 `false`；仅允许与 `dry_run=true` 组合，并且 scopes 必须包含 `dividends` 或 `factors`。
 - `resume`：默认 `true`，复用参数完全一致的 checkpoint。
 - `chunk_size`：默认 100，允许 1 至 1000。
 - `repair_universe_limit`：可选，每个交易所限制候选数量，适合验证。
@@ -55,7 +68,7 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 
 每个成功 chunk 完成后原子更新 checkpoint。失败或超时的 chunk 不会标记完成，使用相同参数再次执行时会继续处理。
 
-Dry-run 不创建或更新 checkpoint，也不会调用行情、XDXR 或主数据写入接口。
+普通 dry-run 不创建或更新 checkpoint，也不会调用行情、XDXR 或主数据写入接口。`scan_sources=true` 会读取 TDX，但仍不会创建、更新或完成 checkpoint chunk。
 
 ## 数据治理规则
 
@@ -68,6 +81,7 @@ Dry-run 不创建或更新 checkpoint，也不会调用行情、XDXR 或主数�
 ## 分红与复权隔离
 
 - TDX category-1 XDXR 原始事件写入 `adjustment_factors_tdx`。
+- XDXR 返回空且同股票行情探针也为空时，会刷新 TDX 长连接并重试一次，避免把静默断线误判为无分红历史。
 - 缺少前收盘价时仍保存分红、送转和配股字段，并标记 `pending_factor_missing_pre_close`。
 - 后续存在前收盘价时，factor 阶段可以更新同一审计行。
 - 原始事件刷新不会覆盖已有的有效计算因子和验证结论。

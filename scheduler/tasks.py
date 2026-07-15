@@ -105,7 +105,13 @@ def _format_scheduler_status(status: Any) -> tuple[str, str]:
 
 def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
     """Build a bounded operator report for the unified A-share history task."""
-    icon, label = _format_scheduler_status(result.get('status'))
+    normalized_status = str(result.get('status') or '').lower()
+    if normalized_status == 'dry_run':
+        icon, label = 'ℹ️', '预演完成'
+    elif normalized_status == 'scan_only':
+        icon, label = 'ℹ️', '源扫描完成'
+    else:
+        icon, label = _format_scheduler_status(result.get('status'))
     parameters = result.get('parameters') or {}
     stages = result.get('stages') or {}
     lines = []
@@ -138,6 +144,7 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
         f"结论: *{label}*\n"
         f"状态: `{result.get('status')}`\n"
         f"dry_run: `{result.get('dry_run')}`\n"
+        f"scan_sources: `{result.get('scan_sources', False)}`\n"
         f"checkpoint: `{result.get('checkpoint_id')}`\n"
         f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`\n"
         f"市场: `{','.join(parameters.get('exchanges') or [])}`\n"
@@ -2689,6 +2696,7 @@ class ScheduledTasks:
         scopes: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         dry_run: bool = True,
+        scan_sources: bool = False,
         resume: bool = True,
         checkpoint_id: Optional[str] = None,
         chunk_size: int = 100,
@@ -2711,6 +2719,7 @@ class ScheduledTasks:
                 scopes=scopes,
                 instrument_ids=instrument_ids,
                 dry_run=dry_run,
+                scan_sources=scan_sources,
                 resume=resume,
                 chunk_size=chunk_size,
                 repair_universe_mode=repair_universe_mode,
@@ -2745,9 +2754,14 @@ class ScheduledTasks:
                 )
 
             result = {
-                'status': 'dry_run' if parameters['dry_run'] else 'success',
+                'status': (
+                    'scan_only'
+                    if parameters['scan_sources']
+                    else ('dry_run' if parameters['dry_run'] else 'success')
+                ),
                 'operation': task_id,
                 'dry_run': parameters['dry_run'],
+                'scan_sources': parameters['scan_sources'],
                 'checkpoint_id': resolved_checkpoint_id,
                 'checkpoint_path': str(checkpoint_store.path_for(resolved_checkpoint_id)),
                 'resumed': bool(checkpoint),
@@ -3063,16 +3077,27 @@ class ScheduledTasks:
             }
             corporate_status = 'skipped'
             if corporate_selected:
-                corporate_status = 'dry_run' if parameters['dry_run'] else 'success'
-                if not parameters['dry_run'] and (master_blocked or universe_blocked):
+                corporate_status = (
+                    'scan_only'
+                    if parameters['scan_sources']
+                    else ('dry_run' if parameters['dry_run'] else 'success')
+                )
+                if (
+                    (not parameters['dry_run'] or parameters['scan_sources'])
+                    and (master_blocked or universe_blocked)
+                ):
                     corporate_status = 'blocked'
             if (
                 corporate_selected
-                and not parameters['dry_run']
+                and (not parameters['dry_run'] or parameters['scan_sources'])
                 and not master_blocked
                 and not universe_blocked
             ):
-                completed = completed_chunks('corporate_actions')
+                completed = (
+                    set()
+                    if parameters['scan_sources']
+                    else completed_chunks('corporate_actions')
+                )
                 for exchange, chunk_identity, chunk in chunks:
                     if chunk_identity in completed:
                         corporate_totals['chunks_resumed'] += 1
@@ -3094,7 +3119,7 @@ class ScheduledTasks:
                         repair_universe_mode=parameters['repair_universe_mode'],
                         override_lifecycle_filter=parameters['override_lifecycle_filter'],
                         per_instrument_timeout_sec=per_instrument_timeout_sec,
-                        dry_run=False,
+                        dry_run=parameters['dry_run'],
                     )
                     totals = chunk_result.get('totals') or {}
                     for key in (
@@ -3103,8 +3128,14 @@ class ScheduledTasks:
                         'timeouts', 'errors',
                     ):
                         corporate_totals[key] += int(totals.get(key, 0) or 0)
-                    if chunk_result.get('status') == 'success':
-                        mark_chunk_complete('corporate_actions', chunk_identity)
+                    successful_chunk_statuses = (
+                        {'success', 'dry_run'}
+                        if parameters['scan_sources']
+                        else {'success'}
+                    )
+                    if chunk_result.get('status') in successful_chunk_statuses:
+                        if not parameters['scan_sources']:
+                            mark_chunk_complete('corporate_actions', chunk_identity)
                         corporate_totals['chunks_completed'] += 1
                     else:
                         corporate_status = 'partial'
@@ -3131,7 +3162,14 @@ class ScheduledTasks:
             if not parameters['dry_run']:
                 checkpoint_store.save(checkpoint)
 
-            if parameters['dry_run']:
+            if parameters['scan_sources']:
+                if result['blockers'] or corporate_status == 'blocked':
+                    result['status'] = 'blocked'
+                elif corporate_status == 'partial':
+                    result['status'] = 'partial'
+                else:
+                    result['status'] = 'scan_only'
+            elif parameters['dry_run']:
                 result['status'] = 'dry_run'
             elif result['blockers']:
                 result['status'] = 'blocked'
@@ -3169,6 +3207,7 @@ class ScheduledTasks:
                 'status': 'failed',
                 'operation': task_id,
                 'dry_run': bool(dry_run),
+                'scan_sources': bool(scan_sources),
                 'checkpoint_id': checkpoint_id,
                 'error': str(exc),
                 'stages': result.get('stages', {}) if isinstance(result, dict) else {},

@@ -15773,25 +15773,28 @@ class DataManager:
                             preserve_computed_fields=True,
                         )
 
-                        if derive_factors:
-                            factor_coro = tdx_source.get_adjustment_factors(
-                                instrument_id,
-                                symbol,
-                                datetime.combine(effective_start, datetime.min.time()),
-                                datetime.combine(effective_end, datetime.max.time()),
-                            )
-                            factors = (
-                                await asyncio.wait_for(factor_coro, timeout=per_instrument_timeout_sec)
-                                if per_instrument_timeout_sec
-                                else await factor_coro
-                            )
-                            for factor in factors or []:
-                                factor.setdefault('validation_result', 'computed_unvalidated')
-                                factor.setdefault('source', 'tdx_xdxr')
-                                derived_date = self._date_from_any(factor.get('ex_date'))
-                                if derived_date is not None:
-                                    derived_dates.add(derived_date)
-                            if factors:
+                    if derive_factors:
+                        factor_coro = tdx_source.get_adjustment_factors(
+                            instrument_id,
+                            symbol,
+                            datetime.combine(effective_start, datetime.min.time()),
+                            datetime.combine(effective_end, datetime.max.time()),
+                        )
+                        factors = (
+                            await asyncio.wait_for(factor_coro, timeout=per_instrument_timeout_sec)
+                            if per_instrument_timeout_sec
+                            else await factor_coro
+                        )
+                        for factor in factors or []:
+                            factor.setdefault('validation_result', 'computed_unvalidated')
+                            factor.setdefault('source', 'tdx_xdxr')
+                            derived_date = self._date_from_any(factor.get('ex_date'))
+                            if derived_date is not None:
+                                derived_dates.add(derived_date)
+                        if factors:
+                            if dry_run:
+                                stats['derived_factors'] += len(factors)
+                            else:
                                 stats['derived_factors'] += await self.db_ops.save_tdx_audit_factors(
                                     factors
                                 )

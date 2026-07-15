@@ -62,6 +62,74 @@ class TestParseInstrumentId:
             _parse_instrument_id("000001")
 
 
+class TestXdxrReconnect:
+    @staticmethod
+    def _event():
+        return {
+            "year": 2020,
+            "month": 6,
+            "day": 1,
+            "category": 1,
+            "fenhong": 2.0,
+            "songzhuangu": 0.0,
+            "peigu": 0.0,
+            "peigujia": 0.0,
+            "suogu": 0.0,
+        }
+
+    @staticmethod
+    def _source(pool):
+        from data_sources.tdx_source import TdxSource
+
+        source = TdxSource.__new__(TdxSource)
+        source.name = "test_pytdx"
+        source.pool = pool
+        return source
+
+    def test_empty_xdxr_on_healthy_connection_does_not_reconnect(self):
+        api = Mock()
+        api.get_xdxr_info.return_value = []
+        api.get_security_bars.return_value = [{"close": 10.0}]
+        pool = Mock()
+        pool.get_connection.return_value = api
+
+        events = self._source(pool)._sync_get_xdxr_events("600000.SH")
+
+        assert events == []
+        pool.reconnect_current.assert_not_called()
+
+    def test_empty_xdxr_and_bar_probe_reconnects_once(self):
+        stale_api = Mock()
+        stale_api.get_xdxr_info.return_value = []
+        stale_api.get_security_bars.return_value = []
+        refreshed_api = Mock()
+        refreshed_api.get_xdxr_info.return_value = [self._event()]
+        pool = Mock()
+        pool.get_connection.return_value = stale_api
+        pool.reconnect_current.return_value = refreshed_api
+
+        events = self._source(pool)._sync_get_xdxr_events("600000.SH")
+
+        assert len(events) == 1
+        assert events[0]["fenhong"] == 2.0
+        pool.reconnect_current.assert_called_once_with(mark_failure=False)
+
+    def test_xdxr_exception_reconnects_at_most_once(self):
+        failed_api = Mock()
+        failed_api.get_xdxr_info.side_effect = ConnectionError("stale")
+        refreshed_api = Mock()
+        refreshed_api.get_xdxr_info.return_value = []
+        refreshed_api.get_security_bars.return_value = []
+        pool = Mock()
+        pool.get_connection.return_value = failed_api
+        pool.reconnect_current.return_value = refreshed_api
+
+        events = self._source(pool)._sync_get_xdxr_events("600000.SH")
+
+        assert events == []
+        pool.reconnect_current.assert_called_once_with()
+
+
 # ===========================================================
 # 2. TdxIPManager
 # ===========================================================
