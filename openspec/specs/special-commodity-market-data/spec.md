@@ -453,3 +453,73 @@ Special commodity syncs running in dry-run mode SHALL report would-write counter
 - **WHEN** a dry-run commodity sync detects observations that would be changed
 - **THEN** the task result SHALL report would-write or changed estimates
 - **AND** no persistent change watermark SHALL be advanced
+
+### Requirement: Special commodity APIs preserve evidence-type boundaries
+
+The system SHALL expose price observations, industrial indicators, actual contract evidence, policy events, policy candidates, source documents, and licensed datasets as distinguishable resource types.
+
+#### Scenario: Consumer queries a policy range
+
+- **WHEN** a consumer reads a policy event
+- **THEN** the response SHALL identify effective-period and policy-range semantics
+- **AND** it SHALL NOT present the event as a daily market or transaction price.
+
+### Requirement: Governance-first orchestration supports evidence providers
+
+The existing governance-first pipeline SHALL support document discovery and indicator providers through registry contracts without source-specific task branches.
+
+#### Scenario: New coal indicator adapter is registered
+
+- **WHEN** a configured scope resolves to the adapter
+- **THEN** common orchestration SHALL execute master governance, period/publication governance, quality gates, persistence, diagnostics, and reporting.
+
+#### Scenario: Association report contains inventory and index values
+
+- **WHEN** a governed CCTDA TTCI report exposes both a combined Bohai-Rim port inventory fact and a TTCI index value
+- **THEN** the inventory adapter SHALL persist only the configured inventory observation with its `10k_ton` unit, report period, publication date, and source URL
+- **AND** it SHALL NOT relabel the TTCI index as a `CNY/ton` commodity price, port throughput, or power-plant inventory
+- **AND** the scope SHALL remain outside scheduled execution until short/full dry-run, production write, and idempotency rollout gates pass.
+
+#### Scenario: Association report omits or mislabels the inventory field
+
+- **WHEN** a cataloged report does not disclose the configured inventory metric
+- **THEN** the provider SHALL count it as a source report without that metric rather than fabricate an observation or report a parser failure
+- **AND** source coverage counts SHALL be available to common diagnostics and operator reports.
+- **WHEN** a port-statistics clause contains shifted labels
+- **THEN** reconciliation SHALL occur only when exactly one value is inside configured inventory bounds
+- **AND** the observation SHALL retain field-alignment lineage
+- **AND** ambiguous values SHALL remain warnings and SHALL NOT be persisted.
+
+#### Scenario: Association changes the formal inventory wording
+
+- **WHEN** a CCTDA report uses the formal wording `combined inventory of four Bohai-Rim ports`
+- **THEN** the adapter SHALL treat that field as the governed combined port inventory
+- **AND** SHALL prefer the dated formal total over narrative port stock, individual-port stock, power-plant inventory, inflow, and outflow values.
+- **WHEN** a report only mentions port inventory generically without a dated formal total or governed legacy statistics clause
+- **THEN** the adapter SHALL classify the metric as not reported rather than emit a parser failure.
+
+#### Scenario: BSPI article uses title value with explicit body period
+
+- **WHEN** a cataloged BSPI article body provides the explicit report period but its unique index value is available only in the catalog title
+- **THEN** the provider MAY recover the title value while retaining `title_value_with_body_period` lineage
+- **AND** an article without an explicit report period or unique plausible value SHALL remain a source-coverage gap rather than create an observation.
+
+### Requirement: Scheduled task identities expose data semantics
+
+Public special-commodity task IDs SHALL distinguish region, data kind, and frequency where applicable, while reusing one internal governance-first observation executor.
+
+#### Scenario: Operator lists or runs a special-commodity task
+
+- **WHEN** the scheduler or Telegram task manager exposes a special-commodity entry
+- **THEN** its task ID and display name SHALL identify overseas daily price, domestic spot price, international monthly price, industrial indicator, policy governance, or historical observation backfill semantics
+- **AND** obsolete ambiguous task IDs SHALL NOT remain as aliases or parallel execution paths.
+
+### Requirement: Policy reconciliation reports disjoint persistence outcomes
+
+Policy governance SHALL report formal-event persistence outcomes separately from approved-candidate semantic deduplication.
+
+#### Scenario: Approved candidate is already represented by a formal event
+
+- **WHEN** an approved candidate has the same governed semantics as an existing formal policy event
+- **THEN** the candidate SHALL NOT create or update another event
+- **AND** it SHALL be reported as already represented rather than counted as an unchanged formal-event write.
