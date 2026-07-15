@@ -3334,6 +3334,11 @@ class CctdaTtciPortInventoryProvider:
     _PORT_METRIC_CLAUSE = re.compile(
         r"(?:截止|截至).{0,80}?环渤海港口(?P<body>.{0,400}?)(?:环比|[。；])"
     )
+    _FOUR_PORT_INVENTORY = re.compile(
+        r"(?:截止|截至)(?:到)?\s*[：:]?\s*.{0,80}?"
+        r"环渤海四港合计库存\s*(?:为|降至|至)?\s*"
+        r"(?P<value>\d+(?:\.\d+)?)\s*万?\s*吨"
+    )
     _TON_VALUE = re.compile(
         r"(?P<value>\d+(?:\.\d+)?)\s*万?\s*吨"
     )
@@ -3408,12 +3413,33 @@ class CctdaTtciPortInventoryProvider:
         text = cls._plain_text(html)
         selected_value: Optional[float] = None
         source_field_alignment = "aligned"
+        formal_values = sorted(
+            {
+                float(match.group("value"))
+                for match in cls._FOUR_PORT_INVENTORY.finditer(text)
+                if inventory_value_min
+                <= float(match.group("value"))
+                <= inventory_value_max
+            }
+        )
+        if len(formal_values) > 1:
+            raise _CctdaInventoryAmbiguousError(
+                "CCTDA TTCI report has multiple formal four-port inventory "
+                f"values: {formal_values}"
+            )
+        if formal_values:
+            selected_value = formal_values[0]
+
+        metric_clause_values: List[float] = []
         for clause_match in cls._PORT_METRIC_CLAUSE.finditer(text):
+            if selected_value is not None:
+                break
             clause = clause_match.group("body")
             values = [
                 float(match.group("value"))
                 for match in cls._TON_VALUE.finditer(clause)
             ]
+            metric_clause_values.extend(values)
             plausible = sorted(
                 {
                     value
@@ -3435,10 +3461,10 @@ class CctdaTtciPortInventoryProvider:
                 source_field_alignment = "reconciled_by_inventory_value_range"
             break
         if selected_value is None:
-            if "环渤海港口" in text and re.search(r"库\s*存", text):
+            if metric_clause_values:
                 raise _CctdaInventoryAmbiguousError(
-                    "CCTDA TTCI report mentions Bohai-Rim port inventory but "
-                    "has no value inside the governed range"
+                    "CCTDA TTCI formal Bohai-Rim port clause has no value "
+                    "inside the governed range"
                 )
             raise _CctdaInventoryNotReportedError(
                 "CCTDA TTCI report missing Bohai-Rim port inventory"

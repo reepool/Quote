@@ -3534,7 +3534,10 @@ class DatabaseOperations:
             return 1.0
 
     async def save_tdx_audit_factors(
-        self, factors: list[dict[str, Any]]
+        self,
+        factors: list[dict[str, Any]],
+        *,
+        preserve_computed_fields: bool = False,
     ) -> int:
         """保存通达信自研复权因子到审计表 (upsert 语义)
 
@@ -3545,6 +3548,8 @@ class DatabaseOperations:
                 instrument_id, ex_date, factor, cumulative_factor,
                 pre_close, fenhong, songzhuangu, peigu, peigujia,
                 validation_result, ref_factor, ref_source, ratio_diff_pct, source
+            preserve_computed_fields: 更新已存在行时只刷新原始 XDXR 字段，
+                保留已计算的因子、前收盘和验证结果。用于原始事件历史回补。
 
         Returns:
             成功保存/更新的记录数
@@ -3572,23 +3577,24 @@ class DatabaseOperations:
                         existing = result.scalar_one_or_none()
 
                         if existing:
-                            existing.factor = float(f.get('factor', 1.0))
-                            existing.cumulative_factor = float(f.get('cumulative_factor', 1.0))
-                            existing.pre_close = float(f.get('pre_close', 0.0))
                             existing.fenhong = float(f.get('fenhong', 0.0))
                             existing.songzhuangu = float(f.get('songzhuangu', 0.0))
                             existing.peigu = float(f.get('peigu', 0.0))
                             existing.peigujia = float(f.get('peigujia', 0.0))
-                            existing.validation_result = f.get('validation_result')
-                            existing.ref_factor = (
-                                float(f['ref_factor']) if f.get('ref_factor') is not None else None
-                            )
-                            existing.ref_source = f.get('ref_source')
-                            existing.ratio_diff_pct = (
-                                float(f['ratio_diff_pct']) if f.get('ratio_diff_pct') is not None else None
-                            )
-                            existing.conflict_reason = f.get('conflict_reason')
                             existing.source = f.get('source', 'tdx_xdxr')
+                            if not preserve_computed_fields:
+                                existing.factor = float(f.get('factor', 1.0))
+                                existing.cumulative_factor = float(f.get('cumulative_factor', 1.0))
+                                existing.pre_close = float(f.get('pre_close', 0.0))
+                                existing.validation_result = f.get('validation_result')
+                                existing.ref_factor = (
+                                    float(f['ref_factor']) if f.get('ref_factor') is not None else None
+                                )
+                                existing.ref_source = f.get('ref_source')
+                                existing.ratio_diff_pct = (
+                                    float(f['ratio_diff_pct']) if f.get('ratio_diff_pct') is not None else None
+                                )
+                                existing.conflict_reason = f.get('conflict_reason')
                         else:
                             new_record = AdjustmentFactorTdxDB(
                                 instrument_id=instrument_id,

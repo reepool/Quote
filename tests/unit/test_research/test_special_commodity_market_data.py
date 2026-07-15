@@ -1296,6 +1296,43 @@ def test_cctda_ttci_port_inventory_reconciles_shifted_source_fields():
     assert parsed["source_field_alignment"] == "reconciled_by_inventory_value_range"
 
 
+def test_cctda_ttci_port_inventory_prefers_formal_four_port_total():
+    parsed = CctdaTtciPortInventoryProvider.parse_article(
+        """
+        <p>2025-08-11 09:00:00 来源：中国煤炭运销协会</p>
+        <p>目前，环渤海港口存煤降至2312万吨。</p>
+        <p>截止到：8月8日，环渤海四港合计库存2474万吨，
+        周环比下降15万吨。调入160.8万吨，调出177.8万吨。</p>
+        <p>电厂库存量为12026万吨。</p>
+        """,
+        source_url="https://www.cctda.org.cn/example-four-port.html",
+        period={
+            "period_start": "2025-08-04",
+            "period_end": "2025-08-08",
+            "observation_date": "2025-08-08",
+        },
+    )
+
+    assert parsed["value"] == 2474.0
+    assert parsed["source_field_alignment"] == "aligned"
+
+
+def test_cctda_ttci_port_inventory_treats_generic_mention_as_not_reported():
+    with pytest.raises(ValueError, match="missing Bohai-Rim port inventory"):
+        CctdaTtciPortInventoryProvider.parse_article(
+            """
+            <p>2025-08-18 09:00:00 来源：中国煤炭运销协会</p>
+            <p>环渤海港口调入量维持中低位，电厂库存天数处于安全位置。</p>
+            """,
+            source_url="https://www.cctda.org.cn/example-no-formal-metric.html",
+            period={
+                "period_start": "2025-08-11",
+                "period_end": "2025-08-15",
+                "observation_date": "2025-08-15",
+            },
+        )
+
+
 def test_cctda_ttci_provider_treats_absent_metric_as_source_coverage(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"

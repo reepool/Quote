@@ -1,0 +1,257 @@
+"""Shared planning and checkpoint helpers for A-share historical backfill."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional
+
+
+A_SHARE_EXCHANGES = ("SSE", "SZSE", "BSE")
+A_SHARE_BACKFILL_SCOPES = ("master", "calendar", "quotes", "dividends", "factors")
+A_SHARE_EXCHANGE_INCEPTION = {
+    "SSE": date(1990, 12, 19),
+    "SZSE": date(1990, 12, 1),
+    "BSE": date(2021, 11, 15),
+}
+
+
+def coerce_date(value: Any, *, field_name: str) -> date:
+    """Normalize an ISO string, date, or datetime into a date."""
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    if value is None or not str(value).strip():
+        raise ValueError(f"{field_name} is required")
+    try:
+        return datetime.strptime(str(value).strip(), "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError(f"{field_name} must use YYYY-MM-DD") from exc
+
+
+def normalize_string_list(value: Any) -> List[str]:
+    """Normalize comma-separated or iterable values into a stable string list."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        values: Iterable[Any] = value.split(",")
+    elif isinstance(value, (list, tuple, set)):
+        values = value
+    else:
+        values = [value]
+    return list(dict.fromkeys(str(item).strip() for item in values if str(item).strip()))
+
+
+def normalize_a_share_backfill_parameters(
+    *,
+    start_date: Any,
+    end_date: Any,
+    exchanges: Any = None,
+    scopes: Any = None,
+    instrument_ids: Any = None,
+    dry_run: Any = True,
+    resume: Any = True,
+    chunk_size: Any = 100,
+    repair_universe_mode: str = "historical_backfill",
+    override_lifecycle_filter: Any = False,
+    force_current_master_refresh: Any = True,
+) -> Dict[str, Any]:
+    """Validate and normalize the operator-facing task parameters."""
+    normalized_start = coerce_date(start_date, field_name="start_date")
+    normalized_end = coerce_date(end_date, field_name="end_date")
+    if normalized_end < normalized_start:
+        raise ValueError("end_date must not be earlier than start_date")
+
+    normalized_exchanges = [item.upper() for item in normalize_string_list(exchanges)]
+    normalized_exchanges = normalized_exchanges or list(A_SHARE_EXCHANGES)
+    unsupported_exchanges = sorted(set(normalized_exchanges) - set(A_SHARE_EXCHANGES))
+    if unsupported_exchanges:
+        raise ValueError(f"unsupported A-share exchanges: {unsupported_exchanges}")
+
+    normalized_scopes = [item.lower() for item in normalize_string_list(scopes)]
+    normalized_scopes = normalized_scopes or list(A_SHARE_BACKFILL_SCOPES)
+    unsupported_scopes = sorted(set(normalized_scopes) - set(A_SHARE_BACKFILL_SCOPES))
+    if unsupported_scopes:
+        raise ValueError(f"unsupported historical backfill scopes: {unsupported_scopes}")
+
+    try:
+        normalized_chunk_size = int(chunk_size)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("chunk_size must be an integer") from exc
+    if normalized_chunk_size < 1 or normalized_chunk_size > 1000:
+        raise ValueError("chunk_size must be between 1 and 1000")
+
+    return {
+        "start_date": normalized_start,
+        "end_date": normalized_end,
+        "exchanges": normalized_exchanges,
+        "scopes": normalized_scopes,
+        "instrument_ids": normalize_string_list(instrument_ids),
+        "dry_run": _coerce_bool(dry_run),
+        "resume": _coerce_bool(resume),
+        "chunk_size": normalized_chunk_size,
+        "repair_universe_mode": str(repair_universe_mode or "historical_backfill").strip(),
+        "override_lifecycle_filter": _coerce_bool(override_lifecycle_filter),
+        "force_current_master_refresh": _coerce_bool(force_current_master_refresh),
+    }
+
+
+def _coerce_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off", ""}:
+        return False
+    raise ValueError(f"invalid boolean value: {value}")
+
+
+def evaluate_calendar_coverage(
+    exchange: str,
+    start_date: date,
+    end_date: date,
+    records: Iterable[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Evaluate contiguous local calendar coverage within market lifetime."""
+    exchange = str(exchange).upper()
+    inception = A_SHARE_EXCHANGE_INCEPTION[exchange]
+    effective_start = max(start_date, inception)
+    if effective_start > end_date:
+        return {
+            "status": "skipped",
+            "exchange": exchange,
+            "effective_start_date": effective_start.isoformat(),
+            "end_date": end_date.isoformat(),
+            "required_days": 0,
+            "covered_days": 0,
+            "missing_days": 0,
+            "missing_samples": [],
+            "reason": "range_before_exchange_inception",
+        }
+
+    covered = set()
+    for record in records or []:
+        raw_date = record.get("date")
+        if isinstance(raw_date, datetime):
+            raw_date = raw_date.date()
+        elif not isinstance(raw_date, date):
+            try:
+                raw_date = datetime.fromisoformat(str(raw_date)[:10]).date()
+            except (TypeError, ValueError):
+                continue
+        if effective_start <= raw_date <= end_date:
+            covered.add(raw_date)
+
+    required = set()
+    cursor = effective_start
+    while cursor <= end_date:
+        required.add(cursor)
+        cursor += timedelta(days=1)
+    missing = sorted(required - covered)
+    return {
+        "status": "success" if not missing else "blocked",
+        "exchange": exchange,
+        "effective_start_date": effective_start.isoformat(),
+        "end_date": end_date.isoformat(),
+        "required_days": len(required),
+        "covered_days": len(required & covered),
+        "missing_days": len(missing),
+        "missing_samples": [item.isoformat() for item in missing[:20]],
+        "reason": None if not missing else "calendar_coverage_incomplete",
+    }
+
+
+def serialize_checkpoint_parameters(parameters: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert normalized task parameters into a stable JSON contract."""
+    payload: Dict[str, Any] = {}
+    for key, value in parameters.items():
+        if isinstance(value, (date, datetime)):
+            payload[key] = value.isoformat()
+        elif isinstance(value, (list, tuple)):
+            payload[key] = list(value)
+        else:
+            payload[key] = value
+    return payload
+
+
+def checkpoint_parameter_hash(parameters: Dict[str, Any]) -> str:
+    payload = serialize_checkpoint_parameters(parameters)
+    encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+class AShareBackfillCheckpointStore:
+    """Atomic JSON checkpoint storage bound to normalized task parameters."""
+
+    def __init__(self, data_dir: Path | str = "data") -> None:
+        self.directory = Path(data_dir) / "backfill_checkpoints"
+
+    def resolve_id(
+        self,
+        parameters: Dict[str, Any],
+        explicit_checkpoint_id: Optional[str] = None,
+    ) -> str:
+        parameter_hash = checkpoint_parameter_hash(parameters)
+        if explicit_checkpoint_id:
+            normalized = "".join(
+                char for char in str(explicit_checkpoint_id) if char.isalnum() or char in {"-", "_"}
+            )
+            if not normalized:
+                raise ValueError("checkpoint_id contains no supported characters")
+            return normalized
+        return f"a_share_history_{parameter_hash[:16]}"
+
+    def path_for(self, checkpoint_id: str) -> Path:
+        return self.directory / f"{checkpoint_id}.json"
+
+    def load(
+        self,
+        checkpoint_id: str,
+        parameters: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        path = self.path_for(checkpoint_id)
+        if not path.exists():
+            return None
+        with path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+        expected_hash = checkpoint_parameter_hash(parameters)
+        if payload.get("parameter_hash") != expected_hash:
+            raise ValueError("checkpoint parameters do not match the requested run")
+        return payload
+
+    def initialize(
+        self,
+        checkpoint_id: str,
+        parameters: Dict[str, Any],
+        universe: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        now = datetime.now().astimezone().isoformat()
+        return {
+            "checkpoint_id": checkpoint_id,
+            "parameter_hash": checkpoint_parameter_hash(parameters),
+            "parameters": serialize_checkpoint_parameters(parameters),
+            "created_at": now,
+            "updated_at": now,
+            "universe": universe,
+            "stages": {},
+        }
+
+    def save(self, payload: Dict[str, Any]) -> Path:
+        self.directory.mkdir(parents=True, exist_ok=True)
+        payload["updated_at"] = datetime.now().astimezone().isoformat()
+        path = self.path_for(str(payload["checkpoint_id"]))
+        temporary = path.with_suffix(f".json.tmp.{os.getpid()}")
+        with temporary.open("w", encoding="utf-8") as handle:
+            json.dump(payload, handle, ensure_ascii=False, indent=2, sort_keys=True)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        return path
+

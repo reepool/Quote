@@ -27,6 +27,20 @@ class TestDailyFactorSyncPolicy:
             date(2026, 4, 12),
         }
 
+    def test_factor_target_dates_keep_internal_dates_for_long_history(self):
+        manager = DataManager()
+
+        target_dates = manager._build_factor_target_dates([{
+            'instrument_id': '000001.SZ',
+            'symbol': '000001',
+            'start_date': date(2020, 1, 1),
+            'end_date': date(2021, 1, 2),
+        }])
+
+        assert date(2020, 6, 1) in target_dates
+        assert date(2020, 12, 31) in target_dates
+        assert len(target_dates) == 368
+
     @pytest.mark.asyncio
     async def test_daily_factor_sync_respects_disabled_exchange_policy(self):
         manager = DataManager()

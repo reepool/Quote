@@ -15114,15 +15114,7 @@ class DataManager:
             return target_dates
 
         span_days = (max_end - min_start).days
-        if span_days <= 366:
-            return {min_start + timedelta(days=offset) for offset in range(span_days + 1)}
-
-        dm_logger.warning(
-            "[DataManager] Phase 2: factor date range %s~%s is too wide for "
-            "precise ex-dividend filtering; using boundary dates only",
-            min_start, max_end
-        )
-        return {min_start, max_end}
+        return {min_start + timedelta(days=offset) for offset in range(span_days + 1)}
 
     async def _query_ex_dividend_symbols(
         self, target_dates: set
@@ -15570,6 +15562,282 @@ class DataManager:
         dm_logger.info("[DataManager] Factor backfill completed: %s", overall_result)
         return overall_result
 
+    @staticmethod
+    def _build_tdx_raw_event_row(
+        instrument_id: str,
+        event: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        """Convert one raw TDX XDXR event into the audit-table contract."""
+        ex_date = DataManager._date_from_any(event.get('date') or event.get('ex_date'))
+        if ex_date is None:
+            return None
+        return {
+            'instrument_id': instrument_id,
+            'ex_date': datetime.combine(ex_date, datetime.min.time()),
+            'factor': 1.0,
+            'cumulative_factor': 1.0,
+            'pre_close': 0.0,
+            'fenhong': float(event.get('fenhong', 0.0) or 0.0),
+            'songzhuangu': float(event.get('songzhuangu', 0.0) or 0.0),
+            'peigu': float(event.get('peigu', 0.0) or 0.0),
+            'peigujia': float(event.get('peigujia', 0.0) or 0.0),
+            'validation_result': 'pending_factor_missing_pre_close',
+            'conflict_reason': 'missing_pre_close',
+            'source': 'tdx_xdxr',
+        }
+
+    async def backfill_tdx_xdxr_history(
+        self,
+        exchanges: Optional[List[str]] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        instrument_ids: Optional[List[str]] = None,
+        instrument_date_ranges: Optional[Dict[str, Dict[str, Any]]] = None,
+        limit: Optional[int] = None,
+        derive_factors: bool = True,
+        repair_universe_mode: str = 'historical_backfill',
+        override_lifecycle_filter: bool = False,
+        per_instrument_timeout_sec: Optional[int] = 30,
+        progress_log_every: int = 200,
+        dry_run: bool = False,
+    ) -> Dict[str, Any]:
+        """Backfill raw TDX XDXR history without dropping uncomputable events.
+
+        Raw events are always isolated in ``adjustment_factors_tdx``. When a
+        prior close is available, the optional derivation pass updates the same
+        row with computed audit factors. Existing computed fields are preserved
+        by the raw-event upsert pass.
+        """
+        if start_date is None:
+            start_date = date(1990, 1, 1)
+        if end_date is None:
+            end_date = date.today()
+        if end_date < start_date:
+            raise ValueError(f"end_date {end_date} is earlier than start_date {start_date}")
+
+        exchanges = [str(item).upper() for item in (exchanges or ['SSE', 'SZSE', 'BSE'])]
+        exchanges = list(dict.fromkeys(exchanges))
+        unsupported = sorted(set(exchanges) - {'SSE', 'SZSE', 'BSE'})
+        if unsupported:
+            raise ValueError(f"Unsupported A-share exchanges: {unsupported}")
+
+        if not hasattr(self, 'source_factory') or not self.source_factory:
+            from data_sources.source_factory import get_data_source_factory
+            self.source_factory = await get_data_source_factory(self.db_ops)
+        tdx_source = self.source_factory._find_source_by_base_name('pytdx')
+        if not tdx_source or not hasattr(tdx_source, 'get_xdxr_events'):
+            return {
+                'status': 'failed',
+                'operation': 'tdx_xdxr_history_backfill',
+                'dry_run': bool(dry_run),
+                'error': 'pytdx XDXR source unavailable',
+                'totals': {'errors': 1},
+                'by_exchange': {},
+            }
+
+        result: Dict[str, Any] = {
+            'status': 'dry_run' if dry_run else 'success',
+            'operation': 'tdx_xdxr_history_backfill',
+            'dry_run': bool(dry_run),
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat(),
+            'exchanges': exchanges,
+            'derive_factors': bool(derive_factors),
+            'by_exchange': {},
+            'totals': {
+                'input_instruments': 0,
+                'eligible_instruments': 0,
+                'processed_instruments': 0,
+                'empty_instruments': 0,
+                'raw_events': 0,
+                'saved_events': 0,
+                'existing_events_refreshed': 0,
+                'derived_factors': 0,
+                'pending_factors': 0,
+                'lifecycle_filtered_events': 0,
+                'timeouts': 0,
+                'errors': 0,
+            },
+            'warnings': [],
+            'errors': [],
+            'samples': [],
+        }
+
+        for exchange in exchanges:
+            raw_instruments = await self.db_ops.get_repair_universe_instruments(
+                exchange,
+                instrument_types=['stock'],
+            )
+            instruments, universe_diag = await self.filter_repair_universe(
+                raw_instruments,
+                start_date=start_date,
+                end_date=end_date,
+                mode=repair_universe_mode,
+                instrument_ids=instrument_ids,
+                override_lifecycle_filter=override_lifecycle_filter,
+                limit=limit,
+                dry_run=dry_run,
+            )
+            stats = {
+                'input_instruments': len(raw_instruments),
+                'eligible_instruments': len(instruments),
+                'processed_instruments': 0,
+                'empty_instruments': 0,
+                'raw_events': 0,
+                'saved_events': 0,
+                'existing_events_refreshed': 0,
+                'derived_factors': 0,
+                'pending_factors': 0,
+                'lifecycle_filtered_events': 0,
+                'timeouts': 0,
+                'errors': 0,
+                'repair_universe': universe_diag,
+            }
+
+            for idx, instrument in enumerate(instruments, start=1):
+                instrument_id = instrument['instrument_id']
+                symbol = instrument['symbol']
+                effective_start = self._date_from_any(
+                    instrument.get('_repair_start_date')
+                ) or start_date
+                effective_end = self._date_from_any(
+                    instrument.get('_repair_end_date')
+                ) or end_date
+                frozen_range = (instrument_date_ranges or {}).get(instrument_id) or {}
+                effective_start = self._date_from_any(
+                    frozen_range.get('start_date')
+                ) or effective_start
+                effective_end = self._date_from_any(
+                    frozen_range.get('end_date')
+                ) or effective_end
+                try:
+                    event_coro = tdx_source.get_xdxr_events(instrument_id)
+                    events = (
+                        await asyncio.wait_for(event_coro, timeout=per_instrument_timeout_sec)
+                        if per_instrument_timeout_sec
+                        else await event_coro
+                    )
+                    events = list(events or [])
+                    filtered_events = []
+                    for event in events:
+                        event_date = self._date_from_any(event.get('date') or event.get('ex_date'))
+                        if event_date is None:
+                            continue
+                        if effective_start <= event_date <= effective_end:
+                            filtered_events.append(event)
+                    stats['lifecycle_filtered_events'] += max(
+                        0, len(events) - len(filtered_events)
+                    )
+
+                    if not filtered_events:
+                        stats['empty_instruments'] += 1
+                        stats['processed_instruments'] += 1
+                        continue
+
+                    raw_rows = [
+                        row
+                        for row in (
+                            self._build_tdx_raw_event_row(instrument_id, event)
+                            for event in filtered_events
+                        )
+                        if row is not None
+                    ]
+                    event_dates = {
+                        self._date_from_any(row.get('ex_date'))
+                        for row in raw_rows
+                    }
+                    existing_rows = await self.db_ops.execute_read_query(
+                        """
+                        SELECT ex_date, pre_close, validation_result
+                        FROM adjustment_factors_tdx
+                        WHERE instrument_id = :instrument_id
+                        """,
+                        {'instrument_id': instrument_id},
+                    )
+                    existing_dates = {
+                        self._date_from_any(row.get('ex_date'))
+                        for row in existing_rows
+                    }
+                    computed_dates = {
+                        self._date_from_any(row.get('ex_date'))
+                        for row in existing_rows
+                        if float(row.get('pre_close') or 0.0) > 0
+                    }
+
+                    stats['raw_events'] += len(raw_rows)
+                    stats['existing_events_refreshed'] += len(event_dates & existing_dates)
+                    derived_dates = set()
+                    if not dry_run:
+                        stats['saved_events'] += await self.db_ops.save_tdx_audit_factors(
+                            raw_rows,
+                            preserve_computed_fields=True,
+                        )
+
+                        if derive_factors:
+                            factor_coro = tdx_source.get_adjustment_factors(
+                                instrument_id,
+                                symbol,
+                                datetime.combine(effective_start, datetime.min.time()),
+                                datetime.combine(effective_end, datetime.max.time()),
+                            )
+                            factors = (
+                                await asyncio.wait_for(factor_coro, timeout=per_instrument_timeout_sec)
+                                if per_instrument_timeout_sec
+                                else await factor_coro
+                            )
+                            for factor in factors or []:
+                                factor.setdefault('validation_result', 'computed_unvalidated')
+                                factor.setdefault('source', 'tdx_xdxr')
+                                derived_date = self._date_from_any(factor.get('ex_date'))
+                                if derived_date is not None:
+                                    derived_dates.add(derived_date)
+                            if factors:
+                                stats['derived_factors'] += await self.db_ops.save_tdx_audit_factors(
+                                    factors
+                                )
+
+                    stats['pending_factors'] += len(
+                        event_dates - computed_dates - derived_dates
+                    )
+                    stats['processed_instruments'] += 1
+                except asyncio.TimeoutError:
+                    stats['timeouts'] += 1
+                    result['samples'].append({
+                        'instrument_id': instrument_id,
+                        'exchange': exchange,
+                        'reason': 'timeout',
+                    })
+                except Exception as exc:
+                    stats['errors'] += 1
+                    result['errors'].append(f"{instrument_id}: {exc}")
+                    if len(result['samples']) < 20:
+                        result['samples'].append({
+                            'instrument_id': instrument_id,
+                            'exchange': exchange,
+                            'reason': str(exc),
+                        })
+
+                if progress_log_every and idx % progress_log_every == 0:
+                    dm_logger.info(
+                        "[DataManager] XDXR history progress %s: %d/%d events=%d errors=%d timeouts=%d",
+                        exchange,
+                        idx,
+                        len(instruments),
+                        stats['raw_events'],
+                        stats['errors'],
+                        stats['timeouts'],
+                    )
+
+            result['by_exchange'][exchange] = stats
+            for key in result['totals']:
+                result['totals'][key] += int(stats.get(key, 0) or 0)
+
+        result['samples'] = result['samples'][:20]
+        result['errors'] = result['errors'][:50]
+        if result['totals']['errors'] or result['totals']['timeouts']:
+            result['status'] = 'partial'
+        return result
+
     async def update_daily_data(self, exchanges: Optional[List[str]] = None,
                                target_date: Optional[date] = None,
                                per_instrument_timeout_sec: Optional[int] = None,
@@ -15905,6 +16173,10 @@ class DataManager:
         repair_universe_mode: str = 'historical_backfill',
         override_lifecycle_filter: bool = False,
         repair_universe_limit: Optional[int] = None,
+        instrument_ids: Optional[List[str]] = None,
+        instrument_date_ranges: Optional[Dict[str, Dict[str, Any]]] = None,
+        sync_adjustment_factors: bool = True,
+        factor_sync_reason: str = 'daily',
         force_current_master_refresh: bool = False,
         current_master_refresh_scopes: Optional[List[str]] = None,
     ) -> dict:
@@ -16012,6 +16284,7 @@ class DataManager:
                     start_date=start_date,
                     end_date=end_date,
                     mode=repair_universe_mode,
+                    instrument_ids=instrument_ids,
                     override_lifecycle_filter=override_lifecycle_filter,
                     limit=repair_universe_limit,
                 )
@@ -16076,6 +16349,15 @@ class DataManager:
                         query_start = range_fetch_start
                         repair_start = _to_date(instrument.get('_repair_start_date'))
                         repair_end = _to_date(instrument.get('_repair_end_date')) or end_date
+                        frozen_range = (instrument_date_ranges or {}).get(
+                            instrument.get('instrument_id')
+                        ) or {}
+                        repair_start = _to_date(
+                            frozen_range.get('start_date')
+                        ) or repair_start
+                        repair_end = _to_date(
+                            frozen_range.get('end_date')
+                        ) or repair_end
                         if listed_date and listed_date > query_start:
                             query_start = listed_date
                         if repair_start and repair_start > query_start:
@@ -16164,11 +16446,12 @@ class DataManager:
                     exchange_result['quotes_added'],
                 )
 
-                if stocks_needing_factors:
+                if sync_adjustment_factors and stocks_needing_factors:
                     factor_result = await self._batch_sync_adjustment_factors(
                         exchange,
                         stocks_needing_factors,
-                        sync_reason='daily',
+                        skip_filter=factor_sync_reason != 'daily',
+                        sync_reason=factor_sync_reason,
                     )
                     update_results.setdefault('factor_stats', {})[exchange] = factor_result
 

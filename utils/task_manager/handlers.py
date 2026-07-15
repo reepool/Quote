@@ -3176,6 +3176,7 @@ class TaskManagerHandlers:
             'exchanges',
             'instrument_ids',
             'scope_ids',
+            'scopes',
             'series_ids',
             'series_types',
             'source_profiles',

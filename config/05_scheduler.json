@@ -121,6 +121,40 @@
           "max_runtime_seconds": 600
         }
       },
+      "a_share_daily_data_historical_backfill": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股行情、交易日历与分红派息历史全量回补（仅手工触发，默认 dry-run）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": null,
+          "end_date": null,
+          "exchanges": [
+            "SSE",
+            "SZSE",
+            "BSE"
+          ],
+          "scopes": [
+            "master",
+            "calendar",
+            "quotes",
+            "dividends",
+            "factors"
+          ],
+          "dry_run": true,
+          "resume": true,
+          "chunk_size": 100,
+          "repair_universe_mode": "historical_backfill",
+          "override_lifecycle_filter": false,
+          "force_current_master_refresh": true,
+          "per_instrument_timeout_sec": 60,
+          "max_runtime_seconds": 86400
+        }
+      },
       "index_master_governance_sync": {
         "enabled": true,
         "manual_only": true,

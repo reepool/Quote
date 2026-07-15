@@ -162,7 +162,15 @@ def is_successful_task_result(result: Any) -> bool:
         return result
     if isinstance(result, dict):
         status = str(result.get("status") or "").lower()
-        return status in {"success", "degraded", "partial", "scan_only", "disabled", "unavailable"}
+        return status in {
+            "success",
+            "degraded",
+            "partial",
+            "dry_run",
+            "scan_only",
+            "disabled",
+            "unavailable",
+        }
     return bool(result)
 
 

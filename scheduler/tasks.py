@@ -4,6 +4,7 @@ Defines all automated data update and maintenance tasks.
 """
 
 import asyncio
+import hashlib
 import json
 import os
 from datetime import datetime, date, timedelta, time
@@ -29,6 +30,13 @@ from data_manager import data_manager
 from instrument_master_governance import MasterGovernanceRequirement
 from utils.date_utils import DateUtils, get_shanghai_time
 from utils.cache import cache_manager
+from utils.a_share_historical_backfill import (
+    A_SHARE_EXCHANGE_INCEPTION,
+    AShareBackfillCheckpointStore,
+    evaluate_calendar_coverage,
+    normalize_a_share_backfill_parameters,
+    serialize_checkpoint_parameters,
+)
 
 
 def _apply_hkex_gap_guard(
@@ -88,11 +96,57 @@ def _format_scheduler_status(status: Any) -> tuple[str, str]:
         return "✅", "成功"
     if normalized in {"degraded", "warning", "partial"}:
         return "⚠️", "部分完成"
-    if normalized in {"skipped", "disabled", "unavailable"}:
+    if normalized in {"skipped", "disabled", "unavailable", "dry_run"}:
         return "ℹ️", "未执行"
-    if normalized in {"failed", "error"}:
+    if normalized in {"failed", "error", "blocked"}:
         return "❌", "失败"
     return "ℹ️", status_text
+
+
+def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
+    """Build a bounded operator report for the unified A-share history task."""
+    icon, label = _format_scheduler_status(result.get('status'))
+    parameters = result.get('parameters') or {}
+    stages = result.get('stages') or {}
+    lines = []
+    for stage_name in ('master', 'calendar', 'quotes', 'dividends', 'factors'):
+        stage = stages.get(stage_name) or {}
+        counters = stage.get('totals') or stage.get('counters') or {}
+        detail = ', '.join(
+            f"{key}={value}"
+            for key, value in list(counters.items())[:6]
+            if isinstance(value, (int, float, str))
+        )
+        lines.append(
+            f"{stage_name}: {stage.get('status', 'skipped')}"
+            + (f" ({detail})" if detail else "")
+        )
+    blocker_lines = [str(item) for item in (result.get('blockers') or [])[:10]]
+    failure_samples = result.get('failure_samples') or []
+    sample_lines = [
+        f"{item.get('instrument_id', item.get('exchange', 'unknown'))}: {item.get('reason', 'failed')}"
+        for item in failure_samples[:10]
+        if isinstance(item, dict)
+    ]
+    extras = ""
+    if blocker_lines:
+        extras += "\n\n阻断项:\n```text\n" + "\n".join(blocker_lines) + "\n```"
+    if sample_lines:
+        extras += "\n\n失败样本:\n```text\n" + "\n".join(sample_lines) + "\n```"
+    return (
+        f"{icon} *A 股历史全量回补*\n\n"
+        f"结论: *{label}*\n"
+        f"状态: `{result.get('status')}`\n"
+        f"dry_run: `{result.get('dry_run')}`\n"
+        f"checkpoint: `{result.get('checkpoint_id')}`\n"
+        f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`\n"
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`\n"
+        f"scopes: `{','.join(parameters.get('scopes') or [])}`\n\n"
+        "阶段:\n```text\n"
+        + "\n".join(lines)
+        + "\n```"
+        + extras
+    )
 
 
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
@@ -2626,6 +2680,519 @@ class ScheduledTasks:
             return False
         finally:
             self._active_tasks.discard('daily_data_update')
+
+    async def a_share_daily_data_historical_backfill(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        scopes: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+        resume: bool = True,
+        checkpoint_id: Optional[str] = None,
+        chunk_size: int = 100,
+        repair_universe_mode: str = 'historical_backfill',
+        override_lifecycle_filter: bool = False,
+        repair_universe_limit: Optional[int] = None,
+        force_current_master_refresh: bool = True,
+        per_instrument_timeout_sec: Optional[int] = 30,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run the dry-run-first governed A-share historical backfill pipeline."""
+        task_id = 'a_share_daily_data_historical_backfill'
+        self._active_tasks.add(task_id)
+        result: Dict[str, Any] = {}
+        try:
+            parameters = normalize_a_share_backfill_parameters(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                scopes=scopes,
+                instrument_ids=instrument_ids,
+                dry_run=dry_run,
+                resume=resume,
+                chunk_size=chunk_size,
+                repair_universe_mode=repair_universe_mode,
+                override_lifecycle_filter=override_lifecycle_filter,
+                force_current_master_refresh=force_current_master_refresh,
+            )
+            if repair_universe_limit is not None:
+                repair_universe_limit = int(repair_universe_limit)
+                if repair_universe_limit < 1:
+                    raise ValueError('repair_universe_limit must be positive')
+            if per_instrument_timeout_sec is not None:
+                per_instrument_timeout_sec = int(per_instrument_timeout_sec)
+                if per_instrument_timeout_sec < 1:
+                    raise ValueError('per_instrument_timeout_sec must be positive')
+
+            checkpoint_parameters = dict(parameters)
+            checkpoint_parameters.update({
+                'repair_universe_limit': repair_universe_limit,
+                'per_instrument_timeout_sec': per_instrument_timeout_sec,
+            })
+            data_dir = data_manager.data_config.get('data_dir', 'data')
+            checkpoint_store = AShareBackfillCheckpointStore(data_dir)
+            resolved_checkpoint_id = checkpoint_store.resolve_id(
+                checkpoint_parameters,
+                checkpoint_id,
+            )
+            checkpoint = None
+            if parameters['resume'] and not parameters['dry_run']:
+                checkpoint = checkpoint_store.load(
+                    resolved_checkpoint_id,
+                    checkpoint_parameters,
+                )
+
+            result = {
+                'status': 'dry_run' if parameters['dry_run'] else 'success',
+                'operation': task_id,
+                'dry_run': parameters['dry_run'],
+                'checkpoint_id': resolved_checkpoint_id,
+                'checkpoint_path': str(checkpoint_store.path_for(resolved_checkpoint_id)),
+                'resumed': bool(checkpoint),
+                'parameters': serialize_checkpoint_parameters(checkpoint_parameters),
+                'stages': {},
+                'blockers': [],
+                'warnings': [],
+                'errors': [],
+                'failure_samples': [],
+            }
+
+            # Stage 1: optional current-master refresh. A resumed checkpoint
+            # already owns a frozen universe and must not silently replace it.
+            if checkpoint and checkpoint.get('universe'):
+                master_stage = {
+                    'status': 'skipped',
+                    'reason': 'resume_uses_frozen_universe',
+                }
+            elif 'master' not in parameters['scopes']:
+                master_stage = {'status': 'skipped', 'reason': 'scope_not_selected'}
+            elif parameters['dry_run']:
+                master_stage = {
+                    'status': 'dry_run',
+                    'reason': 'current_master_refresh_planned',
+                }
+            elif parameters['force_current_master_refresh']:
+                master_stage = await data_manager._run_repair_current_master_refresh(
+                    job_name=task_id,
+                    exchanges=parameters['exchanges'],
+                    instrument_types=['stock'],
+                    target_date=parameters['end_date'],
+                    scopes=['a_share_stock'],
+                )
+                if str(master_stage.get('status') or '').lower() in {
+                    'failed', 'error', 'blocked'
+                }:
+                    result['blockers'].append('master_governance_failed')
+            else:
+                master_stage = {
+                    'status': 'skipped',
+                    'reason': 'current_master_refresh_disabled',
+                }
+            result['stages']['master'] = master_stage
+            master_blocked = 'master_governance_failed' in result['blockers']
+
+            if checkpoint and checkpoint.get('universe'):
+                frozen_universe = list(checkpoint.get('universe') or [])
+            else:
+                frozen_universe = []
+                universe_diagnostics = {}
+                for exchange in parameters['exchanges']:
+                    raw_instruments = await data_manager.db_ops.get_repair_universe_instruments(
+                        exchange,
+                        instrument_types=['stock'],
+                    )
+                    governed, diagnostics = await data_manager.filter_repair_universe(
+                        raw_instruments,
+                        start_date=parameters['start_date'],
+                        end_date=parameters['end_date'],
+                        mode=parameters['repair_universe_mode'],
+                        instrument_ids=parameters['instrument_ids'],
+                        override_lifecycle_filter=parameters['override_lifecycle_filter'],
+                        limit=repair_universe_limit,
+                    )
+                    universe_diagnostics[exchange] = diagnostics
+                    for instrument in governed:
+                        frozen_universe.append({
+                            'instrument_id': instrument['instrument_id'],
+                            'symbol': instrument['symbol'],
+                            'exchange': exchange,
+                            'start_date': (
+                                data_manager._date_from_any(
+                                    instrument.get('_repair_start_date')
+                                ) or parameters['start_date']
+                            ).isoformat(),
+                            'end_date': (
+                                data_manager._date_from_any(
+                                    instrument.get('_repair_end_date')
+                                ) or parameters['end_date']
+                            ).isoformat(),
+                        })
+                result['universe_diagnostics'] = universe_diagnostics
+
+            result['universe'] = {
+                'instrument_count': len(frozen_universe),
+                'by_exchange': {
+                    exchange: sum(
+                        1 for item in frozen_universe if item.get('exchange') == exchange
+                    )
+                    for exchange in parameters['exchanges']
+                },
+            }
+            if not frozen_universe:
+                result['blockers'].append('historical_repair_universe_empty')
+            universe_blocked = not frozen_universe
+
+            if checkpoint is None:
+                checkpoint = checkpoint_store.initialize(
+                    resolved_checkpoint_id,
+                    checkpoint_parameters,
+                    frozen_universe,
+                )
+            checkpoint.setdefault('stages', {})['master'] = master_stage
+            if not parameters['dry_run']:
+                checkpoint_store.save(checkpoint)
+
+            def completed_chunks(stage_name: str) -> set[str]:
+                stage_state = checkpoint.setdefault('stages', {}).setdefault(stage_name, {})
+                return set(stage_state.get('completed_chunks') or [])
+
+            def mark_chunk_complete(stage_name: str, chunk_id_value: str) -> None:
+                stage_state = checkpoint.setdefault('stages', {}).setdefault(stage_name, {})
+                completed = set(stage_state.get('completed_chunks') or [])
+                completed.add(chunk_id_value)
+                stage_state['completed_chunks'] = sorted(completed)
+                if not parameters['dry_run']:
+                    checkpoint_store.save(checkpoint)
+
+            def iter_chunks() -> List[tuple[str, str, List[Dict[str, Any]]]]:
+                chunks = []
+                for exchange in parameters['exchanges']:
+                    exchange_items = [
+                        item for item in frozen_universe
+                        if item.get('exchange') == exchange
+                    ]
+                    for offset in range(0, len(exchange_items), parameters['chunk_size']):
+                        chunk = exchange_items[offset: offset + parameters['chunk_size']]
+                        identity = hashlib.sha1(
+                            ','.join(item['instrument_id'] for item in chunk).encode('utf-8')
+                        ).hexdigest()[:12]
+                        chunks.append((exchange, f"{exchange}:{offset // parameters['chunk_size']}:{identity}", chunk))
+                return chunks
+
+            chunks = iter_chunks()
+
+            # Stage 2: refresh when selected, always validate when quotes need it.
+            blocked_exchanges = set()
+            calendar_items = {}
+            calendar_required = 'calendar' in parameters['scopes'] or 'quotes' in parameters['scopes']
+            if calendar_required:
+                for exchange in parameters['exchanges']:
+                    effective_start = max(
+                        parameters['start_date'],
+                        A_SHARE_EXCHANGE_INCEPTION[exchange],
+                    )
+                    update_error = None
+                    updated_rows = 0
+                    if 'calendar' in parameters['scopes'] and not parameters['dry_run']:
+                        try:
+                            updated_rows = await data_manager._update_trading_calendar(
+                                exchange,
+                                effective_start,
+                                parameters['end_date'],
+                            )
+                        except Exception as exc:
+                            update_error = str(exc)
+                    records = await data_manager.db_ops.get_trading_calendar_records(
+                        exchange,
+                        effective_start,
+                        parameters['end_date'],
+                    )
+                    coverage = evaluate_calendar_coverage(
+                        exchange,
+                        parameters['start_date'],
+                        parameters['end_date'],
+                        records,
+                    )
+                    coverage['updated_rows'] = int(updated_rows or 0)
+                    if update_error:
+                        coverage['update_error'] = update_error
+                        result['warnings'].append(
+                            f"{exchange} calendar refresh failed: {update_error}"
+                        )
+                    if coverage['status'] == 'blocked':
+                        blocked_exchanges.add(exchange)
+                        result['blockers'].append(
+                            f"{exchange}:calendar_coverage_incomplete:{coverage['missing_days']}"
+                        )
+                    calendar_items[exchange] = coverage
+                calendar_status = 'blocked' if blocked_exchanges else (
+                    'dry_run' if parameters['dry_run'] else 'success'
+                )
+                calendar_stage = {
+                    'status': calendar_status,
+                    'exchanges': calendar_items,
+                    'counters': {
+                        'exchanges': len(calendar_items),
+                        'blocked_exchanges': len(blocked_exchanges),
+                        'missing_days': sum(
+                            int(item.get('missing_days', 0) or 0)
+                            for item in calendar_items.values()
+                        ),
+                    },
+                }
+            else:
+                calendar_stage = {'status': 'skipped', 'reason': 'scope_not_selected'}
+            result['stages']['calendar'] = calendar_stage
+            checkpoint.setdefault('stages', {})['calendar'] = calendar_stage
+            if not parameters['dry_run']:
+                checkpoint_store.save(checkpoint)
+
+            # Stage 3: bounded quote chunks. Existing range-backfill defaults are
+            # untouched; the new optional filters are supplied only here.
+            quote_totals = {
+                'chunks_total': sum(1 for exchange, _, _ in chunks if exchange not in blocked_exchanges),
+                'chunks_completed': 0,
+                'chunks_resumed': 0,
+                'success_count': 0,
+                'failure_count': 0,
+                'quotes_added': 0,
+            }
+            if 'quotes' not in parameters['scopes']:
+                quote_stage = {'status': 'skipped', 'reason': 'scope_not_selected', 'totals': quote_totals}
+            elif parameters['dry_run']:
+                quote_stage = {'status': 'dry_run', 'totals': quote_totals}
+            elif master_blocked or universe_blocked:
+                quote_stage = {
+                    'status': 'blocked',
+                    'reason': (
+                        'master_governance_failed'
+                        if master_blocked
+                        else 'historical_repair_universe_empty'
+                    ),
+                    'totals': quote_totals,
+                }
+            elif blocked_exchanges:
+                runnable = [item for item in chunks if item[0] not in blocked_exchanges]
+                if not runnable:
+                    quote_stage = {
+                        'status': 'blocked',
+                        'reason': 'calendar_coverage_incomplete',
+                        'totals': quote_totals,
+                    }
+                else:
+                    quote_stage = {'status': 'partial', 'totals': quote_totals}
+            else:
+                quote_stage = {'status': 'success', 'totals': quote_totals}
+
+            if (
+                'quotes' in parameters['scopes']
+                and not parameters['dry_run']
+                and not master_blocked
+                and not universe_blocked
+            ):
+                completed = completed_chunks('quotes')
+                for exchange, chunk_identity, chunk in chunks:
+                    if exchange in blocked_exchanges:
+                        continue
+                    if chunk_identity in completed:
+                        quote_totals['chunks_resumed'] += 1
+                        quote_totals['chunks_completed'] += 1
+                        continue
+                    chunk_result = await data_manager.update_daily_data_range(
+                        exchanges=[exchange],
+                        start_date=parameters['start_date'],
+                        end_date=parameters['end_date'],
+                        per_instrument_timeout_sec=per_instrument_timeout_sec,
+                        instrument_types=['stock'],
+                        run_factor_audit=False,
+                        repair_universe_mode=parameters['repair_universe_mode'],
+                        override_lifecycle_filter=parameters['override_lifecycle_filter'],
+                        instrument_ids=[item['instrument_id'] for item in chunk],
+                        instrument_date_ranges={
+                            item['instrument_id']: {
+                                'start_date': item['start_date'],
+                                'end_date': item['end_date'],
+                            }
+                            for item in chunk
+                        },
+                        sync_adjustment_factors='factors' in parameters['scopes'],
+                        factor_sync_reason='historical_backfill',
+                        force_current_master_refresh=False,
+                    )
+                    quote_totals['success_count'] += int(chunk_result.get('success_count', 0) or 0)
+                    quote_totals['failure_count'] += int(chunk_result.get('failure_count', 0) or 0)
+                    quote_totals['quotes_added'] += int(chunk_result.get('total_quotes_added', 0) or 0)
+                    exchange_stats = chunk_result.get('exchange_stats') or {}
+                    chunk_failed = (
+                        int(chunk_result.get('failure_count', 0) or 0) > 0
+                        or bool(chunk_result.get('error'))
+                        or any(
+                            isinstance(item, dict) and bool(item.get('error'))
+                            for item in exchange_stats.values()
+                        )
+                    )
+                    if not chunk_failed:
+                        mark_chunk_complete('quotes', chunk_identity)
+                        quote_totals['chunks_completed'] += 1
+                    else:
+                        quote_stage['status'] = 'partial'
+                        result['failure_samples'].append({
+                            'exchange': exchange,
+                            'reason': 'quote_chunk_failed',
+                            'chunk_id': chunk_identity,
+                        })
+            result['stages']['quotes'] = quote_stage
+
+            # Stages 4/5 share one TDX request pass. Raw events are saved first;
+            # factor derivation updates only events with prior-close evidence.
+            corporate_selected = bool({'dividends', 'factors'} & set(parameters['scopes']))
+            corporate_totals = {
+                'chunks_total': len(chunks),
+                'chunks_completed': 0,
+                'chunks_resumed': 0,
+                'raw_events': 0,
+                'saved_events': 0,
+                'existing_events_refreshed': 0,
+                'derived_factors': 0,
+                'pending_factors': 0,
+                'empty_instruments': 0,
+                'timeouts': 0,
+                'errors': 0,
+            }
+            corporate_status = 'skipped'
+            if corporate_selected:
+                corporate_status = 'dry_run' if parameters['dry_run'] else 'success'
+                if not parameters['dry_run'] and (master_blocked or universe_blocked):
+                    corporate_status = 'blocked'
+            if (
+                corporate_selected
+                and not parameters['dry_run']
+                and not master_blocked
+                and not universe_blocked
+            ):
+                completed = completed_chunks('corporate_actions')
+                for exchange, chunk_identity, chunk in chunks:
+                    if chunk_identity in completed:
+                        corporate_totals['chunks_resumed'] += 1
+                        corporate_totals['chunks_completed'] += 1
+                        continue
+                    chunk_result = await data_manager.backfill_tdx_xdxr_history(
+                        exchanges=[exchange],
+                        start_date=parameters['start_date'],
+                        end_date=parameters['end_date'],
+                        instrument_ids=[item['instrument_id'] for item in chunk],
+                        instrument_date_ranges={
+                            item['instrument_id']: {
+                                'start_date': item['start_date'],
+                                'end_date': item['end_date'],
+                            }
+                            for item in chunk
+                        },
+                        derive_factors='factors' in parameters['scopes'],
+                        repair_universe_mode=parameters['repair_universe_mode'],
+                        override_lifecycle_filter=parameters['override_lifecycle_filter'],
+                        per_instrument_timeout_sec=per_instrument_timeout_sec,
+                        dry_run=False,
+                    )
+                    totals = chunk_result.get('totals') or {}
+                    for key in (
+                        'raw_events', 'saved_events', 'existing_events_refreshed',
+                        'derived_factors', 'pending_factors', 'empty_instruments',
+                        'timeouts', 'errors',
+                    ):
+                        corporate_totals[key] += int(totals.get(key, 0) or 0)
+                    if chunk_result.get('status') == 'success':
+                        mark_chunk_complete('corporate_actions', chunk_identity)
+                        corporate_totals['chunks_completed'] += 1
+                    else:
+                        corporate_status = 'partial'
+                        result['failure_samples'].extend(
+                            (chunk_result.get('samples') or [])[:5]
+                        )
+
+            result['stages']['dividends'] = (
+                {'status': corporate_status, 'totals': corporate_totals}
+                if 'dividends' in parameters['scopes']
+                else {'status': 'skipped', 'reason': 'scope_not_selected'}
+            )
+            result['stages']['factors'] = (
+                {'status': corporate_status, 'totals': corporate_totals}
+                if 'factors' in parameters['scopes']
+                else {'status': 'skipped', 'reason': 'scope_not_selected'}
+            )
+
+            checkpoint.setdefault('stages', {})['quotes_summary'] = quote_stage
+            checkpoint.setdefault('stages', {})['corporate_actions_summary'] = {
+                'status': corporate_status,
+                'totals': corporate_totals,
+            }
+            if not parameters['dry_run']:
+                checkpoint_store.save(checkpoint)
+
+            if parameters['dry_run']:
+                result['status'] = 'dry_run'
+            elif result['blockers']:
+                result['status'] = 'blocked'
+            elif any(
+                str((result['stages'].get(name) or {}).get('status')).lower()
+                in {'partial', 'failed', 'error'}
+                for name in ('master', 'calendar', 'quotes', 'dividends', 'factors')
+            ):
+                result['status'] = 'partial'
+            else:
+                result['status'] = 'success'
+            result['failure_samples'] = result['failure_samples'][:20]
+            result['warnings'] = result['warnings'][:50]
+            result['errors'] = result['errors'][:50]
+
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股历史全量回补',
+                        'status': result['status'],
+                        'content': _format_a_share_historical_backfill_report(result),
+                        'result': result,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share historical backfill failed: %s",
+                exc,
+            )
+            failure = {
+                'status': 'failed',
+                'operation': task_id,
+                'dry_run': bool(dry_run),
+                'checkpoint_id': checkpoint_id,
+                'error': str(exc),
+                'stages': result.get('stages', {}) if isinstance(result, dict) else {},
+                'blockers': [],
+                'warnings': [],
+                'errors': [str(exc)],
+                'failure_samples': [],
+                'parameters': result.get('parameters', {}) if isinstance(result, dict) else {},
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股历史全量回补',
+                        'status': 'failed',
+                        'content': _format_a_share_historical_backfill_report(failure),
+                        'result': failure,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
 
     async def daily_data_backfill_range(
         self,
