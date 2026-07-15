@@ -130,6 +130,78 @@ class TestXdxrReconnect:
         pool.reconnect_current.assert_called_once_with()
 
 
+class TestDailyDataReconnect:
+    @staticmethod
+    def _bar(code_date="2026-07-15"):
+        return {
+            "datetime": code_date,
+            "open": 10.0,
+            "high": 10.5,
+            "low": 9.8,
+            "close": 10.2,
+            "vol": 100.0,
+            "amount": 102000.0,
+        }
+
+    @staticmethod
+    def _source(pool):
+        from data_sources.tdx_source import TdxSource
+
+        source = TdxSource.__new__(TdxSource)
+        source.name = "test_pytdx"
+        source.pool = pool
+        source._batch_size = 800
+        return source
+
+    def test_empty_delisted_series_on_healthy_connection_uses_backup(self):
+        api = Mock()
+
+        def get_bars(_category, _market, code, _offset, _count):
+            if code == "300208":
+                return []
+            return [self._bar()]
+
+        api.get_security_bars.side_effect = get_bars
+        pool = Mock()
+        pool.get_connection.return_value = api
+
+        quotes = self._source(pool)._sync_get_daily_data(
+            "300208.SZ",
+            "300208",
+            datetime(1990, 12, 19),
+            datetime(2026, 7, 15),
+        )
+
+        assert quotes == []
+        pool.reconnect_current.assert_not_called()
+
+    def test_dead_connection_rotates_endpoint_and_retries_target(self):
+        stale_api = Mock()
+        stale_api.get_security_bars.return_value = []
+        refreshed_api = Mock()
+
+        def get_refreshed_bars(_category, _market, code, _offset, _count):
+            if code == "300208":
+                return [self._bar()]
+            return [self._bar()]
+
+        refreshed_api.get_security_bars.side_effect = get_refreshed_bars
+        pool = Mock()
+        pool.get_connection.return_value = stale_api
+        pool.reconnect_current.return_value = refreshed_api
+
+        quotes = self._source(pool)._sync_get_daily_data(
+            "300208.SZ",
+            "300208",
+            datetime(2026, 7, 15),
+            datetime(2026, 7, 15),
+        )
+
+        assert len(quotes) == 1
+        assert quotes[0]["instrument_id"] == "300208.SZ"
+        pool.reconnect_current.assert_called_once_with(mark_failure=True)
+
+
 # ===========================================================
 # 2. TdxIPManager
 # ===========================================================

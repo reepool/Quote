@@ -439,6 +439,20 @@ class TdxSource(BaseDataSource):
         api = self.pool.get_connection()
         return api.get_security_bars(KLINE_TYPE_DAILY, 1, "000001", 0, 1)
 
+    @staticmethod
+    def _is_connection_healthy(api: TdxHq_API) -> bool:
+        """Use liquid A-share symbols to distinguish an empty series from a dead socket."""
+        for market, code in ((1, "600000"), (0, "000001")):
+            try:
+                bars = api.get_security_bars(
+                    KLINE_TYPE_DAILY, market, code, 0, 1
+                )
+            except Exception:
+                continue
+            if bars:
+                return True
+        return False
+
     # ================================================================
     # BaseDataSource 抽象方法实现
     # ================================================================
@@ -557,28 +571,46 @@ class TdxSource(BaseDataSource):
                     break
 
             if not bars:
-                # ★ 静默断连检测: 首轮 offset=0 就返回空, 大概率是 TCP 连接已死
-                # pytdx 在连接断开时不抛异常, 而是返回 None/空列表
+                # pytdx 对退市股票也可能合法返回空，先用流动性基准判断连接状态。
                 if offset == 0 and not _reconnected_this_call:
+                    if self._is_connection_healthy(api):
+                        tdx_logger.info(
+                            f"[{self.name}] 目标日线为空但连接健康, "
+                            f"可能不提供退市/历史行情, 交由备源处理 "
+                            f"({instrument_id})"
+                        )
+                        break
+
                     tdx_logger.warning(
-                        f"[{self.name}] 首轮请求即返回空数据, 怀疑连接已断开, "
-                        f"尝试重连... ({instrument_id})"
+                        f"[{self.name}] 目标日线及连接健康探针均为空, "
+                        f"切换 TDX 节点重试... ({instrument_id})"
                     )
                     try:
-                        api = self.pool.reconnect_current(mark_failure=False)
+                        api = self.pool.reconnect_current(mark_failure=True)
                         _reconnected_this_call = True
                         bars = api.get_security_bars(
                             KLINE_TYPE_DAILY, market, code, offset, self._batch_size
                         )
                         if bars:
                             tdx_logger.info(
-                                f"[{self.name}] 重连后成功获取数据 ({instrument_id})"
+                                f"[{self.name}] 切换节点后成功获取数据 ({instrument_id})"
                             )
                         else:
-                            break  # 重连后仍然为空 → 确实没有数据
+                            probe_healthy = self._is_connection_healthy(api)
+                            log = (
+                                tdx_logger.info
+                                if probe_healthy
+                                else tdx_logger.error
+                            )
+                            log(
+                                f"[{self.name}] 切换节点后目标日线仍为空; "
+                                f"连接健康={probe_healthy}, 交由备源处理 "
+                                f"({instrument_id})"
+                            )
+                            break
                     except Exception as e:
                         tdx_logger.error(
-                            f"[{self.name}] 静默断连重连失败 {instrument_id}: {e}"
+                            f"[{self.name}] 切换 TDX 节点失败 {instrument_id}: {e}"
                         )
                         break
                 else:
