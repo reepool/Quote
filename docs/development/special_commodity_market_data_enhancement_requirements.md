@@ -93,17 +93,25 @@
 | 指标 | 探测结论 | 当前实现与边界 |
 |---|---|---|
 | 沿海煤炭运价 | 上海航运交易所公开 CBCFI 单期页可匿名读取综合指数、本期日、上期值和涨跌；多期查询要求登录/授权 | 已实现 `sse_cbcfi_public_latest` adapter、`CMD.CN.COAL.FREIGHT.CBCFI.SSE.DAILY` 和 `cn_coal_cbcfi` scope。该序列单位为 `index_point`、币种为空、`data_kind=industrial_indicator`，并已加入共享的 `special_commodity_industrial_indicator_sync` 聚合调度。provider 会接收请求区间内的本期和上期，但公开页总体仍只能支持从部署日起持续积累；更早历史区间必须报告 `sse_cbcfi_public_history_requires_entitlement`，不得猜测或绕过登录。 |
-| 环渤海动力煤港口价 | 已区分两类不同口径：BSPI 是周度综合指数；`CCTD 环渤海动力煤现货参考价`是 5500K/5000K/4500K 的日度港口现货参考价，不得混为一条序列。CCTD `catid=698` 历史目录可稳定枚举 2023-05-30 恢复发布后的计算基础记录，中煤协价格指数目录可稳定枚举 2026-06-01 以来的日评，正文可解析三个热值规格及 `CNY/ton` 数值。2026-07-15进一步验证秦皇岛市发改委官方“价格监测”栏目：页面可匿名披露 BSPI 及秦皇岛港4500/5000/5500/5800大卡价格区间，但按“环渤海动力煤”仅检出11条且包含重复记录，时间离散在2021、2023、2024年，不能形成连续周频历史或稳定日更。 | 技术解析已通过，但尚未注册生产 scope：CCTD 正文明确声明未经书面许可不得使用或复制，且当前两个公开目录之间尚未证明连续覆盖。秦皇岛市发改委页面许可条件优于 CCTD，可作为官方交叉验证证据，但覆盖连续性不满足生产主源门禁。只有取得许可或找到许可清晰且连续的免费来源后，才能实现 provider 和回补；不得因页面可访问就绕过来源许可门槛。BSPI 继续作为独立周频候选，不得用日度现货参考价替代。 |
+| 环渤海动力煤港口价 | 已区分两类不同口径：BSPI 是周度综合指数；`CCTD 环渤海动力煤现货参考价`是 5500K/5000K/4500K 的日度港口现货参考价，不得混为一条序列。CCTD `catid=698` 历史目录可枚举 2023-05-30 恢复发布后的计算基础记录，但正文存在明确的未经许可使用限制且公开目录连续性未获证明，因此日频 CCTD 继续阻断。CCTDA 行业资讯公开目录可稳定发现 BSPI 周报；逐篇来源探测发现48篇候选，45篇可由正文明确的报告周期和正文/标题唯一价格形成治理观测，连续可治理起点为报告期末2025-06-03。 | 已实现独立的 `cctda_bspi_weekly_port_price` provider、`association_public_price` 主数据治理、`CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY` 和 `cn_coal_bspi` scope。只保存 BSPI 事实值、明确报告期、发布日期和来源 URL，不调用 `robots.txt` 禁止的 CCTDA `/api`，不保存或分发文章正文。单位固定为 `CNY/ton`、币种为 `CNY`、`data_kind=market_price`，观测日为报告期末；它不是 CCTD 日度现货价、实际长协成交价或港口库存。2026-07-15 live smoke 成功解析2026-06-23的714元/吨和2026-06-30的712元/吨，无 warning/blocker。scope 在完成全历史 dry-run、write 和幂等复验前不加入自动调度。 |
 | 环渤海港口煤炭库存 | 中国煤炭运销协会 CCTDA 的 TTCI 周报专栏可稳定枚举周报，正文可能以“环渤海港口合计库存”或“环渤海四港合计库存”披露库存、统计周期和发布日期。目录自2024-08-02开始，但逐篇核验确认早期报告没有库存字段，首次同口径披露日为2025-02-08；因此目录日期不能直接作为序列生命周期。此前探测到的付费库存页和 AkShare 沿海电厂库存仍不可替代该口径。 | 已实现 `cctda_ttci_port_inventory` adapter、`CMD.CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA.WEEKLY` 和 `cn_coal_bohai_port_inventory` scope。仅保存库存事实值、周期、发布日期和来源 URL，不保存/分发文章正文；单位为 `10k_ton`、币种为空、`data_kind=industrial_indicator`。观测日使用周报期末，发布日期独立保存。TTCI 指数点不是港口煤价，港口库存也不是港口吞吐量或电厂库存。`run_id=156` 暴露了旧 parser 误取错位字段200.8/201.4的问题；`run_id=157` 将问题收敛为4期未识别“四港合计库存”。adapter 现优先识别截止日正式四港合计值，再对旧的港口统计句按配置的800—6000万吨范围进行唯一候选对齐；泛化提及港口库存但无正式指标值时计入未披露，不误报解析失败。任务级全历史 dry-run `run_id=158` 成功：70期报告、57条观测、13期未披露、0解析失败、0 warning、0 blocker，数值范围2276—3286万吨，主数据和日期治理均为 `success`；错位修复保留 `source_field_alignment`。生产 write `run_id=159` 成功新增57条观测、57条来源日期治理和1条主数据治理证据；库内无重复日期，单位为 `10k_ton`，来源统一为 CCTDA，41条原字段对齐、16条受控字段修复，发布日无早于观测日的异常，SQLite `quick_check=ok`。重复 write `run_id=160` 严格幂等：`inserted=0`、`changed=0`、`unchanged=57`，库内观测和日期治理均仍为57条。应用重启后的首次共享任务于2026-07-15完成：CCTDA `run_id=162` 在21日滚动窗口获取2条、`inserted=0`、`changed=0`、`unchanged=2`，无 warning/blocker；聚合任务三个 scope 均成功并发送 Telegram 报告，CCTDA rollout 已完成。 |
 | 全国规模以上工业原煤累计产量 | 国家统计局月度工业增加值官方发布页可稳定发现统计期、发布日期和原煤累计绝对量；1—2月为合并累计口径，3月以后同时发布当月值和年初至当月累计值 | 已实现 `nbs_monthly_industrial_output` adapter、`CMD.CN.COAL.RAW_COAL.OUTPUT.NBS.YTD.MONTHLY` 和 `cn_nbs_raw_coal_output` scope。统一治理仅保存官方累计值，单位为 `10k_ton`、币种为空、`data_kind=industrial_indicator`，不自动差分或伪造1月/2月单月值。来源发现以官方栏目目录为主，只有目录缺少应披露统计期时才调用辅助搜索；直连网络失败或 challenge 使用统一代理配置做最多3次出口轮换，临时限流最多重试3次并从5秒开始退避，出口轮换仍无法解除 `-101` IP禁用才熔断本轮搜索。2026年2—5月短窗及2022-02-28至2026-05-31全历史隔离 dry-run 均成功；全历史应有48期、实际发现和解析48期，年度分布为2022—2025各11期、2026年截至5月4期，无 warning 或 blocker。生产 write 写入48期，重复 write 为48期 `unchanged`。向前探测证明2017—2021年旧版工业增加值文章并不稳定包含原煤绝对量，因此当前同口径可用起点收紧为2022-02-28；更早“能源生产情况”数据不得未经精度和口径治理直接混填。2026-07-15首次实际到期共享调度 `run_id=163` 在四个月回看窗口获取2期、`inserted=0`、`changed=0`、`unchanged=2`，无 warning/blocker，调度幂等验收完成。 |
 
 CBCFI、CCTDA 环渤海港口库存和 NBS 原煤累计产量的治理前置均走统一主数据、来源观测日/周期、持久化和报告流水线，来源页面解析只存在于各自 provider adapter 内。由于它们不是商品价格，不得加入 `special_commodity_overseas_daily_price_sync`、`special_commodity_domestic_spot_price_sync` 或月度价格任务。工程只保留一个 `special_commodity_industrial_indicator_sync` 产业指标域聚合任务：各 scope 独立声明启用状态、到期日和观测窗口；CBCFI 使用 `provider_latest`，NBS 原煤累计产量使用月度四个月回看窗口，CCTDA 港口库存使用21日滚动窗口，三者均已启用。未来新增产业指标时扩展 scope 和 adapter，不为单个产品或来源新增调度任务。
+
+BSPI 复用同一个主数据、来源周期、持久化和报告流水线，但其语义是周频市场价格，因此使用独立的公开协会价格治理 adapter，不能标成 `industrial_indicator`。rollout 通过后应把 `cn_coal_bspi` 加入既有 `special_commodity_domestic_spot_price_sync` 聚合任务，不新增 BSPI 专项任务；调度回看窗口须覆盖周报发布日期相对报告期末的延迟。
 
 CCTDA 港口库存 rollout 使用当前唯一的历史观测回补入口，旧任务 `special_commodity_price_backfill` 已删除且不保留别名：
 
 - 短窗口 dry-run：`/run special_commodity_observation_backfill scope_id=cn_coal_bohai_port_inventory start=2026-06-22 end=2026-07-03 dry_run`。
 - 全历史 dry-run：`/run special_commodity_observation_backfill scope_id=cn_coal_bohai_port_inventory start=2025-02-08 end=2026-07-15 dry_run`。
 - 全历史正式写入：仅在前两步无 blocker、`parse_failed=0` 且来源覆盖诊断解释通过后，运行 `/run special_commodity_observation_backfill scope_id=cn_coal_bohai_port_inventory start=2025-02-08 end=2026-07-15 write`。
+
+BSPI rollout 同样使用唯一的历史观测回补入口：
+
+- 短窗口 dry-run：`/run special_commodity_observation_backfill scope_id=cn_coal_bspi start=2026-06-17 end=2026-07-01 dry_run`。
+- 全历史 dry-run：`/run special_commodity_observation_backfill scope_id=cn_coal_bspi start=2025-06-03 end=2026-07-15 dry_run`。
+- 生产 write 和重复 write 仅在全历史报告无 blocker、解析失败为零且来源覆盖缺口均有明确原因后执行；重复 write 必须全部为 `unchanged`，随后才能加入国内现货与价格基准聚合任务。
 
 ## 6. 更多连续商品行情
 
@@ -214,7 +222,7 @@ CCTDA 港口库存 rollout 使用当前唯一的历史观测回补入口，旧�
 | 中国煤炭运销协会 TTCI 周报 | `https://www.cctda.org.cn/list-42-1.html`、`https://www.cctda.org.cn/list-60-1.html` | 环渤海港口合计煤炭库存的周度行业协会来源；仅提取事实值、周期、发布日期和来源 URL，不保存/分发文章正文，不把 TTCI 指数点当作港口煤价 |
 | 中国煤炭工业协会价格指数目录 | `https://www.coalchina.org.cn/list-25-1.html` | 可枚举 2026-06-01 以来的 CCTD 日度现货参考价日评；作为来源发现证据，不代表已取得 CCTD 内容使用许可 |
 | CCTD 环渤海现货日指数披露 | `https://www.cctd.com.cn/index.php?m=content&c=index&a=lists&catid=698` | 可枚举 2023-05-30 恢复发布后的 5500K/5000K/4500K 计算基础；页面明确限制未经许可使用，当前仅登记为 blocked 候选源 |
-| 中国煤炭工业协会 BSPI | `https://www.coalchina.org.cn/index.php?m=content&c=index&a=lists&catid=30` | 与 CCTD 日度现货参考价不同的周度综合指数候选；公开历史目录停在 2025-06，仍需连续日更入口 |
-| 中国煤炭运销协会 | `https://www.cctda.org.cn/` | 可找到 2026 年 BSPI 正文，当前未发现稳定专用目录/API，不允许扫描文章 ID 作为生产发现方式 |
+| 中国煤炭工业协会 BSPI | `https://www.coalchina.org.cn/index.php?m=content&c=index&a=lists&catid=30` | 与 CCTD 日度现货参考价不同的周度综合指数交叉验证候选；不作为当前生产发现入口 |
+| 中国煤炭运销协会 BSPI 公开文章目录 | `https://www.cctda.org.cn/list-6-1.html` | 当前周频 BSPI 主源；按公开目录发现文章，只提取价格、明确报告期、发布日期和来源 URL。不得调用 robots 禁止的 `/api`，不得顺序扫描文章 ID或保存/分发正文 |
 
 来源登记仅代表待实施 adapter 的入口，不代表已取得自动抓取、再分发或商业使用许可。实施时必须重新验证页面、接口、许可和字段口径。

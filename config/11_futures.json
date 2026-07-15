@@ -868,6 +868,33 @@
           "reuse_policy": "internal_research_factual_observations_only",
           "note": "Parse only factual Bohai-Rim combined port coal inventory values, report periods, publication dates, and source URLs from CCTDA-authored TTCI weekly reports. Do not store or redistribute article text, treat TTCI index points as CNY/ton, or substitute power-plant inventory."
         },
+        "cctda_bspi_weekly_port_price": {
+          "venue": "CCTDA",
+          "source": "China Coal Transportation and Distribution Association public BSPI articles",
+          "source_mode": "industry_association_public_web",
+          "source_interface": "cctda_public_bspi_article_catalog",
+          "provider_adapter": "cctda_bspi_weekly_port_price",
+          "governance_adapter": "association_public_price",
+          "calendar_type": "source_observed_weekly_report_period",
+          "calendar_quality_flag": "association_source_observed",
+          "quality_flag": "industry_association_public_web",
+          "parser_version": "cctda_bspi_weekly_port_price.v1",
+          "listing_urls": [
+            "https://www.cctda.org.cn/list-6-1.html"
+          ],
+          "listing_max_pages": 38,
+          "timeout_seconds": 30,
+          "request_retry": {
+            "max_attempts": 3,
+            "backoff_seconds": 1.0
+          },
+          "progress_log_every_articles": 10,
+          "price_value_min": 100.0,
+          "price_value_max": 3000.0,
+          "user_agent": "QuoteSystem/SpecialCommodityMarketData",
+          "reuse_policy": "internal_research_factual_observations_only",
+          "note": "Collect only factual weekly BSPI values, explicit report periods, publication dates, and source URLs from public articles. Do not call the robots-disallowed CCTDA structured API, store or redistribute article text, or substitute daily CCTD port spot prices or long-term contract prices."
+        },
         "100ppi_public_web": {
           "venue": "100PPI",
           "source": "100ppi public web",
@@ -1581,6 +1608,22 @@
             "not_port_throughput": true,
             "not_power_plant_inventory": true,
             "source_scope": "CCTDA TTCI weekly reports"
+          }
+        },
+        {
+          "commodity_id": "CN.COAL.PORT_PRICE.BSPI.CCTDA",
+          "symbol": "BSPI",
+          "name": "Bohai-Rim Steam-Coal Price Index",
+          "category": "coal",
+          "commodity_type": "port_price_index",
+          "default_currency": "CNY",
+          "default_unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "dcf_role": "thermal_coal_port_price_cycle_anchor",
+            "source_scope": "CCTDA public BSPI weekly articles",
+            "not_daily_spot_price": true,
+            "not_long_term_contract_price": true
           }
         },
         {
@@ -2368,6 +2411,31 @@
           }
         },
         {
+          "series_id": "CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY",
+          "commodity_id": "CN.COAL.PORT_PRICE.BSPI.CCTDA",
+          "venue": "CCTDA",
+          "source_profile": "cctda_bspi_weekly_port_price",
+          "source_symbol": "BSPI",
+          "frequency": "weekly",
+          "quote_type": "port_price_index",
+          "currency": "CNY",
+          "unit": "CNY/ton",
+          "active": true,
+          "metadata": {
+            "data_kind": "market_price",
+            "source_name": "China Coal Transportation and Distribution Association public BSPI articles",
+            "source_url": "https://www.cctda.org.cn/list-6-1.html",
+            "source_available_from": "2025-06-03",
+            "region_or_spec": "Bohai-Rim six-port 5500 kcal equivalent weekly composite price index",
+            "publication_date_semantics": "public_article_publication_date",
+            "source_period_semantics": "weekly_report_period_end",
+            "price_semantics": "BSPI weekly composite index in CNY per ton; not a daily spot quote or actual long-term contract price",
+            "reuse_policy": "internal_research_factual_observations_only",
+            "not_daily_spot_price": true,
+            "not_long_term_contract_price": true
+          }
+        },
+        {
           "series_id": "CMD.CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS.TEN_DAY",
           "commodity_id": "CN.COAL.THERMAL.SHANXI_BLEND_5500.NBS",
           "venue": "NBS",
@@ -2670,6 +2738,22 @@
           ],
           "commodity_ids": [
             "CN.COAL.PORT_INVENTORY.BOHAI_RIM.CCTDA"
+          ],
+          "frequencies": [
+            "weekly"
+          ]
+        },
+        {
+          "scope_id": "cn_coal_bspi",
+          "enabled": true,
+          "venues": [
+            "CCTDA"
+          ],
+          "categories": [
+            "coal"
+          ],
+          "commodity_ids": [
+            "CN.COAL.PORT_PRICE.BSPI.CCTDA"
           ],
           "frequencies": [
             "weekly"

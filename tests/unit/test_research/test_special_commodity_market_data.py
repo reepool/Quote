@@ -23,6 +23,7 @@ from research.special_commodity_market_data import (
     CommoditySeries,
     CommodityUniverseSelector,
     ConfiguredSourceChainProvider,
+    CctdaBspiPortPriceProvider,
     CctdaTtciPortInventoryProvider,
     EiaCommodityProvider,
     FredCommodityProvider,
@@ -31,6 +32,7 @@ from research.special_commodity_market_data import (
     NbsOfficialSearchBlockedError,
     NbsProductionMaterialsGovernanceAdapter,
     NbsProductionMaterialsProvider,
+    AssociationPublicPriceGovernanceAdapter,
     OfficialPublicIndicatorGovernanceAdapter,
     NdrcPolicyDiscoveryAdapter,
     SpecialCommodityPolicyDiscoveryService,
@@ -127,8 +129,8 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
     ).sync()
 
     assert result["status"] == "success"
-    assert result["instruments"] == 43
-    assert result["series"] >= 44
+    assert result["instruments"] == 44
+    assert result["series"] >= 45
 
     dictionary = storage.read_dictionary()
     assert {item["commodity_id"] for item in dictionary["instruments"]} >= {
@@ -151,6 +153,7 @@ def test_special_commodity_master_schema_and_seed(tmp_path):
         "CN.CHEMICAL.UREA.SPOT",
         "CN.CHEMICAL.CAUSTIC_SODA.SPOT",
         "CN.CHEMICAL.SODA_ASH.SPOT",
+        "CN.COAL.PORT_PRICE.BSPI.CCTDA",
         "CN.BUILDING.GLASS.SPOT",
         "CN.ENERGY.ASPHALT.SPOT",
         "CN.ENERGY.LPG.SPOT",
@@ -1396,6 +1399,122 @@ def test_cctda_ttci_port_inventory_parser_rejects_index_without_inventory():
             source_url="https://www.cctda.org.cn/example.html",
             period=period,
         )
+
+
+def _cctda_bspi_listing_html() -> str:
+    return """
+    <html><body><div class="news_list"><ul>
+      <li><el-link href="https://www.cctda.org.cn/bspi-20260701.html">
+        【BSPI】环渤海动力煤价格指数712元/吨
+      </el-link><span class="rt">2026-07-01</span></li>
+      <li><el-link href="https://www.cctda.org.cn/bspi-20260625.html">
+        【BSPI】环渤海动力煤价格指数714元/吨
+      </el-link><span class="rt">2026-06-25</span></li>
+    </ul></div></body></html>
+    """
+
+
+def _cctda_bspi_article_html(*, include_body_value: bool = True) -> str:
+    value_text = (
+        "环渤海动力煤价格指数报收于712元/吨，环比下降。"
+        if include_body_value
+        else "本期指数保持平稳。"
+    )
+    return f"""
+    <html><body>
+      <h1>【BSPI】环渤海动力煤价格指数712元/吨</h1>
+      <p>2026-07-01 15:18:02 来源：秦皇岛煤炭网</p>
+      <p>本报告期（2026年6月24日至2026年6月30日），{value_text}</p>
+    </body></html>
+    """
+
+
+def test_cctda_bspi_provider_preserves_weekly_price_semantics(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+    source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-6-1.html"]
+    source_cfg["listing_max_pages"] = 2
+
+    def fake_get(url, *args, **kwargs):
+        if str(url).endswith("list-6-1.html"):
+            payload = _cctda_bspi_listing_html()
+        elif str(url).endswith("list-6-2.html"):
+            payload = "<html><body></body></html>"
+        elif str(url).endswith("bspi-20260701.html"):
+            payload = _cctda_bspi_article_html()
+        else:
+            raise AssertionError(f"unexpected URL: {url}")
+        return SimpleNamespace(
+            text=payload,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get", fake_get
+    )
+    result = CctdaBspiPortPriceProvider(
+        item.source_profile, source_cfg
+    ).fetch([item], start_date="2026-06-30", end_date="2026-06-30")
+
+    assert result.blockers == []
+    assert result.warnings == []
+    assert len(result.observations) == 1
+    observation = result.observations[0]
+    assert observation.observation_date == "2026-06-30"
+    assert observation.value == 712.0
+    assert observation.currency == "CNY"
+    assert observation.unit == "CNY/ton"
+    assert observation.metadata["data_kind"] == "market_price"
+    assert observation.metadata["publication_date"] == "2026-07-01"
+    assert observation.metadata["source_period_start"] == "2026-06-24"
+    assert observation.metadata["source_period_end"] == "2026-06-30"
+    assert observation.metadata["source_field_alignment"] == "article_body"
+    assert observation.metadata["not_daily_spot_price"] is True
+    assert result.metadata["source_coverage"]["coverage_ratio"] == 1.0
+
+
+def test_cctda_bspi_parser_allows_title_value_only_with_body_period():
+    parsed = CctdaBspiPortPriceProvider.parse_article(
+        _cctda_bspi_article_html(include_body_value=False),
+        source_url="https://www.cctda.org.cn/bspi-20260701.html",
+        listing_title="【BSPI】环渤海动力煤价格指数712元/吨",
+    )
+
+    assert parsed["value"] == 712.0
+    assert parsed["observation_date"] == "2026-06-30"
+    assert parsed["source_field_alignment"] == "title_value_with_body_period"
+
+
+def test_association_public_price_governance_keeps_price_semantics():
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(scope_id="cn_coal_bspi")[0]
+    provider_result = CommodityProviderResult()
+
+    class FakeProvider:
+        def fetch(self, series, *, start_date, end_date):
+            return provider_result
+
+    adapter = AssociationPublicPriceGovernanceAdapter(
+        cfg["source_profiles"][item.source_profile]
+    )
+    result = adapter.govern_master(
+        [item], FakeProvider(), start_date="2026-06-30", end_date="2026-06-30"
+    )
+
+    assert result.blockers == []
+    assert result.records[0]["governance_status"] == "success"
+    assert result.records[0]["source_currency"] == "CNY"
+    assert result.records[0]["source_unit"] == "CNY/ton"
+    assert result.records[0]["lifecycle_start"] == "2025-06-03"
+    assert result.records[0]["metadata"]["data_kind"] == "market_price"
+    assert result.prefetched_result is provider_result
 
 
 def test_official_public_indicator_governance_uses_explicit_series_semantics(
