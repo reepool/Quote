@@ -11,7 +11,7 @@ from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
-from sqlalchemy import text, func, desc, asc, tuple_
+from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
@@ -3532,6 +3532,194 @@ class DatabaseOperations:
                 instrument_id, e
             )
             return 1.0
+
+    async def get_xdxr_pre_close_overrides(
+        self,
+        instrument_id: str,
+        event_dates: List[Union[datetime, date, str]],
+    ) -> Dict[date, float]:
+        """Resolve local raw prior closes for XDXR factor derivation.
+
+        A suspended same-day placeholder keeps the preceding raw close in
+        ``pre_close``. On a normally traded ex-date, ``pre_close`` may instead
+        be the ex-right reference price, so the latest earlier trading close
+        is used.
+        """
+        normalized_dates = sorted({
+            parsed.date()
+            for value in event_dates
+            if (parsed := self._coerce_datetime(value)) is not None
+        })
+        if not instrument_id or not normalized_dates:
+            return {}
+
+        try:
+            statements = []
+            for event_date in normalized_dates:
+                event_start = datetime.combine(event_date, datetime.min.time())
+                event_end = event_start + timedelta(days=1)
+                suspended_pre_close = (
+                    select(DailyQuoteDB.pre_close)
+                    .where(
+                        DailyQuoteDB.instrument_id == instrument_id,
+                        DailyQuoteDB.time >= event_start,
+                        DailyQuoteDB.time < event_end,
+                        DailyQuoteDB.tradestatus != 1,
+                        DailyQuoteDB.pre_close > 0,
+                    )
+                    .order_by(DailyQuoteDB.time.desc())
+                    .limit(1)
+                    .scalar_subquery()
+                )
+                prior_trading_close = (
+                    select(DailyQuoteDB.close)
+                    .where(
+                        DailyQuoteDB.instrument_id == instrument_id,
+                        DailyQuoteDB.time < event_start,
+                        DailyQuoteDB.tradestatus == 1,
+                        DailyQuoteDB.close > 0,
+                    )
+                    .order_by(DailyQuoteDB.time.desc())
+                    .limit(1)
+                    .scalar_subquery()
+                )
+                statements.append(select(
+                    literal(event_start).label('ex_date'),
+                    suspended_pre_close.label('suspended_pre_close'),
+                    prior_trading_close.label('prior_trading_close'),
+                ))
+
+            stmt = statements[0] if len(statements) == 1 else union_all(*statements)
+            async with self.get_async_session() as session:
+                rows = (await session.execute(stmt)).mappings().all()
+
+            overrides: Dict[date, float] = {}
+            for row in rows:
+                event_dt = self._coerce_datetime(row.get('ex_date'))
+                pre_close = self._resolve_xdxr_pre_close_candidate(
+                    row.get('suspended_pre_close'),
+                    row.get('prior_trading_close'),
+                )
+                if event_dt is not None and pre_close > 0:
+                    overrides[event_dt.date()] = pre_close
+            return overrides
+        except Exception as exc:
+            self.db_logger.error(
+                "Failed to resolve XDXR pre-close overrides for %s: %s",
+                instrument_id,
+                exc,
+            )
+            return {}
+
+    @staticmethod
+    def _resolve_xdxr_pre_close_candidate(
+        suspended_pre_close: Any,
+        prior_trading_close: Any,
+    ) -> float:
+        """Choose safe local XDXR evidence in financial-semantic order."""
+        for candidate in (suspended_pre_close, prior_trading_close):
+            try:
+                value = float(candidate or 0.0)
+            except (TypeError, ValueError):
+                continue
+            if value > 0:
+                return value
+        return 0.0
+
+    async def get_tdx_audit_factors(
+        self,
+        instrument_id: Optional[str] = None,
+        start_date: Optional[Union[datetime, date]] = None,
+        end_date: Optional[Union[datetime, date]] = None,
+        validation_result: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return a filtered, stable page from the TDX-only audit table."""
+        limit = max(1, min(int(limit), 1000))
+        offset = max(0, int(offset))
+        conditions = []
+        if instrument_id:
+            conditions.append(AdjustmentFactorTdxDB.instrument_id == instrument_id)
+        if start_date:
+            start_dt = self._coerce_datetime(start_date)
+            if start_dt is not None:
+                conditions.append(
+                    AdjustmentFactorTdxDB.ex_date >= datetime.combine(
+                        start_dt.date(), datetime.min.time()
+                    )
+                )
+        if end_date:
+            end_dt = self._coerce_datetime(end_date)
+            if end_dt is not None:
+                conditions.append(
+                    AdjustmentFactorTdxDB.ex_date < datetime.combine(
+                        end_dt.date() + timedelta(days=1), datetime.min.time()
+                    )
+                )
+        if validation_result:
+            conditions.append(
+                AdjustmentFactorTdxDB.validation_result == validation_result
+            )
+
+        try:
+            async with self.get_async_session() as session:
+                count_stmt = select(func.count()).select_from(AdjustmentFactorTdxDB)
+                if conditions:
+                    count_stmt = count_stmt.where(*conditions)
+                total = int((await session.execute(count_stmt)).scalar_one() or 0)
+
+                stmt = select(AdjustmentFactorTdxDB)
+                if conditions:
+                    stmt = stmt.where(*conditions)
+                stmt = (
+                    stmt.order_by(
+                        AdjustmentFactorTdxDB.instrument_id.asc(),
+                        AdjustmentFactorTdxDB.ex_date.asc(),
+                        AdjustmentFactorTdxDB.id.asc(),
+                    )
+                    .offset(offset)
+                    .limit(limit)
+                )
+                rows = (await session.execute(stmt)).scalars().all()
+
+            items = [{
+                'instrument_id': row.instrument_id,
+                'ex_date': row.ex_date,
+                'factor': row.factor,
+                'cumulative_factor': row.cumulative_factor,
+                'pre_close': row.pre_close,
+                'fenhong': row.fenhong,
+                'songzhuangu': row.songzhuangu,
+                'peigu': row.peigu,
+                'peigujia': row.peigujia,
+                'validation_result': row.validation_result,
+                'ref_factor': row.ref_factor,
+                'ref_source': row.ref_source,
+                'ratio_diff_pct': row.ratio_diff_pct,
+                'conflict_reason': row.conflict_reason,
+                'source': row.source,
+                'created_at': row.created_at,
+                'updated_at': row.updated_at,
+            } for row in rows]
+            return {
+                'items': items,
+                'total': total,
+                'limit': limit,
+                'offset': offset,
+                'returned': len(items),
+                'has_more': offset + len(items) < total,
+            }
+        except Exception as exc:
+            self.db_logger.error("Failed to query TDX audit factors: %s", exc)
+            return {
+                'items': [],
+                'total': 0,
+                'limit': limit,
+                'offset': offset,
+                'returned': 0,
+                'has_more': False,
+            }
 
     async def save_tdx_audit_factors(
         self,

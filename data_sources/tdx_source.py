@@ -681,6 +681,7 @@ class TdxSource(BaseDataSource):
         symbol: str,
         start_date: datetime,
         end_date: datetime,
+        pre_close_overrides: Optional[Dict[Any, float]] = None,
     ) -> List[Dict[str, Any]]:
         """获取自研复权因子 (通过 TdxFactorEngine 计算)"""
         if not self.factor_engine:
@@ -690,7 +691,7 @@ class TdxSource(BaseDataSource):
         return await loop.run_in_executor(
             self._executor,
             self._sync_get_adjustment_factors,
-            instrument_id, symbol, start_date, end_date,
+            instrument_id, symbol, start_date, end_date, pre_close_overrides,
         )
 
     def _sync_get_adjustment_factors(
@@ -699,6 +700,7 @@ class TdxSource(BaseDataSource):
         symbol: str,
         start_date: datetime,
         end_date: datetime,
+        pre_close_overrides: Optional[Dict[Any, float]] = None,
     ) -> list[dict]:
         """同步计算自研因子"""
         try:
@@ -708,7 +710,13 @@ class TdxSource(BaseDataSource):
 
         api = self.pool.get_connection()
         return self.factor_engine.compute_factors(
-            api, market, code, instrument_id, start_date, end_date
+            api,
+            market,
+            code,
+            instrument_id,
+            start_date,
+            end_date,
+            pre_close_overrides=pre_close_overrides,
         )
 
     async def get_xdxr_events(

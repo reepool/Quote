@@ -81,6 +81,7 @@ async def test_raw_tdx_upsert_preserves_computed_fields():
 class _FakeTdxSource:
     def __init__(self, factors=None):
         self.factors = factors or []
+        self.factor_kwargs = None
 
     async def get_xdxr_events(self, instrument_id):
         return [{
@@ -93,7 +94,8 @@ class _FakeTdxSource:
             "peigujia": 0.0,
         }]
 
-    async def get_adjustment_factors(self, *_args):
+    async def get_adjustment_factors(self, *_args, **kwargs):
+        self.factor_kwargs = kwargs
         return list(self.factors)
 
 
@@ -122,6 +124,9 @@ class _FakeDbOps:
 
     async def execute_read_query(self, _sql, _params):
         return []
+
+    async def get_xdxr_pre_close_overrides(self, _instrument_id, _event_dates):
+        return {date(2020, 6, 1): 10.0}
 
     async def save_tdx_audit_factors(self, rows, preserve_computed_fields=False):
         self.saved_calls.append((list(rows), preserve_computed_fields))
@@ -178,7 +183,8 @@ async def test_xdxr_history_derivation_updates_pending_event():
         "peigu": 0.0,
         "peigujia": 0.0,
     }
-    manager = _build_manager(_FakeTdxSource([factor]))
+    source = _FakeTdxSource([factor])
+    manager = _build_manager(source)
 
     result = await manager.backfill_tdx_xdxr_history(
         exchanges=["SSE"],
@@ -191,6 +197,7 @@ async def test_xdxr_history_derivation_updates_pending_event():
     assert result["totals"]["pending_factors"] == 0
     assert manager.db_ops.saved_calls[1][1] is False
     assert manager.db_ops.saved_calls[1][0][0]["validation_result"] == "computed_unvalidated"
+    assert source.factor_kwargs["pre_close_overrides"] == {date(2020, 6, 1): 10.0}
 
 
 @pytest.mark.asyncio

@@ -83,9 +83,19 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 - TDX category-1 XDXR 原始事件写入 `adjustment_factors_tdx`。
 - XDXR 返回空且同股票行情探针也为空时，会刷新 TDX 长连接并重试一次，避免把静默断线误判为无分红历史。
 - 缺少前收盘价时仍保存分红、送转和配股字段，并标记 `pending_factor_missing_pre_close`。
+- 停牌除权日优先使用本地停牌占位行的正数 `pre_close`；正常交易的除权日不使用同日除权参考价，而取除权日前最后一个 `tradestatus=1` 的正数收盘价。
+- 本地行情仍无有效证据时，TDX 因子引擎按 XDXR 事件日寻找严格早于该日的最近 K 线，不要求除权日本身存在 K 线。
 - 后续存在前收盘价时，factor 阶段可以更新同一审计行。
 - 原始事件刷新不会覆盖已有的有效计算因子和验证结论。
 - TDX 数据不会写入生产表 `adjustment_factors`；生产因子仍使用现有正式数据源路由。
+
+审计事件可通过只读 API 查询：
+
+```text
+GET /api/v1/corporate-actions/xdxr?instrument_id=000001.SZ&start_date=2007-01-01&end_date=2008-12-31&limit=100&offset=0
+```
+
+接口还支持 `validation_result` 过滤，响应固定包含 `audit_only=true` 和 `dataset=adjustment_factors_tdx`，不能作为生产复权因子接口使用。
 
 ## 对现有业务的影响
 

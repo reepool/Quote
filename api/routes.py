@@ -3022,6 +3022,63 @@ async def get_daily_quote_changes(
 
 
 @router.get(
+    "/corporate-actions/xdxr",
+    response_model=XdxrAuditPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_xdxr_audit_events(
+    instrument_id: Optional[str] = Query(None, description="证券 ID 过滤"),
+    start_date: Optional[date] = Query(None, description="除权日起始, 双端包含"),
+    end_date: Optional[date] = Query(None, description="除权日结束, 双端包含"),
+    validation_result: Optional[str] = Query(None, description="审计验证状态过滤"),
+    limit: int = Query(100, description="返回数量限制", ge=1, le=1000),
+    offset: int = Query(0, description="偏移量", ge=0),
+):
+    """查询隔离的 TDX XDXR 审计事件, 不读取生产复权因子表。"""
+    instrument_id = _normalize_optional_query(instrument_id)
+    start_date = _normalize_optional_query(start_date)
+    end_date = _normalize_optional_query(end_date)
+    validation_result = _normalize_optional_query(validation_result)
+    limit = int(_query_default(limit, 100))
+    offset = int(_query_default(offset, 0))
+
+    if start_date and end_date and end_date < start_date:
+        raise HTTPException(
+            status_code=400,
+            detail="end_date must be greater than or equal to start_date",
+        )
+
+    normalized_instrument_id = None
+    if instrument_id:
+        normalized_instrument_id = convert_to_database_format(
+            str(instrument_id).strip()
+        )
+    normalized_validation = (
+        str(validation_result).strip() if validation_result else None
+    )
+
+    page = await data_manager.db_ops.get_tdx_audit_factors(
+        instrument_id=normalized_instrument_id,
+        start_date=start_date,
+        end_date=end_date,
+        validation_result=normalized_validation,
+        limit=limit,
+        offset=offset,
+    )
+    return XdxrAuditPageResponse(
+        audit_only=True,
+        dataset="adjustment_factors_tdx",
+        filters={
+            "instrument_id": normalized_instrument_id,
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None,
+            "validation_result": normalized_validation,
+        },
+        **page,
+    )
+
+
+@router.get(
     "/quotes/daily",
     tags=["Quotes"],
     responses={

@@ -16,7 +16,8 @@
 """
 
 import logging
-from datetime import datetime
+from bisect import bisect_left
+from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 from pytdx.hq import TdxHq_API
@@ -84,6 +85,7 @@ class TdxFactorEngine:
         instrument_id: str,
         start_date: datetime,
         end_date: datetime,
+        pre_close_overrides: Optional[Dict[Any, float]] = None,
     ) -> list[dict]:
         """计算指定品种在日期范围内的复权因子
 
@@ -94,6 +96,7 @@ class TdxFactorEngine:
             instrument_id: 品种 ID (如 '000001.SZ')
             start_date: 开始日期
             end_date: 结束日期
+            pre_close_overrides: 本地行情解析出的 {除权日: 前收盘价}; 有效值优先
 
         Returns:
             因子列表, 每条包含:
@@ -135,10 +138,32 @@ class TdxFactorEngine:
         # 按日期排序
         div_events.sort(key=lambda e: e["ex_date"])
 
-        # 2. 获取日线数据 (用于查前收盘价)
-        #    需要获取从最早事件日之前到最晚事件日的日线
-        earliest_event = div_events[0]["ex_date"]
-        pre_close_map = self._build_pre_close_map(api, market, code, earliest_event)
+        # 2. 先归一化本地证据, 仅为缺口请求 TDX 日线
+        local_pre_close_map: dict[date, float] = {}
+        for raw_date, raw_value in (pre_close_overrides or {}).items():
+            try:
+                if isinstance(raw_date, datetime):
+                    normalized_date = raw_date.date()
+                elif isinstance(raw_date, date):
+                    normalized_date = raw_date
+                else:
+                    normalized_date = datetime.fromisoformat(
+                        str(raw_date)[:10]
+                    ).date()
+                value = float(raw_value or 0.0)
+                if value > 0:
+                    local_pre_close_map[normalized_date] = value
+            except (TypeError, ValueError):
+                continue
+        event_dates = [event["ex_date"] for event in div_events]
+        fallback_event_dates = [
+            event_date
+            for event_date in event_dates
+            if event_date.date() not in local_pre_close_map
+        ]
+        pre_close_map = self._build_pre_close_map(
+            api, market, code, fallback_event_dates
+        )
 
         # 3. 计算因子
         results: list[dict] = []
@@ -152,7 +177,9 @@ class TdxFactorEngine:
             peigujia = event["peigujia"]
 
             # 查找除权日前一交易日的收盘价
-            pre_close = pre_close_map.get(ex_date)
+            pre_close = local_pre_close_map.get(ex_date.date())
+            if pre_close is None or pre_close <= 0:
+                pre_close = pre_close_map.get(ex_date.date())
             if pre_close is None or pre_close <= 0:
                 tdx_factor_logger.warning(
                     f"[TdxFactorEngine] {instrument_id} "
@@ -223,13 +250,17 @@ class TdxFactorEngine:
         api: TdxHq_API,
         market: int,
         code: str,
-        earliest_event: datetime,
-    ) -> dict[datetime, float]:
+        event_dates: List[datetime],
+    ) -> dict[date, float]:
         """构建 {除权日: 前一交易日收盘价} 映射
 
         思路: 获取足够多的日线, 构建日期→收盘价映射,
         然后对每个除权日, 查找 < ex_date 的最后一个交易日收盘价.
         """
+        if not event_dates:
+            return {}
+        earliest_event = min(event_dates)
+
         # 获取全历史日线 (从最新往前取, 直到早于 earliest_event)
         all_bars: list[tuple[datetime, float]] = []  # (date, close)
         offset = 0
@@ -257,8 +288,7 @@ class TdxFactorEngine:
             # 检查是否已足够早
             if all_bars:
                 earliest_bar = min(all_bars, key=lambda x: x[0])
-                if earliest_bar[0].date() < earliest_event.date() - \
-                        __import__("datetime").timedelta(days=30):
+                if earliest_bar[0].date() < earliest_event.date() - timedelta(days=30):
                     break
 
             if len(bars) < batch_size:
@@ -267,18 +297,18 @@ class TdxFactorEngine:
         # 按日期排序
         all_bars.sort(key=lambda x: x[0])
 
-        # 构建 {日期: 收盘价}
-        date_close_map: dict[datetime, float] = {dt: close for dt, close in all_bars}
+        # 构建 {日期: 收盘价}, 过滤无效 bar
+        date_close_map: dict[datetime, float] = {
+            dt: close for dt, close in all_bars if close > 0
+        }
         sorted_dates = sorted(date_close_map.keys())
 
         # 构建 {除权日: 前一交易日收盘价}
-        pre_close_map: dict[datetime, float] = {}
-
-        for ex_date_candidate in date_close_map.keys():
-            # 找 < ex_date_candidate 的最近交易日
-            prev_dates = [d for d in sorted_dates if d.date() < ex_date_candidate.date()]
-            if prev_dates:
-                prev_date = prev_dates[-1]
-                pre_close_map[ex_date_candidate] = date_close_map[prev_date]
+        pre_close_map: dict[date, float] = {}
+        for event_date in event_dates:
+            previous_index = bisect_left(sorted_dates, event_date) - 1
+            if previous_index >= 0:
+                previous_date = sorted_dates[previous_index]
+                pre_close_map[event_date.date()] = date_close_map[previous_date]
 
         return pre_close_map

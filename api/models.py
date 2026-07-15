@@ -223,6 +223,40 @@ class DailyQuotesEnvelopeResponse(BaseModel):
     instrument_delisted: bool = Field(False, description="该证券是否已退市 (delisted_date 非空)")
 
 
+class XdxrAuditEventResponse(BaseModel):
+    """TDX XDXR raw event and derived audit factor."""
+    instrument_id: str = Field(..., description="交易品种 ID")
+    ex_date: datetime = Field(..., description="除权除息日")
+    factor: float = Field(..., description="单日审计因子")
+    cumulative_factor: float = Field(..., description="累积审计因子")
+    pre_close: float = Field(..., description="因子计算使用的前收盘价")
+    fenhong: float = Field(..., description="每 10 股现金分红")
+    songzhuangu: float = Field(..., description="每 10 股送转股")
+    peigu: float = Field(..., description="每 10 股配股")
+    peigujia: float = Field(..., description="配股价")
+    validation_result: Optional[str] = Field(None, description="审计验证状态")
+    ref_factor: Optional[float] = Field(None, description="参考源因子")
+    ref_source: Optional[str] = Field(None, description="参考源")
+    ratio_diff_pct: Optional[float] = Field(None, description="因子比率差异百分比")
+    conflict_reason: Optional[str] = Field(None, description="冲突或 pending 原因")
+    source: Optional[str] = Field(None, description="数据来源")
+    created_at: Optional[datetime] = Field(None, description="首次写入时间")
+    updated_at: Optional[datetime] = Field(None, description="最后更新时间")
+
+
+class XdxrAuditPageResponse(BaseModel):
+    """Read-only page from the isolated TDX audit dataset."""
+    audit_only: bool = Field(True, description="始终为 true; 不属于生产复权因子")
+    dataset: str = Field("adjustment_factors_tdx", description="审计数据集名称")
+    total: int = Field(0, description="过滤后的总记录数")
+    limit: int = Field(100, description="本页限制")
+    offset: int = Field(0, description="本页偏移")
+    returned: int = Field(0, description="本页实际返回数")
+    has_more: bool = Field(False, description="是否还有后续记录")
+    filters: Dict[str, Any] = Field(default_factory=dict, description="生效的查询条件")
+    items: List[XdxrAuditEventResponse] = Field(default_factory=list)
+
+
 class ChangeLogRecordResponse(BaseModel):
     """本地已观测增量变更记录。"""
     sequence_id: int = Field(..., description="单库内只增不减水位")

@@ -15774,11 +15774,22 @@ class DataManager:
                         )
 
                     if derive_factors:
+                        pre_close_overrides = await self.db_ops.get_xdxr_pre_close_overrides(
+                            instrument_id,
+                            [event_date for event_date in event_dates if event_date is not None],
+                        )
+                        dm_logger.debug(
+                            "[DataManager] XDXR prior-close evidence %s: local=%d events=%d",
+                            instrument_id,
+                            len(pre_close_overrides),
+                            len(event_dates),
+                        )
                         factor_coro = tdx_source.get_adjustment_factors(
                             instrument_id,
                             symbol,
                             datetime.combine(effective_start, datetime.min.time()),
                             datetime.combine(effective_end, datetime.max.time()),
+                            pre_close_overrides=pre_close_overrides,
                         )
                         factors = (
                             await asyncio.wait_for(factor_coro, timeout=per_instrument_timeout_sec)
