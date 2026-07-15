@@ -58,6 +58,51 @@ def test_normalize_a_share_backfill_parameters_accepts_read_only_source_scan():
     assert result["scan_sources"] is True
 
 
+def test_normalize_a_share_backfill_parameters_accepts_pending_quote_repair_in_write_mode():
+    result = normalize_a_share_backfill_parameters(
+        start_date="2020-01-01",
+        end_date="2020-12-31",
+        scopes="dividends,factors",
+        dry_run=False,
+        repair_pending_factor_quotes="true",
+    )
+
+    assert result["repair_pending_factor_quotes"] is True
+
+
+@pytest.mark.parametrize(
+    "kwargs, message",
+    [
+        (
+            {
+                "dry_run": True,
+                "scopes": ["factors"],
+                "repair_pending_factor_quotes": True,
+            },
+            "requires write mode",
+        ),
+        (
+            {
+                "dry_run": False,
+                "scopes": ["dividends"],
+                "repair_pending_factor_quotes": True,
+            },
+            "requires factors scope",
+        ),
+    ],
+)
+def test_normalize_a_share_backfill_parameters_rejects_invalid_pending_quote_repair(
+    kwargs,
+    message,
+):
+    with pytest.raises(ValueError, match=message):
+        normalize_a_share_backfill_parameters(
+            start_date="2020-01-01",
+            end_date="2020-12-31",
+            **kwargs,
+        )
+
+
 @pytest.mark.parametrize(
     "kwargs, message",
     [
@@ -136,3 +181,18 @@ def test_checkpoint_store_is_parameter_bound_and_atomic(tmp_path):
     changed = dict(parameters, end_date=date(2021, 1, 1))
     with pytest.raises(ValueError, match="do not match"):
         store.load(checkpoint_id, changed)
+
+
+def test_pending_quote_repair_policy_changes_checkpoint_identity(tmp_path):
+    store = AShareBackfillCheckpointStore(tmp_path)
+    common = {
+        "start_date": date(2020, 1, 1),
+        "end_date": date(2020, 12, 31),
+        "exchanges": ["SSE"],
+        "scopes": ["factors"],
+    }
+
+    disabled = store.resolve_id({**common, "repair_pending_factor_quotes": False})
+    enabled = store.resolve_id({**common, "repair_pending_factor_quotes": True})
+
+    assert disabled != enabled

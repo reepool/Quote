@@ -395,9 +395,9 @@ scope 解析
 
 当前工程使用独立的 `special_commodity_*` 任务域，不把特殊商品现货并入国内五大交易所的 `futures_market_data_sync`。任务 ID 按“地域 + 数据语义 + 频率”命名，直接区分海外日频价格、国内现货价格、国际月频价格、非价格产业指标、政策治理和历史观测回补；旧的歧义 ID 已一次性删除且不保留别名。所有价格和指标入口复用同一个内部治理执行器，不形成平行链路。海外日频任务 `special_commodity_overseas_daily_price_sync` 在周二至周六 08:00（Asia/Shanghai）运行，覆盖 `lme_nonferrous` 与 `eia_energy_oil`；国内现货与价格基准任务 `special_commodity_domestic_spot_price_sync` 在周一至周五 22:30 运行，覆盖已完成历史回补和治理验证的 `cn_100ppi_chemical`、`cn_100ppi_methanol`、`cn_100ppi_ethylene_glycol`、`cn_100ppi_pvc`、`cn_100ppi_polypropylene`、`cn_100ppi_styrene`、`cn_100ppi_urea`、`cn_100ppi_caustic_soda`、`cn_100ppi_soda_ash`、`cn_100ppi_glass`、`cn_100ppi_asphalt`、`cn_100ppi_lpg`、`cn_100ppi_natural_rubber`、`cn_100ppi_softwood_pulp`、`cn_nbs_thermal_coal` 与 `cn_coal_bspi`。
 
-`special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 已启用并使用 `provider_latest` 窗口；`cn_nbs_raw_coal_output` 已完成全历史 dry-run、正式写入和幂等复验，并以月度四个月回看窗口在每月15日至22日启用。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
+`special_commodity_industrial_indicator_sync` 是唯一的产业指标域聚合任务，不为每个产品或数据源创建新任务。调度配置通过 `scope_runs` 为每个 scope 独立声明启用状态、运行日和观测窗口；任务逐 scope 执行统一 provider/governance/persistence 流水线，单一 scope 失败不得阻止其他 scope，最终只发送一份聚合报告。当前 `cn_coal_cbcfi` 使用 `provider_latest` 窗口，`cn_coal_bohai_port_inventory` 使用21日滚动窗口，`cn_nbs_raw_coal_output` 使用月度四个月回看窗口并在每月15日至22日到期运行；三个 scope 均已完成历史/可用窗口验证、正式写入、幂等复验和共享调度验收。未来新增产量、库存、运费、进口量或仓单指标时，只增加 scope 和 adapter，不增加同目的调度任务。
 
-2026-07-14，`cn_nbs_raw_coal_output` 全历史 dry-run `run_id=148` 获取48条官方累计产量观测，覆盖2022-02至2026-05，预期月份48、发现48、未解决缺口0。正式写入 `run_id=149` 新增48条观测、48条来源月份治理和1条主数据治理记录；回补入口幂等复验 `run_id=150` 为新增0、变更0、不变48。三个阶段均为主数据治理成功、日期治理成功且无 warning/blocker，因此正式加入非价格产业指标聚合任务；应用重启后仍须运行一次聚合任务，验收 scope 到期判断、月度窗口和聚合报告幂等性。
+2026-07-14，`cn_nbs_raw_coal_output` 全历史 dry-run `run_id=148` 获取48条官方累计产量观测，覆盖2022-02至2026-05，预期月份48、发现48、未解决缺口0。正式写入 `run_id=149` 新增48条观测、48条来源月份治理和1条主数据治理记录；回补入口幂等复验 `run_id=150` 为新增0、变更0、不变48。三个阶段均为主数据治理成功、日期治理成功且无 warning/blocker。应用重启后的首次到期共享调度 `run_id=163` 使用月度四个月回看窗口获取2期并全部保持不变，0 warning、0 blocker，scope 到期判断、窗口和聚合报告验收均已完成。
 
 滚动窗口任务默认回看最近10个自然日，而来源窗口任务使用来源公开边界。各 scope 隔离来源、频率、报告和日期治理。国内现货、官方旬价和产业指标不进入期货连续合约任务，因为来源观测日、单值价格或指数和缺口治理不同于交易所交易日、合约生命周期和 OHLCV 治理。原始 FRED 序列继续独立保存用于来源审计；其他100ppi品种需完成逐品种治理和历史验证后再加入国内现货任务。World Bank/FRED-IMF 月频和政策事件继续使用独立频率。08:00缓存预热保持在08:20，避免同分钟竞争。其他特殊商品任务继续保持手工或未启用状态：
 
@@ -426,8 +426,15 @@ FRED/EIA 官方 API 的主数据与观测值请求必须共用有界重试策略
 - `GET /api/v1/research/commodities/dictionary`：商品及序列字典。
 - `GET /api/v1/research/commodities/series?active_only=true`：启用序列。
 - `GET /api/v1/research/commodities/observations?series_id=...&start_date=...&end_date=...`：指定序列观测值。
-- `GET /api/v1/research/commodities/diagnostics?target_currency=CNY`：覆盖、质量和本地 FX 依赖诊断。
+- `GET /api/v1/research/commodities/diagnostics?target_currency=CNY`：覆盖、无本地观测序列、治理质量和本地 FX 依赖诊断；该字段不伪装成按频率计算的 freshness 判断。
 - `GET /api/v1/research/commodities/policy-events?commodity_id=...`：政策/长协事件及有效期。
+- `GET /api/v1/research/commodities/policy-candidates?review_status=...`：政策解析候选及短审核码。
+- `POST /api/v1/research/commodities/policy-candidates/review?...`：按短码、完整 ID 或文号审核，并可通过统一 validator 一步提升。
+- `GET /api/v1/research/commodities/source-documents?source_profile=...`：官方来源文档版本和哈希证据，不返回正文。
+- `GET /api/v1/research/commodities/indicators?...`：按分类、序列和日期读取非价格产业指标。
+- `GET /api/v1/research/commodities/series-candidates?...`：读取未进入正式主数据的扩品候选。
+- `POST /api/v1/research/commodities/series-catalog-sync?dry_run=true`：执行扩品发现，不自动上线。
+- `POST /api/v1/research/commodities/policy-discovery?...`：执行官方政策目录发现，默认 dry-run。
 - `POST /api/v1/research/commodities/price-sync?...`：受 API 工作负载保护的价格同步。
 - `POST /api/v1/research/commodities/calendar-governance?...`：观测日/发布期治理。
 
@@ -515,6 +522,6 @@ DCF 侧读取商品数据时，应使用明确的 `series_id` 或 `commodity_id 
 
 环渤海港口煤炭库存已复用同一工业指标契约实现 CCTDA TTCI 周报 adapter、主数据、来源周期/发布日期治理和 `cn_coal_bohai_port_inventory` scope。该序列仅保存中国煤炭运销协会周报披露的环渤海港口/四港合计库存事实值，单位为 `10k_ton`，观测日为周报统计期末，发布日期单独保存；不得解释为港口吞吐量、沿海电厂库存或商品价格，也不得把 TTCI 指数点当作 `CNY/ton`。公开 TTCI 目录自2024-08-02起可枚举，但早期周报并未披露该库存指标，当前同口径指标起点为首次实际披露日2025-02-08。adapter 优先解析“截止日+环渤海四港合计库存”的正式统计句，避免被正文中其他港口、电厂库存或调入调出值污染；对旧的港口统计句，仅当存在唯一符合配置数量级的候选时进行字段对齐并保留 reconciliation 标记。“报告存在但未披露正式库存指标”计入来源覆盖诊断，不因泛化提及港口库存而误报解析故障。该 scope 已完成全历史 dry-run、生产 write、重复 write 和共享调度幂等验收，当前由 `special_commodity_industrial_indicator_sync` 以21日滚动窗口维护。
 
-港口价格按独立语义治理。CCTD 5500K/5000K/4500K 日频现货参考价因许可限制和公开历史连续性不足继续阻断；不能因港口库存或 BSPI 来源可用而放行。CCTDA 公开文章目录已落地独立 BSPI 周频价格 adapter、`association_public_price` 治理、`CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY` 和 `cn_coal_bspi` scope。该序列为 `CNY/ton`、`data_kind=market_price`，只保存价格事实、明确周报周期、发布日期和 URL，不保存正文、不调用 robots 禁止的结构化 API，也不替代 CCTD 日价或实际长协价。2026-07-15 全历史 dry-run（run_id=166）已通过：范围内47篇候选文章形成45条观测，2篇明确未披露指标值，0解析失败、0未解决日期，覆盖2025-06-03至2026-06-30。生产 rollout 尚需 write 和幂等复验，验收前不加入自动日更。
+港口价格按独立语义治理。CCTD 5500K/5000K/4500K 日频现货参考价因许可限制和公开历史连续性不足继续阻断；不能因港口库存或 BSPI 来源可用而放行。CCTDA 公开文章目录已落地独立 BSPI 周频价格 adapter、`association_public_price` 治理、`CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY` 和 `cn_coal_bspi` scope。该序列为 `CNY/ton`、`data_kind=market_price`，只保存价格事实、明确周报周期、发布日期和 URL，不保存正文、不调用 robots 禁止的结构化 API，也不替代 CCTD 日价或实际长协价。全历史 dry-run `run_id=166` 形成45条观测且0解析失败/未解决日期；生产 `run_id=167` 新增45条，重复 `run_id=168` 全部不变；重启后聚合 `run_id=169` 成功加载全部16个国内价格 scope，0 warning、0 blocker。BSPI 已由 `special_commodity_domestic_spot_price_sync` 正式维护。
 
-同日已按相同工业指标契约实现国家统计局规模以上工业原煤累计产量 provider、主数据和 `cn_nbs_raw_coal_output` scope。该序列保存国家统计局官方年初至统计月累计绝对量，单位为 `10k_ton`；1—2月合并口径不会被拆成单月值，后续月份也不自动通过累计差分生成“官方月度产量”。生产 dry-run 曾因 adapter 只接受 `/sj/zxfb/` 而漏掉发布在 `/sj/zxfbhjd/` 的2026年4月文章，同时辅助搜索接口对本机 IP 返回禁用，形成47/48期 warning。adapter 现已将两个国家统计局官方发布栏目纳入同一来源契约，并改为先扫描官方目录、只对未解决统计期调用辅助搜索；目录完整覆盖48期时搜索请求为零。搜索临时限流按统一配置有界退避，`-101` IP禁用则立即熔断本轮搜索，避免继续消耗被封出口。修复后的2022-02-28至2026-05-31隔离全历史 dry-run取得48/48期，主数据治理和来源日期治理均成功，零 warning/blocker；生产 write 写入48期，重复 write 为48期 `unchanged`，证明人工回补幂等。对2017年以来的向前探测确认，2017—2021年旧版工业增加值文章不稳定包含同精度原煤绝对量，因此当前生产历史起点为2022-02-28；更早能源生产材料需作为独立来源完成精度和口径治理后才能扩展。该 scope 已启用月度回看调度，但首次实际到期调度运行的幂等验收仍需完成，不能仅以手工重复 write 代替调度验收。
+同日已按相同工业指标契约实现国家统计局规模以上工业原煤累计产量 provider、主数据和 `cn_nbs_raw_coal_output` scope。该序列保存国家统计局官方年初至统计月累计绝对量，单位为 `10k_ton`；1—2月合并口径不会被拆成单月值，后续月份也不自动通过累计差分生成“官方月度产量”。生产 dry-run 曾因 adapter 只接受 `/sj/zxfb/` 而漏掉发布在 `/sj/zxfbhjd/` 的2026年4月文章，同时辅助搜索接口对本机 IP 返回禁用，形成47/48期 warning。adapter 现已将两个国家统计局官方发布栏目纳入同一来源契约，并改为先扫描官方目录、只对未解决统计期调用辅助搜索；目录完整覆盖48期时搜索请求为零。搜索临时限流按统一配置有界退避，`-101` IP禁用则立即熔断本轮搜索，避免继续消耗被封出口。修复后的2022-02-28至2026-05-31隔离全历史 dry-run取得48/48期，主数据治理和来源日期治理均成功，零 warning/blocker；生产 write 写入48期，重复 write 为48期 `unchanged`。对2017年以来的向前探测确认，2017—2021年旧版工业增加值文章不稳定包含同精度原煤绝对量，因此当前生产历史起点为2022-02-28；更早能源生产材料需作为独立来源完成精度和口径治理后才能扩展。首次实际到期共享调度 `run_id=163` 已验证月度四个月回看窗口、到期判断和聚合报告，获取2期且全部不变，无 warning/blocker。

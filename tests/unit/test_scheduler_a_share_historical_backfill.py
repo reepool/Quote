@@ -242,6 +242,7 @@ def test_scheduler_config_registers_manual_dry_run_job():
     assert job["parameters"]["dry_run"] is True
     assert job["parameters"]["scan_sources"] is False
     assert job["parameters"]["resume"] is True
+    assert job["parameters"]["repair_pending_factor_quotes"] is False
     assert job["parameters"]["scopes"] == [
         "master", "calendar", "quotes", "dividends", "factors"
     ]
@@ -302,3 +303,275 @@ def test_historical_backfill_report_distinguishes_preview_and_source_scan():
     assert "结论: *预演完成*" in preview
     assert "结论: *源扫描完成*" in scan
     assert "scan_sources: `True`" in scan
+
+
+@pytest.mark.asyncio
+async def test_a_share_historical_backfill_is_partial_when_persisted_pending_remains(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [])
+    monkeypatch.setattr(
+        data_manager,
+        "backfill_tdx_xdxr_history",
+        AsyncMock(return_value={
+            "status": "success",
+            "totals": {
+                "raw_events": 2,
+                "saved_events": 2,
+                "derived_factors": 1,
+                "pending_factors": 1,
+            },
+        }),
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "get_tdx_xdxr_pending_factor_summary",
+        AsyncMock(return_value={
+            "status": "partial",
+            "totals": {
+                "pending_factors": 1,
+                "pending_instruments": 1,
+                "pending_cash_events": 1,
+            },
+            "instrument_ids": ["600000.SH"],
+            "samples": [{
+                "instrument_id": "600000.SH",
+                "ex_date": "2020-06-01",
+                "reason": "pending_factor_missing_pre_close",
+            }],
+        }),
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "reconcile_tdx_xdxr_history",
+        AsyncMock(return_value={
+            "status": "success",
+            "totals": {
+                "tdx_events": 2,
+                "reference_events": 2,
+                "reference_only_events": 0,
+                "tdx_only_events": 0,
+            },
+        }),
+    )
+
+    result = await task.a_share_daily_data_historical_backfill(
+        start_date="2020-01-01",
+        end_date="2020-12-31",
+        exchanges=["SSE"],
+        scopes=["dividends", "factors"],
+        dry_run=False,
+        chunk_size=1,
+    )
+
+    assert result["status"] == "partial"
+    assert result["stages"]["completeness"]["status"] == "partial"
+    assert result["stages"]["completeness"]["reasons"] == ["pending_factors"]
+    assert result["stages"]["completeness"]["totals"]["pending_factors"] == 1
+
+
+@pytest.mark.asyncio
+async def test_a_share_historical_backfill_repairs_pending_quotes_when_enabled(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [])
+    xdxr_mock = AsyncMock(return_value={
+        "status": "success",
+        "totals": {
+            "raw_events": 1,
+            "saved_events": 1,
+            "derived_factors": 1,
+            "pending_factors": 0,
+            "errors": 0,
+            "timeouts": 0,
+        },
+    })
+    pending_mock = AsyncMock(side_effect=[
+        {
+            "status": "partial",
+            "totals": {
+                "pending_factors": 1,
+                "pending_instruments": 1,
+                "pending_cash_events": 1,
+            },
+            "instrument_ids": ["600000.SH"],
+            "samples": [],
+        },
+        {
+            "status": "success",
+            "totals": {
+                "pending_factors": 0,
+                "pending_instruments": 0,
+                "pending_cash_events": 0,
+            },
+            "instrument_ids": [],
+            "samples": [],
+        },
+    ])
+    quote_repair_mock = AsyncMock(return_value={
+        "status": "success",
+        "target_count": 1,
+        "saved_rows": 100,
+        "failure_count": 0,
+    })
+    monkeypatch.setattr(data_manager, "backfill_tdx_xdxr_history", xdxr_mock)
+    monkeypatch.setattr(
+        data_manager,
+        "get_tdx_xdxr_pending_factor_summary",
+        pending_mock,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "run_delisted_a_share_quote_backfill",
+        quote_repair_mock,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "reconcile_tdx_xdxr_history",
+        AsyncMock(return_value={
+            "status": "success",
+            "totals": {
+                "tdx_events": 1,
+                "reference_events": 1,
+                "reference_only_events": 0,
+                "tdx_only_events": 0,
+            },
+        }),
+    )
+
+    result = await task.a_share_daily_data_historical_backfill(
+        start_date="2020-01-01",
+        end_date="2020-12-31",
+        exchanges=["SSE"],
+        scopes=["dividends", "factors"],
+        dry_run=False,
+        repair_pending_factor_quotes=True,
+        chunk_size=1,
+    )
+
+    assert result["status"] == "success"
+    assert result["stages"]["pending_quote_repair"]["status"] == "success"
+    assert (
+        result["stages"]["pending_quote_repair"]["totals"][
+            "remaining_pending_factors"
+        ]
+        == 0
+    )
+    assert xdxr_mock.await_count == 2
+    quote_repair_mock.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_a_share_historical_backfill_resume_rechecks_persisted_completeness(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [])
+    xdxr_mock = AsyncMock(return_value={
+        "status": "success",
+        "totals": {
+            "raw_events": 1,
+            "saved_events": 1,
+            "derived_factors": 1,
+            "pending_factors": 0,
+        },
+    })
+    pending_mock = AsyncMock(return_value={
+        "status": "success",
+        "totals": {
+            "pending_factors": 0,
+            "pending_instruments": 0,
+            "pending_cash_events": 0,
+        },
+        "instrument_ids": [],
+        "samples": [],
+    })
+    reconciliation_mock = AsyncMock(return_value={
+        "status": "success",
+        "totals": {
+            "tdx_events": 1,
+            "reference_events": 1,
+            "reference_only_events": 0,
+            "tdx_only_events": 0,
+        },
+    })
+    monkeypatch.setattr(data_manager, "backfill_tdx_xdxr_history", xdxr_mock)
+    monkeypatch.setattr(
+        data_manager,
+        "get_tdx_xdxr_pending_factor_summary",
+        pending_mock,
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "reconcile_tdx_xdxr_history",
+        reconciliation_mock,
+    )
+    parameters = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-12-31",
+        "exchanges": ["SSE"],
+        "scopes": ["dividends", "factors"],
+        "dry_run": False,
+        "resume": True,
+        "chunk_size": 1,
+    }
+
+    first = await task.a_share_daily_data_historical_backfill(**parameters)
+    second = await task.a_share_daily_data_historical_backfill(**parameters)
+
+    assert first["status"] == "success"
+    assert second["status"] == "success"
+    assert second["resumed"] is True
+    assert second["stages"]["dividends"]["totals"]["chunks_resumed"] == 1
+    assert xdxr_mock.await_count == 1
+    assert pending_mock.await_count == 2
+    assert reconciliation_mock.await_count == 2
+
+
+def test_historical_backfill_report_exposes_completeness_and_pending_repair():
+    content = _format_a_share_historical_backfill_report({
+        "status": "partial",
+        "dry_run": False,
+        "checkpoint_id": "quality-checkpoint",
+        "parameters": {
+            "start_date": "2020-01-01",
+            "end_date": "2020-12-31",
+            "exchanges": ["SSE"],
+            "scopes": ["dividends", "factors"],
+            "repair_pending_factor_quotes": True,
+        },
+        "stages": {
+            "dividends": {
+                "status": "success",
+                "totals": {"raw_events": 2, "saved_events": 2},
+            },
+            "factors": {
+                "status": "success",
+                "totals": {"derived_factors": 1, "pending_factors": 1},
+            },
+            "pending_quote_repair": {
+                "status": "partial",
+                "totals": {"remaining_pending_factors": 1},
+            },
+            "completeness": {
+                "status": "partial",
+                "totals": {
+                    "persisted_tdx_events": 2,
+                    "pending_factors": 1,
+                    "reference_only_events": 1,
+                },
+                "samples": [{
+                    "instrument_id": "600000.SH",
+                    "ex_date": "2020-06-01",
+                    "reason": "pending_factor_missing_pre_close",
+                }],
+            },
+        },
+    })
+
+    assert "repair_pending_factor_quotes: `True`" in content
+    assert "completeness: partial" in content
+    assert "pending_factors=1" in content
+    assert "600000.SH 2020-06-01" in content

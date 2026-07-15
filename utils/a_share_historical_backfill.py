@@ -60,6 +60,7 @@ def normalize_a_share_backfill_parameters(
     repair_universe_mode: str = "historical_backfill",
     override_lifecycle_filter: Any = False,
     force_current_master_refresh: Any = True,
+    repair_pending_factor_quotes: Any = False,
 ) -> Dict[str, Any]:
     """Validate and normalize the operator-facing task parameters."""
     normalized_start = coerce_date(start_date, field_name="start_date")
@@ -93,6 +94,12 @@ def normalize_a_share_backfill_parameters(
     if normalized_scan_sources and not ({"dividends", "factors"} & set(normalized_scopes)):
         raise ValueError("scan_sources=true requires dividends or factors scope")
 
+    normalized_repair_pending = _coerce_bool(repair_pending_factor_quotes)
+    if normalized_repair_pending and normalized_dry_run:
+        raise ValueError("repair_pending_factor_quotes=true requires write mode")
+    if normalized_repair_pending and "factors" not in normalized_scopes:
+        raise ValueError("repair_pending_factor_quotes=true requires factors scope")
+
     return {
         "start_date": normalized_start,
         "end_date": normalized_end,
@@ -106,6 +113,7 @@ def normalize_a_share_backfill_parameters(
         "repair_universe_mode": str(repair_universe_mode or "historical_backfill").strip(),
         "override_lifecycle_filter": _coerce_bool(override_lifecycle_filter),
         "force_current_master_refresh": _coerce_bool(force_current_master_refresh),
+        "repair_pending_factor_quotes": normalized_repair_pending,
     }
 
 

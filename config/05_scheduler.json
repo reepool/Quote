@@ -152,6 +152,7 @@
           "repair_universe_mode": "historical_backfill",
           "override_lifecycle_filter": false,
           "force_current_master_refresh": true,
+          "repair_pending_factor_quotes": false,
           "per_instrument_timeout_sec": 60,
           "max_runtime_seconds": 86400
         }

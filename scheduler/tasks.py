@@ -115,12 +115,42 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
     parameters = result.get('parameters') or {}
     stages = result.get('stages') or {}
     lines = []
-    for stage_name in ('master', 'calendar', 'quotes', 'dividends', 'factors'):
+    stage_counter_keys = {
+        'dividends': (
+            'raw_events', 'saved_events', 'pending_factors',
+            'empty_instruments', 'errors', 'timeouts',
+        ),
+        'factors': (
+            'derived_factors', 'pending_factors_detected', 'pending_factors',
+            'raw_events',
+            'errors', 'timeouts',
+        ),
+        'pending_quote_repair': (
+            'target_instruments', 'quote_rows_saved', 'quote_failures',
+            'redriven_factors', 'remaining_pending_factors',
+        ),
+        'completeness': (
+            'persisted_tdx_events', 'pending_factors', 'pending_instruments',
+            'unresolved_lifecycle_instruments', 'degraded_lifecycle_fallbacks',
+            'reference_only_events', 'tdx_only_events',
+        ),
+    }
+    for stage_name in (
+        'master', 'calendar', 'quotes', 'dividends', 'factors',
+        'pending_quote_repair', 'completeness',
+    ):
         stage = stages.get(stage_name) or {}
         counters = stage.get('totals') or stage.get('counters') or {}
+        preferred_keys = stage_counter_keys.get(stage_name)
+        counter_items = (
+            ((key, counters.get(key)) for key in preferred_keys)
+            if preferred_keys
+            else list(counters.items())[:6]
+        )
         detail = ', '.join(
             f"{key}={value}"
-            for key, value in list(counters.items())[:6]
+            for key, value in counter_items
+            if key in counters
             if isinstance(value, (int, float, str))
         )
         lines.append(
@@ -134,17 +164,29 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
         for item in failure_samples[:10]
         if isinstance(item, dict)
     ]
+    completeness_samples = (stages.get('completeness') or {}).get('samples') or []
+    remediation_lines = [
+        (
+            f"{item.get('instrument_id', item.get('exchange', 'unknown'))}"
+            f" {item.get('ex_date', '')}: {item.get('reason', 'review_required')}"
+        ).strip()
+        for item in completeness_samples[:10]
+        if isinstance(item, dict)
+    ]
     extras = ""
     if blocker_lines:
         extras += "\n\n阻断项:\n```text\n" + "\n".join(blocker_lines) + "\n```"
     if sample_lines:
         extras += "\n\n失败样本:\n```text\n" + "\n".join(sample_lines) + "\n```"
+    if remediation_lines:
+        extras += "\n\n完整性样本:\n```text\n" + "\n".join(remediation_lines) + "\n```"
     return (
         f"{icon} *A 股历史全量回补*\n\n"
         f"结论: *{label}*\n"
         f"状态: `{result.get('status')}`\n"
         f"dry_run: `{result.get('dry_run')}`\n"
         f"scan_sources: `{result.get('scan_sources', False)}`\n"
+        f"repair_pending_factor_quotes: `{parameters.get('repair_pending_factor_quotes', False)}`\n"
         f"checkpoint: `{result.get('checkpoint_id')}`\n"
         f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`\n"
         f"市场: `{','.join(parameters.get('exchanges') or [])}`\n"
@@ -2716,6 +2758,7 @@ class ScheduledTasks:
         override_lifecycle_filter: bool = False,
         repair_universe_limit: Optional[int] = None,
         force_current_master_refresh: bool = True,
+        repair_pending_factor_quotes: bool = False,
         per_instrument_timeout_sec: Optional[int] = 30,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
@@ -2737,6 +2780,7 @@ class ScheduledTasks:
                 repair_universe_mode=repair_universe_mode,
                 override_lifecycle_filter=override_lifecycle_filter,
                 force_current_master_refresh=force_current_master_refresh,
+                repair_pending_factor_quotes=repair_pending_factor_quotes,
             )
             if repair_universe_limit is not None:
                 repair_universe_limit = int(repair_universe_limit)
@@ -2821,13 +2865,34 @@ class ScheduledTasks:
 
             if checkpoint and checkpoint.get('universe'):
                 frozen_universe = list(checkpoint.get('universe') or [])
+                universe_diagnostics = dict(
+                    checkpoint.get('universe_diagnostics') or {}
+                )
+                candidate_universe_ids = list(
+                    checkpoint.get('candidate_universe_ids')
+                    or [item.get('instrument_id') for item in frozen_universe]
+                )
             else:
                 frozen_universe = []
                 universe_diagnostics = {}
+                candidate_universe_ids = []
+                requested_ids = set(parameters['instrument_ids'])
                 for exchange in parameters['exchanges']:
                     raw_instruments = await data_manager.db_ops.get_repair_universe_instruments(
                         exchange,
                         instrument_types=['stock'],
+                    )
+                    selected_candidates = [
+                        item for item in raw_instruments
+                        if not requested_ids
+                        or item.get('instrument_id') in requested_ids
+                    ]
+                    if repair_universe_limit is not None:
+                        selected_candidates = selected_candidates[:repair_universe_limit]
+                    candidate_universe_ids.extend(
+                        item.get('instrument_id')
+                        for item in selected_candidates
+                        if item.get('instrument_id')
                     )
                     governed, diagnostics = await data_manager.filter_repair_universe(
                         raw_instruments,
@@ -2857,6 +2922,56 @@ class ScheduledTasks:
                         })
                 result['universe_diagnostics'] = universe_diagnostics
 
+            result['universe_diagnostics'] = universe_diagnostics
+
+            lifecycle_reason_distribution: Dict[str, int] = {}
+            lifecycle_samples: List[Dict[str, Any]] = []
+            lifecycle_skipped = 0
+            degraded_fallbacks = 0
+            for diagnostics in universe_diagnostics.values():
+                lifecycle_skipped += int(
+                    diagnostics.get('skipped_instrument_count', 0) or 0
+                )
+                degraded_fallbacks += int(
+                    diagnostics.get('degraded_fallback_count', 0) or 0
+                )
+                for reason, count in (
+                    diagnostics.get('reason_distribution') or {}
+                ).items():
+                    lifecycle_reason_distribution[reason] = (
+                        lifecycle_reason_distribution.get(reason, 0)
+                        + int(count or 0)
+                    )
+                lifecycle_samples.extend(
+                    item
+                    for item in (diagnostics.get('samples') or [])
+                    if item.get('reason') == 'inactive_without_lifecycle_boundary'
+                )
+                lifecycle_samples.extend(
+                    diagnostics.get('degraded_fallback_samples') or []
+                )
+            unresolved_lifecycle = int(
+                lifecycle_reason_distribution.get(
+                    'inactive_without_lifecycle_boundary', 0
+                ) or 0
+            )
+            result['lifecycle_completeness'] = {
+                'status': (
+                    'partial'
+                    if unresolved_lifecycle or degraded_fallbacks
+                    else 'success'
+                ),
+                'totals': {
+                    'candidate_instruments': len(set(candidate_universe_ids)),
+                    'eligible_instruments': len(frozen_universe),
+                    'skipped_instruments': lifecycle_skipped,
+                    'unresolved_lifecycle_instruments': unresolved_lifecycle,
+                    'degraded_lifecycle_fallbacks': degraded_fallbacks,
+                },
+                'reason_distribution': lifecycle_reason_distribution,
+                'samples': lifecycle_samples[:20],
+            }
+
             result['universe'] = {
                 'instrument_count': len(frozen_universe),
                 'by_exchange': {
@@ -2876,6 +2991,8 @@ class ScheduledTasks:
                     checkpoint_parameters,
                     frozen_universe,
                 )
+            checkpoint['universe_diagnostics'] = universe_diagnostics
+            checkpoint['candidate_universe_ids'] = sorted(set(candidate_universe_ids))
             checkpoint.setdefault('stages', {})['master'] = master_stage
             if not parameters['dry_run']:
                 checkpoint_store.save(checkpoint)
@@ -3166,10 +3283,247 @@ class ScheduledTasks:
                 else {'status': 'skipped', 'reason': 'scope_not_selected'}
             )
 
+            pending_summary: Dict[str, Any] = {
+                'status': 'skipped',
+                'totals': {
+                    'pending_factors': 0,
+                    'pending_instruments': 0,
+                    'pending_cash_events': 0,
+                },
+                'instrument_ids': [],
+                'samples': [],
+            }
+            pending_repair_stage: Dict[str, Any] = {
+                'status': 'skipped',
+                'reason': (
+                    'repair_not_requested'
+                    if not parameters['repair_pending_factor_quotes']
+                    else 'not_applicable'
+                ),
+            }
+            reconciliation: Dict[str, Any] = {
+                'status': 'skipped',
+                'totals': {},
+            }
+            completeness_stage: Dict[str, Any] = {
+                'status': 'skipped',
+                'reason': 'corporate_action_scope_not_selected',
+                'totals': {},
+                'reasons': [],
+                'samples': [],
+            }
+
+            if corporate_selected and parameters['dry_run']:
+                completeness_stage = {
+                    'status': (
+                        'scan_only' if parameters['scan_sources'] else 'dry_run'
+                    ),
+                    'totals': {
+                        'pending_factors': corporate_totals['pending_factors'],
+                        **result['lifecycle_completeness']['totals'],
+                    },
+                    'reasons': [],
+                    'samples': result['lifecycle_completeness']['samples'][:20],
+                }
+            elif corporate_selected and (master_blocked or universe_blocked):
+                completeness_stage = {
+                    'status': 'blocked',
+                    'reason': (
+                        'master_governance_failed'
+                        if master_blocked
+                        else 'historical_repair_universe_empty'
+                    ),
+                    'totals': result['lifecycle_completeness']['totals'],
+                    'reasons': ['corporate_action_completeness_not_evaluated'],
+                    'samples': result['lifecycle_completeness']['samples'][:20],
+                }
+            elif corporate_selected:
+                completeness_ids = sorted(set(candidate_universe_ids))
+                pending_summary = (
+                    await data_manager.get_tdx_xdxr_pending_factor_summary(
+                        start_date=parameters['start_date'],
+                        end_date=parameters['end_date'],
+                        instrument_ids=completeness_ids,
+                    )
+                )
+
+                if parameters['repair_pending_factor_quotes']:
+                    pending_ids = list(pending_summary.get('instrument_ids') or [])
+                    if not pending_ids:
+                        pending_repair_stage = {
+                            'status': 'success',
+                            'reason': 'no_pending_factors',
+                            'totals': {
+                                'target_instruments': 0,
+                                'remaining_pending_factors': 0,
+                            },
+                        }
+                    else:
+                        quote_repair = await data_manager.run_delisted_a_share_quote_backfill(
+                            exchanges=parameters['exchanges'],
+                            instrument_ids=pending_ids,
+                            dry_run=False,
+                            per_instrument_timeout_sec=per_instrument_timeout_sec,
+                        )
+                        frozen_by_id = {
+                            item['instrument_id']: item for item in frozen_universe
+                        }
+                        repair_ranges = {
+                            instrument_id: {
+                                'start_date': frozen_by_id[instrument_id]['start_date'],
+                                'end_date': frozen_by_id[instrument_id]['end_date'],
+                            }
+                            for instrument_id in pending_ids
+                            if instrument_id in frozen_by_id
+                        }
+                        repair_exchanges = sorted({
+                            frozen_by_id[instrument_id]['exchange']
+                            for instrument_id in pending_ids
+                            if instrument_id in frozen_by_id
+                        }) or parameters['exchanges']
+                        redrive_result = await data_manager.backfill_tdx_xdxr_history(
+                            exchanges=repair_exchanges,
+                            start_date=parameters['start_date'],
+                            end_date=parameters['end_date'],
+                            instrument_ids=pending_ids,
+                            instrument_date_ranges=repair_ranges,
+                            derive_factors=True,
+                            repair_universe_mode=parameters['repair_universe_mode'],
+                            override_lifecycle_filter=parameters['override_lifecycle_filter'],
+                            per_instrument_timeout_sec=per_instrument_timeout_sec,
+                            dry_run=False,
+                        )
+                        pending_summary = (
+                            await data_manager.get_tdx_xdxr_pending_factor_summary(
+                                start_date=parameters['start_date'],
+                                end_date=parameters['end_date'],
+                                instrument_ids=completeness_ids,
+                            )
+                        )
+                        quote_failures = int(
+                            quote_repair.get('failure_count', 0) or 0
+                        )
+                        redrive_totals = redrive_result.get('totals') or {}
+                        repair_failed = (
+                            quote_failures > 0
+                            or int(redrive_totals.get('errors', 0) or 0) > 0
+                            or int(redrive_totals.get('timeouts', 0) or 0) > 0
+                            or int(
+                                pending_summary.get('totals', {}).get(
+                                    'pending_factors', 0
+                                ) or 0
+                            ) > 0
+                        )
+                        pending_repair_stage = {
+                            'status': 'partial' if repair_failed else 'success',
+                            'totals': {
+                                'target_instruments': len(pending_ids),
+                                'quote_target_instruments': int(
+                                    quote_repair.get('target_count', 0) or 0
+                                ),
+                                'quote_rows_saved': int(
+                                    quote_repair.get('saved_rows', 0) or 0
+                                ),
+                                'quote_failures': quote_failures,
+                                'redriven_factors': int(
+                                    redrive_totals.get('derived_factors', 0) or 0
+                                ),
+                                'remaining_pending_factors': int(
+                                    pending_summary.get('totals', {}).get(
+                                        'pending_factors', 0
+                                    ) or 0
+                                ),
+                            },
+                            'quote_result': quote_repair,
+                            'redrive_result': redrive_result,
+                        }
+
+                reconciliation = await data_manager.reconcile_tdx_xdxr_history(
+                    start_date=parameters['start_date'],
+                    end_date=parameters['end_date'],
+                    instrument_ids=completeness_ids,
+                )
+                result['warnings'].extend(reconciliation.get('warnings') or [])
+                pending_totals = pending_summary.get('totals') or {}
+                corporate_totals['pending_factors_detected'] = int(
+                    corporate_totals.get('pending_factors', 0) or 0
+                )
+                corporate_totals['pending_factors'] = int(
+                    pending_totals.get('pending_factors', 0) or 0
+                )
+                reconciliation_totals = reconciliation.get('totals') or {}
+                lifecycle_totals = result['lifecycle_completeness']['totals']
+                completeness_reasons = []
+                if int(pending_totals.get('pending_factors', 0) or 0) > 0:
+                    completeness_reasons.append('pending_factors')
+                if int(
+                    lifecycle_totals.get('unresolved_lifecycle_instruments', 0)
+                    or 0
+                ) > 0:
+                    completeness_reasons.append('unresolved_lifecycle_boundaries')
+                if int(
+                    lifecycle_totals.get('degraded_lifecycle_fallbacks', 0)
+                    or 0
+                ) > 0:
+                    completeness_reasons.append('degraded_lifecycle_fallbacks')
+                if corporate_totals['errors'] or corporate_totals['timeouts']:
+                    completeness_reasons.append('provider_failures')
+                if reconciliation.get('status') == 'partial':
+                    completeness_reasons.append('reference_only_events')
+                elif reconciliation.get('status') == 'unavailable':
+                    completeness_reasons.append('reference_evidence_unavailable')
+
+                completeness_samples = []
+                completeness_samples.extend(pending_summary.get('samples') or [])
+                completeness_samples.extend(
+                    reconciliation.get('reference_only_samples') or []
+                )
+                completeness_samples.extend(
+                    result['lifecycle_completeness'].get('samples') or []
+                )
+                completeness_stage = {
+                    'status': 'partial' if completeness_reasons else 'success',
+                    'totals': {
+                        'persisted_tdx_events': int(
+                            reconciliation_totals.get('tdx_events', 0) or 0
+                        ),
+                        **pending_totals,
+                        **lifecycle_totals,
+                        'reference_events': int(
+                            reconciliation_totals.get('reference_events', 0) or 0
+                        ),
+                        'reference_only_events': int(
+                            reconciliation_totals.get('reference_only_events', 0)
+                            or 0
+                        ),
+                        'tdx_only_events': int(
+                            reconciliation_totals.get('tdx_only_events', 0) or 0
+                        ),
+                    },
+                    'reasons': completeness_reasons,
+                    'pending': pending_summary,
+                    'reconciliation': reconciliation,
+                    'lifecycle': result['lifecycle_completeness'],
+                    'samples': completeness_samples[:20],
+                }
+
+            result['stages']['pending_quote_repair'] = pending_repair_stage
+            result['stages']['completeness'] = completeness_stage
+
             checkpoint.setdefault('stages', {})['quotes_summary'] = quote_stage
             checkpoint.setdefault('stages', {})['corporate_actions_summary'] = {
                 'status': corporate_status,
                 'totals': corporate_totals,
+            }
+            checkpoint.setdefault('stages', {})['pending_quote_repair_summary'] = {
+                'status': pending_repair_stage.get('status'),
+                'reason': pending_repair_stage.get('reason'),
+                'totals': pending_repair_stage.get('totals') or {},
+            }
+            checkpoint.setdefault('stages', {})['completeness_summary'] = {
+                'status': completeness_stage.get('status'),
+                'totals': completeness_stage.get('totals') or {},
+                'reasons': completeness_stage.get('reasons') or [],
             }
             if not parameters['dry_run']:
                 checkpoint_store.save(checkpoint)
@@ -3188,7 +3542,10 @@ class ScheduledTasks:
             elif any(
                 str((result['stages'].get(name) or {}).get('status')).lower()
                 in {'partial', 'failed', 'error'}
-                for name in ('master', 'calendar', 'quotes', 'dividends', 'factors')
+                for name in (
+                    'master', 'calendar', 'quotes', 'dividends', 'factors',
+                    'pending_quote_repair', 'completeness',
+                )
             ):
                 result['status'] = 'partial'
             else:

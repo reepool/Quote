@@ -188,6 +188,32 @@ class FakeRepairDbOps:
                 'delisted_date': datetime(2026, 6, 10),
                 'source_symbol': '000001',
             },
+            '600193.SH': {
+                'instrument_id': '600193.SH',
+                'symbol': '600193',
+                'name': 'Delisted stock without official boundary',
+                'exchange': 'SSE',
+                'type': 'stock',
+                'status': 'delisted',
+                'is_active': False,
+                'trading_status': 0,
+                'listed_date': datetime(1999, 5, 27),
+                'delisted_date': None,
+                'source_symbol': '600193',
+            },
+            '600194.SH': {
+                'instrument_id': '600194.SH',
+                'symbol': '600194',
+                'name': 'Inactive stock without terminal evidence',
+                'exchange': 'SSE',
+                'type': 'stock',
+                'status': 'delisted',
+                'is_active': False,
+                'trading_status': 0,
+                'listed_date': datetime(1999, 6, 1),
+                'delisted_date': None,
+                'source_symbol': '600194',
+            },
             '00007.HK': {
                 'instrument_id': '00007.HK',
                 'symbol': '00007',
@@ -234,6 +260,7 @@ class FakeRepairDbOps:
             '399238.SZ': datetime(2025, 12, 5),
             '00007.HK': datetime(2024, 3, 28),
             '01688.HK': datetime(2026, 6, 26),
+            '600193.SH': datetime(2026, 7, 3),
         }
         self.first_quotes = {
             '00007.HK': datetime(2000, 9, 8),
@@ -412,6 +439,52 @@ async def test_lifecycle_window_clips_pre_delisting_history():
     assert eligible[0]['_repair_end_date'] == date(2026, 6, 10)
     assert eligible[0]['_repair_universe_clipped'] is True
     assert diagnostics['clipped_instrument_count'] == 1
+
+
+@pytest.mark.asyncio
+async def test_inactive_a_share_without_delisted_date_uses_last_quote_fallback():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['600193.SH']],
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 15),
+        mode='historical_backfill',
+    )
+
+    assert [item['instrument_id'] for item in eligible] == ['600193.SH']
+    assert eligible[0]['_repair_end_date'] == date(2026, 7, 3)
+    assert (
+        eligible[0]['_repair_universe_reason']
+        == 'a_share_stock_delisted_last_quote_fallback'
+    )
+    assert eligible[0]['_repair_universe_clipped'] is True
+    assert diagnostics['degraded_fallback_count'] == 1
+    assert diagnostics['degraded_fallback_samples'][0]['instrument_id'] == '600193.SH'
+    assert (
+        diagnostics['clip_reason_distribution'][
+            'a_share_stock_delisted_last_quote_fallback'
+        ]
+        == 1
+    )
+
+
+@pytest.mark.asyncio
+async def test_inactive_a_share_without_any_terminal_evidence_remains_excluded():
+    manager = _manager()
+    manager.db_ops = FakeRepairDbOps()
+
+    eligible, diagnostics = await manager.filter_repair_universe(
+        [manager.db_ops.instruments['600194.SH']],
+        start_date=date(1990, 12, 19),
+        end_date=date(2026, 7, 15),
+        mode='historical_backfill',
+    )
+
+    assert eligible == []
+    assert diagnostics['skipped_instrument_count'] == 1
+    assert diagnostics['reason_distribution']['inactive_without_lifecycle_boundary'] == 1
 
 
 @pytest.mark.asyncio

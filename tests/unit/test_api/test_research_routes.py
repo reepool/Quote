@@ -67,6 +67,15 @@ from api.routes import (
     get_research_fx_rates,
     get_research_fx_readiness,
     get_research_fx_series,
+    get_research_special_commodity_diagnostics,
+    get_research_special_commodity_dictionary,
+    get_research_special_commodity_indicators,
+    get_research_special_commodity_observations,
+    get_research_special_commodity_policy_candidates,
+    get_research_special_commodity_policy_events,
+    get_research_special_commodity_series,
+    get_research_special_commodity_series_candidates,
+    get_research_special_commodity_source_documents,
     get_research_futures_calendar,
     get_research_futures_calendar_evidence,
     get_research_futures_contract_prices,
@@ -87,6 +96,9 @@ from api.routes import (
     get_research_futures_trading_day_governance,
     get_research_company_futures_exposure,
     run_research_futures_official_calendar_backfill,
+    review_research_special_commodity_policy_candidate_by_ref,
+    run_research_special_commodity_policy_discovery,
+    run_research_special_commodity_series_catalog_sync,
     get_research_metadata_readiness,
     get_research_official_industry_mapping,
     get_research_official_mapping_override_review,
@@ -3527,6 +3539,162 @@ class TestResearchRoutes:
         )
         mock_dm.get_research_fx_readiness.assert_awaited_once_with(
             as_of_date="2026-06-26"
+        )
+
+    @patch("api.routes.data_manager")
+    def test_research_special_commodity_read_routes_success(self, mock_dm):
+        mock_dm.get_special_commodity_dictionary = AsyncMock(
+            return_value={"status": "success", "series": []}
+        )
+        mock_dm.get_special_commodity_series = AsyncMock(
+            return_value={"status": "success", "series": []}
+        )
+        mock_dm.get_special_commodity_observations = AsyncMock(
+            return_value={"status": "success", "observations": []}
+        )
+        mock_dm.get_special_commodity_diagnostics = AsyncMock(
+            return_value={"status": "success", "missing_master_governance": []}
+        )
+        mock_dm.get_special_commodity_policy_events = AsyncMock(
+            return_value={"status": "success", "events": []}
+        )
+        mock_dm.get_special_commodity_policy_candidates = AsyncMock(
+            return_value={"status": "success", "candidates": []}
+        )
+        mock_dm.get_special_commodity_source_documents = AsyncMock(
+            return_value={"status": "success", "documents": []}
+        )
+        mock_dm.get_special_commodity_indicators = AsyncMock(
+            return_value={"status": "success", "observations": []}
+        )
+        mock_dm.get_special_commodity_series_candidates = AsyncMock(
+            return_value={"status": "success", "candidates": []}
+        )
+
+        assert _run(get_research_special_commodity_dictionary())["status"] == "success"
+        assert _run(get_research_special_commodity_series(active_only=True))["status"] == "success"
+        assert _run(
+            get_research_special_commodity_observations(
+                series_id="CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY",
+                start_date="2026-06-01",
+                end_date="2026-07-15",
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_diagnostics(
+                target_currency="CNY",
+                max_fx_lag_days=3,
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_policy_events(
+                commodity_id="CMD.CN.COAL.THERMAL"
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_policy_candidates(
+                review_status="pending_review"
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_source_documents(
+                source_profile="ndrc_policy_catalog"
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_indicators(
+                category="coal",
+                series_id="CMD.CN.COAL.INVENTORY.BOHAI_PORTS.CCTDA.WEEKLY",
+                start_date="2026-06-01",
+                end_date="2026-07-15",
+            )
+        )["status"] == "success"
+        assert _run(
+            get_research_special_commodity_series_candidates(
+                rollout_state="discovered",
+                category="chemical",
+            )
+        )["status"] == "success"
+
+        mock_dm.get_special_commodity_series.assert_awaited_once_with(active_only=True)
+        mock_dm.get_special_commodity_observations.assert_awaited_once_with(
+            series_id="CMD.CN.COAL.PORT_PRICE.BSPI.CCTDA.WEEKLY",
+            start_date="2026-06-01",
+            end_date="2026-07-15",
+        )
+        mock_dm.get_special_commodity_diagnostics.assert_awaited_once_with(
+            target_currency="CNY",
+            max_fx_lag_days=3,
+        )
+        mock_dm.get_special_commodity_policy_events.assert_awaited_once_with(
+            commodity_id="CMD.CN.COAL.THERMAL"
+        )
+        mock_dm.get_special_commodity_policy_candidates.assert_awaited_once_with(
+            review_status="pending_review"
+        )
+        mock_dm.get_special_commodity_source_documents.assert_awaited_once_with(
+            source_profile="ndrc_policy_catalog"
+        )
+        mock_dm.get_special_commodity_indicators.assert_awaited_once_with(
+            category="coal",
+            series_id="CMD.CN.COAL.INVENTORY.BOHAI_PORTS.CCTDA.WEEKLY",
+            start_date="2026-06-01",
+            end_date="2026-07-15",
+        )
+        mock_dm.get_special_commodity_series_candidates.assert_awaited_once_with(
+            rollout_state="discovered",
+            category="chemical",
+        )
+
+    @patch("api.routes.data_manager")
+    def test_research_special_commodity_governance_routes_success(self, mock_dm):
+        mock_dm.review_special_commodity_policy_candidate = AsyncMock(
+            return_value={"status": "success", "candidate_ref": "93acac0c"}
+        )
+        mock_dm.run_special_commodity_series_catalog_sync = AsyncMock(
+            return_value={"status": "success", "dry_run": True}
+        )
+        mock_dm.run_special_commodity_policy_discovery = AsyncMock(
+            return_value={"status": "success", "dry_run": True}
+        )
+
+        reviewed = _run(
+            review_research_special_commodity_policy_candidate_by_ref(
+                candidate_ref="93acac0c",
+                decision="approved",
+                reviewer="api_operator",
+                notes="verified",
+                promote=True,
+            )
+        )
+        catalog = _run(run_research_special_commodity_series_catalog_sync(dry_run=True))
+        discovery = _run(
+            run_research_special_commodity_policy_discovery(
+                adapter_id="ndrc",
+                start_date="2022-01-01",
+                end_date="2026-07-15",
+                dry_run=True,
+            )
+        )
+
+        assert reviewed["candidate_ref"] == "93acac0c"
+        assert catalog["dry_run"] is True
+        assert discovery["dry_run"] is True
+        mock_dm.review_special_commodity_policy_candidate.assert_awaited_once_with(
+            candidate_ref="93acac0c",
+            decision="approved",
+            reviewer="api_operator",
+            notes="verified",
+            promote=True,
+        )
+        mock_dm.run_special_commodity_series_catalog_sync.assert_awaited_once_with(
+            dry_run=True
+        )
+        mock_dm.run_special_commodity_policy_discovery.assert_awaited_once_with(
+            adapter_id="ndrc",
+            start_date="2022-01-01",
+            end_date="2026-07-15",
+            dry_run=True,
         )
 
     @patch("api.routes.data_manager")

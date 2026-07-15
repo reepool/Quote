@@ -2806,6 +2806,11 @@ def test_special_commodity_diagnostics_reads_latest_observations(monkeypatch, tm
     assert diagnostics["currencies"] == ["USD"]
     assert diagnostics["units"] == ["USD/barrel"]
     assert diagnostics["latest_observations"][0]["series_id"] == "CMD.OIL.WTI.SPOT.FRED.DAILY"
+    assert diagnostics["missing_observation_series"] == [
+        item["series_id"]
+        for item in storage.read_dictionary()["series"]
+        if item["active"] and item["series_id"] != "CMD.OIL.WTI.SPOT.FRED.DAILY"
+    ]
     assert diagnostics["missing_master_governance"] == [
         item["series_id"]
         for item in storage.read_dictionary()["series"]

@@ -8724,7 +8724,7 @@ class SpecialCommodityReadService:
         series_rows = dictionary.get("series", [])
         governance_rows = dictionary.get("master_governance", [])
         governance_by_series = {item["series_id"]: item for item in governance_rows}
-        stale_or_missing = [
+        missing_observation_series = [
             item["series_id"]
             for item in series_rows
             if item.get("active") and item["series_id"] not in latest_by_series
@@ -8759,7 +8759,7 @@ class SpecialCommodityReadService:
             "status": "success",
             "series_count": len(series_rows),
             "latest_observations": latest,
-            "stale_or_missing_series": stale_or_missing,
+            "missing_observation_series": missing_observation_series,
             "master_governance": governance_rows,
             "missing_master_governance": missing_master_governance,
             "blocked_master_governance": blocked_master_governance,

@@ -55,6 +55,7 @@ Scheduler 手工任务 `a_share_daily_data_historical_backfill` 统一编排以�
 - `per_instrument_timeout_sec`：单股票行情或 XDXR 请求超时。
 - `force_current_master_refresh`：写入模式默认先刷新当前股票主数据。
 - `override_lifecycle_filter`：仅用于明确的取证型修复，正常回补保持 `false`。
+- `repair_pending_factor_quotes`：默认 `false`；仅可在包含 `factors` 的写入模式启用。启用后只对当前范围内 `pending_factor_missing_pre_close` 的股票调用既有退市 A 股历史行情回补，并重新派生 TDX 因子。
 
 ## Checkpoint
 
@@ -74,6 +75,7 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 
 - 历史股票池来自本地主数据，包含 inactive 和 delisted 股票，不使用 active-only 当前股票池。
 - 每只股票按 `listed_date`、`delisted_date` 裁剪下载区间。
+- inactive/delisted A 股缺少 `delisted_date` 但存在本地最后行情日时，以最后行情日作为只读降级边界纳入历史回补；该日期不会写回主数据，并会以 `a_share_stock_delisted_last_quote_fallback` 报告。
 - 行情请求前必须通过目标交易所日历连续覆盖校验。
 - BSE 日历和股票范围从 2021-11-15 起计算，不要求北交所成立前的伪历史。
 - 日历覆盖失败会阻断对应交易所行情回补，并在报告中给出缺失日期样本。
@@ -88,6 +90,25 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 - 后续存在前收盘价时，factor 阶段可以更新同一审计行。
 - 原始事件刷新不会覆盖已有的有效计算因子和验证结论。
 - TDX 数据不会写入生产表 `adjustment_factors`；生产因子仍使用现有正式数据源路由。
+
+## 完整性门禁与对账
+
+写入模式下，只要 scopes 包含 `dividends` 或 `factors`，任务都会在 provider chunk 完成后读取数据库最终状态并生成 `completeness` 阶段：
+
+- 汇总 persisted XDXR 事件、pending 因子、受影响股票和现金分红事件。
+- 将 TDX 事件日期与 BaoStock/AkShare 生产复权因子变动日期进行本地只读对账。
+- 报告 reference-only、TDX-only、provider-empty、生命周期排除和降级边界样本。
+- pending 因子、未解决生命周期边界、降级边界、provider 错误/超时、reference-only 事件或参考证据不可用时，顶层状态返回 `partial`，即使全部 chunk 已完成。
+
+`resume=true` 可以跳过已经完成的 provider chunk，但不会跳过持久化完整性检查，因此报告反映当前数据库状态，而不是只显示本轮新增计数。
+
+对已知 pending 股票进行显式行情修复时，推荐先使用 instrument filter 控制范围：
+
+```text
+/run a_share_daily_data_historical_backfill start_date=1990-12-19 end_date=2026-07-15 exchanges=SSE,SZSE instrument_ids=000040.SZ,000584.SZ scopes=dividends,factors chunk_size=2 repair_pending_factor_quotes=true resume=false write
+```
+
+该选项会产生真实行情请求和数据库写入，不允许与 `dry_run` 或 `scan_sources=true` 同时使用。
 
 审计事件可通过只读 API 查询：
 

@@ -7164,7 +7164,7 @@ class DataManager:
             }
         blockers: List[str] = []
         warnings: List[str] = []
-        if diagnostics.get("stale_or_missing_series"):
+        if diagnostics.get("missing_observation_series"):
             warnings.append("special_commodity_series_missing_local_observation")
         if diagnostics.get("fx_dependency_gaps"):
             blockers.append("requires_fx_conversion")
@@ -7175,7 +7175,9 @@ class DataManager:
             "target_currency": target_currency,
             "series_count": diagnostics.get("series_count", 0),
             "latest_observations": diagnostics.get("latest_observations", []),
-            "stale_or_missing_series": diagnostics.get("stale_or_missing_series", []),
+            "missing_observation_series": diagnostics.get(
+                "missing_observation_series", []
+            ),
             "currencies": diagnostics.get("currencies", []),
             "units": diagnostics.get("units", []),
             "fx_checks": diagnostics.get("fx_checks", []),
@@ -9307,6 +9309,7 @@ class DataManager:
             'reason_distribution': {},
             'clip_reason_distribution': {},
             'degraded_fallback_count': 0,
+            'degraded_fallback_samples': [],
             'samples': [],
             'clip_samples': [],
             'warnings': [],
@@ -9318,6 +9321,32 @@ class DataManager:
                 'operator_requested': False,
             },
         }
+
+    def _record_repair_degraded_fallback(
+        self,
+        diagnostics: Dict[str, Any],
+        instrument: Dict[str, Any],
+        window: Dict[str, Any],
+    ) -> None:
+        """Record one bounded degraded lifecycle fallback sample."""
+        sample_limit = int(
+            self._get_repair_universe_governance_config().get('sample_limit', 10)
+            or 0
+        )
+        samples = diagnostics.setdefault('degraded_fallback_samples', [])
+        if sample_limit <= 0 or len(samples) >= sample_limit:
+            return
+        samples.append({
+            'instrument_id': instrument.get('instrument_id'),
+            'symbol': instrument.get('symbol'),
+            'exchange': instrument.get('exchange'),
+            'type': instrument.get('type'),
+            'status': instrument.get('status'),
+            'reason': window.get('reason'),
+            'start_date': self._date_text(window.get('start_date')),
+            'end_date': self._date_text(window.get('end_date')),
+            'degraded_fallback': True,
+        })
 
     def _record_repair_universe_skip(
         self,
@@ -9857,6 +9886,29 @@ class DataManager:
                     'clipped': False,
                 }
 
+        if (
+            mode in {'historical_backfill', 'dry_run'}
+            and instrument_type == 'stock'
+            and exchange in {'SSE', 'SZSE', 'BSE'}
+            and is_active in (False, 0, '0')
+            and not delisted
+            and status not in {'active', 'active_quote'}
+            and config.get('enable_a_share_stock_last_quote_fallback', True)
+            and latest_quote_date is not None
+        ):
+            if requested_start and requested_start > latest_quote_date:
+                return {
+                    'eligible': False,
+                    'reason': 'a_share_stock_after_last_quote_fallback',
+                    'start_date': start,
+                    'end_date': latest_quote_date,
+                    'clipped': True,
+                    'degraded_fallback': True,
+                }
+            if end > latest_quote_date:
+                end = latest_quote_date
+            lifecycle_state = 'a_share_stock_delisted_last_quote_fallback'
+
         if mode == 'current_repair':
             if is_active in (False, 0, '0'):
                 return {
@@ -9883,6 +9935,7 @@ class DataManager:
                 is_active in (False, 0, '0')
                 and not delisted
                 and not index_lifecycle_boundary
+                and lifecycle_state != 'a_share_stock_delisted_last_quote_fallback'
                 and status not in {'active', 'active_quote'}
             )
             if inactive_without_boundary:
@@ -10007,7 +10060,7 @@ class DataManager:
         ])
 
         eligible: List[Dict[str, Any]] = []
-        stale_checked = 0
+        index_stale_checked = 0
         for instrument in instruments or []:
             latest_quote_date = None
             instrument_type = str(instrument.get('type') or '').lower()
@@ -10020,6 +10073,17 @@ class DataManager:
                 )
                 or (
                     instrument_type == 'stock'
+                    and exchange in {'SSE', 'SZSE', 'BSE'}
+                    and instrument.get('is_active') in (False, 0, '0')
+                    and not self._date_from_any(instrument.get('delisted_date'))
+                    and str(instrument.get('status') or '').lower()
+                    not in {'active', 'active_quote'}
+                    and config.get(
+                        'enable_a_share_stock_last_quote_fallback', True
+                    )
+                )
+                or (
+                    instrument_type == 'stock'
                     and exchange == 'HKEX'
                     and str(instrument.get('status') or '').lower() == 'suspended'
                     and instrument.get('trading_status') in (0, '0', False)
@@ -10029,7 +10093,8 @@ class DataManager:
                     latest_quote_date = self._date_from_any(
                         await self.db_ops.get_latest_quote_date(instrument.get('instrument_id'))
                     )
-                    stale_checked += 1
+                    if instrument_type == 'index':
+                        index_stale_checked += 1
                 except Exception as exc:
                     diagnostics['warnings'].append(
                         f"latest quote lookup failed for {instrument.get('instrument_id')}: {exc}"
@@ -10058,6 +10123,9 @@ class DataManager:
                 )
                 if window.get('degraded_fallback'):
                     diagnostics['degraded_fallback_count'] += 1
+                    self._record_repair_degraded_fallback(
+                        diagnostics, instrument, window
+                    )
                 continue
 
             item = dict(instrument)
@@ -10077,10 +10145,13 @@ class DataManager:
                 )
             if window.get('degraded_fallback'):
                 diagnostics['degraded_fallback_count'] += 1
+                self._record_repair_degraded_fallback(
+                    diagnostics, instrument, window
+                )
             eligible.append(item)
 
         if (
-            stale_checked == 0
+            index_stale_checked == 0
             and any(str(item.get('type') or '').lower() == 'index' for item in instruments or [])
         ):
             diagnostics['warnings'].append(
@@ -15584,6 +15655,213 @@ class DataManager:
             'validation_result': 'pending_factor_missing_pre_close',
             'conflict_reason': 'missing_pre_close',
             'source': 'tdx_xdxr',
+        }
+
+    async def get_tdx_xdxr_pending_factor_summary(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        instrument_ids: List[str],
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Summarize persisted XDXR events that still lack prior-close evidence."""
+        normalized_ids = list(dict.fromkeys(
+            str(item).strip() for item in (instrument_ids or []) if str(item).strip()
+        ))
+        rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(normalized_ids), 500):
+            chunk = normalized_ids[offset: offset + 500]
+            placeholders = ", ".join(f":id_{idx}" for idx in range(len(chunk)))
+            params: Dict[str, Any] = {
+                f"id_{idx}": instrument_id
+                for idx, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+            })
+            rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date,
+                       fenhong, songzhuangu, peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                  AND validation_result = 'pending_factor_missing_pre_close'
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
+
+        pending_ids = sorted({row.get('instrument_id') for row in rows if row.get('instrument_id')})
+        cash_events = sum(float(row.get('fenhong') or 0.0) > 0 for row in rows)
+        samples = [
+            {
+                'instrument_id': row.get('instrument_id'),
+                'ex_date': self._date_text(row.get('ex_date')),
+                'fenhong': float(row.get('fenhong') or 0.0),
+                'songzhuangu': float(row.get('songzhuangu') or 0.0),
+                'peigu': float(row.get('peigu') or 0.0),
+                'reason': 'pending_factor_missing_pre_close',
+            }
+            for row in rows[:max(0, int(sample_limit or 0))]
+        ]
+        return {
+            'status': 'partial' if rows else 'success',
+            'totals': {
+                'pending_factors': len(rows),
+                'pending_instruments': len(pending_ids),
+                'pending_cash_events': int(cash_events),
+            },
+            'instrument_ids': pending_ids,
+            'samples': samples,
+        }
+
+    async def reconcile_tdx_xdxr_history(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        instrument_ids: List[str],
+        reference_sources: Optional[List[str]] = None,
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Compare persisted TDX event dates with independent production factors."""
+        normalized_ids = list(dict.fromkeys(
+            str(item).strip() for item in (instrument_ids or []) if str(item).strip()
+        ))
+        sources = list(dict.fromkeys(
+            str(item).strip().lower()
+            for item in (reference_sources or ['baostock', 'akshare'])
+            if str(item).strip()
+        ))
+        tdx_rows: List[Dict[str, Any]] = []
+        reference_rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(normalized_ids), 500):
+            chunk = normalized_ids[offset: offset + 500]
+            placeholders = ", ".join(f":id_{idx}" for idx in range(len(chunk)))
+            source_placeholders = ", ".join(
+                f":source_{idx}" for idx in range(len(sources))
+            )
+            params: Dict[str, Any] = {
+                f"id_{idx}": instrument_id
+                for idx, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                f"source_{idx}": source
+                for idx, source in enumerate(sources)
+            })
+            params.update({
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+            })
+            tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
+            reference_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date, source,
+                       factor, cumulative_factor
+                FROM adjustment_factors
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) <= :end_date
+                  AND lower(source) IN ({source_placeholders})
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
+
+        tdx_keys = {
+            (row.get('instrument_id'), self._date_text(row.get('ex_date')))
+            for row in tdx_rows
+            if row.get('instrument_id') and row.get('ex_date')
+        }
+        reference_by_key: Dict[tuple[str, str], str] = {}
+        previous_cumulative: Dict[tuple[str, str], float] = {}
+        for row in reference_rows:
+            instrument_id = row.get('instrument_id')
+            ex_date = self._date_text(row.get('ex_date'))
+            source = str(row.get('source') or 'unknown').lower()
+            if not instrument_id or not ex_date:
+                continue
+            key = (instrument_id, ex_date)
+            if source == 'baostock':
+                series_key = (instrument_id, source)
+                cumulative = float(
+                    row.get('cumulative_factor')
+                    or row.get('factor')
+                    or 1.0
+                )
+                previous = previous_cumulative.get(series_key)
+                previous_cumulative[series_key] = cumulative
+                if (
+                    ex_date >= start_date.isoformat()
+                    and previous is not None
+                    and abs(cumulative - previous) > 1e-12
+                ):
+                    reference_by_key[key] = source
+            elif (
+                ex_date >= start_date.isoformat()
+                and abs(float(row.get('factor') or 1.0) - 1.0) > 1e-12
+            ):
+                reference_by_key[key] = source
+        reference_keys = set(reference_by_key)
+        overlap = tdx_keys & reference_keys
+        reference_only = sorted(reference_keys - tdx_keys)
+        tdx_only = sorted(tdx_keys - reference_keys)
+        source_distribution = dict(Counter(reference_by_key.values()))
+        bounded_limit = max(0, int(sample_limit or 0))
+
+        if not reference_keys:
+            status = 'unavailable'
+            warnings = ['independent production factor evidence unavailable']
+        elif reference_only:
+            status = 'partial'
+            warnings = []
+        else:
+            status = 'success'
+            warnings = []
+
+        return {
+            'status': status,
+            'reference_sources': sources,
+            'reference_source_distribution': source_distribution,
+            'totals': {
+                'tdx_events': len(tdx_keys),
+                'reference_events': len(reference_keys),
+                'overlap_events': len(overlap),
+                'reference_only_events': len(reference_only),
+                'reference_only_instruments': len({item[0] for item in reference_only}),
+                'tdx_only_events': len(tdx_only),
+                'tdx_only_instruments': len({item[0] for item in tdx_only}),
+            },
+            'reference_only_samples': [
+                {
+                    'instrument_id': instrument_id,
+                    'ex_date': ex_date,
+                    'source': reference_by_key[(instrument_id, ex_date)],
+                    'reason': 'reference_event_missing_from_tdx',
+                }
+                for instrument_id, ex_date in reference_only[:bounded_limit]
+            ],
+            'tdx_only_samples': [
+                {
+                    'instrument_id': instrument_id,
+                    'ex_date': ex_date,
+                    'source': 'tdx_xdxr',
+                    'reason': 'tdx_event_missing_from_reference',
+                }
+                for instrument_id, ex_date in tdx_only[:bounded_limit]
+            ],
+            'warnings': warnings,
         }
 
     async def backfill_tdx_xdxr_history(

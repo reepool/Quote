@@ -37,6 +37,7 @@
         "stale_no_quote"
       ],
       "enable_local_stale_no_quote": true,
+      "enable_a_share_stock_last_quote_fallback": true,
       "stale_no_quote_trading_days": 10,
       "max_index_no_data_failures_per_instrument": 1,
       "max_no_data_failures_per_instrument": 3,

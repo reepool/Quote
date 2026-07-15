@@ -176,7 +176,7 @@ BSPI rollout 同样使用唯一的历史观测回补入口：
 建议新增：
 
 - `/run special_commodity_policy_governance_sync dry_run|write`：月度政策发现和候选治理。
-- `/run special_commodity_industrial_indicator_backfill scope_id=...`。
+- `/run special_commodity_observation_backfill scope_id=... start=YYYY-MM-DD end=YYYY-MM-DD dry_run|write`：价格和产业指标共用的唯一历史观测回补入口。
 - `/run special_commodity_industrial_indicator_sync`。
 - `/api/v1/research/commodities/policy-candidates`。
 - `/api/v1/research/commodities/indicators`。
