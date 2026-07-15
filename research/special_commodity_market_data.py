@@ -3305,6 +3305,14 @@ class ShanghaiShippingExchangeCbcfiProvider:
         )
 
 
+class _CctdaInventoryNotReportedError(ValueError):
+    """The source report does not disclose the configured inventory metric."""
+
+
+class _CctdaInventoryAmbiguousError(ValueError):
+    """The source report mentions inventory but cannot be normalized safely."""
+
+
 class CctdaTtciPortInventoryProvider:
     """Weekly Bohai-Rim port coal inventory from CCTDA TTCI reports."""
 
@@ -3323,9 +3331,14 @@ class CctdaTtciPortInventoryProvider:
         r"(?P<date>20\d{2}-\d{2}-\d{2})\s+\d{2}:\d{2}:\d{2}"
         r"\s*来源[：:]\s*中国煤炭运销协会"
     )
-    _INVENTORY = re.compile(
-        r"环渤海港口(?:(?!联系电话).){0,500}?库\s*存\s*"
-        r"(?P<value>\d+(?:\.\d+)?)\s*万吨"
+    _PORT_METRIC_CLAUSE = re.compile(
+        r"(?:截止|截至).{0,80}?环渤海港口(?P<body>.{0,400}?)(?:环比|[。；])"
+    )
+    _TON_VALUE = re.compile(
+        r"(?P<value>\d+(?:\.\d+)?)\s*万?\s*吨"
+    )
+    _LABELED_INVENTORY = re.compile(
+        r"库\s*存\s*(?P<value>\d+(?:\.\d+)?)\s*万?\s*吨"
     )
 
     def __init__(self, source_profile: str, source_cfg: Mapping[str, Any]):
@@ -3389,18 +3402,55 @@ class CctdaTtciPortInventoryProvider:
         *,
         source_url: str,
         period: Mapping[str, str],
+        inventory_value_min: float = 800.0,
+        inventory_value_max: float = 6000.0,
     ) -> Dict[str, Any]:
         text = cls._plain_text(html)
-        inventory = cls._INVENTORY.search(text)
-        if inventory is None:
-            raise ValueError("CCTDA TTCI report missing Bohai-Rim port inventory")
+        selected_value: Optional[float] = None
+        source_field_alignment = "aligned"
+        for clause_match in cls._PORT_METRIC_CLAUSE.finditer(text):
+            clause = clause_match.group("body")
+            values = [
+                float(match.group("value"))
+                for match in cls._TON_VALUE.finditer(clause)
+            ]
+            plausible = sorted(
+                {
+                    value
+                    for value in values
+                    if inventory_value_min <= value <= inventory_value_max
+                }
+            )
+            if not plausible:
+                continue
+            if len(plausible) > 1:
+                raise _CctdaInventoryAmbiguousError(
+                    "CCTDA TTCI report has multiple plausible Bohai-Rim port "
+                    f"inventory values: {plausible}"
+                )
+            selected_value = plausible[0]
+            labeled = cls._LABELED_INVENTORY.search(clause)
+            labeled_value = float(labeled.group("value")) if labeled else None
+            if labeled_value != selected_value:
+                source_field_alignment = "reconciled_by_inventory_value_range"
+            break
+        if selected_value is None:
+            if "环渤海港口" in text and re.search(r"库\s*存", text):
+                raise _CctdaInventoryAmbiguousError(
+                    "CCTDA TTCI report mentions Bohai-Rim port inventory but "
+                    "has no value inside the governed range"
+                )
+            raise _CctdaInventoryNotReportedError(
+                "CCTDA TTCI report missing Bohai-Rim port inventory"
+            )
         publication = cls._PUBLICATION_DATE.search(text)
         if publication is None:
             raise ValueError("CCTDA TTCI report missing publication date")
         return {
             **dict(period),
             "publication_date": publication.group("date"),
-            "value": float(inventory.group("value")),
+            "value": selected_value,
+            "source_field_alignment": source_field_alignment,
             "source_url": source_url,
         }
 
@@ -3418,8 +3468,8 @@ class CctdaTtciPortInventoryProvider:
 
     def _discover_reports(
         self, start: Optional[date], end: Optional[date]
-    ) -> tuple[List[Dict[str, str]], List[Dict[str, Any]]]:
-        discovered: Dict[str, Dict[str, str]] = {}
+    ) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        discovered: Dict[str, Dict[str, Any]] = {}
         warnings: List[Dict[str, Any]] = []
         max_pages = max(1, int(self.source_cfg.get("listing_max_pages") or 4))
         for configured_url in self.listing_urls:
@@ -3462,10 +3512,17 @@ class CctdaTtciPortInventoryProvider:
                         continue
                     if end and observed > end:
                         continue
-                    discovered.setdefault(
+                    report = discovered.setdefault(
                         period["observation_date"],
-                        {**period, "title": title, "source_url": source_url},
+                        {
+                            **period,
+                            "title": title,
+                            "source_url": source_url,
+                            "source_urls": [],
+                        },
                     )
+                    if source_url not in report["source_urls"]:
+                        report["source_urls"].append(source_url)
                 logger.info(
                     "[CctdaTtciPortInventory] listing progress source=%s page=%s/%s "
                     "page_rows=%s candidates=%s oldest=%s newest=%s",
@@ -3526,65 +3583,105 @@ class CctdaTtciPortInventoryProvider:
         reports, warnings = self._discover_reports(start, end)
         observations: List[CommodityObservation] = []
         parse_failures: List[Dict[str, Any]] = []
+        reports_without_inventory: List[Dict[str, Any]] = []
+        alternate_source_recoveries = 0
+        field_reconciliations = 0
+        inventory_value_min = float(
+            self.source_cfg.get("inventory_value_min") or 800.0
+        )
+        inventory_value_max = float(
+            self.source_cfg.get("inventory_value_max") or 6000.0
+        )
         progress_every = max(
             1, int(self.source_cfg.get("progress_log_every_articles") or 10)
         )
         for index, report in enumerate(reports, start=1):
-            try:
-                article_html = self._fetch_html(
-                    report["source_url"],
-                    context=(
-                        "cctda_ttci_article "
-                        f"date={report['observation_date']}"
-                    ),
-                )
-                parsed = self.parse_article(
-                    article_html,
-                    source_url=report["source_url"],
-                    period=report,
-                )
-            except Exception as exc:
+            parsed: Optional[Dict[str, Any]] = None
+            not_reported_urls: List[str] = []
+            source_errors: List[Dict[str, str]] = []
+            source_urls = list(report.get("source_urls") or [report["source_url"]])
+            for source_index, source_url in enumerate(source_urls):
+                try:
+                    article_html = self._fetch_html(
+                        source_url,
+                        context=(
+                            "cctda_ttci_article "
+                            f"date={report['observation_date']} source={source_index + 1}"
+                        ),
+                    )
+                    parsed = self.parse_article(
+                        article_html,
+                        source_url=source_url,
+                        period=report,
+                        inventory_value_min=inventory_value_min,
+                        inventory_value_max=inventory_value_max,
+                    )
+                    if source_index:
+                        alternate_source_recoveries += 1
+                    break
+                except _CctdaInventoryNotReportedError:
+                    not_reported_urls.append(source_url)
+                except Exception as exc:
+                    source_errors.append(
+                        {"source_url": source_url, "error": str(exc)}
+                    )
+            if parsed is None and source_errors:
                 parse_failures.append(
                     {
                         "reason": "cctda_ttci_inventory_parse_failed",
                         "observation_date": report["observation_date"],
-                        "source_url": report["source_url"],
-                        "error": str(exc),
+                        "source_urls": source_urls,
+                        "errors": source_errors,
                     }
                 )
-                continue
-            for item in series:
-                observations.append(
-                    _build_observation(
-                        item=item,
-                        source_profile=self.source_profile,
-                        source_cfg=self.source_cfg,
-                        observation_date=parsed["observation_date"],
-                        value=parsed["value"],
-                        source_url=parsed["source_url"],
-                        source_symbol=item.source_symbol,
-                        raw_payload=parsed,
-                        metadata={
-                            "data_kind": "industrial_indicator",
-                            "publication_date": parsed["publication_date"],
-                            "source_period_start": parsed["period_start"],
-                            "source_period_end": parsed["period_end"],
-                            "region": "Bohai-Rim coal ports",
-                            "statistical_scope": "combined Bohai-Rim port coal inventory",
-                            "source_report": "CCTDA TTCI weekly report",
-                            "not_port_throughput": True,
-                            "not_power_plant_inventory": True,
-                        },
-                    )
+            elif parsed is None:
+                reports_without_inventory.append(
+                    {
+                        "observation_date": report["observation_date"],
+                        "source_urls": not_reported_urls,
+                    }
                 )
+            else:
+                if parsed["source_field_alignment"] != "aligned":
+                    field_reconciliations += 1
+                for item in series:
+                    observations.append(
+                        _build_observation(
+                            item=item,
+                            source_profile=self.source_profile,
+                            source_cfg=self.source_cfg,
+                            observation_date=parsed["observation_date"],
+                            value=parsed["value"],
+                            source_url=parsed["source_url"],
+                            source_symbol=item.source_symbol,
+                            raw_payload=parsed,
+                            metadata={
+                                "data_kind": "industrial_indicator",
+                                "publication_date": parsed["publication_date"],
+                                "source_period_start": parsed["period_start"],
+                                "source_period_end": parsed["period_end"],
+                                "region": "Bohai-Rim coal ports",
+                                "statistical_scope": "combined Bohai-Rim port coal inventory",
+                                "source_report": "CCTDA TTCI weekly report",
+                                "source_field_alignment": parsed[
+                                    "source_field_alignment"
+                                ],
+                                "not_port_throughput": True,
+                                "not_power_plant_inventory": True,
+                            },
+                        )
+                    )
             if index % progress_every == 0 or index == len(reports):
                 logger.info(
                     "[CctdaTtciPortInventory] article progress processed=%s/%s "
-                    "observations=%s parse_failures=%s",
+                    "observations=%s metric_absent=%s parse_failures=%s "
+                    "field_reconciliations=%s",
                     index,
                     len(reports),
                     len(observations),
+                    len(reports_without_inventory),
                     len(parse_failures),
+                    field_reconciliations,
                 )
         warnings.extend(parse_failures)
         blockers: List[Dict[str, Any]] = []
@@ -3598,11 +3695,14 @@ class CctdaTtciPortInventoryProvider:
             )
         logger.info(
             "[CctdaTtciPortInventory] fetch done range=%s..%s reports=%s "
-            "observations=%s warnings=%s blockers=%s",
+            "observations=%s metric_absent=%s field_reconciliations=%s "
+            "warnings=%s blockers=%s",
             start_date,
             end_date,
             len(reports),
             len(observations),
+            len(reports_without_inventory),
+            field_reconciliations,
             len(warnings),
             len(blockers),
         )
@@ -3615,6 +3715,18 @@ class CctdaTtciPortInventoryProvider:
                 "reports_discovered": len(reports),
                 "rows": len(observations),
                 "parse_failures": len(parse_failures),
+                "source_coverage": {
+                    "reports_discovered": len(reports),
+                    "metric_observations": len(observations),
+                    "reports_without_metric": len(reports_without_inventory),
+                    "parse_failures": len(parse_failures),
+                    "alternate_source_recoveries": alternate_source_recoveries,
+                    "field_reconciliations": field_reconciliations,
+                    "coverage_ratio": (
+                        len(observations) / len(reports) if reports else None
+                    ),
+                    "metric_absent_samples": reports_without_inventory[:10],
+                },
                 "quality_diagnostics": {
                     "observations": _observation_quality_diagnostics(observations)
                 },
@@ -7164,6 +7276,9 @@ class SpecialCommodityGovernancePipeline:
                 "calendar_type": date_result.metadata.get("calendar_type"),
                 "weekday_inference_used": False,
                 "date_gap_fill": provider_result.metadata.get("date_gap_fill", {}),
+                "source_coverage": provider_result.metadata.get(
+                    "source_coverage", {}
+                ),
                 "quality_diagnostics": quality_diagnostics,
             }
             logger.info(

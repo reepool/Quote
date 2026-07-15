@@ -1206,6 +1206,16 @@ def _cctda_ttci_article_html() -> str:
     """
 
 
+def _cctda_ttci_article_without_inventory_html() -> str:
+    return """
+    <html><body>
+      <h1>唐山动力煤现货价格指数（TTCI）（2026年6月22日-6月26日）</h1>
+      <p>2026-06-29 10:20:00 来源：中国煤炭运销协会</p>
+      <p>唐山动力煤现货价格指数本周平均报收1580.20。</p>
+    </body></html>
+    """
+
+
 def test_cctda_ttci_port_inventory_provider_preserves_weekly_semantics(monkeypatch):
     cfg = config_manager.get_research_config().modules["commodity_market_data"][
         "special_commodity_market_data"
@@ -1254,6 +1264,80 @@ def test_cctda_ttci_port_inventory_provider_preserves_weekly_semantics(monkeypat
     assert observation.metadata["source_period_start"] == "2026-06-29"
     assert observation.metadata["source_period_end"] == "2026-07-03"
     assert observation.metadata["not_power_plant_inventory"] is True
+    assert observation.metadata["source_field_alignment"] == "aligned"
+    assert result.metadata["source_coverage"] == {
+        "reports_discovered": 1,
+        "metric_observations": 1,
+        "reports_without_metric": 0,
+        "parse_failures": 0,
+        "alternate_source_recoveries": 0,
+        "field_reconciliations": 0,
+        "coverage_ratio": 1.0,
+        "metric_absent_samples": [],
+    }
+
+
+def test_cctda_ttci_port_inventory_reconciles_shifted_source_fields():
+    parsed = CctdaTtciPortInventoryProvider.parse_article(
+        """
+        <p>2026-03-30 09:00:00 来源：中国煤炭运销协会</p>
+        <p>截止到3月27日，环渤海港口合计调入2938万吨，调出180.6万吨，
+        库存200.8万吨，环比上涨152万吨。</p>
+        """,
+        source_url="https://www.cctda.org.cn/example-shifted.html",
+        period={
+            "period_start": "2026-03-23",
+            "period_end": "2026-03-27",
+            "observation_date": "2026-03-27",
+        },
+    )
+
+    assert parsed["value"] == 2938.0
+    assert parsed["source_field_alignment"] == "reconciled_by_inventory_value_range"
+
+
+def test_cctda_ttci_provider_treats_absent_metric_as_source_coverage(monkeypatch):
+    cfg = config_manager.get_research_config().modules["commodity_market_data"][
+        "special_commodity_market_data"
+    ]
+    item = CommodityUniverseSelector(cfg).resolve(
+        scope_id="cn_coal_bohai_port_inventory"
+    )[0]
+    source_cfg = deepcopy(cfg["source_profiles"][item.source_profile])
+    source_cfg["listing_urls"] = ["https://www.cctda.org.cn/list-42-1.html"]
+    source_cfg["listing_max_pages"] = 2
+
+    def fake_get(url, *args, **kwargs):
+        if str(url).endswith("list-42-1.html"):
+            payload = _cctda_ttci_listing_html()
+        elif str(url).endswith("list-42-2.html"):
+            payload = "<html><body></body></html>"
+        elif str(url).endswith("report-20260703.html"):
+            payload = _cctda_ttci_article_html()
+        elif str(url).endswith("report-20260626.html"):
+            payload = _cctda_ttci_article_without_inventory_html()
+        else:
+            raise AssertionError(f"unexpected URL: {url}")
+        return SimpleNamespace(
+            text=payload,
+            apparent_encoding="utf-8",
+            encoding="utf-8",
+            raise_for_status=lambda: None,
+        )
+
+    monkeypatch.setattr(
+        "research.special_commodity_market_data.request_get", fake_get
+    )
+    result = CctdaTtciPortInventoryProvider(
+        item.source_profile, source_cfg
+    ).fetch([item], start_date="2026-06-22", end_date="2026-07-03")
+
+    assert result.warnings == []
+    assert result.blockers == []
+    assert len(result.observations) == 1
+    assert result.metadata["source_coverage"]["reports_discovered"] == 2
+    assert result.metadata["source_coverage"]["reports_without_metric"] == 1
+    assert result.metadata["source_coverage"]["parse_failures"] == 0
 
 
 def test_cctda_ttci_port_inventory_parser_rejects_index_without_inventory():
@@ -2717,6 +2801,12 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
                         "ohlc": {"close_outside_range": 141},
                         "cross_source": {"conflict_count": 3},
                     },
+                    "source_coverage": {
+                        "reports_discovered": 90,
+                        "reports_without_metric": 12,
+                        "parse_failures": 1,
+                        "field_reconciliations": 2,
+                    },
                     "warnings": 0,
                     "blockers": 0,
                 }
@@ -2736,6 +2826,10 @@ def test_special_commodity_scheduler_report_compacts_normal_success():
     assert "fallback_unresolved=0" in report
     assert "ohlc_outside=141" in report
     assert "source_conflicts=3" in report
+    assert "reports=90" in report
+    assert "metric_absent=12" in report
+    assert "parse_failed=1" in report
+    assert "field_reconciled=2" in report
 
 
 def test_special_commodity_industrial_scope_windows_and_aggregation():

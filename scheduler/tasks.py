@@ -1834,6 +1834,15 @@ def _format_special_commodity_scheduler_report(
                     for value in coverage_series.values()
                     if isinstance(value, dict)
                 )
+                source_coverage = item.get("source_coverage") or {}
+                coverage_suffix = ""
+                if source_coverage:
+                    coverage_suffix = (
+                        f", reports={source_coverage.get('reports_discovered', 0)}, "
+                        f"metric_absent={source_coverage.get('reports_without_metric', 0)}, "
+                        f"parse_failed={source_coverage.get('parse_failures', 0)}, "
+                        f"field_reconciled={source_coverage.get('field_reconciliations', 0)}"
+                    )
                 source_lines.append(
                     f"{source_profile}: status={item.get('status', 'unknown')}, "
                     f"series={item.get('series', 0)}, master={item.get('master_records', 0)}, "
@@ -1847,6 +1856,7 @@ def _format_special_commodity_scheduler_report(
                     f"calendar_missing={missing_dates}, "
                     f"warnings={item.get('warnings', 0)}, "
                     f"blockers={item.get('blockers', 0)}"
+                    f"{coverage_suffix}"
                 )
             else:
                 source_lines.append(f"{source_profile}: {item}")

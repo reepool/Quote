@@ -862,6 +862,8 @@
             "backoff_seconds": 1.0
           },
           "progress_log_every_articles": 10,
+          "inventory_value_min": 800.0,
+          "inventory_value_max": 6000.0,
           "user_agent": "QuoteSystem/SpecialCommodityMarketData",
           "reuse_policy": "internal_research_factual_observations_only",
           "note": "Parse only factual Bohai-Rim combined port coal inventory values, report periods, publication dates, and source URLs from CCTDA-authored TTCI weekly reports. Do not store or redistribute article text, treat TTCI index points as CNY/ton, or substitute power-plant inventory."
@@ -2354,7 +2356,7 @@
             "data_kind": "industrial_indicator",
             "source_name": "China Coal Transportation and Distribution Association TTCI weekly reports",
             "source_url": "https://www.cctda.org.cn/list-42-1.html",
-            "source_available_from": "2024-08-02",
+            "source_available_from": "2025-02-08",
             "region_or_spec": "Combined coal inventory across Bohai-Rim ports reported in CCTDA TTCI weekly reports",
             "publication_date_semantics": "association_report_publication_date",
             "source_period_semantics": "weekly_report_period_end",
