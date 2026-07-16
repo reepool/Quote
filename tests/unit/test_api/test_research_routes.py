@@ -19,6 +19,10 @@ from api.models import (
     ResearchIndustryStandardReadinessResponse,
     ResearchIndustryTaxonomyResponse,
     ResearchCompanyProfileResponse,
+    ResearchCompanyBusinessProfileResponse,
+    ResearchCompanyBusinessProfileHistoryResponse,
+    ResearchCompanyCommodityExposureResponse,
+    ResearchBusinessProfileReviewQueueResponse,
     ResearchCompanyOverviewResponse,
     ResearchDcfValuationResponse,
     ResearchFinancialStatementsResponse,
@@ -52,6 +56,10 @@ from api.routes import (
     get_research_industry_standard_readiness,
     get_research_company_overview,
     get_research_company_profile,
+    get_research_company_business_profile,
+    get_research_company_business_profile_history,
+    get_research_company_commodity_exposures,
+    get_research_business_profile_review_queue,
     get_research_dcf_assumptions,
     get_research_dcf_input_gaps,
     get_research_dcf_model_profiles,
@@ -1395,6 +1403,115 @@ class TestResearchRoutes:
             "600000.SH",
             include_snapshot=False,
         )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_company_business_profile_success(self, mock_dm):
+        mock_dm.get_research_company_business_profile = AsyncMock(
+            return_value={
+                "schema_version": "company_business_profile.v1",
+                "status": "industry_fallback",
+                "instrument_id": "601088.SH",
+                "data_available_cutoff": "2026-04-30",
+                "industry_default_profile": {"mapping_scope_id": "煤炭"},
+                "company_specific_profile": {},
+                "segment_profiles": [],
+                "approved_exposures": [],
+                "candidate_exposures": [],
+                "candidate_facts": {},
+                "executable_exposure_mappings": [],
+                "model_scores": {"industry_model_score": 0.9},
+                "model_recommendation": "industry_default",
+                "conflicts": [],
+                "warnings": ["insufficient_company_evidence"],
+                "profile_version": "profile-v1",
+                "lineage_hash": "lineage-v1",
+                "readiness": {"status": "industry_fallback"},
+            }
+        )
+
+        response = _run(
+            get_research_company_business_profile(
+                "601088.SH",
+                as_of_date=date(2026, 4, 30),
+                include_candidates=True,
+            )
+        )
+
+        assert isinstance(response, ResearchCompanyBusinessProfileResponse)
+        assert response.model_recommendation == "industry_default"
+        mock_dm.get_research_company_business_profile.assert_awaited_once_with(
+            "601088.SH",
+            as_of_date="2026-04-30",
+            include_candidates=True,
+        )
+
+    @patch("api.routes.data_manager")
+    def test_get_research_company_business_profile_history_success(self, mock_dm):
+        mock_dm.get_research_company_business_profile_history = AsyncMock(
+            return_value={
+                "status": "success",
+                "instrument_id": "601088.SH",
+                "history": {"evidence": [{"evidence_id": "e1"}]},
+            }
+        )
+
+        response = _run(
+            get_research_company_business_profile_history("601088.SH", limit=100)
+        )
+
+        assert isinstance(response, ResearchCompanyBusinessProfileHistoryResponse)
+        assert response.history["evidence"][0]["evidence_id"] == "e1"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_company_commodity_exposures_success(self, mock_dm):
+        mock_dm.get_research_company_commodity_exposures = AsyncMock(
+            return_value={
+                "status": "ready",
+                "instrument_id": "601088.SH",
+                "data_available_cutoff": "2026-04-30",
+                "approved_exposures": [{"exposure_id": "coal"}],
+                "candidate_exposures": [],
+                "executable_exposure_mappings": [],
+                "industry_default_profile": {},
+                "conflicts": [],
+                "readiness": {"status": "ready"},
+                "warnings": [],
+                "profile_version": "profile-v1",
+                "lineage_hash": "lineage-v1",
+            }
+        )
+
+        response = _run(
+            get_research_company_commodity_exposures(
+                "601088.SH",
+                as_of_date=date(2026, 4, 30),
+                include_candidates=False,
+            )
+        )
+
+        assert isinstance(response, ResearchCompanyCommodityExposureResponse)
+        assert response.approved_exposures[0]["exposure_id"] == "coal"
+
+    @patch("api.routes.data_manager")
+    def test_get_research_business_profile_review_queue_success(self, mock_dm):
+        mock_dm.get_research_business_profile_review_queue = AsyncMock(
+            return_value={
+                "status": "success",
+                "row_count": 1,
+                "rows": [{"record_type": "exposures", "exposure_id": "candidate"}],
+            }
+        )
+
+        response = _run(
+            get_research_business_profile_review_queue(
+                instrument_id="601088.SH",
+                record_type="exposures",
+                limit=20,
+            )
+        )
+
+        assert isinstance(response, ResearchBusinessProfileReviewQueueResponse)
+        assert response.row_count == 1
 
     @patch("api.routes.data_manager")
     def test_get_research_financial_summary_success(self, mock_dm):

@@ -836,6 +836,125 @@ async def get_research_company_profile(
 
 
 @router.get(
+    "/research/company/{instrument_id}/business-profile",
+    response_model=ResearchCompanyBusinessProfileResponse,
+    tags=["Research"],
+)
+async def get_research_company_business_profile(
+    instrument_id: str,
+    as_of_date: Optional[date] = Query(None, description="估值日/数据可得日截止"),
+    include_candidates: bool = Query(True, description="是否包含候选事实诊断"),
+):
+    """读取本地、时点化且可审计的公司业务画像。"""
+    try:
+        target_date = _normalize_optional_query(as_of_date)
+        payload = await data_manager.get_research_company_business_profile(
+            instrument_id,
+            as_of_date=(
+                target_date.isoformat()
+                if isinstance(target_date, date)
+                else target_date
+            ),
+            include_candidates=include_candidates,
+        )
+        return ResearchCompanyBusinessProfileResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research company business profile: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company/{instrument_id}/business-profile/history",
+    response_model=ResearchCompanyBusinessProfileHistoryResponse,
+    tags=["Research"],
+)
+async def get_research_company_business_profile_history(
+    instrument_id: str,
+    limit: int = Query(5000, ge=1, le=10000),
+):
+    """读取本地公司业务画像全版本历史。"""
+    try:
+        payload = await data_manager.get_research_company_business_profile_history(
+            instrument_id,
+            limit=limit,
+        )
+        return ResearchCompanyBusinessProfileHistoryResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research company business profile history: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company/{instrument_id}/commodity-exposures",
+    response_model=ResearchCompanyCommodityExposureResponse,
+    tags=["Research"],
+)
+async def get_research_company_commodity_exposures(
+    instrument_id: str,
+    as_of_date: Optional[date] = Query(None, description="估值日/数据可得日截止"),
+    include_candidates: bool = Query(True, description="是否包含候选暴露"),
+):
+    """读取公司商品暴露、行业默认和 DCF 可执行映射。"""
+    try:
+        target_date = _normalize_optional_query(as_of_date)
+        payload = await data_manager.get_research_company_commodity_exposures(
+            instrument_id,
+            as_of_date=(
+                target_date.isoformat()
+                if isinstance(target_date, date)
+                else target_date
+            ),
+            include_candidates=include_candidates,
+        )
+        return ResearchCompanyCommodityExposureResponse(**payload)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get research company commodity exposures: {str(e)}",
+        )
+
+
+@router.get(
+    "/research/company-profiles/review-queue",
+    response_model=ResearchBusinessProfileReviewQueueResponse,
+    tags=["Research"],
+)
+async def get_research_business_profile_review_queue(
+    instrument_id: Optional[str] = Query(None),
+    record_type: Optional[str] = Query(None),
+    limit: int = Query(200, ge=1, le=1000),
+):
+    """读取候选业务画像事实，不触发同步或审批。"""
+    try:
+        payload = await data_manager.get_research_business_profile_review_queue(
+            instrument_id=_normalize_optional_query(instrument_id),
+            record_type=_normalize_optional_query(record_type),
+            limit=limit,
+        )
+        return ResearchBusinessProfileReviewQueueResponse(**payload)
+    except (RuntimeError, ValueError) as e:
+        raise HTTPException(
+            status_code=503 if isinstance(e, RuntimeError) else 400,
+            detail=str(e),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get business profile review queue: {str(e)}",
+        )
+
+
+@router.get(
     "/research/company/{instrument_id}/financial-indicators",
     response_model=ResearchFinancialSummaryResponse,
     tags=["Research"],

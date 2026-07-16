@@ -704,6 +704,62 @@ class ResearchCompanyProfileResponse(BaseModel):
     profile: Optional[Dict[str, Any]] = Field(None, description="标准化快照详情")
 
 
+class ResearchCompanyBusinessProfileResponse(BaseModel):
+    """公司业务画像治理上下文。"""
+
+    schema_version: str = Field(..., description="画像结构版本")
+    status: str = Field(..., description="画像就绪状态")
+    instrument_id: str = Field(..., description="交易品种ID")
+    data_available_cutoff: str = Field(..., description="数据可得日截止")
+    industry_default_profile: Dict[str, Any] = Field(default_factory=dict)
+    company_specific_profile: Dict[str, Any] = Field(default_factory=dict)
+    segment_profiles: List[Dict[str, Any]] = Field(default_factory=list)
+    approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+    candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+    candidate_facts: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
+    executable_exposure_mappings: List[Dict[str, Any]] = Field(default_factory=list)
+    model_scores: Dict[str, Any] = Field(default_factory=dict)
+    model_recommendation: str = Field(..., description="行业/公司/双模型建议")
+    conflicts: List[Dict[str, Any]] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
+    profile_version: str = Field(..., description="画像版本")
+    lineage_hash: str = Field(..., description="画像血缘哈希")
+    readiness: Dict[str, Any] = Field(default_factory=dict)
+
+
+class ResearchCompanyBusinessProfileHistoryResponse(BaseModel):
+    """公司业务画像历史事实。"""
+
+    status: str
+    instrument_id: str
+    history: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
+
+
+class ResearchCompanyCommodityExposureResponse(BaseModel):
+    """公司商品暴露与可执行映射。"""
+
+    status: str
+    instrument_id: str
+    data_available_cutoff: str
+    approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+    candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)
+    executable_exposure_mappings: List[Dict[str, Any]] = Field(default_factory=list)
+    industry_default_profile: Dict[str, Any] = Field(default_factory=dict)
+    conflicts: List[Dict[str, Any]] = Field(default_factory=list)
+    readiness: Dict[str, Any] = Field(default_factory=dict)
+    warnings: List[str] = Field(default_factory=list)
+    profile_version: Optional[str] = None
+    lineage_hash: Optional[str] = None
+
+
+class ResearchBusinessProfileReviewQueueResponse(BaseModel):
+    """待复核业务画像事实清单。"""
+
+    status: str
+    row_count: int
+    rows: List[Dict[str, Any]] = Field(default_factory=list)
+
+
 class ResearchFinancialSummaryResponse(BaseModel):
     """研究域财务摘要响应模型。"""
 
@@ -1396,6 +1452,10 @@ class ResearchDcfValuationResponse(BaseModel):
     cyclical_model_diagnostics: Optional[Dict[str, Any]] = Field(
         None,
         description="周期行业 DCF 商品、利润率和期货诊断",
+    )
+    business_profile_context: Optional[Dict[str, Any]] = Field(
+        None,
+        description="时点化公司业务画像、行业默认、商品暴露及模型评分",
     )
     forecast_rows: List[Dict[str, Any]] = Field(
         default_factory=list,

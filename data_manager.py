@@ -21,6 +21,7 @@ import hashlib
 import inspect
 import json
 import os
+import sqlite3
 from calendar import monthrange
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple, Union, Set
@@ -1043,6 +1044,109 @@ class DataManager:
                 include_snapshot=include_snapshot,
             )
         return None
+
+    async def get_research_company_business_profile(
+        self,
+        instrument_id: str,
+        *,
+        as_of_date: Optional[str] = None,
+        include_candidates: bool = True,
+    ) -> Dict[str, Any]:
+        """Read the governed local business profile for one company."""
+        storage = self._require_research_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+        cutoff = str(as_of_date or get_shanghai_time().date().isoformat())[:10]
+        membership = await self._get_dcf_industry_membership(
+            storage,
+            normalized_id,
+            valuation_date=cutoff,
+            historical_request=as_of_date is not None,
+        )
+        return await self._resolve_business_profile_context(
+            storage,
+            normalized_id,
+            valuation_date=cutoff,
+            industry_membership=membership,
+            include_candidates=include_candidates,
+        )
+
+    async def get_research_company_business_profile_history(
+        self,
+        instrument_id: str,
+        *,
+        limit: int = 5000,
+    ) -> Dict[str, Any]:
+        """Read normalized profile history without applying valuation gates."""
+        from research.business_profile_governance import BusinessProfileRepository
+
+        storage = self._require_research_storage()
+        normalized_id = convert_to_database_format(instrument_id)
+        repository = BusinessProfileRepository(storage)
+        history = await asyncio.to_thread(
+            repository.get_profile_history,
+            normalized_id,
+            limit=limit,
+        )
+        return {
+            "status": "success" if any(history.values()) else "empty",
+            "instrument_id": normalized_id,
+            "history": history,
+        }
+
+    async def get_research_company_commodity_exposures(
+        self,
+        instrument_id: str,
+        *,
+        as_of_date: Optional[str] = None,
+        include_candidates: bool = True,
+    ) -> Dict[str, Any]:
+        """Read governed and executable commodity exposure for one company."""
+        context = await self.get_research_company_business_profile(
+            instrument_id,
+            as_of_date=as_of_date,
+            include_candidates=include_candidates,
+        )
+        return {
+            "status": context.get("status"),
+            "instrument_id": context.get("instrument_id"),
+            "data_available_cutoff": context.get("data_available_cutoff"),
+            "approved_exposures": context.get("approved_exposures") or [],
+            "candidate_exposures": context.get("candidate_exposures") or [],
+            "executable_exposure_mappings": context.get("executable_exposure_mappings") or [],
+            "industry_default_profile": context.get("industry_default_profile") or {},
+            "conflicts": context.get("conflicts") or [],
+            "readiness": context.get("readiness") or {},
+            "warnings": context.get("warnings") or [],
+            "profile_version": context.get("profile_version"),
+            "lineage_hash": context.get("lineage_hash"),
+        }
+
+    async def get_research_business_profile_review_queue(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        record_type: Optional[str] = None,
+        limit: int = 200,
+    ) -> Dict[str, Any]:
+        """Read local candidate facts awaiting review."""
+        from research.business_profile_governance import BusinessProfileRepository
+
+        storage = self._require_research_storage()
+        normalized_id = (
+            convert_to_database_format(instrument_id) if instrument_id else None
+        )
+        repository = BusinessProfileRepository(storage)
+        rows = await asyncio.to_thread(
+            repository.get_review_queue,
+            instrument_id=normalized_id,
+            record_type=record_type,
+            limit=limit,
+        )
+        return {
+            "status": "success" if rows else "empty",
+            "row_count": len(rows),
+            "rows": rows,
+        }
 
     async def run_industry_shadow_sync(
         self,
@@ -6056,6 +6160,7 @@ class DataManager:
         *,
         industry_membership: Optional[Dict[str, Any]] = None,
         as_of_date: Optional[str] = None,
+        governed_exposure_mappings: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
         """Return local futures exposure and diagnostics for cyclical DCF."""
         storage = self._require_futures_storage()
@@ -6066,6 +6171,7 @@ class DataManager:
                 storage,
                 normalized_id,
                 industry_membership=industry_membership,
+                governed_exposure_mappings=governed_exposure_mappings,
             )
             if exposure.get("status") != "success":
                 return exposure
@@ -6093,7 +6199,17 @@ class DataManager:
         instrument_id: str,
         *,
         industry_membership: Optional[Dict[str, Any]],
+        governed_exposure_mappings: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
+        if governed_exposure_mappings:
+            return {
+                "status": "success",
+                "instrument_id": instrument_id,
+                "mapping_scope": "governed_business_profile",
+                "mapping_scope_id": instrument_id,
+                "mappings": governed_exposure_mappings,
+                "input_gaps": [],
+            }
         mappings = storage.get_exposure_mappings(
             scope_type="instrument",
             scope_id=instrument_id,
@@ -7049,6 +7165,25 @@ class DataManager:
                 "data_as_of": industry_membership.get("data_as_of"),
             }
 
+        business_profile_context = await self._resolve_business_profile_context(
+            storage,
+            normalized_id,
+            valuation_date=target_valuation_date,
+            industry_membership=industry_membership,
+            include_candidates=True,
+        )
+        financial_bundle["business_profile_context"] = business_profile_context
+        profile_lineage = financial_bundle.get("lineage")
+        if not isinstance(profile_lineage, dict):
+            profile_lineage = {}
+            financial_bundle["lineage"] = profile_lineage
+        profile_lineage["business_profile_context"] = {
+            "profile_version": business_profile_context.get("profile_version"),
+            "lineage_hash": business_profile_context.get("lineage_hash"),
+            "data_available_cutoff": business_profile_context.get("data_available_cutoff"),
+            "status": business_profile_context.get("status"),
+        }
+
         report_period = str(
             financial_bundle.get("report_period")
             or (financial_bundle.get("latest_facts") or {}).get("report_period")
@@ -7147,6 +7282,7 @@ class DataManager:
             }.items()
             if value is not None
         }
+        overrides["business_profile_context"] = business_profile_context
         risk_free_rate_context = await self._get_dcf_risk_free_rate_context(
             storage,
             valuation_date=target_valuation_date,
@@ -7215,6 +7351,7 @@ class DataManager:
             normalized_id,
             valuation_date=target_valuation_date,
             industry_membership=industry_membership,
+            business_profile_context=business_profile_context,
         )
         if futures_cycle_context:
             overrides.setdefault(
@@ -7271,8 +7408,9 @@ class DataManager:
             latest_close=latest_close,
             overrides=overrides,
         )
+        result = deepcopy(result)
+        result["business_profile_context"] = business_profile_context
         if futures_cycle_context:
-            result = deepcopy(result)
             cyclical_diagnostics = result.setdefault("cyclical_model_diagnostics", {})
             if isinstance(cyclical_diagnostics, dict):
                 cyclical_diagnostics["futures_market_data"] = futures_cycle_context
@@ -7332,6 +7470,51 @@ class DataManager:
             instrument_id,
             include_snapshot=False,
         )
+
+    async def _resolve_business_profile_context(
+        self,
+        storage: Any,
+        instrument_id: str,
+        *,
+        valuation_date: str,
+        industry_membership: Optional[Dict[str, Any]],
+        include_candidates: bool,
+    ) -> Dict[str, Any]:
+        """Resolve local business facts and executable mappings as of valuation date."""
+        from research.business_profile_governance import (
+            BusinessProfileRepository,
+            BusinessProfileResolver,
+            build_empty_business_profile_context,
+        )
+
+        futures_storage = None
+        try:
+            futures_storage = self._require_futures_storage()
+        except RuntimeError:
+            pass
+        resolver = BusinessProfileResolver(
+            BusinessProfileRepository(storage),
+            futures_storage=futures_storage,
+        )
+        try:
+            return await asyncio.to_thread(
+                resolver.resolve,
+                instrument_id,
+                as_of_date=valuation_date,
+                industry_membership=industry_membership,
+                include_candidates=include_candidates,
+            )
+        except (OSError, sqlite3.Error, AttributeError, TypeError) as exc:
+            dm_logger.warning(
+                "[DataManager] business profile unavailable for %s: %s",
+                instrument_id,
+                exc,
+            )
+            return build_empty_business_profile_context(
+                instrument_id,
+                as_of_date=valuation_date,
+                warning="business_profile_storage_unavailable",
+            )
 
     async def _normalize_dcf_historical_industry_membership(
         self,
@@ -7634,6 +7817,7 @@ class DataManager:
         *,
         valuation_date: Optional[str] = None,
         industry_membership: Optional[Dict[str, Any]] = None,
+        business_profile_context: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
         """Return compact local futures diagnostics for DCF, if configured."""
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
@@ -7654,6 +7838,11 @@ class DataManager:
                 instrument_id,
                 industry_membership=industry_membership,
                 as_of_date=valuation_date,
+                governed_exposure_mappings=(
+                    business_profile_context.get("executable_exposure_mappings")
+                    if isinstance(business_profile_context, dict)
+                    else None
+                ),
             )
         except RuntimeError:
             return None
@@ -7723,6 +7912,16 @@ class DataManager:
             "diagnostics_by_series": diagnostics_by_series,
             "input_gaps": payload.get("input_gaps") or [],
             "source_policy": "local_futures_db_only",
+            "business_profile_version": (
+                business_profile_context.get("profile_version")
+                if isinstance(business_profile_context, dict)
+                else None
+            ),
+            "business_profile_lineage_hash": (
+                business_profile_context.get("lineage_hash")
+                if isinstance(business_profile_context, dict)
+                else None
+            ),
         }
 
     def _enrich_dcf_bundle_with_broker_risk_control_facts(

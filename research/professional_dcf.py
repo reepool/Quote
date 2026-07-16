@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -350,6 +350,7 @@ class DcfInputBundle:
     warnings: Tuple[str, ...]
     lineage: Dict[str, Any]
     company_characteristics: Tuple[Dict[str, Any], ...]
+    business_profile_context: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -612,6 +613,11 @@ class ProfessionalDcfEngine:
         )
         blockers.extend(assumption_blockers)
         warnings.extend(assumption_warnings)
+        business_profile_context = deepcopy(
+            overrides.get("business_profile_context")
+            or financial_bundle.get("business_profile_context")
+            or {}
+        )
         input_payload = {
             "instrument_id": instrument.get("instrument_id"),
             "facts": facts,
@@ -619,6 +625,7 @@ class ProfessionalDcfEngine:
             "valuation_date": valuation_date,
             "latest_close": latest_close,
             "beta": beta_context,
+            "business_profile_context": business_profile_context,
         }
         input_hash = self._hash_payload(input_payload)
         lineage = {
@@ -656,6 +663,18 @@ class ProfessionalDcfEngine:
             "beta": beta_context,
             "company_characteristics": list(company_characteristics),
             "listed_broker_dealer_scope": broker_scope.to_dict(),
+            "business_profile_context": {
+                "schema_version": business_profile_context.get("schema_version"),
+                "status": business_profile_context.get("status"),
+                "profile_version": business_profile_context.get("profile_version"),
+                "lineage_hash": business_profile_context.get("lineage_hash"),
+                "data_available_cutoff": business_profile_context.get(
+                    "data_available_cutoff"
+                ),
+                "model_recommendation": business_profile_context.get(
+                    "model_recommendation"
+                ),
+            },
         }
         return DcfInputBundle(
             instrument=instrument,
@@ -670,6 +689,7 @@ class ProfessionalDcfEngine:
             warnings=tuple(warnings),
             lineage=lineage,
             company_characteristics=tuple(company_characteristics),
+            business_profile_context=business_profile_context,
         )
 
     def get_assumptions(

@@ -1311,13 +1311,14 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已将估值日有效的权威申万一级、二级、三级行业归属注入 DCF instrument、输入 hash 和 lineage，模型选择不再主要依赖公司名称或行情库粗行业字段；历史估值使用历史行业归属，不回填当前分类。
 - 已将估值库的时点股本接入 `shares_outstanding`，并将现金流量表“购建固定资产、无形资产和其他长期资产所支付的现金”映射为 capex 代理。年度使用报告值，季度/半年使用累计现金流 TTM 桥接；桥接期不完整时显式返回缺口。现金取资产负债表货币资金；有息债务由短期借款、一年内到期非流动负债、长期借款及应付债券等明细保守汇总，租赁负债单列，明确禁止把当前数据源语义上的负债合计字段 `balance_sheet.total_debt` 当作有息债务。
 - DCF 已接收 benchmark-aware Beta 的质量元数据。非正 Beta 或明确为 low/unavailable 的观测不会直接进入 CAPM，而是保留原始观测并回退配置 Beta，同时输出 `beta_fallback_used` 和拒绝原因，避免异常 Beta 造成股权成本低于永续增长率。
-- 公司业务画像、分部、产品、上下游角色和商品敏感性仍未形成生产数据层。详细字段、免费数据源、证据治理、置信度和分行业实施方案见 `company_business_profile_and_commodity_exposure_requirements.md`；当前应将申万行业画像视为行业默认，不声称是公司精确商品暴露。
+- 公司业务画像治理基础层已实现：`research.db` 已具备证据、业务分部、经营量事实、价值链角色和公司商品暴露规范化表，DCF 已接入时点化 `business_profile_context`，并执行事实审批、证据审批、证据完整性、可得日、有效期和行情序列有效性门槛。公司级 approved 暴露可覆盖同商品/角色的行业默认，候选和未来信息仅进入 diagnostics；相关只读 API 已开放。当前尚未执行全市场官方年报回补，生产库 approved 公司画像覆盖仍为空或有限，不得把治理能力误述为数据覆盖完成。字段和下一阶段采集方案见 `company_business_profile_and_commodity_exposure_requirements.md`。
 - 保险、地产、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
 
 - 真实主备外部数据源刷新 adapter 和生产级联网刷新调度。
 - 跨进程 saved-run audit 表和可检索历史运行视图。
+- 公司业务画像 Phase 0/1 数据生产：首批行业人工金标准、官方年报/半年报分部与产品抽取、行业默认商品映射审批及公司覆盖项回补；当前只完成治理存储、解析门槛、DCF 和只读 API 接入。
 - 保险、地产 NAV、控股公司等特殊行业/类型完整实算模型；证券模型后续仍需扩展更细的市场周期、两融、投行、资管和自营分部驱动；周期模型后续仍需接入更稳定的商品价格/行业景气指数主备源。
 - 已实现 OpenSpec change `use-annual-report-broker-risk-control-source` 的核心链路：正式年报/半年报 PDF 内嵌“净资本及风险控制指标”表为主源，CSRC 名录 + `listed_broker_dealer_scope` 作为上市券商主体 gate，解析结果写入现有财务事实表；独立《风险控制指标报告》保留为补充/校验源。历史回补使用显式 CLI，日更由 `financial_disclosure_incremental_sync` 成功后自动触发 `broker_risk_control_incremental_sync` 后置任务。经纪、投行、资管、自营收入仍归年报分部/附注解析，不从监管风控表推断。
 - 覆盖所有代表性行业/公司类型的大样本 fixture 与集成验证。

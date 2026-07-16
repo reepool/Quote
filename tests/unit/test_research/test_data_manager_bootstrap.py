@@ -3026,6 +3026,64 @@ def test_data_manager_dcf_futures_context_falls_back_to_industry_mapping(tmp_pat
     )
 
 
+def test_data_manager_dcf_futures_context_prefers_governed_company_mapping(tmp_path):
+    mock_config = _build_mock_config(tmp_path, research_enabled=True)
+    mock_config.get_research_config.return_value.modules = {
+        "commodity_market_data": {"enabled": True},
+    }
+
+    with patch("data_manager.config_manager", mock_config):
+        manager = DataManager()
+
+    futures_storage = Mock()
+    futures_storage.get_cycle_diagnostics.return_value = [
+        {
+            "series_id": "CNF.CU.SHFE.main",
+            "as_of_date": "2026-04-30",
+            "lookback_years": 10,
+            "latest_price": 80500.0,
+            "mean_price": 72000.0,
+            "median_price": 70000.0,
+            "percentile": 0.82,
+            "cycle_state": "high",
+        }
+    ]
+    manager.research_storage = Mock()
+    manager.futures_storage = futures_storage
+    profile_context = {
+        "profile_version": "profile-v1",
+        "lineage_hash": "lineage-v1",
+        "executable_exposure_mappings": [
+            {
+                "mapping_id": "business-profile:copper",
+                "scope_type": "instrument",
+                "scope_id": "000630.SZ",
+                "product_name": "铜",
+                "revenue_series_id": "CNF.CU.SHFE.main",
+                "cost_series_ids": [],
+                "spread_ids": [],
+                "direction": "positive",
+                "source": "approved_company_business_profile",
+            }
+        ],
+    }
+
+    with patch("data_manager.asyncio.to_thread", side_effect=_sync_to_thread):
+        context = _run(
+            manager._get_dcf_futures_cycle_context(
+                "000630.SZ",
+                valuation_date="2026-04-30",
+                business_profile_context=profile_context,
+            )
+        )
+
+    assert context["mapping_scope"] == "governed_business_profile"
+    assert context["selected_series_id"] == "CNF.CU.SHFE.main"
+    assert context["business_profile_version"] == "profile-v1"
+    assert context["business_profile_lineage_hash"] == "lineage-v1"
+    futures_storage.get_exposure_mappings.assert_not_called()
+
+
 def test_data_manager_dcf_bounded_cache_hits_and_invalidates_on_price_change(tmp_path):
     mock_config = _build_mock_config(tmp_path, research_enabled=True)
     mock_config.get_research_config.return_value.modules = {

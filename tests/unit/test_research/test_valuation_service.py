@@ -1532,6 +1532,43 @@ def test_professional_dcf_assumptions_expose_fallback_missing_and_refresh_diagno
     assert refresh["source_results"][0]["timeout_seconds"] == 3
 
 
+def test_professional_dcf_input_bundle_preserves_business_profile_context():
+    engine = ProfessionalDcfEngine()
+    profile_context = {
+        "schema_version": "company_business_profile.v1",
+        "status": "ready",
+        "profile_version": "profile-v1",
+        "lineage_hash": "lineage-v1",
+        "data_available_cutoff": "2026-03-28",
+        "model_recommendation": "company_specific",
+        "approved_exposures": [{"exposure_id": "coal"}],
+    }
+
+    bundle = engine.build_input_bundle(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "sw_l1_name": "煤炭",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-03-28",
+            "revenue": 1000.0,
+            "operating_profit": 200.0,
+            "capital_expenditure": 80.0,
+        },
+        latest_close=30.0,
+        valuation_date="2026-04-30",
+        overrides={"business_profile_context": profile_context},
+        research_mode=True,
+    )
+
+    assert bundle.business_profile_context["profile_version"] == "profile-v1"
+    assert bundle.lineage["business_profile_context"]["lineage_hash"] == "lineage-v1"
+    assert bundle.input_hash
+
+
 def test_professional_dcf_fx_assumption_override_uses_local_fx_lineage():
     engine = ProfessionalDcfEngine()
 

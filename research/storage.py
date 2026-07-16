@@ -11315,6 +11315,171 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_company_profiles_exchange_source
             ON company_profiles(exchange, source, updated_at);
 
+            CREATE TABLE IF NOT EXISTS business_profile_evidence (
+                evidence_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                source_document_id TEXT NOT NULL,
+                source_institution TEXT,
+                source_tier TEXT NOT NULL,
+                document_type TEXT,
+                title TEXT,
+                source_url TEXT,
+                document_hash TEXT NOT NULL,
+                report_period TEXT,
+                publish_date TEXT,
+                data_available_date TEXT NOT NULL,
+                availability_quality TEXT NOT NULL,
+                page_number INTEGER,
+                table_name TEXT,
+                section_path TEXT,
+                evidence_text_hash TEXT NOT NULL,
+                extraction_method TEXT NOT NULL,
+                parser_version TEXT,
+                ocr_status TEXT,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                reviewed_by TEXT,
+                reviewed_at TEXT,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_evidence_instrument_period
+            ON business_profile_evidence(instrument_id, report_period, data_available_date);
+            CREATE INDEX IF NOT EXISTS idx_business_profile_evidence_review
+            ON business_profile_evidence(review_status, updated_at);
+
+            CREATE TABLE IF NOT EXISTS company_business_segments (
+                record_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                segment_id TEXT NOT NULL,
+                segment_name_raw TEXT NOT NULL,
+                segment_name_normalized TEXT,
+                segment_type TEXT NOT NULL,
+                revenue REAL,
+                revenue_share REAL,
+                segment_profit REAL,
+                segment_assets REAL,
+                currency TEXT,
+                consolidation_scope TEXT,
+                geography TEXT,
+                source_document_id TEXT,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                extraction_method TEXT,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_business_segments_asof
+            ON company_business_segments(instrument_id, data_available_date, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_business_segments_period
+            ON company_business_segments(instrument_id, report_period, segment_type);
+
+            CREATE TABLE IF NOT EXISTS company_operating_facts (
+                record_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                segment_id TEXT,
+                project_id TEXT,
+                fact_type TEXT NOT NULL,
+                value_raw REAL,
+                unit_raw TEXT,
+                value_normalized REAL,
+                unit_normalized TEXT,
+                fact_scope TEXT,
+                currency TEXT,
+                equity_basis TEXT,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_operating_facts_asof
+            ON company_operating_facts(instrument_id, data_available_date, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_operating_facts_type
+            ON company_operating_facts(instrument_id, report_period, fact_type);
+
+            CREATE TABLE IF NOT EXISTS company_value_chain_roles (
+                record_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                segment_id TEXT,
+                role TEXT NOT NULL,
+                materiality TEXT,
+                revenue_share REAL,
+                mapping_basis TEXT NOT NULL,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_value_chain_roles_asof
+            ON company_value_chain_roles(instrument_id, data_available_date, review_status);
+
+            CREATE TABLE IF NOT EXISTS company_commodity_exposures (
+                exposure_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                report_period TEXT NOT NULL,
+                scope_type TEXT NOT NULL,
+                scope_id TEXT NOT NULL,
+                commodity_id TEXT NOT NULL,
+                exposure_role TEXT NOT NULL,
+                direction TEXT NOT NULL,
+                materiality TEXT,
+                mapping_basis TEXT NOT NULL,
+                price_series_id TEXT,
+                spread_definition_id TEXT,
+                lag_days INTEGER NOT NULL DEFAULT 0,
+                pass_through_score REAL,
+                hedge_adjustment REAL,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                effective_from TEXT,
+                effective_to TEXT,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_asof
+            ON company_commodity_exposures(instrument_id, data_available_date, review_status);
+            CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_commodity
+            ON company_commodity_exposures(commodity_id, exposure_role, review_status);
+
             CREATE TABLE IF NOT EXISTS financial_summaries (
                 instrument_id TEXT PRIMARY KEY,
                 symbol TEXT NOT NULL,

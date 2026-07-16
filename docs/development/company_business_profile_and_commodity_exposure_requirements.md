@@ -309,14 +309,17 @@ DCF 仅消费 `approved` 且可得日不晚于估值日的事实。候选数据�
 
 ### 7.4 API
 
-建议新增：
+当前已实现本地只读接口：
 
-- `GET /api/v1/research/company-profiles/{instrument_id}`；
-- `GET /api/v1/research/company-profiles/{instrument_id}/history`；
-- `GET /api/v1/research/company-profiles/{instrument_id}/exposures`；
-- `GET /api/v1/research/company-profiles/review-queue`；
+- `GET /api/v1/research/company/{instrument_id}/business-profile`；
+- `GET /api/v1/research/company/{instrument_id}/business-profile/history`；
+- `GET /api/v1/research/company/{instrument_id}/commodity-exposures`；
+- `GET /api/v1/research/company-profiles/review-queue`。
+
+后续受权运维接口：
+
 - `POST /api/v1/research/company-profiles/{instrument_id}/review`；
-- `POST /api/v1/research/company-profiles/sync`，仅运维或受权调用。
+- `POST /api/v1/research/company-profiles/sync`。
 
 读取接口不得隐式抓取网络；同步接口返回任务和数据质量报告。
 
@@ -425,6 +428,33 @@ DCF 仅消费 `approved` 且可得日不晚于估值日的事实。候选数据�
 
 ---
 
-## 12. 当前建议
+## 12. 当前实施状态与下一步
 
-本专项应独立作为后续 OpenSpec Change 实施，不与本次申万行业、股本、capex、财务可得日和无风险利率接入混在一个代码变更中。当前 DCF 可先使用权威申万三级行业完成精确行业定位，并把公司画像缺失作为透明的中低置信度限制；公司事实层完成后再提升到公司特定商品驱动和分部 DCF。
+### 12.1 已实现的治理基础层（2026-07-16）
+
+OpenSpec change `establish-a-share-business-profile-governance` 已建立并完成第一阶段工程实现：
+
+- `research.db` 新增 `business_profile_evidence`、`company_business_segments`、`company_operating_facts`、`company_value_chain_roles`、`company_commodity_exposures` 五类规范化表；`company_profiles` 继续只承担公司基础快照，不承载复杂历史事实。
+- 仓储入口支持稳定主键幂等写入、版本和 lineage hash、原始/标准单位并存、候选复核队列与全历史读取。
+- 解析器按估值日同时检查事实 `review_status`、证据 `review_status`、证据完整性、`data_available_date`、事实有效期及行情序列有效性；任一门槛不满足时不得进入 DCF。
+- 行业默认画像与公司特定画像分开返回。相同商品和角色下，公司级已批准暴露优先；未匹配的行业默认仍保留，冲突、评分和推荐策略显式输出。
+- 已批准公司暴露在内存中投影为现有 `futures_exposure_mappings` 兼容结构，不复制期货行情或价差主数据，也不在读取/估值请求中写库。
+- DCF 输入 hash、lineage、响应和周期诊断已包含 `business_profile_context`；画像库为空或不可用时返回结构化 readiness 并保留原行业回退，不隐式联网。
+- 已实现画像、历史、商品暴露和复核队列四类只读 API。
+
+### 12.2 当前生产数据边界
+
+以上完成的是数据契约、治理门槛和 DCF 接入，不代表公司画像数据已经覆盖全市场。当前本地生产库尚未执行官方年报业务分部的系统回补，`futures_exposure_mappings` 的行业/公司映射也需要通过独立目录和审批流程逐批建立。因此：
+
+1. 没有 approved 公司事实时，DCF 继续使用权威申万行业和既有财务模型，并明确输出 `insufficient_company_evidence`。
+2. 不得把 BaoStock、行情库行业、公司简称关键词或聚合页面标签直接提升为 approved 商品暴露。
+3. 不得因为期货序列缺失而删除业务事实；只应降低商品驱动 readiness。
+4. 本阶段未实现自动审批、PDF/OCR 抽取、合同和套保量化，也未对生产数据库静默写入示例映射。
+
+### 12.3 后续优先顺序
+
+1. 建立 Phase 0 首批行业样本目录、商品词典、证据等级和人工金标准，每个行业先选 20-30 家代表公司。
+2. 基于 CNInfo/交易所正式年报和半年报实现业务分部、产品及价值链角色候选抽取，并保留页码、章节和文档哈希。
+3. 对煤炭、有色、钢铁、石油石化、基础化工和部分建材建立经过审批的行业默认暴露目录，再逐家公司形成覆盖项。
+4. 生成并回补加工价差定义；随后推进产销量、售价、单位成本、产能和储量。
+5. 在人工金标准精确率达到验收线后，再扩大到全市场增量维护和受权审批 API。
