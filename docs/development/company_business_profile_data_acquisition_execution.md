@@ -247,6 +247,33 @@ data/filings/business_profile/{exchange}/{symbol}/{report_period}/
 9. 写入 candidate 事实和复核队列；
 10. 输出字段级质量报告。
 
+其中第 1-3 步的第一版已由 `BusinessProfilePdfArtifactExtractor` 实现：
+
+- 以实际 PDF bytes 计算 source content hash；
+- 分类 `invalid_pdf_signature / malformed_pdf / malformed_page_tree / empty_pdf / encrypted_password_required / pypdf_unavailable`；
+- 逐页保留原生文本、页面尺寸、非空字符数、每平方英寸文本密度、提取状态、文本哈希和页 artifact hash；
+- 对主营、经营模式、分部、收入成本、产销量、成本构成、资源储量、重大项目和套保建立标题索引；
+- 低文本页只有在标题命中或显式 target page 范围内才进入 `ocr_required_pages`，OCR 不在本流程执行。
+
+派生文件使用确定性 gzip JSON，布局为：
+
+```text
+derived/{pypdf_extractor_version}/{source_content_hash}_{parameter_hash}.json.gz
+tables/{table_extractor_version}/{source_content_hash}_{parameter_hash}.json.gz
+ocr/{ocr_worker_version}/{source_content_hash}_{parameter_hash}.json.gz
+```
+
+parameter hash 包含低文本阈值、标题词典和显式目标页；artifact hash 不包含本地原件路径或单一 manifest ID，因此归档迁移和相同内容复用不改变内容身份，不同参数也不会发生不可变路径冲突。当前 `tables/` 与 `ocr/` 仅固定目录和版本合同；表格/OCR 实现仍须经过 benchmark。操作命令：
+
+```bash
+python scripts/research_business_profile_pdf_artifact.py \
+  data/filings/business_profile/SSE/600309/2025-12-31/original/<file>.pdf \
+  --source-file-id <source_file_id> \
+  --target-pages 12,35
+```
+
+添加 `--diagnostics-only` 时不写派生 artifact。命令不联网、不写公司画像事实。
+
 ### 6.2 依赖选择
 
 当前仅有 `pypdf`。不应立即引入一套重量级 OCR 栈。Phase 0 应在同一金标准上比较：
@@ -257,6 +284,8 @@ data/filings/business_profile/{exchange}/{symbol}/{report_period}/
 - 运行时间、内存、许可证和部署复杂度。
 
 表格/OCR 组件必须封装为 adapter，不能让业务解析器直接依赖具体库。OCR 运行在独立 worker，不进入 API 进程。
+
+完整 failure taxonomy 尚未完成。`glyph_decoding / table_parse_failure / unsupported_template / not_disclosed` 必须分别由页文本、表格和字段解析层补齐，不能把当前原生文本为空直接解释为公司未披露。
 
 ### 6.3 大模型边界
 

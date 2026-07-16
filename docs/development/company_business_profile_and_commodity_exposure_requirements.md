@@ -493,5 +493,7 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 降级公告扫描不得推进水位；语料审计只统计 `business_profile_source_file_manifest.v1`，并将全文与其修订稿归入统一 annual/semiannual document family。
 - 已实现按申万历史归属和股票上市生命周期导出首批行业 universe 的只读审计工具。2026-07-16 当前在市样本为 791 家，现有正式业务画像全文归档覆盖仍为 0。
 - 已建立包含文档、页/表证据、产品、商品、单位、业务 regime、画像事件和审核决定的金标准 JSON Schema。
+- 已实现 `pypdf` 页级派生 artifact：验证 PDF/加密/页树，逐页保存原生文本、尺寸、文本密度、文本哈希和 artifact 哈希，生成主营、分部、产销、成本、资源、项目及套保标题索引。压缩文件按原件内容哈希、parameter hash 和 extractor version 写入 `derived/`，同内容、同参数换目录或 manifest ID 不改变 artifact hash。
+- 低文本页不会一律触发 OCR；只有命中业务标题或由上游显式标为目标页时才进入 `ocr_required_pages`。`tables/` 与 `ocr/` 版本目录合同已固定，但表格解析器、OCR worker 及 `not_disclosed` 字段语义仍未实现。
 
-下一批进入每行业 5 家 parser benchmark、交易所备源、CNInfo 受控 live 归档及 page artifact，不提前进行全市场画像事实写入。
+下一批使用页级诊断选择每行业 5 家 parser benchmark，并继续交易所备源和 CNInfo 受控 live 归档，不提前进行全市场画像事实写入。
