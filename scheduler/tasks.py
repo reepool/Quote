@@ -250,7 +250,8 @@ def _format_a_share_corporate_action_validation_report(
             for key in (
                 'instrument_source_paths_compared', 'latest_acceptable',
                 'latest_warning', 'latest_conflict',
-                'historical_conflict_anchors', 'latest_error_p95_pct',
+                'historical_conflict_anchors', 'reference_paths_unavailable',
+                'latest_error_p95_pct',
                 'latest_error_max_pct',
             )
         )
@@ -280,6 +281,9 @@ def _format_a_share_corporate_action_validation_report(
         samples.extend((result.get('event_validation') or {}).get(key) or [])
     samples.extend(
         (result.get('cumulative_validation') or {}).get('anchor_conflict_samples') or []
+    )
+    samples.extend(
+        (result.get('cumulative_validation') or {}).get('unavailable_samples') or []
     )
     if samples:
         lines.extend(["", "样本:"])

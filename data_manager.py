@@ -16331,6 +16331,7 @@ class DataManager:
             f"{year}{suffix}"
             for year in range(max(1990, start_date.year - 1), end_date.year + 1)
             for suffix in ("0630", "1231")
+            if date(year, int(suffix[:2]), int(suffix[2:])) <= end_date
         ]
 
     async def _fetch_eastmoney_corporate_action_rows(

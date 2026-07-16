@@ -26,6 +26,17 @@ def test_scheduler_config_registers_validation_as_manual_only():
     assert "cron" not in job
 
 
+def test_eastmoney_report_periods_exclude_future_period_end_dates():
+    periods = DataManager._corporate_action_report_periods(
+        date(2020, 1, 1),
+        date(2026, 7, 15),
+    )
+
+    assert "20191231" in periods
+    assert "20260630" in periods
+    assert "20261231" not in periods
+
+
 class _ValidationDbOps:
     async def get_research_target_instruments_by_exchange(
         self,
@@ -138,7 +149,14 @@ async def test_scheduler_manual_validation_passes_normalized_parameters(monkeypa
         "source_coverage": {},
         "event_validation": {"totals": {}},
         "official_validation": {"totals": {}},
-        "cumulative_validation": {"totals": {}},
+        "cumulative_validation": {
+            "totals": {"reference_paths_unavailable": 1},
+            "unavailable_samples": [{
+                "instrument_id": "600000.SH",
+                "source": "akshare",
+                "reason": "reference_factor_path_unavailable",
+            }],
+        },
         "reasons": ["event_field_evidence_unresolved"],
     })
     monkeypatch.setattr(
@@ -160,6 +178,7 @@ async def test_scheduler_manual_validation_passes_normalized_parameters(monkeypa
     assert validation_mock.await_args.kwargs["exchanges"] == ["SSE"]
     assert validation_mock.await_args.kwargs["instrument_ids"] == ["600000.SH"]
     assert validation_mock.await_args.kwargs["scan_official_announcements"] is False
-    assert "event_field_evidence_unresolved" in (
-        _format_a_share_corporate_action_validation_report(result)
-    )
+    report = _format_a_share_corporate_action_validation_report(result)
+    assert "event_field_evidence_unresolved" in report
+    assert "reference_paths_unavailable=1" in report
+    assert "reference_factor_path_unavailable" in report
