@@ -7,6 +7,24 @@
     "data_dir": "data",
     "batch_size": 50,
     "download_chunk_days": 0,
+    "adjustment_factor_governance": {
+      "read_dataset": "legacy",
+      "canonical_series_version": "a_share_event_product_v1",
+      "allow_legacy_fallback": true,
+      "write_source_observations": true,
+      "rebase_legacy_appends": true,
+      "normalization_version": "event_ratio_v1",
+      "source_priority": ["akshare", "tdx_xdxr", "baostock"],
+      "quality_thresholds": {
+        "min_instrument_coverage_ratio": 0.99,
+        "max_conflict_ratio": 0.001,
+        "max_tdx_factor_error_pct": 0.5,
+        "max_tdx_discrepancy_ratio": 0.02,
+        "max_tdx_adjusted_price_error_pct": 0.5,
+        "acceptable_cumulative_error_pct": 0.1,
+        "warning_cumulative_error_pct": 0.5
+      }
+    },
     "max_concurrent_downloads": 1,
     "retry_times": 3,
     "retry_interval_seconds": 5,

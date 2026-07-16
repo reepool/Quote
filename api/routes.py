@@ -3198,6 +3198,106 @@ async def get_xdxr_audit_events(
 
 
 @router.get(
+    "/corporate-actions/adjustment-factor-observations",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_adjustment_factor_observations(
+    instrument_id: Optional[str] = Query(None),
+    source: Optional[str] = Query(None),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query source-isolated adjustment-factor observations."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    page = await data_manager.db_ops.get_adjustment_factor_observations(
+        instrument_id=normalized_id,
+        source=_normalize_optional_query(source),
+        start_date=_normalize_optional_query(start_date),
+        end_date=_normalize_optional_query(end_date),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="adjustment_factor_observations",
+        filters={
+            "instrument_id": normalized_id,
+            "source": _normalize_optional_query(source),
+            "start_date": str(_normalize_optional_query(start_date) or "") or None,
+            "end_date": str(_normalize_optional_query(end_date) or "") or None,
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/adjustment-factor-canonical",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_canonical_adjustment_factors(
+    instrument_id: Optional[str] = Query(None),
+    series_version: str = Query("a_share_event_product_v1"),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query versioned canonical adjustment-factor rows."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    version = str(_query_default(series_version, "a_share_event_product_v1"))
+    page = await data_manager.db_ops.get_canonical_adjustment_factor_page(
+        series_version=version,
+        instrument_id=normalized_id,
+        start_date=_normalize_optional_query(start_date),
+        end_date=_normalize_optional_query(end_date),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="adjustment_factors_canonical",
+        filters={
+            "instrument_id": normalized_id,
+            "series_version": version,
+            "start_date": str(_normalize_optional_query(start_date) or "") or None,
+            "end_date": str(_normalize_optional_query(end_date) or "") or None,
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/adjustment-factor-quality",
+    response_model=AdjustmentFactorQualityResponse,
+    tags=["Corporate Actions"],
+)
+async def get_adjustment_factor_quality(
+    series_version: str = Query("a_share_event_product_v1"),
+):
+    """Query canonical series quality and promotion eligibility."""
+    version = str(_query_default(series_version, "a_share_event_product_v1"))
+    report = await data_manager.db_ops.get_adjustment_factor_series_status(version)
+    if report is None:
+        raise HTTPException(status_code=404, detail="factor series status not found")
+    return AdjustmentFactorQualityResponse(
+        series_version=version,
+        status=str(report.get("status") or "unknown"),
+        promotion_eligible=bool(report.get("promotion_eligible")),
+        report=report,
+    )
+
+
+@router.get(
     "/quotes/daily",
     tags=["Quotes"],
     responses={
@@ -3299,9 +3399,47 @@ async def get_daily_quotes(
             and instrument_type.lower() == 'stock'
         )
 
+        factor_metadata = {
+            "requested_dataset": "none",
+            "actual_dataset": "none",
+            "series_version": None,
+            "fallback_used": False,
+            "availability_error": None,
+            "coverage_status": None,
+        }
         if needs_adjust:
             # 从缓存或 DB 加载复权因子
-            factors = await data_manager.get_cached_adjustment_factors(actual_instrument_id)
+            if hasattr(data_manager, "get_cached_adjustment_factor_bundle"):
+                factor_bundle = await data_manager.get_cached_adjustment_factor_bundle(
+                    actual_instrument_id
+                )
+            else:
+                factor_bundle = {
+                    "factors": await data_manager.get_cached_adjustment_factors(
+                        actual_instrument_id
+                    ),
+                    "requested_dataset": "legacy",
+                    "actual_dataset": "legacy",
+                    "series_version": None,
+                    "fallback_used": False,
+                    "availability_error": None,
+                }
+            factors = factor_bundle["factors"]
+            factor_metadata = {
+                key: factor_bundle.get(key)
+                for key in (
+                    "requested_dataset", "actual_dataset", "series_version",
+                    "fallback_used", "availability_error",
+                )
+            }
+            factor_metadata["coverage_status"] = (
+                (factor_bundle.get("instrument_status") or {}).get("coverage_status")
+            )
+            if factor_metadata.get("availability_error"):
+                raise HTTPException(
+                    status_code=409,
+                    detail=factor_metadata["availability_error"],
+                )
 
             if factors:
                 from utils.adjustment import AdjustmentEngine
@@ -3448,7 +3586,8 @@ async def get_daily_quotes(
                 "quality_summary": quality_summary,
                 "pagination": pagination_meta,
                 "include_delisted": include_delisted,
-                "instrument_delisted": instrument_delisted
+                "instrument_delisted": instrument_delisted,
+                "factor_metadata": factor_metadata,
             }
             return JSONResponse(content=_serialize_value(response_payload))
 
@@ -3473,7 +3612,8 @@ async def get_daily_quotes(
                 "quality_summary": quality_summary,
                 "pagination": pagination_meta,
                 "include_delisted": include_delisted,
-                "instrument_delisted": instrument_delisted
+                "instrument_delisted": instrument_delisted,
+                "factor_metadata": factor_metadata,
             }
             return JSONResponse(content=_serialize_value(response_payload))
 

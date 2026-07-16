@@ -159,7 +159,7 @@ class DataManager:
         self.fx_storage = None
         self.special_commodity_storage = None
 
-        # 复权因子内存缓存: {instrument_id: (timestamp, factors)}
+        # 复权因子内存缓存: {dataset/version/instrument: (timestamp, bundle)}
         # TTL = 1 小时, 适用于 API 高频查询场景
         self._factor_cache: Dict[str, tuple] = {}
         self._FACTOR_CACHE_TTL: float = 3600.0  # 秒
@@ -195,18 +195,93 @@ class DataManager:
         Returns:
             复权因子列表, 按 ex_date 升序
         """
-        import time
-        now = time.monotonic()
-        cached = self._factor_cache.get(instrument_id)
-        if cached is not None:
-            ts, factors = cached
-            if (now - ts) < self._FACTOR_CACHE_TTL:
-                return factors
+        bundle = await self.get_cached_adjustment_factor_bundle(instrument_id)
+        return bundle["factors"]
 
-        # 缓存未命中或已过期 → 从 DB 加载
-        factors = await self.db_ops.get_adjustment_factors(instrument_id)
-        self._factor_cache[instrument_id] = (now, factors)
-        return factors
+    async def get_cached_adjustment_factor_bundle(
+        self, instrument_id: str
+    ) -> Dict[str, Any]:
+        """Return factors plus the configured dataset/version provenance."""
+        import time
+
+        governance = self.data_config.get("adjustment_factor_governance", {})
+        requested_dataset = str(governance.get("read_dataset", "legacy")).lower()
+        series_version = str(
+            governance.get("canonical_series_version", "a_share_event_product_v1")
+        ).strip()
+        if not series_version or len(series_version) > 64:
+            raise ValueError("canonical_series_version must contain 1 to 64 characters")
+        allow_legacy_fallback = bool(governance.get("allow_legacy_fallback", True))
+        cache_key = (
+            f"{requested_dataset}:{series_version}:{int(allow_legacy_fallback)}:"
+            f"{instrument_id}"
+        )
+        now = time.monotonic()
+        cached = self._factor_cache.get(cache_key)
+        if cached is not None:
+            ts, bundle = cached
+            if (now - ts) < self._FACTOR_CACHE_TTL:
+                return bundle
+
+        actual_dataset = requested_dataset
+        fallback_used = False
+        availability_error = None
+        factors: List[Dict[str, Any]] = []
+        series_status = None
+        instrument_status = None
+        if requested_dataset == "canonical":
+            series_status = await self.db_ops.get_adjustment_factor_series_status(
+                series_version
+            )
+            if series_status and series_status.get("promotion_eligible"):
+                instrument_status = (
+                    await self.db_ops.get_adjustment_factor_instrument_status(
+                        instrument_id, series_version
+                    )
+                )
+                coverage_status = (
+                    instrument_status.get("coverage_status")
+                    if instrument_status else None
+                )
+                if coverage_status == "complete_with_events":
+                    factors = await self.db_ops.get_canonical_adjustment_factors(
+                        instrument_id, series_version
+                    )
+                    if not factors:
+                        availability_error = (
+                            "canonical coverage says events exist but no factor rows were found"
+                        )
+                elif coverage_status == "complete_no_events":
+                    factors = []
+                else:
+                    availability_error = (
+                        f"canonical factor coverage is unavailable for {instrument_id}"
+                    )
+            else:
+                availability_error = (
+                    f"canonical factor series {series_version} is not promotion eligible"
+                )
+            if availability_error and allow_legacy_fallback:
+                factors = await self.db_ops.get_adjustment_factors(instrument_id)
+                actual_dataset = "legacy"
+                fallback_used = True
+                availability_error = None
+        else:
+            factors = await self.db_ops.get_adjustment_factors(instrument_id)
+            actual_dataset = "legacy"
+
+        bundle = {
+            "factors": factors,
+            "requested_dataset": requested_dataset,
+            "actual_dataset": actual_dataset,
+            "series_version": series_version if actual_dataset == "canonical" else None,
+            "fallback_used": fallback_used,
+            "availability_error": availability_error,
+            "series_status": series_status,
+            "instrument_status": instrument_status,
+        }
+        self._factor_cache[cache_key] = (now, bundle)
+        return bundle
 
     def invalidate_factor_cache(self, instrument_id: Optional[str] = None) -> None:
         """清除复权因子缓存
@@ -215,13 +290,76 @@ class DataManager:
             instrument_id: 若指定则清除单个品种缓存, 否则清除全部缓存
         """
         if instrument_id:
-            self._factor_cache.pop(instrument_id, None)
+            suffix = f":{instrument_id}"
+            for key in [key for key in self._factor_cache if key.endswith(suffix)]:
+                self._factor_cache.pop(key, None)
         else:
             self._factor_cache.clear()
         dm_logger.debug(
             "[DataManager] Factor cache cleared for %s",
             instrument_id or "ALL"
         )
+
+    async def _persist_adjustment_factor_batch(
+        self,
+        exchange: str,
+        factors: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Persist factor evidence and contain cumulative source-basis changes."""
+        if not factors:
+            return {"saved": 0, "observation_stats": {}, "rebase_stats": {}}
+
+        is_a_share = str(exchange).upper() in {"SSE", "SZSE", "BSE"}
+        governance = self.data_config.get("adjustment_factor_governance", {})
+        if not is_a_share:
+            saved = await self.db_ops.save_adjustment_factors(factors)
+            return {"saved": saved, "observation_stats": {}, "rebase_stats": {}}
+
+        from data_sources.adjustment_factor_governance import normalize_source_path
+
+        observations = normalize_source_path(
+            factors,
+            normalization_version=str(
+                governance.get("normalization_version", "event_ratio_v1")
+            ),
+        )
+        if not observations:
+            raise RuntimeError("A-share factor rows produced no valid source observations")
+        observation_stats: Dict[str, int] = {}
+        if governance.get("write_source_observations", True):
+            observation_stats = await self.db_ops.save_adjustment_factor_observations(
+                observations,
+                ingestion_run_id=ingestion_run_id,
+            )
+            processed_observations = sum(
+                int(observation_stats.get(key, 0))
+                for key in ("inserted", "changed", "unchanged")
+            )
+            if (
+                int(observation_stats.get("failed", 0)) > 0
+                or processed_observations != len(observations)
+            ):
+                raise RuntimeError(
+                    "source observation persistence incomplete: "
+                    f"expected={len(observations)} stats={observation_stats}"
+                )
+
+        legacy_rows = factors
+        rebase_stats: Dict[str, int] = {}
+        if governance.get("rebase_legacy_appends", True):
+            legacy_rows, rebase_stats = await self.db_ops.prepare_legacy_factor_appends(
+                observations
+            )
+        saved = await self.db_ops.save_adjustment_factors(legacy_rows) if legacy_rows else 0
+        for instrument_id in {str(item.get("instrument_id")) for item in factors}:
+            self.invalidate_factor_cache(instrument_id)
+        return {
+            "saved": saved,
+            "observation_stats": observation_stats,
+            "rebase_stats": rebase_stats,
+        }
 
 
 
@@ -11424,7 +11562,9 @@ class DataManager:
                                 end_date,
                             )
                             if factors:
-                                await self.db_ops.save_adjustment_factors(factors)
+                                await self._persist_adjustment_factor_batch(
+                                    gap.exchange, factors
+                                )
                         except Exception as factor_e:
                             dm_logger.debug(
                                 "[DataManager] Factor sync skipped during gap fill for %s: %s",
@@ -15742,7 +15882,7 @@ class DataManager:
                     datetime.combine(stock['end_date'], datetime.max.time()),
                 )
                 if factors:
-                    await self.db_ops.save_adjustment_factors(factors)
+                    await self._persist_adjustment_factor_batch(exchange, factors)
                     result['synced'] += 1
                 else:
                     result['skipped'] += 1
@@ -16080,6 +16220,519 @@ class DataManager:
         dm_logger.info("[DataManager] Weekly full factor sync completed: %s", overall_result)
         return overall_result
 
+    async def rebuild_a_share_adjustment_factor_governance(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        source: str = "akshare",
+        dry_run: bool = True,
+        resume: bool = True,
+        chunk_size: int = 100,
+        request_interval_seconds: float = 1.0,
+        checkpoint_id: Optional[str] = None,
+        build_canonical: bool = True,
+    ) -> Dict[str, Any]:
+        """Backfill isolated observations and build a gated canonical series."""
+        from utils.a_share_historical_backfill import (
+            AShareBackfillCheckpointStore,
+            coerce_date,
+            normalize_string_list,
+        )
+        from data_sources.adjustment_factor_governance import (
+            build_canonical_series,
+            compare_normalized_cumulative_paths,
+            normalize_source_path,
+            reconcile_factor_events,
+            source_transition_metrics,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        normalized_exchanges = [
+            item.upper() for item in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE", "BSE"]
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE", "BSE"})
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        normalized_ids = set(normalize_string_list(instrument_ids))
+        normalized_source = str(source or "akshare").strip().lower()
+        if normalized_source not in {"akshare", "baostock"}:
+            raise ValueError("source must be akshare or baostock")
+        chunk_size = max(1, min(int(chunk_size), 1000))
+        request_interval_seconds = max(0.0, float(request_interval_seconds))
+
+        universe: List[Dict[str, Any]] = []
+        for exchange in normalized_exchanges:
+            instruments = await self.db_ops.get_instruments_list(
+                exchange=exchange, type="stock", is_active=None
+            )
+            for instrument in instruments:
+                instrument_id = str(instrument.get("instrument_id") or "")
+                if normalized_ids and instrument_id not in normalized_ids:
+                    continue
+                universe.append({
+                    "instrument_id": instrument_id,
+                    "symbol": str(instrument.get("symbol") or ""),
+                    "exchange": exchange,
+                })
+        universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
+        universe_ids = {item["instrument_id"] for item in universe}
+        missing_requested_ids = sorted(normalized_ids - universe_ids)
+        if missing_requested_ids:
+            raise ValueError(
+                "requested instruments are absent from the selected historical universe: "
+                f"{missing_requested_ids[:20]}"
+            )
+        if not universe:
+            raise ValueError("A-share historical factor universe is empty")
+
+        governance = self.data_config.get("adjustment_factor_governance", {})
+        target_series_version = str(
+            governance.get("canonical_series_version", "a_share_event_product_v1")
+        ).strip()
+        if not target_series_version or len(target_series_version) > 64:
+            raise ValueError("canonical_series_version must contain 1 to 64 characters")
+        source_priority = list(
+            governance.get("source_priority") or ["akshare", "tdx_xdxr", "baostock"]
+        )
+        parameters = {
+            "start_date": normalized_start,
+            "end_date": normalized_end,
+            "exchanges": normalized_exchanges,
+            "instrument_ids": sorted(normalized_ids),
+            "source": normalized_source,
+            "dry_run": bool(dry_run),
+            "resume": bool(resume),
+            "chunk_size": chunk_size,
+            "request_interval_seconds": request_interval_seconds,
+            "build_canonical": bool(build_canonical),
+            "series_version": target_series_version,
+        }
+        identity = hashlib.sha256(json.dumps(
+            {
+                key: value.isoformat() if isinstance(value, date) else value
+                for key, value in parameters.items() if key not in {"resume", "dry_run"}
+            },
+            sort_keys=True,
+        ).encode("utf-8")).hexdigest()[:16]
+        checkpoint_store = AShareBackfillCheckpointStore(
+            self.data_config.get("data_dir", "data")
+        )
+        resolved_checkpoint_id = checkpoint_id or f"a_share_factor_{identity}"
+        staging_suffix = f"__staging__{identity}"
+        staging_series_version = (
+            f"{target_series_version[:64 - len(staging_suffix)]}{staging_suffix}"
+        )
+        target_ids = [item["instrument_id"] for item in universe]
+        existing_observations = await self.db_ops.list_adjustment_factor_observations(
+            instrument_ids=target_ids,
+            sources=[normalized_source],
+            start_date=normalized_start,
+            end_date=normalized_end,
+        )
+        existing_observation_instruments = {
+            row["instrument_id"] for row in existing_observations
+        }
+        checkpoint_parameters = {
+            key: value for key, value in parameters.items() if key != "dry_run"
+        }
+        checkpoint = None
+        stage: Dict[str, Any] = {
+            "completed_instruments": [], "empty_instruments": [], "errors": []
+        }
+        completed: set[str] = set()
+        if not dry_run:
+            checkpoint = (
+                checkpoint_store.load(resolved_checkpoint_id, checkpoint_parameters)
+                if resume else None
+            )
+            if checkpoint is None:
+                checkpoint = checkpoint_store.initialize(
+                    resolved_checkpoint_id, checkpoint_parameters, universe
+                )
+            stage = checkpoint.setdefault("stages", {}).setdefault(
+                "factor_governance",
+                {"completed_instruments": [], "empty_instruments": [], "errors": []},
+            )
+            completed = set(stage.get("completed_instruments") or []) if resume else set()
+            stage["errors"] = [
+                error for error in (stage.get("errors") or [])
+                if error.get("instrument_id") not in completed
+            ]
+        pending = [item for item in universe if item["instrument_id"] not in completed]
+
+        result: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "running",
+            "dry_run": bool(dry_run),
+            "checkpoint_id": resolved_checkpoint_id,
+            "parameters": {
+                **parameters,
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+            },
+            "universe": {
+                "instrument_count": len(universe),
+                "completed_count": len(completed),
+                "pending_count": len(pending),
+            },
+            "observations": {
+                "existing_rows": len(existing_observations),
+                "existing_instruments": len({
+                    row["instrument_id"] for row in existing_observations
+                }),
+            },
+            "canonical": {},
+            "target_series_version": target_series_version,
+            "staging_series_version": staging_series_version,
+        }
+        if dry_run:
+            return result
+
+        source_instance = self.source_factory._find_source_by_base_name(normalized_source)
+        if source_instance is None:
+            result.update({
+                "status": "failed",
+                "errors": [f"source unavailable: {normalized_source}"],
+            })
+            return result
+
+        counters = {
+            "requested_instruments": 0,
+            "completed_instruments": len(completed),
+            "empty_instruments": len(set(stage.get("empty_instruments") or [])),
+            "observation_inserted": 0,
+            "observation_changed": 0,
+            "observation_unchanged": 0,
+            "errors": 0,
+        }
+        for index, item in enumerate(pending, start=1):
+            instrument_id = item["instrument_id"]
+            stage["errors"] = [
+                error for error in (stage.get("errors") or [])
+                if error.get("instrument_id") != instrument_id
+            ]
+            try:
+                counters["requested_instruments"] += 1
+                factors = await source_instance.get_adjustment_factors(
+                    instrument_id,
+                    item["symbol"],
+                    datetime.combine(normalized_start, datetime.min.time()),
+                    datetime.combine(normalized_end, datetime.max.time()),
+                )
+                if factors is None:
+                    raise RuntimeError("source returned indeterminate factor response")
+                observations = normalize_source_path(
+                    factors,
+                    normalization_version=str(
+                        governance.get("normalization_version", "event_ratio_v1")
+                    ),
+                )
+                observed_sources = {
+                    str(row.get("source") or "").lower() for row in observations
+                }
+                if observed_sources - {normalized_source}:
+                    raise RuntimeError(
+                        "source identity mismatch: "
+                        f"expected {normalized_source}, got {sorted(observed_sources)}"
+                    )
+                if (
+                    not observations
+                    and instrument_id in existing_observation_instruments
+                ):
+                    raise RuntimeError(
+                        "source returned empty history despite existing observations"
+                    )
+                write_stats = await self.db_ops.save_adjustment_factor_observations(
+                    observations,
+                    ingestion_run_id=resolved_checkpoint_id,
+                )
+                processed_observations = sum(
+                    int(write_stats.get(key, 0))
+                    for key in ("inserted", "changed", "unchanged")
+                )
+                if (
+                    int(write_stats.get("failed", 0)) > 0
+                    or processed_observations != len(observations)
+                ):
+                    raise RuntimeError(
+                        "source observation persistence incomplete: "
+                        f"expected={len(observations)} stats={write_stats}"
+                    )
+                for key in ("inserted", "changed", "unchanged"):
+                    counters[f"observation_{key}"] += int(write_stats.get(key, 0))
+                if not observations:
+                    empty_instruments = set(stage.get("empty_instruments") or [])
+                    empty_instruments.add(instrument_id)
+                    stage["empty_instruments"] = sorted(empty_instruments)
+                else:
+                    stage["empty_instruments"] = sorted(
+                        set(stage.get("empty_instruments") or []) - {instrument_id}
+                    )
+                stage["completed_instruments"] = sorted(
+                    set(stage.get("completed_instruments") or []) | {instrument_id}
+                )
+                completed.add(instrument_id)
+                counters["completed_instruments"] += 1
+            except Exception as exc:
+                stage.setdefault("errors", []).append({
+                    "instrument_id": instrument_id,
+                    "reason": str(exc),
+                })
+            counters["empty_instruments"] = len(stage.get("empty_instruments") or [])
+            counters["errors"] = len(stage.get("errors") or [])
+            assert checkpoint is not None
+            checkpoint_store.save(checkpoint)
+            if index % chunk_size == 0:
+                dm_logger.info(
+                    "[DataManager] A-share factor rebuild progress: %d/%d completed=%d errors=%d",
+                    index, len(pending), counters["completed_instruments"], counters["errors"],
+                )
+            if request_interval_seconds:
+                await asyncio.sleep(request_interval_seconds)
+
+        observation_rows = await self.db_ops.list_adjustment_factor_observations(
+            instrument_ids=target_ids,
+            sources=[normalized_source],
+            start_date=normalized_start,
+            end_date=normalized_end,
+        )
+        canonical_rows, canonical_summary = build_canonical_series(
+            observation_rows,
+            series_version=staging_series_version,
+            source_priority=source_priority,
+            target_instruments=target_ids,
+            completed_sources={normalized_source: sorted(completed)},
+        )
+
+        legacy_rows: List[Dict[str, Any]] = []
+        tdx_rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(target_ids), 500):
+            chunk = target_ids[offset: offset + 500]
+            placeholders = ", ".join(f":id_{index}" for index in range(len(chunk)))
+            query_parameters: Dict[str, Any] = {
+                f"id_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            query_parameters.update({
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+            })
+            legacy_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date,
+                       factor, cumulative_factor, source
+                FROM adjustment_factors
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                ORDER BY instrument_id, ex_date
+                """,
+                query_parameters,
+            ))
+            tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date,
+                       factor, cumulative_factor, validation_result
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                  AND factor IS NOT NULL
+                  AND factor > 0
+                  AND COALESCE(validation_result, '') NOT LIKE 'pending_%'
+                ORDER BY instrument_id, ex_date
+                """,
+                query_parameters,
+            ))
+
+        sessions_by_exchange: Dict[str, List[date]] = {}
+        for exchange in normalized_exchanges:
+            calendar_rows = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                normalized_start - timedelta(days=14),
+                normalized_end + timedelta(days=14),
+            )
+            sessions_by_exchange[exchange] = [
+                parsed_date
+                for row in calendar_rows
+                if row.get("is_trading_day")
+                if (parsed_date := self._date_from_any(row.get("date"))) is not None
+            ]
+
+        event_reconciliation = reconcile_factor_events(
+            canonical_rows,
+            tdx_rows,
+            sessions_by_exchange=sessions_by_exchange,
+            factor_tolerance_pct=float(
+                governance.get("quality_thresholds", {}).get(
+                    "max_tdx_factor_error_pct", 0.5
+                )
+            ),
+        )
+        tdx_path_comparison = compare_normalized_cumulative_paths(
+            canonical_rows, tdx_rows
+        )
+        legacy_path_comparison = compare_normalized_cumulative_paths(
+            canonical_rows, legacy_rows
+        )
+        legacy_transition_metrics = source_transition_metrics(legacy_rows)
+
+        coverage_ratio = len(completed) / len(universe) if universe else 1.0
+        thresholds = governance.get("quality_thresholds", {})
+        conflict_ratio = (
+            canonical_summary["conflict_count"] / canonical_summary["row_count"]
+            if canonical_summary["row_count"] else 0.0
+        )
+        full_market_parameters = (
+            not normalized_ids
+            and set(normalized_exchanges) == {"SSE", "SZSE", "BSE"}
+            and normalized_start <= date(1990, 12, 19)
+        )
+        latest_trading_dates: Dict[str, Optional[date]] = {}
+        if full_market_parameters:
+            for exchange in normalized_exchanges:
+                latest_trading_dates[exchange] = self._date_from_any(
+                    await self.db_ops.get_previous_trading_day(
+                        exchange, date.today() + timedelta(days=1)
+                    )
+                )
+        full_market_scope = (
+            full_market_parameters
+            and all(latest_trading_dates.values())
+            and normalized_end >= max(
+                trading_date
+                for trading_date in latest_trading_dates.values()
+                if trading_date is not None
+            )
+        )
+        tdx_discrepancy_ratio = event_reconciliation.get("discrepancy_ratio")
+        tdx_adjusted_error = tdx_path_comparison.get(
+            "max_adjusted_price_error_pct"
+        )
+        quality_gates = {
+            "full_market_scope": full_market_scope,
+            "coverage": coverage_ratio >= float(
+                thresholds.get("min_instrument_coverage_ratio", 0.99)
+            ),
+            "source_internal_consistency": conflict_ratio <= float(
+                thresholds.get("max_conflict_ratio", 0.001)
+            ),
+            "tdx_event_reconciliation": (
+                tdx_discrepancy_ratio is not None
+                and tdx_discrepancy_ratio <= float(
+                    thresholds.get("max_tdx_discrepancy_ratio", 0.02)
+                )
+            ),
+            "tdx_adjusted_price_equivalence": (
+                tdx_adjusted_error is not None
+                and tdx_adjusted_error <= float(
+                    thresholds.get(
+                        "max_tdx_adjusted_price_error_pct",
+                        thresholds.get("warning_cumulative_error_pct", 0.5),
+                    )
+                )
+            ),
+            "no_download_errors": counters["errors"] == 0,
+        }
+        promotion_eligible = all(quality_gates.values())
+        combined_samples = [
+            *(canonical_summary.get("samples") or []),
+            *(event_reconciliation.get("samples") or []),
+            *(
+                tdx_path_comparison.get("samples") or []
+            ),
+            *(
+                legacy_path_comparison.get("samples") or []
+            ),
+        ][:20]
+        canonical_summary.update({
+            "status": "success" if promotion_eligible else "partial",
+            "source_priority": source_priority,
+            "start_date": normalized_start.isoformat(),
+            "end_date": normalized_end.isoformat(),
+            "coverage_ratio": coverage_ratio,
+            "conflict_ratio": conflict_ratio,
+            "event_reconciliation": event_reconciliation,
+            "tdx_adjusted_price_comparison": tdx_path_comparison,
+            "legacy_adjusted_price_comparison": legacy_path_comparison,
+            "legacy_source_transition_metrics": legacy_transition_metrics,
+            "max_cumulative_error_pct": tdx_adjusted_error,
+            "quality_gates": quality_gates,
+            "latest_trading_dates": {
+                exchange: trading_date.isoformat() if trading_date else None
+                for exchange, trading_date in latest_trading_dates.items()
+            },
+            "samples": combined_samples,
+            "promotion_eligible": promotion_eligible,
+            "target_series_version": target_series_version,
+            "staging_series_version": staging_series_version,
+        })
+        if build_canonical:
+            event_counts: Dict[str, int] = {}
+            for row in canonical_rows:
+                instrument_id = str(row.get("instrument_id") or "")
+                event_counts[instrument_id] = event_counts.get(instrument_id, 0) + 1
+            instrument_status_rows = [{
+                "instrument_id": item["instrument_id"],
+                "source": normalized_source,
+                "coverage_status": (
+                    "complete_with_events"
+                    if item["instrument_id"] in completed
+                    and event_counts.get(item["instrument_id"], 0) > 0
+                    else "complete_no_events"
+                    if item["instrument_id"] in completed
+                    else "incomplete"
+                ),
+                "event_count": event_counts.get(item["instrument_id"], 0),
+                "start_date": normalized_start,
+                "end_date": normalized_end,
+                "ingestion_run_id": resolved_checkpoint_id,
+            } for item in universe]
+            canonical_summary["saved_rows"] = await self.db_ops.replace_canonical_adjustment_factors(
+                canonical_rows,
+                series_version=staging_series_version,
+                instrument_ids=target_ids,
+            )
+            canonical_summary["saved_instrument_statuses"] = (
+                await self.db_ops.replace_adjustment_factor_instrument_statuses(
+                    instrument_status_rows,
+                    series_version=staging_series_version,
+                    instrument_ids=target_ids,
+                )
+            )
+            staging_report = {
+                **canonical_summary,
+                "status": "validated_staging" if promotion_eligible else "partial",
+                "candidate_promotion_eligible": promotion_eligible,
+                "promotion_eligible": False,
+            }
+            await self.db_ops.upsert_adjustment_factor_series_status(
+                staging_series_version, staging_report
+            )
+            canonical_summary["status_persisted"] = True
+            canonical_summary["promoted"] = False
+            if promotion_eligible:
+                canonical_summary["promotion_result"] = (
+                    await self.db_ops.promote_canonical_adjustment_factor_series(
+                        staging_series_version=staging_series_version,
+                        target_series_version=target_series_version,
+                        report=canonical_summary,
+                    )
+                )
+                canonical_summary["promoted"] = True
+        result["observations"] = counters
+        result["canonical"] = canonical_summary
+        result["status"] = "success" if promotion_eligible else "partial"
+        result["universe"]["completed_count"] = len(completed)
+        result["universe"]["pending_count"] = len(universe) - len(completed)
+        assert checkpoint is not None
+        checkpoint_store.save(checkpoint)
+        self.invalidate_factor_cache()
+        return result
+
     async def backfill_adjustment_factors(
         self,
         exchanges: Optional[List[str]] = None,
@@ -16193,7 +16846,10 @@ class DataManager:
                     )
 
                     if factors:
-                        saved_count = await self.db_ops.save_adjustment_factors(factors)
+                        persist_result = await self._persist_adjustment_factor_batch(
+                            exchange, factors
+                        )
+                        saved_count = int(persist_result.get('saved', 0))
                         source_name = str(factors[0].get('source', 'unknown')).lower()
                         exchange_stats['synced_instruments'] += 1
                         exchange_stats['saved_records'] += saved_count

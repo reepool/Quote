@@ -1202,6 +1202,7 @@ class AkShareSource(BaseDataSource):
                     'factor': day_factor,
                     'cumulative_factor': round(cum_val, 6),
                     'source': source,
+                    'source_profile': 'sina_hfq_factor' if source == 'akshare' else source,
                 })
 
             prev_cum = cum_val

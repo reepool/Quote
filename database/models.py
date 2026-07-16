@@ -289,6 +289,108 @@ class AdjustmentFactorDB(Base):
     )
 
 
+class AdjustmentFactorObservationDB(Base):
+    """Source-isolated adjustment-factor observation."""
+    __tablename__ = 'adjustment_factor_observations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True)
+    ex_date = Column(DateTime, nullable=False, index=True)
+    source = Column(String(32), nullable=False, index=True)
+    source_profile = Column(String(64), nullable=False, default='default')
+    provider_factor = Column(Float, nullable=True)
+    provider_cumulative_factor = Column(Float, nullable=True)
+    normalized_factor = Column(Float, nullable=True)
+    normalization_version = Column(String(64), nullable=False)
+    quality_status = Column(String(32), nullable=False, default='unvalidated', index=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    raw_payload_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'ex_date', 'source', 'source_profile',
+            name='uq_adj_factor_observation_source_date',
+        ),
+        Index('idx_adj_factor_observation_inst_source_date', 'instrument_id', 'source', 'ex_date'),
+    )
+
+
+class AdjustmentFactorCanonicalDB(Base):
+    """Versioned source-independent adjustment-factor series."""
+    __tablename__ = 'adjustment_factors_canonical'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True)
+    ex_date = Column(DateTime, nullable=False, index=True)
+    series_version = Column(String(64), nullable=False, index=True)
+    factor = Column(Float, nullable=False)
+    cumulative_factor = Column(Float, nullable=False)
+    selected_source = Column(String(32), nullable=False, index=True)
+    source_profile = Column(String(64), nullable=False, default='default')
+    quality_status = Column(String(32), nullable=False, default='unvalidated', index=True)
+    evidence_count = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'ex_date', 'series_version',
+            name='uq_adj_factor_canonical_version_date',
+        ),
+        Index('idx_adj_factor_canonical_inst_version_date', 'instrument_id', 'series_version', 'ex_date'),
+    )
+
+
+class AdjustmentFactorSeriesStatusDB(Base):
+    """Quality and promotion status for one canonical factor series version."""
+    __tablename__ = 'adjustment_factor_series_status'
+
+    series_version = Column(String(64), primary_key=True)
+    status = Column(String(32), nullable=False, default='building', index=True)
+    source_priority_json = Column(Text, nullable=True)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+    instrument_count = Column(Integer, nullable=False, default=0)
+    row_count = Column(Integer, nullable=False, default=0)
+    coverage_ratio = Column(Float, nullable=False, default=0.0)
+    conflict_count = Column(Integer, nullable=False, default=0)
+    max_cumulative_error_pct = Column(Float, nullable=True)
+    promotion_eligible = Column(Boolean, nullable=False, default=False, index=True)
+    report_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
+
+
+class AdjustmentFactorInstrumentStatusDB(Base):
+    """Per-instrument completeness state for one canonical series version."""
+    __tablename__ = 'adjustment_factor_instrument_status'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True)
+    series_version = Column(String(64), nullable=False, index=True)
+    source = Column(String(32), nullable=False)
+    coverage_status = Column(String(32), nullable=False, index=True)
+    event_count = Column(Integer, nullable=False, default=0)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time)
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'series_version',
+            name='uq_adj_factor_instrument_status_version',
+        ),
+        Index(
+            'idx_adj_factor_instrument_status_version_coverage',
+            'series_version', 'coverage_status',
+        ),
+    )
+
+
 class DataChangeLogDB(Base):
     """Append-only local-observed change records for incremental sync."""
     __tablename__ = 'data_change_log'

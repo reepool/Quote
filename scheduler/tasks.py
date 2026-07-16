@@ -300,6 +300,86 @@ def _format_a_share_corporate_action_validation_report(
     return "\n".join(lines)
 
 
+def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
+    """Build a bounded adjustment-factor governance report."""
+    icon, label = _format_scheduler_status(result.get("status"))
+    parameters = result.get("parameters") or {}
+    universe = result.get("universe") or {}
+    observations = result.get("observations") or {}
+    canonical = result.get("canonical") or {}
+    reconciliation = canonical.get("event_reconciliation") or {}
+    tdx_price = canonical.get("tdx_adjusted_price_comparison") or {}
+    legacy_price = canonical.get("legacy_adjusted_price_comparison") or {}
+    gates = canonical.get("quality_gates") or {}
+    lines = [
+        f"{icon} *A 股复权因子重建与治理*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{result.get('status', 'unknown')}`",
+        f"dry_run: `{result.get('dry_run', True)}`",
+        f"checkpoint: `{result.get('checkpoint_id', 'N/A')}`",
+        f"范围: `{parameters.get('start_date', 'N/A')}` 至 `{parameters.get('end_date', 'N/A')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"来源: `{parameters.get('source', 'akshare')}`",
+        f"staging版本: `{result.get('staging_series_version', 'N/A')}`",
+        f"生产版本: `{result.get('target_series_version', 'N/A')}`",
+        "",
+        "处理:",
+        "`"
+        + ", ".join(
+            f"{key}={observations.get(key, 0)}"
+            for key in (
+                "requested_instruments", "completed_instruments", "empty_instruments",
+                "observation_inserted", "observation_changed", "errors",
+            )
+        )
+        + "`",
+        "",
+        "标准序列:",
+        "`"
+        + ", ".join(
+            f"{key}={canonical.get(key, 0)}"
+            for key in (
+                "row_count", "built_instruments", "coverage_ratio",
+                "conflict_count", "conflict_ratio", "saved_rows",
+            )
+        )
+        + "`",
+        "事件核对: `"
+        + ", ".join(
+            f"{key}={reconciliation.get(key, 0)}"
+            for key in (
+                "exact_matches", "shifted_matches", "factor_conflicts",
+                "candidate_only", "tdx_only",
+            )
+        )
+        + "`",
+        "路径误差: `"
+        f"tdx_max={tdx_price.get('max_adjusted_price_error_pct')}, "
+        f"legacy_max={legacy_price.get('max_adjusted_price_error_pct')}`",
+        "质量门禁: `"
+        + ", ".join(f"{key}={value}" for key, value in gates.items())
+        + "`",
+        f"可切换生产: `{canonical.get('promotion_eligible', False)}`",
+        f"已晋级生产: `{canonical.get('promoted', False)}`",
+    ]
+    samples = canonical.get("samples") or []
+    if samples:
+        lines.extend([
+            "",
+            "异常样本:",
+            "```text",
+            *[
+                f"{item.get('instrument_id')} "
+                f"{item.get('ex_date') or item.get('date') or item.get('candidate_ex_date')}: "
+                f"{item.get('reason') or 'adjusted_price_path_difference'}"
+                for item in samples[:10]
+            ],
+            "```",
+        ])
+    return "\n".join(lines)
+
+
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
     """Return a compact operator summary for shared instrument master governance."""
     if not isinstance(governance, dict) or not governance:
@@ -3734,6 +3814,78 @@ class ScheduledTasks:
                         'name': 'A 股历史全量回补',
                         'status': 'failed',
                         'content': _format_a_share_historical_backfill_report(failure),
+                        'result': failure,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_adjustment_factor_rebuild(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        source: str = 'akshare',
+        dry_run: bool = True,
+        resume: bool = True,
+        chunk_size: int = 100,
+        request_interval_seconds: float = 1.0,
+        checkpoint_id: Optional[str] = None,
+        build_canonical: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run the manual checkpointed A-share factor governance workflow."""
+        task_id = 'a_share_adjustment_factor_rebuild'
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.rebuild_a_share_adjustment_factor_governance(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                source=source,
+                dry_run=dry_run,
+                resume=resume,
+                chunk_size=chunk_size,
+                request_interval_seconds=request_interval_seconds,
+                checkpoint_id=checkpoint_id,
+                build_canonical=build_canonical,
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股复权因子重建与治理',
+                        'status': result.get('status'),
+                        'content': _format_a_share_factor_rebuild_report(result),
+                        'result': result,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share factor rebuild failed: %s", exc
+            )
+            failure = {
+                'status': 'failed',
+                'operation': task_id,
+                'dry_run': dry_run,
+                'error': str(exc),
+                'errors': [str(exc)],
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股复权因子重建与治理',
+                        'status': 'failed',
+                        'content': _format_a_share_factor_rebuild_report(failure),
                         'result': failure,
                     },
                     report_type='maintenance_report',

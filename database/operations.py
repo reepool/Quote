@@ -11,7 +11,7 @@ from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
 import pandas as pd
-from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all
+from sqlalchemy import text, func, desc, asc, tuple_, literal, union_all, delete
 from sqlalchemy.orm import sessionmaker
 from utils.date_utils import get_shanghai_time
 from utils import db_logger, config_manager
@@ -23,6 +23,8 @@ from .connection import db_manager
 from .models import (
     InstrumentDB, DailyQuoteDB, TradingCalendarDB, TradingSessionDB,
     DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB,
+    AdjustmentFactorObservationDB, AdjustmentFactorCanonicalDB,
+    AdjustmentFactorSeriesStatusDB, AdjustmentFactorInstrumentStatusDB,
     DataChangeLogDB,
 )
 
@@ -3532,6 +3534,513 @@ class DatabaseOperations:
                 instrument_id, e
             )
             return 1.0
+
+    async def save_adjustment_factor_observations(
+        self,
+        observations: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Upsert source-isolated factor observations."""
+        stats = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
+        if not observations:
+            return stats
+        try:
+            async with self.get_async_session() as session:
+                for item in observations:
+                    try:
+                        instrument_id = str(item.get("instrument_id") or "").strip()
+                        ex_date = self._coerce_datetime(item.get("ex_date"))
+                        source = str(item.get("source") or "unknown").strip().lower()
+                        source_profile = str(item.get("source_profile") or "default")
+                        if not instrument_id or ex_date is None:
+                            stats["failed"] += 1
+                            continue
+                        result = await session.execute(select(AdjustmentFactorObservationDB).where(
+                            AdjustmentFactorObservationDB.instrument_id == instrument_id,
+                            AdjustmentFactorObservationDB.ex_date == ex_date,
+                            AdjustmentFactorObservationDB.source == source,
+                            AdjustmentFactorObservationDB.source_profile == source_profile,
+                        ))
+                        existing = result.scalar_one_or_none()
+                        values = {
+                            "provider_factor": item.get("provider_factor"),
+                            "provider_cumulative_factor": item.get("provider_cumulative_factor"),
+                            "normalized_factor": item.get("normalized_factor"),
+                            "normalization_version": str(item.get("normalization_version") or "event_ratio_v1"),
+                            "quality_status": str(item.get("quality_status") or "unvalidated"),
+                            "ingestion_run_id": ingestion_run_id or item.get("ingestion_run_id"),
+                            "raw_payload_json": json.dumps(
+                                item.get("raw_payload") or {}, ensure_ascii=True, default=str, sort_keys=True
+                            ),
+                        }
+                        if existing is None:
+                            session.add(AdjustmentFactorObservationDB(
+                                instrument_id=instrument_id,
+                                ex_date=ex_date,
+                                source=source,
+                                source_profile=source_profile,
+                                **values,
+                            ))
+                            stats["inserted"] += 1
+                            continue
+                        changed = any(getattr(existing, key) != value for key, value in values.items())
+                        if not changed:
+                            stats["unchanged"] += 1
+                            continue
+                        for key, value in values.items():
+                            setattr(existing, key, value)
+                        existing.updated_at = get_shanghai_time()
+                        stats["changed"] += 1
+                    except Exception as row_error:
+                        stats["failed"] += 1
+                        self.db_logger.warning("Failed to save factor observation: %s", row_error)
+                await session.commit()
+            return stats
+        except Exception as exc:
+            self.db_logger.error("Failed to save factor observations: %s", exc)
+            stats["failed"] = max(stats["failed"], len(observations))
+            return stats
+
+    async def get_adjustment_factor_observations(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        source: Optional[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        async with self.get_async_session() as session:
+            filters = []
+            if instrument_id:
+                filters.append(AdjustmentFactorObservationDB.instrument_id == instrument_id)
+            if source:
+                filters.append(AdjustmentFactorObservationDB.source == source.lower())
+            if start_date:
+                filters.append(AdjustmentFactorObservationDB.ex_date >= self._coerce_datetime(start_date))
+            if end_date:
+                filters.append(
+                    AdjustmentFactorObservationDB.ex_date
+                    < self._coerce_datetime(end_date + timedelta(days=1))
+                )
+            total = await session.scalar(
+                select(func.count()).select_from(AdjustmentFactorObservationDB).where(*filters)
+            )
+            rows = (await session.execute(
+                select(AdjustmentFactorObservationDB)
+                .where(*filters)
+                .order_by(
+                    AdjustmentFactorObservationDB.instrument_id,
+                    AdjustmentFactorObservationDB.ex_date,
+                    AdjustmentFactorObservationDB.source,
+                )
+                .offset(offset).limit(limit)
+            )).scalars().all()
+            items = [{
+                "instrument_id": row.instrument_id,
+                "ex_date": row.ex_date,
+                "source": row.source,
+                "source_profile": row.source_profile,
+                "provider_factor": row.provider_factor,
+                "provider_cumulative_factor": row.provider_cumulative_factor,
+                "normalized_factor": row.normalized_factor,
+                "normalization_version": row.normalization_version,
+                "quality_status": row.quality_status,
+                "ingestion_run_id": row.ingestion_run_id,
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            } for row in rows]
+            return {
+                "total": int(total or 0), "limit": limit, "offset": offset,
+                "returned": len(items), "has_more": offset + len(items) < int(total or 0),
+                "items": items,
+            }
+
+    async def list_adjustment_factor_observations(
+        self,
+        *,
+        instrument_ids: Optional[List[str]] = None,
+        sources: Optional[List[str]] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+    ) -> List[Dict[str, Any]]:
+        """Return complete bounded observation sets for rebuild services."""
+        async with self.get_async_session() as session:
+            stmt = select(AdjustmentFactorObservationDB)
+            if instrument_ids:
+                stmt = stmt.where(AdjustmentFactorObservationDB.instrument_id.in_(instrument_ids))
+            if sources:
+                stmt = stmt.where(
+                    AdjustmentFactorObservationDB.source.in_([item.lower() for item in sources])
+                )
+            if start_date:
+                stmt = stmt.where(
+                    AdjustmentFactorObservationDB.ex_date >= self._coerce_datetime(start_date)
+                )
+            if end_date:
+                stmt = stmt.where(
+                    AdjustmentFactorObservationDB.ex_date
+                    < self._coerce_datetime(end_date + timedelta(days=1))
+                )
+            rows = (await session.execute(stmt.order_by(
+                AdjustmentFactorObservationDB.instrument_id,
+                AdjustmentFactorObservationDB.source,
+                AdjustmentFactorObservationDB.ex_date,
+            ))).scalars().all()
+            return [{
+                "instrument_id": row.instrument_id,
+                "ex_date": row.ex_date,
+                "source": row.source,
+                "source_profile": row.source_profile,
+                "provider_factor": row.provider_factor,
+                "provider_cumulative_factor": row.provider_cumulative_factor,
+                "normalized_factor": row.normalized_factor,
+                "normalization_version": row.normalization_version,
+                "quality_status": row.quality_status,
+                "ingestion_run_id": row.ingestion_run_id,
+            } for row in rows]
+
+    async def replace_canonical_adjustment_factors(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        series_version: str,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> int:
+        """Replace canonical rows for affected instruments and one version."""
+        affected = sorted(set(instrument_ids or [str(row.get("instrument_id")) for row in rows]))
+        if not affected:
+            return 0
+        async with self.get_async_session() as session:
+            await session.execute(delete(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.series_version == series_version,
+                AdjustmentFactorCanonicalDB.instrument_id.in_(affected),
+            ))
+            saved = 0
+            for row in rows:
+                ex_date = self._coerce_datetime(row.get("ex_date"))
+                factor = row.get("factor")
+                cumulative = row.get("cumulative_factor")
+                if ex_date is None or factor is None or cumulative is None:
+                    continue
+                session.add(AdjustmentFactorCanonicalDB(
+                    instrument_id=str(row.get("instrument_id")),
+                    ex_date=ex_date,
+                    series_version=series_version,
+                    factor=float(factor),
+                    cumulative_factor=float(cumulative),
+                    selected_source=str(row.get("selected_source") or "unknown"),
+                    source_profile=str(row.get("source_profile") or "default"),
+                    quality_status=str(row.get("quality_status") or "unvalidated"),
+                    evidence_count=int(row.get("evidence_count") or 1),
+                ))
+                saved += 1
+            await session.commit()
+            return saved
+
+    async def get_canonical_adjustment_factors(
+        self,
+        instrument_id: str,
+        series_version: str,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+    ) -> List[Dict[str, Any]]:
+        async with self.get_async_session() as session:
+            stmt = select(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.instrument_id == instrument_id,
+                AdjustmentFactorCanonicalDB.series_version == series_version,
+            )
+            if start_date:
+                stmt = stmt.where(AdjustmentFactorCanonicalDB.ex_date >= start_date)
+            if end_date:
+                stmt = stmt.where(AdjustmentFactorCanonicalDB.ex_date <= end_date)
+            rows = (await session.execute(
+                stmt.order_by(AdjustmentFactorCanonicalDB.ex_date)
+            )).scalars().all()
+            return [{
+                "instrument_id": row.instrument_id,
+                "ex_date": row.ex_date,
+                "factor": row.factor,
+                "cumulative_factor": row.cumulative_factor,
+                "source": row.selected_source,
+                "source_profile": row.source_profile,
+                "quality_status": row.quality_status,
+                "series_version": row.series_version,
+            } for row in rows]
+
+    async def get_canonical_adjustment_factor_page(
+        self,
+        *,
+        series_version: str,
+        instrument_id: Optional[str] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        async with self.get_async_session() as session:
+            filters = [AdjustmentFactorCanonicalDB.series_version == series_version]
+            if instrument_id:
+                filters.append(AdjustmentFactorCanonicalDB.instrument_id == instrument_id)
+            if start_date:
+                filters.append(
+                    AdjustmentFactorCanonicalDB.ex_date >= self._coerce_datetime(start_date)
+                )
+            if end_date:
+                filters.append(
+                    AdjustmentFactorCanonicalDB.ex_date
+                    < self._coerce_datetime(end_date + timedelta(days=1))
+                )
+            total = await session.scalar(
+                select(func.count()).select_from(AdjustmentFactorCanonicalDB).where(*filters)
+            )
+            rows = (await session.execute(
+                select(AdjustmentFactorCanonicalDB).where(*filters)
+                .order_by(AdjustmentFactorCanonicalDB.instrument_id, AdjustmentFactorCanonicalDB.ex_date)
+                .offset(offset).limit(limit)
+            )).scalars().all()
+            items = [{
+                "instrument_id": row.instrument_id, "ex_date": row.ex_date,
+                "factor": row.factor, "cumulative_factor": row.cumulative_factor,
+                "series_version": row.series_version, "selected_source": row.selected_source,
+                "source_profile": row.source_profile, "quality_status": row.quality_status,
+                "evidence_count": row.evidence_count,
+            } for row in rows]
+            return {
+                "total": int(total or 0), "limit": limit, "offset": offset,
+                "returned": len(items), "has_more": offset + len(items) < int(total or 0),
+                "items": items,
+            }
+
+    async def upsert_adjustment_factor_series_status(
+        self,
+        series_version: str,
+        report: Dict[str, Any],
+    ) -> None:
+        async with self.get_async_session() as session:
+            existing = await session.get(AdjustmentFactorSeriesStatusDB, series_version)
+            values = self._adjustment_factor_series_status_values(report)
+            if existing is None:
+                session.add(AdjustmentFactorSeriesStatusDB(series_version=series_version, **values))
+            else:
+                for key, value in values.items():
+                    setattr(existing, key, value)
+                existing.updated_at = get_shanghai_time()
+            await session.commit()
+
+    def _adjustment_factor_series_status_values(
+        self,
+        report: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Build one normalized persistence payload for series quality status."""
+        return {
+            "status": str(report.get("status") or "built"),
+            "source_priority_json": json.dumps(
+                report.get("source_priority") or [], ensure_ascii=True
+            ),
+            "start_date": self._coerce_datetime(report.get("start_date")),
+            "end_date": self._coerce_datetime(report.get("end_date")),
+            "instrument_count": int(report.get("instrument_count") or 0),
+            "row_count": int(report.get("row_count") or 0),
+            "coverage_ratio": float(report.get("coverage_ratio") or 0.0),
+            "conflict_count": int(report.get("conflict_count") or 0),
+            "max_cumulative_error_pct": report.get("max_cumulative_error_pct"),
+            "promotion_eligible": bool(report.get("promotion_eligible")),
+            "report_json": json.dumps(
+                report, ensure_ascii=True, default=str, sort_keys=True
+            ),
+        }
+
+    async def get_adjustment_factor_series_status(self, series_version: str) -> Optional[Dict[str, Any]]:
+        async with self.get_async_session() as session:
+            row = await session.get(AdjustmentFactorSeriesStatusDB, series_version)
+            if row is None:
+                return None
+            return json.loads(row.report_json or "{}") | {
+                "series_version": row.series_version,
+                "status": row.status,
+                "promotion_eligible": bool(row.promotion_eligible),
+            }
+
+    async def replace_adjustment_factor_instrument_statuses(
+        self,
+        rows: List[Dict[str, Any]],
+        *,
+        series_version: str,
+        instrument_ids: Optional[List[str]] = None,
+    ) -> int:
+        """Replace per-instrument completeness states for one series version."""
+        affected = sorted(set(
+            instrument_ids or [str(row.get("instrument_id") or "") for row in rows]
+        ) - {""})
+        if not affected:
+            return 0
+        async with self.get_async_session() as session:
+            await session.execute(delete(AdjustmentFactorInstrumentStatusDB).where(
+                AdjustmentFactorInstrumentStatusDB.series_version == series_version,
+                AdjustmentFactorInstrumentStatusDB.instrument_id.in_(affected),
+            ))
+            saved = 0
+            for row in rows:
+                instrument_id = str(row.get("instrument_id") or "").strip()
+                coverage_status = str(row.get("coverage_status") or "").strip()
+                if not instrument_id or not coverage_status:
+                    continue
+                session.add(AdjustmentFactorInstrumentStatusDB(
+                    instrument_id=instrument_id,
+                    series_version=series_version,
+                    source=str(row.get("source") or "unknown"),
+                    coverage_status=coverage_status,
+                    event_count=int(row.get("event_count") or 0),
+                    start_date=self._coerce_datetime(row.get("start_date")),
+                    end_date=self._coerce_datetime(row.get("end_date")),
+                    ingestion_run_id=row.get("ingestion_run_id"),
+                ))
+                saved += 1
+            await session.commit()
+            return saved
+
+    async def get_adjustment_factor_instrument_status(
+        self,
+        instrument_id: str,
+        series_version: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Return canonical completeness for one instrument and version."""
+        async with self.get_async_session() as session:
+            row = (await session.execute(
+                select(AdjustmentFactorInstrumentStatusDB).where(
+                    AdjustmentFactorInstrumentStatusDB.instrument_id == instrument_id,
+                    AdjustmentFactorInstrumentStatusDB.series_version == series_version,
+                )
+            )).scalar_one_or_none()
+            if row is None:
+                return None
+            return {
+                "instrument_id": row.instrument_id,
+                "series_version": row.series_version,
+                "source": row.source,
+                "coverage_status": row.coverage_status,
+                "event_count": row.event_count,
+                "start_date": row.start_date,
+                "end_date": row.end_date,
+                "ingestion_run_id": row.ingestion_run_id,
+            }
+
+    async def promote_canonical_adjustment_factor_series(
+        self,
+        *,
+        staging_series_version: str,
+        target_series_version: str,
+        report: Dict[str, Any],
+    ) -> Dict[str, int]:
+        """Atomically replace one production series from a validated staging version."""
+        if staging_series_version == target_series_version:
+            raise ValueError("staging and target series versions must differ")
+        async with self.get_async_session() as session:
+            staging_rows = (await session.execute(
+                select(AdjustmentFactorCanonicalDB).where(
+                    AdjustmentFactorCanonicalDB.series_version == staging_series_version
+                )
+            )).scalars().all()
+            staging_statuses = (await session.execute(
+                select(AdjustmentFactorInstrumentStatusDB).where(
+                    AdjustmentFactorInstrumentStatusDB.series_version == staging_series_version
+                )
+            )).scalars().all()
+            if not staging_statuses:
+                raise RuntimeError("staging series has no instrument coverage states")
+
+            await session.execute(delete(AdjustmentFactorCanonicalDB).where(
+                AdjustmentFactorCanonicalDB.series_version == target_series_version
+            ))
+            await session.execute(delete(AdjustmentFactorInstrumentStatusDB).where(
+                AdjustmentFactorInstrumentStatusDB.series_version == target_series_version
+            ))
+            for row in staging_rows:
+                session.add(AdjustmentFactorCanonicalDB(
+                    instrument_id=row.instrument_id,
+                    ex_date=row.ex_date,
+                    series_version=target_series_version,
+                    factor=row.factor,
+                    cumulative_factor=row.cumulative_factor,
+                    selected_source=row.selected_source,
+                    source_profile=row.source_profile,
+                    quality_status=row.quality_status,
+                    evidence_count=row.evidence_count,
+                ))
+            for row in staging_statuses:
+                session.add(AdjustmentFactorInstrumentStatusDB(
+                    instrument_id=row.instrument_id,
+                    series_version=target_series_version,
+                    source=row.source,
+                    coverage_status=row.coverage_status,
+                    event_count=row.event_count,
+                    start_date=row.start_date,
+                    end_date=row.end_date,
+                    ingestion_run_id=row.ingestion_run_id,
+                ))
+
+            target_report = {
+                **report,
+                "series_version": target_series_version,
+                "staging_series_version": staging_series_version,
+                "status": "promoted",
+                "promotion_eligible": True,
+            }
+            existing = await session.get(
+                AdjustmentFactorSeriesStatusDB, target_series_version
+            )
+            values = self._adjustment_factor_series_status_values(target_report)
+            values["row_count"] = len(staging_rows)
+            if existing is None:
+                session.add(AdjustmentFactorSeriesStatusDB(
+                    series_version=target_series_version, **values
+                ))
+            else:
+                for key, value in values.items():
+                    setattr(existing, key, value)
+                existing.updated_at = get_shanghai_time()
+            await session.commit()
+            return {
+                "canonical_rows": len(staging_rows),
+                "instrument_statuses": len(staging_statuses),
+            }
+
+    async def prepare_legacy_factor_appends(
+        self,
+        factors: List[Dict[str, Any]],
+    ) -> tuple[List[Dict[str, Any]], Dict[str, int]]:
+        """Rebase only new tail events; historical rows remain observation-only."""
+        from data_sources.adjustment_factor_governance import rebase_legacy_tail
+
+        stats = {"rebased": 0, "historical_skipped": 0, "invalid": 0}
+        prepared: List[Dict[str, Any]] = []
+        grouped: Dict[str, List[Dict[str, Any]]] = {}
+        for factor in factors:
+            grouped.setdefault(str(factor.get("instrument_id") or ""), []).append(factor)
+        async with self.get_async_session() as session:
+            for instrument_id, items in grouped.items():
+                if not instrument_id:
+                    stats["invalid"] += len(items)
+                    continue
+                latest = (await session.execute(
+                    select(AdjustmentFactorDB).where(
+                        AdjustmentFactorDB.instrument_id == instrument_id
+                    ).order_by(AdjustmentFactorDB.ex_date.desc()).limit(1)
+                )).scalar_one_or_none()
+                rows, row_stats = rebase_legacy_tail(
+                    items,
+                    latest_date=latest.ex_date if latest else None,
+                    latest_cumulative_factor=(
+                        float(latest.cumulative_factor) if latest else 1.0
+                    ),
+                )
+                prepared.extend(rows)
+                for key in stats:
+                    stats[key] += int(row_stats.get(key, 0))
+        return prepared, stats
 
     async def get_xdxr_pre_close_overrides(
         self,

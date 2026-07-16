@@ -157,6 +157,30 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_adjustment_factor_rebuild": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股多源复权因子隔离回补、标准序列重建与质量验证（仅手工触发，默认 dry-run）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "instrument_ids": [],
+          "source": "akshare",
+          "dry_run": true,
+          "resume": true,
+          "chunk_size": 100,
+          "request_interval_seconds": 1.0,
+          "checkpoint_id": null,
+          "build_canonical": true,
+          "max_runtime_seconds": 86400
+        }
+      },
       "a_share_corporate_action_validation": {
         "enabled": true,
         "manual_only": true,

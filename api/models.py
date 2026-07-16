@@ -221,6 +221,9 @@ class DailyQuotesEnvelopeResponse(BaseModel):
     pagination: Optional[DailyQuotePaginationMeta] = Field(None, description="分页元数据 (REQ-11.1)")
     include_delisted: bool = Field(False, description="本次请求是否允许退市证券 (REQ-01.1)")
     instrument_delisted: bool = Field(False, description="该证券是否已退市 (delisted_date 非空)")
+    factor_metadata: Optional[Dict[str, Any]] = Field(
+        None, description="复权因子数据集、版本和 fallback 元数据"
+    )
 
 
 class XdxrAuditEventResponse(BaseModel):
@@ -255,6 +258,24 @@ class XdxrAuditPageResponse(BaseModel):
     has_more: bool = Field(False, description="是否还有后续记录")
     filters: Dict[str, Any] = Field(default_factory=dict, description="生效的查询条件")
     items: List[XdxrAuditEventResponse] = Field(default_factory=list)
+
+
+class AdjustmentFactorPageResponse(BaseModel):
+    dataset: str
+    total: int = 0
+    limit: int = 100
+    offset: int = 0
+    returned: int = 0
+    has_more: bool = False
+    filters: Dict[str, Any] = Field(default_factory=dict)
+    items: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class AdjustmentFactorQualityResponse(BaseModel):
+    series_version: str
+    status: str
+    promotion_eligible: bool = False
+    report: Dict[str, Any] = Field(default_factory=dict)
 
 
 class ChangeLogRecordResponse(BaseModel):

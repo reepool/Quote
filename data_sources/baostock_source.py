@@ -978,6 +978,7 @@ class BaostockSource(BaseDataSource):
                 'cumulative_factor': cumulative,
                 'fore_adjust_factor': item['fore_adjust_factor'],
                 'source': 'baostock',
+                'source_profile': 'baostock_query_adjust_factor',
             })
         return factors
 
