@@ -4,6 +4,7 @@
 > 日期：2026-07-16
 > 适用范围：A 股上市公司，第一阶段服务专业 DCF 的行业模型选择、周期归一化与商品驱动
 > 关联文档：`professional_dcf_requirements.md`、`commodity_futures_market_data_requirements.md`
+> 采集实施方案：`company_business_profile_data_acquisition_execution.md`
 
 ---
 
@@ -458,3 +459,9 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 3. 对煤炭、有色、钢铁、石油石化、基础化工和部分建材建立经过审批的行业默认暴露目录，再逐家公司形成覆盖项。
 4. 生成并回补加工价差定义；随后推进产销量、售价、单位成本、产能和储量。
 5. 在人工金标准精确率达到验收线后，再扩大到全市场增量维护和受权审批 API。
+
+### 12.4 公开数据采集专项（2026-07-16）
+
+已新增本地 OpenSpec change `build-a-share-business-profile-evidence-pipeline`，用于补齐当前治理基础层与生产数据之间的缺口。该 change 的边界是：复用现有 CNInfo/交易所公告发现、PDF 归档和 source manifest，建立首批周期行业金标准、版本化披露模板和词典、文档派生 artifact、候选事实抽取、受控本地审核、增量维护及字段级质量门槛。
+
+详细主备源、五类对象获取方式、解析分层、审核边界、维护频率、样本设计和工期评估见 `company_business_profile_data_acquisition_execution.md`。在项目具备管理接口鉴权之前，审核写操作只通过受控本地工具开放，不新增无鉴权 POST 接口。
