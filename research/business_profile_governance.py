@@ -9,9 +9,17 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 from utils.date_utils import get_shanghai_time
 
 
-BUSINESS_PROFILE_SCHEMA_VERSION = "company_business_profile.v1"
+BUSINESS_PROFILE_SCHEMA_VERSION = "company_business_profile.v2"
 BUSINESS_PROFILE_SCORE_VERSION = "business_profile_model_score.v1"
 REVIEW_STATUSES = {"candidate", "approved", "rejected", "superseded"}
+MATERIAL_PROFILE_EVENT_TYPES = {
+    "reverse_merger",
+    "major_asset_restructuring",
+    "business_acquisition",
+    "business_disposal",
+    "control_change",
+    "principal_business_change",
+}
 
 
 def _json_dumps(value: Any) -> str:
@@ -50,6 +58,7 @@ def build_empty_business_profile_context(
         "data_available_cutoff": _date_key(as_of_date) or str(as_of_date),
         "industry_default_profile": {},
         "company_specific_profile": {
+            "business_regime": None,
             "segments": [],
             "operating_facts": [],
             "value_chain_roles": [],
@@ -59,6 +68,13 @@ def build_empty_business_profile_context(
         "approved_exposures": [],
         "candidate_exposures": [],
         "candidate_facts": {},
+        "profile_lifecycle": {
+            "active_regime": None,
+            "approved_regimes": [],
+            "approved_events": [],
+            "candidate_regimes": [],
+            "candidate_events": [],
+        },
         "executable_exposure_mappings": [],
         "model_scores": {
             "score_version": BUSINESS_PROFILE_SCORE_VERSION,
@@ -73,6 +89,8 @@ def build_empty_business_profile_context(
             "status": "not_ready",
             "approved_company_fact_count": 0,
             "approved_company_exposure_count": 0,
+            "active_business_regime_id": None,
+            "approved_profile_event_count": 0,
             "industry_mapping_count": 0,
             "executable_mapping_count": 0,
             "input_gaps": [warning],
@@ -104,6 +122,30 @@ class BusinessProfileRepository:
             ),
             "json": {"metadata_json"},
         },
+        "events": {
+            "table": "company_business_profile_events",
+            "pk": "event_id",
+            "columns": (
+                "event_id", "instrument_id", "event_type", "event_date",
+                "event_date_quality", "prior_regime_id", "resulting_regime_id",
+                "materiality", "description", "evidence_id", "data_available_date",
+                "confidence", "review_status", "version", "lineage_hash",
+                "metadata_json", "created_at", "updated_at",
+            ),
+            "json": {"metadata_json"},
+        },
+        "regimes": {
+            "table": "company_business_profile_regimes",
+            "pk": "regime_id",
+            "columns": (
+                "regime_id", "regime_key", "instrument_id", "regime_name",
+                "regime_type", "valid_from", "valid_to", "knowledge_from",
+                "knowledge_to", "trigger_event_id", "evidence_id",
+                "data_available_date", "confidence", "review_status", "version",
+                "lineage_hash", "metadata_json", "created_at", "updated_at",
+            ),
+            "json": {"metadata_json"},
+        },
         "segments": {
             "table": "company_business_segments",
             "pk": "record_id",
@@ -113,8 +155,9 @@ class BusinessProfileRepository:
                 "revenue", "revenue_share", "segment_profit", "segment_assets",
                 "currency", "consolidation_scope", "geography", "source_document_id",
                 "evidence_id", "data_available_date", "extraction_method", "confidence",
-                "review_status", "valid_from", "valid_to", "version", "lineage_hash",
-                "metadata_json", "created_at", "updated_at",
+                "review_status", "valid_from", "valid_to", "business_regime_id",
+                "knowledge_from", "knowledge_to", "supersedes_record_id", "version",
+                "lineage_hash", "metadata_json", "created_at", "updated_at",
             ),
             "json": {"metadata_json"},
         },
@@ -126,8 +169,9 @@ class BusinessProfileRepository:
                 "project_id", "fact_type", "value_raw", "unit_raw",
                 "value_normalized", "unit_normalized", "fact_scope", "currency",
                 "equity_basis", "evidence_id", "data_available_date", "confidence",
-                "review_status", "valid_from", "valid_to", "version", "lineage_hash",
-                "metadata_json", "created_at", "updated_at",
+                "review_status", "valid_from", "valid_to", "business_regime_id",
+                "knowledge_from", "knowledge_to", "supersedes_record_id", "version",
+                "lineage_hash", "metadata_json", "created_at", "updated_at",
             ),
             "json": {"metadata_json"},
         },
@@ -138,8 +182,9 @@ class BusinessProfileRepository:
                 "record_id", "instrument_id", "report_period", "segment_id", "role",
                 "materiality", "revenue_share", "mapping_basis", "evidence_id",
                 "data_available_date", "confidence", "review_status", "valid_from",
-                "valid_to", "version", "lineage_hash", "metadata_json", "created_at",
-                "updated_at",
+                "valid_to", "business_regime_id", "knowledge_from", "knowledge_to",
+                "supersedes_record_id", "version", "lineage_hash", "metadata_json",
+                "created_at", "updated_at",
             ),
             "json": {"metadata_json"},
         },
@@ -152,8 +197,9 @@ class BusinessProfileRepository:
                 "mapping_basis", "price_series_id", "spread_definition_id", "lag_days",
                 "pass_through_score", "hedge_adjustment", "evidence_id",
                 "data_available_date", "confidence", "review_status", "effective_from",
-                "effective_to", "version", "lineage_hash", "metadata_json", "created_at",
-                "updated_at",
+                "effective_to", "business_regime_id", "knowledge_from", "knowledge_to",
+                "supersedes_exposure_id", "version", "lineage_hash", "metadata_json",
+                "created_at", "updated_at",
             ),
             "json": {"metadata_json"},
         },
@@ -178,8 +224,23 @@ class BusinessProfileRepository:
             raise ValueError(f"unsupported review_status: {status}")
         payload["review_status"] = status
         payload.setdefault("version", 1)
+        if record_type == "regimes":
+            payload.setdefault("regime_key", payload.get("regime_id"))
         if record_type == "exposures":
             payload.setdefault("lag_days", 0)
+        if "knowledge_from" in spec["columns"]:
+            payload.setdefault("knowledge_from", payload.get("data_available_date"))
+            if not payload.get("knowledge_from"):
+                raise ValueError("knowledge_from or data_available_date is required")
+            self._validate_interval(
+                payload.get("knowledge_from"),
+                payload.get("knowledge_to"),
+                "knowledge",
+            )
+        if record_type == "regimes":
+            self._validate_interval(
+                payload.get("valid_from"), payload.get("valid_to"), "valid"
+            )
         now = get_shanghai_time().isoformat()
         payload.setdefault("created_at", now)
         payload["updated_at"] = now
@@ -245,7 +306,15 @@ class BusinessProfileRepository:
     def get_profile_history(self, instrument_id: str, *, limit: int = 5000) -> Dict[str, Any]:
         return {
             record_type: self.list_records(record_type, instrument_id=instrument_id, limit=limit)
-            for record_type in ("evidence", "segments", "operating_facts", "value_chain_roles", "exposures")
+            for record_type in (
+                "evidence",
+                "events",
+                "regimes",
+                "segments",
+                "operating_facts",
+                "value_chain_roles",
+                "exposures",
+            )
         }
 
     def get_review_queue(
@@ -256,7 +325,8 @@ class BusinessProfileRepository:
         limit: int = 200,
     ) -> List[Dict[str, Any]]:
         record_types = [record_type] if record_type else [
-            "evidence", "segments", "operating_facts", "value_chain_roles", "exposures"
+            "evidence", "events", "regimes", "segments", "operating_facts",
+            "value_chain_roles", "exposures",
         ]
         queue: List[Dict[str, Any]] = []
         for item_type in record_types:
@@ -269,6 +339,13 @@ class BusinessProfileRepository:
                 queue.append({"record_type": item_type, **row})
         queue.sort(key=lambda item: str(item.get("updated_at") or ""), reverse=True)
         return queue[: max(1, min(int(limit), 1000))]
+
+    @staticmethod
+    def _validate_interval(start_value: Any, end_value: Any, label: str) -> None:
+        start = _date_key(start_value)
+        end = _date_key(end_value)
+        if start and end and end < start:
+            raise ValueError(f"{label}_to cannot be earlier than {label}_from")
 
     @staticmethod
     def _decode_row(row: Dict[str, Any], json_columns: Sequence[str]) -> Dict[str, Any]:
@@ -297,9 +374,22 @@ class BusinessProfileResolver:
         cutoff = _date_key(as_of_date) or get_shanghai_time().date().isoformat()
         history = self.repository.get_profile_history(instrument_id)
         evidence = {item["evidence_id"]: item for item in history["evidence"]}
+        lifecycle = self._resolve_lifecycle(
+            history,
+            evidence,
+            cutoff,
+            include_candidates=include_candidates,
+        )
+        active_regime = lifecycle["active_regime"]
+        active_regime_id = (
+            str(active_regime.get("regime_id"))
+            if isinstance(active_regime, dict)
+            else None
+        )
+        has_governed_regimes = bool(lifecycle["approved_regimes"])
         approved: Dict[str, List[Dict[str, Any]]] = {}
         candidates: Dict[str, List[Dict[str, Any]]] = {}
-        warnings: List[str] = []
+        warnings: List[str] = list(lifecycle["warnings"])
         for fact_type in ("segments", "operating_facts", "value_chain_roles", "exposures"):
             approved[fact_type] = []
             candidates[fact_type] = []
@@ -307,18 +397,41 @@ class BusinessProfileResolver:
                 eligible_date = self._is_date_eligible(fact, cutoff, fact_type)
                 evidence_row = evidence.get(fact.get("evidence_id"))
                 evidence_valid = self._evidence_is_valid(evidence_row, cutoff)
-                if fact.get("review_status") == "approved" and eligible_date and evidence_valid:
+                regime_eligible = self._fact_regime_is_eligible(
+                    fact,
+                    active_regime_id=active_regime_id,
+                    has_governed_regimes=has_governed_regimes,
+                )
+                if (
+                    fact.get("review_status") == "approved"
+                    and eligible_date
+                    and evidence_valid
+                    and regime_eligible
+                ):
                     approved[fact_type].append(fact)
                 elif include_candidates:
                     diagnostic = dict(fact)
                     diagnostic["eligibility"] = {
                         "date_eligible": eligible_date,
                         "evidence_valid": evidence_valid,
+                        "regime_eligible": regime_eligible,
+                        "active_regime_id": active_regime_id,
                         "review_status": fact.get("review_status"),
                     }
                     candidates[fact_type].append(diagnostic)
                 if fact.get("review_status") == "approved" and not evidence_valid:
-                    warnings.append(f"invalid_evidence:{fact_type}:{self._record_id(fact)}")
+                    warnings.append(
+                        f"invalid_evidence:{fact_type}:{self._record_id(fact)}"
+                    )
+                if (
+                    fact.get("review_status") == "approved"
+                    and eligible_date
+                    and evidence_valid
+                    and not regime_eligible
+                ):
+                    warnings.append(
+                        f"inactive_business_regime:{fact_type}:{self._record_id(fact)}"
+                    )
 
         industry_mappings, industry_scope = self._load_industry_mappings(industry_membership, cutoff)
         executable_company, mapping_gaps = self._company_executable_mappings(approved["exposures"])
@@ -339,6 +452,7 @@ class BusinessProfileResolver:
                 "exposure_mappings": industry_mappings,
             },
             "company_specific_profile": {
+                "business_regime": active_regime,
                 "segments": approved["segments"],
                 "operating_facts": approved["operating_facts"],
                 "value_chain_roles": approved["value_chain_roles"],
@@ -348,6 +462,9 @@ class BusinessProfileResolver:
             "approved_exposures": approved["exposures"],
             "candidate_exposures": candidates["exposures"] if include_candidates else [],
             "candidate_facts": candidates if include_candidates else {},
+            "profile_lifecycle": {
+                key: value for key, value in lifecycle.items() if key != "warnings"
+            },
             "executable_exposure_mappings": selected_mappings,
             "model_scores": scores,
             "model_recommendation": recommendation,
@@ -359,6 +476,10 @@ class BusinessProfileResolver:
             {
                 "facts": [item.get("lineage_hash") for values in approved.values() for item in values],
                 "industry_scope": industry_scope,
+                "active_regime": active_regime_id,
+                "profile_events": [
+                    item.get("lineage_hash") for item in lifecycle["approved_events"]
+                ],
                 "mappings": [item.get("mapping_id") for item in selected_mappings],
             }
         )
@@ -369,6 +490,8 @@ class BusinessProfileResolver:
             "status": profile_payload["status"],
             "approved_company_fact_count": sum(len(values) for values in approved.values()),
             "approved_company_exposure_count": len(approved["exposures"]),
+            "active_business_regime_id": active_regime_id,
+            "approved_profile_event_count": len(lifecycle["approved_events"]),
             "industry_mapping_count": len(industry_mappings),
             "executable_mapping_count": len(selected_mappings),
             "input_gaps": sorted(set(mapping_gaps + (["company_business_profile_missing"] if not any(approved.values()) else []))),
@@ -384,11 +507,139 @@ class BusinessProfileResolver:
         available = _date_key(record.get("data_available_date"))
         if not available or available > cutoff:
             return False
+        knowledge_from = _date_key(record.get("knowledge_from")) or available
+        knowledge_to = _date_key(record.get("knowledge_to"))
+        if knowledge_from > cutoff or (knowledge_to and cutoff >= knowledge_to):
+            return False
         start_field = "effective_from" if record_type == "exposures" else "valid_from"
         end_field = "effective_to" if record_type == "exposures" else "valid_to"
         start = _date_key(record.get(start_field))
         end = _date_key(record.get(end_field))
         return (not start or start <= cutoff) and (not end or end >= cutoff)
+
+    @staticmethod
+    def _fact_regime_is_eligible(
+        fact: Dict[str, Any],
+        *,
+        active_regime_id: Optional[str],
+        has_governed_regimes: bool,
+    ) -> bool:
+        regime_id = str(fact.get("business_regime_id") or "").strip() or None
+        if not has_governed_regimes:
+            return regime_id is None
+        return bool(active_regime_id and regime_id == active_regime_id)
+
+    def _resolve_lifecycle(
+        self,
+        history: Dict[str, List[Dict[str, Any]]],
+        evidence: Dict[str, Dict[str, Any]],
+        cutoff: str,
+        *,
+        include_candidates: bool,
+    ) -> Dict[str, Any]:
+        approved_regimes: List[Dict[str, Any]] = []
+        active_regimes: List[Dict[str, Any]] = []
+        candidate_regimes: List[Dict[str, Any]] = []
+        approved_events: List[Dict[str, Any]] = []
+        candidate_events: List[Dict[str, Any]] = []
+        warnings: List[str] = []
+
+        for regime in history.get("regimes", []):
+            evidence_valid = self._evidence_is_valid(
+                evidence.get(regime.get("evidence_id")), cutoff
+            )
+            knowledge_eligible = self._knowledge_is_eligible(regime, cutoff)
+            business_eligible = self._business_interval_is_eligible(regime, cutoff)
+            if (
+                regime.get("review_status") == "approved"
+                and evidence_valid
+                and knowledge_eligible
+            ):
+                approved_regimes.append(regime)
+                if business_eligible:
+                    active_regimes.append(regime)
+            elif include_candidates:
+                diagnostic = dict(regime)
+                diagnostic["eligibility"] = {
+                    "evidence_valid": evidence_valid,
+                    "knowledge_eligible": knowledge_eligible,
+                    "business_eligible": business_eligible,
+                    "review_status": regime.get("review_status"),
+                }
+                candidate_regimes.append(diagnostic)
+
+        active_regimes.sort(
+            key=lambda item: (
+                _date_key(item.get("valid_from")) or "",
+                _date_key(item.get("knowledge_from")) or "",
+                int(item.get("version") or 0),
+            )
+        )
+        active_regime = active_regimes[-1] if active_regimes else None
+        if len(active_regimes) > 1:
+            warnings.append("overlapping_active_business_regimes")
+
+        for event in history.get("events", []):
+            evidence_valid = self._evidence_is_valid(
+                evidence.get(event.get("evidence_id")), cutoff
+            )
+            available = _date_key(event.get("data_available_date"))
+            known = bool(available and available <= cutoff)
+            event_date = _date_key(event.get("event_date"))
+            effective = not event_date or event_date <= cutoff
+            if (
+                event.get("review_status") == "approved"
+                and evidence_valid
+                and known
+                and effective
+            ):
+                approved_events.append(event)
+            elif include_candidates:
+                diagnostic = dict(event)
+                diagnostic["eligibility"] = {
+                    "evidence_valid": evidence_valid,
+                    "knowledge_eligible": known,
+                    "business_eligible": effective,
+                    "review_status": event.get("review_status"),
+                }
+                candidate_events.append(diagnostic)
+            if (
+                event.get("review_status") == "candidate"
+                and known
+                and str(event.get("event_type") or "") in MATERIAL_PROFILE_EVENT_TYPES
+                and str(event.get("materiality") or "").lower() in {"high", "material"}
+            ):
+                warnings.append(
+                    f"material_profile_change_pending_review:{event.get('event_id')}"
+                )
+
+        return {
+            "active_regime": active_regime,
+            "approved_regimes": approved_regimes,
+            "approved_events": approved_events,
+            "candidate_regimes": candidate_regimes,
+            "candidate_events": candidate_events,
+            "warnings": warnings,
+        }
+
+    @staticmethod
+    def _knowledge_is_eligible(record: Dict[str, Any], cutoff: str) -> bool:
+        available = _date_key(record.get("data_available_date"))
+        start = _date_key(record.get("knowledge_from")) or available
+        end = _date_key(record.get("knowledge_to"))
+        return bool(
+            available
+            and available <= cutoff
+            and start
+            and start <= cutoff
+            and (not end or cutoff < end)
+        )
+
+    @staticmethod
+    def _business_interval_is_eligible(record: Dict[str, Any], cutoff: str) -> bool:
+        start = _date_key(record.get("valid_from"))
+        end = _date_key(record.get("valid_to"))
+        return (not start or start <= cutoff) and (not end or cutoff < end)
 
     @staticmethod
     def _evidence_is_valid(evidence: Optional[Dict[str, Any]], cutoff: str) -> bool:

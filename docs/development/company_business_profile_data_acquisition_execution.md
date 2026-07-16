@@ -18,6 +18,7 @@
 4. 再用行业词典和公司原文生成价值链及商品暴露候选；
 5. 所有自动结果先进入候选审核，不能直接进入 DCF；
 6. 按行业和字段逐项通过金标准后上线，不进行一次性全市场黑箱回补。
+7. 公司画像按业务 regime 长期版本化，借壳、重大重组和新增主业不会覆盖历史画像。
 
 公开信息的可得性不是主要障碍。真正的工程难点是 PDF 版式、历史规则版本、单位和合并口径、产品实体归一化、综合企业分部拆分以及持续审核。首批六类周期行业形成可用生产能力预计是数月级工作，不需要先完成所有行业和全部深度字段。
 
@@ -36,11 +37,26 @@
 | 官方年报 PDF 实例 | 局部已有 | 券商专项已归档 259 份年报/半年报，可作为复用代码证据，不代表周期行业覆盖 |
 | 权威行业 | 已有 | `industry_memberships` 可按日期读取申万行业归属 |
 | 业务画像治理表 | 已有空表 | 五类表均已建成，但当前生产记录均为 0 |
+| 长期画像生命周期 | 已有第一版 | 业务 regime、画像事件和双时点 resolver 已实现，生产数据仍为空 |
+| 首批行业 universe | 已有只读工具 | 2026-07-16 按申万历史归属和上市生命周期识别当前在市 791 家 |
+| 公告分类 | 已有第一版 | 可区分全文、摘要、修订、经营、资源、合同、套保和画像变化类公告 |
+| 画像 PDF 归档 | 已有第一版代码 | 不可变哈希路径、manifest 来源层级/替代关系、重复短路和中断 checkpoint；生产归档仍为 0 |
 | 候选抽取器 | 未实现 | 没有通用主营分部、经营量、价值链或商品暴露抽取器 |
 | 审核写入流程 | 未实现 | 有 review 状态契约和只读队列，没有受控审批操作和审计日志 |
 | 行业默认暴露 | 未填充 | 现有期货映射结构可复用，但生产目录仍为空 |
 
 因此，下一阶段不应再设计一套新数据库或新公告框架，而应补齐“正式披露 -> 证据块 -> 候选事实 -> 审核 -> DCF 可用事实”这一条缺失的数据生产链。
+
+只读命令：
+
+```bash
+python scripts/research_business_profile_corpus_audit.py \
+  --as-of-date 2026-07-16 \
+  --include-universe \
+  --output /tmp/business_profile_corpus_audit.json
+```
+
+该命令只用 SQLite `mode=ro` 打开生产库，可显式指定预期报告期、是否包含历史退市样本和金标准目录，不写入画像事实。
 
 ---
 
@@ -206,6 +222,10 @@ data/filings/business_profile/{exchange}/{symbol}/{report_period}/
 
 原件只写一次；派生文件可按版本重建。SQLite 只保存 manifest、哈希、路径和诊断，不重复保存整份 PDF 文本。
 
+当前代码通过 `BusinessProfileDocumentArchiveService` 实现原件层。共享 `financial_source_files` 已增加 `source_tier` 和 `supersedes_source_file_id`，业务画像文档使用独立 `business_profile_source_file_manifest.v1` schema，避免与财务数值事实混淆。更正公告、新公告复用相同内容、同一公告附件变化分别保留公告身份和内容身份；只有同一公告 ID、同一内容哈希的重跑才直接返回 `unchanged`。
+
+批量归档必须设置 `max_documents`，可选 checkpoint 只用于恢复未完成批次。checkpoint 完整结束后删除，不能长期充当公告是否变化的权威判断；跨批次幂等仍以 source manifest 和重新计算的内容哈希为准。
+
 ---
 
 ## 6. 解析架构
@@ -321,6 +341,22 @@ extracted -> candidate -> approved / rejected
 ---
 
 ## 10. 后续维护
+
+### 10.0 画像生命周期维护
+
+证券代码和上市主体是行情、股本与公告的法律身份；经营画像是随时间变化的业务身份。系统为同一 `instrument_id` 保留多个 `business_regime_id`，并监听借壳、重大资产重组、发行股份购买资产、重大收购或出售、控制权变更、主营业务变更和新增重大业务等公告。
+
+变更处理遵循：
+
+1. 公告分类器只生成 profile-change event candidate；
+2. 人工确认事件性质、交割/并表日期、材料性和新旧分部范围；
+3. approved 事件产生新 regime 或更新当前 regime 的分部集合；
+4. 旧 regime 不删除，通过 `knowledge_to` 关闭；
+5. 新 regime 同时记录经济 `valid_from` 和信息 `knowledge_from`；
+6. 历史 DCF 按知识截止日读取当时可知版本，避免后来公告回写历史；
+7. 候选事件未审核前，仅输出 `material_profile_change_pending_review`，不切换 DCF 输入。
+
+借壳和主营替换原则上创建新 regime；普通有机扩产只更新经营事实；新增跨行业业务是否创建新 regime，由收入、利润、资产材料性、合并范围及管理层分部口径共同决定，不能只按公司公告措辞自动判断。
 
 ### 10.1 日常增量
 

@@ -348,9 +348,13 @@
       "exchanges_supported": [
         "a_stock"
       ],
-      "max_requests_per_minute": 60,
-      "max_requests_per_hour": 3000,
-      "max_requests_per_day": 60000,
+      "max_requests_per_minute": 300,
+      "max_requests_per_hour": 5000,
+      "max_requests_per_day": 40000,
+      "min_interval_seconds": 0.2,
+      "daily_request_safety_limit": 40000,
+      "usage_state_path": "~/.cache/quote/baostock_api_usage.json",
+      "session_lock_path": "~/.cache/quote/baostock_session.lock",
       "retry_times": 5,
       "retry_interval": 5.0,
       "network_error_retry_interval": 10.0,

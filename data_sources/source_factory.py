@@ -172,6 +172,18 @@ class DataSourceFactory:
                 rate_limit_config,
                 connection_timeout_seconds=connection_timeout,
                 login_timeout_seconds=login_timeout,
+                daily_request_safety_limit=source_config.get(
+                    'daily_request_safety_limit',
+                    min(rate_limit_config.max_requests_per_day, 40000),
+                ),
+                usage_state_path=source_config.get(
+                    'usage_state_path',
+                    '~/.cache/quote/baostock_api_usage.json',
+                ),
+                session_lock_path=source_config.get(
+                    'session_lock_path',
+                    '~/.cache/quote/baostock_session.lock',
+                ),
             )
         elif source_name == 'akshare':
             return AkShareSource(instance_name, rate_limit_config)

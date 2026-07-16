@@ -1,0 +1,171 @@
+import json
+import sqlite3
+
+from research.business_profile_corpus import (
+    apply_instrument_lifecycle,
+    list_first_wave_universe,
+    summarize_corpus_readiness,
+)
+
+
+def _corpus_connection():
+    conn = sqlite3.connect(":memory:")
+    conn.executescript(
+        """
+        CREATE TABLE industry_taxonomy (
+            taxonomy_system TEXT,
+            taxonomy_version TEXT,
+            industry_code TEXT,
+            industry_name TEXT,
+            industry_level INTEGER,
+            parent_code TEXT
+        );
+        CREATE TABLE industry_classification_history (
+            instrument_id TEXT,
+            symbol TEXT,
+            exchange TEXT,
+            taxonomy_system TEXT,
+            taxonomy_version TEXT,
+            official_industry_code TEXT,
+            official_start_date TEXT,
+            official_update_time TEXT,
+            created_at TEXT,
+            updated_at TEXT
+        );
+        """
+    )
+    conn.executemany(
+        "INSERT INTO industry_taxonomy VALUES (?,?,?,?,?,?)",
+        [
+            ("sw", "sw_2021", "210000", "煤炭", 1, None),
+            ("sw", "sw_2021", "210100", "煤炭开采", 2, "210000"),
+            ("sw", "sw_2021", "210101", "动力煤", 3, "210100"),
+            ("sw", "sw_2021", "220000", "基础化工", 1, None),
+            ("sw", "sw_2021", "220100", "化学原料", 2, "220000"),
+            ("sw", "sw_2021", "220101", "氯碱", 3, "220100"),
+            ("sw", "sw_2021", "230000", "钢铁", 1, None),
+            ("sw", "sw_2021", "230100", "普钢", 2, "230000"),
+            ("sw", "sw_2021", "230101", "长材", 3, "230100"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO industry_classification_history VALUES (?,?,?,?,?,?,?,?,?,?)",
+        [
+            (
+                "600001.SH",
+                "600001",
+                "SSE",
+                "sw",
+                "sw_2021",
+                "210101",
+                "2020-01-01",
+                "2020-01-02",
+                "2020-01-02",
+                "2020-01-02",
+            ),
+            (
+                "600001.SH",
+                "600001",
+                "SSE",
+                "sw",
+                "sw_2021",
+                "220101",
+                "2024-01-01",
+                "2024-02-01",
+                "2024-02-01",
+                "2024-02-01",
+            ),
+            (
+                "000002.SZ",
+                "000002",
+                "SZSE",
+                "sw",
+                "sw_2021",
+                "230101",
+                "2024-01-01",
+                "2026-01-01",
+                "2026-01-01",
+                "2026-01-01",
+            ),
+        ],
+    )
+    return conn
+
+
+def test_universe_uses_effective_and_knowledge_dates():
+    conn = _corpus_connection()
+
+    before_change = list_first_wave_universe(conn, as_of_date="2023-12-31")
+    after_change = list_first_wave_universe(conn, as_of_date="2025-12-31")
+
+    assert before_change[0]["industry_group"] == "coal"
+    assert before_change[0]["sw_l3_name"] == "动力煤"
+    assert after_change[0]["industry_group"] == "basic_chemical"
+    assert after_change[0]["sw_l3_name"] == "氯碱"
+    assert {item["instrument_id"] for item in after_change} == {"600001.SH"}
+
+
+def test_corpus_summary_reports_documents_and_labels(tmp_path):
+    annotation = tmp_path / "600001.json"
+    annotation.write_text(
+        json.dumps({"instrument_id": "600001.SH"}),
+        encoding="utf-8",
+    )
+    universe = list_first_wave_universe(
+        _corpus_connection(),
+        as_of_date="2025-12-31",
+    )
+
+    summary = summarize_corpus_readiness(
+        universe,
+        source_manifests=[
+                {
+                    "instrument_id": "600001.SH",
+                    "report_period": "2024-12-31",
+                    "report_type": "annual",
+                "archive_path": "/tmp/report.pdf",
+            }
+        ],
+        annotation_files=[annotation],
+        expected_report_periods=["2024-12-31"],
+    )
+
+    assert summary["universe_count"] == 1
+    assert summary["archived_document_count"] == 1
+    assert summary["labelled_instrument_count"] == 1
+    assert summary["missing_document_instrument_count"] == 0
+    assert summary["expected_document_count"] == 1
+    assert summary["covered_expected_document_count"] == 1
+    assert summary["parse_mode_counts"] == {"unknown": 1}
+
+
+def test_universe_filters_stock_lifecycle_at_requested_date():
+    universe = list_first_wave_universe(
+        _corpus_connection(),
+        as_of_date="2025-12-31",
+    )
+    lifecycle = {
+        "600001.SH": {
+            "name": "sample company",
+            "listed_date": "2000-01-01",
+            "delisted_date": "2025-06-30",
+            "status": "delisted",
+            "is_active": 0,
+        }
+    }
+
+    active_only = apply_instrument_lifecycle(
+        universe,
+        lifecycle,
+        as_of_date="2025-12-31",
+    )
+    historical = apply_instrument_lifecycle(
+        universe,
+        lifecycle,
+        as_of_date="2025-12-31",
+        include_delisted=True,
+    )
+
+    assert active_only == []
+    assert historical[0]["company_name"] == "sample company"
+    assert historical[0]["delisted_date"] == "2025-06-30"

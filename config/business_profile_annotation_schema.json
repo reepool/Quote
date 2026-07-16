@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quote://business-profile/annotation/v1",
+  "title": "A-share business-profile gold annotation",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "instrument_id",
+    "document",
+    "business_regimes",
+    "profile_events",
+    "products",
+    "commodities",
+    "unit_conversions",
+    "segments",
+    "operating_facts",
+    "value_chain_roles",
+    "commodity_exposures",
+    "review_decisions"
+  ],
+  "properties": {
+    "schema_version": {"const": "business_profile_gold.v1"},
+    "instrument_id": {"type": "string", "minLength": 1},
+    "document": {
+      "type": "object",
+      "required": [
+        "source_document_id",
+        "document_type",
+        "report_period",
+        "publish_date",
+        "document_hash"
+      ],
+      "properties": {
+        "source_document_id": {"type": "string"},
+        "document_type": {"type": "string"},
+        "report_period": {"type": "string", "format": "date"},
+        "publish_date": {"type": "string", "format": "date"},
+        "document_hash": {"type": "string"},
+        "source_url": {"type": ["string", "null"]},
+        "page_count": {"type": ["integer", "null"], "minimum": 1},
+        "parse_mode": {
+          "enum": ["native_text", "table", "ocr_required", "ocr", "unsupported"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "business_regimes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/regime"}
+    },
+    "profile_events": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/profile_event"}
+    },
+    "sections": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_location"},
+      "default": []
+    },
+    "tables": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence_location"},
+      "default": []
+    },
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["product_id", "name_raw", "name_normalized", "evidence"],
+        "properties": {
+          "product_id": {"type": "string"},
+          "name_raw": {"type": "string"},
+          "name_normalized": {"type": ["string", "null"]},
+          "segment_id": {"type": ["string", "null"]},
+          "dictionary_version": {"type": ["string", "null"]},
+          "evidence": {"$ref": "#/$defs/evidence_location"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "commodities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["product_id", "commodity_candidates", "review_status"],
+        "properties": {
+          "product_id": {"type": "string"},
+          "commodity_candidates": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1
+          },
+          "ambiguity_reason": {"type": ["string", "null"]},
+          "dictionary_version": {"type": ["string", "null"]},
+          "review_status": {"enum": ["candidate", "approved", "rejected", "superseded"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "unit_conversions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["raw_unit", "normalized_unit", "factor", "rule_version"],
+        "properties": {
+          "raw_unit": {"type": "string"},
+          "normalized_unit": {"type": "string"},
+          "factor": {"type": "number"},
+          "period_basis": {"type": ["string", "null"]},
+          "equity_basis": {"type": ["string", "null"]},
+          "rule_version": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "segments": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "operating_facts": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "value_chain_roles": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "commodity_exposures": {"type": "array", "items": {"$ref": "#/$defs/fact"}},
+    "review_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target_type", "target_id", "decision", "reviewer", "reason_code"],
+        "properties": {
+          "target_type": {"type": "string"},
+          "target_id": {"type": "string"},
+          "decision": {"enum": ["approved", "rejected", "superseded"]},
+          "reviewer": {"type": "string"},
+          "reason_code": {"type": "string"},
+          "reviewed_at": {"type": ["string", "null"], "format": "date-time"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "$defs": {
+    "evidence_location": {
+      "type": "object",
+      "required": ["page_number", "section_path", "evidence_text_hash"],
+      "properties": {
+        "page_number": {"type": "integer", "minimum": 1},
+        "section_path": {"type": "string"},
+        "table_name": {"type": ["string", "null"]},
+        "evidence_text_hash": {"type": "string"},
+        "text": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "bitemporal": {
+      "type": "object",
+      "required": ["valid_from", "knowledge_from"],
+      "properties": {
+        "valid_from": {"type": ["string", "null"], "format": "date"},
+        "valid_to": {"type": ["string", "null"], "format": "date"},
+        "knowledge_from": {"type": "string", "format": "date"},
+        "knowledge_to": {"type": ["string", "null"], "format": "date"}
+      }
+    },
+    "regime": {
+      "allOf": [
+        {"$ref": "#/$defs/bitemporal"},
+        {
+          "type": "object",
+          "required": ["regime_id", "regime_key", "regime_name", "regime_type"],
+          "properties": {
+            "regime_id": {"type": "string"},
+            "regime_key": {"type": "string"},
+            "regime_name": {"type": "string"},
+            "regime_type": {"type": "string"},
+            "trigger_event_id": {"type": ["string", "null"]}
+          }
+        }
+      ]
+    },
+    "profile_event": {
+      "type": "object",
+      "required": ["event_id", "event_type", "data_available_date", "review_status"],
+      "properties": {
+        "event_id": {"type": "string"},
+        "event_type": {
+          "enum": [
+            "reverse_merger",
+            "major_asset_restructuring",
+            "business_acquisition",
+            "business_disposal",
+            "control_change",
+            "principal_business_change",
+            "organic_expansion",
+            "company_name_change",
+            "other"
+          ]
+        },
+        "event_date": {"type": ["string", "null"], "format": "date"},
+        "data_available_date": {"type": "string", "format": "date"},
+        "materiality": {"enum": ["high", "medium", "low", "unknown"]},
+        "prior_regime_id": {"type": ["string", "null"]},
+        "resulting_regime_id": {"type": ["string", "null"]},
+        "review_status": {"enum": ["candidate", "approved", "rejected", "superseded"]},
+        "evidence": {"$ref": "#/$defs/evidence_location"}
+      },
+      "additionalProperties": true
+    },
+    "fact": {
+      "type": "object",
+      "required": [
+        "record_id",
+        "business_regime_id",
+        "report_period",
+        "review_status",
+        "evidence"
+      ],
+      "properties": {
+        "record_id": {"type": "string"},
+        "business_regime_id": {"type": ["string", "null"]},
+        "report_period": {"type": "string", "format": "date"},
+        "review_status": {"enum": ["candidate", "approved", "rejected", "superseded"]},
+        "raw_value": {},
+        "raw_unit": {"type": ["string", "null"]},
+        "normalized_value": {},
+        "normalized_unit": {"type": ["string", "null"]},
+        "scope": {"type": ["string", "null"]},
+        "evidence": {"$ref": "#/$defs/evidence_location"}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

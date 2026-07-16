@@ -1971,6 +1971,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
         FinancialSourceFileManifest(
             source="sse",
             source_mode="direct",
+            source_tier="official_primary",
             instrument_id="600000.SH",
             symbol="600000",
             exchange="SSE",
@@ -2035,6 +2036,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
     )
 
     assert manifests[0]["source_file_id"] == source_file_id
+    assert manifests[0]["source_tier"] == "official_primary"
     assert manifests[0]["parser_diagnostics"] == {"numeric_fact_count": 1}
     assert manifests[0]["metadata"] == {"probe": True}
     assert facts[0]["fact_name"] == "Revenue"
@@ -2065,6 +2067,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
             source_file_id=source_file_id,
             source="sse",
             source_mode="direct",
+            source_tier="official_primary",
             instrument_id="600000.SH",
             symbol="600000",
             exchange="SSE",
@@ -2074,6 +2077,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
             source_url="https://example.test/600000/2024q1-revised.xbrl",
             content_hash="hash-600000-q1-revised",
             parser_version="financial_structured_filing.v1",
+            supersedes_source_file_id="prior-source-file",
             status="downloaded",
         ),
         ingestion_run_id=run_id,
@@ -2083,6 +2087,7 @@ def test_financial_source_manifest_and_numeric_facts_round_trip(tmp_path):
         report_period="2024-03-31",
     )[0]
     assert revised_manifest["content_hash"] == "hash-600000-q1-revised"
+    assert revised_manifest["supersedes_source_file_id"] == "prior-source-file"
 
     with sqlite3.connect(research_db_path) as conn:
         canonical_count = conn.execute(

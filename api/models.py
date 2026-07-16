@@ -717,6 +717,10 @@ class ResearchCompanyBusinessProfileResponse(BaseModel):
     approved_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_exposures: List[Dict[str, Any]] = Field(default_factory=list)
     candidate_facts: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
+    profile_lifecycle: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="业务 regime、画像变更事件及双时点历史",
+    )
     executable_exposure_mappings: List[Dict[str, Any]] = Field(default_factory=list)
     model_scores: Dict[str, Any] = Field(default_factory=dict)
     model_recommendation: str = Field(..., description="行业/公司/双模型建议")

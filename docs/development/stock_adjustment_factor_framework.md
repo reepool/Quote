@@ -156,6 +156,17 @@ BaoStock 官方说明采用“涨跌幅复权算法”：假设除权日前卖�
 
 BaoStock 适合作为 SSE/SZSE 的 A 股权威因子主源。北交所支持情况需要按实际接口验证，不应默认完整。
 
+#### BaoStock 访问治理
+
+BaoStock 当前规定同一出口不得并发连接，且每日 API 请求不得超过 50,000 次。
+项目使用以下硬约束：
+
+- `~/.cache/quote/baostock_session.lock` 持有完整登录会话的跨进程文件锁；同一系统用户只允许一个 BaoStock 会话。
+- `~/.cache/quote/baostock_api_usage.json` 按香港自然日持久化实际 API 调用次数，应用重启或切换 worktree 不会清零。
+- 所有登录、查询、重试、健康检查和登出都通过 `_run_bs_call` 计数。
+- 生产安全上限为每日 40,000 次，保留 10,000 次源端余量；达到上限后硬停止 BaoStock 请求并允许路由降级到 AkShare。
+- `asyncio.Lock` 继续负责单进程 socket 串行化，文件锁负责跨进程连接互斥。直接调用 `baostock` 包会绕过治理，不得用于生产任务。
+
 ### 3.3 A 股：AkShare
 
 AkShare A 股因子通过：

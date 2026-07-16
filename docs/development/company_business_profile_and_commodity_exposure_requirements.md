@@ -30,6 +30,7 @@
 4. 以估值日为截止日期读取当时已公开的事实，避免未来信息泄漏。
 5. 支持商品价格、价差、产量、单位成本、产能和储量进入周期 DCF。
 6. 对低置信度、口径冲突和多业务抵消情况生成复核任务，而不是强行给出结论。
+7. 将证券法律身份与经营业务画像分离，长期保留借壳、重大重组、业务出售和新增主业前后的画像版本。
 
 ### 2.2 非目标
 
@@ -276,6 +277,19 @@ Wind、Choice、同花顺 iFinD、彭博、Refinitiv 等付费终端可能显著
 - 套保方向和经营暴露方向相互矛盾；
 - 行业默认和公司披露的价值链角色冲突。
 
+### 6.6 公司画像生命周期与双时点
+
+公司画像不是一个永久静态标签。同一 `instrument_id` 在借壳上市、重大资产重组、控制权变更、主营资产出售、跨行业收购或新增重大主业后，可能对应不同的经营业务状态。系统必须增加 `business_regime_id` 和画像变更事件，不得用最新画像覆盖上市以来的全部历史。
+
+时间治理采用双时点：
+
+- `valid_from/valid_to`：业务状态在经济和会计口径上的适用区间；
+- `knowledge_from/knowledge_to`：该画像版本被市场公开且经系统审核后可用于研究的区间。
+
+例如借壳资产在 6 月 30 日完成交割、7 月 5 日公告，7 月 3 日的历史 DCF 仍只能使用当时可知的旧画像；7 月 5 日以后才可在审核通过后切换到新 regime。旧版本通过 knowledge interval 关闭并保留，不做原地覆盖。
+
+普通产品扩展不必机械地产生新 regime。若新增业务仍在原合并范围和经营模式内，可在当前 regime 增加分部；若发生主营替换、控制权变化、重大合并范围变化，或新业务达到设定的收入/利润/资产材料性门槛，则进入 regime change 复核。候选变更事件只能形成预警，不能提前停用当前 approved 画像。
+
 ---
 
 ## 7. 与现有模块的工程衔接
@@ -465,3 +479,16 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 已新增本地 OpenSpec change `build-a-share-business-profile-evidence-pipeline`，用于补齐当前治理基础层与生产数据之间的缺口。该 change 的边界是：复用现有 CNInfo/交易所公告发现、PDF 归档和 source manifest，建立首批周期行业金标准、版本化披露模板和词典、文档派生 artifact、候选事实抽取、受控本地审核、增量维护及字段级质量门槛。
 
 详细主备源、五类对象获取方式、解析分层、审核边界、维护频率、样本设计和工期评估见 `company_business_profile_data_acquisition_execution.md`。在项目具备管理接口鉴权之前，审核写操作只通过受控本地工具开放，不新增无鉴权 POST 接口。
+
+### 12.5 公开数据采集第一批基础实现（2026-07-16）
+
+- 已增加 `company_business_profile_regimes` 和 `company_business_profile_events`，分部、经营事实、价值链角色和商品暴露增加 `business_regime_id`、`knowledge_from/to` 及 supersession 字段。
+- resolver 已按业务有效区间与知识有效区间选择 active regime。借壳交割早于公告时，公告前的历史估值继续使用当时可知旧画像；候选重大变化只产生复核预警。
+- 已实现年报全文/摘要/修订版、经营数据、资源报告、重大合同、套保和画像变化公告分类器；借壳、重组、收购、出售、控制权及主营变化只生成事件提示，不自动切换画像。
+- 已实现 CNInfo 公司级文档发现 adapter，复用统一股票身份解析、分页、重试、限速、水位和公告审计；发现阶段不下载 PDF、不写业务事实。
+- 已实现业务画像 PDF 不可变归档服务：共享 source manifest 显式记录 `source_tier`、公告发布时间和 `supersedes_source_file_id`，归档路径包含公告 ID 与 SHA-256；同一公告同一内容重跑短路，修订稿或附件变化建立新版本且不覆盖旧原件。
+- 归档批次支持 `max_documents` 和原子 checkpoint；中断后按公告元数据指纹续跑，完整批次结束后清除 checkpoint。归档阶段只写原件和 manifest，不写 candidate/approved 业务事实。
+- 已实现按申万历史归属和股票上市生命周期导出首批行业 universe 的只读审计工具。2026-07-16 当前在市样本为 791 家，现有正式业务画像全文归档覆盖仍为 0。
+- 已建立包含文档、页/表证据、产品、商品、单位、业务 regime、画像事件和审核决定的金标准 JSON Schema。
+
+下一批进入每行业 5 家 parser benchmark、交易所备源、CNInfo 受控 live 归档及 page artifact，不提前进行全市场画像事实写入。

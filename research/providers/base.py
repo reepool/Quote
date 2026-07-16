@@ -173,6 +173,7 @@ class FinancialSourceFileManifest:
     report_period: str
     parser_version: str
     source_mode: str = "direct"
+    source_tier: Optional[str] = None
     instrument_id: Optional[str] = None
     symbol: Optional[str] = None
     report_type: Optional[str] = None
@@ -184,6 +185,7 @@ class FinancialSourceFileManifest:
     published_at: Optional[str] = None
     downloaded_at: Optional[str] = None
     source_file_id: Optional[str] = None
+    supersedes_source_file_id: Optional[str] = None
     status: str = "discovered"
     schema_version: str = "financial_source_file_manifest.v1"
     parser_diagnostics: Dict[str, Any] = field(default_factory=dict)

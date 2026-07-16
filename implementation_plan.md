@@ -81,6 +81,10 @@
   - `2026-06-13` DCF 周期行业专项已推进：`cyclical_fcff_midcycle.v1` 支持资源周期公司用 mid-cycle operating margin 归一化 FCFF，不再直接外推景气高点利润；输出 `cyclical_model_diagnostics`，记录 reported/normalized margin、cap/floor、周期输入缺口和敏感性
   - `2026-07-16` DCF 公司业务画像治理基础层已推进：新增证据、分部、经营事实、价值链角色和商品暴露规范化存储；按审批、证据完整性、可得日和有效期构建 `business_profile_context`，公司 approved 暴露可在 DCF 周期诊断中覆盖同商品/角色行业默认，并新增画像、历史、商品暴露和复核队列只读 API。当前未执行全市场官方年报回补，下一步是首批周期行业金标准、官方披露抽取和经审批的行业/公司映射数据填充
   - `2026-07-16` DCF 公司业务画像公开数据采集已形成专项工程方案和本地 OpenSpec `build-a-share-business-profile-evidence-pipeline`：以 CNInfo 正式全文为主源、交易所为备源，按“不可变文档 -> 页/表证据 -> candidate 事实 -> 受控审核 -> approved DCF 输入”推进；首期覆盖煤炭、有色/固体矿产、钢铁、石油石化、基础化工和建筑材料，先完成金标准及通用分部/产销量/成本表，再逐行业生成价值链和商品暴露候选
+  - `2026-07-16` 公司画像长期治理补充采用 `instrument_id + business_regime_id` 和双时点区间：借壳、重大重组、业务出售及新增重大主业形成候选变更事件，approved 后通过 immutable supersession 切换业务 regime；历史 DCF 按当时 knowledge interval 读取，不使用后来披露的业务变化回写历史
+  - `2026-07-16` 上述长期治理基础已进入代码：新增 regime/event 存储和 API/DCF `profile_lifecycle`，公告分类器只生成画像变化提示；首批行业只读 universe 工具按申万历史归属与上市生命周期识别当前在市 791 家（基础化工 446、有色 145、建材 76、石化 48、钢铁 43、煤炭 33），正式业务画像全文归档覆盖仍为 0，下一步进入每行业 5 家文档基准和 CNInfo 全文归档
+  - `2026-07-16` CNInfo 业务画像文档发现 adapter 已实现：按公司复用官方 orgId/stock identity、分页、水位、限速重试和 announcement audit，摘要不会替代全文，重组公告只产生 profile event hints
+  - `2026-07-16` 业务画像 PDF 原件归档第一版已实现：复用 `financial_source_files` 并新增显式 `source_tier / supersedes_source_file_id`，按 `exchange/symbol/report_period/original/announcement_id_sha256.pdf` 不可变归档；同公告同内容短路，修订稿和附件内容变化建立 supersession，有限批次支持原子 checkpoint 中断续跑。当前尚未执行生产归档，交易所备源、page artifact 和候选事实抽取仍待实现
   - 个股历史估值分位按请求从 `valuation_history` 即时计算，不持久化全量 `instrument x date x metric x window` 分位矩阵；默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度，并对负值估值显式返回解释提示
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过

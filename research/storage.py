@@ -111,6 +111,22 @@ class FinancialStatementStorageRepository:
                 ingestion_run_id=ingestion_run_id,
             )
 
+    def get_source_file_manifests(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        exchange: Optional[str] = None,
+        report_period: Optional[str] = None,
+        source: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        with self._storage.financial_database_scope():
+            return self._storage.get_financial_source_file_manifests(
+                instrument_id=instrument_id,
+                exchange=exchange,
+                report_period=report_period,
+                source=source,
+            )
+
     def upsert_numeric_facts(
         self,
         facts: List[FinancialNumericFactSnapshot],
@@ -1320,12 +1336,14 @@ class ResearchStorageManager:
                     schema_version,
                     source,
                     source_mode,
+                    source_tier,
                     status,
+                    supersedes_source_file_id,
                     metadata_json,
                     ingestion_run_id,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(source_file_id)
                 DO UPDATE SET
                     instrument_id = excluded.instrument_id,
@@ -1345,7 +1363,9 @@ class ResearchStorageManager:
                     schema_version = excluded.schema_version,
                     source = excluded.source,
                     source_mode = excluded.source_mode,
+                    source_tier = excluded.source_tier,
                     status = excluded.status,
+                    supersedes_source_file_id = excluded.supersedes_source_file_id,
                     metadata_json = excluded.metadata_json,
                     ingestion_run_id = excluded.ingestion_run_id,
                     updated_at = excluded.updated_at
@@ -1369,7 +1389,9 @@ class ResearchStorageManager:
                     manifest.schema_version,
                     manifest.source,
                     manifest.source_mode,
+                    manifest.source_tier,
                     manifest.status,
+                    manifest.supersedes_source_file_id,
                     metadata_json,
                     ingestion_run_id,
                     now,
@@ -11179,6 +11201,18 @@ class ResearchStorageManager:
         cls._ensure_column(conn, "financial_facts", "report_type", "report_type TEXT")
         cls._ensure_column(
             conn,
+            "financial_source_files",
+            "source_tier",
+            "source_tier TEXT",
+        )
+        cls._ensure_column(
+            conn,
+            "financial_source_files",
+            "supersedes_source_file_id",
+            "supersedes_source_file_id TEXT",
+        )
+        cls._ensure_column(
+            conn,
             "financial_facts",
             "statement_family",
             "statement_family TEXT",
@@ -11262,6 +11296,61 @@ class ResearchStorageManager:
             "float_market_cap",
         ):
             cls._ensure_column(conn, "valuation_history", column_name, f"{column_name} REAL")
+        for table_name in (
+            "company_business_segments",
+            "company_operating_facts",
+            "company_value_chain_roles",
+            "company_commodity_exposures",
+        ):
+            cls._ensure_column(
+                conn,
+                table_name,
+                "business_regime_id",
+                "business_regime_id TEXT",
+            )
+            cls._ensure_column(
+                conn,
+                table_name,
+                "knowledge_from",
+                "knowledge_from TEXT",
+            )
+            cls._ensure_column(
+                conn,
+                table_name,
+                "knowledge_to",
+                "knowledge_to TEXT",
+            )
+        for table_name in (
+            "company_business_segments",
+            "company_operating_facts",
+            "company_value_chain_roles",
+        ):
+            cls._ensure_column(
+                conn,
+                table_name,
+                "supersedes_record_id",
+                "supersedes_record_id TEXT",
+            )
+        cls._ensure_column(
+            conn,
+            "company_commodity_exposures",
+            "supersedes_exposure_id",
+            "supersedes_exposure_id TEXT",
+        )
+        for table_name in (
+            "company_business_segments",
+            "company_operating_facts",
+            "company_value_chain_roles",
+            "company_commodity_exposures",
+        ):
+            conn.execute(
+                f"""
+                UPDATE {table_name}
+                SET knowledge_from = data_available_date
+                WHERE knowledge_from IS NULL
+                  AND data_available_date IS NOT NULL
+                """
+            )
 
     @staticmethod
     def _create_tables(conn: sqlite3.Connection) -> None:
@@ -11350,6 +11439,66 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_business_profile_evidence_review
             ON business_profile_evidence(review_status, updated_at);
 
+            CREATE TABLE IF NOT EXISTS company_business_profile_events (
+                event_id TEXT PRIMARY KEY,
+                instrument_id TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                event_date TEXT,
+                event_date_quality TEXT,
+                prior_regime_id TEXT,
+                resulting_regime_id TEXT,
+                materiality TEXT,
+                description TEXT,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_events_asof
+            ON company_business_profile_events(
+                instrument_id, data_available_date, event_date, review_status
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_events_review
+            ON company_business_profile_events(review_status, materiality, updated_at);
+
+            CREATE TABLE IF NOT EXISTS company_business_profile_regimes (
+                regime_id TEXT PRIMARY KEY,
+                regime_key TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                regime_name TEXT NOT NULL,
+                regime_type TEXT NOT NULL,
+                valid_from TEXT,
+                valid_to TEXT,
+                knowledge_from TEXT NOT NULL,
+                knowledge_to TEXT,
+                trigger_event_id TEXT,
+                evidence_id TEXT NOT NULL,
+                data_available_date TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                review_status TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
+                lineage_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (evidence_id) REFERENCES business_profile_evidence(evidence_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_regimes_asof
+            ON company_business_profile_regimes(
+                instrument_id, knowledge_from, knowledge_to, valid_from, valid_to,
+                review_status
+            );
+            CREATE INDEX IF NOT EXISTS idx_company_business_profile_regimes_key
+            ON company_business_profile_regimes(instrument_id, regime_key, version);
+
             CREATE TABLE IF NOT EXISTS company_business_segments (
                 record_id TEXT PRIMARY KEY,
                 instrument_id TEXT NOT NULL,
@@ -11373,6 +11522,10 @@ class ResearchStorageManager:
                 review_status TEXT NOT NULL,
                 valid_from TEXT,
                 valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT,
+                knowledge_to TEXT,
+                supersedes_record_id TEXT,
                 version INTEGER NOT NULL DEFAULT 1,
                 lineage_hash TEXT NOT NULL,
                 metadata_json TEXT NOT NULL DEFAULT '{}',
@@ -11406,6 +11559,10 @@ class ResearchStorageManager:
                 review_status TEXT NOT NULL,
                 valid_from TEXT,
                 valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT,
+                knowledge_to TEXT,
+                supersedes_record_id TEXT,
                 version INTEGER NOT NULL DEFAULT 1,
                 lineage_hash TEXT NOT NULL,
                 metadata_json TEXT NOT NULL DEFAULT '{}',
@@ -11434,6 +11591,10 @@ class ResearchStorageManager:
                 review_status TEXT NOT NULL,
                 valid_from TEXT,
                 valid_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT,
+                knowledge_to TEXT,
+                supersedes_record_id TEXT,
                 version INTEGER NOT NULL DEFAULT 1,
                 lineage_hash TEXT NOT NULL,
                 metadata_json TEXT NOT NULL DEFAULT '{}',
@@ -11467,6 +11628,10 @@ class ResearchStorageManager:
                 review_status TEXT NOT NULL,
                 effective_from TEXT,
                 effective_to TEXT,
+                business_regime_id TEXT,
+                knowledge_from TEXT,
+                knowledge_to TEXT,
+                supersedes_exposure_id TEXT,
                 version INTEGER NOT NULL DEFAULT 1,
                 lineage_hash TEXT NOT NULL,
                 metadata_json TEXT NOT NULL DEFAULT '{}',
@@ -11686,7 +11851,9 @@ class ResearchStorageManager:
                 schema_version TEXT NOT NULL,
                 source TEXT NOT NULL,
                 source_mode TEXT NOT NULL,
+                source_tier TEXT,
                 status TEXT NOT NULL,
+                supersedes_source_file_id TEXT,
                 metadata_json TEXT NOT NULL DEFAULT '{}',
                 ingestion_run_id INTEGER,
                 created_at TEXT NOT NULL,

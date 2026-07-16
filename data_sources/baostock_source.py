@@ -5,9 +5,14 @@ Specialized for Chinese stock market historical data.
 
 import asyncio
 import concurrent.futures
+import fcntl
+import json
+import os
 import socket
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta, date
+from zoneinfo import ZoneInfo
 import pandas as pd
 import baostock as bs
 
@@ -20,6 +25,116 @@ from utils import baostock_logger
 
 _BAOSTOCK_FACTOR_HISTORY_START = datetime(1990, 1, 1)
 _FACTOR_EPSILON = 1e-12
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_HONG_KONG_TZ = ZoneInfo("Asia/Hong_Kong")
+
+
+class BaostockAccessGovernor:
+    """Enforce a single local BaoStock session and a persistent daily quota."""
+
+    def __init__(
+        self,
+        *,
+        daily_request_limit: int,
+        state_path: str,
+        session_lock_path: str,
+    ):
+        self.daily_request_limit = max(1, int(daily_request_limit))
+        self.state_path = self._resolve_path(state_path)
+        self.session_lock_path = self._resolve_path(session_lock_path)
+        self._session_lock_handle = None
+
+    @staticmethod
+    def _resolve_path(value: str) -> Path:
+        path = Path(value).expanduser()
+        return path if path.is_absolute() else _PROJECT_ROOT / path
+
+    def acquire_session(self) -> None:
+        """Hold an OS lock for the complete login session."""
+        if self._session_lock_handle is not None:
+            return
+        self.session_lock_path.parent.mkdir(parents=True, exist_ok=True)
+        handle = self.session_lock_path.open("a+", encoding="utf-8")
+        try:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as exc:
+            handle.close()
+            raise DataSourceError(
+                "Another local process already owns the BaoStock session",
+                ErrorCodes.DATASOURCE_RATE_LIMIT,
+            ) from exc
+        handle.seek(0)
+        handle.truncate()
+        handle.write(str(os.getpid()))
+        handle.flush()
+        self._session_lock_handle = handle
+
+    def release_session(self) -> None:
+        handle = self._session_lock_handle
+        self._session_lock_handle = None
+        if handle is None:
+            return
+        try:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        finally:
+            handle.close()
+
+    def reserve_request(self, method: str, *, allow_cleanup: bool = False) -> int:
+        """Persist one actual API call before it is sent to BaoStock."""
+        now = datetime.now(_HONG_KONG_TZ)
+        today = now.date().isoformat()
+        state = self._read_state()
+        count = int(state.get("count", 0)) if state.get("date") == today else 0
+        if count >= self.daily_request_limit and not allow_cleanup:
+            raise DataSourceError(
+                "BaoStock daily safety quota reached: "
+                f"{count}/{self.daily_request_limit}",
+                ErrorCodes.DATASOURCE_RATE_LIMIT,
+                context={
+                    "date": today,
+                    "count": count,
+                    "limit": self.daily_request_limit,
+                    "method": method,
+                },
+            )
+        count += 1
+        self._write_state({
+            "date": today,
+            "count": count,
+            "daily_request_limit": self.daily_request_limit,
+            "last_request_at": now.isoformat(),
+            "last_method": method,
+            "pid": os.getpid(),
+        })
+        return count
+
+    def _read_state(self) -> Dict[str, Any]:
+        if not self.state_path.exists():
+            return {}
+        try:
+            payload = json.loads(self.state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise DataSourceError(
+                f"BaoStock quota state is unreadable: {self.state_path}",
+                ErrorCodes.DATASOURCE_RATE_LIMIT,
+            ) from exc
+        if not isinstance(payload, dict):
+            raise DataSourceError(
+                f"BaoStock quota state is invalid: {self.state_path}",
+                ErrorCodes.DATASOURCE_RATE_LIMIT,
+            )
+        return payload
+
+    def _write_state(self, payload: Dict[str, Any]) -> None:
+        self.state_path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = self.state_path.with_name(
+            f"{self.state_path.name}.{os.getpid()}.tmp"
+        )
+        temp_path.write_text(
+            json.dumps(payload, ensure_ascii=True, sort_keys=True),
+            encoding="utf-8",
+        )
+        os.replace(temp_path, self.state_path)
 
 
 class BaostockSource(BaseDataSource):
@@ -35,6 +150,9 @@ class BaostockSource(BaseDataSource):
         *,
         connection_timeout_seconds: float = 30.0,
         login_timeout_seconds: Optional[float] = None,
+        daily_request_safety_limit: int = 40000,
+        usage_state_path: str = "~/.cache/quote/baostock_api_usage.json",
+        session_lock_path: str = "~/.cache/quote/baostock_session.lock",
     ):
         super().__init__(name, rate_limit_config)
         self.supported_exchanges = ['SSE', 'SZSE']  # 上海证券交易所、深圳证券交易所
@@ -48,6 +166,11 @@ class BaostockSource(BaseDataSource):
         )
         self._bs_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1, thread_name_prefix='bs')
         self._last_success_time: float = 0.0  # 最近一次成功 API 调用的时间戳
+        self._access_governor = BaostockAccessGovernor(
+            daily_request_limit=daily_request_safety_limit,
+            state_path=usage_state_path,
+            session_lock_path=session_lock_path,
+        )
 
     async def _run_bs_call(self, func, *args, timeout: int = None, **kwargs):
         """在线程池中执行 BaoStock 同步调用，带强制超时保护
@@ -56,6 +179,18 @@ class BaostockSource(BaseDataSource):
         彻底终止卡死在 C 层 recv() 上的线程，防止永久死锁。
         """
         _timeout = timeout or self._bs_call_timeout
+        method_name = getattr(func, "__name__", type(func).__name__)
+        request_count = self._access_governor.reserve_request(
+            method_name,
+            allow_cleanup=method_name == "logout",
+        )
+        if request_count == 1 or request_count % 1000 == 0:
+            baostock_logger.info(
+                "BaoStock daily API usage: %d/%d (last_method=%s)",
+                request_count,
+                self._access_governor.daily_request_limit,
+                method_name,
+            )
         loop = asyncio.get_running_loop()
         future = loop.run_in_executor(self._bs_executor, lambda: func(*args, **kwargs))
         try:
@@ -98,6 +233,7 @@ class BaostockSource(BaseDataSource):
         """初始化Baostock数据源"""
         try:
             baostock_logger.info("Initializing Baostock data source")
+            self._access_governor.acquire_session()
 
             # 登录Baostock（加锁保护全局 socket）
             async with BaostockSource._bs_lock:
@@ -114,6 +250,7 @@ class BaostockSource(BaseDataSource):
             baostock_logger.info("Baostock connection successful")
 
         except Exception as e:
+            self._access_governor.release_session()
             data_source_metrics.increment("initialization_failure")
             if isinstance(e, (ConnectionError, TimeoutError)):
                 baostock_logger.error(f"Network error during Baostock initialization: {str(e)}")
@@ -679,7 +816,7 @@ class BaostockSource(BaseDataSource):
 
     async def get_adjustment_factors(self, instrument_id: str, symbol: str,
                                      start_date: datetime, end_date: datetime
-                                     ) -> List[Dict[str, Any]]:
+                                     ) -> Optional[List[Dict[str, Any]]]:
         """获取复权因子数据
 
         调用 bs.query_adjust_factor 获取除权除息因子.
@@ -747,6 +884,17 @@ class BaostockSource(BaseDataSource):
             )
             return factors
 
+        except DataSourceError as e:
+            if e.error_code == ErrorCodes.DATASOURCE_RATE_LIMIT:
+                baostock_logger.warning(
+                    "BaoStock factor source unavailable due to access governance: %s",
+                    e,
+                )
+                return None
+            baostock_logger.error(
+                f"Failed to get adjustment factors from Baostock for {instrument_id}: {e}"
+            )
+            return []
         except Exception as e:
             baostock_logger.error(
                 f"Failed to get adjustment factors from Baostock for {instrument_id}: {e}"
@@ -835,11 +983,14 @@ class BaostockSource(BaseDataSource):
 
     async def close(self):
         """关闭数据源连接（加锁保护全局 socket）"""
-        if self.is_logged_in:
-            try:
+        try:
+            if self.is_logged_in:
                 async with BaostockSource._bs_lock:
                     await self._run_bs_call(bs.logout, timeout=5)
                     self.is_logged_in = False
                 baostock_logger.info("Baostock logged out successfully")
-            except Exception as e:
-                baostock_logger.error(f"Error during Baostock logout: {e}")
+        except Exception as e:
+            baostock_logger.error(f"Error during Baostock logout: {e}")
+        finally:
+            self.is_logged_in = False
+            self._access_governor.release_session()
