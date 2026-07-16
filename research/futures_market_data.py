@@ -3369,7 +3369,14 @@ class FuturesStorageManager:
     ) -> List[Dict[str, Any]]:
         params: List[Any] = [series_id]
         if as_of_date:
-            date_filter = "AND as_of_date = ?"
+            date_filter = """
+            AND as_of_date = (
+                SELECT MAX(as_of_date)
+                FROM futures_cycle_diagnostics
+                WHERE series_id = ? AND as_of_date <= ?
+            )
+            """
+            params.append(series_id)
             params.append(_date_key(as_of_date))
         else:
             date_filter = """

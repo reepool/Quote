@@ -1021,7 +1021,10 @@ def test_valuation_service_dcf_cyclical_defaults_to_midcycle_model():
         instrument={
             "instrument_id": "601088.SH",
             "symbol": "601088",
+            "name": "中国神华",
             "exchange": "SSE",
+            "type": "stock",
+            "status": "active",
             "industry_name": "煤炭",
         },
         financial_bundle={
@@ -1040,6 +1043,7 @@ def test_valuation_service_dcf_cyclical_defaults_to_midcycle_model():
 
     assert result["status"] == "success"
     assert result["model_profile"] == "cyclical_fcff_midcycle.v1"
+    assert "st_or_delisting_risk" not in result["readiness"]["blockers"]
     assert result["calc_method"] == "professional_dcf_cyclical_midcycle_fcff"
     assert result["base_cash_flow_source"] == "midcycle_fcff"
     assert result["enterprise_value"] is not None
@@ -1557,6 +1561,102 @@ def test_professional_dcf_fx_assumption_override_uses_local_fx_lineage():
     assert fx["lineage_hash"]
 
 
+def test_professional_dcf_risk_free_override_preserves_local_interests_lineage():
+    engine = ProfessionalDcfEngine()
+
+    assumptions = engine.get_assumptions(
+        market="SSE",
+        currency="CNY",
+        overrides={
+            "risk_free_rate": 0.017402,
+            "risk_free_rate_source": "akshare",
+            "risk_free_rate_source_profile": "china_bond_10y",
+            "risk_free_rate_quality_flag": "local_interests_db_observation",
+            "risk_free_rate_as_of_date": "2026-07-14",
+            "risk_free_rate_lineage_hash": "local-rate-lineage",
+            "risk_free_rate_metadata": {"database": "interests.db"},
+        },
+    )
+
+    risk_free = assumptions["risk_free_rate"]
+    assert risk_free["value"] == 0.017402
+    assert risk_free["source"] == "akshare"
+    assert risk_free["source_profile"] == "china_bond_10y"
+    assert risk_free["quality_flag"] == "local_interests_db_observation"
+    assert risk_free["fallback_used"] is False
+    assert risk_free["as_of_date"] == "2026-07-14"
+    assert risk_free["lineage_hash"] == "local-rate-lineage"
+    assert risk_free["metadata"]["database"] == "interests.db"
+
+
+def test_professional_dcf_uses_estimated_a_share_availability_and_shenwan_industry():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "sw_l1_name": "煤炭",
+            "sw_l2_name": "煤炭开采",
+            "sw_l3_name": "动力煤",
+            "dcf_industry_mapping_status": "authoritative",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={"valuation_date": "2026-05-01"},
+    )
+
+    assert result["model_profile"] == "cyclical_fcff_midcycle.v1"
+    assert "estimated_financial_data_available_date" in result["warnings"]
+    assert "missing_data_available_date" not in result["readiness"]["blockers"]
+    assert result["lineage"]["financial"]["data_available_date"] == "2026-04-30"
+    assert result["lineage"]["financial"]["data_available_date_estimated"] is True
+
+
+def test_professional_dcf_rejects_non_positive_observed_beta_for_discount_rate():
+    service = ResearchValuationService()
+
+    result = service.run_dcf(
+        instrument={
+            "instrument_id": "601088.SH",
+            "symbol": "601088",
+            "exchange": "SSE",
+            "sw_l1_name": "煤炭",
+            "dcf_industry_mapping_status": "authoritative",
+        },
+        financial_bundle={
+            "report_period": "2025-12-31",
+            "data_available_date": "2026-04-30",
+            "revenue": 1000.0,
+            "operating_profit": 180.0,
+            "capital_expenditure": 60.0,
+            "shares_outstanding": 10.0,
+        },
+        latest_close=12.0,
+        overrides={
+            "valuation_date": "2026-05-01",
+            "beta": -0.1372,
+            "beta_source": "beta_on_demand",
+            "beta_quality_flag": "low",
+            "beta_interpretation_flags": ["low_explanatory_power"],
+        },
+    )
+
+    assert result["status"] == "success"
+    assert result["lineage"]["beta"]["beta"] == 1.0
+    assert result["lineage"]["beta"]["raw_beta"] == -0.1372
+    assert result["lineage"]["beta"]["beta_rejection_reason"] == "non_positive_beta"
+    assert "beta_fallback_used" in result["warnings"]
+    assert "non_positive_beta" in result["warnings"]
+
+
 def test_professional_dcf_missing_required_assumption_returns_structured_blocker():
     service = ResearchValuationService(
         {
@@ -1623,7 +1723,7 @@ def test_professional_dcf_fallback_assumptions_are_warned():
     assert "beta_fallback_used" in result["warnings"]
 
 
-def test_valuation_service_dcf_blocks_missing_availability_date():
+def test_valuation_service_dcf_blocks_estimated_availability_after_valuation_date():
     service = ResearchValuationService()
 
     result = service.run_dcf(
@@ -1640,7 +1740,9 @@ def test_valuation_service_dcf_blocks_missing_availability_date():
     )
 
     assert result["status"] == "unavailable"
-    assert result["missing_reason"] == "missing_data_available_date"
+    assert result["missing_reason"] == "financial_fact_after_valuation_date"
+    assert "estimated_financial_data_available_date" in result["warnings"]
+    assert result["lineage"]["financial"]["data_available_date"] == "2026-04-30"
 
 
 def test_valuation_service_dcf_missing_capex_blocks_full_fcff():

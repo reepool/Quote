@@ -6055,6 +6055,7 @@ class DataManager:
         instrument_id: str,
         *,
         industry_membership: Optional[Dict[str, Any]] = None,
+        as_of_date: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Return local futures exposure and diagnostics for cyclical DCF."""
         storage = self._require_futures_storage()
@@ -6075,7 +6076,10 @@ class DataManager:
                     series_ids.append(mapping["revenue_series_id"])
                 series_ids.extend(mapping.get("cost_series_ids") or [])
                 for series_id in sorted(set(series_ids)):
-                    diagnostics_by_series[series_id] = storage.get_cycle_diagnostics(series_id)
+                    diagnostics_by_series[series_id] = storage.get_cycle_diagnostics(
+                        series_id,
+                        as_of_date=as_of_date,
+                    )
             return {
                 **exposure,
                 "diagnostics_by_series": diagnostics_by_series,
@@ -6973,16 +6977,131 @@ class DataManager:
         instrument = await self.db_ops.get_instrument_by_id(normalized_id)
         if not instrument:
             return None
+        target_valuation_date = str(
+            valuation_date or get_shanghai_time().date().isoformat()
+        )[:10]
 
-        financial_bundle = await asyncio.to_thread(
-            self._run_financial_storage_call,
-            storage,
-            "get_financial_statement_bundle",
-            normalized_id,
-            include_statements=False,
+        financial_history: List[Dict[str, Any]] = []
+        if hasattr(storage, "get_financial_statement_bundles"):
+            financial_history = await asyncio.to_thread(
+                self._run_financial_storage_call,
+                storage,
+                "get_financial_statement_bundles",
+                normalized_id,
+                include_statements=False,
+                limit=80 if valuation_date is not None else 16,
+            )
+            if not isinstance(financial_history, list):
+                financial_history = []
+        if not financial_history:
+            latest_bundle = await asyncio.to_thread(
+                self._run_financial_storage_call,
+                storage,
+                "get_financial_statement_bundle",
+                normalized_id,
+                include_statements=False,
+            )
+            if isinstance(latest_bundle, dict):
+                financial_history = [latest_bundle]
+        if not financial_history:
+            return None
+
+        from research.dcf_input_governance import (
+            derive_cash_and_debt,
+            derive_capital_expenditure,
+            enrich_instrument_with_industry,
+            select_financial_bundle_as_of,
+        )
+
+        financial_bundle = select_financial_bundle_as_of(
+            financial_history,
+            valuation_date=target_valuation_date,
+            exchange=instrument.get("exchange"),
         )
         if financial_bundle is None:
-            return None
+            # Compatibility for synthetic/test bundles without top-level period metadata.
+            financial_bundle = deepcopy(financial_history[0])
+
+        industry_membership = await self._get_dcf_industry_membership(
+            storage,
+            normalized_id,
+            valuation_date=target_valuation_date,
+            historical_request=valuation_date is not None,
+        )
+        instrument = enrich_instrument_with_industry(instrument, industry_membership)
+        if industry_membership:
+            financial_bundle["dcf_industry_membership"] = deepcopy(industry_membership)
+            lineage = financial_bundle.get("lineage")
+            if not isinstance(lineage, dict):
+                lineage = {}
+                financial_bundle["lineage"] = lineage
+            lineage["industry_membership"] = {
+                "taxonomy_system": industry_membership.get("taxonomy_system"),
+                "taxonomy_version": industry_membership.get("taxonomy_version"),
+                "industry_code": industry_membership.get("industry_code"),
+                "sw_l1_code": industry_membership.get("sw_l1_code"),
+                "sw_l2_code": industry_membership.get("sw_l2_code"),
+                "sw_l3_code": industry_membership.get("sw_l3_code"),
+                "mapping_status": industry_membership.get("mapping_status"),
+                "effective_date": industry_membership.get("effective_date"),
+                "source": industry_membership.get("source"),
+                "source_mode": industry_membership.get("source_mode"),
+                "data_as_of": industry_membership.get("data_as_of"),
+            }
+
+        report_period = str(
+            financial_bundle.get("report_period")
+            or (financial_bundle.get("latest_facts") or {}).get("report_period")
+            or ""
+        )[:10]
+        if report_period:
+            capex_context = derive_capital_expenditure(
+                financial_history,
+                selected_report_period=report_period,
+            )
+            financial_bundle["capital_expenditure_context"] = capex_context
+            if capex_context.get("value") is not None:
+                financial_bundle["capital_expenditure"] = capex_context["value"]
+                latest_facts = financial_bundle.get("latest_facts")
+                if not isinstance(latest_facts, dict):
+                    latest_facts = {}
+                    financial_bundle["latest_facts"] = latest_facts
+                latest_facts.setdefault(
+                    "capital_expenditure",
+                    capex_context["value"],
+                )
+                capex_lineage = financial_bundle.get("lineage")
+                if not isinstance(capex_lineage, dict):
+                    capex_lineage = {}
+                    financial_bundle["lineage"] = capex_lineage
+                capex_lineage["capital_expenditure"] = capex_context
+
+        balance_sheet_context = derive_cash_and_debt(financial_bundle)
+        financial_bundle["cash_and_debt_context"] = balance_sheet_context
+        for field_name in (
+            "cash_and_equivalents",
+            "total_debt",
+            "lease_liabilities",
+        ):
+            if balance_sheet_context.get(field_name) is not None:
+                financial_bundle[field_name] = balance_sheet_context[field_name]
+                latest_facts = financial_bundle.get("latest_facts")
+                if not isinstance(latest_facts, dict):
+                    latest_facts = {}
+                    financial_bundle["latest_facts"] = latest_facts
+                latest_facts[field_name] = balance_sheet_context[field_name]
+        balance_lineage = financial_bundle.get("lineage")
+        if not isinstance(balance_lineage, dict):
+            balance_lineage = {}
+            financial_bundle["lineage"] = balance_lineage
+        balance_lineage["cash_and_debt"] = balance_sheet_context
+
+        financial_bundle = await self._enrich_dcf_bundle_with_local_shares(
+            storage,
+            normalized_id,
+            financial_bundle,
+            valuation_date=target_valuation_date,
+        )
         financial_bundle = await asyncio.to_thread(
             self._enrich_dcf_bundle_with_broker_risk_control_facts,
             storage,
@@ -6992,6 +7111,11 @@ class DataManager:
 
         latest_quotes = await self.db_ops.get_daily_data(
             instrument_id=normalized_id,
+            end_date=(
+                datetime.fromisoformat(target_valuation_date)
+                + timedelta(days=1)
+                - timedelta(microseconds=1)
+            ),
             limit=1,
             return_format="pandas",
         )
@@ -7008,7 +7132,7 @@ class DataManager:
                 "projection_years": projection_years,
                 "model_profile": model_profile,
                 "model_strategy": model_strategy,
-                "valuation_date": valuation_date,
+                "valuation_date": target_valuation_date,
                 "scenario_set": scenario_set,
                 "terminal_method": terminal_method,
                 "cash_flow_model": cash_flow_model,
@@ -7023,6 +7147,31 @@ class DataManager:
             }.items()
             if value is not None
         }
+        risk_free_rate_context = await self._get_dcf_risk_free_rate_context(
+            storage,
+            valuation_date=target_valuation_date,
+            exchange=instrument.get("exchange"),
+            currency=str(financial_bundle.get("currency") or "CNY"),
+        )
+        if risk_free_rate_context and risk_free_rate_context.get("value") is not None:
+            overrides["risk_free_rate"] = risk_free_rate_context["value"]
+            overrides["risk_free_rate_source"] = risk_free_rate_context.get("source")
+            overrides["risk_free_rate_source_profile"] = risk_free_rate_context.get(
+                "source_profile"
+            )
+            overrides["risk_free_rate_quality_flag"] = risk_free_rate_context.get(
+                "quality_flag"
+            )
+            overrides["risk_free_rate_as_of_date"] = risk_free_rate_context.get(
+                "as_of_date"
+            )
+            overrides["risk_free_rate_last_updated_at"] = risk_free_rate_context.get(
+                "last_updated_at"
+            )
+            overrides["risk_free_rate_lineage_hash"] = risk_free_rate_context.get(
+                "lineage_hash"
+            )
+            overrides["risk_free_rate_metadata"] = risk_free_rate_context
         dcf_beta_cfg = module_cfg.get("dcf", {}).get("beta", {})
         if "beta" not in overrides and dcf_beta_cfg.get("enabled", True):
             try:
@@ -7031,6 +7180,7 @@ class DataManager:
                     benchmark_family=dcf_beta_cfg.get("benchmark_family", "market_default"),
                     benchmark_instrument_id=dcf_beta_cfg.get("benchmark_instrument_id"),
                     window_days=int(dcf_beta_cfg.get("window_days", 252)),
+                    as_of_date=date.fromisoformat(target_valuation_date),
                     include_details=False,
                 )
             except RuntimeError:
@@ -7047,6 +7197,12 @@ class DataManager:
                 if beta_result:
                     overrides["beta"] = float(beta_result["beta"])
                     overrides["beta_source"] = "beta_on_demand"
+                    overrides["beta_quality_flag"] = beta_result.get("quality_flag")
+                    overrides["beta_interpretation_flags"] = beta_result.get(
+                        "interpretation_flags"
+                    ) or []
+                    overrides["beta_r_squared"] = beta_result.get("r_squared")
+                    overrides["beta_p_value"] = beta_result.get("p_value_beta")
                     overrides["beta_benchmark"] = {
                         "benchmark_family": beta_result.get("benchmark_family"),
                         "benchmark_instrument_id": beta_result.get("benchmark_instrument_id"),
@@ -7055,7 +7211,11 @@ class DataManager:
                         "as_of_date": beta_result.get("as_of_date"),
                     }
 
-        futures_cycle_context = await self._get_dcf_futures_cycle_context(normalized_id)
+        futures_cycle_context = await self._get_dcf_futures_cycle_context(
+            normalized_id,
+            valuation_date=target_valuation_date,
+            industry_membership=industry_membership,
+        )
         if futures_cycle_context:
             overrides.setdefault(
                 "commodity_price_assumption",
@@ -7136,8 +7296,238 @@ class DataManager:
                     warning = f"fx_market_data_{blocker}"
                     if warning not in result["warnings"]:
                         result["warnings"].append(warning)
+        if isinstance(result.get("warnings"), list):
+            result["warnings"] = list(dict.fromkeys(result["warnings"]))
         self._store_dcf_run_cache(cache_key, result, module_cfg)
         return result
+
+    async def _get_dcf_industry_membership(
+        self,
+        storage: Any,
+        instrument_id: str,
+        *,
+        valuation_date: str,
+        historical_request: bool,
+    ) -> Optional[Dict[str, Any]]:
+        """Resolve authoritative Shenwan membership for the DCF valuation date."""
+        if historical_request and hasattr(storage, "get_industry_membership_as_of"):
+            historical = await asyncio.to_thread(
+                storage.get_industry_membership_as_of,
+                instrument_id,
+                valuation_date,
+                taxonomy_system="sw",
+                include_snapshot=True,
+            )
+            normalized = await self._normalize_dcf_historical_industry_membership(
+                storage,
+                historical,
+            )
+            if normalized:
+                return normalized
+            return None
+        if not hasattr(storage, "get_industry_membership"):
+            return None
+        return await asyncio.to_thread(
+            storage.get_industry_membership,
+            instrument_id,
+            include_snapshot=False,
+        )
+
+    async def _normalize_dcf_historical_industry_membership(
+        self,
+        storage: Any,
+        historical: Optional[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        if not isinstance(historical, dict):
+            return None
+        if historical.get("sw_l1_name"):
+            return historical
+        if not hasattr(storage, "list_industry_taxonomy_records"):
+            return None
+
+        taxonomy_system = str(historical.get("taxonomy_system") or "sw")
+        taxonomy_version = str(historical.get("taxonomy_version") or "")
+        industry_code = str(
+            historical.get("mapped_industry_code")
+            or historical.get("official_industry_code")
+            or ""
+        )
+        if not industry_code:
+            return None
+        nodes: Dict[int, Dict[str, Any]] = {}
+        current_code: Optional[str] = industry_code
+        while current_code and len(nodes) < 3:
+            rows = await asyncio.to_thread(
+                storage.list_industry_taxonomy_records,
+                taxonomy_system=taxonomy_system,
+                taxonomy_version=taxonomy_version,
+                industry_code=current_code,
+                active_only=False,
+                limit=1,
+            )
+            if not rows:
+                return None
+            node = rows[0]
+            nodes[int(node.get("industry_level") or 0)] = node
+            current_code = node.get("parent_code")
+        if not nodes:
+            return None
+
+        leaf = nodes[max(nodes)]
+        normalized = deepcopy(historical)
+        normalized.update(
+            {
+                "industry_code": leaf.get("industry_code"),
+                "industry_name": leaf.get("industry_name"),
+                "industry_level": leaf.get("industry_level"),
+                "parent_code": leaf.get("parent_code"),
+                "mapping_status": "authoritative",
+                "sw_l1_code": (nodes.get(1) or {}).get("industry_code"),
+                "sw_l1_name": (nodes.get(1) or {}).get("industry_name"),
+                "sw_l2_code": (nodes.get(2) or {}).get("industry_code"),
+                "sw_l2_name": (nodes.get(2) or {}).get("industry_name"),
+                "sw_l3_code": (nodes.get(3) or {}).get("industry_code"),
+                "sw_l3_name": (nodes.get(3) or {}).get("industry_name"),
+            }
+        )
+        return normalized
+
+    async def _enrich_dcf_bundle_with_local_shares(
+        self,
+        storage: Any,
+        instrument_id: str,
+        financial_bundle: Dict[str, Any],
+        *,
+        valuation_date: str,
+    ) -> Dict[str, Any]:
+        """Attach the latest locally available share count to the DCF bundle."""
+        if not hasattr(storage, "get_latest_valuation_input"):
+            return financial_bundle
+        try:
+            valuation_input = await asyncio.to_thread(
+                storage.get_latest_valuation_input,
+                instrument_id,
+                as_of_date=valuation_date,
+                include_diagnostics=True,
+            )
+        except Exception:
+            return financial_bundle
+        if not isinstance(valuation_input, dict):
+            return financial_bundle
+        try:
+            shares = float(valuation_input.get("shares_outstanding"))
+        except (TypeError, ValueError):
+            return financial_bundle
+        if shares <= 0:
+            return financial_bundle
+
+        enriched = deepcopy(financial_bundle)
+        enriched["shares_outstanding"] = shares
+        latest_facts = enriched.setdefault("latest_facts", {})
+        if isinstance(latest_facts, dict):
+            latest_facts["shares_outstanding"] = shares
+        lineage = enriched.get("lineage")
+        if not isinstance(lineage, dict):
+            lineage = {}
+            enriched["lineage"] = lineage
+        share_lineage = {
+            "value": shares,
+            "as_of_date": valuation_input.get("as_of_date"),
+            "data_as_of": valuation_input.get("data_as_of"),
+            "source": valuation_input.get("source"),
+            "source_mode": valuation_input.get("source_mode"),
+            "input_kind": valuation_input.get("input_kind"),
+            "unit": valuation_input.get("unit"),
+            "quality_flag": "local_point_in_time_valuation_input",
+        }
+        share_lineage["lineage_hash"] = self._stable_hash(share_lineage)
+        lineage["shares_outstanding"] = share_lineage
+        return enriched
+
+    async def _get_dcf_risk_free_rate_context(
+        self,
+        storage: Any,
+        *,
+        valuation_date: str,
+        exchange: Optional[str],
+        currency: str,
+    ) -> Optional[Dict[str, Any]]:
+        """Resolve the local China 10Y yield for RMB A-share DCF."""
+        if str(exchange or "").upper() not in {"SSE", "SZSE", "BSE"}:
+            return None
+        if str(currency or "CNY").upper() != "CNY":
+            return None
+        if not (
+            hasattr(storage, "list_risk_free_rate_series")
+            and hasattr(storage, "get_risk_free_rate_observations")
+        ):
+            return None
+        series_rows = await asyncio.to_thread(storage.list_risk_free_rate_series)
+        if not isinstance(series_rows, list):
+            return None
+        series = next(
+            (
+                item
+                for item in series_rows
+                if item.get("series_id") == "china_treasury_10y"
+            ),
+            None,
+        )
+        if not series:
+            return None
+        observations = await asyncio.to_thread(
+            storage.get_risk_free_rate_observations,
+            "china_treasury_10y",
+            start_date=(
+                date.fromisoformat(valuation_date) - timedelta(days=31)
+            ).isoformat(),
+            end_date=valuation_date,
+        )
+        if not isinstance(observations, list):
+            return None
+        if not observations:
+            observations = await asyncio.to_thread(
+                storage.get_risk_free_rate_observations,
+                "china_treasury_10y",
+                end_date=valuation_date,
+            )
+            if not isinstance(observations, list):
+                return None
+        eligible = [
+            item
+            for item in observations
+            if item.get("value") is not None
+            and str(item.get("observation_date") or "")[:10] <= valuation_date
+        ]
+        if not eligible:
+            return None
+        observation = max(
+            eligible,
+            key=lambda item: str(item.get("observation_date") or ""),
+        )
+        raw_value = float(observation["value"])
+        unit = str(series.get("unit") or "")
+        decimal_value = raw_value / 100.0 if unit == "percent_annual" else raw_value
+        context = {
+            "assumption_key": "risk_free_rate_rmb_10y",
+            "series_id": "china_treasury_10y",
+            "value": decimal_value,
+            "raw_value": raw_value,
+            "unit": "rate_decimal_annual",
+            "raw_unit": unit,
+            "currency": series.get("currency") or "CNY",
+            "tenor": series.get("tenor") or "10Y",
+            "as_of_date": observation.get("observation_date"),
+            "last_updated_at": series.get("updated_at"),
+            "source": observation.get("source") or series.get("source"),
+            "source_mode": observation.get("source_mode") or series.get("source_mode"),
+            "source_profile": series.get("source_profile"),
+            "quality_flag": "local_interests_db_observation",
+            "fallback_used": False,
+            "database": "interests.db",
+        }
+        context["lineage_hash"] = self._stable_hash(context)
+        return context
 
     async def _get_dcf_special_commodity_context(
         self,
@@ -7241,6 +7631,9 @@ class DataManager:
     async def _get_dcf_futures_cycle_context(
         self,
         instrument_id: str,
+        *,
+        valuation_date: Optional[str] = None,
+        industry_membership: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
         """Return compact local futures diagnostics for DCF, if configured."""
         module_cfg = self.research_config.modules.get("commodity_market_data", {})
@@ -7248,17 +7641,19 @@ class DataManager:
             return None
         try:
             research_storage = self._require_research_storage()
-            industry_membership = await asyncio.to_thread(
-                research_storage.get_industry_membership,
-                instrument_id,
-                include_snapshot=False,
-            )
+            if industry_membership is None:
+                industry_membership = await asyncio.to_thread(
+                    research_storage.get_industry_membership,
+                    instrument_id,
+                    include_snapshot=False,
+                )
         except Exception:
             industry_membership = None
         try:
             payload = await self.get_local_futures_cycle_inputs_for_dcf(
                 instrument_id,
                 industry_membership=industry_membership,
+                as_of_date=valuation_date,
             )
         except RuntimeError:
             return None

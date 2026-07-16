@@ -17,6 +17,7 @@ from research.futures_market_data import (
     FuturesContinuousMapping,
     FuturesContract,
     FuturesContractBar,
+    FuturesCycleDiagnostic,
     FuturesDiagnosticsService,
     FuturesExposureMapping,
     FuturesInstrument,
@@ -3832,6 +3833,48 @@ def test_futures_cycle_diagnostics_marks_ten_year_window_ready(tmp_path):
     ten_year = next(item for item in diagnostics if item["lookback_years"] == 10)
     assert ten_year["cycle_state"] != "insufficient_history"
     assert ten_year["latest_price"] == 209
+
+
+def test_futures_cycle_diagnostics_as_of_uses_latest_prior_snapshot(tmp_path):
+    storage = FuturesStorageManager(_research_config(tmp_path))
+    storage.initialize()
+
+    def diagnostic(as_of_date, latest_price):
+        return FuturesCycleDiagnostic(
+            series_id="CNF.CU.SHFE.main",
+            as_of_date=as_of_date,
+            lookback_years=10,
+            latest_price=latest_price,
+            mean_price=100.0,
+            median_price=100.0,
+            percentile=0.5,
+            mean_deviation_pct=0.0,
+            rolling_volatility=0.2,
+            window_high=120.0,
+            window_low=80.0,
+            drawdown_from_high=-0.1,
+            distance_from_low=0.2,
+            cycle_state="normal",
+            history_coverage_ratio=1.0,
+            observation_count=100,
+            min_required_observations=50,
+        )
+
+    storage.upsert_cycle_diagnostics(
+        [
+            diagnostic("2026-07-10", 98.0),
+            diagnostic("2026-07-15", 105.0),
+        ]
+    )
+
+    result = storage.get_cycle_diagnostics(
+        "CNF.CU.SHFE.main",
+        as_of_date="2026-07-14",
+    )
+
+    assert len(result) == 1
+    assert result[0]["as_of_date"] == "2026-07-10"
+    assert result[0]["latest_price"] == 98.0
 
 
 def test_futures_readiness_uses_trading_calendar_expected_date(tmp_path):

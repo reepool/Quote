@@ -545,6 +545,17 @@ class ProfessionalDcfEngine:
         research_mode: bool = False,
     ) -> DcfInputBundle:
         facts = self._extract_financial_facts(financial_bundle)
+        from research.dcf_input_governance import resolve_financial_availability
+
+        availability = resolve_financial_availability(
+            facts,
+            exchange=instrument.get("exchange"),
+        )
+        if availability.get("data_available_date"):
+            facts["data_available_date"] = availability["data_available_date"]
+            facts["data_available_date_source"] = availability["source"]
+            facts["data_available_date_quality_flag"] = availability["quality_flag"]
+            facts["data_available_date_estimated"] = availability["estimated"]
         broker_scope = resolve_listed_broker_dealer_scope(instrument)
         facts["listed_broker_dealer_scope"] = broker_scope.to_dict()
         facts["listed_broker_dealer_scope_confirmed"] = broker_scope.eligible
@@ -563,6 +574,14 @@ class ProfessionalDcfEngine:
                 warnings.append("missing_data_available_date")
             else:
                 blockers.append("missing_data_available_date")
+        elif facts.get("data_available_date_estimated"):
+            warnings.append("estimated_financial_data_available_date")
+        if (
+            str(instrument.get("exchange") or "").upper() in {"SSE", "SZSE", "BSE"}
+            and instrument.get("dcf_industry_mapping_status") != "authoritative"
+            and not instrument.get("sw_l1_name")
+        ):
+            warnings.append("authoritative_shenwan_industry_missing")
         if (
             str(overrides.get("model_profile") or "") == "broker_excess_capital.v1"
             and not broker_scope.eligible
@@ -606,10 +625,23 @@ class ProfessionalDcfEngine:
             "financial": {
                 "report_period": facts.get("report_period"),
                 "data_available_date": data_available_date,
+                "data_available_date_source": facts.get("data_available_date_source"),
+                "data_available_date_quality_flag": facts.get(
+                    "data_available_date_quality_flag"
+                ),
+                "data_available_date_estimated": bool(
+                    facts.get("data_available_date_estimated")
+                ),
                 "source": facts.get("source"),
                 "source_mode": facts.get("source_mode"),
                 "currency": facts.get("currency"),
             },
+            "financial_inputs": deepcopy(financial_bundle.get("lineage") or {}),
+            "industry_membership": deepcopy(
+                instrument.get("dcf_industry_membership")
+                or financial_bundle.get("dcf_industry_membership")
+                or {}
+            ),
             "assumptions": {
                 key: {
                     "source": value.get("source"),
@@ -666,9 +698,27 @@ class ProfessionalDcfEngine:
             risk_free.update(
                 {
                     "value": float(overrides["risk_free_rate"]),
-                    "source": "manual_override",
-                    "quality_flag": "manual_override",
-                    "fallback_used": False,
+                    "source": overrides.get(
+                        "risk_free_rate_source", "manual_override"
+                    ),
+                    "source_profile": overrides.get(
+                        "risk_free_rate_source_profile"
+                    ),
+                    "quality_flag": overrides.get(
+                        "risk_free_rate_quality_flag", "manual_override"
+                    ),
+                    "fallback_used": bool(
+                        overrides.get("risk_free_rate_fallback_used", False)
+                    ),
+                    "as_of_date": overrides.get("risk_free_rate_as_of_date"),
+                    "last_updated_at": overrides.get(
+                        "risk_free_rate_last_updated_at"
+                    ),
+                    "lineage_hash": overrides.get("risk_free_rate_lineage_hash"),
+                    "metadata": {
+                        **dict(risk_free.get("metadata") or {}),
+                        **dict(overrides.get("risk_free_rate_metadata") or {}),
+                    },
                 }
             )
             assumptions[risk_key] = self._assumption_to_dict(risk_free)
@@ -3360,7 +3410,7 @@ class ProfessionalDcfEngine:
             fallback_used=fallback_used,
             as_of_date=item.get("as_of_date"),
             last_updated_at=item.get("last_updated_at"),
-            lineage_hash=self._hash_payload(lineage_payload),
+            lineage_hash=item.get("lineage_hash") or self._hash_payload(lineage_payload),
         )
         item.update(
             {
@@ -3424,8 +3474,12 @@ class ProfessionalDcfEngine:
                 warnings.append(f"{assumption_key}_missing")
             elif item.get("fallback_used") or str(item.get("quality_flag") or "").endswith("fallback"):
                 warnings.append(f"{assumption_key}_fallback_used")
-        if beta_context.get("beta_source") == "configured_default_beta":
+        if str(beta_context.get("beta_source") or "").startswith(
+            "configured_default_beta"
+        ):
             warnings.append("beta_fallback_used")
+        if beta_context.get("beta_rejection_reason"):
+            warnings.append(str(beta_context["beta_rejection_reason"]))
         return list(dict.fromkeys(blockers)), list(dict.fromkeys(warnings))
 
     def _extract_financial_facts(self, financial_bundle: Dict[str, Any]) -> Dict[str, Any]:
@@ -3459,6 +3513,7 @@ class ProfessionalDcfEngine:
                 instrument.get("industry_name"),
                 instrument.get("sw_l1_name"),
                 instrument.get("sw_l2_name"),
+                instrument.get("sw_l3_name"),
                 instrument.get("type"),
                 bundle.financial_facts.get("profile"),
             )
@@ -3519,7 +3574,25 @@ class ProfessionalDcfEngine:
         equity = self._safe_float(facts.get("equity")) or 0.0
         leverage = debt / equity if equity > 0 else None
 
-        if bool(instrument.get("is_st")) or "st" in text or "退市" in text or "delist" in text:
+        company_name = str(
+            instrument.get("name")
+            or instrument.get("short_name")
+            or instrument.get("company_name")
+            or ""
+        ).strip()
+        normalized_name = company_name.upper().replace(" ", "")
+        status_text = " ".join(
+            str(instrument.get(field_name) or "")
+            for field_name in ("status", "trading_status", "listing_status")
+        ).lower()
+        st_name = normalized_name.startswith(("ST", "*ST", "S*ST"))
+        delisting_status = (
+            "退市" in company_name
+            or "退市" in status_text
+            or "delist" in status_text
+            or status_text.strip() in {"st", "*st", "s*st"}
+        )
+        if bool(instrument.get("is_st")) or st_name or delisting_status:
             characteristics.append(
                 {
                     "code": "st_or_delisting_risk",
@@ -3879,10 +3952,35 @@ class ProfessionalDcfEngine:
         }
 
     def _resolve_beta_context(self, overrides: Dict[str, Any]) -> Dict[str, Any]:
-        beta = overrides.get("beta")
+        raw_beta = self._safe_float(overrides.get("beta"))
+        quality_flag = str(overrides.get("beta_quality_flag") or "")
+        rejection_reason = None
+        if raw_beta is not None and raw_beta <= 0:
+            rejection_reason = "non_positive_beta"
+        elif raw_beta is not None and quality_flag in {"low", "unavailable"}:
+            rejection_reason = "low_quality_beta"
+        accepted_beta = raw_beta if rejection_reason is None else None
+        fallback_beta = float(self.parameters.get("default_beta", 1.0))
         return {
-            "beta": float(beta) if beta is not None else float(self.parameters.get("default_beta", 1.0)),
-            "beta_source": overrides.get("beta_source", "configured_default_beta" if beta is None else "override"),
+            "beta": accepted_beta if accepted_beta is not None else fallback_beta,
+            "beta_source": (
+                overrides.get("beta_source", "override")
+                if accepted_beta is not None
+                else (
+                    "configured_default_beta"
+                    if raw_beta is None
+                    else "configured_default_beta_rejected_observation"
+                )
+            ),
+            "raw_beta": raw_beta,
+            "raw_beta_source": overrides.get("beta_source"),
+            "beta_quality_flag": quality_flag or None,
+            "beta_interpretation_flags": list(
+                overrides.get("beta_interpretation_flags") or []
+            ),
+            "beta_r_squared": self._safe_float(overrides.get("beta_r_squared")),
+            "beta_p_value": self._safe_float(overrides.get("beta_p_value")),
+            "beta_rejection_reason": rejection_reason,
             "beta_benchmark": overrides.get("beta_benchmark"),
             "used_in_discount_rate": overrides.get("discount_rate") is None,
         }
@@ -3926,6 +4024,7 @@ class ProfessionalDcfEngine:
                 instrument.get("industry_name"),
                 instrument.get("sw_l1_name"),
                 instrument.get("sw_l2_name"),
+                instrument.get("sw_l3_name"),
                 instrument.get("type"),
                 instrument.get("status"),
                 facts.get("profile"),

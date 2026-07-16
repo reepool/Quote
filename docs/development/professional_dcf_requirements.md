@@ -1290,7 +1290,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 
 ## 15. 分阶段落地建议
 
-### 15.0 当前实现状态（2026-06-10）
+### 15.0 当前实现状态（2026-07-16）
 
 已启动 OpenSpec change `add-professional-dcf-engine` 并完成第一批工程落地：
 
@@ -1302,12 +1302,16 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已实现 `broker_excess_capital.v1`：证券公司默认不走通用 FCFF，在净利润、净资产、净资本、股本和 cost of equity 假设充足时使用归一化 ROE residual income + excess capital 直接估算股权价值，并输出 implied P/B、normalized ROE、excess capital 和市场周期输入诊断。
 - 已实现 `cyclical_fcff_midcycle.v1`：资源周期行业默认不直接外推最新景气利润，在收入、经营利润、资本开支和折现假设充足时使用 mid-cycle operating margin 归一化 FCFF，并输出 reported/normalized margin、cap/floor 和周期输入缺口诊断。
 - 已实现模型 profile registry、行业/公司特性双候选 scoring、`model_strategy=auto|industry|characteristic|compare`、接近分数模型对比，以及 FCFE/FCFF adapter 输出。
-- 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。
+- 已实现本地假设读取、A 股/美股/港股 10 年期无风险利率配置口径、assumption lineage、per-company readiness、input-gap 和 model-profile discovery API。A 股人民币 DCF 已按估值日读取 `interests.db` 的 `china_treasury_10y` 时序；本地无可用观测时才保留配置 fallback，并在结果中区分来源、观测日和质量标识。2026-07-16 现场基线为 6,126 条观测，覆盖 2002-01-04 至 2026-07-14。
 - 已实现显式 assumption refresh 入口，当前为本地优先 source policy/diagnostics，不在 DCF 计算路径隐式联网。
 - 已实现投行级 xlsx workbook artifact：由 `DcfWorkbookBuilder` 生成 stdlib OOXML 工作簿，通过 `/api/v1/research/valuation/dcf/workbooks/{artifact_id}` 下载。
 - 已实现进程内 bounded DCF run cache：按输入 hash、参数 hash、最新收盘价和 TTL 控制复用，不写入 `valuation_history`。
 - 已完成 DCF contract hardening：`compare` 返回行业/公司特性候选 result object，未实现模型 fail closed；显式 `fcfe` 不再伪装为成功 FCFF；`scenario_set / terminal_method / include_* / workbook_style / cash_flow_model` 参数具备明确语义；假设缺失和 fallback 进入结构化 blocker/warning；REST workbook metadata 不暴露本地 artifact path。
-- 已实现 `data_available_date <= valuation_date` 过滤 blocker，避免财务事实未来函数；缺失可得日默认在生产路径 fail closed。
+- 已实现 `data_available_date <= valuation_date` 过滤，避免财务事实未来函数。A 股优先使用真实 `data_available_date/publish_date`；缺失时按年报次年 4 月 30 日、一季报 4 月 30 日、半年报 8 月 31 日、三季报 10 月 31 日生成保守估算可得日。估算值标识为 `estimated_conservative` 并产生 warning，不伪装为实际公告日；非 A 股或无法识别报告期时仍 fail closed。
+- 已将估值日有效的权威申万一级、二级、三级行业归属注入 DCF instrument、输入 hash 和 lineage，模型选择不再主要依赖公司名称或行情库粗行业字段；历史估值使用历史行业归属，不回填当前分类。
+- 已将估值库的时点股本接入 `shares_outstanding`，并将现金流量表“购建固定资产、无形资产和其他长期资产所支付的现金”映射为 capex 代理。年度使用报告值，季度/半年使用累计现金流 TTM 桥接；桥接期不完整时显式返回缺口。现金取资产负债表货币资金；有息债务由短期借款、一年内到期非流动负债、长期借款及应付债券等明细保守汇总，租赁负债单列，明确禁止把当前数据源语义上的负债合计字段 `balance_sheet.total_debt` 当作有息债务。
+- DCF 已接收 benchmark-aware Beta 的质量元数据。非正 Beta 或明确为 low/unavailable 的观测不会直接进入 CAPM，而是保留原始观测并回退配置 Beta，同时输出 `beta_fallback_used` 和拒绝原因，避免异常 Beta 造成股权成本低于永续增长率。
+- 公司业务画像、分部、产品、上下游角色和商品敏感性仍未形成生产数据层。详细字段、免费数据源、证据治理、置信度和分行业实施方案见 `company_business_profile_and_commodity_exposure_requirements.md`；当前应将申万行业画像视为行业默认，不声称是公司精确商品暴露。
 - 保险、地产、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
