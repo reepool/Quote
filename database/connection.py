@@ -129,12 +129,32 @@ class DatabaseManager:
             self.AsyncSessionLocal = self.TaskAsyncSessionLocal
 
             self._ensure_change_watermark_schema()
+            self._ensure_adjustment_factor_governance_schema()
 
             db_logger.info("[Database] Database connection initialized successfully")
 
         except Exception as e:
             db_logger.error(f"[Database] Failed to initialize database: {e}")
             raise
+
+    def _ensure_adjustment_factor_governance_schema(self) -> None:
+        """Create additive adjustment-factor governance tables on existing DBs."""
+        from .models import (
+            AdjustmentFactorCanonicalDB,
+            AdjustmentFactorInstrumentStatusDB,
+            AdjustmentFactorObservationDB,
+            AdjustmentFactorSeriesStatusDB,
+        )
+
+        tables = (
+            AdjustmentFactorObservationDB.__table__,
+            AdjustmentFactorCanonicalDB.__table__,
+            AdjustmentFactorSeriesStatusDB.__table__,
+            AdjustmentFactorInstrumentStatusDB.__table__,
+        )
+        with self.sync_engine.begin() as connection:
+            for table in tables:
+                table.create(bind=connection, checkfirst=True)
 
     def _create_async_engine(
         self,

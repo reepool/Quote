@@ -1,4 +1,5 @@
 from datetime import datetime
+import sqlite3
 
 import pytest
 from sqlalchemy import select
@@ -11,7 +12,32 @@ from database.models import (
     Base,
     InstrumentDB,
 )
+from database.connection import DatabaseManager
 from database.operations import DatabaseOperations
+
+
+def test_existing_database_bootstraps_adjustment_factor_governance_tables(tmp_path):
+    database_path = tmp_path / "existing.db"
+    sqlite3.connect(database_path).close()
+    manager = DatabaseManager(str(database_path))
+
+    manager.initialize()
+    try:
+        with sqlite3.connect(database_path) as connection:
+            tables = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+        assert {
+            "adjustment_factor_observations",
+            "adjustment_factors_canonical",
+            "adjustment_factor_series_status",
+            "adjustment_factor_instrument_status",
+        } <= tables
+    finally:
+        manager.close()
 
 
 @pytest.mark.asyncio
