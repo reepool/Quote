@@ -14,6 +14,7 @@ from proxy_patch_bootstrap import install_akshare_proxy_patch as _install_akshar
 _install_akshare_proxy_patch(required=False)
 
 import asyncio
+from bisect import bisect_right
 from collections import Counter
 from copy import deepcopy
 import hashlib
@@ -15727,7 +15728,7 @@ class DataManager:
         reference_sources: Optional[List[str]] = None,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
-        """Compare persisted TDX event dates with independent production factors."""
+        """Reconcile TDX actions with independent cumulative-factor evidence."""
         normalized_ids = list(dict.fromkeys(
             str(item).strip() for item in (instrument_ids or []) if str(item).strip()
         ))
@@ -15758,7 +15759,9 @@ class DataManager:
             })
             tdx_rows.extend(await self.db_ops.execute_read_query(
                 f"""
-                SELECT instrument_id, date(ex_date) AS ex_date
+                SELECT instrument_id, date(ex_date) AS ex_date,
+                       factor, cumulative_factor, validation_result,
+                       pre_close, fenhong, songzhuangu, peigu, peigujia
                 FROM adjustment_factors_tdx
                 WHERE instrument_id IN ({placeholders})
                   AND date(ex_date) BETWEEN :start_date AND :end_date
@@ -15779,89 +15782,499 @@ class DataManager:
                 params,
             ))
 
-        tdx_keys = {
-            (row.get('instrument_id'), self._date_text(row.get('ex_date')))
-            for row in tdx_rows
-            if row.get('instrument_id') and row.get('ex_date')
-        }
-        reference_by_key: Dict[tuple[str, str], str] = {}
-        previous_cumulative: Dict[tuple[str, str], float] = {}
-        for row in reference_rows:
-            instrument_id = row.get('instrument_id')
-            ex_date = self._date_text(row.get('ex_date'))
-            source = str(row.get('source') or 'unknown').lower()
-            if not instrument_id or not ex_date:
+        def _positive_float(value: Any) -> Optional[float]:
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                return None
+            if pd.isna(number) or number <= 0:
+                return None
+            return number
+
+        def _event_date(value: Any) -> Optional[date]:
+            return self._date_from_any(value)
+
+        def _exchange_for(instrument_id: str) -> Optional[str]:
+            normalized = str(instrument_id or '').upper()
+            if normalized.endswith('.SH'):
+                return 'SSE'
+            if normalized.endswith('.SZ'):
+                return 'SZSE'
+            if normalized.endswith(('.BJ', '.BSE')):
+                return 'BSE'
+            return None
+
+        def _factor_diff(left: Optional[float], right: Optional[float]) -> Optional[float]:
+            if left is None or right is None or right <= 0:
+                return None
+            return abs((left / right) - 1.0)
+
+        def _action_bucket(item: Dict[str, Any]) -> str:
+            cash = float(item.get('fenhong') or 0.0) > 0
+            bonus = float(item.get('songzhuangu') or 0.0) > 0
+            rights = float(item.get('peigu') or 0.0) > 0
+            active = sum((cash, bonus, rights))
+            if active > 1:
+                return 'mixed'
+            if cash:
+                return 'cash_only'
+            if bonus:
+                return 'bonus_only'
+            if rights:
+                return 'rights_only'
+            return 'no_standard_action'
+
+        def _decade_bucket(item: Dict[str, Any], key: str) -> str:
+            value = item.get(key)
+            parsed = value if isinstance(value, date) else _event_date(value)
+            return f'{parsed.year // 10 * 10}s' if parsed else 'unknown'
+
+        def _session_distance(left: date, right: date, sessions: List[date]) -> int:
+            if left == right:
+                return 0
+            if right > left:
+                return bisect_right(sessions, right) - bisect_right(sessions, left)
+            return -(bisect_right(sessions, left) - bisect_right(sessions, right))
+
+        tdx_events: List[Dict[str, Any]] = []
+        seen_tdx: Set[tuple[str, date]] = set()
+        for row in tdx_rows:
+            instrument_id = str(row.get('instrument_id') or '').strip()
+            ex_date = _event_date(row.get('ex_date'))
+            if not instrument_id or ex_date is None:
                 continue
             key = (instrument_id, ex_date)
-            if source == 'baostock':
-                series_key = (instrument_id, source)
-                cumulative = float(
-                    row.get('cumulative_factor')
-                    or row.get('factor')
-                    or 1.0
-                )
-                previous = previous_cumulative.get(series_key)
-                previous_cumulative[series_key] = cumulative
-                if (
-                    ex_date >= start_date.isoformat()
-                    and previous is not None
-                    and abs(cumulative - previous) > 1e-12
-                ):
-                    reference_by_key[key] = source
-            elif (
-                ex_date >= start_date.isoformat()
-                and abs(float(row.get('factor') or 1.0) - 1.0) > 1e-12
-            ):
-                reference_by_key[key] = source
-        reference_keys = set(reference_by_key)
-        overlap = tdx_keys & reference_keys
-        reference_only = sorted(reference_keys - tdx_keys)
-        tdx_only = sorted(tdx_keys - reference_keys)
-        source_distribution = dict(Counter(reference_by_key.values()))
-        bounded_limit = max(0, int(sample_limit or 0))
+            if key in seen_tdx:
+                continue
+            seen_tdx.add(key)
+            validation_result = str(row.get('validation_result') or '')
+            comparable_factor = (
+                None
+                if validation_result.startswith('pending_')
+                else _positive_float(row.get('factor'))
+            )
+            tdx_events.append({
+                'instrument_id': instrument_id,
+                'ex_date': ex_date,
+                'factor': comparable_factor,
+                'source': 'tdx_xdxr',
+                'validation_result': validation_result,
+                'pre_close': float(row.get('pre_close') or 0.0),
+                'fenhong': float(row.get('fenhong') or 0.0),
+                'songzhuangu': float(row.get('songzhuangu') or 0.0),
+                'peigu': float(row.get('peigu') or 0.0),
+                'peigujia': float(row.get('peigujia') or 0.0),
+            })
 
-        if not reference_keys:
+        reference_groups: Dict[tuple[str, str], List[Dict[str, Any]]] = {}
+        for row in reference_rows:
+            instrument_id = str(row.get('instrument_id') or '').strip()
+            source = str(row.get('source') or 'unknown').lower()
+            ex_date = _event_date(row.get('ex_date'))
+            if not instrument_id or ex_date is None:
+                continue
+            reference_groups.setdefault((instrument_id, source), []).append({
+                **row,
+                'instrument_id': instrument_id,
+                'source': source,
+                'ex_date': ex_date,
+            })
+
+        reference_events: List[Dict[str, Any]] = []
+        seen_reference: Set[tuple[str, str, date]] = set()
+        for (instrument_id, source), rows in sorted(reference_groups.items()):
+            previous_cumulative: Optional[float] = None
+            for row in sorted(rows, key=lambda item: item['ex_date']):
+                cumulative = _positive_float(row.get('cumulative_factor'))
+                stored_factor = _positive_float(row.get('factor'))
+                if cumulative is not None and previous_cumulative is not None:
+                    comparable_factor = cumulative / previous_cumulative
+                    if abs(comparable_factor - 1.0) <= 1e-12:
+                        previous_cumulative = cumulative
+                        continue
+                elif stored_factor is not None and abs(stored_factor - 1.0) > 1e-12:
+                    comparable_factor = stored_factor
+                elif cumulative is not None and abs(cumulative - 1.0) > 1e-12:
+                    # A complete history starts from a unit baseline, but old
+                    # persisted BaoStock series can begin at their first event.
+                    comparable_factor = cumulative
+                else:
+                    if cumulative is not None:
+                        previous_cumulative = cumulative
+                    continue
+                if cumulative is not None:
+                    previous_cumulative = cumulative
+                ex_date = row['ex_date']
+                if ex_date < start_date or ex_date > end_date:
+                    continue
+                key = (instrument_id, source, ex_date)
+                if key in seen_reference:
+                    continue
+                seen_reference.add(key)
+                reference_events.append({
+                    'instrument_id': instrument_id,
+                    'ex_date': ex_date,
+                    'factor': comparable_factor,
+                    'cumulative_factor': cumulative,
+                    'source': source,
+                })
+
+        calendar_start = start_date - timedelta(days=14)
+        calendar_end = end_date + timedelta(days=14)
+        sessions_by_exchange: Dict[str, List[date]] = {}
+        warnings: List[str] = []
+        requested_exchanges = sorted({
+            exchange
+            for instrument_id in normalized_ids
+            if (exchange := _exchange_for(instrument_id)) is not None
+        })
+        for exchange in requested_exchanges:
+            records = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                calendar_start,
+                calendar_end,
+            )
+            sessions = sorted({
+                parsed
+                for record in records
+                if record.get('is_trading_day')
+                if (parsed := _event_date(record.get('date'))) is not None
+            })
+            sessions_by_exchange[exchange] = sessions
+            if not sessions:
+                warnings.append(
+                    f'trading calendar evidence unavailable for {exchange}'
+                )
+
+        tdx_by_instrument: Dict[str, List[Dict[str, Any]]] = {}
+        reference_by_instrument: Dict[str, List[Dict[str, Any]]] = {}
+        for event in tdx_events:
+            tdx_by_instrument.setdefault(event['instrument_id'], []).append(event)
+        for event in reference_events:
+            reference_by_instrument.setdefault(event['instrument_id'], []).append(event)
+
+        exact_matches: List[Dict[str, Any]] = []
+        shifted_matches: List[Dict[str, Any]] = []
+        factor_conflicts: List[Dict[str, Any]] = []
+        reference_only: List[Dict[str, Any]] = []
+        tdx_only: List[Dict[str, Any]] = []
+        calendar_unavailable_instruments: Set[str] = set()
+        max_session_distance = 3
+        factor_tolerance = 0.05
+
+        for instrument_id in sorted(set(tdx_by_instrument) | set(reference_by_instrument)):
+            tdx_items = sorted(
+                tdx_by_instrument.get(instrument_id, []),
+                key=lambda item: item['ex_date'],
+            )
+            reference_items = sorted(
+                reference_by_instrument.get(instrument_id, []),
+                key=lambda item: (item['ex_date'], item['source']),
+            )
+            used_tdx: Set[int] = set()
+            used_reference: Set[int] = set()
+
+            exact_candidates = []
+            for tdx_idx, tdx_event in enumerate(tdx_items):
+                for ref_idx, reference_event in enumerate(reference_items):
+                    if tdx_event['ex_date'] != reference_event['ex_date']:
+                        continue
+                    difference = _factor_diff(
+                        tdx_event.get('factor'), reference_event.get('factor')
+                    )
+                    if difference is not None and difference <= factor_tolerance:
+                        exact_candidates.append((
+                            difference,
+                            tdx_event['ex_date'],
+                            reference_event['source'],
+                            tdx_idx,
+                            ref_idx,
+                        ))
+            for difference, _, _, tdx_idx, ref_idx in sorted(exact_candidates):
+                if tdx_idx in used_tdx or ref_idx in used_reference:
+                    continue
+                used_tdx.add(tdx_idx)
+                used_reference.add(ref_idx)
+                exact_matches.append({
+                    'instrument_id': instrument_id,
+                    'tdx_ex_date': tdx_items[tdx_idx]['ex_date'],
+                    'reference_ex_date': reference_items[ref_idx]['ex_date'],
+                    'tdx_factor': tdx_items[tdx_idx].get('factor'),
+                    'reference_factor': reference_items[ref_idx].get('factor'),
+                    'factor_diff_pct': difference * 100.0,
+                    'trading_session_distance': 0,
+                    'source': reference_items[ref_idx]['source'],
+                    'reason': 'exact_factor_match',
+                })
+
+            exchange = _exchange_for(instrument_id)
+            sessions = sessions_by_exchange.get(exchange or '', [])
+            remaining_tdx = [idx for idx in range(len(tdx_items)) if idx not in used_tdx]
+            remaining_reference = [
+                idx for idx in range(len(reference_items))
+                if idx not in used_reference
+            ]
+            if remaining_tdx and remaining_reference and not sessions:
+                if any(
+                    tdx_items[tdx_idx]['ex_date'] != reference_items[ref_idx]['ex_date']
+                    for tdx_idx in remaining_tdx
+                    for ref_idx in remaining_reference
+                ):
+                    calendar_unavailable_instruments.add(instrument_id)
+
+            shifted_candidates = []
+            if sessions:
+                for tdx_idx in remaining_tdx:
+                    for ref_idx in remaining_reference:
+                        tdx_event = tdx_items[tdx_idx]
+                        reference_event = reference_items[ref_idx]
+                        if tdx_event['ex_date'] == reference_event['ex_date']:
+                            continue
+                        session_distance = _session_distance(
+                            tdx_event['ex_date'], reference_event['ex_date'], sessions
+                        )
+                        if abs(session_distance) > max_session_distance:
+                            continue
+                        difference = _factor_diff(
+                            tdx_event.get('factor'), reference_event.get('factor')
+                        )
+                        if difference is None or difference > factor_tolerance:
+                            continue
+                        shifted_candidates.append((
+                            abs(session_distance),
+                            difference,
+                            abs((reference_event['ex_date'] - tdx_event['ex_date']).days),
+                            tdx_event['ex_date'],
+                            reference_event['ex_date'],
+                            reference_event['source'],
+                            session_distance,
+                            tdx_idx,
+                            ref_idx,
+                        ))
+            for candidate in sorted(shifted_candidates):
+                *_, session_distance, tdx_idx, ref_idx = candidate
+                if tdx_idx in used_tdx or ref_idx in used_reference:
+                    continue
+                used_tdx.add(tdx_idx)
+                used_reference.add(ref_idx)
+                tdx_event = tdx_items[tdx_idx]
+                reference_event = reference_items[ref_idx]
+                shifted_matches.append({
+                    'instrument_id': instrument_id,
+                    'tdx_ex_date': tdx_event['ex_date'],
+                    'reference_ex_date': reference_event['ex_date'],
+                    'tdx_factor': tdx_event.get('factor'),
+                    'reference_factor': reference_event.get('factor'),
+                    'factor_diff_pct': (
+                        _factor_diff(
+                            tdx_event.get('factor'), reference_event.get('factor')
+                        ) or 0.0
+                    ) * 100.0,
+                    'trading_session_distance': session_distance,
+                    'calendar_day_distance': (
+                        reference_event['ex_date'] - tdx_event['ex_date']
+                    ).days,
+                    'source': reference_event['source'],
+                    'reason': 'provider_date_shift_factor_match',
+                })
+
+            conflict_candidates = []
+            for tdx_idx, tdx_event in enumerate(tdx_items):
+                if tdx_idx in used_tdx:
+                    continue
+                for ref_idx, reference_event in enumerate(reference_items):
+                    if ref_idx in used_reference:
+                        continue
+                    if tdx_event['ex_date'] == reference_event['ex_date']:
+                        session_distance = 0
+                    elif sessions:
+                        session_distance = _session_distance(
+                            tdx_event['ex_date'], reference_event['ex_date'], sessions
+                        )
+                        if abs(session_distance) > max_session_distance:
+                            continue
+                    else:
+                        continue
+                    difference = _factor_diff(
+                        tdx_event.get('factor'), reference_event.get('factor')
+                    )
+                    if difference is None or difference <= factor_tolerance:
+                        continue
+                    conflict_candidates.append((
+                        abs(session_distance),
+                        abs((reference_event['ex_date'] - tdx_event['ex_date']).days),
+                        difference,
+                        tdx_event['ex_date'],
+                        reference_event['ex_date'],
+                        reference_event['source'],
+                        session_distance,
+                        tdx_idx,
+                        ref_idx,
+                    ))
+            for candidate in sorted(conflict_candidates):
+                *_, session_distance, tdx_idx, ref_idx = candidate
+                if tdx_idx in used_tdx or ref_idx in used_reference:
+                    continue
+                used_tdx.add(tdx_idx)
+                used_reference.add(ref_idx)
+                tdx_event = tdx_items[tdx_idx]
+                reference_event = reference_items[ref_idx]
+                factor_conflicts.append({
+                    'instrument_id': instrument_id,
+                    'tdx_ex_date': tdx_event['ex_date'],
+                    'reference_ex_date': reference_event['ex_date'],
+                    'tdx_factor': tdx_event.get('factor'),
+                    'reference_factor': reference_event.get('factor'),
+                    'factor_diff_pct': (
+                        _factor_diff(
+                            tdx_event.get('factor'), reference_event.get('factor')
+                        ) or 0.0
+                    ) * 100.0,
+                    'trading_session_distance': session_distance,
+                    'source': reference_event['source'],
+                    'pre_close': tdx_event.get('pre_close', 0.0),
+                    'fenhong': tdx_event.get('fenhong', 0.0),
+                    'songzhuangu': tdx_event.get('songzhuangu', 0.0),
+                    'peigu': tdx_event.get('peigu', 0.0),
+                    'peigujia': tdx_event.get('peigujia', 0.0),
+                    'validation_result': tdx_event.get('validation_result'),
+                    'reason': 'nearby_factor_conflict',
+                })
+
+            tdx_only.extend(
+                event for idx, event in enumerate(tdx_items) if idx not in used_tdx
+            )
+            reference_only.extend(
+                event
+                for idx, event in enumerate(reference_items)
+                if idx not in used_reference
+            )
+
+        bounded_limit = max(0, int(sample_limit or 0))
+        source_distribution = dict(Counter(
+            event['source'] for event in reference_events
+        ))
+        if not reference_events:
             status = 'unavailable'
-            warnings = ['independent production factor evidence unavailable']
-        elif reference_only:
+            warnings.append('independent production factor evidence unavailable')
+        elif calendar_unavailable_instruments:
+            status = 'unavailable'
+            warnings.append(
+                'trading calendar evidence unavailable for shifted-date reconciliation'
+            )
+        elif reference_only or factor_conflicts:
             status = 'partial'
-            warnings = []
         else:
             status = 'success'
-            warnings = []
 
+        def _serialize_match(item: Dict[str, Any]) -> Dict[str, Any]:
+            return {
+                **item,
+                'tdx_ex_date': self._date_text(item.get('tdx_ex_date')),
+                'reference_ex_date': self._date_text(item.get('reference_ex_date')),
+            }
+
+        reference_only_samples = [
+            {
+                'instrument_id': item['instrument_id'],
+                'ex_date': self._date_text(item['ex_date']),
+                'factor': item.get('factor'),
+                'source': item['source'],
+                'reason': 'reference_factor_change_unmatched',
+            }
+            for item in reference_only[:bounded_limit]
+        ]
+        tdx_only_samples = [
+            {
+                'instrument_id': item['instrument_id'],
+                'ex_date': self._date_text(item['ex_date']),
+                'factor': item.get('factor'),
+                'pre_close': item.get('pre_close', 0.0),
+                'fenhong': item.get('fenhong', 0.0),
+                'songzhuangu': item.get('songzhuangu', 0.0),
+                'peigu': item.get('peigu', 0.0),
+                'peigujia': item.get('peigujia', 0.0),
+                'validation_result': item.get('validation_result'),
+                'source': 'tdx_xdxr',
+                'reason': 'tdx_event_unmatched_by_reference_factor',
+            }
+            for item in tdx_only[:bounded_limit]
+        ]
+
+        totals = {
+            'tdx_events': len(tdx_events),
+            'reference_factor_changes': len(reference_events),
+            'reference_events': len(reference_events),
+            'exact_factor_matches': len(exact_matches),
+            'shifted_factor_matches': len(shifted_matches),
+            'factor_conflicts': len(factor_conflicts),
+            'reference_factor_change_only': len(reference_only),
+            'reference_factor_change_only_instruments': len({
+                item['instrument_id'] for item in reference_only
+            }),
+            'tdx_event_only': len(tdx_only),
+            'tdx_event_only_instruments': len({
+                item['instrument_id'] for item in tdx_only
+            }),
+            'calendar_unavailable_instruments': len(calendar_unavailable_instruments),
+            # Compatibility aliases for existing result consumers.
+            'overlap_events': len(exact_matches),
+            'reference_only_events': len(reference_only),
+            'reference_only_instruments': len({
+                item['instrument_id'] for item in reference_only
+            }),
+            'tdx_only_events': len(tdx_only),
+            'tdx_only_instruments': len({
+                item['instrument_id'] for item in tdx_only
+            }),
+        }
         return {
             'status': status,
             'reference_sources': sources,
             'reference_source_distribution': source_distribution,
-            'totals': {
-                'tdx_events': len(tdx_keys),
-                'reference_events': len(reference_keys),
-                'overlap_events': len(overlap),
-                'reference_only_events': len(reference_only),
-                'reference_only_instruments': len({item[0] for item in reference_only}),
-                'tdx_only_events': len(tdx_only),
-                'tdx_only_instruments': len({item[0] for item in tdx_only}),
+            'matching_policy': {
+                'max_trading_session_distance': max_session_distance,
+                'factor_tolerance_pct': factor_tolerance * 100.0,
             },
-            'reference_only_samples': [
-                {
-                    'instrument_id': instrument_id,
-                    'ex_date': ex_date,
-                    'source': reference_by_key[(instrument_id, ex_date)],
-                    'reason': 'reference_event_missing_from_tdx',
-                }
-                for instrument_id, ex_date in reference_only[:bounded_limit]
+            'totals': totals,
+            'exact_match_samples': [
+                _serialize_match(item) for item in exact_matches[:bounded_limit]
             ],
-            'tdx_only_samples': [
-                {
-                    'instrument_id': instrument_id,
-                    'ex_date': ex_date,
-                    'source': 'tdx_xdxr',
-                    'reason': 'tdx_event_missing_from_reference',
-                }
-                for instrument_id, ex_date in tdx_only[:bounded_limit]
+            'shifted_match_samples': [
+                _serialize_match(item) for item in shifted_matches[:bounded_limit]
             ],
-            'warnings': warnings,
+            'factor_conflict_samples': [
+                _serialize_match(item) for item in factor_conflicts[:bounded_limit]
+            ],
+            'reference_factor_change_only_samples': reference_only_samples,
+            'tdx_event_only_samples': tdx_only_samples,
+            'reference_only_samples': reference_only_samples,
+            'tdx_only_samples': tdx_only_samples,
+            'calendar_unavailable_instrument_ids': sorted(
+                calendar_unavailable_instruments
+            )[:bounded_limit],
+            'distributions': {
+                'factor_conflicts_by_action': dict(Counter(
+                    _action_bucket(item) for item in factor_conflicts
+                )),
+                'factor_conflicts_by_decade': dict(Counter(
+                    _decade_bucket(item, 'tdx_ex_date')
+                    for item in factor_conflicts
+                )),
+                'reference_factor_change_only_by_source': dict(Counter(
+                    item['source'] for item in reference_only
+                )),
+                'reference_factor_change_only_by_decade': dict(Counter(
+                    _decade_bucket(item, 'ex_date') for item in reference_only
+                )),
+                'tdx_event_only_by_action': dict(Counter(
+                    _action_bucket(item) for item in tdx_only
+                )),
+                'tdx_event_only_by_decade': dict(Counter(
+                    _decade_bucket(item, 'ex_date') for item in tdx_only
+                )),
+            },
+            'warnings': list(dict.fromkeys(warnings)),
         }
 
     async def backfill_tdx_xdxr_history(

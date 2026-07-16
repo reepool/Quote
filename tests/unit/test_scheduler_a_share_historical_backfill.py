@@ -492,9 +492,12 @@ async def test_a_share_historical_backfill_resume_rechecks_persisted_completenes
         "status": "success",
         "totals": {
             "tdx_events": 1,
-            "reference_events": 1,
-            "reference_only_events": 0,
-            "tdx_only_events": 0,
+            "reference_factor_changes": 1,
+            "exact_factor_matches": 0,
+            "shifted_factor_matches": 1,
+            "factor_conflicts": 0,
+            "reference_factor_change_only": 0,
+            "tdx_event_only": 0,
         },
     })
     monkeypatch.setattr(data_manager, "backfill_tdx_xdxr_history", xdxr_mock)
@@ -528,6 +531,82 @@ async def test_a_share_historical_backfill_resume_rechecks_persisted_completenes
     assert xdxr_mock.await_count == 1
     assert pending_mock.await_count == 2
     assert reconciliation_mock.await_count == 2
+    assert (
+        second["stages"]["completeness"]["totals"]["shifted_factor_matches"]
+        == 1
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_share_historical_backfill_is_partial_on_factor_conflict(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [])
+    monkeypatch.setattr(
+        data_manager,
+        "backfill_tdx_xdxr_history",
+        AsyncMock(return_value={
+            "status": "success",
+            "totals": {
+                "raw_events": 1,
+                "saved_events": 1,
+                "derived_factors": 1,
+                "pending_factors": 0,
+                "errors": 0,
+                "timeouts": 0,
+            },
+        }),
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "get_tdx_xdxr_pending_factor_summary",
+        AsyncMock(return_value={
+            "status": "success",
+            "totals": {
+                "pending_factors": 0,
+                "pending_instruments": 0,
+                "pending_cash_events": 0,
+            },
+            "instrument_ids": [],
+            "samples": [],
+        }),
+    )
+    monkeypatch.setattr(
+        data_manager,
+        "reconcile_tdx_xdxr_history",
+        AsyncMock(return_value={
+            "status": "partial",
+            "totals": {
+                "tdx_events": 1,
+                "reference_factor_changes": 1,
+                "exact_factor_matches": 0,
+                "shifted_factor_matches": 0,
+                "factor_conflicts": 1,
+                "reference_factor_change_only": 0,
+                "tdx_event_only": 0,
+            },
+            "factor_conflict_samples": [{
+                "instrument_id": "600000.SH",
+                "tdx_ex_date": "2020-06-01",
+                "reference_ex_date": "2020-06-01",
+                "reason": "nearby_factor_conflict",
+            }],
+        }),
+    )
+
+    result = await task.a_share_daily_data_historical_backfill(
+        start_date="2020-01-01",
+        end_date="2020-12-31",
+        exchanges=["SSE"],
+        scopes=["dividends", "factors"],
+        dry_run=False,
+        chunk_size=1,
+    )
+
+    assert result["status"] == "partial"
+    assert result["stages"]["completeness"]["reasons"] == ["factor_conflicts"]
+    assert result["stages"]["completeness"]["totals"]["factor_conflicts"] == 1
 
 
 def test_historical_backfill_report_exposes_completeness_and_pending_repair():
@@ -560,7 +639,10 @@ def test_historical_backfill_report_exposes_completeness_and_pending_repair():
                 "totals": {
                     "persisted_tdx_events": 2,
                     "pending_factors": 1,
-                    "reference_only_events": 1,
+                    "exact_factor_matches": 10,
+                    "shifted_factor_matches": 2,
+                    "factor_conflicts": 1,
+                    "reference_factor_change_only": 1,
                 },
                 "samples": [{
                     "instrument_id": "600000.SH",
@@ -574,4 +656,6 @@ def test_historical_backfill_report_exposes_completeness_and_pending_repair():
     assert "repair_pending_factor_quotes: `True`" in content
     assert "completeness: partial" in content
     assert "pending_factors=1" in content
+    assert "shifted_factor_matches=2" in content
+    assert "reference_factor_change_only=1" in content
     assert "600000.SH 2020-06-01" in content

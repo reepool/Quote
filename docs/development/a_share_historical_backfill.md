@@ -96,9 +96,12 @@ data/backfill_checkpoints/a_share_history_<parameter_hash>.json
 写入模式下，只要 scopes 包含 `dividends` 或 `factors`，任务都会在 provider chunk 完成后读取数据库最终状态并生成 `completeness` 阶段：
 
 - 汇总 persisted XDXR 事件、pending 因子、受影响股票和现金分红事件。
-- 将 TDX 事件日期与 BaoStock/AkShare 生产复权因子变动日期进行本地只读对账。
-- 报告 reference-only、TDX-only、provider-empty、生命周期排除和降级边界样本。
-- pending 因子、未解决生命周期边界、降级边界、provider 错误/超时、reference-only 事件或参考证据不可用时，顶层状态返回 `partial`，即使全部 chunk 已完成。
+- 将 TDX 公司行动事件与 BaoStock/AkShare 生产复权因子变化证据进行本地只读对账。
+- 对账优先匹配同日且因子幅度一致的记录，再使用治理后的交易日历在 3 个交易日窗口内进行确定性一对一匹配；默认相对因子容差为 5%。
+- 报告 exact factor match、shifted factor match、factor conflict、reference factor change only、TDX event only、provider-empty、生命周期排除和降级边界样本。
+- 参考因子变化没有现金分红、送转或配股字段，不能单独证明 TDX 漏掉了具体公司行动。
+- BaoStock 使用涨跌幅复权算法，TDX 审计因子使用公司行动字段推导理论除权价；同日但幅度不一致的记录归类为 factor conflict，不强制合并。
+- 已解释的日期偏移不会使任务变成 `partial`；pending 因子、未解决生命周期边界、降级边界、provider 错误/超时、因子冲突、未解释参考因子变化或参考证据不可用时，顶层状态返回 `partial`，即使全部 chunk 已完成。
 
 `resume=true` 可以跳过已经完成的 provider chunk，但不会跳过持久化完整性检查，因此报告反映当前数据库状态，而不是只显示本轮新增计数。
 

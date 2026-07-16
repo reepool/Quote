@@ -135,11 +135,24 @@ async def get_adjustment_factors(
 
 BaoStock 因子接口返回字段包括 `adjustFactor`、`backAdjustFactor`、`foreAdjustFactor`。
 
-本项目使用：
+BaoStock 的 `query_adjust_factor` 按 `dividOperateDate` 返回稀疏序列。实测
+`backAdjustFactor`（以及当前版本常见的 `adjustFactor`）按累计因子演进，
+不能直接把 `adjustFactor` 当成本项目协议中的单次因子。本项目统一为：
 
-- `factor = adjustFactor`
-- `cumulative_factor = backAdjustFactor`
-- `source = baostock`
+- `cumulative_factor(t) = backAdjustFactor(t)`；
+- `factor(t) = cumulative_factor(t) / cumulative_factor(previous event)`；
+- 查询时从全历史锚点获取稀疏序列，完成相邻比值计算后再裁剪调用方区间；
+- 累计因子为 `1.0` 的基线只作为内部锚点，不作为公司行动事件返回；
+- `source = baostock`。
+
+例如 `600000.SH` 的累计因子从 `1.006502` 变化到 `1.526763` 时，
+本次单次因子约为 `1.526763 / 1.006502`，而不是 `1.526763`。
+
+BaoStock 官方说明采用“涨跌幅复权算法”：假设除权日前卖出、除权日按前收
+重新买入，不直接模拟投资者参加分红或配股。其后复权比例依据“除权日前一
+交易日收盘价 / 除权日最近交易日的前收盘价”。因此它与本项目 TDX 审计
+引擎按分红、送转、配股字段推导理论除权价的计算链不同；二者因子冲突必须
+作为口径证据保留，不能直接判定任一数据源错误。
 
 BaoStock 适合作为 SSE/SZSE 的 A 股权威因子主源。北交所支持情况需要按实际接口验证，不应默认完整。
 
@@ -648,4 +661,3 @@ api/
 - `tests/unit/test_data_sources/test_tdx_source.py`
 - `tests/unit/test_factor_backfill_logic.py`
 - `tests/unit/test_daily_factor_sync_policy.py`
-

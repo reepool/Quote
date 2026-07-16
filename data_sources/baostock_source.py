@@ -18,6 +18,10 @@ from utils import log_execution, data_source_metrics
 from utils import baostock_logger
 
 
+_BAOSTOCK_FACTOR_HISTORY_START = datetime(1990, 1, 1)
+_FACTOR_EPSILON = 1e-12
+
+
 class BaostockSource(BaseDataSource):
     """Baostock数据源 - 专注中国股市历史数据"""
 
@@ -696,7 +700,11 @@ class BaostockSource(BaseDataSource):
                 baostock_logger.error(f"Cannot parse instrument_id for factors: {instrument_id}")
                 return []
 
-            start_str = start_date.strftime('%Y-%m-%d')
+            # BaoStock returns a sparse cumulative-factor sequence. Query from
+            # the market-history anchor so the first requested event can be
+            # derived from its predecessor before the result is windowed.
+            query_start = min(start_date, _BAOSTOCK_FACTOR_HISTORY_START)
+            start_str = query_start.strftime('%Y-%m-%d')
             end_str = end_date.strftime('%Y-%m-%d')
 
             # 加锁保护全局 socket
@@ -726,27 +734,13 @@ class BaostockSource(BaseDataSource):
                 )
                 return []
 
-            df = pd.DataFrame(data_list, columns=rs.fields)
-
-            factors = []
-            for _, row in df.iterrows():
-                try:
-                    # BaoStock 返回字段: code, dividOperateDate,
-                    # foreAdjustFactor, backAdjustFactor, adjustFactor
-                    factor_record = {
-                        'instrument_id': instrument_id,
-                        'ex_date': pd.to_datetime(row['dividOperateDate']),
-                        'factor': float(row['adjustFactor']) if row['adjustFactor'] else 1.0,
-                        'cumulative_factor': float(row['backAdjustFactor']) if row['backAdjustFactor'] else 1.0,
-                        'fore_adjust_factor': float(row['foreAdjustFactor']) if row['foreAdjustFactor'] else 1.0,
-                        'source': 'baostock',
-                    }
-                    factors.append(factor_record)
-                except Exception as parse_e:
-                    baostock_logger.warning(
-                        f"Failed to parse factor row for {instrument_id}: {parse_e}"
-                    )
-                    continue
+            raw_rows = pd.DataFrame(data_list, columns=rs.fields).to_dict('records')
+            factors = self._normalize_adjustment_factor_rows(
+                raw_rows,
+                instrument_id=instrument_id,
+                start_date=start_date,
+                end_date=end_date,
+            )
 
             baostock_logger.info(
                 f"Retrieved {len(factors)} adjustment factors for {instrument_id} ({start_str} to {end_str})"
@@ -758,6 +752,86 @@ class BaostockSource(BaseDataSource):
                 f"Failed to get adjustment factors from Baostock for {instrument_id}: {e}"
             )
             return []
+
+    @staticmethod
+    def _positive_float(value: Any) -> Optional[float]:
+        """Return a finite positive float, otherwise ``None``."""
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        if pd.isna(number) or number <= 0:
+            return None
+        return number
+
+    @classmethod
+    def _normalize_adjustment_factor_rows(
+        cls,
+        rows: List[Dict[str, Any]],
+        *,
+        instrument_id: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> List[Dict[str, Any]]:
+        """Convert BaoStock cumulative rows into sparse single-event factors.
+
+        ``query_adjust_factor`` is sparse by ``dividOperateDate``. Empirical
+        source sequences show ``backAdjustFactor`` (and commonly
+        ``adjustFactor``) carrying cumulative semantics, while this project's
+        provider contract requires ``factor`` to be the adjacent event ratio.
+        """
+        parsed_by_date: Dict[datetime, Dict[str, Any]] = {}
+        for row in rows:
+            try:
+                ex_date = pd.to_datetime(row.get('dividOperateDate')).to_pydatetime()
+            except (TypeError, ValueError, AttributeError):
+                baostock_logger.warning(
+                    f"Failed to parse BaoStock factor date for {instrument_id}: "
+                    f"{row.get('dividOperateDate')!r}"
+                )
+                continue
+            if pd.isna(ex_date):
+                baostock_logger.warning(
+                    f"Skipping empty BaoStock factor date for {instrument_id}"
+                )
+                continue
+            cumulative = cls._positive_float(row.get('backAdjustFactor'))
+            if cumulative is None:
+                cumulative = cls._positive_float(row.get('adjustFactor'))
+            if cumulative is None:
+                baostock_logger.warning(
+                    f"Skipping invalid BaoStock cumulative factor for "
+                    f"{instrument_id} on {ex_date.date()}"
+                )
+                continue
+            parsed_by_date[ex_date] = {
+                'ex_date': ex_date,
+                'cumulative_factor': cumulative,
+                'fore_adjust_factor': cls._positive_float(
+                    row.get('foreAdjustFactor')
+                ) or 1.0,
+            }
+
+        previous_cumulative = 1.0
+        factors: List[Dict[str, Any]] = []
+        for item in sorted(parsed_by_date.values(), key=lambda value: value['ex_date']):
+            cumulative = item['cumulative_factor']
+            event_factor = cumulative / previous_cumulative
+            previous_cumulative = cumulative
+            ex_date = item['ex_date']
+            if ex_date < start_date or ex_date > end_date:
+                continue
+            if abs(event_factor - 1.0) <= _FACTOR_EPSILON:
+                continue
+            factors.append({
+                'instrument_id': instrument_id,
+                'ex_date': ex_date,
+                'factor': event_factor,
+                'cumulative_factor': cumulative,
+                'fore_adjust_factor': item['fore_adjust_factor'],
+                'source': 'baostock',
+            })
+        return factors
 
     async def close(self):
         """关闭数据源连接（加锁保护全局 socket）"""

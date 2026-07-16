@@ -132,7 +132,9 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
         'completeness': (
             'persisted_tdx_events', 'pending_factors', 'pending_instruments',
             'unresolved_lifecycle_instruments', 'degraded_lifecycle_fallbacks',
-            'reference_only_events', 'tdx_only_events',
+            'exact_factor_matches', 'shifted_factor_matches',
+            'factor_conflicts', 'reference_factor_change_only',
+            'tdx_event_only',
         ),
     }
     for stage_name in (
@@ -165,14 +167,20 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
         if isinstance(item, dict)
     ]
     completeness_samples = (stages.get('completeness') or {}).get('samples') or []
-    remediation_lines = [
-        (
+    remediation_lines = []
+    for item in completeness_samples[:10]:
+        if not isinstance(item, dict):
+            continue
+        date_text = item.get('ex_date', '')
+        if not date_text and (item.get('tdx_ex_date') or item.get('reference_ex_date')):
+            date_text = (
+                f"tdx={item.get('tdx_ex_date', '?')} "
+                f"reference={item.get('reference_ex_date', '?')}"
+            )
+        remediation_lines.append((
             f"{item.get('instrument_id', item.get('exchange', 'unknown'))}"
-            f" {item.get('ex_date', '')}: {item.get('reason', 'review_required')}"
-        ).strip()
-        for item in completeness_samples[:10]
-        if isinstance(item, dict)
-    ]
+            f" {date_text}: {item.get('reason', 'review_required')}"
+        ).strip())
     extras = ""
     if blocker_lines:
         extras += "\n\n阻断项:\n```text\n" + "\n".join(blocker_lines) + "\n```"
@@ -3468,15 +3476,30 @@ class ScheduledTasks:
                     completeness_reasons.append('degraded_lifecycle_fallbacks')
                 if corporate_totals['errors'] or corporate_totals['timeouts']:
                     completeness_reasons.append('provider_failures')
-                if reconciliation.get('status') == 'partial':
-                    completeness_reasons.append('reference_only_events')
-                elif reconciliation.get('status') == 'unavailable':
+                if int(
+                    reconciliation_totals.get('reference_factor_change_only', 0)
+                    or reconciliation_totals.get('reference_only_events', 0)
+                    or 0
+                ) > 0:
+                    completeness_reasons.append(
+                        'reference_factor_changes_unmatched'
+                    )
+                if int(
+                    reconciliation_totals.get('factor_conflicts', 0) or 0
+                ) > 0:
+                    completeness_reasons.append('factor_conflicts')
+                if reconciliation.get('status') == 'unavailable':
                     completeness_reasons.append('reference_evidence_unavailable')
 
                 completeness_samples = []
                 completeness_samples.extend(pending_summary.get('samples') or [])
                 completeness_samples.extend(
-                    reconciliation.get('reference_only_samples') or []
+                    reconciliation.get('reference_factor_change_only_samples')
+                    or reconciliation.get('reference_only_samples')
+                    or []
+                )
+                completeness_samples.extend(
+                    reconciliation.get('factor_conflict_samples') or []
                 )
                 completeness_samples.extend(
                     result['lifecycle_completeness'].get('samples') or []
@@ -3489,15 +3512,39 @@ class ScheduledTasks:
                         ),
                         **pending_totals,
                         **lifecycle_totals,
-                        'reference_events': int(
-                            reconciliation_totals.get('reference_events', 0) or 0
+                        'reference_factor_changes': int(
+                            reconciliation_totals.get(
+                                'reference_factor_changes',
+                                reconciliation_totals.get('reference_events', 0),
+                            ) or 0
                         ),
-                        'reference_only_events': int(
-                            reconciliation_totals.get('reference_only_events', 0)
+                        'exact_factor_matches': int(
+                            reconciliation_totals.get('exact_factor_matches', 0)
                             or 0
                         ),
-                        'tdx_only_events': int(
-                            reconciliation_totals.get('tdx_only_events', 0) or 0
+                        'shifted_factor_matches': int(
+                            reconciliation_totals.get('shifted_factor_matches', 0)
+                            or 0
+                        ),
+                        'factor_conflicts': int(
+                            reconciliation_totals.get('factor_conflicts', 0) or 0
+                        ),
+                        'reference_factor_change_only': int(
+                            reconciliation_totals.get(
+                                'reference_factor_change_only',
+                                reconciliation_totals.get('reference_only_events', 0),
+                            ) or 0
+                        ),
+                        'tdx_event_only': int(
+                            reconciliation_totals.get(
+                                'tdx_event_only',
+                                reconciliation_totals.get('tdx_only_events', 0),
+                            ) or 0
+                        ),
+                        'calendar_unavailable_instruments': int(
+                            reconciliation_totals.get(
+                                'calendar_unavailable_instruments', 0
+                            ) or 0
                         ),
                     },
                     'reasons': completeness_reasons,

@@ -122,6 +122,121 @@ class TestBaoStockSource:
         assert by_id['600355.SH']['delisted_date'] == datetime(2026, 4, 15)
         assert by_id['600000.SH']['is_active'] is True
 
+    def test_adjustment_factor_rows_derive_single_event_ratio_after_window_anchor(self):
+        rows = [
+            {
+                'dividOperateDate': '1999-11-10',
+                'foreAdjustFactor': '1',
+                'backAdjustFactor': '1',
+                'adjustFactor': '1',
+            },
+            {
+                'dividOperateDate': '2000-07-06',
+                'foreAdjustFactor': '0.99354',
+                'backAdjustFactor': '1.006502',
+                'adjustFactor': '1.006502',
+            },
+            {
+                'dividOperateDate': '2002-08-22',
+                'foreAdjustFactor': '0.65498',
+                'backAdjustFactor': '1.526763',
+                'adjustFactor': '1.526763',
+            },
+        ]
+
+        factors = BaostockSource._normalize_adjustment_factor_rows(
+            rows,
+            instrument_id='600000.SH',
+            start_date=datetime(2002, 1, 1),
+            end_date=datetime(2002, 12, 31),
+        )
+
+        assert len(factors) == 1
+        assert factors[0]['ex_date'] == datetime(2002, 8, 22)
+        assert factors[0]['factor'] == pytest.approx(1.526763 / 1.006502)
+        assert factors[0]['cumulative_factor'] == pytest.approx(1.526763)
+
+    def test_adjustment_factor_rows_skip_baselines_and_invalid_values(self):
+        rows = [
+            {
+                'dividOperateDate': '2020-01-01',
+                'foreAdjustFactor': '1',
+                'backAdjustFactor': '1',
+                'adjustFactor': '1',
+            },
+            {
+                'dividOperateDate': '2020-02-01',
+                'foreAdjustFactor': '',
+                'backAdjustFactor': '0',
+                'adjustFactor': '1.2',
+            },
+            {
+                'dividOperateDate': '2020-03-01',
+                'foreAdjustFactor': '1',
+                'backAdjustFactor': 'not-a-number',
+                'adjustFactor': '',
+            },
+        ]
+
+        factors = BaostockSource._normalize_adjustment_factor_rows(
+            rows,
+            instrument_id='000001.SZ',
+            start_date=datetime(2020, 1, 1),
+            end_date=datetime(2020, 12, 31),
+        )
+
+        assert len(factors) == 1
+        assert factors[0]['factor'] == pytest.approx(1.2)
+        assert factors[0]['cumulative_factor'] == pytest.approx(1.2)
+        assert factors[0]['fore_adjust_factor'] == pytest.approx(1.0)
+
+    @pytest.mark.asyncio
+    async def test_get_adjustment_factors_queries_full_history_before_windowing(self):
+        class FakeResult:
+            error_code = '0'
+            error_msg = ''
+            fields = [
+                'code', 'dividOperateDate', 'foreAdjustFactor',
+                'backAdjustFactor', 'adjustFactor',
+            ]
+
+            def __init__(self):
+                self._rows = [
+                    ['sh.600000', '2000-07-06', '1', '1.006502', '1.006502'],
+                    ['sh.600000', '2002-08-22', '1', '1.526763', '1.526763'],
+                ]
+                self._idx = -1
+
+            def next(self):
+                self._idx += 1
+                return self._idx < len(self._rows)
+
+            def get_row_data(self):
+                return self._rows[self._idx]
+
+        source = BaostockSource(
+            'baostock',
+            RateLimitConfig(
+                max_requests_per_minute=10000,
+                max_requests_per_hour=10000,
+                max_requests_per_day=10000,
+            ),
+        )
+        source._ensure_login = AsyncMock()
+        source._run_bs_call = AsyncMock(return_value=FakeResult())
+
+        factors = await source.get_adjustment_factors(
+            '600000.SH',
+            '600000',
+            datetime(2002, 1, 1),
+            datetime(2002, 12, 31),
+        )
+
+        assert len(factors) == 1
+        assert factors[0]['factor'] == pytest.approx(1.526763 / 1.006502)
+        assert source._run_bs_call.await_args.kwargs['start_date'] == '1990-01-01'
+        assert source._run_bs_call.await_args.kwargs['end_date'] == '2002-12-31'
+
     @pytest.mark.asyncio
     async def test_get_daily_data(self, baostock_source):
         """Test getting daily quote data"""
