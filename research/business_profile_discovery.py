@@ -138,7 +138,9 @@ class CninfoBusinessProfileDiscoveryAdapter:
                 end_date=end_date,
                 page_size=max(1, page_size),
                 max_pages=max(1, max_pages),
-                stop_at_watermark=None if state is None else state.get("last_watermark"),
+                stop_at_watermark=(
+                    None if state is None else state.get("last_watermark")
+                ),
             ),
             filters=[self._record_filter],
         )
@@ -187,7 +189,9 @@ class CninfoBusinessProfileDiscoveryAdapter:
         return reasons
 
     @staticmethod
-    def _candidate(record: CninfoAnnouncementRecord) -> BusinessProfileDocumentCandidate:
+    def _candidate(
+        record: CninfoAnnouncementRecord,
+    ) -> BusinessProfileDocumentCandidate:
         classification = classify_business_profile_document(
             record.title,
             adjunct_type=record.adjunct_type,
@@ -225,11 +229,17 @@ class CninfoBusinessProfileDiscoveryAdapter:
         if self.storage is None:
             raise RuntimeError("storage is required when dry_run is false")
         now = get_shanghai_time().isoformat()
+        prior_watermark = scan_result.config.stop_at_watermark
+        committed_watermark = (
+            prior_watermark
+            if scan_result.errors
+            else scan_result.max_announcement_time or prior_watermark
+        )
         self.storage.upsert_cninfo_announcement_scan_state(
             purpose_key=scoped_purpose,
             market=market_config["market"],
             column=market_config["column"],
-            last_watermark=scan_result.max_announcement_time,
+            last_watermark=committed_watermark,
             last_scan_started_at=now,
             last_scan_completed_at=now,
             pages_scanned=scan_result.pages_scanned,
@@ -243,6 +253,7 @@ class CninfoBusinessProfileDiscoveryAdapter:
                 ),
                 "stopped_at_watermark": scan_result.stopped_at_watermark,
                 "errors": list(scan_result.errors)[:5],
+                "watermark_advanced": committed_watermark != prior_watermark,
             },
         )
         record_by_id = {
@@ -263,9 +274,7 @@ class CninfoBusinessProfileDiscoveryAdapter:
                 selection_reasons=candidate.selection_reasons,
                 raw_payload={
                     **record.raw_payload,
-                    "business_profile_classification": asdict(
-                        candidate.classification
-                    ),
+                    "business_profile_classification": asdict(candidate.classification),
                 },
                 ingestion_run_id=ingestion_run_id,
             )

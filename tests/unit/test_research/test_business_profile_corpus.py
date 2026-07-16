@@ -119,10 +119,10 @@ def test_corpus_summary_reports_documents_and_labels(tmp_path):
     summary = summarize_corpus_readiness(
         universe,
         source_manifests=[
-                {
-                    "instrument_id": "600001.SH",
-                    "report_period": "2024-12-31",
-                    "report_type": "annual",
+            {
+                "instrument_id": "600001.SH",
+                "report_period": "2024-12-31",
+                "report_type": "annual_report_correction",
                 "archive_path": "/tmp/report.pdf",
             }
         ],
@@ -137,6 +137,29 @@ def test_corpus_summary_reports_documents_and_labels(tmp_path):
     assert summary["expected_document_count"] == 1
     assert summary["covered_expected_document_count"] == 1
     assert summary["parse_mode_counts"] == {"unknown": 1}
+
+
+def test_non_periodic_business_document_does_not_cover_expected_report():
+    universe = list_first_wave_universe(
+        _corpus_connection(),
+        as_of_date="2025-12-31",
+    )
+
+    summary = summarize_corpus_readiness(
+        universe,
+        source_manifests=[
+            {
+                "instrument_id": "600001.SH",
+                "report_period": "2024-12-31",
+                "report_type": "profile_change_event",
+                "archive_path": "/tmp/event.pdf",
+            }
+        ],
+        expected_report_periods=["2024-12-31"],
+    )
+
+    assert summary["source_manifest_count"] == 1
+    assert summary["covered_expected_document_count"] == 0
 
 
 def test_universe_filters_stock_lifecycle_at_requested_date():

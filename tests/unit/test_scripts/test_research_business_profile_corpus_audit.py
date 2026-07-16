@@ -60,18 +60,18 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
                 report_period TEXT, report_type TEXT, filing_id TEXT,
                 source_url TEXT, archive_path TEXT, content_hash TEXT,
                 published_at TEXT, parser_version TEXT, status TEXT,
-                metadata_json TEXT
+                metadata_json TEXT, schema_version TEXT
             )
             """
         )
         conn.execute(
-            "INSERT INTO financial_source_files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO financial_source_files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 "file-1",
                 "600001.SH",
                 "cninfo",
                 "2024-12-31",
-                "annual",
+                "annual_report",
                 "announcement-1",
                 "report.pdf",
                 "/archive/report.pdf",
@@ -80,6 +80,7 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
                 "parser.v1",
                 "parsed",
                 "{}",
+                "business_profile_source_file_manifest.v1",
             ),
         )
         conn.commit()

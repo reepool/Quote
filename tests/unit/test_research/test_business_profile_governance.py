@@ -367,6 +367,57 @@ def test_material_business_expansion_keeps_existing_segments_in_same_regime(tmp_
     }
 
 
+def test_overlapping_approved_regimes_fail_closed(tmp_path):
+    storage, _ = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    for regime_id, valid_from in (
+        ("regime-one", "2020-01-01"),
+        ("regime-two", "2025-01-01"),
+    ):
+        repository.upsert(
+            "regimes",
+            {
+                "regime_id": regime_id,
+                "instrument_id": "601088.SH",
+                "regime_name": regime_id,
+                "regime_type": "operating_business",
+                "valid_from": valid_from,
+                "knowledge_from": "2026-03-28",
+                "evidence_id": "evidence-2025-ar",
+                "data_available_date": "2026-03-28",
+                "confidence": 1.0,
+                "review_status": "approved",
+            },
+        )
+        repository.upsert(
+            "segments",
+            {
+                "record_id": f"segment-{regime_id}",
+                "instrument_id": "601088.SH",
+                "report_period": "2025-12-31",
+                "segment_id": regime_id,
+                "segment_name_raw": regime_id,
+                "segment_type": "product",
+                "business_regime_id": regime_id,
+                "evidence_id": "evidence-2025-ar",
+                "data_available_date": "2026-03-28",
+                "confidence": 1.0,
+                "review_status": "approved",
+            },
+        )
+
+    context = BusinessProfileResolver(repository).resolve(
+        "601088.SH",
+        as_of_date="2026-04-30",
+    )
+
+    assert context["profile_lifecycle"]["active_regime"] is None
+    assert context["company_specific_profile"]["segments"] == []
+    assert "overlapping_active_business_regimes" in context["warnings"]
+    assert "overlapping_active_business_regimes" in context["readiness"]["input_gaps"]
+
+
 def test_resolver_applies_review_date_evidence_and_company_precedence(tmp_path):
     storage, _ = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)

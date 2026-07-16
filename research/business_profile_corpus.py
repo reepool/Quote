@@ -150,6 +150,7 @@ def summarize_corpus_readiness(
             str(item.get("report_period") or ""),
         )
         for item in manifests
+        if _manifest_document_family(item) in {"annual_report", "semiannual_report"}
     }
     return {
         "schema_version": "business_profile_corpus_audit.v1",
@@ -254,7 +255,7 @@ def load_business_profile_source_manifests(
             FROM financial_source_files
             WHERE instrument_id IN ({placeholders})
               AND source IN ('cninfo', 'sse', 'szse', 'bse')
-              AND report_type IN ('annual', 'semiannual')
+              AND schema_version = 'business_profile_source_file_manifest.v1'
             """,
             batch,
         ).fetchall()
@@ -344,3 +345,17 @@ def _manifest_parse_mode(manifest: Mapping[str, Any]) -> str:
     if "pdf" in parser_version:
         return "native_pdf"
     return str(manifest.get("status") or "unknown")
+
+
+def _manifest_document_family(manifest: Mapping[str, Any]) -> str:
+    metadata = manifest.get("metadata_json")
+    if isinstance(metadata, str):
+        try:
+            metadata = json.loads(metadata)
+        except ValueError:
+            metadata = {}
+    if isinstance(metadata, Mapping):
+        family = str(metadata.get("document_family") or "").strip()
+        if family:
+            return family
+    return str(manifest.get("report_type") or "").removesuffix("_correction")

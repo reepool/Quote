@@ -60,6 +60,22 @@ def test_profile_change_hints_cover_long_term_business_changes():
     ]
 
 
+def test_all_profile_change_hints_are_selected_for_discovery():
+    cases = {
+        "关于新增主营业务的公告": "principal_business_change",
+        "关于出售重大资产的公告": "business_disposal",
+        "关于重大资产购买的公告": "major_asset_restructuring",
+        "关于重大收购事项的公告": "business_acquisition",
+        "关于证券简称变更的公告": "company_name_change",
+    }
+
+    for title, event_type in cases.items():
+        result = classify_business_profile_document(title, adjunct_type="PDF")
+        assert result.selected is True
+        assert result.document_type == "profile_change_event"
+        assert event_type in result.profile_event_hints
+
+
 def test_non_pdf_attachment_is_not_selected():
     result = classify_business_profile_document(
         "2025年年度报告",

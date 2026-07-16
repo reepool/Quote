@@ -85,6 +85,7 @@
   - `2026-07-16` 上述长期治理基础已进入代码：新增 regime/event 存储和 API/DCF `profile_lifecycle`，公告分类器只生成画像变化提示；首批行业只读 universe 工具按申万历史归属与上市生命周期识别当前在市 791 家（基础化工 446、有色 145、建材 76、石化 48、钢铁 43、煤炭 33），正式业务画像全文归档覆盖仍为 0，下一步进入每行业 5 家文档基准和 CNInfo 全文归档
   - `2026-07-16` CNInfo 业务画像文档发现 adapter 已实现：按公司复用官方 orgId/stock identity、分页、水位、限速重试和 announcement audit，摘要不会替代全文，重组公告只产生 profile event hints
   - `2026-07-16` 业务画像 PDF 原件归档第一版已实现：复用 `financial_source_files` 并新增显式 `source_tier / supersedes_source_file_id`，按 `exchange/symbol/report_period/original/announcement_id_sha256.pdf` 不可变归档；同公告同内容短路，修订稿和附件内容变化建立 supersession，有限批次支持原子 checkpoint 中断续跑。当前尚未执行生产归档，交易所备源、page artifact 和候选事实抽取仍待实现
+  - `2026-07-16` 业务画像首轮 review 缺陷已修正：业务画像父任务留在 `research.db`，PDF manifest 在 `financials.db` 使用自动创建的 `financial_business_profile_documents` 子任务并通过 metadata 保留父任务 lineage；manifest 失败会清理本轮未登记原件。语料审计按业务画像 schema 和 annual/semiannual document family 统计，降级分页不推进 watermark，所有已识别画像变化 hint 均进入候选；多个 active approved regime 时 resolver fail closed 并输出 blocker
   - 个股历史估值分位按请求从 `valuation_history` 即时计算，不持久化全量 `instrument x date x metric x window` 分位矩阵；默认指标为 `pe_ttm / pb_mrq / ps_ttm`，默认窗口为过去 `12` 个季度，并对负值估值显式返回解释提示
   - `valuation.db` 只保存估值输入、估值历史、估值运行审计和必要 lineage，不复制财务大表、行业大表或行情全量数据
   - 代码层已接入 `valuation_db_path`、`valuation_inputs`、估值域 ingestion audit 路由与 readiness input coverage blocker；`2026-05-29` 已用 `600000.SH / 001233.SZ / 920009.BJ` 完成 SSE/SZSE/BSE bounded 输入同步和估值历史重建验证，`2026-05-30` 已补齐财务核心事实 `data_available_date` 本地回填链路并完成 `50` 标的估值历史 dry-run，生产启用仍需全市场覆盖率与 strict Shenwan blocker 通过

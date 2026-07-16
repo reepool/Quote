@@ -8,9 +8,10 @@ from research.providers.cninfo_announcements import (
 
 
 class _Scanner:
-    def __init__(self, records, *, identity=True):
+    def __init__(self, records, *, identity=True, errors=None):
         self.records = records
         self.identity = identity
+        self.errors = list(errors or [])
         self.config = None
 
     def resolve_stock_identity(self, symbol):
@@ -42,7 +43,7 @@ class _Scanner:
             announcements_seen=len(self.records),
             max_announcement_time="2026-04-21T00:00:00+00:00",
             stopped_at_watermark=False,
-            errors=[],
+            errors=self.errors,
         )
 
 
@@ -107,15 +108,16 @@ def test_instrument_discovery_selects_full_report_and_uses_watermark():
     assert scanner.config.stop_at_watermark == "2026-01-01T00:00:00+00:00"
     assert storage.state_writes[0]["selected_announcements"] == 1
     assert storage.audits[0]["ingestion_run_id"] == 7
-    assert storage.audits[0]["raw_payload"][
-        "business_profile_classification"
-    ]["document_type"] == "annual_report"
+    assert (
+        storage.audits[0]["raw_payload"]["business_profile_classification"][
+            "document_type"
+        ]
+        == "annual_report"
+    )
 
 
 def test_discovery_keeps_restructuring_as_candidate_hint():
-    scanner = _Scanner(
-        [_record("event", "重大资产置换及发行股份购买资产公告")]
-    )
+    scanner = _Scanner([_record("event", "重大资产置换及发行股份购买资产公告")])
     adapter = CninfoBusinessProfileDiscoveryAdapter(scanner=scanner)
 
     result = adapter.discover_instrument(
@@ -141,3 +143,24 @@ def test_discovery_reports_missing_cninfo_identity_without_scan():
     assert result.status == "not_found"
     assert result.errors == ["cninfo_stock_identity_not_found"]
     assert scanner.config is None
+
+
+def test_degraded_scan_keeps_prior_watermark():
+    scanner = _Scanner(
+        [_record("full", "万华化学2025年年度报告")],
+        errors=["page 2 failed"],
+    )
+    storage = _Storage()
+    adapter = CninfoBusinessProfileDiscoveryAdapter(
+        storage=storage,
+        scanner=scanner,
+    )
+
+    result = adapter.discover_instrument(
+        {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"},
+        dry_run=False,
+    )
+
+    assert result.status == "degraded"
+    assert storage.state_writes[0]["last_watermark"] == ("2026-01-01T00:00:00+00:00")
+    assert storage.state_writes[0]["metadata"]["watermark_advanced"] is False

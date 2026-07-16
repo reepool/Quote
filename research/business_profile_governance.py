@@ -494,7 +494,11 @@ class BusinessProfileResolver:
             "approved_profile_event_count": len(lifecycle["approved_events"]),
             "industry_mapping_count": len(industry_mappings),
             "executable_mapping_count": len(selected_mappings),
-            "input_gaps": sorted(set(mapping_gaps + (["company_business_profile_missing"] if not any(approved.values()) else []))),
+            "input_gaps": sorted(set(
+                mapping_gaps
+                + lifecycle["blockers"]
+                + (["company_business_profile_missing"] if not any(approved.values()) else [])
+            )),
         }
         return profile_payload
 
@@ -575,9 +579,11 @@ class BusinessProfileResolver:
                 int(item.get("version") or 0),
             )
         )
-        active_regime = active_regimes[-1] if active_regimes else None
+        active_regime = active_regimes[0] if len(active_regimes) == 1 else None
+        blockers: List[str] = []
         if len(active_regimes) > 1:
             warnings.append("overlapping_active_business_regimes")
+            blockers.append("overlapping_active_business_regimes")
 
         for event in history.get("events", []):
             evidence_valid = self._evidence_is_valid(
@@ -619,6 +625,7 @@ class BusinessProfileResolver:
             "approved_events": approved_events,
             "candidate_regimes": candidate_regimes,
             "candidate_events": candidate_events,
+            "blockers": blockers,
             "warnings": warnings,
         }
 

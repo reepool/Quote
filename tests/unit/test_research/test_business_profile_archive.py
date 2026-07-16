@@ -1,5 +1,7 @@
 from dataclasses import asdict
+import json
 from pathlib import Path
+import sqlite3
 
 import pytest
 
@@ -9,6 +11,12 @@ from research.business_profile_archive import (
 )
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import classify_business_profile_document
+from research.storage import ResearchStorageManager
+from utils.config_manager import (
+    ResearchBudgetConfig,
+    ResearchConfig,
+    ResearchStorageConfig,
+)
 
 
 class _Storage:
@@ -68,7 +76,8 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
         _instrument(),
         candidate,
         content,
-        ingestion_run_id=7,
+        manifest_ingestion_run_id=7,
+        parent_ingestion_run_id=3,
     )
 
     path = Path(record.archive_path)
@@ -83,6 +92,10 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
     assert storage.rows[0]["filing_id"] == "annual-1"
     assert storage.rows[0]["published_at"] == candidate.announcement_time
     assert storage.rows[0]["metadata"]["document_family"] == "annual_report"
+    assert storage.rows[0]["metadata"]["parent_ingestion_run"] == {
+        "domain": "business_profile",
+        "ingestion_run_id": 3,
+    }
 
 
 def test_exact_rerun_short_circuits_manifest_write(tmp_path):
@@ -188,3 +201,83 @@ def test_archive_rejects_non_pdf_payload(tmp_path):
             _candidate("annual-1", "万华化学2025年年度报告"),
             b"<html>rate limited</html>",
         )
+
+
+def test_archive_batch_creates_financial_child_run_for_split_databases(tmp_path):
+    quotes_db = tmp_path / "quotes.db"
+    quotes_db.write_bytes(b"")
+    storage = ResearchStorageManager(
+        ResearchConfig(
+            enabled=True,
+            storage=ResearchStorageConfig(
+                db_path=str(tmp_path / "research.db"),
+                financials_db_path=str(tmp_path / "financials.db"),
+                valuation_db_path=str(tmp_path / "valuation.db"),
+                quotes_db_path=str(quotes_db),
+                attach_quotes_db=False,
+                shadow_mode=True,
+            ),
+            budget=ResearchBudgetConfig(),
+        )
+    )
+    storage.initialize()
+    parent_run_id = storage.start_ingestion_run(
+        domain="business_profile",
+        job_name="business_profile_sync",
+    )
+    candidate = _candidate("annual-1", "万华化学2025年年度报告")
+    result = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        archive_root=tmp_path / "filings",
+        downloader=lambda _: b"%PDF-1.7\nsplit-db",
+    ).archive_candidates(
+        _instrument(),
+        [candidate],
+        parent_ingestion_run_id=parent_run_id,
+    )
+    storage.finish_ingestion_run(parent_run_id, status="success", rows_written=1)
+
+    with sqlite3.connect(tmp_path / "research.db") as conn:
+        parent = conn.execute(
+            "SELECT domain, status FROM ingestion_runs WHERE id = ?",
+            (parent_run_id,),
+        ).fetchone()
+    with sqlite3.connect(tmp_path / "financials.db") as conn:
+        child = conn.execute(
+            "SELECT domain, status FROM ingestion_runs WHERE id = ?",
+            (result.manifest_ingestion_run_id,),
+        ).fetchone()
+        manifest = conn.execute(
+            "SELECT ingestion_run_id, metadata_json FROM financial_source_files"
+        ).fetchone()
+
+    assert parent == ("business_profile", "success")
+    assert child == ("financial_business_profile_documents", "success")
+    assert manifest[0] == result.manifest_ingestion_run_id
+    assert json.loads(manifest[1])["parent_ingestion_run"] == {
+        "domain": "business_profile",
+        "ingestion_run_id": parent_run_id,
+    }
+
+
+def test_manifest_failure_removes_new_unregistered_archive(tmp_path):
+    class _FailingStorage(_Storage):
+        def upsert_financial_source_file_manifest(
+            self, manifest, *, ingestion_run_id=None
+        ):
+            raise RuntimeError("manifest write failed")
+
+    archive_root = tmp_path / "filings"
+    service = BusinessProfileDocumentArchiveService(
+        storage=_FailingStorage(),
+        archive_root=archive_root,
+    )
+
+    with pytest.raises(RuntimeError, match="manifest write failed"):
+        service.archive_content(
+            _instrument(),
+            _candidate("annual-1", "万华化学2025年年度报告"),
+            b"%PDF-1.7\norphan",
+        )
+
+    assert list(archive_root.rglob("*.pdf")) == []

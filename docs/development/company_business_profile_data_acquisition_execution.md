@@ -224,7 +224,11 @@ data/filings/business_profile/{exchange}/{symbol}/{report_period}/
 
 当前代码通过 `BusinessProfileDocumentArchiveService` 实现原件层。共享 `financial_source_files` 已增加 `source_tier` 和 `supersedes_source_file_id`，业务画像文档使用独立 `business_profile_source_file_manifest.v1` schema，避免与财务数值事实混淆。更正公告、新公告复用相同内容、同一公告附件变化分别保留公告身份和内容身份；只有同一公告 ID、同一内容哈希的重跑才直接返回 `unchanged`。
 
+由于业务画像父流程和 source manifest 分别属于 `research.db` 与 `financials.db`，运行审计采用父子任务而不是跨库外键：父流程继续使用 `business_profile` domain；归档批次在财务库创建 `financial_business_profile_documents` 子任务，`financial_source_files.ingestion_run_id` 只引用该子任务。父任务 ID、domain 和 instrument scope 写入子任务及 manifest metadata，作为可验证逻辑 lineage。若 manifest 落库失败，本轮新建且此前不存在的 PDF 必须删除，不能留下无登记原件。
+
 批量归档必须设置 `max_documents`，可选 checkpoint 只用于恢复未完成批次。checkpoint 完整结束后删除，不能长期充当公告是否变化的权威判断；跨批次幂等仍以 source manifest 和重新计算的内容哈希为准。
+
+公告扫描只有完整成功时才能推进 watermark。任一后续页请求失败时，本次状态记为 degraded 并保留旧水位，避免未扫描页面被永久跨过。语料覆盖审计按业务画像 manifest schema 过滤，年度/半年度全文及修订稿通过 `document_family` 统一计入预期报告覆盖；经营、重组、合同等临时公告不能冒充定期报告覆盖。
 
 ---
 
@@ -357,6 +361,8 @@ extracted -> candidate -> approved / rejected
 7. 候选事件未审核前，仅输出 `material_profile_change_pending_review`，不切换 DCF 输入。
 
 借壳和主营替换原则上创建新 regime；普通有机扩产只更新经营事实；新增跨行业业务是否创建新 regime，由收入、利润、资产材料性、合并范围及管理层分部口径共同决定，不能只按公司公告措辞自动判断。
+
+同一经济和知识时点出现多个 approved active regime 属于治理冲突，不允许 resolver 自动选择“最新”版本。此时所有 regime 绑定事实对 DCF fail closed，readiness 返回 `overlapping_active_business_regimes`，待审核人员关闭错误区间或完成 supersession 后恢复。
 
 ### 10.1 日常增量
 

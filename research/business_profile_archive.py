@@ -52,6 +52,8 @@ class BusinessProfileArchiveBatchResult:
     skipped_checkpoint: int = 0
     failed: int = 0
     checkpoint_complete: bool = False
+    parent_ingestion_run_id: Optional[int] = None
+    manifest_ingestion_run_id: Optional[int] = None
     records: List[BusinessProfileArchiveRecord] = field(default_factory=list)
     errors: List[Dict[str, str]] = field(default_factory=list)
 
@@ -84,7 +86,8 @@ class BusinessProfileDocumentArchiveService:
         *,
         max_documents: int = 20,
         checkpoint_path: Optional[str | Path] = None,
-        ingestion_run_id: Optional[int] = None,
+        parent_ingestion_run_id: Optional[int] = None,
+        manifest_ingestion_run_id: Optional[int] = None,
     ) -> BusinessProfileArchiveBatchResult:
         """Archive a bounded batch and retain progress only while work is incomplete."""
         if max_documents < 1:
@@ -94,56 +97,79 @@ class BusinessProfileDocumentArchiveService:
             raise ValueError("instrument_id is required")
         checkpoint = self._load_checkpoint(checkpoint_path, instrument_id)
         completed = set(checkpoint.get("completed") or [])
-        result = BusinessProfileArchiveBatchResult()
-
-        for candidate in candidates:
-            fingerprint = self._candidate_fingerprint(candidate)
-            if fingerprint in completed:
-                result.skipped_checkpoint += 1
-                continue
-            if result.attempted >= max_documents:
-                break
-            result.attempted += 1
-            try:
-                content = self.downloader(candidate)
-                record = self.archive_content(
-                    instrument,
-                    candidate,
-                    content,
-                    ingestion_run_id=ingestion_run_id,
-                )
-            except Exception as exc:
-                result.failed += 1
-                result.errors.append(
-                    {
-                        "announcement_id": candidate.announcement_id,
-                        "error": str(exc),
-                    }
-                )
-                LOGGER.warning(
-                    "business-profile document archive failed: instrument_id=%s announcement_id=%s error=%s",
-                    instrument_id,
-                    candidate.announcement_id,
-                    exc,
-                )
-                continue
-            result.records.append(record)
-            if record.status == "unchanged":
-                result.unchanged += 1
-            else:
-                result.archived += 1
-            completed.add(fingerprint)
-            self._write_checkpoint(checkpoint_path, instrument_id, completed)
-
-        all_fingerprints = {self._candidate_fingerprint(item) for item in candidates}
-        result.checkpoint_complete = (
-            result.failed == 0 and all_fingerprints <= completed
+        owns_manifest_run = manifest_ingestion_run_id is None
+        if owns_manifest_run:
+            manifest_ingestion_run_id = self._start_manifest_ingestion_run(
+                instrument,
+                parent_ingestion_run_id=parent_ingestion_run_id,
+            )
+        result = BusinessProfileArchiveBatchResult(
+            parent_ingestion_run_id=parent_ingestion_run_id,
+            manifest_ingestion_run_id=manifest_ingestion_run_id,
         )
-        if result.checkpoint_complete:
-            self._remove_checkpoint(checkpoint_path)
-        elif completed:
-            self._write_checkpoint(checkpoint_path, instrument_id, completed)
-        return result
+        interrupted_error: Optional[str] = None
+        try:
+            for candidate in candidates:
+                fingerprint = self._candidate_fingerprint(candidate)
+                if fingerprint in completed:
+                    result.skipped_checkpoint += 1
+                    continue
+                if result.attempted >= max_documents:
+                    break
+                result.attempted += 1
+                try:
+                    content = self.downloader(candidate)
+                    record = self.archive_content(
+                        instrument,
+                        candidate,
+                        content,
+                        manifest_ingestion_run_id=manifest_ingestion_run_id,
+                        parent_ingestion_run_id=parent_ingestion_run_id,
+                    )
+                except Exception as exc:
+                    result.failed += 1
+                    result.errors.append(
+                        {
+                            "announcement_id": candidate.announcement_id,
+                            "error": str(exc),
+                        }
+                    )
+                    LOGGER.warning(
+                        "business-profile document archive failed: instrument_id=%s announcement_id=%s error=%s",
+                        instrument_id,
+                        candidate.announcement_id,
+                        exc,
+                    )
+                    continue
+                result.records.append(record)
+                if record.status == "unchanged":
+                    result.unchanged += 1
+                else:
+                    result.archived += 1
+                completed.add(fingerprint)
+                self._write_checkpoint(checkpoint_path, instrument_id, completed)
+
+            all_fingerprints = {
+                self._candidate_fingerprint(item) for item in candidates
+            }
+            result.checkpoint_complete = (
+                result.failed == 0 and all_fingerprints <= completed
+            )
+            if result.checkpoint_complete:
+                self._remove_checkpoint(checkpoint_path)
+            elif completed:
+                self._write_checkpoint(checkpoint_path, instrument_id, completed)
+            return result
+        except BaseException as exc:
+            interrupted_error = f"{type(exc).__name__}: {exc}"
+            raise
+        finally:
+            if owns_manifest_run and manifest_ingestion_run_id is not None:
+                self._finish_manifest_ingestion_run(
+                    manifest_ingestion_run_id,
+                    result,
+                    interrupted_error=interrupted_error,
+                )
 
     def archive_content(
         self,
@@ -151,7 +177,8 @@ class BusinessProfileDocumentArchiveService:
         candidate: BusinessProfileDocumentCandidate,
         content: bytes,
         *,
-        ingestion_run_id: Optional[int] = None,
+        manifest_ingestion_run_id: Optional[int] = None,
+        parent_ingestion_run_id: Optional[int] = None,
     ) -> BusinessProfileArchiveRecord:
         """Persist one verified PDF and its versioned source manifest."""
         if not isinstance(content, bytes) or not content:
@@ -184,7 +211,7 @@ class BusinessProfileDocumentArchiveService:
             announcement_id=candidate.announcement_id,
             content_hash=content_hash,
         )
-        self._write_immutable(archive_path, content, content_hash)
+        archive_created = self._write_immutable(archive_path, content, content_hash)
         if exact is not None and str(exact.get("archive_path") or "") == str(
             archive_path
         ):
@@ -237,12 +264,21 @@ class BusinessProfileDocumentArchiveService:
                 "is_correction": candidate.classification.is_correction,
                 "profile_event_hints": candidate.classification.profile_event_hints,
                 "selection_reasons": candidate.selection_reasons,
+                "parent_ingestion_run": {
+                    "domain": "business_profile",
+                    "ingestion_run_id": parent_ingestion_run_id,
+                },
             },
         )
-        source_file_id = self._upsert_manifest(
-            manifest,
-            ingestion_run_id=ingestion_run_id,
-        )
+        try:
+            source_file_id = self._upsert_manifest(
+                manifest,
+                ingestion_run_id=manifest_ingestion_run_id,
+            )
+        except Exception:
+            if archive_created:
+                archive_path.unlink(missing_ok=True)
+            raise
         return BusinessProfileArchiveRecord(
             announcement_id=candidate.announcement_id,
             report_period=report_period,
@@ -343,12 +379,12 @@ class BusinessProfileDocumentArchiveService:
         )
 
     @staticmethod
-    def _write_immutable(path: Path, content: bytes, content_hash: str) -> None:
+    def _write_immutable(path: Path, content: bytes, content_hash: str) -> bool:
         if path.exists():
             existing_hash = hashlib.sha256(path.read_bytes()).hexdigest()
             if existing_hash != content_hash:
                 raise RuntimeError(f"immutable archive hash mismatch: {path}")
-            return
+            return False
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".part")
         temporary.write_bytes(content)
@@ -356,6 +392,74 @@ class BusinessProfileDocumentArchiveService:
             temporary.unlink(missing_ok=True)
             raise RuntimeError("archive write hash verification failed")
         os.replace(temporary, path)
+        return True
+
+    def _start_manifest_ingestion_run(
+        self,
+        instrument: Dict[str, Any],
+        *,
+        parent_ingestion_run_id: Optional[int],
+    ) -> Optional[int]:
+        if not hasattr(self.storage, "start_ingestion_run"):
+            return None
+        kwargs = {
+            "domain": "financial_business_profile_documents",
+            "job_name": "business_profile_document_archive",
+            "market": str(instrument.get("exchange") or "").upper() or None,
+            "source": "cninfo",
+            "mode": "archive",
+            "metadata": {
+                "instrument_id": instrument.get("instrument_id"),
+                "parent_domain": "business_profile",
+                "parent_ingestion_run_id": parent_ingestion_run_id,
+            },
+        }
+        financial_scope = getattr(self.storage, "financial_database_scope", None)
+        if financial_scope is None:
+            return self.storage.start_ingestion_run(**kwargs)
+        with financial_scope():
+            run_id = self.storage.start_ingestion_run(**kwargs)
+        route_ids = getattr(self.storage, "_financial_ingestion_run_ids", None)
+        if route_ids is not None:
+            route_ids.discard(run_id)
+        return run_id
+
+    def _finish_manifest_ingestion_run(
+        self,
+        run_id: int,
+        result: BusinessProfileArchiveBatchResult,
+        *,
+        interrupted_error: Optional[str],
+    ) -> None:
+        if not hasattr(self.storage, "finish_ingestion_run"):
+            return
+        status = (
+            "failed" if interrupted_error else "partial" if result.failed else "success"
+        )
+        try:
+            kwargs = {
+                "status": status,
+                "rows_written": result.archived,
+                "error_message": interrupted_error,
+                "metadata": {
+                    "parent_ingestion_run_id": result.parent_ingestion_run_id,
+                    "attempted": result.attempted,
+                    "archived": result.archived,
+                    "unchanged": result.unchanged,
+                    "failed": result.failed,
+                    "checkpoint_complete": result.checkpoint_complete,
+                },
+            }
+            financial_scope = getattr(self.storage, "financial_database_scope", None)
+            if financial_scope is None:
+                self.storage.finish_ingestion_run(run_id, **kwargs)
+            else:
+                with financial_scope():
+                    self.storage.finish_ingestion_run(run_id, **kwargs)
+        finally:
+            route_ids = getattr(self.storage, "_financial_ingestion_run_ids", None)
+            if route_ids is not None:
+                route_ids.discard(run_id)
 
     @staticmethod
     def _candidate_fingerprint(candidate: BusinessProfileDocumentCandidate) -> str:

@@ -484,10 +484,13 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 
 - 已增加 `company_business_profile_regimes` 和 `company_business_profile_events`，分部、经营事实、价值链角色和商品暴露增加 `business_regime_id`、`knowledge_from/to` 及 supersession 字段。
 - resolver 已按业务有效区间与知识有效区间选择 active regime。借壳交割早于公告时，公告前的历史估值继续使用当时可知旧画像；候选重大变化只产生复核预警。
+- 同一估值时点若存在两个以上 approved active regime，resolver 不再按排序任取一个，而是清空 active regime、排除所有 regime 绑定事实，并输出 `overlapping_active_business_regimes` readiness blocker。
 - 已实现年报全文/摘要/修订版、经营数据、资源报告、重大合同、套保和画像变化公告分类器；借壳、重组、收购、出售、控制权及主营变化只生成事件提示，不自动切换画像。
 - 已实现 CNInfo 公司级文档发现 adapter，复用统一股票身份解析、分页、重试、限速、水位和公告审计；发现阶段不下载 PDF、不写业务事实。
 - 已实现业务画像 PDF 不可变归档服务：共享 source manifest 显式记录 `source_tier`、公告发布时间和 `supersedes_source_file_id`，归档路径包含公告 ID 与 SHA-256；同一公告同一内容重跑短路，修订稿或附件变化建立新版本且不覆盖旧原件。
 - 归档批次支持 `max_documents` 和原子 checkpoint；中断后按公告元数据指纹续跑，完整批次结束后清除 checkpoint。归档阶段只写原件和 manifest，不写 candidate/approved 业务事实。
+- 归档采用跨库父子任务：`research.db` 保存业务画像父任务，`financials.db` 创建 `financial_business_profile_documents` 子任务并由 manifest 外键引用；父任务 ID 只记录在 manifest metadata，不建立跨库物理外键。manifest 写入失败时删除本轮新建且尚未登记的原件。
+- 降级公告扫描不得推进水位；语料审计只统计 `business_profile_source_file_manifest.v1`，并将全文与其修订稿归入统一 annual/semiannual document family。
 - 已实现按申万历史归属和股票上市生命周期导出首批行业 universe 的只读审计工具。2026-07-16 当前在市样本为 791 家，现有正式业务画像全文归档覆盖仍为 0。
 - 已建立包含文档、页/表证据、产品、商品、单位、业务 regime、画像事件和审核决定的金标准 JSON Schema。
 

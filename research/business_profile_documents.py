@@ -160,6 +160,17 @@ def classify_business_profile_document(
                 profile_event_hints=hints,
             )
 
+    if hints:
+        return BusinessProfileDocumentClassification(
+            document_type="profile_change_event",
+            selected=True,
+            is_correction=correction,
+            selection_reasons=[
+                f"profile_event_hint:{event_type}" for event_type in hints
+            ],
+            profile_event_hints=hints,
+        )
+
     return BusinessProfileDocumentClassification(
         document_type="audit_report" if "审计报告" in normalized else "other",
         selected=False,
