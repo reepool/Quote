@@ -121,6 +121,37 @@ GET /api/v1/corporate-actions/xdxr?instrument_id=000001.SZ&start_date=2007-01-01
 
 接口还支持 `validation_result` 过滤，响应固定包含 `audit_only=true` 和 `dataset=adjustment_factors_tdx`，不能作为生产复权因子接口使用。
 
+## 公司行动多源验证
+
+手工任务 `a_share_corporate_action_validation` 对已入库 TDX XDXR 做三层只读验证：
+
+1. **事件字段层**：通过 AkShare 的 `stock_fhps_em` 读取东方财富已实施分红方案，按除权除息日比较每 10 股现金分红和送转总比例。AkShare 是适配器，报告中的上游来源明确标记为 Eastmoney。
+2. **官方公告层**：对冲突和单边事件的有限股票扫描 CNInfo 权益分派实施公告。该层只证明实施公告元数据存在，不在未解析 PDF 的情况下声称金额已经获得官方验证。
+3. **累计结果层**：将 TDX 与 BaoStock/AkShare 的事件日因子都归一为 1，从同一窗口重新连乘，在各年末和最新日期比较累计因子。默认误差不超过 0.1% 为 acceptable，0.1% 至 0.5% 为 warning，超过 0.5% 为 conflict。
+
+推荐先运行少量股票和近期区间：
+
+```text
+/run a_share_corporate_action_validation start_date=2020-01-01 end_date=2026-07-15 exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ reference_sources=baostock,akshare scan_official_announcements=true official_sample_limit=2
+```
+
+扩大到全市场时，CNInfo 不会扫描全部股票，只会优先选择事件冲突和单边事件股票，并受 `official_sample_limit` 限制：
+
+```text
+/run a_share_corporate_action_validation start_date=1990-12-19 end_date=2026-07-15 exchanges=SSE,SZSE,BSE reference_sources=baostock,akshare scan_official_announcements=true official_sample_limit=50 official_lookback_years=3
+```
+
+关键参数：
+
+- `field_tolerance`：每 10 股现金或送转字段的绝对差容限，默认 `0.0001`。
+- `acceptable_cumulative_error_pct`：累计因子可接受误差百分数，默认 `0.1`。
+- `warning_cumulative_error_pct`：累计因子 warning 上限百分数，默认 `0.5`。
+- `official_sample_limit`：本轮最多进行 CNInfo 定向扫描的股票数量。
+- `official_lookback_years`：官方公告扫描只覆盖截止日前最近若干年，默认 3 年；更早事件不会被误报为“官方公告不存在”。
+- `per_source_timeout_sec`：单报告期 Eastmoney 请求或单股票 CNInfo 请求的超时。
+
+该任务不更新 `adjustment_factors`、`adjustment_factors_tdx` 或主数据。事件字段冲突、任一来源单边事件、累计 warning/conflict、源请求失败或官方证据未解决时返回 `partial`。累计因子收敛不会覆盖事件层冲突，因为不同错误可能在最终累计结果中相互抵消。
+
 ## 对现有业务的影响
 
 - 不修改 `daily_data_update` 的定时计划或默认参数。

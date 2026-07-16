@@ -656,6 +656,31 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_corporate_action_validation": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股分红派息与复权因子多源只读验证（仅手工触发）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": null,
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "reference_sources": ["baostock", "akshare"],
+          "scan_official_announcements": true,
+          "official_sample_limit": 50,
+          "official_lookback_years": 3,
+          "field_tolerance": 0.0001,
+          "acceptable_cumulative_error_pct": 0.1,
+          "warning_cumulative_error_pct": 0.5,
+          "per_source_timeout_sec": 60,
+          "sample_limit": 20,
+          "max_runtime_seconds": 86400
+        }
+      },
       "index_master_governance_sync": {
         "enabled": true,
         "manual_only": true,

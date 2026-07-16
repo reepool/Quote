@@ -33,8 +33,10 @@ from utils.cache import cache_manager
 from utils.a_share_historical_backfill import (
     A_SHARE_EXCHANGE_INCEPTION,
     AShareBackfillCheckpointStore,
+    coerce_date,
     evaluate_calendar_coverage,
     normalize_a_share_backfill_parameters,
+    normalize_string_list,
     serialize_checkpoint_parameters,
 )
 
@@ -204,6 +206,94 @@ def _format_a_share_historical_backfill_report(result: Dict[str, Any]) -> str:
         + "\n```"
         + extras
     )
+
+
+def _format_a_share_corporate_action_validation_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a bounded report for layered corporate-action validation."""
+    icon, label = _format_scheduler_status(result.get('status'))
+    parameters = result.get('parameters') or {}
+    universe = result.get('universe') or {}
+    coverage = result.get('source_coverage') or {}
+    event_totals = (result.get('event_validation') or {}).get('totals') or {}
+    official_totals = (result.get('official_validation') or {}).get('totals') or {}
+    cumulative_totals = (result.get('cumulative_validation') or {}).get('totals') or {}
+    lines = [
+        f"{icon} *A 股公司行动多源验证*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{result.get('status', 'unknown')}`",
+        f"只读: `{result.get('read_only', True)}`",
+        f"范围: `{parameters.get('start_date', 'N/A')}` 至 "
+        f"`{parameters.get('end_date', 'N/A')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"股票: `{universe.get('instrument_count', 0)}`",
+        "",
+        "事件字段:",
+        "`"
+        + ", ".join(
+            f"{key}={event_totals.get(key, 0)}"
+            for key in (
+                'tdx_comparable_events', 'eastmoney_implemented_events',
+                'exact_event_field_matches', 'shifted_event_field_matches',
+                'event_field_conflicts', 'tdx_event_only',
+                'eastmoney_event_only', 'unsupported_rights_only_tdx_events',
+            )
+        )
+        + "`",
+        "",
+        "累计因子:",
+        "`"
+        + ", ".join(
+            f"{key}={cumulative_totals.get(key, 0)}"
+            for key in (
+                'instrument_source_paths_compared', 'latest_acceptable',
+                'latest_warning', 'latest_conflict',
+                'historical_conflict_anchors', 'latest_error_p95_pct',
+                'latest_error_max_pct',
+            )
+        )
+        + "`",
+        "",
+        "官方公告证据:",
+        "`"
+        + ", ".join(
+            f"{key}={official_totals.get(key, 0)}"
+            for key in (
+                'events_checked', 'official_announcement_evidence_found',
+                'official_announcement_evidence_not_found',
+            )
+        )
+        + "`",
+        "",
+        "源覆盖:",
+        f"`periods_requested={len(coverage.get('periods_requested') or [])}, "
+        f"periods_succeeded={coverage.get('periods_succeeded', 0)}, "
+        f"failed_periods={len(coverage.get('failed_periods') or [])}`",
+    ]
+    reasons = [str(item) for item in (result.get('reasons') or [])[:10]]
+    if reasons:
+        lines.extend(["", "待跟踪:", *[f"- `{item}`" for item in reasons]])
+    samples = []
+    for key in ('field_conflict_samples', 'tdx_only_samples', 'eastmoney_only_samples'):
+        samples.extend((result.get('event_validation') or {}).get(key) or [])
+    samples.extend(
+        (result.get('cumulative_validation') or {}).get('anchor_conflict_samples') or []
+    )
+    if samples:
+        lines.extend(["", "样本:"])
+        for item in samples[:10]:
+            event_date = (
+                item.get('tdx_ex_date')
+                or item.get('ex_date')
+                or item.get('anchor_date')
+            )
+            lines.append(
+                f"`{item.get('instrument_id', 'unknown')} {event_date}: "
+                f"{item.get('reason') or item.get('classification') or 'conflict'}`"
+            )
+    return "\n".join(lines)
 
 
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
@@ -3640,6 +3730,108 @@ class ScheduledTasks:
                         'name': 'A 股历史全量回补',
                         'status': 'failed',
                         'content': _format_a_share_historical_backfill_report(failure),
+                        'result': failure,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_corporate_action_validation(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        reference_sources: Optional[List[str]] = None,
+        scan_official_announcements: bool = True,
+        official_sample_limit: int = 50,
+        official_lookback_years: int = 3,
+        field_tolerance: float = 0.0001,
+        acceptable_cumulative_error_pct: float = 0.1,
+        warning_cumulative_error_pct: float = 0.5,
+        per_source_timeout_sec: int = 60,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run the manual read-only A-share corporate-action validation."""
+        task_id = 'a_share_corporate_action_validation'
+        self._active_tasks.add(task_id)
+        try:
+            normalized_start = coerce_date(start_date, field_name='start_date')
+            normalized_end = coerce_date(end_date, field_name='end_date')
+            normalized_exchanges = [
+                item.upper() for item in normalize_string_list(exchanges)
+            ] or ['SSE', 'SZSE', 'BSE']
+            normalized_ids = [
+                item.upper() for item in normalize_string_list(instrument_ids)
+            ]
+            normalized_sources = [
+                item.lower() for item in normalize_string_list(reference_sources)
+            ] or ['baostock', 'akshare']
+            scan_official = (
+                scan_official_announcements
+                if isinstance(scan_official_announcements, bool)
+                else str(scan_official_announcements).strip().lower()
+                in {'1', 'true', 'yes', 'y', 'on'}
+            )
+            result = await data_manager.validate_a_share_corporate_actions(
+                start_date=normalized_start,
+                end_date=normalized_end,
+                exchanges=normalized_exchanges,
+                instrument_ids=normalized_ids,
+                reference_sources=normalized_sources,
+                scan_official_announcements=scan_official,
+                official_sample_limit=int(official_sample_limit),
+                official_lookback_years=int(official_lookback_years),
+                field_tolerance=float(field_tolerance),
+                acceptable_cumulative_error_pct=float(
+                    acceptable_cumulative_error_pct
+                ),
+                warning_cumulative_error_pct=float(
+                    warning_cumulative_error_pct
+                ),
+                per_source_timeout_sec=int(per_source_timeout_sec),
+                sample_limit=int(sample_limit),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股公司行动多源验证',
+                        'status': result.get('status'),
+                        'content': _format_a_share_corporate_action_validation_report(
+                            result
+                        ),
+                        'result': result,
+                    },
+                    report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share corporate-action validation failed: %s",
+                exc,
+            )
+            failure = {
+                'status': 'failed',
+                'operation': task_id,
+                'read_only': True,
+                'error': str(exc),
+                'errors': [str(exc)],
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        'name': 'A 股公司行动多源验证',
+                        'status': 'failed',
+                        'content': _format_a_share_corporate_action_validation_report(
+                            failure
+                        ),
                         'result': failure,
                     },
                     report_type='maintenance_report',

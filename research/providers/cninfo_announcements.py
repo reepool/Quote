@@ -17,6 +17,7 @@ from utils.http_transport import HttpTlsConfig, create_requests_session
 _logger = logging.getLogger("DataManager")
 
 _CNINFO_ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
+_CNINFO_TOP_SEARCH_URL = "https://www.cninfo.com.cn/new/information/topSearch/query"
 _CNINFO_ANNOUNCEMENT_HEADERS = {
     "Accept": "application/json, text/plain, */*",
     "Origin": "https://www.cninfo.com.cn",
@@ -103,6 +104,50 @@ class CninfoAnnouncementScanner:
         self.retry_backoff_seconds = max(0.0, retry_backoff_seconds)
         self.tls_config = HttpTlsConfig(source_name="cninfo")
         self.session = session or create_requests_session(tls_config=self.tls_config)
+
+    def resolve_stock_identity(self, symbol: str) -> Optional[Dict[str, str]]:
+        """Resolve the CNInfo org id required for per-stock announcement scans."""
+        normalized_symbol = str(symbol or "").strip().zfill(6)
+        if not normalized_symbol.isdigit() or len(normalized_symbol) != 6:
+            return None
+        last_exc: Optional[Exception] = None
+        for attempt in range(self.retry_attempts + 1):
+            try:
+                response = self.session.post(
+                    _CNINFO_TOP_SEARCH_URL,
+                    data={"keyWord": normalized_symbol, "maxNum": "10"},
+                    headers={
+                        **_CNINFO_ANNOUNCEMENT_HEADERS,
+                        "Referer": (
+                            "https://www.cninfo.com.cn/new/disclosure/stock"
+                            f"?stockCode={normalized_symbol}"
+                        ),
+                    },
+                    timeout=self.request_timeout_seconds,
+                )
+                response.raise_for_status()
+                payload = response.json()
+                if not isinstance(payload, list):
+                    raise ValueError("CNInfo top-search response is not a list")
+                for item in payload:
+                    if not isinstance(item, dict):
+                        continue
+                    code = str(item.get("code") or "").strip().zfill(6)
+                    org_id = str(item.get("orgId") or "").strip()
+                    if code == normalized_symbol and org_id:
+                        return {
+                            "symbol": code,
+                            "org_id": org_id,
+                            "stock": f"{code},{org_id}",
+                        }
+                return None
+            except Exception as exc:
+                last_exc = exc
+                if attempt >= self.retry_attempts:
+                    break
+                if self.retry_backoff_seconds > 0:
+                    time.sleep(self.retry_backoff_seconds * (attempt + 1))
+        raise RuntimeError(f"CNInfo stock identity request failed: {last_exc}")
 
     def scan(
         self,

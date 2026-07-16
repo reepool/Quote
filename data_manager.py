@@ -39,6 +39,14 @@ from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateI
 from utils.date_utils import DateUtils, get_shanghai_time
 from utils.validation import DataValidator
 from utils.cache import cache_manager
+from data_sources.corporate_action_validation import (
+    compare_cumulative_factor_paths,
+    match_official_announcement_evidence,
+    normalize_cninfo_implementation_announcements,
+    normalize_eastmoney_events,
+    normalize_tdx_events,
+    reconcile_event_fields,
+)
 from research.empty_support import (
     EMPTY_PLACEHOLDER_MODE,
     EMPTY_PLACEHOLDER_REASON,
@@ -16311,6 +16319,460 @@ class DataManager:
             },
             'instrument_ids': pending_ids,
             'samples': samples,
+        }
+
+    @staticmethod
+    def _corporate_action_report_periods(
+        start_date: date,
+        end_date: date,
+    ) -> List[str]:
+        """Return annual and interim report periods that can produce ex-dates."""
+        return [
+            f"{year}{suffix}"
+            for year in range(max(1990, start_date.year - 1), end_date.year + 1)
+            for suffix in ("0630", "1231")
+        ]
+
+    async def _fetch_eastmoney_corporate_action_rows(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        target_symbols: Set[str],
+        per_period_timeout_sec: int,
+    ) -> Dict[str, Any]:
+        """Fetch implemented-distribution candidates through AkShare/Eastmoney."""
+        periods = self._corporate_action_report_periods(start_date, end_date)
+        rows: List[Dict[str, Any]] = []
+        failed_periods: List[Dict[str, str]] = []
+        empty_periods: List[str] = []
+        try:
+            import akshare as ak
+        except ImportError as exc:
+            return {
+                'status': 'unavailable',
+                'source': 'eastmoney_stock_fhps',
+                'adapter': 'akshare.stock_fhps_em',
+                'rows': [],
+                'periods_requested': periods,
+                'periods_succeeded': 0,
+                'empty_periods': [],
+                'failed_periods': [{'period': '*', 'error': str(exc)}],
+            }
+
+        for index, period in enumerate(periods, start=1):
+            try:
+                frame = await asyncio.wait_for(
+                    asyncio.to_thread(ak.stock_fhps_em, date=period),
+                    timeout=max(1, int(per_period_timeout_sec)),
+                )
+                if frame is None or frame.empty:
+                    empty_periods.append(period)
+                    continue
+                period_rows = frame.to_dict(orient='records')
+                for row in period_rows:
+                    symbol = str(row.get('代码') or '').strip().zfill(6)
+                    if target_symbols and symbol not in target_symbols:
+                        continue
+                    rows.append({**row, '_report_period': period})
+            except Exception as exc:
+                failed_periods.append({'period': period, 'error': str(exc)})
+            if index == 1 or index % 4 == 0 or index == len(periods):
+                dm_logger.info(
+                    "[DataManager] corporate-action Eastmoney progress: %d/%d "
+                    "rows=%d failures=%d",
+                    index,
+                    len(periods),
+                    len(rows),
+                    len(failed_periods),
+                )
+        return {
+            'status': 'partial' if failed_periods else 'success',
+            'source': 'eastmoney_stock_fhps',
+            'adapter': 'akshare.stock_fhps_em',
+            'rows': rows,
+            'periods_requested': periods,
+            'periods_succeeded': len(periods) - len(failed_periods),
+            'empty_periods': empty_periods,
+            'failed_periods': failed_periods,
+        }
+
+    async def _scan_cninfo_corporate_action_announcements(
+        self,
+        *,
+        instrument_ids: List[str],
+        start_date: date,
+        end_date: date,
+        per_instrument_timeout_sec: int,
+    ) -> Dict[str, Any]:
+        """Scan bounded official implementation-announcement metadata."""
+        from research.providers.cninfo_announcements import (
+            CninfoAnnouncementScanConfig,
+            CninfoAnnouncementScanner,
+        )
+
+        scanner = CninfoAnnouncementScanner()
+        records: List[Any] = []
+        errors: List[Dict[str, str]] = []
+        scanned = 0
+        exchange_config = {
+            'SSE': {'column': 'sse', 'plate': 'sh'},
+            'SZSE': {'column': 'szse', 'plate': 'sz'},
+            'BSE': {'column': 'neeq', 'plate': 'bj'},
+        }
+        for index, instrument_id in enumerate(instrument_ids, start=1):
+            symbol = str(instrument_id).split('.')[0].zfill(6)
+            exchange = (
+                'SSE'
+                if str(instrument_id).endswith('.SH')
+                else ('SZSE' if str(instrument_id).endswith('.SZ') else 'BSE')
+            )
+            config = exchange_config[exchange]
+            try:
+                identity = await asyncio.wait_for(
+                    asyncio.to_thread(scanner.resolve_stock_identity, symbol),
+                    timeout=max(1, int(per_instrument_timeout_sec)),
+                )
+                if not identity:
+                    errors.append({
+                        'instrument_id': instrument_id,
+                        'error': 'cninfo_stock_identity_unavailable',
+                    })
+                    continue
+                scan_result = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        scanner.scan,
+                        CninfoAnnouncementScanConfig(
+                            purpose_key='a_share_corporate_action_validation',
+                            market=exchange,
+                            column=config['column'],
+                            plate=config['plate'],
+                            search_key='权益分派实施公告',
+                            stock=identity['stock'],
+                            org_id=identity['org_id'],
+                            start_date=start_date.isoformat(),
+                            end_date=end_date.isoformat(),
+                            page_size=30,
+                            max_pages=20,
+                        ),
+                    ),
+                    timeout=max(1, int(per_instrument_timeout_sec)),
+                )
+                scanned += 1
+                records.extend(scan_result.records)
+                errors.extend({
+                    'instrument_id': instrument_id,
+                    'error': error,
+                } for error in scan_result.errors)
+            except Exception as exc:
+                errors.append({'instrument_id': instrument_id, 'error': str(exc)})
+            if index == 1 or index % 10 == 0 or index == len(instrument_ids):
+                dm_logger.info(
+                    "[DataManager] corporate-action CNInfo progress: %d/%d "
+                    "records=%d errors=%d",
+                    index,
+                    len(instrument_ids),
+                    len(records),
+                    len(errors),
+                )
+        return {
+            'status': 'partial' if errors else 'success',
+            'source': 'cninfo_announcement_metadata',
+            'records': records,
+            'instruments_requested': len(instrument_ids),
+            'instruments_scanned': scanned,
+            'errors': errors,
+        }
+
+    async def validate_a_share_corporate_actions(
+        self,
+        *,
+        start_date: date,
+        end_date: date,
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        reference_sources: Optional[List[str]] = None,
+        scan_official_announcements: bool = True,
+        official_sample_limit: int = 50,
+        official_lookback_years: int = 3,
+        field_tolerance: float = 0.0001,
+        acceptable_cumulative_error_pct: float = 0.1,
+        warning_cumulative_error_pct: float = 0.5,
+        per_source_timeout_sec: int = 60,
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Run read-only event, official-evidence, and cumulative validation."""
+        if end_date < start_date:
+            raise ValueError('end_date must not be earlier than start_date')
+        normalized_exchanges = list(dict.fromkeys(
+            str(item).strip().upper()
+            for item in (exchanges or ['SSE', 'SZSE', 'BSE'])
+            if str(item).strip()
+        ))
+        unsupported = sorted(set(normalized_exchanges) - {'SSE', 'SZSE', 'BSE'})
+        if unsupported:
+            raise ValueError(f'unsupported A-share exchanges: {unsupported}')
+        sources = list(dict.fromkeys(
+            str(item).strip().lower()
+            for item in (reference_sources or ['baostock', 'akshare'])
+            if str(item).strip()
+        ))
+
+        requested_ids = list(dict.fromkeys(
+            str(item).strip().upper()
+            for item in (instrument_ids or [])
+            if str(item).strip()
+        ))
+        instruments: List[Dict[str, Any]] = []
+        if requested_ids:
+            requested_set = set(requested_ids)
+            for exchange in normalized_exchanges:
+                rows = await self.db_ops.get_research_target_instruments_by_exchange(
+                    exchange,
+                    is_active=None,
+                )
+                instruments.extend(
+                    item for item in rows
+                    if str(item.get('instrument_id')) in requested_set
+                )
+        else:
+            for exchange in normalized_exchanges:
+                instruments.extend(
+                    await self.db_ops.get_research_target_instruments_by_exchange(
+                        exchange,
+                        is_active=None,
+                    )
+                )
+        instrument_ids_final = sorted({
+            str(item.get('instrument_id') or '').strip()
+            for item in instruments
+            if str(item.get('instrument_id') or '').strip()
+        })
+        symbol_to_instrument = {
+            str(item.get('symbol') or '').strip().zfill(6): str(item['instrument_id'])
+            for item in instruments
+            if item.get('symbol') and item.get('instrument_id')
+        }
+        if not instrument_ids_final:
+            return {
+                'status': 'blocked',
+                'operation': 'a_share_corporate_action_validation',
+                'blockers': ['validation_universe_empty'],
+                'warnings': [],
+                'errors': [],
+            }
+
+        tdx_rows: List[Dict[str, Any]] = []
+        factor_rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(instrument_ids_final), 500):
+            chunk = instrument_ids_final[offset: offset + 500]
+            placeholders = ', '.join(f':id_{idx}' for idx in range(len(chunk)))
+            source_placeholders = ', '.join(
+                f':source_{idx}' for idx in range(len(sources))
+            )
+            params: Dict[str, Any] = {
+                f'id_{idx}': instrument_id
+                for idx, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                f'source_{idx}': source for idx, source in enumerate(sources)
+            })
+            params.update({
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+            })
+            tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date,
+                       factor, cumulative_factor, validation_result,
+                       fenhong, songzhuangu, peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
+            factor_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, date(ex_date) AS ex_date, source,
+                       factor, cumulative_factor
+                FROM adjustment_factors
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) <= :end_date
+                  AND lower(source) IN ({source_placeholders})
+                ORDER BY instrument_id, source, ex_date
+                """,
+                params,
+            ))
+
+        tdx_events = normalize_tdx_events(
+            tdx_rows,
+            start_date=start_date,
+            end_date=end_date,
+        )
+        eastmoney_fetch = await self._fetch_eastmoney_corporate_action_rows(
+            start_date=start_date,
+            end_date=end_date,
+            target_symbols=set(symbol_to_instrument),
+            per_period_timeout_sec=per_source_timeout_sec,
+        )
+        eastmoney_events = normalize_eastmoney_events(
+            eastmoney_fetch.get('rows') or [],
+            symbol_to_instrument=symbol_to_instrument,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+        sessions_by_exchange: Dict[str, List[date]] = {}
+        for exchange in normalized_exchanges:
+            records = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                start_date - timedelta(days=14),
+                end_date + timedelta(days=14),
+            )
+            sessions_by_exchange[exchange] = sorted({
+                parsed
+                for record in records
+                if record.get('is_trading_day')
+                if (parsed := self._date_from_any(record.get('date'))) is not None
+            })
+
+        event_validation = reconcile_event_fields(
+            tdx_events,
+            eastmoney_events,
+            trading_sessions_by_exchange=sessions_by_exchange,
+            field_tolerance=field_tolerance,
+            sample_limit=sample_limit,
+        )
+        cumulative_validation = compare_cumulative_factor_paths(
+            tdx_events,
+            factor_rows,
+            start_date=start_date,
+            end_date=end_date,
+            reference_sources=sources,
+            instrument_ids=instrument_ids_final,
+            acceptable_error_pct=acceptable_cumulative_error_pct,
+            warning_error_pct=warning_cumulative_error_pct,
+            sample_limit=sample_limit,
+        )
+
+        official_validation: Dict[str, Any] = {
+            'status': 'skipped',
+            'reason': 'official_scan_disabled',
+            'evidence_scope': 'announcement_existence_only',
+            'totals': {},
+        }
+        official_scan: Dict[str, Any] = {
+            'status': 'skipped',
+            'records': [],
+            'errors': [],
+        }
+        if scan_official_announcements:
+            follow_up_ids = event_validation.get('follow_up_instrument_ids') or []
+            if requested_ids:
+                available_ids = set(instrument_ids_final)
+                follow_up_ids = [
+                    item for item in requested_ids if item in available_ids
+                ]
+            official_targets = follow_up_ids[:max(0, int(official_sample_limit))]
+            official_start = max(
+                start_date,
+                end_date - timedelta(days=max(1, int(official_lookback_years)) * 366),
+            )
+            official_target_set = set(official_targets)
+            official_event_map: Dict[tuple[str, date], Dict[str, Any]] = {}
+            for item in [*eastmoney_events, *tdx_events]:
+                if (
+                    item['instrument_id'] in official_target_set
+                    and item['ex_date'] >= official_start
+                    and (
+                        float(item.get('cash_per_10') or 0.0) > 0
+                        or float(item.get('bonus_per_10') or 0.0) > 0
+                    )
+                ):
+                    official_event_map[(
+                        item['instrument_id'], item['ex_date']
+                    )] = dict(item)
+            official_events = sorted(
+                official_event_map.values(),
+                key=lambda item: (item['instrument_id'], item['ex_date']),
+            )
+            if official_targets:
+                official_scan = await self._scan_cninfo_corporate_action_announcements(
+                    instrument_ids=official_targets,
+                    start_date=official_start - timedelta(days=180),
+                    end_date=end_date,
+                    per_instrument_timeout_sec=per_source_timeout_sec,
+                )
+                announcements = normalize_cninfo_implementation_announcements(
+                    official_scan.get('records') or [],
+                    symbol_to_instrument=symbol_to_instrument,
+                )
+                official_validation = match_official_announcement_evidence(
+                    official_events,
+                    announcements,
+                    sample_limit=sample_limit,
+                )
+                official_validation['target_instrument_ids'] = official_targets
+                official_validation['scan_start_date'] = official_start.isoformat()
+                official_validation['scan_errors'] = official_scan.get('errors') or []
+                if official_scan.get('errors'):
+                    official_validation['status'] = 'partial'
+            else:
+                official_validation = {
+                    'status': 'success',
+                    'reason': 'no_event_follow_up_targets',
+                    'evidence_scope': 'announcement_existence_only',
+                    'totals': {
+                        'events_checked': 0,
+                        'official_announcement_evidence_found': 0,
+                        'official_announcement_evidence_not_found': 0,
+                    },
+                }
+
+        reasons: List[str] = []
+        if eastmoney_fetch.get('status') != 'success':
+            reasons.append('eastmoney_source_coverage_partial')
+        if event_validation.get('status') != 'success':
+            reasons.append('event_field_evidence_unresolved')
+        if cumulative_validation.get('status') != 'success':
+            reasons.append('cumulative_factor_evidence_unresolved')
+        if official_validation.get('status') not in {'success', 'skipped'}:
+            reasons.append('official_announcement_evidence_unresolved')
+        return {
+            'status': 'partial' if reasons else 'success',
+            'operation': 'a_share_corporate_action_validation',
+            'read_only': True,
+            'parameters': {
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+                'exchanges': normalized_exchanges,
+                'instrument_ids': requested_ids,
+                'reference_sources': sources,
+                'scan_official_announcements': scan_official_announcements,
+                'official_sample_limit': official_sample_limit,
+                'official_lookback_years': official_lookback_years,
+                'field_tolerance': field_tolerance,
+                'acceptable_cumulative_error_pct': acceptable_cumulative_error_pct,
+                'warning_cumulative_error_pct': warning_cumulative_error_pct,
+            },
+            'universe': {
+                'instrument_count': len(instrument_ids_final),
+                'tdx_events': len(tdx_events),
+                'eastmoney_events': len(eastmoney_events),
+            },
+            'source_coverage': {
+                key: value
+                for key, value in eastmoney_fetch.items()
+                if key != 'rows'
+            },
+            'event_validation': event_validation,
+            'official_validation': official_validation,
+            'cumulative_validation': cumulative_validation,
+            'reasons': reasons,
+            'warnings': [],
+            'errors': [],
         }
 
     async def reconcile_tdx_xdxr_history(
