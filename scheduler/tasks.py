@@ -2809,6 +2809,7 @@ class ScheduledTasks:
             resolved_checkpoint_id = checkpoint_store.resolve_id(
                 checkpoint_parameters,
                 checkpoint_id,
+                prefer_existing=parameters['resume'] and not parameters['dry_run'],
             )
             checkpoint = None
             if parameters['resume'] and not parameters['dry_run']:

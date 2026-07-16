@@ -201,6 +201,42 @@ async def test_a_share_historical_backfill_success_resumes_completed_chunk(monke
 
 
 @pytest.mark.asyncio
+async def test_a_share_historical_backfill_resume_reuses_non_resume_run(
+    monkeypatch,
+    tmp_path,
+):
+    task = _task(monkeypatch, tmp_path, [{"date": date(2026, 1, 5)}])
+    quote_mock = AsyncMock(return_value={
+        "success_count": 1,
+        "failure_count": 0,
+        "total_quotes_added": 1,
+    })
+    monkeypatch.setattr(data_manager, "update_daily_data_range", quote_mock)
+    common = {
+        "start_date": "2026-01-05",
+        "end_date": "2026-01-05",
+        "exchanges": ["SSE"],
+        "scopes": ["quotes"],
+        "dry_run": False,
+        "chunk_size": 1,
+    }
+
+    first = await task.a_share_daily_data_historical_backfill(
+        **common,
+        resume=False,
+    )
+    second = await task.a_share_daily_data_historical_backfill(
+        **common,
+        resume=True,
+    )
+
+    assert first["checkpoint_id"] == second["checkpoint_id"]
+    assert second["resumed"] is True
+    assert second["stages"]["quotes"]["totals"]["chunks_resumed"] == 1
+    assert quote_mock.await_count == 1
+
+
+@pytest.mark.asyncio
 async def test_a_share_historical_backfill_master_failure_blocks_write_stages(monkeypatch, tmp_path):
     task = _task(monkeypatch, tmp_path, [{"date": date(2026, 1, 5)}])
     quote_mock = AsyncMock()

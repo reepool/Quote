@@ -196,3 +196,61 @@ def test_pending_quote_repair_policy_changes_checkpoint_identity(tmp_path):
     enabled = store.resolve_id({**common, "repair_pending_factor_quotes": True})
 
     assert disabled != enabled
+
+
+def test_resume_control_does_not_change_checkpoint_identity(tmp_path):
+    store = AShareBackfillCheckpointStore(tmp_path)
+    common = {
+        "start_date": date(2020, 1, 1),
+        "end_date": date(2020, 12, 31),
+        "exchanges": ["SSE"],
+        "scopes": ["dividends", "factors"],
+        "chunk_size": 100,
+    }
+
+    disabled = store.resolve_id({**common, "resume": False})
+    enabled = store.resolve_id({**common, "resume": True})
+
+    assert disabled == enabled
+
+
+def test_checkpoint_store_discovers_and_migrates_compatible_legacy_checkpoint(tmp_path):
+    store = AShareBackfillCheckpointStore(tmp_path)
+    legacy_parameters = {
+        "start_date": date(2020, 1, 1),
+        "end_date": date(2020, 12, 31),
+        "exchanges": ["SSE"],
+        "scopes": ["quotes"],
+        "resume": False,
+    }
+    requested_parameters = {**legacy_parameters, "resume": True}
+    legacy_id = "a_share_history_legacy123456789"
+    payload = store.initialize(legacy_id, legacy_parameters, [])
+    payload["parameter_hash"] = "legacy-resume-sensitive-hash"
+    store.save(payload)
+
+    resolved = store.resolve_id(requested_parameters, prefer_existing=True)
+    loaded = store.load(resolved, requested_parameters)
+
+    assert resolved == legacy_id
+    assert loaded["parameter_hash"] == checkpoint_parameter_hash(requested_parameters)
+
+
+def test_explicit_checkpoint_id_takes_precedence_over_discovery(tmp_path):
+    store = AShareBackfillCheckpointStore(tmp_path)
+    parameters = {
+        "start_date": date(2020, 1, 1),
+        "end_date": date(2020, 12, 31),
+        "exchanges": ["SSE"],
+        "scopes": ["quotes"],
+        "resume": True,
+    }
+
+    assert (
+        store.resolve_id(
+            parameters,
+            "operator-checkpoint",
+            prefer_existing=True,
+        )
+        == "operator-checkpoint"
+    )

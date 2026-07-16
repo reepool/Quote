@@ -17,6 +17,7 @@ A_SHARE_EXCHANGE_INCEPTION = {
     "SZSE": date(1990, 12, 1),
     "BSE": date(2021, 11, 15),
 }
+CHECKPOINT_IDENTITY_EXCLUDED_PARAMETERS = frozenset({"resume"})
 
 
 def coerce_date(value: Any, *, field_name: str) -> date:
@@ -199,7 +200,13 @@ def serialize_checkpoint_parameters(parameters: Dict[str, Any]) -> Dict[str, Any
 
 
 def checkpoint_parameter_hash(parameters: Dict[str, Any]) -> str:
-    payload = serialize_checkpoint_parameters(parameters)
+    payload = serialize_checkpoint_parameters(
+        {
+            key: value
+            for key, value in parameters.items()
+            if key not in CHECKPOINT_IDENTITY_EXCLUDED_PARAMETERS
+        }
+    )
     encoded = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
@@ -214,6 +221,8 @@ class AShareBackfillCheckpointStore:
         self,
         parameters: Dict[str, Any],
         explicit_checkpoint_id: Optional[str] = None,
+        *,
+        prefer_existing: bool = False,
     ) -> str:
         parameter_hash = checkpoint_parameter_hash(parameters)
         if explicit_checkpoint_id:
@@ -223,7 +232,41 @@ class AShareBackfillCheckpointStore:
             if not normalized:
                 raise ValueError("checkpoint_id contains no supported characters")
             return normalized
-        return f"a_share_history_{parameter_hash[:16]}"
+        canonical_id = f"a_share_history_{parameter_hash[:16]}"
+        if not prefer_existing or self.path_for(canonical_id).exists():
+            return canonical_id
+        return self._find_compatible_checkpoint_id(parameters) or canonical_id
+
+    def _find_compatible_checkpoint_id(
+        self,
+        parameters: Dict[str, Any],
+    ) -> Optional[str]:
+        """Find the newest legacy auto-generated checkpoint with matching identity."""
+        if not self.directory.exists():
+            return None
+        expected_hash = checkpoint_parameter_hash(parameters)
+        candidates = []
+        for path in self.directory.glob("a_share_history_*.json"):
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    payload = json.load(handle)
+                stored_parameters = payload.get("parameters")
+                if not isinstance(stored_parameters, dict):
+                    continue
+                if checkpoint_parameter_hash(stored_parameters) != expected_hash:
+                    continue
+                candidates.append(
+                    (
+                        str(payload.get("updated_at") or ""),
+                        path.stat().st_mtime,
+                        path.stem,
+                    )
+                )
+            except (OSError, TypeError, ValueError, json.JSONDecodeError):
+                continue
+        if not candidates:
+            return None
+        return max(candidates)[2]
 
     def path_for(self, checkpoint_id: str) -> Path:
         return self.directory / f"{checkpoint_id}.json"
@@ -240,7 +283,13 @@ class AShareBackfillCheckpointStore:
             payload = json.load(handle)
         expected_hash = checkpoint_parameter_hash(parameters)
         if payload.get("parameter_hash") != expected_hash:
-            raise ValueError("checkpoint parameters do not match the requested run")
+            stored_parameters = payload.get("parameters")
+            if (
+                not isinstance(stored_parameters, dict)
+                or checkpoint_parameter_hash(stored_parameters) != expected_hash
+            ):
+                raise ValueError("checkpoint parameters do not match the requested run")
+            payload["parameter_hash"] = expected_hash
         return payload
 
     def initialize(
