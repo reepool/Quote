@@ -621,8 +621,8 @@ class TestConfigRoutes:
         assert daily["SZSE"]["stock"][0] == "pytdx"
         assert daily["BSE"]["stock"][0] == "pytdx"
 
-    def test_baostock_routes_instrument_list_and_calendar_for_a_stock(self):
-        """baostock 负责 a_stock 的品种列表和交易日历"""
+    def test_baostock_is_backup_for_a_stock_master_and_calendar(self):
+        """BaoStock 仅作为 A 股主数据和交易日历备源。"""
         import json
         config_path = os.path.join(
             os.path.dirname(__file__), '..', '..', '..', 'config', '03_data.json'
@@ -630,8 +630,11 @@ class TestConfigRoutes:
         with open(config_path) as f:
             d = json.load(f)
         routing = d["routing"]
-        assert routing["instrument_list"]["a_stock"][0] == "baostock"
-        assert routing["calendar"]["a_stock"][0] == "baostock"
+        assert routing["instrument_list"]["a_stock"][:2] == [
+            "exchange_official",
+            "baostock",
+        ]
+        assert routing["calendar"]["a_stock"] == ["akshare", "baostock"]
 
     def test_factor_routes_complete(self):
         """因子路由覆盖 SSE/SZSE/BSE"""
@@ -642,9 +645,11 @@ class TestConfigRoutes:
         with open(config_path) as f:
             d = json.load(f)
         fs = d["routing"]["factor"]
-        assert fs["SSE"]["primary"] == "baostock"
+        assert fs["SSE"]["primary"] == "akshare"
+        assert fs["SSE"]["fallback"] == "baostock"
         assert fs["SSE"]["validator"] == "tdx_xdxr"
-        assert fs["SZSE"]["primary"] == "baostock"
+        assert fs["SZSE"]["primary"] == "akshare"
+        assert fs["SZSE"]["fallback"] == "baostock"
         assert fs["BSE"]["primary"] == "akshare"
         assert fs["BSE"]["fallback"] is None
 

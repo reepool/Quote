@@ -1451,7 +1451,7 @@ class AkShareSource(BaseDataSource):
 
     async def get_adjustment_factors(self, instrument_id: str, symbol: str,
                                      start_date: datetime, end_date: datetime
-                                     ) -> List[Dict[str, Any]]:
+                                     ) -> Optional[List[Dict[str, Any]]]:
         """获取复权因子数据
 
         调用 ak.stock_zh_a_daily(adjust="hfq-factor") 获取后复权因子.
@@ -1489,10 +1489,13 @@ class AkShareSource(BaseDataSource):
                 akshare_logger.warning(
                     f"AkShare factor fetch failed for {ak_symbol}: {fetch_e}"
                 )
-                return []
+                return None
 
             if factor_df is None or factor_df.empty:
-                return []
+                akshare_logger.warning(
+                    f"AkShare factor response unavailable for {instrument_id}"
+                )
+                return None
 
             # ---------- 解析: 仅保留因子发生显著变化的除权事件日 ----------
             # ak.stock_zh_a_daily(adjust="hfq-factor") 返回每日一条累积因子记录,
@@ -1519,7 +1522,7 @@ class AkShareSource(BaseDataSource):
                 akshare_logger.warning(
                     f"AkShare factor DataFrame has no recognized factor column for {instrument_id}"
                 )
-                return []
+                return None
 
             # ★ AkShare 返回的因子列可能是 object/str 类型，必须先转 float
             factor_df = factor_df.copy()
@@ -1527,7 +1530,10 @@ class AkShareSource(BaseDataSource):
             factor_df = factor_df.dropna(subset=[factor_col])
 
             if factor_df.empty:
-                return []
+                akshare_logger.warning(
+                    f"AkShare factor response has no valid numeric rows for {instrument_id}"
+                )
+                return None
             factors = self._build_sparse_factor_events(
                 instrument_id=instrument_id,
                 cum_factor=factor_df[factor_col],
@@ -1546,7 +1552,7 @@ class AkShareSource(BaseDataSource):
             akshare_logger.error(
                 f"Failed to get adjustment factors from AkShare for {instrument_id}: {e}"
             )
-            return []
+            return None
 
     async def _get_hk_adjustment_factors(
         self, instrument_id: str, symbol: str,

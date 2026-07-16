@@ -80,8 +80,8 @@ TECH_STACK = {
         "pydantic": "2.11.0"              # 数据验证
     },
     "data_sources": {
-        "baostock": "A股历史数据（股票+指数）",  # 主要数据源
-        "akshare": "综合数据接口（ETF数据源）",  # 开源数据
+        "baostock": "A股行情、日历和因子备源",  # 受每日配额约束
+        "akshare": "A股日历和因子主源、综合数据接口",  # 开源数据
         "tushare": "专业数据服务",         # 商业数据
         "yfinance": "国际市场数据"          # 雅虎财经
     },
@@ -109,8 +109,8 @@ TECH_STACK = {
 - **AIOSQLite 0.20.0**: 异步 SQLite 驱动
 
 #### 数据源
-- **BaoStock**: A股历史数据主要数据源（支持股票和指数，ETF 不支持）
-- **AkShare**: 综合性金融数据接口（A股交易日历、实盘行情、港股历史日线；港股复权因子通过新浪 `stock_hk_daily(adjust="qfq-factor")` 稀疏接口直连获取）
+- **BaoStock**: A 股股票、指数、交易日历和因子备源（ETF 不支持，调用受每日配额约束）
+- **AkShare**: 综合性金融数据接口（A 股交易日历和因子主源、实盘行情、港股历史日线；港股复权因子通过新浪 `stock_hk_daily(adjust="qfq-factor")` 稀疏接口直连获取）
 - **Tushare**: 专业级金融数据服务
 - **YFinance**: 雅虎财经数据接口（美股主源/兜底；港股仅作为 AkShare 失败时的少量补位，不承担主源角色）
 

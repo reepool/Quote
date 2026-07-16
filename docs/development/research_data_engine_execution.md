@@ -1390,7 +1390,7 @@ technical readiness 接口会聚合：
 
 - research 存储新增行业表
 - industry provider 抽象与 registry
-- `BaoStock` 主源 + `PyTDX` 次级支持
+- `PyTDX` 主源 + `BaoStock` 备源
 - `company -> industry` 标准化 membership
 - `/api/v1/research/company/{instrument_id}/industry`
 - `overview` 中的标准化行业整合

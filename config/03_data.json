@@ -541,8 +541,8 @@
     },
     "calendar": {
       "a_stock": [
-        "baostock",
-        "akshare"
+        "akshare",
+        "baostock"
       ],
       "hk_stock": [
         "akshare"
@@ -553,16 +553,16 @@
     },
     "factor": {
       "SSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },
       "SZSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },

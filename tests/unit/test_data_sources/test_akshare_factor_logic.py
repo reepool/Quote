@@ -95,3 +95,21 @@ class TestAkshareFactorLogic:
         assert events[0]["factor"] == 1.1
         assert events[0]["cumulative_factor"] == 2.2
         assert mock_to_thread.await_count == 1
+
+    @pytest.mark.asyncio
+    async def test_a_share_factor_fetch_failure_allows_factory_fallback(self):
+        source = AkShareSource("akshare_test", RateLimitConfig())
+        source.rate_limiter.acquire = AsyncMock()
+
+        with patch(
+            "data_sources.akshare_source.asyncio.to_thread",
+            new=AsyncMock(side_effect=RuntimeError("upstream unavailable")),
+        ):
+            events = await source.get_adjustment_factors(
+                instrument_id="600000.SH",
+                symbol="600000",
+                start_date=datetime(2026, 1, 1),
+                end_date=datetime(2026, 7, 15),
+            )
+
+        assert events is None

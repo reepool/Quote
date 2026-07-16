@@ -154,7 +154,7 @@ BaoStock 官方说明采用“涨跌幅复权算法”：假设除权日前卖�
 引擎按分红、送转、配股字段推导理论除权价的计算链不同；二者因子冲突必须
 作为口径证据保留，不能直接判定任一数据源错误。
 
-BaoStock 适合作为 SSE/SZSE 的 A 股权威因子主源。北交所支持情况需要按实际接口验证，不应默认完整。
+BaoStock 适合作为 SSE/SZSE 的 A 股因子备源和交叉验证源。生产主抓取使用 AkShare，BaoStock 受每日请求配额约束，仅在主源不可判定时降级调用；北交所支持情况需要按实际接口验证，不应默认完整。
 
 #### BaoStock 访问治理
 
@@ -397,16 +397,16 @@ adjust=none  不复权
   "routing": {
     "factor": {
       "SSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },
       "SZSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },
@@ -621,8 +621,8 @@ TDX XDXR 审计流程：
 data_sources/
   adjustment_provider.py      # Provider 协议
   adjustment_config.py        # 各源非复权行情配置
-  baostock_source.py          # A 股因子主源
-  akshare_source.py           # A 股/港股因子适配
+  baostock_source.py          # A 股因子备源
+  akshare_source.py           # A 股/港股因子主源适配
   yfinance_source.py          # 港股/美股 fallback
   tdx_factor_engine.py        # 审计源
 

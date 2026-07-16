@@ -1137,7 +1137,7 @@
         "cost_tier": "free",
         "anti_crawl_risk": "low",
         "supports_proxy_patch": false,
-        "role": "structured_a_share_facts",
+        "role": "backup_structured_a_share_facts",
         "financial_summary": {
           "lookback_quarters": 6
         }
@@ -1912,11 +1912,11 @@
       "company_profile": {
         "free_chain": [
           {
-            "source": "baostock",
+            "source": "pytdx",
             "mode": "direct"
           },
           {
-            "source": "pytdx",
+            "source": "baostock",
             "mode": "direct"
           }
         ],
@@ -1935,11 +1935,11 @@
       "industry": {
         "free_chain": [
           {
-            "source": "baostock",
+            "source": "pytdx",
             "mode": "direct"
           },
           {
-            "source": "pytdx",
+            "source": "baostock",
             "mode": "direct"
           }
         ],
@@ -1998,11 +1998,11 @@
       "financial_summary": {
         "free_chain": [
           {
-            "source": "baostock",
+            "source": "pytdx",
             "mode": "direct"
           },
           {
-            "source": "pytdx",
+            "source": "baostock",
             "mode": "direct"
           }
         ],

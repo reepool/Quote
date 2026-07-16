@@ -1103,13 +1103,13 @@
       "us_stock": ["akshare"]
     },
     "calendar": {
-      "a_stock": ["baostock"],
+      "a_stock": ["akshare", "baostock"],
       "hk_stock": ["akshare"],
       "us_stock": ["akshare"]
     },
     "factor": {
-      "SSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
-      "SZSE": {"primary": "baostock", "validator": "tdx_xdxr", "fallback": "akshare", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
+      "SSE": {"primary": "akshare", "validator": "tdx_xdxr", "fallback": "baostock", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
+      "SZSE": {"primary": "akshare", "validator": "tdx_xdxr", "fallback": "baostock", "daily_sync_enabled": true, "maintenance_sync_enabled": true},
       "BSE": {"primary": "akshare", "validator": "tdx_xdxr", "fallback": null, "daily_sync_enabled": true, "maintenance_sync_enabled": true},
       "HKEX": {"primary": "akshare", "validator": null, "fallback": "yfinance", "daily_sync_enabled": false, "maintenance_sync_enabled": true},
       "NASDAQ": {"primary": "yfinance", "validator": null, "fallback": null, "daily_sync_enabled": false, "maintenance_sync_enabled": false},
@@ -1144,9 +1144,9 @@
 - 北交所股票日线：`BSE stock = pytdx -> akshare`
 - 港股股票日线：`HKEX stock = akshare -> yfinance`
 - A 股股票品种列表：`exchange_official -> baostock -> akshare`
-- A 股交易日历：`baostock`
+- A 股交易日历：`akshare -> baostock`
 - 港股/美股品种列表与交易日历：`akshare`
-- A 股复权因子主源：`baostock`
+- A 股复权因子：`akshare -> baostock`，TDX XDXR 继续作为旁路审计源
 - 港股复权因子主源：`akshare`（生产算法使用 `qfq-factor` 转换为乘法累积因子；`yfinance` 仅作为失败时的少量补位）
 - 美股复权因子主源：`yfinance`（当前尚未正式上线）
 

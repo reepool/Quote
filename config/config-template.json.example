@@ -289,7 +289,7 @@
   },
   "data_sources_config": {
     "akshare": {
-      "enabled": false,
+      "enabled": true,
       "exchanges_supported": [
         "a_stock"
       ],
@@ -428,8 +428,8 @@
     "daily": {
       "SSE": {
         "stock": [
-          "baostock",
-          "akshare"
+          "akshare",
+          "baostock"
         ],
         "index": [
           "csindex",
@@ -440,8 +440,8 @@
       },
       "SZSE": {
         "stock": [
-          "baostock",
-          "akshare"
+          "akshare",
+          "baostock"
         ],
         "index": [
           "cnindex",
@@ -472,22 +472,22 @@
     },
     "calendar": {
       "a_stock": [
-        "baostock",
-        "akshare"
+        "akshare",
+        "baostock"
       ]
     },
     "factor": {
       "SSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },
       "SZSE": {
-        "primary": "baostock",
+        "primary": "akshare",
         "validator": "tdx_xdxr",
-        "fallback": "akshare",
+        "fallback": "baostock",
         "daily_sync_enabled": true,
         "maintenance_sync_enabled": true
       },
