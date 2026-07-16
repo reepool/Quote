@@ -303,6 +303,9 @@ def _format_a_share_corporate_action_validation_report(
 def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     """Build a bounded adjustment-factor governance report."""
     icon, label = _format_scheduler_status(result.get("status"))
+    is_dry_run = bool(result.get("dry_run"))
+    if result.get("status") == "dry_run":
+        icon, label = "ℹ️", "预演完成"
     parameters = result.get("parameters") or {}
     universe = result.get("universe") or {}
     observations = result.get("observations") or {}
@@ -324,45 +327,64 @@ def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
         f"staging版本: `{result.get('staging_series_version', 'N/A')}`",
         f"生产版本: `{result.get('target_series_version', 'N/A')}`",
         "",
-        "处理:",
+        "规划:",
         "`"
         + ", ".join(
-            f"{key}={observations.get(key, 0)}"
+            f"{key}={universe.get(key, 0)}"
             for key in (
-                "requested_instruments", "completed_instruments", "empty_instruments",
-                "observation_inserted", "observation_changed", "errors",
+                "instrument_count", "completed_count", "pending_count",
             )
         )
         + "`",
-        "",
-        "标准序列:",
-        "`"
-        + ", ".join(
-            f"{key}={canonical.get(key, 0)}"
-            for key in (
-                "row_count", "built_instruments", "coverage_ratio",
-                "conflict_count", "conflict_ratio", "saved_rows",
-            )
-        )
-        + "`",
-        "事件核对: `"
-        + ", ".join(
-            f"{key}={reconciliation.get(key, 0)}"
-            for key in (
-                "exact_matches", "shifted_matches", "factor_conflicts",
-                "candidate_only", "tdx_only",
-            )
-        )
-        + "`",
-        "路径误差: `"
-        f"tdx_max={tdx_price.get('max_adjusted_price_error_pct')}, "
-        f"legacy_max={legacy_price.get('max_adjusted_price_error_pct')}`",
-        "质量门禁: `"
-        + ", ".join(f"{key}={value}" for key, value in gates.items())
-        + "`",
-        f"可切换生产: `{canonical.get('promotion_eligible', False)}`",
-        f"已晋级生产: `{canonical.get('promoted', False)}`",
     ]
+    if is_dry_run:
+        lines.extend([
+            "已有证据: `"
+            f"rows={observations.get('existing_rows', 0)}, "
+            f"instruments={observations.get('existing_instruments', 0)}`",
+            "外部请求: `0`",
+            "数据库写入: `0`",
+        ])
+    else:
+        lines.extend([
+            "处理: `"
+            + ", ".join(
+                f"{key}={observations.get(key, 0)}"
+                for key in (
+                    "requested_instruments", "completed_instruments",
+                    "empty_instruments", "observation_inserted",
+                    "observation_changed", "errors",
+                )
+            )
+            + "`",
+            "",
+            "标准序列: `"
+            + ", ".join(
+                f"{key}={canonical.get(key, 0)}"
+                for key in (
+                    "row_count", "built_instruments", "coverage_ratio",
+                    "conflict_count", "conflict_ratio", "saved_rows",
+                )
+            )
+            + "`",
+            "事件核对: `"
+            + ", ".join(
+                f"{key}={reconciliation.get(key, 0)}"
+                for key in (
+                    "exact_matches", "shifted_matches", "factor_conflicts",
+                    "candidate_only", "tdx_only",
+                )
+            )
+            + "`",
+            "路径误差: `"
+            f"tdx_max={tdx_price.get('max_adjusted_price_error_pct')}, "
+            f"legacy_max={legacy_price.get('max_adjusted_price_error_pct')}`",
+            "质量门禁: `"
+            + ", ".join(f"{key}={value}" for key, value in gates.items())
+            + "`",
+            f"可切换生产: `{canonical.get('promotion_eligible', False)}`",
+            f"已晋级生产: `{canonical.get('promoted', False)}`",
+        ])
     samples = canonical.get("samples") or []
     if samples:
         lines.extend([

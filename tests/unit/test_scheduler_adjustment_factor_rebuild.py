@@ -47,6 +47,32 @@ def test_factor_rebuild_report_contains_quality_evidence():
     assert "可切换生产: `False`" in content
 
 
+def test_factor_rebuild_dry_run_report_shows_planned_universe_without_fake_work():
+    content = _format_a_share_factor_rebuild_report({
+        "status": "dry_run",
+        "dry_run": True,
+        "checkpoint_id": "unit",
+        "parameters": {
+            "start_date": "1990-12-19",
+            "end_date": "2026-07-16",
+            "exchanges": ["SSE", "SZSE"],
+            "source": "akshare",
+        },
+        "universe": {
+            "instrument_count": 2,
+            "completed_count": 0,
+            "pending_count": 2,
+        },
+        "observations": {"existing_rows": 0, "existing_instruments": 0},
+    })
+
+    assert "结论: *预演完成*" in content
+    assert "instrument_count=2" in content
+    assert "pending_count=2" in content
+    assert "外部请求: `0`" in content
+    assert "标准序列" not in content
+
+
 @pytest.mark.asyncio
 async def test_scheduler_factor_rebuild_delegates_manual_parameters(monkeypatch):
     task = ScheduledTasks()
