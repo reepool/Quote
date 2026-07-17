@@ -6,6 +6,7 @@ import pytest
 
 from data_manager import DataManager
 from data_sources.adjustment_factor_governance import (
+    build_event_product_path,
     build_canonical_series,
     compare_normalized_cumulative_paths,
     normalize_source_path,
@@ -120,6 +121,30 @@ def test_normalized_path_comparison_ignores_scale_but_detects_reset():
 
     assert equivalent["max_adjusted_price_error_pct"] == pytest.approx(0.0)
     assert reset["max_adjusted_price_error_pct"] > 30.0
+
+
+def test_event_product_path_ignores_stored_tdx_cumulative_reset():
+    rows = [
+        {
+            "instrument_id": "600000.SH",
+            "ex_date": "2025-07-16",
+            "factor": 1.03,
+            "cumulative_factor": 16.60,
+        },
+        {
+            "instrument_id": "600000.SH",
+            "ex_date": "2026-07-16",
+            "factor": 1.04,
+            "cumulative_factor": 1.04,
+        },
+    ]
+
+    rebuilt = build_event_product_path(rows)
+
+    assert [item["cumulative_factor"] for item in rebuilt] == pytest.approx([
+        1.03,
+        1.0712,
+    ])
 
 
 def test_event_reconciliation_accepts_one_session_provider_date_shift():

@@ -16243,6 +16243,7 @@ class DataManager:
         )
         from data_sources.adjustment_factor_governance import (
             build_canonical_series,
+            build_event_product_path,
             compare_normalized_cumulative_paths,
             normalize_source_path,
             reconcile_factor_events,
@@ -16572,8 +16573,9 @@ class DataManager:
                 )
             ),
         )
+        tdx_event_product_rows = build_event_product_path(tdx_rows)
         tdx_path_comparison = compare_normalized_cumulative_paths(
-            canonical_rows, tdx_rows
+            canonical_rows, tdx_event_product_rows
         )
         legacy_path_comparison = compare_normalized_cumulative_paths(
             canonical_rows, legacy_rows

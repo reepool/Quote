@@ -298,6 +298,32 @@ def compare_normalized_cumulative_paths(
     }
 
 
+def build_event_product_path(
+    rows: Iterable[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Rebuild cumulative paths solely from ordered adjacent event factors."""
+    grouped: Dict[str, Dict[date, float]] = defaultdict(dict)
+    for row in rows:
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        ex_date = _date(row.get("ex_date"))
+        factor = _positive(row.get("factor"))
+        if instrument_id and ex_date and factor:
+            grouped[instrument_id][ex_date] = factor
+
+    rebuilt: List[Dict[str, Any]] = []
+    for instrument_id, events in sorted(grouped.items()):
+        cumulative = 1.0
+        for ex_date, factor in sorted(events.items()):
+            cumulative *= factor
+            rebuilt.append({
+                "instrument_id": instrument_id,
+                "ex_date": datetime.combine(ex_date, datetime.min.time()),
+                "factor": factor,
+                "cumulative_factor": cumulative,
+            })
+    return rebuilt
+
+
 def reconcile_factor_events(
     candidate_rows: Iterable[Mapping[str, Any]],
     tdx_rows: Iterable[Mapping[str, Any]],
