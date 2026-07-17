@@ -152,6 +152,64 @@ GET /api/v1/corporate-actions/xdxr?instrument_id=000001.SZ&start_date=2007-01-01
 
 该任务不更新 `adjustment_factors`、`adjustment_factors_tdx` 或主数据。事件字段冲突、任一来源单边事件、累计 warning/conflict、源请求失败或官方证据未解决时返回 `partial`。累计因子收敛不会覆盖事件层冲突，因为不同错误可能在最终累计结果中相互抵消。
 
+## 巨潮官方公司行动结构化回补
+
+手工任务 `a_share_cninfo_corporate_action_backfill` 将巨潮历史分红和配股实施方案写入隔离的官方观测层：
+
+- 上游来源固定标记为 `cninfo`。
+- `akshare.stock_dividend_cninfo` 和 `akshare.stock_allotment_cninfo` 仅作为巨潮 Web API 的传输适配器。
+- 现金分红、送股、转增和配股比例统一保存为每股值。
+- 巨潮返回缺少数值时，可从标准的 `10派`、`10送`、`10转增`实施描述中解析，并标记为 `parsed_description`。
+- 缺少除权日的记录不会被移动到交易日或补成虚假日期，而是标记为 `partial_missing_ex_date`。
+- 接口异常、畸形空响应和超时标记为 `indeterminate`，不能解释为确认无公司行动。
+- AkShare 巨潮适配器在自身 HTTP 请求层设置超时，任务严格等待当前请求结束后再访问下一个接口，不通过取消后台线程继续下载。
+- 显式存在配股失败退款日的记录标记为 `failed`；实际配股数量为零但失败状态不明确时标记为部分完整，不能进入后续因子计算。
+- 完整接口快照中消失的旧事件保留审计记录并标记为非当前记录；异常或无法判定的响应不会使已有事件失效。
+- 覆盖状态按股票、来源、接口和请求起止区间分别保存，窄区间检查不会覆盖全历史结论。
+
+新增数据集：
+
+```text
+corporate_action_observations
+corporate_action_instrument_status
+```
+
+它们不参与当前 `adjustment_factors`、`adjustment_factors_tdx` 或 canonical 生产读取。
+
+首次运行前先做定向预演：
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE instrument_ids=600000.SH,000001.SZ,920833.BJ,000003.SZ scopes=dividends,allotments chunk_size=4 request_interval_seconds=1.0 resume=false dry_run
+```
+
+确认规划后进行定向写入：
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE instrument_ids=600000.SH,000001.SZ,920833.BJ,000003.SZ scopes=dividends,allotments chunk_size=4 request_interval_seconds=1.0 resume=false write
+```
+
+全市场任务必须保持单请求流并启用 checkpoint：
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true write
+```
+
+只读查询：
+
+```text
+GET /api/v1/corporate-actions/official-observations?instrument_id=000001.SZ&source_profile=cninfo_dividend&limit=100&offset=0
+GET /api/v1/corporate-actions/official-coverage?coverage_status=partial_missing_fields&limit=100&offset=0
+```
+
+官方观测接口默认只返回当前有效记录。审计已从完整快照中消失的历史记录时，增加 `include_inactive=true`。
+
+当前已知边界：
+
+- 巨潮结构化分红不能单独覆盖股权分置改革对价等特殊事件。
+- 部分早期退市股票的分红接口返回畸形空结构，需要公告恢复，不能标记为 `complete_no_events`。
+- 北交所可能返回实施描述但缺少登记日、除权日和派息日。
+- 本阶段只建立官方原始证据和覆盖状态；公告正文解析、canonical 公司行动和独立复权因子计算属于后续阶段。
+
 ## 对现有业务的影响
 
 - 不修改 `daily_data_update` 的定时计划或默认参数。

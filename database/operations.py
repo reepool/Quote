@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import json
 import math
+import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Any, Optional, Union
@@ -25,6 +26,7 @@ from .models import (
     DataUpdateDB, DataSourceStatusDB, AdjustmentFactorDB, AdjustmentFactorTdxDB,
     AdjustmentFactorObservationDB, AdjustmentFactorCanonicalDB,
     AdjustmentFactorSeriesStatusDB, AdjustmentFactorInstrumentStatusDB,
+    CorporateActionObservationDB, CorporateActionInstrumentStatusDB,
     DataChangeLogDB,
 )
 
@@ -3601,6 +3603,423 @@ class DatabaseOperations:
             self.db_logger.error("Failed to save factor observations: %s", exc)
             stats["failed"] = max(stats["failed"], len(observations))
             return stats
+
+    @staticmethod
+    def _corporate_action_observation_values(
+        row: Dict[str, Any],
+        *,
+        ingestion_run_id: Optional[str],
+    ) -> Dict[str, Any]:
+        """Build normalized values for one official corporate-action observation."""
+        raw_payload = row.get("raw_payload") or {}
+        values = {
+            "action_type": str(row.get("action_type") or "unknown"),
+            "fiscal_period": row.get("fiscal_period"),
+            "announcement_date": DatabaseOperations._coerce_datetime(
+                row.get("announcement_date")
+            ),
+            "record_date": DatabaseOperations._coerce_datetime(row.get("record_date")),
+            "ex_date": DatabaseOperations._coerce_datetime(row.get("ex_date")),
+            "pay_date": DatabaseOperations._coerce_datetime(row.get("pay_date")),
+            "share_arrival_date": DatabaseOperations._coerce_datetime(
+                row.get("share_arrival_date")
+            ),
+            "cash_dividend_per_share": row.get("cash_dividend_per_share"),
+            "bonus_shares_per_share": row.get("bonus_shares_per_share"),
+            "capitalization_shares_per_share": row.get(
+                "capitalization_shares_per_share"
+            ),
+            "rights_shares_per_share": row.get("rights_shares_per_share"),
+            "rights_price": row.get("rights_price"),
+            "currency": str(row.get("currency") or "CNY"),
+            "description": row.get("description"),
+            "event_status": str(row.get("event_status") or "unvalidated"),
+            "quality_status": str(row.get("quality_status") or "unvalidated"),
+            "ingestion_run_id": ingestion_run_id,
+            "raw_payload_json": json.dumps(
+                raw_payload, ensure_ascii=True, default=str, sort_keys=True
+            ),
+        }
+        hash_values = {
+            key: value for key, value in values.items() if key != "ingestion_run_id"
+        }
+        values["row_hash"] = hashlib.sha256(
+            json.dumps(
+                hash_values, ensure_ascii=True, default=str, sort_keys=True
+            ).encode("utf-8")
+        ).hexdigest()
+        return values
+
+    async def save_corporate_action_observations(
+        self,
+        observations: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Idempotently persist source-neutral corporate-action evidence."""
+        stats = {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "reactivated": 0,
+            "failed": 0,
+        }
+        if not observations:
+            return stats
+        try:
+            async with self.get_async_session() as session:
+                for row in observations:
+                    instrument_id = str(row.get("instrument_id") or "").strip()
+                    source = str(row.get("source") or "").strip().lower()
+                    source_profile = str(row.get("source_profile") or "").strip()
+                    source_event_key = str(row.get("source_event_key") or "").strip()
+                    if not all((instrument_id, source, source_profile, source_event_key)):
+                        stats["failed"] += 1
+                        continue
+                    existing = (await session.execute(
+                        select(CorporateActionObservationDB).where(
+                            CorporateActionObservationDB.instrument_id == instrument_id,
+                            CorporateActionObservationDB.source == source,
+                            CorporateActionObservationDB.source_profile == source_profile,
+                            CorporateActionObservationDB.source_event_key == source_event_key,
+                        )
+                    )).scalar_one_or_none()
+                    values = self._corporate_action_observation_values(
+                        row, ingestion_run_id=ingestion_run_id
+                    )
+                    if existing is None:
+                        session.add(CorporateActionObservationDB(
+                            instrument_id=instrument_id,
+                            source=source,
+                            source_profile=source_profile,
+                            source_event_key=source_event_key,
+                            is_current=True,
+                            last_seen_run_id=ingestion_run_id,
+                            **values,
+                        ))
+                        stats["inserted"] += 1
+                    else:
+                        was_current = bool(existing.is_current)
+                        if existing.row_hash == values["row_hash"]:
+                            existing.ingestion_run_id = ingestion_run_id
+                            stats["unchanged"] += 1
+                        else:
+                            for key, value in values.items():
+                                setattr(existing, key, value)
+                            existing.row_version = int(existing.row_version or 1) + 1
+                            stats["changed"] += 1
+                        existing.is_current = True
+                        existing.last_seen_run_id = ingestion_run_id
+                        existing.retired_at = None
+                        existing.retired_run_id = None
+                        existing.retirement_reason = None
+                        existing.updated_at = get_shanghai_time()
+                        if not was_current:
+                            stats["reactivated"] += 1
+                await session.commit()
+            return stats
+        except Exception as exc:
+            self.db_logger.error("Failed to save corporate-action observations: %s", exc)
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "reactivated": 0,
+                "failed": len(observations),
+            }
+
+    @staticmethod
+    def _corporate_action_row_in_requested_range(
+        row: CorporateActionObservationDB,
+        start_date: date,
+        end_date: date,
+    ) -> bool:
+        """Match persisted rows using the same temporal fallback as normalization."""
+        candidate = row.ex_date or row.announcement_date
+        if candidate is not None:
+            candidate_date = candidate.date() if isinstance(candidate, datetime) else candidate
+            return start_date <= candidate_date <= end_date
+        fiscal_period = str(row.fiscal_period or "")
+        year_match = re.search(r"(19|20)\d{2}", fiscal_period)
+        return bool(
+            year_match
+            and start_date.year - 1 <= int(year_match.group(0)) <= end_date.year
+        )
+
+    async def reconcile_corporate_action_observation_snapshot(
+        self,
+        *,
+        instrument_id: str,
+        source: str,
+        source_profile: str,
+        requested_start_date: Union[str, date, datetime],
+        requested_end_date: Union[str, date, datetime],
+        seen_event_keys: List[str],
+        ingestion_run_id: Optional[str],
+    ) -> int:
+        """Retire current rows absent from one complete endpoint snapshot."""
+        normalized_source = str(source or "").strip().lower()
+        normalized_profile = str(source_profile or "").strip()
+        start_dt = self._coerce_datetime(requested_start_date)
+        end_dt = self._coerce_datetime(requested_end_date)
+        if not all((instrument_id, normalized_source, normalized_profile, start_dt, end_dt)):
+            raise ValueError("snapshot identity and requested date range are required")
+        start_value = start_dt.date()
+        end_value = end_dt.date()
+        if end_value < start_value:
+            raise ValueError("requested_end_date must not precede requested_start_date")
+        seen = {str(value).strip() for value in seen_event_keys if str(value).strip()}
+        retired = 0
+        async with self.get_async_session() as session:
+            rows = (await session.execute(
+                select(CorporateActionObservationDB).where(
+                    CorporateActionObservationDB.instrument_id == instrument_id,
+                    CorporateActionObservationDB.source == normalized_source,
+                    CorporateActionObservationDB.source_profile == normalized_profile,
+                    CorporateActionObservationDB.is_current.is_(True),
+                )
+            )).scalars().all()
+            now = get_shanghai_time()
+            for row in rows:
+                if row.source_event_key in seen:
+                    continue
+                if not self._corporate_action_row_in_requested_range(
+                    row, start_value, end_value
+                ):
+                    continue
+                row.is_current = False
+                row.retired_at = now
+                row.retired_run_id = ingestion_run_id
+                row.retirement_reason = "missing_from_complete_source_snapshot"
+                row.updated_at = now
+                retired += 1
+            await session.commit()
+        return retired
+
+    async def upsert_corporate_action_instrument_status(
+        self,
+        row: Dict[str, Any],
+    ) -> None:
+        """Persist one endpoint-level official source coverage state."""
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        source = str(row.get("source") or "").strip().lower()
+        source_profile = str(row.get("source_profile") or "").strip()
+        if not all((instrument_id, source, source_profile)):
+            raise ValueError("instrument_id, source, and source_profile are required")
+        requested_start_date = self._coerce_datetime(row.get("requested_start_date"))
+        requested_end_date = self._coerce_datetime(row.get("requested_end_date"))
+        if requested_start_date is None or requested_end_date is None:
+            raise ValueError("requested_start_date and requested_end_date are required")
+        if requested_end_date < requested_start_date:
+            raise ValueError("requested_end_date must not precede requested_start_date")
+        async with self.get_async_session() as session:
+            existing = (await session.execute(
+                select(CorporateActionInstrumentStatusDB).where(
+                    CorporateActionInstrumentStatusDB.instrument_id == instrument_id,
+                    CorporateActionInstrumentStatusDB.source == source,
+                    CorporateActionInstrumentStatusDB.source_profile == source_profile,
+                    CorporateActionInstrumentStatusDB.requested_start_date
+                    == requested_start_date,
+                    CorporateActionInstrumentStatusDB.requested_end_date
+                    == requested_end_date,
+                )
+            )).scalar_one_or_none()
+            values = {
+                "coverage_status": str(row.get("coverage_status") or "indeterminate"),
+                "event_count": int(row.get("event_count") or 0),
+                "missing_ex_date_count": int(row.get("missing_ex_date_count") or 0),
+                "requested_start_date": requested_start_date,
+                "requested_end_date": requested_end_date,
+                "earliest_event_date": self._coerce_datetime(
+                    row.get("earliest_event_date")
+                ),
+                "latest_event_date": self._coerce_datetime(
+                    row.get("latest_event_date")
+                ),
+                "error_message": row.get("error_message"),
+                "ingestion_run_id": row.get("ingestion_run_id"),
+                "last_attempt_at": get_shanghai_time(),
+            }
+            if existing is None:
+                session.add(CorporateActionInstrumentStatusDB(
+                    instrument_id=instrument_id,
+                    source=source,
+                    source_profile=source_profile,
+                    **values,
+                ))
+            else:
+                for key, value in values.items():
+                    setattr(existing, key, value)
+                existing.updated_at = get_shanghai_time()
+            await session.commit()
+
+    async def get_corporate_action_observations(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        source: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        action_type: Optional[str] = None,
+        quality_status: Optional[str] = None,
+        include_inactive: bool = False,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return a paginated official corporate-action observation page."""
+        async with self.get_async_session() as session:
+            filters = []
+            if instrument_id:
+                filters.append(CorporateActionObservationDB.instrument_id == instrument_id)
+            if source:
+                filters.append(CorporateActionObservationDB.source == source.lower())
+            if source_profile:
+                filters.append(
+                    CorporateActionObservationDB.source_profile == source_profile
+                )
+            if action_type:
+                filters.append(CorporateActionObservationDB.action_type == action_type)
+            if quality_status:
+                filters.append(
+                    CorporateActionObservationDB.quality_status == quality_status
+                )
+            if not include_inactive:
+                filters.append(CorporateActionObservationDB.is_current.is_(True))
+            if start_date:
+                filters.append(
+                    CorporateActionObservationDB.ex_date
+                    >= self._coerce_datetime(start_date)
+                )
+            if end_date:
+                filters.append(
+                    CorporateActionObservationDB.ex_date
+                    < self._coerce_datetime(end_date + timedelta(days=1))
+                )
+            total = await session.scalar(
+                select(func.count()).select_from(CorporateActionObservationDB).where(
+                    *filters
+                )
+            )
+            rows = (await session.execute(
+                select(CorporateActionObservationDB)
+                .where(*filters)
+                .order_by(
+                    CorporateActionObservationDB.instrument_id,
+                    CorporateActionObservationDB.ex_date,
+                    CorporateActionObservationDB.announcement_date,
+                )
+                .offset(offset)
+                .limit(limit)
+            )).scalars().all()
+            items = [{
+                "instrument_id": row.instrument_id,
+                "source": row.source,
+                "source_profile": row.source_profile,
+                "source_event_key": row.source_event_key,
+                "action_type": row.action_type,
+                "fiscal_period": row.fiscal_period,
+                "announcement_date": row.announcement_date,
+                "record_date": row.record_date,
+                "ex_date": row.ex_date,
+                "pay_date": row.pay_date,
+                "share_arrival_date": row.share_arrival_date,
+                "cash_dividend_per_share": row.cash_dividend_per_share,
+                "bonus_shares_per_share": row.bonus_shares_per_share,
+                "capitalization_shares_per_share": (
+                    row.capitalization_shares_per_share
+                ),
+                "rights_shares_per_share": row.rights_shares_per_share,
+                "rights_price": row.rights_price,
+                "currency": row.currency,
+                "description": row.description,
+                "event_status": row.event_status,
+                "quality_status": row.quality_status,
+                "ingestion_run_id": row.ingestion_run_id,
+                "row_version": row.row_version,
+                "is_current": bool(row.is_current),
+                "last_seen_run_id": row.last_seen_run_id,
+                "retired_at": row.retired_at,
+                "retired_run_id": row.retired_run_id,
+                "retirement_reason": row.retirement_reason,
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            } for row in rows]
+            total_value = int(total or 0)
+            return {
+                "total": total_value,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(items),
+                "has_more": offset + len(items) < total_value,
+                "items": items,
+            }
+
+    async def get_corporate_action_instrument_status_page(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        coverage_status: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return endpoint-level official source coverage states."""
+        async with self.get_async_session() as session:
+            filters = []
+            if instrument_id:
+                filters.append(
+                    CorporateActionInstrumentStatusDB.instrument_id == instrument_id
+                )
+            if source_profile:
+                filters.append(
+                    CorporateActionInstrumentStatusDB.source_profile == source_profile
+                )
+            if coverage_status:
+                filters.append(
+                    CorporateActionInstrumentStatusDB.coverage_status == coverage_status
+                )
+            total = await session.scalar(
+                select(func.count())
+                .select_from(CorporateActionInstrumentStatusDB)
+                .where(*filters)
+            )
+            rows = (await session.execute(
+                select(CorporateActionInstrumentStatusDB)
+                .where(*filters)
+                .order_by(
+                    CorporateActionInstrumentStatusDB.instrument_id,
+                    CorporateActionInstrumentStatusDB.source_profile,
+                    CorporateActionInstrumentStatusDB.requested_start_date,
+                    CorporateActionInstrumentStatusDB.requested_end_date,
+                )
+                .offset(offset)
+                .limit(limit)
+            )).scalars().all()
+            items = [{
+                "instrument_id": row.instrument_id,
+                "source": row.source,
+                "source_profile": row.source_profile,
+                "coverage_status": row.coverage_status,
+                "event_count": row.event_count,
+                "missing_ex_date_count": row.missing_ex_date_count,
+                "requested_start_date": row.requested_start_date,
+                "requested_end_date": row.requested_end_date,
+                "earliest_event_date": row.earliest_event_date,
+                "latest_event_date": row.latest_event_date,
+                "error_message": row.error_message,
+                "ingestion_run_id": row.ingestion_run_id,
+                "last_attempt_at": row.last_attempt_at,
+            } for row in rows]
+            total_value = int(total or 0)
+            return {
+                "total": total_value,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(items),
+                "has_more": offset + len(items) < total_value,
+                "items": items,
+            }
 
     async def get_adjustment_factor_observations(
         self,

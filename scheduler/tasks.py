@@ -300,6 +300,87 @@ def _format_a_share_corporate_action_validation_report(
     return "\n".join(lines)
 
 
+def _format_a_share_cninfo_corporate_action_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a concise report for official CNInfo corporate-action backfill."""
+    normalized_status = str(result.get("status") or "unknown").lower()
+    if normalized_status == "dry_run":
+        icon, label = "ℹ️", "预演完成"
+    else:
+        icon, label = _format_scheduler_status(normalized_status)
+    parameters = result.get("parameters") or {}
+    universe = result.get("universe") or {}
+    counters = result.get("counters") or {}
+    lines = [
+        f"{icon} *A 股巨潮官方公司行动回补*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{result.get('status')}`",
+        f"dry_run: `{result.get('dry_run')}`",
+        f"checkpoint: `{result.get('checkpoint_id')}`",
+        f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"scopes: `{','.join(parameters.get('scopes') or [])}`",
+        "",
+        "规划:",
+        "`"
+        f"instrument_count={universe.get('instrument_count', 0)}, "
+        f"completed_count={universe.get('completed_count', 0)}, "
+        f"pending_count={universe.get('pending_count', 0)}"
+        "`",
+    ]
+    if normalized_status == "dry_run":
+        lines.extend([
+            "外部请求: `0`",
+            "数据库写入: `0`",
+            "生产因子影响: `无`",
+        ])
+        return "\n".join(lines)
+    lines.extend([
+        "",
+        "处理:",
+        "`"
+        + ", ".join(
+            f"{key}={counters.get(key, 0)}"
+            for key in (
+                "requested_instruments",
+                "requested_endpoints",
+                "observations_inserted",
+                "observations_changed",
+                "observations_unchanged",
+                "observations_reactivated",
+                "observations_retired",
+            )
+        )
+        + "`",
+        "覆盖:",
+        "`"
+        + ", ".join(
+            f"{key}={counters.get(key, 0)}"
+            for key in (
+                "complete_with_events",
+                "complete_no_events",
+                "partial_missing_fields",
+                "indeterminate",
+                "missing_ex_date_events",
+            )
+        )
+        + "`",
+        f"需公告补证: `{result.get('announcement_recovery_required', 0)}`",
+        f"生产因子影响: `{'无' if result.get('production_isolation', True) else '有'}`",
+    ])
+    error_lines = [
+        f"{item.get('instrument_id')} {item.get('source_profile')}: "
+        f"{item.get('reason')}"
+        for item in (result.get("errors") or [])[:10]
+        if isinstance(item, dict)
+    ]
+    if error_lines:
+        lines.extend(["", "异常样本:", "```text", *error_lines, "```"])
+    return "\n".join(lines)
+
+
 def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     """Build a bounded adjustment-factor governance report."""
     icon, label = _format_scheduler_status(result.get("status"))
@@ -4013,6 +4094,84 @@ class ScheduledTasks:
                         'result': failure,
                     },
                     report_type='maintenance_report',
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_corporate_action_backfill(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        scopes: Optional[List[str]] = None,
+        dry_run: bool = True,
+        resume: bool = True,
+        chunk_size: int = 50,
+        request_interval_seconds: float = 1.0,
+        per_instrument_timeout_sec: int = 60,
+        checkpoint_id: Optional[str] = None,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run the manual official CNInfo corporate-action backfill."""
+        task_id = "a_share_cninfo_corporate_action_backfill"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.backfill_a_share_cninfo_corporate_actions(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                scopes=scopes,
+                dry_run=bool(dry_run),
+                resume=bool(resume),
+                chunk_size=int(chunk_size),
+                request_interval_seconds=float(request_interval_seconds),
+                per_instrument_timeout_sec=int(per_instrument_timeout_sec),
+                checkpoint_id=checkpoint_id,
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股巨潮官方公司行动回补",
+                        "status": result.get("status"),
+                        "content": _format_a_share_cninfo_corporate_action_report(
+                            result
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] A-share CNInfo corporate-action backfill failed: %s",
+                exc,
+            )
+            failure = {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "error": str(exc),
+                "errors": [str(exc)],
+                "production_isolation": True,
+            }
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股巨潮官方公司行动回补",
+                        "status": "failed",
+                        "content": _format_a_share_cninfo_corporate_action_report(
+                            failure
+                        ),
+                        "result": failure,
+                    },
+                    report_type="maintenance_report",
                     task_name=task_id,
                     job_config=job_config,
                 )

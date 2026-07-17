@@ -16992,6 +16992,346 @@ class DataManager:
             if date(year, int(suffix[:2]), int(suffix[2:])) <= end_date
         ]
 
+    async def backfill_a_share_cninfo_corporate_actions(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        scopes: Optional[List[str]] = None,
+        dry_run: bool = True,
+        resume: bool = True,
+        chunk_size: int = 50,
+        request_interval_seconds: float = 1.0,
+        per_instrument_timeout_sec: int = 60,
+        checkpoint_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Backfill isolated official CNInfo dividend and allotment evidence."""
+        from data_sources.cninfo_corporate_actions import (
+            ALLOTMENT_PROFILE,
+            CNINFO_SOURCE,
+            DIVIDEND_PROFILE,
+            CninfoCorporateActionProvider,
+            CninfoEndpointResult,
+        )
+        from utils.a_share_historical_backfill import (
+            AShareBackfillCheckpointStore,
+            coerce_date,
+            normalize_string_list,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        normalized_exchanges = [
+            item.upper() for item in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE", "BSE"]
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE", "BSE"})
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        normalized_ids = set(normalize_string_list(instrument_ids))
+        normalized_scopes = [
+            item.lower() for item in normalize_string_list(scopes)
+        ] or ["dividends", "allotments"]
+        unsupported_scopes = sorted(
+            set(normalized_scopes) - {"dividends", "allotments"}
+        )
+        if unsupported_scopes:
+            raise ValueError(
+                f"unsupported CNInfo corporate-action scopes: {unsupported_scopes}"
+            )
+        chunk_size = max(1, min(int(chunk_size), 1000))
+        request_interval_seconds = max(0.0, float(request_interval_seconds))
+        per_instrument_timeout_sec = max(1, int(per_instrument_timeout_sec))
+
+        universe: List[Dict[str, Any]] = []
+        for exchange in normalized_exchanges:
+            instruments = await self.db_ops.get_instruments_list(
+                exchange=exchange, type="stock", is_active=None
+            )
+            for instrument in instruments:
+                instrument_id = str(instrument.get("instrument_id") or "").strip()
+                if normalized_ids and instrument_id not in normalized_ids:
+                    continue
+                universe.append({
+                    "instrument_id": instrument_id,
+                    "symbol": str(instrument.get("symbol") or "").strip().zfill(6),
+                    "exchange": exchange,
+                })
+        universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
+        universe_ids = {item["instrument_id"] for item in universe}
+        missing_requested = sorted(normalized_ids - universe_ids)
+        if missing_requested:
+            raise ValueError(
+                "requested instruments are absent from the selected historical universe: "
+                f"{missing_requested[:20]}"
+            )
+        if not universe:
+            raise ValueError("A-share CNInfo corporate-action universe is empty")
+
+        parameters = {
+            "start_date": normalized_start,
+            "end_date": normalized_end,
+            "exchanges": normalized_exchanges,
+            "instrument_ids": sorted(normalized_ids),
+            "scopes": normalized_scopes,
+            "resume": bool(resume),
+            "chunk_size": chunk_size,
+            "request_interval_seconds": request_interval_seconds,
+            "per_instrument_timeout_sec": per_instrument_timeout_sec,
+        }
+        identity = hashlib.sha256(json.dumps(
+            {
+                key: value.isoformat() if isinstance(value, date) else value
+                for key, value in parameters.items() if key != "resume"
+            },
+            sort_keys=True,
+        ).encode("utf-8")).hexdigest()[:16]
+        resolved_checkpoint_id = checkpoint_id or f"a_share_cninfo_actions_{identity}"
+        checkpoint_store = AShareBackfillCheckpointStore(
+            self.data_config.get("data_dir", "data")
+        )
+        result: Dict[str, Any] = {
+            "operation": "a_share_cninfo_corporate_action_backfill",
+            "status": "dry_run" if dry_run else "running",
+            "dry_run": bool(dry_run),
+            "checkpoint_id": resolved_checkpoint_id,
+            "parameters": {
+                **parameters,
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+            },
+            "universe": {
+                "instrument_count": len(universe),
+                "completed_count": 0,
+                "pending_count": len(universe),
+            },
+            "production_isolation": True,
+        }
+        if dry_run:
+            return result
+
+        checkpoint_parameters = dict(parameters)
+        checkpoint = (
+            checkpoint_store.load(resolved_checkpoint_id, checkpoint_parameters)
+            if resume else None
+        )
+        if checkpoint is None:
+            checkpoint = checkpoint_store.initialize(
+                resolved_checkpoint_id, checkpoint_parameters, universe
+            )
+        stage = checkpoint.setdefault("stages", {}).setdefault(
+            "cninfo_corporate_actions",
+            {
+                "completed_instruments": [],
+                "partial_instruments": [],
+                "errors": [],
+            },
+        )
+        completed = set(stage.get("completed_instruments") or []) if resume else set()
+        stage["errors"] = [
+            error for error in (stage.get("errors") or [])
+            if error.get("instrument_id") not in completed
+        ]
+        pending = [
+            item for item in universe if item["instrument_id"] not in completed
+        ]
+        result["universe"] = {
+            "instrument_count": len(universe),
+            "completed_count": len(completed),
+            "pending_count": len(pending),
+        }
+
+        provider = CninfoCorporateActionProvider(
+            request_timeout_seconds=per_instrument_timeout_sec
+        )
+        counters = Counter({
+            "requested_instruments": 0,
+            "requested_endpoints": 0,
+            "completed_instruments": len(completed),
+            "observations_inserted": 0,
+            "observations_changed": 0,
+            "observations_unchanged": 0,
+            "observations_reactivated": 0,
+            "observations_retired": 0,
+            "complete_with_events": 0,
+            "complete_no_events": 0,
+            "partial_missing_fields": 0,
+            "indeterminate": 0,
+            "missing_ex_date_events": 0,
+        })
+        endpoint_specs = []
+        if "dividends" in normalized_scopes:
+            endpoint_specs.append((DIVIDEND_PROFILE, provider.fetch_dividends))
+        if "allotments" in normalized_scopes:
+            endpoint_specs.append((ALLOTMENT_PROFILE, provider.fetch_allotments))
+
+        for index, item in enumerate(pending, start=1):
+            instrument_id = item["instrument_id"]
+            counters["requested_instruments"] += 1
+            stage["errors"] = [
+                error for error in (stage.get("errors") or [])
+                if error.get("instrument_id") != instrument_id
+            ]
+            instrument_indeterminate = False
+            instrument_partial = False
+            for source_profile, fetcher in endpoint_specs:
+                counters["requested_endpoints"] += 1
+                try:
+                    endpoint_result = await asyncio.to_thread(
+                        fetcher,
+                        instrument_id,
+                        item["symbol"],
+                        start_date=normalized_start,
+                        end_date=normalized_end,
+                    )
+                except Exception as exc:
+                    endpoint_result = CninfoEndpointResult(
+                        source_profile=source_profile,
+                        coverage_status="indeterminate",
+                        observations=[],
+                        error=str(exc),
+                    )
+
+                observations = endpoint_result.observations
+                write_stats = await self.db_ops.save_corporate_action_observations(
+                    observations,
+                    ingestion_run_id=resolved_checkpoint_id,
+                )
+                if int(write_stats.get("failed", 0)) > 0:
+                    endpoint_result = CninfoEndpointResult(
+                        source_profile=source_profile,
+                        coverage_status="indeterminate",
+                        observations=observations,
+                        rows_received=endpoint_result.rows_received,
+                        error=f"observation persistence incomplete: {write_stats}",
+                    )
+                elif endpoint_result.coverage_status != "indeterminate":
+                    try:
+                        retired = await self.db_ops.reconcile_corporate_action_observation_snapshot(
+                            instrument_id=instrument_id,
+                            source=CNINFO_SOURCE,
+                            source_profile=source_profile,
+                            requested_start_date=normalized_start,
+                            requested_end_date=normalized_end,
+                            seen_event_keys=[
+                                str(observation.get("source_event_key") or "")
+                                for observation in observations
+                            ],
+                            ingestion_run_id=resolved_checkpoint_id,
+                        )
+                        counters["observations_retired"] += int(retired)
+                    except Exception as exc:
+                        endpoint_result = CninfoEndpointResult(
+                            source_profile=source_profile,
+                            coverage_status="indeterminate",
+                            observations=observations,
+                            rows_received=endpoint_result.rows_received,
+                            error=f"observation snapshot reconciliation failed: {exc}",
+                        )
+                for key in ("inserted", "changed", "unchanged", "reactivated"):
+                    counters[f"observations_{key}"] += int(write_stats.get(key, 0))
+
+                event_dates = [
+                    self._date_from_any(observation.get("ex_date"))
+                    for observation in observations
+                    if observation.get("ex_date") is not None
+                ]
+                event_dates = [value for value in event_dates if value is not None]
+                missing_ex_dates = sum(
+                    observation.get("ex_date") is None
+                    for observation in observations
+                )
+                counters["missing_ex_date_events"] += int(missing_ex_dates)
+                counters[endpoint_result.coverage_status] += 1
+                try:
+                    await self.db_ops.upsert_corporate_action_instrument_status({
+                        "instrument_id": instrument_id,
+                        "source": CNINFO_SOURCE,
+                        "source_profile": source_profile,
+                        "coverage_status": endpoint_result.coverage_status,
+                        "event_count": len(observations),
+                        "missing_ex_date_count": missing_ex_dates,
+                        "requested_start_date": normalized_start,
+                        "requested_end_date": normalized_end,
+                        "earliest_event_date": (
+                            min(event_dates) if event_dates else None
+                        ),
+                        "latest_event_date": max(event_dates) if event_dates else None,
+                        "error_message": endpoint_result.error,
+                        "ingestion_run_id": resolved_checkpoint_id,
+                    })
+                except Exception as exc:
+                    counters[endpoint_result.coverage_status] -= 1
+                    counters["indeterminate"] += 1
+                    endpoint_result = CninfoEndpointResult(
+                        source_profile=source_profile,
+                        coverage_status="indeterminate",
+                        observations=observations,
+                        rows_received=endpoint_result.rows_received,
+                        error=f"coverage persistence failed: {exc}",
+                    )
+                if endpoint_result.coverage_status == "indeterminate":
+                    instrument_indeterminate = True
+                    stage.setdefault("errors", []).append({
+                        "instrument_id": instrument_id,
+                        "source_profile": source_profile,
+                        "reason": endpoint_result.error or "indeterminate response",
+                    })
+                elif endpoint_result.coverage_status == "partial_missing_fields":
+                    instrument_partial = True
+                if request_interval_seconds:
+                    await asyncio.sleep(request_interval_seconds)
+
+            if instrument_partial:
+                stage["partial_instruments"] = sorted(
+                    set(stage.get("partial_instruments") or []) | {instrument_id}
+                )
+            else:
+                stage["partial_instruments"] = sorted(
+                    set(stage.get("partial_instruments") or []) - {instrument_id}
+                )
+            if not instrument_indeterminate:
+                completed.add(instrument_id)
+                stage["completed_instruments"] = sorted(completed)
+                counters["completed_instruments"] += 1
+            checkpoint_store.save(checkpoint)
+            if index == 1 or index % chunk_size == 0 or index == len(pending):
+                dm_logger.info(
+                    "[DataManager] CNInfo corporate-action progress: %d/%d "
+                    "completed=%d partial=%d errors=%d observations=%d",
+                    index,
+                    len(pending),
+                    counters["completed_instruments"],
+                    len(stage.get("partial_instruments") or []),
+                    len(stage.get("errors") or []),
+                    counters["observations_inserted"]
+                    + counters["observations_changed"]
+                    + counters["observations_unchanged"],
+                )
+
+        has_partial = bool(stage.get("partial_instruments"))
+        has_errors = bool(stage.get("errors"))
+        result.update({
+            "status": "partial" if has_partial or has_errors else "success",
+            "universe": {
+                "instrument_count": len(universe),
+                "completed_count": len(completed),
+                "pending_count": len(universe) - len(completed),
+            },
+            "counters": dict(counters),
+            "partial_instruments": list(stage.get("partial_instruments") or []),
+            "errors": list(stage.get("errors") or [])[:50],
+            "announcement_recovery_required": (
+                len(stage.get("partial_instruments") or [])
+                + int(counters["indeterminate"])
+            ),
+        })
+        checkpoint_store.save(checkpoint)
+        return result
+
     async def _fetch_eastmoney_corporate_action_rows(
         self,
         *,

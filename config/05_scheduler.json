@@ -181,6 +181,30 @@
           "max_runtime_seconds": 86400
         }
       },
+      "a_share_cninfo_corporate_action_backfill": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股巨潮官方分红与配股结构化历史回补（隔离观测层，仅手工触发，默认 dry-run）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE", "BSE"],
+          "instrument_ids": [],
+          "scopes": ["dividends", "allotments"],
+          "dry_run": true,
+          "resume": true,
+          "chunk_size": 50,
+          "request_interval_seconds": 1.0,
+          "per_instrument_timeout_sec": 60,
+          "checkpoint_id": null,
+          "max_runtime_seconds": 86400
+        }
+      },
       "a_share_corporate_action_validation": {
         "enabled": true,
         "manual_only": true,

@@ -3237,6 +3237,100 @@ async def get_adjustment_factor_observations(
 
 
 @router.get(
+    "/corporate-actions/official-observations",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_official_corporate_action_observations(
+    instrument_id: Optional[str] = Query(None),
+    source: Optional[str] = Query("cninfo"),
+    source_profile: Optional[str] = Query(None),
+    action_type: Optional[str] = Query(None),
+    quality_status: Optional[str] = Query(None),
+    include_inactive: bool = Query(False),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query isolated official corporate-action evidence, not production factors."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    normalized_start = _normalize_optional_query(start_date)
+    normalized_end = _normalize_optional_query(end_date)
+    if normalized_start and normalized_end and normalized_end < normalized_start:
+        raise HTTPException(
+            status_code=400,
+            detail="end_date must be greater than or equal to start_date",
+        )
+    page = await data_manager.db_ops.get_corporate_action_observations(
+        instrument_id=normalized_id,
+        source=_normalize_optional_query(source),
+        source_profile=_normalize_optional_query(source_profile),
+        action_type=_normalize_optional_query(action_type),
+        quality_status=_normalize_optional_query(quality_status),
+        include_inactive=bool(_query_default(include_inactive, False)),
+        start_date=normalized_start,
+        end_date=normalized_end,
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_observations",
+        filters={
+            "instrument_id": normalized_id,
+            "source": _normalize_optional_query(source),
+            "source_profile": _normalize_optional_query(source_profile),
+            "action_type": _normalize_optional_query(action_type),
+            "quality_status": _normalize_optional_query(quality_status),
+            "include_inactive": bool(_query_default(include_inactive, False)),
+            "start_date": str(normalized_start or "") or None,
+            "end_date": str(normalized_end or "") or None,
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/official-coverage",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_official_corporate_action_coverage(
+    instrument_id: Optional[str] = Query(None),
+    source_profile: Optional[str] = Query(None),
+    coverage_status: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query endpoint-level CNInfo history completeness states."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    page = await data_manager.db_ops.get_corporate_action_instrument_status_page(
+        instrument_id=normalized_id,
+        source_profile=_normalize_optional_query(source_profile),
+        coverage_status=_normalize_optional_query(coverage_status),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_instrument_status",
+        filters={
+            "instrument_id": normalized_id,
+            "source_profile": _normalize_optional_query(source_profile),
+            "coverage_status": _normalize_optional_query(coverage_status),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
     "/corporate-actions/adjustment-factor-canonical",
     response_model=AdjustmentFactorPageResponse,
     tags=["Corporate Actions"],

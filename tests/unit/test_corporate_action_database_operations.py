@@ -1,0 +1,332 @@
+import asyncio
+from datetime import date, datetime
+
+import pytest
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from database.models import (
+    Base,
+    CorporateActionInstrumentStatusDB,
+    CorporateActionObservationDB,
+    InstrumentDB,
+)
+from database.operations import DatabaseOperations
+
+
+def test_corporate_action_observation_revision_and_partial_coverage():
+    asyncio.run(_exercise_observation_revision_and_partial_coverage())
+
+
+async def _exercise_observation_revision_and_partial_coverage():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
+                CorporateActionInstrumentStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                name="Ping An Bank",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                is_active=True,
+            )
+        )
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    observation = {
+        "instrument_id": "000001.SZ",
+        "source": "cninfo",
+        "source_profile": "cninfo_dividend",
+        "source_event_key": "event-1",
+        "action_type": "dividend",
+        "fiscal_period": "2025年报",
+        "announcement_date": date(2026, 6, 1),
+        "record_date": date(2026, 6, 11),
+        "ex_date": date(2026, 6, 12),
+        "cash_dividend_per_share": 0.2,
+        "currency": "CNY",
+        "event_status": "implemented",
+        "quality_status": "structured_complete",
+        "raw_payload": {"派息比例": 2.0},
+    }
+    first = await operations.save_corporate_action_observations(
+        [observation], ingestion_run_id="run-1"
+    )
+    unchanged = await operations.save_corporate_action_observations(
+        [observation], ingestion_run_id="run-2"
+    )
+    changed = await operations.save_corporate_action_observations(
+        [{**observation, "cash_dividend_per_share": 0.25}],
+        ingestion_run_id="run-3",
+    )
+    await operations.upsert_corporate_action_instrument_status(
+        {
+            "instrument_id": "000001.SZ",
+            "source": "cninfo",
+            "source_profile": "cninfo_dividend",
+            "coverage_status": "partial_missing_fields",
+            "event_count": 1,
+            "missing_ex_date_count": 1,
+            "requested_start_date": date(1990, 1, 1),
+            "requested_end_date": date(2026, 7, 17),
+            "ingestion_run_id": "run-3",
+        }
+    )
+
+    async with session_factory() as session:
+        row = (await session.execute(select(CorporateActionObservationDB))).scalar_one()
+        status = (
+            await session.execute(select(CorporateActionInstrumentStatusDB))
+        ).scalar_one()
+
+    assert first == {
+        "inserted": 1,
+        "changed": 0,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 0,
+    }
+    assert unchanged == {
+        "inserted": 0,
+        "changed": 0,
+        "unchanged": 1,
+        "reactivated": 0,
+        "failed": 0,
+    }
+    assert changed == {
+        "inserted": 0,
+        "changed": 1,
+        "unchanged": 0,
+        "reactivated": 0,
+        "failed": 0,
+    }
+    assert row.cash_dividend_per_share == pytest.approx(0.25)
+    assert row.row_version == 2
+    assert row.ingestion_run_id == "run-3"
+    assert status.coverage_status == "partial_missing_fields"
+    assert status.missing_ex_date_count == 1
+    assert isinstance(status.last_attempt_at, datetime)
+    await engine.dispose()
+
+
+def test_corporate_action_confirmed_empty_status_is_queryable():
+    asyncio.run(_exercise_confirmed_empty_status_is_queryable())
+
+
+async def _exercise_confirmed_empty_status_is_queryable():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionInstrumentStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000003.SZ",
+                symbol="000003",
+                name="Delisted Sample",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                is_active=False,
+            )
+        )
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    await operations.upsert_corporate_action_instrument_status(
+        {
+            "instrument_id": "000003.SZ",
+            "source": "cninfo",
+            "source_profile": "cninfo_allotment",
+            "coverage_status": "complete_no_events",
+            "event_count": 0,
+            "requested_start_date": date(1990, 1, 1),
+            "requested_end_date": date(2002, 12, 31),
+        }
+    )
+    page = await operations.get_corporate_action_instrument_status_page(
+        instrument_id="000003.SZ",
+        coverage_status="complete_no_events",
+    )
+
+    assert page["total"] == 1
+    assert page["items"][0]["source_profile"] == "cninfo_allotment"
+    await engine.dispose()
+
+
+def test_corporate_action_snapshot_retirement_and_reactivation():
+    asyncio.run(_exercise_snapshot_retirement_and_reactivation())
+
+
+async def _exercise_snapshot_retirement_and_reactivation():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionObservationDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                name="Ping An Bank",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                is_active=True,
+            )
+        )
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    observations = [
+        {
+            "instrument_id": "000001.SZ",
+            "source": "cninfo",
+            "source_profile": "cninfo_dividend",
+            "source_event_key": event_key,
+            "action_type": "dividend",
+            "ex_date": ex_date,
+            "cash_dividend_per_share": amount,
+            "quality_status": "structured_complete",
+        }
+        for event_key, ex_date, amount in (
+            ("event-1", date(2025, 6, 10), 0.1),
+            ("event-2", date(2026, 6, 10), 0.2),
+        )
+    ]
+    await operations.save_corporate_action_observations(
+        observations,
+        ingestion_run_id="run-1",
+    )
+    retired = await operations.reconcile_corporate_action_observation_snapshot(
+        instrument_id="000001.SZ",
+        source="cninfo",
+        source_profile="cninfo_dividend",
+        requested_start_date=date(2020, 1, 1),
+        requested_end_date=date(2026, 12, 31),
+        seen_event_keys=["event-1"],
+        ingestion_run_id="run-2",
+    )
+
+    current_page = await operations.get_corporate_action_observations(
+        instrument_id="000001.SZ"
+    )
+    audit_page = await operations.get_corporate_action_observations(
+        instrument_id="000001.SZ",
+        include_inactive=True,
+    )
+    reactivated = await operations.save_corporate_action_observations(
+        [observations[1]],
+        ingestion_run_id="run-3",
+    )
+    restored_page = await operations.get_corporate_action_observations(
+        instrument_id="000001.SZ"
+    )
+
+    assert retired == 1
+    assert current_page["total"] == 1
+    assert audit_page["total"] == 2
+    retired_row = next(
+        row for row in audit_page["items"] if row["source_event_key"] == "event-2"
+    )
+    assert retired_row["is_current"] is False
+    assert retired_row["retirement_reason"] == ("missing_from_complete_source_snapshot")
+    assert reactivated["reactivated"] == 1
+    assert restored_page["total"] == 2
+    await engine.dispose()
+
+
+def test_corporate_action_coverage_is_versioned_by_requested_range():
+    asyncio.run(_exercise_coverage_is_versioned_by_requested_range())
+
+
+async def _exercise_coverage_is_versioned_by_requested_range():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionInstrumentStatusDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(
+            InstrumentDB(
+                instrument_id="000001.SZ",
+                symbol="000001",
+                name="Ping An Bank",
+                exchange="SZSE",
+                type="stock",
+                currency="CNY",
+                is_active=True,
+            )
+        )
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    base_status = {
+        "instrument_id": "000001.SZ",
+        "source": "cninfo",
+        "source_profile": "cninfo_dividend",
+        "coverage_status": "complete_with_events",
+        "event_count": 10,
+    }
+    await operations.upsert_corporate_action_instrument_status(
+        {
+            **base_status,
+            "requested_start_date": date(1990, 1, 1),
+            "requested_end_date": date(2026, 12, 31),
+        }
+    )
+    await operations.upsert_corporate_action_instrument_status(
+        {
+            **base_status,
+            "coverage_status": "complete_no_events",
+            "event_count": 0,
+            "requested_start_date": date(2020, 1, 1),
+            "requested_end_date": date(2020, 12, 31),
+        }
+    )
+    page = await operations.get_corporate_action_instrument_status_page(
+        instrument_id="000001.SZ"
+    )
+
+    assert page["total"] == 2
+    assert {
+        (item["requested_start_date"].date(), item["requested_end_date"].date())
+        for item in page["items"]
+    } == {
+        (date(1990, 1, 1), date(2026, 12, 31)),
+        (date(2020, 1, 1), date(2020, 12, 31)),
+    }
+    await engine.dispose()

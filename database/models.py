@@ -391,6 +391,97 @@ class AdjustmentFactorInstrumentStatusDB(Base):
     )
 
 
+class CorporateActionObservationDB(Base):
+    """Source-neutral corporate-action evidence before factor derivation."""
+    __tablename__ = 'corporate_action_observations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source = Column(String(32), nullable=False, index=True)
+    source_profile = Column(String(64), nullable=False, index=True)
+    source_event_key = Column(String(64), nullable=False)
+    action_type = Column(String(32), nullable=False, index=True)
+    fiscal_period = Column(String(32), nullable=True, index=True)
+    announcement_date = Column(DateTime, nullable=True, index=True)
+    record_date = Column(DateTime, nullable=True)
+    ex_date = Column(DateTime, nullable=True, index=True)
+    pay_date = Column(DateTime, nullable=True)
+    share_arrival_date = Column(DateTime, nullable=True)
+    cash_dividend_per_share = Column(Float, nullable=True)
+    bonus_shares_per_share = Column(Float, nullable=True)
+    capitalization_shares_per_share = Column(Float, nullable=True)
+    rights_shares_per_share = Column(Float, nullable=True)
+    rights_price = Column(Float, nullable=True)
+    currency = Column(String(8), nullable=False, default='CNY')
+    description = Column(Text, nullable=True)
+    event_status = Column(String(32), nullable=False, default='unvalidated', index=True)
+    quality_status = Column(String(32), nullable=False, default='unvalidated', index=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    raw_payload_json = Column(Text, nullable=True)
+    row_hash = Column(String(64), nullable=False, index=True)
+    row_version = Column(Integer, nullable=False, default=1)
+    is_current = Column(Boolean, nullable=False, default=True)
+    last_seen_run_id = Column(String(64), nullable=True)
+    retired_at = Column(DateTime, nullable=True)
+    retired_run_id = Column(String(64), nullable=True)
+    retirement_reason = Column(String(64), nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'source', 'source_profile', 'source_event_key',
+            name='uq_corporate_action_observation_source_event',
+        ),
+        Index(
+            'idx_corporate_action_observation_inst_profile_date',
+            'instrument_id', 'source_profile', 'ex_date',
+        ),
+    )
+
+
+class CorporateActionInstrumentStatusDB(Base):
+    """Endpoint-level completeness for official corporate-action histories."""
+    __tablename__ = 'corporate_action_instrument_status'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source = Column(String(32), nullable=False, index=True)
+    source_profile = Column(String(64), nullable=False, index=True)
+    coverage_status = Column(String(32), nullable=False, index=True)
+    event_count = Column(Integer, nullable=False, default=0)
+    missing_ex_date_count = Column(Integer, nullable=False, default=0)
+    requested_start_date = Column(DateTime, nullable=False)
+    requested_end_date = Column(DateTime, nullable=False)
+    earliest_event_date = Column(DateTime, nullable=True)
+    latest_event_date = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    last_attempt_at = Column(DateTime, default=safe_get_shanghai_time, index=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'source', 'source_profile',
+            'requested_start_date', 'requested_end_date',
+            name='uq_corporate_action_instrument_source_profile_range',
+        ),
+        Index(
+            'idx_corporate_action_status_profile_coverage',
+            'source_profile', 'coverage_status',
+        ),
+    )
+
+
 class DataChangeLogDB(Base):
     """Append-only local-observed change records for incremental sync."""
     __tablename__ = 'data_change_log'

@@ -4,6 +4,7 @@ Provides SQLite database connection with async support and connection pooling.
 """
 
 import os
+from datetime import date, datetime
 from utils import db_logger, config_manager
 
 import aiosqlite
@@ -130,6 +131,7 @@ class DatabaseManager:
 
             self._ensure_change_watermark_schema()
             self._ensure_adjustment_factor_governance_schema()
+            self._ensure_corporate_action_governance_schema()
 
             db_logger.info("[Database] Database connection initialized successfully")
 
@@ -155,6 +157,125 @@ class DatabaseManager:
         with self.sync_engine.begin() as connection:
             for table in tables:
                 table.create(bind=connection, checkfirst=True)
+
+    def _ensure_corporate_action_governance_schema(self) -> None:
+        """Create additive official corporate-action tables on existing DBs."""
+        from .models import (
+            CorporateActionInstrumentStatusDB,
+            CorporateActionObservationDB,
+        )
+
+        tables = (
+            CorporateActionObservationDB.__table__,
+            CorporateActionInstrumentStatusDB.__table__,
+        )
+        with self.sync_engine.begin() as connection:
+            for table in tables:
+                table.create(bind=connection, checkfirst=True)
+
+            observation_columns = {
+                row[1]
+                for row in connection.execute(
+                    text("PRAGMA table_info(corporate_action_observations)")
+                ).fetchall()
+            }
+            additive_columns = (
+                ("is_current", "BOOLEAN NOT NULL DEFAULT 1"),
+                ("last_seen_run_id", "VARCHAR(64)"),
+                ("retired_at", "DATETIME"),
+                ("retired_run_id", "VARCHAR(64)"),
+                ("retirement_reason", "VARCHAR(64)"),
+            )
+            for column_name, column_type in additive_columns:
+                if column_name not in observation_columns:
+                    connection.execute(text(
+                        "ALTER TABLE corporate_action_observations "
+                        f"ADD COLUMN {column_name} {column_type}"
+                    ))
+            connection.execute(text(
+                "CREATE INDEX IF NOT EXISTS idx_corporate_action_observation_current "
+                "ON corporate_action_observations(is_current)"
+            ))
+            desired_unique_columns = (
+                "instrument_id",
+                "source",
+                "source_profile",
+                "requested_start_date",
+                "requested_end_date",
+            )
+            unique_indexes = []
+            for index_row in connection.execute(text(
+                "PRAGMA index_list(corporate_action_instrument_status)"
+            )).fetchall():
+                if not bool(index_row[2]):
+                    continue
+                index_name = str(index_row[1]).replace("'", "''")
+                unique_indexes.append(tuple(
+                    row[2]
+                    for row in connection.execute(text(
+                        f"PRAGMA index_info('{index_name}')"
+                    )).fetchall()
+                ))
+            if desired_unique_columns not in unique_indexes:
+                legacy_rows = [
+                    dict(row)
+                    for row in connection.execute(text(
+                        "SELECT * FROM corporate_action_instrument_status"
+                    )).mappings().all()
+                ]
+                connection.execute(text(
+                    "DROP TABLE corporate_action_instrument_status"
+                ))
+                CorporateActionInstrumentStatusDB.__table__.create(
+                    bind=connection,
+                    checkfirst=False,
+                )
+
+                def coerce_legacy_datetime(value):
+                    if isinstance(value, datetime):
+                        return value.replace(tzinfo=None)
+                    if isinstance(value, date):
+                        return datetime(value.year, value.month, value.day)
+                    if value is None:
+                        return None
+                    try:
+                        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).replace(
+                            tzinfo=None
+                        )
+                    except ValueError:
+                        return None
+
+                datetime_columns = (
+                    "requested_start_date",
+                    "requested_end_date",
+                    "earliest_event_date",
+                    "latest_event_date",
+                    "last_attempt_at",
+                    "created_at",
+                    "updated_at",
+                )
+                for legacy_row in legacy_rows:
+                    for column_name in datetime_columns:
+                        legacy_row[column_name] = coerce_legacy_datetime(
+                            legacy_row.get(column_name)
+                        )
+                    if (
+                        legacy_row.get("requested_start_date") is None
+                        or legacy_row.get("requested_end_date") is None
+                    ):
+                        legacy_row["requested_start_date"] = datetime(1900, 1, 1)
+                        legacy_row["requested_end_date"] = datetime(1900, 1, 1)
+                        legacy_row["coverage_status"] = "indeterminate"
+                        previous_error = str(legacy_row.get("error_message") or "").strip()
+                        migration_error = "legacy coverage interval was unavailable"
+                        legacy_row["error_message"] = (
+                            f"{previous_error}; {migration_error}"
+                            if previous_error else migration_error
+                        )
+                    connection.execute(
+                        CorporateActionInstrumentStatusDB.__table__.insert(),
+                        legacy_row,
+                    )
 
     def _create_async_engine(
         self,
