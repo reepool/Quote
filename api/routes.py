@@ -3205,6 +3205,7 @@ async def get_xdxr_audit_events(
 async def get_adjustment_factor_observations(
     instrument_id: Optional[str] = Query(None),
     source: Optional[str] = Query(None),
+    source_profile: Optional[str] = Query(None),
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
     limit: int = Query(100, ge=1, le=1000),
@@ -3218,6 +3219,7 @@ async def get_adjustment_factor_observations(
     page = await data_manager.db_ops.get_adjustment_factor_observations(
         instrument_id=normalized_id,
         source=_normalize_optional_query(source),
+        source_profile=_normalize_optional_query(source_profile),
         start_date=_normalize_optional_query(start_date),
         end_date=_normalize_optional_query(end_date),
         limit=int(_query_default(limit, 100)),
@@ -3228,6 +3230,7 @@ async def get_adjustment_factor_observations(
         filters={
             "instrument_id": normalized_id,
             "source": _normalize_optional_query(source),
+            "source_profile": _normalize_optional_query(source_profile),
             "start_date": str(_normalize_optional_query(start_date) or "") or None,
             "end_date": str(_normalize_optional_query(end_date) or "") or None,
         },

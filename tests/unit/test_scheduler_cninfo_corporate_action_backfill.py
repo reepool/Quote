@@ -105,3 +105,38 @@ async def test_scheduler_cninfo_backfill_delegates_manual_parameters(monkeypatch
     assert backfill.await_args.kwargs["instrument_ids"] == ["000001.SZ"]
     assert backfill.await_args.kwargs["request_interval_seconds"] == 1.5
     assert "a_share_cninfo_corporate_action_backfill" not in task._active_tasks
+
+
+def test_cninfo_primary_daily_job_is_bounded_and_single_instance():
+    config = json.loads(Path("config/05_scheduler.json").read_text(encoding="utf-8"))
+    job = config["scheduler_config"]["jobs"][
+        "a_share_cninfo_corporate_action_daily_sync"
+    ]
+
+    assert job["manual_only"] is False
+    assert job["max_instances"] == 1
+    assert job["parameters"]["rolling_days"] <= 14
+    assert job["parameters"]["build_canonical"] is True
+
+
+@pytest.mark.asyncio
+async def test_scheduler_cninfo_daily_sync_delegates_to_isolated_maintenance(monkeypatch):
+    task = ScheduledTasks()
+    task.telegram_enabled = False
+    maintenance = AsyncMock(return_value={"status": "success"})
+    monkeypatch.setattr(
+        data_manager,
+        "maintain_a_share_cninfo_primary_factors",
+        maintenance,
+    )
+
+    result = await task.a_share_cninfo_corporate_action_daily_sync(
+        exchanges=["SZSE"],
+        rolling_days=7,
+        request_interval_seconds=0.5,
+    )
+
+    assert result["status"] == "success"
+    assert maintenance.await_args.kwargs["exchanges"] == ["SZSE"]
+    assert maintenance.await_args.kwargs["rolling_days"] == 7
+    assert "a_share_cninfo_corporate_action_daily_sync" not in task._active_tasks

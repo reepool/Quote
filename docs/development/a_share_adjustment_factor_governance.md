@@ -27,6 +27,25 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
 
 ## 分阶段实施
 
+### 0. CNInfo 主线与 TDX 备份的长期运行模型
+
+公司行动原始证据和因子路径分开维护：
+
+- `corporate_action_observations` 中保留 CNInfo 分红/配股全历史，CNInfo 是主来源；
+- `adjustment_factors_tdx` 继续保留 TDX XDXR 全历史，作为独立备份和缺失补充；
+- `adjustment_factor_observations` 分别保存 `cninfo_event_derived_v1` 与
+  `tdx_event_derived_v1`，不把两家来源拼成一条未经标注的序列；
+- `adjustment_factors_canonical` 只保存带 `series_version` 的隔离 staging 候选，CNInfo
+  同一有效交易日优先，TDX-only 事件才可作为 `tdx_fallback_unverified` 补充；
+- `a_share_cninfo_corporate_action_daily_sync` 在每日行情更新后按最近 7 天滚动刷新活跃股票的
+  两个原始来源，再利用本地全历史重建累计因子；任务单实例运行且不会晋级生产；
+- `a_share_cninfo_corporate_action_backfill` 和
+  `a_share_cninfo_adjustment_factor_rebuild` 仍是手工任务，分别负责官方事件全量回补和
+  全历史因子重建/对账。
+
+自动日更只刷新源数据的近期窗口，因子重建不能只从这个窗口起算，否则累计因子会错误地从
+  1 重新开始。任何生产切换仍需要独立的全市场覆盖、事件冲突和累计路径质量门禁及人工确认。
+
 ### 1. 定向预演
 
 预演只统计股票池和已有 observation，不访问外部因子接口、不写数据库、也不创建
@@ -82,7 +101,7 @@ checkpoint。
 
 ```text
 GET /api/v1/corporate-actions/adjustment-factor-quality?series_version=a_share_event_product_v1
-GET /api/v1/corporate-actions/adjustment-factor-observations?instrument_id=000001.SZ&source=akshare&limit=100
+GET /api/v1/corporate-actions/adjustment-factor-observations?instrument_id=000001.SZ&source=cninfo&source_profile=cninfo_event_derived_v1&limit=100
 GET /api/v1/corporate-actions/adjustment-factor-canonical?instrument_id=000001.SZ&series_version=a_share_event_product_v1&limit=100
 ```
 

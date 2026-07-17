@@ -14,6 +14,7 @@ from typing import Any, Callable, Dict, List, Mapping, Optional
 CNINFO_SOURCE = "cninfo"
 DIVIDEND_PROFILE = "cninfo_dividend"
 ALLOTMENT_PROFILE = "cninfo_allotment"
+ECONOMIC_VALUE_PRECISION = 10
 
 
 class _RequestsTimeoutProxy:
@@ -22,10 +23,17 @@ class _RequestsTimeoutProxy:
     def __init__(self, delegate: Any, timeout_seconds: float) -> None:
         self._delegate = delegate
         self._timeout_seconds = timeout_seconds
+        self.last_payload: Optional[Mapping[str, Any]] = None
 
     def post(self, *args: Any, **kwargs: Any) -> Any:
         kwargs.setdefault("timeout", self._timeout_seconds)
-        return self._delegate.post(*args, **kwargs)
+        response = self._delegate.post(*args, **kwargs)
+        try:
+            payload = response.json()
+        except Exception:
+            payload = None
+        self.last_payload = payload if isinstance(payload, Mapping) else None
+        return response
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._delegate, name)
@@ -44,10 +52,11 @@ def _bind_requests_timeout(
         raise RuntimeError("CNInfo AkShare loader does not expose requests.post")
 
     bound_globals = dict(loader_globals)
-    bound_globals["requests"] = _RequestsTimeoutProxy(
+    requests_proxy = _RequestsTimeoutProxy(
         requests_client,
         max(1.0, float(timeout_seconds)),
     )
+    bound_globals["requests"] = requests_proxy
     bound = FunctionType(
         loader.__code__,
         bound_globals,
@@ -58,7 +67,23 @@ def _bind_requests_timeout(
     bound.__kwdefaults__ = getattr(loader, "__kwdefaults__", None)
     bound.__annotations__ = dict(getattr(loader, "__annotations__", {}))
     bound.__doc__ = loader.__doc__
+    bound._cninfo_requests_proxy = requests_proxy
     return bound
+
+
+def _loader_confirmed_empty(loader: Callable[..., Any]) -> bool:
+    proxy = getattr(loader, "_cninfo_requests_proxy", None)
+    payload = getattr(proxy, "last_payload", None)
+    if not isinstance(payload, Mapping):
+        return False
+    records = payload.get("records")
+    result_code = str(payload.get("resultcode") or "").strip().lower()
+    result_message = str(payload.get("resultmsg") or "").strip().lower()
+    return (
+        isinstance(records, list)
+        and not records
+        and (result_code in {"0", "200", "success"} or result_message == "success")
+    )
 
 
 @dataclass(frozen=True)
@@ -110,7 +135,11 @@ def _date(value: Any) -> Optional[date]:
 
 def _per_share(value: Any) -> Optional[float]:
     number = _number(value)
-    return number / 10.0 if number is not None else None
+    return (
+        round(number / 10.0, ECONOMIC_VALUE_PRECISION)
+        if number is not None
+        else None
+    )
 
 
 def parse_cninfo_distribution_description(
@@ -145,7 +174,11 @@ def parse_cninfo_distribution_description(
     def extract(pattern: str) -> Optional[float]:
         match = re.search(pattern, text)
         value = _number(match.group(1)) if match else None
-        return value / base if value is not None else None
+        return (
+            round(value / base, ECONOMIC_VALUE_PRECISION)
+            if value is not None
+            else None
+        )
 
     return {
         "cash_dividend_per_share": extract(
@@ -311,7 +344,12 @@ def normalize_cninfo_allotment_rows(
         record_date = _date(raw.get("股权登记日"))
         ex_date = _date(raw.get("除权基准日"))
         rights_shares = _per_share(raw.get("配股比例"))
-        rights_price = _number(raw.get("配股价格"))
+        rights_price_raw = _number(raw.get("配股价格"))
+        rights_price = (
+            round(rights_price_raw, ECONOMIC_VALUE_PRECISION)
+            if rights_price_raw is not None
+            else None
+        )
         failure_refund_date = _date(raw.get("配股失败，退还申购款日期"))
         actual_allotted_shares = _number(raw.get("实际配股数量"))
         failed = failure_refund_date is not None
@@ -467,6 +505,13 @@ class CninfoCorporateActionProvider:
                 rows_received=len(raw_rows),
             )
         except Exception as exc:
+            if _loader_confirmed_empty(self.dividend_loader):
+                return CninfoEndpointResult(
+                    source_profile=DIVIDEND_PROFILE,
+                    coverage_status="complete_no_events",
+                    observations=[],
+                    rows_received=0,
+                )
             return CninfoEndpointResult(
                 source_profile=DIVIDEND_PROFILE,
                 coverage_status="indeterminate",
@@ -530,6 +575,13 @@ class CninfoCorporateActionProvider:
                 rows_received=len(raw_rows),
             )
         except Exception as exc:
+            if _loader_confirmed_empty(self.allotment_loader):
+                return CninfoEndpointResult(
+                    source_profile=ALLOTMENT_PROFILE,
+                    coverage_status="complete_no_events",
+                    observations=[],
+                    rows_received=0,
+                )
             return CninfoEndpointResult(
                 source_profile=ALLOTMENT_PROFILE,
                 coverage_status="indeterminate",

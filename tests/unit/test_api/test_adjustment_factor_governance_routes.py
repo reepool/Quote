@@ -77,6 +77,7 @@ async def test_observation_and_canonical_routes_forward_filters(monkeypatch):
     observations = await routes.get_adjustment_factor_observations(
         instrument_id="000001.SZ",
         source="akshare",
+        source_profile="sina_hfq_factor",
         start_date=date(2020, 1, 1),
         end_date=date(2020, 12, 31),
         limit=10,
@@ -93,6 +94,9 @@ async def test_observation_and_canonical_routes_forward_filters(monkeypatch):
 
     assert observations.dataset == "adjustment_factor_observations"
     assert canonical.dataset == "adjustment_factors_canonical"
+    assert db_ops.get_adjustment_factor_observations.await_args.kwargs[
+        "source_profile"
+    ] == "sina_hfq_factor"
     assert db_ops.get_canonical_adjustment_factor_page.await_args.kwargs["start_date"] == date(2020, 1, 1)
     assert db_ops.get_canonical_adjustment_factor_page.await_args.kwargs["end_date"] == date(2020, 12, 31)
 

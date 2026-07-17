@@ -4026,6 +4026,7 @@ class DatabaseOperations:
         *,
         instrument_id: Optional[str] = None,
         source: Optional[str] = None,
+        source_profile: Optional[str] = None,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         limit: int = 100,
@@ -4037,6 +4038,10 @@ class DatabaseOperations:
                 filters.append(AdjustmentFactorObservationDB.instrument_id == instrument_id)
             if source:
                 filters.append(AdjustmentFactorObservationDB.source == source.lower())
+            if source_profile:
+                filters.append(
+                    AdjustmentFactorObservationDB.source_profile == source_profile
+                )
             if start_date:
                 filters.append(AdjustmentFactorObservationDB.ex_date >= self._coerce_datetime(start_date))
             if end_date:
@@ -4054,6 +4059,7 @@ class DatabaseOperations:
                     AdjustmentFactorObservationDB.instrument_id,
                     AdjustmentFactorObservationDB.ex_date,
                     AdjustmentFactorObservationDB.source,
+                    AdjustmentFactorObservationDB.source_profile,
                 )
                 .offset(offset).limit(limit)
             )).scalars().all()
@@ -4082,6 +4088,7 @@ class DatabaseOperations:
         *,
         instrument_ids: Optional[List[str]] = None,
         sources: Optional[List[str]] = None,
+        source_profiles: Optional[List[str]] = None,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> List[Dict[str, Any]]:
@@ -4093,6 +4100,10 @@ class DatabaseOperations:
             if sources:
                 stmt = stmt.where(
                     AdjustmentFactorObservationDB.source.in_([item.lower() for item in sources])
+                )
+            if source_profiles:
+                stmt = stmt.where(
+                    AdjustmentFactorObservationDB.source_profile.in_(source_profiles)
                 )
             if start_date:
                 stmt = stmt.where(
@@ -4106,6 +4117,7 @@ class DatabaseOperations:
             rows = (await session.execute(stmt.order_by(
                 AdjustmentFactorObservationDB.instrument_id,
                 AdjustmentFactorObservationDB.source,
+                AdjustmentFactorObservationDB.source_profile,
                 AdjustmentFactorObservationDB.ex_date,
             ))).scalars().all()
             return [{
@@ -4120,6 +4132,74 @@ class DatabaseOperations:
                 "quality_status": row.quality_status,
                 "ingestion_run_id": row.ingestion_run_id,
             } for row in rows]
+
+    async def get_quote_evidence_for_event_dates(
+        self,
+        event_dates: List[tuple[str, date]],
+    ) -> List[Dict[str, Any]]:
+        """Return bounded quote evidence on or after each source event date.
+
+        A source date may fall on a weekend or holiday, but accepting an
+        arbitrarily distant quote would silently turn a missing historical
+        quote into false factor evidence. Fourteen calendar days covers the
+        normal exchange holiday window while keeping stale matches visible as
+        pending.
+        """
+        normalized = sorted({
+            (str(instrument_id).strip(), parsed_date)
+            for instrument_id, parsed_date in event_dates
+            if str(instrument_id).strip() and isinstance(parsed_date, date)
+        })
+        rows: List[Dict[str, Any]] = []
+        async with self.get_async_session() as session:
+            for offset in range(0, len(normalized), 200):
+                chunk = normalized[offset: offset + 200]
+                values_sql = ", ".join(
+                    f"(:instrument_{index}, :date_{index})"
+                    for index in range(len(chunk))
+                )
+                parameters: Dict[str, Any] = {}
+                for index, (instrument_id, source_date) in enumerate(chunk):
+                    parameters[f"instrument_{index}"] = instrument_id
+                    parameters[f"date_{index}"] = source_date.isoformat()
+                result = await session.execute(text(f"""
+                    WITH requested(instrument_id, source_date) AS (
+                        VALUES {values_sql}
+                    )
+                    SELECT requested.instrument_id,
+                           requested.source_date,
+                           (
+                               SELECT date(q.time)
+                               FROM daily_quotes q
+                               WHERE q.instrument_id = requested.instrument_id
+                                 AND date(q.time) >= date(requested.source_date)
+                                 AND date(q.time) <= date(requested.source_date, '+14 day')
+                               ORDER BY q.time
+                               LIMIT 1
+                           ) AS effective_date,
+                           (
+                               SELECT q.pre_close
+                               FROM daily_quotes q
+                               WHERE q.instrument_id = requested.instrument_id
+                                 AND date(q.time) >= date(requested.source_date)
+                                 AND date(q.time) <= date(requested.source_date, '+14 day')
+                               ORDER BY q.time
+                               LIMIT 1
+                           ) AS pre_close,
+                           (
+                               SELECT q.close
+                               FROM daily_quotes q
+                               WHERE q.instrument_id = requested.instrument_id
+                                 AND date(q.time) >= date(requested.source_date)
+                                 AND date(q.time) <= date(requested.source_date, '+14 day')
+                               ORDER BY q.time
+                               LIMIT 1
+                           ) AS close
+                    FROM requested
+                    ORDER BY requested.instrument_id, requested.source_date
+                """), parameters)
+                rows.extend(dict(row) for row in result.mappings().all())
+        return rows
 
     async def replace_canonical_adjustment_factors(
         self,

@@ -15,7 +15,7 @@ _install_akshare_proxy_patch(required=False)
 
 import asyncio
 from bisect import bisect_right
-from collections import Counter
+from collections import Counter, defaultdict
 from copy import deepcopy
 import hashlib
 import inspect
@@ -17006,6 +17006,7 @@ class DataManager:
         request_interval_seconds: float = 1.0,
         per_instrument_timeout_sec: int = 60,
         checkpoint_id: Optional[str] = None,
+        active_only: bool = False,
     ) -> Dict[str, Any]:
         """Backfill isolated official CNInfo dividend and allotment evidence."""
         from data_sources.cninfo_corporate_actions import (
@@ -17049,7 +17050,9 @@ class DataManager:
         universe: List[Dict[str, Any]] = []
         for exchange in normalized_exchanges:
             instruments = await self.db_ops.get_instruments_list(
-                exchange=exchange, type="stock", is_active=None
+                exchange=exchange,
+                type="stock",
+                is_active=True if active_only else None,
             )
             for instrument in instruments:
                 instrument_id = str(instrument.get("instrument_id") or "").strip()
@@ -17081,6 +17084,7 @@ class DataManager:
             "chunk_size": chunk_size,
             "request_interval_seconds": request_interval_seconds,
             "per_instrument_timeout_sec": per_instrument_timeout_sec,
+            "active_only": bool(active_only),
         }
         identity = hashlib.sha256(json.dumps(
             {
@@ -17331,6 +17335,553 @@ class DataManager:
         })
         checkpoint_store.save(checkpoint)
         return result
+
+    async def rebuild_cninfo_primary_adjustment_factors(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+        build_canonical: bool = True,
+        series_version: str = "a_share_cninfo_primary_v1",
+        field_tolerance: float = 0.0001,
+        max_session_shift: int = 3,
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Derive and compare CNInfo-primary and TDX-secondary factor paths."""
+        from data_sources.adjustment_factor_governance import (
+            compare_normalized_cumulative_paths,
+        )
+        from data_sources.cninfo_factor_governance import (
+            build_cninfo_primary_candidate,
+            build_quote_evidence_keys,
+            derive_cninfo_factor_path,
+            derive_tdx_factor_path,
+            reconcile_cninfo_tdx_events,
+        )
+        from utils.a_share_historical_backfill import (
+            coerce_date,
+            normalize_string_list,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        normalized_exchanges = [
+            value.upper() for value in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE", "BSE"]
+        unsupported = sorted(set(normalized_exchanges) - {"SSE", "SZSE", "BSE"})
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        requested_ids = set(normalize_string_list(instrument_ids))
+        normalized_series_version = str(series_version or "").strip()
+        if not normalized_series_version or len(normalized_series_version) > 64:
+            raise ValueError("series_version must contain 1 to 64 characters")
+
+        universe: List[Dict[str, Any]] = []
+        for exchange in normalized_exchanges:
+            instruments = await self.db_ops.get_instruments_list(
+                exchange=exchange,
+                type="stock",
+                is_active=None,
+            )
+            for instrument in instruments:
+                instrument_id = str(instrument.get("instrument_id") or "").strip()
+                if requested_ids and instrument_id not in requested_ids:
+                    continue
+                universe.append({
+                    "instrument_id": instrument_id,
+                    "exchange": exchange,
+                })
+        universe.sort(key=lambda item: (item["exchange"], item["instrument_id"]))
+        target_ids = [item["instrument_id"] for item in universe]
+        missing_ids = sorted(requested_ids - set(target_ids))
+        if missing_ids:
+            raise ValueError(
+                "requested instruments are absent from the selected universe: "
+                f"{missing_ids[:20]}"
+            )
+        if not target_ids:
+            raise ValueError("CNInfo factor rebuild universe is empty")
+
+        cninfo_rows: List[Dict[str, Any]] = []
+        tdx_rows: List[Dict[str, Any]] = []
+        legacy_rows: List[Dict[str, Any]] = []
+        endpoint_status_rows: List[Dict[str, Any]] = []
+        for offset in range(0, len(target_ids), 400):
+            chunk = target_ids[offset: offset + 400]
+            placeholders = ", ".join(
+                f":instrument_{index}" for index in range(len(chunk))
+            )
+            params: Dict[str, Any] = {
+                f"instrument_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            params.update({
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+            })
+            cninfo_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_profile, source_event_key,
+                       action_type, fiscal_period, announcement_date,
+                       record_date, ex_date, pay_date, share_arrival_date,
+                       cash_dividend_per_share, bonus_shares_per_share,
+                       capitalization_shares_per_share,
+                       rights_shares_per_share, rights_price,
+                       event_status, quality_status, is_current
+                FROM corporate_action_observations
+                WHERE instrument_id IN ({placeholders})
+                  AND source = 'cninfo'
+                  AND is_current = 1
+                  AND (
+                        ex_date IS NULL
+                        OR date(ex_date) BETWEEN :start_date AND :end_date
+                  )
+                ORDER BY instrument_id, ex_date, source_profile
+                """,
+                params,
+            ))
+            tdx_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, ex_date, factor, cumulative_factor,
+                       validation_result, pre_close,
+                       fenhong, songzhuangu, peigu, peigujia
+                FROM adjustment_factors_tdx
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                ORDER BY instrument_id, ex_date
+                """,
+                params,
+            ))
+            legacy_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, ex_date, factor, cumulative_factor, source
+                FROM adjustment_factors
+                WHERE instrument_id IN ({placeholders})
+                  AND date(ex_date) BETWEEN :start_date AND :end_date
+                ORDER BY instrument_id, source, ex_date
+                """,
+                params,
+            ))
+            endpoint_status_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_profile, coverage_status,
+                       event_count, missing_ex_date_count,
+                       requested_start_date, requested_end_date, error_message
+                FROM corporate_action_instrument_status
+                WHERE instrument_id IN ({placeholders})
+                  AND source = 'cninfo'
+                  AND date(requested_start_date) <= :start_date
+                  AND date(requested_end_date) >= :end_date
+                ORDER BY instrument_id, source_profile, last_attempt_at DESC
+                """,
+                params,
+            ))
+
+        quote_keys = build_quote_evidence_keys(cninfo_rows, tdx_rows)
+        quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
+            quote_keys
+        )
+        cninfo_path = derive_cninfo_factor_path(cninfo_rows, quote_evidence)
+        tdx_path = derive_tdx_factor_path(tdx_rows, quote_evidence)
+
+        sessions_by_exchange: Dict[str, List[date]] = {}
+        for exchange in normalized_exchanges:
+            calendar_rows = await self.db_ops.get_trading_calendar_records(
+                exchange,
+                normalized_start - timedelta(days=14),
+                normalized_end + timedelta(days=14),
+            )
+            sessions_by_exchange[exchange] = sorted({
+                parsed
+                for row in calendar_rows
+                if row.get("is_trading_day")
+                if (parsed := self._date_from_any(row.get("date"))) is not None
+            })
+        reconciliation = reconcile_cninfo_tdx_events(
+            cninfo_path["events"],
+            tdx_path["events"],
+            sessions_by_exchange=sessions_by_exchange,
+            field_tolerance=max(0.0, float(field_tolerance)),
+            max_session_shift=max(0, int(max_session_shift)),
+            sample_limit=max(0, int(sample_limit)),
+        )
+
+        identity = hashlib.sha256(json.dumps({
+            "start_date": normalized_start.isoformat(),
+            "end_date": normalized_end.isoformat(),
+            "exchanges": normalized_exchanges,
+            "instrument_ids": sorted(requested_ids),
+            "series_version": normalized_series_version,
+            "write_run": (
+                get_shanghai_time().strftime("%Y%m%d%H%M%S%f")
+                if not dry_run else "preview"
+            ),
+        }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+        staging_suffix = f"__staging__{identity}"
+        staging_version = (
+            f"{normalized_series_version[:64 - len(staging_suffix)]}{staging_suffix}"
+        )
+        candidate_rows, candidate_summary = build_cninfo_primary_candidate(
+            cninfo_path["events"],
+            tdx_path["events"],
+            reconciliation,
+            series_version=staging_version,
+        )
+
+        cninfo_comparison_rows = [
+            {
+                "instrument_id": row["instrument_id"],
+                "ex_date": row["effective_date"],
+                "cumulative_factor": row["cumulative_factor"],
+            }
+            for row in cninfo_path["events"]
+        ]
+        tdx_comparison_rows = [
+            {
+                "instrument_id": row["instrument_id"],
+                "ex_date": row["effective_date"],
+                "cumulative_factor": row["cumulative_factor"],
+            }
+            for row in tdx_path["events"]
+        ]
+        source_observations = await self.db_ops.list_adjustment_factor_observations(
+            instrument_ids=target_ids,
+            sources=["akshare"],
+            start_date=normalized_start,
+            end_date=normalized_end,
+        )
+        sina_rows = [
+            {
+                "instrument_id": row["instrument_id"],
+                "ex_date": row["ex_date"],
+                "cumulative_factor": row.get("provider_cumulative_factor"),
+            }
+            for row in source_observations
+            if row.get("source_profile") == "sina_hfq_factor"
+        ]
+        baostock_rows = [
+            row for row in legacy_rows
+            if str(row.get("source") or "").lower() == "baostock"
+        ]
+        comparisons = {
+            "tdx": compare_normalized_cumulative_paths(
+                cninfo_comparison_rows, tdx_comparison_rows, sample_limit=sample_limit
+            ),
+            "sina": compare_normalized_cumulative_paths(
+                cninfo_comparison_rows, sina_rows, sample_limit=sample_limit
+            ),
+            "baostock": compare_normalized_cumulative_paths(
+                cninfo_comparison_rows, baostock_rows, sample_limit=sample_limit
+            ),
+        }
+
+        endpoint_by_instrument: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        seen_endpoint_keys = set()
+        for row in endpoint_status_rows:
+            key = (row.get("instrument_id"), row.get("source_profile"))
+            if key in seen_endpoint_keys:
+                continue
+            seen_endpoint_keys.add(key)
+            endpoint_by_instrument[str(row.get("instrument_id"))].append(row)
+        unresolved_ids = {
+            str(item.get("instrument_id"))
+            for item in [
+                *cninfo_path["pending"],
+                *tdx_path["pending"],
+                *reconciliation.get("conflicts", []),
+                *reconciliation.get("cninfo_only", []),
+                *reconciliation.get("tdx_only", []),
+            ]
+            if item.get("instrument_id")
+        }
+        required_profiles = {"cninfo_dividend", "cninfo_allotment"}
+        endpoint_incomplete_ids = set()
+        missing_profile_samples: List[Dict[str, Any]] = []
+        for instrument_id in target_ids:
+            rows = endpoint_by_instrument.get(instrument_id, [])
+            profiles = {str(row.get("source_profile") or "") for row in rows}
+            missing_profiles = sorted(required_profiles - profiles)
+            if missing_profiles or any(
+                str(row.get("coverage_status"))
+                in {"partial_missing_fields", "indeterminate"}
+                for row in rows
+            ):
+                endpoint_incomplete_ids.add(instrument_id)
+            if missing_profiles and len(missing_profile_samples) < sample_limit:
+                missing_profile_samples.append({
+                    "instrument_id": instrument_id,
+                    "reason": "missing_cninfo_endpoint_status",
+                    "missing_profiles": missing_profiles,
+                })
+        overall_incomplete_ids = sorted(unresolved_ids | endpoint_incomplete_ids)
+        overall_completeness = {
+            "status": "partial" if overall_incomplete_ids else "success",
+            "endpoint_status_rows": len(endpoint_status_rows),
+            "endpoint_incomplete_instruments": len(endpoint_incomplete_ids),
+            "reconciliation_incomplete_instruments": len(unresolved_ids),
+            "overall_incomplete_instruments": len(overall_incomplete_ids),
+            "instrument_ids": overall_incomplete_ids[:100],
+            "missing_endpoint_profile_samples": missing_profile_samples,
+        }
+        full_market_scope = (
+            not requested_ids
+            and set(normalized_exchanges) == {"SSE", "SZSE", "BSE"}
+            and normalized_start <= date(1990, 12, 19)
+        )
+        quality_gates = {
+            "full_market_scope": full_market_scope,
+            "endpoint_completeness": overall_completeness["status"] == "success",
+            "no_pending_factor_events": not (
+                cninfo_path["pending"] or tdx_path["pending"]
+            ),
+            "event_reconciliation": reconciliation.get("status") == "success",
+            "no_unverified_tdx_fallback": (
+                int(candidate_summary.get("tdx_fallback_count", 0) or 0) == 0
+            ),
+        }
+        candidate_summary.update({
+            "quality_gates": quality_gates,
+            "candidate_promotion_eligible": all(quality_gates.values()),
+            "promotion_eligible": all(quality_gates.values()),
+        })
+
+        run_id = f"a_share_cninfo_factor_{identity}"
+        write_result: Dict[str, Any] = {
+            "cninfo_observations": {},
+            "tdx_observations": {},
+            "canonical_saved_rows": 0,
+        }
+        if not dry_run:
+            write_result["cninfo_observations"] = (
+                await self.db_ops.save_adjustment_factor_observations(
+                    cninfo_path["observations"],
+                    ingestion_run_id=run_id,
+                )
+            )
+            write_result["tdx_observations"] = (
+                await self.db_ops.save_adjustment_factor_observations(
+                    tdx_path["observations"],
+                    ingestion_run_id=run_id,
+                )
+            )
+            if build_canonical:
+                write_result["canonical_saved_rows"] = (
+                    await self.db_ops.replace_canonical_adjustment_factors(
+                        candidate_rows,
+                        series_version=staging_version,
+                        instrument_ids=target_ids,
+                    )
+                )
+                event_counts = Counter(
+                    row["instrument_id"] for row in candidate_rows
+                )
+                status_rows = [{
+                    "instrument_id": instrument_id,
+                    "source": "cninfo_primary",
+                    "coverage_status": (
+                        "incomplete"
+                        if instrument_id in overall_incomplete_ids
+                        else "complete_with_events"
+                        if event_counts.get(instrument_id, 0) > 0
+                        else "complete_no_events"
+                    ),
+                    "event_count": event_counts.get(instrument_id, 0),
+                    "start_date": normalized_start,
+                    "end_date": normalized_end,
+                    "ingestion_run_id": run_id,
+                } for instrument_id in target_ids]
+                write_result["instrument_statuses"] = (
+                    await self.db_ops.replace_adjustment_factor_instrument_statuses(
+                        status_rows,
+                        series_version=staging_version,
+                        instrument_ids=target_ids,
+                    )
+                )
+                await self.db_ops.upsert_adjustment_factor_series_status(
+                    staging_version,
+                    {
+                        **candidate_summary,
+                        "status": (
+                            "validated_staging"
+                            if candidate_summary["candidate_promotion_eligible"]
+                            else "partial"
+                        ),
+                        "promotion_eligible": False,
+                        "start_date": normalized_start.isoformat(),
+                        "end_date": normalized_end.isoformat(),
+                        "reconciliation": reconciliation,
+                        "comparisons": comparisons,
+                        "overall_completeness": overall_completeness,
+                    },
+                )
+            self.invalidate_factor_cache()
+
+        has_pending = bool(cninfo_path["pending"] or tdx_path["pending"])
+        has_source_issues = reconciliation.get("status") != "success"
+        result_status = (
+            "dry_run" if dry_run
+            else "partial"
+            if has_pending or has_source_issues or overall_incomplete_ids
+            else "success"
+        )
+        return {
+            "status": result_status,
+            "operation": "a_share_cninfo_adjustment_factor_rebuild",
+            "dry_run": bool(dry_run),
+            "production_isolation": True,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "exchanges": normalized_exchanges,
+                "instrument_ids": sorted(requested_ids),
+                "build_canonical": bool(build_canonical),
+                "series_version": normalized_series_version,
+            },
+            "universe": {"instrument_count": len(target_ids)},
+            "source_events": {
+                "cninfo_rows": len(cninfo_rows),
+                "tdx_rows": len(tdx_rows),
+            },
+            "cninfo_path": {
+                "derived_events": len(cninfo_path["events"]),
+                "pending_count": len(cninfo_path["pending"]),
+                "pending": cninfo_path["pending"][:sample_limit],
+            },
+            "tdx_path": {
+                "derived_events": len(tdx_path["events"]),
+                "pending_count": len(tdx_path["pending"]),
+                "pending": tdx_path["pending"][:sample_limit],
+            },
+            "reconciliation": reconciliation,
+            "comparisons": comparisons,
+            "overall_completeness": overall_completeness,
+            "candidate": {
+                **candidate_summary,
+                "staging_series_version": staging_version,
+                "promotion_eligible": bool(
+                    candidate_summary.get("candidate_promotion_eligible")
+                ),
+                "promoted": False,
+            },
+            "write_result": write_result,
+        }
+
+    async def maintain_a_share_cninfo_primary_factors(
+        self,
+        *,
+        start_date: Optional[Union[str, date, datetime]] = None,
+        end_date: Optional[Union[str, date, datetime]] = None,
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        rolling_days: int = 7,
+        request_interval_seconds: float = 0.5,
+        per_instrument_timeout_sec: int = 60,
+        build_canonical: bool = True,
+        series_version: str = "a_share_cninfo_primary_v1",
+    ) -> Dict[str, Any]:
+        """Refresh recent CNInfo/TDX events and rebuild isolated factor paths.
+
+        Source refresh is bounded to a rolling window. Factor derivation reads
+        stored full history so cumulative paths do not reset at that boundary.
+        The operation never modifies or promotes the production factor table.
+        """
+        from utils.a_share_historical_backfill import coerce_date, normalize_string_list
+
+        normalized_end = coerce_date(end_date or date.today(), field_name="end_date")
+        normalized_start = coerce_date(
+            start_date or normalized_end - timedelta(days=max(1, int(rolling_days))),
+            field_name="start_date",
+        )
+        normalized_exchanges = [
+            item.upper() for item in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE", "BSE"]
+        requested_ids = set(normalize_string_list(instrument_ids))
+        active_ids: List[str] = []
+        for exchange in normalized_exchanges:
+            rows = await self.db_ops.get_active_instruments(
+                exchange, instrument_types=["stock"], tradable_only=False
+            )
+            active_ids.extend(
+                str(row.get("instrument_id") or "").strip()
+                for row in rows
+                if row.get("instrument_id")
+                and (not requested_ids or row.get("instrument_id") in requested_ids)
+            )
+        active_ids = sorted(set(active_ids))
+        if requested_ids:
+            missing_ids = sorted(requested_ids - set(active_ids))
+            if missing_ids:
+                return {
+                    "status": "partial",
+                    "operation": "a_share_cninfo_primary_daily_maintenance",
+                    "production_isolation": True,
+                    "error": "requested instruments are not active",
+                    "missing_instruments": missing_ids[:50],
+                }
+        if not active_ids:
+            return {
+                "status": "partial",
+                "operation": "a_share_cninfo_primary_daily_maintenance",
+                "production_isolation": True,
+                "error": "active A-share stock universe is empty",
+            }
+
+        cninfo_result = await self.backfill_a_share_cninfo_corporate_actions(
+            start_date=normalized_start,
+            end_date=normalized_end,
+            exchanges=normalized_exchanges,
+            instrument_ids=active_ids,
+            dry_run=False,
+            resume=False,
+            chunk_size=50,
+            request_interval_seconds=request_interval_seconds,
+            per_instrument_timeout_sec=per_instrument_timeout_sec,
+            active_only=True,
+        )
+        tdx_result = await self.backfill_tdx_xdxr_history(
+            exchanges=normalized_exchanges,
+            start_date=normalized_start,
+            end_date=normalized_end,
+            instrument_ids=active_ids,
+            derive_factors=True,
+            repair_universe_mode="current_repair",
+            per_instrument_timeout_sec=per_instrument_timeout_sec,
+            dry_run=False,
+        )
+        rebuild_result = await self.rebuild_cninfo_primary_adjustment_factors(
+            start_date=date(1990, 12, 19),
+            end_date=normalized_end,
+            exchanges=normalized_exchanges,
+            instrument_ids=active_ids,
+            dry_run=False,
+            build_canonical=build_canonical,
+            series_version=series_version,
+        )
+        statuses = {
+            str(cninfo_result.get("status")),
+            str(tdx_result.get("status")),
+            str(rebuild_result.get("status")),
+        }
+        return {
+            "status": "partial" if statuses & {"partial", "failed"} else "success",
+            "operation": "a_share_cninfo_primary_daily_maintenance",
+            "production_isolation": True,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "exchanges": normalized_exchanges,
+                "instrument_ids": active_ids,
+                "rolling_days": int(rolling_days),
+            },
+            "cninfo_refresh": cninfo_result,
+            "tdx_refresh": tdx_result,
+            "factor_rebuild": rebuild_result,
+        }
 
     async def _fetch_eastmoney_corporate_action_rows(
         self,

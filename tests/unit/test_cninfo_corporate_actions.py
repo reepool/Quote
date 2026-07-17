@@ -34,6 +34,48 @@ def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
     assert loader.__globals__["requests"] is fake_requests
 
 
+def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
+    class FakeResponse:
+        @staticmethod
+        def json():
+            return {
+                "resultcode": 200,
+                "resultmsg": "success",
+                "records": [],
+            }
+
+    class FakeRequests:
+        @staticmethod
+        def post(*_args, **_kwargs):
+            return FakeResponse()
+
+    def failing_empty_loader(**_kwargs):
+        requests.post("https://example.invalid")
+        raise KeyError("实施方案公告日期")
+
+    monkeypatch.setitem(
+        failing_empty_loader.__globals__, "requests", FakeRequests()
+    )
+    bounded_loader = _bind_requests_timeout(failing_empty_loader, 5)
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=bounded_loader,
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+    )
+
+    result = provider.fetch_dividends(
+        "000003.SZ",
+        "000003",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "complete_no_events"
+    assert result.rows_received == 0
+    assert result.error is None
+
+
 def test_parse_cninfo_distribution_description_uses_per_share_units():
     parsed = parse_cninfo_distribution_description("每10股送3.5转增5股派发现金红利3元")
 
@@ -72,6 +114,25 @@ def test_normalize_dividend_uses_description_when_bse_fields_are_missing():
     assert rows[0]["capitalization_shares_per_share"] == pytest.approx(0.4)
     assert rows[0]["ex_date"] is None
     assert rows[0]["quality_status"] == "partial_missing_ex_date"
+
+
+def test_normalized_economic_values_have_stable_precision():
+    rows = normalize_cninfo_dividend_rows(
+        "000001.SZ",
+        [{
+            "实施方案公告日期": date(2020, 5, 22),
+            "派息比例": 2.18,
+            "送股比例": None,
+            "转增比例": None,
+            "除权日": date(2020, 5, 28),
+            "实施方案分红说明": "10派2.18元",
+            "报告时间": "2019年报",
+        }],
+        start_date=date(2020, 1, 1),
+        end_date=date(2020, 12, 31),
+    )
+
+    assert rows[0]["cash_dividend_per_share"] == 0.218
 
 
 def test_dividend_event_key_distinguishes_same_period_implementations():

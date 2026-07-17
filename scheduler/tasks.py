@@ -483,6 +483,46 @@ def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
+    """Build a bounded report for the CNInfo-primary isolated workflow."""
+    status = result.get("status", "unknown")
+    label = {"success": "完成", "partial": "部分完成", "dry_run": "预演完成"}.get(
+        status, status
+    )
+    parameters = result.get("parameters") or {}
+    reconciliation = result.get("reconciliation") or {}
+    totals = reconciliation.get("totals") or {}
+    candidate = result.get("candidate") or {}
+    lines = [
+        "ℹ️ *A 股 CNInfo 主线公司行动与复权因子治理*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{status}`",
+        f"生产表影响: `无`",
+        f"范围: `{parameters.get('start_date', 'N/A')}` 至 `{parameters.get('end_date', 'N/A')}`",
+        f"市场: `{','.join(parameters.get('exchanges') or [])}`",
+        f"CNInfo事件: `{(result.get('source_events') or {}).get('cninfo_rows', 0)}`",
+        f"TDX事件: `{(result.get('source_events') or {}).get('tdx_rows', 0)}`",
+        f"CNInfo因子: `{(result.get('cninfo_path') or {}).get('derived_events', 0)}`",
+        f"TDX因子: `{(result.get('tdx_path') or {}).get('derived_events', 0)}`",
+        "事件对账: `"
+        + ", ".join(
+            f"{key}={totals.get(key, 0)}"
+            for key in (
+                "exact_matches", "shifted_matches", "conflicts",
+                "cninfo_only", "tdx_only",
+            )
+        )
+        + "`",
+        f"候选版本: `{candidate.get('staging_series_version', 'N/A')}`",
+        f"候选行数: `{candidate.get('row_count', 0)}`",
+        f"可晋级生产: `{candidate.get('promotion_eligible', False)}`",
+    ]
+    if result.get("operation") == "a_share_cninfo_primary_daily_maintenance":
+        lines.insert(1, "模式: `滚动源刷新 + 全历史本地因子重建`")
+    return "\n".join(lines)
+
+
 def _format_instrument_master_governance_summary(governance: Optional[Dict[str, Any]]) -> str:
     """Return a compact operator summary for shared instrument master governance."""
     if not isinstance(governance, dict) or not governance:
@@ -4114,6 +4154,7 @@ class ScheduledTasks:
         request_interval_seconds: float = 1.0,
         per_instrument_timeout_sec: int = 60,
         checkpoint_id: Optional[str] = None,
+        active_only: bool = False,
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:
         """Run the manual official CNInfo corporate-action backfill."""
@@ -4132,6 +4173,7 @@ class ScheduledTasks:
                 request_interval_seconds=float(request_interval_seconds),
                 per_instrument_timeout_sec=int(per_instrument_timeout_sec),
                 checkpoint_id=checkpoint_id,
+                active_only=bool(active_only),
             )
             if self.telegram_enabled:
                 await self._send_task_report(
@@ -4176,6 +4218,119 @@ class ScheduledTasks:
                     job_config=job_config,
                 )
             return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_adjustment_factor_rebuild(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+        build_canonical: bool = True,
+        series_version: str = "a_share_cninfo_primary_v1",
+        field_tolerance: float = 0.0001,
+        max_session_shift: int = 3,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Run the manual CNInfo-primary factor rebuild and reconciliation."""
+        task_id = "a_share_cninfo_adjustment_factor_rebuild"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.rebuild_cninfo_primary_adjustment_factors(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                dry_run=bool(dry_run),
+                build_canonical=bool(build_canonical),
+                series_version=series_version,
+                field_tolerance=float(field_tolerance),
+                max_session_shift=int(max_session_shift),
+                sample_limit=int(sample_limit),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股 CNInfo 主线复权因子重建",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_primary_factor_report(result),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] CNInfo-primary factor rebuild failed: %s", exc
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_corporate_action_daily_sync(
+        self,
+        start_date: Optional[Union[str, date, datetime]] = None,
+        end_date: Optional[Union[str, date, datetime]] = None,
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        rolling_days: int = 7,
+        request_interval_seconds: float = 0.5,
+        per_instrument_timeout_sec: int = 60,
+        build_canonical: bool = True,
+        series_version: str = "a_share_cninfo_primary_v1",
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Refresh active CNInfo/TDX events and rebuild isolated paths."""
+        task_id = "a_share_cninfo_corporate_action_daily_sync"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.maintain_a_share_cninfo_primary_factors(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                rolling_days=int(rolling_days),
+                request_interval_seconds=float(request_interval_seconds),
+                per_instrument_timeout_sec=int(per_instrument_timeout_sec),
+                build_canonical=bool(build_canonical),
+                series_version=series_version,
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股 CNInfo/TDX 公司行动日更",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_primary_factor_report(result),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] CNInfo corporate-action daily sync failed: %s", exc
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
         finally:
             self._active_tasks.discard(task_id)
 

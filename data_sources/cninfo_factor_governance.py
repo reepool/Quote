@@ -1,0 +1,659 @@
+"""Official-first A-share corporate-action factor derivation and reconciliation."""
+
+from __future__ import annotations
+
+import math
+from bisect import bisect_right
+from collections import defaultdict
+from datetime import date, datetime
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+
+
+CNINFO_FACTOR_PROFILE = "cninfo_event_derived_v1"
+TDX_FACTOR_PROFILE = "tdx_event_derived_v1"
+FACTOR_NORMALIZATION_VERSION = "official_event_formula_v1"
+
+
+def _date(value: Any) -> Optional[date]:
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    if value in (None, ""):
+        return None
+    try:
+        return datetime.fromisoformat(str(value)[:10]).date()
+    except ValueError:
+        return None
+
+
+def _number(value: Any) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return number if math.isfinite(number) else 0.0
+
+
+def _positive(value: Any) -> Optional[float]:
+    number = _number(value)
+    return number if number > 0 else None
+
+
+def _exchange(instrument_id: str) -> Optional[str]:
+    normalized = str(instrument_id or "").upper()
+    if normalized.endswith(".SH"):
+        return "SSE"
+    if normalized.endswith(".SZ"):
+        return "SZSE"
+    if normalized.endswith((".BJ", ".BSE")):
+        return "BSE"
+    return None
+
+
+def build_quote_evidence_keys(
+    cninfo_rows: Iterable[Mapping[str, Any]],
+    tdx_rows: Iterable[Mapping[str, Any]],
+) -> List[Tuple[str, date]]:
+    """Return unique instrument/source-date pairs requiring quote evidence."""
+    keys = set()
+    for row in cninfo_rows:
+        if not bool(row.get("is_current", True)):
+            continue
+        if str(row.get("event_status") or "") == "failed":
+            continue
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        ex_date = _date(row.get("ex_date"))
+        if instrument_id and ex_date:
+            keys.add((instrument_id, ex_date))
+    for row in tdx_rows:
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        ex_date = _date(row.get("ex_date"))
+        if instrument_id and ex_date:
+            keys.add((instrument_id, ex_date))
+    return sorted(keys)
+
+
+def _quote_map(
+    quote_evidence: Iterable[Mapping[str, Any]],
+) -> Dict[Tuple[str, date], Dict[str, Any]]:
+    result = {}
+    for row in quote_evidence:
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        source_date = _date(row.get("source_date"))
+        effective_date = _date(row.get("effective_date"))
+        if instrument_id and source_date and effective_date:
+            result[(instrument_id, source_date)] = {
+                "effective_date": effective_date,
+                "pre_close": _positive(row.get("pre_close")),
+                "close": _positive(row.get("close")),
+            }
+    return result
+
+
+def _event_factor(
+    *,
+    pre_close: float,
+    cash_per_share: float,
+    bonus_per_share: float,
+    rights_per_share: float,
+    rights_proceeds_per_share: float,
+) -> Optional[float]:
+    denominator = pre_close - cash_per_share + rights_proceeds_per_share
+    if pre_close <= 0 or denominator <= 0:
+        return None
+    factor = (
+        pre_close
+        * (1.0 + bonus_per_share + rights_per_share)
+        / denominator
+    )
+    return round(factor, 12) if math.isfinite(factor) and factor > 0 else None
+
+
+def derive_cninfo_factor_path(
+    observations: Iterable[Mapping[str, Any]],
+    quote_evidence: Iterable[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Aggregate current CNInfo events and derive one factor per effective session."""
+    quote_lookup = _quote_map(quote_evidence)
+    pending: List[Dict[str, Any]] = []
+    grouped: Dict[Tuple[str, date], Dict[str, Any]] = {}
+    pending_source_dates: Dict[str, List[date]] = defaultdict(list)
+    unlocated_pending_instruments = set()
+    for row in observations:
+        if not bool(row.get("is_current", True)):
+            continue
+        if str(row.get("event_status") or "") == "failed":
+            continue
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        source_date = _date(row.get("ex_date"))
+        event_key = str(row.get("source_event_key") or "")
+        if not instrument_id:
+            continue
+        if source_date is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "reason": "missing_ex_date",
+            })
+            unlocated_pending_instruments.add(instrument_id)
+            continue
+        quality_status = str(row.get("quality_status") or "")
+        if quality_status.startswith("partial_"):
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "source_ex_date": source_date.isoformat(),
+                "reason": quality_status,
+            })
+            pending_source_dates[instrument_id].append(source_date)
+            continue
+        quote = quote_lookup.get((instrument_id, source_date))
+        if not quote or quote.get("effective_date") is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "source_ex_date": source_date.isoformat(),
+                "reason": "missing_effective_trade_date",
+            })
+            pending_source_dates[instrument_id].append(source_date)
+            continue
+        effective_date = quote["effective_date"]
+        key = (instrument_id, effective_date)
+        aggregate = grouped.setdefault(key, {
+            "instrument_id": instrument_id,
+            "source_ex_dates": set(),
+            "effective_date": effective_date,
+            "cash_per_share": 0.0,
+            "bonus_per_share": 0.0,
+            "rights_per_share": 0.0,
+            "rights_proceeds_per_share": 0.0,
+            "event_keys": [],
+            "pre_close": quote.get("pre_close"),
+        })
+        rights_per_share = _number(row.get("rights_shares_per_share"))
+        rights_price = _number(row.get("rights_price"))
+        aggregate["source_ex_dates"].add(source_date)
+        aggregate["cash_per_share"] += _number(
+            row.get("cash_dividend_per_share")
+        )
+        aggregate["bonus_per_share"] += (
+            _number(row.get("bonus_shares_per_share"))
+            + _number(row.get("capitalization_shares_per_share"))
+        )
+        aggregate["rights_per_share"] += rights_per_share
+        aggregate["rights_proceeds_per_share"] += rights_per_share * rights_price
+        aggregate["event_keys"].append(event_key)
+
+    events: List[Dict[str, Any]] = []
+    observations_out: List[Dict[str, Any]] = []
+    cumulative_by_instrument: Dict[str, float] = defaultdict(lambda: 1.0)
+    blocked_instruments = set()
+    for (instrument_id, effective_date), aggregate in sorted(grouped.items()):
+        if instrument_id in unlocated_pending_instruments:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "source_event_keys": aggregate["event_keys"],
+                "reason": "prior_unlocated_event_pending",
+            })
+            continue
+        if any(
+            effective_date >= source_date
+            for source_date in pending_source_dates.get(instrument_id, [])
+        ):
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "source_event_keys": aggregate["event_keys"],
+                "reason": "prior_event_pending",
+            })
+            continue
+        if instrument_id in blocked_instruments:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "source_event_keys": aggregate["event_keys"],
+                "reason": "prior_event_pending",
+            })
+            continue
+        pre_close = _positive(aggregate.get("pre_close"))
+        if pre_close is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "source_event_keys": aggregate["event_keys"],
+                "reason": "missing_pre_close",
+            })
+            blocked_instruments.add(instrument_id)
+            continue
+        factor = _event_factor(
+            pre_close=pre_close,
+            cash_per_share=aggregate["cash_per_share"],
+            bonus_per_share=aggregate["bonus_per_share"],
+            rights_per_share=aggregate["rights_per_share"],
+            rights_proceeds_per_share=aggregate["rights_proceeds_per_share"],
+        )
+        if factor is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "source_event_keys": aggregate["event_keys"],
+                "reason": "invalid_factor_denominator",
+            })
+            blocked_instruments.add(instrument_id)
+            continue
+        cumulative_by_instrument[instrument_id] = round(
+            cumulative_by_instrument[instrument_id] * factor,
+            12,
+        )
+        source_dates = sorted(aggregate["source_ex_dates"])
+        event = {
+            "instrument_id": instrument_id,
+            "source_ex_date": source_dates[0],
+            "source_ex_dates": source_dates,
+            "effective_date": effective_date,
+            "cash_per_share": round(aggregate["cash_per_share"], 10),
+            "bonus_per_share": round(aggregate["bonus_per_share"], 10),
+            "rights_per_share": round(aggregate["rights_per_share"], 10),
+            "rights_proceeds_per_share": round(
+                aggregate["rights_proceeds_per_share"], 10
+            ),
+            "pre_close": pre_close,
+            "factor": factor,
+            "cumulative_factor": cumulative_by_instrument[instrument_id],
+            "source_event_keys": aggregate["event_keys"],
+            "date_shifted": any(value != effective_date for value in source_dates),
+        }
+        events.append(event)
+        observations_out.append({
+            "instrument_id": instrument_id,
+            "ex_date": datetime.combine(effective_date, datetime.min.time()),
+            "source": "cninfo",
+            "source_profile": CNINFO_FACTOR_PROFILE,
+            "provider_factor": factor,
+            "provider_cumulative_factor": cumulative_by_instrument[instrument_id],
+            "normalized_factor": factor,
+            "normalization_version": FACTOR_NORMALIZATION_VERSION,
+            "quality_status": "valid",
+            "raw_payload": event,
+        })
+    return {
+        "observations": observations_out,
+        "events": events,
+        "pending": pending,
+    }
+
+
+def derive_tdx_factor_path(
+    rows: Iterable[Mapping[str, Any]],
+    quote_evidence: Iterable[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Rebuild a TDX event-product path while aligning source dates to sessions."""
+    quote_lookup = _quote_map(quote_evidence)
+    grouped: Dict[Tuple[str, date], Dict[str, Any]] = {}
+    pending: List[Dict[str, Any]] = []
+    pending_source_dates: Dict[str, List[date]] = defaultdict(list)
+    unlocated_pending_instruments = set()
+    for row in rows:
+        instrument_id = str(row.get("instrument_id") or "").strip()
+        source_date = _date(row.get("ex_date"))
+        factor = _positive(row.get("factor"))
+        validation_result = str(row.get("validation_result") or "")
+        if not instrument_id:
+            continue
+        if source_date is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "reason": "missing_ex_date",
+            })
+            unlocated_pending_instruments.add(instrument_id)
+            continue
+        if factor is None or validation_result.startswith("pending_"):
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_ex_date": source_date.isoformat(),
+                "reason": validation_result or "missing_factor",
+            })
+            pending_source_dates[instrument_id].append(source_date)
+            continue
+        quote = quote_lookup.get((instrument_id, source_date))
+        effective_date = quote.get("effective_date") if quote else None
+        if effective_date is None:
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_ex_date": source_date.isoformat(),
+                "reason": "missing_effective_trade_date",
+            })
+            pending_source_dates[instrument_id].append(source_date)
+            continue
+        key = (instrument_id, effective_date)
+        aggregate = grouped.setdefault(key, {
+            "instrument_id": instrument_id,
+            "source_ex_dates": [],
+            "effective_date": effective_date,
+            "factor": 1.0,
+            "cash_per_share": 0.0,
+            "bonus_per_share": 0.0,
+            "rights_per_share": 0.0,
+            "rights_price": 0.0,
+        })
+        aggregate["source_ex_dates"].append(source_date)
+        aggregate["factor"] *= factor
+        aggregate["cash_per_share"] += _number(row.get("fenhong")) / 10.0
+        aggregate["bonus_per_share"] += _number(row.get("songzhuangu")) / 10.0
+        aggregate["rights_per_share"] += _number(row.get("peigu")) / 10.0
+        if _number(row.get("peigu")) > 0:
+            aggregate["rights_price"] = _number(row.get("peigujia"))
+
+    events: List[Dict[str, Any]] = []
+    observations_out: List[Dict[str, Any]] = []
+    cumulative_by_instrument: Dict[str, float] = defaultdict(lambda: 1.0)
+    blocked_instruments = set()
+    for (instrument_id, effective_date), aggregate in sorted(grouped.items()):
+        if instrument_id in unlocated_pending_instruments:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "reason": "prior_unlocated_event_pending",
+            })
+            continue
+        if any(
+            effective_date >= source_date
+            for source_date in pending_source_dates.get(instrument_id, [])
+        ):
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "reason": "prior_event_pending",
+            })
+            continue
+        if instrument_id in blocked_instruments:
+            pending.append({
+                "instrument_id": instrument_id,
+                "effective_date": effective_date.isoformat(),
+                "reason": "prior_event_pending",
+            })
+            continue
+        factor = round(aggregate["factor"], 12)
+        cumulative_by_instrument[instrument_id] = round(
+            cumulative_by_instrument[instrument_id] * factor,
+            12,
+        )
+        event = {
+            **aggregate,
+            "source_ex_date": min(aggregate["source_ex_dates"]),
+            "factor": factor,
+            "cumulative_factor": cumulative_by_instrument[instrument_id],
+            "date_shifted": any(
+                value != effective_date for value in aggregate["source_ex_dates"]
+            ),
+        }
+        events.append(event)
+        observations_out.append({
+            "instrument_id": instrument_id,
+            "ex_date": datetime.combine(effective_date, datetime.min.time()),
+            "source": "tdx_xdxr",
+            "source_profile": TDX_FACTOR_PROFILE,
+            "provider_factor": factor,
+            "provider_cumulative_factor": cumulative_by_instrument[instrument_id],
+            "normalized_factor": factor,
+            "normalization_version": FACTOR_NORMALIZATION_VERSION,
+            "quality_status": "valid",
+            "raw_payload": event,
+        })
+    return {
+        "observations": observations_out,
+        "events": events,
+        "pending": pending,
+    }
+
+
+def _session_distance(left: date, right: date, sessions: Sequence[date]) -> Optional[int]:
+    if left == right:
+        return 0
+    if not sessions:
+        return None
+    if right > left:
+        return bisect_right(sessions, right) - bisect_right(sessions, left)
+    return -(bisect_right(sessions, left) - bisect_right(sessions, right))
+
+
+def _economic_differences(
+    cninfo_event: Mapping[str, Any],
+    tdx_event: Mapping[str, Any],
+) -> Dict[str, float]:
+    return {
+        "cash_per_share": abs(
+            _number(cninfo_event.get("cash_per_share"))
+            - _number(tdx_event.get("cash_per_share"))
+        ),
+        "bonus_per_share": abs(
+            _number(cninfo_event.get("bonus_per_share"))
+            - _number(tdx_event.get("bonus_per_share"))
+        ),
+        "rights_per_share": abs(
+            _number(cninfo_event.get("rights_per_share"))
+            - _number(tdx_event.get("rights_per_share"))
+        ),
+        "rights_price": abs(
+            _number(cninfo_event.get("rights_proceeds_per_share"))
+            - (
+                _number(tdx_event.get("rights_per_share"))
+                * _number(tdx_event.get("rights_price"))
+            )
+        ),
+    }
+
+
+def reconcile_cninfo_tdx_events(
+    cninfo_events: Sequence[Mapping[str, Any]],
+    tdx_events: Sequence[Mapping[str, Any]],
+    *,
+    sessions_by_exchange: Optional[Mapping[str, Sequence[date]]] = None,
+    field_tolerance: float = 0.0001,
+    max_session_shift: int = 3,
+    sample_limit: int = 20,
+) -> Dict[str, Any]:
+    """Reconcile source dates and all supported economic fields."""
+    sessions_by_exchange = sessions_by_exchange or {}
+    cninfo = [dict(item) for item in cninfo_events]
+    tdx = [dict(item) for item in tdx_events]
+    used_cninfo: set[int] = set()
+    used_tdx: set[int] = set()
+    exact: List[Dict[str, Any]] = []
+    shifted: List[Dict[str, Any]] = []
+    conflicts: List[Dict[str, Any]] = []
+
+    def detail(c_idx: int, t_idx: int, distance: int) -> Dict[str, Any]:
+        left = cninfo[c_idx]
+        right = tdx[t_idx]
+        differences = _economic_differences(left, right)
+        return {
+            "instrument_id": left["instrument_id"],
+            "cninfo_source_date": _date(left.get("source_ex_date")),
+            "tdx_source_date": _date(right.get("source_ex_date")),
+            "cninfo_effective_date": _date(left.get("effective_date")),
+            "tdx_effective_date": _date(right.get("effective_date")),
+            "trading_session_distance": distance,
+            "differences": differences,
+            "cninfo_factor": left.get("factor"),
+            "tdx_factor": right.get("factor"),
+            "cninfo_index": c_idx,
+            "tdx_index": t_idx,
+        }
+
+    for c_idx, left in enumerate(cninfo):
+        for t_idx, right in enumerate(tdx):
+            if t_idx in used_tdx or left["instrument_id"] != right["instrument_id"]:
+                continue
+            if _date(left.get("source_ex_date")) != _date(right.get("source_ex_date")):
+                continue
+            item = detail(c_idx, t_idx, 0)
+            used_cninfo.add(c_idx)
+            used_tdx.add(t_idx)
+            if max(item["differences"].values(), default=0.0) <= field_tolerance:
+                item["reason"] = "exact_event_match"
+                exact.append(item)
+            else:
+                item["reason"] = "same_date_economic_conflict"
+                conflicts.append(item)
+            break
+
+    candidates = []
+    for c_idx, left in enumerate(cninfo):
+        if c_idx in used_cninfo:
+            continue
+        exchange = _exchange(str(left.get("instrument_id") or "")) or ""
+        sessions = sessions_by_exchange.get(exchange, [])
+        for t_idx, right in enumerate(tdx):
+            if t_idx in used_tdx or left["instrument_id"] != right["instrument_id"]:
+                continue
+            left_date = _date(left.get("source_ex_date"))
+            right_date = _date(right.get("source_ex_date"))
+            if left_date is None or right_date is None:
+                continue
+            distance = _session_distance(left_date, right_date, sessions)
+            if distance is None or abs(distance) > max_session_shift:
+                continue
+            item = detail(c_idx, t_idx, distance)
+            candidates.append((
+                max(item["differences"].values(), default=0.0),
+                abs(distance),
+                c_idx,
+                t_idx,
+                item,
+            ))
+    for difference, _, c_idx, t_idx, item in sorted(candidates):
+        if c_idx in used_cninfo or t_idx in used_tdx:
+            continue
+        used_cninfo.add(c_idx)
+        used_tdx.add(t_idx)
+        if difference <= field_tolerance:
+            item["reason"] = "shifted_event_match"
+            shifted.append(item)
+        else:
+            item["reason"] = "shifted_economic_conflict"
+            conflicts.append(item)
+
+    cninfo_only = [
+        {**item, "cninfo_index": index, "reason": "cninfo_event_only"}
+        for index, item in enumerate(cninfo)
+        if index not in used_cninfo
+    ]
+    tdx_only = [
+        {**item, "tdx_index": index, "reason": "tdx_event_only"}
+        for index, item in enumerate(tdx)
+        if index not in used_tdx
+    ]
+    totals = {
+        "cninfo_events": len(cninfo),
+        "tdx_events": len(tdx),
+        "exact_matches": len(exact),
+        "shifted_matches": len(shifted),
+        "conflicts": len(conflicts),
+        "cninfo_only": len(cninfo_only),
+        "tdx_only": len(tdx_only),
+    }
+    return {
+        "status": (
+            "partial" if conflicts or cninfo_only or tdx_only else "success"
+        ),
+        "totals": totals,
+        "exact_matches": exact,
+        "shifted_matches": shifted,
+        "conflicts": conflicts,
+        "cninfo_only": cninfo_only,
+        "tdx_only": tdx_only,
+        "samples": [*conflicts, *cninfo_only, *tdx_only, *shifted][:sample_limit],
+    }
+
+
+def build_cninfo_primary_candidate(
+    cninfo_events: Sequence[Mapping[str, Any]],
+    tdx_events: Sequence[Mapping[str, Any]],
+    reconciliation: Mapping[str, Any],
+    *,
+    series_version: str,
+    promotion_eligible: bool = False,
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Build a staging candidate with CNInfo first and labelled TDX-only fallback."""
+    conflict_indexes = {
+        int(item["cninfo_index"])
+        for item in reconciliation.get("conflicts", [])
+        if item.get("cninfo_index") is not None
+    }
+    rows: List[Dict[str, Any]] = []
+    cninfo_dates = set()
+    for index, event in enumerate(cninfo_events):
+        factor = _positive(event.get("factor"))
+        effective_date = _date(event.get("effective_date"))
+        if factor is None or effective_date is None:
+            continue
+        row = {
+            "instrument_id": event["instrument_id"],
+            "ex_date": effective_date,
+            "factor": factor,
+            "selected_source": "cninfo",
+            "source_profile": CNINFO_FACTOR_PROFILE,
+            "quality_status": (
+                "source_conflict" if index in conflict_indexes else "valid"
+            ),
+            "evidence_count": 1,
+        }
+        rows.append(row)
+        cninfo_dates.add((row["instrument_id"], row["ex_date"]))
+    fallback_dates = set(cninfo_dates)
+    for item in reconciliation.get("tdx_only", []):
+        index = item.get("tdx_index")
+        if index is None or int(index) >= len(tdx_events):
+            continue
+        event = tdx_events[int(index)]
+        factor = _positive(event.get("factor"))
+        effective_date = _date(event.get("effective_date"))
+        if factor is None or effective_date is None:
+            continue
+        key = (event["instrument_id"], effective_date)
+        # CNInfo is primary for an effective session. A TDX-only event that
+        # lands on an already occupied session must remain reconciliation data,
+        # otherwise the staging table violates its one-row-per-session key.
+        if key in fallback_dates:
+            continue
+        rows.append({
+            "instrument_id": event["instrument_id"],
+            "ex_date": effective_date,
+            "factor": factor,
+            "selected_source": "tdx_xdxr",
+            "source_profile": TDX_FACTOR_PROFILE,
+            "quality_status": "tdx_fallback_unverified",
+            "evidence_count": 1,
+        })
+        fallback_dates.add(key)
+
+    canonical: List[Dict[str, Any]] = []
+    cumulative_by_instrument: Dict[str, float] = defaultdict(lambda: 1.0)
+    for row in sorted(rows, key=lambda item: (item["instrument_id"], item["ex_date"])):
+        instrument_id = row["instrument_id"]
+        cumulative_by_instrument[instrument_id] = round(
+            cumulative_by_instrument[instrument_id] * row["factor"],
+            12,
+        )
+        canonical.append({
+            **row,
+            "ex_date": datetime.combine(row["ex_date"], datetime.min.time()),
+            "series_version": series_version,
+            "cumulative_factor": cumulative_by_instrument[instrument_id],
+        })
+    conflict_count = sum(
+        row["quality_status"] != "valid" for row in canonical
+    )
+    return canonical, {
+        "series_version": series_version,
+        "row_count": len(canonical),
+        "instrument_count": len({row["instrument_id"] for row in canonical}),
+        "conflict_count": conflict_count,
+        "tdx_fallback_count": sum(
+            row["selected_source"] == "tdx_xdxr" for row in canonical
+        ),
+        "promotion_eligible": bool(promotion_eligible),
+    }
