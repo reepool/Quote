@@ -1312,6 +1312,7 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已将估值库的时点股本接入 `shares_outstanding`，并将现金流量表“购建固定资产、无形资产和其他长期资产所支付的现金”映射为 capex 代理。年度使用报告值，季度/半年使用累计现金流 TTM 桥接；桥接期不完整时显式返回缺口。现金取资产负债表货币资金；有息债务由短期借款、一年内到期非流动负债、长期借款及应付债券等明细保守汇总，租赁负债单列，明确禁止把当前数据源语义上的负债合计字段 `balance_sheet.total_debt` 当作有息债务。
 - DCF 已接收 benchmark-aware Beta 的质量元数据。非正 Beta 或明确为 low/unavailable 的观测不会直接进入 CAPM，而是保留原始观测并回退配置 Beta，同时输出 `beta_fallback_used` 和拒绝原因，避免异常 Beta 造成股权成本低于永续增长率。
 - 公司业务画像治理基础层已实现：`research.db` 已具备证据、业务分部、经营量事实、价值链角色和公司商品暴露规范化表，DCF 已接入时点化 `business_profile_context`，并执行事实审批、证据审批、证据完整性、可得日、有效期和行情序列有效性门槛。公司级 approved 暴露可覆盖同商品/角色的行业默认，候选和未来信息仅进入 diagnostics；相关只读 API 已开放。当前尚未执行全市场官方年报回补，生产库 approved 公司画像覆盖仍为空或有限，不得把治理能力误述为数据覆盖完成。字段和下一阶段采集方案见 `company_business_profile_and_commodity_exposure_requirements.md`。
+- 公司画像抽取已建立 `business_profile_facts.2026.1` 事实目录，逐字段治理语义、类型、数值单位或枚举允许值、材料性、候选/勾稽/审核策略和 DCF 资格；目录发布日期与可处理报告日期分离，可回补 `2021-01-01` 起的历史报告。目录中的 DCF 字段均为 `approved_only + human_required`；单位成本、储量、合同、套保、价值链角色和商品暴露参数进一步标记为敏感人工审核，只能由明确披露生成待审候选，不能从行业假设自动推导，也不能因 parser 高置信度直接进入估值。披露模板选择返回精确市场规则作用域，无专项规则的组合标为 `observed_parser_pattern`；合计、抵销和未分配行保留用于财务勾稽。
 - 保险、地产、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：

@@ -499,6 +499,8 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 定期报告分类不再依赖“年度报告”关键词本身：标题必须包含可解析且与报告期推断一致的报告年度，且报告词后的后缀只能为空、`全文` 或明确的更正后/修订版/更新后/补充后全文标识。年度报告信息披露制度和业绩说明会等 related 文档不入选；更正公告单列为 `annual|semiannual_report_correction_notice`，可作为治理线索但不是修订后全文。
 - 已增加 CNInfo 主源到交易所官方备源的条件式协调器。CNInfo 完整返回时不请求备源；失败、降级、身份缺失或明确报告查询为空时，仅调用 instrument 所属交易所。SSE/SZSE 公开定期报告接口已完成单公司 live 验证，候选和归档 manifest 保留真实 `sse|szse / official_backup` lineage。BSE adapter 已实现但因生产网络对公开端点发生重定向循环而配置禁用，故北交所继续使用 CNInfo 主源且不会把端点失败误报为无披露。
 - 已增加交易所备源 live 验证 CLI，强制 instrument、日期和页数边界，默认只读 metadata。原有及新增单元测试覆盖标题分类、全文/摘要、条件式 fallback、重复内容、更正跨来源 supersession 和 checkpoint 中断续跑；SSE/SZSE 用同一生产配置完成单公司单页 live 验证，BSE disabled 状态按 blocked 处理。
+- 已建立版本化 `business_fact_catalog` 第一版：29 个字段覆盖业务分部、产销量/库存/售价/成本/产能/储量、合同与套保、价值链角色和商品暴露。目录逐字段声明语义、类型、规范单位或枚举允许值、材料性、候选策略、勾稽策略、审核要求和 DCF 资格；目录发布日期与源文档适用日期分离，当前版本可解析 `2021-01-01` 起的历史报告。所有 `approved_only` 字段强制人工审核；单位成本、储量、合同、套保和商品敏感性参数仅可从明确披露生成候选，不能由行业或收入占比直接推导，更不能自动批准。当前目录是解析与审核契约，不代表字段已有生产覆盖。
+- 已建立版本化 `disclosure_template_catalog` 第一版：1 个通用定期报告模板加 6 个首批行业模板。解析签名与市场规则作用域分离，按规则版本、生效日期、交易所、板块、全文类型和当期权威行业组选择，并返回 `csrc_common_rule / exchange_industry_rule / observed_parser_pattern` 的准确 lineage；没有专项监管规则的市场组合不得伪装为交易所规则。首版保守地只把交易所行业专项规则绑定到年报及其更正稿，半年报复用签名时仍标为观测模式。本地主数据 `main_board / star_market` 和中文板块名均可规范化。章节别名与表格签名引用事实目录字段并执行交叉校验；合计、小计、抵销、未分配和不适用行保留并标注角色，以支持分部勾稽。行业模板只约束候选定位，不直接产生公司事实。
 
 下一批使用页级诊断选择每行业 5 家 parser benchmark，并继续交易所备源和 CNInfo 受控 live 归档，不提前进行全市场画像事实写入。
 

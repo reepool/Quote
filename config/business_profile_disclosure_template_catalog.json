@@ -1,0 +1,747 @@
+{
+  "schema_version": "business_profile_disclosure_template_catalog.v1",
+  "catalog_version": "business_profile_disclosure_templates.2026.1",
+  "fact_catalog_version": "business_profile_facts.2026.1",
+  "templates": [
+    {
+      "template_id": "common_periodic_report.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["all"],
+      "scopes": [
+        {
+          "scope_id": "common.sse.observed.2021",
+          "exchange": "SSE",
+          "boards": ["main", "star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_periodic_report_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2025-06-30",
+          "source_rule_refs": ["project benchmark corpus and issuer consolidated financial statement notes"]
+        },
+        {
+          "scope_id": "common.szse.observed.2021",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_periodic_report_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2025-06-30",
+          "source_rule_refs": ["project benchmark corpus and issuer consolidated financial statement notes"]
+        },
+        {
+          "scope_id": "common.sse.csrc_annual.2025",
+          "exchange": "SSE",
+          "boards": ["main", "star"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "csrc_common_rule",
+          "rule_version": "csrc_rule_no_2_2025",
+          "effective_from": "2025-07-01",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.csrc.gov.cn/csrc/c101954/c7547588/content.shtml"]
+        },
+        {
+          "scope_id": "common.sse.csrc_semiannual.2025",
+          "exchange": "SSE",
+          "boards": ["main", "star"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "csrc_common_rule",
+          "rule_version": "csrc_rule_no_3_2025",
+          "effective_from": "2025-07-01",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.csrc.gov.cn/csrc/c101954/c7547590/content.shtml"]
+        },
+        {
+          "scope_id": "common.szse.csrc_annual.2025",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "csrc_common_rule",
+          "rule_version": "csrc_rule_no_2_2025",
+          "effective_from": "2025-07-01",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.csrc.gov.cn/csrc/c101954/c7547588/content.shtml"]
+        },
+        {
+          "scope_id": "common.szse.csrc_semiannual.2025",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "csrc_common_rule",
+          "rule_version": "csrc_rule_no_3_2025",
+          "effective_from": "2025-07-01",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.csrc.gov.cn/csrc/c101954/c7547590/content.shtml"]
+        },
+        {
+          "scope_id": "common.bse.observed.2021",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_bse_periodic_report_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus", "https://www.csrc.gov.cn/csrc/c101950/c1496874/content.shtml"]
+        }
+      ],
+      "section_aliases": {
+        "principal_business": ["主要业务", "主营业务", "公司从事的主要业务", "principal business"],
+        "business_model": ["经营模式", "主要经营模式", "business model"],
+        "segment_information": ["分部信息", "分部报告", "分行业", "分产品", "分地区", "segment information"],
+        "revenue_cost_analysis": ["营业收入和营业成本", "主营业务分析", "收入和成本分析", "revenue and cost"],
+        "production_sales_inventory": ["产销量", "生产量", "销售量", "库存量", "production and sales"],
+        "cost_composition": ["成本构成", "成本分析", "主要成本构成", "cost composition"],
+        "major_projects": ["重大项目", "主要项目", "在建工程", "major projects"],
+        "derivatives_and_hedging": ["套期保值", "期货和衍生品", "衍生工具", "hedging", "derivatives"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "common.segment_revenue_cost.v1",
+          "fact_group": "business_segment",
+          "section_keys": ["segment_information", "revenue_cost_analysis"],
+          "required_headers": ["营业收入", "营业成本", "毛利率"],
+          "optional_headers": ["分行业", "分产品", "分地区", "同比增减", "占营业收入比重"],
+          "min_required_header_matches": 2,
+          "field_ids": ["segment.name", "segment.type", "segment.revenue", "segment.revenue_share", "segment.cost", "segment.gross_margin"],
+          "row_role_markers": {
+            "total": ["合计"],
+            "subtotal": ["小计"],
+            "elimination": ["分部间抵销", "内部抵销"]
+          }
+        },
+        {
+          "signature_id": "common.segment_notes.v1",
+          "fact_group": "financial_segment_note",
+          "section_keys": ["segment_information"],
+          "required_headers": ["分部收入", "分部利润", "分部资产"],
+          "optional_headers": ["对外交易收入", "分部间交易收入", "未分配项目", "抵销"],
+          "min_required_header_matches": 2,
+          "field_ids": ["segment.name", "segment.revenue", "segment.profit", "segment.assets"],
+          "row_role_markers": {
+            "elimination": ["抵销", "合并"],
+            "unallocated": ["未分配"]
+          }
+        },
+        {
+          "signature_id": "common.production_sales_inventory.v1",
+          "fact_group": "production_sales_inventory",
+          "section_keys": ["production_sales_inventory"],
+          "required_headers": ["生产量", "销售量", "库存量"],
+          "optional_headers": ["主要产品", "单位", "同比增减", "自用量"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.inventory_volume"],
+          "row_role_markers": {
+            "total": ["合计"],
+            "not_applicable": ["不适用"]
+          }
+        },
+        {
+          "signature_id": "common.cost_composition.v1",
+          "fact_group": "cost_composition",
+          "section_keys": ["cost_composition"],
+          "required_headers": ["成本构成项目", "本期金额", "本期占总成本比例"],
+          "optional_headers": ["上年同期金额", "上年同期占总成本比例", "情况说明"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.cost_composition_amount", "operating.cost_composition_share"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "coal_industry.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["coal"],
+      "scopes": [
+        {
+          "scope_id": "coal.sse_main.observed.pre_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_coal_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2022-01-06",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "coal.sse_main.rule_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "sse_guideline_3_2022_no_2_coal",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250619_10782390.shtml"]
+        },
+        {
+          "scope_id": "coal.sse_main.semiannual.observed",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_coal_pattern.2022",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "coal.sse_star.observed",
+          "exchange": "SSE",
+          "boards": ["star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_coal_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "coal.szse.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_coal_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "coal.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_coal_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "coal_operations": ["煤炭业务经营情况", "煤炭产销量", "商品煤产销", "煤炭板块"],
+        "coal_resources": ["煤炭资源储量", "保有资源量", "可采储量", "矿业权"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "coal.production_sales.v1",
+          "fact_group": "coal_operating_volume",
+          "section_keys": ["coal_operations"],
+          "required_headers": ["原煤产量", "商品煤产量", "商品煤销量"],
+          "optional_headers": ["内部销量", "外购煤销量", "吨煤售价", "吨煤成本"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.average_selling_price", "operating.unit_cost"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "coal.resources.v1",
+          "fact_group": "coal_resource",
+          "section_keys": ["coal_resources"],
+          "required_headers": ["矿区", "资源量", "可采储量"],
+          "optional_headers": ["权益比例", "剩余可采年限", "核定产能"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.reserve_or_resource", "operating.capacity"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "nonferrous_solid_mineral.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["nonferrous_and_solid_mineral"],
+      "scopes": [
+        {
+          "scope_id": "mineral.sse_main.observed.pre_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2022-01-06",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "mineral.sse_main.rule_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "sse_guideline_3_2022_no_16_nonferrous",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250619_10782390.shtml"]
+        },
+        {
+          "scope_id": "mineral.sse_main.semiannual.observed",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2022",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "mineral.sse_star.observed",
+          "exchange": "SSE",
+          "boards": ["star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "mineral.szse.observed.pre_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2023-02-09",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "mineral.szse.rule_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "szse_guideline_3_2023_solid_mineral",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.szse.cn/lawrules/rule/stock/supervision/currency/t20250327_612558.html"]
+        },
+        {
+          "scope_id": "mineral.szse.semiannual.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2023",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "mineral.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_mineral_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "mineral_resources": ["矿产资源情况", "资源储量", "矿业权", "主要矿山"],
+        "mining_processing": ["采选业务", "采矿量", "处理量", "金属产量", "冶炼业务"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "mineral.resources.v1",
+          "fact_group": "mineral_resource",
+          "section_keys": ["mineral_resources"],
+          "required_headers": ["矿山名称", "资源量", "储量"],
+          "optional_headers": ["品位", "权益比例", "资源量类型", "剩余服务年限"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.reserve_or_resource"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "mineral.production_recovery.v1",
+          "fact_group": "mineral_operating_volume",
+          "section_keys": ["mining_processing"],
+          "required_headers": ["采矿量", "处理量", "产量"],
+          "optional_headers": ["回收率", "品位", "销量", "单位成本"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.recovery_rate", "operating.unit_cost"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "steel_industry.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["steel"],
+      "scopes": [
+        {
+          "scope_id": "steel.sse_main.observed.pre_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_steel_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2022-01-06",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "steel.sse_main.rule_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "sse_guideline_3_2022_no_7_steel",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250619_10782390.shtml"]
+        },
+        {
+          "scope_id": "steel.sse_main.semiannual.observed",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_steel_pattern.2022",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "steel.sse_star.observed",
+          "exchange": "SSE",
+          "boards": ["star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_steel_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "steel.szse.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_steel_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "steel.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_steel_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "steel_operations": ["钢铁行业经营性信息", "钢材产销量", "主要产品产销", "钢铁业务"],
+        "steel_capacity": ["炼铁产能", "炼钢产能", "轧钢产能", "主要生产线"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "steel.production_sales.v1",
+          "fact_group": "steel_operating_volume",
+          "section_keys": ["steel_operations"],
+          "required_headers": ["产品名称", "产量", "销量"],
+          "optional_headers": ["库存量", "平均售价", "营业收入", "营业成本"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.inventory_volume", "operating.average_selling_price"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "steel.capacity_yield.v1",
+          "fact_group": "steel_capacity",
+          "section_keys": ["steel_capacity"],
+          "required_headers": ["生产线", "设计产能"],
+          "optional_headers": ["有效产能", "产能利用率", "成材率"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.capacity", "operating.capacity_utilization", "operating.yield_rate"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "petrochemical_industry.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["petrochemical"],
+      "scopes": [
+        {
+          "scope_id": "petrochemical.sse.observed",
+          "exchange": "SSE",
+          "boards": ["main", "star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_petrochemical_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "petrochemical.szse.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_petrochemical_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "petrochemical.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_petrochemical_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "oil_gas_operations": ["油气勘探开发", "原油产量", "天然气产量", "油气储量"],
+        "refining_chemical_operations": ["炼油业务", "化工业务", "原油加工量", "主要装置"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "petrochemical.upstream.v1",
+          "fact_group": "oil_gas_upstream",
+          "section_keys": ["oil_gas_operations"],
+          "required_headers": ["原油产量", "天然气产量"],
+          "optional_headers": ["油气当量产量", "探明储量", "权益产量", "实现价格"],
+          "min_required_header_matches": 1,
+          "field_ids": ["operating.production_volume", "operating.average_selling_price", "operating.reserve_or_resource"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "petrochemical.refining.v1",
+          "fact_group": "refining_chemical",
+          "section_keys": ["refining_chemical_operations"],
+          "required_headers": ["原油加工量", "产品产量"],
+          "optional_headers": ["产品销量", "装置能力", "开工率"],
+          "min_required_header_matches": 1,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.capacity", "operating.capacity_utilization"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "basic_chemical_industry.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["basic_chemical"],
+      "scopes": [
+        {
+          "scope_id": "chemical.sse_main.observed.pre_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2022-01-06",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "chemical.sse_main.rule_2022",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "sse_guideline_3_2022_no_13_chemical",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250619_10782390.shtml"]
+        },
+        {
+          "scope_id": "chemical.sse_main.semiannual.observed",
+          "exchange": "SSE",
+          "boards": ["main"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2022",
+          "effective_from": "2022-01-07",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "chemical.sse_star.observed",
+          "exchange": "SSE",
+          "boards": ["star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "chemical.szse.observed.pre_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2023-02-09",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "chemical.szse.rule_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "szse_guideline_3_2023_chemical",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.szse.cn/lawrules/rule/stock/supervision/currency/t20250327_612558.html"]
+        },
+        {
+          "scope_id": "chemical.szse.semiannual.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2023",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "chemical.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_chemical_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "chemical_products": ["主要化工产品", "化工产品产销量", "主要产品及用途", "化工业务"],
+        "chemical_capacity": ["主要装置产能", "产能情况", "在建产能", "装置开工率"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "chemical.production_sales.v1",
+          "fact_group": "chemical_operating_volume",
+          "section_keys": ["chemical_products"],
+          "required_headers": ["主要产品", "产量", "销量"],
+          "optional_headers": ["库存量", "平均售价", "主要原材料"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.inventory_volume", "operating.average_selling_price"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "chemical.capacity.v1",
+          "fact_group": "chemical_capacity",
+          "section_keys": ["chemical_capacity"],
+          "required_headers": ["产品", "设计产能"],
+          "optional_headers": ["有效产能", "在建产能", "产能利用率"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.capacity", "operating.capacity_utilization"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    },
+    {
+      "template_id": "building_material_industry.v1",
+      "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+      "industry_groups": ["building_material"],
+      "scopes": [
+        {
+          "scope_id": "building_material.sse.observed",
+          "exchange": "SSE",
+          "boards": ["main", "star"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_building_material_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "building_material.szse.observed.pre_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_building_material_pattern.2021",
+          "effective_from": "2021-01-01",
+          "effective_to": "2023-02-09",
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "building_material.szse.rule_2023",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["annual_report", "annual_report_correction"],
+          "authority_type": "exchange_industry_rule",
+          "rule_version": "szse_guideline_3_2023_nonmetal_building_material",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["https://www.szse.cn/lawrules/rule/stock/supervision/currency/t20250327_612558.html"]
+        },
+        {
+          "scope_id": "building_material.szse.semiannual.observed",
+          "exchange": "SZSE",
+          "boards": ["main", "chinext"],
+          "document_types": ["semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_building_material_pattern.2023",
+          "effective_from": "2023-02-10",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        },
+        {
+          "scope_id": "building_material.bse.observed",
+          "exchange": "BSE",
+          "boards": ["bse"],
+          "document_types": ["annual_report", "annual_report_correction", "semiannual_report", "semiannual_report_correction"],
+          "authority_type": "observed_parser_pattern",
+          "rule_version": "project_observed_building_material_pattern.2021",
+          "effective_from": "2021-11-15",
+          "effective_to": null,
+          "source_rule_refs": ["project benchmark corpus"]
+        }
+      ],
+      "section_aliases": {
+        "building_material_operations": ["水泥业务", "熟料业务", "玻璃业务", "非金属建材经营情况"],
+        "building_material_capacity": ["水泥产能", "熟料产能", "玻璃生产线", "主要生产基地"]
+      },
+      "table_signatures": [
+        {
+          "signature_id": "building_material.production_sales.v1",
+          "fact_group": "building_material_operating_volume",
+          "section_keys": ["building_material_operations"],
+          "required_headers": ["主要产品", "产量", "销量"],
+          "optional_headers": ["库存量", "平均售价", "单位成本"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.production_volume", "operating.sales_volume", "operating.inventory_volume", "operating.average_selling_price", "operating.unit_cost"],
+          "row_role_markers": {"total": ["合计"]}
+        },
+        {
+          "signature_id": "building_material.capacity.v1",
+          "fact_group": "building_material_capacity",
+          "section_keys": ["building_material_capacity"],
+          "required_headers": ["生产基地", "设计产能"],
+          "optional_headers": ["有效产能", "产能利用率", "生产线状态"],
+          "min_required_header_matches": 2,
+          "field_ids": ["operating.capacity", "operating.capacity_utilization"],
+          "row_role_markers": {"total": ["合计"]}
+        }
+      ]
+    }
+  ]
+}

@@ -310,6 +310,41 @@ PDF artifact v2 已补齐分层 parser diagnostic 合同：文档层区分 `encr
 3. `product_commodity_dictionary`：原文别名 -> 产品实体 -> 商品实体，允许一对多；
 4. `value_chain_rule_catalog`：动作词、对象、上下游角色和排除规则。
 
+第一版 `business_fact_catalog` 已落地到
+`config/business_profile_fact_catalog.json`，由
+`research.business_profile_fact_catalog` 只读加载并严格校验。当前版本
+`business_profile_facts.2026.1` 包含 29 个字段定义，覆盖分部、经营事实、价值链角色和商品暴露四类记录：
+
+- 每个字段显式声明 `semantic / value_type / unit_dimension / canonical_units / allowed_values`；数值单位与枚举允许值不得混用；
+- 每个字段显式声明 DCF 材料性、机器候选策略、勾稽策略、审核策略和 DCF 资格；
+- 数值字段没有规范单位时配置加载直接失败；
+- `approved_only` 字段必须使用人工审核策略，不能配置为规则自动批准；
+- 单位成本、储量、合同、套保、价值链角色和商品暴露参数使用
+  `human_required_sensitive`；可从明确、可回链的披露生成 `candidate`，但不得由行业、收入占比、授权额度或衍生品公允价值自动推导，也不得自动批准；
+- 目录的 `released_on` 记录目录发布日期，`document_applicable_from / document_applicable_to` 记录可处理源文档区间。当前版本虽于 `2026-07-17` 发布，但可处理 `2021-01-01` 起的历史报告；不能用目录发布日期阻断历史报告解析。历史估值仍按事实 `data_available_date` 防未来函数，不以抽取目录发布日期替代事实可得日。
+
+该目录只定义事实契约，不表示相应字段已经具备生产数据。分部成本和毛利率等字段即使已进入目录，仍需后续表格解析、存储映射、金标准和字段级 promotion gate 全部通过后，才允许写入生产候选。
+
+第一版 `disclosure_template_catalog` 已落地到
+`config/business_profile_disclosure_template_catalog.json`，由
+`research.business_profile_disclosure_templates` 选择和校验。当前包含 1 个
+通用定期报告模板及煤炭、有色/固体矿产、钢铁、石油石化、基础化工、建筑材料
+6 个行业模板。每个模板声明：
+
+- 可复用解析签名，以及独立的市场规则作用域；
+- 每个规则作用域精确声明交易所、板块、全文类型、规则版本、生效区间、来源引用和 `csrc_common_rule / exchange_industry_rule / observed_parser_pattern` 权威类型；
+- 主营业务、经营模式、分部、产销存、成本、资源、项目及套保等章节别名；
+- 表格签名、最少表头命中数、可选表头、行角色标记和候选字段；
+- 关联的 `business_fact_catalog.field_id`，加载时必须通过跨目录引用校验。
+
+`合计 / 小计 / 抵销 / 未分配 / 不适用` 等行必须保留在解析结果中，并分别标注 `total / subtotal / elimination / unallocated / not_applicable`。这些角色行不提升为普通产品候选，但必须参与分部收入、成本及财务合计勾稽，禁止在表格抽取阶段直接删除。
+
+模板选择始终合并一个有效通用模板和一个匹配的公司当期行业模板，并返回各模板实际命中的唯一规则作用域。未提供行业时只返回通用模板；未知市场、板块、文档类型、行业组、无有效作用域或作用域重叠直接失败。行业模板只能缩小候选章节和表格范围，不得由模板本身生成产品、角色、经营数值或商品暴露。没有专项交易所规则的市场组合继续使用经样本验证的解析签名，但 lineage 必须标为 `observed_parser_pattern`，不得伪称监管规则。首版对交易所行业专项规则采用保守边界：明确绑定年报及年报更正稿；半年报即使复用同一签名也标为观测模式，待逐条确认监管条款后再升级 authority。
+模板目录同时锁定所依赖的事实目录版本，并校验 `SSE-main/star`、
+`SZSE-main/chinext`、`BSE-bse` 市场板块组合，同时接受本地主数据
+`main_board / star_market` 及中文板块别名；目录版本不一致、市场板块
+组合无效或指定日期没有生效模板时均 fail closed。
+
 每次 dictionary 变更必须：
 
 - 产生新 semantic version；
