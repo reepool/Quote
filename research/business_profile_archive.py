@@ -33,6 +33,12 @@ DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE = (
 )
 LOGGER = logging.getLogger(__name__)
 _SAFE_PATH_RE = re.compile(r"[^0-9A-Za-z_.-]+")
+_BUSINESS_PROFILE_SOURCE_BASE_URLS = {
+    "cninfo": "https://static.cninfo.com.cn/",
+    "sse": "https://www.sse.com.cn/",
+    "szse": "https://disc.static.szse.cn/",
+    "bse": "https://www.bse.cn/",
+}
 _ARCHIVE_TEMPLATE_FIELDS = {
     "announcement_id",
     "content_hash",
@@ -46,20 +52,31 @@ _ARCHIVE_TEMPLATE_FIELDS = {
 }
 
 
-def business_profile_candidate_url(url: Optional[str]) -> Optional[str]:
-    """Resolve one CNInfo attachment URL without performing network access."""
+def business_profile_candidate_url(
+    url: Optional[str],
+    *,
+    source: str = "cninfo",
+) -> Optional[str]:
+    """Resolve one official attachment URL without performing network access."""
     if not url:
         return None
     if url.startswith(("http://", "https://")):
         return url
-    return f"https://static.cninfo.com.cn/{url.lstrip('/')}"
+    source_name = str(source or "").strip().lower()
+    base_url = _BUSINESS_PROFILE_SOURCE_BASE_URLS.get(source_name)
+    if not base_url:
+        raise ValueError(f"unsupported business-profile document source: {source}")
+    return f"{base_url.rstrip('/')}/{url.lstrip('/')}"
 
 
 def download_business_profile_candidate(
     candidate: BusinessProfileDocumentCandidate,
 ) -> bytes:
     """Download one official CNInfo attachment through governed transport."""
-    url = business_profile_candidate_url(candidate.adjunct_url)
+    url = business_profile_candidate_url(
+        candidate.adjunct_url,
+        source=candidate.source,
+    )
     if not url:
         raise ValueError("candidate attachment URL is missing")
     response = request_get(
@@ -294,11 +311,20 @@ class BusinessProfileDocumentArchiveService:
         )
         document_type = candidate.classification.document_type
         document_family = business_profile_document_family(document_type)
+        source = str(candidate.source or "cninfo").strip().lower()
+        source_tier = str(candidate.source_tier or BUSINESS_PROFILE_SOURCE_TIER).strip()
+        if source not in _BUSINESS_PROFILE_SOURCE_BASE_URLS:
+            raise ValueError(
+                f"unsupported business-profile document source: {candidate.source}"
+            )
+        if source_tier not in {"official_primary", "official_backup"}:
+            raise ValueError(
+                f"unsupported business-profile source tier: {candidate.source_tier}"
+            )
         content_hash = hashlib.sha256(content).hexdigest()
         rows = self._get_manifests(
             instrument_id=instrument_id,
             report_period=report_period,
-            source="cninfo",
         )
         exact = self._find_exact_manifest(rows, candidate.announcement_id, content_hash)
         if exact is not None:
@@ -357,16 +383,19 @@ class BusinessProfileDocumentArchiveService:
         )
         same_content = any(row.get("content_hash") == content_hash for row in rows)
         manifest = FinancialSourceFileManifest(
-            source="cninfo",
+            source=source,
             source_mode="direct",
-            source_tier=BUSINESS_PROFILE_SOURCE_TIER,
+            source_tier=source_tier,
             instrument_id=instrument_id,
             symbol=symbol,
             exchange=exchange,
             report_period=report_period,
             report_type=document_type,
             filing_id=candidate.announcement_id,
-            source_url=self._absolute_cninfo_url(candidate.adjunct_url),
+            source_url=business_profile_candidate_url(
+                candidate.adjunct_url,
+                source=source,
+            ),
             archive_path=str(archive_path),
             content_hash=content_hash,
             content_length=len(content),
@@ -384,6 +413,8 @@ class BusinessProfileDocumentArchiveService:
                 "is_correction": candidate.classification.is_correction,
                 "profile_event_hints": candidate.classification.profile_event_hints,
                 "selection_reasons": candidate.selection_reasons,
+                "discovery_source": source,
+                "discovery_source_tier": source_tier,
                 "parent_ingestion_run": {
                     "domain": "business_profile",
                     "ingestion_run_id": parent_ingestion_run_id,
@@ -689,6 +720,8 @@ class BusinessProfileDocumentArchiveService:
             "announcement_time": candidate.announcement_time,
             "adjunct_url": candidate.adjunct_url,
             "document_type": candidate.classification.document_type,
+            "source": candidate.source,
+            "source_tier": candidate.source_tier,
         }
         encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode(
             "utf-8"
@@ -742,4 +775,4 @@ class BusinessProfileDocumentArchiveService:
 
     @staticmethod
     def _absolute_cninfo_url(url: Optional[str]) -> Optional[str]:
-        return business_profile_candidate_url(url)
+        return business_profile_candidate_url(url, source="cninfo")

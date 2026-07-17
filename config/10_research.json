@@ -40,6 +40,56 @@
       },
       "business_profile_evidence": {
         "enabled": false,
+        "discovery": {
+          "primary_source": "cninfo",
+          "fallback_on_empty": true,
+          "official_exchange_backups": {
+            "SSE": {
+              "source": "sse",
+              "enabled": true,
+              "method": "GET",
+              "endpoint_url": "https://query.sse.com.cn/security/stock/queryCompanyBulletin.do",
+              "referer": "https://www.sse.com.cn/disclosure/listedinfo/regular/",
+              "artifact_base_url": "https://www.sse.com.cn/",
+              "request_timeout_seconds": 20.0,
+              "request_interval_seconds": 0.2,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 0.5
+            },
+            "SZSE": {
+              "source": "szse",
+              "enabled": true,
+              "method": "POST",
+              "endpoint_url": "https://www.szse.cn/api/disc/announcement/annList",
+              "referer": "https://www.szse.cn/disclosure/listed/fixed/index.html",
+              "artifact_base_url": "https://disc.static.szse.cn/",
+              "request_timeout_seconds": 20.0,
+              "request_interval_seconds": 0.2,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 0.5,
+              "options": {
+                "channel_code": "fixed_disc"
+              }
+            },
+            "BSE": {
+              "source": "bse",
+              "enabled": false,
+              "method": "POST",
+              "endpoint_url": "https://www.bse.cn/disclosureInfoController/companyAnnouncement.do",
+              "referer": "https://www.bse.cn/disclosure/announcement.html",
+              "artifact_base_url": "https://www.bse.cn/",
+              "request_timeout_seconds": 20.0,
+              "request_interval_seconds": 0.2,
+              "retry_attempts": 2,
+              "retry_backoff_seconds": 0.5,
+              "options": {
+                "is_new_three": "1",
+                "xxfcbj": "1"
+              },
+              "note": "Adapter is implemented but disabled because the official endpoint currently enters a redirect loop from the production network. CNInfo remains the active BSE official primary source."
+            }
+          }
+        },
         "archive": {
           "archive_root": "data/filings/business_profile",
           "directory_template": "{year}/{market}",

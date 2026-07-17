@@ -138,6 +138,69 @@ def test_archive_layout_requires_content_hash_for_immutable_versions(tmp_path):
         )
 
 
+def test_exchange_backup_archive_preserves_source_lineage(tmp_path):
+    storage = _Storage()
+    service = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        archive_root=tmp_path / "filings",
+    )
+    candidate = _candidate("sse-annual", "万华化学2025年年度报告")
+    candidate = type(candidate)(
+        **{
+            **candidate.__dict__,
+            "adjunct_url": ("https://www.sse.com.cn/disclosure/report/annual.pdf"),
+            "source": "sse",
+            "source_tier": "official_backup",
+        }
+    )
+
+    service.archive_content(
+        _instrument(),
+        candidate,
+        b"%PDF-1.7\nsse-backup",
+    )
+
+    manifest = storage.rows[0]
+    assert manifest["source"] == "sse"
+    assert manifest["source_tier"] == "official_backup"
+    assert manifest["source_url"] == candidate.adjunct_url
+    assert manifest["metadata"]["discovery_source"] == "sse"
+
+
+def test_exchange_correction_can_supersede_cninfo_original(tmp_path):
+    storage = _Storage()
+    service = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        archive_root=tmp_path / "filings",
+    )
+    original = service.archive_content(
+        _instrument(),
+        _candidate("cninfo-original", "万华化学2025年年度报告"),
+        b"%PDF-1.7\ncninfo-original",
+    )
+    correction = _candidate(
+        "sse-correction",
+        "万华化学2025年年度报告（修订版）",
+    )
+    correction = type(correction)(
+        **{
+            **correction.__dict__,
+            "adjunct_url": ("https://www.sse.com.cn/disclosure/report/correction.pdf"),
+            "source": "sse",
+            "source_tier": "official_backup",
+        }
+    )
+
+    corrected = service.archive_content(
+        _instrument(),
+        correction,
+        b"%PDF-1.7\nsse-correction",
+    )
+
+    assert corrected.supersedes_source_file_id == original.source_file_id
+    assert storage.rows[-1]["source"] == "sse"
+
+
 def test_exact_rerun_short_circuits_manifest_write(tmp_path):
     storage = _Storage()
     service = BusinessProfileDocumentArchiveService(

@@ -386,6 +386,18 @@ extracted -> candidate -> approved / rejected
 
 后续官方 PDF 诊断可能替换候选。替换必须由选择器输出的新增 strata 和官方文档证据解释，不能手工静默改名单。
 
+### 9.1.2 官方来源优先级与交易所备源
+
+公司业务画像文档发现采用 `CNInfo official_primary -> issuer exchange official_backup`。`BusinessProfileDiscoveryCoordinator` 只有在 CNInfo 请求失败、降级、无法解析公司身份，或在明确报告查询中返回空候选时，才调用该 instrument 对应交易所的一个备源；CNInfo 返回完整候选时不得同时请求交易所。
+
+交易所备源由 `research_config.modules.business_profile_evidence.discovery.official_exchange_backups` 配置：
+
+- SSE 使用上交所定期报告公开查询，附件保留 `sse / official_backup`；
+- SZSE 使用深交所 `fixed_disc` 定期报告查询，附件保留 `szse / official_backup`；
+- BSE adapter 已实现，但生产网络对当前北交所公开端点出现重定向循环，因此配置保持 disabled，不能把网络失败解释为“公司没有报告”。
+
+协调结果必须返回每次实际调用的 source、source tier、状态、页数、公告数、候选数和错误。只选择一个最高优先级可用来源进入后续归档，不合并聚合站结果，也不在发现阶段写画像事实。交易所候选进入归档后，source manifest 必须记录真实交易所来源和 `official_backup`，不能继续硬编码为 CNInfo。
+
 ### 9.2 指标
 
 | 指标 | 首期门槛 |

@@ -37,6 +37,9 @@ class BusinessProfileDocumentCandidate:
     adjunct_type: Optional[str]
     classification: BusinessProfileDocumentClassification
     selection_reasons: List[str] = field(default_factory=list)
+    source: str = "cninfo"
+    source_tier: str = "official_primary"
+    raw_payload: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -59,6 +62,8 @@ class BusinessProfileDiscoveryResult:
     max_announcement_time: Optional[str]
     stopped_at_watermark: bool
     errors: List[str] = field(default_factory=list)
+    source: str = "cninfo"
+    source_tier: str = "official_primary"
 
     def to_dict(self) -> Dict[str, Any]:
         payload = asdict(self)
@@ -209,6 +214,9 @@ class CninfoBusinessProfileDiscoveryAdapter:
             adjunct_type=record.adjunct_type,
             classification=classification,
             selection_reasons=list(record.selection_reasons),
+            source="cninfo",
+            source_tier="official_primary",
+            raw_payload=dict(record.raw_payload),
         )
 
     def _get_state(self, **kwargs: Any) -> Optional[Dict[str, Any]]:
