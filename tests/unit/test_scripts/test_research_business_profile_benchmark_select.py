@@ -1,12 +1,13 @@
+import json
 import sqlite3
 
-from scripts.research_business_profile_corpus_audit import build_corpus_audit
+from scripts.research_business_profile_benchmark_select import build_parser_benchmark
 
 
-def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
+def test_benchmark_command_builder_uses_read_only_point_in_time_universe(tmp_path):
     research_db = tmp_path / "research.db"
-    quotes_db = tmp_path / "quotes.db"
     financials_db = tmp_path / "financials.db"
+    quotes_db = tmp_path / "quotes.db"
     with sqlite3.connect(research_db) as conn:
         conn.executescript(
             """
@@ -24,10 +25,25 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
                 ('sw','sw_2021','210000','煤炭',1,NULL),
                 ('sw','sw_2021','210100','煤炭开采',2,'210000'),
                 ('sw','sw_2021','210101','动力煤',3,'210100');
-            INSERT INTO industry_classification_history VALUES
-                ('600001.SH','600001','SSE','sw','sw_2021','210101',
-                 '2020-01-01','2020-01-02','2020-01-02','2020-01-02');
             """
+        )
+        conn.executemany(
+            "INSERT INTO industry_classification_history VALUES (?,?,?,?,?,?,?,?,?,?)",
+            [
+                (
+                    f"60000{index}.SH",
+                    f"60000{index}",
+                    "SSE",
+                    "sw",
+                    "sw_2021",
+                    "210101",
+                    "2020-01-01",
+                    "2020-01-02",
+                    "2020-01-02",
+                    "2020-01-02",
+                )
+                for index in range(1, 6)
+            ],
         )
     with sqlite3.connect(quotes_db) as conn:
         conn.execute(
@@ -38,20 +54,22 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
             )
             """
         )
-        conn.execute(
+        conn.executemany(
             "INSERT INTO instruments VALUES (?,?,?,?,?,?,?,?)",
-            (
-                "600001.SH",
-                "sample coal",
-                "SSE",
-                "stock",
-                "2000-01-01",
-                None,
-                "active",
-                1,
-            ),
+            [
+                (
+                    f"60000{index}.SH",
+                    f"issuer {index}",
+                    "SSE",
+                    "stock",
+                    "2000-01-01",
+                    None,
+                    "active",
+                    1,
+                )
+                for index in range(1, 6)
+            ],
         )
-        conn.commit()
     with sqlite3.connect(financials_db) as conn:
         conn.execute(
             """
@@ -68,35 +86,60 @@ def test_corpus_audit_is_read_only_and_reports_local_coverage(tmp_path):
         conn.execute(
             "INSERT INTO financial_source_files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
-                "file-1",
+                "source-1",
                 "600001.SH",
                 "cninfo",
                 "2024-12-31",
-                "annual_report",
+                "annual_report_correction",
                 "announcement-1",
-                "report.pdf",
+                "https://www.cninfo.com.cn/report.pdf",
                 "/archive/report.pdf",
-                "hash",
+                "a" * 64,
                 "2025-03-20",
-                "parser.v1",
-                "parsed",
+                "business_profile_pdf_archive.v1",
+                "archived",
                 "official_primary",
                 "business_profile_source_file_manifest.v1",
                 None,
                 "{}",
             ),
         )
-        conn.commit()
 
-    payload = build_corpus_audit(
+    payload = build_parser_benchmark(
         research_db=research_db,
         financials_db=financials_db,
         quotes_db=quotes_db,
         as_of_date="2025-12-31",
-        expected_report_periods=["2024-12-31"],
     )
 
-    assert payload["readiness"]["universe_count"] == 1
-    assert payload["readiness"]["archived_document_count"] == 1
-    assert payload["readiness"]["missing_expected_document_count"] == 0
-    assert payload["universe"][0]["company_name"] == "sample coal"
+    assert payload["selected_issuer_count"] == 5
+    assert payload["status"] == "evidence_incomplete"
+    assert payload["industries"]["coal"]["candidate_count"] == 5
+    assert len(payload["incomplete_industry_groups"]) == 6
+
+    evidence_path = tmp_path / "evidence.json"
+    evidence_path.write_text(
+        json.dumps(
+            [
+                {
+                    "instrument_id": "600001.SH",
+                    "verified": True,
+                    "diversified_business": True,
+                    "correction_report": True,
+                    "complex_table": True,
+                    "source_document_ids": ["source-1"],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    validated = build_parser_benchmark(
+        research_db=research_db,
+        financials_db=financials_db,
+        quotes_db=quotes_db,
+        as_of_date="2025-12-31",
+        evidence_path=evidence_path,
+    )
+
+    assert validated["industries"]["coal"]["status"] == "ready"
+    assert validated["status"] == "evidence_incomplete"

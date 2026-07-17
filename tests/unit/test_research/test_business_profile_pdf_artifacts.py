@@ -1,6 +1,7 @@
 from io import BytesIO
 from pathlib import Path
 
+import pytest
 from pypdf import PdfWriter
 from pypdf.generic import DictionaryObject, NameObject, StreamObject
 
@@ -8,6 +9,9 @@ from research.business_profile_pdf_artifacts import (
     BUSINESS_PROFILE_PDF_ARTIFACT_SCHEMA_VERSION,
     BusinessProfilePdfArtifactExtractor,
     BusinessProfilePdfArtifactStore,
+    build_not_disclosed_diagnostic,
+    build_table_parse_failure_diagnostic,
+    build_unsupported_template_diagnostic,
 )
 from scripts.research_business_profile_pdf_artifact import build_pdf_artifact
 
@@ -93,9 +97,76 @@ def test_failure_classes_cover_invalid_malformed_and_encrypted_pdf():
 
     assert invalid.status == "parse_failed"
     assert invalid.diagnostics["failure_class"] == "invalid_pdf_signature"
+    assert invalid.parser_diagnostics[0].outcome == "unsupported"
     assert malformed.diagnostics["failure_class"] == "malformed_pdf"
+    assert malformed.parser_diagnostics[0].outcome == "malformed"
     assert encrypted.encrypted is True
     assert encrypted.diagnostics["failure_class"] == "encrypted_password_required"
+    assert encrypted.parser_diagnostics[0].outcome == "encrypted"
+
+
+def test_glyph_decoding_failure_is_distinct_and_queues_target_page_for_ocr():
+    content = _pdf_bytes(["Principal Business \x01\x02\x03 corrupted glyphs"])
+    artifact = BusinessProfilePdfArtifactExtractor(
+        low_text_character_threshold=1,
+        glyph_decoding_ratio_threshold=0.01,
+    ).extract_bytes(content, target_page_numbers=[1])
+
+    assert artifact.pages[0].native_text_status == "glyph_decoding_error"
+    assert artifact.pages[0].suspicious_glyph_count == 3
+    assert artifact.diagnostics["glyph_decoding_pages"] == [1]
+    assert artifact.ocr_required_pages == [1]
+    assert [item.outcome for item in artifact.parser_diagnostics] == [
+        "glyph_decoding",
+        "ocr_required",
+    ]
+
+
+def test_downstream_diagnostics_keep_parse_failures_separate_from_not_disclosed():
+    table_failure = build_table_parse_failure_diagnostic(
+        page_numbers=[8, 7, 8],
+        field_name="segment_revenue",
+        detail="merged header spans pages",
+    )
+    unsupported = build_unsupported_template_diagnostic(
+        page_numbers=[12],
+        detail="issuer-specific reserve table",
+    )
+    not_disclosed = build_not_disclosed_diagnostic(
+        field_name="hedge_quantity",
+        section_parse_succeeded=True,
+        page_numbers=[30],
+    )
+
+    assert table_failure.outcome == "table_parse_failure"
+    assert table_failure.page_numbers == [7, 8]
+    assert table_failure.blocks_numeric_candidates is True
+    assert unsupported.outcome == "unsupported_template"
+    assert not_disclosed.outcome == "not_disclosed"
+    assert not_disclosed.blocks_numeric_candidates is True
+
+
+def test_not_disclosed_requires_successful_section_parse_and_evidence():
+    with pytest.raises(ValueError, match="successfully parsed"):
+        build_not_disclosed_diagnostic(
+            field_name="unit_cost",
+            section_parse_succeeded=False,
+            page_numbers=[20],
+        )
+    with pytest.raises(ValueError, match="evidence pages"):
+        build_not_disclosed_diagnostic(
+            field_name="unit_cost",
+            section_parse_succeeded=True,
+            page_numbers=[],
+        )
+
+
+def test_table_parse_failure_requires_evidence_pages():
+    with pytest.raises(ValueError, match="requires evidence pages"):
+        build_table_parse_failure_diagnostic(
+            page_numbers=[],
+            detail="merged header spans pages",
+        )
 
 
 def test_artifact_store_writes_gzip_beside_original_and_short_circuits(tmp_path):
@@ -179,4 +250,5 @@ def test_diagnostics_only_command_helper_does_not_write_artifact(tmp_path):
     assert payload["status"] == "parsed"
     assert payload["artifact_path"] is None
     assert payload["parameter_hash"]
+    assert payload["parser_diagnostics"] == []
     assert not (tmp_path / "derived").exists()

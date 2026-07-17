@@ -16,6 +16,8 @@ if str(ROOT_DIR) not in sys.path:
 
 
 from research.business_profile_pdf_artifacts import (
+    DEFAULT_GLYPH_DECODING_MIN_CHARACTERS,
+    DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD,
     BusinessProfilePdfArtifactExtractor,
     BusinessProfilePdfArtifactStore,
 )
@@ -27,11 +29,15 @@ def build_pdf_artifact(
     source_file_id: Optional[str] = None,
     target_page_numbers: Sequence[int] = (),
     low_text_character_threshold: int = 40,
+    glyph_decoding_ratio_threshold: float = (DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD),
+    glyph_decoding_min_characters: int = DEFAULT_GLYPH_DECODING_MIN_CHARACTERS,
     diagnostics_only: bool = False,
 ) -> Dict[str, Any]:
     """Extract one local PDF and optionally persist its immutable artifact."""
     artifact = BusinessProfilePdfArtifactExtractor(
         low_text_character_threshold=low_text_character_threshold,
+        glyph_decoding_ratio_threshold=glyph_decoding_ratio_threshold,
+        glyph_decoding_min_characters=glyph_decoding_min_characters,
     ).extract_file(
         source_pdf,
         source_file_id=source_file_id,
@@ -53,6 +59,7 @@ def build_pdf_artifact(
         "heading_match_count": len(artifact.heading_index),
         "low_text_pages": artifact.low_text_pages,
         "ocr_required_pages": artifact.ocr_required_pages,
+        "parser_diagnostics": [item.to_dict() for item in artifact.parser_diagnostics],
         "diagnostics": artifact.diagnostics,
     }
 
@@ -66,6 +73,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help="Comma-separated one-based pages known to contain target sections",
     )
     parser.add_argument("--low-text-character-threshold", type=int, default=40)
+    parser.add_argument(
+        "--glyph-decoding-ratio-threshold",
+        type=float,
+        default=DEFAULT_GLYPH_DECODING_RATIO_THRESHOLD,
+    )
+    parser.add_argument(
+        "--glyph-decoding-min-characters",
+        type=int,
+        default=DEFAULT_GLYPH_DECODING_MIN_CHARACTERS,
+    )
     parser.add_argument("--diagnostics-only", action="store_true")
     args = parser.parse_args(argv)
     payload = build_pdf_artifact(
@@ -73,6 +90,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         source_file_id=args.source_file_id,
         target_page_numbers=_parse_pages(args.target_pages),
         low_text_character_threshold=args.low_text_character_threshold,
+        glyph_decoding_ratio_threshold=args.glyph_decoding_ratio_threshold,
+        glyph_decoding_min_characters=args.glyph_decoding_min_characters,
         diagnostics_only=args.diagnostics_only,
     )
     print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))

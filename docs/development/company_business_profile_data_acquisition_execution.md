@@ -285,7 +285,7 @@ python scripts/research_business_profile_pdf_artifact.py \
 
 表格/OCR 组件必须封装为 adapter，不能让业务解析器直接依赖具体库。OCR 运行在独立 worker，不进入 API 进程。
 
-完整 failure taxonomy 尚未完成。`glyph_decoding / table_parse_failure / unsupported_template / not_disclosed` 必须分别由页文本、表格和字段解析层补齐，不能把当前原生文本为空直接解释为公司未披露。
+PDF artifact v2 已补齐分层 parser diagnostic 合同：文档层区分 `encrypted / malformed / unsupported`，页文本层按 replacement glyph、Unicode 私用区和异常控制字符比例识别 `glyph_decoding`，并将字段相关页面标记为 `ocr_required`；表格与模板层分别使用 `table_parse_failure / unsupported_template`。`not_disclosed` 只有在目标章节成功解析且保留证据页时才允许生成，并继续阻止数值候选，不能把原生文本为空、乱码、表格失败或模板不支持解释为公司未披露。glyph 比例与最小字符阈值进入 parameter hash，可通过诊断 CLI 显式调整和复现。
 
 ### 6.3 大模型边界
 
@@ -356,6 +356,33 @@ extracted -> candidate -> approved / rejected
 - ST、并购重组、业务剥离和名称变化等异常样本。
 
 先以每行业 5 家完成工具选型和 schema 校准，再扩展到不少于 20 家的独立验收集，避免一开始投入全部人工标注。
+
+### 9.1.1 五家公司 parser benchmark 选择合同
+
+`scripts/research_business_profile_benchmark_select.py` 从时点申万行业池和上市生命周期只读选择每行业 5 家。选择顺序先硬覆盖该行业实际存在的交易所，再按已核验证据、申万二/三级、上市年代做确定性增量覆盖；输入顺序变化不能改变结果。运行示例：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/research_business_profile_benchmark_select.py \
+  --as-of-date 2026-07-17 \
+  --evidence /path/to/verified_document_evidence.json \
+  --output /tmp/business_profile_parser_benchmark.json
+```
+
+证据文件为 JSON list，或包含 `evidence_profiles` list 的对象。只有 `verified=true` 且至少有一个官方 `source_document_ids` 的记录才参与覆盖评分；每个 ID 还必须在 `financials.db.financial_source_files` 中匹配同一 `instrument_id`，且满足业务画像 manifest schema、官方主/备来源层、有效归档/解析状态、公告 ID、归档路径和 SHA-256 内容哈希约束。任一伪造、跨公司或失效 ID 会使整条证据记录失效。支持 `diversified_business / correction_report / complex_table / cross_page_table / ocr_required / glyph_decoding / malformed_pdf / profile_change`。六个首期行业必须全部存在并各自达到 5 家；任一行业缺失、数量不足，或未覆盖综合经营、修订稿和至少一种 PDF format edge 时，结果必须为 `evidence_incomplete`，命令返回码为 `3`，不能据此宣布金标准样本完成。
+
+`2026-07-17` 在生产库只读运行的初始候选如下；这只是待核验清单，不是已完成金标准：
+
+| 行业 | 候选 instrument_id | 市场覆盖 | 当前缺口 |
+|---|---|---|---|
+| 基础化工 | `920015.BJ / 600063.SH / 000973.SZ / 002381.SZ / 000408.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
+| 建筑材料 | `920076.BJ / 600176.SH / 002205.SZ / 002333.SZ / 000012.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
+| 煤炭 | `600121.SH / 000723.SZ / 000983.SZ / 600925.SH / 601011.SH` | 沪/深 | 综合经营、修订稿、PDF 边界证据 |
+| 有色及固体矿产 | `920068.BJ / 600219.SH / 000969.SZ / 002460.SZ / 000506.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
+| 石油石化 | `920088.BJ / 600028.SH / 000968.SZ / 000554.SZ / 002377.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
+| 钢铁 | `600010.SH / 000629.SZ / 002443.SZ / 001203.SZ / 000717.SZ` | 沪/深 | 综合经营、修订稿、PDF 边界证据 |
+
+后续官方 PDF 诊断可能替换候选。替换必须由选择器输出的新增 strata 和官方文档证据解释，不能手工静默改名单。
 
 ### 9.2 指标
 

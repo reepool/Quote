@@ -494,6 +494,8 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 已实现按申万历史归属和股票上市生命周期导出首批行业 universe 的只读审计工具。2026-07-16 当前在市样本为 791 家，现有正式业务画像全文归档覆盖仍为 0。
 - 已建立包含文档、页/表证据、产品、商品、单位、业务 regime、画像事件和审核决定的金标准 JSON Schema。
 - 已实现 `pypdf` 页级派生 artifact：验证 PDF/加密/页树，逐页保存原生文本、尺寸、文本密度、文本哈希和 artifact 哈希，生成主营、分部、产销、成本、资源、项目及套保标题索引。压缩文件按原件内容哈希、parameter hash 和 extractor version 写入 `derived/`，同内容、同参数换目录或 manifest ID 不改变 artifact hash。
-- 低文本页不会一律触发 OCR；只有命中业务标题或由上游显式标为目标页时才进入 `ocr_required_pages`。`tables/` 与 `ocr/` 版本目录合同已固定，但表格解析器、OCR worker 及 `not_disclosed` 字段语义仍未实现。
+- 低文本页不会一律触发 OCR；只有命中业务标题或由上游显式标为目标页时才进入 `ocr_required_pages`。`tables/` 与 `ocr/` 版本目录合同已固定，分层 parser diagnostic 和受证据约束的 `not_disclosed` 合同已实现；表格解析器、OCR worker 及字段事实层完整状态集仍待后续实现。
 
 下一批使用页级诊断选择每行业 5 家 parser benchmark，并继续交易所备源和 CNInfo 受控 live 归档，不提前进行全市场画像事实写入。
+
+五家公司 benchmark 已增加确定性分层选择器：先覆盖行业内实际存在的沪深北市场，再最大化申万二/三级、上市年代和经官方文档核验的综合经营、修订稿、复杂/跨页表、OCR/乱码等边界。六个首期行业缺一不可；空库、缺行业或单行业就绪不能使全局状态变为 `ready`。标签除 `verified=true + source_document_ids` 外，还必须通过 `financials.db` 中同公司官方业务画像 manifest 的来源层、状态、归档路径和内容哈希校验；截至 `2026-07-17` 已形成 30 家待核验候选，但六个行业均仍缺正式文档证据，因此 OpenSpec `1.2` 尚未完成。

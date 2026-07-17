@@ -251,7 +251,8 @@ def load_business_profile_source_manifests(
             f"""
             SELECT source_file_id, instrument_id, source, report_period, report_type,
                    filing_id, source_url, archive_path, content_hash, published_at,
-                   parser_version, status, metadata_json
+                   parser_version, status, source_tier, schema_version,
+                   supersedes_source_file_id, metadata_json
             FROM financial_source_files
             WHERE instrument_id IN ({placeholders})
               AND source IN ('cninfo', 'sse', 'szse', 'bse')
