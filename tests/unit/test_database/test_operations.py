@@ -7,6 +7,8 @@ import asyncio
 from datetime import date, datetime
 from unittest.mock import Mock, AsyncMock, patch, MagicMock
 import pandas as pd
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.operations import DatabaseOperations
 from database.models import Instrument, DailyQuote, TradingCalendar, DataUpdateInfo
@@ -91,6 +93,51 @@ class TestDatabaseOperations:
         quotes = await db_operations.get_daily_data('000001.SZ', date(2024, 1, 1), date(2024, 1, 10))
         assert isinstance(quotes, pd.DataFrame)
         assert len(quotes) > 0
+
+    @pytest.mark.asyncio
+    async def test_factor_quote_evidence_uses_prior_trading_close(
+        self,
+        tmp_path,
+    ):
+        engine = create_async_engine(
+            f"sqlite+aiosqlite:///{tmp_path / 'factor_evidence.db'}"
+        )
+        try:
+            async with engine.begin() as connection:
+                await connection.execute(text("""
+                    CREATE TABLE daily_quotes (
+                        time DATETIME NOT NULL,
+                        instrument_id VARCHAR(32) NOT NULL,
+                        close FLOAT NOT NULL,
+                        pre_close FLOAT,
+                        tradestatus INTEGER NOT NULL
+                    )
+                """))
+                await connection.execute(text("""
+                    INSERT INTO daily_quotes
+                        (time, instrument_id, close, pre_close, tradestatus)
+                    VALUES
+                        ('2024-06-13', '000001.SZ', 10.80, 10.88, 1),
+                        ('2024-06-14', '000001.SZ', 10.80, 10.80, 0),
+                        ('2024-06-17', '000001.SZ', 10.18, 10.08, 1)
+                """))
+
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            operations = DatabaseOperations(auto_initialize=False)
+            operations.get_async_session = sessions
+            evidence = await operations.get_quote_evidence_for_event_dates([
+                ("000001.SZ", date(2024, 6, 14)),
+            ])
+        finally:
+            await engine.dispose()
+
+        assert evidence == [{
+            "instrument_id": "000001.SZ",
+            "source_date": "2024-06-14",
+            "effective_date": "2024-06-17",
+            "pre_close": 10.80,
+            "close": 10.18,
+        }]
 
     @pytest.mark.asyncio
     async def test_get_daily_data(self, db_operations, sample_quote_data):

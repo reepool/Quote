@@ -4137,13 +4137,16 @@ class DatabaseOperations:
         self,
         event_dates: List[tuple[str, date]],
     ) -> List[Dict[str, Any]]:
-        """Return bounded quote evidence on or after each source event date.
+        """Return bounded unadjusted quote evidence for each source event date.
 
         A source date may fall on a weekend or holiday, but accepting an
         arbitrarily distant quote would silently turn a missing historical
         quote into false factor evidence. Fourteen calendar days covers the
         normal exchange holiday window while keeping stale matches visible as
-        pending.
+        pending. The factor formula must use the prior trading session's raw
+        close. An ex-date row's ``pre_close`` may already be an exchange or
+        provider adjusted reference price, and suspended placeholder rows are
+        not valid effective sessions.
         """
         normalized = sorted({
             (str(instrument_id).strip(), parsed_date)
@@ -4165,38 +4168,47 @@ class DatabaseOperations:
                 result = await session.execute(text(f"""
                     WITH requested(instrument_id, source_date) AS (
                         VALUES {values_sql}
+                    ), evidence AS MATERIALIZED (
+                        SELECT requested.instrument_id,
+                               requested.source_date,
+                               (
+                                   SELECT q.time
+                                   FROM daily_quotes q
+                                   WHERE q.instrument_id = requested.instrument_id
+                                     AND q.time >= datetime(requested.source_date)
+                                     AND q.time < datetime(requested.source_date, '+15 day')
+                                     AND q.tradestatus = 1
+                                     AND q.close > 0
+                                   ORDER BY q.time
+                                   LIMIT 1
+                               ) AS effective_time
+                        FROM requested
                     )
-                    SELECT requested.instrument_id,
-                           requested.source_date,
+                    SELECT evidence.instrument_id,
+                           evidence.source_date,
+                           date(evidence.effective_time) AS effective_date,
                            (
-                               SELECT date(q.time)
+                               SELECT q.close
                                FROM daily_quotes q
-                               WHERE q.instrument_id = requested.instrument_id
-                                 AND date(q.time) >= date(requested.source_date)
-                                 AND date(q.time) <= date(requested.source_date, '+14 day')
-                               ORDER BY q.time
-                               LIMIT 1
-                           ) AS effective_date,
-                           (
-                               SELECT q.pre_close
-                               FROM daily_quotes q
-                               WHERE q.instrument_id = requested.instrument_id
-                                 AND date(q.time) >= date(requested.source_date)
-                                 AND date(q.time) <= date(requested.source_date, '+14 day')
-                               ORDER BY q.time
+                               WHERE q.instrument_id = evidence.instrument_id
+                                 AND q.time < evidence.effective_time
+                                 AND q.tradestatus = 1
+                                 AND q.close > 0
+                               ORDER BY q.time DESC
                                LIMIT 1
                            ) AS pre_close,
                            (
                                SELECT q.close
                                FROM daily_quotes q
-                               WHERE q.instrument_id = requested.instrument_id
-                                 AND date(q.time) >= date(requested.source_date)
-                                 AND date(q.time) <= date(requested.source_date, '+14 day')
+                               WHERE q.instrument_id = evidence.instrument_id
+                                 AND q.time = evidence.effective_time
+                                 AND q.tradestatus = 1
+                                 AND q.close > 0
                                ORDER BY q.time
                                LIMIT 1
                            ) AS close
-                    FROM requested
-                    ORDER BY requested.instrument_id, requested.source_date
+                    FROM evidence
+                    ORDER BY evidence.instrument_id, evidence.source_date
                 """), parameters)
                 rows.extend(dict(row) for row in result.mappings().all())
         return rows
