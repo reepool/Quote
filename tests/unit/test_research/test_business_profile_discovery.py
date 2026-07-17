@@ -98,6 +98,8 @@ def test_instrument_discovery_selects_full_report_and_uses_watermark():
         {"instrument_id": "600309.SH", "symbol": "600309", "exchange": "SSE"},
         start_date="2026-01-01",
         end_date="2026-07-16",
+        search_key="年度报告",
+        category="category_ndbg_szsh",
         dry_run=False,
         ingestion_run_id=7,
     )
@@ -105,6 +107,8 @@ def test_instrument_discovery_selects_full_report_and_uses_watermark():
     assert [item.announcement_id for item in result.candidates] == ["full"]
     assert result.candidates[0].classification.document_type == "annual_report"
     assert scanner.config.stock == "600309,org-1"
+    assert scanner.config.search_key == "年度报告"
+    assert scanner.config.category == "category_ndbg_szsh"
     assert scanner.config.stop_at_watermark == "2026-01-01T00:00:00+00:00"
     assert storage.state_writes[0]["selected_announcements"] == 1
     assert storage.audits[0]["ingestion_run_id"] == 7
@@ -130,6 +134,19 @@ def test_discovery_keeps_restructuring_as_candidate_hint():
         "reverse_merger",
         "major_asset_restructuring",
     ]
+
+
+def test_discovery_keeps_correction_notice_out_of_full_report_class():
+    scanner = _Scanner([_record("notice", "关于《2023年年度报告》的补充更正公告")])
+    adapter = CninfoBusinessProfileDiscoveryAdapter(scanner=scanner)
+
+    result = adapter.discover_instrument(
+        {"instrument_id": "600001.SH", "symbol": "600001", "exchange": "SSE"}
+    )
+
+    candidate = result.candidates[0]
+    assert candidate.classification.document_type == ("annual_report_correction_notice")
+    assert candidate.classification.is_full_report is False
 
 
 def test_discovery_reports_missing_cninfo_identity_without_scan():

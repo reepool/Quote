@@ -210,17 +210,19 @@ CNInfo 公告索引
 
 ### 5.3 本地归档
 
-建议目录：
+原件归档布局由 `research_config.modules.business_profile_evidence.archive` 管理。默认目录：
 
 ```text
-data/filings/business_profile/{exchange}/{symbol}/{report_period}/
-  original/{announcement_id}_{content_hash}.pdf
+data/filings/business_profile/{year}/{market}/
+  {instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf
   derived/{extractor_version}/{content_hash}.json.gz
   tables/{extractor_version}/{content_hash}.json.gz
   ocr/{ocr_version}/{content_hash}.json.gz
 ```
 
-原件只写一次；派生文件可按版本重建。SQLite 只保存 manifest、哈希、路径和诊断，不重复保存整份 PDF 文本。
+例如 A 股 `600839.SH` 的 2025 年报使用 `600839_SH_2025Q4_<announcement_id>_<sha256>.pdf`。`directory_template` 可配置为 `{market}/{year}` 等安全相对路径；`filename_template` 可调整字段顺序，但完整归档路径必须包含 `{content_hash}`，不能直接使用会让修订稿相互覆盖的 `600839_SH_2025Q4.pdf`。如需面向人工浏览的“当前版”短文件名，应由独立索引或只读视图提供，不得替代不可变原件。
+
+原件只写一次；派生文件可按版本重建。SQLite 只保存 manifest、哈希、路径和诊断，不重复保存整份 PDF 文本。配置布局变化只作用于后续新归档；同公告、同哈希且 manifest 原件仍存在时继续使用原路径短路，不自动搬迁或复制历史原件。目录迁移必须由独立、可校验、可回滚的维护任务完成。
 
 当前代码通过 `BusinessProfileDocumentArchiveService` 实现原件层。共享 `financial_source_files` 已增加 `source_tier` 和 `supersedes_source_file_id`，业务画像文档使用独立 `business_profile_source_file_manifest.v1` schema，避免与财务数值事实混淆。更正公告、新公告复用相同内容、同一公告附件变化分别保留公告身份和内容身份；只有同一公告 ID、同一内容哈希的重跑才直接返回 `unchanged`。
 

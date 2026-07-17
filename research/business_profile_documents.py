@@ -9,7 +9,12 @@ from typing import List, Optional
 
 _SPACE_RE = re.compile(r"\s+")
 _TAG_RE = re.compile(r"<[^>]+>")
-_REPORT_YEAR_RE = re.compile(r"(?P<year>20\d{2})年")
+_PERIODIC_REPORT_TITLE_RE = re.compile(
+    r"(?P<year>20\d{2})(?:年年度报告|年度报告|年半年度报告|年中期报告)"
+)
+_FULL_REPORT_SUFFIX_RE = re.compile(
+    r"^(?:全文|[（(](?:更正后|修订(?:版|稿)?|更新后|更新版|补充后|补充版|补充修订版)[）)])?$"
+)
 
 
 @dataclass(frozen=True)
@@ -74,7 +79,7 @@ def infer_business_profile_report_period(
 ) -> str:
     """Infer a filing period, falling back to the publication date for events."""
     normalized = normalize_announcement_title(title)
-    match = _REPORT_YEAR_RE.search(normalized)
+    match = _PERIODIC_REPORT_TITLE_RE.search(normalized)
     if match and ("半年度报告" in normalized or "中期报告" in normalized):
         return f"{match.group('year')}-06-30"
     if match and "年度报告" in normalized:
@@ -103,7 +108,31 @@ def classify_business_profile_document(
         )
 
     correction = any(
-        keyword in normalized for keyword in ("更正", "修订", "更新后", "修订版")
+        keyword in normalized
+        for keyword in (
+            "更正",
+            "修订",
+            "更新后",
+            "更新版",
+            "补充",
+        )
+    )
+    correction_notice = (
+        correction
+        and "公告" in normalized
+        and not any(
+            keyword in normalized
+            for keyword in (
+                "更正后",
+                "修订版",
+                "修订稿",
+                "更新后",
+                "更新版",
+                "补充后",
+                "补充版",
+                "补充修订版",
+            )
+        )
     )
     summary = "摘要" in normalized
     translation = any(
@@ -113,6 +142,7 @@ def classify_business_profile_document(
     periodic = _classify_periodic_report(
         normalized,
         correction=correction,
+        correction_notice=correction_notice,
         summary=summary,
         translation=translation,
         profile_event_hints=hints,
@@ -183,10 +213,14 @@ def _classify_periodic_report(
     normalized: str,
     *,
     correction: bool,
+    correction_notice: bool,
     summary: bool,
     translation: bool,
     profile_event_hints: List[str],
 ) -> Optional[BusinessProfileDocumentClassification]:
+    report_match = _PERIODIC_REPORT_TITLE_RE.search(normalized)
+    if report_match is None:
+        return None
     report_type: Optional[str] = None
     if "半年度报告" in normalized or "中期报告" in normalized:
         report_type = "semiannual_report"
@@ -194,6 +228,15 @@ def _classify_periodic_report(
         report_type = "annual_report"
     if report_type is None:
         return None
+    if correction_notice:
+        return BusinessProfileDocumentClassification(
+            document_type=f"{report_type}_correction_notice",
+            selected=True,
+            is_full_report=False,
+            is_correction=True,
+            selection_reasons=["official_periodic_report_correction_notice"],
+            profile_event_hints=profile_event_hints,
+        )
     if summary:
         return BusinessProfileDocumentClassification(
             document_type=f"{report_type}_summary",
@@ -208,6 +251,15 @@ def _classify_periodic_report(
             selected=False,
             is_correction=correction,
             exclusion_reason="translation_not_primary_report",
+            profile_event_hints=profile_event_hints,
+        )
+    suffix = normalized[report_match.end() :]
+    if _FULL_REPORT_SUFFIX_RE.fullmatch(suffix) is None:
+        return BusinessProfileDocumentClassification(
+            document_type=f"{report_type}_related",
+            selected=False,
+            is_correction=correction,
+            exclusion_reason="periodic_report_related_not_full_report",
             profile_event_hints=profile_event_hints,
         )
     return BusinessProfileDocumentClassification(

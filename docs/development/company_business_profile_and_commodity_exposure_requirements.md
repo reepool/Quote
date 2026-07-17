@@ -487,7 +487,7 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 同一估值时点若存在两个以上 approved active regime，resolver 不再按排序任取一个，而是清空 active regime、排除所有 regime 绑定事实，并输出 `overlapping_active_business_regimes` readiness blocker。
 - 已实现年报全文/摘要/修订版、经营数据、资源报告、重大合同、套保和画像变化公告分类器；借壳、重组、收购、出售、控制权及主营变化只生成事件提示，不自动切换画像。
 - 已实现 CNInfo 公司级文档发现 adapter，复用统一股票身份解析、分页、重试、限速、水位和公告审计；发现阶段不下载 PDF、不写业务事实。
-- 已实现业务画像 PDF 不可变归档服务：共享 source manifest 显式记录 `source_tier`、公告发布时间和 `supersedes_source_file_id`，归档路径包含公告 ID 与 SHA-256；同一公告同一内容重跑短路，修订稿或附件变化建立新版本且不覆盖旧原件。
+- 已实现业务画像 PDF 不可变归档服务：共享 source manifest 显式记录 `source_tier`、公告发布时间和 `supersedes_source_file_id`；归档主目录、子目录模板和文件名模板从 `research_config.modules.business_profile_evidence.archive` 读取，默认按 `{year}/{market}` 分层并使用 `{instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf`。`instrument_id` 文件名化为 `600839_SH`，年报/半年报报告期标准化为 `2025Q4 / 2025Q2`。模板必须包含完整 `{content_hash}`，因此同一报告期的修订稿或附件变化不会覆盖旧原件；配置变化只影响新归档，既有 manifest 文件不隐式搬迁。
 - 归档批次支持 `max_documents` 和原子 checkpoint；中断后按公告元数据指纹续跑，完整批次结束后清除 checkpoint。归档阶段只写原件和 manifest，不写 candidate/approved 业务事实。
 - 归档采用跨库父子任务：`research.db` 保存业务画像父任务，`financials.db` 创建 `financial_business_profile_documents` 子任务并由 manifest 外键引用；父任务 ID 只记录在 manifest metadata，不建立跨库物理外键。manifest 写入失败时删除本轮新建且尚未登记的原件。
 - 降级公告扫描不得推进水位；语料审计只统计 `business_profile_source_file_manifest.v1`，并将全文与其修订稿归入统一 annual/semiannual document family。
@@ -495,7 +495,11 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 已建立包含文档、页/表证据、产品、商品、单位、业务 regime、画像事件和审核决定的金标准 JSON Schema。
 - 已实现 `pypdf` 页级派生 artifact：验证 PDF/加密/页树，逐页保存原生文本、尺寸、文本密度、文本哈希和 artifact 哈希，生成主营、分部、产销、成本、资源、项目及套保标题索引。压缩文件按原件内容哈希、parameter hash 和 extractor version 写入 `derived/`，同内容、同参数换目录或 manifest ID 不改变 artifact hash。
 - 低文本页不会一律触发 OCR；只有命中业务标题或由上游显式标为目标页时才进入 `ocr_required_pages`。`tables/` 与 `ocr/` 版本目录合同已固定，分层 parser diagnostic 和受证据约束的 `not_disclosed` 合同已实现；表格解析器、OCR worker 及字段事实层完整状态集仍待后续实现。
+- 已实现 benchmark 官方文档 probe。调用方可按行业、标的、日期、页数和最大公司数限制 CNInfo 查询；默认只获取 metadata，显式指定非生产临时目录时才下载内容寻址 PDF 并运行 diagnostics。probe 不写公告水位、生产 source manifest 或画像事实，且拒绝生产归档路径、非 PDF 内容和静默 `parse_failed`。
+- 定期报告分类不再依赖“年度报告”关键词本身：标题必须包含可解析且与报告期推断一致的报告年度，且报告词后的后缀只能为空、`全文` 或明确的更正后/修订版/更新后/补充后全文标识。年度报告信息披露制度和业绩说明会等 related 文档不入选；更正公告单列为 `annual|semiannual_report_correction_notice`，可作为治理线索但不是修订后全文。
 
 下一批使用页级诊断选择每行业 5 家 parser benchmark，并继续交易所备源和 CNInfo 受控 live 归档，不提前进行全市场画像事实写入。
 
 五家公司 benchmark 已增加确定性分层选择器：先覆盖行业内实际存在的沪深北市场，再最大化申万二/三级、上市年代和经官方文档核验的综合经营、修订稿、复杂/跨页表、OCR/乱码等边界。六个首期行业缺一不可；空库、缺行业或单行业就绪不能使全局状态变为 `ready`。标签除 `verified=true + source_document_ids` 外，还必须通过 `financials.db` 中同公司官方业务画像 manifest 的来源层、状态、归档路径和内容哈希校验；截至 `2026-07-17` 已形成 30 家待核验候选，但六个行业均仍缺正式文档证据，因此 OpenSpec `1.2` 尚未完成。
+
+`2026-07-17` 受控 live 验证已完成既定 30 家 CNInfo metadata 探测，沪深北身份解析均成功，未发现正式定期报告缺口；`000983.SZ / 000506.SZ / 000968.SZ / 000629.SZ` 存在可用于 correction 分层的真实“补充后/更正后”全文。六个行业各 1 份 2025 年正式年报在 `/tmp` 完成页级诊断，共 `1112` 页和 `308` 个业务标题命中，全部页面可提取原生文本，无解析、乱码或 OCR blocker。该临时验证没有写入生产 manifest，尚未完成 30 家全部 PDF、复杂/跨页表和多元业务人工核验，不能据此将 OpenSpec `1.2` 标记完成。

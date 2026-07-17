@@ -8,8 +8,10 @@ import logging
 import os
 import re
 from dataclasses import asdict, dataclass, field
+from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from string import Formatter
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
 
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import (
@@ -22,10 +24,51 @@ from utils.http_transport import HttpTlsConfig, request_get
 
 
 BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION = "business_profile_source_file_manifest.v1"
-BUSINESS_PROFILE_ARCHIVE_VERSION = "business_profile_pdf_archive.v1"
+BUSINESS_PROFILE_ARCHIVE_VERSION = "business_profile_pdf_archive.v2"
 BUSINESS_PROFILE_SOURCE_TIER = "official_primary"
+DEFAULT_BUSINESS_PROFILE_ARCHIVE_ROOT = "data/filings/business_profile"
+DEFAULT_BUSINESS_PROFILE_DIRECTORY_TEMPLATE = "{year}/{market}"
+DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE = (
+    "{instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf"
+)
 LOGGER = logging.getLogger(__name__)
 _SAFE_PATH_RE = re.compile(r"[^0-9A-Za-z_.-]+")
+_ARCHIVE_TEMPLATE_FIELDS = {
+    "announcement_id",
+    "content_hash",
+    "document_type",
+    "instrument_id",
+    "market",
+    "period_label",
+    "report_period",
+    "symbol",
+    "year",
+}
+
+
+def business_profile_candidate_url(url: Optional[str]) -> Optional[str]:
+    """Resolve one CNInfo attachment URL without performing network access."""
+    if not url:
+        return None
+    if url.startswith(("http://", "https://")):
+        return url
+    return f"https://static.cninfo.com.cn/{url.lstrip('/')}"
+
+
+def download_business_profile_candidate(
+    candidate: BusinessProfileDocumentCandidate,
+) -> bytes:
+    """Download one official CNInfo attachment through governed transport."""
+    url = business_profile_candidate_url(candidate.adjunct_url)
+    if not url:
+        raise ValueError("candidate attachment URL is missing")
+    response = request_get(
+        url,
+        tls_config=HttpTlsConfig(source_name="cninfo"),
+        timeout=20,
+    )
+    response.raise_for_status()
+    return bytes(response.content or b"")
 
 
 @dataclass(frozen=True)
@@ -70,14 +113,68 @@ class BusinessProfileDocumentArchiveService:
         self,
         *,
         storage: Any,
-        archive_root: str | Path = "data/filings/business_profile",
+        archive_root: str | Path = DEFAULT_BUSINESS_PROFILE_ARCHIVE_ROOT,
+        directory_template: str = DEFAULT_BUSINESS_PROFILE_DIRECTORY_TEMPLATE,
+        filename_template: str = DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE,
         downloader: Optional[
             Callable[[BusinessProfileDocumentCandidate], bytes]
         ] = None,
     ) -> None:
         self.storage = storage
         self.archive_root = Path(archive_root)
-        self.downloader = downloader or self._download_candidate
+        self.directory_template = self._validate_layout_template(
+            directory_template,
+            field_name="directory_template",
+        )
+        self.filename_template = self._validate_layout_template(
+            filename_template,
+            field_name="filename_template",
+        )
+        layout_fields = self._template_fields(
+            self.directory_template
+        ) | self._template_fields(self.filename_template)
+        if "content_hash" not in layout_fields:
+            raise ValueError(
+                "business-profile archive layout must include {content_hash}"
+            )
+        self.downloader = downloader or download_business_profile_candidate
+
+    @classmethod
+    def from_research_config(
+        cls,
+        *,
+        storage: Any,
+        research_config: Any,
+        downloader: Optional[
+            Callable[[BusinessProfileDocumentCandidate], bytes]
+        ] = None,
+    ) -> "BusinessProfileDocumentArchiveService":
+        """Build the archive service from the governed research module config."""
+        modules = getattr(research_config, "modules", {}) or {}
+        if not isinstance(modules, Mapping):
+            raise ValueError("research_config.modules must be a mapping")
+        module_cfg = modules.get("business_profile_evidence", {})
+        if not isinstance(module_cfg, Mapping):
+            raise ValueError("business_profile_evidence config must be a mapping")
+        archive_cfg = module_cfg.get("archive", {})
+        if not isinstance(archive_cfg, Mapping):
+            raise ValueError("business_profile_evidence.archive must be a mapping")
+        return cls(
+            storage=storage,
+            archive_root=archive_cfg.get(
+                "archive_root",
+                DEFAULT_BUSINESS_PROFILE_ARCHIVE_ROOT,
+            ),
+            directory_template=archive_cfg.get(
+                "directory_template",
+                DEFAULT_BUSINESS_PROFILE_DIRECTORY_TEMPLATE,
+            ),
+            filename_template=archive_cfg.get(
+                "filename_template",
+                DEFAULT_BUSINESS_PROFILE_FILENAME_TEMPLATE,
+            ),
+            downloader=downloader,
+        )
 
     def archive_candidates(
         self,
@@ -204,10 +301,33 @@ class BusinessProfileDocumentArchiveService:
             source="cninfo",
         )
         exact = self._find_exact_manifest(rows, candidate.announcement_id, content_hash)
+        if exact is not None:
+            existing_archive_path = Path(str(exact.get("archive_path") or ""))
+            if existing_archive_path.is_file():
+                existing_hash = hashlib.sha256(
+                    existing_archive_path.read_bytes()
+                ).hexdigest()
+                if existing_hash != content_hash:
+                    raise RuntimeError(
+                        "registered business-profile archive hash mismatch: "
+                        f"{existing_archive_path}"
+                    )
+                return BusinessProfileArchiveRecord(
+                    announcement_id=candidate.announcement_id,
+                    report_period=report_period,
+                    document_type=document_type,
+                    content_hash=content_hash,
+                    archive_path=str(existing_archive_path),
+                    source_file_id=str(exact["source_file_id"]),
+                    status="unchanged",
+                    supersedes_source_file_id=exact.get("supersedes_source_file_id"),
+                )
         archive_path = self._archive_path(
+            instrument_id=instrument_id,
             exchange=exchange,
             symbol=symbol,
             report_period=report_period,
+            document_type=document_type,
             announcement_id=candidate.announcement_id,
             content_hash=content_hash,
         )
@@ -360,23 +480,124 @@ class BusinessProfileDocumentArchiveService:
     def _archive_path(
         self,
         *,
+        instrument_id: str,
         exchange: str,
         symbol: str,
         report_period: str,
+        document_type: str,
         announcement_id: str,
         content_hash: str,
     ) -> Path:
-        safe_announcement = _SAFE_PATH_RE.sub("_", announcement_id).strip("._")
-        if not safe_announcement:
-            raise ValueError("announcement_id is invalid for archive path")
-        return (
-            self.archive_root
-            / exchange
-            / symbol
-            / report_period
-            / "original"
-            / f"{safe_announcement}_{content_hash}.pdf"
+        context = self._archive_template_context(
+            instrument_id=instrument_id,
+            exchange=exchange,
+            symbol=symbol,
+            report_period=report_period,
+            document_type=document_type,
+            announcement_id=announcement_id,
+            content_hash=content_hash,
         )
+        directory = self.directory_template.format_map(context)
+        filename = self.filename_template.format_map(context)
+        relative_directory = Path(directory) if directory else Path()
+        if relative_directory.is_absolute() or ".." in relative_directory.parts:
+            raise ValueError("archive directory template rendered an unsafe path")
+        filename_path = Path(filename)
+        if (
+            not filename
+            or filename_path.name != filename
+            or filename_path.suffix.lower() != ".pdf"
+        ):
+            raise ValueError(
+                "archive filename template must render one relative PDF filename"
+            )
+        return self.archive_root / relative_directory / filename
+
+    @classmethod
+    def _archive_template_context(
+        cls,
+        *,
+        instrument_id: str,
+        exchange: str,
+        symbol: str,
+        report_period: str,
+        document_type: str,
+        announcement_id: str,
+        content_hash: str,
+    ) -> Dict[str, str]:
+        period_date = date.fromisoformat(report_period)
+        return {
+            "instrument_id": cls._safe_component(
+                str(instrument_id).replace(".", "_"),
+                field_name="instrument_id",
+            ),
+            "market": cls._safe_component(exchange, field_name="market"),
+            "symbol": cls._safe_component(symbol, field_name="symbol"),
+            "year": str(period_date.year),
+            "report_period": period_date.isoformat(),
+            "period_label": cls._period_label(period_date),
+            "document_type": cls._safe_component(
+                document_type,
+                field_name="document_type",
+            ),
+            "announcement_id": cls._safe_component(
+                announcement_id,
+                field_name="announcement_id",
+            ),
+            "content_hash": cls._safe_component(
+                content_hash,
+                field_name="content_hash",
+            ),
+        }
+
+    @staticmethod
+    def _period_label(period_date: date) -> str:
+        quarter_ends = {
+            (3, 31): "Q1",
+            (6, 30): "Q2",
+            (9, 30): "Q3",
+            (12, 31): "Q4",
+        }
+        quarter = quarter_ends.get((period_date.month, period_date.day))
+        return (
+            f"{period_date.year}{quarter}"
+            if quarter
+            else period_date.strftime("%Y%m%d")
+        )
+
+    @staticmethod
+    def _safe_component(value: str, *, field_name: str) -> str:
+        normalized = _SAFE_PATH_RE.sub("_", str(value)).strip("._")
+        if not normalized:
+            raise ValueError(f"{field_name} is invalid for archive layout")
+        return normalized
+
+    @classmethod
+    def _validate_layout_template(
+        cls,
+        value: str,
+        *,
+        field_name: str,
+    ) -> str:
+        template = str(value or "")
+        if field_name == "filename_template" and not template:
+            raise ValueError("filename_template must not be empty")
+        cls._template_fields(template)
+        return template
+
+    @staticmethod
+    def _template_fields(template: str) -> set[str]:
+        fields: set[str] = set()
+        for _, field_name, format_spec, conversion in Formatter().parse(template):
+            if field_name is None:
+                continue
+            if field_name not in _ARCHIVE_TEMPLATE_FIELDS or format_spec or conversion:
+                raise ValueError(
+                    f"unsupported business-profile archive template field: "
+                    f"{field_name}"
+                )
+            fields.add(field_name)
+        return fields
 
     @staticmethod
     def _write_immutable(path: Path, content: bytes, content_hash: str) -> bool:
@@ -521,21 +742,4 @@ class BusinessProfileDocumentArchiveService:
 
     @staticmethod
     def _absolute_cninfo_url(url: Optional[str]) -> Optional[str]:
-        if not url:
-            return None
-        if url.startswith(("http://", "https://")):
-            return url
-        return f"https://static.cninfo.com.cn/{url.lstrip('/')}"
-
-    @classmethod
-    def _download_candidate(cls, candidate: BusinessProfileDocumentCandidate) -> bytes:
-        url = cls._absolute_cninfo_url(candidate.adjunct_url)
-        if not url:
-            raise ValueError("candidate attachment URL is missing")
-        response = request_get(
-            url,
-            tls_config=HttpTlsConfig(source_name="cninfo"),
-            timeout=20,
-        )
-        response.raise_for_status()
-        return bytes(response.content or b"")
+        return business_profile_candidate_url(url)

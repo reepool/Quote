@@ -21,6 +21,57 @@ def test_classifies_full_periodic_reports_and_excludes_summaries():
     assert corrected.is_correction is True
 
 
+def test_periodic_report_keyword_in_governance_policy_is_not_a_full_report():
+    result = classify_business_profile_document(
+        "年度报告信息披露重大差错责任追究管理办法（2025年修订）"
+    )
+
+    assert result.selected is False
+    assert result.document_type == "other"
+    assert result.exclusion_reason == "unsupported_document_class"
+
+
+def test_correction_notice_is_selected_but_not_classified_as_corrected_full_report():
+    result = classify_business_profile_document("关于《2023年年度报告》的补充更正公告")
+
+    assert result.selected is True
+    assert result.document_type == "annual_report_correction_notice"
+    assert result.is_correction is True
+    assert result.is_full_report is False
+
+
+def test_periodic_report_meeting_notice_is_not_a_full_report():
+    result = classify_business_profile_document("2025年年度报告业绩说明会预告公告")
+
+    assert result.selected is False
+    assert result.document_type == "annual_report_related"
+    assert result.exclusion_reason == "periodic_report_related_not_full_report"
+
+
+def test_supplemented_full_report_is_kept_as_a_correction():
+    result = classify_business_profile_document("2025年年度报告（补充后）")
+
+    assert result.selected is True
+    assert result.document_type == "annual_report_correction"
+    assert result.is_full_report is True
+    assert result.is_correction is True
+
+
+def test_periodic_title_and_report_period_use_the_same_year_contract():
+    unsupported = classify_business_profile_document("2025半年度报告")
+    supported = classify_business_profile_document("2025年半年度报告")
+
+    assert unsupported.selected is False
+    assert supported.selected is True
+    assert (
+        infer_business_profile_report_period(
+            "2025年半年度报告",
+            "2026-08-01T00:00:00+08:00",
+        )
+        == "2025-06-30"
+    )
+
+
 def test_classifies_operating_resource_contract_and_hedging_disclosures():
     cases = {
         "2026年6月份主要经营数据公告": "operating_data",

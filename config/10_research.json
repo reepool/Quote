@@ -38,6 +38,15 @@
           "BSE"
         ]
       },
+      "business_profile_evidence": {
+        "enabled": false,
+        "archive": {
+          "archive_root": "data/filings/business_profile",
+          "directory_template": "{year}/{market}",
+          "filename_template": "{instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf",
+          "note": "instrument_id is rendered as 600839_SH; annual and semiannual periods render as 2025Q4 and 2025Q2. content_hash is mandatory so corrections and changed attachments never overwrite prior official PDFs."
+        }
+      },
       "industry": {
         "enabled": true,
         "optional_empty_exchanges": [

@@ -2,6 +2,7 @@ from dataclasses import asdict
 import json
 from pathlib import Path
 import sqlite3
+from types import SimpleNamespace
 
 import pytest
 
@@ -84,8 +85,8 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
     assert record.status == "archived"
     assert record.report_period == "2025-12-31"
     assert record.content_hash in record.archive_path
-    assert path.name.endswith(".pdf")
-    assert path.parent.name == "original"
+    assert path.parent == tmp_path / "filings" / "2025" / "SSE"
+    assert path.name == (f"600309_SH_2025Q4_annual-1_{record.content_hash}.pdf")
     assert path.read_bytes() == content
     assert storage.rows[0]["schema_version"] == BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION
     assert storage.rows[0]["source_tier"] == "official_primary"
@@ -96,6 +97,45 @@ def test_archive_writes_immutable_hash_path_and_manifest(tmp_path):
         "domain": "business_profile",
         "ingestion_run_id": 3,
     }
+
+
+def test_archive_layout_loads_configured_market_year_template(tmp_path):
+    service = BusinessProfileDocumentArchiveService.from_research_config(
+        storage=_Storage(),
+        research_config=SimpleNamespace(
+            modules={
+                "business_profile_evidence": {
+                    "archive": {
+                        "archive_root": str(tmp_path / "reports"),
+                        "directory_template": "{market}/{year}",
+                        "filename_template": (
+                            "{instrument_id}_{period_label}_{document_type}_"
+                            "{content_hash}.pdf"
+                        ),
+                    }
+                }
+            }
+        ),
+    )
+
+    record = service.archive_content(
+        _instrument(),
+        _candidate("annual-1", "万华化学2025年年度报告"),
+        b"%PDF-1.7\nconfigured-layout",
+    )
+
+    path = Path(record.archive_path)
+    assert path.parent == tmp_path / "reports" / "SSE" / "2025"
+    assert path.name == (f"600309_SH_2025Q4_annual_report_{record.content_hash}.pdf")
+
+
+def test_archive_layout_requires_content_hash_for_immutable_versions(tmp_path):
+    with pytest.raises(ValueError, match=r"must include \{content_hash\}"):
+        BusinessProfileDocumentArchiveService(
+            storage=_Storage(),
+            archive_root=tmp_path,
+            filename_template="{instrument_id}_{period_label}.pdf",
+        )
 
 
 def test_exact_rerun_short_circuits_manifest_write(tmp_path):
@@ -113,6 +153,30 @@ def test_exact_rerun_short_circuits_manifest_write(tmp_path):
     assert first.status == "archived"
     assert second.status == "unchanged"
     assert second.source_file_id == first.source_file_id
+    assert storage.upsert_calls == 1
+
+
+def test_layout_change_does_not_relocate_an_existing_exact_archive(tmp_path):
+    storage = _Storage()
+    candidate = _candidate("annual-1", "万华化学2025年年度报告")
+    content = b"%PDF-1.7\nstable-layout"
+    first = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        archive_root=tmp_path / "filings",
+    ).archive_content(_instrument(), candidate, content)
+
+    second = BusinessProfileDocumentArchiveService(
+        storage=storage,
+        archive_root=tmp_path / "filings",
+        directory_template="{market}/{year}",
+        filename_template=(
+            "{instrument_id}_{document_type}_{period_label}_{content_hash}.pdf"
+        ),
+    ).archive_content(_instrument(), candidate, content)
+
+    assert second.status == "unchanged"
+    assert second.archive_path == first.archive_path
+    assert len(list((tmp_path / "filings").rglob("*.pdf"))) == 1
     assert storage.upsert_calls == 1
 
 
