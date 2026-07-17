@@ -498,6 +498,7 @@ OpenSpec change `establish-a-share-business-profile-governance` 已建立并完�
 - 已实现 benchmark 官方文档 probe。调用方可按行业、标的、日期、页数和最大公司数限制 CNInfo 查询；默认只获取 metadata，显式指定非生产临时目录时才下载内容寻址 PDF 并运行 diagnostics。probe 不写公告水位、生产 source manifest 或画像事实，且拒绝生产归档路径、非 PDF 内容和静默 `parse_failed`。
 - 定期报告分类不再依赖“年度报告”关键词本身：标题必须包含可解析且与报告期推断一致的报告年度，且报告词后的后缀只能为空、`全文` 或明确的更正后/修订版/更新后/补充后全文标识。年度报告信息披露制度和业绩说明会等 related 文档不入选；更正公告单列为 `annual|semiannual_report_correction_notice`，可作为治理线索但不是修订后全文。
 - 已增加 CNInfo 主源到交易所官方备源的条件式协调器。CNInfo 完整返回时不请求备源；失败、降级、身份缺失或明确报告查询为空时，仅调用 instrument 所属交易所。SSE/SZSE 公开定期报告接口已完成单公司 live 验证，候选和归档 manifest 保留真实 `sse|szse / official_backup` lineage。BSE adapter 已实现但因生产网络对公开端点发生重定向循环而配置禁用，故北交所继续使用 CNInfo 主源且不会把端点失败误报为无披露。
+- 已增加交易所备源 live 验证 CLI，强制 instrument、日期和页数边界，默认只读 metadata。原有及新增单元测试覆盖标题分类、全文/摘要、条件式 fallback、重复内容、更正跨来源 supersession 和 checkpoint 中断续跑；SSE/SZSE 用同一生产配置完成单公司单页 live 验证，BSE disabled 状态按 blocked 处理。
 
 下一批使用页级诊断选择每行业 5 家 parser benchmark，并继续交易所备源和 CNInfo 受控 live 归档，不提前进行全市场画像事实写入。
 

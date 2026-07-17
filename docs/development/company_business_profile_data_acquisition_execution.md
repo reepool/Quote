@@ -398,6 +398,20 @@ extracted -> candidate -> approved / rejected
 
 协调结果必须返回每次实际调用的 source、source tier、状态、页数、公告数、候选数和错误。只选择一个最高优先级可用来源进入后续归档，不合并聚合站结果，也不在发现阶段写画像事实。交易所候选进入归档后，source manifest 必须记录真实交易所来源和 `official_backup`，不能继续硬编码为 CNInfo。
 
+受控 live 验证使用 `scripts/dev_validation/probe_business_profile_exchange_discovery.py`。命令强制显式 instrument 和日期范围，默认每家公司只扫 1 页、最多 10 家，只返回 metadata，不下载 PDF、不写数据库、不推进水位：
+
+```bash
+/home/python/miniconda3/envs/Quote/bin/python \
+  scripts/dev_validation/probe_business_profile_exchange_discovery.py \
+  --instrument 600028.SH \
+  --instrument 000983.SZ \
+  --start-date 2026-01-01 \
+  --end-date 2026-07-17 \
+  --mode backup
+```
+
+`chain` 模式验证 CNInfo 优先级和条件式 fallback；`backup` 模式直接验证所属交易所适配器。禁用或未配置的备源返回 `blocked` 和非零退出码，不能记作合法空披露。
+
 ### 9.2 指标
 
 | 指标 | 首期门槛 |
