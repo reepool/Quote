@@ -127,6 +127,7 @@ def _retryable_loader_error(exc: Exception) -> bool:
             ConnectionError,
             requests_exceptions.Timeout,
             requests_exceptions.ConnectionError,
+            requests_exceptions.JSONDecodeError,
             requests_exceptions.ChunkedEncodingError,
             requests_exceptions.ContentDecodingError,
         ),

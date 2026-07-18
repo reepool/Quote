@@ -238,6 +238,8 @@ class JobConfigManager:
         job_config = self.get_job_config(job_id)
         if not job_config:
             return None
+        if job_config.trigger is None:
+            return None
 
         try:
             # 创建一个临时触发器来获取下次运行时间

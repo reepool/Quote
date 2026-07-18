@@ -19,6 +19,12 @@ def test_generic_requests_timeout_is_retryable():
     assert _retryable_loader_error(requests.exceptions.Timeout("timeout"))
 
 
+def test_requests_json_decode_error_is_retryable():
+    error = requests.exceptions.JSONDecodeError("invalid", "", 0)
+
+    assert _retryable_loader_error(error)
+
+
 def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
     calls = []
 
