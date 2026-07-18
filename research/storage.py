@@ -11645,6 +11645,48 @@ class ResearchStorageManager:
             CREATE INDEX IF NOT EXISTS idx_company_commodity_exposures_commodity
             ON company_commodity_exposures(commodity_id, exposure_role, review_status);
 
+            CREATE TABLE IF NOT EXISTS business_profile_review_audit (
+                audit_id TEXT PRIMARY KEY,
+                operation_id TEXT NOT NULL,
+                record_type TEXT NOT NULL,
+                record_id TEXT NOT NULL,
+                instrument_id TEXT NOT NULL,
+                decision TEXT NOT NULL,
+                prior_status TEXT NOT NULL,
+                new_status TEXT NOT NULL,
+                prior_version INTEGER,
+                new_version INTEGER,
+                prior_updated_at TEXT NOT NULL,
+                new_updated_at TEXT NOT NULL,
+                record_lineage_hash TEXT,
+                reviewer TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                evidence_references_json TEXT NOT NULL DEFAULT '[]',
+                replacement_record_id TEXT,
+                prior_audit_hash TEXT,
+                audit_hash TEXT NOT NULL,
+                metadata_json TEXT NOT NULL DEFAULT '{}',
+                reviewed_at TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_business_profile_review_audit_record
+            ON business_profile_review_audit(record_type, record_id, reviewed_at);
+            CREATE INDEX IF NOT EXISTS idx_business_profile_review_audit_instrument
+            ON business_profile_review_audit(instrument_id, reviewed_at);
+
+            CREATE TRIGGER IF NOT EXISTS business_profile_review_audit_no_update
+            BEFORE UPDATE ON business_profile_review_audit
+            BEGIN
+                SELECT RAISE(ABORT, 'business_profile_review_audit is immutable');
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS business_profile_review_audit_no_delete
+            BEFORE DELETE ON business_profile_review_audit
+            BEGIN
+                SELECT RAISE(ABORT, 'business_profile_review_audit is immutable');
+            END;
+
             CREATE TABLE IF NOT EXISTS financial_summaries (
                 instrument_id TEXT PRIMARY KEY,
                 symbol TEXT NOT NULL,

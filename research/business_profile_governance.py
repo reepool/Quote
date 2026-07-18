@@ -260,9 +260,30 @@ class BusinessProfileRepository:
             INSERT INTO {spec['table']} ({', '.join(columns)})
             VALUES ({', '.join('?' for _ in columns)})
             ON CONFLICT({pk}) DO UPDATE SET {', '.join(updates)}
+            WHERE {spec['table']}.review_status = 'candidate'
+              AND excluded.review_status = 'candidate'
         """
         with self.storage.get_connection() as conn:
             self.storage._apply_pragmas(conn)
+            existing = conn.execute(
+                f"""
+                SELECT review_status
+                FROM {spec['table']}
+                WHERE {pk} = ?
+                """,
+                (payload[pk],),
+            ).fetchone()
+            if existing is not None and existing["review_status"] != "candidate":
+                return str(payload[pk])
+            if (
+                existing is not None
+                and existing["review_status"] == "candidate"
+                and status != "candidate"
+            ):
+                raise ValueError(
+                    "review status transitions require BusinessProfileReviewService: "
+                    f"{record_type}:{payload[pk]}"
+                )
             conn.execute(sql, values)
             conn.commit()
         return str(payload[pk])

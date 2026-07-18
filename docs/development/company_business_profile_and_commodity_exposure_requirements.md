@@ -323,6 +323,19 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
   candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
   候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；
+- 已实现业务画像候选审核 CLI 和追加式审计表，支持 `approved / rejected /
+  superseded` 三类显式决定；写入要求 operator switch、审核人、理由、预期状态
+  和预期更新时间，证据以外的事实只有在同公司 evidence 已批准后才能批准。
+  审核状态迁移与审计写入处于同一事务，审计表由数据库触发器禁止更新和删除；
+  后续结构化同步通过数据库 conflict 条件保护终态，不得在并发窗口把终态记录
+  重新降级为 candidate；官方来源 evidence 可直接人工批准，免费聚合源 evidence
+  必须留下至少一项复核依据；queue/audit 使用 SQLite 只读连接；
+- 已实现正式报告产品标签人工复核包和 99% precision gate：正式报告必须在
+  `financials.db` 中存在有效业务画像 manifest，来源层为官方主源或备源，报告期
+  与候选一致，未被后续文件替代，且归档文件 SHA-256 与 manifest 一致；人工结果
+  必须指定具体文档 hash、正式页码、正式标签、审核人和理由，并以 source hash
+  防止待审字段被篡改。排除项只允许治理目录中的原因，默认排除率不得超过 5%；
+  gate 使用双侧 95% Wilson 下界，零错误也至少需要 381 条独立有效样本；
 - 已完成六行业各 5 家、跨 BSE/SSE/SZSE 和四个上市年代的分层只读 pilot：
   两个来源均 30/30 成功，但东方财富 24/30 达到 200 行疑似上限，产品精确别名
   覆盖仅 2.18%；因此来源链可用但 promotion gate 未通过；
@@ -331,8 +344,11 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
   5,554 candidate segments，approved/value-chain/exposure 均为 0；
 - 公告发现、PDF 归档和页级 artifact 继续保留；
 - `601088.SH` bounded live smoke 中两个结构化源均成功，主营构成返回 200 行、覆盖 2018-12-31 至 2025-12-31，并触发 `possible_source_row_cap`；同报告期产品收入比例合计约为 `1`，已按小数比例口径实现；
-- 免费结构化源的 scheduler、正式报告 99% precision 核对、全市场回补、人工
-  审批 CLI 和生产 DCF 数据覆盖尚未完成。
+- 先前从 `/tmp` 六份 PDF 目录导出的 1 条材料性精确别名只能作为工具诊断，因未
+  绑定官方 manifest，不能计入 promotion evidence。当前生产 `financials.db`
+  合格业务画像官方 manifest 为 0，因此 `6.3` 仍为 `not_ready`。免费结构化源
+  scheduler、足量正式报告 99% precision 核对、全市场回补和生产 DCF 数据覆盖
+  尚未完成。
 
 因此，当前结论是“新路线已具备受控批次采集和候选治理能力”，不是“公司画像
 数据已生产完备”。
