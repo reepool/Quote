@@ -95,6 +95,65 @@
           "directory_template": "{year}/{market}",
           "filename_template": "{instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf",
           "note": "instrument_id is rendered as 600839_SH; annual and semiannual periods render as 2025Q4 and 2025Q2. content_hash is mandatory so corrections and changed attachments never overwrite prior official PDFs."
+        },
+        "free_structured_sources": {
+          "enabled": false,
+          "candidate_only": true,
+          "sources": [
+            {
+              "source": "eastmoney_main_composition",
+              "adapter": "project_http.eastmoney_main_composition",
+              "enabled": true,
+              "mode": "direct",
+              "possible_row_cap": 200,
+              "fields": [
+                "report_period",
+                "classification_type",
+                "item_name",
+                "revenue",
+                "revenue_ratio",
+                "cost",
+                "cost_ratio",
+                "profit",
+                "profit_ratio",
+                "gross_margin"
+              ]
+            },
+            {
+              "source": "ths_main_business_intro",
+              "adapter": "project_http.ths_main_business_intro",
+              "enabled": true,
+              "mode": "direct",
+              "current_snapshot_only": true,
+              "fields": [
+                "main_business",
+                "product_types",
+                "product_names",
+                "business_scope"
+              ]
+            }
+          ],
+          "runtime": {
+            "request_timeout_seconds": 20.0,
+            "request_interval_seconds": 0.5,
+            "retry_attempts": 2,
+            "retry_backoff_seconds": 1.0,
+            "max_instruments_per_run": 30
+          },
+          "note": "Free aggregator fields create evidence and segment candidates only. First-observed time is the conservative availability date; no value-chain, customer/supplier, commodity direction, or DCF approval is inferred."
+        },
+        "llm_extraction": {
+          "enabled": false,
+          "provider": "openai_compatible",
+          "base_url": "",
+          "model": "",
+          "api_key_env": "",
+          "endpoint": "/v1/chat/completions",
+          "timeout_seconds": 90.0,
+          "max_input_characters": 30000,
+          "temperature": 0.0,
+          "candidate_only": true,
+          "note": "Reserved interface only. It accepts selected filing sections, returns business_profile_llm_report.v1 JSON, and has no scheduler or DCF integration until a local model and quality benchmark are approved."
         }
       },
       "industry": {

@@ -1,548 +1,328 @@
-# A 股公司业务画像公开数据采集与维护工程方案
+# A 股公司业务画像数据采集实施方案
 
-> 状态：OpenSpec 实施基线
-> 日期：2026-07-16
-> 适用范围：A 股第一阶段周期行业公司
-> 关联需求：`company_business_profile_and_commodity_exposure_requirements.md`
-> 关联变更：`build-a-share-business-profile-evidence-pipeline`（本地 OpenSpec，不进入 Git）
+> 更新日期：2026-07-18
+> 对应需求：`company_business_profile_and_commodity_exposure_requirements.md`
+> OpenSpec：`build-a-share-business-profile-evidence-pipeline`
 
----
+## 1. 当前工程目标
 
-## 1. 结论
+工程主线已经从“程序解析年报叙述并推断价值链”调整为：
 
-这些信息可以主要依靠免费公开数据落地，但不存在一个免费 API 能稳定、结构化、全市场地直接返回“公司分部、产品、价值链角色和商品暴露”。可行路径是把官方披露文档建设成可持续的数据生产线：
+```text
+免费结构化主营数据
+  -> 原始快照与内容哈希
+  -> 字段规范化
+  -> candidate evidence / segment
+  -> 精确产品别名匹配
+  -> 商品映射候选
+  -> 人工审批
+  -> approved DCF input
+```
 
-1. 以巨潮资讯正式年报、半年报和更正公告为跨市场主源，以各交易所公告为备源；
-2. 将 PDF 原件、公告时间、文档哈希和解析版本永久留存；
-3. 先从监管模板相对稳定的主营分部、产销量、库存量和成本构成表抽取；
-4. 再用行业词典和公司原文生成价值链及商品暴露候选；
-5. 所有自动结果先进入候选审核，不能直接进入 DCF；
-6. 按行业和字段逐项通过金标准后上线，不进行一次性全市场黑箱回补。
-7. 公司画像按业务 regime 长期版本化，借壳、重大重组和新增主业不会覆盖历史画像。
+官方公告和 PDF 链路继续承担正式证据、差异复核、专项字段和未来 LLM 选段输入。它不再承担关键词语义推断任务。
 
-公开信息的可得性不是主要障碍。真正的工程难点是 PDF 版式、历史规则版本、单位和合并口径、产品实体归一化、综合企业分部拆分以及持续审核。首批六类周期行业形成可用生产能力预计是数月级工作，不需要先完成所有行业和全部深度字段。
+## 2. 代码边界
 
----
-
-## 2. 当前本地基线
-
-截至 2026-07-16 的本地核查：
-
-| 能力 | 当前状态 | 可复用内容 |
+| 模块 | 职责 | 当前状态 |
 |---|---|---|
-| 公告发现 | 已有 | `CninfoAnnouncementScanner` 支持公司身份解析、分页、水位和附件元数据 |
-| PDF 下载与归档 | 已有专项实现 | 证券风控年报链已支持 CNInfo 附件下载、SHA-256、归档路径和 manifest |
-| PDF 文本抽取 | 已有基础 | `pypdf` 可提取原生文本并记录不可解析页 |
-| 官方财务源 manifest | 已有 | `financial_source_files` 有 61,528 条，覆盖 5,523 个 instrument |
-| 官方年报 PDF 实例 | 局部已有 | 券商专项已归档 259 份年报/半年报，可作为复用代码证据，不代表周期行业覆盖 |
-| 权威行业 | 已有 | `industry_memberships` 可按日期读取申万行业归属 |
-| 业务画像治理表 | 已有空表 | 五类表均已建成，但当前生产记录均为 0 |
-| 长期画像生命周期 | 已有第一版 | 业务 regime、画像事件和双时点 resolver 已实现，生产数据仍为空 |
-| 首批行业 universe | 已有只读工具 | 2026-07-16 按申万历史归属和上市生命周期识别当前在市 791 家 |
-| 公告分类 | 已有第一版 | 可区分全文、摘要、修订、经营、资源、合同、套保和画像变化类公告 |
-| 画像 PDF 归档 | 已有第一版代码 | 不可变哈希路径、manifest 来源层级/替代关系、重复短路和中断 checkpoint；生产归档仍为 0 |
-| 候选抽取器 | 未实现 | 没有通用主营分部、经营量、价值链或商品暴露抽取器 |
-| 审核写入流程 | 未实现 | 有 review 状态契约和只读队列，没有受控审批操作和审计日志 |
-| 行业默认暴露 | 未填充 | 现有期货映射结构可复用，但生产目录仍为空 |
+| `research/providers/akshare_business_profile.py` | 东方财富主营构成、同花顺主营介绍受控 HTTP 适配和规范化 | 已实现 |
+| `research/business_profile_structured_ingestion.py` | candidate evidence 快照和 segment 行级派生版本治理 | 已实现 |
+| `research/business_profile_product_catalog.py` | 产品精确别名和商品 master 候选映射 | 已实现 v2 |
+| `research/business_profile_unit_conversions.py` | 固定单位换算和事实目录版本锁 | 已实现 |
+| `research/business_profile_llm.py` | 默认禁用的 OpenAI-compatible 选段协议 | 已实现接口 |
+| `research/business_profile_governance.py` | 审批事实的时点解析和 DCF context | 已实现 |
+| 公告发现、archive、PDF artifacts | 正式证据与未来关键 section | 已实现基础 |
+| bounded sync service / scheduler | 批量维护 | 待实现 |
+| 审核 CLI 和字典治理 | candidate 审批、驳回、supersede | 待实现 |
+| 生产回补 | A 股数据填充 | 未开始 |
 
-因此，下一阶段不应再设计一套新数据库或新公告框架，而应补齐“正式披露 -> 证据块 -> 候选事实 -> 审核 -> DCF 可用事实”这一条缺失的数据生产链。
+已删除的旧实现：
 
-只读命令：
+- `business_profile_value_chain_rules.py`；
+- `business_profile_value_chain_rule_catalog.json`；
+- 对应词法规则测试。
 
-```bash
-python scripts/research_business_profile_corpus_audit.py \
-  --as-of-date 2026-07-16 \
-  --include-universe \
-  --output /tmp/business_profile_corpus_audit.json
-```
+禁止重新引入同类关键词主客体推断。
 
-该命令只用 SQLite `mode=ro` 打开生产库，可显式指定预期报告期、是否包含历史退市样本和金标准目录，不写入画像事实。
+## 3. 结构化来源合同
 
----
+### 3.1 东方财富主营构成
 
-## 3. 公开来源分层
+输入：
 
-### 3.1 第一层：法定披露主源
+接口语义与 AkShare `stock_zygc_em(symbol="SH601088")` 一致，但生产
+transport 直接使用项目 `requests.Session` 请求公开 PageAjax 接口，显式传入
+timeout，并在 provider 层执行 pacing、retry 和 backoff。不能调用 AkShare
+内部未设置 timeout 的 `requests.get()` 作为批量主链。
 
-| 来源 | 角色 | 适用数据 | 可靠性判断 |
-|---|---|---|---|
-| 巨潮资讯 CNInfo | 跨沪深京主源 | 年报、半年报、更正报告、临时公告、问询回复、重大合同、套保公告 | 权威、覆盖广；接口无 SLA，必须限流和本地归档 |
-| 上海证券交易所 | 沪市备源及规则源 | 年报、行业经营信息、月度经营数据、资源和项目公告 | 权威；页面/API 变化时作为独立 source health 处理 |
-| 深圳证券交易所 | 深市备源及规则源 | 年报、行业信息披露、互动易确认信息 | 权威；结构化业务字段有限 |
-| 北京证券交易所 | 京市备源 | 定期报告和临时公告 | 权威；首期只覆盖 A 股身份，不单独优化解析模板 |
-| 中国证监会 | 披露规则源 | 年报格式准则、发行/重组材料、监管规则 | 决定字段 catalog 的版本，不直接作为公司事实日常源 |
+规范字段：
 
-主源和备源发生冲突时，以同一公告标识和文档哈希去重。交易所正式更正报告必须形成新版本，不能覆盖旧文档。
-
-### 3.2 第二层：发行人和监管补充源
-
-| 来源 | 可补充字段 | 使用限制 |
+| 源字段 | 本地字段 | 处理 |
 |---|---|---|
-| 公司官网投资者关系 | 演示材料、项目进度、产品解释 | 链接可能失效，必须保存原件和下载时间 |
-| 业绩说明会材料 | 经营量、项目爬坡、价格变化解释 | 可形成候选，不替代经审计报表口径 |
-| 互动易 / 上证 e 互动 | 产品、客户、原料和产能答复 | 公司确认但非系统性披露，证据等级低于定期报告 |
-| 招股书、再融资和重组报告 | 历史产品、工艺、产能、原料、客户、项目和储量 | 适合建立初始画像；不能默认持续有效 |
-| 资源储量、矿权评估和资产评估报告 | 矿种、权益比例、资源量、可采储量和项目寿命 | 口径专业且版本敏感，必须人工审批 |
-| 商品衍生品和套保公告 | 品种、额度、方向、期限和风险政策 | 额度不等于实际头寸，不可直接计算 hedge ratio |
+| 报告日期 | `report_period` | ISO date |
+| 分类类型 | `product/industry/geography` | 只接受三个已知枚举 |
+| 主营构成 | `item_name` | 保留原文 |
+| 主营收入 | `revenue` | float，可空 |
+| 收入比例 | `revenue_ratio` | 源值为 `[0,1]` 小数比例 |
+| 主营成本 | `cost` | float，可空 |
+| 成本比例 | `cost_ratio` | 源值为 `[0,1]` 小数比例 |
+| 主营利润 | `profit` | float，可空 |
+| 利润比例 | `profit_ratio` | 源值为 `[0,1]` 小数比例 |
+| 毛利率 | `gross_margin` | 源值为 `[0,1]` 小数比例 |
 
-### 3.3 第三层：政府和行业公开数据
+live probe 已核验同报告期产品收入比例合计约为 `1`。写入 segment 时仅接受 `[0,1]` 并原值写入 `revenue_share`；越界值不归一化，并写 `source_ratio_out_of_range`。
 
-自然资源、能源、统计、海关、地方发改和生态环境等公开资料可以确认行业、项目、许可、产能或宏观产量，但通常不能直接代表上市公司合并口径。只有同时满足公司主体、项目权益、统计期间和单位可核验时，才可形成公司候选事实。
+达到配置的 `possible_row_cap=200` 时，运行结果标记 `possible_source_row_cap`。该状态表示可能截断，不表示一定截断。
 
-### 3.4 第四层：聚合发现源
+### 3.2 同花顺主营介绍
 
-AkShare、东方财富 F10、同花顺和其他聚合页面可以用于：
+输入：
 
-- 发现主营构成表是否存在；
-- 获得产品别名和候选关键词；
-- 快速比较解析结果是否明显异常；
-- 在官方源故障时生成待补任务。
+接口语义与 AkShare `stock_zyjs_ths(symbol="601088")` 一致，但生产
+transport 使用项目受控 session 请求公开页面，并显式执行 timeout、pacing、
+retry 和 backoff。
 
-它们不能单独生成 approved 事实，也不能在官方源缺失时无标识替代官方证据。
+只保留：
 
----
+- 主营业务；
+- 产品类型；
+- 产品名称；
+- 经营范围。
 
-## 4. 五类对象如何获取
+这些字段是当前快照复核上下文。当前不拆词、不抽取关系、不写 segment、不生成历史时点事实。
 
-### 4.1 公司业务证据 `business_profile_evidence`
+### 3.3 失败语义
 
-直接来自公告和附件元数据，不需要模型推断：
+每个来源独立返回：
 
-- 公告 ID、标题、证券代码、发布日期和附件 URL 来自 CNInfo/交易所公告索引；
-- PDF 原件下载后计算内容哈希并归档；
-- 报告期和报告类型由标题、公告分类和正文封面联合识别；
-- 页码、章节、表名、原文片段哈希由文档解析器产生；
-- parser、catalog、dictionary、OCR 版本写入 lineage；
-- 更正公告和内容变化形成新 evidence 版本。
+- `success`：有规范化结果；
+- `empty`：请求成功但没有可用字段；
+- `failed`：接口或解析异常；
+- diagnostics：异常类型、疑似行数上限、空规范化结果。
 
-这是最容易完整自动化的一层，目标应接近 100% 可追溯。
+一个来源失败不阻断另一个来源，整体返回 `degraded`。两个来源均不可用时返回 `failed`。
 
-### 4.2 业务分部 `company_business_segments`
+## 4. 候选写入
 
-首选年报/半年报中的两组证据：
-
-1. 管理层讨论与分析中的“主营业务分行业、分产品、分地区、分销售模式”；
-2. 财务报表附注中的“分部信息”“营业收入和营业成本”。
-
-抽取策略：
-
-- 先识别表头签名，再解析行列，不依赖固定页码；
-- 产品、行业、地区和销售模式分开存储，禁止跨维度相加；
-- 保留抵销、其他和合计行，用于勾稽但不当作普通产品；
-- 收入、成本和毛利率至少满足两项勾稽关系；
-- 与合并营业收入差异超阈值时进入复核；
-- 分部名称先保留原文，再映射稳定实体 ID。
-
-这类字段监管模板最稳定，应作为第一批生产字段。
-
-### 4.3 经营事实 `company_operating_facts`
-
-按可行性分三层推进：
-
-| 层级 | 字段 | 主要位置 | 自动化策略 |
-|---|---|---|---|
-| A | 产量、销量、库存量 | 年报产销量表、月度经营公告 | 表格优先，可自动生成候选 |
-| A | 成本构成及占比 | 年报成本分析表 | 可生成候选，但原材料类别通常仍需细化 |
-| B | 产能、产能利用率、售价 | 行业经营信息、项目说明、经营公告 | 行业模板解析，范围和设计/实际产能必须分开 |
-| B | 储量、资源量、权益量 | 年报、资源报告、评估报告 | 专业口径和权益换算，强制人工审批 |
-| C | 单位成本、现金成本、回收率、成材率 | 公司自愿披露、项目报告 | 覆盖不稳定，字段级上线 |
-| C | 合同和套保量 | 临时公告、衍生工具附注 | 不从额度或公允价值倒推实际头寸 |
-
-“未披露”“不适用”“解析失败”“单位不明”和“存在但待审核”必须是不同状态。
-
-### 4.4 价值链角色 `company_value_chain_roles`
-
-角色不是从申万行业直接复制，而是从分部业务描述和经营模式产生候选：
-
-- `resource_owner`：探矿权、采矿权、油气权益、权益资源量；
-- `upstream_producer`：开采、采掘、选矿、原油/天然气生产；
-- `processor`：冶炼、精炼、裂解、聚合、焦化、轧制等转化活动；
-- `integrated_producer`：同一分部或可勾稽分部同时具有上游和加工活动；
-- `trader_or_distributor`：采购后销售且缺少实质生产转换；
-- `downstream_manufacturer`：商品是主要投入而产品是更下游制成品；
-- `utility_or_consumer`：能源或原料消耗是核心成本；
-- `service_provider`：矿服、油服、物流等间接暴露。
-
-实现上采用“动作词 + 对象实体 + 分部范围 + 收入材料性”规则。行业只提供候选词典。综合企业允许多个角色，不输出唯一公司标签。
-
-### 4.5 商品暴露 `company_commodity_exposures`
-
-商品暴露通常不是年报中的一个直接字段，而是受约束的治理映射：
-
-1. 从 approved 分部、产品、原料和角色事实产生候选；
-2. 产品实体映射到商品主数据，例如商品煤 -> 动力煤/焦煤候选；
-3. 根据角色生成收入端、原料端、能源端、库存端或套保端候选；
-4. 加工企业优先生成产品腿和原料腿，不直接简化为单边价格；
-5. 检查本地现货/期货/指数序列和价差定义是否可用；
-6. 人工批准方向、材料性和适用序列后才进入 DCF。
-
-不能自动得到的参数包括精确价格弹性、传导滞后、成本转嫁能力和真实套保比例。这些参数必须保留空值或使用明确标识的行业情景假设，不能伪装为公司披露事实。
-
----
-
-## 5. 文档采集链路
-
-### 5.1 文档分类
-
-首期监听以下类别：
-
-- 年度报告全文、半年度报告全文；
-- 年报/半年报更正及更新版；
-- 月度或季度主要经营数据公告；
-- 重大采购、销售、长协和定价公告；
-- 商品期货、期权和套期保值公告；
-- 矿权、资源储量、资产评估和重大项目公告；
-- 重大资产重组、业务出售和收购公告。
-
-年度报告摘要不能代替全文。英文版、摘要、审计报告和 ESG 报告要与全文分开分类，避免误选。
-
-### 5.2 主备路由
+### 4.1 幂等键
 
 ```text
-CNInfo 公告索引
-  -> CNInfo 正式附件
-  -> 对应交易所公告索引/附件备查
-  -> 发行人官网补充材料
-  -> 聚合源仅生成发现任务
+payload_hash = sha256(canonical raw payload)
+evidence_id = sha256(source + instrument_id + payload_hash)
+source_row_key = sha256(source + instrument_id + report_period + classification + raw_label)
+segment_record_id = sha256(source + source_row_hash + parser_version + product_catalog_version)
 ```
 
-每次同步输出：预期文档、发现文档、下载成功、重复、内容变化、解析完成、OCR 待办、候选数、失败原因和下一次重试时间。
+evidence 按整份 payload 保存不可变快照；segment 按来源行及派生规则版本治理。
+因此：
 
-### 5.3 本地归档
+- 新报告期导致 payload 变化时，只写新增或数值发生变化的行，快照内未变化的历史行不重复进入审核队列；
+- parser 或产品目录版本升级时，即使 payload 未变化，也会重新生成派生候选；
+- 新派生候选记录 `version`、`supersedes_record_id`、`parser_version` 和 `product_catalog_version`；
+- 同一派生版本再次运行才返回 `unchanged`，原 evidence 和 segment 的首次可得日均不后移。
 
-原件归档布局由 `research_config.modules.business_profile_evidence.archive` 管理。默认目录：
+### 4.2 可得日
+
+聚合源没有可靠发布日时：
 
 ```text
-data/filings/business_profile/{year}/{market}/
-  {instrument_id}_{period_label}_{announcement_id}_{content_hash}.pdf
-  derived/{extractor_version}/{content_hash}.json.gz
-  tables/{extractor_version}/{content_hash}.json.gz
-  ocr/{ocr_version}/{content_hash}.json.gz
+data_available_date = observed_at[:10]
+availability_quality = first_observed_at
 ```
 
-例如 A 股 `600839.SH` 的 2025 年报使用 `600839_SH_2025Q4_<announcement_id>_<sha256>.pdf`。`directory_template` 可配置为 `{market}/{year}` 等安全相对路径；`filename_template` 可调整字段顺序，但完整归档路径必须包含 `{content_hash}`，不能直接使用会让修订稿相互覆盖的 `600839_SH_2025Q4.pdf`。如需面向人工浏览的“当前版”短文件名，应由独立索引或只读视图提供，不得替代不可变原件。
+历史报告在第一次采集之前不可用于历史 DCF，虽然这会降低历史覆盖，但不会引入未来函数。
 
-原件只写一次；派生文件可按版本重建。SQLite 只保存 manifest、哈希、路径和诊断，不重复保存整份 PDF 文本。配置布局变化只作用于后续新归档；同公告、同哈希且 manifest 原件仍存在时继续使用原路径短路，不自动搬迁或复制历史原件。目录迁移必须由独立、可校验、可回滚的维护任务完成。
+### 4.3 审核状态
 
-当前代码通过 `BusinessProfileDocumentArchiveService` 实现原件层。共享 `financial_source_files` 已增加 `source_tier` 和 `supersedes_source_file_id`，业务画像文档使用独立 `business_profile_source_file_manifest.v1` schema，避免与财务数值事实混淆。更正公告、新公告复用相同内容、同一公告附件变化分别保留公告身份和内容身份；只有同一公告 ID、同一内容哈希的重跑才直接返回 `unchanged`。
+结构化来源生成的 evidence 和 segment 均为 `candidate`。writer 不写：
 
-由于业务画像父流程和 source manifest 分别属于 `research.db` 与 `financials.db`，运行审计采用父子任务而不是跨库外键：父流程继续使用 `business_profile` domain；归档批次在财务库创建 `financial_business_profile_documents` 子任务，`financial_source_files.ingestion_run_id` 只引用该子任务。父任务 ID、domain 和 instrument scope 写入子任务及 manifest metadata，作为可验证逻辑 lineage。若 manifest 落库失败，本轮新建且此前不存在的 PDF 必须删除，不能留下无登记原件。
+- `company_value_chain_roles`；
+- `company_commodity_exposures`；
+- approved regime；
+- DCF 参数。
 
-批量归档必须设置 `max_documents`，可选 checkpoint 只用于恢复未完成批次。checkpoint 完整结束后删除，不能长期充当公告是否变化的权威判断；跨批次幂等仍以 source manifest 和重新计算的内容哈希为准。
+### 4.4 产品匹配
 
-公告扫描只有完整成功时才能推进 watermark。任一后续页请求失败时，本次状态记为 degraded 并保留旧水位，避免未扫描页面被永久跨过。语料覆盖审计按业务画像 manifest schema 过滤，年度/半年度全文及修订稿通过 `document_family` 统一计入预期报告覆盖；经营、重组、合同等临时公告不能冒充定期报告覆盖。
-
----
-
-## 6. 解析架构
-
-### 6.1 分层流程
-
-1. 验证 PDF 签名、页数和加密状态；
-2. 使用 `pypdf` 提取原生文本并计算每页文本密度；
-3. 构建目录、标题和页码索引；
-4. 根据通用和行业模板定位候选章节；
-5. 对候选页运行表格抽取器；
-6. 对低文本候选页进入可选 OCR 队列；
-7. 运行字段解析器和单位归一化；
-8. 做表内、跨表、跨期和财务总额勾稽；
-9. 写入 candidate 事实和复核队列；
-10. 输出字段级质量报告。
-
-其中第 1-3 步的第一版已由 `BusinessProfilePdfArtifactExtractor` 实现：
-
-- 以实际 PDF bytes 计算 source content hash；
-- 分类 `invalid_pdf_signature / malformed_pdf / malformed_page_tree / empty_pdf / encrypted_password_required / pypdf_unavailable`；
-- 逐页保留原生文本、页面尺寸、非空字符数、每平方英寸文本密度、提取状态、文本哈希和页 artifact hash；
-- 对主营、经营模式、分部、收入成本、产销量、成本构成、资源储量、重大项目和套保建立标题索引；
-- 低文本页只有在标题命中或显式 target page 范围内才进入 `ocr_required_pages`，OCR 不在本流程执行。
-
-派生文件使用确定性 gzip JSON，布局为：
+只对 `classification_type=product` 行运行精确别名：
 
 ```text
-derived/{pypdf_extractor_version}/{source_content_hash}_{parameter_hash}.json.gz
-tables/{table_extractor_version}/{source_content_hash}_{parameter_hash}.json.gz
-ocr/{ocr_worker_version}/{source_content_hash}_{parameter_hash}.json.gz
+normalize(label) == normalize(alias)
 ```
 
-parameter hash 包含低文本阈值、标题词典和显式目标页；artifact hash 不包含本地原件路径或单一 manifest ID，因此归档迁移和相同内容复用不改变内容身份，不同参数也不会发生不可变路径冲突。当前 `tables/` 与 `ocr/` 仅固定目录和版本合同；表格/OCR 实现仍须经过 benchmark。操作命令：
+申万行业组只缩小候选目录。匹配结果：
 
-```bash
-python scripts/research_business_profile_pdf_artifact.py \
-  data/filings/business_profile/SSE/600309/2025-12-31/original/<file>.pdf \
-  --source-file-id <source_file_id> \
-  --target-pages 12,35
+- 唯一：保存规范产品 ID；
+- 一对多：保留全部产品 ID并要求复核；
+- 未匹配：保留原标签和 `alias_not_found`。
+
+唯一产品仅筛选 `evidence_requirement=explicit_product` 的 revenue 商品映射，写入 `commodity_mapping_candidates` metadata。不能据此创建公司级暴露。
+
+## 5. 免费源维护任务
+
+下一步实现一个统一的 `business_profile_structured_sync`，不按行业或来源拆成多个 scheduler job。
+
+运行参数：
+
+- instrument 或申万行业范围；
+- 最大公司数；
+- source scope；
+- request interval、timeout、retry；
+- max elapsed seconds；
+- checkpoint path；
+- dry-run / candidate-write；
+- 是否只处理当前活跃 A 股。
+
+运行报告：
+
+- 目标、成功、降级、失败、空响应；
+- source latency 和异常类型；
+- 新 payload、unchanged、candidate 数；
+- report period 范围；
+- 200 行疑似截断；
+- 未匹配和歧义产品标签；
+- 数据库写入和 DCF approved 覆盖变化。
+
+生产默认仍为 disabled，先运行临时库和每行业 5 家样本。
+
+## 6. 字典治理
+
+字典修改必须通过待审标签触发，不允许开发者为了提高覆盖随意增加宽泛别名。
+
+每条别名至少记录：
+
+- alias id；
+- 原始标签；
+- 规范产品 ID；
+- 适用行业组；
+- 一对多审核策略；
+- catalog version。
+
+删除上下文必需词、排除词和值链角色约束后，目录 schema 已升级为 `business_profile_product_catalog.v2`，catalog version 为 `business_profile_products.2026.2`。旧 v1 文件不能由 v2 loader 静默加载。
+
+单位目录 `business_profile_units.2026.1` 锁定 `business_profile_facts.2026.1`。事实目录升级后，单位目录版本不一致必须 fail closed。
+
+## 7. 官方文档链路的保留用途
+
+继续保留：
+
+- CNInfo/交易所公告发现和分页水位；
+- 正式附件下载；
+- 按年/市场配置化不可变归档；
+- 公告 ID、内容 hash、更正和 supersession；
+- PDF 签名、原生文本、页码和 heading index；
+- 低文本页和 OCR-required 诊断；
+- 业务 regime 变化提示。
+
+停止推进：
+
+- 用动作词自动识别资源商、加工商、贸易商；
+- 用句段关键词推断客户/供应商；
+- 用文本规则自动生成商品暴露方向；
+- 为了全市场覆盖而无边界下载全部历史 PDF。
+
+正式 PDF 按需用于：
+
+1. 结构化源冲突复核；
+2. 高材料性候选审批；
+3. 产销量、单位成本、储量、套保等专项字段；
+4. 未来 LLM 关键 section 输入；
+5. 公司重大业务变化证据。
+
+## 8. LLM 接口实施边界
+
+当前配置：
+
+```json
+{
+  "enabled": false,
+  "provider": "openai_compatible",
+  "base_url": "",
+  "model": "",
+  "api_key_env": "",
+  "endpoint": "/v1/chat/completions",
+  "max_input_characters": 30000,
+  "candidate_only": true
+}
 ```
 
-添加 `--diagnostics-only` 时不写派生 artifact。命令不联网、不写公司画像事实。
-
-### 6.2 依赖选择
-
-当前仅有 `pypdf`。不应立即引入一套重量级 OCR 栈。Phase 0 应在同一金标准上比较：
-
-- 原生文本正确率和页码稳定性；
-- 合并单元格、跨页表、竖排表头和负数格式；
-- 中文 OCR 数字、单位和小数点准确率；
-- 运行时间、内存、许可证和部署复杂度。
-
-表格/OCR 组件必须封装为 adapter，不能让业务解析器直接依赖具体库。OCR 运行在独立 worker，不进入 API 进程。
-
-PDF artifact v2 已补齐分层 parser diagnostic 合同：文档层区分 `encrypted / malformed / unsupported`，页文本层按 replacement glyph、Unicode 私用区和异常控制字符比例识别 `glyph_decoding`，并将字段相关页面标记为 `ocr_required`；表格与模板层分别使用 `table_parse_failure / unsupported_template`。`not_disclosed` 只有在目标章节成功解析且保留证据页时才允许生成，并继续阻止数值候选，不能把原生文本为空、乱码、表格失败或模板不支持解释为公司未披露。glyph 比例与最小字符阈值进入 parameter hash，可通过诊断 CLI 显式调整和复现。
-
-### 6.3 大模型边界
-
-首期不需要依赖大模型才能完成通用表格。若后续引入，只允许：
-
-- 对已定位的小段证据生成产品归一化候选；
-- 对叙述性经营模式生成价值链候选；
-- 辅助解释冲突和生成复核摘要。
-
-模型输出必须保存模型版本、prompt 版本、输入证据哈希和原始输出；不得直接 approved，不得补写原文没有的数值、单位或范围。
-
----
-
-## 7. 词典与模板治理
-
-需要建立四类版本化资产：
-
-1. `business_fact_catalog`：字段定义、数据类型、单位、是否可自动候选、审核要求；
-2. `disclosure_template_catalog`：规则版本、交易所、板块、章节和表头签名；
-3. `product_commodity_dictionary`：原文别名 -> 产品实体 -> 商品实体，允许一对多；
-4. `value_chain_rule_catalog`：动作词、对象、上下游角色和排除规则。
-
-第一版 `business_fact_catalog` 已落地到
-`config/business_profile_fact_catalog.json`，由
-`research.business_profile_fact_catalog` 只读加载并严格校验。当前版本
-`business_profile_facts.2026.1` 包含 29 个字段定义，覆盖分部、经营事实、价值链角色和商品暴露四类记录：
-
-- 每个字段显式声明 `semantic / value_type / unit_dimension / canonical_units / allowed_values`；数值单位与枚举允许值不得混用；
-- 每个字段显式声明 DCF 材料性、机器候选策略、勾稽策略、审核策略和 DCF 资格；
-- 数值字段没有规范单位时配置加载直接失败；
-- `approved_only` 字段必须使用人工审核策略，不能配置为规则自动批准；
-- 单位成本、储量、合同、套保、价值链角色和商品暴露参数使用
-  `human_required_sensitive`；可从明确、可回链的披露生成 `candidate`，但不得由行业、收入占比、授权额度或衍生品公允价值自动推导，也不得自动批准；
-- 目录的 `released_on` 记录目录发布日期，`document_applicable_from / document_applicable_to` 记录可处理源文档区间。当前版本虽于 `2026-07-17` 发布，但可处理 `2021-01-01` 起的历史报告；不能用目录发布日期阻断历史报告解析。历史估值仍按事实 `data_available_date` 防未来函数，不以抽取目录发布日期替代事实可得日。
-
-该目录只定义事实契约，不表示相应字段已经具备生产数据。分部成本和毛利率等字段即使已进入目录，仍需后续表格解析、存储映射、金标准和字段级 promotion gate 全部通过后，才允许写入生产候选。
-
-第一版 `disclosure_template_catalog` 已落地到
-`config/business_profile_disclosure_template_catalog.json`，由
-`research.business_profile_disclosure_templates` 选择和校验。当前包含 1 个
-通用定期报告模板及煤炭、有色/固体矿产、钢铁、石油石化、基础化工、建筑材料
-6 个行业模板。每个模板声明：
-
-- 可复用解析签名，以及独立的市场规则作用域；
-- 每个规则作用域精确声明交易所、板块、全文类型、规则版本、生效区间、来源引用和 `csrc_common_rule / exchange_industry_rule / observed_parser_pattern` 权威类型；
-- 主营业务、经营模式、分部、产销存、成本、资源、项目及套保等章节别名；
-- 表格签名、最少表头命中数、可选表头、行角色标记和候选字段；
-- 关联的 `business_fact_catalog.field_id`，加载时必须通过跨目录引用校验。
-
-`合计 / 小计 / 抵销 / 未分配 / 不适用` 等行必须保留在解析结果中，并分别标注 `total / subtotal / elimination / unallocated / not_applicable`。这些角色行不提升为普通产品候选，但必须参与分部收入、成本及财务合计勾稽，禁止在表格抽取阶段直接删除。
-
-模板选择始终合并一个有效通用模板和一个匹配的公司当期行业模板，并返回各模板实际命中的唯一规则作用域。未提供行业时只返回通用模板；未知市场、板块、文档类型、行业组、无有效作用域或作用域重叠直接失败。行业模板只能缩小候选章节和表格范围，不得由模板本身生成产品、角色、经营数值或商品暴露。没有专项交易所规则的市场组合继续使用经样本验证的解析签名，但 lineage 必须标为 `observed_parser_pattern`，不得伪称监管规则。首版对交易所行业专项规则采用保守边界：明确绑定年报及年报更正稿；半年报即使复用同一签名也标为观测模式，待逐条确认监管条款后再升级 authority。
-模板目录同时锁定所依赖的事实目录版本，并校验 `SSE-main/star`、
-`SZSE-main/chinext`、`BSE-bse` 市场板块组合，同时接受本地主数据
-`main_board / star_market` 及中文板块别名；目录版本不一致、市场板块
-组合无效或指定日期没有生效模板时均 fail closed。
-
-每次 dictionary 变更必须：
-
-- 产生新 semantic version；
-- 列出受影响的历史证据和候选；
-- 只重放受影响文档；
-- 不覆盖既有审核决定；
-- 生成 no-change、conflict 或 supersession 任务。
-
----
-
-## 8. 审核流程
-
-### 8.1 候选状态
-
-```text
-extracted -> candidate -> approved / rejected
-                        -> superseded
-```
-
-重新解析产生新 candidate，不能把 approved 事实改回未审核。审核记录至少包含 operator、时间、reason code、候选哈希、原版本和新版本。
-
-### 8.2 审核优先级
-
-1. 会改变 DCF 模型选择的价值链角色；
-2. 高材料性分部和商品映射；
-3. 数值型产销量、成本、产能和储量；
-4. 综合企业、上下游一体化和方向冲突；
-5. 合同、套保和价格传导参数。
-
-项目当前没有管理 API 鉴权，因此第一版使用受控本地 CLI/服务操作。不得为了方便增加无鉴权 POST 审核接口。
-
----
-
-## 9. 金标准与上线门槛
-
-### 9.1 样本设计
-
-首批行业：煤炭、有色及固体矿产、钢铁、石油石化、基础化工、建筑材料。
-
-每个行业至少 20 家，覆盖：
-
-- 沪深北不同市场；
-- 龙头、单一业务、综合企业和贸易型企业；
-- 原生 PDF、复杂表格、跨页表和少量扫描件；
-- 最近两期年报、至少一份更正或口径变化样本；
-- ST、并购重组、业务剥离和名称变化等异常样本。
-
-先以每行业 5 家完成工具选型和 schema 校准，再扩展到不少于 20 家的独立验收集，避免一开始投入全部人工标注。
-
-### 9.1.1 五家公司 parser benchmark 选择合同
-
-`scripts/research_business_profile_benchmark_select.py` 从时点申万行业池和上市生命周期只读选择每行业 5 家。选择顺序先硬覆盖该行业实际存在的交易所，再按已核验证据、申万二/三级、上市年代做确定性增量覆盖；输入顺序变化不能改变结果。运行示例：
-
-```bash
-/home/python/miniconda3/envs/Quote/bin/python \
-  scripts/research_business_profile_benchmark_select.py \
-  --as-of-date 2026-07-17 \
-  --evidence /path/to/verified_document_evidence.json \
-  --output /tmp/business_profile_parser_benchmark.json
-```
-
-证据文件为 JSON list，或包含 `evidence_profiles` list 的对象。只有 `verified=true` 且至少有一个官方 `source_document_ids` 的记录才参与覆盖评分；每个 ID 还必须在 `financials.db.financial_source_files` 中匹配同一 `instrument_id`，且满足业务画像 manifest schema、官方主/备来源层、有效归档/解析状态、公告 ID、归档路径和 SHA-256 内容哈希约束。任一伪造、跨公司或失效 ID 会使整条证据记录失效。支持 `diversified_business / correction_report / complex_table / cross_page_table / ocr_required / glyph_decoding / malformed_pdf / profile_change`。六个首期行业必须全部存在并各自达到 5 家；任一行业缺失、数量不足，或未覆盖综合经营、修订稿和至少一种 PDF format edge 时，结果必须为 `evidence_incomplete`，命令返回码为 `3`，不能据此宣布金标准样本完成。
-
-`2026-07-17` 在生产库只读运行的初始候选如下；这只是待核验清单，不是已完成金标准：
-
-| 行业 | 候选 instrument_id | 市场覆盖 | 当前缺口 |
-|---|---|---|---|
-| 基础化工 | `920015.BJ / 600063.SH / 000973.SZ / 002381.SZ / 000408.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
-| 建筑材料 | `920076.BJ / 600176.SH / 002205.SZ / 002333.SZ / 000012.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
-| 煤炭 | `600121.SH / 000723.SZ / 000983.SZ / 600925.SH / 601011.SH` | 沪/深 | 综合经营、修订稿、PDF 边界证据 |
-| 有色及固体矿产 | `920068.BJ / 600219.SH / 000969.SZ / 002460.SZ / 000506.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
-| 石油石化 | `920088.BJ / 600028.SH / 000968.SZ / 000554.SZ / 002377.SZ` | 北/沪/深 | 综合经营、修订稿、PDF 边界证据 |
-| 钢铁 | `600010.SH / 000629.SZ / 002443.SZ / 001203.SZ / 000717.SZ` | 沪/深 | 综合经营、修订稿、PDF 边界证据 |
-
-后续官方 PDF 诊断可能替换候选。替换必须由选择器输出的新增 strata 和官方文档证据解释，不能手工静默改名单。
-
-### 9.1.2 官方来源优先级与交易所备源
-
-公司业务画像文档发现采用 `CNInfo official_primary -> issuer exchange official_backup`。`BusinessProfileDiscoveryCoordinator` 只有在 CNInfo 请求失败、降级、无法解析公司身份，或在明确报告查询中返回空候选时，才调用该 instrument 对应交易所的一个备源；CNInfo 返回完整候选时不得同时请求交易所。
-
-交易所备源由 `research_config.modules.business_profile_evidence.discovery.official_exchange_backups` 配置：
-
-- SSE 使用上交所定期报告公开查询，附件保留 `sse / official_backup`；
-- SZSE 使用深交所 `fixed_disc` 定期报告查询，附件保留 `szse / official_backup`；
-- BSE adapter 已实现，但生产网络对当前北交所公开端点出现重定向循环，因此配置保持 disabled，不能把网络失败解释为“公司没有报告”。
-
-协调结果必须返回每次实际调用的 source、source tier、状态、页数、公告数、候选数和错误。只选择一个最高优先级可用来源进入后续归档，不合并聚合站结果，也不在发现阶段写画像事实。交易所候选进入归档后，source manifest 必须记录真实交易所来源和 `official_backup`，不能继续硬编码为 CNInfo。
-
-受控 live 验证使用 `scripts/dev_validation/probe_business_profile_exchange_discovery.py`。命令强制显式 instrument 和日期范围，默认每家公司只扫 1 页、最多 10 家，只返回 metadata，不下载 PDF、不写数据库、不推进水位：
-
-```bash
-/home/python/miniconda3/envs/Quote/bin/python \
-  scripts/dev_validation/probe_business_profile_exchange_discovery.py \
-  --instrument 600028.SH \
-  --instrument 000983.SZ \
-  --start-date 2026-01-01 \
-  --end-date 2026-07-17 \
-  --mode backup
-```
-
-`chain` 模式验证 CNInfo 优先级和条件式 fallback；`backup` 模式直接验证所属交易所适配器。禁用或未配置的备源返回 `blocked` 和非零退出码，不能记作合法空披露。
-
-### 9.2 指标
-
-| 指标 | 首期门槛 |
-|---|---:|
-| 正式报告发现召回率 | >= 99% |
-| 原件与公告 lineage 完整率 | 100% |
-| 已接受分部/角色候选抽样精确率 | >= 95% |
-| 已接受数值的 value + unit + period + scope 完全正确率 | >= 98% |
-| approved 事实证据定位率 | 100% |
-| 未来日期泄漏 | 0 |
-| 首期公司主营产品覆盖率 | >= 80% |
-
-指标按字段和文档类型计算，不能用容易字段的高分掩盖储量、单位成本或套保字段的低质量。
-
----
-
-## 10. 后续维护
-
-### 10.0 画像生命周期维护
-
-证券代码和上市主体是行情、股本与公告的法律身份；经营画像是随时间变化的业务身份。系统为同一 `instrument_id` 保留多个 `business_regime_id`，并监听借壳、重大资产重组、发行股份购买资产、重大收购或出售、控制权变更、主营业务变更和新增重大业务等公告。
-
-变更处理遵循：
-
-1. 公告分类器只生成 profile-change event candidate；
-2. 人工确认事件性质、交割/并表日期、材料性和新旧分部范围；
-3. approved 事件产生新 regime 或更新当前 regime 的分部集合；
-4. 旧 regime 不删除，通过 `knowledge_to` 关闭；
-5. 新 regime 同时记录经济 `valid_from` 和信息 `knowledge_from`；
-6. 历史 DCF 按知识截止日读取当时可知版本，避免后来公告回写历史；
-7. 候选事件未审核前，仅输出 `material_profile_change_pending_review`，不切换 DCF 输入。
-
-借壳和主营替换原则上创建新 regime；普通有机扩产只更新经营事实；新增跨行业业务是否创建新 regime，由收入、利润、资产材料性、合并范围及管理层分部口径共同决定，不能只按公司公告措辞自动判断。
-
-同一经济和知识时点出现多个 approved active regime 属于治理冲突，不允许 resolver 自动选择“最新”版本。此时所有 regime 绑定事实对 DCF fail closed，readiness 返回 `overlapping_active_business_regimes`，待审核人员关闭错误区间或完成 supersession 后恢复。
-
-### 10.1 日常增量
-
-- 每日扫描新增公告和更正公告；
-- 只下载未见公告或新内容哈希；
-- 只解析未被当前 parser/catalog 版本处理的文档；
-- 同一候选哈希不重复进入复核队列；
-- 主源故障进入重试，备源成功仍保留主源失败诊断。
-
-### 10.2 定期维护
-
-- 年报季提高下载和解析并发上限，但保持来源限流；
-- 半年报更新分部与经营事实，季度报告只在明确披露时更新；
-- 每周检查待审核量、失败重试和 DCF readiness 变化；
-- 每月检查词典冲突、未映射产品和失效行情序列；
-- parser/dictionary 升级后只重放受影响文档；
-- 重大重组、更正和分部断裂自动重开复核。
-
-### 10.3 容量控制
-
-当材料性复核队列超过阈值时，暂停新历史回补，但继续日常公告发现和已下载文件维护。这样不会在年报季因人工能力不足而丢失新证据。
-
----
-
-## 11. 待完成任务与阶段退出条件
-
-详细勾选清单位于本地 OpenSpec `build-a-share-business-profile-evidence-pipeline/tasks.md`。工程执行顺序固定为：
-
-1. **Phase 0A：基线审计**。完成样本清单、规则/字段 catalog 和本地能力报告；未完成不得选解析依赖。
-2. **Phase 0B：文档层**。打通发现、归档、版本、更正和派生 artifact；未达到 99% 发现率不得进入事实抽取。
-3. **Phase 1：通用表格**。完成主营分部、产销量和成本构成候选；未通过数值/单位门槛不得写生产候选。
-4. **Phase 2：角色与商品候选**。建立首六行业词典、冲突和价差候选；公司映射未审核不得进入 DCF。
-5. **Phase 3：审核和增量维护**。完成本地审核、审计、checkpoint、scheduler 和报告。
-6. **Phase 4：逐行业回补**。一次只放开一个行业和有限报告期，通过运行验收后扩大。
-7. **后续专项**。储量、单位成本、项目产能、合同和套保按字段单独立项，不绑架基础画像上线。
-
----
-
-## 12. 工期与可行性判断
-
-以下是单一资深工程开发并有业务复核配合时的数量级估算，不是固定承诺：
-
-| 阶段 | 估算 | 主要不确定性 |
-|---|---:|---|
-| Phase 0 样本、规则和工具基准 | 2-3 周 | 金标准人工标注和 PDF 异常比例 |
-| 文档发现、归档、派生 artifact | 2-3 周 | 交易所备源和更正版本处理 |
-| 通用分部/产销量/成本表 | 3-5 周 | 跨页表和历史模板差异 |
-| 首六行业角色与商品候选 | 3-5 周 | 产品别名、综合企业和价差治理 |
-| 审核、调度、逐行业回补 | 2-4 周 | 审核队列和数据质量返工 |
-
-形成“主营分部 + 基础角色 + 经审核商品暴露”的首六行业生产版本，合理范围约为 2-4 个月。产能、储量、单位成本、合同和套保全部做深，可能需要继续 6-12 个月分行业迭代。正确做法不是等待所有深度字段完成，而是让已通过质量门槛的字段独立上线。
-
----
-
-## 13. 官方依据
-
-- [中国证监会：2025 年年度报告内容与格式准则](https://www.csrc.gov.cn/csrc/c101954/c7547588/content.shtml)：要求披露主要业务、产品、经营模式、材料性收入/成本/毛利率、实物产销量库存及成本构成。
-- [上海证券交易所：上市公司自律监管指引第 3 号——行业信息披露](https://www.sse.com.cn/lawandrules/sselawsrules2025/stocks/mainipo/c/c_20250619_10782390.shtml)：包含煤炭、钢铁、化工和有色金属等行业专项要求。
-- [深圳证券交易所：上市公司自律监管指引第 3 号——行业信息披露](https://docs.static.szse.cn/www/lawrules/rule/stock/W020250327501380493065.pdf)：覆盖固体矿产、化工和非金属建材等行业经营信息。
-- [巨潮资讯网](https://www.cninfo.com.cn/)：深交所法定信息披露平台，可作为跨市场公告和正式附件主入口。
-- [上海证券交易所定期报告](https://www.sse.com.cn/disclosure/listedinfo/regular/)：沪市定期报告备源。
-- [北京证券交易所上市公司公告](https://www.bse.cn/disclosure/announcement.html)：北交所正式公告备源。
-
-代表性公开样本中，万华化学 2025 年报可直接定位主营分产品收入/成本/毛利率、产品系列产销量库存、分产品成本构成和 LPG/碳酸锂/天然气等互换合约用途，说明核心字段可从正式 PDF 产生，但商品方向和套保程度仍必须经过业务审核。
+接口实现要求：
+
+- 只接受带 page、heading、text hash 的 selected sections；
+- section id 必须唯一，页码必须为正，发送前重新计算规范文本 hash；
+- 默认关闭时在发出 HTTP 前失败；
+- key 只从环境变量读取；
+- response 必须为 JSON object；
+- instrument、报告期、schema 和事实目录版本必须与请求一致；
+- `field_id` 必须存在于版本化业务事实目录，candidate 必须具备符合字段类型的原值，数值字段必须带原单位；
+- 每条事实和关系必须引用输入 section；
+- 关系必须标记为原文明示；
+- 输出必须为 candidate；
+- 保存 request/response hash、model、base URL、prompt/schema version 和 fact catalog version。
+
+当前没有 scheduler、数据库 writer 或 DCF 接入。后续本地模型评估通过后另开 promotion change。
+
+## 9. 验证计划
+
+### 9.1 单元测试
+
+- 市场代码转换；
+- 三类主营构成枚举；
+- 数字、日期、空值和未知分类；
+- 单源失败降级；
+- 200 行疑似上限；
+- payload 快照幂等、行级增量幂等和目录版本重放；
+- provider timeout、retry、backoff 和 pacing；
+- candidate-only 写入；
+- 未匹配产品保留；
+- 不写价值链角色和商品暴露；
+- LLM disabled、输入上限、JSON/schema、事实目录、section hash、证据引用和 candidate gate。
+
+### 9.2 Live probe
+
+第一轮每个行业 5 家：
+
+- 煤炭；
+- 有色及固体矿产；
+- 钢铁；
+- 石油石化；
+- 基础化工；
+- 建筑材料。
+
+live probe 只读上游并写 `/tmp` 证据，不写生产库。记录成功率、耗时、行数、报告期、分类覆盖、字段空值和疑似截断。
+
+### 9.3 生产启用门槛
+
+- 30 家 probe 成功率不低于 95%；
+- 必需字段结构一致率 100%；
+- payload/hash/observed_at lineage 100%；
+- 产品精确匹配人工抽样 precision 不低于 99%；
+- candidate 进入 DCF 的泄漏数为 0；
+- bounded retry、checkpoint 和中断恢复通过；
+- 生产写入有显式 operator 开关。
+
+## 10. 待完成任务
+
+高优先级：
+
+1. 实现 bounded sync service 和 CLI；
+2. 从配置读取 source、限速、批量和 enabled 状态；
+3. 增加 raw payload 缓存或专用 manifest，避免 metadata 过大；
+4. 建立未匹配/歧义产品标签审核队列；
+5. 运行 30 家 live probe 并固定源字段基线；
+6. 增加数据源漂移和 200 行上限监控；
+7. 完成临时库回补和幂等/恢复测试。
+
+中优先级：
+
+1. 建立人工 approve/reject/supersede CLI；
+2. 将成本和毛利字段从 metadata 升级为明确 schema；
+3. 对正式报告抽样核对结构化主营构成；
+4. 审批首批高材料性产品到商品映射；
+5. 将 approved 产品/成本事实接入周期 DCF 情景。
+
+后续评估：
+
+1. 免费来源中原材料、产销量、产能、储量和套保结构化字段；
+2. 本地 LLM 模型、硬件、token、吞吐和质量；
+3. selected-section LLM candidate writer；
+4. 港股来源和数据模型差异。

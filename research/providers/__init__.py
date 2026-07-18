@@ -11,6 +11,13 @@ from .akshare_shareholders import AkshareShareholdersProvider
 from .akshare_shenwan_industry import AkshareShenwanIndustryProvider
 from .akshare_swsresearch_index_analysis import AkshareSWSResearchIndexAnalysisProvider
 from .akshare_valuation_inputs import AkshareCninfoValuationInputProvider
+from .akshare_business_profile import (
+    AkshareStructuredBusinessProfileProvider,
+    BusinessCompositionRow,
+    BusinessIntroduction,
+    StructuredBusinessProfileSnapshot,
+    StructuredSourceResult,
+)
 from .eastmoney_industry_supplement import EastmoneyIndustryNameSupplementProvider
 from .manual_industry_supplement import ManualIndustryNameSupplementProvider
 from .official_financial_filings import ConfiguredOfficialFinancialFilingProvider
@@ -136,6 +143,11 @@ __all__ = [
     "AkshareSWSResearchIndexAnalysisProvider",
     "AkshareShareholdersProvider",
     "AkshareCninfoValuationInputProvider",
+    "AkshareStructuredBusinessProfileProvider",
+    "BusinessCompositionRow",
+    "BusinessIntroduction",
+    "StructuredBusinessProfileSnapshot",
+    "StructuredSourceResult",
     "EastmoneyIndustryNameSupplementProvider",
     "ManualIndustryNameSupplementProvider",
     "ConfiguredOfficialFinancialFilingProvider",

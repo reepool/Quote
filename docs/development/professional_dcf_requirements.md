@@ -1311,8 +1311,10 @@ POST /api/v1/research/valuation/dcf/external-data/refresh
 - 已将估值日有效的权威申万一级、二级、三级行业归属注入 DCF instrument、输入 hash 和 lineage，模型选择不再主要依赖公司名称或行情库粗行业字段；历史估值使用历史行业归属，不回填当前分类。
 - 已将估值库的时点股本接入 `shares_outstanding`，并将现金流量表“购建固定资产、无形资产和其他长期资产所支付的现金”映射为 capex 代理。年度使用报告值，季度/半年使用累计现金流 TTM 桥接；桥接期不完整时显式返回缺口。现金取资产负债表货币资金；有息债务由短期借款、一年内到期非流动负债、长期借款及应付债券等明细保守汇总，租赁负债单列，明确禁止把当前数据源语义上的负债合计字段 `balance_sheet.total_debt` 当作有息债务。
 - DCF 已接收 benchmark-aware Beta 的质量元数据。非正 Beta 或明确为 low/unavailable 的观测不会直接进入 CAPM，而是保留原始观测并回退配置 Beta，同时输出 `beta_fallback_used` 和拒绝原因，避免异常 Beta 造成股权成本低于永续增长率。
-- 公司业务画像治理基础层已实现：`research.db` 已具备证据、业务分部、经营量事实、价值链角色和公司商品暴露规范化表，DCF 已接入时点化 `business_profile_context`，并执行事实审批、证据审批、证据完整性、可得日、有效期和行情序列有效性门槛。公司级 approved 暴露可覆盖同商品/角色的行业默认，候选和未来信息仅进入 diagnostics；相关只读 API 已开放。当前尚未执行全市场官方年报回补，生产库 approved 公司画像覆盖仍为空或有限，不得把治理能力误述为数据覆盖完成。字段和下一阶段采集方案见 `company_business_profile_and_commodity_exposure_requirements.md`。
-- 公司画像抽取已建立 `business_profile_facts.2026.1` 事实目录，逐字段治理语义、类型、数值单位或枚举允许值、材料性、候选/勾稽/审核策略和 DCF 资格；目录发布日期与可处理报告日期分离，可回补 `2021-01-01` 起的历史报告。目录中的 DCF 字段均为 `approved_only + human_required`；单位成本、储量、合同、套保、价值链角色和商品暴露参数进一步标记为敏感人工审核，只能由明确披露生成待审候选，不能从行业假设自动推导，也不能因 parser 高置信度直接进入估值。披露模板选择返回精确市场规则作用域，无专项规则的组合标为 `observed_parser_pattern`；合计、抵销和未分配行保留用于财务勾稽。
+- 公司业务画像治理基础层已实现：`research.db` 已具备证据、业务分部、经营量事实、价值链角色和公司商品暴露规范化表，DCF 已接入时点化 `business_profile_context`，并执行事实审批、证据审批、可得日、有效期和行情序列门槛。候选和未来信息不能进入估值；当前生产库 approved 公司画像覆盖仍为空或有限。
+- `2026-07-18` 公司画像采集路线调整为“免费结构化数据优先、官方 PDF 按需复核、LLM 延后”。第一阶段使用项目受控 HTTP transport 从东方财富主营构成获取报告期产品/行业/地区收入、成本、利润及占比，从同花顺主营介绍补充当前复核上下文；timeout、限速、重试和退避实际生效。两者只写 candidate evidence/segment，缺少可靠发布日期时采用首次观测日作为保守可得日。evidence 按 payload 快照保存，segment 按来源行、parser 和产品目录版本增量治理，目录升级可重放并保留 supersession。
+- 产品目录已升级为 `business_profile_products.2026.2`：只允许结构化来源标签的规范化精确匹配和显式一对多歧义，不再读取周边叙述、动作词或价值链角色。唯一产品命中只能生成与事实角色一致的商品 master 映射候选；当前产品收入行不能生成原料成本、价值链角色或公司商品暴露。旧 `value_chain_rule_catalog` 及词法推断代码已删除。
+- 官方公告发现、不可变 PDF 归档和页级文本 artifact 继续保留，用于人工复核、专项字段和未来 selected-section LLM 输入。OpenAI-compatible LLM 接口已预留但默认关闭，输入 section 必须通过页码、唯一 ID 和文本 hash 复核，输出必须绑定版本化事实目录并通过字段、值类型、单位、证据引用和 candidate-only 校验；当前无 scheduler、数据库 writer 或 DCF 接入，只有本地模型通过证据定位、字段准确率、幻觉率、成本和吞吐 holdout 后才能另行启用 candidate writer。
 - 保险、地产、控股公司等 profile 当前为 guardrail/partial 状态，缺少专用输入时返回 blocker，不静默降级为普通 FCFF。
 
 尚未完成：
