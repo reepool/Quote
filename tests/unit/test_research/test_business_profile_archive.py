@@ -9,6 +9,7 @@ import pytest
 from research.business_profile_archive import (
     BUSINESS_PROFILE_MANIFEST_SCHEMA_VERSION,
     BusinessProfileDocumentArchiveService,
+    download_business_profile_candidate,
 )
 from research.business_profile_discovery import BusinessProfileDocumentCandidate
 from research.business_profile_documents import classify_business_profile_document
@@ -165,6 +166,46 @@ def test_exchange_backup_archive_preserves_source_lineage(tmp_path):
     assert manifest["source_tier"] == "official_backup"
     assert manifest["source_url"] == candidate.adjunct_url
     assert manifest["metadata"]["discovery_source"] == "sse"
+
+
+def test_exchange_backup_download_uses_source_tls_and_referer(monkeypatch):
+    captured = {}
+
+    class _Response:
+        content = b"%PDF-1.7\nsse"
+
+        @staticmethod
+        def raise_for_status():
+            return None
+
+    def _request_get(url, **kwargs):
+        captured["url"] = url
+        captured.update(kwargs)
+        return _Response()
+
+    monkeypatch.setattr(
+        "research.business_profile_archive.request_get",
+        _request_get,
+    )
+    candidate = _candidate(
+        "sse-annual",
+        "万华化学2025年年度报告",
+        content_url="https://www.sse.com.cn/disclosure/report/annual.pdf",
+    )
+    candidate = type(candidate)(
+        **{
+            **candidate.__dict__,
+            "source": "sse",
+            "source_tier": "official_backup",
+        }
+    )
+
+    content = download_business_profile_candidate(candidate)
+
+    assert content.startswith(b"%PDF-")
+    assert captured["tls_config"].source_name == "sse"
+    assert captured["headers"]["Referer"].startswith("https://www.sse.com.cn/")
+    assert "Mozilla/5.0" in captured["headers"]["User-Agent"]
 
 
 def test_exchange_correction_can_supersede_cninfo_original(tmp_path):

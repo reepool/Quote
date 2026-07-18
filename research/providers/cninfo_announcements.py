@@ -18,6 +18,7 @@ _logger = logging.getLogger("DataManager")
 
 _CNINFO_ANNOUNCEMENT_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
 _CNINFO_TOP_SEARCH_URL = "https://www.cninfo.com.cn/new/information/topSearch/query"
+_CNINFO_MAX_PAGE_SIZE = 30
 _CNINFO_ANNOUNCEMENT_HEADERS = {
     "Accept": "application/json, text/plain, */*",
     "Origin": "https://www.cninfo.com.cn",
@@ -163,6 +164,7 @@ class CninfoAnnouncementScanner:
         stopped_at_watermark = False
         filter_list = list(filters or [])
         pages_scanned = 0
+        effective_page_size = self._effective_page_size(config.page_size)
 
         for page_num in range(1, max(1, config.max_pages) + 1):
             payload: Optional[Dict[str, Any]] = None
@@ -224,7 +226,7 @@ class CninfoAnnouncementScanner:
             if self._page_reached_watermark(page_records, config.stop_at_watermark):
                 stopped_at_watermark = True
                 break
-            if len(page_records) < max(1, config.page_size):
+            if len(page_records) < effective_page_size:
                 break
             if self.request_interval_seconds > 0:
                 time.sleep(self.request_interval_seconds)
@@ -247,7 +249,7 @@ class CninfoAnnouncementScanner:
     ) -> Dict[str, Any]:
         body = {
             "pageNum": str(page_num),
-            "pageSize": str(max(1, config.page_size)),
+            "pageSize": str(self._effective_page_size(config.page_size)),
             "column": config.column,
             "tabName": config.tab_name,
             "isHLtitle": "true",
@@ -286,6 +288,11 @@ class CninfoAnnouncementScanner:
                 if self.retry_backoff_seconds > 0:
                     time.sleep(self.retry_backoff_seconds * (attempt + 1))
         raise RuntimeError(f"CNInfo announcement request failed: {last_exc}")
+
+    @staticmethod
+    def _effective_page_size(page_size: int) -> int:
+        """Respect CNInfo's effective 30-row page limit."""
+        return min(_CNINFO_MAX_PAGE_SIZE, max(1, int(page_size)))
 
     @classmethod
     def _extract_records(cls, payload: Dict[str, Any]) -> List[Dict[str, Any]]:

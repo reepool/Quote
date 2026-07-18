@@ -716,6 +716,86 @@ class BusinessProfileDiscoveryCoordinator:
             fallback_reason=fallback_reason,
         )
 
+    def discover_backup_instrument(
+        self,
+        instrument: Dict[str, Any],
+        **kwargs: Any,
+    ) -> BusinessProfileDiscoveryResolution:
+        """Read the matching exchange backup without repeating the primary."""
+        exchange = str(instrument.get("exchange") or "").strip().upper()
+        backup_adapter = self.backup_adapters.get(exchange)
+        if backup_adapter is None:
+            return self._resolution(
+                selected=None,
+                attempts=[],
+                fallback_used=False,
+                fallback_reason="backup_not_configured",
+            )
+        source = str(backup_adapter.config.source or exchange.lower()).strip().lower()
+        backup_result, backup_error = self._attempt(
+            backup_adapter,
+            instrument,
+            kwargs,
+            source=source,
+            source_tier=OFFICIAL_EXCHANGE_SOURCE_TIER,
+        )
+        attempts: List[BusinessProfileSourceAttempt] = []
+        if backup_result is not None:
+            attempts.append(self._source_attempt(backup_result))
+        elif backup_error:
+            attempts.append(
+                BusinessProfileSourceAttempt(
+                    source=source,
+                    source_tier=OFFICIAL_EXCHANGE_SOURCE_TIER,
+                    status="failed",
+                    candidate_count=0,
+                    pages_scanned=0,
+                    announcements_seen=0,
+                    errors=[backup_error],
+                )
+            )
+        return self._resolution(
+            selected=backup_result,
+            attempts=attempts,
+            fallback_used=True,
+            fallback_reason="explicit_backup",
+        )
+
+    def discover_primary_instrument(
+        self,
+        instrument: Dict[str, Any],
+        **kwargs: Any,
+    ) -> BusinessProfileDiscoveryResolution:
+        """Read CNInfo without invoking an exchange fallback."""
+        primary_result, primary_error = self._attempt(
+            self.primary_adapter,
+            instrument,
+            kwargs,
+            source="cninfo",
+            source_tier="official_primary",
+        )
+        attempts: List[BusinessProfileSourceAttempt] = []
+        if primary_result is not None:
+            attempts.append(self._source_attempt(primary_result))
+        elif primary_error:
+            attempts.append(
+                BusinessProfileSourceAttempt(
+                    source="cninfo",
+                    source_tier="official_primary",
+                    status="failed",
+                    candidate_count=0,
+                    pages_scanned=0,
+                    announcements_seen=0,
+                    errors=[primary_error],
+                )
+            )
+        return self._resolution(
+            selected=primary_result,
+            attempts=attempts,
+            fallback_used=False,
+            fallback_reason="explicit_primary",
+        )
+
     @staticmethod
     def _attempt(
         adapter: Any,

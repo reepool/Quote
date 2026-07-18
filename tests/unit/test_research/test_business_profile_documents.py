@@ -72,6 +72,27 @@ def test_periodic_title_and_report_period_use_the_same_year_contract():
     )
 
 
+def test_accepts_observed_official_semiannual_title_variants():
+    titles = (
+        "宝泰隆新材料股份有限公司2022年度半年度报告全文",
+        "中国石化2021年半年报",
+    )
+
+    for title in titles:
+        result = classify_business_profile_document(title, adjunct_type="PDF")
+        assert result.document_type == "semiannual_report"
+        assert result.selected is True
+
+    assert (
+        infer_business_profile_report_period(titles[0], "2026-01-01")
+        == "2022-06-30"
+    )
+    assert (
+        infer_business_profile_report_period(titles[1], "2026-01-01")
+        == "2021-06-30"
+    )
+
+
 def test_classifies_operating_resource_contract_and_hedging_disclosures():
     cases = {
         "2026年6月份主要经营数据公告": "operating_data",

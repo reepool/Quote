@@ -250,6 +250,49 @@ def test_cninfo_announcement_scanner_paginates_and_filters():
     assert session.calls[0]["data"]["plate"] == "sz"
 
 
+def test_cninfo_announcement_scanner_caps_page_size_at_upstream_limit():
+    first_page = [
+        {
+            "announcementId": f"a{index}",
+            "announcementTitle": f"测试公告{index}",
+            "announcementTime": 1777392000000 - index,
+            "secCode": "000001",
+        }
+        for index in range(30)
+    ]
+    session = _FakeSession(
+        [
+            {"announcements": first_page, "hasMore": True},
+            {
+                "announcements": [
+                    {
+                        "announcementId": "a30",
+                        "announcementTitle": "历史测试公告",
+                        "announcementTime": 1777391000000,
+                        "secCode": "000001",
+                    }
+                ],
+                "hasMore": False,
+            },
+        ]
+    )
+    scanner = CninfoAnnouncementScanner(session=session, request_interval_seconds=0)
+
+    result = scanner.scan(
+        CninfoAnnouncementScanConfig(
+            purpose_key="page-size-cap",
+            market="SZSE",
+            column="szse",
+            page_size=100,
+            max_pages=3,
+        )
+    )
+
+    assert result.pages_scanned == 2
+    assert result.announcements_seen == 31
+    assert [call["data"]["pageSize"] for call in session.calls] == ["30", "30"]
+
+
 @pytest.mark.asyncio
 async def test_shareholder_incremental_sync_writes_then_skips_unchanged(tmp_path):
     config = _build_config(tmp_path)

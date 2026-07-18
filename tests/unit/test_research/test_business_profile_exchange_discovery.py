@@ -353,6 +353,52 @@ def test_coordinator_records_primary_and_backup_failures():
     assert result.fallback_reason == "primary_failed"
 
 
+def test_coordinator_can_query_exchange_backup_without_repeating_primary():
+    primary = _Adapter(_result("cninfo", candidates=[_candidate()]))
+    backup = _Adapter(_result("sse", candidates=[_candidate("sse")]))
+    backup.config = SimpleNamespace(source="sse")
+    coordinator = BusinessProfileDiscoveryCoordinator(
+        primary_adapter=primary,
+        backup_adapters={"SSE": backup},
+    )
+
+    result = coordinator.discover_backup_instrument(
+        {"instrument_id": "600001.SH", "symbol": "600001", "exchange": "SSE"},
+        dry_run=True,
+    )
+
+    assert result.status == "success"
+    assert result.selected_source == "sse"
+    assert result.selected_source_tier == "official_backup"
+    assert result.fallback_used is True
+    assert result.fallback_reason == "explicit_backup"
+    assert primary.calls == []
+    assert len(backup.calls) == 1
+
+
+def test_coordinator_can_retry_cninfo_without_calling_backup():
+    primary = _Adapter(_result("cninfo", candidates=[_candidate()]))
+    backup = _Adapter(_result("sse", candidates=[_candidate("sse")]))
+    backup.config = SimpleNamespace(source="sse")
+    coordinator = BusinessProfileDiscoveryCoordinator(
+        primary_adapter=primary,
+        backup_adapters={"SSE": backup},
+    )
+
+    result = coordinator.discover_primary_instrument(
+        {"instrument_id": "600001.SH", "symbol": "600001", "exchange": "SSE"},
+        dry_run=True,
+    )
+
+    assert result.status == "success"
+    assert result.selected_source == "cninfo"
+    assert result.selected_source_tier == "official_primary"
+    assert result.fallback_used is False
+    assert result.fallback_reason == "explicit_primary"
+    assert len(primary.calls) == 1
+    assert backup.calls == []
+
+
 def test_config_factory_skips_disabled_bse_backup():
     config = SimpleNamespace(
         modules={

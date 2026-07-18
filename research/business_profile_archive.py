@@ -39,6 +39,17 @@ _BUSINESS_PROFILE_SOURCE_BASE_URLS = {
     "szse": "https://disc.static.szse.cn/",
     "bse": "https://www.bse.cn/",
 }
+_BUSINESS_PROFILE_SOURCE_REFERERS = {
+    "cninfo": "https://www.cninfo.com.cn/",
+    "sse": "https://www.sse.com.cn/disclosure/listedinfo/regular/",
+    "szse": "https://www.szse.cn/disclosure/listed/fixed/index.html",
+    "bse": "https://www.bse.cn/disclosure/announcement.html",
+}
+_BUSINESS_PROFILE_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/124.0 Safari/537.36"
+)
 _ARCHIVE_TEMPLATE_FIELDS = {
     "announcement_id",
     "content_hash",
@@ -72,16 +83,26 @@ def business_profile_candidate_url(
 def download_business_profile_candidate(
     candidate: BusinessProfileDocumentCandidate,
 ) -> bytes:
-    """Download one official CNInfo attachment through governed transport."""
+    """Download one official attachment through source-aware governed transport."""
+    source = str(candidate.source or "cninfo").strip().lower()
+    if source not in _BUSINESS_PROFILE_SOURCE_REFERERS:
+        raise ValueError(
+            f"unsupported business-profile document source: {candidate.source}"
+        )
     url = business_profile_candidate_url(
         candidate.adjunct_url,
-        source=candidate.source,
+        source=source,
     )
     if not url:
         raise ValueError("candidate attachment URL is missing")
     response = request_get(
         url,
-        tls_config=HttpTlsConfig(source_name="cninfo"),
+        tls_config=HttpTlsConfig(source_name=source),
+        headers={
+            "Accept": "application/pdf,application/octet-stream,*/*",
+            "Referer": _BUSINESS_PROFILE_SOURCE_REFERERS[source],
+            "User-Agent": _BUSINESS_PROFILE_USER_AGENT,
+        },
         timeout=20,
     )
     response.raise_for_status()

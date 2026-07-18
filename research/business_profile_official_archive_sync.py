@@ -20,6 +20,7 @@ from research.business_profile_documents import (
 )
 from research.business_profile_exchange_discovery import (
     BusinessProfileDiscoveryCoordinator,
+    BusinessProfileDiscoveryResolution,
 )
 from research.business_profile_precision_review import (
     load_product_label_review_rows,
@@ -303,28 +304,91 @@ class BusinessProfileOfficialArchiveSyncService:
                 max_pages=max_pages,
                 dry_run=True,
             )
-            attempts.extend(asdict(item) for item in resolution.attempts)
-            for attempt in resolution.attempts:
-                discovery_errors.extend(attempt.errors)
-            for candidate in resolution.candidates:
-                if (
-                    business_profile_document_family(
-                        candidate.classification.document_type
+            matched_family_periods = _merge_discovery_resolution(
+                resolution,
+                family=family,
+                periods=periods,
+                candidates=candidates,
+                attempts=attempts,
+                discovery_errors=discovery_errors,
+            )
+            missing_family_periods = sorted(set(periods) - matched_family_periods)
+            primary_discovery = getattr(
+                self.coordinator,
+                "discover_primary_instrument",
+                None,
+            )
+            if (
+                missing_family_periods
+                and _primary_discovery_succeeded(resolution)
+                and callable(primary_discovery)
+            ):
+                for missing_period in list(missing_family_periods):
+                    retry_window = _period_disclosure_window(
+                        missing_period,
+                        as_of_date=as_of_date,
+                        start_date=start_date,
+                        end_date=end_date,
                     )
-                    != family
-                ):
-                    continue
-                try:
-                    candidate_period = infer_business_profile_report_period(
-                        candidate.title,
-                        candidate.announcement_time,
+                    if retry_window is None:
+                        continue
+                    primary_resolution = primary_discovery(
+                        instrument,
+                        start_date=retry_window[0],
+                        end_date=retry_window[1],
+                        search_key=f"{missing_period[:4]}年",
+                        page_size=page_size,
+                        max_pages=max_pages,
+                        dry_run=True,
                     )
-                except ValueError:
-                    continue
-                if candidate_period not in periods:
-                    continue
-                key = (candidate_period, candidate.announcement_id)
-                candidates[key] = candidate
+                    _merge_discovery_resolution(
+                        primary_resolution,
+                        family=family,
+                        periods=[missing_period],
+                        candidates=candidates,
+                        attempts=attempts,
+                        discovery_errors=discovery_errors,
+                    )
+                matched_family_periods = {
+                    period
+                    for period, _announcement_id in candidates
+                    if period in periods
+                }
+                missing_family_periods = sorted(
+                    set(periods) - matched_family_periods
+                )
+            backup_discovery = getattr(
+                self.coordinator,
+                "discover_backup_instrument",
+                None,
+            )
+            if missing_family_periods and callable(backup_discovery):
+                for missing_period in missing_family_periods:
+                    retry_window = _period_disclosure_window(
+                        missing_period,
+                        as_of_date=as_of_date,
+                        start_date=start_date,
+                        end_date=end_date,
+                    )
+                    if retry_window is None:
+                        continue
+                    backup_resolution = backup_discovery(
+                        instrument,
+                        start_date=retry_window[0],
+                        end_date=retry_window[1],
+                        search_key=FAMILY_SEARCH_KEYS[family],
+                        page_size=page_size,
+                        max_pages=max_pages,
+                        dry_run=True,
+                    )
+                    _merge_discovery_resolution(
+                        backup_resolution,
+                        family=family,
+                        periods=[missing_period],
+                        candidates=candidates,
+                        attempts=attempts,
+                        discovery_errors=discovery_errors,
+                    )
 
         selected = _select_active_candidates(candidates.values())
         matched_periods = sorted(
@@ -527,6 +591,44 @@ def _query_window(
     return earliest.isoformat(), as_of_date
 
 
+def _period_disclosure_window(
+    period: str,
+    *,
+    as_of_date: str,
+    start_date: Optional[str],
+    end_date: Optional[str],
+) -> Optional[tuple[str, str]]:
+    """Bound a retry to the normal publication window for one periodic report."""
+    report_date = date.fromisoformat(period)
+    if period.endswith("-12-31"):
+        default_end = date(report_date.year + 1, 6, 30)
+    elif period.endswith("-06-30"):
+        default_end = date(report_date.year, 12, 31)
+    else:
+        return None
+    lower = max(
+        report_date,
+        date.fromisoformat(start_date) if start_date else report_date,
+    )
+    upper = min(
+        default_end,
+        date.fromisoformat(end_date) if end_date else date.fromisoformat(as_of_date),
+        date.fromisoformat(as_of_date),
+    )
+    if lower > upper:
+        return None
+    return lower.isoformat(), upper.isoformat()
+
+
+def _primary_discovery_succeeded(
+    resolution: BusinessProfileDiscoveryResolution,
+) -> bool:
+    return any(
+        attempt.source == "cninfo" and attempt.status == "success"
+        for attempt in resolution.attempts
+    )
+
+
 def _select_active_candidates(
     candidates: Sequence[BusinessProfileDocumentCandidate],
 ) -> List[BusinessProfileDocumentCandidate]:
@@ -550,6 +652,40 @@ def _select_active_candidates(
             )
         )
     return output
+
+
+def _merge_discovery_resolution(
+    resolution: BusinessProfileDiscoveryResolution,
+    *,
+    family: str,
+    periods: Sequence[str],
+    candidates: Dict[tuple[str, str], BusinessProfileDocumentCandidate],
+    attempts: List[Dict[str, Any]],
+    discovery_errors: List[str],
+) -> set[str]:
+    attempts.extend(asdict(item) for item in resolution.attempts)
+    for attempt in resolution.attempts:
+        discovery_errors.extend(attempt.errors)
+    matched_periods = set()
+    for candidate in resolution.candidates:
+        if (
+            business_profile_document_family(candidate.classification.document_type)
+            != family
+        ):
+            continue
+        try:
+            candidate_period = infer_business_profile_report_period(
+                candidate.title,
+                candidate.announcement_time,
+            )
+        except ValueError:
+            continue
+        if candidate_period not in periods:
+            continue
+        key = (candidate_period, candidate.announcement_id)
+        candidates[key] = candidate
+        matched_periods.add(candidate_period)
+    return matched_periods
 
 
 def _candidate_table_counts(path: Path) -> Dict[str, int]:

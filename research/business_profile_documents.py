@@ -10,7 +10,9 @@ from typing import List, Optional
 _SPACE_RE = re.compile(r"\s+")
 _TAG_RE = re.compile(r"<[^>]+>")
 _PERIODIC_REPORT_TITLE_RE = re.compile(
-    r"(?P<year>20\d{2})(?:年年度报告|年度报告|年半年度报告|年中期报告)"
+    r"(?P<year>20\d{2})(?:"
+    r"年年度报告|年度报告|年半年度报告|年度半年度报告|年中期报告|年半年报"
+    r")"
 )
 _FULL_REPORT_SUFFIX_RE = re.compile(
     r"^(?:全文|[（(](?:更正后|修订(?:版|稿)?|更新后|更新版|补充后|补充版|补充修订版)[）)])?$"
@@ -80,7 +82,11 @@ def infer_business_profile_report_period(
     """Infer a filing period, falling back to the publication date for events."""
     normalized = normalize_announcement_title(title)
     match = _PERIODIC_REPORT_TITLE_RE.search(normalized)
-    if match and ("半年度报告" in normalized or "中期报告" in normalized):
+    if match and (
+        "半年度报告" in normalized
+        or "中期报告" in normalized
+        or "半年报" in normalized
+    ):
         return f"{match.group('year')}-06-30"
     if match and "年度报告" in normalized:
         return f"{match.group('year')}-12-31"
@@ -222,7 +228,11 @@ def _classify_periodic_report(
     if report_match is None:
         return None
     report_type: Optional[str] = None
-    if "半年度报告" in normalized or "中期报告" in normalized:
+    if (
+        "半年度报告" in normalized
+        or "中期报告" in normalized
+        or "半年报" in normalized
+    ):
         report_type = "semiannual_report"
     elif "年度报告" in normalized:
         report_type = "annual_report"

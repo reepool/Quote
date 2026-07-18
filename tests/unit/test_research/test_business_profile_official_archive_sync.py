@@ -61,6 +61,7 @@ def _official_candidate(
     *,
     title: str = "中国神华2025年年度报告",
     announcement_id: str = "ann-2025-ar",
+    source: str = "cninfo",
 ):
     return BusinessProfileDocumentCandidate(
         announcement_id=announcement_id,
@@ -74,8 +75,8 @@ def _official_candidate(
             adjunct_type="PDF",
         ),
         selection_reasons=["periodic_report"],
-        source="cninfo",
-        source_tier="official_primary",
+        source=source,
+        source_tier=("official_primary" if source == "cninfo" else "official_backup"),
     )
 
 
@@ -113,10 +114,93 @@ class _FailIfArchived:
         raise AssertionError("metadata-only sync must not archive documents")
 
 
+class _PartialBackupCoordinator:
+    def __init__(self, primary_candidates, backup_candidates):
+        self.primary_candidates = list(primary_candidates)
+        self.backup_candidates = list(backup_candidates)
+        self.primary_calls = []
+        self.backup_calls = []
+
+    def discover_instrument(self, instrument, **kwargs):
+        self.primary_calls.append((instrument, kwargs))
+        return _resolution(self.primary_candidates, source="cninfo")
+
+    def discover_backup_instrument(self, instrument, **kwargs):
+        self.backup_calls.append((instrument, kwargs))
+        return _resolution(self.backup_candidates, source="sse")
+
+
+class _PartialPrimaryRetryCoordinator(_PartialBackupCoordinator):
+    def __init__(self, primary_candidates, retry_candidates, backup_candidates):
+        super().__init__(primary_candidates, backup_candidates)
+        self.retry_candidates = list(retry_candidates)
+        self.primary_retry_calls = []
+
+    def discover_primary_instrument(self, instrument, **kwargs):
+        self.primary_retry_calls.append((instrument, kwargs))
+        return _resolution(self.retry_candidates, source="cninfo")
+
+
+class _InitialPartialBackupCoordinator:
+    def __init__(self, initial_candidates, retry_candidates):
+        self.initial_candidates = list(initial_candidates)
+        self.retry_candidates = list(retry_candidates)
+        self.initial_calls = []
+        self.backup_calls = []
+
+    def discover_instrument(self, instrument, **kwargs):
+        self.initial_calls.append((instrument, kwargs))
+        return _resolution(self.initial_candidates, source="sse")
+
+    def discover_backup_instrument(self, instrument, **kwargs):
+        self.backup_calls.append((instrument, kwargs))
+        return _resolution(self.retry_candidates, source="sse")
+
+
+def _resolution(candidates, *, source):
+    source_tier = "official_primary" if source == "cninfo" else "official_backup"
+    return BusinessProfileDiscoveryResolution(
+        status="success",
+        selected_source=source,
+        selected_source_tier=source_tier,
+        fallback_used=source != "cninfo",
+        fallback_reason="explicit_backup" if source != "cninfo" else None,
+        candidates=list(candidates),
+        attempts=[
+            BusinessProfileSourceAttempt(
+                source=source,
+                source_tier=source_tier,
+                status="success",
+                candidate_count=len(candidates),
+                pages_scanned=1,
+                announcements_seen=len(candidates),
+            )
+        ],
+    )
+
+
 def _seed_review_candidate(storage):
     repository = BusinessProfileRepository(storage)
     repository.upsert("evidence", _approved_evidence())
     repository.upsert("segments", _candidate_segment())
+
+
+def _seed_additional_review_period(storage, report_period):
+    repository = BusinessProfileRepository(storage)
+    evidence_id = f"evidence-{report_period}"
+    evidence = _approved_evidence()
+    evidence["evidence_id"] = evidence_id
+    evidence["source_document_id"] = f"source-{report_period}"
+    evidence["report_period"] = report_period
+    repository.upsert("evidence", evidence)
+    repository.upsert(
+        "segments",
+        _candidate_segment(
+            report_period=report_period,
+            evidence_id=evidence_id,
+            revenue_share=0.7,
+        ),
+    )
 
 
 def _seed_invalid_review_candidate(storage):
@@ -189,6 +273,117 @@ def test_default_cutoff_uses_shanghai_calendar_date(tmp_path, monkeypatch):
 
     assert report["scope"]["as_of_date"] == "2026-07-19"
     assert coordinator.calls[0][1]["end_date"] == "2026-07-19"
+
+
+def test_partial_primary_result_queries_backup_for_missing_periods(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    _seed_review_candidate(storage)
+    _seed_additional_review_period(storage, "2024-12-31")
+    coordinator = _PartialBackupCoordinator(
+        [_official_candidate()],
+        [
+            _official_candidate(
+                title="中国神华2024年年度报告",
+                announcement_id="sse-2024-ar",
+                source="sse",
+            )
+        ],
+    )
+    service = BusinessProfileOfficialArchiveSyncService(
+        storage=storage,
+        research_config=storage.research_config,
+        coordinator=coordinator,
+        archive_service=_FailIfArchived(),
+    )
+
+    report = service.sync(
+        target_research_db=research_db,
+        max_instruments=1,
+        as_of_date="2026-07-18",
+    )
+
+    assert report["status"] == "success"
+    assert report["matched_instrument_periods"] == 2
+    assert report["missing_instrument_periods"] == 0
+    assert [item["source"] for item in report["results"][0]["attempts"]] == [
+        "cninfo",
+        "sse",
+    ]
+    assert len(coordinator.primary_calls) == 1
+    assert len(coordinator.backup_calls) == 1
+    assert coordinator.backup_calls[0][1]["start_date"] == "2024-12-31"
+
+
+def test_partial_primary_result_retries_narrow_period_before_backup(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    _seed_review_candidate(storage)
+    _seed_additional_review_period(storage, "2021-06-30")
+    coordinator = _PartialPrimaryRetryCoordinator(
+        [_official_candidate()],
+        [
+            _official_candidate(
+                title="中国神华2021年半年度报告",
+                announcement_id="cninfo-2021-semi",
+            )
+        ],
+        [],
+    )
+    service = BusinessProfileOfficialArchiveSyncService(
+        storage=storage,
+        research_config=storage.research_config,
+        coordinator=coordinator,
+        archive_service=_FailIfArchived(),
+    )
+
+    report = service.sync(
+        target_research_db=research_db,
+        max_instruments=1,
+        as_of_date="2026-07-18",
+    )
+
+    assert report["status"] == "success"
+    assert report["matched_instrument_periods"] == 2
+    assert len(coordinator.primary_retry_calls) == 1
+    assert coordinator.primary_retry_calls[0][1]["start_date"] == "2021-06-30"
+    assert coordinator.primary_retry_calls[0][1]["end_date"] == "2021-12-31"
+    assert coordinator.primary_retry_calls[0][1]["search_key"] == "2021年"
+    assert coordinator.backup_calls == []
+
+
+def test_partial_initial_backup_retries_missing_period_with_narrow_window(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    _seed_review_candidate(storage)
+    _seed_additional_review_period(storage, "2024-12-31")
+    coordinator = _InitialPartialBackupCoordinator(
+        [_official_candidate()],
+        [
+            _official_candidate(
+                title="中国神华2024年年度报告",
+                announcement_id="sse-2024-ar",
+                source="sse",
+            )
+        ],
+    )
+    service = BusinessProfileOfficialArchiveSyncService(
+        storage=storage,
+        research_config=storage.research_config,
+        coordinator=coordinator,
+        archive_service=_FailIfArchived(),
+    )
+
+    report = service.sync(
+        target_research_db=research_db,
+        max_instruments=1,
+        as_of_date="2026-07-18",
+    )
+
+    assert report["status"] == "success"
+    assert report["matched_instrument_periods"] == 2
+    assert report["missing_instrument_periods"] == 0
+    assert len(coordinator.initial_calls) == 1
+    assert len(coordinator.backup_calls) == 1
+    assert coordinator.backup_calls[0][1]["start_date"] == "2024-12-31"
+    assert coordinator.backup_calls[0][1]["end_date"] == "2025-06-30"
 
 
 def test_archive_write_requires_exact_operator_switch(tmp_path):
