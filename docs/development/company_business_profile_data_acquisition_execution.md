@@ -30,10 +30,12 @@
 | `research/business_profile_product_catalog.py` | 产品精确别名和商品 master 候选映射 | 已实现 v2 |
 | `research/business_profile_unit_conversions.py` | 固定单位换算和事实目录版本锁 | 已实现 |
 | `research/business_profile_llm.py` | 默认禁用的 OpenAI-compatible 选段协议 | 已实现接口 |
+| `research/business_profile_structured_sync.py` | bounded sync、checkpoint、raw cache 和运行报告 | 已实现，生产开关关闭 |
+| `research/business_profile_catalog_governance.py` | 标签审计和受控精确别名升级 | 已实现 |
 | `research/business_profile_governance.py` | 审批事实的时点解析和 DCF context | 已实现 |
 | 公告发现、archive、PDF artifacts | 正式证据与未来关键 section | 已实现基础 |
-| bounded sync service / scheduler | 批量维护 | 待实现 |
-| 审核 CLI 和字典治理 | candidate 审批、驳回、supersede | 待实现 |
+| scheduler | 自动批量维护 | 待 30 家 pilot gate 通过 |
+| 审核 CLI | candidate 审批、驳回、supersede | 待实现 |
 | 生产回补 | A 股数据填充 | 未开始 |
 
 已删除的旧实现：
@@ -102,6 +104,44 @@ retry 和 backoff。
 
 一个来源失败不阻断另一个来源，整体返回 `degraded`。两个来源均不可用时返回 `failed`。
 
+### 3.4 Bounded sync
+
+统一 dry-run 入口：
+
+```bash
+python scripts/research_business_profile_structured_sync.py \
+  --probe-disabled-config \
+  --industry-group coal \
+  --max-instruments 5 \
+  --max-elapsed-seconds 300 \
+  --checkpoint /tmp/business_profile_coal.checkpoint.json \
+  --output /tmp/business_profile_coal.report.json
+```
+
+生产配置仍为 `enabled=false`。`--probe-disabled-config` 只放行不写候选的
+dry-run。candidate 写入还必须同时满足配置启用、`candidate_only=true` 以及：
+
+```text
+--candidate-write
+--operator-switch BUSINESS_PROFILE_CANDIDATE_WRITE
+```
+
+source、行业、instrument、数量和时长均有显式边界，CLI 不能超过配置上限。
+checkpoint 按 `instrument × source` 记录，并绑定估值日、筛选条件、产品目录版本
+和时点 universe hash；续跑只重试失败来源，scope 或 universe 改变时 fail
+closed。
+
+候选写入强制将原始 payload 保存为内容寻址 gzip：
+
+```text
+{raw_cache_root}/{source}/{instrument_id}/{payload_hash}.json.gz
+```
+
+cache 重新计算 payload hash 并记录文件 hash；run manifest 保存公司、来源、观测
+时间、cache 路径和 hash。evidence metadata 只保留引用，不重复保存大 payload。
+运行报告按来源汇总成功/空/失败、耗时、行数、报告期、payload 新增/不变、cache
+命中、候选数、别名命中和 DCF 零泄漏。
+
 ## 4. 候选写入
 
 ### 4.1 幂等键
@@ -113,7 +153,8 @@ source_row_key = sha256(source + instrument_id + report_period + classification 
 segment_record_id = sha256(source + source_row_hash + parser_version + product_catalog_version)
 ```
 
-evidence 按整份 payload 保存不可变快照；segment 按来源行及派生规则版本治理。
+evidence 按整份 payload 身份保存不可变快照；生产 sync 将原始内容放入内容寻址
+cache，并在 evidence 保存可校验引用。segment 按来源行及派生规则版本治理。
 因此：
 
 - 新报告期导致 payload 变化时，只写新增或数值发生变化的行，快照内未变化的历史行不重复进入审核队列；
@@ -182,6 +223,15 @@ normalize(label) == normalize(alias)
 - 未匹配和歧义产品标签；
 - 数据库写入和 DCF approved 覆盖变化。
 
+运行控制要求：
+
+- `max_elapsed_seconds` 必须下传为单次请求和重试 deadline，不能只在公司之间检查；
+- 来源返回证券代码时必须与请求 instrument 一致，否则整个来源结果失败；
+- candidate 写入前必须先持久化对应 raw manifest；manifest 失败不得写候选或推进
+  checkpoint，ingestion run 仍须结束为可审计终态；
+- DCF 泄漏必须使用运行前后 approved、价值链角色和公司商品暴露的数据库差值，
+  不得在报告中硬编码为通过。
+
 生产默认仍为 disabled，先运行临时库和每行业 5 家样本。
 
 ## 6. 字典治理
@@ -200,6 +250,11 @@ normalize(label) == normalize(alias)
 删除上下文必需词、排除词和值链角色约束后，目录 schema 已升级为 `business_profile_product_catalog.v2`，catalog version 为 `business_profile_products.2026.2`。旧 v1 文件不能由 v2 loader 静默加载。
 
 单位目录 `business_profile_units.2026.1` 锁定 `business_profile_facts.2026.1`。事实目录升级后，单位目录版本不一致必须 fail closed。
+
+标签审计必须先按 `source_name + source_row_key` 选择最新版本，再筛选 candidate。
+达到安全记录上限时返回 `incomplete` 和非零退出码，不得用截断样本生成 ready
+结论。目录与 promotion manifest 均为不可覆盖版本文件；目录先发布、manifest
+作为 commit marker 最后发布，manifest 失败时回滚本次目录输出。
 
 ## 7. 官方文档链路的保留用途
 
@@ -259,7 +314,11 @@ normalize(label) == normalize(alias)
 - 输出必须为 candidate；
 - 保存 request/response hash、model、base URL、prompt/schema version 和 fact catalog version。
 
-当前没有 scheduler、数据库 writer 或 DCF 接入。后续本地模型评估通过后另开 promotion change。
+当前没有 scheduler、数据库 writer 或 DCF 接入。冻结语料、人工金标准、精度/
+证据/幻觉门槛、硬件和吞吐要求见
+`docs/development/business_profile_llm_benchmark_requirements.md`。后续本地模型评估
+通过后必须另开 `promote-business-profile-local-llm-extraction`，且只能先申请
+candidate writer 和 bounded 人工复核试点。
 
 ## 9. 验证计划
 
@@ -272,7 +331,10 @@ normalize(label) == normalize(alias)
 - 200 行疑似上限；
 - payload 快照幂等、行级增量幂等和目录版本重放；
 - provider timeout、retry、backoff 和 pacing；
+- 请求 deadline、来源证券代码错配；
 - candidate-only 写入；
+- manifest 失败终态、真实治理表 delta 泄漏检测；
+- 标签审计最新版本、截断 fail-closed 和 promotion 双文件回滚；
 - 未匹配产品保留；
 - 不写价值链角色和商品暴露；
 - LLM disabled、输入上限、JSON/schema、事实目录、section hash、证据引用和 candidate gate。
@@ -290,6 +352,11 @@ normalize(label) == normalize(alias)
 
 live probe 只读上游并写 `/tmp` 证据，不写生产库。记录成功率、耗时、行数、报告期、分类覆盖、字段空值和疑似截断。
 
+2026-07-18 分层 30 家 pilot 已完成，完整结果见
+`docs/development/business_profile_structured_source_pilot_20260718.md`。两个来源均
+30/30 成功，但东方财富 24/30 达到 200 行疑似上限，产品精确别名覆盖仅 2.18%，
+因此只完成来源基线，不满足 production promotion。
+
 ### 9.3 生产启用门槛
 
 - 30 家 probe 成功率不低于 95%；
@@ -304,13 +371,13 @@ live probe 只读上游并写 `/tmp` 证据，不写生产库。记录成功率�
 
 高优先级：
 
-1. 实现 bounded sync service 和 CLI；
-2. 从配置读取 source、限速、批量和 enabled 状态；
-3. 增加 raw payload 缓存或专用 manifest，避免 metadata 过大；
-4. 建立未匹配/歧义产品标签审核队列；
-5. 运行 30 家 live probe 并固定源字段基线；
-6. 增加数据源漂移和 200 行上限监控；
-7. 完成临时库回补和幂等/恢复测试。
+1. 对 pilot 高频产品标签执行正式报告核对并建立 99% precision 证据；
+2. 增加数据源字段漂移、非标准报告期和 200 行上限 promotion gate；
+3. 建立人工 approve/reject/supersede CLI；
+4. promotion gate 通过后再增加默认关闭的 scheduler job。
+
+临时库回补、失败来源 checkpoint 恢复、全量重放幂等和 DCF 零泄漏已于
+2026-07-18 使用 30 家分层样本通过，详见 pilot 基线文档。
 
 中优先级：
 

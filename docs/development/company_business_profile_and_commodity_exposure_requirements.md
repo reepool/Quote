@@ -203,7 +203,9 @@ version、request hash 和 response hash。模型不能直接 approved，不能�
 
 ### 6.4 启用门槛
 
-后续评估本地模型时至少验证：
+详细冻结语料、金标准、指标和 promotion 流程见
+`docs/development/business_profile_llm_benchmark_requirements.md`。后续评估本地
+模型时至少验证：
 
 - 产品/分部字段 precision；
 - 数值、单位、期间和实体范围 exact match；
@@ -214,6 +216,8 @@ version、request hash 和 response hash。模型不能直接 approved，不能�
 - 模型、prompt、量化版本和硬件可复现性。
 
 未通过独立 holdout 评估前，不得启用批处理。
+通过后仍必须另开 `promote-business-profile-local-llm-extraction`，且第一阶段
+只能启用 candidate writer 和 bounded 人工复核试点，不能自动批准或进入 DCF。
 
 ## 7. 公司画像长期性
 
@@ -276,8 +280,9 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 
 ### Phase B：治理和维护
 
-- 增加 bounded sync service、checkpoint、重试和 source health；
-- 建立未匹配标签队列和人工字典审批；
+- 使用已实现的 bounded sync service、checkpoint、重试和 source health 完成
+  30 家 pilot；
+- 使用已实现的未匹配/歧义标签审计和受控目录 promotion，完成人工字典治理；
 - 建立字段漂移、200 行上限和跨源差异监控；
 - 完成首批行业历史回补；
 - 审批少量高材料性产品事实。
@@ -309,8 +314,25 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 已删除尚未进入生产的 `value_chain_rule_catalog` 及词法推断代码；
 - 已为单位目录增加事实目录版本锁；
 - 已实现默认禁用的 OpenAI-compatible 选段抽取协议、输入上限、section hash、事实目录版本、证据引用和值类型/candidate-only 校验；
+- 已实现配置驱动的结构化业务画像 bounded sync：按申万时点行业和上市生命周期
+  选择 A 股范围，支持来源/行业/公司、数量和时长边界，按公司和来源 checkpoint
+  续跑；候选写入强制使用内容寻址 raw cache/manifest，生产开关仍关闭；
+- 已实现未匹配/歧义产品标签审计与受控目录升级；别名只允许人工确认后的精确
+  标签，升级必须生成不可覆盖的新目录版本和独立审计 manifest；审计先选择
+  最新来源行，记录上限截断时返回 incomplete；
+- structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
+  candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
+  候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；
+- 已完成六行业各 5 家、跨 BSE/SSE/SZSE 和四个上市年代的分层只读 pilot：
+  两个来源均 30/30 成功，但东方财富 24/30 达到 200 行疑似上限，产品精确别名
+  覆盖仅 2.18%；因此来源链可用但 promotion gate 未通过；
+- 已在全新 `/tmp` research DB 完成 30 家三阶段回补验收：首轮写入、失败来源
+  checkpoint 恢复后，全量重放新增 evidence/segment 均为 0；最终 60 evidence、
+  5,554 candidate segments，approved/value-chain/exposure 均为 0；
 - 公告发现、PDF 归档和页级 artifact 继续保留；
 - `601088.SH` bounded live smoke 中两个结构化源均成功，主营构成返回 200 行、覆盖 2018-12-31 至 2025-12-31，并触发 `possible_source_row_cap`；同报告期产品收入比例合计约为 `1`，已按小数比例口径实现；
-- 免费结构化源的 scheduler、全市场回补、人工审批 CLI 和生产 DCF 数据覆盖尚未完成。
+- 免费结构化源的 scheduler、正式报告 99% precision 核对、全市场回补、人工
+  审批 CLI 和生产 DCF 数据覆盖尚未完成。
 
-因此，当前结论是“新路线的适配和候选写入基础已实现”，不是“公司画像数据已生产完备”。
+因此，当前结论是“新路线已具备受控批次采集和候选治理能力”，不是“公司画像
+数据已生产完备”。

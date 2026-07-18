@@ -1,8 +1,10 @@
 import asyncio
 
 import pandas as pd
+import pytest
 
 from research.providers.akshare_business_profile import (
+    COMPOSITION_SOURCE,
     AkshareStructuredBusinessProfileProvider,
     normalize_composition_rows,
     normalize_introduction_rows,
@@ -145,6 +147,58 @@ def test_provider_retries_each_source_independently():
 
     assert snapshot.status == "success"
     assert _Akshare.composition_calls == 2
+
+
+def test_provider_honors_explicit_source_scope_without_calling_other_source():
+    class _Akshare:
+        @staticmethod
+        def stock_zygc_em(symbol):
+            return pd.DataFrame(
+                [
+                    {
+                        "报告日期": "2025-12-31",
+                        "分类类型": "按产品分类",
+                        "主营构成": "动力煤",
+                    }
+                ]
+            )
+
+        @staticmethod
+        def stock_zyjs_ths(symbol):
+            raise AssertionError("out-of-scope source must not be called")
+
+    provider = AkshareStructuredBusinessProfileProvider(
+        akshare_module=_Akshare(),
+        request_interval_seconds=0,
+        retry_backoff_seconds=0,
+    )
+    snapshot = asyncio.run(provider.fetch("601088.SH", sources=[COMPOSITION_SOURCE]))
+
+    assert snapshot.status == "success"
+    assert snapshot.composition.status == "success"
+    assert snapshot.composition.elapsed_seconds >= 0
+    assert snapshot.introduction.status == "skipped"
+
+
+def test_normalization_rejects_rows_for_a_different_security():
+    with pytest.raises(ValueError, match="source security mismatch"):
+        normalize_composition_rows(
+            [
+                {
+                    "股票代码": "600000",
+                    "报告日期": "2025-12-31",
+                    "分类类型": "按产品分类",
+                    "主营构成": "动力煤",
+                }
+            ],
+            instrument_id="601088.SH",
+        )
+
+    with pytest.raises(ValueError, match="source security mismatch"):
+        normalize_introduction_rows(
+            [{"股票代码": "000001", "主营业务": "银行业务"}],
+            instrument_id="601088.SH",
+        )
 
 
 def test_default_transport_applies_timeout_and_normalizes_public_endpoints():

@@ -19,6 +19,10 @@ from .akshare_support import load_akshare
 
 COMPOSITION_SOURCE = "eastmoney_main_composition"
 INTRODUCTION_SOURCE = "ths_main_business_intro"
+STRUCTURED_BUSINESS_PROFILE_SOURCES = {
+    COMPOSITION_SOURCE,
+    INTRODUCTION_SOURCE,
+}
 COMPOSITION_CLASSIFICATIONS = {
     "按产品分类": "product",
     "按行业分类": "industry",
@@ -27,9 +31,7 @@ COMPOSITION_CLASSIFICATIONS = {
 EASTMONEY_COMPOSITION_ENDPOINT = (
     "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/PageAjax"
 )
-THS_INTRODUCTION_URL_TEMPLATE = (
-    "https://basic.10jqka.com.cn/new/{symbol}/operate.html"
-)
+THS_INTRODUCTION_URL_TEMPLATE = "https://basic.10jqka.com.cn/new/{symbol}/operate.html"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -76,6 +78,7 @@ class StructuredSourceResult:
     introduction: Optional[BusinessIntroduction] = None
     raw_payload: tuple[dict[str, Any], ...] = ()
     diagnostics: tuple[str, ...] = ()
+    elapsed_seconds: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -87,10 +90,18 @@ class StructuredBusinessProfileSnapshot:
 
     @property
     def status(self) -> str:
-        statuses = {self.composition.status, self.introduction.status}
+        statuses = {
+            status
+            for status in (self.composition.status, self.introduction.status)
+            if status != "skipped"
+        }
+        if not statuses:
+            return "skipped"
         if statuses == {"success"}:
             return "success"
-        if "success" in statuses:
+        if statuses == {"empty"}:
+            return "empty"
+        if statuses & {"success", "empty"}:
             return "degraded"
         return "failed"
 
@@ -133,24 +144,31 @@ class AkshareStructuredBusinessProfileProvider:
         instrument_id: str,
         *,
         observed_at: Optional[str] = None,
+        sources: Optional[Sequence[str]] = None,
+        deadline_monotonic: Optional[float] = None,
     ) -> StructuredBusinessProfileSnapshot:
+        selected_sources = _normalize_source_scope(sources)
         return await asyncio.to_thread(
             self._fetch_sync,
             _normalize_instrument_id(instrument_id),
             observed_at or get_shanghai_time().isoformat(),
+            selected_sources,
+            deadline_monotonic,
         )
 
     def _fetch_sync(
         self,
         instrument_id: str,
         observed_at: str,
+        sources: frozenset[str],
+        deadline_monotonic: Optional[float],
     ) -> StructuredBusinessProfileSnapshot:
         owned_session = None
         if self._akshare_module is not None:
-            composition_loader = lambda: self._akshare_module.stock_zygc_em(
+            composition_loader = lambda _timeout: self._akshare_module.stock_zygc_em(
                 symbol=_eastmoney_symbol(instrument_id)
             )
-            introduction_loader = lambda: self._akshare_module.stock_zyjs_ths(
+            introduction_loader = lambda _timeout: self._akshare_module.stock_zyjs_ths(
                 symbol=instrument_id.split(".", 1)[0]
             )
         else:
@@ -160,22 +178,34 @@ class AkshareStructuredBusinessProfileProvider:
             if session is None:
                 session = create_requests_session(tls_config=self._tls_config)
                 owned_session = session
-            composition_loader = lambda: self._request_eastmoney_composition(
+            composition_loader = lambda timeout: self._request_eastmoney_composition(
                 session,
                 instrument_id,
+                timeout_seconds=timeout,
             )
-            introduction_loader = lambda: self._request_ths_introduction(
+            introduction_loader = lambda timeout: self._request_ths_introduction(
                 session,
                 instrument_id,
+                timeout_seconds=timeout,
             )
         try:
-            composition = self._fetch_composition(
-                instrument_id,
-                composition_loader,
+            composition = (
+                self._fetch_composition(
+                    instrument_id,
+                    composition_loader,
+                    deadline_monotonic=deadline_monotonic,
+                )
+                if COMPOSITION_SOURCE in sources
+                else _skipped_source(COMPOSITION_SOURCE)
             )
-            introduction = self._fetch_introduction(
-                instrument_id,
-                introduction_loader,
+            introduction = (
+                self._fetch_introduction(
+                    instrument_id,
+                    introduction_loader,
+                    deadline_monotonic=deadline_monotonic,
+                )
+                if INTRODUCTION_SOURCE in sources
+                else _skipped_source(INTRODUCTION_SOURCE)
             )
         finally:
             if owned_session is not None:
@@ -190,10 +220,16 @@ class AkshareStructuredBusinessProfileProvider:
     def _fetch_composition(
         self,
         instrument_id: str,
-        loader: Callable[[], Any],
+        loader: Callable[[float], Any],
+        *,
+        deadline_monotonic: Optional[float],
     ) -> StructuredSourceResult:
+        started_at = time.perf_counter()
         try:
-            frame = self._call_with_retry(loader)
+            frame = self._call_with_retry(
+                loader,
+                deadline_monotonic=deadline_monotonic,
+            )
             raw_rows = _frame_records(frame)
             rows = normalize_composition_rows(raw_rows, instrument_id=instrument_id)
             diagnostics: list[str] = []
@@ -208,6 +244,7 @@ class AkshareStructuredBusinessProfileProvider:
                 rows=rows,
                 raw_payload=tuple(raw_rows),
                 diagnostics=tuple(diagnostics),
+                elapsed_seconds=time.perf_counter() - started_at,
             )
         except Exception as exc:
             return StructuredSourceResult(
@@ -215,15 +252,22 @@ class AkshareStructuredBusinessProfileProvider:
                 status="failed",
                 payload_hash=None,
                 diagnostics=(f"{type(exc).__name__}:{exc}",),
+                elapsed_seconds=time.perf_counter() - started_at,
             )
 
     def _fetch_introduction(
         self,
         instrument_id: str,
-        loader: Callable[[], Any],
+        loader: Callable[[float], Any],
+        *,
+        deadline_monotonic: Optional[float],
     ) -> StructuredSourceResult:
+        started_at = time.perf_counter()
         try:
-            frame = self._call_with_retry(loader)
+            frame = self._call_with_retry(
+                loader,
+                deadline_monotonic=deadline_monotonic,
+            )
             raw_rows = _frame_records(frame)
             introduction = normalize_introduction_rows(
                 raw_rows,
@@ -237,6 +281,7 @@ class AkshareStructuredBusinessProfileProvider:
                 introduction=introduction,
                 raw_payload=tuple(raw_rows),
                 diagnostics=diagnostics,
+                elapsed_seconds=time.perf_counter() - started_at,
             )
         except Exception as exc:
             return StructuredSourceResult(
@@ -244,45 +289,82 @@ class AkshareStructuredBusinessProfileProvider:
                 status="failed",
                 payload_hash=None,
                 diagnostics=(f"{type(exc).__name__}:{exc}",),
+                elapsed_seconds=time.perf_counter() - started_at,
             )
 
-    def _call_with_retry(self, loader: Callable[[], Any]) -> Any:
+    def _call_with_retry(
+        self,
+        loader: Callable[[float], Any],
+        *,
+        deadline_monotonic: Optional[float],
+    ) -> Any:
         last_error: Optional[Exception] = None
         for attempt in range(1, self.retry_attempts + 1):
-            self._wait_for_request_slot()
+            self._wait_for_request_slot(deadline_monotonic=deadline_monotonic)
+            request_timeout = self.request_timeout_seconds
+            if deadline_monotonic is not None:
+                remaining = deadline_monotonic - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("structured business-profile deadline exhausted")
+                request_timeout = min(request_timeout, remaining)
             try:
-                return loader()
+                result = loader(max(0.001, request_timeout))
+                if (
+                    deadline_monotonic is not None
+                    and time.monotonic() >= deadline_monotonic
+                ):
+                    raise TimeoutError("structured business-profile deadline exhausted")
+                return result
             except Exception as exc:
                 last_error = exc
                 if attempt >= self.retry_attempts:
                     break
-                if self.retry_backoff_seconds > 0:
-                    time.sleep(self.retry_backoff_seconds * attempt)
+                backoff = self.retry_backoff_seconds * attempt
+                if deadline_monotonic is not None:
+                    remaining = deadline_monotonic - time.monotonic()
+                    if remaining <= backoff:
+                        raise TimeoutError(
+                            "structured business-profile deadline exhausted"
+                        ) from exc
+                if backoff > 0:
+                    time.sleep(backoff)
         raise RuntimeError(
             f"structured business-profile request failed after "
             f"{self.retry_attempts} attempts: {last_error}"
         ) from last_error
 
-    def _wait_for_request_slot(self) -> None:
+    def _wait_for_request_slot(
+        self,
+        *,
+        deadline_monotonic: Optional[float],
+    ) -> None:
         now = time.monotonic()
         elapsed = now - self._last_request_started_at
         if (
             self._last_request_started_at > 0
             and elapsed < self.request_interval_seconds
         ):
-            time.sleep(self.request_interval_seconds - elapsed)
+            wait_seconds = self.request_interval_seconds - elapsed
+            if (
+                deadline_monotonic is not None
+                and deadline_monotonic - now <= wait_seconds
+            ):
+                raise TimeoutError("structured business-profile deadline exhausted")
+            time.sleep(wait_seconds)
         self._last_request_started_at = time.monotonic()
 
     def _request_eastmoney_composition(
         self,
         session: Any,
         instrument_id: str,
+        *,
+        timeout_seconds: float,
     ) -> list[dict[str, Any]]:
         response = session.get(
             EASTMONEY_COMPOSITION_ENDPOINT,
             params={"code": _eastmoney_symbol(instrument_id)},
             headers={"User-Agent": USER_AGENT},
-            timeout=self.request_timeout_seconds,
+            timeout=timeout_seconds,
         )
         response.raise_for_status()
         payload = response.json()
@@ -301,6 +383,8 @@ class AkshareStructuredBusinessProfileProvider:
         self,
         session: Any,
         instrument_id: str,
+        *,
+        timeout_seconds: float,
     ) -> list[dict[str, Any]]:
         from bs4 import BeautifulSoup
 
@@ -308,7 +392,7 @@ class AkshareStructuredBusinessProfileProvider:
         response = session.get(
             THS_INTRODUCTION_URL_TEMPLATE.format(symbol=symbol),
             headers={"User-Agent": USER_AGENT},
-            timeout=self.request_timeout_seconds,
+            timeout=timeout_seconds,
         )
         response.raise_for_status()
         response.encoding = "gb2312"
@@ -360,6 +444,10 @@ def normalize_composition_rows(
     normalized_instrument = _normalize_instrument_id(instrument_id)
     output: list[BusinessCompositionRow] = []
     for row in rows:
+        _validate_source_security_code(
+            row.get("股票代码"),
+            instrument_id=normalized_instrument,
+        )
         report_period = _normalize_date(row.get("报告日期"))
         classification = COMPOSITION_CLASSIFICATIONS.get(
             _optional_text(row.get("分类类型")) or ""
@@ -406,8 +494,13 @@ def normalize_introduction_rows(
     if not rows:
         return None
     row = rows[0]
+    normalized_instrument = _normalize_instrument_id(instrument_id)
+    _validate_source_security_code(
+        row.get("股票代码"),
+        instrument_id=normalized_instrument,
+    )
     values = {
-        "instrument_id": _normalize_instrument_id(instrument_id),
+        "instrument_id": normalized_instrument,
         "main_business": _first_text(row, ("主营业务", "主营介绍")),
         "product_types": _first_text(row, ("产品类型",)),
         "product_names": _first_text(row, ("产品名称", "主要产品")),
@@ -466,6 +559,34 @@ def _payload_hash(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def _normalize_source_scope(
+    sources: Optional[Sequence[str]],
+) -> frozenset[str]:
+    if sources is None:
+        return frozenset(STRUCTURED_BUSINESS_PROFILE_SOURCES)
+    selected = frozenset(
+        str(source or "").strip() for source in sources if str(source or "").strip()
+    )
+    if not selected:
+        raise ValueError("structured business-profile source scope must not be empty")
+    unsupported = selected - STRUCTURED_BUSINESS_PROFILE_SOURCES
+    if unsupported:
+        raise ValueError(
+            f"unsupported structured business-profile sources: "
+            f"{sorted(unsupported)}"
+        )
+    return selected
+
+
+def _skipped_source(source: str) -> StructuredSourceResult:
+    return StructuredSourceResult(
+        source=source,
+        status="skipped",
+        payload_hash=None,
+        diagnostics=("not_in_source_scope",),
+    )
+
+
 def _normalize_instrument_id(value: str) -> str:
     text = str(value or "").strip().upper()
     if len(text) != 9 or text[6:] not in {".SH", ".SZ", ".BJ"}:
@@ -473,6 +594,33 @@ def _normalize_instrument_id(value: str) -> str:
     if not text[:6].isdigit():
         raise ValueError(f"unsupported A-share instrument_id: {value}")
     return text
+
+
+def _validate_source_security_code(
+    value: Any,
+    *,
+    instrument_id: str,
+) -> None:
+    if value is None or str(value).strip() in {"", "None", "nan", "--"}:
+        return
+    text = str(value).strip().upper()
+    expected_code = instrument_id[:6]
+    source_code: Optional[str] = None
+    if text.isdigit():
+        source_code = text.zfill(6)
+    elif text.endswith(".0") and text[:-2].isdigit():
+        source_code = text[:-2].zfill(6)
+    elif len(text) == 8 and text[:2] in {"SH", "SZ", "BJ"}:
+        source_code = text[2:]
+    elif len(text) == 9 and text[6:] in {".SH", ".SZ", ".BJ"}:
+        source_code = text[:6]
+    if source_code is None or not source_code.isdigit():
+        raise ValueError(f"unsupported source security code: {value}")
+    if source_code != expected_code:
+        raise ValueError(
+            "structured business-profile source security mismatch: "
+            f"expected={expected_code}, actual={source_code}"
+        )
 
 
 def _eastmoney_symbol(instrument_id: str) -> str:

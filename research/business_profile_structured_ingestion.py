@@ -39,6 +39,7 @@ class StructuredBusinessProfileCandidateWriter:
         snapshot: StructuredBusinessProfileSnapshot,
         *,
         industry_group: Optional[str] = None,
+        raw_snapshot_references: Optional[dict[str, dict[str, Any]]] = None,
     ) -> dict[str, Any]:
         result = {
             "instrument_id": snapshot.instrument_id,
@@ -53,6 +54,9 @@ class StructuredBusinessProfileCandidateWriter:
                 snapshot,
                 source_result,
                 industry_group=industry_group,
+                raw_snapshot_reference=(
+                    (raw_snapshot_references or {}).get(source_result.source)
+                ),
             )
             result["source_results"][source_result.source] = source_summary
             result["evidence_written"] += source_summary["evidence_written"]
@@ -69,6 +73,7 @@ class StructuredBusinessProfileCandidateWriter:
         source_result: StructuredSourceResult,
         *,
         industry_group: Optional[str],
+        raw_snapshot_reference: Optional[dict[str, Any]],
     ) -> dict[str, Any]:
         if source_result.status == "empty":
             return {
@@ -148,7 +153,12 @@ class StructuredBusinessProfileCandidateWriter:
                     "observed_at": snapshot.observed_at,
                     "source_status": source_result.status,
                     "source_diagnostics": list(source_result.diagnostics),
-                    "raw_payload": list(source_result.raw_payload),
+                    "raw_payload": (
+                        []
+                        if raw_snapshot_reference is not None
+                        else list(source_result.raw_payload)
+                    ),
+                    "raw_snapshot_reference": raw_snapshot_reference,
                     "introduction": (
                         asdict(source_result.introduction)
                         if source_result.introduction is not None
@@ -248,9 +258,7 @@ class StructuredBusinessProfileCandidateWriter:
             source_row_key=source_row_key,
             exclude_record_id=record_id,
         )
-        revenue_share, revenue_share_diagnostic = _validated_fraction(
-            row.revenue_ratio
-        )
+        revenue_share, revenue_share_diagnostic = _validated_fraction(row.revenue_ratio)
         return {
             "record_id": record_id,
             "instrument_id": row.instrument_id,
@@ -296,6 +304,7 @@ class StructuredBusinessProfileCandidateWriter:
                 "source_name": source_name,
                 "source_row_key": source_row_key,
                 "source_row_hash": row.source_row_hash,
+                "industry_group": str(industry_group or "").strip() or None,
                 "parser_version": PARSER_VERSION,
                 "product_catalog_version": self.product_catalog.catalog_version,
                 "revenue_ratio": row.revenue_ratio,

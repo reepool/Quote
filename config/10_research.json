@@ -138,7 +138,10 @@
             "request_interval_seconds": 0.5,
             "retry_attempts": 2,
             "retry_backoff_seconds": 1.0,
-            "max_instruments_per_run": 30
+            "max_instruments_per_run": 30,
+            "max_elapsed_seconds": 900.0,
+            "raw_cache_root": "data/cache/research/business_profile_structured",
+            "checkpoint_root": "data/checkpoints/business_profile_structured"
           },
           "note": "Free aggregator fields create evidence and segment candidates only. First-observed time is the conservative availability date; no value-chain, customer/supplier, commodity direction, or DCF approval is inferred."
         },
