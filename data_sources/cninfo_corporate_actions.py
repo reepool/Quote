@@ -3,18 +3,27 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import logging
 import math
 import re
+import time
 from types import FunctionType
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Callable, Dict, List, Mapping, Optional
+
+from requests import exceptions as requests_exceptions
 
 
 CNINFO_SOURCE = "cninfo"
 DIVIDEND_PROFILE = "cninfo_dividend"
 ALLOTMENT_PROFILE = "cninfo_allotment"
 ECONOMIC_VALUE_PRECISION = 10
+DEFAULT_LOADER_ATTEMPTS = 3
+DEFAULT_RETRY_BACKOFF_SECONDS = 1.0
+
+cninfo_logger = logging.getLogger(__name__)
 
 
 class _RequestsTimeoutProxy:
@@ -24,10 +33,16 @@ class _RequestsTimeoutProxy:
         self._delegate = delegate
         self._timeout_seconds = timeout_seconds
         self.last_payload: Optional[Mapping[str, Any]] = None
+        self.last_status_code: Optional[int] = None
+
+    def reset_diagnostics(self) -> None:
+        self.last_payload = None
+        self.last_status_code = None
 
     def post(self, *args: Any, **kwargs: Any) -> Any:
         kwargs.setdefault("timeout", self._timeout_seconds)
         response = self._delegate.post(*args, **kwargs)
+        self.last_status_code = getattr(response, "status_code", None)
         try:
             payload = response.json()
         except Exception:
@@ -83,6 +98,38 @@ def _loader_confirmed_empty(loader: Callable[..., Any]) -> bool:
         isinstance(records, list)
         and not records
         and (result_code in {"0", "200", "success"} or result_message == "success")
+    )
+
+
+def _loader_response_diagnostics(loader: Callable[..., Any]) -> str:
+    proxy = getattr(loader, "_cninfo_requests_proxy", None)
+    payload = getattr(proxy, "last_payload", None)
+    status_code = getattr(proxy, "last_status_code", None)
+    details = []
+    if status_code is not None:
+        details.append(f"http_status={status_code}")
+    if isinstance(payload, Mapping):
+        details.extend([
+            f"resultcode={payload.get('resultcode')!r}",
+            f"resultmsg={payload.get('resultmsg')!r}",
+            f"payload_keys={sorted(str(key) for key in payload)}",
+        ])
+    return "; ".join(details) or "response_metadata=unavailable"
+
+
+def _retryable_loader_error(exc: Exception) -> bool:
+    return isinstance(
+        exc,
+        (
+            KeyError,
+            json.JSONDecodeError,
+            TimeoutError,
+            ConnectionError,
+            requests_exceptions.Timeout,
+            requests_exceptions.ConnectionError,
+            requests_exceptions.ChunkedEncodingError,
+            requests_exceptions.ContentDecodingError,
+        ),
     )
 
 
@@ -417,6 +464,9 @@ class CninfoCorporateActionProvider:
         dividend_loader: Optional[Callable[..., Any]] = None,
         allotment_loader: Optional[Callable[..., Any]] = None,
         request_timeout_seconds: float = 60.0,
+        loader_attempts: int = DEFAULT_LOADER_ATTEMPTS,
+        retry_backoff_seconds: float = DEFAULT_RETRY_BACKOFF_SECONDS,
+        sleep_func: Callable[[float], None] = time.sleep,
     ) -> None:
         if dividend_loader is None or allotment_loader is None:
             import akshare as ak
@@ -433,6 +483,47 @@ class CninfoCorporateActionProvider:
                 )
         self.dividend_loader = dividend_loader
         self.allotment_loader = allotment_loader
+        self.loader_attempts = max(1, int(loader_attempts))
+        self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
+        self._sleep = sleep_func
+
+    def _load_with_retry(
+        self,
+        loader: Callable[..., Any],
+        **kwargs: Any,
+    ) -> Any:
+        for attempt in range(1, self.loader_attempts + 1):
+            proxy = getattr(loader, "_cninfo_requests_proxy", None)
+            if proxy is not None and hasattr(proxy, "reset_diagnostics"):
+                proxy.reset_diagnostics()
+            try:
+                return loader(**kwargs)
+            except Exception as exc:
+                if _loader_confirmed_empty(loader) or not _retryable_loader_error(exc):
+                    raise
+                if attempt >= self.loader_attempts:
+                    diagnostics = _loader_response_diagnostics(loader)
+                    raise RuntimeError(
+                        "CNInfo loader transient failure exhausted "
+                        f"after {self.loader_attempts} attempts: "
+                        f"{type(exc).__name__}: {exc}; {diagnostics}"
+                    ) from exc
+                delay = self.retry_backoff_seconds * (2 ** (attempt - 1))
+                cninfo_logger.warning(
+                    "[CNInfo] transient loader failure, retrying: "
+                    "loader=%s symbol=%s attempt=%d/%d error=%s response=%s "
+                    "backoff=%.1fs",
+                    getattr(loader, "__name__", type(loader).__name__),
+                    kwargs.get("symbol"),
+                    attempt,
+                    self.loader_attempts,
+                    f"{type(exc).__name__}: {exc}",
+                    _loader_response_diagnostics(loader),
+                    delay,
+                )
+                if delay:
+                    self._sleep(delay)
+        raise RuntimeError("CNInfo loader retry loop exited unexpectedly")
 
     @staticmethod
     def _coverage_status(observations: List[Dict[str, Any]]) -> str:
@@ -461,7 +552,7 @@ class CninfoCorporateActionProvider:
         end_date: date,
     ) -> CninfoEndpointResult:
         try:
-            frame = self.dividend_loader(symbol=symbol)
+            frame = self._load_with_retry(self.dividend_loader, symbol=symbol)
             if frame is None or not hasattr(frame, "to_dict"):
                 raise ValueError("CNInfo dividend response is not a table")
             self._require_columns(
@@ -528,7 +619,8 @@ class CninfoCorporateActionProvider:
         end_date: date,
     ) -> CninfoEndpointResult:
         try:
-            frame = self.allotment_loader(
+            frame = self._load_with_retry(
+                self.allotment_loader,
                 symbol=symbol,
                 start_date=start_date.strftime("%Y%m%d"),
                 end_date=end_date.strftime("%Y%m%d"),

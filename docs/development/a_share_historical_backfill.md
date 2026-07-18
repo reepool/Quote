@@ -163,6 +163,8 @@ GET /api/v1/corporate-actions/xdxr?instrument_id=000001.SZ&start_date=2007-01-01
 - 缺少除权日的记录不会被移动到交易日或补成虚假日期，而是标记为 `partial_missing_ex_date`。
 - 接口异常、畸形空响应和超时标记为 `indeterminate`，不能解释为确认无公司行动。
 - AkShare 巨潮适配器在自身 HTTP 请求层设置超时，任务严格等待当前请求结束后再访问下一个接口，不通过取消后台线程继续下载。
+- CNInfo 适配层对缺少 `records`、JSON 解码失败和连接/超时类瞬时错误执行最多 3 次串行请求，按 1 秒、2 秒退避；成功空响应和字段确定缺失的业务记录不会重试。
+- 重试耗尽时只记录 HTTP 状态、巨潮结果码/消息和响应字段名，不记录完整响应正文；对应接口继续标记为 `indeterminate`，留待相同 checkpoint 续跑。
 - 显式存在配股失败退款日的记录标记为 `failed`；实际配股数量为零但失败状态不明确时标记为部分完整，不能进入后续因子计算。
 - 完整接口快照中消失的旧事件保留审计记录并标记为非当前记录；异常或无法判定的响应不会使已有事件失效。
 - 覆盖状态按股票、来源、接口和请求起止区间分别保存，窄区间检查不会覆盖全历史结论。
@@ -175,6 +177,8 @@ corporate_action_instrument_status
 ```
 
 它们不参与当前 `adjustment_factors`、`adjustment_factors_tdx` 或 canonical 生产读取。
+
+CNInfo 与 TDX 始终保持独立来源事实：`source=cninfo` 的观测只允许保存 CNInfo 返回或由其实施描述确定性解析出的字段。TDX 可用于后续对账，但不得写入 CNInfo 观测、伪装为 CNInfo 补录，也不得改变 CNInfo 的 `partial_missing_fields` 或 `indeterminate` 结论。北交所结构化接口缺少除权日时，现阶段保留为 CNInfo 来源局限。
 
 首次运行前先做定向预演：
 
@@ -193,6 +197,14 @@ corporate_action_instrument_status
 ```text
 /run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true write
 ```
+
+2026-07-18 全市场首轮回补完成后，如需使用已生成的 checkpoint 重试剩余 `indeterminate` 股票，必须保持原参数完全一致：
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
+```
+
+不要修改日期、交易所、scopes、chunk 大小或请求间隔；任一参数变化都会生成不同的 checkpoint 身份，无法只续跑原任务剩余股票。
 
 全量事件完成后，默认运行独立路径和 benchmark，不创建 canonical 候选：
 

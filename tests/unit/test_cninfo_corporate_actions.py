@@ -1,3 +1,4 @@
+import json
 from datetime import date
 
 import pandas as pd
@@ -7,10 +8,15 @@ import requests
 from data_sources.cninfo_corporate_actions import (
     CninfoCorporateActionProvider,
     _bind_requests_timeout,
+    _retryable_loader_error,
     normalize_cninfo_allotment_rows,
     normalize_cninfo_dividend_rows,
     parse_cninfo_distribution_description,
 )
+
+
+def test_generic_requests_timeout_is_retryable():
+    assert _retryable_loader_error(requests.exceptions.Timeout("timeout"))
 
 
 def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
@@ -35,6 +41,8 @@ def test_bound_cninfo_loader_injects_timeout_without_global_patch(monkeypatch):
 
 
 def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
+    calls = []
+
     class FakeResponse:
         @staticmethod
         def json():
@@ -47,6 +55,7 @@ def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
     class FakeRequests:
         @staticmethod
         def post(*_args, **_kwargs):
+            calls.append(1)
             return FakeResponse()
 
     def failing_empty_loader(**_kwargs):
@@ -74,6 +83,159 @@ def test_provider_recovers_confirmed_empty_akshare_response(monkeypatch):
     assert result.coverage_status == "complete_no_events"
     assert result.rows_received == 0
     assert result.error is None
+    assert len(calls) == 1
+
+
+def test_provider_retries_missing_records_then_succeeds():
+    calls = []
+    sleeps = []
+
+    def dividend_loader(**_kwargs):
+        calls.append(1)
+        if len(calls) == 1:
+            raise KeyError("records")
+        return pd.DataFrame([{
+            "实施方案公告日期": date(2025, 5, 1),
+            "除权日": date(2025, 5, 10),
+            "实施方案分红说明": "10派1元",
+            "报告时间": "2024年报",
+        }])
+
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=dividend_loader,
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+        retry_backoff_seconds=0.5,
+        sleep_func=sleeps.append,
+    )
+
+    result = provider.fetch_dividends(
+        "000001.SZ",
+        "000001",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "complete_with_events"
+    assert len(calls) == 2
+    assert sleeps == [0.5]
+    assert {item["source"] for item in result.observations} == {"cninfo"}
+
+
+def test_provider_retries_json_decode_then_recovers_empty():
+    calls = []
+    sleeps = []
+
+    def allotment_loader(**_kwargs):
+        calls.append(1)
+        if len(calls) == 1:
+            raise json.JSONDecodeError("invalid response", "", 0)
+        return pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ])
+
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=lambda **_: pd.DataFrame(columns=[
+            "实施方案公告日期", "除权日", "实施方案分红说明",
+        ]),
+        allotment_loader=allotment_loader,
+        retry_backoff_seconds=0.25,
+        sleep_func=sleeps.append,
+    )
+
+    result = provider.fetch_allotments(
+        "000001.SZ",
+        "000001",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "complete_no_events"
+    assert len(calls) == 2
+    assert sleeps == [0.25]
+
+
+def test_provider_reports_response_metadata_after_retry_exhaustion(monkeypatch):
+    calls = []
+    sleeps = []
+
+    class FakeResponse:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {"resultcode": 503, "resultmsg": "busy"}
+
+    class FakeRequests:
+        @staticmethod
+        def post(*_args, **_kwargs):
+            calls.append(1)
+            return FakeResponse()
+
+    def failing_loader(**_kwargs):
+        response = requests.post("https://example.invalid")
+        return pd.DataFrame(response.json()["records"])
+
+    monkeypatch.setitem(failing_loader.__globals__, "requests", FakeRequests())
+    bounded_loader = _bind_requests_timeout(failing_loader, 5)
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=bounded_loader,
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+        loader_attempts=3,
+        retry_backoff_seconds=0.5,
+        sleep_func=sleeps.append,
+    )
+
+    result = provider.fetch_dividends(
+        "600007.SH",
+        "600007",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "indeterminate"
+    assert len(calls) == 3
+    assert sleeps == [0.5, 1.0]
+    assert "after 3 attempts" in str(result.error)
+    assert "KeyError" in str(result.error)
+    assert "resultcode=503" in str(result.error)
+    assert "payload_keys=['resultcode', 'resultmsg']" in str(result.error)
+
+
+def test_provider_does_not_retry_deterministic_partial_cninfo_rows():
+    calls = []
+
+    def dividend_loader(**_kwargs):
+        calls.append(1)
+        return pd.DataFrame([{
+            "实施方案公告日期": date(2025, 5, 1),
+            "除权日": None,
+            "实施方案分红说明": "10派1元",
+            "报告时间": "2024年报",
+        }])
+
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=dividend_loader,
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+        sleep_func=lambda _delay: pytest.fail("partial rows must not retry"),
+    )
+
+    result = provider.fetch_dividends(
+        "920000.BJ",
+        "920000",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "partial_missing_fields"
+    assert len(calls) == 1
+    assert result.observations[0]["source"] == "cninfo"
+    assert result.observations[0]["ex_date"] is None
 
 
 def test_parse_cninfo_distribution_description_uses_per_share_units():
