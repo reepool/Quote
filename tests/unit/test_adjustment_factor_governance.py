@@ -8,6 +8,7 @@ from data_manager import DataManager
 from data_sources.adjustment_factor_governance import (
     build_event_product_path,
     build_canonical_series,
+    build_factor_source_benchmark,
     compare_normalized_cumulative_paths,
     normalize_source_path,
     rebase_legacy_tail,
@@ -120,7 +121,74 @@ def test_normalized_path_comparison_ignores_scale_but_detects_reset():
     reset = compare_normalized_cumulative_paths(candidate, reset_path)
 
     assert equivalent["max_adjusted_price_error_pct"] == pytest.approx(0.0)
+    assert equivalent["p95_adjusted_price_error_pct"] == pytest.approx(0.0)
     assert reset["max_adjusted_price_error_pct"] > 30.0
+    assert reset["over_1_ratio"] > 0.0
+
+
+def test_normalized_path_comparison_uses_common_latest_anchor():
+    candidate = [
+        {"instrument_id": "000001.SZ", "ex_date": "2020-05-28", "cumulative_factor": 1.2},
+        {"instrument_id": "000001.SZ", "ex_date": "2021-05-28", "cumulative_factor": 1.44},
+    ]
+    reference = [
+        {"instrument_id": "000001.SZ", "ex_date": "2020-05-28", "cumulative_factor": 120.0},
+        {"instrument_id": "000001.SZ", "ex_date": "2021-05-28", "cumulative_factor": 144.0},
+        {"instrument_id": "000001.SZ", "ex_date": "2022-05-28", "cumulative_factor": 172.8},
+    ]
+
+    result = compare_normalized_cumulative_paths(candidate, reference)
+
+    assert result["comparison_points"] == 2
+    assert result["max_adjusted_price_error_pct"] == pytest.approx(0.0)
+    assert result["endpoint_mismatch_instruments"] == 1
+    assert result["endpoint_mismatch_samples"][0]["common_latest_date"] == "2021-05-28"
+
+
+def test_factor_source_benchmark_reports_coverage_without_selecting_primary():
+    baseline = [
+        {"instrument_id": "000001.SZ", "ex_date": "2020-05-28", "cumulative_factor": 1.2},
+        {"instrument_id": "000001.SZ", "ex_date": "2021-05-28", "cumulative_factor": 1.44},
+        {"instrument_id": "600000.SH", "ex_date": "2020-05-28", "cumulative_factor": 1.1},
+    ]
+    tdx = [
+        {"instrument_id": "000001.SZ", "ex_date": "2020-05-28", "cumulative_factor": 12.0},
+        {"instrument_id": "000001.SZ", "ex_date": "2021-05-28", "cumulative_factor": 14.4},
+    ]
+
+    result = build_factor_source_benchmark(
+        baseline,
+        {"tdx": tdx, "sina": []},
+        target_instruments=["000001.SZ", "600000.SH", "920001.BJ"],
+        baseline_covered_instruments=["000001.SZ", "600000.SH"],
+        reference_covered_instruments={
+            "tdx": ["000001.SZ", "600000.SH"],
+            "sina": ["000001.SZ"],
+        },
+        full_market_scope=True,
+    )
+
+    assert result["source_selection_status"] == "deferred"
+    assert result["selected_primary_source"] is None
+    assert result["baseline_instruments"] == 2
+    assert result["baseline_coverage_ratio"] == pytest.approx(2 / 3)
+    assert result["reference_sources"]["tdx"]["coverage_ratio"] == pytest.approx(2 / 3)
+    assert result["reference_sources"]["tdx"]["path_instruments"] == 1
+    assert result["reference_sources"]["tdx"]["comparable_instruments"] == 1
+    assert result["reference_sources"]["sina"]["comparison_points"] == 0
+    assert len(result["pairwise_comparisons"]) == 3
+    assert result["pairwise_comparisons"][
+        "cninfo_event_derived_v1__vs__tdx"
+    ]["comparison_points"] == 2
+
+    incomplete = build_factor_source_benchmark(
+        baseline,
+        {"tdx": tdx},
+        target_instruments=["000001.SZ", "600000.SH"],
+        baseline_covered_instruments=[],
+    )
+    assert incomplete["status"] == "empty"
+    assert incomplete["baseline_coverage_ratio"] == 0.0
 
 
 def test_event_product_path_ignores_stored_tdx_cumulative_reset():

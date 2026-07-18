@@ -188,11 +188,25 @@ corporate_action_instrument_status
 /run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE instrument_ids=600000.SH,000001.SZ,920833.BJ,000003.SZ scopes=dividends,allotments chunk_size=4 request_interval_seconds=1.0 resume=false write
 ```
 
-全市场任务必须保持单请求流并启用 checkpoint：
+全市场任务必须保持单请求流并启用 checkpoint。先完成结构化基线，不要求逐股票公告分析：
 
 ```text
 /run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true write
 ```
+
+全量事件完成后，默认运行独立路径和 benchmark，不创建 canonical 候选：
+
+```text
+/run a_share_cninfo_adjustment_factor_rebuild start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE dry_run=true
+```
+
+```text
+/run a_share_cninfo_adjustment_factor_rebuild start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE dry_run=false
+```
+
+该任务分别保存 CNInfo 自研和 TDX 自研路径，比较已有 Sina、BaoStock 参考路径，并返回
+`source_selection_status=deferred`。只有后续明确决定候选规则时才传入
+`build_canonical=true`。
 
 只读查询：
 

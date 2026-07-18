@@ -99,6 +99,11 @@ class _FakeTdxSource:
         return list(self.factors)
 
 
+class _EmptyTdxSource(_FakeTdxSource):
+    async def get_xdxr_events(self, instrument_id):
+        return []
+
+
 class _FakeSourceFactory:
     def __init__(self, source):
         self.source = source
@@ -110,6 +115,7 @@ class _FakeSourceFactory:
 class _FakeDbOps:
     def __init__(self):
         self.saved_calls = []
+        self.coverage_statuses = []
 
     async def get_repair_universe_instruments(self, exchange, instrument_types=None):
         return [{
@@ -131,6 +137,9 @@ class _FakeDbOps:
     async def save_tdx_audit_factors(self, rows, preserve_computed_fields=False):
         self.saved_calls.append((list(rows), preserve_computed_fields))
         return len(rows)
+
+    async def upsert_corporate_action_instrument_status(self, row):
+        self.coverage_statuses.append(dict(row))
 
 
 def _build_manager(source):
@@ -168,6 +177,7 @@ async def test_xdxr_history_keeps_inactive_event_pending_without_pre_close():
     assert preserve is True
     assert raw_rows[0]["fenhong"] == 2.0
     assert raw_rows[0]["validation_result"] == "pending_factor_missing_pre_close"
+    assert manager.db_ops.coverage_statuses[0]["coverage_status"] == "complete_with_events"
 
 
 @pytest.mark.asyncio
@@ -229,3 +239,32 @@ async def test_xdxr_history_dry_run_counts_events_and_factors_without_saving():
     assert result["totals"]["derived_factors"] == 1
     assert result["totals"]["pending_factors"] == 0
     assert manager.db_ops.saved_calls == []
+    assert manager.db_ops.coverage_statuses == []
+
+
+@pytest.mark.asyncio
+async def test_xdxr_history_persists_confirmed_no_event_coverage():
+    manager = _build_manager(_EmptyTdxSource())
+
+    result = await manager.backfill_tdx_xdxr_history(
+        exchanges=["SSE"],
+        start_date=date(1990, 12, 19),
+        end_date=date(2020, 12, 31),
+        derive_factors=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["totals"]["empty_instruments"] == 1
+    assert manager.db_ops.coverage_statuses == [{
+        "instrument_id": "600000.SH",
+        "source": "tdx",
+        "source_profile": "tdx_xdxr",
+        "coverage_status": "complete_no_events",
+        "event_count": 0,
+        "missing_ex_date_count": 0,
+        "requested_start_date": date(1990, 12, 19),
+        "requested_end_date": date(2020, 12, 31),
+        "earliest_event_date": None,
+        "latest_event_date": None,
+        "ingestion_run_id": "tdx_xdxr_19901219_20201231",
+    }]

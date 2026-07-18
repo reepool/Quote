@@ -63,7 +63,7 @@
       "a_share_cninfo_corporate_action_daily_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "A股巨潮主线与TDX备份公司行动滚动日更及隔离因子重建（不切换生产因子）",
+        "description": "A股CNInfo与TDX公司行动滚动日更、独立因子路径及多源基准（不选择或切换生产主源）",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -84,7 +84,7 @@
           "rolling_days": 7,
           "request_interval_seconds": 0.5,
           "per_instrument_timeout_sec": 60,
-          "build_canonical": true,
+          "build_canonical": false,
           "series_version": "a_share_cninfo_primary_v1",
           "max_runtime_seconds": 86400
         }
@@ -238,7 +238,7 @@
       "a_share_cninfo_adjustment_factor_rebuild": {
         "enabled": true,
         "manual_only": true,
-        "description": "A股CNInfo主线复权因子重建、TDX补充与多源对账（隔离 staging，仅手工触发）",
+        "description": "A股CNInfo与TDX独立复权因子重建及多源基准（候选构造显式启用，仅手工触发）",
         "report": true,
         "pre_run_notify": true,
         "max_instances": 1,
@@ -250,7 +250,7 @@
           "exchanges": ["SSE", "SZSE", "BSE"],
           "instrument_ids": [],
           "dry_run": true,
-          "build_canonical": true,
+          "build_canonical": false,
           "series_version": "a_share_cninfo_primary_v1",
           "field_tolerance": 0.0001,
           "max_session_shift": 3,

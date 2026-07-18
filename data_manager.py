@@ -17344,14 +17344,15 @@ class DataManager:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         dry_run: bool = True,
-        build_canonical: bool = True,
+        build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
         max_session_shift: int = 3,
         sample_limit: int = 20,
     ) -> Dict[str, Any]:
-        """Derive and compare CNInfo-primary and TDX-secondary factor paths."""
+        """Persist independent CNInfo/TDX paths and benchmark all references."""
         from data_sources.adjustment_factor_governance import (
+            build_factor_source_benchmark,
             compare_normalized_cumulative_paths,
         )
         from data_sources.cninfo_factor_governance import (
@@ -17411,6 +17412,7 @@ class DataManager:
         tdx_rows: List[Dict[str, Any]] = []
         legacy_rows: List[Dict[str, Any]] = []
         endpoint_status_rows: List[Dict[str, Any]] = []
+        tdx_endpoint_status_rows: List[Dict[str, Any]] = []
         for offset in range(0, len(target_ids), 400):
             chunk = target_ids[offset: offset + 400]
             placeholders = ", ".join(
@@ -17481,6 +17483,21 @@ class DataManager:
                 """,
                 params,
             ))
+            tdx_endpoint_status_rows.extend(await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_profile, coverage_status,
+                       event_count, missing_ex_date_count,
+                       requested_start_date, requested_end_date, error_message
+                FROM corporate_action_instrument_status
+                WHERE instrument_id IN ({placeholders})
+                  AND source = 'tdx'
+                  AND source_profile = 'tdx_xdxr'
+                  AND date(requested_start_date) <= :start_date
+                  AND date(requested_end_date) >= :end_date
+                ORDER BY instrument_id, last_attempt_at DESC
+                """,
+                params,
+            ))
 
         quote_keys = build_quote_evidence_keys(cninfo_rows, tdx_rows)
         quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
@@ -17526,12 +17543,31 @@ class DataManager:
         staging_version = (
             f"{normalized_series_version[:64 - len(staging_suffix)]}{staging_suffix}"
         )
-        candidate_rows, candidate_summary = build_cninfo_primary_candidate(
-            cninfo_path["events"],
-            tdx_path["events"],
-            reconciliation,
-            series_version=staging_version,
+        benchmark_suffix = f"__benchmark__{identity}"
+        benchmark_version = (
+            f"{normalized_series_version[:64 - len(benchmark_suffix)]}"
+            f"{benchmark_suffix}"
         )
+        candidate_rows: List[Dict[str, Any]] = []
+        candidate_summary: Dict[str, Any] = {
+            "series_version": None,
+            "row_count": 0,
+            "instrument_count": 0,
+            "conflict_count": 0,
+            "tdx_fallback_count": 0,
+            "candidate_built": False,
+            "source_selection_status": "deferred",
+            "promotion_eligible": False,
+        }
+        if build_canonical:
+            candidate_rows, candidate_summary = build_cninfo_primary_candidate(
+                cninfo_path["events"],
+                tdx_path["events"],
+                reconciliation,
+                series_version=staging_version,
+            )
+            candidate_summary["candidate_built"] = True
+            candidate_summary["source_selection_status"] = "deferred"
 
         cninfo_comparison_rows = [
             {
@@ -17633,6 +17669,50 @@ class DataManager:
             and set(normalized_exchanges) == {"SSE", "SZSE", "BSE"}
             and normalized_start <= date(1990, 12, 19)
         )
+        pending_factor_ids = {
+            str(item.get("instrument_id"))
+            for item in [*cninfo_path["pending"], *tdx_path["pending"]]
+            if item.get("instrument_id")
+        }
+        baseline_covered_ids = sorted(
+            set(target_ids) - endpoint_incomplete_ids - pending_factor_ids
+        )
+        tdx_covered_ids = set()
+        seen_tdx_status_ids = set()
+        for row in tdx_endpoint_status_rows:
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            if not instrument_id or instrument_id in seen_tdx_status_ids:
+                continue
+            seen_tdx_status_ids.add(instrument_id)
+            if str(row.get("coverage_status") or "") in {
+                "complete_with_events",
+                "complete_no_events",
+            }:
+                tdx_covered_ids.add(instrument_id)
+        benchmark = build_factor_source_benchmark(
+            cninfo_comparison_rows,
+            {
+                "tdx_event_derived_v1": tdx_comparison_rows,
+                "sina_hfq_factor": sina_rows,
+                "baostock_legacy": baostock_rows,
+            },
+            target_instruments=target_ids,
+            baseline_covered_instruments=baseline_covered_ids,
+            reference_covered_instruments={
+                "tdx_event_derived_v1": sorted(tdx_covered_ids),
+            },
+            full_market_scope=full_market_scope,
+            sample_limit=sample_limit,
+        )
+        benchmark.update({
+            "benchmark_series_version": benchmark_version,
+            "event_reconciliation": reconciliation.get("totals") or {},
+            "pending_factor_events": (
+                len(cninfo_path["pending"]) + len(tdx_path["pending"])
+            ),
+            "endpoint_incomplete_instruments": len(endpoint_incomplete_ids),
+            "tdx_coverage_status_rows": len(tdx_endpoint_status_rows),
+        })
         quality_gates = {
             "full_market_scope": full_market_scope,
             "endpoint_completeness": overall_completeness["status"] == "success",
@@ -17646,8 +17726,12 @@ class DataManager:
         }
         candidate_summary.update({
             "quality_gates": quality_gates,
-            "candidate_promotion_eligible": all(quality_gates.values()),
-            "promotion_eligible": all(quality_gates.values()),
+            "candidate_promotion_eligible": (
+                bool(build_canonical) and all(quality_gates.values())
+            ),
+            "promotion_eligible": (
+                bool(build_canonical) and all(quality_gates.values())
+            ),
         })
 
         run_id = f"a_share_cninfo_factor_{identity}"
@@ -17655,6 +17739,7 @@ class DataManager:
             "cninfo_observations": {},
             "tdx_observations": {},
             "canonical_saved_rows": 0,
+            "benchmark_status_saved": False,
         }
         if not dry_run:
             write_result["cninfo_observations"] = (
@@ -17669,6 +17754,43 @@ class DataManager:
                     ingestion_run_id=run_id,
                 )
             )
+            benchmark_errors = [
+                report.get("max_adjusted_price_error_pct")
+                for report in benchmark.get("reference_sources", {}).values()
+                if report.get("max_adjusted_price_error_pct") is not None
+            ]
+            await self.db_ops.upsert_adjustment_factor_series_status(
+                benchmark_version,
+                {
+                    "status": (
+                        "benchmarked"
+                        if not cninfo_path["pending"]
+                        and not tdx_path["pending"]
+                        and not endpoint_incomplete_ids
+                        else "partial"
+                    ),
+                    "source_priority": [],
+                    "source_selection_status": "deferred",
+                    "selected_primary_source": None,
+                    "start_date": normalized_start.isoformat(),
+                    "end_date": normalized_end.isoformat(),
+                    "instrument_count": len(target_ids),
+                    "row_count": len(cninfo_path["events"]),
+                    "coverage_ratio": benchmark.get("baseline_coverage_ratio", 0.0),
+                    "conflict_count": (
+                        int(reconciliation.get("totals", {}).get("conflicts", 0))
+                        + int(reconciliation.get("totals", {}).get("cninfo_only", 0))
+                        + int(reconciliation.get("totals", {}).get("tdx_only", 0))
+                    ),
+                    "max_cumulative_error_pct": max(benchmark_errors, default=None),
+                    "promotion_eligible": False,
+                    "benchmark": benchmark,
+                    "reconciliation": reconciliation,
+                    "comparisons": comparisons,
+                    "overall_completeness": overall_completeness,
+                },
+            )
+            write_result["benchmark_status_saved"] = True
             if build_canonical:
                 write_result["canonical_saved_rows"] = (
                     await self.db_ops.replace_canonical_adjustment_factors(
@@ -17721,12 +17843,15 @@ class DataManager:
                 )
             self.invalidate_factor_cache()
 
-        has_pending = bool(cninfo_path["pending"] or tdx_path["pending"])
-        has_source_issues = reconciliation.get("status") != "success"
+        has_operational_issues = bool(
+            cninfo_path["pending"]
+            or tdx_path["pending"]
+            or endpoint_incomplete_ids
+        )
         result_status = (
             "dry_run" if dry_run
             else "partial"
-            if has_pending or has_source_issues or overall_incomplete_ids
+            if has_operational_issues
             else "success"
         )
         return {
@@ -17759,10 +17884,17 @@ class DataManager:
             },
             "reconciliation": reconciliation,
             "comparisons": comparisons,
+            "benchmark": benchmark,
+            "source_selection": {
+                "status": "deferred",
+                "selected_primary_source": None,
+            },
             "overall_completeness": overall_completeness,
             "candidate": {
                 **candidate_summary,
-                "staging_series_version": staging_version,
+                "staging_series_version": (
+                    staging_version if build_canonical else None
+                ),
                 "promotion_eligible": bool(
                     candidate_summary.get("candidate_promotion_eligible")
                 ),
@@ -17781,7 +17913,7 @@ class DataManager:
         rolling_days: int = 7,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
-        build_canonical: bool = True,
+        build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
     ) -> Dict[str, Any]:
         """Refresh recent CNInfo/TDX events and rebuild isolated factor paths.
@@ -17789,6 +17921,8 @@ class DataManager:
         Source refresh is bounded to a rolling window. Factor derivation reads
         stored full history so cumulative paths do not reset at that boundary.
         The operation never modifies or promotes the production factor table.
+        Canonical staging is opt-in; the default persists independent paths and
+        source-neutral benchmark evidence only.
         """
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
 
@@ -19007,6 +19141,8 @@ class DataManager:
                 effective_end = self._date_from_any(
                     frozen_range.get('end_date')
                 ) or effective_end
+                coverage_start = effective_start if frozen_range else start_date
+                coverage_end = effective_end if frozen_range else end_date
                 try:
                     event_coro = tdx_source.get_xdxr_events(instrument_id)
                     events = (
@@ -19016,9 +19152,11 @@ class DataManager:
                     )
                     events = list(events or [])
                     filtered_events = []
+                    missing_event_dates = 0
                     for event in events:
                         event_date = self._date_from_any(event.get('date') or event.get('ex_date'))
                         if event_date is None:
+                            missing_event_dates += 1
                             continue
                         if effective_start <= event_date <= effective_end:
                             filtered_events.append(event)
@@ -19027,6 +19165,25 @@ class DataManager:
                     )
 
                     if not filtered_events:
+                        if not dry_run:
+                            await self.db_ops.upsert_corporate_action_instrument_status({
+                                'instrument_id': instrument_id,
+                                'source': 'tdx',
+                                'source_profile': 'tdx_xdxr',
+                                'coverage_status': (
+                                    'partial_missing_fields'
+                                    if missing_event_dates else 'complete_no_events'
+                                ),
+                                'event_count': 0,
+                                'missing_ex_date_count': missing_event_dates,
+                                'requested_start_date': coverage_start,
+                                'requested_end_date': coverage_end,
+                                'earliest_event_date': None,
+                                'latest_event_date': None,
+                                'ingestion_run_id': (
+                                    f"tdx_xdxr_{start_date:%Y%m%d}_{end_date:%Y%m%d}"
+                                ),
+                            })
                         stats['empty_instruments'] += 1
                         stats['processed_instruments'] += 1
                         continue
@@ -19110,6 +19267,34 @@ class DataManager:
                     stats['pending_factors'] += len(
                         event_dates - computed_dates - derived_dates
                     )
+                    if not dry_run:
+                        valid_event_dates = sorted(
+                            event_date
+                            for event_date in event_dates
+                            if event_date is not None
+                        )
+                        await self.db_ops.upsert_corporate_action_instrument_status({
+                            'instrument_id': instrument_id,
+                            'source': 'tdx',
+                            'source_profile': 'tdx_xdxr',
+                            'coverage_status': (
+                                'partial_missing_fields'
+                                if missing_event_dates else 'complete_with_events'
+                            ),
+                            'event_count': len(raw_rows),
+                            'missing_ex_date_count': missing_event_dates,
+                            'requested_start_date': coverage_start,
+                            'requested_end_date': coverage_end,
+                            'earliest_event_date': (
+                                valid_event_dates[0] if valid_event_dates else None
+                            ),
+                            'latest_event_date': (
+                                valid_event_dates[-1] if valid_event_dates else None
+                            ),
+                            'ingestion_run_id': (
+                                f"tdx_xdxr_{start_date:%Y%m%d}_{end_date:%Y%m%d}"
+                            ),
+                        })
                     stats['processed_instruments'] += 1
                 except asyncio.TimeoutError:
                     stats['timeouts'] += 1

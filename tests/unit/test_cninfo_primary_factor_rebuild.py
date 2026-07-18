@@ -52,6 +52,13 @@ def _manager_with_factor_evidence(*, tdx_validation_result="computed_unvalidated
                 "source": "baostock",
             }]
         if "FROM corporate_action_instrument_status" in query:
+            if "source = 'tdx'" in query:
+                return [{
+                    "instrument_id": "000001.SZ",
+                    "source_profile": "tdx_xdxr",
+                    "coverage_status": "complete_with_events",
+                    "event_count": 1,
+                }]
             return [
                 {
                     "instrument_id": "000001.SZ",
@@ -119,12 +126,17 @@ async def test_cninfo_primary_factor_rebuild_dry_run_is_read_only():
     assert result["cninfo_path"]["derived_events"] == 1
     assert result["tdx_path"]["derived_events"] == 1
     assert result["reconciliation"]["totals"]["exact_matches"] == 1
+    assert result["benchmark"]["source_selection_status"] == "deferred"
+    assert result["benchmark"]["reference_sources"][
+        "tdx_event_derived_v1"
+    ]["coverage_ratio"] == pytest.approx(1.0)
+    assert result["candidate"]["candidate_built"] is False
     manager.db_ops.save_adjustment_factor_observations.assert_not_awaited()
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
 
 
 @pytest.mark.asyncio
-async def test_cninfo_primary_factor_rebuild_writes_isolated_staging_paths():
+async def test_cninfo_factor_rebuild_writes_paths_and_benchmark_without_candidate():
     manager = _manager_with_factor_evidence()
 
     result = await manager.rebuild_cninfo_primary_adjustment_factors(
@@ -136,15 +148,39 @@ async def test_cninfo_primary_factor_rebuild_writes_isolated_staging_paths():
     )
 
     assert result["status"] == "success"
+    assert result["source_selection"]["status"] == "deferred"
+    assert result["candidate"]["candidate_built"] is False
     assert result["candidate"]["promotion_eligible"] is False
-    assert result["write_result"]["canonical_saved_rows"] == 1
+    assert result["write_result"]["canonical_saved_rows"] == 0
+    assert result["write_result"]["benchmark_status_saved"] is True
     assert manager.db_ops.save_adjustment_factor_observations.await_count == 2
     manager.db_ops.upsert_adjustment_factor_series_status.assert_awaited_once()
+    manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
     manager.invalidate_factor_cache.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_incomplete_rebuild_writes_isolated_partial_staging_candidate():
+async def test_explicit_candidate_build_remains_isolated_staging():
+    manager = _manager_with_factor_evidence()
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=False,
+        build_canonical=True,
+    )
+
+    assert result["status"] == "success"
+    assert result["candidate"]["candidate_built"] is True
+    assert result["write_result"]["canonical_saved_rows"] == 1
+    assert manager.db_ops.upsert_adjustment_factor_series_status.await_count == 2
+    manager.db_ops.replace_canonical_adjustment_factors.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_incomplete_rebuild_still_persists_benchmark_without_candidate():
     manager = _manager_with_factor_evidence(
         tdx_validation_result="pending_factor_missing_pre_close"
     )
@@ -158,5 +194,6 @@ async def test_incomplete_rebuild_writes_isolated_partial_staging_candidate():
     )
 
     assert result["status"] == "partial"
-    assert result["write_result"]["canonical_saved_rows"] == 1
-    manager.db_ops.replace_canonical_adjustment_factors.assert_awaited_once()
+    assert result["write_result"]["canonical_saved_rows"] == 0
+    assert result["write_result"]["benchmark_status_saved"] is True
+    manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()

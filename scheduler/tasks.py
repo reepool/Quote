@@ -484,7 +484,7 @@ def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
 
 
 def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
-    """Build a bounded report for the CNInfo-primary isolated workflow."""
+    """Build a bounded report for the isolated multi-source factor workflow."""
     status = result.get("status", "unknown")
     label = {"success": "完成", "partial": "部分完成", "dry_run": "预演完成"}.get(
         status, status
@@ -493,8 +493,10 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
     reconciliation = result.get("reconciliation") or {}
     totals = reconciliation.get("totals") or {}
     candidate = result.get("candidate") or {}
+    benchmark = result.get("benchmark") or {}
+    reference_sources = benchmark.get("reference_sources") or {}
     lines = [
-        "ℹ️ *A 股 CNInfo 主线公司行动与复权因子治理*",
+        "ℹ️ *A 股公司行动与复权因子多源基准*",
         "",
         f"结论: *{label}*",
         f"状态: `{status}`",
@@ -514,10 +516,23 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
             )
         )
         + "`",
-        f"候选版本: `{candidate.get('staging_series_version', 'N/A')}`",
-        f"候选行数: `{candidate.get('row_count', 0)}`",
-        f"可晋级生产: `{candidate.get('promotion_eligible', False)}`",
+        f"基准版本: `{benchmark.get('benchmark_series_version', 'N/A')}`",
+        f"主源选择: `{benchmark.get('source_selection_status', 'deferred')}`",
+        "来源覆盖: `"
+        + ", ".join(
+            f"{source}={details.get('available_instruments', 0)}"
+            for source, details in sorted(reference_sources.items())
+        )
+        + "`",
     ]
+    if candidate.get("candidate_built"):
+        lines.extend([
+            f"候选版本: `{candidate.get('staging_series_version', 'N/A')}`",
+            f"候选行数: `{candidate.get('row_count', 0)}`",
+            f"可晋级生产: `{candidate.get('promotion_eligible', False)}`",
+        ])
+    else:
+        lines.append("候选构造: `未执行（需 build_canonical=true）`")
     if result.get("operation") == "a_share_cninfo_primary_daily_maintenance":
         lines.insert(1, "模式: `滚动源刷新 + 全历史本地因子重建`")
     return "\n".join(lines)
@@ -4228,7 +4243,7 @@ class ScheduledTasks:
         exchanges: Optional[List[str]] = None,
         instrument_ids: Optional[List[str]] = None,
         dry_run: bool = True,
-        build_canonical: bool = True,
+        build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         field_tolerance: float = 0.0001,
         max_session_shift: int = 3,
@@ -4288,7 +4303,7 @@ class ScheduledTasks:
         rolling_days: int = 7,
         request_interval_seconds: float = 0.5,
         per_instrument_timeout_sec: int = 60,
-        build_canonical: bool = True,
+        build_canonical: bool = False,
         series_version: str = "a_share_cninfo_primary_v1",
         job_config: Optional[JobConfig] = None,
     ) -> Dict[str, Any]:

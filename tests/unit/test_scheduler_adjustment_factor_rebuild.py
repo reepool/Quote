@@ -113,16 +113,23 @@ def test_cninfo_primary_factor_report_keeps_production_isolation_visible():
         "cninfo_path": {"derived_events": 8},
         "tdx_path": {"derived_events": 9},
         "reconciliation": {"totals": {"conflicts": 1, "tdx_only": 2}},
+        "benchmark": {
+            "benchmark_series_version": "benchmark",
+            "source_selection_status": "deferred",
+            "reference_sources": {
+                "tdx_event_derived_v1": {"available_instruments": 1},
+            },
+        },
         "candidate": {
-            "staging_series_version": "staging",
-            "row_count": 9,
+            "candidate_built": False,
             "promotion_eligible": False,
         },
     })
 
     assert "生产表影响: `无`" in report
     assert "conflicts=1" in report
-    assert "可晋级生产: `False`" in report
+    assert "主源选择: `deferred`" in report
+    assert "候选构造: `未执行" in report
 
 
 @pytest.mark.asyncio
@@ -148,4 +155,5 @@ async def test_scheduler_cninfo_primary_rebuild_delegates_manual_parameters(monk
     assert result["status"] == "dry_run"
     assert rebuild.await_args.kwargs["instrument_ids"] == ["000001.SZ"]
     assert rebuild.await_args.kwargs["field_tolerance"] == 0.001
+    assert rebuild.await_args.kwargs["build_canonical"] is False
     assert "a_share_cninfo_adjustment_factor_rebuild" not in task._active_tasks

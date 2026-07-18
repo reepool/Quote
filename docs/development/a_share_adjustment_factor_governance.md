@@ -27,16 +27,18 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
 
 ## 分阶段实施
 
-### 0. CNInfo 主线与 TDX 备份的长期运行模型
+### 0. CNInfo 官方事件基线与多源因子比较模型
 
 公司行动原始证据和因子路径分开维护：
 
-- `corporate_action_observations` 中保留 CNInfo 分红/配股全历史，CNInfo 是主来源；
+- `corporate_action_observations` 中保留 CNInfo 分红/配股全历史，CNInfo 是官方事件基线；
 - `adjustment_factors_tdx` 继续保留 TDX XDXR 全历史，作为独立备份和缺失补充；
 - `adjustment_factor_observations` 分别保存 `cninfo_event_derived_v1` 与
   `tdx_event_derived_v1`，不把两家来源拼成一条未经标注的序列；
-- `adjustment_factors_canonical` 只保存带 `series_version` 的隔离 staging 候选，CNInfo
-  同一有效交易日优先，TDX-only 事件才可作为 `tdx_fallback_unverified` 补充；
+- `adjustment_factor_series_status` 保存全市场 benchmark，比较 CNInfo 自研、TDX 自研、
+  Sina 和 BaoStock 路径的覆盖率、P50/P95、最大误差和阈值超限比例；
+- 默认重建不创建 `adjustment_factors_canonical`。只有显式传入 `build_canonical=true`
+  才创建隔离 staging 候选，且仍不影响生产读取；
 - `a_share_cninfo_corporate_action_daily_sync` 在每日行情更新后按最近 7 天滚动刷新活跃股票的
   两个原始来源，再利用本地全历史重建累计因子；任务单实例运行且不会晋级生产；
 - `a_share_cninfo_corporate_action_backfill` 和
@@ -44,9 +46,43 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
   全历史因子重建/对账。
 
 自动日更只刷新源数据的近期窗口，因子重建不能只从这个窗口起算，否则累计因子会错误地从
-  1 重新开始。任何生产切换仍需要独立的全市场覆盖、事件冲突和累计路径质量门禁及人工确认。
+1 重新开始。CNInfo 是事件来源候选，不代表其自研累计因子已被选为生产主源；主源选择必须
+等待全市场 benchmark 完成并人工评审。
 
-### 1. 定向预演
+### 1. 全市场 CNInfo 官方事件回补
+
+先完成 CNInfo 分红和配股结构化历史，不以前置公告语义分析阻塞全市场处理：
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=true
+```
+
+```text
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
+```
+
+历史冲突先记录为异常类别。只有累计路径无法解释的重大边界才进入后续公告补证。
+
+### 2. CNInfo/TDX 独立路径和多源 benchmark
+
+默认 `build_canonical=false`。预演只计算报告，不写 observation、benchmark 或 canonical：
+
+```text
+/run a_share_cninfo_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE dry_run=true
+```
+
+确认后写入 CNInfo 自研、TDX 自研独立路径，并保存 benchmark 状态：
+
+```text
+/run a_share_cninfo_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE dry_run=false
+```
+
+任务返回 `source_selection_status=deferred`，即使来源存在差异也不阻止独立路径落库。
+报告中的 `benchmark_series_version` 可用于质量 API 查询。
+
+### 3. 参考累计因子补足
+
+#### 3.1 定向预演
 
 预演只统计股票池和已有 observation，不访问外部因子接口、不写数据库、也不创建
 checkpoint。
@@ -55,7 +91,7 @@ checkpoint。
 /run a_share_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ source=akshare chunk_size=2 request_interval_seconds=1.0 resume=false dry_run=true
 ```
 
-### 2. 定向写入与核对
+#### 3.2 定向写入与核对
 
 先用长历史、已知 BaoStock 异常和无分红样本进行 smoke test。任务顺序调用新浪接口，
 每只股票后保存 checkpoint。`request_interval_seconds` 默认 1 秒，不允许并发任务。
@@ -66,7 +102,7 @@ checkpoint。
 
 定向任务只写独立 staging 版本，不会改写配置中的生产 canonical 版本。
 
-### 3. 全市场回补
+#### 3.3 全市场回补
 
 必须先 dry-run，再执行 write。全市场任务预计约 5,000 至 6,000 次股票级请求；
 不得与其他 AkShare/Sina 全市场任务并发，也不得注册为 cron。
@@ -82,9 +118,34 @@ checkpoint。
 中断后使用相同参数和 checkpoint 继续。不要把 dry-run checkpoint 用于 write；当前实现
 已保证 dry-run 不创建或读取 checkpoint。
 
-## 质量门禁
+参考路径补足后，重新运行第 2 步 benchmark，使 Sina 等来源覆盖率进入同一份报告。
 
-全市场 canonical 版本必须同时满足：
+### 4. 显式候选构造
+
+只有全市场 benchmark 已完成并确定候选规则后，才允许构造隔离 staging：
+
+```text
+/run a_share_cninfo_adjustment_factor_rebuild start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE build_canonical=true dry_run=false
+```
+
+该操作仍不会切换生产读取，也不会自动选择主源。
+
+## Benchmark 指标与候选门禁
+
+Benchmark 本身不选择主源，至少报告：
+
+- 各来源可用股票数和相对全市场覆盖率。
+- 与 CNInfo 自研路径可比较的股票数和比例。
+- CNInfo 自研、TDX 自研、Sina、BaoStock 所有可用路径的两两比较矩阵。
+- 归一化前复权路径的平均、P50、P95 和最大误差。
+- 路径比较只在双方共同的最新事件日期内归一化；双方末端事件日期不同的股票
+  另计入 `endpoint_mismatch_instruments` 和样本，不能静默视为路径质量误差或一致。
+- `available_instruments` 使用股票级完整扫描状态并包含 `complete_no_events`；
+  `path_instruments` 只统计实际存在因子事件行的股票，两个口径不得混用。
+- 超过 0.1%、0.5% 和 1% 的点数及比例。
+- 事件精确匹配、错位匹配、经济字段冲突和来源单边事件。
+
+后续显式构造的 canonical 候选必须同时满足：
 
 - 股票级完成覆盖率不低于 99%，确认无公司行动的股票也计为已覆盖。
 - 回补结束日期覆盖本地交易日历中 SSE、SZSE、BSE 各自最近交易日。
@@ -96,6 +157,10 @@ checkpoint。
 
 与 legacy BaoStock 路径的前复权误差是诊断指标，不把 BaoStock 当作权威答案。较大差异
 必须结合 TDX XDXR、交易所/巨潮已实施分红公告以及价格连续性进一步确认。
+
+旧版本 TDX 回补没有持久化股票级空结果。升级后需至少重新执行一次对应范围的 TDX XDXR
+写入回补，系统才会把确认无事件的股票记录为 `source=tdx / source_profile=tdx_xdxr /
+complete_no_events` 并纳入 benchmark 覆盖率；已有事件路径仍会作为最低可用覆盖证据保留。
 
 质量查询：
 
@@ -117,7 +182,8 @@ GET /api/v1/corporate-actions/adjustment-factor-canonical?instrument_id=000001.S
 }
 ```
 
-每次 write 都先写入由参数哈希标识的 staging 版本。只有全市场任务全部通过质量门禁，
+默认 write 只写独立 observation 和由参数哈希标识的 benchmark 版本，不写 canonical。
+显式候选操作才写入 staging 版本。只有全市场任务全部通过质量门禁，
 系统才在同一数据库事务中把 staging 行、逐证券覆盖状态和生产版本状态一起晋级；定向、
 部分完成或中断任务不能修改已晋级版本。只有生产版本
 `adjustment_factor_series_status.promotion_eligible=true` 且人工复核通过后，才将

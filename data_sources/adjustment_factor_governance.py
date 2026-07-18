@@ -6,6 +6,7 @@ import math
 from bisect import bisect_right
 from collections import defaultdict
 from datetime import date, datetime
+from itertools import combinations
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
@@ -250,15 +251,40 @@ def compare_normalized_cumulative_paths(
     candidate = _group(candidate_rows)
     reference = _group(reference_rows)
     comparisons: List[Dict[str, Any]] = []
+    endpoint_mismatches: List[Dict[str, Any]] = []
     comparable_instruments = sorted(set(candidate) & set(reference))
     for instrument_id in comparable_instruments:
         candidate_items = candidate[instrument_id]
         reference_items = reference[instrument_id]
         candidate_dates = [item[0] for item in candidate_items]
         reference_dates = [item[0] for item in reference_items]
-        candidate_latest = candidate_items[-1][1]
-        reference_latest = reference_items[-1][1]
-        comparison_dates = sorted(set(candidate_dates) | set(reference_dates))
+        common_latest_date = min(candidate_dates[-1], reference_dates[-1])
+        if candidate_dates[-1] != reference_dates[-1]:
+            endpoint_mismatches.append({
+                "instrument_id": instrument_id,
+                "candidate_latest_date": candidate_dates[-1].isoformat(),
+                "reference_latest_date": reference_dates[-1].isoformat(),
+                "common_latest_date": common_latest_date.isoformat(),
+            })
+        candidate_anchor_index = bisect_right(
+            candidate_dates, common_latest_date
+        ) - 1
+        reference_anchor_index = bisect_right(
+            reference_dates, common_latest_date
+        ) - 1
+        candidate_latest = (
+            candidate_items[candidate_anchor_index][1]
+            if candidate_anchor_index >= 0 else 1.0
+        )
+        reference_latest = (
+            reference_items[reference_anchor_index][1]
+            if reference_anchor_index >= 0 else 1.0
+        )
+        comparison_dates = sorted(
+            comparison_date
+            for comparison_date in set(candidate_dates) | set(reference_dates)
+            if comparison_date <= common_latest_date
+        )
         for comparison_date in comparison_dates:
             candidate_index = bisect_right(candidate_dates, comparison_date) - 1
             reference_index = bisect_right(reference_dates, comparison_date) - 1
@@ -280,6 +306,20 @@ def compare_normalized_cumulative_paths(
             })
 
     differences = [item["difference_pct"] for item in comparisons]
+
+    def percentile(values: Sequence[float], quantile: float) -> Optional[float]:
+        if not values:
+            return None
+        ordered = sorted(values)
+        position = (len(ordered) - 1) * quantile
+        lower = int(math.floor(position))
+        upper = int(math.ceil(position))
+        if lower == upper:
+            return ordered[lower]
+        weight = position - lower
+        return ordered[lower] * (1.0 - weight) + ordered[upper] * weight
+
+    comparison_count = len(differences)
     return {
         "comparable_instruments": len(comparable_instruments),
         "comparison_points": len(comparisons),
@@ -287,14 +327,151 @@ def compare_normalized_cumulative_paths(
         "mean_adjusted_price_error_pct": (
             sum(differences) / len(differences) if differences else None
         ),
+        "median_adjusted_price_error_pct": percentile(differences, 0.5),
+        "p95_adjusted_price_error_pct": percentile(differences, 0.95),
         "over_0_1_pct": sum(value > 0.1 for value in differences),
         "over_0_5_pct": sum(value > 0.5 for value in differences),
         "over_1_pct": sum(value > 1.0 for value in differences),
+        "over_0_1_ratio": (
+            sum(value > 0.1 for value in differences) / comparison_count
+            if comparison_count else None
+        ),
+        "over_0_5_ratio": (
+            sum(value > 0.5 for value in differences) / comparison_count
+            if comparison_count else None
+        ),
+        "over_1_ratio": (
+            sum(value > 1.0 for value in differences) / comparison_count
+            if comparison_count else None
+        ),
+        "endpoint_mismatch_instruments": len(endpoint_mismatches),
+        "endpoint_mismatch_samples": endpoint_mismatches[:sample_limit],
         "samples": sorted(
             comparisons,
             key=lambda item: item["difference_pct"],
             reverse=True,
         )[:sample_limit],
+    }
+
+
+def build_factor_source_benchmark(
+    baseline_rows: Iterable[Mapping[str, Any]],
+    reference_paths: Mapping[str, Iterable[Mapping[str, Any]]],
+    *,
+    target_instruments: Optional[Sequence[str]] = None,
+    baseline_covered_instruments: Optional[Sequence[str]] = None,
+    reference_covered_instruments: Optional[
+        Mapping[str, Sequence[str]]
+    ] = None,
+    baseline_source_profile: str = "cninfo_event_derived_v1",
+    full_market_scope: bool = False,
+    sample_limit: int = 20,
+) -> Dict[str, Any]:
+    """Build source-neutral coverage and normalized path comparison evidence."""
+
+    baseline = [dict(row) for row in baseline_rows]
+    references = {
+        str(source): [dict(row) for row in rows]
+        for source, rows in reference_paths.items()
+    }
+    reference_covered = {
+        str(source): {
+            str(instrument_id).strip()
+            for instrument_id in instrument_ids
+            if str(instrument_id).strip()
+        }
+        for source, instrument_ids in (reference_covered_instruments or {}).items()
+    }
+    universe = {
+        str(instrument_id).strip()
+        for instrument_id in (target_instruments or [])
+        if str(instrument_id).strip()
+    }
+
+    def instrument_ids(rows: Iterable[Mapping[str, Any]]) -> set[str]:
+        return {
+            str(row.get("instrument_id") or "").strip()
+            for row in rows
+            if str(row.get("instrument_id") or "").strip()
+            and _date(row.get("ex_date")) is not None
+            and _positive(row.get("cumulative_factor")) is not None
+        }
+
+    baseline_instruments = instrument_ids(baseline)
+    baseline_covered = (
+        set(baseline_instruments)
+        if baseline_covered_instruments is None
+        else {
+            str(instrument_id).strip()
+            for instrument_id in baseline_covered_instruments
+            if str(instrument_id).strip()
+        }
+    )
+    if not universe:
+        universe = set(baseline_instruments)
+        for rows in references.values():
+            universe.update(instrument_ids(rows))
+    universe_count = len(universe)
+    source_reports: Dict[str, Dict[str, Any]] = {}
+    for source, rows in sorted(references.items()):
+        path_instruments = instrument_ids(rows)
+        covered = path_instruments | reference_covered.get(source, set())
+        if universe:
+            covered &= universe
+        comparison = compare_normalized_cumulative_paths(
+            baseline,
+            rows,
+            sample_limit=sample_limit,
+        )
+        comparable = int(comparison.get("comparable_instruments") or 0)
+        source_reports[source] = {
+            "available_instruments": len(covered),
+            "coverage_ratio": (
+                len(covered) / universe_count if universe_count else 0.0
+            ),
+            "path_instruments": len(path_instruments),
+            "comparable_instruments": comparable,
+            "comparable_ratio": (
+                comparable / universe_count if universe_count else 0.0
+            ),
+            **comparison,
+        }
+
+    all_paths = {baseline_source_profile: baseline, **references}
+    pairwise_comparisons: Dict[str, Dict[str, Any]] = {}
+    for left_source, right_source in combinations(sorted(all_paths), 2):
+        left_rows = all_paths[left_source]
+        right_rows = all_paths[right_source]
+        comparison = compare_normalized_cumulative_paths(
+            left_rows,
+            right_rows,
+            sample_limit=sample_limit,
+        )
+        pairwise_comparisons[f"{left_source}__vs__{right_source}"] = {
+            "left_source": left_source,
+            "right_source": right_source,
+            **comparison,
+        }
+
+    return {
+        "status": (
+            "empty" if not baseline_covered
+            else "complete"
+            if universe and baseline_covered == universe
+            else "partial"
+        ),
+        "source_selection_status": "deferred",
+        "selected_primary_source": None,
+        "baseline_source_profile": baseline_source_profile,
+        "full_market_scope": bool(full_market_scope),
+        "universe_instruments": universe_count,
+        "baseline_instruments": len(baseline_instruments),
+        "baseline_covered_instruments": len(baseline_covered),
+        "baseline_coverage_ratio": (
+            len(baseline_covered) / universe_count if universe_count else 0.0
+        ),
+        "reference_sources": source_reports,
+        "pairwise_comparisons": pairwise_comparisons,
     }
 
 
