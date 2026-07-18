@@ -83,6 +83,9 @@ def _manager_with_factor_evidence(*, tdx_validation_result="computed_unvalidated
         "pre_close": 13.5,
         "close": 13.0,
     }])
+    manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
+        return_value={}
+    )
     manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[{
         "date": date(2020, 5, 28),
         "is_trading_day": True,

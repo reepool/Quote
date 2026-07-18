@@ -364,6 +364,7 @@ def _format_a_share_cninfo_corporate_action_report(
                 "partial_missing_fields",
                 "indeterminate",
                 "missing_ex_date_events",
+                "ignored_placeholders",
             )
         )
         + "`",
@@ -378,6 +379,55 @@ def _format_a_share_cninfo_corporate_action_report(
     ]
     if error_lines:
         lines.extend(["", "异常样本:", "```text", *error_lines, "```"])
+    return "\n".join(lines)
+
+
+def _format_cninfo_special_action_discovery_report(
+    result: Dict[str, Any],
+) -> str:
+    """Build a bounded report for candidate-only effective-date discovery."""
+    status = str(result.get("status") or "unknown").lower()
+    if status == "dry_run":
+        icon, label = "ℹ️", "预演完成"
+    else:
+        icon, label = _format_scheduler_status(status)
+    parameters = result.get("parameters") or {}
+    targets = result.get("targets") or {}
+    evidence = result.get("evidence") or {}
+    lines = [
+        f"{icon} *A 股巨潮特殊公司行动公告发现*",
+        "",
+        f"结论: *{label}*",
+        f"状态: `{result.get('status')}`",
+        f"dry_run: `{result.get('dry_run')}`",
+        f"范围: `{parameters.get('start_date')}` 至 `{parameters.get('end_date')}`",
+        f"扫描市场: `{','.join(parameters.get('scanned_exchanges') or [])}`",
+        f"排除市场: `{','.join(parameters.get('excluded_exchanges') or [])}`",
+        "",
+        "目标:",
+        "`"
+        f"loaded={targets.get('candidate_rows_loaded', 0)}, "
+        f"searchable={targets.get('searchable_events', 0)}, "
+        f"batch={targets.get('batch_events', 0)}, "
+        f"offset={targets.get('target_offset', 0)}, "
+        f"with_candidates={targets.get('events_with_candidates', 0)}, "
+        f"without_candidates={targets.get('events_without_candidates', 0)}, "
+        f"unbounded_skipped={targets.get('skipped_without_bounded_anchor', 0)}"
+        "`",
+        f"公告候选证据: `{evidence.get('candidate_count', 0)}`",
+        f"下一批 offset: `{targets.get('next_target_offset')}`",
+        "已确认有效日期: `0（本任务不从标题推断日期）`",
+        f"生产因子影响: `{'无' if result.get('production_isolation', True) else '有'}`",
+    ]
+    errors = result.get("errors") or []
+    if errors:
+        lines.extend(["", "异常样本:", "```text"])
+        lines.extend(
+            f"{item.get('instrument_id')} {item.get('source_event_key')}: "
+            f"{item.get('error')}"
+            for item in errors[:10]
+        )
+        lines.append("```")
     return "\n".join(lines)
 
 
@@ -535,6 +585,14 @@ def _format_cninfo_primary_factor_report(result: Dict[str, Any]) -> str:
         lines.append("候选构造: `未执行（需 build_canonical=true）`")
     if result.get("operation") == "a_share_cninfo_primary_daily_maintenance":
         lines.insert(1, "模式: `滚动源刷新 + 全历史本地因子重建`")
+        lines.insert(
+            7,
+            "CNInfo市场: `"
+            + ",".join(parameters.get("cninfo_exchanges") or [])
+            + "`；排除: `"
+            + ",".join(parameters.get("cninfo_excluded_exchanges") or [])
+            + "` (`source_not_supported`)",
+        )
     return "\n".join(lines)
 
 
@@ -4233,6 +4291,76 @@ class ScheduledTasks:
                     job_config=job_config,
                 )
             return failure
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_special_action_discovery(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+        max_events: int = 500,
+        target_offset: int = 0,
+        window_before_days: int = 10,
+        window_after_days: int = 30,
+        max_window_days: int = 180,
+        page_size: int = 30,
+        max_pages: int = 5,
+        request_interval_seconds: float = 0.5,
+        per_event_timeout_sec: int = 60,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Discover official announcement candidates for missing-date events."""
+        task_id = "a_share_cninfo_special_action_discovery"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.discover_cninfo_special_action_effective_dates(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                dry_run=bool(dry_run),
+                max_events=int(max_events),
+                target_offset=int(target_offset),
+                window_before_days=int(window_before_days),
+                window_after_days=int(window_after_days),
+                max_window_days=int(max_window_days),
+                page_size=int(page_size),
+                max_pages=int(max_pages),
+                request_interval_seconds=float(request_interval_seconds),
+                per_event_timeout_sec=int(per_event_timeout_sec),
+                sample_limit=int(sample_limit),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股巨潮特殊公司行动公告发现",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_special_action_discovery_report(
+                            result
+                        ),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] CNInfo special-action discovery failed: %s", exc
+            )
+            return {
+                "status": "failed",
+                "operation": task_id,
+                "dry_run": bool(dry_run),
+                "production_isolation": True,
+                "error": str(exc),
+                "errors": [str(exc)],
+            }
         finally:
             self._active_tasks.discard(task_id)
 

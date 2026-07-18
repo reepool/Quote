@@ -27,6 +27,7 @@ from .models import (
     AdjustmentFactorObservationDB, AdjustmentFactorCanonicalDB,
     AdjustmentFactorSeriesStatusDB, AdjustmentFactorInstrumentStatusDB,
     CorporateActionObservationDB, CorporateActionInstrumentStatusDB,
+    CorporateActionEffectiveDateEvidenceDB,
     DataChangeLogDB,
 )
 
@@ -4020,6 +4021,283 @@ class DatabaseOperations:
                 "has_more": offset + len(items) < total_value,
                 "items": items,
             }
+
+    async def save_corporate_action_effective_date_evidence(
+        self,
+        evidence_rows: List[Dict[str, Any]],
+        *,
+        ingestion_run_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """Idempotently persist derived effective-date evidence."""
+        stats = {"inserted": 0, "changed": 0, "unchanged": 0, "failed": 0}
+        if not evidence_rows:
+            return stats
+        try:
+            async with self.get_async_session() as session:
+                for row in evidence_rows:
+                    instrument_id = str(row.get("instrument_id") or "").strip()
+                    source_event_key = str(row.get("source_event_key") or "").strip()
+                    evidence_source = str(row.get("evidence_source") or "").strip()
+                    evidence_key = str(row.get("evidence_key") or "").strip()
+                    source_profile = str(row.get("source_profile") or "").strip()
+                    if not all((
+                        instrument_id,
+                        source_event_key,
+                        evidence_source,
+                        evidence_key,
+                        source_profile,
+                    )):
+                        stats["failed"] += 1
+                        continue
+                    raw_payload = row.get("raw_payload") or {}
+                    resolution_status = str(
+                        row.get("resolution_status") or "candidate"
+                    ).strip().lower()
+                    effective_date = self._coerce_datetime(row.get("effective_date"))
+                    if resolution_status not in {"candidate", "resolved", "rejected"}:
+                        stats["failed"] += 1
+                        continue
+                    if resolution_status == "resolved" and effective_date is None:
+                        stats["failed"] += 1
+                        continue
+                    if resolution_status == "resolved" and not str(
+                        row.get("date_basis") or ""
+                    ).strip():
+                        stats["failed"] += 1
+                        continue
+                    if resolution_status != "resolved":
+                        effective_date = None
+                    values = {
+                        "observation_source": str(
+                            row.get("observation_source") or "cninfo"
+                        ).lower(),
+                        "source_profile": source_profile,
+                        "resolution_status": resolution_status,
+                        "effective_date": effective_date,
+                        "date_basis": row.get("date_basis"),
+                        "announcement_id": row.get("announcement_id"),
+                        "announcement_title": row.get("announcement_title"),
+                        "announcement_time": self._coerce_datetime(
+                            row.get("announcement_time")
+                        ),
+                        "evidence_url": row.get("evidence_url"),
+                        "confidence": row.get("confidence"),
+                        "ingestion_run_id": ingestion_run_id,
+                        "raw_payload_json": json.dumps(
+                            raw_payload,
+                            ensure_ascii=True,
+                            default=str,
+                            sort_keys=True,
+                        ),
+                    }
+                    hash_values = {
+                        key: value
+                        for key, value in values.items()
+                        if key != "ingestion_run_id"
+                    }
+                    values["row_hash"] = hashlib.sha256(
+                        json.dumps(
+                            hash_values,
+                            ensure_ascii=True,
+                            default=str,
+                            sort_keys=True,
+                        ).encode("utf-8")
+                    ).hexdigest()
+                    existing = (await session.execute(
+                        select(CorporateActionEffectiveDateEvidenceDB).where(
+                            CorporateActionEffectiveDateEvidenceDB.instrument_id
+                            == instrument_id,
+                            CorporateActionEffectiveDateEvidenceDB.source_event_key
+                            == source_event_key,
+                            CorporateActionEffectiveDateEvidenceDB.evidence_source
+                            == evidence_source,
+                            CorporateActionEffectiveDateEvidenceDB.evidence_key
+                            == evidence_key,
+                        )
+                    )).scalar_one_or_none()
+                    if existing is None:
+                        session.add(CorporateActionEffectiveDateEvidenceDB(
+                            instrument_id=instrument_id,
+                            source_event_key=source_event_key,
+                            evidence_source=evidence_source,
+                            evidence_key=evidence_key,
+                            **values,
+                        ))
+                        stats["inserted"] += 1
+                    elif (
+                        resolution_status == "candidate"
+                        and existing.resolution_status in {"resolved", "rejected"}
+                    ):
+                        existing.ingestion_run_id = ingestion_run_id
+                        existing.updated_at = get_shanghai_time()
+                        stats["unchanged"] += 1
+                    elif existing.row_hash == values["row_hash"]:
+                        existing.ingestion_run_id = ingestion_run_id
+                        existing.updated_at = get_shanghai_time()
+                        stats["unchanged"] += 1
+                    else:
+                        for key, value in values.items():
+                            setattr(existing, key, value)
+                        existing.updated_at = get_shanghai_time()
+                        stats["changed"] += 1
+                await session.commit()
+            return stats
+        except Exception as exc:
+            self.db_logger.error(
+                "Failed to save corporate-action effective-date evidence: %s", exc
+            )
+            return {
+                "inserted": 0,
+                "changed": 0,
+                "unchanged": 0,
+                "failed": len(evidence_rows),
+            }
+
+    async def get_corporate_action_effective_date_evidence(
+        self,
+        *,
+        instrument_id: Optional[str] = None,
+        source_event_key: Optional[str] = None,
+        source_profile: Optional[str] = None,
+        evidence_source: Optional[str] = None,
+        resolution_status: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Return paginated special-action effective-date evidence."""
+        normalized_limit = max(1, min(int(limit), 1000))
+        normalized_offset = max(0, int(offset))
+        async with self.get_async_session() as session:
+            filters = []
+            if instrument_id:
+                filters.append(
+                    CorporateActionEffectiveDateEvidenceDB.instrument_id
+                    == instrument_id
+                )
+            if source_event_key:
+                filters.append(
+                    CorporateActionEffectiveDateEvidenceDB.source_event_key
+                    == source_event_key
+                )
+            if source_profile:
+                filters.append(
+                    CorporateActionEffectiveDateEvidenceDB.source_profile
+                    == source_profile
+                )
+            if evidence_source:
+                filters.append(
+                    CorporateActionEffectiveDateEvidenceDB.evidence_source
+                    == evidence_source
+                )
+            if resolution_status:
+                filters.append(
+                    CorporateActionEffectiveDateEvidenceDB.resolution_status
+                    == resolution_status
+                )
+            total = await session.scalar(
+                select(func.count())
+                .select_from(CorporateActionEffectiveDateEvidenceDB)
+                .where(*filters)
+            )
+            rows = (await session.execute(
+                select(CorporateActionEffectiveDateEvidenceDB)
+                .where(*filters)
+                .order_by(
+                    CorporateActionEffectiveDateEvidenceDB.instrument_id,
+                    CorporateActionEffectiveDateEvidenceDB.source_event_key,
+                    CorporateActionEffectiveDateEvidenceDB.announcement_time,
+                )
+                .offset(normalized_offset)
+                .limit(normalized_limit)
+            )).scalars().all()
+            items = [{
+                "instrument_id": row.instrument_id,
+                "source_event_key": row.source_event_key,
+                "observation_source": row.observation_source,
+                "source_profile": row.source_profile,
+                "evidence_source": row.evidence_source,
+                "evidence_key": row.evidence_key,
+                "resolution_status": row.resolution_status,
+                "effective_date": row.effective_date,
+                "date_basis": row.date_basis,
+                "announcement_id": row.announcement_id,
+                "announcement_title": row.announcement_title,
+                "announcement_time": row.announcement_time,
+                "evidence_url": row.evidence_url,
+                "confidence": row.confidence,
+                "ingestion_run_id": row.ingestion_run_id,
+                "raw_payload": json.loads(row.raw_payload_json or "{}"),
+                "created_at": row.created_at,
+                "updated_at": row.updated_at,
+            } for row in rows]
+            total_value = int(total or 0)
+            return {
+                "total": total_value,
+                "limit": normalized_limit,
+                "offset": normalized_offset,
+                "returned": len(items),
+                "has_more": normalized_offset + len(items) < total_value,
+                "items": items,
+            }
+
+    async def get_resolved_corporate_action_effective_dates(
+        self,
+        source_event_keys: List[str],
+    ) -> Dict[str, Dict[str, Any]]:
+        """Return one resolved date per source event for factor derivation."""
+        normalized_keys = sorted({
+            str(value).strip() for value in source_event_keys if str(value).strip()
+        })
+        if not normalized_keys:
+            return {}
+        rows = []
+        async with self.get_async_session() as session:
+            for offset in range(0, len(normalized_keys), 400):
+                chunk = normalized_keys[offset: offset + 400]
+                rows.extend((await session.execute(
+                    select(CorporateActionEffectiveDateEvidenceDB).where(
+                        CorporateActionEffectiveDateEvidenceDB.source_event_key.in_(
+                            chunk
+                        ),
+                        CorporateActionEffectiveDateEvidenceDB.resolution_status
+                        == "resolved",
+                        CorporateActionEffectiveDateEvidenceDB.observation_source
+                        == "cninfo",
+                        CorporateActionEffectiveDateEvidenceDB.effective_date.is_not(
+                            None
+                        ),
+                    ).order_by(
+                        CorporateActionEffectiveDateEvidenceDB.updated_at.desc(),
+                        CorporateActionEffectiveDateEvidenceDB.id.desc(),
+                    )
+                )).scalars().all())
+        rows_by_event: Dict[str, List[Any]] = {}
+        for row in rows:
+            rows_by_event.setdefault(row.source_event_key, []).append(row)
+        resolved = {}
+        for source_event_key, event_rows in rows_by_event.items():
+            dates = {
+                row.effective_date.date()
+                if isinstance(row.effective_date, datetime)
+                else row.effective_date
+                for row in event_rows
+            }
+            if len(dates) != 1:
+                self.db_logger.warning(
+                    "Conflicting resolved corporate-action dates ignored: "
+                    "source_event_key=%s dates=%s",
+                    source_event_key,
+                    sorted(str(value) for value in dates),
+                )
+                continue
+            row = event_rows[0]
+            resolved[source_event_key] = {
+                "effective_date": row.effective_date,
+                "date_basis": row.date_basis,
+                "evidence_source": row.evidence_source,
+                "evidence_key": row.evidence_key,
+            }
+        return resolved
 
     async def get_adjustment_factor_observations(
         self,

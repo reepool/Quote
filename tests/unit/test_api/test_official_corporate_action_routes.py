@@ -43,6 +43,20 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
                 ],
             }
         ),
+        get_corporate_action_effective_date_evidence=AsyncMock(
+            return_value={
+                "total": 1,
+                "limit": 10,
+                "offset": 0,
+                "returned": 1,
+                "has_more": False,
+                "items": [{
+                    "instrument_id": "000001.SZ",
+                    "source_event_key": "event-1",
+                    "resolution_status": "candidate",
+                }],
+            }
+        ),
     )
     monkeypatch.setattr(routes, "data_manager", SimpleNamespace(db_ops=db_ops))
 
@@ -65,9 +79,19 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
         limit=10,
         offset=0,
     )
+    evidence = await routes.get_corporate_action_effective_date_evidence(
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        source_profile="cninfo_dividend",
+        evidence_source="cninfo_announcement_metadata",
+        resolution_status="candidate",
+        limit=10,
+        offset=0,
+    )
 
     assert observations.dataset == "corporate_action_observations"
     assert coverage.dataset == "corporate_action_instrument_status"
+    assert evidence.dataset == "corporate_action_effective_date_evidence"
     assert db_ops.get_corporate_action_observations.await_args.kwargs[
         "start_date"
     ] == date(2026, 1, 1)
@@ -81,3 +105,6 @@ async def test_official_observation_and_coverage_routes_forward_filters(monkeypa
         ]
         == "complete_with_events"
     )
+    assert db_ops.get_corporate_action_effective_date_evidence.await_args.kwargs[
+        "resolution_status"
+    ] == "candidate"

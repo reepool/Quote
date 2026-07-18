@@ -244,6 +244,101 @@ def test_provider_does_not_retry_deterministic_partial_cninfo_rows():
     assert result.observations[0]["ex_date"] is None
 
 
+def test_provider_preserves_nat_ex_date_when_announcement_date_exists():
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=lambda **_: pd.DataFrame([{
+            "实施方案公告日期": date(2006, 8, 10),
+            "分红类型": "股改分红",
+            "转增比例": 5.2,
+            "股权登记日": date(2006, 8, 11),
+            "除权日": pd.NaT,
+            "股份到账日": None,
+            "实施方案分红说明": "10转增5.2股",
+            "报告时间": None,
+        }]),
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+    )
+
+    result = provider.fetch_dividends(
+        "000007.SZ",
+        "000007",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "partial_missing_fields"
+    assert result.observations[0]["announcement_date"] == date(2006, 8, 10)
+    assert result.observations[0]["ex_date"] is None
+    assert result.observations[0]["capitalization_shares_per_share"] == 0.52
+
+
+def test_record_date_only_event_is_kept_in_range_and_in_event_identity():
+    rows = normalize_cninfo_dividend_rows(
+        "600108.SH",
+        [{
+            "实施方案公告日期": None,
+            "分红类型": "股改分红",
+            "送股比例": 6.8,
+            "转增比例": 3.4,
+            "派息比例": 0.3581058,
+            "股权登记日": date(2006, 6, 12),
+            "除权日": None,
+            "股份到账日": None,
+            "实施方案分红说明": "10送6.8转增3.4股派0.3581058元",
+            "报告时间": None,
+        }],
+        start_date=date(2006, 1, 1),
+        end_date=date(2006, 12, 31),
+    )
+
+    assert len(rows) == 1
+    assert rows[0]["record_date"] == date(2006, 6, 12)
+    different_date_rows = normalize_cninfo_dividend_rows(
+        "600108.SH",
+        [{
+            **rows[0]["raw_payload"],
+            "股权登记日": date(2006, 6, 13),
+        }],
+        start_date=date(2006, 1, 1),
+        end_date=date(2006, 12, 31),
+    )
+    assert rows[0]["source_event_key"] != different_date_rows[0]["source_event_key"]
+
+
+def test_provider_ignores_empty_dividend_placeholder():
+    provider = CninfoCorporateActionProvider(
+        dividend_loader=lambda **_: pd.DataFrame([{
+            "实施方案公告日期": None,
+            "分红类型": None,
+            "送股比例": None,
+            "转增比例": None,
+            "派息比例": None,
+            "股权登记日": None,
+            "除权日": None,
+            "股份到账日": None,
+            "实施方案分红说明": None,
+            "报告时间": None,
+        }]),
+        allotment_loader=lambda **_: pd.DataFrame(columns=[
+            "记录标识", "除权基准日", "配股比例", "配股价格",
+        ]),
+    )
+
+    result = provider.fetch_dividends(
+        "000001.SZ",
+        "000001",
+        start_date=date(1990, 1, 1),
+        end_date=date(2026, 12, 31),
+    )
+
+    assert result.coverage_status == "complete_no_events"
+    assert result.observations == []
+    assert result.rows_received == 1
+    assert result.ignored_placeholders == 1
+
+
 def test_parse_cninfo_distribution_description_uses_per_share_units():
     parsed = parse_cninfo_distribution_description("每10股送3.5转增5股派发现金红利3元")
 

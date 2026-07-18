@@ -63,9 +63,11 @@ def build_quote_evidence_keys(
         if str(row.get("event_status") or "") == "failed":
             continue
         instrument_id = str(row.get("instrument_id") or "").strip()
-        ex_date = _date(row.get("ex_date"))
-        if instrument_id and ex_date:
-            keys.add((instrument_id, ex_date))
+        source_date = _date(row.get("ex_date")) or _date(
+            row.get("resolved_effective_date")
+        )
+        if instrument_id and source_date:
+            keys.add((instrument_id, source_date))
     for row in tdx_rows:
         instrument_id = str(row.get("instrument_id") or "").strip()
         ex_date = _date(row.get("ex_date"))
@@ -126,7 +128,9 @@ def derive_cninfo_factor_path(
         if str(row.get("event_status") or "") == "failed":
             continue
         instrument_id = str(row.get("instrument_id") or "").strip()
-        source_date = _date(row.get("ex_date"))
+        raw_ex_date = _date(row.get("ex_date"))
+        resolved_effective_date = _date(row.get("resolved_effective_date"))
+        source_date = raw_ex_date or resolved_effective_date
         event_key = str(row.get("source_event_key") or "")
         if not instrument_id:
             continue
@@ -139,7 +143,12 @@ def derive_cninfo_factor_path(
             unlocated_pending_instruments.add(instrument_id)
             continue
         quality_status = str(row.get("quality_status") or "")
-        if quality_status.startswith("partial_"):
+        resolved_missing_date = (
+            quality_status == "partial_missing_ex_date"
+            and raw_ex_date is None
+            and resolved_effective_date is not None
+        )
+        if quality_status.startswith("partial_") and not resolved_missing_date:
             pending.append({
                 "instrument_id": instrument_id,
                 "source_event_key": event_key,
@@ -169,6 +178,7 @@ def derive_cninfo_factor_path(
             "rights_per_share": 0.0,
             "rights_proceeds_per_share": 0.0,
             "event_keys": [],
+            "date_evidence": [],
             "pre_close": quote.get("pre_close"),
         })
         rights_per_share = _number(row.get("rights_shares_per_share"))
@@ -184,6 +194,14 @@ def derive_cninfo_factor_path(
         aggregate["rights_per_share"] += rights_per_share
         aggregate["rights_proceeds_per_share"] += rights_per_share * rights_price
         aggregate["event_keys"].append(event_key)
+        if resolved_missing_date:
+            aggregate["date_evidence"].append({
+                "source_event_key": event_key,
+                "effective_date": resolved_effective_date,
+                "date_basis": row.get("resolved_date_basis"),
+                "evidence_source": row.get("resolved_evidence_source"),
+                "evidence_key": row.get("resolved_evidence_key"),
+            })
 
     events: List[Dict[str, Any]] = []
     observations_out: List[Dict[str, Any]] = []
@@ -263,6 +281,7 @@ def derive_cninfo_factor_path(
             "factor": factor,
             "cumulative_factor": cumulative_by_instrument[instrument_id],
             "source_event_keys": aggregate["event_keys"],
+            "resolved_date_evidence": aggregate["date_evidence"],
             "date_shifted": any(value != effective_date for value in source_dates),
         }
         events.append(event)

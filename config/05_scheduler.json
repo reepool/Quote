@@ -63,7 +63,7 @@
       "a_share_cninfo_corporate_action_daily_sync": {
         "enabled": true,
         "manual_only": false,
-        "description": "A股CNInfo与TDX公司行动滚动日更、独立因子路径及多源基准（不选择或切换生产主源）",
+        "description": "A股CNInfo（仅沪深）与TDX（沪深北）公司行动滚动日更、独立因子路径及多源基准（不选择或切换生产主源）",
         "report": true,
         "pre_run_notify": true,
         "trigger": {
@@ -254,6 +254,34 @@
           "series_version": "a_share_cninfo_primary_v1",
           "field_tolerance": 0.0001,
           "max_session_shift": 3,
+          "sample_limit": 20,
+          "max_runtime_seconds": 86400
+        }
+      },
+      "a_share_cninfo_special_action_discovery": {
+        "enabled": true,
+        "manual_only": true,
+        "description": "A股巨潮股改、重整转增等缺失生效日期事件的官方公告候选发现（仅沪深、候选证据不直接参与因子）",
+        "report": true,
+        "pre_run_notify": true,
+        "max_instances": 1,
+        "misfire_grace_time": 3600,
+        "coalesce": true,
+        "parameters": {
+          "start_date": "1990-12-19",
+          "end_date": null,
+          "exchanges": ["SSE", "SZSE"],
+          "instrument_ids": [],
+          "dry_run": true,
+          "max_events": 500,
+          "target_offset": 0,
+          "window_before_days": 10,
+          "window_after_days": 30,
+          "max_window_days": 180,
+          "page_size": 30,
+          "max_pages": 5,
+          "request_interval_seconds": 0.5,
+          "per_event_timeout_sec": 60,
           "sample_limit": 20,
           "max_runtime_seconds": 86400
         }

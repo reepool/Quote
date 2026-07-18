@@ -145,6 +145,53 @@ def test_cninfo_partial_economic_fields_are_pending_not_zero_effect():
     assert result["pending"][0]["reason"] == "partial_missing_economic_fields"
 
 
+def test_resolved_date_evidence_allows_missing_ex_date_event_only():
+    result = derive_cninfo_factor_path(
+        [{
+            "instrument_id": "600108.SH",
+            "source_event_key": "special-action",
+            "ex_date": None,
+            "resolved_effective_date": date(2006, 6, 13),
+            "resolved_date_basis": "official_resumption_date",
+            "resolved_evidence_source": "cninfo_announcement_review",
+            "resolved_evidence_key": "announcement-1",
+            "event_status": "announced_incomplete",
+            "quality_status": "partial_missing_ex_date",
+            "bonus_shares_per_share": 0.68,
+            "capitalization_shares_per_share": 0.34,
+        }],
+        [{
+            "instrument_id": "600108.SH",
+            "source_date": date(2006, 6, 13),
+            "effective_date": date(2006, 6, 13),
+            "pre_close": 10.0,
+        }],
+    )
+
+    assert result["pending"] == []
+    assert result["events"][0]["factor"] == pytest.approx(2.02)
+    evidence = result["events"][0]["resolved_date_evidence"][0]
+    assert evidence["date_basis"] == "official_resumption_date"
+
+
+def test_candidate_only_metadata_does_not_resolve_missing_ex_date():
+    result = derive_cninfo_factor_path(
+        [{
+            "instrument_id": "600108.SH",
+            "source_event_key": "special-action",
+            "ex_date": None,
+            "event_status": "announced_incomplete",
+            "quality_status": "partial_missing_ex_date",
+            "bonus_shares_per_share": 0.68,
+            "capitalization_shares_per_share": 0.34,
+        }],
+        [],
+    )
+
+    assert result["events"] == []
+    assert result["pending"][0]["reason"] == "missing_ex_date"
+
+
 def test_pending_factor_blocks_later_cumulative_path():
     result = derive_cninfo_factor_path(
         [

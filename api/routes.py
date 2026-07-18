@@ -3334,6 +3334,48 @@ async def get_official_corporate_action_coverage(
 
 
 @router.get(
+    "/corporate-actions/effective-date-evidence",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_effective_date_evidence(
+    instrument_id: Optional[str] = Query(None),
+    source_event_key: Optional[str] = Query(None),
+    source_profile: Optional[str] = Query(None),
+    evidence_source: Optional[str] = Query(None),
+    resolution_status: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query candidate and resolved effective-date evidence without mutation."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    page = await data_manager.db_ops.get_corporate_action_effective_date_evidence(
+        instrument_id=normalized_id,
+        source_event_key=_normalize_optional_query(source_event_key),
+        source_profile=_normalize_optional_query(source_profile),
+        evidence_source=_normalize_optional_query(evidence_source),
+        resolution_status=_normalize_optional_query(resolution_status),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_effective_date_evidence",
+        filters={
+            "instrument_id": normalized_id,
+            "source_event_key": _normalize_optional_query(source_event_key),
+            "source_profile": _normalize_optional_query(source_profile),
+            "evidence_source": _normalize_optional_query(evidence_source),
+            "resolution_status": _normalize_optional_query(resolution_status),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
     "/corporate-actions/adjustment-factor-canonical",
     response_model=AdjustmentFactorPageResponse,
     tags=["Corporate Actions"],

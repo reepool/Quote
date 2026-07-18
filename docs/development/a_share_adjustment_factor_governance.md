@@ -40,7 +40,8 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
 - 默认重建不创建 `adjustment_factors_canonical`。只有显式传入 `build_canonical=true`
   才创建隔离 staging 候选，且仍不影响生产读取；
 - `a_share_cninfo_corporate_action_daily_sync` 在每日行情更新后按最近 7 天滚动刷新活跃股票的
-  两个原始来源，再利用本地全历史重建累计因子；任务单实例运行且不会晋级生产；
+  两个原始来源，再利用本地全历史重建累计因子；CNInfo 只请求沪深，TDX 仍请求沪深北，
+  任务单实例运行且不会晋级生产；
 - `a_share_cninfo_corporate_action_backfill` 和
   `a_share_cninfo_adjustment_factor_rebuild` 仍是手工任务，分别负责官方事件全量回补和
   全历史因子重建/对账。
@@ -54,14 +55,33 @@ BaoStock 不再作为任何业务下载主源。现有 `adjustment_factors` 继�
 先完成 CNInfo 分红和配股结构化历史，不以前置公告语义分析阻塞全市场处理：
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=true
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=true
 ```
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
 ```
 
 历史冲突先记录为异常类别。只有累计路径无法解释的重大边界才进入后续公告补证。
+
+缺少除权日但包含实际分红、送转、股改或重整经济内容的记录，使用手工公告发现任务建立
+候选证据。该任务的 dry-run 会访问巨潮公告接口，但不写数据库；公告标题和元数据只形成
+`candidate`，不会推断生效日期：
+
+```text
+/run a_share_cninfo_special_action_discovery start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE max_events=500 target_offset=0 window_before_days=10 window_after_days=30 request_interval_seconds=0.5 dry_run=true
+```
+
+```text
+/run a_share_cninfo_special_action_discovery start_date=1990-12-19 end_date=<YYYY-MM-DD> exchanges=SSE,SZSE max_events=500 target_offset=0 window_before_days=10 window_after_days=30 request_interval_seconds=0.5 dry_run=false
+```
+
+若报告返回 `targets.has_more=true`，保持其他参数不变，将下一次的
+`target_offset` 设置为报告中的 `targets.next_target_offset`。写入任务在仍有后续批次时返回
+`partial`，不会把受限批次误报为全量完成。
+
+只有公告正文解析或人工复核明确给出实施、复牌、上市、对价到账等日期，并将证据标记为
+`resolved` 后，CNInfo 因子路径才可使用该日期。原始 CNInfo `ex_date` 始终保持不变。
 
 ### 2. CNInfo/TDX 独立路径和多源 benchmark
 

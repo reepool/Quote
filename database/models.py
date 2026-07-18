@@ -482,6 +482,47 @@ class CorporateActionInstrumentStatusDB(Base):
     )
 
 
+class CorporateActionEffectiveDateEvidenceDB(Base):
+    """Source-neutral evidence used to resolve special-action effective dates."""
+    __tablename__ = 'corporate_action_effective_date_evidence'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source_event_key = Column(String(64), nullable=False, index=True)
+    observation_source = Column(String(32), nullable=False, default='cninfo')
+    source_profile = Column(String(64), nullable=False, index=True)
+    evidence_source = Column(String(64), nullable=False, index=True)
+    evidence_key = Column(String(128), nullable=False)
+    resolution_status = Column(String(32), nullable=False, index=True)
+    effective_date = Column(DateTime, nullable=True, index=True)
+    date_basis = Column(String(64), nullable=True)
+    announcement_id = Column(String(64), nullable=True, index=True)
+    announcement_title = Column(Text, nullable=True)
+    announcement_time = Column(DateTime, nullable=True)
+    evidence_url = Column(Text, nullable=True)
+    confidence = Column(Float, nullable=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    raw_payload_json = Column(Text, nullable=True)
+    row_hash = Column(String(64), nullable=False, index=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'source_event_key', 'evidence_source', 'evidence_key',
+            name='uq_corporate_action_effective_date_evidence',
+        ),
+        Index(
+            'idx_corporate_action_effective_date_resolution',
+            'resolution_status', 'effective_date',
+        ),
+    )
+
+
 class DataChangeLogDB(Base):
     """Append-only local-observed change records for incremental sync."""
     __tablename__ = 'data_change_log'

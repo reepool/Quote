@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from database.models import (
     Base,
+    CorporateActionEffectiveDateEvidenceDB,
     CorporateActionInstrumentStatusDB,
     CorporateActionObservationDB,
     InstrumentDB,
@@ -265,6 +266,88 @@ async def _exercise_snapshot_retirement_and_reactivation():
 
 def test_corporate_action_coverage_is_versioned_by_requested_range():
     asyncio.run(_exercise_coverage_is_versioned_by_requested_range())
+
+
+def test_effective_date_evidence_is_idempotent_and_queryable():
+    asyncio.run(_exercise_effective_date_evidence_is_idempotent_and_queryable())
+
+
+async def _exercise_effective_date_evidence_is_idempotent_and_queryable():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionEffectiveDateEvidenceDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000007.SZ",
+            symbol="000007",
+            name="Test",
+            exchange="SZSE",
+            type="stock",
+            currency="CNY",
+            is_active=True,
+        ))
+        await session.commit()
+
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    candidate = {
+        "instrument_id": "000007.SZ",
+        "source_event_key": "event-1",
+        "source_profile": "cninfo_dividend",
+        "evidence_source": "cninfo_announcement",
+        "evidence_key": "announcement-1",
+        "resolution_status": "candidate",
+        "announcement_id": "announcement-1",
+        "announcement_title": "股权分置改革方案实施公告",
+        "announcement_time": date(2006, 8, 10),
+        "evidence_url": "https://example.test/announcement.pdf",
+    }
+    first = await operations.save_corporate_action_effective_date_evidence(
+        [candidate], ingestion_run_id="run-1"
+    )
+    unchanged = await operations.save_corporate_action_effective_date_evidence(
+        [candidate], ingestion_run_id="run-2"
+    )
+    resolved = {
+        **candidate,
+        "resolution_status": "resolved",
+        "effective_date": date(2006, 8, 14),
+        "date_basis": "official_resumption_date",
+    }
+    changed = await operations.save_corporate_action_effective_date_evidence(
+        [resolved], ingestion_run_id="run-3"
+    )
+    rediscovered = await operations.save_corporate_action_effective_date_evidence(
+        [candidate], ingestion_run_id="run-4"
+    )
+    invalid_resolved = await operations.save_corporate_action_effective_date_evidence(
+        [{**candidate, "resolution_status": "resolved", "effective_date": date(2006, 8, 14)}],
+        ingestion_run_id="run-5",
+    )
+    page = await operations.get_corporate_action_effective_date_evidence(
+        instrument_id="000007.SZ",
+        resolution_status="resolved",
+    )
+    resolved_map = await operations.get_resolved_corporate_action_effective_dates(
+        ["event-1"]
+    )
+
+    assert first["inserted"] == 1
+    assert unchanged["unchanged"] == 1
+    assert changed["changed"] == 1
+    assert rediscovered["unchanged"] == 1
+    assert invalid_resolved["failed"] == 1
+    assert page["total"] == 1
+    assert page["items"][0]["date_basis"] == "official_resumption_date"
+    assert resolved_map["event-1"]["effective_date"].date() == date(2006, 8, 14)
+    await engine.dispose()
 
 
 async def _exercise_coverage_is_versioned_by_requested_range():

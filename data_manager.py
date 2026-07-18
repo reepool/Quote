@@ -21,6 +21,7 @@ import hashlib
 import inspect
 import json
 import os
+import re
 import sqlite3
 from calendar import monthrange
 from pathlib import Path
@@ -17229,6 +17230,7 @@ class DataManager:
             "partial_missing_fields": 0,
             "indeterminate": 0,
             "missing_ex_date_events": 0,
+            "ignored_placeholders": 0,
         })
         endpoint_specs = []
         if "dividends" in normalized_scopes:
@@ -17274,6 +17276,7 @@ class DataManager:
                         coverage_status="indeterminate",
                         observations=observations,
                         rows_received=endpoint_result.rows_received,
+                        ignored_placeholders=endpoint_result.ignored_placeholders,
                         error=f"observation persistence incomplete: {write_stats}",
                     )
                 elif endpoint_result.coverage_status != "indeterminate":
@@ -17297,6 +17300,7 @@ class DataManager:
                             coverage_status="indeterminate",
                             observations=observations,
                             rows_received=endpoint_result.rows_received,
+                            ignored_placeholders=endpoint_result.ignored_placeholders,
                             error=f"observation snapshot reconciliation failed: {exc}",
                         )
                 for key in ("inserted", "changed", "unchanged", "reactivated"):
@@ -17313,6 +17317,9 @@ class DataManager:
                     for observation in observations
                 )
                 counters["missing_ex_date_events"] += int(missing_ex_dates)
+                counters["ignored_placeholders"] += int(
+                    endpoint_result.ignored_placeholders
+                )
                 counters[endpoint_result.coverage_status] += 1
                 try:
                     await self.db_ops.upsert_corporate_action_instrument_status({
@@ -17339,6 +17346,7 @@ class DataManager:
                         coverage_status="indeterminate",
                         observations=observations,
                         rows_received=endpoint_result.rows_received,
+                        ignored_placeholders=endpoint_result.ignored_placeholders,
                         error=f"coverage persistence failed: {exc}",
                     )
                 if endpoint_result.coverage_status == "indeterminate":
@@ -17563,11 +17571,48 @@ class DataManager:
                 params,
             ))
 
-        quote_keys = build_quote_evidence_keys(cninfo_rows, tdx_rows)
+        resolved_date_evidence = (
+            await self.db_ops.get_resolved_corporate_action_effective_dates([
+                str(row.get("source_event_key") or "")
+                for row in cninfo_rows
+                if row.get("source_event_key")
+            ])
+        )
+        factor_cninfo_rows: List[Dict[str, Any]] = []
+        resolved_outside_range = 0
+        for row in cninfo_rows:
+            event_key = str(row.get("source_event_key") or "")
+            resolved = resolved_date_evidence.get(event_key)
+            resolved_date = (
+                self._date_from_any(resolved.get("effective_date"))
+                if resolved else None
+            )
+            if (
+                row.get("ex_date") is None
+                and resolved_date is not None
+                and not normalized_start <= resolved_date <= normalized_end
+            ):
+                resolved_outside_range += 1
+                continue
+            factor_cninfo_rows.append({
+                **row,
+                "resolved_effective_date": resolved_date,
+                "resolved_date_basis": (
+                    resolved.get("date_basis") if resolved else None
+                ),
+                "resolved_evidence_source": (
+                    resolved.get("evidence_source") if resolved else None
+                ),
+                "resolved_evidence_key": (
+                    resolved.get("evidence_key") if resolved else None
+                ),
+            })
+
+        quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
         quote_evidence = await self.db_ops.get_quote_evidence_for_event_dates(
             quote_keys
         )
-        cninfo_path = derive_cninfo_factor_path(cninfo_rows, quote_evidence)
+        cninfo_path = derive_cninfo_factor_path(factor_cninfo_rows, quote_evidence)
         tdx_path = derive_tdx_factor_path(tdx_rows, quote_evidence)
 
         sessions_by_exchange: Dict[str, List[date]] = {}
@@ -17935,6 +17980,8 @@ class DataManager:
             "source_events": {
                 "cninfo_rows": len(cninfo_rows),
                 "tdx_rows": len(tdx_rows),
+                "resolved_effective_date_events": len(resolved_date_evidence),
+                "resolved_effective_dates_outside_range": resolved_outside_range,
             },
             "cninfo_path": {
                 "derived_events": len(cninfo_path["events"]),
@@ -17988,6 +18035,7 @@ class DataManager:
         Canonical staging is opt-in; the default persists independent paths and
         source-neutral benchmark evidence only.
         """
+        from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
         from utils.a_share_historical_backfill import coerce_date, normalize_string_list
 
         normalized_end = coerce_date(end_date or date.today(), field_name="end_date")
@@ -17999,18 +18047,22 @@ class DataManager:
             item.upper() for item in normalize_string_list(exchanges)
         ] or ["SSE", "SZSE", "BSE"]
         requested_ids = set(normalize_string_list(instrument_ids))
-        active_ids: List[str] = []
+        active_ids_by_exchange: Dict[str, List[str]] = {}
         for exchange in normalized_exchanges:
             rows = await self.db_ops.get_active_instruments(
                 exchange, instrument_types=["stock"], tradable_only=False
             )
-            active_ids.extend(
+            active_ids_by_exchange[exchange] = sorted({
                 str(row.get("instrument_id") or "").strip()
                 for row in rows
                 if row.get("instrument_id")
                 and (not requested_ids or row.get("instrument_id") in requested_ids)
-            )
-        active_ids = sorted(set(active_ids))
+            })
+        active_ids = sorted({
+            instrument_id
+            for values in active_ids_by_exchange.values()
+            for instrument_id in values
+        })
         if requested_ids:
             missing_ids = sorted(requested_ids - set(active_ids))
             if missing_ids:
@@ -18029,18 +18081,50 @@ class DataManager:
                 "error": "active A-share stock universe is empty",
             }
 
-        cninfo_result = await self.backfill_a_share_cninfo_corporate_actions(
-            start_date=normalized_start,
-            end_date=normalized_end,
-            exchanges=normalized_exchanges,
-            instrument_ids=active_ids,
-            dry_run=False,
-            resume=False,
-            chunk_size=50,
-            request_interval_seconds=request_interval_seconds,
-            per_instrument_timeout_sec=per_instrument_timeout_sec,
-            active_only=True,
-        )
+        cninfo_exchanges = [
+            exchange
+            for exchange in normalized_exchanges
+            if exchange in CNINFO_SUPPORTED_EXCHANGES
+        ]
+        cninfo_excluded_exchanges = [
+            exchange
+            for exchange in normalized_exchanges
+            if exchange not in CNINFO_SUPPORTED_EXCHANGES
+        ]
+        cninfo_active_ids = sorted({
+            instrument_id
+            for exchange in cninfo_exchanges
+            for instrument_id in active_ids_by_exchange.get(exchange, [])
+        })
+        if cninfo_active_ids:
+            cninfo_result = await self.backfill_a_share_cninfo_corporate_actions(
+                start_date=normalized_start,
+                end_date=normalized_end,
+                exchanges=cninfo_exchanges,
+                instrument_ids=cninfo_active_ids,
+                dry_run=False,
+                resume=False,
+                chunk_size=50,
+                request_interval_seconds=request_interval_seconds,
+                per_instrument_timeout_sec=per_instrument_timeout_sec,
+                active_only=True,
+            )
+        else:
+            cninfo_result = {
+                "status": "skipped",
+                "operation": "a_share_cninfo_corporate_action_backfill",
+                "production_isolation": True,
+                "reason": "no_instruments_in_supported_exchanges",
+            }
+        cninfo_result["source_coverage"] = {
+            "supported_exchanges": sorted(CNINFO_SUPPORTED_EXCHANGES),
+            "requested_exchanges": normalized_exchanges,
+            "refreshed_exchanges": cninfo_exchanges,
+            "excluded_exchanges": cninfo_excluded_exchanges,
+            "excluded_reason": (
+                "source_not_supported" if cninfo_excluded_exchanges else None
+            ),
+        }
         tdx_result = await self.backfill_tdx_xdxr_history(
             exchanges=normalized_exchanges,
             start_date=normalized_start,
@@ -18073,6 +18157,9 @@ class DataManager:
                 "start_date": normalized_start.isoformat(),
                 "end_date": normalized_end.isoformat(),
                 "exchanges": normalized_exchanges,
+                "cninfo_exchanges": cninfo_exchanges,
+                "cninfo_excluded_exchanges": cninfo_excluded_exchanges,
+                "tdx_exchanges": normalized_exchanges,
                 "instrument_ids": active_ids,
                 "rolling_days": int(rolling_days),
             },
@@ -18230,6 +18317,388 @@ class DataManager:
             'instruments_requested': len(instrument_ids),
             'instruments_scanned': scanned,
             'errors': errors,
+        }
+
+    async def discover_cninfo_special_action_effective_dates(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        dry_run: bool = True,
+        max_events: int = 500,
+        target_offset: int = 0,
+        window_before_days: int = 10,
+        window_after_days: int = 30,
+        max_window_days: int = 180,
+        page_size: int = 30,
+        max_pages: int = 5,
+        request_interval_seconds: float = 0.5,
+        per_event_timeout_sec: int = 60,
+        sample_limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Discover candidate official documents for unresolved special actions."""
+        from data_sources.cninfo_corporate_actions import CNINFO_SUPPORTED_EXCHANGES
+        from data_sources.cninfo_special_action_resolution import (
+            announcement_match_reasons,
+            build_candidate_evidence,
+            build_search_target,
+            parse_date,
+        )
+        from research.providers.cninfo_announcements import (
+            CninfoAnnouncementScanConfig,
+            CninfoAnnouncementScanner,
+        )
+        from utils.a_share_historical_backfill import (
+            coerce_date,
+            normalize_string_list,
+        )
+
+        normalized_start = coerce_date(start_date, field_name="start_date")
+        normalized_end = coerce_date(end_date, field_name="end_date")
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        normalized_exchanges = [
+            value.upper() for value in normalize_string_list(exchanges)
+        ] or ["SSE", "SZSE"]
+        unsupported = sorted(
+            set(normalized_exchanges) - {"SSE", "SZSE", "BSE"}
+        )
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        scan_exchanges = [
+            value
+            for value in normalized_exchanges
+            if value in CNINFO_SUPPORTED_EXCHANGES
+        ]
+        excluded_exchanges = [
+            value
+            for value in normalized_exchanges
+            if value not in CNINFO_SUPPORTED_EXCHANGES
+        ]
+        requested_ids = sorted(set(normalize_string_list(instrument_ids)))
+        suffixes = {
+            "SSE": ".SH",
+            "SZSE": ".SZ",
+        }
+        params: Dict[str, Any] = {}
+        exchange_filters = []
+        for index, exchange in enumerate(scan_exchanges):
+            key = f"exchange_suffix_{index}"
+            params[key] = f"%{suffixes[exchange]}"
+            exchange_filters.append(f"instrument_id LIKE :{key}")
+        if not exchange_filters:
+            rows: List[Dict[str, Any]] = []
+        else:
+            instrument_filter = ""
+            if requested_ids:
+                placeholders = []
+                for index, instrument_id in enumerate(requested_ids):
+                    key = f"instrument_{index}"
+                    params[key] = instrument_id
+                    placeholders.append(f":{key}")
+                instrument_filter = (
+                    f" AND instrument_id IN ({', '.join(placeholders)})"
+                )
+            rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, source_profile, source_event_key,
+                       action_type, fiscal_period, announcement_date,
+                       record_date, ex_date, pay_date, share_arrival_date,
+                       cash_dividend_per_share, bonus_shares_per_share,
+                       capitalization_shares_per_share,
+                       rights_shares_per_share, rights_price, description,
+                       event_status, quality_status, raw_payload_json
+                FROM corporate_action_observations
+                WHERE source = 'cninfo'
+                  AND source_profile = 'cninfo_dividend'
+                  AND is_current = 1
+                  AND ex_date IS NULL
+                  AND quality_status = 'partial_missing_ex_date'
+                  AND ({' OR '.join(exchange_filters)})
+                  {instrument_filter}
+                ORDER BY instrument_id, announcement_date, record_date,
+                         source_event_key
+                """,
+                params,
+            )
+
+        event_dates_by_instrument: Dict[str, List[date]] = defaultdict(list)
+        row_instrument_ids = sorted({
+            str(row.get("instrument_id") or "").strip()
+            for row in rows
+            if row.get("instrument_id")
+        })
+        for offset in range(0, len(row_instrument_ids), 400):
+            chunk = row_instrument_ids[offset: offset + 400]
+            adjacent_params = {
+                f"adjacent_{index}": instrument_id
+                for index, instrument_id in enumerate(chunk)
+            }
+            placeholders = ", ".join(
+                f":adjacent_{index}" for index in range(len(chunk))
+            )
+            adjacent_rows = await self.db_ops.execute_read_query(
+                f"""
+                SELECT instrument_id, ex_date, announcement_date, record_date,
+                       share_arrival_date
+                FROM corporate_action_observations
+                WHERE source = 'cninfo'
+                  AND is_current = 1
+                  AND instrument_id IN ({placeholders})
+                """,
+                adjacent_params,
+            )
+            for item in adjacent_rows:
+                instrument_id = str(item.get("instrument_id") or "").strip()
+                for field_name in (
+                    "ex_date",
+                    "announcement_date",
+                    "record_date",
+                    "share_arrival_date",
+                ):
+                    parsed = parse_date(item.get(field_name))
+                    if instrument_id and parsed is not None:
+                        event_dates_by_instrument[instrument_id].append(parsed)
+
+        targets = []
+        skipped_outside_range = 0
+        skipped_without_bounded_anchor = 0
+        for row in rows:
+            instrument_id = str(row.get("instrument_id") or "").strip()
+            structured_anchors = [
+                parsed
+                for field_name in (
+                    "announcement_date",
+                    "record_date",
+                    "share_arrival_date",
+                )
+                if (parsed := parse_date(row.get(field_name))) is not None
+            ]
+            if structured_anchors and (
+                max(structured_anchors) < normalized_start
+                or min(structured_anchors) > normalized_end
+            ):
+                skipped_outside_range += 1
+                continue
+            adjacent_dates: List[date] = []
+            if not structured_anchors:
+                fiscal_match = re.search(
+                    r"(19|20)\d{2}", str(row.get("fiscal_period") or "")
+                )
+                if fiscal_match:
+                    pivot = date(int(fiscal_match.group(0)), 12, 31)
+                    dates = sorted(set(event_dates_by_instrument[instrument_id]))
+                    previous = [value for value in dates if value < pivot]
+                    following = [value for value in dates if value > pivot]
+                    if previous and following:
+                        adjacent_dates = [previous[-1], following[0]]
+            target = build_search_target(
+                row,
+                adjacent_dates=adjacent_dates,
+                window_before_days=window_before_days,
+                window_after_days=window_after_days,
+                max_window_days=max_window_days,
+            )
+            if target is None:
+                skipped_without_bounded_anchor += 1
+                continue
+            if (
+                target.end_date < normalized_start
+                or target.start_date > normalized_end
+            ):
+                skipped_outside_range += 1
+                continue
+            targets.append(target)
+
+        total_searchable_events = len(targets)
+        target_limit = min(5000, max(1, int(max_events)))
+        normalized_target_offset = max(0, int(target_offset))
+        batch_end_offset = min(
+            total_searchable_events,
+            normalized_target_offset + target_limit,
+        )
+        targets = targets[normalized_target_offset:batch_end_offset]
+        has_more_targets = batch_end_offset < total_searchable_events
+        bounded_request_timeout = max(
+            1.0,
+            min(20.0, float(per_event_timeout_sec) / 3.0),
+        )
+        effective_request_interval = max(0.2, float(request_interval_seconds))
+        scanner = CninfoAnnouncementScanner(
+            request_timeout_seconds=bounded_request_timeout,
+            request_interval_seconds=effective_request_interval,
+        )
+        exchange_config = {
+            "SSE": {"column": "sse", "plate": "sh"},
+            "SZSE": {"column": "szse", "plate": "sz"},
+        }
+        identity_cache: Dict[str, Optional[Dict[str, str]]] = {}
+        evidence_rows: List[Dict[str, Any]] = []
+        target_results: List[Dict[str, Any]] = []
+        errors: List[Dict[str, str]] = []
+        for index, target in enumerate(targets, start=1):
+            symbol = target.instrument_id.split(".")[0].zfill(6)
+            exchange = "SSE" if target.instrument_id.endswith(".SH") else "SZSE"
+            config = exchange_config[exchange]
+            try:
+                if symbol not in identity_cache:
+                    identity_cache[symbol] = await asyncio.to_thread(
+                        scanner.resolve_stock_identity,
+                        symbol,
+                    )
+                identity = identity_cache[symbol]
+                if not identity:
+                    raise RuntimeError("cninfo_stock_identity_unavailable")
+                scan_result = await asyncio.to_thread(
+                    scanner.scan,
+                    CninfoAnnouncementScanConfig(
+                        purpose_key="a_share_cninfo_special_action_discovery",
+                        market=exchange,
+                        column=config["column"],
+                        plate=config["plate"],
+                        stock=identity["stock"],
+                        org_id=identity["org_id"],
+                        start_date=target.start_date.isoformat(),
+                        end_date=target.end_date.isoformat(),
+                        page_size=min(50, max(1, int(page_size))),
+                        max_pages=min(20, max(1, int(max_pages))),
+                    ),
+                    filters=[
+                        lambda record, current=target: announcement_match_reasons(
+                            current, record.title
+                        )
+                    ],
+                )
+                candidates = build_candidate_evidence(
+                    target, scan_result.selected_records
+                )
+                evidence_rows.extend(candidates)
+                target_results.append({
+                    "instrument_id": target.instrument_id,
+                    "source_event_key": target.source_event_key,
+                    "event_class": target.event_class,
+                    "search_start_date": target.start_date.isoformat(),
+                    "search_end_date": target.end_date.isoformat(),
+                    "search_basis": target.search_basis,
+                    "announcements_seen": scan_result.announcements_seen,
+                    "candidate_count": len(candidates),
+                    "errors": list(scan_result.errors),
+                })
+                for error in scan_result.errors:
+                    errors.append({
+                        "instrument_id": target.instrument_id,
+                        "source_event_key": target.source_event_key,
+                        "error": error,
+                    })
+            except Exception as exc:
+                errors.append({
+                    "instrument_id": target.instrument_id,
+                    "source_event_key": target.source_event_key,
+                    "error": str(exc),
+                })
+            if index == 1 or index % 10 == 0 or index == len(targets):
+                dm_logger.info(
+                    "[DataManager] CNInfo special-action discovery: %d/%d "
+                    "candidates=%d errors=%d",
+                    index,
+                    len(targets),
+                    len(evidence_rows),
+                    len(errors),
+                )
+            if index < len(targets):
+                await asyncio.sleep(effective_request_interval)
+
+        identity = hashlib.sha256(json.dumps({
+            "start_date": normalized_start.isoformat(),
+            "end_date": normalized_end.isoformat(),
+            "exchanges": scan_exchanges,
+            "instrument_ids": requested_ids,
+            "target_offset": normalized_target_offset,
+            "target_keys": [target.source_event_key for target in targets],
+        }, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+        run_id = f"a_share_cninfo_special_action_{identity}"
+        write_result = {
+            "inserted": 0,
+            "changed": 0,
+            "unchanged": 0,
+            "failed": 0,
+        }
+        if not dry_run:
+            write_result = (
+                await self.db_ops.save_corporate_action_effective_date_evidence(
+                    evidence_rows,
+                    ingestion_run_id=run_id,
+                )
+            )
+        status = (
+            "partial"
+            if (
+                errors
+                or int(write_result.get("failed", 0) or 0) > 0
+                or (has_more_targets and not dry_run)
+            )
+            else "dry_run" if dry_run else "success"
+        )
+        batch_failed = bool(
+            errors or int(write_result.get("failed", 0) or 0) > 0
+        )
+        return {
+            "status": status,
+            "operation": "a_share_cninfo_special_action_discovery",
+            "dry_run": bool(dry_run),
+            "production_isolation": True,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "requested_exchanges": normalized_exchanges,
+                "scanned_exchanges": scan_exchanges,
+                "excluded_exchanges": excluded_exchanges,
+                "excluded_reason": (
+                    "source_not_supported" if excluded_exchanges else None
+                ),
+                "instrument_ids": requested_ids,
+                "max_events": target_limit,
+                "target_offset": normalized_target_offset,
+                "window_before_days": int(window_before_days),
+                "window_after_days": int(window_after_days),
+                "max_window_days": int(max_window_days),
+                "request_interval_seconds": effective_request_interval,
+                "request_timeout_seconds": bounded_request_timeout,
+            },
+            "targets": {
+                "candidate_rows_loaded": len(rows),
+                "searchable_events": total_searchable_events,
+                "batch_events": len(targets),
+                "target_offset": normalized_target_offset,
+                "batch_end_offset": batch_end_offset,
+                "has_more": has_more_targets,
+                "next_target_offset": (
+                    batch_end_offset
+                    if has_more_targets and not batch_failed
+                    else None
+                ),
+                "retry_target_offset": (
+                    normalized_target_offset if batch_failed else None
+                ),
+                "skipped_outside_range": skipped_outside_range,
+                "skipped_without_bounded_anchor": skipped_without_bounded_anchor,
+                "events_with_candidates": sum(
+                    1 for item in target_results if item["candidate_count"] > 0
+                ),
+                "events_without_candidates": sum(
+                    1 for item in target_results if item["candidate_count"] == 0
+                ),
+            },
+            "evidence": {
+                "candidate_count": len(evidence_rows),
+                "resolved_count": 0,
+                "write_result": write_result,
+            },
+            "target_samples": target_results[:max(0, int(sample_limit))],
+            "errors": errors[:max(0, int(sample_limit))],
+            "ingestion_run_id": run_id,
         }
 
     async def validate_a_share_corporate_actions(

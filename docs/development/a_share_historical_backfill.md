@@ -174,37 +174,59 @@ GET /api/v1/corporate-actions/xdxr?instrument_id=000001.SZ&start_date=2007-01-01
 ```text
 corporate_action_observations
 corporate_action_instrument_status
+corporate_action_effective_date_evidence
 ```
 
 它们不参与当前 `adjustment_factors`、`adjustment_factors_tdx` 或 canonical 生产读取。
 
-CNInfo 与 TDX 始终保持独立来源事实：`source=cninfo` 的观测只允许保存 CNInfo 返回或由其实施描述确定性解析出的字段。TDX 可用于后续对账，但不得写入 CNInfo 观测、伪装为 CNInfo 补录，也不得改变 CNInfo 的 `partial_missing_fields` 或 `indeterminate` 结论。北交所结构化接口缺少除权日时，现阶段保留为 CNInfo 来源局限。
+CNInfo 与 TDX 始终保持独立来源事实：`source=cninfo` 的观测只允许保存 CNInfo 返回或由其实施描述确定性解析出的字段。TDX 可用于后续对账，但不得写入 CNInfo 观测、伪装为 CNInfo 补录，也不得改变 CNInfo 的 `partial_missing_fields` 或 `indeterminate` 结论。CNInfo 定时日更只覆盖沪深，北交所明确标记为 `source_not_supported`；TDX 的沪深北日更继续运行，历史 CNInfo 北交所观测保留审计但不再补齐。
 
 首次运行前先做定向预演：
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE instrument_ids=600000.SH,000001.SZ,920833.BJ,000003.SZ scopes=dividends,allotments chunk_size=4 request_interval_seconds=1.0 resume=false dry_run
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ,000003.SZ scopes=dividends,allotments chunk_size=3 request_interval_seconds=1.0 resume=false dry_run
 ```
 
 确认规划后进行定向写入：
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE instrument_ids=600000.SH,000001.SZ,920833.BJ,000003.SZ scopes=dividends,allotments chunk_size=4 request_interval_seconds=1.0 resume=false write
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE instrument_ids=600000.SH,000001.SZ,000003.SZ scopes=dividends,allotments chunk_size=3 request_interval_seconds=1.0 resume=false write
 ```
 
 全市场任务必须保持单请求流并启用 checkpoint。先完成结构化基线，不要求逐股票公告分析：
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-17 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true write
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true write
 ```
 
 2026-07-18 全市场首轮回补完成后，如需使用已生成的 checkpoint 重试剩余 `indeterminate` 股票，必须保持原参数完全一致：
 
 ```text
-/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE,BSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
+/run a_share_cninfo_corporate_action_backfill start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE scopes=dividends,allotments chunk_size=50 request_interval_seconds=1.0 resume=true dry_run=false
 ```
 
 不要修改日期、交易所、scopes、chunk 大小或请求间隔；任一参数变化都会生成不同的 checkpoint 身份，无法只续跑原任务剩余股票。
+
+全量结构化回补完成后，对缺少 `ex_date` 但具有实际经济内容的沪深事件执行公告候选发现。
+先用少量股票预演；此处 dry-run 会发送受限、串行、按事件窗口约束的巨潮公告请求：
+
+```text
+/run a_share_cninfo_special_action_discovery start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE instrument_ids=600108.SH max_events=10 target_offset=0 window_before_days=10 window_after_days=30 max_window_days=180 request_interval_seconds=0.5 dry_run=true
+```
+
+确认候选标题和窗口合理后落库：
+
+```text
+/run a_share_cninfo_special_action_discovery start_date=1990-12-19 end_date=2026-07-18 exchanges=SSE,SZSE max_events=500 target_offset=0 window_before_days=10 window_after_days=30 max_window_days=180 request_interval_seconds=0.5 dry_run=false
+```
+
+全市场目标超过单批上限时，任务返回 `partial` 和 `targets.next_target_offset`；使用该值作为
+下一次 `target_offset` 继续，直至 `targets.has_more=false`。发生请求或写入错误时优先使用
+`targets.retry_target_offset` 重试当前批次，不要直接跳到下一批。
+
+候选公告仅标记 `resolution_status=candidate`。系统不会根据标题、下一交易日、TDX 日期或
+价格跳变自动填写生效日期。只有明确的官方正文或人工复核证据写为 `resolved` 后，因子重建
+才会使用该日期；`corporate_action_observations.ex_date` 不被覆盖。
 
 全量事件完成后，默认运行独立路径和 benchmark，不创建 canonical 候选：
 
@@ -225,16 +247,17 @@ CNInfo 与 TDX 始终保持独立来源事实：`source=cninfo` 的观测只允�
 ```text
 GET /api/v1/corporate-actions/official-observations?instrument_id=000001.SZ&source_profile=cninfo_dividend&limit=100&offset=0
 GET /api/v1/corporate-actions/official-coverage?coverage_status=partial_missing_fields&limit=100&offset=0
+GET /api/v1/corporate-actions/effective-date-evidence?instrument_id=600108.SH&resolution_status=candidate&limit=100&offset=0
 ```
 
 官方观测接口默认只返回当前有效记录。审计已从完整快照中消失的历史记录时，增加 `include_inactive=true`。
 
 当前已知边界：
 
-- 巨潮结构化分红不能单独覆盖股权分置改革对价等特殊事件。
+- 巨潮结构化分红中的股权分置、重整转增等记录可能缺少生效日期，需要独立公告证据。
 - 部分早期退市股票的分红接口返回畸形空结构，需要公告恢复，不能标记为 `complete_no_events`。
-- 北交所可能返回实施描述但缺少登记日、除权日和派息日。
-- 本阶段只建立官方原始证据和覆盖状态；公告正文解析、canonical 公司行动和独立复权因子计算属于后续阶段。
+- 北交所不进入 CNInfo 定时日更，也不使用 TDX 回填 CNInfo 表；TDX 独立表继续覆盖北交所。
+- 当前公告任务只发现候选元数据，不自动解析任意 PDF 正文；未 resolved 的事件继续阻断对应 CNInfo 累积因子路径。
 
 ## 对现有业务的影响
 

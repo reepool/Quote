@@ -19,6 +19,7 @@ from requests import exceptions as requests_exceptions
 CNINFO_SOURCE = "cninfo"
 DIVIDEND_PROFILE = "cninfo_dividend"
 ALLOTMENT_PROFILE = "cninfo_allotment"
+CNINFO_SUPPORTED_EXCHANGES = frozenset({"SSE", "SZSE"})
 ECONOMIC_VALUE_PRECISION = 10
 DEFAULT_LOADER_ATTEMPTS = 3
 DEFAULT_RETRY_BACKOFF_SECONDS = 1.0
@@ -142,6 +143,7 @@ class CninfoEndpointResult:
     coverage_status: str
     observations: List[Dict[str, Any]]
     rows_received: int = 0
+    ignored_placeholders: int = 0
     error: Optional[str] = None
 
 
@@ -266,10 +268,18 @@ def _date_in_range(
     start_date: date,
     end_date: date,
 ) -> bool:
-    candidate = observation.get("ex_date") or observation.get("announcement_date")
-    parsed = _date(candidate)
-    if parsed is not None:
-        return start_date <= parsed <= end_date
+    anchors = [
+        parsed
+        for field_name in (
+            "ex_date",
+            "announcement_date",
+            "record_date",
+            "share_arrival_date",
+        )
+        if (parsed := _date(observation.get(field_name))) is not None
+    ]
+    if anchors:
+        return any(start_date <= parsed <= end_date for parsed in anchors)
     fiscal_period = _clean_text(observation.get("fiscal_period")) or ""
     year_match = re.search(r"(19|20)\d{2}", fiscal_period)
     return bool(
@@ -278,10 +288,39 @@ def _date_in_range(
 
 
 def _has_temporal_anchor(observation: Mapping[str, Any]) -> bool:
-    if _date(observation.get("ex_date") or observation.get("announcement_date")):
+    if any(
+        _date(observation.get(field_name)) is not None
+        for field_name in (
+            "ex_date",
+            "announcement_date",
+            "record_date",
+            "share_arrival_date",
+        )
+    ):
         return True
     fiscal_period = _clean_text(observation.get("fiscal_period")) or ""
     return re.search(r"(19|20)\d{2}", fiscal_period) is not None
+
+
+def _is_dividend_placeholder(raw: Mapping[str, Any]) -> bool:
+    temporal = {
+        "ex_date": raw.get("除权日"),
+        "announcement_date": raw.get("实施方案公告日期"),
+        "record_date": raw.get("股权登记日"),
+        "share_arrival_date": raw.get("股份到账日"),
+        "fiscal_period": raw.get("报告时间"),
+    }
+    if _has_temporal_anchor(temporal):
+        return False
+    if any(
+        (_number(raw.get(field_name)) or 0.0) > 0
+        for field_name in ("派息比例", "送股比例", "转增比例")
+    ):
+        return False
+    return not any(
+        _clean_text(raw.get(field_name))
+        for field_name in ("实施方案分红说明", "分红类型")
+    )
 
 
 def normalize_cninfo_dividend_rows(
@@ -314,6 +353,7 @@ def normalize_cninfo_dividend_rows(
         record_date = _date(raw.get("股权登记日"))
         ex_date = _date(raw.get("除权日"))
         pay_date = _date(raw.get("派息日"))
+        share_arrival_date = _date(raw.get("股份到账日"))
         fiscal_period = _clean_text(raw.get("报告时间"))
         distribution_type = _clean_text(raw.get("分红类型"))
         action_type = _action_type(
@@ -341,6 +381,16 @@ def normalize_cninfo_dividend_rows(
                 f"ex:{ex_date.isoformat()}:"
                 f"period:{fiscal_period or ''}:type:{distribution_type or ''}"
             )
+        elif record_date:
+            business_anchor = (
+                f"record:{record_date.isoformat()}:"
+                f"period:{fiscal_period or ''}:type:{distribution_type or ''}"
+            )
+        elif share_arrival_date:
+            business_anchor = (
+                f"arrival:{share_arrival_date.isoformat()}:"
+                f"period:{fiscal_period or ''}:type:{distribution_type or ''}"
+            )
         else:
             business_anchor = (
                 f"period:{fiscal_period or ''}:type:{distribution_type or ''}:"
@@ -359,7 +409,7 @@ def normalize_cninfo_dividend_rows(
             "record_date": record_date,
             "ex_date": ex_date,
             "pay_date": pay_date,
-            "share_arrival_date": _date(raw.get("股份到账日")),
+            "share_arrival_date": share_arrival_date,
             **values,
             "rights_shares_per_share": None,
             "rights_price": None,
@@ -562,13 +612,22 @@ class CninfoCorporateActionProvider:
                 DIVIDEND_PROFILE,
             )
             raw_rows = frame.to_dict(orient="records")
+            ignored_placeholder_count = 0
+            candidate_rows = []
+            for raw in raw_rows:
+                if _is_dividend_placeholder(raw):
+                    ignored_placeholder_count += 1
+                else:
+                    candidate_rows.append(raw)
             anchored_rows = [
                 raw
-                for raw in raw_rows
+                for raw in candidate_rows
                 if _has_temporal_anchor(
                     {
                         "ex_date": raw.get("除权日"),
                         "announcement_date": raw.get("实施方案公告日期"),
+                        "record_date": raw.get("股权登记日"),
+                        "share_arrival_date": raw.get("股份到账日"),
                         "fiscal_period": raw.get("报告时间"),
                     }
                 )
@@ -579,15 +638,16 @@ class CninfoCorporateActionProvider:
                 start_date=start_date,
                 end_date=end_date,
             )
-            if len(anchored_rows) != len(raw_rows):
+            if len(anchored_rows) != len(candidate_rows):
                 return CninfoEndpointResult(
                     source_profile=DIVIDEND_PROFILE,
                     coverage_status="indeterminate",
                     observations=observations,
                     rows_received=len(raw_rows),
+                    ignored_placeholders=ignored_placeholder_count,
                     error=(
                         "CNInfo dividend response contains "
-                        f"{len(raw_rows) - len(anchored_rows)} rows without a temporal anchor"
+                        f"{len(candidate_rows) - len(anchored_rows)} rows without a temporal anchor"
                     ),
                 )
             return CninfoEndpointResult(
@@ -595,6 +655,7 @@ class CninfoCorporateActionProvider:
                 coverage_status=self._coverage_status(observations),
                 observations=observations,
                 rows_received=len(raw_rows),
+                ignored_placeholders=ignored_placeholder_count,
             )
         except Exception as exc:
             if _loader_confirmed_empty(self.dividend_loader):

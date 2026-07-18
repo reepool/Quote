@@ -161,6 +161,7 @@ class DatabaseManager:
     def _ensure_corporate_action_governance_schema(self) -> None:
         """Create additive official corporate-action tables on existing DBs."""
         from .models import (
+            CorporateActionEffectiveDateEvidenceDB,
             CorporateActionInstrumentStatusDB,
             CorporateActionObservationDB,
         )
@@ -168,6 +169,7 @@ class DatabaseManager:
         tables = (
             CorporateActionObservationDB.__table__,
             CorporateActionInstrumentStatusDB.__table__,
+            CorporateActionEffectiveDateEvidenceDB.__table__,
         )
         with self.sync_engine.begin() as connection:
             for table in tables:
