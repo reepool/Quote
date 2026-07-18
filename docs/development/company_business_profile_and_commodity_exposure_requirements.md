@@ -356,14 +356,18 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 已在全新 `/tmp` research DB 完成 30 家三阶段回补验收：首轮写入、失败来源
   checkpoint 恢复后，全量重放新增 evidence/segment 均为 0；最终 60 evidence、
   5,554 candidate segments，approved/value-chain/exposure 均为 0；
-- 公告发现、PDF 归档和页级 artifact 继续保留；
+- 公告发现、PDF 归档和页级 artifact 继续保留；已新增材料性 precision 候选
+  驱动的官方报告编排 service/CLI，默认只读发现，显式 operator switch 后才允许
+  按公司和报告期归档，且候选表运行前后差值必须为 0；
 - `601088.SH` bounded live smoke 中两个结构化源均成功，主营构成返回 200 行、覆盖 2018-12-31 至 2025-12-31，并触发 `possible_source_row_cap`；同报告期产品收入比例合计约为 `1`，已按小数比例口径实现；
 - 先前从 `/tmp` 六份 PDF 目录导出的 1 条材料性精确别名只能作为工具诊断，因未
-  绑定官方 manifest，不能计入 promotion evidence。当前生产 `financials.db`
-  合格业务画像官方 manifest 为 0，生产 `research.db` 产品 candidate 也为 0。
+  绑定官方 manifest，不能计入 promotion evidence。`2026-07-18` 已完成首个
+  生产归档试点：`000717.SZ` 的 2025 年完整年报已写入配置化目录并登记
+  `financial_source_files`，文件 SHA-256、父子 ingestion lineage 和 checkpoint
+  清理均验证通过；生产 `research.db` 产品 candidate 仍为 0。
   保留的 30 家隔离回补库有 51 条材料性唯一映射候选，覆盖 5 家公司、51 个
-  公司/报告期，距离 381 条还差 330 条；候选层缺有色和建材，正式报告绑定层
-  六行业均未覆盖。因此 `6.3` 仍为
+  公司/报告期，距离 381 条还差 330 条；候选层缺有色和建材。限定 2025 年的
+  严格候选当前为 2 行，其中 1 行已绑定正式报告，仍无法形成统计样本。因此 `6.3` 仍为
   `not_ready`。免费结构化源
   scheduler 已接线但保持关闭；足量正式报告 99% precision 核对、单行业生产
   candidate pilot、全市场回补和生产 DCF 数据覆盖尚未完成。

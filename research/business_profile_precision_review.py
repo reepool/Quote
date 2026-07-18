@@ -27,6 +27,34 @@ OFFICIAL_DOCUMENT_STATUSES = {"archived", "archived_unchanged_content"}
 OFFICIAL_SOURCE_TIERS = {"official_primary", "official_backup"}
 
 
+def load_product_label_review_rows(
+    *,
+    research_db: Path,
+    instrument_ids: Optional[Sequence[str]] = None,
+    report_period: Optional[str] = None,
+    minimum_revenue_share: float = 0.01,
+) -> List[Dict[str, Any]]:
+    """Load material, uniquely mapped, de-duplicated product review rows."""
+    if not research_db.exists():
+        raise FileNotFoundError(research_db)
+    if minimum_revenue_share < 0 or minimum_revenue_share > 1:
+        raise ValueError("minimum_revenue_share must be between 0 and 1")
+    normalized_instruments = sorted(
+        {str(item).strip() for item in (instrument_ids or ()) if str(item).strip()}
+    )
+    if not normalized_instruments:
+        normalized_instruments = _load_candidate_instrument_ids(
+            research_db,
+            report_period=report_period,
+        )
+    return _load_exact_product_rows(
+        research_db,
+        instrument_ids=normalized_instruments,
+        report_period=report_period,
+        minimum_revenue_share=minimum_revenue_share,
+    )
+
+
 def audit_product_label_review_readiness(
     *,
     research_db: Path,
@@ -55,16 +83,12 @@ def audit_product_label_review_readiness(
             if str(item).strip()
         )
     )
-    instrument_ids = _load_candidate_instrument_ids(
-        research_db,
-        report_period=report_period,
-    )
-    rows = _load_exact_product_rows(
-        research_db,
-        instrument_ids=instrument_ids,
+    rows = load_product_label_review_rows(
+        research_db=research_db,
         report_period=report_period,
         minimum_revenue_share=minimum_revenue_share,
     )
+    instrument_ids = sorted({str(item["instrument_id"]) for item in rows})
     instrument_periods = {
         (str(item["instrument_id"]), str(item["report_period"])) for item in rows
     }
@@ -183,17 +207,14 @@ def build_product_label_review_package(
     normalized_instruments = sorted(
         {str(item).strip() for item in (instrument_ids or ()) if str(item).strip()}
     )
-    if not normalized_instruments:
-        normalized_instruments = _load_candidate_instrument_ids(
-            research_db,
-            report_period=report_period,
-        )
-    rows = _load_exact_product_rows(
-        research_db,
+    rows = load_product_label_review_rows(
+        research_db=research_db,
         instrument_ids=normalized_instruments,
         report_period=report_period,
         minimum_revenue_share=minimum_revenue_share,
     )
+    if not normalized_instruments:
+        normalized_instruments = sorted({str(item["instrument_id"]) for item in rows})
     instrument_periods = {
         (str(item["instrument_id"]), str(item["report_period"])) for item in rows
     }
