@@ -22,10 +22,13 @@ def audit_product_label_resolutions(
     segments: Iterable[Mapping[str, Any]],
     *,
     sample_limit: int = 5,
+    minimum_material_revenue_share: float = 0.01,
 ) -> dict[str, Any]:
     """Summarize unresolved latest candidate product rows without inference."""
     if sample_limit < 1:
         raise ValueError("sample_limit must be positive")
+    if not 0 <= minimum_material_revenue_share <= 1:
+        raise ValueError("minimum_material_revenue_share must be between 0 and 1")
 
     latest = _latest_source_rows(segments)
     issues: dict[tuple[str, str], dict[str, Any]] = {}
@@ -61,6 +64,9 @@ def audit_product_label_resolutions(
                 "issue_type": issue_type,
                 "normalized_alias": normalized_alias,
                 "row_count": 0,
+                "material_row_count": 0,
+                "material_instrument_ids": set(),
+                "max_revenue_share": None,
                 "raw_labels": set(),
                 "instrument_ids": set(),
                 "report_periods": set(),
@@ -73,6 +79,20 @@ def audit_product_label_resolutions(
             },
         )
         issue["row_count"] += 1
+        revenue_share = _optional_fraction(segment.get("revenue_share"))
+        if revenue_share is not None:
+            current_max = issue["max_revenue_share"]
+            issue["max_revenue_share"] = (
+                revenue_share
+                if current_max is None
+                else max(float(current_max), revenue_share)
+            )
+            if revenue_share >= minimum_material_revenue_share:
+                issue["material_row_count"] += 1
+                _add_text(
+                    issue["material_instrument_ids"],
+                    segment.get("instrument_id"),
+                )
         _add_text(issue["raw_labels"], raw_label)
         _add_text(issue["instrument_ids"], segment.get("instrument_id"))
         _add_text(issue["report_periods"], segment.get("report_period"))
@@ -91,8 +111,11 @@ def audit_product_label_resolutions(
     rendered_issues = []
     for issue in issues.values():
         instrument_ids = sorted(issue.pop("instrument_ids"))
+        material_instrument_ids = sorted(issue.pop("material_instrument_ids"))
         issue["instrument_count"] = len(instrument_ids)
+        issue["material_instrument_count"] = len(material_instrument_ids)
         issue["sample_instrument_ids"] = instrument_ids[:sample_limit]
+        issue["sample_material_instrument_ids"] = material_instrument_ids[:sample_limit]
         for key in (
             "raw_labels",
             "report_periods",
@@ -107,6 +130,8 @@ def audit_product_label_resolutions(
         rendered_issues.append(issue)
     rendered_issues.sort(
         key=lambda item: (
+            -int(item["material_row_count"]),
+            -float(item["max_revenue_share"] or 0),
             -int(item["row_count"]),
             str(item["issue_type"]),
             str(item["normalized_alias"]),
@@ -130,6 +155,10 @@ def audit_product_label_resolutions(
         "missing_resolution_product_rows": missing_resolution_rows,
         "unmatched_product_rows": unmatched_rows,
         "ambiguous_product_rows": ambiguous_rows,
+        "minimum_material_revenue_share": minimum_material_revenue_share,
+        "material_issue_rows": sum(
+            int(item["material_row_count"]) for item in rendered_issues
+        ),
         "issue_count": len(rendered_issues),
         "issues": rendered_issues,
     }
@@ -372,6 +401,18 @@ def _add_text(target: set[str], value: Any) -> None:
     text = str(value or "").strip()
     if text:
         target.add(text)
+
+
+def _optional_fraction(value: Any) -> Optional[float]:
+    if value is None or value == "":
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    if numeric < 0 or numeric > 1:
+        return None
+    return numeric
 
 
 def _unique_required(values: Sequence[str], name: str) -> tuple[str, ...]:

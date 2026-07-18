@@ -16,6 +16,7 @@ if str(ROOT_DIR) not in sys.path:
 
 
 from research.business_profile_precision_review import (
+    audit_product_label_review_readiness,
     build_product_label_review_package,
     evaluate_product_label_review,
 )
@@ -32,6 +33,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     export.add_argument("--instrument-id", action="append")
     export.add_argument("--report-period")
     export.add_argument("--minimum-revenue-share", type=float, default=0.01)
+
+    audit = subparsers.add_parser("audit")
+    audit.add_argument("--research-db", type=Path, required=True)
+    audit.add_argument("--financials-db", type=Path, required=True)
+    audit.add_argument("--report-period")
+    audit.add_argument("--minimum-revenue-share", type=float, default=0.01)
+    audit.add_argument(
+        "--minimum-precision-lower-bound",
+        type=float,
+        default=0.99,
+    )
+    audit.add_argument(
+        "--expected-industry-group",
+        action="append",
+        help="Required industry group; defaults to all first-wave industries",
+    )
 
     evaluate = subparsers.add_parser("evaluate")
     evaluate.add_argument("--review-package", type=Path, required=True)
@@ -50,6 +67,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             instrument_ids=args.instrument_id,
             report_period=args.report_period,
             minimum_revenue_share=args.minimum_revenue_share,
+        )
+    elif args.command == "audit":
+        payload = audit_product_label_review_readiness(
+            research_db=args.research_db,
+            financials_db=args.financials_db,
+            report_period=args.report_period,
+            minimum_revenue_share=args.minimum_revenue_share,
+            minimum_precision_lower_bound=args.minimum_precision_lower_bound,
+            expected_industry_groups=args.expected_industry_group,
         )
     else:
         package = json.loads(args.review_package.read_text(encoding="utf-8"))

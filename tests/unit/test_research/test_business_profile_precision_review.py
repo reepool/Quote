@@ -6,6 +6,7 @@ from research.business_profile_governance import BusinessProfileRepository
 from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_precision_review import (
     _stable_hash,
+    audit_product_label_review_readiness,
     build_product_label_review_package,
     evaluate_product_label_review,
     minimum_all_correct_sample_size,
@@ -43,7 +44,13 @@ def _candidate_segment():
     }
 
 
-def _write_official_manifest(storage, pdf_path: Path, *, report_period="2025-12-31"):
+def _write_official_manifest(
+    storage,
+    pdf_path: Path,
+    *,
+    report_period="2025-12-31",
+    report_type="annual_report",
+):
     content = pdf_path.read_bytes()
     return storage.financial_statements.upsert_source_file_manifest(
         FinancialSourceFileManifest(
@@ -54,8 +61,8 @@ def _write_official_manifest(storage, pdf_path: Path, *, report_period="2025-12-
             symbol="601088",
             exchange="SSE",
             report_period=report_period,
-            report_type="annual_report",
-            filing_id=f"annual-{report_period}",
+            report_type=report_type,
+            filing_id=f"{report_type}-{report_period}",
             source_url="https://example.test/official.pdf",
             archive_path=str(pdf_path),
             content_hash=hashlib.sha256(content).hexdigest(),
@@ -123,6 +130,131 @@ def test_review_package_exports_only_material_exact_labels(tmp_path):
     assert reviewed_package["row_count"] == 0
 
 
+def test_readiness_audit_reports_candidate_and_manifest_shortfalls(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    repository.upsert("segments", _candidate_segment())
+
+    missing = audit_product_label_review_readiness(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        expected_industry_groups=[],
+    )
+
+    assert missing["status"] == "not_ready"
+    assert missing["counts"]["eligible_rows"] == 1
+    assert missing["counts"]["required_all_correct_rows"] == 381
+    assert missing["counts"]["eligible_row_shortfall"] == 380
+    assert missing["counts"]["manifest_bound_rows"] == 0
+    assert missing["missing_manifest_instrument_periods"] == ["601088.SH:2025-12-31"]
+    assert missing["industries"]["unknown"]["eligible_rows"] == 1
+    assert set(missing["blockers"]) == {
+        "insufficient_eligible_rows",
+        "insufficient_manifest_bound_rows",
+    }
+
+    pdf_path = tmp_path / "annual.pdf"
+    pdf_path.write_bytes(b"%PDF-official-fixture")
+    _write_official_manifest(storage, pdf_path)
+    covered = audit_product_label_review_readiness(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        expected_industry_groups=[],
+    )
+
+    assert covered["counts"]["manifest_bound_rows"] == 1
+    assert covered["counts"]["manifest_bound_instrument_periods"] == 1
+    assert covered["counts"]["missing_manifest_instrument_periods"] == 0
+    assert set(covered["blockers"]) == {
+        "insufficient_eligible_rows",
+        "insufficient_manifest_bound_rows",
+    }
+
+
+def test_precision_rows_exclude_ambiguous_and_cross_source_duplicates(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    repository.upsert("segments", _candidate_segment())
+
+    duplicate = _candidate_segment()
+    duplicate["record_id"] = "segment-coal-second-source"
+    duplicate["metadata"]["source_name"] = "secondary_structured_source"
+    duplicate["metadata"]["source_row_key"] = "coal-2025-secondary"
+    repository.upsert("segments", duplicate)
+
+    ambiguous = _candidate_segment()
+    ambiguous["record_id"] = "segment-ambiguous"
+    ambiguous["segment_id"] = "ambiguous"
+    ambiguous["segment_name_raw"] = "煤"
+    ambiguous["metadata"]["source_row_key"] = "ambiguous-2025"
+    ambiguous["metadata"]["product_resolution"] = {
+        "product_ids": ["thermal_coal", "coking_coal"],
+        "matched_alias_ids": ["coal-ambiguous"],
+        "diagnostics": ["ambiguous_product_alias"],
+    }
+    repository.upsert("segments", ambiguous)
+
+    pdf_path = tmp_path / "annual.pdf"
+    pdf_path.write_bytes(b"%PDF-official-fixture")
+    _write_official_manifest(storage, pdf_path)
+    package = build_product_label_review_package(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+    )
+    readiness = audit_product_label_review_readiness(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        expected_industry_groups=[],
+    )
+
+    assert package["row_count"] == 1
+    assert package["rows"][0]["candidate_product_ids"] == ["coal"]
+    assert readiness["counts"]["eligible_rows"] == 1
+    assert readiness["counts"]["manifest_bound_rows"] == 1
+
+
+def test_industry_coverage_requires_periodic_report_manifest(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    segment = _candidate_segment()
+    segment["metadata"]["industry_group"] = "coal"
+    repository.upsert("segments", segment)
+
+    event_pdf = tmp_path / "operating-data.pdf"
+    event_pdf.write_bytes(b"%PDF-operating-data")
+    _write_official_manifest(
+        storage,
+        event_pdf,
+        report_type="operating_data",
+    )
+    without_periodic_report = audit_product_label_review_readiness(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        expected_industry_groups=["coal"],
+    )
+
+    assert without_periodic_report["counts"]["manifest_bound_rows"] == 0
+    assert without_periodic_report["document_bound_industry_groups"] == []
+    assert without_periodic_report["missing_required_industry_groups"] == ["coal"]
+    assert "missing_required_industry_coverage" in without_periodic_report["blockers"]
+
+    annual_pdf = tmp_path / "annual.pdf"
+    annual_pdf.write_bytes(b"%PDF-annual")
+    _write_official_manifest(storage, annual_pdf)
+    with_periodic_report = audit_product_label_review_readiness(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        expected_industry_groups=["coal"],
+    )
+
+    assert with_periodic_report["counts"]["manifest_bound_rows"] == 1
+    assert with_periodic_report["document_bound_industry_groups"] == ["coal"]
+    assert with_periodic_report["missing_required_industry_groups"] == []
+
+
 def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_path):
     storage, research_db = _storage(tmp_path)
     repository = BusinessProfileRepository(storage)
@@ -153,6 +285,33 @@ def test_review_package_rejects_wrong_period_or_hash_mismatched_manifests(tmp_pa
     assert mismatched["official_document_validation_errors"][0]["reason"] == (
         "official_archive_hash_mismatch"
     )
+
+
+def test_review_package_ignores_invalid_manifest_outside_selected_period(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    repository.upsert("segments", _candidate_segment())
+    selected_pdf = tmp_path / "annual-2025.pdf"
+    selected_pdf.write_bytes(b"%PDF-selected")
+    _write_official_manifest(storage, selected_pdf)
+    unrelated_pdf = tmp_path / "annual-2024.pdf"
+    unrelated_pdf.write_bytes(b"%PDF-unrelated")
+    _write_official_manifest(
+        storage,
+        unrelated_pdf,
+        report_period="2024-12-31",
+    )
+    unrelated_pdf.write_bytes(b"%PDF-unrelated-tampered")
+
+    package = build_product_label_review_package(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+        report_period="2025-12-31",
+    )
+
+    assert package["status"] == "ready_for_human_review"
+    assert package["official_document_validation_errors"] == []
 
 
 def test_review_evaluation_is_fail_closed_and_detects_source_tampering(tmp_path):

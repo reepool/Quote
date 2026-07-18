@@ -232,6 +232,31 @@ def test_checkpoint_resume_retries_only_failed_instrument_source(tmp_path):
     ]
 
 
+def test_resume_starts_a_new_checkpoint_when_none_exists(tmp_path):
+    config = _config(tmp_path)
+    storage = ResearchStorageManager(config)
+    checkpoint = tmp_path / "missing.checkpoint.json"
+    service = StructuredBusinessProfileSyncService(
+        storage=storage,
+        research_config=config,
+        provider=_ResumeProvider(),
+    )
+
+    result = asyncio.run(
+        service.sync(
+            universe=_universe(),
+            sources=[COMPOSITION_SOURCE],
+            dry_run=True,
+            checkpoint_path=checkpoint,
+            resume=True,
+        )
+    )
+
+    assert result["status"] == "success"
+    assert checkpoint.is_file()
+    assert result["completed"] is True
+
+
 def test_candidate_write_uses_raw_cache_reference_and_remains_candidate_only(
     tmp_path,
 ):

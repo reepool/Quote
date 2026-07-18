@@ -1163,6 +1163,70 @@ class DataManager:
         )
         return self._attach_instrument_master_governance(result, governance)
 
+    async def run_business_profile_structured_sync(
+        self,
+        *,
+        as_of_date: Optional[str] = None,
+        sources: Optional[List[str]] = None,
+        industry_groups: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        max_instruments: Optional[int] = None,
+        max_elapsed_seconds: Optional[float] = None,
+        candidate_write: bool = True,
+        operator_switch: str = "",
+        checkpoint_path: Optional[str] = None,
+        resume: bool = True,
+    ) -> Dict[str, Any]:
+        """Run the bounded candidate-only structured business-profile sync."""
+        if not self.research_config.enabled:
+            return {
+                "status": "disabled",
+                "reason": "research_config.enabled is false",
+            }
+        if self.research_storage is None:
+            return {
+                "status": "unavailable",
+                "reason": "research storage is not initialized",
+            }
+
+        module = self.research_config.modules.get("business_profile_evidence", {})
+        if module.get("enabled") is not True:
+            return {
+                "status": "disabled",
+                "reason": "research business_profile_evidence module is disabled",
+            }
+        source_config = module.get("free_structured_sources", {})
+        if source_config.get("enabled") is not True:
+            return {
+                "status": "disabled",
+                "reason": "free structured business-profile sync is disabled",
+            }
+
+        from research.business_profile_structured_sync import (
+            StructuredBusinessProfileSyncService,
+        )
+
+        service = StructuredBusinessProfileSyncService(
+            storage=self.research_storage,
+            research_config=self.research_config,
+        )
+        return await service.sync(
+            as_of_date=as_of_date,
+            sources=sources,
+            industry_groups=industry_groups,
+            instrument_ids=instrument_ids,
+            max_instruments=max_instruments,
+            max_elapsed_seconds=max_elapsed_seconds,
+            dry_run=not candidate_write,
+            candidate_write=candidate_write,
+            operator_switch=operator_switch,
+            cache_raw_snapshots=candidate_write,
+            checkpoint_path=(
+                Path(checkpoint_path) if checkpoint_path else None
+            ),
+            resume=resume,
+        )
+
     async def get_research_company_profile(
         self,
         instrument_id: str,

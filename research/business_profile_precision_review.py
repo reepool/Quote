@@ -9,7 +9,12 @@ import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from research.business_profile_corpus import load_business_profile_source_manifests
+from research.business_profile_corpus import (
+    FIRST_WAVE_INDUSTRY_GROUPS,
+    load_business_profile_source_manifests,
+)
+from research.business_profile_documents import business_profile_document_family
+from research.business_profile_product_catalog import normalize_product_alias
 
 DEFAULT_WILSON_Z = 1.959963984540054
 REVIEW_OUTCOMES = {"correct", "incorrect", "excluded"}
@@ -20,6 +25,144 @@ ALLOWED_EXCLUSION_REASON_CODES = {
 }
 OFFICIAL_DOCUMENT_STATUSES = {"archived", "archived_unchanged_content"}
 OFFICIAL_SOURCE_TIERS = {"official_primary", "official_backup"}
+
+
+def audit_product_label_review_readiness(
+    *,
+    research_db: Path,
+    financials_db: Path,
+    report_period: Optional[str] = None,
+    minimum_revenue_share: float = 0.01,
+    minimum_precision_lower_bound: float = 0.99,
+    expected_industry_groups: Optional[Sequence[str]] = None,
+) -> Dict[str, Any]:
+    """Audit whether the local candidate and official-document corpus is reviewable."""
+    if not research_db.exists():
+        raise FileNotFoundError(research_db)
+    if not financials_db.exists():
+        raise FileNotFoundError(financials_db)
+    if minimum_revenue_share < 0 or minimum_revenue_share > 1:
+        raise ValueError("minimum_revenue_share must be between 0 and 1")
+    required_rows = minimum_all_correct_sample_size(minimum_precision_lower_bound)
+    required_industries = tuple(
+        dict.fromkeys(
+            str(item).strip()
+            for item in (
+                FIRST_WAVE_INDUSTRY_GROUPS
+                if expected_industry_groups is None
+                else expected_industry_groups
+            )
+            if str(item).strip()
+        )
+    )
+    instrument_ids = _load_candidate_instrument_ids(
+        research_db,
+        report_period=report_period,
+    )
+    rows = _load_exact_product_rows(
+        research_db,
+        instrument_ids=instrument_ids,
+        report_period=report_period,
+        minimum_revenue_share=minimum_revenue_share,
+    )
+    instrument_periods = {
+        (str(item["instrument_id"]), str(item["report_period"])) for item in rows
+    }
+    documents, document_validation_errors = _load_official_documents(
+        financials_db,
+        instrument_ids=instrument_ids,
+        report_period=report_period,
+        instrument_periods=instrument_periods,
+    )
+    covered_pairs = {pair for pair in instrument_periods if documents.get(pair)}
+    document_bound_rows = sum(
+        (str(item["instrument_id"]), str(item["report_period"])) in covered_pairs
+        for item in rows
+    )
+    industries: Dict[str, Dict[str, Any]] = {}
+    for item in rows:
+        industry_group = str(
+            (item.get("metadata") or {}).get("industry_group") or "unknown"
+        )
+        summary = industries.setdefault(
+            industry_group,
+            {
+                "eligible_rows": 0,
+                "document_bound_rows": 0,
+                "instrument_ids": set(),
+                "instrument_periods": set(),
+            },
+        )
+        pair = (str(item["instrument_id"]), str(item["report_period"]))
+        summary["eligible_rows"] += 1
+        summary["document_bound_rows"] += int(pair in covered_pairs)
+        summary["instrument_ids"].add(str(item["instrument_id"]))
+        summary["instrument_periods"].add(
+            f"{item['instrument_id']}:{item['report_period']}"
+        )
+    normalized_industries = {
+        industry: {
+            "eligible_rows": summary["eligible_rows"],
+            "document_bound_rows": summary["document_bound_rows"],
+            "instrument_count": len(summary["instrument_ids"]),
+            "instrument_period_count": len(summary["instrument_periods"]),
+        }
+        for industry, summary in sorted(industries.items())
+    }
+    document_bound_industries = sorted(
+        industry
+        for industry, summary in normalized_industries.items()
+        if int(summary["document_bound_rows"]) > 0
+    )
+    missing_industries = sorted(
+        set(required_industries) - set(document_bound_industries)
+    )
+    blockers: List[str] = []
+    if len(rows) < required_rows:
+        blockers.append("insufficient_eligible_rows")
+    if document_bound_rows < required_rows:
+        blockers.append("insufficient_manifest_bound_rows")
+    if document_validation_errors:
+        blockers.append("official_document_validation_failed")
+    if missing_industries:
+        blockers.append("missing_required_industry_coverage")
+    return {
+        "schema_version": "business_profile_product_label_readiness.v1",
+        "status": "ready_for_human_review" if not blockers else "not_ready",
+        "research_db": str(research_db),
+        "financials_db": str(financials_db),
+        "scope": {
+            "report_period": report_period,
+            "minimum_revenue_share": minimum_revenue_share,
+            "minimum_precision_lower_bound": minimum_precision_lower_bound,
+            "expected_industry_groups": list(required_industries),
+        },
+        "counts": {
+            "eligible_rows": len(rows),
+            "required_all_correct_rows": required_rows,
+            "eligible_row_shortfall": max(0, required_rows - len(rows)),
+            "candidate_instruments": len({str(item["instrument_id"]) for item in rows}),
+            "candidate_instrument_periods": len(instrument_periods),
+            "manifest_bound_rows": document_bound_rows,
+            "manifest_bound_row_shortfall": max(
+                0,
+                required_rows - document_bound_rows,
+            ),
+            "manifest_bound_instrument_periods": len(covered_pairs),
+            "missing_manifest_instrument_periods": len(
+                instrument_periods - covered_pairs
+            ),
+        },
+        "industries": normalized_industries,
+        "document_bound_industry_groups": document_bound_industries,
+        "missing_required_industry_groups": missing_industries,
+        "missing_manifest_instrument_periods": [
+            f"{instrument_id}:{period}"
+            for instrument_id, period in sorted(instrument_periods - covered_pairs)
+        ],
+        "official_document_validation_errors": document_validation_errors,
+        "blockers": blockers,
+    }
 
 
 def build_product_label_review_package(
@@ -45,16 +188,20 @@ def build_product_label_review_package(
             research_db,
             report_period=report_period,
         )
-    documents, document_validation_errors = _load_official_documents(
-        financials_db,
-        instrument_ids=normalized_instruments,
-        report_period=report_period,
-    )
     rows = _load_exact_product_rows(
         research_db,
         instrument_ids=normalized_instruments,
         report_period=report_period,
         minimum_revenue_share=minimum_revenue_share,
+    )
+    instrument_periods = {
+        (str(item["instrument_id"]), str(item["report_period"])) for item in rows
+    }
+    documents, document_validation_errors = _load_official_documents(
+        financials_db,
+        instrument_ids=normalized_instruments,
+        report_period=report_period,
+        instrument_periods=instrument_periods,
     )
     review_rows: List[Dict[str, Any]] = []
     missing_documents: set[str] = set()
@@ -322,6 +469,7 @@ def _load_official_documents(
     *,
     instrument_ids: Sequence[str],
     report_period: Optional[str],
+    instrument_periods: Optional[set[tuple[str, str]]] = None,
 ) -> tuple[
     Dict[tuple[str, str], List[Dict[str, Any]]],
     List[Dict[str, Any]],
@@ -344,11 +492,20 @@ def _load_official_documents(
         item_period = str(item.get("report_period") or "")
         if report_period and item_period != report_period:
             continue
+        if (
+            instrument_periods is not None
+            and (instrument_id, item_period) not in instrument_periods
+        ):
+            continue
         if source_file_id in superseded_ids:
             continue
         if item.get("source_tier") not in OFFICIAL_SOURCE_TIERS:
             continue
         if item.get("status") not in OFFICIAL_DOCUMENT_STATUSES:
+            continue
+        if business_profile_document_family(
+            str(item.get("report_type") or "")
+        ) not in {"annual_report", "semiannual_report"}:
             continue
         path = Path(str(item.get("archive_path") or ""))
         content_hash = str(item.get("content_hash") or "")
@@ -399,7 +556,7 @@ def _load_candidate_instrument_ids(
         "review_status = 'candidate'",
         "json_array_length("
         "json_extract(metadata_json, '$.product_resolution.product_ids')"
-        ") > 0",
+        ") = 1",
     ]
     params: List[Any] = []
     if report_period:
@@ -458,7 +615,7 @@ def _load_exact_product_rows(
           AND review_status = 'candidate'
           AND json_array_length(
               json_extract(metadata_json, '$.product_resolution.product_ids')
-          ) > 0
+          ) = 1
           AND COALESCE(revenue_share, 0) >= ?
         ORDER BY instrument_id, report_period, segment_name_raw, record_id
     """
@@ -470,6 +627,42 @@ def _load_exact_product_rows(
         row = dict(item)
         row["metadata"] = json.loads(row.pop("metadata_json") or "{}")
         output.append(row)
+    return _deduplicate_exact_product_rows(output)
+
+
+def _deduplicate_exact_product_rows(
+    rows: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Remove obvious cross-source duplicates without collapsing distinct periods."""
+    output: List[Dict[str, Any]] = []
+    seen: set[tuple[str, str, str, str, tuple[str, ...]]] = set()
+    for item in rows:
+        metadata = item.get("metadata")
+        metadata = metadata if isinstance(metadata, Mapping) else {}
+        resolution = metadata.get("product_resolution")
+        resolution = resolution if isinstance(resolution, Mapping) else {}
+        product_ids = tuple(
+            sorted(
+                str(product_id).strip()
+                for product_id in (resolution.get("product_ids") or [])
+                if str(product_id).strip()
+            )
+        )
+        normalized_alias = str(resolution.get("normalized_alias") or "").strip()
+        normalized_alias = normalized_alias or normalize_product_alias(
+            str(item.get("segment_name_raw") or "")
+        )
+        key = (
+            str(item.get("instrument_id") or ""),
+            str(item.get("report_period") or ""),
+            str(metadata.get("industry_group") or ""),
+            normalized_alias,
+            product_ids,
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        output.append(dict(item))
     return output
 
 

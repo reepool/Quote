@@ -608,6 +608,46 @@
           "max_runtime_seconds": 3600
         }
       },
+      "business_profile_structured_sync": {
+        "enabled": false,
+        "manual_only": false,
+        "description": "A股结构化业务画像候选统一维护（默认关闭，须完成正式报告精度与单行业生产门槛后启用）",
+        "report": true,
+        "pre_run_notify": false,
+        "trigger": {
+          "type": "cron",
+          "day_of_week": "sun",
+          "hour": 10,
+          "minute": 0,
+          "second": 0
+        },
+        "max_instances": 1,
+        "misfire_grace_time": 1800,
+        "coalesce": true,
+        "parameters": {
+          "as_of_date": null,
+          "sources": [
+            "eastmoney_main_composition",
+            "ths_main_business_intro"
+          ],
+          "industry_groups": [
+            "coal",
+            "nonferrous_and_solid_mineral",
+            "steel",
+            "petrochemical",
+            "basic_chemical",
+            "building_material"
+          ],
+          "instrument_ids": [],
+          "max_instruments": 30,
+          "max_elapsed_seconds": 900,
+          "candidate_write": true,
+          "operator_switch": "BUSINESS_PROFILE_CANDIDATE_WRITE",
+          "checkpoint_path": null,
+          "resume": true,
+          "max_runtime_seconds": 960
+        }
+      },
       "industry_official_mapping_refresh": {
         "enabled": false,
         "description": "研究域申万官方历史分类映射审计缓存刷新（非 current membership 前置）",

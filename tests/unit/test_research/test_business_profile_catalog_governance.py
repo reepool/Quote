@@ -23,6 +23,7 @@ def _segment(
     version=1,
     instrument_id="600001.SH",
     industry_group="coal",
+    revenue_share=0.1,
 ):
     return {
         "record_id": record_id,
@@ -30,6 +31,7 @@ def _segment(
         "report_period": "2025-12-31",
         "segment_type": "product",
         "segment_name_raw": raw_label,
+        "revenue_share": revenue_share,
         "review_status": "candidate",
         "version": version,
         "updated_at": f"2026-07-{17 + version:02d}T00:00:00+08:00",
@@ -99,6 +101,9 @@ def test_label_audit_groups_issues_and_keeps_latest_source_row_version():
     )
     assert unknown["row_count"] == 2
     assert unknown["instrument_count"] == 2
+    assert unknown["material_row_count"] == 2
+    assert unknown["material_instrument_count"] == 2
+    assert unknown["max_revenue_share"] == 0.1
     assert len(unknown["sample_instrument_ids"]) == 1
     assert all(item["normalized_alias"] != "煤制品" for item in result["issues"])
 

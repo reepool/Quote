@@ -36,6 +36,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     source.add_argument("--research-db", type=Path, default=Path("data/research.db"))
     audit.add_argument("--record-limit", type=int, default=100000)
     audit.add_argument("--sample-limit", type=int, default=5)
+    audit.add_argument(
+        "--minimum-material-revenue-share",
+        type=float,
+        default=0.01,
+    )
     audit.add_argument("--output", type=Path)
 
     promote = subparsers.add_parser(
@@ -111,6 +116,7 @@ def _run_audit(args: argparse.Namespace) -> dict[str, Any]:
     audit = audit_product_label_resolutions(
         segments,
         sample_limit=args.sample_limit,
+        minimum_material_revenue_share=args.minimum_material_revenue_share,
     )
     if load_diagnostics["input_truncated"]:
         audit["status"] = "incomplete"

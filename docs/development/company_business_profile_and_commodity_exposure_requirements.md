@@ -323,6 +323,13 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
   candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
   候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；
+- 已接入唯一的 `business_profile_structured_sync` scheduler job，经
+  `ScheduledTasks -> DataManager -> StructuredBusinessProfileSyncService`
+  调用现有统一服务；job 为周度有界任务，配置和业务模块均默认关闭，启用后仍受
+  `max_instruments / max_elapsed_seconds / candidate_only / operator_switch`
+  约束。模块关闭时在 provider 构造前短路，任务不调用 LLM；单源失败保留另一源
+  结果，未变化不重复写；`resume=true` 在首次无 checkpoint 时创建新批次，已有
+  checkpoint 时才按公司和来源恢复；
 - 已实现业务画像候选审核 CLI 和追加式审计表，支持 `approved / rejected /
   superseded` 三类显式决定；写入要求 operator switch、审核人、理由、预期状态
   和预期更新时间，证据以外的事实只有在同公司 evidence 已批准后才能批准。
@@ -335,7 +342,14 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
   与候选一致，未被后续文件替代，且归档文件 SHA-256 与 manifest 一致；人工结果
   必须指定具体文档 hash、正式页码、正式标签、审核人和理由，并以 source hash
   防止待审字段被篡改。排除项只允许治理目录中的原因，默认排除率不得超过 5%；
-  gate 使用双侧 95% Wilson 下界，零错误也至少需要 381 条独立有效样本；
+  gate 使用双侧 95% Wilson 下界，零错误也至少需要 381 条有效样本。样本只接受
+  唯一产品映射，并去除同公司、同报告期、同规范标签和同产品映射的跨来源明显
+  重复；不会按公司或行业一刀切去重，也不会用歧义标签凑样本数；
+- 已新增只读 precision-corpus readiness 审计，分别统计材料性精确候选、公司/
+  报告期、正式年报/半年报 manifest 绑定和六行业文档覆盖，不满足时返回独立
+  blocker。现有标签
+  审计同时增加材料性行数、材料性公司数和最大收入占比，只用于排序人工复核，
+  不会把高频标签自动解释为产品或写入目录；
 - 已完成六行业各 5 家、跨 BSE/SSE/SZSE 和四个上市年代的分层只读 pilot：
   两个来源均 30/30 成功，但东方财富 24/30 达到 200 行疑似上限，产品精确别名
   覆盖仅 2.18%；因此来源链可用但 promotion gate 未通过；
@@ -346,9 +360,17 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - `601088.SH` bounded live smoke 中两个结构化源均成功，主营构成返回 200 行、覆盖 2018-12-31 至 2025-12-31，并触发 `possible_source_row_cap`；同报告期产品收入比例合计约为 `1`，已按小数比例口径实现；
 - 先前从 `/tmp` 六份 PDF 目录导出的 1 条材料性精确别名只能作为工具诊断，因未
   绑定官方 manifest，不能计入 promotion evidence。当前生产 `financials.db`
-  合格业务画像官方 manifest 为 0，因此 `6.3` 仍为 `not_ready`。免费结构化源
-  scheduler、足量正式报告 99% precision 核对、全市场回补和生产 DCF 数据覆盖
-  尚未完成。
+  合格业务画像官方 manifest 为 0，生产 `research.db` 产品 candidate 也为 0。
+  保留的 30 家隔离回补库有 51 条材料性唯一映射候选，覆盖 5 家公司、51 个
+  公司/报告期，距离 381 条还差 330 条；候选层缺有色和建材，正式报告绑定层
+  六行业均未覆盖。因此 `6.3` 仍为
+  `not_ready`。免费结构化源
+  scheduler 已接线但保持关闭；足量正式报告 99% precision 核对、单行业生产
+  candidate pilot、全市场回补和生产 DCF 数据覆盖尚未完成。
 
 因此，当前结论是“新路线已具备受控批次采集和候选治理能力”，不是“公司画像
-数据已生产完备”。
+数据已生产完备”。下一步应先按材料性标签审计选择可明确归类的有色、建材及
+其他首期行业标签，归档对应公司/报告期正式报告并受控升级精确别名目录；重放
+隔离候选后再次运行 readiness 审计，只有六行业均存在正式报告绑定样本且全局
+达到 381 条 manifest-bound 样本时，才进入正式人工比较和单行业生产 candidate
+pilot；不额外设置每行业统一最低样本数。

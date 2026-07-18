@@ -5108,6 +5108,97 @@ class ScheduledTasks:
         finally:
             self._active_tasks.discard('company_profile_shadow_sync')
 
+    async def business_profile_structured_sync(
+        self,
+        as_of_date: Optional[str] = None,
+        sources: Optional[List[str]] = None,
+        industry_groups: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        max_instruments: Optional[int] = None,
+        max_elapsed_seconds: Optional[float] = None,
+        candidate_write: bool = True,
+        operator_switch: str = "",
+        checkpoint_path: Optional[str] = None,
+        resume: bool = True,
+        job_config: Optional[JobConfig] = None,
+    ) -> bool:
+        """Run one bounded candidate-only business-profile maintenance batch."""
+        task_id = "business_profile_structured_sync"
+        self._active_tasks.add(task_id)
+        try:
+            scheduler_logger.info(
+                "[Scheduler] Starting structured business-profile sync..."
+            )
+            result = await data_manager.run_business_profile_structured_sync(
+                as_of_date=as_of_date,
+                sources=sources,
+                industry_groups=industry_groups,
+                instrument_ids=instrument_ids,
+                max_instruments=max_instruments,
+                max_elapsed_seconds=max_elapsed_seconds,
+                candidate_write=candidate_write,
+                operator_switch=operator_switch,
+                checkpoint_path=checkpoint_path,
+                resume=resume,
+            )
+            status = str(result.get("status") or "failed")
+            success = status in {"success", "degraded"}
+            source_tasks = []
+            for source, source_result in sorted((result.get("sources") or {}).items()):
+                source_tasks.append(
+                    {
+                        "task_name": source,
+                        "status": (
+                            f"success={source_result.get('success_count', 0)}, "
+                            f"empty={source_result.get('empty_count', 0)}, "
+                            f"failed={source_result.get('failed_count', 0)}"
+                        ),
+                    }
+                )
+            if not source_tasks:
+                source_tasks.append(
+                    {
+                        "task_name": task_id,
+                        "status": result.get("reason") or status,
+                    }
+                )
+            await self._send_task_report(
+                report_data={
+                    "name": "结构化业务画像同步报告",
+                    "status": "success" if success else "error",
+                    "tasks_completed": result.get("attempted_instruments", 0),
+                    "duration": f"{result.get('elapsed_seconds', 0):.2f}s",
+                    "maintenance_tasks": source_tasks,
+                    "business_profile_sync": result,
+                },
+                report_type="maintenance_report",
+                task_name="结构化业务画像同步",
+                job_config=job_config,
+            )
+            return success
+        except Exception as exc:
+            scheduler_logger.exception(
+                "[Scheduler] Structured business-profile sync failed: %s",
+                exc,
+            )
+            await self._send_task_report(
+                report_data={
+                    "name": "结构化业务画像同步报告",
+                    "status": "error",
+                    "tasks_completed": 0,
+                    "duration": "N/A",
+                    "maintenance_tasks": [
+                        {"task_name": task_id, "status": str(exc)}
+                    ],
+                },
+                report_type="maintenance_report",
+                task_name="结构化业务画像同步",
+                job_config=job_config,
+            )
+            return False
+        finally:
+            self._active_tasks.discard(task_id)
+
     async def industry_shadow_sync(
         self,
         exchanges: Optional[List[str]] = None,

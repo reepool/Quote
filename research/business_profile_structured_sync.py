@@ -989,9 +989,7 @@ def _load_checkpoint(
     scope_hash: str,
     resume: bool,
 ) -> dict[str, Any]:
-    if resume:
-        if not path.exists():
-            raise FileNotFoundError(path)
+    if resume and path.exists():
         payload = json.loads(path.read_text(encoding="utf-8"))
         if payload.get("scope_hash") != scope_hash or payload.get("scope") != dict(
             scope
