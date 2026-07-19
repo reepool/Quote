@@ -59,6 +59,8 @@ def test_metadata_cli_is_read_only_and_forwards_bounded_scope(
         [
             "--target-research-db",
             str(tmp_path / "candidate.db"),
+            "--target-scope",
+            "catalog_issues",
             "--instrument",
             "601088.SH,600028.SH",
             "--report-period",
@@ -78,6 +80,7 @@ def test_metadata_cli_is_read_only_and_forwards_bounded_scope(
     assert _Storage.instances[0].initialized is False
     call = _Service.calls[0]
     assert call["archive_write"] is False
+    assert call["target_scope"] == "catalog_issues"
     assert call["instrument_ids"] == ["601088.SH", "600028.SH"]
     assert call["max_instruments"] == 2
     assert call["max_pages"] == 3

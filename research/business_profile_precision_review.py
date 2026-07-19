@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import sqlite3
+from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -25,6 +26,10 @@ ALLOWED_EXCLUSION_REASON_CODES = {
 }
 OFFICIAL_DOCUMENT_STATUSES = {"archived", "archived_unchanged_content"}
 OFFICIAL_SOURCE_TIERS = {"official_primary", "official_backup"}
+CATALOG_REVIEW_DIAGNOSTICS = {
+    "alias_not_found",
+    "ambiguous_product_alias",
+}
 
 
 def load_product_label_review_rows(
@@ -48,6 +53,29 @@ def load_product_label_review_rows(
             report_period=report_period,
         )
     return _load_exact_product_rows(
+        research_db,
+        instrument_ids=normalized_instruments,
+        report_period=report_period,
+        minimum_revenue_share=minimum_revenue_share,
+    )
+
+
+def load_product_catalog_issue_review_rows(
+    *,
+    research_db: Path,
+    instrument_ids: Optional[Sequence[str]] = None,
+    report_period: Optional[str] = None,
+    minimum_revenue_share: float = 0.01,
+) -> List[Dict[str, Any]]:
+    """Load material unresolved labels that need official-report evidence."""
+    if not research_db.exists():
+        raise FileNotFoundError(research_db)
+    if minimum_revenue_share < 0 or minimum_revenue_share > 1:
+        raise ValueError("minimum_revenue_share must be between 0 and 1")
+    normalized_instruments = sorted(
+        {str(item).strip() for item in (instrument_ids or ()) if str(item).strip()}
+    )
+    return _load_catalog_issue_product_rows(
         research_db,
         instrument_ids=normalized_instruments,
         report_period=report_period,
@@ -651,6 +679,68 @@ def _load_exact_product_rows(
     return _deduplicate_exact_product_rows(output)
 
 
+def _load_catalog_issue_product_rows(
+    research_db: Path,
+    *,
+    instrument_ids: Sequence[str],
+    report_period: Optional[str],
+    minimum_revenue_share: float,
+) -> List[Dict[str, Any]]:
+    clauses = ["segment_type = 'product'"]
+    params: List[Any] = []
+    if instrument_ids:
+        placeholders = ",".join("?" for _item in instrument_ids)
+        clauses.append(f"instrument_id IN ({placeholders})")
+        params.extend(instrument_ids)
+    if report_period:
+        clauses.append("report_period = ?")
+        params.append(report_period)
+    params.append(minimum_revenue_share)
+    query = f"""
+        WITH ranked AS (
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY
+                           instrument_id,
+                           json_extract(metadata_json, '$.source_name'),
+                           json_extract(metadata_json, '$.source_row_key')
+                       ORDER BY version DESC, updated_at DESC, record_id DESC
+                   ) AS source_row_rank
+            FROM company_business_segments
+            WHERE {' AND '.join(clauses)}
+        )
+        SELECT *
+        FROM ranked
+        WHERE source_row_rank = 1
+          AND review_status = 'candidate'
+          AND COALESCE(revenue_share, 0) >= ?
+        ORDER BY instrument_id, report_period, segment_name_raw, record_id
+    """
+    with sqlite3.connect(f"file:{research_db.resolve()}?mode=ro", uri=True) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(query, params).fetchall()
+    output: List[Dict[str, Any]] = []
+    for item in rows:
+        row = dict(item)
+        if not _is_periodic_review_period(row.get("report_period")):
+            continue
+        metadata = json.loads(row.pop("metadata_json") or "{}")
+        resolution = metadata.get("product_resolution")
+        resolution = resolution if isinstance(resolution, Mapping) else {}
+        diagnostics = {
+            str(value).strip()
+            for value in (resolution.get("diagnostics") or [])
+            if str(value).strip()
+        }
+        issue_types = sorted(diagnostics & CATALOG_REVIEW_DIAGNOSTICS)
+        if not issue_types:
+            continue
+        row["metadata"] = metadata
+        row["catalog_review_issue_types"] = issue_types
+        output.append(row)
+    return _deduplicate_catalog_issue_rows(output)
+
+
 def _deduplicate_exact_product_rows(
     rows: Sequence[Mapping[str, Any]],
 ) -> List[Dict[str, Any]]:
@@ -685,6 +775,75 @@ def _deduplicate_exact_product_rows(
         seen.add(key)
         output.append(dict(item))
     return output
+
+
+def _deduplicate_catalog_issue_rows(
+    rows: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Remove duplicate unresolved labels emitted by multiple structured sources."""
+    grouped: Dict[tuple[str, str, str, str], Dict[str, Any]] = {}
+    ordered_keys: List[tuple[str, str, str, str]] = []
+    for item in rows:
+        metadata = item.get("metadata")
+        metadata = metadata if isinstance(metadata, Mapping) else {}
+        resolution = metadata.get("product_resolution")
+        resolution = resolution if isinstance(resolution, Mapping) else {}
+        normalized_alias = str(resolution.get("normalized_alias") or "").strip()
+        normalized_alias = normalized_alias or normalize_product_alias(
+            str(item.get("segment_name_raw") or "")
+        )
+        key = (
+            str(item.get("instrument_id") or ""),
+            str(item.get("report_period") or ""),
+            str(metadata.get("industry_group") or ""),
+            normalized_alias,
+        )
+        current = grouped.get(key)
+        if current is None:
+            grouped[key] = dict(item)
+            ordered_keys.append(key)
+            continue
+        issue_types = {
+            str(value).strip()
+            for row in (current, item)
+            for value in (row.get("catalog_review_issue_types") or [])
+            if str(value).strip()
+        }
+        preferred = max(
+            (current, item),
+            key=_catalog_issue_representative_key,
+        )
+        merged = dict(preferred)
+        merged["catalog_review_issue_types"] = sorted(issue_types)
+        grouped[key] = merged
+    return [grouped[key] for key in ordered_keys]
+
+
+def _catalog_issue_representative_key(
+    item: Mapping[str, Any],
+) -> tuple[float, int, str, str]:
+    try:
+        revenue_share = float(item.get("revenue_share"))
+    except (TypeError, ValueError):
+        revenue_share = -1.0
+    try:
+        version = int(item.get("version") or 0)
+    except (TypeError, ValueError):
+        version = 0
+    return (
+        revenue_share,
+        version,
+        str(item.get("updated_at") or ""),
+        str(item.get("record_id") or ""),
+    )
+
+
+def _is_periodic_review_period(value: Any) -> bool:
+    try:
+        parsed = date.fromisoformat(str(value or ""))
+    except ValueError:
+        return False
+    return (parsed.month, parsed.day) in {(6, 30), (12, 31)}
 
 
 def _stable_hash(value: Any) -> str:

@@ -185,6 +185,24 @@ def _seed_review_candidate(storage):
     repository.upsert("segments", _candidate_segment())
 
 
+def _seed_catalog_issue_candidate(storage):
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    segment = _candidate_segment()
+    segment["record_id"] = "segment-catalog-issue"
+    segment["segment_id"] = "glass-products"
+    segment["segment_name_raw"] = "玻璃制品"
+    segment["metadata"]["source_row_key"] = "glass-products-2025"
+    segment["metadata"]["industry_group"] = "building_material"
+    segment["metadata"]["product_resolution"] = {
+        "product_ids": [],
+        "matched_alias_ids": [],
+        "normalized_alias": "玻璃制品",
+        "diagnostics": ["alias_not_found"],
+    }
+    repository.upsert("segments", segment)
+
+
 def _seed_additional_review_period(storage, report_period):
     repository = BusinessProfileRepository(storage)
     evidence_id = f"evidence-{report_period}"
@@ -248,6 +266,48 @@ def test_metadata_probe_matches_period_without_writing_candidates_or_archive(
     assert len(coordinator.calls) == 1
     assert coordinator.calls[0][1]["dry_run"] is True
     assert coordinator.calls[0][1]["search_key"] == "年度报告"
+
+
+def test_catalog_issue_scope_discovers_reports_without_promoting_candidates(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    _seed_catalog_issue_candidate(storage)
+    repository = BusinessProfileRepository(storage)
+    quarterly = _candidate_segment(report_period="2025-09-30")
+    quarterly["record_id"] = "segment-catalog-issue-quarterly"
+    quarterly["segment_id"] = "glass-products-quarterly"
+    quarterly["segment_name_raw"] = "玻璃制品"
+    quarterly["metadata"]["source_row_key"] = "glass-products-2025-q3"
+    quarterly["metadata"]["industry_group"] = "building_material"
+    quarterly["metadata"]["product_resolution"] = {
+        "product_ids": [],
+        "matched_alias_ids": [],
+        "normalized_alias": "玻璃制品",
+        "diagnostics": ["alias_not_found"],
+    }
+    repository.upsert("segments", quarterly)
+    coordinator = _FakeCoordinator([_official_candidate()])
+    service = BusinessProfileOfficialArchiveSyncService(
+        storage=storage,
+        research_config=storage.research_config,
+        coordinator=coordinator,
+        archive_service=_FailIfArchived(),
+    )
+
+    report = service.sync(
+        target_research_db=research_db,
+        target_scope="catalog_issues",
+        max_instruments=1,
+        as_of_date="2026-07-18",
+    )
+
+    assert report["status"] == "success"
+    assert report["scope"]["target_scope"] == "catalog_issues"
+    assert report["eligible_review_rows"] == 1
+    assert report["matched_instrument_periods"] == 1
+    assert report["candidate_rows_written"] == 0
+    assert report["archived_documents"] == 0
+    assert report["results"][0]["requested_report_periods"] == ["2025-12-31"]
+    assert report["results"][0]["unsupported_report_periods"] == []
 
 
 def test_default_cutoff_uses_shanghai_calendar_date(tmp_path, monkeypatch):

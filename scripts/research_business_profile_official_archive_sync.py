@@ -16,6 +16,7 @@ if str(ROOT_DIR) not in sys.path:
 
 
 from research.business_profile_official_archive_sync import (
+    OFFICIAL_ARCHIVE_TARGET_SCOPES,
     OFFICIAL_ARCHIVE_WRITE_SWITCH,
     BusinessProfileOfficialArchiveSyncService,
 )
@@ -29,6 +30,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--target-research-db",
         type=Path,
         default=Path("data/research.db"),
+    )
+    parser.add_argument(
+        "--target-scope",
+        choices=sorted(OFFICIAL_ARCHIVE_TARGET_SCOPES),
+        default="precision_exact",
     )
     parser.add_argument("--instrument", action="append")
     parser.add_argument("--report-period")
@@ -65,6 +71,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     report = service.sync(
         target_research_db=args.target_research_db,
+        target_scope=args.target_scope,
         instrument_ids=_split_values(args.instrument),
         report_period=args.report_period,
         minimum_revenue_share=args.minimum_revenue_share,

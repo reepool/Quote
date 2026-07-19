@@ -9,6 +9,7 @@ from research.business_profile_precision_review import (
     audit_product_label_review_readiness,
     build_product_label_review_package,
     evaluate_product_label_review,
+    load_product_catalog_issue_review_rows,
     minimum_all_correct_sample_size,
     wilson_lower_bound,
 )
@@ -213,6 +214,65 @@ def test_precision_rows_exclude_ambiguous_and_cross_source_duplicates(tmp_path):
     assert package["rows"][0]["candidate_product_ids"] == ["coal"]
     assert readiness["counts"]["eligible_rows"] == 1
     assert readiness["counts"]["manifest_bound_rows"] == 1
+
+
+def test_catalog_issue_rows_select_material_unresolved_labels_only(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    repository.upsert("segments", _candidate_segment())
+
+    unresolved = _candidate_segment()
+    unresolved["record_id"] = "segment-unresolved"
+    unresolved["segment_id"] = "glass-products"
+    unresolved["segment_name_raw"] = "玻璃制品"
+    unresolved["metadata"]["source_row_key"] = "glass-products-2025"
+    unresolved["metadata"]["industry_group"] = "building_material"
+    unresolved["metadata"]["product_resolution"] = {
+        "product_ids": [],
+        "matched_alias_ids": [],
+        "normalized_alias": "玻璃制品",
+        "diagnostics": ["alias_not_found"],
+    }
+    repository.upsert("segments", unresolved)
+
+    duplicate = copy.deepcopy(unresolved)
+    duplicate["record_id"] = "segment-unresolved-second-source"
+    duplicate["revenue_share"] = 0.9
+    duplicate["metadata"]["source_name"] = "secondary_structured_source"
+    duplicate["metadata"]["source_row_key"] = "glass-products-secondary"
+    duplicate["metadata"]["product_resolution"]["diagnostics"] = [
+        "ambiguous_product_alias"
+    ]
+    repository.upsert("segments", duplicate)
+
+    insignificant = copy.deepcopy(unresolved)
+    insignificant["record_id"] = "segment-unresolved-small"
+    insignificant["segment_id"] = "glass-products-small"
+    insignificant["revenue_share"] = 0.001
+    insignificant["metadata"]["source_row_key"] = "glass-products-small"
+    repository.upsert("segments", insignificant)
+
+    quarterly = copy.deepcopy(unresolved)
+    quarterly["record_id"] = "segment-unresolved-quarterly"
+    quarterly["report_period"] = "2025-09-30"
+    quarterly["revenue_share"] = 1.0
+    quarterly["metadata"]["source_row_key"] = "glass-products-quarterly"
+    repository.upsert("segments", quarterly)
+
+    rows = load_product_catalog_issue_review_rows(
+        research_db=research_db,
+        minimum_revenue_share=0.01,
+    )
+
+    assert len(rows) == 1
+    assert rows[0]["segment_name_raw"] == "玻璃制品"
+    assert rows[0]["revenue_share"] == 0.9
+    assert rows[0]["catalog_review_issue_types"] == [
+        "alias_not_found",
+        "ambiguous_product_alias",
+    ]
+    assert rows[0]["metadata"]["industry_group"] == "building_material"
 
 
 def test_industry_coverage_requires_periodic_report_manifest(tmp_path):

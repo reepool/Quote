@@ -23,6 +23,7 @@ from research.business_profile_exchange_discovery import (
     BusinessProfileDiscoveryResolution,
 )
 from research.business_profile_precision_review import (
+    load_product_catalog_issue_review_rows,
     load_product_label_review_rows,
 )
 from research.storage import ResearchStorageManager
@@ -31,6 +32,7 @@ from utils.date_utils import get_shanghai_time
 
 
 OFFICIAL_ARCHIVE_WRITE_SWITCH = "BUSINESS_PROFILE_OFFICIAL_ARCHIVE_WRITE"
+OFFICIAL_ARCHIVE_TARGET_SCOPES = {"precision_exact", "catalog_issues"}
 PERIODIC_REPORT_FAMILIES = {"annual_report", "semiannual_report"}
 FAMILY_SEARCH_KEYS = {
     "annual_report": "年度报告",
@@ -78,6 +80,7 @@ class BusinessProfileOfficialArchiveSyncService:
         self,
         *,
         target_research_db: Path,
+        target_scope: str = "precision_exact",
         instrument_ids: Optional[Sequence[str]] = None,
         report_period: Optional[str] = None,
         minimum_revenue_share: float = 0.01,
@@ -106,11 +109,21 @@ class BusinessProfileOfficialArchiveSyncService:
                 "official archive writes require operator switch "
                 f"{OFFICIAL_ARCHIVE_WRITE_SWITCH}"
             )
+        if target_scope not in OFFICIAL_ARCHIVE_TARGET_SCOPES:
+            raise ValueError(
+                "target_scope must be one of "
+                f"{sorted(OFFICIAL_ARCHIVE_TARGET_SCOPES)}"
+            )
         cutoff = date.fromisoformat(
             str(as_of_date or get_shanghai_time().date().isoformat())[:10]
         ).isoformat()
         effective_checkpoint_root = checkpoint_root or self.checkpoint_root
-        rows = load_product_label_review_rows(
+        row_loader = (
+            load_product_label_review_rows
+            if target_scope == "precision_exact"
+            else load_product_catalog_issue_review_rows
+        )
+        rows = row_loader(
             research_db=target_research_db,
             instrument_ids=instrument_ids,
             report_period=report_period,
@@ -125,6 +138,7 @@ class BusinessProfileOfficialArchiveSyncService:
             "started_at": get_shanghai_time().isoformat(),
             "target_research_db": str(target_research_db),
             "scope": {
+                "target_scope": target_scope,
                 "instrument_ids": sorted(
                     {
                         str(item).strip()
@@ -179,6 +193,7 @@ class BusinessProfileOfficialArchiveSyncService:
                 mode="direct",
                 metadata={
                     "target_research_db": str(target_research_db),
+                    "target_scope": target_scope,
                     "selected_instruments": len(targets),
                     "target_instrument_periods": report["target_instrument_periods"],
                 },
