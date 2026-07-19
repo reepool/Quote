@@ -1,5 +1,8 @@
 # 公共 LLM 网关使用说明
 
+完整的模块分层、接口字段、错误语义和生命周期说明见
+[`common_llm_gateway_architecture.md`](common_llm_gateway_architecture.md)。
+
 公共网关位于 `utils/llm/`，业务模块只提交消息、版本化 JSON Schema 和业务元数据，不能直接调用供应商 SDK、`requests` 或 `httpx`。
 
 ## 配置与密钥
