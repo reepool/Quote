@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 from utils import api_logger, config_manager
+from utils.llm import load_project_environment
 
 from .routes import router
 from .middleware import setup_middleware
@@ -19,6 +20,7 @@ from .middleware import setup_middleware
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     api_logger.info("[API] Starting Quote System API...")
+    load_project_environment()
 
     # 启动时初始化
     try:

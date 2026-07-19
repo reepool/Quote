@@ -15,6 +15,7 @@ pypdf>=4.0.0
 
 # API and Serialization
 pydantic==2.11.0
+jsonschema==4.23.0
 python-multipart==0.0.9
 
 # Task Scheduling

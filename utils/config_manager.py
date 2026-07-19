@@ -6,9 +6,12 @@
 import json
 import logging
 from copy import deepcopy
-from typing import Any, Optional, Dict, List, TypeVar
+from typing import Any, Optional, Dict, List, TypeVar, TYPE_CHECKING
 from dataclasses import dataclass, field
 from pathlib import Path
+
+if TYPE_CHECKING:
+    from utils.llm import LlmConfig
 
 
 # 定义自定义异常（避免循环导入）
@@ -714,6 +717,16 @@ class UnifiedConfigManager:
                 self._typed_cache['research_config'] = ResearchConfig()
 
         return self._typed_cache['research_config']
+
+    def get_llm_config(self) -> "LlmConfig":
+        """Return the typed common LLM gateway configuration.
+
+        Import lazily to keep the base configuration manager independent from the
+        transport and schema implementation.
+        """
+        from utils.llm import load_llm_config
+
+        return load_llm_config(self.get_nested('llm', {}))
 
     @classmethod
     def _build_research_modules_config(

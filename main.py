@@ -19,6 +19,7 @@ from datetime import date, datetime
 from utils import (
     scheduler_logger, dm_logger, tgbot_logger, api_logger, config_manager, get_process_manager
 )
+from utils.llm import load_project_environment
 # 直接导入代码转换工具，避免依赖问题
 from utils.code_utils import convert_to_database_format, is_valid_standard_format
 
@@ -33,6 +34,9 @@ class QuoteSystem:
     """行情系统主类"""
 
     def __init__(self):
+        # Load the ignored local `.env` only when the application starts.
+        # Existing process-injected variables remain authoritative.
+        load_project_environment()
         self.config = config_manager
         self.running = False
         self.task_manager_bot = None

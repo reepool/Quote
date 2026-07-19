@@ -9,6 +9,11 @@ from research.business_profile_llm import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _llm_test_key(monkeypatch):
+    monkeypatch.setenv("QUOTE_LLM_API_KEY", "unit-test-key")
+
+
 def _section():
     return BusinessProfileDocumentSection.build(
         section_id="page-31-main-business",
@@ -19,9 +24,7 @@ def _section():
 
 
 def test_llm_interface_is_disabled_by_default():
-    extractor = OpenAICompatibleBusinessProfileExtractor(
-        OpenAICompatibleLlmConfig()
-    )
+    extractor = OpenAICompatibleBusinessProfileExtractor(OpenAICompatibleLlmConfig())
 
     with pytest.raises(RuntimeError, match="disabled"):
         extractor.extract(
@@ -35,9 +38,7 @@ def test_llm_interface_accepts_strict_candidate_report():
     captured = {}
 
     def transport(url, headers, payload, timeout):
-        captured.update(
-            {"url": url, "headers": headers, "payload": payload, "timeout": timeout}
-        )
+        captured.update({"url": url, "headers": headers, "payload": payload, "timeout": timeout})
         report = {
             "schema_version": "business_profile_llm_report.v1",
             "fact_catalog_version": "business_profile_facts.2026.1",
@@ -64,7 +65,10 @@ def test_llm_interface_accepts_strict_candidate_report():
             ],
             "warnings": [],
         }
-        return {"choices": [{"message": {"content": json.dumps(report)}}]}
+        return {
+            "model": "provider-model-v2",
+            "choices": [{"message": {"content": json.dumps(report)}}],
+        }
 
     extractor = OpenAICompatibleBusinessProfileExtractor(
         OpenAICompatibleLlmConfig(
@@ -81,16 +85,36 @@ def test_llm_interface_accepts_strict_candidate_report():
     )
 
     assert captured["url"].endswith("/v1/chat/completions")
-    user_payload = json.loads(captured["payload"]["messages"][1]["content"])
-    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.1"
-    assert any(
-        item["field_id"] == "segment.name"
-        for item in user_payload["fact_fields"]
+    user_message = next(
+        message for message in captured["payload"]["messages"] if message.get("role") == "user"
     )
+    user_payload = json.loads(user_message["content"])
+    assert user_payload["fact_catalog_version"] == "business_profile_facts.2026.1"
+    assert any(item["field_id"] == "segment.name" for item in user_payload["fact_fields"])
     assert result.report["facts"][0]["review_status"] == "candidate"
     assert result.fact_catalog_version == "business_profile_facts.2026.1"
     assert result.request_hash
     assert result.response_hash
+    assert result.model == "provider-model-v2"
+
+
+def test_business_profile_config_preserves_defaults_and_explicit_zeroes():
+    defaults = OpenAICompatibleLlmConfig.from_mapping({})
+    assert defaults.api_key_env == "QUOTE_LLM_API_KEY"
+    assert defaults.max_retries == 2
+    assert defaults.max_schema_repair_attempts == 1
+    assert defaults.requests_per_minute == 20
+
+    disabled_limits = OpenAICompatibleLlmConfig.from_mapping(
+        {
+            "max_retries": 0,
+            "max_schema_repair_attempts": 0,
+            "requests_per_minute": 0,
+        }
+    )
+    assert disabled_limits.max_retries == 0
+    assert disabled_limits.max_schema_repair_attempts == 0
+    assert disabled_limits.requests_per_minute == 0
 
 
 def test_llm_interface_rejects_unknown_evidence_and_inferred_relationship():
