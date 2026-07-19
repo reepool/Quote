@@ -3,6 +3,9 @@ import sqlite3
 
 from research.business_profile_product_catalog import DEFAULT_PRODUCT_CATALOG_PATH
 from scripts.research_business_profile_catalog_governance import main
+from tests.unit.test_research.test_business_profile_catalog_governance import (
+    _official_promotion_fixture,
+)
 
 
 def test_audit_cli_reads_candidate_segments_from_research_db(tmp_path):
@@ -162,6 +165,9 @@ def test_audit_cli_ranks_latest_source_rows_and_fails_closed_when_truncated(
 
 
 def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
+    financials_db, evidence_path, _pdf_path, _evidence = _official_promotion_fixture(
+        tmp_path
+    )
     output = tmp_path / "catalog.next.json"
     manifest = tmp_path / "catalog.next.promotion.json"
 
@@ -181,7 +187,7 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
             "--released-on",
             "2026-07-19",
             "--alias",
-            "优质动力煤",
+            "premium thermal coal",
             "--product-id",
             "coal.thermal_coal",
             "--industry-group",
@@ -190,8 +196,10 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
             "reviewer",
             "--reason",
             "official report review",
-            "--evidence-reference",
-            "cninfo:600001:2025:page-12",
+            "--financials-db",
+            str(financials_db),
+            "--official-evidence",
+            str(evidence_path),
         ]
     )
 
@@ -201,3 +209,4 @@ def test_promote_alias_cli_writes_new_catalog_and_audit_manifest(tmp_path):
     assert catalog["catalog_version"] == "business_profile_products.2026.3"
     assert audit["change_type"] == "add_normalized_exact_alias"
     assert audit["output_catalog_hash"]
+    assert audit["official_evidence"]["source_file_id"] == "source-1"

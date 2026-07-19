@@ -16,6 +16,16 @@ from research.business_profile_product_catalog import (
     normalize_product_alias,
     parse_business_product_catalog,
 )
+from research.business_profile_pdf_artifacts import (
+    BusinessProfilePdfArtifactExtractor,
+)
+from research.business_profile_precision_review import (
+    load_validated_official_documents,
+)
+
+
+OFFICIAL_ALIAS_EVIDENCE_SCHEMA = "business_profile_product_alias_official_evidence.v1"
+DEFAULT_ARCHIVE_PATH_BASE = Path(__file__).resolve().parent.parent
 
 
 def audit_product_label_resolutions(
@@ -175,7 +185,9 @@ def build_product_alias_promotion(
     industry_groups: Sequence[str],
     operator: str,
     reason: str,
-    evidence_references: Sequence[str],
+    official_evidence: Mapping[str, Any],
+    financials_db: Path,
+    archive_path_base: Path = DEFAULT_ARCHIVE_PATH_BASE,
     alias_id: Optional[str] = None,
     review_policy: Optional[str] = None,
     promoted_at: Optional[str] = None,
@@ -247,9 +259,19 @@ def build_product_alias_promotion(
         raise ValueError(f"alias_id already exists: {resolved_alias_id}")
     operator_name = _required_text(operator, "operator")
     promotion_reason = _required_text(reason, "reason")
-    references = _unique_required(evidence_references, "evidence_references")
-    timestamp = promoted_at or datetime.now(timezone.utc).isoformat()
-    datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    timestamp = _required_aware_timestamp(
+        promoted_at or datetime.now(timezone.utc).isoformat(),
+        "promoted_at",
+    )
+    evidence = validate_product_alias_official_evidence(
+        official_evidence,
+        financials_db=financials_db,
+        archive_path_base=archive_path_base,
+        alias=alias_text,
+        product_ids=targets,
+        industry_groups=groups,
+        promoted_at=timestamp,
+    )
 
     output = json.loads(json.dumps(source_payload, ensure_ascii=False, sort_keys=True))
     output["catalog_version"] = new_version
@@ -279,7 +301,9 @@ def build_product_alias_promotion(
         "promoted_at": timestamp,
         "operator": operator_name,
         "reason": promotion_reason,
-        "evidence_references": list(references),
+        "evidence_references": [evidence["reference"]],
+        "official_evidence": evidence,
+        "official_evidence_hash": _canonical_hash(evidence),
         "source_catalog_version": source_catalog.catalog_version,
         "source_catalog_hash": _canonical_hash(source_payload),
         "output_catalog_version": promoted_catalog.catalog_version,
@@ -300,6 +324,9 @@ def write_product_alias_promotion(
     source_path: Path,
     output_path: Path,
     manifest_path: Path,
+    financials_db: Path,
+    official_evidence_path: Path,
+    archive_path_base: Path = DEFAULT_ARCHIVE_PATH_BASE,
     **promotion: Any,
 ) -> dict[str, Any]:
     """Publish an immutable catalog followed by its commit-marker manifest."""
@@ -313,8 +340,14 @@ def write_product_alias_promotion(
             raise FileExistsError(path)
 
     source_payload = json.loads(source.read_text(encoding="utf-8"))
+    evidence_payload = json.loads(official_evidence_path.read_text(encoding="utf-8"))
+    if not isinstance(evidence_payload, Mapping):
+        raise ValueError("official evidence JSON must be an object")
     output_payload, manifest = build_product_alias_promotion(
         source_payload,
+        official_evidence=evidence_payload,
+        financials_db=financials_db,
+        archive_path_base=archive_path_base,
         **promotion,
     )
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -340,6 +373,118 @@ def write_product_alias_promotion(
         output_temp.unlink(missing_ok=True)
         manifest_temp.unlink(missing_ok=True)
     return manifest
+
+
+def validate_product_alias_official_evidence(
+    payload: Mapping[str, Any],
+    *,
+    financials_db: Path,
+    archive_path_base: Path = DEFAULT_ARCHIVE_PATH_BASE,
+    alias: Any,
+    product_ids: Sequence[str],
+    industry_groups: Sequence[str],
+    promoted_at: Optional[str] = None,
+) -> dict[str, Any]:
+    """Bind one alias decision to a hash-validated official full report."""
+    if payload.get("schema_version") != OFFICIAL_ALIAS_EVIDENCE_SCHEMA:
+        raise ValueError("unsupported official alias evidence schema_version")
+    alias_text = _required_text(alias, "alias")
+    official_label = _required_text(payload.get("official_label"), "official_label")
+    if normalize_product_alias(official_label) != normalize_product_alias(alias_text):
+        raise ValueError("official_label must exactly match the promoted alias")
+    expected_products = _unique_required(product_ids, "product_ids")
+    evidence_products = _unique_required(
+        _sequence_values(payload.get("product_ids"), "product_ids"),
+        "official_evidence.product_ids",
+    )
+    if set(evidence_products) != set(expected_products):
+        raise ValueError("official evidence product_ids do not match promotion")
+    expected_groups = _unique_required(industry_groups, "industry_groups")
+    evidence_groups = _unique_required(
+        _sequence_values(payload.get("industry_groups"), "industry_groups"),
+        "official_evidence.industry_groups",
+    )
+    if set(evidence_groups) != set(expected_groups):
+        raise ValueError("official evidence industry_groups do not match promotion")
+
+    instrument_id = _required_text(payload.get("instrument_id"), "instrument_id")
+    report_period = _required_text(payload.get("report_period"), "report_period")
+    source_file_id = _required_text(payload.get("source_file_id"), "source_file_id")
+    document_hash = _required_sha256(
+        payload.get("official_document_sha256"),
+        "official_document_sha256",
+    )
+    pages = _positive_pages(payload.get("official_page_numbers"))
+    reviewer = _required_text(payload.get("reviewer"), "reviewer")
+    reviewed_at = _required_aware_timestamp(payload.get("reviewed_at"), "reviewed_at")
+    if promoted_at is not None:
+        promotion_time = _required_aware_timestamp(promoted_at, "promoted_at")
+        if _parse_aware_timestamp(reviewed_at) > _parse_aware_timestamp(promotion_time):
+            raise ValueError("reviewed_at must not be later than promoted_at")
+    review_reason = _required_text(payload.get("reason"), "official evidence reason")
+
+    documents, validation_errors = load_validated_official_documents(
+        financials_db,
+        instrument_ids=[instrument_id],
+        report_period=report_period,
+        instrument_periods={(instrument_id, report_period)},
+        archive_path_base=archive_path_base,
+    )
+    matches = [
+        document
+        for document in documents.get((instrument_id, report_period), [])
+        if document.get("source_file_id") == source_file_id
+        and document.get("sha256") == document_hash
+    ]
+    if len(matches) != 1:
+        related_errors = [
+            item
+            for item in validation_errors
+            if str(item.get("source_file_id") or "") == source_file_id
+        ]
+        suffix = f": {related_errors}" if related_errors else ""
+        raise ValueError(
+            "official evidence does not match one active hash-validated manifest"
+            f"{suffix}"
+        )
+    document = matches[0]
+    page_count, page_evidence = _validate_official_page_evidence(
+        document,
+        page_numbers=pages,
+        official_label=official_label,
+    )
+    reference = (
+        f"official_manifest:{source_file_id}:sha256:{document_hash}:"
+        f"pages:{','.join(str(page) for page in pages)}"
+    )
+    return {
+        "schema_version": OFFICIAL_ALIAS_EVIDENCE_SCHEMA,
+        "reference": reference,
+        "instrument_id": instrument_id,
+        "report_period": report_period,
+        "source_file_id": source_file_id,
+        "official_document_sha256": document_hash,
+        "official_page_numbers": pages,
+        "official_document_page_count": page_count,
+        "official_page_evidence": page_evidence,
+        "official_label": official_label,
+        "product_ids": sorted(expected_products),
+        "industry_groups": sorted(expected_groups),
+        "reviewer": reviewer,
+        "reviewed_at": reviewed_at,
+        "reason": review_reason,
+        "source": document.get("source"),
+        "source_tier": document.get("source_tier"),
+        "report_type": document.get("report_type"),
+        "filing_id": document.get("filing_id"),
+        "validation": {
+            "active_official_manifest": True,
+            "archive_hash_verified": True,
+            "full_periodic_report": True,
+            "cited_pages_verified": True,
+            "official_label_verified_on_cited_page": True,
+        },
+    }
 
 
 def _latest_source_rows(
@@ -429,6 +574,101 @@ def _required_text(value: Any, name: str) -> str:
     if not text:
         raise ValueError(f"{name} is required")
     return text
+
+
+def _sequence_values(value: Any, name: str) -> Sequence[str]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError(f"official_evidence.{name} must be an array")
+    return value
+
+
+def _required_sha256(value: Any, name: str) -> str:
+    text = _required_text(value, name).lower()
+    if len(text) != 64 or any(
+        character not in "0123456789abcdef" for character in text
+    ):
+        raise ValueError(f"{name} must be a SHA-256 hex digest")
+    return text
+
+
+def _positive_pages(value: Any) -> list[int]:
+    if (
+        not isinstance(value, Sequence)
+        or isinstance(value, (str, bytes))
+        or not value
+        or not all(
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+            for page in value
+        )
+    ):
+        raise ValueError("official_page_numbers requires positive integer pages")
+    pages = list(value)
+    if len(set(pages)) != len(pages):
+        raise ValueError("official_page_numbers contains duplicates")
+    return sorted(pages)
+
+
+def _validate_official_page_evidence(
+    document: Mapping[str, Any],
+    *,
+    page_numbers: Sequence[int],
+    official_label: str,
+) -> tuple[int, list[dict[str, Any]]]:
+    artifact = BusinessProfilePdfArtifactExtractor().extract_file(
+        Path(_required_text(document.get("path"), "official document path")),
+        source_file_id=_required_text(
+            document.get("source_file_id"),
+            "source_file_id",
+        ),
+        target_page_numbers=page_numbers,
+    )
+    expected_hash = _required_sha256(document.get("sha256"), "document sha256")
+    if artifact.source_content_hash != expected_hash:
+        raise ValueError("official PDF artifact hash does not match manifest")
+    if artifact.page_count < max(page_numbers):
+        raise ValueError(
+            "official_page_numbers exceed official document page count: "
+            f"{artifact.page_count}"
+        )
+    pages_by_number = {page.page_number: page for page in artifact.pages}
+    normalized_label = normalize_product_alias(official_label)
+    page_evidence: list[dict[str, Any]] = []
+    label_verified = False
+    for page_number in page_numbers:
+        page = pages_by_number.get(page_number)
+        if page is None:
+            raise ValueError(f"official page artifact missing: {page_number}")
+        if page.native_text_status != "extracted":
+            raise ValueError(
+                "official cited page requires readable native text: "
+                f"page={page_number}, status={page.native_text_status}"
+            )
+        label_match = normalized_label in normalize_product_alias(page.text)
+        label_verified = label_verified or label_match
+        page_evidence.append(
+            {
+                "page_number": page_number,
+                "text_hash": page.text_hash,
+                "page_artifact_hash": page.page_artifact_hash,
+                "native_text_status": page.native_text_status,
+                "official_label_match": label_match,
+            }
+        )
+    if not label_verified:
+        raise ValueError("official_label does not appear on any cited page")
+    return artifact.page_count, page_evidence
+
+
+def _required_aware_timestamp(value: Any, name: str) -> str:
+    text = _required_text(value, name)
+    parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError(f"{name} must include a timezone")
+    return parsed.isoformat()
+
+
+def _parse_aware_timestamp(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
 def _promotion_alias_id(

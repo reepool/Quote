@@ -64,7 +64,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     promote.add_argument("--review-policy")
     promote.add_argument("--operator", required=True)
     promote.add_argument("--reason", required=True)
-    promote.add_argument("--evidence-reference", action="append", required=True)
+    promote.add_argument(
+        "--financials-db",
+        type=Path,
+        default=ROOT_DIR / "data" / "financials.db",
+    )
+    promote.add_argument(
+        "--archive-path-base",
+        type=Path,
+        default=ROOT_DIR,
+        help="base directory used to resolve relative archive_path manifest values",
+    )
+    promote.add_argument("--official-evidence", type=Path, required=True)
 
     args = parser.parse_args(argv)
     if args.command == "audit":
@@ -74,6 +85,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             source_path=args.source_catalog,
             output_path=args.output_catalog,
             manifest_path=args.manifest_output,
+            financials_db=args.financials_db,
+            official_evidence_path=args.official_evidence,
+            archive_path_base=args.archive_path_base,
             expected_catalog_version=args.expected_version,
             new_catalog_version=args.new_version,
             released_on=args.released_on,
@@ -84,7 +98,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             review_policy=args.review_policy,
             operator=args.operator,
             reason=args.reason,
-            evidence_references=args.evidence_reference,
         )
         payload = {
             "status": "written",

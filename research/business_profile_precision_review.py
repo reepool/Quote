@@ -513,12 +513,36 @@ def minimum_all_correct_sample_size(
     return total
 
 
+def load_validated_official_documents(
+    financials_db: Path,
+    *,
+    instrument_ids: Sequence[str],
+    report_period: Optional[str] = None,
+    instrument_periods: Optional[set[tuple[str, str]]] = None,
+    archive_path_base: Optional[Path] = None,
+) -> tuple[
+    Dict[tuple[str, str], List[Dict[str, Any]]],
+    List[Dict[str, Any]],
+]:
+    """Load active official full reports after archive hash validation."""
+    if not financials_db.exists():
+        raise FileNotFoundError(financials_db)
+    return _load_official_documents(
+        financials_db,
+        instrument_ids=instrument_ids,
+        report_period=report_period,
+        instrument_periods=instrument_periods,
+        archive_path_base=archive_path_base,
+    )
+
+
 def _load_official_documents(
     financials_db: Path,
     *,
     instrument_ids: Sequence[str],
     report_period: Optional[str],
     instrument_periods: Optional[set[tuple[str, str]]] = None,
+    archive_path_base: Optional[Path] = None,
 ) -> tuple[
     Dict[tuple[str, str], List[Dict[str, Any]]],
     List[Dict[str, Any]],
@@ -552,11 +576,24 @@ def _load_official_documents(
             continue
         if item.get("status") not in OFFICIAL_DOCUMENT_STATUSES:
             continue
-        if business_profile_document_family(
-            str(item.get("report_type") or "")
-        ) not in {"annual_report", "semiannual_report"}:
+        if business_profile_document_family(str(item.get("report_type") or "")) not in {
+            "annual_report",
+            "semiannual_report",
+        }:
             continue
-        path = Path(str(item.get("archive_path") or ""))
+        path = _resolve_official_archive_path(
+            item.get("archive_path"),
+            archive_path_base=archive_path_base,
+        )
+        if path is None:
+            validation_errors.append(
+                {
+                    "source_file_id": source_file_id,
+                    "reason": "official_archive_path_outside_base",
+                    "archive_path": str(item.get("archive_path") or ""),
+                }
+            )
+            continue
         content_hash = str(item.get("content_hash") or "")
         if not path.is_file():
             validation_errors.append(
@@ -593,6 +630,23 @@ def _load_official_documents(
             }
         )
     return output, validation_errors
+
+
+def _resolve_official_archive_path(
+    value: Any,
+    *,
+    archive_path_base: Optional[Path],
+) -> Optional[Path]:
+    path = Path(str(value or ""))
+    if path.is_absolute() or archive_path_base is None:
+        return path
+    base = Path(archive_path_base).resolve()
+    resolved = (base / path).resolve()
+    try:
+        resolved.relative_to(base)
+    except ValueError:
+        return None
+    return resolved
 
 
 def _load_candidate_instrument_ids(

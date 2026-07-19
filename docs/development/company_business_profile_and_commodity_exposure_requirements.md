@@ -125,6 +125,17 @@ availability_quality = first_observed_at
 - 因公司属于某行业而补写未披露产品；
 - 自动写入 `company_commodity_exposures`。
 
+产品目录 promotion 必须使用
+`business_profile_product_alias_official_evidence.v1` 结构化证据，不再接受任意
+文本引用。证据必须绑定同公司、同报告期、未被替代的官方完整年报/半年报
+manifest，复核本地文件 SHA-256，并记录正式标签、正页码、产品、行业、审核人、
+带时区审核时间和理由。正式标签规范化后必须与新增精确别名一致；证据产品和行业
+必须与 promotion 参数一致。验证后的证据摘要及其 hash 写入不可变 promotion
+manifest，本地归档路径不对外复制。引用页还必须落在 PDF 实际页数内、原生文本
+可读，且至少一个引用页必须出现规范化后的正式标签；manifest 记录引用页文本 hash
+和页 artifact hash，不保存页全文。扫描件或解码异常页保持 fail closed，后续通过
+受控 OCR artifact 另行处理，不以语义推断替代原文核验。
+
 产品标签命中后，仅能基于明确事实角色筛选映射：
 
 | 事实证据 | 允许的映射 |
@@ -320,6 +331,13 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 - 已实现未匹配/歧义产品标签审计与受控目录升级；别名只允许人工确认后的精确
   标签，升级必须生成不可覆盖的新目录版本和独立审计 manifest；审计先选择
   最新来源行，记录上限截断时返回 incomplete；
+- 目录升级 CLI 已移除自由文本证据参数，改为强制读取
+  `business_profile_product_alias_official_evidence.v1` JSON 和
+  `financials.db`；写目录前验证公司、报告期、活动官方 manifest、完整报告类型、
+  归档 SHA-256、PDF 实际页数、引用页原生文本及 hash、正式标签原文、产品/行业
+  结论和人工审核字段，并要求审核时间不晚于 promotion 时间。相对归档路径按显式
+  基准目录解析，避免依赖进程工作目录。验证后的证据摘要及 hash 进入 promotion
+  manifest，任一项不匹配则 fail closed；
 - structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
   candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
   候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；
