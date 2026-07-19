@@ -523,6 +523,197 @@ class CorporateActionEffectiveDateEvidenceDB(Base):
     )
 
 
+class CorporateActionDocumentArtifactDB(Base):
+    """Immutable official-document artifact for one corporate-action notice."""
+    __tablename__ = 'corporate_action_document_artifacts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    announcement_id = Column(String(64), nullable=False, index=True)
+    source = Column(String(32), nullable=False, default='cninfo', index=True)
+    source_url = Column(Text, nullable=False)
+    announcement_title = Column(Text, nullable=True)
+    announcement_time = Column(DateTime, nullable=True, index=True)
+    content_hash = Column(String(64), nullable=False, index=True)
+    content_type = Column(String(64), nullable=True)
+    content_length = Column(Integer, nullable=False)
+    archive_path = Column(Text, nullable=False)
+    download_status = Column(String(32), nullable=False, index=True)
+    extraction_status = Column(String(32), nullable=False, index=True)
+    parser_version = Column(String(64), nullable=False)
+    error_message = Column(Text, nullable=True)
+    metadata_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'announcement_id', 'content_hash',
+            name='uq_corporate_action_document_artifact',
+        ),
+        Index(
+            'idx_corporate_action_document_status',
+            'download_status', 'extraction_status',
+        ),
+    )
+
+
+class CorporateActionDocumentPageDB(Base):
+    """Page-level normalized text tied to an immutable document artifact."""
+    __tablename__ = 'corporate_action_document_pages'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    artifact_id = Column(
+        Integer,
+        ForeignKey('corporate_action_document_artifacts.id'),
+        nullable=False,
+        index=True,
+    )
+    page_number = Column(Integer, nullable=False)
+    extraction_method = Column(String(32), nullable=False)
+    quality_status = Column(String(32), nullable=False, index=True)
+    text = Column(Text, nullable=False)
+    text_hash = Column(String(64), nullable=False, index=True)
+    character_count = Column(Integer, nullable=False)
+    parser_version = Column(String(64), nullable=False)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'artifact_id', 'page_number', 'parser_version',
+            name='uq_corporate_action_document_page',
+        ),
+        Index(
+            'idx_corporate_action_document_page_quality',
+            'artifact_id', 'quality_status',
+        ),
+    )
+
+
+class CorporateActionLlmAnalysisDB(Base):
+    """Versioned LLM analysis and deterministic gate result for one source event."""
+    __tablename__ = 'corporate_action_llm_analyses'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    analysis_key = Column(String(64), nullable=False, unique=True, index=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source_event_key = Column(String(64), nullable=False, index=True)
+    analysis_status = Column(String(32), nullable=False, index=True)
+    validation_status = Column(String(32), nullable=False, index=True)
+    profile = Column(String(64), nullable=False)
+    model = Column(String(128), nullable=True)
+    schema_version = Column(String(64), nullable=False)
+    prompt_version = Column(String(64), nullable=False)
+    parser_version = Column(String(64), nullable=False)
+    input_hash = Column(String(64), nullable=False, index=True)
+    response_hash = Column(String(64), nullable=True)
+    request_id = Column(String(64), nullable=True, index=True)
+    artifact_ids_json = Column(Text, nullable=False)
+    result_json = Column(Text, nullable=True)
+    gate_results_json = Column(Text, nullable=False)
+    usage_json = Column(Text, nullable=True)
+    latency_ms = Column(Integer, nullable=True)
+    attempt_count = Column(Integer, nullable=False, default=0)
+    error_code = Column(String(64), nullable=True, index=True)
+    error_message = Column(Text, nullable=True)
+    ingestion_run_id = Column(String(64), nullable=True, index=True)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        Index(
+            'idx_corporate_action_llm_event_status',
+            'source_event_key', 'validation_status',
+        ),
+    )
+
+
+class CorporateActionResolutionReviewDB(Base):
+    """Explicit operator decision for one derived corporate-action resolution."""
+    __tablename__ = 'corporate_action_resolution_reviews'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    review_key = Column(String(64), nullable=False, unique=True, index=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source_event_key = Column(String(64), nullable=False, index=True)
+    analysis_id = Column(
+        Integer,
+        ForeignKey('corporate_action_llm_analyses.id'),
+        nullable=True,
+        index=True,
+    )
+    evidence_key = Column(String(128), nullable=True, index=True)
+    decision = Column(String(32), nullable=False, index=True)
+    effective_date = Column(DateTime, nullable=True, index=True)
+    date_basis = Column(String(64), nullable=True)
+    reviewer = Column(String(128), nullable=False)
+    notes = Column(Text, nullable=True)
+    review_payload_json = Column(Text, nullable=False)
+    supersedes_review_id = Column(
+        Integer,
+        ForeignKey('corporate_action_resolution_reviews.id'),
+        nullable=True,
+    )
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        Index(
+            'idx_corporate_action_review_event',
+            'source_event_key', 'decision', 'created_at',
+        ),
+    )
+
+
+class CorporateActionResolvedTermsDB(Base):
+    """Reviewed economic-term overlay; raw CNInfo observations remain unchanged."""
+    __tablename__ = 'corporate_action_resolved_terms'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    instrument_id = Column(
+        String(32), ForeignKey('instruments.instrument_id'), nullable=False, index=True
+    )
+    source_event_key = Column(String(64), nullable=False, index=True)
+    analysis_id = Column(
+        Integer, ForeignKey('corporate_action_llm_analyses.id'), nullable=False
+    )
+    review_id = Column(
+        Integer, ForeignKey('corporate_action_resolution_reviews.id'), nullable=False
+    )
+    cash_dividend_per_share = Column(Float, nullable=True)
+    bonus_shares_per_share = Column(Float, nullable=True)
+    capitalization_shares_per_share = Column(Float, nullable=True)
+    rights_shares_per_share = Column(Float, nullable=True)
+    rights_price = Column(Float, nullable=True)
+    currency = Column(String(8), nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True, index=True)
+    resolved_fields_json = Column(Text, nullable=False)
+    evidence_json = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=safe_get_shanghai_time)
+    updated_at = Column(
+        DateTime, default=safe_get_shanghai_time, onupdate=safe_get_shanghai_time
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'instrument_id', 'source_event_key',
+            name='uq_corporate_action_resolved_terms_event',
+        ),
+    )
+
+
 class DataChangeLogDB(Base):
     """Append-only local-observed change records for incremental sync."""
     __tablename__ = 'data_change_log'

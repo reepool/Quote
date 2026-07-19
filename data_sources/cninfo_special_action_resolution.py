@@ -26,6 +26,8 @@ _EXECUTION_MARKERS = (
     "除息",
     "股权登记",
     "对价",
+    "缴款",
+    "配股",
 )
 _GENERIC_ACTION_MARKERS = (
     "权益分派",
@@ -35,6 +37,7 @@ _GENERIC_ACTION_MARKERS = (
     "送股",
     "转增",
     "分红",
+    "配股",
 )
 _TITLE_EXCLUDES = ("取消", "终止", "不予实施", "不实施")
 
@@ -96,10 +99,19 @@ def _raw_payload(row: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def classify_special_action(row: Mapping[str, Any]) -> Optional[str]:
-    """Classify missing-date events that warrant official announcement discovery."""
-    if parse_date(row.get("ex_date")) is not None:
+    """Classify partial events that warrant official announcement discovery."""
+    quality_status = str(row.get("quality_status") or "")
+    if quality_status not in {
+        "partial_missing_ex_date",
+        "partial_missing_fields",
+        "partial_missing_economic_fields",
+        "partial_zero_effect",
+    }:
         return None
-    if str(row.get("quality_status") or "") != "partial_missing_ex_date":
+    if (
+        quality_status == "partial_missing_ex_date"
+        and parse_date(row.get("ex_date")) is not None
+    ):
         return None
     payload = _raw_payload(row)
     text = " ".join(
@@ -118,6 +130,8 @@ def classify_special_action(row: Mapping[str, Any]) -> Optional[str]:
         _number(row.get("cash_dividend_per_share"))
         + _number(row.get("bonus_shares_per_share"))
         + _number(row.get("capitalization_shares_per_share"))
+        + _number(row.get("rights_shares_per_share"))
+        + _number(row.get("rights_price"))
     )
     if economic_effect > 0 or any(
         marker in text for marker in _GENERIC_ACTION_MARKERS
@@ -144,7 +158,7 @@ def build_search_target(
 
     anchors = sorted({
         parsed
-        for field_name in ("announcement_date", "record_date")
+        for field_name in ("announcement_date", "record_date", "ex_date")
         if (parsed := parse_date(row.get(field_name))) is not None
     })
     if anchors:

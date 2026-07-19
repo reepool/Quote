@@ -86,6 +86,7 @@ def _manager_with_factor_evidence(*, tdx_validation_result="computed_unvalidated
     manager.db_ops.get_resolved_corporate_action_effective_dates = AsyncMock(
         return_value={}
     )
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(return_value={})
     manager.db_ops.get_trading_calendar_records = AsyncMock(return_value=[{
         "date": date(2020, 5, 28),
         "is_trading_day": True,
@@ -200,3 +201,64 @@ async def test_incomplete_rebuild_still_persists_benchmark_without_candidate():
     assert result["write_result"]["canonical_saved_rows"] == 0
     assert result["write_result"]["benchmark_status_saved"] is True
     manager.db_ops.replace_canonical_adjustment_factors.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_reviewed_overlay_replaces_zero_effect_placeholder_only(monkeypatch):
+    import data_sources.cninfo_factor_governance as factor_governance
+
+    manager = _manager_with_factor_evidence()
+    captured_rows = []
+    original_derive = factor_governance.derive_cninfo_factor_path
+
+    def capture_derive(observations, quote_evidence):
+        captured_rows.extend(dict(item) for item in observations)
+        return original_derive(captured_rows, quote_evidence)
+
+    monkeypatch.setattr(
+        factor_governance,
+        "derive_cninfo_factor_path",
+        capture_derive,
+    )
+    original_query = manager.db_ops.execute_read_query.side_effect
+
+    async def execute_read_query(query, params):
+        if "FROM corporate_action_observations" in query:
+            return [{
+                "instrument_id": "000001.SZ",
+                "source_profile": "cninfo_dividend",
+                "source_event_key": "event-1",
+                "action_type": "distribution",
+                "ex_date": datetime(2020, 5, 28),
+                "cash_dividend_per_share": 0.0,
+                "bonus_shares_per_share": 0.0,
+                "capitalization_shares_per_share": 0.0,
+                "rights_shares_per_share": None,
+                "rights_price": None,
+                "event_status": "implemented",
+                "quality_status": "partial_zero_effect",
+                "is_current": 1,
+            }]
+        return await original_query(query, params)
+
+    manager.db_ops.execute_read_query = AsyncMock(side_effect=execute_read_query)
+    manager.db_ops.get_corporate_action_resolved_terms = AsyncMock(return_value={
+        "event-1": {
+            "cash_dividend_per_share": 0.218,
+            "resolved_fields": ["cash_dividend_per_share"],
+        }
+    })
+
+    result = await manager.rebuild_cninfo_primary_adjustment_factors(
+        start_date="1990-12-19",
+        end_date="2026-07-17",
+        exchanges=["SZSE"],
+        instrument_ids=["000001.SZ"],
+        dry_run=True,
+    )
+
+    assert result["cninfo_path"]["pending"] == []
+    assert captured_rows[0]["cash_dividend_per_share"] == pytest.approx(0.218)
+    assert captured_rows[0]["resolved_economic_fields"] == [
+        "cash_dividend_per_share"
+    ]

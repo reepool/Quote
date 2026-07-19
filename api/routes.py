@@ -6,7 +6,7 @@ Defines all REST API endpoints with comprehensive features.
 import inspect
 from typing import List, Optional, Dict, Any, Callable
 from datetime import datetime, date, timedelta
-from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Query, Depends, BackgroundTasks, Body
 from fastapi.params import Param
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 import pandas as pd
@@ -3373,6 +3373,151 @@ async def get_corporate_action_effective_date_evidence(
         items=page.pop("items"),
         **page,
     )
+
+
+@router.get(
+    "/corporate-actions/document-artifacts",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_document_artifacts(
+    announcement_id: Optional[str] = Query(None),
+    content_hash: Optional[str] = Query(None),
+    source_event_key: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query immutable official documents and page-level extraction lineage."""
+    page = await data_manager.db_ops.get_corporate_action_document_bundle(
+        announcement_id=_normalize_optional_query(announcement_id),
+        content_hash=_normalize_optional_query(content_hash),
+        source_event_key=_normalize_optional_query(source_event_key),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_document_artifacts",
+        filters={
+            "announcement_id": _normalize_optional_query(announcement_id),
+            "content_hash": _normalize_optional_query(content_hash),
+            "source_event_key": _normalize_optional_query(source_event_key),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/llm-analyses",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_llm_analyses(
+    instrument_id: Optional[str] = Query(None),
+    source_event_key: Optional[str] = Query(None),
+    validation_status: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query candidate analyses and deterministic gate results without mutation."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    page = await data_manager.db_ops.get_corporate_action_llm_analyses(
+        instrument_id=normalized_id,
+        source_event_key=_normalize_optional_query(source_event_key),
+        validation_status=_normalize_optional_query(validation_status),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_llm_analyses",
+        filters={
+            "instrument_id": normalized_id,
+            "source_event_key": _normalize_optional_query(source_event_key),
+            "validation_status": _normalize_optional_query(validation_status),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/resolution-reviews",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_resolution_reviews(
+    source_event_key: Optional[str] = Query(None),
+    decision: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query explicit human review lineage without changing resolution state."""
+    page = await data_manager.db_ops.get_corporate_action_resolution_reviews(
+        source_event_key=_normalize_optional_query(source_event_key),
+        decision=_normalize_optional_query(decision),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_resolution_reviews",
+        filters={
+            "source_event_key": _normalize_optional_query(source_event_key),
+            "decision": _normalize_optional_query(decision),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.get(
+    "/corporate-actions/resolved-terms",
+    response_model=AdjustmentFactorPageResponse,
+    tags=["Corporate Actions"],
+)
+async def get_corporate_action_resolved_terms(
+    instrument_id: Optional[str] = Query(None),
+    source_event_key: Optional[str] = Query(None),
+    active_only: bool = Query(True),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+):
+    """Query reviewed per-share economic overlays without changing raw CNInfo rows."""
+    normalized_id = (
+        convert_to_database_format(str(instrument_id).strip())
+        if _normalize_optional_query(instrument_id) else None
+    )
+    page = await data_manager.db_ops.get_corporate_action_resolved_terms_page(
+        instrument_id=normalized_id,
+        source_event_key=_normalize_optional_query(source_event_key),
+        active_only=bool(_query_default(active_only, True)),
+        limit=int(_query_default(limit, 100)),
+        offset=int(_query_default(offset, 0)),
+    )
+    return AdjustmentFactorPageResponse(
+        dataset="corporate_action_resolved_terms",
+        filters={
+            "instrument_id": normalized_id,
+            "source_event_key": _normalize_optional_query(source_event_key),
+            "active_only": bool(_query_default(active_only, True)),
+        },
+        items=page.pop("items"),
+        **page,
+    )
+
+
+@router.post(
+    "/corporate-actions/resolution-reviews",
+    tags=["Corporate Actions"],
+)
+async def review_corporate_action_resolution(payload: Dict[str, Any] = Body(...)):
+    """Explicitly review one validated candidate; never edits the raw CNInfo row."""
+    try:
+        return await data_manager.review_cninfo_corporate_action_resolution(dict(payload))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get(

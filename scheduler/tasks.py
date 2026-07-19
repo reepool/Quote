@@ -431,6 +431,37 @@ def _format_cninfo_special_action_discovery_report(
     return "\n".join(lines)
 
 
+def _format_cninfo_corporate_action_llm_report(result: Dict[str, Any]) -> str:
+    """Build a bounded candidate-only report for公告正文解析."""
+    counts = result.get("counts") or {}
+    targets = result.get("targets") or {}
+    lines = [
+        "ℹ️ *A 股巨潮公司行动公告正文解析*",
+        "",
+        f"结论: *{'部分完成' if result.get('status') == 'partial' else '预演完成' if result.get('dry_run') else '完成'}*",
+        f"状态: `{result.get('status')}`",
+        f"dry_run: `{result.get('dry_run')}`",
+        f"候选事件: `{targets.get('candidate_events', 0)}`，本批: `{targets.get('batch_events', 0)}`",
+        f"处理/分析: `{counts.get('processed', 0)}/{counts.get('analyzed', 0)}`",
+        f"通过证据门禁: `{counts.get('validated_candidates', 0)}`",
+        f"需人工复核: `{counts.get('manual_required', 0)}`",
+        f"LLM 未启用: `{counts.get('llm_disabled', 0)}`",
+        f"文档失败: `{counts.get('document_failures', 0)}`，分析失败: `{counts.get('errors', 0)}`",
+        f"下一批 offset: `{targets.get('next_target_offset')}`",
+        "",
+        "说明: 解析结果仅保存为候选 lineage，不会自动写入 resolved 有效日期或生产复权因子。",
+    ]
+    errors = result.get("errors") or []
+    if errors:
+        lines.extend(["", "异常样本:", "```text"])
+        lines.extend(
+            f"{item.get('source_event_key', 'unknown')}: {item.get('code', item.get('error', 'unknown'))}"
+            for item in errors[:10] if isinstance(item, dict)
+        )
+        lines.append("```")
+    return "\n".join(lines)
+
+
 def _format_a_share_factor_rebuild_report(result: Dict[str, Any]) -> str:
     """Build a bounded adjustment-factor governance report."""
     icon, label = _format_scheduler_status(result.get("status"))
@@ -4363,6 +4394,100 @@ class ScheduledTasks:
             }
         finally:
             self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_corporate_action_llm_resolution(
+        self,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        max_events: int = 100,
+        target_offset: int = 0,
+        profile: str = "semantic_extraction",
+        resume: bool = True,
+        dry_run: bool = True,
+        download_documents: bool = True,
+        run_ocr: bool = False,
+        refresh_documents: bool = False,
+        discover_candidates: bool = False,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Manually analyze official CNInfo candidate documents; candidate-only."""
+        task_id = "a_share_cninfo_corporate_action_llm_resolution"
+        self._active_tasks.add(task_id)
+        try:
+            result = await data_manager.analyze_cninfo_corporate_action_candidates(
+                start_date=start_date,
+                end_date=end_date,
+                exchanges=exchanges,
+                instrument_ids=instrument_ids,
+                max_events=int(max_events),
+                target_offset=int(target_offset),
+                profile=profile,
+                resume=bool(resume),
+                dry_run=bool(dry_run),
+                download_documents=bool(download_documents),
+                run_ocr=bool(run_ocr),
+                refresh_documents=bool(refresh_documents),
+                discover_candidates=bool(discover_candidates),
+                sample_limit=int(sample_limit),
+            )
+            if self.telegram_enabled:
+                await self._send_task_report(
+                    report_data={
+                        "name": "A 股巨潮公司行动公告正文解析",
+                        "status": result.get("status"),
+                        "content": _format_cninfo_corporate_action_llm_report(result),
+                        "result": result,
+                    },
+                    report_type="maintenance_report",
+                    task_name=task_id,
+                    job_config=job_config,
+                )
+            return result
+        except Exception as exc:
+            scheduler_logger.exception("[Scheduler] CNInfo corporate-action LLM resolution failed: %s", exc)
+            return {
+                "status": "failed", "operation": task_id, "dry_run": bool(dry_run),
+                "production_isolation": True, "error": str(exc), "errors": [str(exc)],
+            }
+        finally:
+            self._active_tasks.discard(task_id)
+
+    async def a_share_cninfo_corporate_action_llm_incremental(
+        self,
+        lookback_days: int = 14,
+        exchanges: Optional[List[str]] = None,
+        max_events: int = 100,
+        profile: str = "semantic_extraction",
+        resume: bool = True,
+        dry_run: bool = True,
+        download_documents: bool = True,
+        run_ocr: bool = False,
+        refresh_documents: bool = False,
+        sample_limit: int = 20,
+        job_config: Optional[JobConfig] = None,
+    ) -> Dict[str, Any]:
+        """Default-disabled daily candidate discovery and analysis entry point."""
+        end = get_shanghai_time().date()
+        start = end - timedelta(days=max(1, int(lookback_days)))
+        return await self.a_share_cninfo_corporate_action_llm_resolution(
+            start_date=start,
+            end_date=end,
+            exchanges=exchanges or ["SSE", "SZSE"],
+            max_events=max_events,
+            target_offset=0,
+            profile=profile,
+            resume=resume,
+            dry_run=dry_run,
+            download_documents=download_documents,
+            run_ocr=run_ocr,
+            refresh_documents=refresh_documents,
+            discover_candidates=True,
+            sample_limit=sample_limit,
+            job_config=job_config,
+        )
 
     async def a_share_cninfo_adjustment_factor_rebuild(
         self,

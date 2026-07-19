@@ -17571,18 +17571,30 @@ class DataManager:
                 params,
             ))
 
+        source_event_keys = [
+            str(row.get("source_event_key") or "")
+            for row in cninfo_rows
+            if row.get("source_event_key")
+        ]
         resolved_date_evidence = (
-            await self.db_ops.get_resolved_corporate_action_effective_dates([
-                str(row.get("source_event_key") or "")
-                for row in cninfo_rows
-                if row.get("source_event_key")
-            ])
+            await self.db_ops.get_resolved_corporate_action_effective_dates(
+                source_event_keys
+            )
         )
+        resolved_term_overlays: Dict[str, Dict[str, Any]] = {}
+        terms_loader = getattr(
+            self.db_ops, "get_corporate_action_resolved_terms", None
+        )
+        if callable(terms_loader):
+            terms_result = terms_loader(source_event_keys)
+            if inspect.isawaitable(terms_result):
+                resolved_term_overlays = await terms_result
         factor_cninfo_rows: List[Dict[str, Any]] = []
         resolved_outside_range = 0
         for row in cninfo_rows:
             event_key = str(row.get("source_event_key") or "")
             resolved = resolved_date_evidence.get(event_key)
+            resolved_terms = resolved_term_overlays.get(event_key) or {}
             resolved_date = (
                 self._date_from_any(resolved.get("effective_date"))
                 if resolved else None
@@ -17594,8 +17606,44 @@ class DataManager:
             ):
                 resolved_outside_range += 1
                 continue
+            merged_row = dict(row)
+            economic_field_names = (
+                "cash_dividend_per_share",
+                "bonus_shares_per_share",
+                "capitalization_shares_per_share",
+                "rights_shares_per_share",
+                "rights_price",
+            )
+            reviewed_fields = {
+                str(item)
+                for item in (resolved_terms.get("resolved_fields") or [])
+                if str(item) in economic_field_names
+            }
+            quality_status = str(row.get("quality_status") or "")
+            zero_placeholder_statuses = {
+                "partial_missing_fields",
+                "partial_missing_economic_fields",
+                "partial_zero_effect",
+            }
+            applied_economic_fields = []
+            for field_name in economic_field_names:
+                reviewed_value = resolved_terms.get(field_name)
+                if field_name not in reviewed_fields or reviewed_value is None:
+                    continue
+                current_value = merged_row.get(field_name)
+                current_is_placeholder = False
+                if quality_status in zero_placeholder_statuses:
+                    try:
+                        current_is_placeholder = (
+                            current_value is not None and float(current_value) <= 0
+                        )
+                    except (TypeError, ValueError):
+                        current_is_placeholder = True
+                if current_value is None or current_is_placeholder:
+                    merged_row[field_name] = reviewed_value
+                    applied_economic_fields.append(field_name)
             factor_cninfo_rows.append({
-                **row,
+                **merged_row,
                 "resolved_effective_date": resolved_date,
                 "resolved_date_basis": (
                     resolved.get("date_basis") if resolved else None
@@ -17606,6 +17654,8 @@ class DataManager:
                 "resolved_evidence_key": (
                     resolved.get("evidence_key") if resolved else None
                 ),
+                "resolved_economic_terms": bool(applied_economic_fields),
+                "resolved_economic_fields": applied_economic_fields,
             })
 
         quote_keys = build_quote_evidence_keys(factor_cninfo_rows, tdx_rows)
@@ -17747,14 +17797,27 @@ class DataManager:
         required_profiles = {"cninfo_dividend", "cninfo_allotment"}
         endpoint_incomplete_ids = set()
         missing_profile_samples: List[Dict[str, Any]] = []
+        cninfo_pending_ids = {
+            str(item.get("instrument_id"))
+            for item in cninfo_path["pending"]
+            if item.get("instrument_id")
+        }
         for instrument_id in target_ids:
             rows = endpoint_by_instrument.get(instrument_id, [])
             profiles = {str(row.get("source_profile") or "") for row in rows}
             missing_profiles = sorted(required_profiles - profiles)
-            if missing_profiles or any(
-                str(row.get("coverage_status"))
-                in {"partial_missing_fields", "indeterminate"}
+            has_indeterminate = any(
+                str(row.get("coverage_status")) == "indeterminate"
                 for row in rows
+            )
+            has_partial = any(
+                str(row.get("coverage_status")) == "partial_missing_fields"
+                for row in rows
+            )
+            if (
+                missing_profiles
+                or has_indeterminate
+                or (has_partial and instrument_id in cninfo_pending_ids)
             ):
                 endpoint_incomplete_ids.add(instrument_id)
             if missing_profiles and len(missing_profile_samples) < sample_limit:
@@ -18412,10 +18475,14 @@ class DataManager:
                        event_status, quality_status, raw_payload_json
                 FROM corporate_action_observations
                 WHERE source = 'cninfo'
-                  AND source_profile = 'cninfo_dividend'
+                  AND source_profile IN ('cninfo_dividend', 'cninfo_allotment')
                   AND is_current = 1
-                  AND ex_date IS NULL
-                  AND quality_status = 'partial_missing_ex_date'
+                  AND (
+                    quality_status = 'partial_missing_ex_date'
+                    OR quality_status = 'partial_missing_fields'
+                    OR quality_status = 'partial_missing_economic_fields'
+                    OR quality_status = 'partial_zero_effect'
+                  )
                   AND ({' OR '.join(exchange_filters)})
                   {instrument_filter}
                 ORDER BY instrument_id, announcement_date, record_date,
@@ -18699,6 +18766,571 @@ class DataManager:
             "target_samples": target_results[:max(0, int(sample_limit))],
             "errors": errors[:max(0, int(sample_limit))],
             "ingestion_run_id": run_id,
+        }
+
+    async def analyze_cninfo_corporate_action_candidates(
+        self,
+        *,
+        start_date: Union[str, date, datetime],
+        end_date: Union[str, date, datetime],
+        exchanges: Optional[List[str]] = None,
+        instrument_ids: Optional[List[str]] = None,
+        max_events: int = 100,
+        target_offset: int = 0,
+        profile: str = "semantic_extraction",
+        resume: bool = True,
+        dry_run: bool = True,
+        download_documents: bool = True,
+        run_ocr: bool = False,
+        refresh_documents: bool = False,
+        discover_candidates: bool = False,
+        sample_limit: int = 20,
+        llm_client: Any = None,
+        ocr_adapter: Any = None,
+    ) -> Dict[str, Any]:
+        """Analyze CNInfo announcement candidates without promoting resolutions.
+
+        Raw observations and effective-date evidence are deliberately read-only here.
+        Write mode persists only document/page and LLM lineage; a human review is
+        required before an effective date can be written as ``resolved``.
+        """
+        from tempfile import TemporaryDirectory
+        from data_sources.cninfo_corporate_action_documents import (
+            CninfoCorporateActionDocumentService,
+            CorporateActionPageText,
+            select_relevant_pages,
+        )
+        from data_sources.cninfo_corporate_action_llm import (
+            CninfoCorporateActionLlmResolver,
+            PARSER_VERSION,
+            PROMPT_VERSION,
+            SCHEMA_VERSION,
+        )
+        from utils.llm import LlmClient
+
+        normalized_start = date.fromisoformat(str(start_date or "1990-12-19")[:10])
+        normalized_end = date.fromisoformat(
+            str(end_date or get_shanghai_time().date())[:10]
+        )
+        if normalized_end < normalized_start:
+            raise ValueError("end_date must not be earlier than start_date")
+        if refresh_documents and not download_documents:
+            raise ValueError(
+                "refresh_documents requires download_documents=true"
+            )
+        exchange_suffixes = {
+            "SSE": ".SH", "SZSE": ".SZ", "BSE": ".BJ",
+        }
+        selected_exchanges = [str(item).upper() for item in (exchanges or ["SSE", "SZSE"])]
+        unsupported = sorted(set(selected_exchanges) - set(exchange_suffixes))
+        if unsupported:
+            raise ValueError(f"unsupported A-share exchanges: {unsupported}")
+        selected_ids = sorted({str(item).strip() for item in (instrument_ids or []) if str(item).strip()})
+        discovery_result = None
+        if discover_candidates:
+            discovery_result = await self.discover_cninfo_special_action_effective_dates(
+                start_date=normalized_start,
+                end_date=normalized_end,
+                exchanges=selected_exchanges,
+                instrument_ids=selected_ids or None,
+                dry_run=bool(dry_run),
+                max_events=max_events,
+                target_offset=target_offset,
+            )
+        params: Dict[str, Any] = {"start_date": normalized_start.isoformat(), "end_date": normalized_end.isoformat()}
+        suffix_clauses = []
+        for index, exchange in enumerate(selected_exchanges):
+            key = f"suffix_{index}"
+            params[key] = f"%{exchange_suffixes[exchange]}"
+            suffix_clauses.append(f"o.instrument_id LIKE :{key}")
+        id_clause = ""
+        if selected_ids:
+            keys = []
+            for index, item in enumerate(selected_ids):
+                key = f"instrument_{index}"
+                params[key] = item
+                keys.append(f":{key}")
+            id_clause = f" AND o.instrument_id IN ({', '.join(keys)})"
+        rows = await self.db_ops.execute_read_query(
+            f"""
+            SELECT o.instrument_id, o.source_event_key, o.source_profile,
+                   o.action_type, o.fiscal_period, o.announcement_date,
+                   o.record_date, o.ex_date, o.pay_date, o.share_arrival_date,
+                   o.cash_dividend_per_share, o.bonus_shares_per_share,
+                   o.capitalization_shares_per_share, o.rights_shares_per_share,
+                   o.rights_price, o.description, o.raw_payload_json,
+                   e.announcement_id, e.announcement_title, e.announcement_time,
+                   e.evidence_url, e.raw_payload_json AS evidence_payload_json
+            FROM corporate_action_observations o
+            JOIN corporate_action_effective_date_evidence e
+              ON e.instrument_id = o.instrument_id
+             AND e.source_event_key = o.source_event_key
+             AND e.resolution_status = 'candidate'
+             AND e.evidence_source = 'cninfo_announcement_metadata'
+            WHERE o.source = 'cninfo' AND o.is_current = 1
+              AND o.source_profile IN ('cninfo_dividend', 'cninfo_allotment')
+              AND (o.announcement_date >= :start_date AND o.announcement_date < :end_date_exclusive
+                   OR o.record_date >= :start_date AND o.record_date < :end_date_exclusive
+                   OR e.announcement_time >= :start_date AND e.announcement_time < :end_date_exclusive
+                   OR o.fiscal_period LIKE :fiscal_year)
+              AND ({' OR '.join(suffix_clauses)}) {id_clause}
+            ORDER BY o.instrument_id, o.source_event_key, e.announcement_id
+            """,
+            {
+                **params,
+                "end_date_exclusive": (normalized_end + timedelta(days=1)).isoformat(),
+                "fiscal_year": f"%{normalized_start.year}%",
+            },
+        )
+        grouped: Dict[str, Dict[str, Any]] = {}
+        for row in rows:
+            key = str(row.get("source_event_key") or "").strip()
+            if not key:
+                continue
+            event = grouped.setdefault(key, {
+                "instrument_id": row.get("instrument_id"),
+                "source_event_key": key,
+                "source_profile": row.get("source_profile"),
+                "action_type": row.get("action_type"),
+                "fiscal_period": row.get("fiscal_period"),
+                "announcement_date": row.get("announcement_date"),
+                "record_date": row.get("record_date"),
+                "ex_date": row.get("ex_date"),
+                "pay_date": row.get("pay_date"),
+                "share_arrival_date": row.get("share_arrival_date"),
+                "cash_dividend_per_share": row.get("cash_dividend_per_share"),
+                "bonus_shares_per_share": row.get("bonus_shares_per_share"),
+                "capitalization_shares_per_share": row.get("capitalization_shares_per_share"),
+                "rights_shares_per_share": row.get("rights_shares_per_share"),
+                "rights_price": row.get("rights_price"),
+                "description": row.get("description"),
+                "raw_payload_json": row.get("raw_payload_json"),
+                "candidates": [],
+            })
+            event["candidates"].append({
+                "announcement_id": row.get("announcement_id"),
+                "announcement_title": row.get("announcement_title"),
+                "announcement_time": row.get("announcement_time"),
+                "evidence_url": row.get("evidence_url"),
+                "raw_payload_json": row.get("evidence_payload_json"),
+            })
+        all_events = sorted(grouped.values(), key=lambda item: (str(item.get("instrument_id")), str(item.get("source_event_key"))))
+        limit = max(1, min(int(max_events), 5000))
+        offset = max(0, int(target_offset))
+        batch = all_events[offset: offset + limit]
+        has_more = offset + len(batch) < len(all_events)
+        run_id = "a_share_cninfo_corporate_action_llm_" + hashlib.sha256(
+            json.dumps({"start": normalized_start.isoformat(), "end": normalized_end.isoformat(), "ids": selected_ids, "offset": offset}, sort_keys=True).encode()
+        ).hexdigest()[:16]
+        result: Dict[str, Any] = {
+            "status": "dry_run" if dry_run else "success",
+            "operation": "a_share_cninfo_corporate_action_llm_resolution",
+            "dry_run": bool(dry_run),
+            "production_isolation": True,
+            "parameters": {
+                "start_date": normalized_start.isoformat(),
+                "end_date": normalized_end.isoformat(),
+                "exchanges": selected_exchanges,
+                "instrument_ids": selected_ids,
+                "max_events": limit,
+                "target_offset": offset,
+                "profile": profile,
+                "resume": bool(resume),
+                "download_documents": bool(download_documents),
+                "run_ocr": bool(run_ocr),
+                "ocr_adapter_configured": ocr_adapter is not None,
+                "refresh_documents": bool(refresh_documents),
+                "discover_candidates": bool(discover_candidates),
+            },
+            "targets": {"candidate_events": len(all_events), "batch_events": len(batch), "has_more": has_more, "next_target_offset": offset + len(batch) if has_more else None},
+            "counts": {"processed": 0, "analyzed": 0, "resumed": 0, "validated_candidates": 0, "manual_required": 0, "llm_disabled": 0, "document_failures": 0, "errors": 0, "persisted_analyses": 0},
+            "errors": [], "samples": [], "discovery": discovery_result,
+            "ingestion_run_id": run_id,
+        }
+        llm_config = self.config.get_llm_config()
+        if llm_client is None:
+            if not llm_config.enabled or not (llm_config.profiles.get(profile) and llm_config.profiles[profile].enabled):
+                result["counts"]["llm_disabled"] = len(batch)
+                result["status"] = "partial" if batch else result["status"]
+                return result
+            llm_client = LlmClient(llm_config)
+        configured_profile = llm_config.profiles.get(profile)
+        resolver = CninfoCorporateActionLlmResolver(
+            llm_client,
+            profile=profile,
+            model_identity=configured_profile.model if configured_profile else None,
+        )
+
+        with TemporaryDirectory(prefix="cninfo_ca_llm_") as temporary_root:
+            archive_root = temporary_root if dry_run else self.data_config.get("data_dir", "data")
+            service = CninfoCorporateActionDocumentService(
+                archive_root=Path(archive_root) / "filings" / "corporate_actions",
+                ocr_adapter=ocr_adapter if run_ocr else None,
+            )
+            for event in batch:
+                result["counts"]["processed"] += 1
+                pages: list[CorporateActionPageText] = []
+                artifact_ids: list[int] = []
+                for candidate in event["candidates"]:
+                    announcement_id = str(candidate.get("announcement_id") or "").strip()
+                    source_url = str(candidate.get("evidence_url") or "").strip()
+                    if not announcement_id or not source_url:
+                        result["counts"]["document_failures"] += 1
+                        result["errors"].append({"source_event_key": event["source_event_key"], "code": "document_url_missing", "announcement_id": announcement_id})
+                        continue
+                    try:
+                        existing = await self.db_ops.get_corporate_action_document_bundle(
+                            announcement_id=announcement_id,
+                            limit=1000,
+                            offset=0,
+                        )
+                        should_download = bool(download_documents) and (
+                            refresh_documents or not existing.get("items")
+                        )
+                        if should_download:
+                            bundle = await asyncio.to_thread(
+                                service.ingest,
+                                announcement_id=announcement_id,
+                                source_url=source_url,
+                                title=candidate.get("announcement_title"),
+                                announcement_time=candidate.get("announcement_time"),
+                            )
+                            pages.extend(select_relevant_pages(bundle.pages))
+                            if not dry_run:
+                                saved = await self.db_ops.save_corporate_action_document_bundle(
+                                    bundle.artifact_row(
+                                        title=candidate.get("announcement_title"),
+                                        announcement_time=candidate.get("announcement_time"),
+                                    ),
+                                    [page.to_row() for page in bundle.pages],
+                                )
+                                artifact_ids.append(int(saved["artifact_id"]))
+                        elif existing.get("items"):
+                            item = existing["items"][-1]
+                            stored_pages: list[CorporateActionPageText] = []
+                            for page in item.get("pages", []):
+                                stored_pages.append(CorporateActionPageText(page_number=int(page["page_number"]), text=str(page["text"]), text_hash=str(page["text_hash"]), announcement_id=announcement_id, extraction_method=str(page.get("extraction_method") or "native_text"), quality_status=str(page.get("quality_status") or "usable")))
+                            pages.extend(select_relevant_pages(stored_pages))
+                            artifact_ids.append(int(item["artifact_id"]))
+                        else:
+                            result["counts"]["document_failures"] += 1
+                            result["errors"].append({"source_event_key": event["source_event_key"], "announcement_id": announcement_id, "code": "document_download_disabled"})
+                    except Exception as exc:
+                        result["counts"]["document_failures"] += 1
+                        error_code = str(exc)
+                        if (
+                            run_ocr
+                            and ocr_adapter is None
+                            and error_code == "ocr_unavailable"
+                        ):
+                            error_code = "ocr_adapter_unconfigured"
+                        result["errors"].append({
+                            "source_event_key": event["source_event_key"],
+                            "announcement_id": announcement_id,
+                            "code": error_code,
+                        })
+                if not pages:
+                    continue
+                current_input_hash = resolver.input_hash(event, pages)
+                try:
+                    if resume and not dry_run:
+                        prior = await self.db_ops.get_corporate_action_llm_analyses(
+                            instrument_id=event["instrument_id"],
+                            source_event_key=event["source_event_key"],
+                            limit=1000,
+                            offset=0,
+                        )
+                        if any(
+                            item.get("input_hash") == current_input_hash
+                            and item.get("validation_status")
+                            in {"validated_candidate", "manual_required", "no_matching_evidence"}
+                            for item in prior.get("items", [])
+                        ):
+                            result["counts"]["resumed"] += 1
+                            continue
+                    analysis = await resolver.analyze(event=event, pages=pages, allowed_start=normalized_start, allowed_end=normalized_end)
+                    result["counts"]["analyzed"] += 1
+                    if analysis.validation_status == "validated_candidate":
+                        result["counts"]["validated_candidates"] += 1
+                    else:
+                        result["counts"]["manual_required"] += 1
+                    if not dry_run:
+                        saved = await self.db_ops.save_corporate_action_llm_analysis({
+                            "analysis_key": hashlib.sha256(f"{event['source_event_key']}:{analysis.input_hash}:{SCHEMA_VERSION}".encode()).hexdigest(),
+                            "instrument_id": event["instrument_id"], "source_event_key": event["source_event_key"],
+                            "analysis_status": analysis.result.get("analysis_status"), "validation_status": analysis.validation_status,
+                            "profile": profile, "model": analysis.model, "schema_version": SCHEMA_VERSION,
+                            "prompt_version": PROMPT_VERSION, "parser_version": PARSER_VERSION, "input_hash": analysis.input_hash,
+                            "response_hash": analysis.response_hash, "request_id": analysis.request_id, "artifact_ids": artifact_ids,
+                            "result": analysis.result, "gate_results": analysis.gate_results, "usage": analysis.usage,
+                            "latency_ms": analysis.latency_ms, "attempt_count": analysis.attempt_count, "ingestion_run_id": run_id,
+                        })
+                        result["counts"]["persisted_analyses"] += 1 if saved else 0
+                    if len(result["samples"]) < max(0, int(sample_limit)):
+                        result["samples"].append({"source_event_key": event["source_event_key"], "validation_status": analysis.validation_status, "gate_results": analysis.gate_results, "result": analysis.result})
+                except Exception as exc:
+                    result["counts"]["errors"] += 1
+                    result["errors"].append({"source_event_key": event["source_event_key"], "code": "llm_failed", "error": str(exc)})
+                    if not dry_run:
+                        try:
+                            await self.db_ops.save_corporate_action_llm_analysis({
+                                "analysis_key": hashlib.sha256(f"{event['source_event_key']}:{current_input_hash}:{SCHEMA_VERSION}".encode()).hexdigest(),
+                                "instrument_id": event["instrument_id"],
+                                "source_event_key": event["source_event_key"],
+                                "analysis_status": "manual_required",
+                                "validation_status": "failed",
+                                "profile": profile,
+                                "model": configured_profile.model if configured_profile else None,
+                                "schema_version": SCHEMA_VERSION,
+                                "prompt_version": PROMPT_VERSION,
+                                "parser_version": PARSER_VERSION,
+                                "input_hash": current_input_hash,
+                                "artifact_ids": artifact_ids,
+                                "result": {},
+                                "gate_results": {},
+                                "attempt_count": 0,
+                                "error_code": "llm_failed",
+                                "error_message": str(exc),
+                                "ingestion_run_id": run_id,
+                            })
+                        except Exception as persistence_exc:
+                            result["errors"].append({
+                                "source_event_key": event["source_event_key"],
+                                "code": "persistence_failed",
+                                "error": str(persistence_exc),
+                            })
+        result["status"] = "partial" if result["errors"] or result["counts"]["document_failures"] or has_more else result["status"]
+        result["checkpoint"] = {"run_id": run_id, "next_target_offset": result["targets"]["next_target_offset"], "input_event_keys": [item["source_event_key"] for item in batch]}
+        return result
+
+    async def review_cninfo_corporate_action_resolution(
+        self,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Persist an explicit review and optionally promote one official date."""
+        instrument_id = convert_to_database_format(str(payload.get("instrument_id") or "").strip())
+        source_event_key = str(payload.get("source_event_key") or "").strip()
+        reviewer = str(payload.get("reviewer") or "").strip()
+        decision = str(payload.get("decision") or "").strip().lower()
+        analysis_id = int(payload.get("analysis_id") or 0)
+        evidence_key = str(payload.get("evidence_key") or "").strip()
+        if not all((instrument_id, source_event_key, reviewer, decision, analysis_id)):
+            raise ValueError("instrument_id, source_event_key, analysis_id, decision, and reviewer are required")
+        analyses = await self.db_ops.get_corporate_action_llm_analyses(
+            instrument_id=instrument_id,
+            source_event_key=source_event_key,
+            limit=1000,
+            offset=0,
+        )
+        analysis = next(
+            (item for item in analyses.get("items", []) if int(item.get("analysis_id") or 0) == analysis_id),
+            None,
+        )
+        if analysis is None:
+            raise ValueError("analysis_id does not belong to the requested event")
+        effective_date = payload.get("effective_date")
+        date_basis = str(payload.get("date_basis") or "").strip() or None
+        selected_evidence = None
+        resolved_source_profile = None
+        if decision == "resolved":
+            if analysis.get("validation_status") != "validated_candidate":
+                raise ValueError("resolved review requires a validated_candidate analysis")
+            required_gates = {
+                "economic_terms_in_evidence",
+                "event_type_compatible",
+                "effective_date_type_compatible",
+                "analysis_status_compatible",
+                "context_complete",
+            }
+            gate_results = analysis.get("gate_results") or {}
+            if not all(gate_results.get(name) is True for name in required_gates):
+                raise ValueError(
+                    "resolved review requires analysis under the current evidence gates"
+                )
+            if not effective_date or not date_basis or not evidence_key:
+                raise ValueError("resolved review requires effective_date, date_basis, and evidence_key")
+            result = analysis.get("result") or {}
+            selected_evidence = next((
+                item for item in result.get("evidence", [])
+                if isinstance(item, dict)
+                and str(item.get("announcement_id") or "") == evidence_key
+                and str(item.get("exact_quote") or "").strip()
+                and int(item.get("page_number") or 0) > 0
+                and str(item.get("text_hash") or "").strip()
+            ), None)
+            if selected_evidence is None:
+                raise ValueError("selected official page evidence is missing or incomplete")
+            documents = await self.db_ops.get_corporate_action_document_bundle(
+                announcement_id=evidence_key,
+                limit=10,
+                offset=0,
+            )
+            page_match = next((
+                page for artifact in documents.get("items", [])
+                for page in artifact.get("pages", [])
+                if int(page.get("page_number") or 0) == int(selected_evidence["page_number"])
+                and str(page.get("text_hash") or "") == str(selected_evidence["text_hash"])
+                and str(selected_evidence.get("exact_quote") or "").strip()
+                in str(page.get("text") or "")
+            ), None)
+            if page_match is None:
+                raise ValueError("selected evidence does not match an archived official page")
+            try:
+                parsed_review_date = date.fromisoformat(str(effective_date)[:10])
+            except ValueError as exc:
+                raise ValueError("resolved effective_date must be ISO formatted") from exc
+            date_forms = {
+                parsed_review_date.isoformat(),
+                parsed_review_date.strftime("%Y年%m月%d日"),
+                f"{parsed_review_date.year}年{parsed_review_date.month}月{parsed_review_date.day}日",
+            }
+            if not any(form in str(selected_evidence.get("exact_quote") or "") for form in date_forms):
+                raise ValueError("review effective_date must appear in the selected official quote")
+            candidate_page = await self.db_ops.get_corporate_action_effective_date_evidence(
+                instrument_id=instrument_id,
+                source_event_key=source_event_key,
+                evidence_source="cninfo_announcement_metadata",
+                limit=1000,
+                offset=0,
+            )
+            resolved_source_profile = next((
+                item.get("source_profile") for item in candidate_page.get("items", [])
+                if str(item.get("announcement_id") or "") == evidence_key
+            ), None)
+            if not resolved_source_profile:
+                raise ValueError("selected evidence is not a stored CNInfo announcement candidate")
+        elif decision not in {"rejected", "conflict", "manual_required"}:
+            raise ValueError("unsupported corporate-action review decision")
+        review_key = hashlib.sha256(json.dumps({
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "analysis_id": analysis_id,
+            "decision": decision,
+            "effective_date": str(effective_date or ""),
+            "date_basis": date_basis,
+            "evidence_key": evidence_key,
+            "reviewer": reviewer,
+            "notes": str(payload.get("notes") or ""),
+        }, sort_keys=True).encode()).hexdigest()
+        review = await self.db_ops.save_corporate_action_resolution_review({
+            "review_key": review_key,
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "analysis_id": analysis_id,
+            "evidence_key": evidence_key or None,
+            "decision": decision,
+            "effective_date": effective_date,
+            "date_basis": date_basis,
+            "reviewer": reviewer,
+            "notes": payload.get("notes"),
+            "review_payload": {"selected_evidence": selected_evidence},
+            "supersedes_review_id": payload.get("supersedes_review_id"),
+        })
+        from data_sources.cninfo_corporate_action_llm import (
+            canonical_supported_economic_fields,
+        )
+
+        analysis_result = analysis.get("result") or {}
+        economic_terms = analysis_result.get("economic_terms") or {}
+        term_field_map = {
+            "cash_dividend": "cash_dividend_per_share",
+            "bonus_shares": "bonus_shares_per_share",
+            "capitalization_shares": "capitalization_shares_per_share",
+            "rights_shares": "rights_shares_per_share",
+            "rights_price": "rights_price",
+        }
+        normalized_terms = {field_name: None for field_name in term_field_map.values()}
+        resolved_fields = set()
+        currency = None
+        economic_field_evidence: Dict[str, List[Dict[str, Any]]] = {}
+        if decision == "resolved":
+            for evidence in analysis_result.get("evidence", []):
+                if not isinstance(evidence, dict):
+                    continue
+                for source_name in canonical_supported_economic_fields(
+                    evidence.get("supports_fields")
+                ):
+                    economic_field_evidence.setdefault(source_name, []).append(evidence)
+            for source_name, field_name in term_field_map.items():
+                term = economic_terms.get(source_name)
+                if (
+                    not isinstance(term, dict)
+                    or term.get("value") is None
+                    or not economic_field_evidence.get(source_name)
+                ):
+                    continue
+                value = float(term["value"])
+                unit = str(term.get("unit") or "")
+                if unit == "per_10_shares":
+                    value /= 10.0
+                normalized_terms[field_name] = value
+                resolved_fields.add(field_name)
+                currency = currency or term.get("currency")
+        terms_write = await self.db_ops.save_corporate_action_resolved_terms({
+            "instrument_id": instrument_id,
+            "source_event_key": source_event_key,
+            "analysis_id": analysis_id,
+            "review_id": review["review_id"],
+            **normalized_terms,
+            "currency": currency,
+            "resolved_fields": sorted(resolved_fields),
+            "evidence": {
+                "selected_date_evidence": selected_evidence,
+                "economic_field_evidence": economic_field_evidence,
+            } if decision == "resolved" else {},
+            "is_active": decision == "resolved",
+        })
+        evidence_write = None
+        if decision == "resolved":
+            evidence_write = await self.db_ops.save_corporate_action_effective_date_evidence([{
+                "instrument_id": instrument_id,
+                "source_event_key": source_event_key,
+                "observation_source": "cninfo",
+                "source_profile": resolved_source_profile,
+                "evidence_source": "cninfo_reviewed_official_document",
+                "evidence_key": source_event_key,
+                "resolution_status": "resolved",
+                "effective_date": effective_date,
+                "date_basis": date_basis,
+                "announcement_id": evidence_key,
+                "announcement_title": None,
+                "evidence_url": None,
+                "confidence": (analysis.get("result") or {}).get("confidence"),
+                "raw_payload": {
+                    "review_key": review_key,
+                    "analysis_id": analysis_id,
+                    "selected_evidence": selected_evidence,
+                },
+            }], ingestion_run_id=f"corporate_action_review_{review_key[:16]}")
+            if int(evidence_write.get("failed", 0) or 0):
+                raise RuntimeError("resolved evidence persistence failed")
+        else:
+            prior = await self.db_ops.get_corporate_action_effective_date_evidence(
+                instrument_id=instrument_id,
+                source_event_key=source_event_key,
+                evidence_source="cninfo_reviewed_official_document",
+                limit=10,
+                offset=0,
+            )
+            if prior.get("items"):
+                prior_row = prior["items"][0]
+                evidence_write = await self.db_ops.save_corporate_action_effective_date_evidence([{
+                    "instrument_id": instrument_id,
+                    "source_event_key": source_event_key,
+                    "observation_source": "cninfo",
+                    "source_profile": prior_row.get("source_profile"),
+                    "evidence_source": "cninfo_reviewed_official_document",
+                    "evidence_key": source_event_key,
+                    "resolution_status": "rejected",
+                    "raw_payload": {"review_key": review_key, "decision": decision},
+                }], ingestion_run_id=f"corporate_action_review_{review_key[:16]}")
+        return {
+            "status": "success",
+            "review": review,
+            "terms_write": terms_write,
+            "evidence_write": evidence_write,
+            "raw_observation_modified": False,
+            "production_factor_modified": False,
         }
 
     async def validate_a_share_corporate_actions(

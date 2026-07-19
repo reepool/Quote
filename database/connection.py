@@ -164,12 +164,22 @@ class DatabaseManager:
             CorporateActionEffectiveDateEvidenceDB,
             CorporateActionInstrumentStatusDB,
             CorporateActionObservationDB,
+            CorporateActionDocumentArtifactDB,
+            CorporateActionDocumentPageDB,
+            CorporateActionLlmAnalysisDB,
+            CorporateActionResolutionReviewDB,
+            CorporateActionResolvedTermsDB,
         )
 
         tables = (
             CorporateActionObservationDB.__table__,
             CorporateActionInstrumentStatusDB.__table__,
             CorporateActionEffectiveDateEvidenceDB.__table__,
+            CorporateActionDocumentArtifactDB.__table__,
+            CorporateActionDocumentPageDB.__table__,
+            CorporateActionLlmAnalysisDB.__table__,
+            CorporateActionResolutionReviewDB.__table__,
+            CorporateActionResolvedTermsDB.__table__,
         )
         with self.sync_engine.begin() as connection:
             for table in tables:

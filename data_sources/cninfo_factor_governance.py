@@ -40,6 +40,58 @@ def _positive(value: Any) -> Optional[float]:
     return number if number > 0 else None
 
 
+def _reviewed_economic_terms_complete(
+    row: Mapping[str, Any],
+) -> bool:
+    """Return whether reviewed fields fully repair one partial event."""
+    resolved_fields = {
+        str(item)
+        for item in (row.get("resolved_economic_fields") or [])
+        if str(item)
+    }
+    if not resolved_fields:
+        return False
+
+    source_profile = str(row.get("source_profile") or "")
+    action_type = str(row.get("action_type") or "")
+    cash = _number(row.get("cash_dividend_per_share"))
+    bonus = _number(row.get("bonus_shares_per_share"))
+    capitalization = _number(row.get("capitalization_shares_per_share"))
+    rights = _number(row.get("rights_shares_per_share"))
+    rights_price = _number(row.get("rights_price"))
+
+    if source_profile == "cninfo_allotment" or action_type == "rights":
+        required = {"rights_shares_per_share", "rights_price"}
+        return bool(resolved_fields & required) and rights > 0 and rights_price > 0
+
+    distribution_fields = {
+        "cash_dividend_per_share": cash,
+        "bonus_shares_per_share": bonus,
+        "capitalization_shares_per_share": capitalization,
+    }
+    return any(
+        field_name in resolved_fields and value > 0
+        for field_name, value in distribution_fields.items()
+    )
+
+
+def _economic_terms_shape_complete(row: Mapping[str, Any]) -> bool:
+    source_profile = str(row.get("source_profile") or "")
+    action_type = str(row.get("action_type") or "")
+    rights = _number(row.get("rights_shares_per_share"))
+    rights_price = _number(row.get("rights_price"))
+    if source_profile == "cninfo_allotment" or action_type == "rights":
+        return rights > 0 and rights_price > 0
+    return any(
+        _number(row.get(field_name)) > 0
+        for field_name in (
+            "cash_dividend_per_share",
+            "bonus_shares_per_share",
+            "capitalization_shares_per_share",
+        )
+    )
+
+
 def _exchange(instrument_id: str) -> Optional[str]:
     normalized = str(instrument_id or "").upper()
     if normalized.endswith(".SH"):
@@ -143,12 +195,36 @@ def derive_cninfo_factor_path(
             unlocated_pending_instruments.add(instrument_id)
             continue
         quality_status = str(row.get("quality_status") or "")
-        resolved_missing_date = (
+        resolved_date_available = (
             quality_status == "partial_missing_ex_date"
             and raw_ex_date is None
             and resolved_effective_date is not None
         )
-        if quality_status.startswith("partial_") and not resolved_missing_date:
+        resolved_missing_date = (
+            resolved_date_available and _economic_terms_shape_complete(row)
+        )
+        if resolved_date_available and not resolved_missing_date:
+            pending.append({
+                "instrument_id": instrument_id,
+                "source_event_key": event_key,
+                "source_ex_date": source_date.isoformat(),
+                "reason": "partial_missing_economic_fields",
+            })
+            pending_source_dates[instrument_id].append(source_date)
+            continue
+        resolved_missing_fields = (
+            quality_status in {
+                "partial_missing_fields",
+                "partial_missing_economic_fields",
+                "partial_zero_effect",
+            }
+            and _reviewed_economic_terms_complete(row)
+        )
+        if (
+            quality_status.startswith("partial_")
+            and not resolved_missing_date
+            and not resolved_missing_fields
+        ):
             pending.append({
                 "instrument_id": instrument_id,
                 "source_event_key": event_key,
