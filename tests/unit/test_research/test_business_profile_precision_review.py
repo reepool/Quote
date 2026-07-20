@@ -2,17 +2,22 @@ import copy
 import hashlib
 from pathlib import Path
 
+import pytest
+
 from research.business_profile_governance import BusinessProfileRepository
-from research.business_profile_review import BusinessProfileReviewService
 from research.business_profile_precision_review import (
+    _catalog_issue_review_source_payload,
     _stable_hash,
     audit_product_label_review_readiness,
+    build_product_alias_official_evidence_from_review,
+    build_product_catalog_issue_review_package,
     build_product_label_review_package,
     evaluate_product_label_review,
     load_product_catalog_issue_review_rows,
     minimum_all_correct_sample_size,
     wilson_lower_bound,
 )
+from research.business_profile_review import BusinessProfileReviewService
 from research.providers.base import FinancialSourceFileManifest
 from tests.unit.test_research.test_business_profile_governance import (
     _approved_evidence,
@@ -273,6 +278,160 @@ def test_catalog_issue_rows_select_material_unresolved_labels_only(tmp_path):
         "ambiguous_product_alias",
     ]
     assert rows[0]["metadata"]["industry_group"] == "building_material"
+
+
+def test_catalog_issue_review_package_exports_promotion_evidence(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    unresolved = _candidate_segment()
+    unresolved["record_id"] = "segment-unresolved"
+    unresolved["segment_id"] = "glass-products"
+    unresolved["segment_name_raw"] = "玻璃制品"
+    unresolved["metadata"]["source_row_key"] = "glass-products-2025"
+    unresolved["metadata"]["industry_group"] = "building_material"
+    unresolved["metadata"]["product_resolution"] = {
+        "product_ids": [],
+        "matched_alias_ids": [],
+        "normalized_alias": "玻璃制品",
+        "diagnostics": ["alias_not_found"],
+    }
+    repository.upsert("segments", unresolved)
+    pdf_path = tmp_path / "annual.pdf"
+    pdf_path.write_bytes(b"%PDF-official-glass-products")
+    _write_official_manifest(storage, pdf_path)
+
+    package = build_product_catalog_issue_review_package(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+    )
+
+    assert package["status"] == "ready_for_human_review"
+    assert package["row_count"] == 1
+    row = package["rows"][0]
+    assert row["source_label"] == "玻璃制品"
+    assert row["issue_types"] == ["alias_not_found"]
+    assert row["candidate_product_ids"] == []
+    document = row["official_documents"][0]
+    row["review"].update(
+        {
+            "outcome": "promote_alias",
+            "official_label": "玻璃制品",
+            "source_file_id": document["source_file_id"],
+            "official_document_sha256": document["sha256"],
+            "official_page_numbers": [12],
+            "product_ids": ["building.flat_glass"],
+            "industry_groups": ["building_material"],
+            "reviewer": "analyst@example",
+            "reviewed_at": "2026-07-20T10:00:00+08:00",
+            "reason": "official segment table uses the exact label",
+        }
+    )
+
+    evidence = build_product_alias_official_evidence_from_review(
+        package,
+        review_id=row["review_id"],
+    )
+
+    assert evidence["official_label"] == "玻璃制品"
+    assert evidence["product_ids"] == ["building.flat_glass"]
+    assert evidence["catalog_issue_review"]["source_hash"] == row["source_hash"]
+    assert evidence["catalog_issue_review"]["record_id"] == "segment-unresolved"
+
+
+def test_catalog_issue_evidence_rejects_tampering_and_nonpromotion(tmp_path):
+    storage, research_db = _storage(tmp_path)
+    repository = BusinessProfileRepository(storage)
+    repository.upsert("evidence", _approved_evidence())
+    unresolved = _candidate_segment()
+    unresolved["record_id"] = "segment-unresolved"
+    unresolved["segment_name_raw"] = "玻璃制品"
+    unresolved["metadata"]["source_row_key"] = "glass-products-2025"
+    unresolved["metadata"]["industry_group"] = "building_material"
+    unresolved["metadata"]["product_resolution"] = {
+        "product_ids": [],
+        "matched_alias_ids": [],
+        "diagnostics": ["alias_not_found"],
+    }
+    repository.upsert("segments", unresolved)
+    pdf_path = tmp_path / "annual.pdf"
+    pdf_path.write_bytes(b"%PDF-official-glass-products")
+    _write_official_manifest(storage, pdf_path)
+    package = build_product_catalog_issue_review_package(
+        research_db=research_db,
+        financials_db=Path(storage.financials_db_path),
+    )
+    row = package["rows"][0]
+    row["review"]["outcome"] = "defer"
+    with pytest.raises(ValueError, match="not approved"):
+        build_product_alias_official_evidence_from_review(
+            package,
+            review_id=row["review_id"],
+        )
+
+    row["source_label"] = "被篡改标签"
+    with pytest.raises(ValueError, match="source_hash mismatch"):
+        build_product_alias_official_evidence_from_review(
+            package,
+            review_id=row["review_id"],
+        )
+
+
+def test_catalog_issue_review_hash_ignores_archive_location_and_document_order():
+    base = {
+        "record_id": "segment-unresolved",
+        "instrument_id": "600001.SH",
+        "report_period": "2025-12-31",
+        "source_name": "eastmoney_main_composition",
+        "source_row_key": "row-1",
+        "source_label": "玻璃制品",
+        "normalized_alias": "玻璃制品",
+        "industry_group": "building_material",
+        "issue_types": ["alias_not_found"],
+        "candidate_product_ids": [],
+        "matched_alias_ids": [],
+        "revenue": 100.0,
+        "revenue_share": 0.8,
+    }
+    documents = [
+        {
+            "source_file_id": "source-2",
+            "sha256": "b" * 64,
+            "instrument_id": "600001.SH",
+            "report_period": "2025-12-31",
+            "report_type": "annual_report",
+            "source": "cninfo",
+            "source_tier": "official_primary",
+            "filing_id": "filing-2",
+            "path": "/host-a/archive/source-2.pdf",
+            "source_url": "https://host-a.example/source-2.pdf",
+        },
+        {
+            "source_file_id": "source-1",
+            "sha256": "a" * 64,
+            "instrument_id": "600001.SH",
+            "report_period": "2025-12-31",
+            "report_type": "annual_report",
+            "source": "cninfo",
+            "source_tier": "official_primary",
+            "filing_id": "filing-1",
+            "path": "/host-a/archive/source-1.pdf",
+            "source_url": "https://host-a.example/source-1.pdf",
+        },
+    ]
+    first = {**base, "official_documents": documents}
+    second_documents = copy.deepcopy(list(reversed(documents)))
+    for document in second_documents:
+        document["path"] = document["path"].replace("host-a", "host-b")
+        document["source_url"] = document["source_url"].replace("host-a", "host-b")
+    second = {**base, "official_documents": second_documents}
+
+    first_payload = _catalog_issue_review_source_payload(first)
+    second_payload = _catalog_issue_review_source_payload(second)
+
+    assert _stable_hash(first_payload) == _stable_hash(second_payload)
+    assert all("path" not in item for item in first_payload["official_documents"])
+    assert first_payload["official_documents"] == second_payload["official_documents"]
 
 
 def test_industry_coverage_requires_periodic_report_manifest(tmp_path):

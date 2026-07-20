@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import json
 import sqlite3
@@ -91,6 +92,41 @@ def _official_promotion_fixture(tmp_path):
     pdf_path = tmp_path / "official.pdf"
     pdf_path.write_bytes(_pdf_bytes("premium thermal coal"))
     document_hash = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
+    catalog_issue_source_snapshot = {
+        "record_id": "segment-source-1",
+        "instrument_id": "600001.SH",
+        "report_period": "2025-12-31",
+        "source_name": "eastmoney_main_composition",
+        "source_row_key": "source-row-1",
+        "source_label": "premium thermal coal",
+        "normalized_alias": "premiumthermalcoal",
+        "industry_group": "coal",
+        "issue_types": ["alias_not_found"],
+        "candidate_product_ids": [],
+        "matched_alias_ids": [],
+        "revenue": 100.0,
+        "revenue_share": 0.8,
+        "official_documents": [
+            {
+                "source_file_id": "source-1",
+                "sha256": document_hash,
+                "instrument_id": "600001.SH",
+                "report_period": "2025-12-31",
+                "report_type": "annual_report",
+                "source": "cninfo",
+                "source_tier": "official_primary",
+                "filing_id": "filing-1",
+            }
+        ],
+    }
+    catalog_issue_source_hash = hashlib.sha256(
+        json.dumps(
+            catalog_issue_source_snapshot,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     financials_db = tmp_path / "financials.db"
     with sqlite3.connect(financials_db) as conn:
         conn.execute(
@@ -153,6 +189,19 @@ def _official_promotion_fixture(tmp_path):
         "reviewer": "reviewer",
         "reviewed_at": "2020-07-19T00:00:00+00:00",
         "reason": "official report review",
+        "catalog_issue_review": {
+            "review_id": catalog_issue_source_hash[:24],
+            "source_hash": catalog_issue_source_hash,
+            "source_manifest_hash": hashlib.sha256(
+                b"catalog-issue-manifest"
+            ).hexdigest(),
+            "record_id": "segment-source-1",
+            "source_name": "eastmoney_main_composition",
+            "source_row_key": "source-row-1",
+            "source_label": "premium thermal coal",
+            "issue_types": ["alias_not_found"],
+            "source_snapshot": catalog_issue_source_snapshot,
+        },
     }
     evidence_path = tmp_path / "official-evidence.json"
     evidence_path.write_text(
@@ -248,7 +297,40 @@ def test_alias_promotion_builds_valid_new_catalog_and_manifest(tmp_path):
     assert page_evidence["official_label_match"] is True
     assert len(page_evidence["text_hash"]) == 64
     assert len(page_evidence["page_artifact_hash"]) == 64
+    assert manifest["official_evidence"]["catalog_issue_review"]["record_id"] == (
+        "segment-source-1"
+    )
     assert manifest["semantic_inference_performed"] is False
+
+
+def test_official_evidence_rejects_tampered_catalog_issue_lineage(tmp_path):
+    financials_db, _evidence_path, _pdf_path, evidence = _official_promotion_fixture(
+        tmp_path
+    )
+    tampered_lineage = copy.deepcopy(evidence)
+    tampered_lineage["catalog_issue_review"]["record_id"] = "other-segment"
+
+    with pytest.raises(ValueError, match="record_id does not match source_snapshot"):
+        validate_product_alias_official_evidence(
+            tampered_lineage,
+            financials_db=financials_db,
+            alias="premium thermal coal",
+            product_ids=["coal.thermal_coal"],
+            industry_groups=["coal"],
+        )
+
+    tampered_snapshot = copy.deepcopy(evidence)
+    tampered_snapshot["catalog_issue_review"]["source_snapshot"][
+        "source_row_key"
+    ] = "other-row"
+    with pytest.raises(ValueError, match="source_snapshot does not match source_hash"):
+        validate_product_alias_official_evidence(
+            tampered_snapshot,
+            financials_db=financials_db,
+            alias="premium thermal coal",
+            product_ids=["coal.thermal_coal"],
+            industry_groups=["coal"],
+        )
 
 
 def test_alias_promotion_fails_on_stale_version_or_overlapping_alias(tmp_path):
@@ -376,6 +458,7 @@ def test_official_evidence_rejects_invalid_pages_and_archive_tampering(tmp_path)
 
     missing_label = dict(evidence)
     missing_label["official_label"] = "metallurgical coke"
+    missing_label.pop("catalog_issue_review")
     with pytest.raises(ValueError, match="does not appear"):
         validate_product_alias_official_evidence(
             missing_label,

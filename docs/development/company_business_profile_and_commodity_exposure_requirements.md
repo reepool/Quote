@@ -136,6 +136,29 @@ manifest，本地归档路径不对外复制。引用页还必须落在 PDF 实�
 和页 artifact hash，不保存页全文。扫描件或解码异常页保持 fail closed，后续通过
 受控 OCR artifact 另行处理，不以语义推断替代原文核验。
 
+标准人工操作顺序如下，其中第 2 步必须由审核人完成：
+
+```bash
+python scripts/research_business_profile_precision_review.py \
+  --output /tmp/catalog-issues.json export-catalog-issues \
+  --research-db data/research.db --financials-db data/financials.db \
+  --instrument-id 000012.SZ --report-period 2025-12-31
+
+# 人工填写指定 row.review，不允许程序自动补 product_ids 或页码。
+
+python scripts/research_business_profile_precision_review.py \
+  --output /tmp/promotion-evidence.json prepare-promotion-evidence \
+  --review-package /tmp/catalog-issues.json --review-id <review_id>
+
+python scripts/research_business_profile_catalog_governance.py promote-alias \
+  --official-evidence /tmp/promotion-evidence.json \
+  --output-catalog <new_catalog.json> --manifest-output <promotion.json> \
+  --expected-version <current_version> --new-version <new_version> \
+  --released-on <YYYY-MM-DD> --alias <official_label> \
+  --product-id <product_id> --industry-group <industry_group> \
+  --operator <operator> --reason <reason>
+```
+
 产品标签命中后，仅能基于明确事实角色筛选映射：
 
 | 事实证据 | 允许的映射 |
@@ -316,7 +339,7 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
 
 ## 11. 当前实现状态
 
-截至 2026-07-19：
+截至 2026-07-20：
 
 - 已实现 `AkshareStructuredBusinessProfileProvider`，按 AkShare 字段语义通过项目受控 HTTP session 读取东方财富主营构成和同花顺主营介绍；timeout、限速、重试和退避实际生效，并允许单源失败降级；
 - 已实现来源字段规范化、payload hash、200 行疑似上限诊断和原始字段保留；
@@ -338,6 +361,18 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
   结论和人工审核字段，并要求审核时间不晚于 promotion 时间。相对归档路径按显式
   基准目录解析，避免依赖进程工作目录。验证后的证据摘要及 hash 进入 promotion
   manifest，任一项不匹配则 fail closed；
+- 已补齐 `catalog_issues` 的标准人工复核工作包：从最新版材料性未匹配/歧义
+  candidate 读取来源标签、行业、收入占比和对应活动官方报告，生成带 row hash
+  与 package manifest hash 的 `business_profile_product_catalog_issue_review.v1`；
+  人工必须逐行填写 `promote_alias / defer / exclude`，其中只有
+  `promote_alias` 可经 CLI 导出 promotion 所需的官方证据 JSON。导出时验证候选
+  快照未被篡改、正式标签与待解决来源标签一致、报告 ID/hash/报告期属于工作包、
+  产品和行业非空、候选行业已包含、页码为正数以及审核时间带时区；证据保留
+  review/package/source hash lineage，后续仍须通过目录 promotion 的 PDF 原文和
+  页级 hash 二次校验。来源快照只纳入可移植的正式报告身份字段，不纳入本机归档
+  路径、URL 或数据库返回顺序；promotion 会重新计算快照 hash，并逐项核对来源行
+  身份、标签和问题类型，避免跨环境编号漂移或人工替换 lineage。该流程不自动选择
+  产品、不自动修改目录或审核状态；
 - structured sync 已校验来源证券代码，并将请求 deadline 下传到 transport；
   candidate 写入以 raw manifest 成功为前置条件，checkpoint 只在 manifest 和
   候选处理完成后推进；DCF 泄漏使用治理表运行前后差值实测；
@@ -403,8 +438,9 @@ DCF 继续只读取 approved 事实。新结构化数据上线初期不会自动
   报告取证，不代表标签已核对、目录已升级或 99% precision gate 已通过。
 
 因此，当前结论是“新路线已具备受控批次采集和候选治理能力”，不是“公司画像
-数据已生产完备”。下一步应先按材料性标签审计选择可明确归类的有色、建材及
-其他首期行业标签，归档对应公司/报告期正式报告并受控升级精确别名目录；重放
+数据已生产完备”。下一步应使用标准目录问题复核包，按材料性标签审计选择可明确
+归类的有色、建材及其他首期行业标签，归档对应公司/报告期正式报告并由人工填写
+页码、产品和行业结论，再受控升级精确别名目录；重放
 隔离候选后再次运行 readiness 审计，只有六行业均存在正式报告绑定样本且全局
 达到 381 条 manifest-bound 样本时，才进入正式人工比较和单行业生产 candidate
 pilot；不额外设置每行业统一最低样本数。

@@ -9,6 +9,12 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional, Sequence
 
+from research.business_profile_pdf_artifacts import BusinessProfilePdfArtifactExtractor
+from research.business_profile_precision_review import (
+    CATALOG_REVIEW_DIAGNOSTICS,
+    OFFICIAL_ALIAS_EVIDENCE_SCHEMA,
+    load_validated_official_documents,
+)
 from research.business_profile_product_catalog import (
     ALIAS_REVIEW_POLICIES,
     INDUSTRY_GROUPS,
@@ -16,15 +22,7 @@ from research.business_profile_product_catalog import (
     normalize_product_alias,
     parse_business_product_catalog,
 )
-from research.business_profile_pdf_artifacts import (
-    BusinessProfilePdfArtifactExtractor,
-)
-from research.business_profile_precision_review import (
-    load_validated_official_documents,
-)
 
-
-OFFICIAL_ALIAS_EVIDENCE_SCHEMA = "business_profile_product_alias_official_evidence.v1"
 DEFAULT_ARCHIVE_PATH_BASE = Path(__file__).resolve().parent.parent
 
 
@@ -422,6 +420,10 @@ def validate_product_alias_official_evidence(
         if _parse_aware_timestamp(reviewed_at) > _parse_aware_timestamp(promotion_time):
             raise ValueError("reviewed_at must not be later than promoted_at")
     review_reason = _required_text(payload.get("reason"), "official evidence reason")
+    catalog_issue_review = _validate_catalog_issue_review_reference(
+        payload.get("catalog_issue_review"),
+        official_label=official_label,
+    )
 
     documents, validation_errors = load_validated_official_documents(
         financials_db,
@@ -473,6 +475,7 @@ def validate_product_alias_official_evidence(
         "reviewer": reviewer,
         "reviewed_at": reviewed_at,
         "reason": review_reason,
+        "catalog_issue_review": catalog_issue_review,
         "source": document.get("source"),
         "source_tier": document.get("source_tier"),
         "report_type": document.get("report_type"),
@@ -606,6 +609,80 @@ def _positive_pages(value: Any) -> list[int]:
     if len(set(pages)) != len(pages):
         raise ValueError("official_page_numbers contains duplicates")
     return sorted(pages)
+
+
+def _validate_catalog_issue_review_reference(
+    value: Any,
+    *,
+    official_label: str,
+) -> Optional[dict[str, Any]]:
+    if value is None:
+        return None
+    if not isinstance(value, Mapping):
+        raise ValueError("catalog_issue_review must be an object")
+    review_id = _required_text(value.get("review_id"), "catalog issue review_id")
+    source_hash = _required_sha256(
+        value.get("source_hash"),
+        "catalog issue source_hash",
+    )
+    if len(review_id) != 24 or source_hash[:24] != review_id:
+        raise ValueError("catalog issue review_id does not match source_hash")
+    source_snapshot = value.get("source_snapshot")
+    if not isinstance(source_snapshot, Mapping):
+        raise ValueError("catalog issue source_snapshot must be an object")
+    if _canonical_hash(source_snapshot) != source_hash:
+        raise ValueError("catalog issue source_snapshot does not match source_hash")
+    source_label = _required_text(
+        value.get("source_label"),
+        "catalog issue source_label",
+    )
+    if normalize_product_alias(source_label) != normalize_product_alias(official_label):
+        raise ValueError("catalog issue source_label does not match official_label")
+    issue_types = _unique_required(
+        _sequence_values(value.get("issue_types"), "catalog_issue_review.issue_types"),
+        "catalog issue_types",
+    )
+    unsupported_issue_types = set(issue_types) - CATALOG_REVIEW_DIAGNOSTICS
+    if unsupported_issue_types:
+        raise ValueError(
+            f"unsupported catalog issue_types: {sorted(unsupported_issue_types)}"
+        )
+    lineage_fields = {
+        "record_id": value.get("record_id"),
+        "source_name": value.get("source_name"),
+        "source_row_key": value.get("source_row_key"),
+        "source_label": source_label,
+        "issue_types": sorted(issue_types),
+    }
+    for field, expected in lineage_fields.items():
+        actual = source_snapshot.get(field)
+        if field == "issue_types":
+            actual = sorted(str(item) for item in (actual or []))
+        if actual != expected:
+            raise ValueError(f"catalog issue {field} does not match source_snapshot")
+    return {
+        "review_id": review_id,
+        "source_hash": source_hash,
+        "source_manifest_hash": _required_sha256(
+            value.get("source_manifest_hash"),
+            "catalog issue source_manifest_hash",
+        ),
+        "record_id": _required_text(
+            value.get("record_id"),
+            "catalog issue record_id",
+        ),
+        "source_name": _required_text(
+            value.get("source_name"),
+            "catalog issue source_name",
+        ),
+        "source_row_key": _required_text(
+            value.get("source_row_key"),
+            "catalog issue source_row_key",
+        ),
+        "source_label": source_label,
+        "issue_types": sorted(issue_types),
+        "source_snapshot": dict(source_snapshot),
+    }
 
 
 def _validate_official_page_evidence(

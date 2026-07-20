@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import sqlite3
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -30,6 +30,9 @@ CATALOG_REVIEW_DIAGNOSTICS = {
     "alias_not_found",
     "ambiguous_product_alias",
 }
+CATALOG_ISSUE_REVIEW_SCHEMA = "business_profile_product_catalog_issue_review.v1"
+OFFICIAL_ALIAS_EVIDENCE_SCHEMA = "business_profile_product_alias_official_evidence.v1"
+CATALOG_ISSUE_REVIEW_OUTCOMES = {"promote_alias", "defer", "exclude"}
 
 
 def load_product_label_review_rows(
@@ -317,6 +320,232 @@ def build_product_label_review_package(
         [item["source_hash"] for item in review_rows]
     )
     return package
+
+
+def build_product_catalog_issue_review_package(
+    *,
+    research_db: Path,
+    financials_db: Path,
+    instrument_ids: Optional[Sequence[str]] = None,
+    report_period: Optional[str] = None,
+    minimum_revenue_share: float = 0.01,
+    archive_path_base: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """Build a tamper-evident human-review package for unresolved labels."""
+    if not research_db.exists():
+        raise FileNotFoundError(research_db)
+    if not financials_db.exists():
+        raise FileNotFoundError(financials_db)
+    rows = load_product_catalog_issue_review_rows(
+        research_db=research_db,
+        instrument_ids=instrument_ids,
+        report_period=report_period,
+        minimum_revenue_share=minimum_revenue_share,
+    )
+    normalized_instruments = sorted({str(item["instrument_id"]) for item in rows})
+    instrument_periods = {
+        (str(item["instrument_id"]), str(item["report_period"])) for item in rows
+    }
+    documents, document_validation_errors = _load_official_documents(
+        financials_db,
+        instrument_ids=normalized_instruments,
+        report_period=report_period,
+        instrument_periods=instrument_periods,
+        archive_path_base=archive_path_base,
+    )
+    review_rows: List[Dict[str, Any]] = []
+    missing_documents: set[str] = set()
+    for row in rows:
+        instrument_id = str(row["instrument_id"])
+        row_period = str(row["report_period"])
+        official_documents = documents.get((instrument_id, row_period), [])
+        if not official_documents:
+            missing_documents.add(f"{instrument_id}:{row_period}")
+        metadata = row.get("metadata")
+        metadata = metadata if isinstance(metadata, Mapping) else {}
+        resolution = metadata.get("product_resolution")
+        resolution = resolution if isinstance(resolution, Mapping) else {}
+        review_source = {
+            "record_id": row["record_id"],
+            "instrument_id": instrument_id,
+            "report_period": row_period,
+            "source_name": metadata.get("source_name"),
+            "source_row_key": metadata.get("source_row_key"),
+            "source_label": row.get("segment_name_raw"),
+            "normalized_alias": (
+                str(resolution.get("normalized_alias") or "").strip()
+                or normalize_product_alias(row.get("segment_name_raw"))
+            ),
+            "industry_group": metadata.get("industry_group"),
+            "issue_types": list(row.get("catalog_review_issue_types") or []),
+            "candidate_product_ids": list(resolution.get("product_ids") or []),
+            "matched_alias_ids": list(resolution.get("matched_alias_ids") or []),
+            "revenue": row.get("revenue"),
+            "revenue_share": row.get("revenue_share"),
+            "official_documents": official_documents,
+        }
+        source_hash = _stable_hash(_catalog_issue_review_source_payload(review_source))
+        review_rows.append(
+            {
+                "review_id": source_hash[:24],
+                "source_hash": source_hash,
+                **review_source,
+                "review": {
+                    "outcome": None,
+                    "official_label": None,
+                    "source_file_id": None,
+                    "official_document_sha256": None,
+                    "official_page_numbers": [],
+                    "product_ids": [],
+                    "industry_groups": [],
+                    "reviewer": None,
+                    "reviewed_at": None,
+                    "reason": None,
+                },
+            }
+        )
+    package: Dict[str, Any] = {
+        "schema_version": CATALOG_ISSUE_REVIEW_SCHEMA,
+        "status": (
+            "ready_for_human_review"
+            if review_rows and not missing_documents and not document_validation_errors
+            else "incomplete"
+        ),
+        "research_db": str(research_db),
+        "financials_db": str(financials_db),
+        "scope": {
+            "instrument_ids": normalized_instruments,
+            "report_period": report_period,
+            "minimum_revenue_share": minimum_revenue_share,
+            "candidate_only": True,
+            "exact_alias_only": True,
+            "semantic_inference_performed": False,
+        },
+        "row_count": len(review_rows),
+        "missing_official_document_instrument_periods": sorted(missing_documents),
+        "official_document_validation_errors": document_validation_errors,
+        "rows": review_rows,
+    }
+    package["source_manifest_hash"] = _stable_hash(
+        [item["source_hash"] for item in review_rows]
+    )
+    return package
+
+
+def build_product_alias_official_evidence_from_review(
+    package: Mapping[str, Any],
+    *,
+    review_id: str,
+) -> Dict[str, Any]:
+    """Export one completed promotion decision to the governed evidence schema."""
+    if package.get("schema_version") != CATALOG_ISSUE_REVIEW_SCHEMA:
+        raise ValueError("unsupported catalog issue review schema_version")
+    rows = package.get("rows")
+    if not isinstance(rows, list):
+        raise ValueError("catalog issue review rows must be an array")
+    selected = [
+        row
+        for row in rows
+        if isinstance(row, Mapping)
+        and str(row.get("review_id") or "").strip() == str(review_id).strip()
+    ]
+    if len(selected) != 1:
+        raise ValueError("review_id must identify exactly one catalog issue row")
+    row = selected[0]
+    expected_source_hash = _stable_hash(_catalog_issue_review_source_payload(row))
+    if row.get("source_hash") != expected_source_hash:
+        raise ValueError("catalog issue review source_hash mismatch")
+    manifest_hash = _stable_hash(
+        [
+            str(item.get("source_hash") or "")
+            for item in rows
+            if isinstance(item, Mapping)
+        ]
+    )
+    if package.get("source_manifest_hash") != manifest_hash:
+        raise ValueError("catalog issue review source_manifest_hash mismatch")
+    review = row.get("review")
+    if not isinstance(review, Mapping):
+        raise ValueError("catalog issue review decision must be an object")
+    outcome = str(review.get("outcome") or "").strip().lower()
+    if outcome not in CATALOG_ISSUE_REVIEW_OUTCOMES:
+        raise ValueError("catalog issue review outcome is unsupported")
+    if outcome != "promote_alias":
+        raise ValueError("catalog issue row is not approved for alias promotion")
+
+    source_label = _required_review_text(row.get("source_label"), "source_label")
+    official_label = _required_review_text(
+        review.get("official_label"),
+        "review.official_label",
+    )
+    if normalize_product_alias(official_label) != normalize_product_alias(source_label):
+        raise ValueError("official_label must match the unresolved source_label")
+    source_file_id = _required_review_text(
+        review.get("source_file_id"),
+        "review.source_file_id",
+    )
+    document_hash = _required_review_sha256(
+        review.get("official_document_sha256"),
+        "review.official_document_sha256",
+    )
+    documents = row.get("official_documents")
+    if not isinstance(documents, list):
+        raise ValueError("catalog issue row official_documents must be an array")
+    matching_documents = [
+        document
+        for document in documents
+        if isinstance(document, Mapping)
+        and document.get("source_file_id") == source_file_id
+        and document.get("sha256") == document_hash
+        and document.get("report_period") == row.get("report_period")
+    ]
+    if len(matching_documents) != 1:
+        raise ValueError("review document does not match one packaged official report")
+    pages = _required_review_pages(review.get("official_page_numbers"))
+    product_ids = _required_review_string_array(
+        review.get("product_ids"),
+        "review.product_ids",
+    )
+    industry_groups = _required_review_string_array(
+        review.get("industry_groups"),
+        "review.industry_groups",
+    )
+    expected_industry = str(row.get("industry_group") or "").strip()
+    if expected_industry and expected_industry not in industry_groups:
+        raise ValueError("review industry_groups must include the candidate industry")
+    reviewed_at = _required_review_timestamp(review.get("reviewed_at"))
+    source_snapshot = _catalog_issue_review_source_payload(row)
+    return {
+        "schema_version": OFFICIAL_ALIAS_EVIDENCE_SCHEMA,
+        "instrument_id": _required_review_text(
+            row.get("instrument_id"),
+            "instrument_id",
+        ),
+        "report_period": _required_review_text(
+            row.get("report_period"),
+            "report_period",
+        ),
+        "source_file_id": source_file_id,
+        "official_document_sha256": document_hash,
+        "official_page_numbers": pages,
+        "official_label": official_label,
+        "product_ids": product_ids,
+        "industry_groups": industry_groups,
+        "reviewer": _required_review_text(review.get("reviewer"), "review.reviewer"),
+        "reviewed_at": reviewed_at,
+        "reason": _required_review_text(review.get("reason"), "review.reason"),
+        "catalog_issue_review": {
+            "review_id": str(row["review_id"]),
+            "source_hash": expected_source_hash,
+            "source_manifest_hash": str(package["source_manifest_hash"]),
+            "record_id": row.get("record_id"),
+            "source_name": row.get("source_name"),
+            "source_row_key": row.get("source_row_key"),
+            "source_label": source_label,
+            "issue_types": list(row.get("issue_types") or []),
+            "source_snapshot": source_snapshot,
+        },
+    }
 
 
 def evaluate_product_label_review(
@@ -898,6 +1127,112 @@ def _is_periodic_review_period(value: Any) -> bool:
     except ValueError:
         return False
     return (parsed.month, parsed.day) in {(6, 30), (12, 31)}
+
+
+def _catalog_issue_review_source_payload(item: Mapping[str, Any]) -> Dict[str, Any]:
+    payload = {
+        key: item.get(key)
+        for key in (
+            "record_id",
+            "instrument_id",
+            "report_period",
+            "source_name",
+            "source_row_key",
+            "source_label",
+            "normalized_alias",
+            "industry_group",
+            "issue_types",
+            "candidate_product_ids",
+            "matched_alias_ids",
+            "revenue",
+            "revenue_share",
+        )
+    }
+    payload["official_documents"] = _canonical_official_document_identities(
+        item.get("official_documents")
+    )
+    return payload
+
+
+def _canonical_official_document_identities(value: Any) -> List[Dict[str, Any]]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return []
+    identities = [
+        {
+            key: document.get(key)
+            for key in (
+                "source_file_id",
+                "sha256",
+                "instrument_id",
+                "report_period",
+                "report_type",
+                "source",
+                "source_tier",
+                "filing_id",
+            )
+        }
+        for document in value
+        if isinstance(document, Mapping)
+    ]
+    return sorted(
+        identities,
+        key=lambda item: json.dumps(
+            item,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ),
+    )
+
+
+def _required_review_text(value: Any, name: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError(f"{name} is required")
+    return text
+
+
+def _required_review_string_array(value: Any, name: str) -> List[str]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError(f"{name} must be an array")
+    output = [str(item).strip() for item in value if str(item).strip()]
+    if not output:
+        raise ValueError(f"{name} must not be empty")
+    if len(set(output)) != len(output):
+        raise ValueError(f"{name} contains duplicates")
+    return sorted(output)
+
+
+def _required_review_pages(value: Any) -> List[int]:
+    if (
+        not isinstance(value, Sequence)
+        or isinstance(value, (str, bytes))
+        or not value
+        or not all(
+            isinstance(page, int) and not isinstance(page, bool) and page > 0
+            for page in value
+        )
+    ):
+        raise ValueError("review.official_page_numbers requires positive pages")
+    pages = list(value)
+    if len(set(pages)) != len(pages):
+        raise ValueError("review.official_page_numbers contains duplicates")
+    return sorted(pages)
+
+
+def _required_review_sha256(value: Any, name: str) -> str:
+    text = _required_review_text(value, name).lower()
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise ValueError(f"{name} must be a SHA-256 hex digest")
+    return text
+
+
+def _required_review_timestamp(value: Any) -> str:
+    text = _required_review_text(value, "review.reviewed_at")
+    parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("review.reviewed_at must include a timezone")
+    return parsed.isoformat()
 
 
 def _stable_hash(value: Any) -> str:
