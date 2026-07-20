@@ -20,6 +20,8 @@
         "requests_per_minute": 20,
         "temperature": 0.0,
         "max_output_tokens_field": "max_completion_tokens",
+        "stream": true,
+        "stream_include_usage": true,
         "max_retry_after_seconds": 30,
         "retry_backoff_seconds": 0.5,
         "idempotency_header": "Idempotency-Key"

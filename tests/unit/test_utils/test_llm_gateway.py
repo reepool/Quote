@@ -109,6 +109,8 @@ def test_profile_defaults_preserve_declared_values_and_explicit_zeroes():
     assert profile.max_retries == 2
     assert profile.max_schema_repair_attempts == 1
     assert profile.requests_per_minute == 20
+    assert profile.stream is False
+    assert profile.stream_include_usage is True
 
     disabled_limits = LlmConfig.from_mapping(
         {
@@ -227,6 +229,72 @@ async def test_non_json_http_errors_keep_status_for_classification():
     with pytest.raises(LlmAuthenticationError):
         await client.complete(_unstructured_request())
     assert client_impl.calls == 1
+
+
+@pytest.mark.asyncio
+async def test_streaming_transport_reassembles_json_and_usage():
+    chunks = [
+        'data: {"id":"stream-1","model":"test-model","choices":[{"delta":{"reasoning_content":"thinking"},"finish_reason":null}]}',
+        "",
+        'data: {"id":"stream-1","model":"test-model","choices":[{"delta":{"content":"{\\\"label\\\":\\\"ok\\\","},"finish_reason":null}]}',
+        "",
+        'data: {"id":"stream-1","model":"test-model","choices":[{"delta":{"content":"\\\"score\\\":1}"},"finish_reason":"stop"}]}',
+        "",
+        'data: {"id":"stream-1","model":"test-model","choices":[],"usage":{"prompt_tokens":10,"completion_tokens":4,"total_tokens":14}}',
+        "",
+        "data: [DONE]",
+        "",
+    ]
+
+    class Response:
+        status_code = 200
+        headers = {"x-request-id": "provider-stream-1"}
+
+        async def aiter_lines(self):
+            for line in chunks:
+                yield line
+
+        async def aread(self):
+            return b""
+
+        def json(self):
+            raise AssertionError("successful stream must not use response.json()")
+
+    class StreamContext:
+        async def __aenter__(self):
+            return Response()
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return None
+
+    class Client:
+        def __init__(self):
+            self.calls = []
+
+        def stream(self, method, url, **kwargs):
+            self.calls.append({"method": method, "url": url, **kwargs})
+            return StreamContext()
+
+        async def aclose(self):
+            return None
+
+    client_impl = Client()
+    client = LlmClient(
+        _config(stream=True, stream_include_usage=True),
+        transport=HttpxOpenAICompatibleTransport(client=client_impl),
+        environment={"TEST_LLM_KEY": "unit-secret"},
+    )
+    response = await client.complete(_request(idempotency_key="stable-stream-job"))
+
+    assert response.data == {"label": "ok", "score": 1}
+    assert response.provider_request_id == "provider-stream-1"
+    assert response.usage is not None
+    assert response.usage.total_tokens == 14
+    assert client_impl.calls[0]["json"]["stream"] is True
+    assert client_impl.calls[0]["json"]["stream_options"] == {"include_usage": True}
+    stream_idempotency_key = client_impl.calls[0]["headers"]["Idempotency-Key"]
+    assert stream_idempotency_key != "stable-stream-job"
+    assert len(stream_idempotency_key) == 64
 
 
 @pytest.mark.asyncio

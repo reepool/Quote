@@ -88,24 +88,30 @@ class LlmClient:
                 ),
                 max_output_tokens=request.max_output_tokens,
                 max_output_tokens_field=profile.max_output_tokens_field,
+                stream=profile.stream,
+                stream_include_usage=profile.stream_include_usage,
             )
-            request_hash = stable_hash(
-                {
-                    "profile": profile.name,
-                    "provider": profile.provider,
-                    "model": model,
-                    "messages": provider_messages,
-                    "schema": schema,
-                    "schema_name": request.schema_name,
-                    "schema_version": request.schema_version,
-                    "mode": mode,
-                    "temperature": payload.get("temperature"),
-                    "max_output_tokens": request.max_output_tokens,
-                    "max_output_tokens_field": profile.max_output_tokens_field,
-                }
-            )
+            request_identity = {
+                "profile": profile.name,
+                "provider": profile.provider,
+                "model": model,
+                "messages": provider_messages,
+                "schema": schema,
+                "schema_name": request.schema_name,
+                "schema_version": request.schema_version,
+                "mode": mode,
+                "temperature": payload.get("temperature"),
+                "max_output_tokens": request.max_output_tokens,
+                "max_output_tokens_field": profile.max_output_tokens_field,
+            }
+            if profile.stream:
+                request_identity.update({
+                    "stream": True,
+                    "stream_include_usage": profile.stream_include_usage,
+                })
+            request_hash = stable_hash(request_identity)
             headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
-            if request.idempotency_key and profile.idempotency_header:
+            if request.idempotency_key and profile.idempotency_header and not profile.stream:
                 headers[profile.idempotency_header] = request.idempotency_key
 
             limiter = self.limiter_registry.get(
@@ -161,7 +167,12 @@ class LlmClient:
                         response = await asyncio.wait_for(
                             self.transport.send(
                                 url,
-                                headers,
+                                self._attempt_headers(
+                                    headers,
+                                    profile=profile,
+                                    idempotency_key=request.idempotency_key,
+                                    payload=current_payload,
+                                ),
                                 current_payload,
                                 attempt_timeout,
                             ),
@@ -357,6 +368,22 @@ class LlmClient:
         return api_key
 
     @staticmethod
+    def _attempt_headers(
+        headers: Mapping[str, str],
+        *,
+        profile: LlmProfile,
+        idempotency_key: Optional[str],
+        payload: Mapping[str, Any],
+    ) -> dict[str, str]:
+        attempt_headers = dict(headers)
+        if profile.stream and idempotency_key and profile.idempotency_header:
+            attempt_headers[profile.idempotency_header] = stable_hash({
+                "caller_key": idempotency_key,
+                "payload": payload,
+            })
+        return attempt_headers
+
+    @staticmethod
     def _validate_untrusted_input(request: LlmRequest, messages: tuple[LlmMessage, ...]) -> None:
         if not request.content_is_untrusted:
             return
@@ -400,6 +427,8 @@ class LlmClient:
         temperature: float,
         max_output_tokens: Optional[int],
         max_output_tokens_field: str,
+        stream: bool,
+        stream_include_usage: bool,
     ) -> dict[str, Any]:
         provider_messages = list(messages)
         payload: dict[str, Any] = {
@@ -409,6 +438,10 @@ class LlmClient:
         }
         if max_output_tokens is not None:
             payload[max_output_tokens_field] = int(max_output_tokens)
+        if stream:
+            payload["stream"] = True
+            if stream_include_usage:
+                payload["stream_options"] = {"include_usage": True}
         if schema is not None and mode == "json_schema":
             payload["response_format"] = {
                 "type": "json_schema",

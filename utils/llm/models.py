@@ -98,6 +98,8 @@ class LlmProfile:
     requests_per_minute: int = 20
     temperature: float = 0.0
     max_output_tokens_field: str = "max_tokens"
+    stream: bool = False
+    stream_include_usage: bool = True
     max_retry_after_seconds: float = 30.0
     retry_backoff_seconds: float = 0.5
     idempotency_header: str = "Idempotency-Key"
@@ -158,6 +160,8 @@ class LlmProfile:
             requests_per_minute=max(0, int(_configured(value, "requests_per_minute", 20))),
             temperature=float(_configured(value, "temperature", 0.0)),
             max_output_tokens_field=max_output_tokens_field,
+            stream=value.get("stream") is True,
+            stream_include_usage=value.get("stream_include_usage", True) is True,
             max_retry_after_seconds=max(
                 0.0, float(_configured(value, "max_retry_after_seconds", 30.0))
             ),
@@ -189,6 +193,8 @@ class LlmProfile:
             "requests_per_minute": self.requests_per_minute,
             "temperature": self.temperature,
             "max_output_tokens_field": self.max_output_tokens_field,
+            "stream": self.stream,
+            "stream_include_usage": self.stream_include_usage,
         }
 
 
