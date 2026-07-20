@@ -504,10 +504,11 @@ async def test_non_retryable_http_statuses_make_one_call(status_code, error_type
 
 
 @pytest.mark.asyncio
-async def test_retryable_5xx_then_success_and_idempotency_header():
+@pytest.mark.parametrize("status_code", [500, 502, 503, 504, 520, 521, 522, 523, 524])
+async def test_retryable_provider_status_then_success_and_idempotency_header(status_code):
     transport = ScriptedTransport(
         [
-            {"status_code": 503, "data": {}},
+            {"status_code": status_code, "data": {}},
             _response({"label": "ok", "score": 1}),
         ]
     )

@@ -19,6 +19,23 @@ ERROR_CODES = {
 }
 
 
+RETRYABLE_PROVIDER_STATUS_CODES = {
+    408,
+    500,
+    502,
+    503,
+    504,
+    # Cloudflare reports origin connection and execution failures with 52x
+    # responses. These are transient gateway failures; 525/526 are excluded
+    # because TLS configuration failures are not expected to recover on retry.
+    520,
+    521,
+    522,
+    523,
+    524,
+}
+
+
 @dataclass
 class LlmError(RuntimeError):
     """Safe, classified gateway error.
@@ -111,7 +128,7 @@ def safe_provider_error(status_code: int) -> LlmError:
         )
     if status_code == 429:
         return LlmRateLimitError("LLM provider rate limit exceeded", status_code=status_code)
-    if status_code in {408, 500, 502, 503, 504}:
+    if status_code in RETRYABLE_PROVIDER_STATUS_CODES:
         return LlmTransientTransportError(
             "LLM provider returned a retryable response", status_code=status_code
         )
