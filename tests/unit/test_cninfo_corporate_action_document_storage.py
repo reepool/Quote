@@ -86,6 +86,64 @@ async def test_document_bundle_is_idempotent_and_event_filter_is_paginated():
 
 
 @pytest.mark.asyncio
+async def test_document_and_analysis_saves_return_ids_with_expiring_sessions():
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_factory = async_sessionmaker(engine, expire_on_commit=True)
+    async with engine.begin() as connection:
+        await connection.run_sync(
+            Base.metadata.create_all,
+            tables=[
+                InstrumentDB.__table__,
+                CorporateActionDocumentArtifactDB.__table__,
+                CorporateActionDocumentPageDB.__table__,
+                CorporateActionLlmAnalysisDB.__table__,
+            ],
+        )
+    async with session_factory() as session:
+        session.add(InstrumentDB(
+            instrument_id="000001.SZ", symbol="000001", name="Test",
+            exchange="SZSE", type="stock", currency="CNY", is_active=True,
+        ))
+        await session.commit()
+    operations = DatabaseOperations(auto_initialize=False)
+    operations.get_async_session = lambda: session_factory()
+    artifact = await operations.save_corporate_action_document_bundle(
+        {
+            "announcement_id": "ann-1",
+            "source_url": "https://example.test/ann-1.pdf",
+            "content_hash": "a" * 64,
+            "content_type": "application/pdf",
+            "content_length": 10,
+            "archive_path": "ann-1/a.pdf",
+            "parser_version": "unit.v1",
+        },
+        [{
+            "page_number": 1,
+            "text": "除权除息日为2026年6月12日。",
+            "text_hash": "b" * 64,
+        }],
+    )
+    analysis = await operations.save_corporate_action_llm_analysis({
+        "analysis_key": "analysis-key",
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_status": "resolved_candidate",
+        "validation_status": "validated_candidate",
+        "profile": "semantic_extraction",
+        "schema_version": "v1",
+        "prompt_version": "p1",
+        "parser_version": "parser-v1",
+        "input_hash": "c" * 64,
+        "artifact_ids": [artifact["artifact_id"]],
+        "result": {"effective_date": "2026-06-12"},
+        "gate_results": {"date_in_evidence": True},
+    })
+    assert artifact["artifact_id"] == 1
+    assert analysis["analysis_id"] == 1
+    await engine.dispose()
+
+
+@pytest.mark.asyncio
 async def test_review_queue_uses_latest_analysis_and_compact_lineage():
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     session_factory = async_sessionmaker(engine, expire_on_commit=False)

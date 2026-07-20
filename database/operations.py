@@ -4221,6 +4221,7 @@ class DatabaseOperations:
                     setattr(existing, key, value)
                 existing.updated_at = get_shanghai_time()
                 artifact_status = "unchanged"
+            artifact_id = int(existing.id)
             page_count = 0
             for page in pages:
                 page_number = int(page.get("page_number") or 0)
@@ -4233,14 +4234,14 @@ class DatabaseOperations:
                     continue
                 page_row = (await session.execute(
                     select(CorporateActionDocumentPageDB).where(
-                        CorporateActionDocumentPageDB.artifact_id == existing.id,
+                        CorporateActionDocumentPageDB.artifact_id == artifact_id,
                         CorporateActionDocumentPageDB.page_number == page_number,
                         CorporateActionDocumentPageDB.parser_version
                         == page_parser_version,
                     )
                 )).scalar_one_or_none()
                 page_values = {
-                    "artifact_id": existing.id,
+                    "artifact_id": artifact_id,
                     "page_number": page_number,
                     "extraction_method": str(
                         page.get("extraction_method") or "native_text"
@@ -4262,7 +4263,7 @@ class DatabaseOperations:
                 page_count += 1
             await session.commit()
             return {
-                "artifact_id": existing.id,
+                "artifact_id": artifact_id,
                 "artifact_status": artifact_status,
                 "page_count": page_count,
             }
@@ -4422,8 +4423,10 @@ class DatabaseOperations:
                     setattr(existing, key, value)
                 existing.updated_at = get_shanghai_time()
                 status = "updated"
+            await session.flush()
+            analysis_id = int(existing.id)
             await session.commit()
-            return {"analysis_id": existing.id, "status": status}
+            return {"analysis_id": analysis_id, "status": status}
 
     async def get_corporate_action_llm_analyses(
         self,
@@ -5192,8 +5195,9 @@ class DatabaseOperations:
                     review.updated_at = get_shanghai_time()
                     review_status = "updated"
                 await session.flush()
+                review_id = int(review.id)
 
-                terms_values["review_id"] = review.id
+                terms_values["review_id"] = review_id
                 terms = await session.scalar(
                     select(CorporateActionResolvedTermsDB).where(
                         CorporateActionResolvedTermsDB.instrument_id == instrument_id,
@@ -5215,6 +5219,7 @@ class DatabaseOperations:
                     terms.updated_at = get_shanghai_time()
                     terms_status = "updated"
                 await session.flush()
+                resolved_terms_id = int(terms.id)
 
                 evidence_write = None
                 if prepared_evidence is not None:
@@ -5258,9 +5263,9 @@ class DatabaseOperations:
                         evidence_write["changed"] = 1
 
             return {
-                "review": {"review_id": review.id, "status": review_status},
+                "review": {"review_id": review_id, "status": review_status},
                 "terms_write": {
-                    "resolved_terms_id": terms.id,
+                    "resolved_terms_id": resolved_terms_id,
                     "status": terms_status,
                 },
                 "evidence_write": evidence_write,

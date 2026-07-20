@@ -209,6 +209,136 @@ def test_share_reform_mixed_distribution_accepts_official_implementation_evidenc
     assert normalized["_review_classification"]["review_tier"] == "quick_review"
 
 
+def test_share_reform_pdf_spacing_and_same_day_roles_validate_candidate():
+    page = _page(
+        "股权分置改革方案实施公告。股权登记日为2006年6月1 2日，"
+        "对价股份上市日为2006年6月1 4日，复牌日为2006年6月1 4日。"
+        "流通股股东每10股定向送红股6.8股，实际可获得转增股份3.4股。"
+    )
+    result = _result(
+        page,
+        effective_date="2006-06-14",
+        effective_date_type="listing_date",
+        date_basis="对价股份上市日",
+        event_type="share_reform",
+        economic_terms={
+            "cash_dividend": None,
+            "bonus_shares": {
+                "value": 6.8, "unit": "per_10_shares", "currency": None,
+            },
+            "capitalization_shares": {
+                "value": 3.4, "unit": "per_10_shares", "currency": None,
+            },
+            "rights_shares": None,
+            "rights_price": None,
+        },
+        alternative_dates=[
+            {
+                "date": "2006-06-12",
+                "date_type": "record_date",
+                "date_basis": "股权登记日",
+                "reason": "公告明确披露",
+            },
+            {
+                "date": "2006-06-14",
+                "date_type": "resumption_date",
+                "date_basis": "复牌日",
+                "reason": "公告明确披露",
+            },
+        ],
+        conflicts=[],
+    )
+    result["evidence"][0]["supports_fields"] = [
+        "effective_date",
+        "effective_date_type",
+        "date_basis",
+        "event_type",
+        "bonus_shares",
+        "capitalization_shares",
+    ]
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["effective_date_type"] == "resumption_date"
+    assert normalized["date_basis"] == "复牌日"
+    assert normalized["conflicts"] == []
+
+
+@pytest.mark.parametrize("conflict", [
+    "Page 1 and page 3 state different ex-dividend dates.",
+    "Page 1 and page 3 state different stock short-name change dates.",
+])
+def test_any_reported_conflict_requires_deep_review(conflict):
+    page = _page()
+    result = _result(
+        page,
+        conflicts=[conflict],
+    )
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["no_conflict"] is False
+    assert normalized["_review_classification"]["review_tier"] == "deep_review"
+
+
+def test_same_day_role_normalization_requires_role_evidence():
+    page = _page(
+        "股权分置改革方案实施公告。对价股份上市日为2006年6月14日。"
+    )
+    result = _result(
+        page,
+        effective_date="2006-06-14",
+        effective_date_type="listing_date",
+        event_type="share_reform",
+        alternative_dates=[{
+            "date": "2006-06-14",
+            "date_type": "resumption_date",
+            "date_basis": "复牌日",
+            "reason": "模型推测",
+        }],
+    )
+    result["evidence"][0]["supports_fields"] = [
+        "effective_date", "effective_date_type", "date_basis", "event_type",
+        "cash_dividend",
+    ]
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["effective_date_type_compatible"] is False
+    assert normalized["effective_date_type"] == "listing_date"
+
+
+def test_date_evidence_does_not_join_across_line_breaks():
+    page = _page("除权除息日为2026年6月1\n4日后办理其他事项。每10股派2.36元。")
+    status, gates, _ = validate_analysis(
+        _result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["date_in_evidence"] is False
+
+
 def test_ordinary_distribution_cannot_be_mislabeled_as_share_reform():
     page = _page()
     status, gates, normalized = validate_analysis(
