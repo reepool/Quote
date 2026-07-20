@@ -1,6 +1,7 @@
 import json
 from copy import deepcopy
 from datetime import date
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
@@ -16,17 +17,23 @@ from data_sources.cninfo_corporate_action_documents import (
 from data_sources.cninfo_corporate_action_llm import (
     ANALYSIS_SCHEMA,
     CninfoCorporateActionLlmResolver,
+    LEGACY_ANALYSIS_SCHEMA,
+    LEGACY_SCHEMA_VERSION,
     MAX_ANALYSIS_OUTPUT_TOKENS,
+    MAX_DATE_FACTS,
+    MAX_ECONOMIC_DERIVATIONS,
     MAX_EVENT_PAGES,
     MAX_EVENT_PROMPT_CHARACTERS,
     SCHEMA_VERSION,
+    _derive_economic_terms,
+    analysis_schema_for_version,
     normalize_analysis_result,
     validate_analysis,
 )
 from utils.llm import LlmDeadlineExceededError
 
 
-def _page(text="本次权益分派每10股派2.36元，除权除息日为2026年6月12日。"):
+def _page(text="本次权益分派向全体股东每10股派2.36元，除权除息日为2026年6月12日。"):
     import hashlib
 
     return CorporateActionPageText(
@@ -39,7 +46,7 @@ def _page(text="本次权益分派每10股派2.36元，除权除息日为2026年
 
 def _result(page, **overrides):
     result = {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": LEGACY_SCHEMA_VERSION,
         "instrument_id": "000001.SZ",
         "source_event_key": "event-1",
         "event_match": True,
@@ -69,6 +76,28 @@ def _result(page, **overrides):
         "confidence": 0.99,
         "reason": "正文明确披露",
     }
+    result.update(overrides)
+    return result
+
+
+def _v2_result(page, **overrides):
+    result = _result(page)
+    result["schema_version"] = SCHEMA_VERSION
+    result["evidence"][0]["evidence_id"] = "ev-1"
+    result["date_facts"] = [{
+        "date": "2026-06-12",
+        "date_type": "ex_dividend_date",
+        "date_basis": "除权除息日",
+        "evidence_ids": ["ev-1"],
+    }]
+    result["economic_primitives"] = [{
+        "fact_id": "cash-ratio",
+        "fact_type": "cash_ratio",
+        "value": 2.36,
+        "unit": "CNY_per_10_shares",
+        "beneficiary_scope": "all_shareholders",
+        "evidence_ids": ["ev-1"],
+    }]
     result.update(overrides)
     return result
 
@@ -135,6 +164,444 @@ def test_analysis_schema_bounds_canonical_fields():
     assert properties["alternative_dates"]["items"]["required"] == [
         "date", "date_type", "date_basis", "reason",
     ]
+    assert properties["alternative_dates"]["maxItems"] == MAX_DATE_FACTS
+    assert "evidence_id" in properties["evidence"]["items"]["required"]
+    assert {"date_facts", "economic_primitives"}.issubset(
+        ANALYSIS_SCHEMA["required"]
+    )
+
+
+def test_schema_dispatch_preserves_legacy_contract():
+    assert analysis_schema_for_version(LEGACY_SCHEMA_VERSION) is LEGACY_ANALYSIS_SCHEMA
+    assert analysis_schema_for_version(SCHEMA_VERSION) is ANALYSIS_SCHEMA
+    with pytest.raises(ValueError, match="unsupported"):
+        analysis_schema_for_version("unknown")
+
+
+def test_v2_direct_ratio_and_official_date_fact_validate():
+    page = _page(
+        "本次权益分派向全体股东每10股派2.36元，"
+        "除权除息日为2026年6月12日。"
+    )
+    status, gates, normalized = validate_analysis(
+        _v2_result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="dividend",
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["economic_terms"]["cash_dividend"]["value"] == 2.36
+    assert normalized["economic_derivations"][0]["formula_id"] == (
+        "direct_cash_ratio_normalization_v1"
+    )
+
+
+def _share_reform_v2_result(page):
+    result = _v2_result(
+        page,
+        event_type="share_reform",
+        effective_date="2006-06-14",
+        effective_date_type="listing_date",
+        date_basis="上市日",
+        economic_terms={
+            "cash_dividend": {
+                "value": 0.3581058,
+                "unit": "per_10_shares",
+                "currency": "CNY",
+            },
+            "bonus_shares": {
+                "value": 6.8, "unit": "per_10_shares", "currency": None,
+            },
+            "capitalization_shares": {
+                "value": 3.4, "unit": "per_10_shares", "currency": None,
+            },
+            "rights_shares": None,
+            "rights_price": None,
+        },
+    )
+    result["date_facts"] = [
+        {
+            "date": "2006-06-12",
+            "date_type": "record_date",
+            "date_basis": "股权登记日",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "date": "2006-06-14",
+            "date_type": "listing_date",
+            "date_basis": "上市日",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "date": "2006-06-14",
+            "date_type": "resumption_date",
+            "date_basis": "复牌日",
+            "evidence_ids": ["ev-1"],
+        },
+    ]
+    result["economic_primitives"] = [
+        {
+            "fact_id": "bonus-total",
+            "fact_type": "bonus_share_total",
+            "value": 33574.8504,
+            "unit": "10k_shares",
+            "beneficiary_scope": "circulating_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "fact_id": "bonus-ratio",
+            "fact_type": "bonus_ratio",
+            "value": 6.8,
+            "unit": "per_10_shares",
+            "beneficiary_scope": "circulating_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "fact_id": "capitalization-ratio",
+            "fact_type": "capitalization_ratio",
+            "value": 3.4,
+            "unit": "per_10_shares",
+            "beneficiary_scope": "circulating_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "fact_id": "cash-total",
+            "fact_type": "cash_total",
+            "value": 1768.1397,
+            "unit": "10k_CNY",
+            "beneficiary_scope": "circulating_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+    ]
+    return result
+
+
+def test_v2_same_day_roles_and_chained_cash_derivation():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日为2006年6月14日，复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "现金对价总额1,768.1397万元。"
+    )
+    status, gates, normalized = validate_analysis(
+        _share_reform_v2_result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["effective_date"] == "2006-06-14"
+    assert normalized["effective_date_type"] == "resumption_date"
+    assert {item["date_type"] for item in normalized["alternative_dates"]} == {
+        "record_date", "listing_date",
+    }
+    cash_derivation = next(
+        item for item in normalized["economic_derivations"]
+        if item["output_field"] == "cash_dividend"
+    )
+    assert cash_derivation["formula_id"] == "cash_total_over_derived_base_v1"
+    assert float(cash_derivation["output_value"]) == pytest.approx(0.03581058)
+
+
+def test_v2_unsupported_date_role_cannot_be_selected():
+    page = _page(
+        "向全体股东每10股派2.36元，除权除息日为2026年6月12日。"
+    )
+    result = _v2_result(page)
+    result["date_facts"].append({
+        "date": "2026-06-13",
+        "date_type": "listing_date",
+        "date_basis": "上市日",
+        "evidence_ids": ["ev-1"],
+    })
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["date_facts_in_evidence"] is False
+    assert normalized["effective_date"] == "2026-06-12"
+
+
+def test_v2_date_role_must_be_bound_to_its_own_date():
+    page = _page(
+        "股权登记日为2006年6月12日，复牌日为2006年6月14日。"
+        "向全体股东每10股派2.36元。"
+    )
+    result = _v2_result(
+        page,
+        event_type="share_reform",
+        effective_date="2006-06-12",
+        effective_date_type="resumption_date",
+        date_basis="复牌日",
+    )
+    result["date_facts"] = [{
+        "date": "2006-06-12",
+        "date_type": "resumption_date",
+        "date_basis": "复牌日",
+        "evidence_ids": ["ev-1"],
+    }]
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["date_facts_in_evidence"] is False
+    assert normalized["effective_date"] is None
+
+
+def test_v2_duplicate_date_facts_merge_official_evidence_ids():
+    page = _page()
+    result = _v2_result(page)
+    second_evidence = deepcopy(result["evidence"][0])
+    second_evidence["evidence_id"] = "ev-2"
+    result["evidence"].append(second_evidence)
+    result["date_facts"].append({
+        "date": "2026-06-12",
+        "date_type": "ex_dividend_date",
+        "date_basis": "除权除息日",
+        "evidence_ids": ["ev-2"],
+    })
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "validated_candidate"
+    assert all(gates.values())
+    assert normalized["date_facts"] == [{
+        "date": "2026-06-12",
+        "date_type": "ex_dividend_date",
+        "date_basis": "除权除息日",
+        "evidence_ids": ["ev-1", "ev-2"],
+    }]
+
+
+def test_v2_same_role_date_conflict_leaves_no_canonical_date():
+    page = _page(
+        "向全体股东每10股派2.36元，除权除息日为2026年6月12日；"
+        "更正后的除权除息日为2026年6月13日。"
+    )
+    result = _v2_result(page)
+    result["date_facts"].append({
+        "date": "2026-06-13",
+        "date_type": "ex_dividend_date",
+        "date_basis": "更正后的除权除息日",
+        "evidence_ids": ["ev-1"],
+    })
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+    )
+    assert status == "manual_required"
+    assert gates["no_conflict"] is False
+    assert normalized["effective_date"] is None
+    assert normalized["_date_fact_conflicts"]
+
+
+def test_v2_scope_mismatch_blocks_total_derivation():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日及复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股；"
+        "向全体股东支付现金对价总额1,768.1397万元。"
+    )
+    result = _share_reform_v2_result(page)
+    result["economic_primitives"][-1]["beneficiary_scope"] = "all_shareholders"
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["economic_terms_in_evidence"] is False
+    assert not any(
+        item["output_field"] == "cash_dividend"
+        for item in normalized["economic_derivations"]
+    )
+
+
+def test_v2_primitive_scope_cannot_be_borrowed_from_another_clause():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日及复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股；"
+        "向全体股东支付现金对价总额1,768.1397万元。"
+    )
+    result = _share_reform_v2_result(page)
+    result["economic_primitives"][0]["beneficiary_scope"] = "all_shareholders"
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+
+def test_v2_primitive_value_must_match_its_fact_type_and_unit():
+    page = _page(
+        "向全体股东每10股送6.8股，送股总数33,574万股，"
+        "除权除息日为2026年6月12日。"
+    )
+    result = _v2_result(
+        page,
+        event_type="bonus_issue",
+        economic_terms={
+            "cash_dividend": None,
+            "bonus_shares": {
+                "value": 6.8, "unit": "per_10_shares", "currency": None,
+            },
+            "capitalization_shares": None,
+            "rights_shares": None,
+            "rights_price": None,
+        },
+    )
+    result["economic_primitives"] = [
+        {
+            "fact_id": "wrong-total",
+            "fact_type": "bonus_share_total",
+            "value": 6.8,
+            "unit": "shares",
+            "beneficiary_scope": "all_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+        {
+            "fact_id": "bonus-ratio",
+            "fact_type": "bonus_ratio",
+            "value": 6.8,
+            "unit": "per_10_shares",
+            "beneficiary_scope": "all_shareholders",
+            "evidence_ids": ["ev-1"],
+        },
+    ]
+    status, gates, _ = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="bonus",
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+    cash_page = _page()
+    invalid_unit = _v2_result(cash_page)
+    invalid_unit["economic_primitives"][0]["unit"] = "CNY"
+    status, gates, _ = validate_analysis(
+        invalid_unit,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[cash_page],
+    )
+    assert status == "manual_required"
+    assert gates["economic_primitives_in_evidence"] is False
+
+
+def test_v2_derivation_catalog_is_bounded_and_fails_closed():
+    primitives = []
+    for index in range(8):
+        primitives.append({
+            "fact_id": f"total-{index}",
+            "fact_type": "bonus_share_total",
+            "beneficiary_scope": "all_shareholders",
+            "evidence_ids": ["ev-1"],
+            "_normalized_value": Decimal(index + 1) * 100,
+            "_normalized_unit": "shares",
+        })
+        primitives.append({
+            "fact_id": f"ratio-{index}",
+            "fact_type": "bonus_ratio",
+            "beneficiary_scope": "all_shareholders",
+            "evidence_ids": ["ev-1"],
+            "_normalized_value": Decimal(index + 1) / 10,
+            "_normalized_unit": "per_share",
+        })
+    derivations, resolved, conflicts = _derive_economic_terms(primitives)
+    assert len(derivations) == MAX_ECONOMIC_DERIVATIONS
+    assert resolved == {}
+    assert any("exceeded the bounded limit" in item for item in conflicts)
+
+
+def test_v2_model_arithmetic_mismatch_and_formula_conflict_fail_closed():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日及复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "现金对价总额1,768.1397万元；另向流通股股东每10股派0.5元。"
+    )
+    result = _share_reform_v2_result(page)
+    result["economic_primitives"].append({
+        "fact_id": "cash-ratio-conflict",
+        "fact_type": "cash_ratio",
+        "value": 0.5,
+        "unit": "CNY_per_10_shares",
+        "beneficiary_scope": "circulating_shareholders",
+        "evidence_ids": ["ev-1"],
+    })
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["no_conflict"] is False
+    assert gates["economic_terms_in_evidence"] is False
+    assert normalized["economic_derivation_conflicts"]
+
+
+def test_v2_model_arithmetic_mismatch_fails_without_formula_conflict():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日及复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "现金对价总额1,768.1397万元。"
+    )
+    result = _share_reform_v2_result(page)
+    result["economic_terms"]["cash_dividend"]["value"] = 0.5
+    status, gates, normalized = validate_analysis(
+        result,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "manual_required"
+    assert gates["no_conflict"] is True
+    assert gates["economic_terms_in_evidence"] is False
+    assert normalized["economic_derivation_conflicts"] == []
 
 
 def test_safe_unit_and_currency_aliases_are_normalized_without_fact_changes():
@@ -550,7 +1017,7 @@ async def test_truncated_event_context_cannot_be_validated():
         for index in range(2, MAX_EVENT_PAGES + 3)
     ]
     client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_result(first_page), response_hash="response-hash",
+        data=_v2_result(first_page), response_hash="response-hash",
         request_id="request-1", model="fake", latency_ms=10,
         attempt_count=1, usage=None,
     )))
@@ -567,7 +1034,7 @@ async def test_truncated_event_context_cannot_be_validated():
 async def test_resolver_uses_common_gateway_and_untrusted_content_guard():
     page = _page()
     response = SimpleNamespace(
-        data=_result(page), response_hash="response-hash", request_id="request-1",
+        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
         model="fake", latency_ms=10, attempt_count=1, usage=None,
     )
     client = SimpleNamespace(complete=AsyncMock(return_value=response))
@@ -623,7 +1090,7 @@ async def test_data_manager_dry_run_never_persists_documents_or_analysis(monkeyp
     )
     monkeypatch.setattr(CninfoCorporateActionDocumentService, "ingest", lambda self, **kwargs: bundle)
     client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_result(page), response_hash="response-hash", request_id="request-1",
+        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
         model="fake", latency_ms=10, attempt_count=1,
         usage=SimpleNamespace(input_tokens=100, output_tokens=50, total_tokens=150),
         warnings=("provider_output_budget_exceeded",),
@@ -706,6 +1173,107 @@ async def test_review_promotes_only_archived_validated_official_evidence():
     assert terms["evidence"]["economic_field_evidence"]["cash_dividend"]
 
 
+@pytest.mark.asyncio
+async def test_v2_review_revalidates_and_persists_derived_term_lineage():
+    page = _page(
+        "股权分置改革方案实施公告。流通股股东股权登记日为2006年6月12日，"
+        "对价股份上市日为2006年6月14日，复牌日为2006年6月14日。"
+        "向流通股股东每10股送6.8股并转增3.4股，送股总数33,574.8504万股，"
+        "现金对价总额1,768.1397万元。"
+    )
+    status, _, normalized = validate_analysis(
+        _share_reform_v2_result(page),
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="mixed_distribution",
+        candidate_titles=["股权分置改革方案实施公告"],
+    )
+    assert status == "validated_candidate"
+    manager = _manual_review_manager(
+        page, normalized, validation_status="validated_candidate"
+    )
+    manager.db_ops.get_corporate_action_observations.return_value = {
+        "items": [{
+            "instrument_id": "000001.SZ",
+            "source_event_key": "event-1",
+            "source_profile": "cninfo_dividend",
+            "action_type": "mixed_distribution",
+        }]
+    }
+    manager.db_ops.get_corporate_action_effective_date_evidence.return_value = {
+        "items": [{
+            "announcement_id": "ann-1",
+            "announcement_title": "股权分置改革方案实施公告",
+            "source_profile": "cninfo_dividend",
+        }]
+    }
+    result = await manager.review_cninfo_corporate_action_resolution({
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 7,
+        "evidence_key": "ann-1",
+        "decision": "resolved",
+        "effective_date": "2006-06-14",
+        "date_basis": "复牌日",
+        "reviewer": "unit-reviewer",
+    })
+    assert result["status"] == "success"
+    terms = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs[
+        "terms_row"
+    ]
+    assert terms["cash_dividend_per_share"] == pytest.approx(0.03581058)
+    assert terms["bonus_shares_per_share"] == pytest.approx(0.68)
+    assert terms["capitalization_shares_per_share"] == pytest.approx(0.34)
+    assert terms["evidence"]["economic_field_evidence"]["cash_dividend"]
+
+
+@pytest.mark.asyncio
+async def test_v2_review_derives_canonical_date_after_fact_correction():
+    page = _page()
+    original = _v2_result(page)
+    original["date_facts"] = [{
+        "date": "2026-06-12",
+        "date_type": "listing_date",
+        "date_basis": "上市日",
+        "evidence_ids": ["ev-1"],
+    }]
+    status, _, normalized = validate_analysis(
+        original,
+        instrument_id="000001.SZ",
+        source_event_key="event-1",
+        pages=[page],
+        source_profile="cninfo_dividend",
+        action_type="dividend",
+    )
+    assert status == "manual_required"
+    assert normalized["effective_date"] is None
+    manager = _manual_review_manager(
+        page, normalized, validation_status="manual_required"
+    )
+    result = await manager.review_cninfo_corporate_action_resolution({
+        "instrument_id": "000001.SZ",
+        "source_event_key": "event-1",
+        "analysis_id": 7,
+        "evidence_key": "ann-1",
+        "decision": "resolved",
+        "reviewer": "unit-reviewer",
+        "corrected_result": {
+            "date_facts": [{
+                "date": "2026-06-12",
+                "date_type": "ex_dividend_date",
+                "date_basis": "除权除息日",
+                "evidence_ids": ["ev-1"],
+            }],
+        },
+    })
+    assert result["status"] == "success"
+    saved = manager.db_ops.save_corporate_action_review_bundle.await_args.kwargs
+    assert saved["evidence_row"]["effective_date"] == "2026-06-12"
+    assert saved["evidence_row"]["date_basis"] == "除权除息日"
+
+
 def _manual_review_manager(page, analysis_result, *, validation_status):
     manager = DataManager()
     manager.db_ops = Mock()
@@ -714,7 +1282,7 @@ def _manual_review_manager(page, analysis_result, *, validation_status):
             "analysis_id": 7,
             "validation_status": validation_status,
             "gate_results": {"date_in_evidence": validation_status == "validated_candidate"},
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": analysis_result.get("schema_version"),
             "prompt_version": "prompt.v1",
             "parser_version": "parser.v1",
             "input_hash": "a" * 64,
@@ -984,7 +1552,7 @@ async def test_refresh_documents_rechecks_existing_announcement(monkeypatch):
     ingest = Mock(return_value=bundle)
     monkeypatch.setattr(CninfoCorporateActionDocumentService, "ingest", ingest)
     client = SimpleNamespace(complete=AsyncMock(return_value=SimpleNamespace(
-        data=_result(page), response_hash="response-hash", request_id="request-1",
+        data=_v2_result(page), response_hash="response-hash", request_id="request-1",
         model="fake", latency_ms=10, attempt_count=1, usage=None,
     )))
     result = await manager.analyze_cninfo_corporate_action_candidates(

@@ -110,7 +110,7 @@ candidate 公告元数据
 ```text
 profile=semantic_extraction
 schema_name=cninfo_corporate_action_resolution
-schema_version=cninfo_corporate_action_resolution.v1
+schema_version=cninfo_corporate_action_resolution.v2
 ```
 
 模型初始配置可使用 `grok-4.5`，但业务代码不得判断或写死模型名称。
@@ -131,20 +131,21 @@ section。不能把不同事件合并成一个无边界 prompt。
 
 ## 7. 结构化输出 schema
 
-`cninfo_corporate_action_resolution.v1` 至少包含：
+`cninfo_corporate_action_resolution.v2` 保留 v1 的规范日期和经济字段，并增加证据 ID、
+多角色日期事实和经济原始事实。历史 v1 分析继续按 v1 schema 审核，不要求迁移：
 
 ```json
 {
-  "schema_version": "cninfo_corporate_action_resolution.v1",
+  "schema_version": "cninfo_corporate_action_resolution.v2",
   "instrument_id": "600108.SH",
   "source_event_key": "...",
   "event_match": true,
   "analysis_status": "resolved_candidate",
   "event_type": "share_reform",
   "event_stage": "implemented",
-  "effective_date": "2006-06-12",
-  "effective_date_type": "implementation_date",
-  "date_basis": "official_announcement_explicit_statement",
+  "effective_date": "2006-06-14",
+  "effective_date_type": "resumption_date",
+  "date_basis": "复牌日",
   "economic_terms": {
     "cash_dividend": {"value": 0.03581058, "unit": "per_share", "currency": "CNY"},
     "bonus_shares": {"value": 6.8, "unit": "per_10_shares", "currency": null},
@@ -154,6 +155,7 @@ section。不能把不同事件合并成一个无边界 prompt。
   },
   "evidence": [
     {
+      "evidence_id": "ev-1",
       "announcement_id": "17286704",
       "section_id": "17286704:p3",
       "page_number": 3,
@@ -162,7 +164,18 @@ section。不能把不同事件合并成一个无边界 prompt。
       "supports_fields": ["event_stage", "effective_date"]
     }
   ],
-  "alternative_dates": [],
+  "date_facts": [
+    {"date": "2006-06-14", "date_type": "listing_date", "date_basis": "上市日", "evidence_ids": ["ev-1"]},
+    {"date": "2006-06-14", "date_type": "resumption_date", "date_basis": "复牌日", "evidence_ids": ["ev-1"]}
+  ],
+  "economic_primitives": [
+    {"fact_id": "bonus-total", "fact_type": "bonus_share_total", "value": 33574.8504, "unit": "10k_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]},
+    {"fact_id": "bonus-ratio", "fact_type": "bonus_ratio", "value": 6.8, "unit": "per_10_shares", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]},
+    {"fact_id": "cash-total", "fact_type": "cash_total", "value": 1768.1397, "unit": "10k_CNY", "beneficiary_scope": "circulating_shareholders", "evidence_ids": ["ev-1"]}
+  ],
+  "alternative_dates": [
+    {"date": "2006-06-14", "date_type": "listing_date", "date_basis": "上市日", "reason": "validated official date fact"}
+  ],
   "conflicts": [],
   "confidence": 0.98,
   "reason": "正文明确说明方案实施日期"
@@ -204,6 +217,24 @@ LLM 返回后必须由程序执行以下校验：
 10. TDX 或行情日期只产生 comparison warning，不能覆盖官方正文日期；
 11. OCR 低质量、页码缺失、正文截断或引用不精确时禁止自动确认；
 12. 模型置信度不能替代上述任何证据门槛。
+
+v2 额外执行以下治理：
+
+- 每条 `date_facts` 必须引用同一语义片段中同时包含日期和对应角色的官方原文，不能把同一
+  引文里的登记日与复牌日交叉配对；同一天可同时是上市日、复牌日等不同角色，不视为冲突；
+- 规范有效日期按事件类型确定性选择，普通分红优先除权除息日，股改依次优先除权日、
+  复牌日、实施日和对价支付日；同一角色出现不同日期时禁止自动选择；
+- `economic_primitives` 只保存公告直接披露的数值、单位、受益范围和 evidence ID，数值必须
+  与具体动作和单位绑定，且 fact type 必须使用允许的单位；`unknown` 范围或无法在原文复核的
+  原始事实不得参与计算；
+- 程序使用 `Decimal` 和命名公式执行每股/每十股归一、`分配股份总数 / 分配比例 = 计股基数`
+  以及 `经济条款总额 / 计股基数 = 每股条款`；不得执行模型返回的表达式；
+- 每项程序派生结果保存公式 ID、输入 fact ID、规范输入、输出、容差和 evidence lineage；
+  不同受益范围不能混算，多条公式结果实质冲突时保持 `manual_required`；
+- 等价原始事实合并证据后再计算；公式组合超过有界目录时 fail closed，避免分析 JSON 超过
+  schema 上限或审核阶段无法重放；
+- 模型未填写规范经济条款但存在唯一可复算结果时，解析器可补入候选规范值；模型已填写时，
+  必须与程序复算值在容差内一致。
 
 校验结果应包含每条 gate 的通过状态和失败原因，便于人工复核。
 
@@ -312,7 +343,7 @@ refresh_documents
 耗时和安全错误分类，不记录 API Key、完整 prompt、完整公告正文或模型原始响应。
 
 当前 `semantic_extraction` 根据供应商实测长尾采用单次 300 秒、总 deadline 620 秒和最多一次
-重试。公司行动结构化输出限制为 4096 tokens，并通过 `max_completion_tokens` 发送给当前
+重试。v2 公司行动结构化输出限制为 8192 tokens，并通过 `max_completion_tokens` 发送给当前
 OpenAI-compatible 服务。若供应商 usage 仍超过预算，任务报告会增加
 `provider_output_budget_overruns`；出现超限时应停止扩大批次并先确认供应商参数契约。
 如果后续供应商时延分布变化，应根据日志中的 attempt latency 调整，而不是缩短到低于已观测的
@@ -517,9 +548,9 @@ POST /api/v1/corporate-actions/resolution-reviews/batch
 
 ## 18. 当前验证状态
 
-离线回归已覆盖公共 LLM payload、Schema/单位规范化、`600108.SH` 股改兼容、相关日期与
-同义冲突、审核分层、最新分析审核队列、人工纠错、批量隔离、日志报告和 CNInfo 因子边界。
+离线回归已覆盖公共 LLM payload、v1/v2 Schema 兼容、同日多角色日期、经济原始事实、
+确定性公式与范围冲突、`600108.SH` 股改样本、审核分层、人工纠错、日志报告和 CNInfo 因子边界。
 
 仍需运维批准后执行一次小额真实供应商调用，确认当前 OpenAI-compatible 服务实际遵守
-`max_completion_tokens=4096`，并观察返回 usage 是否仍包含隐藏推理 token。该验证只需使用
+`max_completion_tokens=8192`，并观察返回 usage 是否仍包含隐藏推理 token。该验证只需使用
 1 至 2 个冻结事件；若报告出现 `provider_output_budget_overruns > 0`，不得开始全历史扩量。

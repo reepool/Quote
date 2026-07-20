@@ -19249,7 +19249,8 @@ class DataManager:
                         "[DataManager] CNInfo LLM analysis completed: run_id=%s event=%s "
                         "validation_status=%s review_tier=%s gate_signature=%s "
                         "attempts=%s latency_ms=%s passed_gates=%s/%s "
-                        "failed_gates=%s usage=%s warnings=%s",
+                        "failed_gates=%s date_facts=%s economic_primitives=%s "
+                        "economic_derivations=%s derivation_conflicts=%s usage=%s warnings=%s",
                         run_id,
                         event.get("source_event_key"),
                         analysis.validation_status,
@@ -19263,6 +19264,10 @@ class DataManager:
                             key for key, value in analysis.gate_results.items()
                             if value is not True
                         ),
+                        len(analysis.result.get("date_facts") or []),
+                        len(analysis.result.get("economic_primitives") or []),
+                        len(analysis.result.get("economic_derivations") or []),
+                        len(analysis.result.get("economic_derivation_conflicts") or []),
                         analysis.usage,
                         list(analysis.warnings),
                     )
@@ -19416,9 +19421,10 @@ class DataManager:
             CorporateActionPageText,
         )
         from data_sources.cninfo_corporate_action_llm import (
-            ANALYSIS_SCHEMA,
+            analysis_schema_for_version,
             canonical_supported_economic_fields,
             normalize_analysis_result,
+            official_quote_supports_date,
             validate_analysis,
         )
         from utils.llm import LlmSchemaValidationError
@@ -19469,6 +19475,8 @@ class DataManager:
             "economic_terms",
             "evidence",
             "alternative_dates",
+            "date_facts",
+            "economic_primitives",
             "conflicts",
         }
         unsupported_corrections = sorted(
@@ -19510,28 +19518,17 @@ class DataManager:
                 )
             normalized_proposed = normalize_analysis_result(proposed_result)
             try:
-                validate_data(normalized_proposed, ANALYSIS_SCHEMA)
-            except LlmSchemaValidationError as exc:
-                raise ValueError("corrected_result does not match the analysis schema") from exc
-            effective_date = effective_date or normalized_proposed.get(
-                "effective_date"
-            )
-            date_basis = date_basis or str(
-                normalized_proposed.get("date_basis") or ""
-            ).strip() or None
-            if payload.get("effective_date") and str(payload["effective_date"])[:10] != str(
-                normalized_proposed.get("effective_date") or ""
-            )[:10]:
-                raise ValueError(
-                    "review effective_date conflicts with corrected_result"
+                validate_data(
+                    normalized_proposed,
+                    analysis_schema_for_version(
+                        normalized_proposed.get("schema_version")
+                    ),
                 )
-            if payload.get("date_basis") and str(payload["date_basis"]).strip() != str(
-                normalized_proposed.get("date_basis") or ""
-            ).strip():
-                raise ValueError("review date_basis conflicts with corrected_result")
-            if not effective_date or not date_basis or not evidence_key:
+            except (LlmSchemaValidationError, ValueError) as exc:
+                raise ValueError("corrected_result does not match the analysis schema") from exc
+            if not evidence_key:
                 raise ValueError(
-                    "resolved review requires effective_date, date_basis, and evidence_key"
+                    "resolved review requires evidence_key"
                 )
 
             observation_page = await self.db_ops.get_corporate_action_observations(
@@ -19629,10 +19626,51 @@ class DataManager:
                 raise ValueError(
                     "corrected result failed evidence gates: " + ", ".join(failed)
                 )
-            selected_evidence = next((
+            validated_effective_date = validated_result.get("effective_date")
+            validated_date_basis = str(
+                validated_result.get("date_basis") or ""
+            ).strip() or None
+            if payload.get("effective_date") and str(payload["effective_date"])[:10] != str(
+                validated_effective_date or ""
+            )[:10]:
+                raise ValueError(
+                    "review effective_date conflicts with validated result"
+                )
+            if payload.get("date_basis") and str(payload["date_basis"]).strip() != str(
+                validated_date_basis or ""
+            ).strip():
+                raise ValueError("review date_basis conflicts with validated result")
+            effective_date = payload.get("effective_date") or validated_effective_date
+            date_basis = (
+                str(payload.get("date_basis") or "").strip()
+                or validated_date_basis
+            )
+            if not effective_date or not date_basis:
+                raise ValueError(
+                    "resolved review requires effective_date and date_basis"
+                )
+            result_evidence = [
                 item for item in validated_result.get("evidence", [])
                 if isinstance(item, dict)
-                and str(item.get("announcement_id") or "") == evidence_key
+            ]
+            selected_date_fact = next((
+                item for item in validated_result.get("date_facts", [])
+                if isinstance(item, dict)
+                and str(item.get("date") or "")[:10] == str(effective_date)[:10]
+                and str(item.get("date_type") or "") == str(
+                    validated_result.get("effective_date_type") or ""
+                )
+            ), None)
+            preferred_evidence_ids = set(
+                (selected_date_fact or {}).get("evidence_ids") or []
+            )
+            selected_evidence = next((
+                item for item in result_evidence
+                if str(item.get("announcement_id") or "") == evidence_key
+                and (
+                    not preferred_evidence_ids
+                    or str(item.get("evidence_id") or "") in preferred_evidence_ids
+                )
                 and str(item.get("exact_quote") or "").strip()
                 and int(item.get("page_number") or 0) > 0
                 and str(item.get("text_hash") or "").strip()
@@ -19640,15 +19678,13 @@ class DataManager:
             if selected_evidence is None:
                 raise ValueError("selected official page evidence is missing or incomplete")
             try:
-                parsed_review_date = date.fromisoformat(str(effective_date)[:10])
+                date.fromisoformat(str(effective_date)[:10])
             except ValueError as exc:
                 raise ValueError("resolved effective_date must be ISO formatted") from exc
-            date_forms = {
-                parsed_review_date.isoformat(),
-                parsed_review_date.strftime("%Y年%m月%d日"),
-                f"{parsed_review_date.year}年{parsed_review_date.month}月{parsed_review_date.day}日",
-            }
-            if not any(form in str(selected_evidence.get("exact_quote") or "") for form in date_forms):
+            if not official_quote_supports_date(
+                str(effective_date)[:10],
+                str(selected_evidence.get("exact_quote") or ""),
+            ):
                 raise ValueError("review effective_date must appear in the selected official quote")
             resolved_source_profile = (
                 candidate_by_announcement.get(evidence_key) or {}
@@ -19713,6 +19749,12 @@ class DataManager:
         currency = None
         economic_field_evidence: Dict[str, List[Dict[str, Any]]] = {}
         if decision == "resolved":
+            evidence_by_id = {
+                str(item.get("evidence_id") or ""): item
+                for item in analysis_result.get("evidence", [])
+                if isinstance(item, dict)
+                and str(item.get("evidence_id") or "")
+            }
             for evidence in analysis_result.get("evidence", []):
                 if not isinstance(evidence, dict):
                     continue
@@ -19720,6 +19762,21 @@ class DataManager:
                     evidence.get("supports_fields")
                 ):
                     economic_field_evidence.setdefault(source_name, []).append(evidence)
+            for derivation in analysis_result.get("economic_derivations", []):
+                if not isinstance(derivation, dict):
+                    continue
+                source_name = str(derivation.get("output_field") or "")
+                if source_name not in term_field_map:
+                    continue
+                for evidence_id in derivation.get("evidence_ids") or []:
+                    evidence = evidence_by_id.get(str(evidence_id))
+                    if (
+                        evidence is not None
+                        and evidence not in economic_field_evidence.setdefault(
+                            source_name, []
+                        )
+                    ):
+                        economic_field_evidence[source_name].append(evidence)
             for source_name, field_name in term_field_map.items():
                 term = economic_terms.get(source_name)
                 if (
